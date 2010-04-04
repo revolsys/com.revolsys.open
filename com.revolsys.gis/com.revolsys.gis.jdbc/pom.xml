@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>com.revolsys.gis</artifactId>
+    <groupId>com.revolsys.gis</groupId>
+    <version>1.0.2-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.revolsys.gis</groupId>
+  <artifactId>com.revolsys.gis.jdbc</artifactId>
+  <name>GIS JDBC Tools</name>
+  <version>1.0.2-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>com.revolsys.gis</groupId>
+      <artifactId>com.revolsys.gis.core</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${org.springframework.version}</version>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>commons-logging</artifactId>
+      		<groupId>commons-logging</groupId>
+      	</exclusion>
+      	<exclusion>
+      		<artifactId>junit</artifactId>
+      		<groupId>junit</groupId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+</project>

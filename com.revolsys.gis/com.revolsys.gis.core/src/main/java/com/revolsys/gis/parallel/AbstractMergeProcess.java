@@ -1,0 +1,319 @@
+package com.revolsys.gis.parallel;
+
+import javax.xml.namespace.QName;
+
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.ClosedException;
+import com.revolsys.parallel.channel.MultiChannelReadSelector;
+import com.revolsys.parallel.process.AbstractInOutProcess;
+
+public abstract class AbstractMergeProcess extends
+  AbstractInOutProcess<DataObject> {
+
+  private static final int OTHER_INDEX = 1;
+
+  private static final int SOURCE_INDEX = 0;
+
+  private Channel<DataObject> otherIn;
+
+  protected boolean acceptObject(
+    final DataObject object) {
+    return true;
+  }
+
+  private void addObjectFromOtherChannel(
+    final Channel<DataObject>[] channels,
+    final boolean[] guard,
+    final DataObject[] objects,
+    final int channelIndex) {
+    int otherIndex;
+    if (channelIndex == SOURCE_INDEX) {
+      otherIndex = OTHER_INDEX;
+    } else {
+      otherIndex = SOURCE_INDEX;
+    }
+    final Channel<DataObject> otherChannel = channels[otherIndex];
+    if (otherChannel == null) {
+      guard[otherIndex] = false;
+      guard[channelIndex] = true;
+    } else if (guard[otherIndex]) {
+      while (objects[otherIndex] == null) {
+        try {
+          final DataObject object = otherChannel.read();
+          if (acceptObject(object)) {
+            objects[otherIndex] = object;
+            return;
+          }
+        } catch (final ClosedException e) {
+          guard[otherIndex] = false;
+          guard[channelIndex] = true;
+          return;
+        }
+      }
+    }
+  }
+
+  /**
+   * Add an object from the other (otherId) channel.
+   * 
+   * @param object The object to add.
+   */
+  protected abstract void addOtherObject(
+    DataObject object);
+
+  private DataObjectMetaData addSavedObjects(
+    final DataObjectMetaData currentType,
+    final QName currentTypeName,
+    final Channel<DataObject> out,
+    final boolean[] guard,
+    final DataObject[] objects) {
+    final DataObject sourceObject = objects[SOURCE_INDEX];
+    final DataObject otherObject = objects[OTHER_INDEX];
+    if (sourceObject == null) {
+      if (otherObject == null) {
+        return null;
+      } else {
+        addOtherObject(otherObject);
+        objects[OTHER_INDEX] = null;
+        guard[OTHER_INDEX] = true;
+        return otherObject.getMetaData();
+      }
+    } else if (otherObject == null) {
+      if (sourceObject == null) {
+        return null;
+      } else {
+        addSourceObject(sourceObject);
+        objects[SOURCE_INDEX] = null;
+        guard[SOURCE_INDEX] = true;
+        return sourceObject.getMetaData();
+      }
+    } else {
+      final DataObjectMetaData sourceType = sourceObject.getMetaData();
+      final QName sourceTypeName = sourceType.getName();
+      final DataObjectMetaData otherType = otherObject.getMetaData();
+      final QName otherTypeName = otherType.getName();
+      if (sourceTypeName.equals(currentTypeName)) {
+        addSourceObject(sourceObject);
+        objects[SOURCE_INDEX] = null;
+        guard[SOURCE_INDEX] = true;
+        objects[OTHER_INDEX] = otherObject;
+        guard[OTHER_INDEX] = false;
+        return currentType;
+      } else if (otherTypeName.equals(currentTypeName)) {
+        addOtherObject(otherObject);
+        objects[SOURCE_INDEX] = sourceObject;
+        guard[SOURCE_INDEX] = false;
+        objects[OTHER_INDEX] = null;
+        guard[OTHER_INDEX] = true;
+        return currentType;
+      } else {
+        processObjects(currentType, out);
+        final int nameCompare = sourceTypeName.toString().compareTo(
+          otherTypeName.toString());
+        if (nameCompare < 0) {
+          // If the first feature type name is < second feature type
+          // name
+          // then add the first feature and save the second feature
+          // for later
+          addSourceObject(sourceObject);
+          objects[SOURCE_INDEX] = null;
+          guard[SOURCE_INDEX] = true;
+          objects[OTHER_INDEX] = otherObject;
+          guard[OTHER_INDEX] = false;
+          return sourceType;
+        } else if (nameCompare == 0) {
+          // If both features have the same type them add them
+          addSourceObject(sourceObject);
+          addOtherObject(otherObject);
+          objects[SOURCE_INDEX] = null;
+          guard[SOURCE_INDEX] = true;
+          objects[OTHER_INDEX] = null;
+          guard[OTHER_INDEX] = true;
+          return sourceType;
+        } else {
+          // If the first feature type name is > second feature type
+          // name
+          // then add the second feature and save the first feature
+          // for later
+          addOtherObject(otherObject);
+          objects[SOURCE_INDEX] = sourceObject;
+          guard[SOURCE_INDEX] = false;
+          objects[OTHER_INDEX] = null;
+          guard[OTHER_INDEX] = true;
+          return otherType;
+        }
+      }
+    }
+
+  }
+
+  /**
+   * Add an object from the source (in) channel.
+   * 
+   * @param object The object to add.
+   */
+  protected abstract void addSourceObject(
+    DataObject object);
+
+  /**
+   * @return the in
+   */
+  public Channel<DataObject> getOtherIn() {
+    if (otherIn == null) {
+      setOtherIn(new Channel<DataObject>());
+    }
+    return otherIn;
+  }
+
+  protected abstract void processObjects(
+    DataObjectMetaData currentType,
+    Channel<DataObject> out);
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void run(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out) {
+    setUp();
+    try {
+      DataObjectMetaData currentType = null;
+      QName currentTypeName = null;
+      final Channel<DataObject>[] channels = Channel.createArray(in, otherIn);
+
+      final boolean[] guard = new boolean[] {
+        true, true
+      };
+      final DataObject[] objects = new DataObject[2];
+      final QName[] typeNames = new QName[2];
+      for (int i = 0; i < 2; i++) {
+        try {
+          final Channel<DataObject> channel = channels[i];
+          if (channel == null) {
+            guard[i] = false;
+          } else {
+            DataObject object = null;
+            boolean accept = false;
+            do {
+              object = channel.read();
+              accept = acceptObject(object);
+            } while (!accept);
+            if (accept) {
+              objects[i] = object;
+              typeNames[i] = objects[i].getMetaData().getName();
+            }
+
+          }
+        } catch (final ClosedException e) {
+          guard[i] = false;
+        }
+      }
+      final DataObject otherObject = objects[OTHER_INDEX];
+      if (typeNames[SOURCE_INDEX] != null) {
+        final DataObject sourceObject = objects[SOURCE_INDEX];
+        if (typeNames[OTHER_INDEX] != null) {
+          final int nameCompare = typeNames[SOURCE_INDEX].toString().compareTo(
+            typeNames[OTHER_INDEX].toString());
+          if (nameCompare <= 0) {
+            currentType = sourceObject.getMetaData();
+            currentTypeName = typeNames[SOURCE_INDEX];
+            addSourceObject(sourceObject);
+            objects[SOURCE_INDEX] = null;
+            if (nameCompare != 0) {
+              guard[OTHER_INDEX] = false;
+            }
+          }
+          if (nameCompare >= 0) {
+            currentType = otherObject.getMetaData();
+            currentTypeName = typeNames[OTHER_INDEX];
+            addOtherObject(otherObject);
+            objects[OTHER_INDEX] = null;
+            if (nameCompare != 0) {
+              guard[SOURCE_INDEX] = false;
+            }
+          }
+        } else {
+          currentType = sourceObject.getMetaData();
+          currentTypeName = typeNames[SOURCE_INDEX];
+          if (otherObject != null) {
+            addSourceObject(otherObject);
+          }
+        }
+      } else {
+        currentType = otherObject.getMetaData();
+        currentTypeName = typeNames[OTHER_INDEX];
+        if (otherObject != null) {
+          addOtherObject(otherObject);
+        }
+        objects[OTHER_INDEX] = null;
+      }
+      try {
+        final MultiChannelReadSelector alt = new MultiChannelReadSelector();
+        final boolean running = true;
+        while (running) {
+          final int channelIndex = alt.select(channels, guard, 1000);
+          if (channelIndex >= 0) {
+            final DataObject object = channels[channelIndex].read();
+            if (acceptObject(object)) {
+              final DataObjectMetaData type = object.getMetaData();
+              final QName typeName = type.getName();
+              if (currentTypeName == null || typeName.equals(currentTypeName)) {
+                currentTypeName = typeName;
+                currentType = type;
+
+                if (channelIndex == SOURCE_INDEX) {
+                  addSourceObject(object);
+                } else {
+                  addOtherObject(object);
+                }
+              } else {
+                objects[channelIndex] = object;
+                addObjectFromOtherChannel(channels, guard, objects,
+                  channelIndex);
+                currentType = addSavedObjects(currentType, currentTypeName,
+                  out, guard, objects);
+                if (currentType != null) {
+                  currentTypeName = currentType.getName();
+                }
+              }
+            }
+          } else {
+            if (channels[0].isClosed()) {
+              guard[1] = true;
+            } else if (channels[1].isClosed()) {
+              guard[0] = true;
+            }
+          }
+        }
+      } finally {
+        try {
+          while (addSavedObjects(currentType, currentTypeName, out, guard,
+            objects) != null) {
+          }
+          processObjects(currentType, out);
+        } finally {
+
+        }
+      }
+    } finally {
+      otherIn.readDisconnect();
+      tearDown();
+    }
+  }
+
+  /**
+   * @param in the in to set
+   */
+  public void setOtherIn(
+    final Channel<DataObject> in) {
+    this.otherIn = in;
+    in.readConnect();
+  }
+
+  protected void setUp() {
+  }
+
+  protected void tearDown() {
+  }
+}

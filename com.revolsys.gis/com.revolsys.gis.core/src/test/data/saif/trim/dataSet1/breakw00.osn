@@ -1,0 +1,80 @@
+BreakwaterComposite::TRIM(
+	objectIdentifier: "Breakwater::TRIM"
+	geoComponents: Set{
+		Breakwater::TRIM(
+			position: SpatialObject(
+				geometry: OrientedArc(
+					qualifier: definite
+					arc: Arc(
+						pointList: List{
+							Point(
+								coords: Coord3D(
+									c1: 695329
+									c2: 5904309
+									c3: 7
+								)
+							)
+							Point(
+								coords: Coord3D(
+									c1: 695276
+									c2: 5904308
+									c3: 7
+								)
+							)
+							Point(
+								coords: Coord3D(
+									c1: 695210
+									c2: 5904313
+									c3: 7
+								)
+							)
+							Point(
+								coords: Coord3D(
+									c1: 695178
+									c2: 5904333
+									c3: 7
+								)
+							)
+						}
+						arcDescription: ArcDefinition(
+							type: line
+						)
+					)
+					traversalDirection: forward
+				)
+			)
+			displayType: primaryLine
+			exchangeFeature: false
+			exchangeInformation: ExchangeInformation::TRIM(
+				confidenceLevel: levelOne
+				confidenceReason: "AA"
+				coordinateSystem: ExchangeCoordinateSystem::TRIM(
+					code: "UTM"
+					horizontalDatum: nad83
+					units: metres
+					verticalDatum: cvd28
+				)
+				dataAccuracy: CoordinateAccuracy(
+					horizontal: 10
+					percentile: 90
+					vertical: 5
+				)
+				dataCaptureMethod: photogrammetric
+				dataSupplier: DataSupplier::TRIM(
+					category: "ministryOfEnvironmentLandsParks"
+					detail: "geographicDataBC"
+				)
+				zValueDerived: "No"
+			)
+			originalFileType: "planimetric"
+			updateHistory: UpdateHistory::TRIM(
+				admissionHistory: RevisionHistory::TRIM(
+					date: Date(
+						year: 0
+					)
+					reasonForChange: additionNew
+				)
+			)
+		)
+	}
+)

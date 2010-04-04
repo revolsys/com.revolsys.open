@@ -1,0 +1,6 @@
+#!/bin/sh
+APP_HOME=`dirname $0`/..
+
+LOCALCLASSPATH="$APP_HOME/scripts"
+export LOCALCLASSPATH
+$APP_HOME/bin/run_java com.revolsys.gis.tools.ProcessorPipelineTool $*

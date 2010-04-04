@@ -1,0 +1,4774 @@
+<Enumeration
+	subclass:	AirfieldType::TRIM
+	values:		abandoned
+			airFacility
+			airport
+			airstrip
+>
+
+<Enumeration
+	subclass:	AreaSymbolType::TRIM
+	values:		swampSymbol
+			marshSymbol
+			inundatedLandSymbol
+			sandGravelBarSymbol
+			cutblockSymbol
+			cutblockRegeneratingSymbol
+			slideSymbol
+			selectiveLogSymbol
+			windfallSymbol
+			burnSymbol
+			burnRegeneratingSymbol
+>
+
+<Enumeration
+	subclass:	BeforeOrAfter
+	values:		before
+			after
+>
+
+<Enumeration
+	subclass:	BreaklineChoice
+	values:		sharp
+			round
+			hydrographic
+			hypsographic
+			anthropogenic
+>
+
+<Enumeration
+	subclass:	BridgeType::TRIM
+	values:		road
+			rail
+>
+
+<Enumeration
+	subclass:	BuildingType::TRIM
+	values:		barn
+			church
+			cityHall
+			college
+			communications
+			courtHouse
+			customsOffice
+			ferryTerminal
+			fireStation
+			greenhouse
+			hospital
+			library
+			lighthouse
+			penitentiary
+			policeStation
+			postOffice
+			school
+			silo
+			tollGate
+			roadBarrier
+			university
+			weighScale
+>
+
+<Enumeration
+	subclass:	CTSSystemType
+	values:		wgs
+			iugg
+			grs
+			itrf
+>
+
+<Enumeration
+	subclass:	CanalType::TRIM
+	values:		canal
+			canalLeftBank
+			canalRightBank
+			ditch
+			flume
+			ditchIndefinite
+			channel
+			channelLeftBank
+			channelRightBank
+>
+
+<Enumeration
+	subclass:	CellShape
+	values:		point
+			rectangle
+			ellipse
+			hexagon
+			triangle
+>
+
+<Enumeration
+	subclass:	CliffTerrainDropOffType::TRIM
+	values:		definite
+			indefinite
+>
+
+<Enumeration
+	subclass:	CompassDirection
+	values:		northOf
+			eastOf
+			southOf
+			westOf
+			above
+			below
+>
+
+<Enumeration
+	subclass:	ConfidenceLevel::TRIM
+	values:		levelOne
+			levelTwo
+			levelThree
+			levelFour
+	comments:	"A confidence level of 1 indicates that the data is of established
+			integrity that meets or surpasses TRIM specifications. Data is fully
+			integrated into the TRIM data set. All TRIM data is necessarily of 
+			confidence level 1.
+			  A confidence level of 2 indicates the data has a lineage and integrity
+			but does not meet Branch specifications.  Data has metadata, is noded to
+			TRIM, and can be used as supporting or secondary information.
+			  A confidence level of 3 indicates the data has an unknown lineage and
+			integrity and does not meet Branch specifications.  Data is not 
+			necessarily noded to TRIM, and can be used for data confirmation or
+			verification.
+			  A confidence level of 4 indicates the data has unknown lineage, does not
+			meet specifications and cannot be made to meet specifications."
+>
+
+<Enumeration
+	subclass:	ConnectionDirection
+	values:		forward
+			backward
+			bothDirections
+			alternating
+			forwardLeftSide
+			forwardRightSide
+			backwardLeftSide
+			backwardRightSide
+			unknown
+>
+
+<Enumeration
+	subclass:	ContourGeneration
+	values:		stereoDigitized
+			fromGeneratedSurface
+			fromOtherContours
+>
+
+<Enumeration
+	subclass:	ControlPointType::TRIM
+	values:		horizontal
+			vertical
+>
+
+<Enumeration
+	subclass:	CorridorLandmarkType::TRIM
+	values:		aerialCableway
+			cable
+			conveyor
+			cutLineSeismicLine
+			pipeline
+			skiLift
+			transmissionLine
+			boundaryInterprovincial
+			boundaryInternational
+>
+
+<Enumeration
+	subclass:	CurveChoice
+	values:		line
+			nonLinear
+			circularArc
+			ellipticalArc
+			uniformBspline
+			piecewiseBezier
+>
+
+<Enumeration
+	subclass:	DEMpointChoice
+	values:		precise
+			spotHeight
+			indefinite
+			hybrid
+>
+
+<Enumeration
+	subclass:	DamSectionType::TRIM
+	values:		base
+			spillwayPenstock
+			top
+>
+
+<Enumeration
+	subclass:	DataCaptureMethod::TRIM
+	values:		photogrammetric
+			differentialGPS
+			coordinateGeometryWithControl
+			orthoPhotography
+			monoRestitution
+			satelliteImagery
+			tabletDigitizing
+			scanning
+			sketchMap
+			nondifferentialGPS
+			rubberSheeting
+			unknown
+>
+
+<Enumeration
+	subclass:	DesignatedAreaType::TRIM
+	values:		ammunitionDump
+			autoWrecker
+			campgroundCampsite
+			cemetery
+			driveinTheatre
+			drivingRange
+			dump
+			electricalSubstationComplex
+			exhibitionGrounds
+			fishHatchery
+			golfCourse
+			lumberYard
+			riparianZone
+			militaryEstablishment
+			parkPicnicArea
+			raceTrack
+			rifleRange
+			settlingPond
+			sewageTreatmentArea
+			sportsField
+			sportTrack
+			stockYard
+			trailerPark
+			yard
+			zoo
+			penitentiary
+			collegeCampus
+			universityCampus
+>
+
+<Enumeration
+	subclass:	Direction
+	values:		forward
+			backward
+			bothDirections
+			alternating
+			across
+			acrossLeftToRight
+			acrossRightToLeft
+			noDirection
+			unknown
+>
+
+<Enumeration
+	subclass:	DirectionThrough
+	values:		forward
+			backward
+>
+
+<Enumeration
+	subclass:	DisplayType::TRIM
+	values:		primary
+			primaryLine
+			primaryCurve
+			constructionLine
+			constructionCurve
+>
+
+<Enumeration
+	subclass:	DockType::TRIM
+	values:		drydock
+			ferryDock
+			marinaDock
+			pierWharf
+>
+
+<Enumeration
+	subclass:	EarthworkType::TRIM
+	values:		cutEarthwork
+			fillEmbankment
+>
+
+<Enumeration
+	subclass:	ExtractionSiteType::TRIM
+	values:		abandonedPit
+			gravelSand
+			undergroundMine
+			openPitMine
+			quarry
+>
+
+<Enumeration
+	subclass:	FloodedLandType::TRIM
+	values:		inundatedLand
+			marsh
+			swamp
+>
+
+<Enumeration
+	subclass:	FlowIndicatorType::TRIM
+	values:		arrowhead
+			flowArrow
+>
+
+<Enumeration
+	subclass:	GeodeticEllipsoidType
+	values:		grs
+			clarke
+			airy
+			australianNational
+			bessel
+			everest
+			fisher
+			international
+			modifiedAiry
+			modifiedEverest
+			walbeck
+			wgs
+			clark
+			krasovsky
+			other
+>
+
+<Enumeration
+	subclass:	GeodeticHorizontalDatumAS
+	values:		nad27
+			nad83
+			may76
+			ats77
+			adindan
+			arc50
+			australianGeodetic
+			bukitRimpah
+			caa
+			campoInchauspe
+			chuaAstro
+			corregoAlegre
+			djakarta
+			european50
+			gSegara
+			gSerindung
+			geodetic1949
+			ghana
+			guam1963
+			heratNorth
+			hjorsey
+			huTzuShan
+			indian
+			ireland1965
+			kertau
+			liberia1964
+			localAstro
+			luzon
+			merchich
+			montjongLowe
+			migeria
+			oldHawaiian
+			osgb
+			psa1956
+			qornoq
+			sierraLeone1960
+			tananariveObsv1925
+			timbalai
+			tokyo
+			voirol
+			wgs60
+			wgs66
+			wgs72
+			wgs84
+			yacare
+			hermannskogel
+			european79
+			german
+			italian
+			other
+>
+
+<Enumeration
+	subclass:	GeodeticSurfaceChoice
+	values:		meanSeaLevel
+			geoid
+			ellipsoid
+			other
+>
+
+<Enumeration
+	subclass:	GeodeticVerticalDatumAS
+	values:		cvd28
+			navd88
+			other
+>
+
+<Enumeration
+	subclass:	GridOrder
+	values:		rowOrder
+			columnOrder
+			boustrophedonByRow
+			boustrophedonByColumn
+>
+
+<Enumeration
+	subclass:	Hemisphere
+	values:		north
+			south
+			east
+			west
+>
+
+<Enumeration
+	subclass:	HorizontalText
+	values:		left
+			centre
+			right
+			normalHorizontal
+			continuousHorizontal
+>
+
+<Enumeration
+	subclass:	IceMassType::TRIM
+	values:		glacier
+			icefield
+>
+
+<Enumeration
+	subclass:	IndexScheme
+	values:		sequentialArray
+			interleavedArray
+			runLengthEncoded
+			nTree
+>
+
+<Enumeration
+	subclass:	IsolineForm
+	values:		normal
+			depression
+>
+
+<Enumeration
+	subclass:	LakeReservoirQualifier::TRIM
+	values:		definite
+			indefinite
+			intermittent
+>
+
+<Enumeration
+	subclass:	LakeReservoirType::TRIM
+	values:		lake
+			proposedMaxResLevel
+			reservoir
+>
+
+<Enumeration
+	subclass:	LandCoverType::TRIM
+	values:		nursery
+			orchard
+			vineyard
+			woodedArea
+			logLanding
+			cutblock
+			cutblockRegenerating
+			scrub
+			burn
+			burnRegenerating
+			selectiveLog
+			windfall
+			loneTree
+			opening
+			snag
+			grassland
+>
+
+<Enumeration
+	subclass:	LocationalQualifier
+	values:		definite
+			indefinite
+			positionApproximate
+			virtual
+>
+
+<Enumeration
+	subclass:	MonumentType::TRIM
+	values:		provBoundaryMonument
+			intlBoundaryMonument
+>
+
+<Enumeration
+	subclass:	NamedSpatialTopology
+	values:		intersects
+			disjoint
+			equals
+			adjacent
+			contains
+			encloses
+			overlaps
+			encircles
+>
+
+<Enumeration
+	subclass:	NeighbourLocation
+	values:		sameLocation
+			onLeft
+			onRight
+			across
+>
+
+<Enumeration
+	subclass:	Noding
+	values:		noded
+			nodedAtEnds
+			notNoded
+>
+
+<Enumeration
+	subclass:	NonCorridorLandmarkType::TRIM
+	values:		beacon
+			burner
+			cranePermanent
+			gasWell
+			oilWell
+>
+
+<Enumeration
+	subclass:	North
+	values:		geodetic
+			grid
+>
+
+<Enumeration
+	subclass:	NumericInstanceType
+	values:		integer8
+			integer8Unsigned
+			integer16
+			integer16Unsigned
+			integer32
+			integer32Unsigned
+			integer64
+			integer64Unsigned
+			real32
+			real64
+			real80
+>
+
+<Enumeration
+	subclass:	OffsetStructure
+	values:		none
+			in
+			out
+>
+
+<Enumeration
+	subclass:	Optionality
+	values:		alwaysNil
+			neverNil
+>
+
+<Enumeration
+	subclass:	OriginReference
+	values:		centre
+			nw
+			sw
+			ne
+			se
+			nwTop
+			swTop
+			neTop
+			seTop
+			nwBottom
+			swBottom
+			neBottom
+			seBottom
+			nwFirst
+			swFirst
+			neFirst
+			seFirst
+			nwLast
+			swLast
+			neLast
+			seLast
+			nwTopFirst
+			swTopFirst
+			neTopFirst
+			seTopFirst
+			nwBottomFirst
+			swBottomFirst
+			neBottomFirst
+			seBottomFirst
+			nwTopLast
+			swTopLast
+			neTopLast
+			seTopLast
+			nwBottomLast
+			swBottomLast
+			neBottomLast
+			seBottomLast
+>
+
+<Enumeration
+	subclass:	PositioningMethod
+	values:		differentialGPS
+			singlePositionGPS
+			photogrammetry
+			radioPositioning
+			terrestrial
+			astronomicObservation
+			approximate
+			fromMap
+			other
+>
+
+<Enumeration
+	subclass:	PositioningOrigin
+	values:		monument
+			fromMapsheet
+			other
+>
+
+<Enumeration
+	subclass:	PrimitiveInstanceType
+	values:		string
+			octetString
+			bitString
+			boolean
+			integer8
+			integer8Unsigned
+			integer16
+			integer16Unsigned
+			integer32
+			integer32Unsigned
+			integer64
+			integer64Unsigned
+			real32
+			real64
+			real80
+>
+
+<Enumeration
+	subclass:	ProjectionName
+	values:		aerialPerspective
+			albersEqualArea
+			azimuthalEqualArea
+			azimuthalEquidistant
+			bipolarObliqueConic
+			boggs
+			bonne
+			cartParallel
+			cassini
+			eckertIV
+			eckertVI
+			equidistantConic
+			globular
+			goodes
+			gnomonic
+			hammerAiitoff
+			hotineObliqueMercator
+			lambertConformalConic
+			lambertEqualArea
+			mercator
+			miller
+			molleweide
+			obliqueMercator
+			obliqueSterographic
+			orthographic
+			parabolic
+			perspectiveCylindrical
+			peters
+			plateCaree
+			polarStereographic
+			polyconic
+			robinson
+			sinusoidal
+			stereographic
+			transverseMercator
+			vanDerGrinten
+			other
+>
+
+<Enumeration
+	subclass:	ProjectionParmName
+	values:		radius
+			eccentricity
+			latitudeOfOrigin
+			longitudeOfOrigin
+			firstStandardParallel
+			secondStandardParallel
+			standardParallelNearestEquator
+			standardParallelFarthestFromEquator
+			longitudeOfTangency
+			latitudeOfTangency
+			longitudeOfGreatCircle
+			latitudeOfGreatCircle
+			azimuthOfGreatCircle
+			centralMeridian
+			centralLongitude
+			centralLatitude
+			centralScaleFactor
+			longitudeScaleFactor
+			latitudeScaleFactor
+			zoneWidth
+			falseEasting
+			falseNorthing
+			falseLatitude
+			falseLongitude
+			other
+>
+
+<Enumeration
+	subclass:	RailLineLocation::TRIM
+	values:		elevated
+			surface
+			underground
+>
+
+<Enumeration
+	subclass:	RailLineType::TRIM
+	values:		abandonedTrack
+			doubleTrack
+			multipleTrack
+			singleTrack
+			spur
+			lightRailTransitSingle
+			lightRailTransitDouble
+>
+
+<Enumeration
+	subclass:	ReasonForChange::TRIM
+	values:		additionNew
+			additionModified
+			additionUnspecified
+			deletionWithReplacement
+			deletionWithoutReplacement
+			deletionUnspecified
+			specificationChange
+			supplementaryAddition
+>
+
+<Enumeration
+	subclass:	RidgeType::TRIM
+	values:		definite
+			indefinite
+>
+
+<Enumeration
+	subclass:	RiverStreamType::TRIM
+	values:		definite
+			indefinite
+			dry
+			intermittent
+			leftBank
+			rightBank
+>
+
+<Enumeration
+	subclass:	SandGravelBarType::TRIM
+	values:		sandGravelBar
+			topofBank
+>
+
+<Enumeration
+	subclass:	SecurityClass
+	values:		topSecret
+			secret
+			confidential
+			restricted
+			unclassified
+>
+
+<Enumeration
+	subclass:	Sharing
+	values:		shared
+			pointsNotShared
+			notShared
+>
+
+<Enumeration
+	subclass:	Side
+	values:		left
+			right
+			leftAndRight
+>
+
+<Enumeration
+	subclass:	SoundingDatum
+	values:		mWL
+			hHWLT
+			hHWMT
+			lLWMT
+			lLWLT
+			lNT
+>
+
+<Enumeration
+	subclass:	SpaceFilling
+	values:		fillsSpace
+			doesNotFillSpace
+>
+
+<Enumeration
+	subclass:	SpotHeightType::TRIM
+	values:		mountainPeak
+			spotHeight
+			waterLevel
+>
+
+<Enumeration
+	subclass:	StartOrEnd
+	values:		start
+			end
+>
+
+<Enumeration
+	subclass:	Succession
+	values:		before
+			after
+			coincident
+>
+
+<Enumeration
+	subclass:	SurfaceType::TRIM
+	values:		loose
+			paved
+			rough
+			decommissioned
+			overgrown
+			unknown
+>
+
+<Enumeration
+	subclass:	TagCategory
+	values:		universal
+			application
+			private
+>
+
+<Enumeration
+	subclass:	TemporalInstance
+	values:		startTime
+			endTime
+			singleInstance
+>
+
+<Enumeration
+	subclass:	TemporalTopologicRelationship
+	values:		temporallyDisjoint
+			temporallyIntersect
+			atStart
+			atEnd
+			follows
+			overlapsAtStart
+			overlapsAtEnd
+			during
+			duringFromStart
+			duringToEnd
+			simultaneous
+>
+
+<Enumeration
+	subclass:	TerminusType
+	values:		producer
+			distributor
+			receiver
+>
+
+<Enumeration
+	subclass:	TextType::TRIM
+	values:		aerialTriangulation
+			generic
+			hydrographic
+			hypsographicContourNumbers
+			hypsographicExcludingContourNumbers
+			landCover
+			landForm
+			landmark
+			transportation
+			historyTracking
+>
+
+<Enumeration
+	subclass:	TimeType
+	values:		utc
+			gps
+			local
+>
+
+<Enumeration
+	subclass:	TowerType::TRIM
+	values:		fireLookout
+			microwave
+			smokestackChimney
+			transmission
+			unspecified
+>
+
+<Enumeration
+	subclass:	TrailType::TRIM
+	values:		unspecified
+			skid
+>
+
+<Enumeration
+	subclass:	TravelDirection::TRIM
+	values:		oneWay
+			twoWay
+>
+
+<Enumeration
+	subclass:	UnitMeaning
+	values:		kilometres
+			metres
+			centimetres
+			millimetres
+			micrometres
+			nanometres
+			nauticalMiles
+			miles
+			fathoms
+			feet
+			inches
+			degrees
+			radians
+			years
+			months
+			weeks
+			days
+			hours
+			minutes
+			seconds
+			nanoseconds
+			metresPerSecond
+			kilometresPerSecond
+			metresPerHour
+			kilometresPerHour
+			centimetresPerYear
+			knots
+			milesPerHour
+			feetPerSecond
+			degreesKelvin
+			degreesCelcius
+			degreesFahrenheit
+			kilopascals
+			digitalNumber
+			other
+>
+
+<Enumeration
+	subclass:	UpdateType
+	values:		add
+			replaceAll
+			replacePart
+			delete
+>
+
+<Enumeration
+	subclass:	VerticalText
+	values:		top
+			cap
+			half
+			base
+			bottom
+			normalVertical
+			continuousVertical
+>
+
+<AggregateType
+	subclass:	Collection
+>
+
+<AggregateType
+	subclass:	List
+>
+
+<AggregateType
+	subclass:	Relation
+>
+
+<AggregateType
+	subclass:	Set
+>
+
+<PrimitiveType
+	subclass:	AbstractObject
+>
+
+<PrimitiveType
+	subclass:	BitString
+>
+
+<PrimitiveType
+	subclass:	Boolean
+>
+
+<PrimitiveType
+	subclass:	Integer
+>
+
+<PrimitiveType
+	subclass:	Integer16
+>
+
+<PrimitiveType
+	subclass:	Integer16Unsigned
+>
+
+<PrimitiveType
+	subclass:	Integer32
+>
+
+<PrimitiveType
+	subclass:	Integer32Unsigned
+>
+
+<PrimitiveType
+	subclass:	Integer64
+>
+
+<PrimitiveType
+	subclass:	Integer64Unsigned
+>
+
+<PrimitiveType
+	subclass:	Integer8
+>
+
+<PrimitiveType
+	subclass:	Integer8Unsigned
+>
+
+<PrimitiveType
+	subclass:	Numeric
+>
+
+<PrimitiveType
+	subclass:	OctetString
+>
+
+<PrimitiveType
+	subclass:	Primitive
+>
+
+<PrimitiveType
+	subclass:	Real
+>
+
+<PrimitiveType
+	subclass:	Real32
+>
+
+<PrimitiveType
+	subclass:	Real64
+>
+
+<PrimitiveType
+	subclass:	Real80
+>
+
+<PrimitiveType
+	subclass:	String
+>
+
+<PrimitiveType
+	subclass:	Type
+>
+
+<AbstractObject
+	subclass:	AbsoluteAccuracy
+	attributes:	coordinateAccuracy	List(CoordinateAccuracy)
+			higherOrderSource	String
+>
+
+<AbstractObject
+	subclass:	ActionHistory
+	attributes:	[beginningTime]	DateTime
+			[endTime]	DateTime
+			[stepOrCategory]	String
+			[operationPerformed]	String
+			[methodUsed]	String
+			[associatedObjects]	List(Primitive)
+			[operator]	String
+			[documentationReference]	String
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	AerialTriangulation
+	attributes:	[project]	Project
+			[agency]	Agency
+			[adjustmentMethod]	String
+			[source]	Agency
+			[blockName]	String
+			[blockNumber]	String
+			[date]	DateTime
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	Agency
+	attributes:	[contactPerson]	String
+			[agencyName]	String
+			[address]	String
+			[telephoneNumber]	String
+			[faxNumber]	String
+			[email]	String
+			[country]	String
+>
+
+<AbstractObject
+	subclass:	Annotation
+	attributes:	[textOrSymbol]	TextOrSymbolObject
+			[spatialReferencing]	SpatialReferencing
+>
+
+<AbstractObject
+	subclass:	ArcDefinition
+	attributes:	type	CurveChoice
+			[supportingPoints]	List(Point)
+>
+
+<AbstractObject
+	subclass:	AttributeAccuracy
+	attributes:	attributeOrCategoryName	String
+			higherOrderSource	String
+			[statistics]	List(Parameter)
+			[error]	ErrorMatrixData
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	AttributeDefinition
+	attributes:	attributeName	String
+			attributeDomain	TypeIdentifier
+			optional	Boolean
+>
+
+<AbstractObject
+	subclass:	BoundingBox
+	attributes:	[coordSystem]	CoordinateSystem
+			minPoint	Point
+			maxPoint	Point
+>
+
+<AbstractObject
+	subclass:	CTSType
+	attributes:	systemType	CTSSystemType
+			systemYear	Integer
+>
+
+<AbstractObject
+	subclass:	Category
+	attributes:	categoryNumber	Integer
+			name	String
+			[description]	String
+>
+
+<AbstractObject
+	subclass:	CellGeometry
+	attributes:	[cellSize]	List(Numeric)
+			[units]	List(UnitMeaning)
+			[cellShape]	CellShape
+	defaults:	cellShape:	rectangle
+>
+
+<AbstractObject
+	subclass:	Channel
+	attributes:	[channelNumber]	Integer
+			[name]	String
+			[description]	String
+			[units]	UnitMeaning
+			[instanceType]	PrimitiveInstanceType
+			[bitsPerValue]	Integer
+	restricted:	instanceType:	integer8 | integer8Unsigned | integer16 | integer16Unsigned | integer32 | integer32Unsigned | integer64 | integer64Unsigned
+>
+
+<AbstractObject
+	subclass:	CharDef
+	attributes:	standard	String
+			[version]	String
+			[private]	Boolean
+			[code]	String
+	defaults:	private:	false
+>
+
+<AbstractObject
+	subclass:	Control
+	attributes:	[horizontalControl]	DataControl
+			[verticalControl]	DataControl
+			[mapDerived]	Tile
+>
+
+<AbstractObject
+	subclass:	Coordinate
+>
+
+<AbstractObject
+	subclass:	CoordinateAccuracy
+	attributes:	percentile	Real
+			[horizontal]	Real
+			[vertical]	Real
+			[time]	Real
+			[timeUnits]	UnitMeaning
+>
+
+<AbstractObject
+	subclass:	CoordinateSystem
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+>
+
+<AbstractObject
+	subclass:	DataControl
+	attributes:	[authority]	Agency
+			[adjustmentOrder]	String
+			[integrationStatus]	String
+			[collectionAgency]	Agency
+			[finalCollectionDate]	DateTime
+			[adjustmentAgency]	Agency
+			[finalAdjustmentDate]	DateTime
+>
+
+<AbstractObject
+	subclass:	DataSupplier::TRIM
+	attributes:	category	String
+			detail	String
+>
+
+<AbstractObject
+	subclass:	DbInfo
+	attributes:	[dbmsIdentifier]	String
+			[dbIdentifier]	String
+>
+
+<AbstractObject
+	subclass:	DistanceAlong
+	attributes:	distance	Real
+			from	StartOrEnd
+>
+
+<AbstractObject
+	subclass:	DistanceAndAzimuth
+	attributes:	distance	Real
+			azimuth	Real
+>
+
+<AbstractObject
+	subclass:	EnumerationValueDef
+	attributes:	description	String
+			[value]	Integer
+>
+
+<AbstractObject
+	subclass:	ErrorMatrixData
+	attributes:	title	String
+			verticalClasses	List(String)
+			horizontalClasses	List(String)
+			classificationMatrix	Matrix
+>
+
+<AbstractObject
+	subclass:	ExchangeInformation::TRIM
+	attributes:	confidenceLevel	ConfidenceLevel::TRIM
+			confidenceReason	String
+			dataSupplier	DataSupplier::TRIM
+			dataCaptureMethod	DataCaptureMethod::TRIM
+			dataAccuracy	CoordinateAccuracy
+			zValueDerived	String
+			coordinateSystem	ExchangeCoordinateSystem::TRIM
+			[exchangeAttributeKeys]	Set(String)
+			[exchangeAttributeValues]	Set(String)
+	defaults:	confidenceReason:	"Unknown"
+			dataCaptureMethod:	unknown
+			zValueDerived:	"Unknown"
+			confidenceLevel:	levelThree
+	restricted:	zValueDerived:	"Yes" | "No" | "Unknown" | "None"
+>
+
+<AbstractObject
+	subclass:	ExternalReference
+	attributes:	address	String
+			[application]	String
+			[comments]	String
+>
+
+<AbstractObject
+	subclass:	FieldWork
+	attributes:	[project]	Project
+			[agency]	Agency
+			[sites]	List(LocationID)
+			[traverse]	List(LocationID)
+			[startDate]	DateTime
+			[endDate]	DateTime
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	GeodeticEllipsoid
+	attributes:	ellipsoidType	GeodeticEllipsoidType
+			[ellipsoidYear]	Integer
+			[semimajorAxis]	Real
+			[flattening]	Real
+>
+
+<AbstractObject
+	subclass:	GeodeticHorizontalReference
+	attributes:	datumAdjustmentSystem	GeodeticHorizontalDatumAS
+			[datumASRelease]	String
+			[ellipsoid]	GeodeticEllipsoid
+			[geodeticOffset]	OriginOffset
+			[geodeticRotation]	Rotation
+>
+
+<AbstractObject
+	subclass:	GeodeticVerticalReference
+	attributes:	[datumAdjustmentSystem]	GeodeticVerticalDatumAS
+			[surface]	GeodeticSurfaceChoice
+>
+
+<AbstractObject
+	subclass:	GeographicObject
+	attributes:	position	SpatialObject
+>
+
+<AbstractObject
+	subclass:	GeometricObject
+	attributes:	[qualifier]	LocationalQualifier
+>
+
+<AbstractObject
+	subclass:	GlobalMetadata
+	attributes:	saifRelease	String
+			saifProfile	Profile
+			[userProfile]	UserProfile
+			[creationTime]	TimeStamp
+			[toolkitVersion]	String
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	GridFramework
+	attributes:	[gridDimensions]	List(Integer)
+			[gridSpacing]	List(Numeric)
+			[offsetStructure]	OffsetStructure
+			[units]	List(UnitMeaning)
+	defaults:	offsetStructure:	none
+>
+
+<AbstractObject
+	subclass:	GridLocation
+>
+
+<AbstractObject
+	subclass:	GridReference
+	attributes:	[ordering]	GridOrder
+			[originCorner]	OriginReference
+			[cellPositionAtCorner]	Boolean
+			[originCoordinates]	List(Integer)
+	defaults:	cellPositionAtCorner:	true
+			ordering:	rowOrder
+>
+
+<AbstractObject
+	subclass:	HydrographicReference
+	attributes:	[tidal]	TidalInfo
+			[sounding]	SoundingDatum
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	Illumination
+	attributes:	[sunAzimuthAngle]	Real
+			[sunElevation]	Real
+			[cloudCover]	Real
+>
+
+<AbstractObject
+	subclass:	ImageBand
+	attributes:	[bandID]	String
+			[wavelengthMin]	Real
+			[wavelengthMax]	Real
+			[quantization]	Integer
+			[pixelWidth]	Real
+			[pixelHeight]	Real
+>
+
+<AbstractObject
+	subclass:	ImageIdentification
+	attributes:	[analogue]	PhotoInfo
+			[digital]	ImageInfo
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	ImageInfo
+	attributes:	[agency]	Agency
+			[project]	Project
+			imagingSystem	String
+			[correction]	String
+			[platformElevation]	Real
+			[bands]	List(ImageBand)
+			imageID	List(SceneID)
+			[beginningDate]	DateTime
+			[endDate]	DateTime
+>
+
+<AbstractObject
+	subclass:	Integrity
+	attributes:	[tests]	List(IntegrityTestInfo)
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	IntegrityTestInfo
+	attributes:	testName	String
+			[submissionDate]	DateTime
+			[completionDate]	DateTime
+			[submissionID]	String
+			[passed]	Boolean
+			[details]	List(Result)
+			[software]	String
+			[authority]	String
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	Legal
+	attributes:	[copyrightNotice]	String
+			[liabilityNotice]	String
+			[limitsOnUse]	String
+			[contractTitle]	String
+			[contractNumber]	String
+>
+
+<AbstractObject
+	subclass:	LocationID
+	attributes:	[identification]	String
+			[type]	String
+>
+
+<AbstractObject
+	subclass:	LocationalDefinitions
+	attributes:	c1	NumericInstanceType
+			c2	NumericInstanceType
+			c3	NumericInstanceType
+			[chi]	NumericInstanceType
+			[eta]	NumericInstanceType
+			[n]	NumericInstanceType
+			[omega]	NumericInstanceType
+			[phi]	NumericInstanceType
+			[kappa]	NumericInstanceType
+			[varX]	NumericInstanceType
+			[varY]	NumericInstanceType
+			[varZ]	NumericInstanceType
+			[varT]	NumericInstanceType
+			[varChi]	NumericInstanceType
+			[varEta]	NumericInstanceType
+			[varN]	NumericInstanceType
+			[covXY]	NumericInstanceType
+			[covXZ]	NumericInstanceType
+			[covYZ]	NumericInstanceType
+			[covChiEta]	NumericInstanceType
+			[second]	NumericInstanceType
+			[minute]	NumericInstanceType
+			[hour]	NumericInstanceType
+			[day]	NumericInstanceType
+			[month]	NumericInstanceType
+			[year]	NumericInstanceType
+			[alignment]	NumericInstanceType
+			[magnitude]	NumericInstanceType
+			[azimuth]	NumericInstanceType
+			[declination]	NumericInstanceType
+	defaults:	varN:	real32
+			varY:	real32
+			magnitude:	real32
+			covYZ:	real32
+			phi:	real32
+			varChi:	real32
+			chi:	real32
+			alignment:	real32
+			varX:	real32
+			omega:	real32
+			varZ:	real32
+			covXZ:	real32
+			kappa:	real32
+			varEta:	real32
+			month:	integer8
+			azimuth:	real32
+			covXY:	real32
+			day:	integer8
+			eta:	real32
+			second:	integer8
+			hour:	integer8
+			declination:	real32
+			covChiEta:	real32
+			year:	integer8
+			minute:	integer8
+			n:	real32
+>
+
+<AbstractObject
+	subclass:	MapsheetDefinition::TRIM
+	attributes:	mapName	String
+			[databaseLoadDate]	Date
+			[mostRecentSourceDate]	Date
+			[program]	String
+>
+
+<AbstractObject
+	subclass:	MapsheetDefinitionComposite::TRIM
+	attributes:	mapsheets	Set(MapsheetDefinition::TRIM)
+>
+
+<AbstractObject
+	subclass:	Matrix
+	attributes:	rows	Integer
+			columns	Integer
+			matrixValues	List(Numeric)
+>
+
+<AbstractObject
+	subclass:	MatrixSymmetric
+	attributes:	rows	Integer
+			columns	Integer
+			matrixValues	List(Numeric)
+>
+
+<AbstractObject
+	subclass:	Metadata
+>
+
+<AbstractObject
+	subclass:	OriginOffset
+	attributes:	deltaX	Real
+			deltaY	Real
+			deltaZ	Real
+>
+
+<AbstractObject
+	subclass:	OriginalDataSource
+	attributes:	[fieldWork]	List(FieldWork)
+			[sourceMaps]	List(Tile)
+			[positioningSystem]	List(Positioning)
+			[aerialTriangulation]	List(AerialTriangulation)
+			[imageIdentification]	List(ImageIdentification)
+			[sourceAgency]	List(Agency)
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	PhotoInfo
+	attributes:	[agency]	Agency
+			[project]	Project
+			[camera]	String
+			[lens]	String
+			[calibratedFocalLength]	Real
+			filmSize	String
+			filmType	String
+			[correction]	String
+			inverseScale	Integer
+			[platformElevation]	Real
+			[photoID]	List(SceneID)
+			[beginningDate]	DateTime
+			[endDate]	DateTime
+			[bands]	List(ImageBand)
+>
+
+<AbstractObject
+	subclass:	PositionalAccuracy
+	attributes:	[classOrCategoryName]	String
+			[absolute]	AbsoluteAccuracy
+			[relative]	List(CoordinateAccuracy)
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	Positioning
+	attributes:	[project]	Project
+			[agency]	Agency
+			[systemType]	String
+			[instrumentType]	String
+			[operatingMethod]	String
+			[stations]	List(LocationID)
+			[networkClassification]	String
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	PriceComponent
+	attributes:	[componentName]	String
+			[description]	String
+			unitPrice	Real
+			volumeDependent	Boolean
+>
+
+<AbstractObject
+	subclass:	Product
+	attributes:	[identity]	ProductID
+			[cycle]	Interval
+			[nextVersion]	Date
+			[price]	ProductPrice
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	ProductID
+	attributes:	[productName]	String
+			[productNumber]	String
+			[versionNumber]	String
+			[releaseDate]	Date
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	ProductPrice
+	attributes:	[pricingStructure]	Set(PriceComponent)
+			[tax]	List(Tax)
+			[currencyUnits]	String
+>
+
+<AbstractObject
+	subclass:	Profile
+	attributes:	authority	String
+			idName	String
+			version	String
+			[description]	String
+>
+
+<AbstractObject
+	subclass:	Project
+	attributes:	[projectIdentifier]	String
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	ProjectionParameter
+	attributes:	parameterName	ProjectionParmName
+			value	Numeric
+			units	UnitMeaning
+			[hemisphere]	Hemisphere
+>
+
+<AbstractObject
+	subclass:	Relationship
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+>
+
+<AbstractObject
+	subclass:	Restricted
+	attributes:	attributePathName	String
+>
+
+<AbstractObject
+	subclass:	Result
+	attributes:	[name]	String
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	RevisionHistory::TRIM
+	attributes:	date	Date
+			[dateOfSourceData]	Date
+			[reasonForChange]	ReasonForChange::TRIM
+			[revisionKey]	String
+			[specificationsRelease]	String
+	comments:	"Revision history record for tracking insertion and retirement of an object.
+			date  -  can be one of the following:
+				1 - date of admission of the object to the database, i.e, the object is 
+				part of the current view of the data, or,
+				2 - date of retirement of the object from the database, i.e, the object is 
+				no longer part of the current view of the data.
+			dateOfSourceDate - optional attribute providing the date of the source 
+			imagery; i.e., aerial photograph, sattelite imagery.
+			reasonForChange -  can be one of the following:
+				if the update history object refers to the inclusion of the object to 
+				the database then;
+					newAddition - the object is new
+					modifiedAddition - the object is replacing an existing 
+						object(s) which is now retired.
+				if the update history object refers to the retirement of the object from 
+				the database then;
+					deletionWithReplacement - the object is replaced by a new 
+						object(s)
+					deletionWithoutReplacement - the object is deleted and not 
+						replaced. 
+			revisionKey - A revision version number or some indication of the update 
+			cycle which provides an implicit or explicit link to external information.
+			SpecificationsRelease - The release number of the specifications document 
+			under which the update was completed."
+>
+
+<AbstractObject
+	subclass:	Rotation
+	attributes:	omega	Real
+			phi	Real
+			kappa	Real
+>
+
+<AbstractObject
+	subclass:	SceneID
+	attributes:	identification	String
+			[acquisitionTime]	DateTime
+			[illumination]	Illumination
+			[view]	ViewAngles
+>
+
+<AbstractObject
+	subclass:	SchemaIdentifier
+	attributes:	schemaName	String
+			version	String
+>
+
+<AbstractObject
+	subclass:	Security
+	attributes:	classification	SecurityClass
+			[downgrading]	Boolean
+			[downgradingDate]	DateTime
+>
+
+<AbstractObject
+	subclass:	SpatialObject
+	attributes:	[geometry]	GeometricObject
+			[spatialReferencing]	SpatialReferencing
+>
+
+<AbstractObject
+	subclass:	Structuring
+	attributes:	[node]	Noding
+			[overlap]	Boolean
+			[share]	Sharing
+			[void]	SpaceFilling
+			[entity]	Boolean
+			[validGeometry]	Boolean
+			[validRelationships]	Boolean
+			[special]	String
+>
+
+<AbstractObject
+	subclass:	Tag
+	attributes:	tagCategory	TagCategory
+			tagNumber	Integer
+>
+
+<AbstractObject
+	subclass:	Tax
+	attributes:	name	String
+			percent	Real
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	TemporalObject
+	attributes:	[timeObject]	TimeObject
+			[temporalReferencing]	TemporalReferencing
+>
+
+<AbstractObject
+	subclass:	Terminus
+	attributes:	[terminusType]	TerminusType
+			[terminusInfo]	Agency
+>
+
+<AbstractObject
+	subclass:	TextAlignment
+	attributes:	horizontal	HorizontalText
+			vertical	VerticalText
+			[horizontalOffset]	Real
+			[verticalOffset]	Real
+>
+
+<AbstractObject
+	subclass:	TextOrSymbolObject
+	attributes:	[qualifier]	LocationalQualifier
+>
+
+<AbstractObject
+	subclass:	TidalInfo
+	attributes:	[reference]	String
+			[tidalHeight]	Real
+			[remarks]	String
+>
+
+<AbstractObject
+	subclass:	Tile
+	attributes:	[mapSheetNumber]	String
+			[mapNumberingSystem]	String
+			[publicationDate]	DateTime
+			[mapSeriesName]	String
+			[mapSheetName]	String
+			[inverseScale]	Integer
+>
+
+<AbstractObject
+	subclass:	TimeObject
+>
+
+<AbstractObject
+	subclass:	Transform
+	attributes:	[transformMatrix]	Matrix
+			[spatialOffset]	Coordinate
+			[remarks]	String
+	restricted:	transformMatrix.rows:	2 | 3
+			transformMatrix.columns:	2 | 3
+			spatialOffset:	Coord2D | Coord3D
+>
+
+<AbstractObject
+	subclass:	TypeDefinition
+	attributes:	type	TypeIdentifier
+			[tag]	Tag
+>
+
+<AbstractObject
+	subclass:	TypeIdentifier
+	attributes:	typeName	String
+			[optionalStringLength]	Integer
+			[schema]	SchemaIdentifier
+			[direct]	Boolean
+	defaults:	direct:	true
+			schema.version:	"3.2"
+			schema.schemaName:	"SAIF"
+>
+
+<AbstractObject
+	subclass:	UTCOffset
+	attributes:	offsetHour	Integer
+			offsetMinute	Integer
+	restricted:	offsetMinute:	"0..59"
+			offsetHour:	"-12..13"
+>
+
+<AbstractObject
+	subclass:	UpdateHistory::TRIM
+	attributes:	[admissionHistory]	RevisionHistory::TRIM
+			[retirementHistory]	RevisionHistory::TRIM
+	comments:	"Update history record.
+			admissionHistory - required attribute providing date and status of admission 
+			of the object to the database
+			retirementHistory - optional attribute providing date and status of retirement 
+			of the object from the database."
+>
+
+<AbstractObject
+	subclass:	UserProfile
+	attributes:	[coordDefs]	LocationalDefinitions
+			[characters]	CharDef
+			organization	Numeric
+	defaults:	characters.standard:	"ASCII"
+>
+
+<AbstractObject
+	subclass:	ViewAngles
+	attributes:	[centreAzimuthAngle]	Real
+			[centreElevationAngle]	Real
+			[leftRightFieldofView]	Real
+			[topBottomFieldofView]	Real
+>
+
+<Annotation
+	subclass:	TrimText::TRIM
+	attributes:	[textOrSymbol]	TextOrSymbolObject
+			[spatialReferencing]	SpatialReferencing
+			updateHistory	UpdateHistory::TRIM
+			exchangeFeature	Boolean
+			exchangeInformation	ExchangeInformation::TRIM
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+	defaults:	originalFileType:	toponymy
+	restricted:	spatialReferencing.coordSystem:	nil
+			textOrSymbol:	^TextLine | ^TextOnCurve
+>
+
+<TrimText::TRIM
+	subclass:	OtherText::TRIM
+	attributes:	[textOrSymbol]	TextOrSymbolObject
+			[spatialReferencing]	SpatialReferencing
+			updateHistory	UpdateHistory::TRIM
+			exchangeFeature	Boolean
+			exchangeInformation	ExchangeInformation::TRIM
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			textType	TextType::TRIM
+>
+
+<TrimText::TRIM
+	subclass:	Toponymy::TRIM
+	attributes:	[textOrSymbol]	TextOrSymbolObject
+			[spatialReferencing]	SpatialReferencing
+			updateHistory	UpdateHistory::TRIM
+			exchangeFeature	Boolean
+			exchangeInformation	ExchangeInformation::TRIM
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+>
+
+<AttributeDefinition
+	subclass:	CollectionAttributeDef
+	attributes:	attributeName	String
+			attributeDomain	TypeIdentifier
+			optional	Boolean
+			membership	TypeIdentifier
+	restricted:	attributeDomain.typeName:	"List" | "Set" | "Relation"
+>
+
+<AttributeDefinition
+	subclass:	ComplexAttributeDef
+	attributes:	attributeName	String
+			attributeDomain	TypeIdentifier
+			optional	Boolean
+>
+
+<AttributeDefinition
+	subclass:	SimpleAttributeDef
+	attributes:	attributeName	String
+			attributeDomain	TypeIdentifier
+			optional	Boolean
+			[default]	Primitive
+>
+
+<Coordinate
+	subclass:	Coord1D
+	attributes:	c1	Numeric
+>
+
+<Coordinate
+	subclass:	Coord2D
+	attributes:	c1	Numeric
+			c2	Numeric
+>
+
+<Coordinate
+	subclass:	Coord3D
+	attributes:	c1	Numeric
+			c2	Numeric
+			c3	Numeric
+>
+
+<Coordinate
+	subclass:	CoordT
+	attributes:	t	TimeObject
+	restricted:	t:	DateTime | Interval
+>
+
+<Coord1D, CoordT
+	subclass:	Coord1DT
+	attributes:	c1	Numeric
+			t	TimeObject
+>
+
+<Coord2D, CoordT
+	subclass:	Coord2DT
+	attributes:	c1	Numeric
+			c2	Numeric
+			t	TimeObject
+>
+
+<Coord3D, CoordT
+	subclass:	Coord3DT
+	attributes:	c1	Numeric
+			c2	Numeric
+			c3	Numeric
+			t	TimeObject
+>
+
+<CoordinateSystem
+	subclass:	ConventionalTerrestrialSystem
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			cts	CTSType
+			[ctsOffset]	OriginOffset
+			[ctsRotation]	Rotation
+>
+
+<CoordinateSystem
+	subclass:	ExchangeCoordinateSystem::TRIM
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			code	String
+			horizontalDatum	GeodeticHorizontalDatumAS
+			verticalDatum	GeodeticVerticalDatumAS
+			units	UnitMeaning
+	restricted:	code:	"UTM" | "Albers" | "Polyconic" | "Polyconic1J" | "LatLon" | "Unknown"
+>
+
+<CoordinateSystem
+	subclass:	GeodeticCoordinateSystem
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			[cts]	CTSType
+			[horizontalReference]	GeodeticHorizontalReference
+			[verticalReference]	GeodeticVerticalReference
+>
+
+<CoordinateSystem
+	subclass:	PlanarProjectionCS
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			[projectionName]	ProjectionName
+			[projectionParameters]	List(ProjectionParameter)
+			[projectionHemisphere]	Hemisphere
+			[geodeticReference]	GeodeticCoordinateSystem
+>
+
+<CoordinateSystem
+	subclass:	SegmentedProjectionCS
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			projection	PlanarProjectionCS
+>
+
+<CoordinateSystem
+	subclass:	SimpleCoordinateSystem
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+>
+
+<SegmentedProjectionCS
+	subclass:	SPCS
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			projection	PlanarProjectionCS
+			stateCode	String
+			zone	String
+			spcsCode	Integer
+>
+
+<SegmentedProjectionCS
+	subclass:	UPS
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			projection	PlanarProjectionCS
+			zone	String
+	restricted:	zone:	"A" | "B" | "Y" | "Z"
+>
+
+<SegmentedProjectionCS
+	subclass:	UTM
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			projection	PlanarProjectionCS
+			zone	Integer
+	restricted:	zone:	"1..60"
+>
+
+<SimpleCoordinateSystem
+	subclass:	Polar
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+>
+
+<SimpleCoordinateSystem
+	subclass:	Rectangular
+	attributes:	[coordinateUnits]	List(UnitMeaning)
+			[origin]	OriginReference
+	defaults:	origin:	sw
+	restricted:	origin:	nw | sw
+>
+
+<DistanceAlong
+	subclass:	DistanceAndSide
+	attributes:	distance	Real
+			from	StartOrEnd
+			side	Side
+>
+
+<DistanceAndSide
+	subclass:	Offset
+	attributes:	distance	Real
+			from	StartOrEnd
+			side	Side
+			offset	Real
+>
+
+<DistanceAndAzimuth
+	subclass:	DistanceAzimuthAndDeclination
+	attributes:	distance	Real
+			azimuth	Real
+			declination	Real
+>
+
+<GeographicObject
+	subclass:	Coverage
+	attributes:	position	SpatialObject
+>
+
+<GeographicObject
+	subclass:	Feature::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	defaults:	exchangeFeature:	true
+			position.geometry.qualifier:	definite
+	restricted:	position.geometry*Coordinate:	^Coord2D | ^Coord3D
+			position.spatialReferencing:	nil
+>
+
+<GeographicObject
+	subclass:	Graph
+	attributes:	position	SpatialObject
+			connections	Set(ConnectedTo)
+>
+
+<GeographicObject
+	subclass:	SpatialDataSet
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+>
+
+<Coverage
+	subclass:	Field
+	attributes:	position	SpatialObject
+	restricted:	position.geometry:	VectorSurface | Grid
+>
+
+<SpatialDataSet, Coverage
+	subclass:	PartitionedCoverage
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+			position	SpatialObject
+>
+
+<Coverage
+	subclass:	Raster
+	attributes:	position	SpatialObject
+			contentValues	Type
+			[indexScheme]	IndexScheme
+	defaults:	indexScheme:	sequentialArray
+	restricted:	contentValues:	ExternalReference | BitString | OctetString
+			position.geometry:	Grid
+>
+
+<Field
+	subclass:	IrregularDEM
+	attributes:	position	SpatialObject
+	restricted:	position.geometry.masspoints{}:	^Point | DEMpoint
+			position.geometry:	MeasuredSurface
+>
+
+<Raster
+	subclass:	CategoricalRaster
+	attributes:	position	SpatialObject
+			contentValues	Type
+			[indexScheme]	IndexScheme
+			category	List(Category)
+			[instanceType]	PrimitiveInstanceType
+			[indexValueType]	PrimitiveInstanceType
+	defaults:	position.geometry:	CellGrid2D
+	restricted:	instanceType:	integer8 | integer8Unsigned | integer16 | integer16Unsigned | integer32 | integer32Unsigned | integer64 | integer64Unsigned
+			indexScheme:	sequentialArray | runLengthEncoded | nTree
+			indexValueType:	integer8 | integer8Unsigned | integer16 | integer16Unsigned | integer32 | integer32Unsigned | integer64 | integer64Unsigned
+>
+
+<Raster
+	subclass:	GeneralRaster
+	attributes:	position	SpatialObject
+			contentValues	Type
+			[indexScheme]	IndexScheme
+			channels	List(Channel)
+	defaults:	position.geometry:	ImageGrid2D
+	restricted:	indexScheme:	sequentialArray | interleavedArray
+>
+
+<Raster
+	subclass:	RasterDEM
+	attributes:	position	SpatialObject
+			contentValues	Type
+			[indexScheme]	IndexScheme
+			[instanceType]	NumericInstanceType
+	restricted:	contentValues:	ExternalReference | OctetString
+>
+
+<Feature::TRIM
+	subclass:	Airfield::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[airfieldType]	AirfieldType::TRIM
+	defaults:	airfieldType:	airstrip
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	AreaOfExclusion::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	AreaOfIndefiniteContours::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	AreaSymbol::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			areaSymbolType	AreaSymbolType::TRIM
+	restricted:	position.geometry:	^Point | ^AlignedPoint
+>
+
+<Feature::TRIM
+	subclass:	BeaverDam::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Breakline::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			breaklineType	BreaklineChoice
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	Breakwater::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc | ^AlignedPoint
+>
+
+<Feature::TRIM
+	subclass:	Bridge::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[bridgeType]	BridgeType::TRIM
+			[width]	Integer16
+	defaults:	bridgeType:	road
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	Building::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[buildingType]	BuildingType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^AlignedPoint | ^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	BuiltupArea::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	CadastralPoint::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord2D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	Canal::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[canalType]	CanalType::TRIM
+	defaults:	canalType:	canal
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^ArcDirected
+>
+
+<Feature::TRIM
+	subclass:	CliffScarp::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	CliffTerrainDropOff::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			cliffTerrainDropOffType	CliffTerrainDropOffType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	Coastline::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	ControlPoint::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			controlPointType	ControlPointType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	CorridorLandmark::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			corridorLandmarkType	CorridorLandmarkType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	DEMPoint::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			demPointType	DEMpointChoice
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	DamSection::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[damSectionType]	DamSectionType::TRIM
+	defaults:	damSectionType:	top
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^AlignedPoint | ^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	DesignatedArea::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[designatedAreaType]	DesignatedAreaType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Dock::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			dockType	DockType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^AlignedPoint | ^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Dyke::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Earthwork::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			earthworkType	EarthworkType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Esker::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	ExtractionSite::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			extractionSiteType	ExtractionSiteType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc | ^Point
+>
+
+<Feature::TRIM
+	subclass:	Falls::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^AlignedPoint | ^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Fence::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	FerryRoute::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	FloodedLand::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			floodedLandType	FloodedLandType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	FlowDirectionIndicator::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			flowIndicatorType	FlowIndicatorType::TRIM
+	restricted:	position.geometry.directionIndicator:	true
+			position.geometry:	^AlignedPoint
+>
+
+<Feature::TRIM
+	subclass:	Footbridge::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	Helipad::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	IceMass::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			iceMassType	IceMassType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Island::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point | ^OrientedArc
+			position.geometry.qualifier:	positionApproximate | definite
+>
+
+<Feature::TRIM
+	subclass:	LakeReservoir::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[lakeReservoirType]	LakeReservoirType::TRIM
+			[lakeReservoirQualifier]	LakeReservoirQualifier::TRIM
+	defaults:	lakeReservoirType:	lake
+			lakeReservoirQualifier:	definite
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	LandCover::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[landCoverType]	LandCoverType::TRIM
+	defaults:	landCoverType:	woodedArea
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc | ^Point
+>
+
+<Feature::TRIM
+	subclass:	LavaBed::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Monument::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			monumentType	MonumentType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	Moraine::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	NoJoinSymbol::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	NonCorridorLandmark::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			nonCorridorLandmarkType	NonCorridorLandmarkType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	PhotoCentre::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord2D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	Pile::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	RailLine::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[railLineType]	RailLineType::TRIM
+			[railLineLocation]	RailLineLocation::TRIM
+	defaults:	railLineLocation:	surface
+			railLineType:	singleTrack
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	Rapids::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^AlignedPoint | ^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	RetainingWall::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Ridge::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			ridgeType	RidgeType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	RiverStream::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[riverStreamType]	RiverStreamType::TRIM
+	defaults:	riverStreamType:	definite
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc | ^ArcDirected
+>
+
+<Feature::TRIM
+	subclass:	Road::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[surfaceType]	SurfaceType::TRIM
+			[numberOfLanes]	Integer8
+			[travelDirection]	TravelDirection::TRIM
+			[divided]	Boolean
+			[underConstruction]	Boolean
+	defaults:	divided:	false
+			travelDirection:	twoWay
+			numberOfLanes:	2
+			surfaceType:	paved
+			underConstruction:	false
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+			numberOfLanes:	1 | 2 | 3 | 4 | 6
+>
+
+<Feature::TRIM
+	subclass:	RockBluff::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	RockOutcrop::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc | ^Point
+>
+
+<Feature::TRIM
+	subclass:	SandGravelBar::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[sandGravelBarType]	SandGravelBarType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Scree::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	SeaWall::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Sinkhole::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry.directionIndicator:	true
+			position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^AlignedPoint
+>
+
+<Feature::TRIM
+	subclass:	SkiJump::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Slide::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Snowshed::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	SpotElevation::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			spotHeightType	SpotHeightType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	TailingArea::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	TailingPond::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Tank::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point | ^OrientedArc
+>
+
+<Feature::TRIM
+	subclass:	Tower::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[towertype]	TowerType::TRIM
+			[height]	Integer
+	defaults:	height:	0
+			towertype:	transmission
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	Trail::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			trailType	TrailType::TRIM
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	TrimContour::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+			[indexContour]	Boolean
+	defaults:	indexContour:	false
+			position.geometry.form:	normal
+			position.geometry.qualifier:	definite
+	restricted:	position.geometry:	Contour
+>
+
+<Feature::TRIM
+	subclass:	Tunnel::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Arc
+>
+
+<Feature::TRIM
+	subclass:	Turntable::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^Point
+>
+
+<Feature::TRIM
+	subclass:	VolcanicCrater::TRIM
+	attributes:	position	SpatialObject
+			updateHistory	UpdateHistory::TRIM
+			exchangeInformation	ExchangeInformation::TRIM
+			exchangeFeature	Boolean
+			[originalFileType]	String
+			[displayType]	DisplayType::TRIM
+			[goid]	String
+	restricted:	position.geometry*Coordinate:	^Coord3D
+			position.geometry:	^OrientedArc
+>
+
+<Graph
+	subclass:	AcyclicNetwork
+	attributes:	position	SpatialObject
+			connections	Set(ConnectedTo)
+>
+
+<Graph
+	subclass:	SingleLineNetwork
+	attributes:	position	SpatialObject
+			connections	Set(ConnectedTo)
+	restricted:	connections{}.objectA.position.geometry:	VectorLine
+			connections{}.objectB.position.geometry:	VectorLine
+>
+
+<SpatialDataSet
+	subclass:	AnnotatedSpatialDataSet
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+			[annotationComponents]	Set(Annotation)
+>
+
+<SpatialDataSet
+	subclass:	TrimComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	position.spatialReferencing.coordSystem:	UTM
+			geoComponents{}:	Feature::TRIM
+			position.geometry:	nil
+			position.spatialReferencing.coordSystem.zone:	"8..11"
+>
+
+<AnnotatedSpatialDataSet
+	subclass:	TrimAnnotatedComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+			[annotationComponents]	Set(Annotation)
+	restricted:	position.spatialReferencing.coordSystem:	UTM
+			position.geometry:	nil
+			position.spatialReferencing.coordSystem.zone:	"8..11"
+			annotationComponents{}:	TrimText::TRIM
+>
+
+<TrimAnnotatedComposite::TRIM
+	subclass:	OtherTextComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+			[annotationComponents]	Set(Annotation)
+	restricted:	annotationComponents{}:	OtherText::TRIM
+>
+
+<TrimAnnotatedComposite::TRIM
+	subclass:	ToponymyComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+			[annotationComponents]	Set(Annotation)
+	restricted:	annotationComponents{}:	Toponymy::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	AirfieldComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Airfield::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	AreaOfExclusionComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	AreaOfExclusion::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	AreaOfIndefiniteContoursComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	AreaOfIndefiniteContours::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	AreaSymbolComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	AreaSymbol::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	BeaverDamComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	BeaverDam::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	BreaklineComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Breakline::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	BreakwaterComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Breakwater::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	BridgeComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Bridge::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	BuildingComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Building::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	BuiltupAreaComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	BuiltupArea::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	CadastralPointComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	CadastralPoint::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	CanalComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Canal::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	CliffScarpComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	CliffScarp::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	CliffTerrainDropOffComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	CliffTerrainDropOff::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	CoastlineComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Coastline::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	ContourComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	TrimContour::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	ControlPointComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	ControlPoint::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	CorridorLandmarkComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	CorridorLandmark::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	DEMPointComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	DEMPoint::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	DamSectionComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	DamSection::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	DesignatedAreaComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	DesignatedArea::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	DockComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Dock::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	DykeComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Dyke::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	EarthworkComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Earthwork::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	EskerComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Esker::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	ExtractionSiteComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	ExtractionSite::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	FallsComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Falls::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	FenceComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Fence::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	FerryRouteComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	FerryRoute::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	FloodedLandComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	FloodedLand::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	FlowDirectionIndicatorComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	FlowDirectionIndicator::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	FootbridgeComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Footbridge::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	HelipadComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Helipad::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	IceMassComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	IceMass::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	IslandComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Island::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	LakeReservoirComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	LakeReservoir::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	LandCoverComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	LandCover::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	LavaBedComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	LavaBed::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	MonumentComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Monument::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	MoraineComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Moraine::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	NoJoinSymbolComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	NoJoinSymbol::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	NonCorridorLandmarkComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	NonCorridorLandmark::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	PhotoCentreComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	PhotoCentre::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	PileComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Pile::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RailLineComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	RailLine::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RapidsComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Rapids::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RetainingWallComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	RetainingWall::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RidgeComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Ridge::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RiverStreamComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	RiverStream::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RoadComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Road::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RockBluffComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	RockBluff::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	RockOutcropComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	RockOutcrop::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SandGravelBarComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	SandGravelBar::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	ScreeComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Scree::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SeaWallComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	SeaWall::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SinkholeComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Sinkhole::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SkiJumpComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	SkiJump::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SlideComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Slide::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SnowshedComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Snowshed::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	SpotElevationComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	SpotElevation::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TailingAreaComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	TailingArea::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TailingPondComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	TailingPond::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TankComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Tank::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TowerComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Tower::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TrailComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Trail::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TunnelComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Tunnel::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	TurntableComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	Turntable::TRIM
+>
+
+<TrimComposite::TRIM
+	subclass:	VolcanicCraterComposite::TRIM
+	attributes:	position	SpatialObject
+			[geoComponents]	Set(GeographicObject)
+	restricted:	geoComponents{}:	VolcanicCrater::TRIM
+>
+
+<GeometricObject
+	subclass:	CellularStructure
+	attributes:	[qualifier]	LocationalQualifier
+>
+
+<GeometricObject
+	subclass:	GeometricAggregate
+	attributes:	[qualifier]	LocationalQualifier
+			objects	Set(GeometricObject)
+	restricted:	objects{}:	Point | VectorLine | VectorArea | VectorVolume | CellularStructure
+>
+
+<GeometricObject
+	subclass:	Point
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+>
+
+<GeometricObject
+	subclass:	VectorArea
+	attributes:	[qualifier]	LocationalQualifier
+>
+
+<GeometricObject
+	subclass:	VectorLine
+	attributes:	[qualifier]	LocationalQualifier
+>
+
+<GeometricObject
+	subclass:	VectorVolume
+	attributes:	[qualifier]	LocationalQualifier
+>
+
+<CellularStructure
+	subclass:	Grid
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	defaults:	orderAndOrigin.originCorner:	nw
+			spacing.offsetStructure:	none
+			orderAndOrigin.cellPositionAtCorner:	true
+			cellGeometry.cellShape:	rectangle
+			orderAndOrigin.ordering:	rowOrder
+			orderAndOrigin.originCoordinates{}:	1
+	restricted:	positionOfOrigin:	^Point
+>
+
+<CellularStructure
+	subclass:	LocationsInGrid
+	attributes:	[qualifier]	LocationalQualifier
+			grid	Grid
+			locations	Set(GridLocation)
+>
+
+<Grid
+	subclass:	CellGrid2D
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	sw
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord2D
+>
+
+<Grid
+	subclass:	CellGrid2DT
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	swFirst
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord2DT
+>
+
+<Grid
+	subclass:	CellGrid3D
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	swBottom
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord3D
+>
+
+<Grid
+	subclass:	CellGrid3DT
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	swBottomFirst
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord3DT
+>
+
+<Grid
+	subclass:	HexagonCellGrid
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	spacing.offsetStructure:	in | out
+			cellGeometry.cellShape:	hexagon
+			orderAndOrigin.cellPositionAtCorner:	false
+			positionOfOrigin.coords:	Coord2D
+>
+
+<Grid
+	subclass:	ImageGrid2D
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	nw
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord2D
+			orderAndOrigin.ordering:	rowOrder
+>
+
+<Grid
+	subclass:	ImageGrid2DT
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	nwLast
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+>
+
+<Grid
+	subclass:	ImageGrid3D
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	nwTop
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord3D
+>
+
+<Grid
+	subclass:	ImageGrid3DT
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	orderAndOrigin.originCorner:	nwTopLast
+			spacing.offsetStructure:	none
+			cellGeometry.cellShape:	rectangle
+			positionOfOrigin.coords:	Coord3DT
+>
+
+<Grid
+	subclass:	PointGrid
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	cellGeometry.cellSize{}:	0
+			cellGeometry.cellShape:	point
+			cellGeometry.units:	nil
+>
+
+<Grid
+	subclass:	TriangleCellGrid
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+	restricted:	spacing.offsetStructure:	in | out
+			cellGeometry.cellShape:	triangle
+			orderAndOrigin.cellPositionAtCorner:	true
+			positionOfOrigin.coords:	Coord2D
+>
+
+<CellGrid2D
+	subclass:	BoxGrid
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+			primitiveType	PrimitiveInstanceType
+			interleavedBounds	List(Primitive)
+			[elevationUnits]	UnitMeaning
+	defaults:	elevationUnits:	metres
+	restricted:	orderAndOrigin.ordering:	rowOrder
+>
+
+<PointGrid
+	subclass:	DEMGrid
+	attributes:	[qualifier]	LocationalQualifier
+			[positionOfOrigin]	Point
+			orderAndOrigin	GridReference
+			spacing	GridFramework
+			[cellGeometry]	CellGeometry
+			primitiveType	PrimitiveInstanceType
+			elevations	List(Primitive)
+			[elevationUnits]	UnitMeaning
+	defaults:	elevationUnits:	metres
+	restricted:	orderAndOrigin.originCorner:	sw
+			positionOfOrigin.coords:	Coord2D
+			orderAndOrigin.ordering:	rowOrder
+>
+
+<Point
+	subclass:	AlignedPoint
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			alignment	Numeric
+			[north]	North
+			[directionIndicator]	Boolean
+	defaults:	directionIndicator:	false
+			north:	grid
+>
+
+<Point
+	subclass:	CorrelationPoint
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			gridCoordinates	List(Integer)
+			[locationInCell]	OriginReference
+>
+
+<Point
+	subclass:	DEMpoint
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			[demPoint]	DEMpointChoice
+>
+
+<Point
+	subclass:	GeoidPoint
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			chi	Real
+			eta	Real
+			n	Real
+	restricted:	coords:	^Coord3DT
+>
+
+<Point
+	subclass:	PointWithAttitude
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			omega	Real
+			phi	Real
+			kappa	Real
+	restricted:	coords:	^Coord3DT
+>
+
+<Point
+	subclass:	VectorAtPoint
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			magnitude	Numeric
+			[azimuth]	Numeric
+			[declination]	Numeric
+			[north]	North
+	defaults:	north:	grid
+>
+
+<GeoidPoint
+	subclass:	GeoidPointWithError
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			chi	Real
+			eta	Real
+			n	Real
+			varC1	Real
+			varC2	Real
+			varC3	Real
+			varChi	Real
+			varEta	Real
+			varN	Real
+			covC1C2	Real
+			covC1C3	Real
+			covC2C3	Real
+			covChiEta	Real
+>
+
+<VectorAtPoint
+	subclass:	VelocityAtPoint
+	attributes:	[qualifier]	LocationalQualifier
+			[coords]	Coordinate
+			magnitude	Numeric
+			[azimuth]	Numeric
+			[declination]	Numeric
+			[north]	North
+			[units]	UnitMeaning
+	defaults:	units:	kilometresPerHour
+>
+
+<VectorArea
+	subclass:	BoundedArea
+	attributes:	[qualifier]	LocationalQualifier
+			[boundary]	Set(VectorLine)
+			[insidePoint]	Point
+>
+
+<VectorArea
+	subclass:	Polygon
+	attributes:	[qualifier]	LocationalQualifier
+			boundary	OrientedPath
+			[insidePoint]	Point
+	restricted:	boundary.path:	Ring
+>
+
+<VectorArea
+	subclass:	Triangle
+	attributes:	[qualifier]	LocationalQualifier
+			pointA	Point
+			pointB	Point
+			pointC	Point
+			[neighbours]	List(Triangle)
+>
+
+<VectorArea
+	subclass:	VectorSurface
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+>
+
+<Polygon
+	subclass:	PolygonWithHoles
+	attributes:	[qualifier]	LocationalQualifier
+			boundary	OrientedPath
+			[insidePoint]	Point
+			innerBoundaries	Set(OrientedPath)
+	restricted:	innerBoundaries{}.path:	Ring
+>
+
+<VectorSurface
+	subclass:	GeneralParametric
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			equation	String
+			coefficients	List(Real)
+			side	Point
+	restricted:	side:	^Point
+>
+
+<VectorSurface
+	subclass:	Isolines
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			lines	List(Isoline)
+>
+
+<VectorSurface
+	subclass:	MeasuredSurface
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			[masspoints]	Set(Point)
+			[breaklines]	Set(Breakline)
+			[areasOfExclusion]	Set(Polygon)
+			[areasIndefinite]	Set(Polygon)
+>
+
+<VectorSurface
+	subclass:	Plane
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			a	Real
+			b	Real
+			c	Real
+			w	Real
+>
+
+<VectorSurface
+	subclass:	SurfacePositions
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			objects	Set(Point)
+>
+
+<VectorSurface
+	subclass:	TIN
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			triangles	Set(Triangle)
+			[surfaceDefining]	String
+			[method]	String
+>
+
+<Isolines
+	subclass:	Contours
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			lines	List(Isoline)
+			[generationType]	ContourGeneration
+	restricted:	lines{}:	Contour
+>
+
+<TIN
+	subclass:	TINEnvelope
+	attributes:	[qualifier]	LocationalQualifier
+			[arealExtent]	VectorArea
+			triangles	Set(Triangle)
+			[surfaceDefining]	String
+			[method]	String
+>
+
+<VectorLine
+	subclass:	Arc
+	attributes:	[qualifier]	LocationalQualifier
+			pointList	List(Point)
+			[arcDescription]	ArcDefinition
+	defaults:	arcDescription.type:	line
+>
+
+<VectorLine
+	subclass:	Breakline
+	attributes:	[qualifier]	LocationalQualifier
+			arc	Arc
+			[breaklineType]	BreaklineChoice
+>
+
+<VectorLine
+	subclass:	Isoline
+	attributes:	[qualifier]	LocationalQualifier
+			value	Numeric
+			arc	Arc
+			[form]	IsolineForm
+>
+
+<VectorLine
+	subclass:	OrientedArc
+	attributes:	[qualifier]	LocationalQualifier
+			arc	Arc
+			[traversalDirection]	DirectionThrough
+	defaults:	traversalDirection:	forward
+>
+
+<VectorLine
+	subclass:	OrientedPath
+	attributes:	[qualifier]	LocationalQualifier
+			path	Path
+			[traversalDirection]	DirectionThrough
+	defaults:	traversalDirection:	forward
+>
+
+<VectorLine
+	subclass:	Path
+	attributes:	[qualifier]	LocationalQualifier
+			arcList	List(OrientedArc)
+>
+
+<Arc
+	subclass:	ArcDirected
+	attributes:	[qualifier]	LocationalQualifier
+			pointList	List(Point)
+			[arcDescription]	ArcDefinition
+			[flowDirection]	Direction
+	defaults:	flowDirection:	forward
+>
+
+<Arc
+	subclass:	Segment
+	attributes:	[qualifier]	LocationalQualifier
+			pointList	List(Point)
+			[arcDescription]	ArcDefinition
+>
+
+<ArcDirected
+	subclass:	Vector
+	attributes:	[qualifier]	LocationalQualifier
+			pointList	List(Point)
+			[arcDescription]	ArcDefinition
+			[flowDirection]	Direction
+	restricted:	arcDescription.type:	line
+>
+
+<Isoline
+	subclass:	Contour
+	attributes:	[qualifier]	LocationalQualifier
+			value	Numeric
+			arc	Arc
+			[form]	IsolineForm
+>
+
+<Path
+	subclass:	PathDirected
+	attributes:	[qualifier]	LocationalQualifier
+			arcList	List(OrientedArc)
+			[direction]	Direction
+	defaults:	direction:	forward
+>
+
+<Path
+	subclass:	Ring
+	attributes:	[qualifier]	LocationalQualifier
+			arcList	List(OrientedArc)
+>
+
+<Ring
+	subclass:	ArcClosed
+	attributes:	[qualifier]	LocationalQualifier
+			arcList	List(OrientedArc)
+>
+
+<Ring
+	subclass:	RingDirected
+	attributes:	[qualifier]	LocationalQualifier
+			arcList	List(OrientedArc)
+>
+
+<VectorVolume
+	subclass:	TIN3D
+	attributes:	[qualifier]	LocationalQualifier
+			boundary	TINEnvelope
+			[insidePoint]	Point
+>
+
+<VectorVolume
+	subclass:	Tetrahedron
+	attributes:	[qualifier]	LocationalQualifier
+			pointA	Point
+			pointB	Point
+			pointC	Point
+			pointD	Point
+			[neighbours]	List(Tetrahedron)
+>
+
+<VectorVolume
+	subclass:	TetrahedronComplex
+	attributes:	[qualifier]	LocationalQualifier
+			tetrahedra	Set(Tetrahedron)
+>
+
+<TIN3D
+	subclass:	TIN3DComplex
+	attributes:	[qualifier]	LocationalQualifier
+			boundary	TINEnvelope
+			[insidePoint]	Point
+			innerBoundaries	Set(TINEnvelope)
+>
+
+<GridLocation
+	subclass:	BitMaskValues
+	attributes:	presenceOrAbsence	BitString
+>
+
+<GridLocation
+	subclass:	DirectGridReference
+	attributes:	gridCoordinate	List(Integer)
+>
+
+<GridLocation
+	subclass:	MortonNumber
+	attributes:	locationalCode	Integer
+>
+
+<GridReference
+	subclass:	GridWithinGridReference
+	attributes:	[ordering]	GridOrder
+			[originCorner]	OriginReference
+			[cellPositionAtCorner]	Boolean
+			[originCoordinates]	List(Integer)
+			reference	GridReference
+>
+
+<Metadata
+	subclass:	GeneralLocation
+	attributes:	[range]	BoundingBox
+			[tiles]	List(Tile)
+			[informal]	String
+>
+
+<Metadata
+	subclass:	Lineage
+	attributes:	[dataSource]	OriginalDataSource
+			[compilationHistory]	List(ActionHistory)
+			[processingHistory]	List(ActionHistory)
+			[remarks]	String
+>
+
+<Metadata
+	subclass:	ProductDescription
+	attributes:	[description]	String
+			[products]	Set(Product)
+			[remarks]	String
+>
+
+<Metadata
+	subclass:	Quality
+	attributes:	[structuring]	Structuring
+			[positional]	Set(PositionalAccuracy)
+			[attribute]	Set(AttributeAccuracy)
+			[clipping]	Boolean
+			[integrity]	Integrity
+			[remarks]	String
+>
+
+<Metadata
+	subclass:	Source
+	attributes:	[terminus]	Set(Terminus)
+			[database]	DbInfo
+			[project]	Set(Project)
+			[releasibility]	String
+			[legality]	Legal
+			[security]	Security
+			[remarks]	String
+>
+
+<Metadata
+	subclass:	SpatialReferencing
+	attributes:	[coordSystem]	CoordinateSystem
+			[hydrographic]	HydrographicReference
+			[control]	Control
+			[transform]	Transform
+			[positioningMethod]	PositioningMethod
+>
+
+<Metadata
+	subclass:	TemporalReferencing
+	attributes:	type	TimeType
+			[offset]	UTCOffset
+			[likelyTimeError]	Interval
+>
+
+<Metadata
+	subclass:	UpdateOperation
+	attributes:	operation	UpdateType
+			linkName	String
+			[effective]	DateTime
+			[remarks]	String
+>
+
+<Relationship
+	subclass:	ConnectedTo
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[connectionDirection]	ConnectionDirection
+	restricted:	objectA:	GeographicObject
+			objectB:	GeographicObject
+>
+
+<Relationship
+	subclass:	ControlledBy
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[remarks]	String
+>
+
+<Relationship
+	subclass:	DerivedFrom
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[method]	String
+>
+
+<Relationship
+	subclass:	SpatialRelationship
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+	restricted:	objectA:	GeographicObject
+			objectB:	GeographicObject
+>
+
+<Relationship
+	subclass:	TemporalRelationship
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+	restricted:	objectA:	GeographicObject
+			objectB:	GeographicObject
+>
+
+<SpatialRelationship
+	subclass:	Compass
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			name	CompassDirection
+>
+
+<SpatialRelationship
+	subclass:	DistanceAndAngles
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			location	DistanceAndAzimuth
+			[north]	North
+	defaults:	north:	grid
+>
+
+<SpatialRelationship
+	subclass:	DistanceFrom
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			distance	Real
+			[metric]	String
+>
+
+<SpatialRelationship
+	subclass:	Neighbour
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			location	NeighbourLocation
+			[way]	SpatialObject
+>
+
+<SpatialRelationship
+	subclass:	RelativeLinearDistance
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			location	DistanceAlong
+>
+
+<SpatialRelationship
+	subclass:	SpatialClip
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[remarks]	String
+>
+
+<SpatialRelationship
+	subclass:	SpatialNeighbourhood
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			distance	Real
+			[method]	String
+			[remarks]	String
+>
+
+<SpatialRelationship
+	subclass:	SpatialTopology
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[iAiB]	Boolean
+			[iAbB]	Boolean
+			[iAeB]	Boolean
+			[bAiB]	Boolean
+			[bAbB]	Boolean
+			[bAeB]	Boolean
+			[eAiB]	Boolean
+			[eAbB]	Boolean
+			[eAeB]	Boolean
+>
+
+<SpatialTopology
+	subclass:	BoundedBy
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[iAiB]	Boolean
+			[iAbB]	Boolean
+			[iAeB]	Boolean
+			[bAiB]	Boolean
+			[bAbB]	Boolean
+			[bAeB]	Boolean
+			[eAiB]	Boolean
+			[eAbB]	Boolean
+			[eAeB]	Boolean
+			[startOrEnd]	StartOrEnd
+>
+
+<SpatialTopology
+	subclass:	OnSide
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[iAiB]	Boolean
+			[iAbB]	Boolean
+			[iAeB]	Boolean
+			[bAiB]	Boolean
+			[bAbB]	Boolean
+			[bAeB]	Boolean
+			[eAiB]	Boolean
+			[eAbB]	Boolean
+			[eAeB]	Boolean
+			side	Side
+>
+
+<SpatialTopology
+	subclass:	SpatialTopologyExtended
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[iAiB]	Boolean
+			[iAbB]	Boolean
+			[iAeB]	Boolean
+			[bAiB]	Boolean
+			[bAbB]	Boolean
+			[bAeB]	Boolean
+			[eAiB]	Boolean
+			[eAbB]	Boolean
+			[eAeB]	Boolean
+			[commonName]	NamedSpatialTopology
+			[dimensionalityOfIntersection]	Integer
+	restricted:	dimensionalityOfIntersection:	"0..3"
+>
+
+<TemporalRelationship
+	subclass:	Precedence
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			sequence	Succession
+>
+
+<TemporalRelationship
+	subclass:	TemporalNeighbourhood
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			travelTime	Interval
+			[method]	String
+			[remarks]	String
+>
+
+<TemporalRelationship
+	subclass:	TemporalOffset
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			instanceA	TemporalInstance
+			instanceB	TemporalInstance
+			from	BeforeOrAfter
+			offset	Interval
+>
+
+<TemporalRelationship
+	subclass:	TemporalProximity
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			interval	Interval
+>
+
+<TemporalRelationship
+	subclass:	TemporalTopology
+	attributes:	objectA	AbstractObject
+			objectB	AbstractObject
+			[cardinalityToTypeAInstances]	String
+			[cardinalityToTypeBInstances]	String
+			[temporalTopologicRelationship]	TemporalTopologicRelationship
+>
+
+<Restricted
+	subclass:	RestrictedCollectionDomain
+	attributes:	attributePathName	String
+			attributeDomain	TypeIdentifier
+			membership	TypeIdentifier
+	restricted:	attributeDomain.typeName:	"List" | "Set" | "Relation"
+>
+
+<Restricted
+	subclass:	RestrictedCollectionDomainSet
+	attributes:	attributePathName	String
+			attributeDomain	TypeIdentifier
+			membership	Set(TypeIdentifier)
+	restricted:	attributeDomain.typeName:	"List" | "Set" | "Relation"
+>
+
+<Restricted
+	subclass:	RestrictedDomain
+	attributes:	attributePathName	String
+			attributeDomain	TypeIdentifier
+>
+
+<Restricted
+	subclass:	RestrictedDomainSet
+	attributes:	attributePathName	String
+			attributeDomain	Set(TypeIdentifier)
+>
+
+<Restricted
+	subclass:	RestrictedOptionality
+	attributes:	attributePathName	String
+			attributeOptionality	Optionality
+>
+
+<Restricted
+	subclass:	RestrictedValue
+	attributes:	attributePathName	String
+			attributeValue	Primitive
+>
+
+<Restricted
+	subclass:	RestrictedValueRange
+	attributes:	attributePathName	String
+			lowerAttributeValue	Primitive
+			upperAttributeValue	Primitive
+>
+
+<Restricted
+	subclass:	RestrictedValueSet
+	attributes:	attributePathName	String
+			attributeValues	Set(Primitive)
+>
+
+<Result
+	subclass:	Check
+	attributes:	[name]	String
+			[remarks]	String
+			value	Boolean
+>
+
+<Result
+	subclass:	Parameter
+	attributes:	[name]	String
+			[remarks]	String
+			value	Real
+			[units]	String
+>
+
+<SpatialObject, TemporalObject
+	subclass:	SpatiotemporalObject
+	attributes:	[geometry]	GeometricObject
+			[spatialReferencing]	SpatialReferencing
+			[timeObject]	TimeObject
+			[temporalReferencing]	TemporalReferencing
+>
+
+<TextOrSymbolObject
+	subclass:	Symbol
+	attributes:	[qualifier]	LocationalQualifier
+			position	Point
+			symbol	String
+			[orientation]	Numeric
+			[symbolLibraryName]	String
+			[other]	String
+	restricted:	position:	^Point
+>
+
+<TextOrSymbolObject
+	subclass:	TextAndArrow
+	attributes:	[qualifier]	LocationalQualifier
+			textOrSymbol	TextOrSymbolObject
+			arrow	Arc
+	restricted:	textOrSymbol:	TextLine | TextOnCurve | TextMultiLine | Symbol | TextOrSymbolAggregate
+>
+
+<TextOrSymbolObject
+	subclass:	TextLine
+	attributes:	[qualifier]	LocationalQualifier
+			position	Point
+			text	String
+			[characterHeight]	Real
+			[stringWidth]	Real
+			[orientation]	Numeric
+			[alignment]	TextAlignment
+			[fontName]	String
+			[other]	String
+	defaults:	orientation:	0.0
+	restricted:	position:	^Point
+>
+
+<TextOrSymbolObject
+	subclass:	TextMultiLine
+	attributes:	[qualifier]	LocationalQualifier
+			textLines	List(TextLine)
+>
+
+<TextOrSymbolObject
+	subclass:	TextOnCurve
+	attributes:	[qualifier]	LocationalQualifier
+			characters	List(TextLine)
+>
+
+<TextOrSymbolObject
+	subclass:	TextOrSymbolAggregate
+	attributes:	[qualifier]	LocationalQualifier
+			objects	Set(TextOrSymbolObject)
+	restricted:	objects{}:	TextLine | TextMultiLine | TextAndArrow | Symbol
+>
+
+<TimeObject
+	subclass:	DateTime
+>
+
+<TimeObject
+	subclass:	Duration
+	attributes:	startTime	DateTime
+			lengthOfTime	Interval
+>
+
+<TimeObject
+	subclass:	Interval
+>
+
+<TimeObject
+	subclass:	TimeAggregate
+	attributes:	objects	Set(TimeObject)
+	restricted:	objects{}:	DateTime | Interval | Duration
+>
+
+<DateTime
+	subclass:	Date
+	attributes:	[year]	Integer
+			[month]	Integer
+			[day]	Integer
+	restricted:	month:	"1..12"
+			day:	"1..31"
+>
+
+<DateTime
+	subclass:	Time
+	attributes:	hour	Integer
+			minute	Integer
+			second	Real
+	restricted:	hour:	"0..24"
+			minute:	"0..59"
+>
+
+<Date, Time
+	subclass:	TimeStamp
+	attributes:	[year]	Integer
+			[month]	Integer
+			[day]	Integer
+			hour	Integer
+			minute	Integer
+			second	Real
+>
+
+<Interval
+	subclass:	DayTimeInterval
+	attributes:	[days]	Integer
+			[hours]	Integer
+			[minutes]	Integer
+			[seconds]	Real
+	defaults:	days:	0
+			seconds:	0.0
+			hours:	0
+			minutes:	0
+>
+
+<Interval
+	subclass:	YearMonthInterval
+	attributes:	[years]	Integer
+			[months]	Integer
+	defaults:	months:	0
+			years:	0
+>
+
+<TypeDefinition
+	subclass:	AbstractObjectDefinition
+	attributes:	type	TypeIdentifier
+			[tag]	Tag
+			[superclass]	List(TypeIdentifier)
+			[subclassing]	String
+			[attributes]	List(AttributeDefinition)
+			[classAttributes]	List(AttributeDefinition)
+			[defaults]	List(RestrictedValue)
+			[restricted]	List(Restricted)
+			[constraints]	String
+			[classAttributeDefaults]	List(RestrictedValue)
+			[classAttributeValues]	List(Restricted)
+			[comments]	String
+	defaults:	superclass.typeName:	"AbstractObject"
+	restricted:	classAttributeValues{}:	RestrictedValue | RestrictedValueSet | RestrictedValueRange
+>
+
+<TypeDefinition
+	subclass:	DomainDefinition
+	attributes:	type	TypeIdentifier
+			[tag]	Tag
+			baseType	PrimitiveInstanceType
+			validValues	List(Primitive)
+			[comments]	String
+	restricted:	baseType:	string | integer8 | integer8Unsigned | integer16 | integer16Unsigned | integer32 | integer32Unsigned | integer64 | integer64Unsigned | real32 | real64 | real80
+>
+
+<TypeDefinition
+	subclass:	EnumerationDefinition
+	attributes:	type	TypeIdentifier
+			[tag]	Tag
+			enumerates	List(EnumerationValueDef)
+			[comments]	String
+>
+

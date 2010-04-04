@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>com.revolsys.gis</artifactId>
+    <groupId>com.revolsys.gis</groupId>
+    <version>1.0.2-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.revolsys.gis</groupId>
+  <artifactId>com.revolsys.gis.core</artifactId>
+  <name>GIS Tools</name>
+  <version>1.0.2-SNAPSHOT</version>
+  <url>http://www.revolsys.com</url>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>geotools</id>
+      <name>Geotools repository</name>
+      <url>http://maven.geotools.fr/repository</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>java.net</id>
+      <name>java.net</name>
+      <url>http://download.java.net/maven/2/</url>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>com.revolsys</groupId>
+      <artifactId>com.revolsys.util</artifactId>
+      <version>${com.revolsys.util.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.revolsys</groupId>
+      <artifactId>com.revolsys.parallel</artifactId>
+      <version>${com.revolsys.parallel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+      <version>1.10</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>${org.springframework.version}</version>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>commons-logging</artifactId>
+      		<groupId>commons-logging</groupId>
+      	</exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>javax.measure</groupId>
+      <artifactId>jsr-275</artifactId>
+      <version>0.9.4</version>
+    </dependency>
+  </dependencies>
+  
+  <scm>
+    <connection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk</connection>
+    <developerConnection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk</developerConnection>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>rs-repo</id>
+      <name>RS Maven Repository</name>
+      <url>file:../../maven/com.revolsys.open/</url>
+    </repository>
+  </distributionManagement>
+</project>
+

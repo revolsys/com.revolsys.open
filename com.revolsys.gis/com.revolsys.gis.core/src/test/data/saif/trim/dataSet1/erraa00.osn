@@ -1,0 +1,8 @@
+// Check that the parser throws an error if an attribute name is not followed
+// by a ':' character. The day attribute shown below is missing the :.
+DateTime (
+	objectIdentifier: "Test of missing : after attribute 'day' name"
+	year: 2006
+  month: 10
+  day 7
+)

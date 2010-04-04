@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.revolsys.gis</groupId>
+  <artifactId>com.revolsys.gis.csv</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0.2-SNAPSHOT</version>
+  <name>com.revolys.gis.csv</name>
+  <url>http://maven.apache.org</url>
+  <parent>
+  	<artifactId>com.revolsys.gis</artifactId>
+  	<groupId>com.revolsys.gis</groupId>
+  	<version>1.0.2-SNAPSHOT</version>
+  </parent>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.revolsys.gis</groupId>
+  		<artifactId>com.revolsys.gis.core</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  </dependencies>
+ </project>

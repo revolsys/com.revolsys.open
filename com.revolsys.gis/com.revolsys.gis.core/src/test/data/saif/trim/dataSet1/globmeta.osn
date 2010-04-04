@@ -1,0 +1,57 @@
+GlobalMetadata(
+	objectIdentifier: "GlobalMetadata"
+	creationTime: TimeStamp(
+		day: 14
+		hour: 12
+		minute: 7
+		month: 8
+		second: 13
+		year: 2002
+	)
+	saifProfile: Profile(
+		authority: "Government of British Columbia"
+		idName: "SAIFLite"
+		version: "Release 1.1"
+	)
+	saifRelease: "SAIF 3.2"
+	toolkitVersion: "SAIF Toolkit Version 1.4.0(May 05, 1997)"
+	userProfile: UserProfile(
+		coordDefs: LocationalDefinitions(
+			c1: real32
+			c2: real32
+			c3: real32
+			varY: real32
+			magnitude: real32
+			covYZ: real32
+			phi: real32
+			varChi: real32
+			chi: real32
+			alignment: real32
+			varX: real32
+			omega: real32
+			varZ: real32
+			covXZ: real32
+			kappa: real32
+			varEta: real32
+			month: integer8
+			azimuth: real32
+			covXY: real32
+			day: integer8
+			eta: real32
+			second: integer8
+			hour: integer8
+			declination: real32
+			covChiEta: real32
+			year: integer8
+			minute: integer8
+			n: real32
+			varN: real32
+		)
+		organization: 4
+		characters: CharDef(
+			standard: "ASCII"
+			private: false
+		)
+	)
+)
+

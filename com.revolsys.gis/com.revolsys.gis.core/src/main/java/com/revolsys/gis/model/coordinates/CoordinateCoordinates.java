@@ -1,0 +1,66 @@
+package com.revolsys.gis.model.coordinates;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
+public class CoordinateCoordinates implements Coordinates {
+  private Coordinate coordinate;
+
+  public CoordinateCoordinates(
+    final Coordinate coordinate) {
+    this.coordinate = coordinate;
+  }
+
+  public Coordinate getCoordinate() {
+    return coordinate;
+  }
+
+  public byte getNumAxis() {
+    if (Double.isNaN(coordinate.z)) {
+      return 2;
+    } else {
+      return 3;
+    }
+  }
+
+  public double getValue(
+    final int index) {
+    switch (index) {
+      case 0:
+        return coordinate.x;
+      case 1:
+        return coordinate.y;
+      case 2:
+        return coordinate.z;
+      default:
+        return Double.NaN;
+    }
+  }
+
+  public void setCoordinate(
+    final Coordinate coordinate) {
+    this.coordinate = coordinate;
+  }
+
+  public void setValue(
+    final int index,
+    final double value) {
+    switch (index) {
+      case 0:
+        coordinate.x = value;
+      break;
+      case 1:
+        coordinate.y = value;
+      break;
+      case 2:
+        coordinate.z = value;
+      break;
+      default:
+      break;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return coordinate.toString();
+  }
+}

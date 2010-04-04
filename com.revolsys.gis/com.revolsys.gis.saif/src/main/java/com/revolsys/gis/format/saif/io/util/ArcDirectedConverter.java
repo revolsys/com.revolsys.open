@@ -1,0 +1,24 @@
+package com.revolsys.gis.format.saif.io.util;
+
+import java.io.IOException;
+import java.util.Map;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
+
+public class ArcDirectedConverter extends ArcConverter {
+
+  public ArcDirectedConverter(
+    final GeometryFactory geometryFactory) {
+    super(geometryFactory, "ArcDirected");
+  }
+
+  @Override
+  protected void writeAttributes(
+    final OsnSerializer serializer,
+    final Map<String, Object> values)
+    throws IOException {
+    writeEnumAttribute(serializer, values, "flowDirection");
+    writeEnumAttribute(serializer, values, "qualifier");
+  }
+
+}
