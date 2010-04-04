@@ -16,6 +16,7 @@
     <module>com.revolsys.orm</module>
     <module>com.revolsys.web</module>
     <module>com.revolsys.gis</module>
+    <module>com.revolsys.jump</module>
   </modules>
   <organization>
   	<name>Revolution Systems Inc.</name>
