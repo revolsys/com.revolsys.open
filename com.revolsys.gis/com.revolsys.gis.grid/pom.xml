@@ -4,11 +4,11 @@
   <groupId>com.revolsys.gis</groupId>
   <artifactId>com.revolsys.gis.grid</artifactId>
   <name>Map Grids</name>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>TRUNK-SNAPSHOT</version>
   <parent>
     <artifactId>com.revolsys.gis</artifactId>
     <groupId>com.revolsys.gis</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
   	<dependency>

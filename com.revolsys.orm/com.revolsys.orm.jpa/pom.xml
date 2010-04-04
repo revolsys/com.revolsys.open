@@ -5,12 +5,12 @@
   <groupId>com.revolsys.orm</groupId>
   <artifactId>com.revolsys.orm.jpa</artifactId>
   <name>ORM JPA</name>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>TRUNK-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
   	<artifactId>com.revolsys.orm</artifactId>
   	<groupId>com.revolsys.orm</groupId>
-  	<version>1.0.0-SNAPSHOT</version>
+  	<version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>

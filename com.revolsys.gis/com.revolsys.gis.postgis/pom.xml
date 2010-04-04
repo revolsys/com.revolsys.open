@@ -3,12 +3,12 @@
   <name>PostGIS Reader</name>
   <groupId>com.revolsys.gis</groupId>
   <artifactId>com.revolsys.gis.postgis</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>TRUNK-SNAPSHOT</version>
   <url>http://www.revolsys.com</url>
   <parent>
     <groupId>com.revolsys.gis</groupId>
     <artifactId>com.revolsys.gis</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>

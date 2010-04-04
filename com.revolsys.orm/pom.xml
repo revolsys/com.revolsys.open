@@ -5,66 +5,16 @@
   <groupId>com.revolsys.orm</groupId>
   <artifactId>com.revolsys.orm</artifactId>
   <name>Revolution Systems - ORM</name>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>TRUNK-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<parent>
+		<artifactId>com.revolsys</artifactId>
+		<groupId>com.revolsys</groupId>
+		<version>TRUNK-SNAPSHOT</version>
+	</parent>
   <modules>
   	<module>com.revolsys.orm.core</module>
   	<module>com.revolsys.orm.hibernate</module>
   	<module>com.revolsys.orm.jpa</module>
   </modules>
-  <repositories>
-    <repository>
-        <id>open.revolsys.com</id>
-        <url>http://open.revolsys.com/m2/repository/</url>
-        <releases>
-           <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>        
-     </repository>
-    <repository>
-        <id>snapshot.open.revolsys.com</id>
-        <url>http://open.revolsys.com/m2/snapshotRepository/</url>
-        <releases>
-           <enabled>false</enabled>
-        </releases>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>        
-     </repository>
-  </repositories>
-
-  <distributionManagement>
-  	<repository>
-  		<id>open.revolsys.com</id>
-  		<name>Revolution Systems Maven Repository</name>
-  		<url>file:../../maven/com.revolsys.open/repository/</url>
-  	</repository>
-  	<snapshotRepository>
-  		<id>snapshots-open.revolsys.com</id>
-  		<name>Revolution Systems Maven Snapshot Repository</name>
-  		<url>file:../../maven/com.revolsys.open/snapshotRepository/</url>
-      <uniqueVersion>false</uniqueVersion>
-  	</snapshotRepository>
-  </distributionManagement>
-  <properties>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<com.revolsys.util.version>1.0.2-SNAPSHOT</com.revolsys.util.version>
-		<org.springframework.version>3.0.1.RELEASE</org.springframework.version>
-		<org.springframework.security.version>3.0.2.RELEASE</org.springframework.security.version>
-	</properties>
 </project>

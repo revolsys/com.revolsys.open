@@ -3,12 +3,12 @@
   <parent>
     <artifactId>com.revolsys.gis</artifactId>
     <groupId>com.revolsys.gis</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <groupId>com.revolsys.gis</groupId>
   <artifactId>com.revolsys.gis.web</artifactId>
   <name>GIS Web</name>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>TRUNK-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>com.revolsys.gis</groupId>
@@ -20,7 +20,7 @@
   	<dependency>
   		<groupId>com.revolsys</groupId>
   		<artifactId>com.revolsys.web</artifactId>
-  		<version>${com.revolsys.web.version}</version>
+  		<version>${project.version}</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
