@@ -8,7 +8,7 @@
 		<version>TRUNK-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-  <groupId>com.revolsys.jump</groupId>
+  <groupId>com.revolsys</groupId>
   <artifactId>com.revolsys.jump</artifactId>
   <name>RS Jump</name>
   <version>TRUNK-SNAPSHOT</version>
