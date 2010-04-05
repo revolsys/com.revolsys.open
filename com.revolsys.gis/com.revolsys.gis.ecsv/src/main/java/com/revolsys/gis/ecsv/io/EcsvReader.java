@@ -9,13 +9,15 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.AbstractReader;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class EcsvReader extends AbstractReader<DataObject> {
+public class EcsvReader extends AbstractReader<DataObject> implements
+  DataObjectReader {
   public static DataObjectMetaData getMetaData(
     final InputStream in) {
     final EcsvDataObjectReaderFactory ecsvDataObjectReaderFactory = EcsvDataObjectReaderFactory.INSTANCE;

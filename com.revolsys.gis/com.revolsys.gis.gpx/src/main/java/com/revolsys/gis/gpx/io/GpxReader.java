@@ -32,11 +32,12 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.AbstractReader;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.FileUtil;
 
-public class GpxReader extends AbstractReader<DataObject> {
+public class GpxReader extends AbstractReader<DataObject>  {
 
   private final DataObjectFactory dataObjectFactory;
 

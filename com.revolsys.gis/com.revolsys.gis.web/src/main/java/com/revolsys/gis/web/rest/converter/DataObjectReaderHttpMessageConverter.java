@@ -1,26 +1,23 @@
 package com.revolsys.gis.web.rest.converter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
-import com.revolsys.gis.data.io.DataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.IoFactoryRegistry;
@@ -29,56 +26,21 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectHttpMessageConverter extends
-  AbstractHttpMessageConverter<DataObject> {
+public class DataObjectReaderHttpMessageConverter extends
+  AbstractHttpMessageConverter<DataObjectReader> {
 
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
-  public DataObjectHttpMessageConverter() {
-    super(DataObject.class,
-      IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectReaderFactory.class),
+  public DataObjectReaderHttpMessageConverter() {
+    super(DataObjectReader.class, null,
       IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
   }
 
   @Override
-  public DataObject read(
-    Class<? extends DataObject> clazz,
-    HttpInputMessage inputMessage)
-    throws IOException,
-    HttpMessageNotReadableException {
-    try {
-      final HttpHeaders headers = inputMessage.getHeaders();
-      final MediaType mediaType = headers.getContentType();
-      Charset charset = mediaType.getCharSet();
-      if (charset == null) {
-        charset = DEFAULT_CHARSET;
-      }
-      final InputStream body = inputMessage.getBody();
-      final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
-      final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByMediaType(
-        DataObjectReaderFactory.class, mediaTypeString);
-      if (readerFactory == null) {
-        throw new HttpMessageNotReadableException("Cannot read data in format"
-          + mediaType);
-      } else {
-        final Reader<DataObject> reader = readerFactory.createDataObjectReader(
-          body, charset);
-        for (DataObject dataObject : reader) {
-          return dataObject;
-        }
-        return null;
-      }
-    } catch (IOException e) {
-      throw new HttpMessageNotReadableException("Error reading data", e);
-    }
-  }
-
-  @Override
   public void write(
-    final DataObject dataObject,
+    final DataObjectReader reader,
     final MediaType mediaType,
     final HttpOutputMessage outputMessage)
     throws IOException,
@@ -102,7 +64,7 @@ public class DataObjectHttpMessageConverter extends
         throw new IllegalArgumentException("Media type " + actualMediaType
           + " not supported");
       } else {
-        final DataObjectMetaData metaData = dataObject.getMetaData();
+        final DataObjectMetaData metaData = reader.getMetaData();
         String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
         final String fileName = baseName + "."
@@ -112,23 +74,32 @@ public class DataObjectHttpMessageConverter extends
         final OutputStream body = outputMessage.getBody();
         final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
           baseName, metaData, body, charset);
-
-        Geometry geometry = dataObject.getGeometryValue();
-        if (geometry != null) {
-          CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-          writer.setProperty(new QName("srid"), coordinateSystem.getId());
-        }
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(QName.valueOf("wrap"), false);
         }
-        final String callback = (String)requestAttributes.getAttribute(
-          "jsonp", RequestAttributes.SCOPE_REQUEST);
+        final String callback = (String)requestAttributes.getAttribute("jsonp",
+          RequestAttributes.SCOPE_REQUEST);
         if (callback != null) {
           writer.setProperty(QName.valueOf("jsonp"), callback);
         }
-        writer.write(dataObject);
+        Iterator<DataObject> iterator = reader.iterator();
+        if (iterator.hasNext()) {
+          DataObject dataObject = iterator.next();
+          Geometry geometry = dataObject.getGeometryValue();
+          if (geometry != null) {
+            CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
+            writer.setProperty(new QName("srid"), coordinateSystem.getId());
+          }
+
+          writer.write(dataObject);
+          while (iterator.hasNext()) {
+            dataObject = iterator.next();
+            writer.write(dataObject);
+
+          }
+        }
         writer.close();
       }
     }
