@@ -3,6 +3,7 @@ package com.revolsys.gis.server.controller;
 import javax.xml.namespace.QName;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,6 +21,7 @@ public class DataService {
   @RequestMapping("/dataStores/{dataStoreName}")
   @ResponseBody
   public DataObjectStore getDataStore(
+    @PathVariable("dataStoreName")
     final String dataStoreName) {
     return dataStores.getDataObjectStore(dataStoreName);
   }
@@ -27,7 +29,9 @@ public class DataService {
   @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}")
   @ResponseBody
   public DataObjectStoreSchema getSchema(
+    @PathVariable("dataStoreName")
     final String dataStoreName,
+    @PathVariable("schemaName")
     final String schemaName) {
     final DataObjectStore dataStore = dataStores.getDataObjectStore(dataStoreName);
     if (dataStore == null) {
@@ -40,8 +44,11 @@ public class DataService {
   @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}/types/{typeName}")
   @ResponseBody
   public DataObjectMetaData getType(
+    @PathVariable("dataStoreName")
     final String dataStoreName,
+    @PathVariable("schemaName")
     final String schemaName,
+    @PathVariable("typeName")
     final String typeName) {
     final DataObjectStore dataStore = dataStores.getDataObjectStore(dataStoreName);
     if (dataStore == null) {
@@ -59,8 +66,11 @@ public class DataService {
   @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}/types/{typeName}/records")
   @ResponseBody
   public Reader<DataObject> getRecords(
+    @PathVariable("dataStoreName")
     final String dataStoreName,
+    @PathVariable("schemaName")
     final String schemaName,
+    @PathVariable("typeName")
     final String typeName) {
     final DataObjectStore dataStore = dataStores.getDataObjectStore(dataStoreName);
     if (dataStore == null) {

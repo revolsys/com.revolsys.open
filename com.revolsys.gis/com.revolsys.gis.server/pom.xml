@@ -18,6 +18,21 @@
   	</dependency>
   	<dependency>
   		<groupId>com.revolsys.gis</groupId>
+  		<artifactId>com.revolsys.gis.ecsv</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.revolsys.gis</groupId>
+  		<artifactId>com.revolsys.gis.html</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.revolsys.gis</groupId>
+  		<artifactId>com.revolsys.gis.kml</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.revolsys.gis</groupId>
   		<artifactId>com.revolsys.gis.oracle</artifactId>
   		<version>${project.version}</version>
   	</dependency>

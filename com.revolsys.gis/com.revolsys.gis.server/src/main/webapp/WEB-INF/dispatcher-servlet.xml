@@ -12,6 +12,62 @@
   "
 >
   <import resource="classpath:com/revolsys/parallel/attributes.sf.xml" />
+
+  <bean
+    class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"
+  >
+   </bean>
+
+  <bean
+    class="com.revolsys.ui.web.rest.interceptor.AnnotationMethodHandlerAdapter"
+    p:defaultMediaType="text/html"
+  >
+    <property name="messageConverters">
+      <list >
+        <bean
+          class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
+        />
+        <bean
+          class="org.springframework.http.converter.StringHttpMessageConverter"
+        />
+        <bean
+          class="org.springframework.http.converter.FormHttpMessageConverter"
+        />
+        <bean
+          class="org.springframework.http.converter.xml.SourceHttpMessageConverter"
+        />
+        <bean
+          class="com.revolsys.gis.web.rest.converter.GeometryHttpMessageConverter"
+        />
+        <bean
+          class="com.revolsys.gis.web.rest.converter.DataObjectHttpMessageConverter"
+        />
+        <bean
+          class="com.revolsys.ui.web.rest.converter.MapHttpMessageConverter"
+        />
+        <bean
+          class="com.revolsys.gis.web.rest.converter.DataObjectReaderHttpMessageConverter"
+        />
+      </list>
+    </property>
+    <property name="mediaTypes">
+      <map>
+        <entry key="html" value="text/html" />
+        <entry key="wkt" value="text/x-wkt" />
+        <entry key="ecsv" value="text/x-ecsv" />
+        <entry key="xml" value="text/xml" />
+        <entry key="json" value="application/json" />
+        <entry key="kml" value="application/vnd.google-earth.kml+xml" />
+        <entry key="shpz" value="application/x-shp+zip" />
+        <entry key="geojson" value="text/x-geojson" />
+      </map>
+    </property>
+  </bean>
+  
+   <context:component-scan
+    base-package="com.revolsys.gis.server.controller"
+    annotation-config="false"
+  />
   
   <bean
     id="dataStores"
@@ -28,7 +84,7 @@
 						  <bean
 						    class="oracle.jdbc.pool.OracleDataSource"
 						    p:connectionCachingEnabled="true"
-						    p:URL="jdbc:oracle:thin:@localhost:1521:db"
+						    p:URL="jdbc:oracle:thin:@revolsys.com:1521:db"
 						    p:user="proxy_geomark_web"
 						    p:password="g30m4rk"
 						    lazy-init="true"
@@ -43,11 +99,6 @@
   <bean
     id="dataService"
     class="com.revolsys.gis.server.controller.DataService"
-  >
-    <property name="dataStores">
-      <list>
-        <ref bean="dataStores" />
-      </list>
-    </property>
-  </bean>
+    p:dataStores-ref="dataStores"
+  />
 </beans>
