@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -116,17 +114,17 @@ public class DataObjectHttpMessageConverter extends
         Geometry geometry = dataObject.getGeometryValue();
         if (geometry != null) {
           CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-          writer.setProperty(new QName("srid"), coordinateSystem.getId());
+          writer.setProperty("srid", coordinateSystem.getId());
         }
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
-          writer.setProperty(QName.valueOf("wrap"), false);
+          writer.setProperty("wrap", false);
         }
-        final String callback = (String)requestAttributes.getAttribute(
-          "jsonp", RequestAttributes.SCOPE_REQUEST);
+        final String callback = (String)requestAttributes.getAttribute("jsonp",
+          RequestAttributes.SCOPE_REQUEST);
         if (callback != null) {
-          writer.setProperty(QName.valueOf("jsonp"), callback);
+          writer.setProperty("jsonp", callback);
         }
         writer.write(dataObject);
         writer.close();

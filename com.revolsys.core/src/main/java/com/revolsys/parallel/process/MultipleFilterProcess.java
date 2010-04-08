@@ -1,6 +1,5 @@
 package com.revolsys.parallel.process;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;

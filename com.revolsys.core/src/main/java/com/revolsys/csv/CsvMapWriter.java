@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.MapWriter;
 
 public class CsvMapWriter extends AbstractMapWriter {
   private List<String> fieldNames;

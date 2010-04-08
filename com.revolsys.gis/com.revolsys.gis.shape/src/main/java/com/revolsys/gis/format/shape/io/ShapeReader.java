@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
@@ -38,7 +36,7 @@ public class ShapeReader extends AbstractReader<DataObject> implements
   }
 
   @Override
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return iterator.getProperties();
   }
 

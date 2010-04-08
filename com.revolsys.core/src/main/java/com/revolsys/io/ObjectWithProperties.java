@@ -1,8 +1,6 @@
-package com.revolsys.gis.data.io;
+package com.revolsys.io;
 
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 public interface ObjectWithProperties {
 
@@ -11,7 +9,7 @@ public interface ObjectWithProperties {
    * 
    * @return The properties.
    */
-  Map<QName, Object> getProperties();
+  Map<String, Object> getProperties();
 
   /**
    * Get a property about the reader.
@@ -20,7 +18,7 @@ public interface ObjectWithProperties {
    * @return The property.
    */
   <C> C getProperty(
-    QName name);
+    String name);
 
-  void setProperty(QName name, Object value);
+  void setProperty(String name, Object value);
 }

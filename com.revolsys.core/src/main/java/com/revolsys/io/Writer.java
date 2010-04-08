@@ -20,23 +20,11 @@
  */
 package com.revolsys.io;
 
-import java.util.Map;
 
-import javax.xml.namespace.QName;
-
-public interface Writer<T> {
+public interface Writer<T> extends ObjectWithProperties {
   void close();
 
   void flush();
-
-  Map<QName, Object> getProperties();
-
-  <V> V getProperty(
-    final QName name);
-
-  void setProperty(
-    QName name,
-    Object value);
 
   void write(
     T object);

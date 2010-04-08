@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
@@ -28,8 +27,7 @@ public class JdbcCodeTableProperty extends AbstractCodeTable implements
   DataObjectMetaDataProperty {
   private static final Logger LOG = Logger.getLogger(JdbcCodeTableProperty.class);
 
-  public static final QName PROPERTY_NAME = new QName(
-    JdbcCodeTableProperty.class.getName());
+  public static final String PROPERTY_NAME = JdbcCodeTableProperty.class.getName();
 
   public static final JdbcCodeTableProperty getProperty(
     final DataObjectMetaData metaData) {
@@ -169,7 +167,7 @@ public class JdbcCodeTableProperty extends AbstractCodeTable implements
     return metaData;
   }
 
-  public QName getPropertyName() {
+  public String getPropertyName() {
     return PROPERTY_NAME;
   }
 

@@ -27,7 +27,6 @@ import com.revolsys.jump.ui.swing.view.InfoGeometryViewFactory;
 import com.revolsys.jump.ui.swing.view.InfoTableViewFactory;
 import com.revolsys.jump.ui.swing.view.LayerPanelComponentFactory;
 import com.revolsys.jump.ui.swing.view.MapViewComponentFactory;
-import com.revolsys.jump.ui.swing.view.NewInfoTableViewFactory;
 import com.revolsys.jump.ui.task.DockingTaskFrameFactory;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.workbench.WorkbenchContext;

@@ -9,9 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
@@ -246,8 +244,8 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
 
   private void writeFileProperties() {
     try {
-      for (final Entry<QName, Object> property : getProperties().entrySet()) {
-        final QName name = property.getKey();
+      for (final Entry<String, Object> property : getProperties().entrySet()) {
+        final String name = property.getKey();
         final Object value = property.getValue();
         writeFileProperty(name, value);
       }
@@ -260,7 +258,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
   }
 
   private void writeFileProperty(
-    final QName name,
+    final String name,
     final Object value)
     throws IOException {
     if (value != null) {

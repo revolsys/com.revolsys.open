@@ -4,14 +4,10 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -24,12 +20,14 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class MoepBinaryIterator implements Iterator {
+public class MoepBinaryIterator extends AbstractObjectWithProperties implements
+  Iterator<DataObject> {
   private static final int COMPLEX_LINE = 3;
 
   private static final int CONSTRUCTION_COMPLEX_LINE = 5;
@@ -71,8 +69,6 @@ public class MoepBinaryIterator implements Iterator {
   private String originalFileType;
 
   private long position = 0;
-
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
 
   public MoepBinaryIterator(
     final MoepDirectoryReader directoryReader,
@@ -130,10 +126,6 @@ public class MoepBinaryIterator implements Iterator {
     } else {
       return baseName;
     }
-  }
-
-  public Map<QName, Object> getProperties() {
-    return properties;
   }
 
   public boolean hasNext() {
@@ -253,7 +245,7 @@ public class MoepBinaryIterator implements Iterator {
     final double longitude = bcgsGrid.getLongitude(mapsheet) - 0.1;
     final int crsId = utmGrid.getNad83Srid(longitude, latitude);
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
-    properties.put(new QName("coordinateSystem"), coordinateSystem);
+    setProperty("coordinateSystem", coordinateSystem);
 
     final String submissionDateString = readString(6);
 
@@ -261,7 +253,7 @@ public class MoepBinaryIterator implements Iterator {
     final int centreY = readLEInt(in);
     center = new DoubleCoordinates(centreX, centreY);
     final PrecisionModel precisionModel = new PrecisionModel(1);
-    factory = new GeometryFactory(coordinateSystem,precisionModel);
+    factory = new GeometryFactory(coordinateSystem, precisionModel);
   }
 
   protected DataObject loadNextRecord() {

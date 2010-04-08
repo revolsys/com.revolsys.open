@@ -8,7 +8,6 @@ import oracle.jdbc.pool.OracleDataSource;
 
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.gis.oracle.io.OracleFactory;
-import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.datastore.AdhocQuery;

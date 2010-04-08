@@ -1,9 +1,8 @@
 package com.revolsys.gis.data.model;
 
-import javax.xml.namespace.QName;
 
 public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
-  private QName propertyName;
+  private String propertyName;
 
   private Object value;
 
@@ -11,7 +10,7 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
   }
 
   public SimpleProperty(
-    final QName propertyName,
+    final String propertyName,
     final Object value) {
     this.propertyName = propertyName;
     this.value = value;
@@ -22,7 +21,7 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
     return new SimpleProperty(propertyName, value);
   }
 
-  public QName getPropertyName() {
+  public String getPropertyName() {
     return propertyName;
   }
 
@@ -31,7 +30,7 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
   }
 
   public void setPropertyName(
-    final QName propertyName) {
+    final String propertyName) {
     this.propertyName = propertyName;
   }
 

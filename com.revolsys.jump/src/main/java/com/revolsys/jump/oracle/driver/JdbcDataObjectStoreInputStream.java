@@ -8,7 +8,6 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.jump.model.DataObjectFeature;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureSchema;

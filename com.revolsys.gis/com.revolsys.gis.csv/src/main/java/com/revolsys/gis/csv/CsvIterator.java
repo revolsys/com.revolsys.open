@@ -39,7 +39,7 @@ public class CsvIterator implements Iterator<DataObject> {
   private DataObjectMetaDataImpl metaData;
 
   /** The map of file property names and values. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
+  private final Map<String, Object> properties = new HashMap<String, Object>();
 
   /**
    * The current record number.
@@ -110,13 +110,13 @@ public class CsvIterator implements Iterator<DataObject> {
     return nextLine;
   }
 
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getProperty(
-    final QName name) {
+    final String name) {
     return (V)properties.get(name);
   }
 

@@ -2,8 +2,6 @@ package com.revolsys.jump.ui.swing.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;

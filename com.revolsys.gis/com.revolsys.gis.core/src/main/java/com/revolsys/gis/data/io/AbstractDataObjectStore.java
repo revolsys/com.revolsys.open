@@ -2,7 +2,6 @@ package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,13 +13,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.io.AbstractObjectWithProperties;
 
-public abstract class AbstractDataObjectStore implements DataObjectStore {
+public abstract class AbstractDataObjectStore extends
+  AbstractObjectWithProperties implements DataObjectStore {
 
   private final DataObjectFactory dataObjectFactory;
-
-  /** The meta data properties of the data type. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
 
   private Map<String, DataObjectStoreSchema> schemaMap = new TreeMap<String, DataObjectStoreSchema>();
 
@@ -91,16 +89,6 @@ public abstract class AbstractDataObjectStore implements DataObjectStore {
     }
   }
 
-  public Map<QName, Object> getProperties() {
-    return properties;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> V getProperty(
-    final QName name) {
-    return (V)properties.get(name);
-  }
-
   public DataObjectStoreSchema getSchema(
     final String schemaName) {
     synchronized (schemaMap) {
@@ -168,12 +156,6 @@ public abstract class AbstractDataObjectStore implements DataObjectStore {
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
-
-  public void setProperty(
-    final QName name,
-    final Object value) {
-    properties.put(name, value);
-  }
 
   public void setSchemaMap(
     final Map<String, DataObjectStoreSchema> schemaMap) {

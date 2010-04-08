@@ -20,7 +20,6 @@ import javax.xml.namespace.QName;
 
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
-import org.springframework.core.io.ResourceLoader;
 
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 

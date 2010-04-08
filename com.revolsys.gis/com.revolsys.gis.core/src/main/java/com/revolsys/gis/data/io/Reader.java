@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.io.ObjectWithProperties;
 
 /**
  * <p>

@@ -2,8 +2,6 @@ package com.revolsys.parallel.channel;
 
 import java.util.LinkedList;
 
-import com.revolsys.parallel.process.Process;
-
 /**
  * <h2>Description</h2>
  * <p>

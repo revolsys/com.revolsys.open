@@ -9,8 +9,7 @@ public interface EcsvConstants {
 
   String NS_URI = "";
 
-  QName ATTRIBUTE_HEADER_TYPES = new QName(NS_URI, "attributeHeaderTypes",
-    NS_PREFIX);
+  String ATTRIBUTE_HEADER_TYPES = "attributeHeaderTypes";
 
   QName ATTRIBUTE_LENGTH = new QName(NS_URI, "attributeLength", NS_PREFIX);
 
@@ -36,9 +35,9 @@ public interface EcsvConstants {
 
   char QUOTE_CHARACTER = '"';
 
-  QName SRID = new QName(NS_URI, "srid", NS_PREFIX);
+  String SRID = "srid";
 
-  QName TYPE_NAME = new QName(NS_URI, "typeName", NS_PREFIX);
+  String TYPE_NAME = "typeName";
 
   String MEDIA_TYPE = "text/x-ecsv";
 }

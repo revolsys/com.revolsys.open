@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
@@ -167,7 +166,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
       writeHeader(indexOut);
     }
 
-    Integer srid = getProperty(new QName("srid"));
+    Integer srid = getProperty("srid");
     if (srid != null && srid > 0) {
       this.coordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
         "EPSG", String.valueOf(srid)));

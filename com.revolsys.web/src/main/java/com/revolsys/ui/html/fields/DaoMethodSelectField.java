@@ -10,7 +10,6 @@ import org.apache.commons.beanutils.MethodUtils;
 
 import com.revolsys.orm.core.DataAccessObject;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.CaseConverter;
 
 public class DaoMethodSelectField extends SelectField {
 

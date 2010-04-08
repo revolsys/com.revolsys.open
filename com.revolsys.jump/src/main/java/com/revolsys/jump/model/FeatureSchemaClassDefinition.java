@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;

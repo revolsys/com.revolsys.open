@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import com.revolsys.parallel.channel.Buffer;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
-import com.revolsys.parallel.tools.ThreadSharedAttributes;
 
 public abstract class AbstractOutProcess<T> extends AbstractProcess implements
   OutProcess<T> {

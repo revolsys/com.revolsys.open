@@ -5,8 +5,6 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.NamedObject;
@@ -61,11 +59,11 @@ public class XhtmlMapWriter extends AbstractMapWriter {
   }
 
   public void setProperty(
-    final QName name,
+    final String name,
     final Object value) {
-    if (name.getLocalPart().equals("wrap")) {
+    if (name.equals("wrap")) {
       wrap = Boolean.valueOf(value.toString());
-    } else if (name.getLocalPart().equals("title")) {
+    } else if (name.equals("title")) {
       title = value.toString();
     }
     super.setProperty(name, value);

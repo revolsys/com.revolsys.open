@@ -6,8 +6,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -49,12 +47,12 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
       MapWriterFactory.class, mediaTypeString);
     final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
       body, charset));
-    writer.setProperty(new QName("indent"), true);
+    writer.setProperty("indent", true);
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     final String callback = (String)requestAttributes.getAttribute("jsonp",
       RequestAttributes.SCOPE_REQUEST);
     if (callback != null) {
-      writer.setProperty(QName.valueOf("jsonp"), callback);
+      writer.setProperty("jsonp", callback);
     }
     writer.write(map);
     writer.close();

@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractReader;
@@ -77,7 +75,7 @@ public class CsvReader extends AbstractReader<DataObject> implements DataObjectR
   }
 
   @Override
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return iterator().getProperties();
   }
 

@@ -47,22 +47,9 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   private DataObjectFactory dataObjectFactory = new ArrayDataObjectFactory();
 
-  private DataObjectStore dataObjectStore;
-
   private DataObjectMetaDataFactory dataObjectMetaDataFactory;
 
-  public DataObjectMetaDataFactory getDataObjectMetaDataFactory() {
-    if (dataObjectMetaDataFactory == null) {
-      return dataObjectStore;
-    } else {
-      return dataObjectMetaDataFactory;
-    }
-  }
-
-  public void setDataObjectMetaDataFactory(
-    DataObjectMetaDataFactory dataObjectMetaDataFactory) {
-    this.dataObjectMetaDataFactory = dataObjectMetaDataFactory;
-  }
+  private DataObjectStore dataObjectStore;
 
   private final Map<String, Object> defaultValues = new HashMap<String, Object>();
 
@@ -80,7 +67,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   private QName name;
 
   /** The meta data properties of the data type. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
+  private final Map<String, Object> properties = new HashMap<String, Object>();
 
   private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
@@ -133,14 +120,14 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   public DataObjectMetaDataImpl(
     final QName name,
-    final Map<QName, Object> properties,
+    final Map<String, Object> properties,
     final Attribute... attributes) {
     this(name, properties, Arrays.asList(attributes));
   }
 
   public DataObjectMetaDataImpl(
     final QName name,
-    final Map<QName, Object> properties,
+    final Map<String, Object> properties,
     final List<Attribute> attributes) {
     this.name = name;
     for (final Attribute attribute : attributes) {
@@ -227,10 +214,10 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   private void cloneProperties(
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     if (properties != null) {
-      for (Entry<QName, Object> property : properties.entrySet()) {
-        final QName propertyName = property.getKey();
+      for (final Entry<String, Object> property : properties.entrySet()) {
+        final String propertyName = property.getKey();
         if (property instanceof DataObjectMetaDataProperty) {
           DataObjectMetaDataProperty metaDataProperty = (DataObjectMetaDataProperty)property;
           metaDataProperty = metaDataProperty.clone();
@@ -330,6 +317,18 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return attribute.getType();
   }
 
+  public DataObjectFactory getDataObjectFactory() {
+    return dataObjectFactory;
+  }
+
+  public DataObjectMetaDataFactory getDataObjectMetaDataFactory() {
+    if (dataObjectMetaDataFactory == null) {
+      return dataObjectStore;
+    } else {
+      return dataObjectMetaDataFactory;
+    }
+  }
+
   public DataObjectStore getDataObjectStore() {
     return dataObjectStore;
   }
@@ -341,10 +340,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   public Map<String, Object> getDefaultValues() {
     return defaultValues;
-  }
-
-  public DataObjectFactory getDataObjectFactory() {
-    return dataObjectFactory;
   }
 
   public Attribute getGeometryAttribute() {
@@ -387,13 +382,13 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return name;
   }
 
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getProperty(
-    final QName name) {
+    final String name) {
     return (V)properties.get(name);
   }
 
@@ -452,6 +447,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
+  public void setDataObjectMetaDataFactory(
+    final DataObjectMetaDataFactory dataObjectMetaDataFactory) {
+    this.dataObjectMetaDataFactory = dataObjectMetaDataFactory;
+  }
+
   /**
    * @param geometryAttributeIndex the geometryAttributeIndex to set
    */
@@ -486,10 +486,10 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public void setProperties(
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     if (properties != null) {
       this.properties.putAll(properties);
-      for (final Entry<QName, Object> propertyIter : properties.entrySet()) {
+      for (final Entry<String, Object> propertyIter : properties.entrySet()) {
         if (propertyIter.getValue() instanceof DataObjectMetaDataProperty) {
           final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)propertyIter.getValue();
           property.setMetaData(this);
@@ -500,7 +500,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public void setProperty(
-    final QName name,
+    final String name,
     final Object value) {
     properties.put(name, value);
   }

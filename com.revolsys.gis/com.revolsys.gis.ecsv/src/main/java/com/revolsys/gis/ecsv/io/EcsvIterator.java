@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,12 +26,14 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTReader;
 
-public class EcsvIterator implements Iterator<DataObject> {
+public class EcsvIterator extends AbstractObjectWithProperties implements
+  Iterator<DataObject> {
   private static final Logger LOG = Logger.getLogger(EcsvIterator.class);
 
   /** The values for each record header type. */
@@ -62,9 +63,6 @@ public class EcsvIterator implements Iterator<DataObject> {
   /** The metadata for the data being read by this iterator. */
   private DataObjectMetaDataImpl metaData;
 
-  /** The map of file property names and values. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
-
   /**
    * The current record number.
    */
@@ -89,7 +87,7 @@ public class EcsvIterator implements Iterator<DataObject> {
     final QName srid = getProperty(EcsvConstants.SRID);
     if (srid != null) {
       final Integer sridNum = Integer.valueOf(srid.getLocalPart());
-      properties.put(new QName("coordinateSystem"),
+      setProperty("coordinateSystem",
         EpsgCoordinateSystems.getCoordinateSystem(sridNum));
       geomFactory = new GeometryFactory(geometryFactory.getPrecisionModel(),
         sridNum);
@@ -137,8 +135,8 @@ public class EcsvIterator implements Iterator<DataObject> {
       attributes.add(new Attribute(name, type, attributeLength, attributeScale,
         attributeTypeRequired));
     }
-    final QName typeName = (QName)properties.get(EcsvConstants.TYPE_NAME);
-    metaData = new DataObjectMetaDataImpl(typeName, properties, attributes);
+    final QName typeName = getProperty(EcsvConstants.TYPE_NAME);
+    metaData = new DataObjectMetaDataImpl(typeName, getProperties(), attributes);
   }
 
   public String getAttributeHeader(
@@ -195,16 +193,6 @@ public class EcsvIterator implements Iterator<DataObject> {
     return nextLine;
   }
 
-  public Map<QName, Object> getProperties() {
-    return properties;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> V getProperty(
-    final QName name) {
-    return (V)properties.get(name);
-  }
-
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
    * 
@@ -252,7 +240,7 @@ public class EcsvIterator implements Iterator<DataObject> {
           object.setValue(i, value);
         }
       } catch (final Throwable e) {
-          LOG.error("Value " + string + " invalid for field "
+        LOG.error("Value " + string + " invalid for field "
           + metaData.getAttributeName(i) + " for record " + recordCount, e);
       }
     }
@@ -405,12 +393,12 @@ public class EcsvIterator implements Iterator<DataObject> {
     throws IOException {
     for (String[] line = readNextRecord(); line != null && line.length > 0; line = readNextRecord()) {
       if (line.length == 3) {
-        final QName name = QName.valueOf(line[0]);
+        final String name = line[0];
         final QName typeName = QName.valueOf(line[1]);
         final String string = line[2];
         final DataType type = DataTypes.getType(typeName);
         final Object value = parseValue(type, string);
-        properties.put(name, value);
+        setProperty(name, value);
       }
     }
   }

@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.ecsv.service.client.EcsvDataObjectStore;
-import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
 import com.vividsolutions.jump.datastore.DataStoreConnection;
 import com.vividsolutions.jump.datastore.DataStoreException;

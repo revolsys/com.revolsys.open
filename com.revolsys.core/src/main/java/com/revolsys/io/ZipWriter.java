@@ -13,7 +13,7 @@ import java.io.OutputStream;
  * @author Paul Austin
  * @param <T> The type of data to write.
  */
-public class ZipWriter<T> extends DelegatingWriter<T> implements Writer<T> {
+public class ZipWriter<T> extends DelegatingWriter<T> {
 
   private File tempDirectory;
 

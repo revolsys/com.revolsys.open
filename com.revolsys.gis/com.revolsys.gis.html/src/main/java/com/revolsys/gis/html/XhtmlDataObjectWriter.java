@@ -3,8 +3,6 @@ package com.revolsys.gis.html;
 import java.io.Writer;
 import java.net.URI;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
@@ -66,15 +64,15 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   @Override
   public void setProperty(
-    final QName name,
+    final String name,
     final Object value) {
     super.setProperty(name, value);
     if (value != null) {
-      if (name.getLocalPart().equals("wrap")) {
+      if (name.equals("wrap")) {
         wrap = Boolean.valueOf(value.toString());
-      } else if (name.getLocalPart().equals("title")) {
+      } else if (name.equals("title")) {
         title = value.toString();
-      } else if (name.getLocalPart().equals("cssClass")) {
+      } else if (name.equals("cssClass")) {
         cssClass = value.toString();
       }
     }

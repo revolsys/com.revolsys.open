@@ -66,7 +66,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
-  private final Map<QName, Map<QName, Object>> typeMetaDataProperties = new HashMap<QName, Map<QName, Object>>();
+  private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
 
   public JdbcDataObjectStore(
     final DataObjectFactory dataObjectFactory) {
@@ -741,7 +741,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
       final DataObjectMetaDataProperty clonedProperty = property.clone();
       clonedProperty.setMetaData(metaData);
     }
-    final Map<QName, Object> properties = typeMetaDataProperties.get(typeName);
+    final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
     if (properties != null) {
       metaData.setProperties(properties);
     }
@@ -768,14 +768,14 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     final Map<Object, List<DataObjectMetaDataProperty>> typeMetaProperties) {
     for (final Entry<Object, List<DataObjectMetaDataProperty>> typeProperties : typeMetaProperties.entrySet()) {
       final QName typeName = getQName(typeProperties.getKey());
-      Map<QName, Object> currentProperties = this.typeMetaDataProperties.get(typeName);
+      Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typeName);
       if (currentProperties == null) {
-        currentProperties = new HashMap<QName, Object>();
+        currentProperties = new HashMap<String, Object>();
         this.typeMetaDataProperties.put(typeName, currentProperties);
       }
       final List<DataObjectMetaDataProperty> properties = typeProperties.getValue();
       for (final DataObjectMetaDataProperty property : properties) {
-        final QName name = property.getPropertyName();
+        final String name = property.getPropertyName();
         currentProperties.put(name, property);
       }
     }

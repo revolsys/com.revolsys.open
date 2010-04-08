@@ -108,7 +108,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private OsnReader osnReader;
 
   /** The meta data properties of the data type. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
+  private final Map<String, Object> properties = new HashMap<String, Object>();
 
   /** The directory the SAIF archive is extracted to. */
   private File saifArchiveDirectory;
@@ -319,13 +319,13 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
 
   }
 
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getProperty(
-    final QName name) {
+    final String name) {
     return (V)properties.get(name);
   }
 
@@ -701,7 +701,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   }
 
   public void setProperty(
-    final QName name,
+    final String name,
     final Object value) {
     properties.put(name, value);
   }

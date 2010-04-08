@@ -1,5 +1,7 @@
 package com.revolsys.gis.data.io;
 
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.ArrayDataObject;
@@ -35,13 +37,18 @@ public class DataObjectWriterGeometryWriter extends AbstractWriter<Geometry> {
     writer.flush();
   }
 
+  @Override
+  public Map<String, Object> getProperties() {
+    return writer.getProperties();
+  }
+
   public <V> V getProperty(
-    QName name) {
+    String name) {
     return (V)writer.getProperty(name);
   }
 
   public void setProperty(
-    QName name,
+    String name,
     Object value) {
     writer.setProperty(name, value);
   }

@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
@@ -63,7 +61,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
         writer.setUseZeroForNull(useZeroForNull);
         final Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
-          writer.setProperty(new QName("srid"), geometry.getSRID());
+          writer.setProperty("srid", geometry.getSRID());
         }
         writers.put(metaData, writer);
       } catch (final IOException e) {

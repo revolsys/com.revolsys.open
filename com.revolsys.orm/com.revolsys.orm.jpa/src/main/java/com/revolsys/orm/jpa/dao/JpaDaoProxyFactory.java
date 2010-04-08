@@ -15,12 +15,9 @@
  */
 package com.revolsys.orm.jpa.dao;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 import javax.persistence.EntityManagerFactory;
-
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.orm.core.DaoProxyFactory;
 import com.revolsys.orm.core.DataAccessObject;

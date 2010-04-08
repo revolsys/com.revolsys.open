@@ -23,29 +23,23 @@ package com.revolsys.gis.gpx.io;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.AbstractReader;
-import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.FileUtil;
 
-public class GpxReader extends AbstractReader<DataObject>  {
+public class GpxReader extends AbstractReader<DataObject> {
 
   private final DataObjectFactory dataObjectFactory;
 
   private final Reader in;
 
   private final GpxIterator iterator;
-
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
 
   private QName typeName;
 
@@ -61,18 +55,13 @@ public class GpxReader extends AbstractReader<DataObject>  {
     this.in = in;
     this.dataObjectFactory = dataObjectFactory;
     this.iterator = new GpxIterator(in, dataObjectFactory, typeName);
-    properties.put(new QName("coordinateSystem"),
+    setProperty("coordinateSystem",
       EpsgCoordinateSystems.getCoordinateSystem(4326));
 
   }
 
   public void close() {
     FileUtil.closeSilent(in);
-  }
-
-  @Override
-  public Map<QName, Object> getProperties() {
-    return Collections.unmodifiableMap(properties);
   }
 
   public Iterator iterator() {

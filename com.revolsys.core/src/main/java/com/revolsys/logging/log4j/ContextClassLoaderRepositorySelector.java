@@ -31,8 +31,8 @@ import org.apache.log4j.spi.RootLogger;
  * {@link #add()} method can be used to create a seperate logger repository for
  * the current thread context class loader. When the class loader is about to be
  * destroyed use the {@link #remove()} method to clean up the logger repository
- * for the class loader. See the {@link Log4jServletContextListener} for use in
- * web applications.
+ * for the class loader. See the Log4jServletContextListener for use in web
+ * applications.
  * 
  * @author Paul Austin
  * @version 1.0

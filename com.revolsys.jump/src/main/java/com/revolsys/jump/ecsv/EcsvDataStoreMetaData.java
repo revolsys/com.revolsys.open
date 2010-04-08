@@ -5,7 +5,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.ecsv.service.client.EcsvDataObjectStore;
-import com.revolsys.jump.model.DataObjectFeature;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jump.datastore.DataStoreMetadata;
 import com.vividsolutions.jump.feature.FeatureSchema;

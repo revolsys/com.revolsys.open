@@ -10,8 +10,6 @@ import javax.swing.MenuElement;
 
 import net.infonode.docking.DockingWindow;
 import net.infonode.docking.DockingWindowAdapter;
-import net.infonode.docking.DockingWindowListener;
-import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.View;
 import net.infonode.util.Direction;

@@ -26,10 +26,10 @@ public class XmlMapWriter extends AbstractMapWriter {
 
   @Override
   public void setProperty(
-    QName name,
+    String name,
     Object value) {
     super.setProperty(name, value);
-    if (name.getLocalPart().equals("ident")) {
+    if (name.equals("ident")) {
       out.setIndent((Boolean)value);
     }
   }

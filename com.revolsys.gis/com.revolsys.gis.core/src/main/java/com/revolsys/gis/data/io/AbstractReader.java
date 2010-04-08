@@ -21,51 +21,23 @@
 package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.io.AbstractObjectWithProperties;
 
 /**
  * The AbstracteReader is an implementation of the {@link Reader} interface,
- * which provides implementatons of {@link #read()} and {@link #visit(Visitor)}
+ * which provides implementations of {@link #read()} and {@link #visit(Visitor)}
  * which use the {@link Reader#iterator()} method which must be implemented by
  * subclasses.
  * 
  * @author Paul Austin
  * @param <T> The type of object being read.
  */
-public abstract class AbstractReader<T> implements Reader<T> {
-  private Map<QName,Object> properties = new HashMap<QName, Object>();
-  /**
-   * Get properties about the reader.
-   * 
-   * @return The properties.
-   */
-  public  Map<QName, Object> getProperties() {
-    return properties;
-  }
+public abstract class AbstractReader<T> extends AbstractObjectWithProperties
+  implements Reader<T> {
 
-  /**
-   * Get a property about the reader.
-   * 
-   * @param name The name of the property to get.
-   * @return The property.
-   */
-  @SuppressWarnings("unchecked")
-  public <C> C getProperty(
-    final QName name) {
-    return (C)getProperties().get(name);
-  }
-
-  public void setProperty(
-    QName name,
-    Object value) {
-    getProperties().put(name, value);
-  }
   /**
    * Read all items and return a List containing the items.
    * 

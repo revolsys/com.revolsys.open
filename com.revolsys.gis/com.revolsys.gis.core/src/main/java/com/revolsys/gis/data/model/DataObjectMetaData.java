@@ -27,8 +27,9 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.io.ObjectWithProperties;
 
-public interface DataObjectMetaData {
+public interface DataObjectMetaData extends ObjectWithProperties {
 
   /** The namespaceUri for standard properties. */
   String NS_URI = "http://revolsys.com/gis";
@@ -173,23 +174,6 @@ public interface DataObjectMetaData {
   QName getName();
 
   /**
-   * Get all meta data properties about the type.
-   * 
-   * @return The properties.
-   */
-  Map<QName, Object> getProperties();
-
-  /**
-   * Get the named meta data property about the type.
-   * 
-   * @param <T> The type to cast the value to.
-   * @param name The name of the property.
-   * @return The property value.
-   */
-  <T> T getProperty(
-    QName name);
-
-  /**
    * Check to see if the type has the specified attribute name.
    * 
    * @param name The name of the attribute.
@@ -218,9 +202,4 @@ public interface DataObjectMetaData {
    */
   void setName(
     QName name);
-
-  void setProperty(
-    QName name,
-    Object value);
-
 }

@@ -9,7 +9,6 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.DataObjectMetaDataFeatureSchema;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jump.datastore.DataStoreMetadata;

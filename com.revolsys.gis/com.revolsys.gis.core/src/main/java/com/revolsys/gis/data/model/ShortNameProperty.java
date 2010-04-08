@@ -1,10 +1,8 @@
 package com.revolsys.gis.data.model;
 
-import javax.xml.namespace.QName;
 
 public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
-  private static final QName PROPERTY_NAME = new QName(
-    "http://revolsys.com/gis", "shortName");
+  private static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
 
   private static ShortNameProperty getProperty(
     final DataObject object) {
@@ -52,7 +50,7 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
     return new ShortNameProperty(shortName);
   }
 
-  public QName getPropertyName() {
+  public String getPropertyName() {
     return PROPERTY_NAME;
   }
 

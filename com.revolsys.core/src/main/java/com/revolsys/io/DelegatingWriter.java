@@ -2,13 +2,11 @@ package com.revolsys.io;
 
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
-public class DelegatingWriter<T> {
-  private final Writer writer;
+public class DelegatingWriter<T> extends AbstractWriter<T> {
+  private final Writer<T> writer;
 
   public DelegatingWriter(
-    final Writer writer) {
+    final Writer<T> writer) {
     this.writer = writer;
   }
 
@@ -20,19 +18,8 @@ public class DelegatingWriter<T> {
     writer.flush();
   }
 
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return writer.getProperties();
-  }
-
-  public <V> V getProperty(
-    final QName name) {
-    return (V)writer.getProperty(name);
-  }
-
-  public void setProperty(
-    final QName name,
-    final Object value) {
-    writer.setProperty(name, value);
   }
 
   public void write(

@@ -22,7 +22,6 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.moep.io.MoepBinaryReader;
-import com.revolsys.gis.moep.io.MoepBinaryReaderFactory;
 import com.revolsys.gis.moep.io.MoepConstants;
 import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.DataObjectMetaDataFeatureSchema;

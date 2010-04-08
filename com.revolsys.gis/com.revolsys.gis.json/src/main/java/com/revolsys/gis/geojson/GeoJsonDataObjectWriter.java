@@ -3,8 +3,6 @@ package com.revolsys.gis.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -180,21 +178,21 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
   private void writeFooter() {
     out.endList();
     out.endObject();
-    final String callback = getProperty(new QName("jsonp"));
+    final String callback = getProperty("jsonp");
     if (callback != null) {
       out.print(");");
     }
- }
+  }
 
   private void writeHeader() {
-    final String callback = getProperty(new QName("jsonp"));
+    final String callback = getProperty("jsonp");
     if (callback != null) {
       out.print(callback);
       out.print('(');
     }
     out.startObject();
     type("FeatureCollection");
-    Integer srid = getProperty(new QName("srid"));
+    Integer srid = getProperty("srid");
     if (srid != null && srid != 0) {
       out.endAttribute();
       srid(srid);

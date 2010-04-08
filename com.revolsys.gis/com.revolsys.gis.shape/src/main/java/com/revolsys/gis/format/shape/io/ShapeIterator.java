@@ -5,9 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -22,12 +20,14 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.JtsGeometryConverter;
 import com.revolsys.gis.format.xbase.io.XbaseIterator;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class ShapeIterator implements Iterator<DataObject> {
+public class ShapeIterator extends AbstractObjectWithProperties implements
+  Iterator<DataObject> {
 
   private DataObject currentObject;
 
@@ -40,8 +40,6 @@ public class ShapeIterator implements Iterator<DataObject> {
   private DataObjectMetaDataImpl metaData;
 
   private QName name;
-
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
 
   private XbaseIterator xbaseIterator;
 
@@ -70,7 +68,7 @@ public class ShapeIterator implements Iterator<DataObject> {
         if (crsId != 0) {
           coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
         }
-        properties.put(new QName("coordinateSystem"), coordinateSystem);
+        setProperty("coordinateSystem", coordinateSystem);
         final PrecisionModel precisionModel = new PrecisionModel();
         geometryReader = new JtsGeometryConverter(new GeometryFactory(
           precisionModel, crsId));
@@ -103,10 +101,6 @@ public class ShapeIterator implements Iterator<DataObject> {
 
   public DataObjectMetaDataImpl getMetaData() {
     return metaData;
-  }
-
-  public Map<QName, Object> getProperties() {
-    return properties;
   }
 
   public boolean hasNext() {

@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 
 public class DataObjectMetaDataFactoryImpl implements DataObjectMetaDataFactory {
   /** The meta data properties of the data type. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
+  private final Map<String, Object> properties = new HashMap<String, Object>();
 
   private final Map<QName, DataObjectMetaData> types = new LinkedHashMap<QName, DataObjectMetaData>();
 
@@ -44,18 +44,18 @@ public class DataObjectMetaDataFactoryImpl implements DataObjectMetaDataFactory 
     return types.get(typeName);
   }
 
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getProperty(
-    final QName name) {
+    final String name) {
     return (V)properties.get(name);
   }
 
   public void setProperty(
-    final QName name,
+    final String name,
     final Object value) {
     properties.put(name, value);
   }

@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 import org.openjump.swing.factory.component.ComponentFactory;
 
 import com.revolsys.jump.ui.info.CurrentFeatureInfoModel;
-import com.revolsys.jump.ui.info.FeatureTablePanel;
 import com.revolsys.jump.ui.info.InfoModelToolbar;
 import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
