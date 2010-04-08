@@ -353,8 +353,7 @@ public final class FileUtil {
    * @throws IOException If a file or directory could not be deleted.
    */
   public static void deleteDirectory(
-    final File directory)
-    throws IOException {
+    final File directory) {
     deleteDirectory(directory, true);
   }
 
@@ -368,8 +367,7 @@ public final class FileUtil {
    */
   public static void deleteDirectory(
     final File directory,
-    final boolean deleteRoot)
-    throws IOException {
+    final boolean deleteRoot) {
     final File[] files = directory.listFiles();
     if (files != null) {
       for (int i = 0; i < files.length; i++) {
@@ -379,7 +377,7 @@ public final class FileUtil {
             deleteDirectory(file, true);
           } else {
             if (!file.delete() && file.exists()) {
-              LOG.error("Cannot delete file: " + file.getCanonicalPath());
+              LOG.error("Cannot delete file: " + getCanonicalPath(file));
             }
           }
         }
@@ -387,8 +385,17 @@ public final class FileUtil {
     }
     if (deleteRoot) {
       if (!directory.delete() && directory.exists()) {
-        LOG.error("Cannot delete directory: " + directory.getCanonicalPath());
+        LOG.error("Cannot delete directory: " + getCanonicalPath(directory));
       }
+    }
+  }
+
+  private static String getCanonicalPath(
+    final File file) {
+    try {
+      return file.getCanonicalPath();
+    } catch (IOException e) {
+      return file.getAbsolutePath();
     }
   }
 
@@ -406,19 +413,14 @@ public final class FileUtil {
           public void run() {
             synchronized (deleteFilesOnExit) {
               for (final File file : deleteFilesOnExit) {
-                try {
-                  if (file.exists()) {
-                    if (file.isFile()) {
-                      LOG.debug("Deleting file: " + file.getAbsolutePath());
-                      file.delete();
-                    } else {
-                      LOG.debug("Deleting directory: " + file.getAbsolutePath());
-                      deleteDirectory(file);
-                    }
+                if (file.exists()) {
+                  if (file.isFile()) {
+                    LOG.debug("Deleting file: " + file.getAbsolutePath());
+                    file.delete();
+                  } else {
+                    LOG.debug("Deleting directory: " + file.getAbsolutePath());
+                    deleteDirectory(file);
                   }
-                } catch (final IOException e) {
-                  LOG.error("Unable to delete file '" + file.getAbsolutePath()
-                    + "': " + e.getMessage(), e);
                 }
               }
             }
@@ -527,8 +529,8 @@ public final class FileUtil {
     final File parentDirectory,
     final File file)
     throws IOException {
-    final String parentPath = parentDirectory.getCanonicalPath();
-    final String filePath = file.getCanonicalPath();
+    final String parentPath = getCanonicalPath(parentDirectory);
+    final String filePath = getCanonicalPath(file);
     if (filePath.startsWith(parentPath)) {
       return filePath.substring(parentPath.length() + 1);
     }

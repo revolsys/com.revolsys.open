@@ -38,7 +38,7 @@ public class ZipWriter<T> extends DelegatingWriter<T> implements Writer<T> {
       } catch (IOException e) {
         throw new RuntimeException("Unable to compress files", e);
       } finally {
-        tempDirectory.delete();
+        FileUtil.deleteDirectory(tempDirectory);
       }
     }
   }

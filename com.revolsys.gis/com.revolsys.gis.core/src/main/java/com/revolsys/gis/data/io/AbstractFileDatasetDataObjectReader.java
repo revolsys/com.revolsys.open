@@ -102,11 +102,7 @@ public abstract class AbstractFileDatasetDataObjectReader extends
       if (log.isDebugEnabled()) {
         log.debug("  Deleting working files");
       }
-      try {
-        FileUtil.deleteDirectory(workingDirectory);
-      } catch (final IOException e) {
-        log.error("  Error deleting working directory " + e.getMessage(), e);
-      }
+      FileUtil.deleteDirectory(workingDirectory);
     }
     if (log.isDebugEnabled()) {
       log.debug("  Finished closing file");

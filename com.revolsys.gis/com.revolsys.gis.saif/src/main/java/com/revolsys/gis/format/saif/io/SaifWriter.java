@@ -124,10 +124,12 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     final String compositeTypeName) {
     compositeTypeNames.put(QName.valueOf(typeName), compositeTypeName);
   }
-public void flush() {
-  // TODO Auto-generated method stub
-  
-}
+
+  public void flush() {
+    // TODO Auto-generated method stub
+
+  }
+
   protected void addExport(
     final QName typeName,
     final QName compositeType,
@@ -193,12 +195,7 @@ public void flush() {
           log.debug("  Deleting temporary files");
         }
         if (!file.isDirectory()) {
-          try {
-            FileUtil.deleteDirectory(tempDirectory);
-          } catch (final IOException e) {
-            log.error("  Unable to delete temporary directory: "
-              + e.getMessage(), e);
-          }
+          FileUtil.deleteDirectory(tempDirectory);
           if (log.isDebugEnabled()) {
             log.debug("  Finished closing file");
           }

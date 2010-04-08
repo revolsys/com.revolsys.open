@@ -166,11 +166,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
       if (log.isDebugEnabled()) {
         log.debug("  Deleting temporary files");
       }
-      try {
-        FileUtil.deleteDirectory(saifArchiveDirectory);
-      } catch (final IOException e) {
-        log.error("  Error deleting temporary directory " + e.getMessage(), e);
-      }
+      FileUtil.deleteDirectory(saifArchiveDirectory);
     }
     if (log.isDebugEnabled()) {
       log.debug("  Finished closing file");
