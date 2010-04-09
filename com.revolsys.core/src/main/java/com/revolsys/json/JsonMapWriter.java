@@ -26,6 +26,7 @@ public class JsonMapWriter extends AbstractMapWriter {
       this.out.print('(');
     }
     this.out.print("{\"items\": [\n");
+    written = true;
   }
 
   /**

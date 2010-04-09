@@ -21,6 +21,7 @@ import com.revolsys.gis.data.io.DataObjectWriterFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
@@ -126,6 +127,7 @@ public class DataObjectHttpMessageConverter extends
         if (callback != null) {
           writer.setProperty("jsonp", callback);
         }
+        writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
         writer.write(dataObject);
         writer.close();
       }

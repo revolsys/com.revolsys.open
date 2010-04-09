@@ -16,10 +16,12 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 
-public class CsvReader extends AbstractReader<DataObject> implements DataObjectReader {
+public class CsvReader extends AbstractReader<DataObject> implements
+  DataObjectReader {
   public static DataObjectMetaData getMetaData(
     final InputStream in) {
-    final CsvReader reader = (CsvReader)CsvReaderFactory.get().createDataObjectReader(in);
+    final CsvReader reader = (CsvReader)CsvReaderFactory.get()
+      .createDataObjectReader(in);
     final DataObjectMetaData metaData = reader.getMetaData();
     reader.close();
     return metaData;
@@ -39,6 +41,11 @@ public class CsvReader extends AbstractReader<DataObject> implements DataObjectR
 
   public CsvReader() {
     dataObjectFactory = new ArrayDataObjectFactory();
+  }
+
+  public CsvReader(
+    final InputStream in) {
+    this(in, new ArrayDataObjectFactory());
   }
 
   public CsvReader(

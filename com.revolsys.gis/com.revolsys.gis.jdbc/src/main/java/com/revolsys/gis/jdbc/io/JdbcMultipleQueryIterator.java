@@ -79,6 +79,9 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
   }
 
   protected DataObjectMetaData getMetaData() {
+    if (metaData == null) {
+      hasNext();
+    }
     return metaData;
   }
 

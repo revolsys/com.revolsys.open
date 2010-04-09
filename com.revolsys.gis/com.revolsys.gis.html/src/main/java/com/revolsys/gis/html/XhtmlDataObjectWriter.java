@@ -7,6 +7,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -26,6 +27,8 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   private DataObjectMetaData metaData;
 
+  private boolean singleObject;
+
   public XhtmlDataObjectWriter(
     DataObjectMetaData metaData,
     final Writer out) {
@@ -39,21 +42,26 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
   public void close() {
     if (out != null) {
       try {
-        if (opened) {
-          out.endTag(HtmlUtil.TABLE);
-          out.endTag(HtmlUtil.DIV);
-          out.endTag(HtmlUtil.DIV);
-          if (wrap) {
-            out.endTag(HtmlUtil.BODY);
-            out.endTag(HtmlUtil.HTML);
-          }
-        }
+        writeFooter();
         out.flush();
       } finally {
         if (wrap) {
           FileUtil.closeSilent(out);
         }
         out = null;
+      }
+    }
+  }
+
+  private void writeFooter() {
+    if (opened) {
+      out.endTag(HtmlUtil.TBODY);
+      out.endTag(HtmlUtil.TABLE);
+      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlUtil.DIV);
+      if (wrap) {
+        out.endTag(HtmlUtil.BODY);
+        out.endTag(HtmlUtil.HTML);
       }
     }
   }
@@ -81,47 +89,80 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
   public void write(
     final DataObject object) {
     if (!opened) {
-      if (wrap) {
-        writeHeader();
+      writeHeader();
+    }
+    if (singleObject) {
+      for (final String key : metaData.getAttributeNames()) {
+        final Object value = object.getValue(key);
+        out.startTag(HtmlUtil.TR);
+        out.element(HtmlUtil.TH,
+          CaseConverter.toCapitalizedWords(key.toString()));
+        out.startTag(HtmlUtil.TD);
+        if (value instanceof URI) {
+          HtmlUtil.serializeA(out, null, value, value);
+        } else {
+          out.text(value);
+        }
+        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlUtil.TR);
       }
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-      if (title != null) {
-        out.element(HtmlUtil.H1, title);
+    } else {
+      out.startTag(HtmlUtil.TR);
+      for (final String key : metaData.getAttributeNames()) {
+        final Object value = object.getValue(key);
+        out.startTag(HtmlUtil.TD);
+        if (value instanceof URI) {
+          HtmlUtil.serializeA(out, null, value, value);
+        } else {
+          out.text(value);
+        }
+        out.endTag(HtmlUtil.TD);
       }
+      out.endTag(HtmlUtil.TR);
+
+    }
+  }
+
+  private void writeHeader() {
+    if (wrap) {
+      out.startDocument();
+      out.startTag(HtmlUtil.HTML);
+
+      out.startTag(HtmlUtil.HEAD);
+      out.element(HtmlUtil.TITLE, title);
+
+      out.endTag(HtmlUtil.HEAD);
+
+      out.startTag(HtmlUtil.BODY);
+    }
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    if (title != null) {
+      out.element(HtmlUtil.H1, title);
+    }
+    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (singleObject) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "objectView");
       out.startTag(HtmlUtil.TABLE);
       out.attribute(HtmlUtil.ATTR_CLASS, "data");
-      opened = true;
-    }
-    out.startTag(HtmlUtil.TBODY);
+      out.startTag(HtmlUtil.TBODY);
+    } else {
+      out.startTag(HtmlUtil.DIV);
+      out.attribute(HtmlUtil.ATTR_CLASS, "objectList");
+      out.startTag(HtmlUtil.TABLE);
+      out.attribute(HtmlUtil.ATTR_CLASS, "data");
 
-    for (final String key : object.getMetaData().getAttributeNames()) {
-      final Object value = object.getValue(key);
+      out.startTag(HtmlUtil.THEAD);
       out.startTag(HtmlUtil.TR);
-      out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
-      out.startTag(HtmlUtil.TD);
-      if (value instanceof URI) {
-        HtmlUtil.serializeA(out, null, value, value);
-      } else {
-        out.text(value);
+      for (String name : metaData.getAttributeNames()) {
+        out.element(HtmlUtil.TD, name);
       }
-      out.endTag(HtmlUtil.TD);
       out.endTag(HtmlUtil.TR);
+      out.endTag(HtmlUtil.THEAD);
+
+      out.startTag(HtmlUtil.TBODY);
     }
-    out.endTag(HtmlUtil.TBODY);
-  }
-
-  private void writeHeader() {
-    out.startDocument();
-    out.startTag(HtmlUtil.HTML);
-
-    out.startTag(HtmlUtil.HEAD);
-    out.element(HtmlUtil.TITLE, title);
-
-    out.endTag(HtmlUtil.HEAD);
-
-    out.startTag(HtmlUtil.BODY);
+    opened = true;
   }
 }

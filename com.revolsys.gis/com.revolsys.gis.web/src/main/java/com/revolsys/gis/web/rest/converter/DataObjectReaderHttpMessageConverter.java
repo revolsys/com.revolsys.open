@@ -62,6 +62,7 @@ public class DataObjectReaderHttpMessageConverter extends
         throw new IllegalArgumentException("Media type " + actualMediaType
           + " not supported");
       } else {
+        
         final DataObjectMetaData metaData = reader.getMetaData();
         String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
