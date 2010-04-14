@@ -45,6 +45,8 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
 
   private final List<JdbcQuery> queries = new ArrayList<JdbcQuery>();
 
+  private JdbcMultipleQueryIterator iterator;
+
   public JdbcQueryReader(
     final JdbcDataObjectStore dataStore) {
     this.dataStore = dataStore;
@@ -76,6 +78,9 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   }
 
   public void close() {
+    if (iterator != null) {
+      iterator.close();
+    }
   }
 
   public JdbcDataObjectStore getDataObjectStore() {
@@ -95,8 +100,11 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
 
   public Iterator<DataObject> iterator() {
     initialize();
-    return new JdbcMultipleQueryIterator(dataStore, queries, autoCommit,
-      fetchSize);
+    if (iterator == null) {
+      iterator = new JdbcMultipleQueryIterator(dataStore, queries, autoCommit,
+        fetchSize);
+    }
+    return iterator;
   }
 
   public DataObjectMetaData getMetaData() {

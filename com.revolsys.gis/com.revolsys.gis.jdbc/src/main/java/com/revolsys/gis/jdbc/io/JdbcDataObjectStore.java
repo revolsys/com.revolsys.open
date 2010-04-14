@@ -436,8 +436,8 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
       return null;
     } else {
       final JdbcQueryReader reader = createReader(typeName, sql, id);
-      final Iterator<DataObject> iterator = reader.iterator();
       try {
+        final Iterator<DataObject> iterator = reader.iterator();
         if (iterator.hasNext()) {
           final DataObject object = iterator.next();
           return object;
