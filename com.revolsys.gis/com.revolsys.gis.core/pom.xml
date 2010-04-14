@@ -10,36 +10,6 @@
   <artifactId>com.revolsys.gis.core</artifactId>
   <name>GIS Tools</name>
   <version>TRUNK-SNAPSHOT</version>
-  <url>http://www.revolsys.com</url>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>geotools</id>
-      <name>Geotools repository</name>
-      <url>http://maven.geotools.fr/repository</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>java.net</id>
-      <name>java.net</name>
-      <url>http://download.java.net/maven/2/</url>
-    </repository>
-  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.revolsys</groupId>
@@ -68,18 +38,5 @@
       <version>0.9.4</version>
     </dependency>
   </dependencies>
-  
-  <scm>
-    <connection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk</connection>
-    <developerConnection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk</developerConnection>
-  </scm>
-
-  <distributionManagement>
-    <repository>
-      <id>rs-repo</id>
-      <name>RS Maven Repository</name>
-      <url>file:../../maven/com.revolsys.open/</url>
-    </repository>
-  </distributionManagement>
 </project>
 
