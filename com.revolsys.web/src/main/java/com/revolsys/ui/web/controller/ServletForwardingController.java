@@ -77,6 +77,8 @@ public class ServletForwardingController extends AbstractController implements
           }
         };
       }
+    } else {
+      request = new HttpServletRequestWrapper(request);
     }
 
     // If already included, include again, else forward.

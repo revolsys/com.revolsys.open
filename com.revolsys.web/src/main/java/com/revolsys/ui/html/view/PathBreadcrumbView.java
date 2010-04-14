@@ -22,14 +22,21 @@ import com.revolsys.xml.io.XmlWriter;
 
 public class PathBreadcrumbView extends Element {
 
+  private String contextPath;
+
   private String path;
 
-  public PathBreadcrumbView(String path) {
-    super();
+  public PathBreadcrumbView(
+    String contextPath,
+    String path) {
+    this.contextPath = contextPath;
     this.path = path;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(
+    final XmlWriter out)
+    throws IOException {
+    path = path.substring(contextPath.length());
     if (path.startsWith("/")) {
       path = path.substring(1);
     }
@@ -45,28 +52,33 @@ public class PathBreadcrumbView extends Element {
       path = path.substring(0, fragmentIndex - 1);
     }
     path = path.replaceAll("//+", "/");
+    path = path.replaceAll("/?index/?$", "");
 
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "breadcrumb");
     out.startTag(HtmlUtil.UL);
-
-    out.startTag(HtmlUtil.LI);
-    HtmlUtil.serializeA(out, null, "/", "/");
-    out.endTag(HtmlUtil.LI);
-    String[] segments = path.split("/");
-    String crumbPath = "";
-    for (int i = 0; i < segments.length - 1; i++) {
-      String segment = segments[i];
-      crumbPath += "/" + segment;
+    if (path.length() == 0 || path.equals("index")) {
       out.startTag(HtmlUtil.LI);
-      HtmlUtil.serializeA(out, null, crumbPath, segment);
+      out.text("HOME");
       out.endTag(HtmlUtil.LI);
-
+    } else {
+      out.startTag(HtmlUtil.LI);
+      HtmlUtil.serializeA(out, null, contextPath + "/", "HOME");
+      out.endTag(HtmlUtil.LI);
+      String[] segments = path.split("/");
+      String crumbPath = contextPath;
+      for (int i = 0; i < segments.length - 1; i++) {
+        String segment = segments[i];
+        crumbPath += "/" + segment;
+        out.startTag(HtmlUtil.LI);
+        HtmlUtil.serializeA(out, null, crumbPath, segment);
+        out.endTag(HtmlUtil.LI);
+      }
+      String segment = segments[segments.length - 1];
+      out.startTag(HtmlUtil.LI);
+      out.text(segment);
+      out.endTag(HtmlUtil.LI);
     }
-    String segment = segments[segments.length - 1];
-    out.startTag(HtmlUtil.LI);
-    out.text(segment);
-    out.endTag(HtmlUtil.LI);
 
     out.endTag(HtmlUtil.UL);
     out.endTag(HtmlUtil.DIV);

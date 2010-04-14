@@ -9,11 +9,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+import org.springframework.web.util.UrlPathHelper;
 
 public class TemplateController extends AbstractController {
   private Map<String, Object> attributes = Collections.emptyMap();
 
   private String viewName;
+
+  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+  public TemplateController() {
+    urlPathHelper.setAlwaysUseFullPath(true);
+  }
 
   public Map<String, Object> getAttributes() {
     return attributes;
@@ -27,13 +34,16 @@ public class TemplateController extends AbstractController {
   public ModelAndView handleRequestInternal(
     final HttpServletRequest request,
     final HttpServletResponse response)
-    throws Exception {  
+    throws Exception {
     final ModelAndView view = new ModelAndView(viewName);
-    for (Entry<String,Object> attribute : attributes.entrySet()) {
-      String attributeName =attribute.getKey();
+    for (Entry<String, Object> attribute : attributes.entrySet()) {
+      String attributeName = attribute.getKey();
       Object attributeValue = attribute.getValue();
       if (attributeValue instanceof String) {
-        attributeValue = ((String)attributeValue).replaceAll("\\[PATH\\]", request.getPathInfo());
+        String path = urlPathHelper.getOriginatingRequestUri(request);
+        String contextPath = urlPathHelper.getOriginatingContextPath(request);
+        path = path.substring(contextPath.length());
+        attributeValue = ((String)attributeValue).replaceAll("\\[PATH\\]", path);
       }
       view.addObject(attributeName, attributeValue);
     }

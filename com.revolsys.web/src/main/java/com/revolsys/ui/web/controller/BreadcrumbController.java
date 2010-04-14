@@ -13,10 +13,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  
- $URL:$
- $Author:$
- $Date:$
- $Revision:$
+ $URL$
+ $Author$
+ $Date$
+ $Revision$
  */
 package com.revolsys.ui.web.controller;
 
@@ -27,15 +27,25 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
+import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.ui.html.view.PathBreadcrumbView;
 
 public class BreadcrumbController implements Controller {
 
-  public ModelAndView handleRequest(final HttpServletRequest request,
-    final HttpServletResponse response) throws Exception {
-    String path = (String)request.getAttribute("javax.servlet.forward.request_uri");
-    PathBreadcrumbView view = new PathBreadcrumbView(path);
+  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+  public BreadcrumbController() {
+    urlPathHelper.setAlwaysUseFullPath(true);
+  }
+
+  public ModelAndView handleRequest(
+    final HttpServletRequest request,
+    final HttpServletResponse response)
+    throws Exception {
+    String path = urlPathHelper.getOriginatingRequestUri(request);
+    String contextPath = urlPathHelper.getOriginatingContextPath(request);
+    PathBreadcrumbView view = new PathBreadcrumbView(contextPath, path);
     PrintWriter writer = response.getWriter();
     view.serialize(writer, false);
     writer.flush();
