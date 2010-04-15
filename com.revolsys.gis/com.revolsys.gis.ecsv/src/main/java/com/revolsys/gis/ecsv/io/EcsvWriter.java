@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.wkt.WktWriter;
 import com.revolsys.io.AbstractWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
@@ -38,15 +40,15 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
 
   private final DataObjectMetaData metaData;
 
-  private final BufferedWriter out;
+  private final PrintWriter out;
 
   private boolean open;
 
   public EcsvWriter(
     final DataObjectMetaData metaData,
-    final BufferedWriter out) {
+    final java.io.Writer out) {
     this.metaData = metaData;
-    this.out = out;
+    this.out = new PrintWriter(new BufferedWriter(out));
     setProperty(EcsvConstants.TYPE_NAME, metaData.getName());
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
@@ -56,34 +58,12 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
 
   }
 
-  public EcsvWriter(
-    final DataObjectMetaData type,
-    final OutputStream out) {
-    this(type, new OutputStreamWriter(out, EcsvConstants.CHARACTER_SET));
-  }
-
-  public EcsvWriter(
-    final DataObjectMetaData type,
-    final java.io.Writer out) {
-    this(type, new BufferedWriter(out));
-  }
-
   public void flush() {
-    try {
-      out.flush();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    out.flush();
   }
 
   public void close() {
-    try {
-      out.close();
-    } catch (final IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+    out.close();
   }
 
   public String toString() {
@@ -195,7 +175,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
       } else if (value instanceof Geometry) {
         final Geometry geometry = (Geometry)value;
         out.write('"');
-        geometryWriter.write(geometry, out);
+        WktWriter.write(out, geometry);
         out.write('"');
       } else if (value instanceof String) {
         final String string = (String)value;
