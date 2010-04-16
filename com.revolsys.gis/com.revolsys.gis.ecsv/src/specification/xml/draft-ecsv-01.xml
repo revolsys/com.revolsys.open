@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!DOCTYPE rfc SYSTEM "rfcXXXX.dtd">
+<rfc
+  ipr="full3978"
+  docName="draft-ecsv-01"
+>
+  <front>
+    <title
+      abbrev="ecsv"
+    >File Format and MIME type for Enhanced Comma-Separated Values (E-CSV) Files</title>
+    <author
+      initials="P.D."
+      surname="Austin"
+      fullname="Paul Austin"
+    >
+      <organization>Revolution Systems Inc.</organization>
+      <email>paul.austin@revolsys.com</email>
+      <uri>paul.austin@revolsys.com</uri>
+    </author>
+    <date
+      month="April"
+      year="2010" />
+    <area>Applications</area>
+    <keyword>I-D</keyword>
+    <keyword>Internet-Draft</keyword>
+    <keyword>CSV</keyword>
+    <keyword>Comma-Separated Values</keyword>
+    <abstract>
+      <t>This document proposes an Enhanced Comma-Separated Values (E-CSV) text
+        file format and registers the associated file extension "ecsv" and MIME
+        type "text/ecsv".</t>
+    </abstract>
+  </front>
+  <middle>
+    <section
+      anchor="intro"
+      title="Introduction"
+    >
+    </section>
+  </middle>
+  <back>
+    <references>
+      <reference
+        anchor="RFC2048"
+      >
+        <front>
+          <title>Multipurpose Internet Mail Extensions (MIME) Part Four:
+            Registration Procedures</title>
+          <author
+            initials="N."
+            surname="Freed" />
+          <author
+            initials="J."
+            surname="Klensin" />
+          <author
+            initials="J."
+            surname="Postel" />
+          <date
+            month="November"
+            year="1996" />
+        </front>
+        <seriesInfo
+          name="RFC"
+          value="2048" />
+        <seriesInfo
+          name="BCP"
+          value="13" />
+        <format
+          type="TXT"
+          target="http://www.ietf.org/rfc/rfc2048.txt" />
+      </reference>
+      <reference
+        anchor="RFC2234"
+      >
+        <front>
+          <title>Augmented BNF for Syntax Specifications: ABNF</title>
+          <author
+            initials="D."
+            surname="Crocker" />
+          <author
+            initials="P."
+            surname="Overell" />
+          <date
+            month="November"
+            year="1997" />
+        </front>
+        <seriesInfo
+          name="RFC"
+          value="2234" />
+        <format
+          type="TXT"
+          target="http://www.ietf.org/rfc/rfc2234.txt" />
+      </reference>
+      <reference
+        anchor="RFC2046"
+      >
+        <front>
+          <title>Multipurpose Internet Mail Extensions (MIME) Part Two: Media
+            Types</title>
+          <author
+            initials="N."
+            surname="Freed" />
+          <author
+            initials="N."
+            surname="Borenstein" />
+          <date
+            month="November"
+            year="1996" />
+        </front>
+        <seriesInfo
+          name="RFC"
+          value="2046" />
+        <format
+          type="TXT"
+          target="http://www.ietf.org/rfc/rfc2046.txt" />
+      </reference>
+      <reference
+        anchor="RFC4180"
+      >
+        <front>
+          <title>Common Format and MIME Type for Comma-Separated Values (CSV)
+            Files</title>
+          <author
+            initials="Y."
+            surname="Shafranovich"
+            fullname="Y Shafranovich"
+          >
+            <organization>SolidMatrix Technologies, Inc.</organization>
+          </author>
+          <date
+            month="October"
+            year="2005" />
+        </front>
+        <seriesInfo
+          name="RFC"
+          value="4180" />
+        <format
+          type="TXT"
+          target="http://www.ietf.org/rfc/rfc4180.txt" />
+      </reference>
+    </references>
+  </back>
+</rfc>

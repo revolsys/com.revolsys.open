@@ -26,6 +26,6 @@ public class KmlDataObjectWriterFactory extends
     Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
-    return new KmlWriter(writer);
+    return new KmlDataObjectWriter(writer);
   }
 }
