@@ -12,9 +12,19 @@ public abstract class JdbcFactory {
 
   private DataSource dataSource;
 
+  public JdbcFactory() {
+    this(DEFAULT_DATA_OBJECT_FACTORY);
+  }
+
   public JdbcFactory(
     final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public JdbcFactory(
+    final DataSource dataSource) {
+    this(DEFAULT_DATA_OBJECT_FACTORY);
+    setDataSource(dataSource);
   }
 
   public JdbcFactory(

@@ -57,8 +57,7 @@ public class OracleDataStoreConnection implements DataStoreConnection {
       dataSource.setUser(user);
       dataSource.setPassword(password);
       dataSource.setConnectionCachingEnabled(true);
-      dataStore = OracleFactory.createFactory(new FeatureDataObjectFactory(),
-        dataSource).createDataObjectStore();
+      dataStore = new OracleFactory(new FeatureDataObjectFactory(), dataSource).createDataObjectStore();
       metaData = new JdbcDataStoreMetaData(dataStore, schema);
     } catch (SQLException e) {
       throw new DataStoreException(e.getMessage(), e);
@@ -108,15 +107,14 @@ public class OracleDataStoreConnection implements DataStoreConnection {
     Geometry filterGeometry = query.getFilterGeometry();
     String condition = query.getCondition();
     JdbcDataObjectStoreInputStream ifs = new JdbcDataObjectStoreInputStream(
-      dataStore, typeName, featureSchema,
-      filterGeometry, condition);
+      dataStore, typeName, featureSchema, filterGeometry, condition);
     return ifs;
   }
 
   public FeatureInputStream executeAdhocQuery(
     final AdhocQuery query) {
     query.getQuery();
-    
+
     return null;
   }
 
