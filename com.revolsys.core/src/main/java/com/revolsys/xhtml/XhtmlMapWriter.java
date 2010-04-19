@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.revolsys.io.NamedObject;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
@@ -61,9 +62,9 @@ public class XhtmlMapWriter extends AbstractMapWriter {
   public void setProperty(
     final String name,
     final Object value) {
-    if (name.equals("wrap")) {
+    if (name.equals(IoConstants.WRAP_PROPERTY)) {
       wrap = Boolean.valueOf(value.toString());
-    } else if (name.equals("title")) {
+    } else if (name.equals(IoConstants.TITLE_PROPERTY)) {
       title = value.toString();
     }
     super.setProperty(name, value);

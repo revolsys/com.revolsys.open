@@ -7,6 +7,7 @@ import java.util.Map;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
@@ -25,17 +26,31 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   private final KmlXmlWriter writer;
 
+  private boolean opened;
+
   public KmlDataObjectWriter(
     final java.io.Writer out) {
     this.writer = new KmlXmlWriter(out);
+   }
+
+  private void writeHeader() {
+    opened = true;
     writer.startDocument();
     writer.startTag(Kml22Constants.KML);
-    writer.startTag(Kml22Constants.DOCUMENT);
+    if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
+      writer.startTag(Kml22Constants.DOCUMENT);
+      writer.element(Kml22Constants.OPEN, 1);
+    }
   }
 
   public void close() {
-    writer.endTag();
-    writer.endTag();
+    if (!opened) {
+      writeHeader();
+    }
+    if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
+      writer.endTag(Kml22Constants.DOCUMENT);
+    }
+    writer.endTag(Kml22Constants.KML);
     writer.endDocument();
     writer.close();
   }
@@ -50,6 +65,9 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   public void write(
     final DataObject object) {
+    if (!opened) {
+      writeHeader();
+    }
     writer.startTag(Kml22Constants.PLACEMARK);
     final DataObjectMetaData metaData = object.getMetaData();
     int geometryIndex = metaData.getGeometryAttributeIndex();
@@ -58,8 +76,11 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
       final Object id = object.getValue(idIndex);
       writer.element(Kml22Constants.NAME, metaData.getName() + " " + id);
     }
+    String styleUrl = getProperty(IoConstants.STYLE_URL);
+    if (styleUrl != null) {
+      writer.element(Kml22Constants.STYLE_URL, styleUrl);
+    }
     boolean hasValues = false;
-
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i != geometryIndex) {
         final String name = metaData.getAttributeName(i);

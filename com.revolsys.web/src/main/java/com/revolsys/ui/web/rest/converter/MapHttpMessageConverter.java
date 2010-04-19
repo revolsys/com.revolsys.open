@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
@@ -47,12 +48,12 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
       MapWriterFactory.class, mediaTypeString);
     final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
       body, charset));
-    writer.setProperty("indent", true);
+    writer.setProperty(IoConstants.INDENT_PROPERTY, true);
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     final String callback = (String)requestAttributes.getAttribute("jsonp",
       RequestAttributes.SCOPE_REQUEST);
     if (callback != null) {
-      writer.setProperty("jsonp", callback);
+      writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
     }
     writer.write(map);
     writer.close();

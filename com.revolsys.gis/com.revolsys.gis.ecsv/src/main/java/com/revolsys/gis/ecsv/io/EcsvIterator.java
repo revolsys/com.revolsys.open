@@ -27,6 +27,8 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.IoConstants;
+import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -87,7 +89,7 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
     final QName srid = getProperty(EcsvConstants.SRID);
     if (srid != null) {
       final Integer sridNum = Integer.valueOf(srid.getLocalPart());
-      setProperty("coordinateSystem",
+      setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
         EpsgCoordinateSystems.getCoordinateSystem(sridNum));
       geomFactory = new GeometryFactory(geometryFactory.getPrecisionModel(),
         sridNum);
@@ -398,7 +400,11 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
         final String string = line[2];
         final DataType type = DataTypes.getType(typeName);
         final Object value = parseValue(type, string);
-        setProperty(name, value);
+        if (name.indexOf('.') == -1) {
+          setProperty("com.revolsys.io." + name, value);
+        } else {
+          setProperty(name, value);
+        }
       }
     }
   }

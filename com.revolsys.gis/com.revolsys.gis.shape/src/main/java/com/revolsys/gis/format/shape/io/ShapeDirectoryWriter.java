@@ -8,6 +8,7 @@ import java.util.Map;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
@@ -61,7 +62,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
         writer.setUseZeroForNull(useZeroForNull);
         final Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
-          writer.setProperty("srid", geometry.getSRID());
+          writer.setProperty(IoConstants.SRID_PROPERTY, geometry.getSRID());
         }
         writers.put(metaData, writer);
       } catch (final IOException e) {

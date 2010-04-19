@@ -20,7 +20,6 @@
  */
 package com.revolsys.io;
 
-
 public interface Writer<T> extends ObjectWithProperties {
   void close();
 

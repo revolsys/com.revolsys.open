@@ -22,6 +22,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -245,7 +246,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final double longitude = bcgsGrid.getLongitude(mapsheet) - 0.1;
     final int crsId = utmGrid.getNad83Srid(longitude, latitude);
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
-    setProperty("coordinateSystem", coordinateSystem);
+    setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY, coordinateSystem);
 
     final String submissionDateString = readString(6);
 

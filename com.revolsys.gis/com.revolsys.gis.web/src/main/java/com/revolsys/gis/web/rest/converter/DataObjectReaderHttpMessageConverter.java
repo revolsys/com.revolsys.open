@@ -18,6 +18,7 @@ import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
@@ -62,7 +63,7 @@ public class DataObjectReaderHttpMessageConverter extends
         throw new IllegalArgumentException("Media type " + actualMediaType
           + " not supported");
       } else {
-        
+
         final DataObjectMetaData metaData = reader.getMetaData();
         String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
@@ -76,12 +77,12 @@ public class DataObjectReaderHttpMessageConverter extends
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
-          writer.setProperty("wrap", false);
+          writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }
         final String callback = (String)requestAttributes.getAttribute("jsonp",
           RequestAttributes.SCOPE_REQUEST);
         if (callback != null) {
-          writer.setProperty("jsonp", callback);
+          writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
         }
         Iterator<DataObject> iterator = reader.iterator();
         if (iterator.hasNext()) {
@@ -89,7 +90,10 @@ public class DataObjectReaderHttpMessageConverter extends
           Geometry geometry = dataObject.getGeometryValue();
           if (geometry != null) {
             CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-            writer.setProperty("srid", coordinateSystem.getId());
+            writer.setProperty(IoConstants.SRID_PROPERTY,
+              coordinateSystem.getId());
+            writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
+              coordinateSystem);
           }
 
           writer.write(dataObject);

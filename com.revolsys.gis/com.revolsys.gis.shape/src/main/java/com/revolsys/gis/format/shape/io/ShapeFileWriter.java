@@ -52,6 +52,7 @@ import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.EndianOutputStream;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -166,7 +167,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
       writeHeader(indexOut);
     }
 
-    Integer srid = getProperty("srid");
+    Integer srid = getProperty(IoConstants.SRID_PROPERTY);
     if (srid != null && srid > 0) {
       this.coordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
         "EPSG", String.valueOf(srid)));

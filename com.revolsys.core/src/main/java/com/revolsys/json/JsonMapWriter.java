@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 
 public class JsonMapWriter extends AbstractMapWriter {
 
@@ -20,7 +21,7 @@ public class JsonMapWriter extends AbstractMapWriter {
   }
 
   private void writeHeader() {
-    final String callback = getProperty("jsonp");
+    final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
       this.out.print(callback);
       this.out.print('(');
@@ -36,7 +37,7 @@ public class JsonMapWriter extends AbstractMapWriter {
     if (out != null) {
       try {
         out.print("\n]}\n");
-        final String callback = getProperty("jsonp");
+        final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
           out.print(");\n");
         }

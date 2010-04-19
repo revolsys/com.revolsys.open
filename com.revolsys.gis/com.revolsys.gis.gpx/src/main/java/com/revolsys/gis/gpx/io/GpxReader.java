@@ -32,6 +32,7 @@ import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 
 public class GpxReader extends AbstractReader<DataObject> {
 
@@ -55,7 +56,7 @@ public class GpxReader extends AbstractReader<DataObject> {
     this.in = in;
     this.dataObjectFactory = dataObjectFactory;
     this.iterator = new GpxIterator(in, dataObjectFactory, typeName);
-    setProperty("coordinateSystem",
+    setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
       EpsgCoordinateSystems.getCoordinateSystem(4326));
 
   }

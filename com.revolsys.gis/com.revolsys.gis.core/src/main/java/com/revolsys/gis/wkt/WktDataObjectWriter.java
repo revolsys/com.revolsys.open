@@ -1,27 +1,14 @@
 package com.revolsys.gis.wkt;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
@@ -43,7 +30,7 @@ public class WktDataObjectWriter extends AbstractWriter<DataObject> {
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final Integer srid = geometryAttribute.getProperty(AttributeProperties.SRID);
-      setProperty("srid", srid);
+      setProperty(IoConstants.SRID_PROPERTY, srid);
     }
 
   }

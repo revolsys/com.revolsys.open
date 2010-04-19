@@ -8,6 +8,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.IoConstants;
 import com.revolsys.json.JsonWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -178,21 +179,21 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
   private void writeFooter() {
     out.endList();
     out.endObject();
-    final String callback = getProperty("jsonp");
+    final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
       out.print(");");
     }
   }
 
   private void writeHeader() {
-    final String callback = getProperty("jsonp");
+    final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
       out.print(callback);
       out.print('(');
     }
     out.startObject();
     type("FeatureCollection");
-    Integer srid = getProperty("srid");
+    Integer srid = getProperty(IoConstants.SRID_PROPERTY);
     if (srid != null && srid != 0) {
       out.endAttribute();
       srid(srid);

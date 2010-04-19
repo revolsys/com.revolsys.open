@@ -22,6 +22,7 @@ import com.revolsys.gis.format.xbase.io.XbaseIterator;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -68,7 +69,7 @@ public class ShapeIterator extends AbstractObjectWithProperties implements
         if (crsId != 0) {
           coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
         }
-        setProperty("coordinateSystem", coordinateSystem);
+        setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY, coordinateSystem);
         final PrecisionModel precisionModel = new PrecisionModel();
         geometryReader = new JtsGeometryConverter(new GeometryFactory(
           precisionModel, crsId));

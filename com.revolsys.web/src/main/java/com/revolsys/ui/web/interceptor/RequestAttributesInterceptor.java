@@ -23,6 +23,9 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
 
     private PathMatcher pathMatcher = new AntPathMatcher();
 
+    public RequestAttributesInterceptor() {
+      urlPathHelper.setAlwaysUseFullPath(true);
+    }
     public boolean preHandle(HttpServletRequest request,
         HttpServletResponse response, Object handler) throws ServletException {
         // TODO implement caching of attributes

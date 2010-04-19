@@ -2,8 +2,6 @@ package com.revolsys.gis.ecsv.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -23,6 +21,8 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.wkt.WktWriter;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.IoConstants;
+import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
@@ -53,7 +53,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final Integer srid = geometryAttribute.getProperty(AttributeProperties.SRID);
-      setProperty(EcsvConstants.SRID, srid);
+      setProperty(IoConstants.SRID_PROPERTY, srid);
     }
 
   }
@@ -227,7 +227,12 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
       for (final Entry<String, Object> property : getProperties().entrySet()) {
         final String name = property.getKey();
         final Object value = property.getValue();
-        writeFileProperty(name, value);
+        final String defaultPrefix = "com.revolsys.io.";
+        if (name.startsWith(defaultPrefix)) {
+          writeFileProperty(name.substring(defaultPrefix.length()), value);
+        } else {
+          writeFileProperty(name, value);
+        }
       }
       writeFileProperty(EcsvConstants.ATTRIBUTE_HEADER_TYPES,
         attributeHeaderTypes);

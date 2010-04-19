@@ -115,17 +115,24 @@ public class DataObjectHttpMessageConverter extends
         Geometry geometry = dataObject.getGeometryValue();
         if (geometry != null) {
           CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-          writer.setProperty("srid", coordinateSystem.getId());
+          writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
+            coordinateSystem.getId());
         }
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
-          writer.setProperty("wrap", false);
+          writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }
         final String callback = (String)requestAttributes.getAttribute("jsonp",
           RequestAttributes.SCOPE_REQUEST);
         if (callback != null) {
-          writer.setProperty("jsonp", callback);
+          writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
+        }
+        final String[] attributeNames = requestAttributes.getAttributeNames(RequestAttributes.SCOPE_REQUEST);
+        for (String attributeName : attributeNames) {
+          final Object value = requestAttributes.getAttribute(attributeName,
+            RequestAttributes.SCOPE_REQUEST);
+          writer.setProperty(attributeName, value);
         }
         writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
         writer.write(dataObject);

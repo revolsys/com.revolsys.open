@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.revolsys.io.NamedObject;
 import com.revolsys.xml.io.XmlWriter;
 
@@ -29,7 +30,7 @@ public class XmlMapWriter extends AbstractMapWriter {
     String name,
     Object value) {
     super.setProperty(name, value);
-    if (name.equals("ident")) {
+    if (name.equals(IoConstants.INDENT_PROPERTY)) {
       out.setIndent((Boolean)value);
     }
   }

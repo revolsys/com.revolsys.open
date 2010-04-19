@@ -79,4 +79,6 @@ public interface Kml22Constants {
   QName VIEW_REFRESH_MODE = new QName(KML_NS_URI, "viewRefreshMode");
 
   QName WEST = new QName(KML_NS_URI, "west");
+
+  QName OPEN = new QName(KML_NS_URI, "open");
 }
