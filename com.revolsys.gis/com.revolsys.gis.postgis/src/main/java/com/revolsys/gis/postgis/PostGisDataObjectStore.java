@@ -9,6 +9,8 @@ import javax.xml.namespace.QName;
 import org.postgresql.geometric.PGbox;
 
 import com.revolsys.gis.data.io.Reader;
+import com.revolsys.gis.data.model.ArrayDataObjectFactory;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
@@ -19,6 +21,11 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class PostGisDataObjectStore extends JdbcDataObjectStore {
+
+  public PostGisDataObjectStore() {
+    this(new ArrayDataObjectFactory());
+  }
+
   public PostGisDataObjectStore(
     final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
@@ -109,7 +116,7 @@ public class PostGisDataObjectStore extends JdbcDataObjectStore {
   }
 
   @Override
-  public Reader query(
+  public Reader<DataObject> query(
     final QName typeName,
     final Envelope envelope) {
     final double x1 = envelope.getMinX();

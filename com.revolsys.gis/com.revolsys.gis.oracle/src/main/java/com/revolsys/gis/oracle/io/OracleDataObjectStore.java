@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.Reader;
+import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -27,6 +29,10 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class OracleDataObjectStore extends JdbcDataObjectStore {
   private boolean initialized;
+
+  public OracleDataObjectStore() {
+   this(new ArrayDataObjectFactory());
+  }
 
   public OracleDataObjectStore(
     final DataObjectFactory dataObjectFactory) {

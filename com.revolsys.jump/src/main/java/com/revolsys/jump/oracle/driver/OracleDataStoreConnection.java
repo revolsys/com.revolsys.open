@@ -7,7 +7,7 @@ import javax.xml.namespace.QName;
 import oracle.jdbc.pool.OracleDataSource;
 
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.gis.oracle.io.OracleFactory;
+import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.datastore.AdhocQuery;
@@ -57,7 +57,7 @@ public class OracleDataStoreConnection implements DataStoreConnection {
       dataSource.setUser(user);
       dataSource.setPassword(password);
       dataSource.setConnectionCachingEnabled(true);
-      dataStore = new OracleFactory(new FeatureDataObjectFactory(), dataSource).createDataObjectStore();
+      dataStore = new OracleDataObjectStore(new FeatureDataObjectFactory(), dataSource);
       metaData = new JdbcDataStoreMetaData(dataStore, schema);
     } catch (SQLException e) {
       throw new DataStoreException(e.getMessage(), e);

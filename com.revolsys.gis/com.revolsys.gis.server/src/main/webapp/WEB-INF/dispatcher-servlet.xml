@@ -77,7 +77,7 @@
       <map>
         <entry key="geomark">
 				  <bean
-				    class="com.revolsys.gis.oracle.io.OracleFactory"
+				    class="com.revolsys.gis.jdbc.io.JdbcFactory"
 				    factory-method="createDataObjectStore"
 				  >
 				    <constructor-arg>

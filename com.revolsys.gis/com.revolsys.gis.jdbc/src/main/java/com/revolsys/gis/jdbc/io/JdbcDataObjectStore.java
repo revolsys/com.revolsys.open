@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.Reader;
+import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -67,6 +68,10 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
   private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
+
+  public JdbcDataObjectStore() {
+    this(new ArrayDataObjectFactory());
+  }
 
   public JdbcDataObjectStore(
     final DataObjectFactory dataObjectFactory) {
