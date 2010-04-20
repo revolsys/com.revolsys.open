@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -33,7 +36,11 @@ public class DataObjectHttpMessageConverter extends
 
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-  private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+
+  private List<String> requestAttributeNames = Arrays.asList(
+    IoConstants.STYLE_URL, IoConstants.JSONP_PROPERTY,
+    IoConstants.TITLE_PROPERTY);
 
   public DataObjectHttpMessageConverter() {
     super(DataObject.class,
@@ -41,10 +48,14 @@ public class DataObjectHttpMessageConverter extends
       IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
   }
 
+  public List<String> getRequestAttributeNames() {
+    return requestAttributeNames;
+  }
+
   @Override
   public DataObject read(
-    Class<? extends DataObject> clazz,
-    HttpInputMessage inputMessage)
+    final Class<? extends DataObject> clazz,
+    final HttpInputMessage inputMessage)
     throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -65,14 +76,19 @@ public class DataObjectHttpMessageConverter extends
       } else {
         final Reader<DataObject> reader = readerFactory.createDataObjectReader(
           body, charset);
-        for (DataObject dataObject : reader) {
+        for (final DataObject dataObject : reader) {
           return dataObject;
         }
         return null;
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new HttpMessageNotReadableException("Error reading data", e);
     }
+  }
+
+  public void setRequestAttributeNames(
+    final List<String> requestAttributeNames) {
+    this.requestAttributeNames = requestAttributeNames;
   }
 
   @Override
@@ -102,7 +118,7 @@ public class DataObjectHttpMessageConverter extends
           + " not supported");
       } else {
         final DataObjectMetaData metaData = dataObject.getMetaData();
-        String baseName = HttpRequestUtils.getRequestBaseFileName();
+        final String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
         final String fileName = baseName + "."
           + writerFactory.getFileExtension(mediaTypeString);
@@ -112,9 +128,9 @@ public class DataObjectHttpMessageConverter extends
         final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
           baseName, metaData, body, charset);
 
-        Geometry geometry = dataObject.getGeometryValue();
+        final Geometry geometry = dataObject.getGeometryValue();
         if (geometry != null) {
-          CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
+          final CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
           writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
             coordinateSystem.getId());
         }
@@ -123,16 +139,12 @@ public class DataObjectHttpMessageConverter extends
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }
-        final String callback = (String)requestAttributes.getAttribute("jsonp",
-          RequestAttributes.SCOPE_REQUEST);
-        if (callback != null) {
-          writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
-        }
-        final String[] attributeNames = requestAttributes.getAttributeNames(RequestAttributes.SCOPE_REQUEST);
-        for (String attributeName : attributeNames) {
+        for (final String attributeName : requestAttributeNames) {
           final Object value = requestAttributes.getAttribute(attributeName,
             RequestAttributes.SCOPE_REQUEST);
-          writer.setProperty(attributeName, value);
+          if (value != null) {
+            writer.setProperty(attributeName, value);
+          }
         }
         writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
         writer.write(dataObject);
