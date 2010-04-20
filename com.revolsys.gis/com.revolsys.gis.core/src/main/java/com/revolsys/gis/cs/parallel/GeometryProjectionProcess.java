@@ -3,6 +3,7 @@ package com.revolsys.gis.cs.parallel;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
@@ -25,6 +26,7 @@ public class GeometryProjectionProcess extends AbstractInOutProcess<DataObject> 
         if (geometry != null) {
           Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
             geometryFactory);
+          JtsGeometryUtil.makePrecise(geometryFactory.getPrecisionModel(), projectedGeometry);
           if (geometry != projectedGeometry) {
             object.setGeometryValue(projectedGeometry);
           }

@@ -99,7 +99,7 @@ public class UtmPrecisionModel extends PrecisionModel {
       lon = coordinate.x;
       lat = coordinate.y;
     }
-    final int utmSrid = utmGrid.getNad83Srid(lat, lon);
+    final int utmSrid = utmGrid.getNad83Srid(lon, lat);
     if (srid != utmSrid) {
       final ProjectedCoordinateSystem utmCoordinateSystem = (ProjectedCoordinateSystem)EpsgCoordinateSystems.getCoordinateSystem(utmSrid);
       final CoordinatesOperation toUtm = ProjectionFactory.getCoordinatesOperation(

@@ -58,6 +58,7 @@ public class OracleDataStoreConnection implements DataStoreConnection {
       dataSource.setPassword(password);
       dataSource.setConnectionCachingEnabled(true);
       dataStore = new OracleDataObjectStore(new FeatureDataObjectFactory(), dataSource);
+      dataStore.initialize();
       metaData = new JdbcDataStoreMetaData(dataStore, schema);
     } catch (SQLException e) {
       throw new DataStoreException(e.getMessage(), e);

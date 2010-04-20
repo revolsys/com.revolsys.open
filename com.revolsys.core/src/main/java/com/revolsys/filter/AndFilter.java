@@ -21,7 +21,8 @@ public class AndFilter<T> implements Filter<T> {
   public boolean accept(
     final T object) {
     for (final Filter<T> filter : filters) {
-      if (!filter.accept(object)) {
+      final boolean accept = filter.accept(object);
+      if (!accept) {
         return false;
       }
     }
