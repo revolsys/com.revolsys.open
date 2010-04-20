@@ -131,8 +131,10 @@ public class DataObjectHttpMessageConverter extends
         final Geometry geometry = dataObject.getGeometryValue();
         if (geometry != null) {
           final CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-          writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
+          writer.setProperty(IoConstants.SRID_PROPERTY,
             coordinateSystem.getId());
+          writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
+            coordinateSystem);
         }
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
