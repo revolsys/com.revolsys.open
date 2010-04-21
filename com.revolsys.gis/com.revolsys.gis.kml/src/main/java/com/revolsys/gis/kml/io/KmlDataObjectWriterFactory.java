@@ -13,7 +13,7 @@ import com.revolsys.io.Writer;
 public class KmlDataObjectWriterFactory extends
   AbstractDataObjectAndGeometryWriterFactory {
   public KmlDataObjectWriterFactory() {
-    super(Kml22Constants.DESCRIPTION);
+    super(Kml22Constants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(Kml22Constants.MEDIA_TYPE,
       Kml22Constants.FILE_EXTENSION);
     setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));

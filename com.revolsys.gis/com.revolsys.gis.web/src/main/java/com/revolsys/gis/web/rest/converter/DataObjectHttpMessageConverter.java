@@ -39,8 +39,9 @@ public class DataObjectHttpMessageConverter extends
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
   private List<String> requestAttributeNames = Arrays.asList(
-    IoConstants.STYLE_URL, IoConstants.JSONP_PROPERTY,
-    IoConstants.TITLE_PROPERTY);
+    IoConstants.STYLE_URL_PROPERTY, IoConstants.JSONP_PROPERTY,
+    IoConstants.TITLE_PROPERTY,
+    IoConstants.DESCRIPTION_PROPERTY);
 
   public DataObjectHttpMessageConverter() {
     super(DataObject.class,

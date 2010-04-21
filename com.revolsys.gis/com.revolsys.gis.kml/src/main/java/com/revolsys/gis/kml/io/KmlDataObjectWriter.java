@@ -31,7 +31,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
   public KmlDataObjectWriter(
     final java.io.Writer out) {
     this.writer = new KmlXmlWriter(out);
-   }
+  }
 
   private void writeHeader() {
     opened = true;
@@ -76,7 +76,13 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
       final Object id = object.getValue(idIndex);
       writer.element(Kml22Constants.NAME, metaData.getName() + " " + id);
     }
-    String styleUrl = getProperty(IoConstants.STYLE_URL);
+    String description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
+    if (description != null) {
+      writer.startTag(Kml22Constants.DESCRIPTION);
+      writer.cdata(description);
+      writer.endTag(Kml22Constants.DESCRIPTION);
+    }
+    String styleUrl = getProperty(IoConstants.STYLE_URL_PROPERTY);
     if (styleUrl != null) {
       writer.element(Kml22Constants.STYLE_URL, styleUrl);
     }

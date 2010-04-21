@@ -10,13 +10,15 @@ public interface Kml22Constants {
 
   String MEDIA_TYPE = "application/vnd.google-earth.kml+xml";
 
-  String DESCRIPTION = "Google Earth";
+  String FORMAT_DESCRIPTION = "Google Earth";
 
   CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
 
   String KML_NS_URI = "http://www.opengis.net/kml/2.2";
 
   QName COORDINATES = new QName(KML_NS_URI, "coordinates");
+
+  QName DESCRIPTION = new QName(KML_NS_URI, "description");
 
   QName DATA = new QName(KML_NS_URI, "Data");
 

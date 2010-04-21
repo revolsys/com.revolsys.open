@@ -9,7 +9,7 @@ import com.revolsys.io.MapWriterFactory;
 public class KmlMapIoFactory extends AbstractIoFactory implements
   MapWriterFactory {
   public KmlMapIoFactory() {
-    super(Kml22Constants.DESCRIPTION);
+    super(Kml22Constants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(Kml22Constants.MEDIA_TYPE,
       Kml22Constants.FILE_EXTENSION);
   }

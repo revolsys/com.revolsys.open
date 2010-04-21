@@ -15,8 +15,10 @@ public interface IoConstants {
 
   String TITLE_PROPERTY = "com.revolsys.io.title";
 
-  String CSS_CLASS = "com.revolsys.io.cssClass";
+  String CSS_CLASS_PROPERTY = "com.revolsys.io.cssClass";
 
-  String STYLE_URL = "com.revolsys.io.styleUrl";
+  String STYLE_URL_PROPERTY = "com.revolsys.io.styleUrl";
+
+  String DESCRIPTION_PROPERTY = "com.revolsys.io.description";
 
 }

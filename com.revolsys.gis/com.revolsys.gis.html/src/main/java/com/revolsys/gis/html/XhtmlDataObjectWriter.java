@@ -80,7 +80,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
         wrap = Boolean.valueOf(value.toString());
       } else if (name.equals(IoConstants.TITLE_PROPERTY)) {
         title = value.toString();
-      } else if (name.equals(IoConstants.CSS_CLASS)) {
+      } else if (name.equals(IoConstants.CSS_CLASS_PROPERTY)) {
         cssClass = value.toString();
       }
     }
