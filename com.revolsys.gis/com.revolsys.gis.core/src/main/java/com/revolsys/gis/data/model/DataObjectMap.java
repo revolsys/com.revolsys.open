@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 public class DataObjectMap extends AbstractMap<String, Object> {
-
   private DataObject object;
+
+  private LinkedHashSet<Entry<String, Object>> entries;
 
   public DataObjectMap() {
   }
@@ -47,24 +49,12 @@ public class DataObjectMap extends AbstractMap<String, Object> {
 
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    final Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
-    for (int i = 0; i < size(); i++) {
-      final int index = i;
-      entries.add(new Entry<String, Object>() {
-        public String getKey() {
-          return object.getMetaData().getAttributeName(index);
-        }
-
-        public Object getValue() {
-          return object.getValue(index);
-        }
-
-        public Object setValue(
-          final Object value) {
-          object.setValue(index, value);
-          return value;
-        }
-      });
+    if (entries == null) {
+      entries = new LinkedHashSet<Entry<String, Object>>();
+      for (int i = 0; i < size(); i++) {
+        final DataObjectMapEntry entry = new DataObjectMapEntry(object, i);
+        entries.add(entry);
+      }
     }
     return entries;
   }
