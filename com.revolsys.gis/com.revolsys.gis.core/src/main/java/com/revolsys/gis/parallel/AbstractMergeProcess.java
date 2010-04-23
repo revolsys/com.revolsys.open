@@ -4,6 +4,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.parallel.channel.Buffer;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.MultiChannelReadSelector;
@@ -157,12 +158,20 @@ public abstract class AbstractMergeProcess extends
   protected abstract void addSourceObject(
     DataObject object);
 
+  private int otherInBufferSize = 0;
+
   /**
    * @return the in
    */
   public Channel<DataObject> getOtherIn() {
     if (otherIn == null) {
-      setOtherIn(new Channel<DataObject>());
+      if (otherInBufferSize < 1) {
+        setOtherIn(new Channel<DataObject>());
+      } else {
+        final Buffer<DataObject> buffer = new Buffer<DataObject>(
+          otherInBufferSize);
+        setOtherIn(new Channel<DataObject>(buffer));
+      }
     }
     return otherIn;
   }

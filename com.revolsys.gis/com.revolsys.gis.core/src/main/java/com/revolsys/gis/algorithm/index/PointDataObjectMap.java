@@ -71,7 +71,7 @@ public class PointDataObjectMap {
     final Filter<DataObject> filter) {
     final List<DataObject> objects = getObjects(object);
     for (final DataObject matchObject : objects) {
-      if (filter.accept(object)) {
+      if (filter.accept(matchObject)) {
         return matchObject;
       }
     }

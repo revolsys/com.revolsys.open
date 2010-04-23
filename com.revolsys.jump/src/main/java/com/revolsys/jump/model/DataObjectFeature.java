@@ -155,10 +155,6 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
     super.setAttribute(index, value);
   }
 
-  @Override
-  public String toString() {
-    return getMetaData().toString();
-  }
 
   protected void updateState() {
     switch (state) {
@@ -169,5 +165,28 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
         throw new IllegalStateException(
           "Cannot modify an object which has been deleted");
     }
+  }
+  /**
+   * Return a String representation of the Object. There is no guarantee as to
+   * the format of this string.
+   * 
+   * @return The string value.
+   */
+  @Override
+  public String toString() {
+    final StringBuffer s = new StringBuffer();
+    final DataObjectMetaData metaData = getMetaData();
+    s.append(metaData.getName()).append("(\n");
+    for (int i = 0; i < getAttributes().length; i++) {
+      final Object value = getValue(i);
+      if (value != null) {
+        s.append(metaData.getAttributeName(i))
+          .append('=')
+          .append(value)
+          .append('\n');
+      }
+    }
+    s.append(')');
+    return s.toString();
   }
 }

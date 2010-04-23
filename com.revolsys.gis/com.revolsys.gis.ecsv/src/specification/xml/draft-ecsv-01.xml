@@ -55,6 +55,90 @@
       <t>UCS characters are designated by the U+HHHH notation, where HHHH is a
         string of from 4 to 6 hexadecimal digits representing the character
         number in ISO/IEC 10646.</t>
+      <t>
+        ECSV documents MUST be encoded using the UTF-8 character set as defined
+        in
+        <xref
+          target="RFC3629"
+        >RFC 3629</xref>
+        . UCS characters must be converted to UTF-8 encoding when writing an
+        ECSV document
+      </t>
+      <section
+        anchor="basicRules"
+        title="Basic ABNF Rules"
+      >
+        <figure>
+          <artwork
+            type="abnf"
+          >
+CR     = U-000D ; Carriage return
+LF     = U-000A ; Line feed
+COMMA  = U-002C ; ',' Comma
+DQUOTE = U-0022 ; '"' (Double Quote)
+            </artwork>
+        </figure>
+      </section>
+    </section>
+    <section
+      anchor="document"
+      title="Document"
+    >
+      <figure>
+        <artwork
+          type="abnf"
+        >
+Document = Properties
+           CRLF
+           Schema
+           CRLF
+           Records
+        </artwork>
+      </figure>
+    </section>
+    <section
+      anchor="properties"
+      title="Properties"
+    >
+      <figure>
+        <artwork
+          type="abnf"
+        >
+Properties = Version
+             *Property      ; List of optional properties
+
+Version    = "version"      ; Name of the version property
+             COMMA
+             "anyURI"       ; TypeName of the version property value
+             COMMA
+             "ecsv-1.0.0"   ; Version URI for ECSV 1.0.0
+             CRLF
+
+Version    = "schemaRecords" ; Name of the version property
+             COMMA
+             "list<anyURI>"  ; TypeName of the version property value
+             COMMA
+             List            ; 
+             CRLF
+
+Property   = Name           ; Name of the property
+             COMMA
+             TypeName       ; TypeName of the property value
+             COMMA
+             Value          ; The value of the property
+             CRLF
+        </artwork>
+      </figure>
+    </section>
+    <section
+      anchor="schema"
+      title="Schema"
+    >
+    </section>
+    <section
+      anchor="data"
+      title="Records"
+    >
     </section>
     <section
       anchor="mime"

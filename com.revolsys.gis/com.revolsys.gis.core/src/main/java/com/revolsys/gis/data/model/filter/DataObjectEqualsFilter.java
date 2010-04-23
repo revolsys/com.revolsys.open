@@ -23,7 +23,6 @@ public class DataObjectEqualsFilter implements Filter<DataObject> {
     final DataObject searchObject,
     final Collection<String> equalExclude) {
     this.searchObject = searchObject;
-    final DataObjectMetaData metaData = searchObject.getMetaData();
     if (equalExclude != null) {
       this.equalExclude.addAll(equalExclude);
     }

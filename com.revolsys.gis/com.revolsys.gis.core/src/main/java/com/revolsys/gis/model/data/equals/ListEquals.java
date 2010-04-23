@@ -10,7 +10,11 @@ public class ListEquals implements Equals<List<?>> {
     final List<?> list1,
     final List<?> list2,
     final Collection<String> exclude) {
-    if (list1.size() != list2.size()) {
+    if (list1 == null) {
+      return list2 == null;
+    } else if (list2 == null) {
+      return false;
+    } else if (list1.size() != list2.size()) {
       return false;
     } else {
       for (int i = 0; i < list1.size(); i++) {

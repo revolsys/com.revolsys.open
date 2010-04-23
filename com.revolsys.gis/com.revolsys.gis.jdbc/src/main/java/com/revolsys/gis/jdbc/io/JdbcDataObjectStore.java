@@ -168,7 +168,6 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   public void delete(
     final DataObject object) {
     if (object.getState() == DataObjectState.Persisted) {
-      ;
       object.setState(DataObjectState.Deleted);
       getWriter().write(object);
     }

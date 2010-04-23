@@ -7,6 +7,13 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   private final byte numAxis;
 
   public DoubleCoordinatesList(
+    final CoordinatesList coordinatesList,
+    int numAxis) {
+    this(coordinatesList.size(), numAxis);
+    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
+  }
+
+  public DoubleCoordinatesList(
     final CoordinatesList coordinatesList) {
     this(coordinatesList.getCoordinates(), coordinatesList.getNumAxis());
   }

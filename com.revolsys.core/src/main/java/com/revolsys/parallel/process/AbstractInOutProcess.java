@@ -21,8 +21,8 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
   }
 
   public AbstractInOutProcess(
-   final Channel<T> in,
-   final Channel<T> out) {
+    final Channel<T> in,
+    final Channel<T> out) {
     this.in = in;
     this.out = out;
   }
@@ -35,7 +35,7 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
    */
   public Channel<T> getIn() {
     if (in == null) {
-      if (inBufferSize == 0) {
+      if (inBufferSize < 1) {
         setIn(new Channel<T>());
       } else {
         setIn(new Channel<T>(new Buffer<T>(inBufferSize)));
@@ -49,7 +49,7 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
    */
   public Channel<T> getOut() {
     if (out == null) {
-      if (outBufferSize == 0) {
+      if (outBufferSize < 1) {
         setOut(new Channel<T>());
       } else {
         setOut(new Channel<T>(new Buffer<T>(outBufferSize)));
@@ -105,6 +105,24 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
     this.out = out;
     out.writeConnect();
 
+  }
+
+  public int getInBufferSize() {
+    return inBufferSize;
+  }
+
+  public void setInBufferSize(
+    int inBufferSize) {
+    this.inBufferSize = inBufferSize;
+  }
+
+  public int getOutBufferSize() {
+    return outBufferSize;
+  }
+
+  public void setOutBufferSize(
+    int outBufferSize) {
+    this.outBufferSize = outBufferSize;
   }
 
 }

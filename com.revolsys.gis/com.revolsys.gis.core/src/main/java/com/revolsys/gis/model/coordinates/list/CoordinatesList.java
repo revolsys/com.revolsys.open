@@ -5,6 +5,13 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public interface CoordinatesList extends CoordinateSequence {
+  void copy(
+    int sourceIndex,
+    CoordinatesList target,
+    int targetIndex,
+    int numAxis,
+    int count);
+
   double[] getCoordinates();
 
   byte getNumAxis();

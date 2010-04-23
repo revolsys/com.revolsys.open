@@ -41,7 +41,9 @@ public final class MoepConstants {
 
   public static final String FEATURE_CODE = "featureCode";
 
-  public static final String FONT_SIZE = "fontSize";
+  public static final String CHARACTER_HEIGHT = "characterHeight";
+
+  public static final String FONT_NAME = "fontName";
 
   public static final DateFormat FULL_DATE_FORMAT = new SimpleDateFormat(
     "yyyyMMdd");
@@ -84,7 +86,8 @@ public final class MoepConstants {
     type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, true);
     type.addAttribute(ANGLE, DataTypes.DECIMAL, false);
     type.addAttribute(ELEVATION, DataTypes.DECIMAL, false);
-    type.addAttribute(FONT_SIZE, DataTypes.DECIMAL, false);
+    type.addAttribute(CHARACTER_HEIGHT, DataTypes.DECIMAL, false);
+    type.addAttribute(FONT_NAME, DataTypes.STRING, false);
     type.addAttribute(TEXT, DataTypes.STRING, false);
     type.addAttribute(GEOMETRY, DataTypes.GEOMETRY, true);
     type.setGeometryAttributeName(GEOMETRY);

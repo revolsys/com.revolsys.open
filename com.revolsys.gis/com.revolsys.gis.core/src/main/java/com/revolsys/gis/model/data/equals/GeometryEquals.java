@@ -22,8 +22,9 @@ public class GeometryEquals implements Equals<Geometry> {
       if (!JtsGeometryUtil.equalsExact3D(geometryPart1, geometryPart2)) {
         return false;
       }
-      if (!equalsRegistry.equals(geometryPart1.getUserData(),
-        geometryPart2.getUserData(), exclude)) {
+      final Object userData1 = geometryPart1.getUserData();
+      final Object userData2 = geometryPart2.getUserData();
+      if (!equalsRegistry.equals(userData1, userData2, exclude)) {
         return false;
       }
     }

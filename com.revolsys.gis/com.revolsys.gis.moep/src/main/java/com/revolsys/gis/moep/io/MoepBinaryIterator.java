@@ -14,6 +14,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -163,8 +164,10 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       final DataObject object = dataObjectFactory.createDataObject(MoepConstants.META_DATA);
       object.setValue(MoepConstants.FEATURE_CODE, featureCode);
       object.setValue(MoepConstants.ORIGINAL_FILE_TYPE, originalFileType);
+      String attribute = null;
       if (numBytes > 0) {
-        object.setValue(MoepConstants.ATTRIBUTE, readString(numBytes));
+        attribute = readString(numBytes);
+        object.setValue(MoepConstants.ATTRIBUTE, attribute);
       }
       switch (featureType) {
         case POINT:
@@ -192,14 +195,20 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(textPoint);
           if (extraParams == 1) {
             final int angle = readLEInt(in);
-            object.setValue(MoepConstants.ANGLE, new Double(
-              ((double)angle) / 10000));
+            object.setValue(MoepConstants.ANGLE, 
+              ((double)angle) / 10000.0);
           }
-          final short fontSize = readLEShort(in);
+          final int fontSize = readLEShort(in);
           final int numChars = read();
           final String text = readString(numChars);
-          object.setValue(MoepConstants.FONT_SIZE, new Integer(fontSize));
+          if (attribute != null) {
+            object.setValue(MoepConstants.FONT_NAME, new String(
+              attribute.substring(0, 3).trim()));
+            object.setValue(MoepConstants.ATTRIBUTE, null);
+          }
+          object.setValue(MoepConstants.CHARACTER_HEIGHT, fontSize);
           object.setValue(MoepConstants.TEXT, text);
+          System.out.println(fontSize + "\t" + text);
 
         break;
       }
