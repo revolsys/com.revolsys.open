@@ -297,7 +297,24 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
         addAttribute(resultSetMetaData, metaData, name, i);
       }
 
-      setMetaDataProperties(metaData);
+      for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
+        final DataObjectMetaDataProperty clonedProperty = property.clone();
+        clonedProperty.setMetaData(metaData);
+      }
+      final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
+      if (properties != null) {
+        for (Entry<String, Object> entry : properties.entrySet()) {
+          String key = entry.getKey();
+          Object value = entry.getValue();
+          if (value instanceof DataObjectMetaDataProperty) {
+            DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
+            final DataObjectMetaDataProperty clonedProperty = property.clone();
+            clonedProperty.setMetaData(metaData);
+          } else {
+            metaData.setProperty(key, value);
+          }
+        }
+      }
 
       return metaData;
     } catch (final SQLException e) {

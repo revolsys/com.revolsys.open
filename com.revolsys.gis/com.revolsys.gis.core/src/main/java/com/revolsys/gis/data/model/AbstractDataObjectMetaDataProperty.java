@@ -13,7 +13,7 @@ public abstract class AbstractDataObjectMetaDataProperty implements
 
   public void setMetaData(
     final DataObjectMetaData metaData) {
-    if (this.metaData == null) {
+    if (this.metaData != null) {
       this.metaData.setProperty(getPropertyName(), null);
     }
     this.metaData = metaData;
