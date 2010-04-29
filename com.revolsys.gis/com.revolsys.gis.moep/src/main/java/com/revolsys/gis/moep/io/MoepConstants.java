@@ -68,6 +68,12 @@ public final class MoepConstants {
 
   public static final QName TYPE_NAME = new QName("MOEP", "Feature");
 
+  public static final String OTHER = "other";
+
+  public static final String TEXT_GROUP = "textGroup";
+
+  public static final String ORIENTATION = "orientation";
+
   static {
     final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(TYPE_NAME);
     type.addAttribute(FEATURE_CODE, DataTypes.STRING, true);
@@ -86,8 +92,6 @@ public final class MoepConstants {
     type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, true);
     type.addAttribute(ANGLE, DataTypes.DECIMAL, false);
     type.addAttribute(ELEVATION, DataTypes.DECIMAL, false);
-    type.addAttribute(CHARACTER_HEIGHT, DataTypes.DECIMAL, false);
-    type.addAttribute(FONT_NAME, DataTypes.STRING, false);
     type.addAttribute(TEXT, DataTypes.STRING, false);
     type.addAttribute(GEOMETRY, DataTypes.GEOMETRY, true);
     type.setGeometryAttributeName(GEOMETRY);

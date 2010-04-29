@@ -9,4 +9,19 @@ public interface Coordinates {
   void setValue(
     final int index,
     final double value);
+
+  double getX();
+
+  double getY();
+
+  double getZ();
+
+  void setX(
+    double x);
+
+  void setY(
+    double y);
+
+  void setZ(
+    double z);
 }

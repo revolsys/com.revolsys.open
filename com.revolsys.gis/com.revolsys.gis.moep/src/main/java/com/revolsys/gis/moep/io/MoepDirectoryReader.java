@@ -5,7 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -104,13 +104,15 @@ public class MoepDirectoryReader extends AbstractFileDatasetDataObjectReader
 
         try {
           final String dateString = versionFields[2];
-          submissionDate = MoepConstants.FULL_DATE_FORMAT.parse(dateString);
+          submissionDate = new Date(MoepConstants.FULL_DATE_FORMAT.parse(
+            dateString).getTime());
         } catch (final ParseException e) {
           throw new IllegalArgumentException("Invalid KN submission date", e);
         }
         revisionKey = versionFields[3];
         try {
-          integrationDate = MoepConstants.FULL_DATE_FORMAT.parse(versionFields[4]);
+          integrationDate = new Date(MoepConstants.FULL_DATE_FORMAT.parse(
+            versionFields[4]).getTime());
         } catch (final ParseException e) {
           throw new IllegalArgumentException("Invalid KN integration date", e);
         }

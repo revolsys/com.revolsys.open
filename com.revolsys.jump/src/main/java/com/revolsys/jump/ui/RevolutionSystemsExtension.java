@@ -43,7 +43,7 @@ public class RevolutionSystemsExtension extends Extension {
 
   @SuppressWarnings("unchecked")
   public void configure(final PlugInContext context) throws Exception {
-    workbenchContext = context.getWorkbenchContext();
+   workbenchContext = context.getWorkbenchContext();
     FeatureInstaller featureInstaller = context.getFeatureInstaller();
 
     new VisibilityPlugin(true).initialize(context);

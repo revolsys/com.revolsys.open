@@ -48,4 +48,26 @@ public interface CoordinatesList extends CoordinateSequence {
     int sourceIndex,
     int targetIndex,
     int count);
+
+  double getX(
+    int index);
+
+  double getY(
+    int index);
+
+  double getZ(
+    int index);
+
+  void setX(
+    int index,
+    double x);
+
+  void setY(
+    int index,
+    double y);
+
+  void setZ(
+    int index,
+    double z);
+
 }

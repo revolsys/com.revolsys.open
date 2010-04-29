@@ -30,7 +30,7 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
   private boolean initialized;
 
   public OracleDataObjectStore() {
-   this(new ArrayDataObjectFactory());
+    this(new ArrayDataObjectFactory());
   }
 
   public OracleDataObjectStore(
@@ -50,6 +50,11 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
   public String getGeneratePrimaryKeySql(
     final DataObjectMetaData metaData) {
     final String shortName = ShortNameProperty.getShortName(metaData);
+    if (shortName == null) {
+      ShortNameProperty.getShortName(metaData);
+      throw new IllegalArgumentException("No sequence for "
+        + metaData.getName());
+    }
     return shortName + "_SEQ.NEXTVAL";
   }
 

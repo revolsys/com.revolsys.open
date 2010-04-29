@@ -122,7 +122,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     if (time != null) {
       if (time instanceof Date) {
         final DateFormat timestampFormat = new SimpleDateFormat(
-          "yyyy-MM-dd'T'HH:mm:ss");
+          "yyyy-MM-dd'T'HH:mm:ss.");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         out.element(GpxConstants.TIME_ELEMENT, timestampFormat.format(time));
       } else {
@@ -161,8 +161,8 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     for (final Coordinates coordinates : new InPlaceIterator(coordinatesList)) {
       inverseCoordinatesOperation.perform(coordinates, geoCoordinates);
       out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
-      out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinates.getValue(0));
-      out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinates.getValue(1));
+      out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinates.getX());
+      out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinates.getY());
       if (coordinatesList.getDimension() > 2) {
         final double elevation = geoCoordinates.getValue(2);
         if (!Double.isNaN(elevation)) {

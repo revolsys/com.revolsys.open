@@ -46,8 +46,8 @@ public class Mercator2SP implements CoordinatesProjection {
   public void inverse(
     final Coordinates from,
     final Coordinates to) {
-    final double x = (from.getValue(0) - x0) / multiple;
-    final double y = (from.getValue(1) - y0) / multiple;
+    final double x = (from.getX() - x0) / multiple;
+    final double y = (from.getY() - y0) / multiple;
 
     final double lambda = x / a + lambda0;
 
@@ -73,8 +73,8 @@ public class Mercator2SP implements CoordinatesProjection {
   public void project(
     final Coordinates from,
     final Coordinates to) {
-    final double lambda = from.getValue(0);
-    final double phi = from.getValue(1);
+    final double lambda = from.getX();
+    final double phi = from.getY();
 
     final double x = (a * (lambda - lambda0)) * multiple;
 

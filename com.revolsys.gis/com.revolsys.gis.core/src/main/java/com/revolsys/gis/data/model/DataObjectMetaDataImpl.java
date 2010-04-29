@@ -213,7 +213,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return metaData;
   }
 
-  private void cloneProperties(
+  public void cloneProperties(
     final Map<String, Object> properties) {
     if (properties != null) {
       for (final Entry<String, Object> property : properties.entrySet()) {
@@ -493,6 +493,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
         if (propertyIter.getValue() instanceof DataObjectMetaDataProperty) {
           final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)propertyIter.getValue();
           property.setMetaData(this);
+          if (property instanceof ShortNameProperty) {
+            if (this.properties.get(ShortNameProperty.PROPERTY_NAME) == null) {
+              System.out.println();
+            }
+          }
         }
       }
     }
@@ -502,6 +507,9 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void setProperty(
     final String name,
     final Object value) {
+    if (value == null) {
+      System.out.println();
+    }
     properties.put(name, value);
   }
 

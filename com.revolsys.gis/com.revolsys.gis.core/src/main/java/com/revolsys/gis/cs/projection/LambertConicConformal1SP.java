@@ -59,8 +59,8 @@ public class LambertConicConformal1SP implements CoordinatesProjection {
   public void inverse(
     final Coordinates from,
     final Coordinates to) {
-    double x = from.getValue(0) - x0;
-    double y = from.getValue(1) - y0;
+    double x = from.getX() - x0;
+    double y = from.getY() - y0;
 
     double rho0 = this.rho0;
     if (n < 0) {
@@ -104,8 +104,8 @@ public class LambertConicConformal1SP implements CoordinatesProjection {
   public void project(
     final Coordinates from,
     final Coordinates to) {
-    final double lambda = from.getValue(0);
-    final double phi = from.getValue(1);
+    final double lambda = from.getX();
+    final double phi = from.getY();
 
     final double t = t(phi);
     final double rho = a * f * Math.pow(t, n) * scaleFactor;

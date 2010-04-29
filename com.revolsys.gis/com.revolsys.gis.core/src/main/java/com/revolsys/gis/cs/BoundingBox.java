@@ -201,8 +201,8 @@ public class BoundingBox extends Envelope {
 
   public void expandToInclude(
     final Coordinates coordinates) {
-    final double x = coordinates.getValue(0);
-    final double y = coordinates.getValue(1);
+    final double x = coordinates.getX();
+    final double y = coordinates.getY();
     super.expandToInclude(x, y);
   }
 

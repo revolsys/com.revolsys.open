@@ -52,7 +52,11 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     final int index,
     final int axisIndex) {
     final byte numAxis = getNumAxis();
-    return coordinates[index * numAxis + axisIndex];
+    if (axisIndex < numAxis) {
+      return coordinates[index * numAxis + axisIndex];
+    } else {
+      return Double.NaN;
+    }
   }
 
   public void setValue(
@@ -60,7 +64,9 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     final int axisIndex,
     final double value) {
     final byte numAxis = getNumAxis();
-    coordinates[index * numAxis + axisIndex] = value;
+    if (axisIndex < numAxis) {
+      coordinates[index * numAxis + axisIndex] = value;
+    }
   }
 
   public int size() {

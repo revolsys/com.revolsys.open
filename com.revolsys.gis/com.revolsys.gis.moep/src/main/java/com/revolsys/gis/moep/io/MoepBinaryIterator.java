@@ -17,6 +17,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
+import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -176,7 +177,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(point);
           if (extraParams == 1 || extraParams == 3) {
             final int angle = readLEInt(in);
-            object.setValue("angle", new Double(((double)angle) / 10000));
+            object.setValue(MoepConstants.ANGLE, new Double(
+              getAngle(((double)angle) / 10000)));
           }
         break;
         case CONSTRUCTION_LINE:
@@ -195,21 +197,38 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(textPoint);
           if (extraParams == 1) {
             final int angle = readLEInt(in);
-            object.setValue(MoepConstants.ANGLE, 
-              ((double)angle) / 10000.0);
+            final double orientation = getAngle(((double)angle) / 10000.0);
+            object.setValue(MoepConstants.ANGLE, orientation);
+            JtsGeometryUtil.setGeometryProperty(textPoint,
+              MoepConstants.ORIENTATION, orientation);
           }
           final int fontSize = readLEShort(in);
           final int numChars = read();
           final String text = readString(numChars);
           if (attribute != null) {
-            object.setValue(MoepConstants.FONT_NAME, new String(
-              attribute.substring(0, 3).trim()));
+            final String fontName = new String(attribute.substring(0, 3).trim());
+            JtsGeometryUtil.setGeometryProperty(textPoint,
+              MoepConstants.FONT_NAME, fontName);
+            if (attribute.length() > 3) {
+              final String other = new String(attribute.substring(3, 5).trim());
+              JtsGeometryUtil.setGeometryProperty(textPoint,
+                MoepConstants.OTHER, other);
+            }
+            if (attribute.length() > 5) {
+              final String textGroup = new String(attribute.substring(4, 9)
+                .trim());
+              JtsGeometryUtil.setGeometryProperty(textPoint,
+                MoepConstants.TEXT_GROUP, textGroup);
+            }
+
             object.setValue(MoepConstants.ATTRIBUTE, null);
           }
-          object.setValue(MoepConstants.CHARACTER_HEIGHT, fontSize);
+          JtsGeometryUtil.setGeometryProperty(textPoint,
+            MoepConstants.CHARACTER_HEIGHT, fontSize);
           object.setValue(MoepConstants.TEXT, text);
-          System.out.println(fontSize + "\t" + text);
-
+          JtsGeometryUtil.setGeometryProperty(textPoint, MoepConstants.TEXT,
+            text);
+          JtsGeometryUtil.setGeometryProperty(textPoint, "textType", "TextLine");
         break;
       }
 
@@ -236,6 +255,15 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       hasNext = false;
       return null;
     }
+  }
+
+  private double getAngle(
+    double angle) {
+    double orientation = (90 - angle) % 360;
+    if (orientation < 0) {
+      orientation = 360 + orientation;
+    }
+    return orientation;
   }
 
   private void loadHeader()

@@ -88,8 +88,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
   public void inverse(
     final Coordinates from,
     final Coordinates to) {
-    final double x = from.getValue(0) - x0;
-    final double y = from.getValue(1) - y0;
+    final double x = from.getX() - x0;
+    final double y = from.getY() - y0;
     final double theta = Math.atan(x / (rho0 - y));
     final double rho = Math.sqrt(x * x + Math.pow((rho0 - y), 2.0));
     final double q = (c - (rho * rho * n * n) / (semiMajorAxis * semiMajorAxis))
@@ -158,8 +158,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
   public void project(
     final Coordinates from,
     final Coordinates to) {
-    final double lambda = from.getValue(0);
-    final double phi = from.getValue(1);
+    final double lambda = from.getX();
+    final double phi = from.getY();
     final double q = q(phi);
     final double theta = n * (lambda - lambda0);
     final double rho = (semiMajorAxis * Math.sqrt(c - n * q)) / n;

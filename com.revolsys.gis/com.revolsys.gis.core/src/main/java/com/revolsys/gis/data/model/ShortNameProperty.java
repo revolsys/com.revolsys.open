@@ -2,7 +2,7 @@ package com.revolsys.gis.data.model;
 
 
 public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
-  private static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
+  static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
 
   private static ShortNameProperty getProperty(
     final DataObject object) {

@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-public class DoubleCoordinates implements Coordinates {
+public class DoubleCoordinates extends AbstractCoordinates {
   private final double[] coordinates;
 
   public DoubleCoordinates(

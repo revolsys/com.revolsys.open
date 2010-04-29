@@ -3,6 +3,7 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
@@ -25,12 +26,12 @@ public class CoordinatesListUtil {
       previousX = Double.NaN;
       previousY = Double.NaN;
     } else {
-      previousX = dest.getValue(startIndex - 1, 0);
-      previousY = dest.getValue(startIndex - 1, 1);
+      previousX = dest.getX(startIndex - 1);
+      previousY = dest.getY(startIndex - 1);
     }
     for (int i = 0; i < srcSize && coordIndex < destSize; i++) {
-      final double x = src.getValue(i, 0);
-      final double y = src.getValue(i, 1);
+      final double x = src.getX(i);
+      final double y = src.getY(i);
       if (x != previousX && y != previousY) {
         dest.setValue(coordIndex, 0, x);
         dest.setValue(coordIndex, 1, y);
@@ -62,12 +63,12 @@ public class CoordinatesListUtil {
       previousX = Double.NaN;
       previousY = Double.NaN;
     } else {
-      previousX = dest.getValue(startIndex - 1, 0);
-      previousY = dest.getValue(startIndex - 1, 1);
+      previousX = dest.getX(startIndex - 1);
+      previousY = dest.getY(startIndex - 1);
     }
     for (int i = srcSize - 1; i > -1 && coordIndex < destSize; i--) {
-      final double x = src.getValue(i, 0);
-      final double y = src.getValue(i, 1);
+      final double x = src.getX(i);
+      final double y = src.getY(i);
       if (x != previousX && y != previousY) {
         dest.setValue(coordIndex, 0, x);
         dest.setValue(coordIndex, 1, y);
@@ -161,4 +162,23 @@ public class CoordinatesListUtil {
     return get(point.getCoordinateSequence());
   }
 
+  public static CoordinatesList create(
+    List<Coordinates> coordinateArray,
+    int numAxis) {
+    CoordinatesList coordinatesList = new DoubleCoordinatesList(
+      coordinateArray.size(), numAxis);
+    int i = 0;
+    for (Coordinates coordinates : coordinateArray) {
+      if (coordinates != null) {
+        for (int j = 0; j < coordinates.getNumAxis(); j++) {
+          coordinatesList.setOrdinate(i, j, coordinates.getValue(j));
+        }
+        i++;
+      }
+    }
+    if (i < coordinatesList.size()) {
+      coordinatesList = coordinatesList.subList(0, i);
+    }
+    return coordinatesList;
+  }
 }

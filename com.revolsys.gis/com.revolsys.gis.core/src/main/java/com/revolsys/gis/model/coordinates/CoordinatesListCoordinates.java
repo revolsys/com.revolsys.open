@@ -2,7 +2,7 @@ package com.revolsys.gis.model.coordinates;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 
-public class CoordinatesListCoordinates implements Coordinates {
+public class CoordinatesListCoordinates extends AbstractCoordinates {
   private final CoordinatesList coordinates;
 
   private int index = 0;
@@ -57,9 +57,13 @@ public class CoordinatesListCoordinates implements Coordinates {
   public String toString() {
     final byte numAxis = getNumAxis();
     if (numAxis > 0) {
-      final StringBuffer s = new StringBuffer(
-        String.valueOf(coordinates.getValue(index, 0)));
-      for (int i = 1; i < numAxis; i++) {
+      final double x = coordinates.getX(index);
+      final StringBuffer s = new StringBuffer(String.valueOf(x));
+      double y = coordinates.getY(index);
+      s.append(',');
+      s.append(y);
+
+      for (int i = 2; i < numAxis; i++) {
         final Double ordinate = coordinates.getValue(index, i);
         s.append(',');
         s.append(ordinate);

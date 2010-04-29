@@ -3,10 +3,11 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 
-public class InPlaceIterator implements Coordinates, Iterator<Coordinates>,
-  Iterable<Coordinates> {
+public class InPlaceIterator extends AbstractCoordinates implements
+  Iterator<Coordinates>, Iterable<Coordinates> {
   private final CoordinatesList coordinates;
 
   private int index = 0;

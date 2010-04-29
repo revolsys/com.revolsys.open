@@ -80,15 +80,6 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static boolean intersects(
-    final Geometry geometry1,
-    final Geometry geometry2) {
-    final int srid2 = geometry2.getSRID();
-    final Geometry projectedGeometry1 = GeometryProjectionUtil.perform(
-      geometry1, srid2);
-    return projectedGeometry1.intersects(geometry2);
-  }
-
   private static void addElevation(
     final LineString original,
     final LineString update) {
@@ -543,6 +534,7 @@ public final class JtsGeometryUtil {
     return factory.createLinearRing(coordinates2d);
   }
 
+
   public static List<Coordinate> getCoordinateList(
     final LineString line) {
     return new ArrayList<Coordinate>(Arrays.asList(line.getCoordinates()));
@@ -964,6 +956,15 @@ public final class JtsGeometryUtil {
     final CoordinateSequence coordinates2 = line2.getCoordinateSequence();
     final LineString line2Floating = factory.createLineString(coordinates2);
     return JtsGeometryUtil.intersection2DZ(line1Floating, line2Floating);
+  }
+
+  public static boolean intersects(
+    final Geometry geometry1,
+    final Geometry geometry2) {
+    final int srid2 = geometry2.getSRID();
+    final Geometry projectedGeometry1 = GeometryProjectionUtil.perform(
+      geometry1, srid2);
+    return projectedGeometry1.intersects(geometry2);
   }
 
   public static boolean intersectsLinearly(

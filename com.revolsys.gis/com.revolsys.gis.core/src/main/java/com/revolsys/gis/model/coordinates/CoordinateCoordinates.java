@@ -2,7 +2,7 @@ package com.revolsys.gis.model.coordinates;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class CoordinateCoordinates implements Coordinates {
+public class CoordinateCoordinates extends AbstractCoordinates {
   private Coordinate coordinate;
 
   public CoordinateCoordinates(

@@ -46,11 +46,18 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
   private void coordinate(
     final CoordinatesList coordinates,
     int i) {
+    final double x = coordinates.getX(i);
     out.print('[');
-    out.value(coordinates.getValue(i, 0));
-    for (int j = 1; j < coordinates.getNumAxis(); j++) {
+    out.value(x);
+
+    final double y = coordinates.getY(i);
+    out.print(',');
+    out.value(y);
+
+    double z = coordinates.getZ(i);
+    if (!Double.isNaN(z)) {
       out.print(',');
-      out.value(coordinates.getValue(i, j));
+      out.value(z);
     }
     out.print(']');
   }

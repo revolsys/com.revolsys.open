@@ -10,8 +10,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     final StringBuffer s,
     final int i,
     final byte numAxis) {
-    s.append(getValue(i, 0));
-    for (int j = 1; j < numAxis; j++) {
+    s.append(getX(i));
+    s.append(' ');
+    s.append(getY(i));
+    for (int j = 2; j < numAxis; j++) {
       final Double coordinate = getValue(i, j);
       s.append(' ');
       s.append(coordinate);
@@ -44,8 +46,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
   public Envelope expandEnvelope(
     final Envelope env) {
     for (int i = 0; i < size(); i++) {
-      final double x = getValue(i, 0);
-      final double y = getValue(i, 1);
+      final double x = getX(i);
+      final double y = getY(i);
       env.expandToInclude(x, y);
     }
     return env;
@@ -61,10 +63,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
   public void getCoordinate(
     final int index,
     final Coordinate coord) {
-    coord.x = getValue(index, 0);
-    coord.y = getValue(index, 1);
+    coord.x = getX(index);
+    coord.y = getY(index);
     if (getNumAxis() > 2) {
-      coord.z = getValue(index, 2);
+      coord.z = getZ(index);
     }
   }
 
@@ -106,19 +108,43 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
 
   public double getY(
     final int index) {
-    return getValue(index, 1);
+    return getValue(index,1);
+  }
+
+  public double getZ(
+    int index) {
+    return getValue(index,2);
+  }
+
+  public void setX(
+    int index,
+    double x) {
+    setValue(index, 0, x);
+  }
+
+  public void setY(
+    int index,
+    double y) {
+    setValue(index, 1, y);
+  }
+
+  public void setZ(
+    int index,
+    double z) {
+    setValue(index, 2, z);
   }
 
   public void makePrecise(
     final PrecisionModel precisionModel) {
     if (precisionModel.getType() == PrecisionModel.FIXED) {
-      final byte numAxis = getNumAxis();
       for (int i = 0; i < size(); i++) {
-        for (int j = 0; j < numAxis; j++) {
-          final double ordinate = getValue(i, j);
-          final double preciseOrdinate = precisionModel.makePrecise(ordinate);
-          setValue(i, j, preciseOrdinate);
-        }
+        double x = getX(i);
+        x = precisionModel.makePrecise(x);
+        setX(i, x);
+
+        double y = getY(i);
+        y = precisionModel.makePrecise(y);
+        setY(i, y);
       }
     }
   }

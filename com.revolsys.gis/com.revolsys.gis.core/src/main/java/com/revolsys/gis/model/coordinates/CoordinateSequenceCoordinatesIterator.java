@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 
-public class CoordinateSequenceCoordinatesIterator implements Coordinates,
+public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates implements
   Iterator<Coordinates>, Iterable<Coordinates> {
   private final CoordinateSequence coordinates;
 

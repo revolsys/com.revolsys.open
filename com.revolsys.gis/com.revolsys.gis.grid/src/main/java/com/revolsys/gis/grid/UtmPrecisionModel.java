@@ -93,8 +93,8 @@ public class UtmPrecisionModel extends PrecisionModel {
         projectedCoordinateSystem.getGeographicCoordinateSystem());
       geoOp.perform(coordinateCoordinates, geoCoordinates);
 
-      lon = geoCoordinates.getValue(0);
-      lat = geoCoordinates.getValue(1);
+      lon = geoCoordinates.getX();
+      lat = geoCoordinates.getY();
     } else {
       lon = coordinate.x;
       lat = coordinate.y;

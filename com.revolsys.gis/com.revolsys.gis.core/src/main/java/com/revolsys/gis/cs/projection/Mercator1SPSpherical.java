@@ -34,8 +34,8 @@ public class Mercator1SPSpherical implements CoordinatesProjection {
   public void inverse(
     final Coordinates from,
     final Coordinates to) {
-    final double x = (from.getValue(0) - x0);
-    final double y = (from.getValue(1) - y0);
+    final double x = (from.getX() - x0);
+    final double y = (from.getY() - y0);
 
     final double lambda = x / r + lambda0;
 
@@ -53,8 +53,8 @@ public class Mercator1SPSpherical implements CoordinatesProjection {
   public void project(
     final Coordinates from,
     final Coordinates to) {
-    final double lambda = from.getValue(0);
-    final double phi = from.getValue(1);
+    final double lambda = from.getX();
+    final double phi = from.getY();
 
     final double x = r * (lambda - lambda0);
 

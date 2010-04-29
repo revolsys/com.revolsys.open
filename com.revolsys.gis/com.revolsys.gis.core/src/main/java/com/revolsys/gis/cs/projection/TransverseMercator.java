@@ -119,8 +119,8 @@ public class TransverseMercator implements CoordinatesProjection {
   public void inverse(
     final Coordinates from,
     final Coordinates to) {
-    final double x = from.getValue(0);
-    final double y = from.getValue(1);
+    final double x = from.getX();
+    final double y = from.getY();
     final double m = m0 + (y - y0) / k0;
     final double sqrt1MinusESq = Math.sqrt(1 - eSq);
     final double e1 = (1 - sqrt1MinusESq) / (1 + sqrt1MinusESq);

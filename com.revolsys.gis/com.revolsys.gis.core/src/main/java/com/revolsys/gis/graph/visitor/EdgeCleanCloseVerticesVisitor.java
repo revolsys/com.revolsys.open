@@ -95,12 +95,12 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
         coordinates);
       final LinkedHashSet<Integer> removeIndicies = new LinkedHashSet<Integer>();
 
-      double x1 = ordinates.getValue(0);
-      double y1 = ordinates.getValue(1);
+      double x1 = ordinates.getX();
+      double y1 = ordinates.getY();
       while (ordinates.hasNext()) {
         ordinates.next();
-        final double x2 = ordinates.getValue(0);
-        final double y2 = ordinates.getValue(1);
+        final double x2 = ordinates.getX();
+        final double y2 = ordinates.getY();
         final double distance = MathUtil.distance(x1, y1, x2, y2);
         if (distance < minDistance) {
           final double previousAngle = getAngle(edge, ordinates, -1);

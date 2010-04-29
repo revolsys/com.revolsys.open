@@ -92,8 +92,8 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
   public void inverse(
     final Coordinates from,
     final Coordinates to) {
-    final double x = from.getValue(0);
-    final double y = from.getValue(1);
+    final double x = from.getX();
+    final double y = from.getY();
 
     final double phi1 = footPointLatitude(y - y0);
     final double cosPhi1 = Math.cos(phi1);
@@ -138,8 +138,8 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
   public void project(
     final Coordinates from,
     final Coordinates to) {
-    final double lon = Math.toRadians(from.getValue(0));
-    final double lat = Math.toRadians(from.getValue(1));
+    final double lon = Math.toRadians(from.getX());
+    final double lat = Math.toRadians(from.getY());
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the spheroid in the prime vertical plane
     final double n = spheroid.primeVerticalRadiusOfCurvature(lat);
