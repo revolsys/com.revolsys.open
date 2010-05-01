@@ -4,27 +4,27 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractOutProcess;
 
-public class IterableProcess extends AbstractOutProcess<DataObject> {
-  private Iterable<DataObject> iterable;
+public class IterableProcess<T> extends AbstractOutProcess<T> {
+  private Iterable<T> iterable;
 
   public IterableProcess() {
 
   }
 
   public IterableProcess(
-    final Channel<DataObject> out,
-    final Iterable<DataObject> iterable) {
+    final Channel<T> out,
+    final Iterable<T> iterable) {
     super(out);
     this.iterable = iterable;
   }
 
   public IterableProcess(
-    final Iterable<DataObject> iterable) {
+    final Iterable<T> iterable) {
     this.iterable = iterable;
   }
 
   public IterableProcess(
-    final Iterable<DataObject> iterable,
+    final Iterable<T> iterable,
     final int bufferSize) {
     super(bufferSize);
     this.iterable = iterable;
@@ -33,23 +33,29 @@ public class IterableProcess extends AbstractOutProcess<DataObject> {
   /**
    * @return the iterable
    */
-  public Iterable<DataObject> getIterable() {
+  public Iterable<T> getIterable() {
     return iterable;
   }
 
   @Override
   protected void run(
-    final Channel<DataObject> out) {
-    for (final DataObject object : iterable) {
-      out.write(object);
+    final Channel<T> out) {
+    for (final T object : iterable) {
+      write(out, object);
     }
+  }
+
+  protected void write(
+    final Channel<T> out,
+    final T object) {
+    out.write(object);
   }
 
   /**
    * @param iterable the iterable to set
    */
   public void setIterable(
-    final Iterable<DataObject> iterable) {
+    final Iterable<T> iterable) {
     this.iterable = iterable;
   }
 

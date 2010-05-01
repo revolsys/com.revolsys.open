@@ -44,7 +44,7 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${basedir}/target/${artifactId}-${project.version}-bin.zip</file>
+                  <file>${basedir}/target/${project.artifactId}-${project.version}-bin.zip</file>
                   <type>zip</type>
                   <classifier>bin</classifier>
                 </artifact>
