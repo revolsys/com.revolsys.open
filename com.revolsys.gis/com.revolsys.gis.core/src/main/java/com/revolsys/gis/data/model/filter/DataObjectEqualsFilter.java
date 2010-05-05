@@ -10,18 +10,36 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectEqualsFilter implements Filter<DataObject> {
+  private EqualsRegistry equalsRegistry = EqualsRegistry.INSTANCE;
+
   private final Collection<String> equalExclude = new HashSet<String>();
 
   private final DataObject searchObject;
 
   public DataObjectEqualsFilter(
     final DataObject searchObject) {
-    this(searchObject, null);
+    this(null, searchObject, null);
   }
 
   public DataObjectEqualsFilter(
     final DataObject searchObject,
     final Collection<String> equalExclude) {
+    this(null, searchObject, equalExclude);
+  }
+
+  public DataObjectEqualsFilter(
+    EqualsRegistry equalsRegistry,
+    final DataObject searchObject) {
+    this(null, searchObject, null);
+  }
+
+  public DataObjectEqualsFilter(
+    EqualsRegistry equalsRegistry,
+    final DataObject searchObject,
+    final Collection<String> equalExclude) {
+    if (equalsRegistry != null) {
+      this.equalsRegistry = equalsRegistry;
+    }
     this.searchObject = searchObject;
     if (equalExclude != null) {
       this.equalExclude.addAll(equalExclude);
@@ -33,8 +51,8 @@ public class DataObjectEqualsFilter implements Filter<DataObject> {
     final Geometry serachGeometry = searchObject.getGeometryValue();
     final Geometry geometry = object.getGeometryValue();
 
-    if (EqualsRegistry.INSTANCE.equals(serachGeometry, geometry, equalExclude)) {
-      if (EqualsRegistry.INSTANCE.equals(searchObject, object, equalExclude)) {
+    if (equalsRegistry.equals(serachGeometry, geometry, equalExclude)) {
+      if (equalsRegistry.equals(searchObject, object, equalExclude)) {
         return true;
       }
     }

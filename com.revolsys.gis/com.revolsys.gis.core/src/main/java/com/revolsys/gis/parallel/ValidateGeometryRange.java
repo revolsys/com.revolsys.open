@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -12,7 +12,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ValidateGeometryRange extends AbstractInOutProcess<DataObject> {
+public class ValidateGeometryRange extends BaseInOutProcess<DataObject> {
   private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;
@@ -147,16 +147,14 @@ public class ValidateGeometryRange extends AbstractInOutProcess<DataObject> {
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
-    while (true) {
-      final DataObject object = in.read();
-      final Geometry geometry = object.getGeometryValue();
-      isValid(object.getMetaData().getName().toString(), geometry);
-      out.write(object);
-    }
-
+  protected void process(
+    Channel<DataObject> in,
+    Channel<DataObject> out,
+    DataObject object) {
+    // TODO Auto-generated method stub
+    final Geometry geometry = object.getGeometryValue();
+    isValid(object.getMetaData().getName().toString(), geometry);
+    out.write(object);
   }
 
   /**

@@ -7,21 +7,18 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.data.validator.AttributeValueValidator;
 import com.revolsys.gis.model.data.validator.DataObjectValidator;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class DataObjectValidationProcess extends
-  AbstractInOutProcess<DataObject> {
+public class DataObjectValidationProcess extends BaseInOutProcess<DataObject> {
   private final DataObjectValidator validator = new DataObjectValidator();
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
-    while (true) {
-      final DataObject object = in.read();
-      validator.isValid(object);
-      out.write(object);
-    }
+  protected void process(
+    Channel<DataObject> in,
+    Channel<DataObject> out,
+    DataObject object) {
+    validator.isValid(object);
+    out.write(object);
   }
 
   public void setValidators(

@@ -15,18 +15,24 @@
     id="moepDirectoryReader"
     class="com.revolsys.gis.moep.io.MoepDirectoryReader"
     p:file="moepDirectory"
+
+    lazy-init="true"
   />
 
   <bean
     id="moepDirectoryStatisticsReader"
     class="com.revolsys.gis.io.StatisticsIterable"
     p:iterable-ref="moepDirectoryReader"
+
+    lazy-init="true"
   />
   
   <bean
-    id="moepDirectoryReaderProcess"
+    id="moepReader"
     class="com.revolsys.gis.parallel.IterableProcess"
     p:iterable-ref="moepDirectoryStatisticsReader"
+
+    lazy-init="true"
   />
   
   <bean

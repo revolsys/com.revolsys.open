@@ -24,13 +24,13 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMap;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInProcess;
+import com.revolsys.parallel.process.BaseInProcess;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 import com.revolsys.parallel.tools.ThreadSharedAttributes;
 import com.revolsys.util.JexlUtil;
 
-public class ScriptExecutorProcess extends AbstractInProcess<DataObject>
-  implements BeanFactoryAware {
+public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
+  BeanFactoryAware {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorProcess.class);
 
   private final Map<String, Object> attributes = new HashMap<String, Object>();
@@ -127,18 +127,18 @@ public class ScriptExecutorProcess extends AbstractInProcess<DataObject>
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in) {
-    try {
-      while (true) {
-        final DataObject object = in.read();
-        executeScript(object);
-      }
-    } catch (final ThreadDeath e) {
-      tasks.clear();
-      if (executor != null) {
-        executor.shutdownNow();
-      }
+  protected void process(
+    Channel<DataObject> in,
+    DataObject object) {
+    executeScript(object);
+  }
+
+  @Override
+  protected void postRun(
+    Channel<DataObject> in) {
+    tasks.clear();
+    if (executor != null) {
+      executor.shutdownNow();
     }
   }
 

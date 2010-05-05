@@ -4,9 +4,9 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class ConverterProcess extends AbstractInOutProcess<DataObject> {
+public class ConverterProcess extends BaseInOutProcess<DataObject> {
 
   private Converter<DataObject, DataObject> converter;
 
@@ -23,15 +23,13 @@ public class ConverterProcess extends AbstractInOutProcess<DataObject> {
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void process(
+    Channel<DataObject> in,
+    Channel<DataObject> out,
+    DataObject object) {
     if (converter != null) {
-      while (true) {
-        final DataObject source = in.read();
-        final DataObject target = converter.convert(source);
-        out.write(target);
-      }
+      final DataObject target = converter.convert(object);
+      out.write(target);
     }
   }
 

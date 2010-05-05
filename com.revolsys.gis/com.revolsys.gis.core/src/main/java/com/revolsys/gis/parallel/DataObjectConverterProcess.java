@@ -47,7 +47,7 @@ public class DataObjectConverterProcess extends BaseInOutProcess<DataObject> {
         for (final FilterDataObjectConverter filterConverter : converters) {
           final Filter<DataObject> filter = filterConverter.getFilter();
           if (filter.accept(sourceObject)) {
-            final Converter<DataObject, DataObject> converter = filterConverter.getConverter();
+              final Converter<DataObject, DataObject> converter = filterConverter.getConverter();
             targetObject = converter.convert(sourceObject);
             matchCount++;
           }
@@ -57,13 +57,6 @@ public class DataObjectConverterProcess extends BaseInOutProcess<DataObject> {
         } else if (matchCount == 0) {
           if (defaultConverter == null) {
             LOG.error("No converter found for: " + sourceObject);
-            for (final FilterDataObjectConverter filterConverter : converters) {
-              final Filter<DataObject> filter = filterConverter.getFilter();
-              if (filter.accept(sourceObject)) {
-                final Converter<DataObject, DataObject> converter = filterConverter.getConverter();
-
-              }
-            }
           } else {
             targetObject = defaultConverter.convert(sourceObject);
             out.write(targetObject);

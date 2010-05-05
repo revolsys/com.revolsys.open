@@ -5,10 +5,10 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryProjectionProcess extends AbstractInOutProcess<DataObject> {
+public class GeometryProjectionProcess extends BaseInOutProcess<DataObject> {
   private GeometryFactory geometryFactory;
 
   public GeometryFactory getGeometryFactory() {
@@ -16,24 +16,21 @@ public class GeometryProjectionProcess extends AbstractInOutProcess<DataObject> 
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
-    while (true) {
-      final DataObject object = in.read();
-      if (object != null) {
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry != null) {
-          Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
-            geometryFactory);
-          JtsGeometryUtil.makePrecise(geometryFactory.getPrecisionModel(), projectedGeometry);
-          if (geometry != projectedGeometry) {
-            object.setGeometryValue(projectedGeometry);
-          }
-        }
-        out.write(object);
+  protected void process(
+    Channel<DataObject> in,
+    Channel<DataObject> out,
+    DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+    if (geometry != null) {
+      Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
+        geometryFactory);
+      JtsGeometryUtil.makePrecise(geometryFactory.getPrecisionModel(),
+        projectedGeometry);
+      if (geometry != projectedGeometry) {
+        object.setGeometryValue(projectedGeometry);
       }
     }
+    out.write(object);
   }
 
   public void setGeometryFactory(

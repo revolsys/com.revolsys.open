@@ -16,11 +16,13 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   public AbstractInProcess() {
   }
 
-  public AbstractInProcess(final Channel<T> in) {
+  public AbstractInProcess(
+    final Channel<T> in) {
     this.in = in;
   }
 
-  public AbstractInProcess(int bufferSize) {
+  public AbstractInProcess(
+    int bufferSize) {
     this.inBufferSize = bufferSize;
   }
 
@@ -34,7 +36,8 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   /**
    * @param bufferSize the bufferSize to set
    */
-  public void setInBufferSize(int inBufferSize) {
+  public void setInBufferSize(
+    int inBufferSize) {
     this.inBufferSize = inBufferSize;
   }
 
@@ -43,10 +46,11 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
    */
   public Channel<T> getIn() {
     if (in == null) {
+      final String channelName = getBeanName() + ".in";
       if (inBufferSize == 0) {
-        setIn(new Channel<T>());
+        setIn(new Channel<T>(channelName));
       } else {
-        setIn(new Channel<T>(new Buffer<T>(inBufferSize)));
+        setIn(new Channel<T>(channelName, new Buffer<T>(inBufferSize)));
       }
     }
     return in;
@@ -55,7 +59,8 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   /**
    * @param in the in to set
    */
-  public void setIn(final Channel<T> in) {
+  public void setIn(
+    final Channel<T> in) {
     this.in = in;
     in.readConnect();
   }
@@ -80,7 +85,8 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
     }
   }
 
-  protected abstract void run(Channel<T> in);
+  protected abstract void run(
+    Channel<T> in);
 
   protected void init() {
   }

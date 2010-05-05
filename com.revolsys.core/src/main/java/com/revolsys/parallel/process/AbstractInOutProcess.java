@@ -35,10 +35,15 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
    */
   public Channel<T> getIn() {
     if (in == null) {
+      final String channelName = getBeanName() + ".in";
       if (inBufferSize < 1) {
-        setIn(new Channel<T>());
+        final Channel<T> channel = new Channel<T>(channelName);
+        setIn(channel);
       } else {
-        setIn(new Channel<T>(new Buffer<T>(inBufferSize)));
+        
+        final Buffer<T> buffer = new Buffer<T>(inBufferSize);
+        final Channel<T> channel = new Channel<T>(channelName, buffer);
+        setIn(channel);
       }
     }
     return in;
@@ -49,10 +54,11 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
    */
   public Channel<T> getOut() {
     if (out == null) {
+      final String channelName = getBeanName() + ".out";
       if (outBufferSize < 1) {
-        setOut(new Channel<T>());
+        setOut(new Channel<T>(channelName));
       } else {
-        setOut(new Channel<T>(new Buffer<T>(outBufferSize)));
+        setOut(new Channel<T>(channelName, new Buffer<T>(outBufferSize)));
       }
     }
     return out;

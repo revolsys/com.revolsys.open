@@ -3,10 +3,10 @@ package com.revolsys.gis.parallel;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryBufferProcess extends AbstractInOutProcess<DataObject> {
+public class GeometryBufferProcess extends BaseInOutProcess<DataObject> {
 
   private int buffer;
 
@@ -15,22 +15,17 @@ public class GeometryBufferProcess extends AbstractInOutProcess<DataObject> {
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
-    while (true) {
-      final DataObject object = in.read();
-      if (object != null) {
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry == null) {
-          out.write(object);
-        } else {
-          final Geometry bufferedGeometry = geometry.buffer(buffer);
-          final DataObject newObject = DataObjectUtil.copy(object,
-            bufferedGeometry);
-          out.write(newObject);
-        }
-      }
+  protected void process(
+    Channel<DataObject> in,
+    Channel<DataObject> out,
+    DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+    if (geometry == null) {
+      out.write(object);
+    } else {
+      final Geometry bufferedGeometry = geometry.buffer(buffer);
+      final DataObject newObject = DataObjectUtil.copy(object, bufferedGeometry);
+      out.write(newObject);
     }
   }
 

@@ -3,13 +3,13 @@ package com.revolsys.gis.parallel;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInOutProcess;
+import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ClipGeometryProcess extends AbstractInOutProcess<DataObject> {
+public class ClipGeometryProcess extends BaseInOutProcess<DataObject> {
 
   private Polygon clipPolygon;
 
@@ -21,34 +21,32 @@ public class ClipGeometryProcess extends AbstractInOutProcess<DataObject> {
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
-    while (true) {
-      final DataObject object = in.read();
-      final Geometry geometry = object.getGeometryValue();
-      if (geometry != null) {
-        final Geometry intersection = geometry.intersection(clipPolygon);
-        if (!intersection.isEmpty()
-          && intersection.getClass() == geometry.getClass()) {
-          if (intersection instanceof LineString) {
-            final LineString lineString = (LineString)intersection;
-            final Coordinate c0 = lineString.getCoordinateN(0);
-            if (Double.isNaN(c0.z)) {
-              JtsGeometryUtil.addElevation(c0, (LineString)geometry);
-            }
-            final Coordinate cN = lineString.getCoordinateN(lineString.getNumPoints() - 1);
-            if (Double.isNaN(cN.z)) {
-              JtsGeometryUtil.addElevation(cN, (LineString)geometry);
-            }
+  protected void process(
+    Channel<DataObject> in,
+    Channel<DataObject> out,
+    DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+    if (geometry != null) {
+      final Geometry intersection = geometry.intersection(clipPolygon);
+      if (!intersection.isEmpty()
+        && intersection.getClass() == geometry.getClass()) {
+        if (intersection instanceof LineString) {
+          final LineString lineString = (LineString)intersection;
+          final Coordinate c0 = lineString.getCoordinateN(0);
+          if (Double.isNaN(c0.z)) {
+            JtsGeometryUtil.addElevation(c0, (LineString)geometry);
           }
-          intersection.setUserData(geometry.getUserData());
-          object.setGeometryValue(intersection);
-          out.write(object);
+          final Coordinate cN = lineString.getCoordinateN(lineString.getNumPoints() - 1);
+          if (Double.isNaN(cN.z)) {
+            JtsGeometryUtil.addElevation(cN, (LineString)geometry);
+          }
         }
-      } else {
+        intersection.setUserData(geometry.getUserData());
+        object.setGeometryValue(intersection);
         out.write(object);
       }
+    } else {
+      out.write(object);
     }
   }
 

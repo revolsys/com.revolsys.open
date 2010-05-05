@@ -6,6 +6,8 @@ import java.util.Collections;
 import com.revolsys.filter.Filter;
 
 public class EqualsFilter<T> implements Filter<T> {
+  private Equals<Object> equals = EqualsRegistry.INSTANCE;
+
   private Collection<String> excludeAttributes = Collections.emptyList();
 
   private final T object;
@@ -22,9 +24,25 @@ public class EqualsFilter<T> implements Filter<T> {
     this.excludeAttributes = excludeAttributes;
   }
 
+  public EqualsFilter(
+    Equals<Object> equals,
+    final T object) {
+    this.equals = equals;
+    this.object = object;
+  }
+
+  public EqualsFilter(
+    Equals<Object> equals,
+    final T object,
+    final Collection<String> excludeAttributes) {
+    this.equals = equals;
+    this.object = object;
+    this.excludeAttributes = excludeAttributes;
+  }
+
   public boolean accept(
     final T object) {
-    if (EqualsRegistry.INSTANCE.equals(this.object, object, excludeAttributes)) {
+    if (equals.equals(this.object, object, excludeAttributes)) {
       return true;
     } else {
       return false;

@@ -3,9 +3,9 @@ package com.revolsys.gis.parallel;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Writer;
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.process.AbstractInProcess;
+import com.revolsys.parallel.process.BaseInProcess;
 
-public class WriterProcess extends AbstractInProcess<DataObject> {
+public class WriterProcess extends BaseInProcess<DataObject> {
   private Writer<DataObject> writer;
 
   public WriterProcess() {
@@ -38,15 +38,16 @@ public class WriterProcess extends AbstractInProcess<DataObject> {
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in) {
-    try {
-      for (DataObject object = in.read(); object != null; object = in.read()) {
-        writer.write(object);
-      }
-    } finally {
-      writer.close();
-    }
+  protected void process(
+    Channel<DataObject> in,
+    DataObject object) {
+    writer.write(object);
+  }
+
+  @Override
+  protected void postRun(
+    Channel<DataObject> in) {
+    writer.close();
   }
 
   public void setWriter(

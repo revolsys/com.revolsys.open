@@ -31,10 +31,14 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
    */
   public Channel<T> getOut() {
     if (out == null) {
+      final String channelName = getBeanName() + ".out";
       if (outBufferSize == 0) {
-        setOut(new Channel<T>());
+        final Channel<T> channel = new Channel<T>(channelName);
+        setOut(channel);
       } else {
-        setOut(new Channel<T>(new Buffer<T>(outBufferSize)));
+        final Buffer<T> buffer = new Buffer<T>(outBufferSize);
+        final Channel<T> channel = new Channel<T>(channelName, buffer);
+        setOut(channel);
       }
     }
     return out;

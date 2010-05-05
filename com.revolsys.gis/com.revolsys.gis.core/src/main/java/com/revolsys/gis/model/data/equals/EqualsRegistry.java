@@ -12,7 +12,7 @@ import java.util.Set;
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class EqualsRegistry {
+public class EqualsRegistry implements Equals<Object> {
 
   private static final ObjectEquals DEFAULT_EQUALS = new ObjectEquals();
 
@@ -93,5 +93,9 @@ public class EqualsRegistry {
     final Equals equals) {
     classEqualsMap.put(clazz, equals);
     equals.setEqualsRegistry(this);
+  }
+
+  public void setEqualsRegistry(
+    EqualsRegistry equalsRegistry) {
   }
 }

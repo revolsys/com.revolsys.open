@@ -28,6 +28,8 @@ public class Channel<T> implements AltingChannelInput {
   /** Flag indicating if the channel is closed for writing. */
   private boolean writeClosed;
 
+  private String name;
+
   /**
    * Constructs a new Channel<T> with a ZeroBuffer ChannelDataStore.
    */
@@ -40,8 +42,26 @@ public class Channel<T> implements AltingChannelInput {
    * 
    * @param data The ChannelDataStore used to store the data for the Channel
    */
-  public Channel(ChannelDataStore<T> data) {
+  public Channel(
+    ChannelDataStore<T> data) {
     this.data = data;
+  }
+
+  public Channel(
+    String name) {
+    this();
+    this.name = name;
+  }
+
+  public Channel(
+    String name,
+    ChannelDataStore<T> data) {
+    this.name = name;
+    this.data = data;
+  }
+
+  public String getName() {
+    return name;
   }
 
   /**
@@ -63,7 +83,8 @@ public class Channel<T> implements AltingChannelInput {
    * 
    * @return The object returned from the Channel.
    */
-  public T read(int timeout) {
+  public T read(
+    int timeout) {
     synchronized (readMonitor) {
       synchronized (monitor) {
         if (isClosed()) {
@@ -96,7 +117,8 @@ public class Channel<T> implements AltingChannelInput {
    * 
    * @param value The object to write to the Channel.
    */
-  public void write(T value) {
+  public void write(
+    T value) {
     synchronized (writeMonitor) {
       synchronized (monitor) {
         if (closed) {
@@ -175,7 +197,8 @@ public class Channel<T> implements AltingChannelInput {
     }
   }
 
-  public synchronized boolean enable(MultiChannelReadSelector alt) {
+  public synchronized boolean enable(
+    MultiChannelReadSelector alt) {
     if (data.getState() == ChannelDataStore.EMPTY) {
       this.alt = alt;
       return false;
@@ -201,11 +224,21 @@ public class Channel<T> implements AltingChannelInput {
     return closed;
   }
 
-  public static <T> T[] createArray(T... o) {
+  public static <T> T[] createArray(
+    T... o) {
     return o;
   }
 
   public void close() {
     closed = true;
+  }
+
+  @Override
+  public String toString() {
+    if (name == null) {
+      return data.toString();
+    } else {
+      return name + "=" + data;
+    }
   }
 }

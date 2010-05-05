@@ -9,25 +9,23 @@ import com.revolsys.filter.Filter;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
-public class MultipleFilterProcess<T> extends AbstractInOutProcess<T> {
+public class MultipleFilterProcess<T> extends BaseInOutProcess<T> {
   /** The map of filters to channels. */
   private Map<Filter<T>, Channel<T>> filters = new LinkedHashMap<Filter<T>, Channel<T>>();
 
-  /**
-   * Execute the process.
-   */
-  protected void run(
-    final Channel<T> in,
-    final Channel<T> out) {
-    try {
-      while (true) {
-        T object = in.read();
-        if (object != null) {
-          process(object, in, out);
-        }
+  protected void process(
+    Channel<T> in,
+    Channel<T> out,
+    T object) {
+    for (Entry<Filter<T>, Channel<T>> entry : filters.entrySet()) {
+      Filter<T> filter = entry.getKey();
+      Channel<T> filterOut = entry.getValue();
+      if (processFilter(object, filter, filterOut)) {
+        return;
       }
-    } catch (ThreadDeath e) {
-    } catch (ClosedException e) {
+    }
+    if (out != null) {
+      out.write(object);
     }
   }
 
@@ -38,22 +36,6 @@ public class MultipleFilterProcess<T> extends AbstractInOutProcess<T> {
       if (channel != null) {
         channel.writeDisconnect();
       }
-    }
-  }
-
-  protected void process(
-    final T object,
-    final Channel<T> in,
-    final Channel<T> out) {
-    for (Entry<Filter<T>, Channel<T>> entry : filters.entrySet()) {
-      Filter<T> filter = entry.getKey();
-      Channel<T> filterOut = entry.getValue();
-      if (processFilter(object, filter, filterOut)) {
-        return;
-      }
-    }
-    if (out != null) {
-      out.write(object);
     }
   }
 
