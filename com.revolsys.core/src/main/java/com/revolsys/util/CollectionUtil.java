@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.model.DataObject;
+
 public final class CollectionUtil {
   public static <T1, T2> Map<T1, T2> createMap(
     final List<T1> sourceValues,
@@ -83,5 +85,19 @@ public final class CollectionUtil {
   }
 
   private CollectionUtil() {
+  }
+
+  public static <T> T get(
+    Collection<T> collection,
+    int index) {
+     int i = 0;
+    for (T object : collection) {
+      if (i == index) {
+        return object;
+      } else {
+        i++;
+      }
+    }
+    throw new ArrayIndexOutOfBoundsException(index);
   }
 }
