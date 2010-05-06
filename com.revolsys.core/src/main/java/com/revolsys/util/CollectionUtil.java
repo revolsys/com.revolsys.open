@@ -8,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-
 public final class CollectionUtil {
   public static <T1, T2> Map<T1, T2> createMap(
     final List<T1> sourceValues,
