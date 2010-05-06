@@ -1,21 +1,5 @@
 package com.revolsys.gis.cs.epsg;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import com.revolsys.gis.cs.Area;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.Projection;
-import com.revolsys.gis.cs.projection.CoordinatesOperation;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.gis.cs.projection.TransverseMercator;
-import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class EpsgCsTest {
   //
