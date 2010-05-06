@@ -2,7 +2,7 @@ package com.revolsys.parallel.tools;
 
 import javax.annotation.PostConstruct;
 
-import com.revolsys.jump.util.BeanUtil;
+import com.revolsys.util.JavaBeanUtil;
 
 public class SetPropertyValue {
 
@@ -24,7 +24,7 @@ public class SetPropertyValue {
   @PostConstruct
   public void init() {
     if (bean != null && propertyName != null) {
-      BeanUtil.setProperty(bean, propertyName, value);
+      JavaBeanUtil.executeSetMethod(bean, propertyName, value);
     }
   }
 
