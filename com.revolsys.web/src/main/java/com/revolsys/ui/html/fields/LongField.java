@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,7 +55,7 @@ public class LongField extends Field {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());

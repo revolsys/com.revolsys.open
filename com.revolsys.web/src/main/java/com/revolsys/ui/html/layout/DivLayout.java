@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.layout;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import com.revolsys.ui.html.HtmlUtil;
@@ -34,7 +33,7 @@ public class DivLayout implements ElementContainerLayout {
   }
 
   public void serialize(final XmlWriter out, final ElementContainer container)
-    throws IOException {
+    {
     out.startTag(HtmlUtil.DIV);
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);

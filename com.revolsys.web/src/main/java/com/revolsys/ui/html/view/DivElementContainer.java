@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -57,7 +56,7 @@ public class DivElementContainer extends ElementContainer {
    * 
    * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.xml.io.XmlWriter)
    */
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     if (id != null) {
       out.attribute(HtmlUtil.ATTR_ID, id);

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,7 +48,7 @@ public class ErrorField extends Field {
     this.message = message;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "alert");
     out.write(message);

@@ -20,9 +20,15 @@ public class DateTimeSerializer extends DateSerializer {
    * @param locale The locale.
    * @return The date format instance.
    */
-  protected DateFormat getDateFormat(final Locale locale) {
-    return SimpleDateFormat.getDateTimeInstance(getDateStyle(), getTimeStyle(),
-      locale);
+  protected DateFormat getDateFormat(
+    final Locale locale) {
+    if (locale == null) {
+      return SimpleDateFormat.getDateTimeInstance(getDateStyle(),
+        getTimeStyle());
+    } else {
+      return SimpleDateFormat.getDateTimeInstance(getDateStyle(),
+        getTimeStyle(), locale);
+    }
   }
 
   /**
@@ -31,7 +37,8 @@ public class DateTimeSerializer extends DateSerializer {
    * 
    * @param styleName The name of the date format style;
    */
-  public void setTimeStyle(final String styleName) {
+  public void setTimeStyle(
+    final String styleName) {
     try {
       Field styleField = DateFormat.class.getField(styleName.toUpperCase());
       setTimeStyle(styleField.getInt(DateFormat.class));
@@ -59,7 +66,8 @@ public class DateTimeSerializer extends DateSerializer {
    * 
    * @param timeStyle The time style.
    */
-  public void setTimeStyle(final int timeStyle) {
+  public void setTimeStyle(
+    final int timeStyle) {
     this.timeStyle = timeStyle;
   }
 }

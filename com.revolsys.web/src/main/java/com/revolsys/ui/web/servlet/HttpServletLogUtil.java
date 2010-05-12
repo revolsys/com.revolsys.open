@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
-public final class Log4jJ2eeUtil {
-  private Log4jJ2eeUtil() {
+public final class HttpServletLogUtil {
+  private HttpServletLogUtil() {
   }
 
   public static void logRequestException(final Logger log,
@@ -54,7 +54,7 @@ public final class Log4jJ2eeUtil {
             }
           }
         }
-        log.error(text, exception);
+        log.error(text.toString(), exception);
         request.setAttribute("LogException", exception);
       }
     }

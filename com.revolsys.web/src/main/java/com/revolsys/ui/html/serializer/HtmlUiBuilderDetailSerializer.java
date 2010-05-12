@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.serializer;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +55,7 @@ public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
   }
 
   public void serializeLabel(final XmlWriter out, final int index)
-    throws IOException {
+    {
     if (index < size) {
       String key = (String)keys.get(index);
       out.text(builder.getLabel(key));
@@ -66,7 +65,7 @@ public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
   }
 
   public void serializeValue(final XmlWriter out, final int index)
-    throws IOException {
+    {
     if (index < size) {
       builder.serialize(out, object, (String)keys.get(index), locale);
     } else {

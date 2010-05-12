@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,7 +59,7 @@ public class MenuElement extends Element {
   }
 
   private void menu(final XmlWriter out, final Collection<Menu> items,
-    final int level) throws IOException {
+    final int level) {
     // Collection items = menu.getItems();
     if (items.size() > 0) {
       out.startTag(HtmlUtil.UL);
@@ -88,7 +87,7 @@ public class MenuElement extends Element {
   }
 
   private void menuLink(final XmlWriter out, final Menu menu)
-    throws IOException {
+    {
     String uri = menu.getLink(jexlContext);
     String linkTitle = menu.getLinkTitle();
     String onClick = menu.getOnClick();
@@ -108,7 +107,7 @@ public class MenuElement extends Element {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     if (menu != null) {
       List<Menu> menus = new ArrayList<Menu>();
       for (Menu menuItem : menu.getMenus()) {

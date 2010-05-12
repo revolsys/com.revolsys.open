@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.serializer;
 
-import java.io.IOException;
-
 import com.revolsys.xml.io.XmlWriter;
 
 public interface TableSerializer {
@@ -32,9 +30,9 @@ public interface TableSerializer {
 
   String getBodyCssClass(int row, int col);
 
-  void serializeHeaderCell(XmlWriter out, int col) throws IOException;
+  void serializeHeaderCell(XmlWriter out, int col);
 
-  void serializeBodyCell(XmlWriter out, int row, int col) throws IOException;
+  void serializeBodyCell(XmlWriter out, int row, int col);
 
-  void serializeFooterCell(XmlWriter out, int row, int col) throws IOException;
+  void serializeFooterCell(XmlWriter out, int row, int col);
 }

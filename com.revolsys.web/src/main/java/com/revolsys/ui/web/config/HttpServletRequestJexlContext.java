@@ -125,7 +125,7 @@ public class HttpServletRequestJexlContext implements JexlContext {
     return attributes.get(key);
   }
 
-  public void setAttributes(Map<String, Object> parameters) {
+  public void setAttributes(Map<String, ? extends Object> parameters) {
     getAttributes().putAll(parameters);
   }
 }

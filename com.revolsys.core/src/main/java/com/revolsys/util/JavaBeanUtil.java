@@ -65,11 +65,11 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @return The property value.
    */
-  public static Object getProperty(
+  public static <T> T getProperty(
     final Object object,
     final String propertyName) {
     try {
-      return PropertyUtils.getProperty(object, propertyName);
+      return (T)PropertyUtils.getProperty(object, propertyName);
     } catch (final IllegalAccessException e) {
       throw new RuntimeException("Unable to get property " + propertyName, e);
     } catch (final InvocationTargetException e) {

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -114,7 +113,7 @@ public class TextAreaField extends Field {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.TEXT_AREA);
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());

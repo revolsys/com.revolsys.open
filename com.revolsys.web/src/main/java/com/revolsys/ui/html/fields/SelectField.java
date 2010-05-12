@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +169,7 @@ public class SelectField extends Field {
     return valid;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
@@ -181,7 +180,7 @@ public class SelectField extends Field {
     out.endTag(HtmlUtil.SELECT);
   }
 
-  private void serializeOptions(final XmlWriter out) throws IOException {
+  private void serializeOptions(final XmlWriter out) {
     if (options.size() == 0) {
       addOption(null, "(None)");
     }

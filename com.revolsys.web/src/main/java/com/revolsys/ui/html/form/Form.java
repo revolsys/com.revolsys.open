@@ -208,7 +208,7 @@ public class Form extends ElementContainer {
   protected void preInit(final HttpServletRequest request) {
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     serializeStartTag(out);
     HtmlUtil.serializeHiddenInput(out, FORM_TASK_PARAM, defaultFormTask);
     for (Entry<String, Object> savedParam : savedParameters.entrySet()) {
@@ -225,7 +225,7 @@ public class Form extends ElementContainer {
    * @param out
    * @throws IOException
    */
-  public void serializeEndTag(final XmlWriter out) throws IOException {
+  public void serializeEndTag(final XmlWriter out) {
     out.endTag(HtmlUtil.DIV);
     out.endTag(HtmlUtil.FORM);
     out.endTag(HtmlUtil.DIV);
@@ -235,7 +235,7 @@ public class Form extends ElementContainer {
    * @param out
    * @throws IOException
    */
-  public void serializeStartTag(final XmlWriter out) throws IOException {
+  public void serializeStartTag(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     String title = getTitle();

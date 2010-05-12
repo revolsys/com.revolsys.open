@@ -1,6 +1,5 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractOutProcess;
 

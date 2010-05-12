@@ -1,8 +1,5 @@
 package com.revolsys.gis.wkt;
 
-import java.nio.charset.Charset;
-
-import javax.xml.namespace.QName;
 
 public interface WktConstants {
 

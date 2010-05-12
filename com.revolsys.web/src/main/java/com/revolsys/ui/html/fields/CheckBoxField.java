@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -93,7 +92,7 @@ public class CheckBoxField extends Field {
     this.onClick = onSelect;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeCheckBox(out, getName(), selectedValue, isSelected(),
       onClick);
   }

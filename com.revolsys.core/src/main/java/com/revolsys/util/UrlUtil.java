@@ -18,10 +18,10 @@ package com.revolsys.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 /**
@@ -84,7 +84,7 @@ public final class UrlUtil {
    */
   public static String getUrl(
     final Object baseUrl,
-    final Map parameters) {
+    final Map<String, ? extends Object> parameters) {
     return getUrl(baseUrl.toString(), parameters);
   }
 
@@ -98,13 +98,12 @@ public final class UrlUtil {
    */
   public static String getUrl(
     final String baseUrl,
-    final Map parameters) {
+    final Map<String, ? extends Object> parameters) {
     final StringBuffer query = new StringBuffer();
     if (parameters != null) {
       boolean firstParameter = true;
-      for (final Iterator entries = parameters.entrySet().iterator(); entries.hasNext();) {
-        final Map.Entry parameter = (Map.Entry)entries.next();
-        final Object name = parameter.getKey();
+      for (final Entry<String, ? extends Object> parameter : parameters.entrySet()) {
+        final String name = parameter.getKey();
         final Object value = parameter.getValue();
         if (name != null && value != null) {
           if (!firstParameter) {

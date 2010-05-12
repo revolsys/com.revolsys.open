@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -11,7 +10,7 @@ public class WeekField extends TextField {
     super(name, required);
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     String id = getName();
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_ID, id);

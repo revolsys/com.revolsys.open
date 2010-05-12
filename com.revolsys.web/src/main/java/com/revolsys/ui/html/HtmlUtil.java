@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html;
 
-import java.io.IOException;
-
 import javax.xml.namespace.QName;
 
 import com.revolsys.xml.io.XmlWriter;
@@ -182,8 +180,11 @@ public final class HtmlUtil {
 
   public static final QName ATTR_LANG = new QName("xml", "lang");
 
-  public static void serializeA(final XmlWriter out, final String cssClass,
-    final String url, final Object content) throws IOException {
+  public static void serializeA(
+    final XmlWriter out,
+    final String cssClass,
+    final String url,
+    final Object content) {
     if (content != null) {
       if (url != null) {
         out.startTag(A);
@@ -199,15 +200,18 @@ public final class HtmlUtil {
     }
   }
 
-  public static void serializeB(final XmlWriter out, final String content)
-    throws IOException {
+  public static void serializeB(
+    final XmlWriter out,
+    final String content) {
     out.startTag(B);
     out.text(content);
     out.endTag(B);
   }
 
-  public static void serializeDiv(final XmlWriter out, final String cssClass,
-    final Object content) throws IOException {
+  public static void serializeDiv(
+    final XmlWriter out,
+    final String cssClass,
+    final Object content) {
     if (content != null) {
       String text = content.toString().trim();
       if (text.length() > 0) {
@@ -221,8 +225,10 @@ public final class HtmlUtil {
     }
   }
 
-  public static void serializeHiddenInput(final XmlWriter out,
-    final String name, final Object value) throws IOException {
+  public static void serializeHiddenInput(
+    final XmlWriter out,
+    final String name,
+    final Object value) {
 
     String stringValue = null;
     if (value != null) {
@@ -231,8 +237,10 @@ public final class HtmlUtil {
     serializeHiddenInput(out, name, stringValue);
   }
 
-  public static void serializeHiddenInput(final XmlWriter out,
-    final String name, final String value) throws IOException {
+  public static void serializeHiddenInput(
+    final XmlWriter out,
+    final String name,
+    final String value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "hidden");
@@ -242,8 +250,10 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializeSubmitInput(final XmlWriter out,
-    final String name, final Object value) throws IOException {
+  public static void serializeSubmitInput(
+    final XmlWriter out,
+    final String name,
+    final Object value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "submit");
@@ -253,9 +263,12 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializeCheckBox(final XmlWriter out, final String name,
-    final String value, final boolean selected, final String onClick)
-    throws IOException {
+  public static void serializeCheckBox(
+    final XmlWriter out,
+    final String name,
+    final String value,
+    final boolean selected,
+    final String onClick) {
     out.startTag(INPUT);
     out.attribute(ATTR_ID, name);
     out.attribute(ATTR_NAME, name);
@@ -272,23 +285,27 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializePre(final XmlWriter out, final String text)
-    throws IOException {
+  public static void serializePre(
+    final XmlWriter out,
+    final String text) {
     out.startTag(PRE);
     out.text(text);
     out.endTag(PRE);
   }
 
-  public static void serializeScript(final XmlWriter out, final String script)
-    throws IOException {
+  public static void serializeScript(
+    final XmlWriter out,
+    final String script) {
     out.startTag(SCRIPT);
     out.attribute(ATTR_TYPE, "text/javascript");
     out.text(script);
     out.endTag(SCRIPT);
   }
 
-  public static void serializeSpan(final XmlWriter out, final String cssClass,
-    final Object content) throws IOException {
+  public static void serializeSpan(
+    final XmlWriter out,
+    final String cssClass,
+    final Object content) {
     if (content != null) {
       String text = content.toString().trim();
       if (text.length() > 0) {
@@ -302,8 +319,10 @@ public final class HtmlUtil {
     }
   }
 
-  public static void serializeTag(final XmlWriter out, final QName tag,
-    final String content) throws IOException {
+  public static void serializeTag(
+    final XmlWriter out,
+    final QName tag,
+    final String content) {
     out.startTag(tag);
     out.text(content);
     out.endTag(tag);

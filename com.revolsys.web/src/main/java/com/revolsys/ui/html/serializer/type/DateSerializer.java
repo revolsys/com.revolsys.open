@@ -6,8 +6,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.xml.io.XmlWriter;
 
 /**
@@ -16,9 +14,6 @@ import com.revolsys.xml.io.XmlWriter;
  * @author Paul Austin
  */
 public class DateSerializer implements TypeSerializer {
-  /** The logger. */
-  private static final Logger log = Logger.getLogger(DateSerializer.class);
-
   /** The date format style. */
   private int dateStyle = DateFormat.DEFAULT;
 
@@ -30,8 +25,11 @@ public class DateSerializer implements TypeSerializer {
    * @param locale The locale.
    * @throws IOException If there was an I/O error serializing the value.
    */
-  public void serialize(final XmlWriter out, final Object value,
-    final Locale locale) throws IOException {
+  public void serialize(
+    final XmlWriter out,
+    final Object value,
+    final Locale locale)
+    {
     DateFormat dateFormat = getDateFormat(locale);
     out.text(dateFormat.format(value));
   }
@@ -42,8 +40,13 @@ public class DateSerializer implements TypeSerializer {
    * @param locale The locale.
    * @return The date format instance.
    */
-  protected DateFormat getDateFormat(final Locale locale) {
-    return SimpleDateFormat.getDateInstance(dateStyle, locale);
+  protected DateFormat getDateFormat(
+    final Locale locale) {
+    if (locale == null) {
+      return SimpleDateFormat.getDateInstance(dateStyle);
+    } else {
+      return SimpleDateFormat.getDateInstance(dateStyle, locale);
+    }
   }
 
   /**
@@ -52,7 +55,8 @@ public class DateSerializer implements TypeSerializer {
    * 
    * @param styleName The name of the date format style;
    */
-  public void setDateStyle(final String styleName) {
+  public void setDateStyle(
+    final String styleName) {
     try {
       Field styleField = DateFormat.class.getField(styleName.toUpperCase());
       setDateStyle(styleField.getInt(DateFormat.class));
@@ -80,7 +84,8 @@ public class DateSerializer implements TypeSerializer {
    * 
    * @param dateStyle The date style.
    */
-  public void setDateStyle(final int dateStyle) {
+  public void setDateStyle(
+    final int dateStyle) {
     this.dateStyle = dateStyle;
   }
 

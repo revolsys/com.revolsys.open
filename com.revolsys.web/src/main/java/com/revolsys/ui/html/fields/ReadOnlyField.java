@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -45,7 +44,7 @@ public class ReadOnlyField extends Field {
     return true;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     if (getValue() != null) {
       String valueString = getValue().toString();
       out.write(valueString);

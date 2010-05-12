@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.serializer;
 
-import java.io.IOException;
-
 import com.revolsys.xml.io.XmlWriter;
 
 public interface LabelValueListSerializer {
@@ -26,7 +24,7 @@ public interface LabelValueListSerializer {
 
   String getValueCss(int index);
 
-  void serializeLabel(XmlWriter out, int index) throws IOException;
+  void serializeLabel(XmlWriter out, int index);
 
-  void serializeValue(XmlWriter out, int index) throws IOException;
+  void serializeValue(XmlWriter out, int index);
 }

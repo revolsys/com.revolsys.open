@@ -1,7 +1,6 @@
 package com.revolsys.parallel.process;
 
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.channel.ClosedException;
 
 public final class Delta<T> extends BaseInOutProcess<T> {
 

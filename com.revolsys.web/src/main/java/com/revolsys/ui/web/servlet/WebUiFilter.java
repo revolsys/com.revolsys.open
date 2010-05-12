@@ -22,10 +22,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.revolsys.ui.web.config.Config;
 import com.revolsys.ui.web.config.InvalidConfigException;
+import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.Site;
 import com.revolsys.ui.web.config.SiteNodeController;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.ui.web.config.XmlConfigLoader;
+import com.revolsys.ui.web.exception.PageNotFoundException;
 
 public class WebUiFilter implements Filter {
   private static final Logger LOG = Logger.getLogger(WebUiFilter.class);
@@ -38,7 +40,9 @@ public class WebUiFilter implements Filter {
 
   private ApplicationContext applicationContext;
 
-  public void init(final FilterConfig filterConfig) throws ServletException {
+  public void init(
+    final FilterConfig filterConfig)
+    throws ServletException {
     String config = filterConfig.getInitParameter("config");
     if (config == null) {
       config = "/WEB-INF/iaf-config.xml";
@@ -59,8 +63,10 @@ public class WebUiFilter implements Filter {
     }
   }
 
-  private void loadIafConfig(final String config,
-    final FilterConfig filterConfig) throws UnavailableException {
+  private void loadIafConfig(
+    final String config,
+    final FilterConfig filterConfig)
+    throws UnavailableException {
     ServletContext servletContext = filterConfig.getServletContext();
     WebUiContext.setServletContext(servletContext);
     applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
@@ -84,22 +90,35 @@ public class WebUiFilter implements Filter {
     }
   }
 
-  public void doFilter(final ServletRequest request,
-    final ServletResponse response, final FilterChain chain)
-    throws IOException, ServletException {
+  public void doFilter(
+    final ServletRequest request,
+    final ServletResponse response,
+    final FilterChain chain)
+    throws IOException,
+    ServletException {
     doFilter((HttpServletRequest)request, (HttpServletResponse)response, chain);
 
   }
 
-  public void doFilter(final HttpServletRequest request,
-    final HttpServletResponse response, final FilterChain chain)
-    throws IOException, ServletException {
+  public void doFilter(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final FilterChain chain)
+    throws IOException,
+    ServletException {
     if (rsWebUiConfig != null) {
       try {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpServletResponse httpResponse = (HttpServletResponse)response;
         String contextPath = httpRequest.getContextPath();
-        WebUiContext.set(new WebUiContext(rsWebUiConfig, contextPath, null,
+        Page page;
+        try {
+          page = rsWebUiConfig.getPage(request.getServletPath()
+            + request.getPathInfo());
+        } catch (PageNotFoundException e) {
+          page = new Page(null, null, "/", false);
+        }
+        WebUiContext.set(new WebUiContext(rsWebUiConfig, contextPath, page,
           httpRequest, httpResponse));
         request.setAttribute("rsWebUiConfig", rsWebUiConfig);
         chain.doFilter(request, response);
@@ -120,7 +139,7 @@ public class WebUiFilter implements Filter {
         }
         if (site != null) {
           SiteNodeController controller = site.getController(path);
-          LOG.debug(path +"=" + controller);
+          LOG.debug(path + "=" + controller);
           request.setAttribute("site", site);
           request.setAttribute("rsWebController", controller);
 

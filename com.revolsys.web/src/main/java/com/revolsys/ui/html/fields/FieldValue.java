@@ -51,7 +51,7 @@ public class FieldValue {
   /**
    * @return Returns the value.
    */
-  public Object getValue() {
-    return value;
+  public <T> T getValue() {
+    return (T)value;
   }
 }

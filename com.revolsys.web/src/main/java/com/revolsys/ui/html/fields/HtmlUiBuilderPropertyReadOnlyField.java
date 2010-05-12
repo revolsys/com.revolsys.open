@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +48,7 @@ public class HtmlUiBuilderPropertyReadOnlyField extends Field {
     return true;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     if (getValue() != null) {
       builder.serialize(out, getValue(), getName(), Locale.getDefault());
     } else {

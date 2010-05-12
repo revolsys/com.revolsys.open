@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.decorator;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import com.revolsys.ui.html.HtmlUtil;
@@ -28,11 +27,14 @@ public class FieldLabelDecorator implements Decorator {
 
   private String instructions = "";
 
-  public FieldLabelDecorator(final String label) {
+  public FieldLabelDecorator(
+    final String label) {
     this.label = label;
   }
 
-  public FieldLabelDecorator(final String label, final String instructions) {
+  public FieldLabelDecorator(
+    final String label,
+    final String instructions) {
     this.label = label;
     this.instructions = instructions;
   }
@@ -45,8 +47,9 @@ public class FieldLabelDecorator implements Decorator {
     return label;
   }
 
-  public void serialize(final XmlWriter out, final Element element)
-    throws IOException {
+  public void serialize(
+    final XmlWriter out,
+    final Element element) {
     Field field = (Field)element;
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "field");
@@ -57,8 +60,9 @@ public class FieldLabelDecorator implements Decorator {
     out.endTag(HtmlUtil.DIV);
   }
 
-  protected void serializeLabel(final XmlWriter out, final Field field)
-    throws IOException {
+  protected void serializeLabel(
+    final XmlWriter out,
+    final Field field) {
     String label = getLabel();
     if (label != null) {
       out.startTag(HtmlUtil.DIV);
@@ -75,15 +79,17 @@ public class FieldLabelDecorator implements Decorator {
     }
   }
 
-  protected void serializeField(final XmlWriter out, final Field field)
-    throws IOException {
+  protected void serializeField(
+    final XmlWriter out,
+    final Field field) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "contents");
     field.serializeElement(out);
     out.endTag(HtmlUtil.DIV);
   }
 
-  protected void serializeInstructions(final XmlWriter out) throws IOException {
+  protected void serializeInstructions(
+    final XmlWriter out) {
     String instructions = getInstructions();
     if (instructions != null) {
       out.startTag(HtmlUtil.DIV);
@@ -93,8 +99,9 @@ public class FieldLabelDecorator implements Decorator {
     }
   }
 
-  protected void serializeErrors(final XmlWriter out, final Field field)
-    throws IOException {
+  protected void serializeErrors(
+    final XmlWriter out,
+    final Field field) {
     if (field.hasValidationErrors()) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "errors");
@@ -109,11 +116,13 @@ public class FieldLabelDecorator implements Decorator {
     }
   }
 
-  public void setInstructions(final String instructions) {
+  public void setInstructions(
+    final String instructions) {
     this.instructions = instructions;
   }
 
-  public void setLabel(final String label) {
+  public void setLabel(
+    final String label) {
     this.label = label;
   }
 }

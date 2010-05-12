@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,7 +43,7 @@ public class SubmitField extends Field {
     setValue(value);
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeSubmitInput(out, getName(), getValue());
   }
 

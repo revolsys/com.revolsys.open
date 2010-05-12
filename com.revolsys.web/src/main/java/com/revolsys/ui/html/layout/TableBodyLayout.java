@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.layout;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,14 +51,14 @@ public class TableBodyLayout implements ElementContainerLayout {
   }
 
   public void serialize(final XmlWriter out, final ElementContainer container)
-    throws IOException {
+    {
     if (!container.getElements().isEmpty()) {
       serializeTbody(out, container);
     }
   }
 
   private void serializeTbody(final XmlWriter out,
-    final ElementContainer container) throws IOException {
+    final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);

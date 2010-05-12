@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.serializer.key;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import com.revolsys.ui.html.HtmlUtil;
@@ -21,10 +20,9 @@ public class EmailKeySerializer implements KeySerializer {
    * @param object The object to get the value from.
    * @param key The key of the property on the object to serialize.
    * @param locale The locale.
-   * @throws IOException If there was an I/O error serializing the value.
    */
   public void serialize(final XmlWriter out, final Object object,
-    final String key, final Locale locale) throws IOException {
+    final String key, final Locale locale) {
     Object email = JavaBeanUtil.getProperty(object, key);
     if (email != null) {
       out.startTag(HtmlUtil.A);

@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
-
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
 import com.revolsys.ui.model.LabelValueListModel;
 import com.revolsys.xml.io.XmlWriter;
@@ -56,7 +54,7 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
   }
 
   public void serializeLabel(final XmlWriter out, final int index)
-    throws IOException {
+    {
     String label = model.getLabel(index);
     if (label != null) {
       out.text(label);
@@ -66,7 +64,7 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
   }
 
   public void serializeValue(final XmlWriter out, final int index)
-    throws IOException {
+    {
     String value = model.getValue(index);
     if (value != null) {
       out.text(value);

@@ -22,7 +22,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.wkt.WktWriter;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 

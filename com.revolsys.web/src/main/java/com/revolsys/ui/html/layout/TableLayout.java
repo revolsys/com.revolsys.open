@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.layout;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -64,7 +63,7 @@ public class TableLayout implements ElementContainerLayout {
   }
 
   public void serialize(final XmlWriter out, final ElementContainer container)
-    throws IOException {
+    {
     if (!container.getElements().isEmpty()) {
       out.startTag(HtmlUtil.DIV);
       if (cssClass != null) {
@@ -83,7 +82,7 @@ public class TableLayout implements ElementContainerLayout {
   }
 
   private void serializeTbody(final XmlWriter out,
-    final ElementContainer container) throws IOException {
+    final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
     List elementList = container.getElements();
     int i = 0;
@@ -128,7 +127,7 @@ public class TableLayout implements ElementContainerLayout {
     out.endTag(HtmlUtil.TBODY);
   }
 
-  private void serializeThead(final XmlWriter out) throws IOException {
+  private void serializeThead(final XmlWriter out) {
     if (titles != null && !titles.isEmpty()) {
       out.startTag(HtmlUtil.THEAD);
       out.startTag(HtmlUtil.TR);

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -36,7 +35,8 @@ public class Element implements Cloneable {
     return container;
   }
 
-  public void setContainer(final ElementContainer container) {
+  public void setContainer(
+    final ElementContainer container) {
     this.container = container;
   }
 
@@ -48,24 +48,28 @@ public class Element implements Cloneable {
     return decorator;
   }
 
-  public final void serialize(final Writer out) throws IOException {
+  public final void serialize(
+    final Writer out) {
     serialize(out, true);
   }
 
-  public void initialize(final HttpServletRequest request) {
+  public void initialize(
+    final HttpServletRequest request) {
   }
 
-  public final void serialize(final Writer out, final boolean useNamespaces)
-    throws IOException {
-    out.flush();
+  public final void serialize(
+    final Writer out,
+    final boolean useNamespaces) {
 
     XmlWriter xmlOut = new XmlWriter(out, useNamespaces);
+    xmlOut.flush();
     serialize(xmlOut);
 
     xmlOut.flush();
   }
 
-  public final void serialize(final XmlWriter out) throws IOException {
+  public final void serialize(
+    final XmlWriter out) {
     if (decorator != null) {
       decorator.serialize(out, this);
     } else {
@@ -73,14 +77,17 @@ public class Element implements Cloneable {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(
+    final XmlWriter out) {
   }
 
-  public void setDecorator(final Decorator decorator) {
+  public void setDecorator(
+    final Decorator decorator) {
     this.decorator = decorator;
   }
 
-  public void serialize(OutputStream outputStream) throws IOException {
+  public void serialize(
+    OutputStream outputStream) {
     serialize(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")));
   }
 

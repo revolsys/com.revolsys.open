@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
@@ -49,7 +48,7 @@ public class XmlTagElementContainer extends ElementContainer {
    * 
    * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.xml.io.XmlWriter)
    */
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(tagName);
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);

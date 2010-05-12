@@ -161,20 +161,20 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
       arguments = args;
     }
     String fullQueryName = getQueryName(queryName);
-    HibernateCallback callback = new HibernateNamedQueryCallback(fullQueryName);
+    HibernateCallback<Query> callback = new HibernateNamedQueryCallback(fullQueryName);
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    Query query = (Query)hibernateTemplate.execute(callback);
+    Query query = hibernateTemplate.execute(callback);
     for (int i = 0; i < arguments.length; i++) {
       String name = getQueryParameterName(method, i);
       Object value = arguments[i];
       if (name == null) {
         query.setParameter(i, value);
       } else {
-        if (value instanceof Collection) {
+        if (value instanceof Collection<?>) {
           query.setParameterList(name, (Collection<?>)value);
         } else if (value instanceof Object[]) {
           query.setParameterList(name, (Object[])value);
-        } else if (value instanceof Enum) {
+        } else if (value instanceof Enum<?>) {
           query.setParameter(name, value.toString());
         } else {
           query.setParameter(name, value);

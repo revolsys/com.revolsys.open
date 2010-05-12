@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.model.filter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.filter.Filter;
@@ -18,6 +19,37 @@ public class AttributeValuesFilter implements Filter<DataObject> {
 
   /** The value to match. */
   private List<Object> values = new ArrayList<Object>();
+
+  /**
+   * Construct a new AttributeValuesFilter.
+   */
+  public AttributeValuesFilter() {
+  }
+
+  /**
+   * Construct a new AttributeValuesFilter.
+   * 
+   * @param attributeName The attribute name.
+   * @param values The array of values.
+   */
+  public AttributeValuesFilter(
+    String attributeName,
+    Object... values) {
+    this(attributeName, Arrays.asList(values));
+  }
+
+  /**
+   * Construct a new AttributeValuesFilter.
+   * 
+   * @param attributeName The attribute name.
+   * @param values The list of values.
+   */
+  public AttributeValuesFilter(
+    String attributeName,
+    List<Object> values) {
+    this.attributeName = attributeName;
+    this.values = values;
+  }
 
   /**
    * Match the attributeName on the data object with the required value.

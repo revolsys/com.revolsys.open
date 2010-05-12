@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.serializer.key;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Locale;
 
@@ -39,11 +38,10 @@ public class PercentKeySerializer implements KeySerializer {
    * @param object The object to get the value from.
    * @param key The key of the property on the object to serialize.
    * @param locale The locale.
-   * @throws IOException If there was an I/O error serializing the value.
    */
   public void serialize(final XmlWriter out, final Object object,
-    final String key, final Locale locale) throws IOException {
-    BigDecimal value = (BigDecimal)JavaBeanUtil.getProperty(object, key);
+    final String key, final Locale locale) {
+    BigDecimal value = JavaBeanUtil.getProperty(object, key);
     if (value != null) {
       out.text(MathUtil.percentToString(value, scale));
     } else {

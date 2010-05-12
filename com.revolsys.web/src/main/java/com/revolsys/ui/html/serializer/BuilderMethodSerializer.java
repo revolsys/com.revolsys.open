@@ -28,7 +28,8 @@ public class BuilderMethodSerializer implements TypeSerializer, KeySerializer {
    * @param builder The HTML UI Builder the method is on.
    * @param method The serializer method.
    */
-  public BuilderMethodSerializer(final HtmlUiBuilder builder,
+  public BuilderMethodSerializer(
+    final HtmlUiBuilder builder,
     final Method method) {
     this.builder = builder;
     this.method = method;
@@ -42,8 +43,10 @@ public class BuilderMethodSerializer implements TypeSerializer, KeySerializer {
    * @param locale The locale.
    * @throws IOException If there was an I/O error serializing the value.
    */
-  public void serialize(final XmlWriter out, final Object value,
-    final Locale locale) throws IOException {
+  public void serialize(
+    final XmlWriter out,
+    final Object value,
+    final Locale locale) {
     try {
       method.invoke(builder, new Object[] {
         out, value
@@ -56,16 +59,17 @@ public class BuilderMethodSerializer implements TypeSerializer, KeySerializer {
         throw (RuntimeException)cause;
       } else if (cause instanceof Error) {
         throw (Error)cause;
-      } else if (cause instanceof IOException) {
-        throw (IOException)cause;
       } else {
         throw new RuntimeException(cause.getMessage(), cause);
       }
     }
   }
 
-  public void serialize(XmlWriter out, Object value, String key, Locale locale)
-    throws IOException {
+  public void serialize(
+    XmlWriter out,
+    Object value,
+    String key,
+    Locale locale) {
     serialize(out, value, locale);
   }
 

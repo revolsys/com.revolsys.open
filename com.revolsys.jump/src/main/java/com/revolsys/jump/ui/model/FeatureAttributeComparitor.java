@@ -25,7 +25,11 @@ public class FeatureAttributeComparitor extends FeatureIdComparitor {
     } else if (value2 == null) {
       compare = 1;
     } else {
-      if (value1 instanceof Comparable && value2 instanceof Comparable) {
+      if (value1 instanceof Number && value2 instanceof Number) {
+        Number comp1 = (Number)value1;
+        Number comp2 = (Number)value2;
+        compare = Double.compare(comp1.doubleValue(), comp2.doubleValue());
+      } else if (value1 instanceof Comparable && value2 instanceof Comparable) {
         Comparable comp1 = (Comparable)value1;
         Comparable comp2 = (Comparable)value2;
         compare = comp1.compareTo(comp2);

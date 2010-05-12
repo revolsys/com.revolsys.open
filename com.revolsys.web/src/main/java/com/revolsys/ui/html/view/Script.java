@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -73,7 +72,7 @@ public class Script extends Element {
     this.content = content;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SCRIPT);
     out.attribute(HtmlUtil.ATTR_TYPE, type);
     if (content != null) {

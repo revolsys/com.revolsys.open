@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -34,8 +33,7 @@ public class PathBreadcrumbView extends Element {
   }
 
   public void serializeElement(
-    final XmlWriter out)
-    throws IOException {
+    final XmlWriter out) {
     path = path.substring(contextPath.length());
     if (path.startsWith("/")) {
       path = path.substring(1);

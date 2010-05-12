@@ -44,7 +44,7 @@ public class BuilderMethodLocaleSerializer implements TypeSerializer,
    * @throws IOException If there was an I/O error serializing the value.
    */
   public void serialize(final XmlWriter out, final Object value,
-    final Locale locale) throws IOException {
+    final Locale locale) {
     try {
       method.invoke(builder, new Object[] {
         out, value, locale
@@ -57,8 +57,6 @@ public class BuilderMethodLocaleSerializer implements TypeSerializer,
         throw (RuntimeException)cause;
       } else if (cause instanceof Error) {
         throw (Error)cause;
-      } else if (cause instanceof IOException) {
-        throw (IOException)cause;
       } else {
         throw new RuntimeException(cause.getMessage(), cause);
       }
@@ -66,7 +64,7 @@ public class BuilderMethodLocaleSerializer implements TypeSerializer,
   }
 
   public void serialize(XmlWriter out, Object value, String key, Locale locale)
-    throws IOException {
+    {
     serialize(out, value, locale);
   }
 

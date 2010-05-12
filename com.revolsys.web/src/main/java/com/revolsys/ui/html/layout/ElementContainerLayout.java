@@ -15,11 +15,9 @@
  */
 package com.revolsys.ui.html.layout;
 
-import java.io.IOException;
-
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.xml.io.XmlWriter;
 
 public interface ElementContainerLayout {
-  void serialize(XmlWriter out, ElementContainer container) throws IOException;
+  void serialize(XmlWriter out, ElementContainer container);
 }

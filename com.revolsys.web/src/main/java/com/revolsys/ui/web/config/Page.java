@@ -18,9 +18,9 @@ package com.revolsys.ui.web.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,47 +33,40 @@ import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
 public class Page extends Component {
-  private static final Logger log = Logger.getLogger(Page.class);
+  private static final Logger LOG = Logger.getLogger(Page.class);
 
-  private List arguments = new ArrayList();
+  private final List<Argument> arguments = new ArrayList<Argument>();
 
-  private long menuId;
+  private final Map<String, Argument> argumentsMap = new HashMap<String, Argument>();
 
-  private String path = "";
+  private final List<Attribute> attributes = new ArrayList<Attribute>();
 
-  private String title = "";
-
-  private HashMap properties = new HashMap();
-
-  private HashMap pages = new HashMap();
-
-  private HashMap menus = new HashMap();
-
-  private HashMap pathMap = new HashMap();
+  private final Map<String, Attribute> attributesMap = new HashMap<String, Attribute>();
 
   private Layout layout;
 
+  private long menuId;
+
+  private final Map<String, Menu> menus = new HashMap<String, Menu>();
+
+  private final Map<String, Page> pages = new HashMap<String, Page>();
+
   private Page parent;
 
-  private Map argumentsMap = new HashMap();
+  private String path = "";
 
-  private Expression titleExpression;
+  private Map<String, Page> pathMap = new HashMap<String, Page>();
 
-  private HashMap attributesMap = new HashMap();
-
-  private List attributes = new ArrayList();
+  private final Map<String, String> properties = new HashMap<String, String>();
 
   private boolean secure;
 
-  public Page(final String name, final String title, final String path,
-    final boolean secure) {
-    super(name);
-    setTitle(title);
-    setPath(path);
-    this.secure = secure;
-  }
+  private String title = "";
 
-  public Page(final Page page) {
+  private Expression titleExpression;
+
+  public Page(
+    final Page page) {
     super(page);
     menuId = page.menuId;
     path = page.path;
@@ -85,221 +78,87 @@ public class Page extends Component {
     attributesMap.putAll(page.attributesMap);
   }
 
-  public void addArgument(final Argument argument) {
+  public Page(
+    final String name,
+    final String title,
+    final String path,
+    final boolean secure) {
+    super(name);
+    setTitle(title);
+    setPath(path);
+    this.secure = secure;
+  }
+
+  public void addArgument(
+    final Argument argument) {
     if (!hasArgument(argument.getName())) {
       arguments.add(argument);
       argumentsMap.put(argument.getName(), argument);
     }
     if (argument.isInheritable()) {
-      for (Iterator pages = this.pages.values().iterator(); pages.hasNext();) {
-        Page page = (Page)pages.next();
+      for (final Page page : this.pages.values()) {
         page.addArgument(argument);
       }
     }
   }
 
-  public boolean hasArgument(final String name) {
-    return argumentsMap.containsKey(name);
-  }
-
-  public void setLayout(final Layout layout) {
-    this.layout = layout;
-    layout.setPage(this);
-  }
-
-  public List getArguments() {
-    return arguments;
-  }
-
-  public Layout getLayout() {
-    return layout;
-  }
-
-  public void setMenuId(final long menuId) {
-    this.menuId = menuId;
-  }
-
-  public long getMenuId() {
-    return menuId;
-  }
-
-  public void setPath(final String path) {
-    if (path != null) {
-      if (!path.startsWith("/")) {
-        this.path = "/" + path;
-      } else {
-        this.path = path;
-      }
-    } else {
-      this.path = "/" + CaseConverter.toLowerCamelCase(getName());
+  public void addAttribute(
+    final Attribute attribute) {
+    if (!hasArgument(attribute.getName())) {
+      attributes.add(attribute);
+      attributesMap.put(attribute.getName(), attribute);
     }
-  }
-
-  public String getPath() {
-    return path;
-  }
-
-  public String getAbsolutePath() {
-    if (parent != null) {
-      return parent.getAbsolutePath() + path;
-    } else {
-      return WebUiContext.get().getConfig().getBasePath() + path;
-    }
-  }
-
-  public String getFullPath() {
-    if (secure) {
-      return getAbsolutePath() + ".wps";
-    } else {
-      return getAbsolutePath() + ".wp";
-    }
-  }
-
-  public String getFullUrl() {
-    return getFullUrl(Collections.EMPTY_MAP);
-  }
-
-  public String getFullUrl(final Map parameters) {
-    WebUiContext iafContext = WebUiContext.get();
-    Map uriParameters = new HashMap(parameters);
-    if (iafContext != null) {
-      HttpServletRequest request = iafContext.getRequest();
-      if (request != null) {
-        for (Iterator arguments = this.arguments.iterator(); arguments.hasNext();) {
-          Argument argument = (Argument)arguments.next();
-          String name = argument.getName();
-          if (!uriParameters.containsKey(name)) {
-            String value = request.getParameter(name);
-            if (value != null) {
-              uriParameters.put(name, value);
-            }
-          }
-        }
+    if (attribute.isInheritable()) {
+      for (final Page page : pages.values()) {
+        page.addAttribute(attribute);
       }
     }
-    return UrlUtil.getUrl(getFullPath(), uriParameters);
   }
 
-  public final boolean isSecure() {
-    return secure;
-  }
-
-  public final void setSecure(final boolean secure) {
-    this.secure = secure;
-  }
-
-  public void setTitle(final String title) {
-    if (title != null) {
-      this.title = title;
-      try {
-        titleExpression = JexlUtil.createExpression(title);
-      } catch (Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    } else {
-      this.title = CaseConverter.toCapitalizedWords(getName());
-    }
-  }
-
-  public String getTitle() {
-    if (titleExpression != null) {
-      WebUiContext context = WebUiContext.get();
-      return (String)context.evaluateExpression(titleExpression);
-    } else {
-      return title;
-    }
-  }
-
-  public void addProperty(final String name, final String value) {
-    properties.put(name, value);
-  }
-
-  public String getProperty(final String name) {
-    return (String)properties.get(name);
-  }
-
-  public Object clone() {
-    return new Page(this);
-  }
-
-  public void addMenu(final Menu menu) {
+  public void addMenu(
+    final Menu menu) {
     menus.put(menu.getName(), menu);
   }
 
-  public Menu getMenu(final String name) {
-    return (Menu)menus.get(name);
-  }
-
-  public void addPage(final Page page) {
+  public void addPage(
+    final Page page) {
     pages.put(page.getName(), page);
     pathMap.put(page.getPath(), page);
     page.setParent(this);
-    for (Iterator entries = page.getPathMap().entrySet().iterator(); entries.hasNext();) {
-      Map.Entry entry = (Map.Entry)entries.next();
-      String path = page.getPath() + entry.getKey();
-      Page childPage = (Page)entry.getValue();
+    for (final Entry<String, Page> entry : page.getPathMap().entrySet()) {
+      final String path = page.getPath() + entry.getKey();
+      final Page childPage = entry.getValue();
       pathMap.put(path, childPage);
     }
 
-    for (Iterator args = arguments.iterator(); args.hasNext();) {
-      Argument argument = (Argument)args.next();
+    for (final Argument argument : arguments) {
       if (argument.isInheritable()) {
         page.addArgument(argument);
       }
     }
-    for (Iterator args = attributes.iterator(); args.hasNext();) {
-      Attribute attribute = (Attribute)args.next();
+    for (final Attribute attribute : attributes) {
       if (attribute.isInheritable()) {
         page.addAttribute(attribute);
       }
     }
   }
 
-  public Page getPage(final String name) {
-    if (name == null) {
-      return null;
-    }
-    try {
-      if (name.startsWith("/")) {
-        return WebUiContext.get().getConfig().getPage(name);
-      }
-      Page page = (Page)pages.get(name);
-      if (page == null) {
-        Page parent = getParent();
-        if (parent != null) {
-          page = parent.getPage(name);
-        } else {
-          page = WebUiContext.get().getConfig().getPage("/" + name);
-        }
-      }
-      return page;
-    } catch (PageNotFoundException e) {
-      return null;
-    }
+  public void addProperty(
+    final String name,
+    final String value) {
+    properties.put(name, value);
   }
 
-  public Page getParent() {
-    return parent;
+  @Override
+  public Object clone() {
+    return new Page(this);
   }
 
-  public void setParent(final Page parent) {
-    this.parent = parent;
-    if (parent.isSecure()) {
-      secure = true;
-    }
-  }
-
-  public HashMap getPathMap() {
-    return pathMap;
-  }
-
-  public void setPathMap(final HashMap pathMap) {
-    this.pathMap = pathMap;
-  }
-
-  public boolean equals(final Object o) {
+  @Override
+  public boolean equals(
+    final Object o) {
     if (o instanceof Page) {
-      Page p = (Page)o;
+      final Page p = (Page)o;
       if (super.equals(o)
         && p.menuId == menuId
         && p.path.equals(path)
@@ -311,33 +170,193 @@ public class Page extends Component {
     return false;
   }
 
+  public String getAbsolutePath() {
+    if (parent != null) {
+      return parent.getAbsolutePath() + path;
+    } else {
+      return WebUiContext.get().getConfig().getBasePath() + path;
+    }
+  }
+
+  public List getArguments() {
+    return arguments;
+  }
+
+  public List<Attribute> getAttributes() {
+    return attributes;
+  }
+
+  public String getFullPath() {
+    if (secure) {
+      return getAbsolutePath() + ".wps";
+    } else {
+      return getAbsolutePath();
+    }
+  }
+
+  public String getFullUrl() {
+    final Map<String, Object> parameters = Collections.emptyMap();
+    return getFullUrl(parameters);
+  }
+
+  public String getFullUrl(
+    final Map<String, Object> parameters) {
+    final WebUiContext context = WebUiContext.get();
+    final Map<String, Object> uriParameters = new HashMap<String, Object>(
+      parameters);
+    if (context != null) {
+      final HttpServletRequest request = context.getRequest();
+      if (request != null) {
+        for (final Argument argument : arguments) {
+          final String name = argument.getName();
+          if (!uriParameters.containsKey(name)) {
+            final String value = request.getParameter(name);
+            if (value != null) {
+              uriParameters.put(name, value);
+            }
+          }
+        }
+      }
+    }
+    return UrlUtil.getUrl(getFullPath(), uriParameters);
+  }
+
+  public Layout getLayout() {
+    return layout;
+  }
+
+  public Menu getMenu(
+    final String name) {
+    return menus.get(name);
+  }
+
+  public long getMenuId() {
+    return menuId;
+  }
+
+  public Page getPage(
+    final String name) {
+    if (name == null) {
+      return null;
+    }
+    try {
+      if (name.startsWith("/")) {
+        return WebUiContext.get().getConfig().getPage(name);
+      }
+      Page page = pages.get(name);
+      if (page == null) {
+        final Page parent = getParent();
+        if (parent != null) {
+          page = parent.getPage(name);
+        } else {
+          page = WebUiContext.get().getConfig().getPage("/" + name);
+        }
+      }
+      return page;
+    } catch (final PageNotFoundException e) {
+      return null;
+    }
+  }
+
+  public Page getParent() {
+    return parent;
+  }
+
+  public String getPath() {
+    return path;
+  }
+
+  public Map<String, Page> getPathMap() {
+    return pathMap;
+  }
+
+  public String getProperty(
+    final String name) {
+    return properties.get(name);
+  }
+
+  public String getTitle() {
+    if (titleExpression != null) {
+      final WebUiContext context = WebUiContext.get();
+      return (String)context.evaluateExpression(titleExpression);
+    } else {
+      return title;
+    }
+  }
+
+  public boolean hasArgument(
+    final String name) {
+    return argumentsMap.containsKey(name);
+  }
+
+  public boolean hasAttribute(
+    final String name) {
+    return attributesMap.containsKey(name);
+  }
+
   /**
    * Generate the hash code for the object.
    * 
    * @return The hashCode.
    */
+  @Override
   public int hashCode() {
     return super.hashCode() + (path.hashCode() << 2);
   }
 
-  public void addAttribute(final Attribute attribute) {
-    if (!hasArgument(attribute.getName())) {
-      attributes.add(attribute);
-      attributesMap.put(attribute.getName(), attribute);
+  public final boolean isSecure() {
+    return secure;
+  }
+
+  public void setLayout(
+    final Layout layout) {
+    this.layout = layout;
+    layout.setPage(this);
+  }
+
+  public void setMenuId(
+    final long menuId) {
+    this.menuId = menuId;
+  }
+
+  public void setParent(
+    final Page parent) {
+    this.parent = parent;
+    if (parent.isSecure()) {
+      secure = true;
     }
-    if (attribute.isInheritable()) {
-      for (Iterator pages = this.pages.values().iterator(); pages.hasNext();) {
-        Page page = (Page)pages.next();
-        page.addAttribute(attribute);
+  }
+
+  public void setPath(
+    final String path) {
+    if (path != null) {
+      this.path = path;
+    } else {
+      this.path = "/" + CaseConverter.toLowerCamelCase(getName());
+    }
+  }
+
+  public void setPathMap(
+    final Map<String, Page> pathMap) {
+    this.pathMap = pathMap;
+  }
+
+  public final void setSecure(
+    final boolean secure) {
+    this.secure = secure;
+  }
+
+  public void setTitle(
+    final String title) {
+    if (title != null) {
+      this.title = title;
+      try {
+        titleExpression = JexlUtil.createExpression(title);
+      } catch (final Exception e) {
+        LOG.error(e.getMessage(), e);
       }
+    } else {
+      this.title = CaseConverter.toCapitalizedWords(getName());
     }
-  }
-
-  public List getAttributes() {
-    return attributes;
-  }
-
-  public boolean hasAttribute(final String name) {
-    return attributesMap.containsKey(name);
   }
 }

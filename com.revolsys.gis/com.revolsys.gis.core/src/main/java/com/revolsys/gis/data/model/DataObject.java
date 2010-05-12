@@ -20,7 +20,9 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -84,6 +86,9 @@ public interface DataObject {
    * @return The attribute value.
    */
   List<Object> getValues();
+
+  Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> attributeNames);
 
   /**
    * Checks to see if the metadata for this DataObject has an attribute with the

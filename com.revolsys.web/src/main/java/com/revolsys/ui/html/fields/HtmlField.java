@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.ui.html.HtmlUtil;
@@ -117,7 +115,7 @@ public class HtmlField extends Field {
     return valid;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "htmlField");
 
@@ -133,7 +131,7 @@ public class HtmlField extends Field {
     out.endTag(HtmlUtil.DIV);
   }
 
-  private void serializeHtmlWidget(final XmlWriter out) throws IOException {
+  private void serializeHtmlWidget(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "htmlFieldWidget");
     out.attribute(HtmlUtil.ATTR_ID, getName() + "HtmlWidget");
@@ -148,7 +146,7 @@ public class HtmlField extends Field {
     out.endTag(HtmlUtil.DIV);
   }
 
-  private void serializePlainTextWidget(final XmlWriter out) throws IOException {
+  private void serializePlainTextWidget(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "htmlFieldPlain");
     out.attribute(HtmlUtil.ATTR_ID, getName() + "PlainWidget");
@@ -170,7 +168,7 @@ public class HtmlField extends Field {
 
   private void serializeToolbarButton(final XmlWriter out,
     final String cssClass, final String title, final String onClick)
-    throws IOException {
+    {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "button " + cssClass);
     out.attribute(HtmlUtil.ATTR_TITLE, title);
@@ -180,7 +178,7 @@ public class HtmlField extends Field {
 
   }
 
-  private void serializeToolbar(final XmlWriter out) throws IOException {
+  private void serializeToolbar(final XmlWriter out) {
     // Toolbar row 1
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "toolBar ");
@@ -222,7 +220,7 @@ public class HtmlField extends Field {
   }
 
   private void serializeBlockFormatToolbarList(final XmlWriter out)
-    throws IOException {
+    {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "blockFormat");
 
@@ -243,7 +241,7 @@ public class HtmlField extends Field {
   }
 
   private void serializeBlockFormatOption(final XmlWriter out,
-    final String tag, final String title) throws IOException {
+    final String tag, final String title) {
     out.startTag(HtmlUtil.OPTION);
     out.attribute(HtmlUtil.ATTR_VALUE, tag);
     out.text(title);

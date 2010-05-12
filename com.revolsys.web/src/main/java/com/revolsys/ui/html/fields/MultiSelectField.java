@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,7 +84,7 @@ public class MultiSelectField extends Field {
     addOption(value, stringValue.toString(), label);
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
@@ -106,7 +105,7 @@ public class MultiSelectField extends Field {
     out.endTag(HtmlUtil.DIV);
   }
 
-  private void serializeOptions(final XmlWriter out) throws IOException {
+  private void serializeOptions(final XmlWriter out) {
     for (Iterator optionIter = options.iterator(); optionIter.hasNext();) {
       FieldValue option = (FieldValue)optionIter.next();
       out.startTag(HtmlUtil.OPTION);

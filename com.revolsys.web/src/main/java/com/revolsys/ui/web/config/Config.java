@@ -40,23 +40,25 @@ public class Config implements Serializable {
 
   private Map layouts = new HashMap();
 
-  private Map pages = new HashMap();
+  private Map<String, Page> pages = new HashMap<String, Page>();
 
-  private Map pageByName = new HashMap();
+  private Map<String, Page> pageByName = new HashMap<String, Page>();
 
-  private Map pageByPattern = new HashMap();
+  private Map<Pattern, Page> pageByPattern = new HashMap<Pattern, Page>();
 
   private Map pagePathMap = new HashMap();
 
-  private List pagePatterns = new ArrayList();
+  private List<Pattern> pagePatterns = new ArrayList<Pattern>();
 
   private Map menus = new HashMap();
 
   private ServletContext servletContext;
 
-  private String basePath;
+  private String basePath = "";
 
-  public Config(final ServletContext servletContext, final String basePath) {
+  public Config(
+    final ServletContext servletContext,
+    final String basePath) {
     this.servletContext = servletContext;
     setBasePath(basePath);
   }
@@ -65,7 +67,8 @@ public class Config implements Serializable {
     return basePath;
   }
 
-  public void setBasePath(final String basePath) {
+  public void setBasePath(
+    final String basePath) {
     if (basePath != null) {
       this.basePath = basePath;
     } else {
@@ -82,7 +85,8 @@ public class Config implements Serializable {
    * @param component The Component to add @ If another Component with the same
    *          name has already been defined
    */
-  public void addComponent(final Component component) {
+  public void addComponent(
+    final Component component) {
     String name = component.getName();
     if (components.containsKey(name)) {
       throw new IllegalArgumentException(new StringBuffer(
@@ -95,7 +99,8 @@ public class Config implements Serializable {
    * @param name
    * @return
    */
-  public Component getComponent(final String name) {
+  public Component getComponent(
+    final String name) {
     Component component = (Component)components.get(name);
     if (component == null) {
       throw new IllegalArgumentException(new StringBuffer(
@@ -109,7 +114,8 @@ public class Config implements Serializable {
   /**
    * @param layout
    */
-  public void addLayout(final Layout layout) {
+  public void addLayout(
+    final Layout layout) {
     addComponent(layout);
     String name = layout.getName();
     if (layouts.containsKey(name)) {
@@ -123,7 +129,8 @@ public class Config implements Serializable {
    * @param name
    * @return
    */
-  public Layout getLayout(final String name) {
+  public Layout getLayout(
+    final String name) {
     Layout layout = (Layout)layouts.get(name);
     if (layout == null) {
       throw new IllegalArgumentException(new StringBuffer(
@@ -137,17 +144,18 @@ public class Config implements Serializable {
   /**
    * @param page
    */
-  public void addPage(final Page page) {
+  public void addPage(
+    final Page page) {
     String path = page.getAbsolutePath();
-//    if (pages.containsKey(path)) {
-//      throw new IllegalArgumentException("Duplicate Page definition with path="
-//        + path);
-//    }
+    // if (pages.containsKey(path)) {
+    // throw new IllegalArgumentException("Duplicate Page definition with path="
+    // + path);
+    // }
     String name = page.getName();
-//    if (pageByName.containsKey(name)) {
-//      throw new IllegalArgumentException("Duplicate Page definition with name "
-//        + name);
-//    }
+    // if (pageByName.containsKey(name)) {
+    // throw new IllegalArgumentException("Duplicate Page definition with name "
+    // + name);
+    // }
     pages.put(path, page);
     pageByName.put(name, page);
     pagePathMap.put(page, path);
@@ -161,17 +169,19 @@ public class Config implements Serializable {
       Map.Entry entry = (Map.Entry)entries.next();
       String fullPath = page.getPath() + entry.getKey();
       Page childPage = (Page)entry.getValue();
-//      if (pages.containsKey(fullPath)) {
-//        throw new IllegalArgumentException(
-//          "Duplicate Page definition with path=" + fullPath);
-//      }
+      // if (pages.containsKey(fullPath)) {
+      // throw new IllegalArgumentException(
+      // "Duplicate Page definition with path=" + fullPath);
+      // }
       pages.put(fullPath, childPage);
       pagePathMap.put(childPage, fullPath);
     }
   }
 
-  public Page getPage(final String path) throws PageNotFoundException {
-    Page page = (Page)pages.get(path);
+  public Page getPage(
+    final String path)
+    throws PageNotFoundException {
+    Page page = pages.get(path);
     if (page != null) {
       return page;
     } else {
@@ -179,24 +189,25 @@ public class Config implements Serializable {
       String parentPath = path;
       for (int pathIndex = parentPath.lastIndexOf('/'); pathIndex != -1; pathIndex = parentPath.lastIndexOf('/')) {
         parentPath = parentPath.substring(0, pathIndex);
-        page = (Page)pages.get(parentPath);
+        page = pages.get(parentPath);
         if (page != null) {
           return page;
         }
       }
       // Check to see if there is a page match using a regular expression
-      for (Iterator patterns = pagePatterns.iterator(); patterns.hasNext();) {
-        Pattern pattern = (Pattern)patterns.next();
+      for (Pattern pattern : pagePatterns) {
         Matcher matcher = pattern.matcher(path);
         if (matcher.matches()) {
-          return (Page)pageByPattern.get(pattern);
+          return pageByPattern.get(pattern);
         }
       }
       throw new PageNotFoundException();
     }
   }
 
-  public Page getPageByName(final String pageName) throws PageNotFoundException {
+  public Page getPageByName(
+    final String pageName)
+    throws PageNotFoundException {
     Page page = (Page)pageByName.get(pageName);
     if (page == null) {
       throw new PageNotFoundException("Page " + pageName + " does not exist");
@@ -204,18 +215,22 @@ public class Config implements Serializable {
     return page;
   }
 
-  public String getPageUri(final String pageRef, final Map parameters)
+  public String getPageUri(
+    final String pageRef,
+    final Map parameters)
     throws PageNotFoundException {
     Page page = getPage(pageRef);
     return page.getFullUrl(parameters);
 
   }
 
-  public String getPath(final Page page) {
+  public String getPath(
+    final Page page) {
     return (String)pagePathMap.get(page);
   }
 
-  public void addMenu(final Menu menu) {
+  public void addMenu(
+    final Menu menu) {
     String name = menu.getName();
     if (menus.containsKey(name)) {
       throw new IllegalArgumentException(new StringBuffer(
@@ -224,7 +239,8 @@ public class Config implements Serializable {
     menus.put(name, menu);
   }
 
-  public Menu getMenu(final String name) {
+  public Menu getMenu(
+    final String name) {
     Menu menu = (Menu)menus.get(name);
     return menu;
   }
@@ -246,7 +262,8 @@ public class Config implements Serializable {
    * @param o The object to compare this object with
    * @return true if both objects are equal
    */
-  public boolean equals(final Object o) {
+  public boolean equals(
+    final Object o) {
     if (o instanceof Config) {
       Config c = (Config)o;
       if (c.components.equals(components) && c.layouts.equals(layouts)

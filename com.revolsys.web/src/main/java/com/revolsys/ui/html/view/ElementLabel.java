@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
-
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.xml.io.XmlWriter;
@@ -43,8 +41,7 @@ public class ElementLabel implements Decorator {
     return label;
   }
 
-  public void serialize(final XmlWriter out, final Element element)
-    throws IOException {
+  public void serialize(final XmlWriter out, final Element element) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "field");
     serializeLabel(out);
@@ -53,7 +50,7 @@ public class ElementLabel implements Decorator {
     out.endTag(HtmlUtil.DIV);
   }
 
-  protected void serializeLabel(final XmlWriter out) throws IOException {
+  protected void serializeLabel(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "label");
     out.startTag(HtmlUtil.LABEL);
@@ -63,14 +60,14 @@ public class ElementLabel implements Decorator {
   }
 
   protected void serializeField(final XmlWriter out, final Element element)
-    throws IOException {
+    {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "contents");
     element.serializeElement(out);
     out.endTag(HtmlUtil.DIV);
   }
 
-  protected void serializeInstructions(final XmlWriter out) throws IOException {
+  protected void serializeInstructions(final XmlWriter out) {
     String instructions = getInstructions();
     if (instructions != null) {
       out.startTag(HtmlUtil.DIV);

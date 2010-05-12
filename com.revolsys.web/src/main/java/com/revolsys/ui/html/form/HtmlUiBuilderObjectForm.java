@@ -116,4 +116,8 @@ public class HtmlUiBuilderObjectForm extends Form {
   public void setFieldKeys(final List fieldKeys) {
     this.fieldKeys = fieldKeys;
   }
+  
+  public Object getObject() {
+    return object;
+  }
 }

@@ -16,6 +16,7 @@
 package com.revolsys.util;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 /**
  * The MathUtil class is a utility class for handling integer, percent and
@@ -46,6 +47,9 @@ public final class MathUtil {
 
   /** A 0 integer. */
   public static final BigDecimal INTEGER0 = getInteger(0);
+
+  /** A 1 integer. */
+  public static final BigDecimal INTEGER1 = getInteger(1);
 
   /** The scale for percent numbers. */
   public static final int PERCENT_SCALE = 4;
@@ -422,9 +426,14 @@ public final class MathUtil {
     final BigDecimal decimalPercent,
     final int scale) {
     if (decimalPercent != null) {
-      return decimalPercent.multiply(new BigDecimal(100)).setScale(scale,
-        BigDecimal.ROUND_HALF_UP)
+      DecimalFormat format = new DecimalFormat();
+      format.setMinimumFractionDigits(0);
+      format.setMaximumFractionDigits(scale);
+      String string = format.format(decimalPercent.multiply(new BigDecimal(100))
+        .setScale(scale, BigDecimal.ROUND_HALF_UP))
         + "%";
+
+      return string;
     } else {
       return null;
     }

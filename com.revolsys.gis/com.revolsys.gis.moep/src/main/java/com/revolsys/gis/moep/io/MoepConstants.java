@@ -50,6 +50,8 @@ public final class MoepConstants {
 
   public static final String GEOMETRY = "geometry";
 
+  public static final String MAPSHEET_NAME = "mapsheetName";
+
   public static final DataObjectMetaData META_DATA;
 
   static final String ORIGINAL_FILE_TYPE = "originalFileType";
@@ -77,6 +79,13 @@ public final class MoepConstants {
   static {
     final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(TYPE_NAME);
     type.addAttribute(FEATURE_CODE, DataTypes.STRING, true);
+    type.addAttribute(MAPSHEET_NAME, DataTypes.STRING,false);
+    type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, true);
+    type.addAttribute(ANGLE, DataTypes.DECIMAL, false);
+    type.addAttribute(ELEVATION, DataTypes.DECIMAL, false);
+    type.addAttribute(TEXT, DataTypes.STRING, false);
+    type.addAttribute(ORIGINAL_FILE_TYPE, DataTypes.STRING, false);
+    type.addAttribute(ATTRIBUTE, DataTypes.STRING, false);
     type.addAttribute(ADMIT_SOURCE_DATE, DataTypes.DATE, false);
     type.addAttribute(ADMIT_INTEGRATION_DATE, DataTypes.DATE, false);
     type.addAttribute(ADMIT_REASON_FOR_CHANGE, DataTypes.STRING, false);
@@ -87,12 +96,6 @@ public final class MoepConstants {
     type.addAttribute(RETIRE_REASON_FOR_CHANGE, DataTypes.STRING, false);
     type.addAttribute(RETIRE_REVISION_KEY, DataTypes.STRING, false);
     type.addAttribute(RETIRE_SPECIFICATIONS_RELEASE, DataTypes.STRING, false);
-    type.addAttribute(ORIGINAL_FILE_TYPE, DataTypes.STRING, false);
-    type.addAttribute(ATTRIBUTE, DataTypes.STRING, false);
-    type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, true);
-    type.addAttribute(ANGLE, DataTypes.DECIMAL, false);
-    type.addAttribute(ELEVATION, DataTypes.DECIMAL, false);
-    type.addAttribute(TEXT, DataTypes.STRING, false);
     type.addAttribute(GEOMETRY, DataTypes.GEOMETRY, true);
     type.setGeometryAttributeName(GEOMETRY);
     META_DATA = type;

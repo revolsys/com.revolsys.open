@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,7 +53,7 @@ public class MenuView extends ObjectView {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     Menu menu = (Menu)getObject();
     if (menu != null) {
       List menuItems = new ArrayList();
@@ -84,7 +83,7 @@ public class MenuView extends ObjectView {
   }
 
   private void menu(final XmlWriter out, final Collection items, final int level)
-    throws IOException {
+    {
     // Collection items = menu.getItems();
     if (items.size() > 0) {
       out.startTag(HtmlUtil.UL);
@@ -113,7 +112,7 @@ public class MenuView extends ObjectView {
   }
 
   private void menuItemLink(final XmlWriter out, final MenuItem menuItem)
-    throws IOException {
+    {
 
     String uri = menuItem.getUri();
     if (uri != null) {

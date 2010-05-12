@@ -41,9 +41,8 @@ public class ResultPagerView extends Element {
    * Serialize the view.
    * 
    * @param out The XML Writer.
-   * @throws IOException If there was an exception serializing.
    */
-  public final void serializeElement(final XmlWriter out) throws IOException {
+  public final void serializeElement(final XmlWriter out) {
     int numPages = pager.getNumPages();
 
     out.startTag(HtmlUtil.DIV);
@@ -136,7 +135,7 @@ public class ResultPagerView extends Element {
    * @throws IOException If there was an exception serializing.
    */
   private void serializePageLink(final XmlWriter out, final int pageNumber)
-    throws IOException {
+    {
     String contents = String.valueOf(pageNumber);
     String title = "Page " + pageNumber;
     if (pageNumber == pager.getPageNumber()) {
@@ -156,7 +155,7 @@ public class ResultPagerView extends Element {
    * @throws IOException If there was an exception serializing.
    */
   private void pageLink(final XmlWriter out, final int pageNumber,
-    final String title, final String contents) throws IOException {
+    final String title, final String contents) {
     parameters.put("page", String.valueOf(pageNumber));
     String url = UrlUtil.getUrl(baseUrl, parameters);
     out.startTag(HtmlUtil.A);
@@ -176,7 +175,7 @@ public class ResultPagerView extends Element {
    * @throws IOException If there was an exception serializing.
    */
   private void pageLinkSpan(final XmlWriter out, final int pageNumber,
-    final String title, final String contents) throws IOException {
+    final String title, final String contents) {
     parameters.put("page", String.valueOf(pageNumber));
     String url = UrlUtil.getUrl(baseUrl, parameters);
     out.startTag(HtmlUtil.A);

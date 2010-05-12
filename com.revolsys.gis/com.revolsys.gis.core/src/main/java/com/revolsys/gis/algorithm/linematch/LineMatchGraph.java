@@ -24,10 +24,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
-public class LineMatchGraph extends Graph<LineSegmentMatch> {
+public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private final GeometryFactory geometryFactory;
 
   private final List<Set<Node<LineSegmentMatch>>> startNodes = new ArrayList<Set<Node<LineSegmentMatch>>>();
+
+  private final List<T> objects = new ArrayList<T>();
 
   private final int tolerance = 1;
 
@@ -35,6 +37,13 @@ public class LineMatchGraph extends Graph<LineSegmentMatch> {
     final LineString line) {
     this.geometryFactory = line.getFactory();
     add(line, 0);
+  }
+
+  public LineMatchGraph(
+    T object,
+    LineString line) {
+    this.geometryFactory = line.getFactory();
+    add(object, line);
   }
 
   private Edge<LineSegmentMatch> add(
@@ -68,6 +77,46 @@ public class LineMatchGraph extends Graph<LineSegmentMatch> {
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     lineSegmentMatch.addSegment(segment, index);
     return edge;
+  }
+
+  public boolean add(
+    final T object,
+    final LineString line) {
+    if (add(line)) {
+      addObject(object);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void addObject(
+    final T object) {
+    final int index = startNodes.size() - 1;
+    for (int i = objects.size(); i < index; i++) {
+      objects.add(null);
+    }
+    objects.add(object);
+  }
+
+  public T getObject(
+    int index) {
+    if (index < objects.size()) {
+      return objects.get(index);
+    } else {
+      return null;
+    }
+  }
+
+  public boolean add(
+    final T object,
+    final MultiLineString multiLine) {
+    if (add(multiLine)) {
+      addObject(object);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public boolean add(
@@ -271,10 +320,18 @@ public class LineMatchGraph extends Graph<LineSegmentMatch> {
   public MultiLineString getMatchedLines(
     final int index1,
     final int index2) {
+    final List<LineString> lines = getMatchedLinesList(index1, index2);
+    final LineString[] lineArray = GeometryFactory.toLineStringArray(lines);
+    return geometryFactory.createMultiLineString(lineArray);
+
+  }
+
+  public List<LineString>  getMatchedLinesList(
+    final int index1,
+    final int index2) {
     final List<LineString> lines = new ArrayList<LineString>();
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
-
-    for (Node<LineSegmentMatch> currentNode : getStartNodes(index2)) {
+  for (Node<LineSegmentMatch> currentNode : getStartNodes(index2)) {
       final List<Coordinate> coordinates = new ArrayList<Coordinate>();
       while (currentNode != null) {
         Node<LineSegmentMatch> nextNode = null;
@@ -303,9 +360,7 @@ public class LineMatchGraph extends Graph<LineSegmentMatch> {
       }
       createLine(lines, coordinates);
     }
-    final LineString[] lineArray = lines.toArray(new LineString[lines.size()]);
-    return geometryFactory.createMultiLineString(lineArray);
-
+  return lines;
   }
 
   public double getMatchLength(
@@ -365,7 +420,7 @@ public class LineMatchGraph extends Graph<LineSegmentMatch> {
       }
       createLine(lines, coordinates);
     }
-    final LineString[] lineArray = lines.toArray(new LineString[lines.size()]);
+    final LineString[] lineArray = GeometryFactory.toLineStringArray(lines);
     return geometryFactory.createMultiLineString(lineArray);
 
   }

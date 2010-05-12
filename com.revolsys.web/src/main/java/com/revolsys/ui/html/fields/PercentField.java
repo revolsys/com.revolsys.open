@@ -15,8 +15,8 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +27,7 @@ import com.revolsys.xml.io.XmlWriter;
 public class PercentField extends BigDecimalField {
   public PercentField(final String name, final boolean required) {
     super(name, MathUtil.PERCENT_SCALE - 2, required);
-    setSize(5);
+    setSize(6);
   }
 
   public void initialize(final Form form, final HttpServletRequest request) {
@@ -38,13 +38,16 @@ public class PercentField extends BigDecimalField {
       if (getValue() != null) {
         setValue(decimal.multiply(new BigDecimal(100)).setScale(getScale(),
           BigDecimal.ROUND_HALF_UP));
-        inputValue = getValue().toString();
-      }
+        DecimalFormat format = new DecimalFormat();
+        format.setMinimumFractionDigits(0);
+        format.setMaximumFractionDigits(getScale());
+        inputValue = format.format(getValue());
+        }
     }
     setInputValue(inputValue);
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
     out.write(" %");
   }

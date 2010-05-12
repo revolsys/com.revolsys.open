@@ -30,9 +30,9 @@ import com.revolsys.orm.core.ResultPager;
  * 
  * @author Paul Austin
  */
-public class HibernateQueryPager implements ResultPager {
+public class HibernateQueryPager<T> implements ResultPager<T> {
   /** The objects in the current page. */
-  private List results;
+  private List<T> results;
 
   /** The number of objects in a page. */
   private int pageSize = 10;
@@ -89,7 +89,7 @@ public class HibernateQueryPager implements ResultPager {
    * 
    * @return The list of objects in the current page.
    */
-  public <T> List<T> getList() {
+  public List<T> getList() {
     if (results == null) {
       throw new IllegalStateException(
         "The page number must be set using setPageNumber");

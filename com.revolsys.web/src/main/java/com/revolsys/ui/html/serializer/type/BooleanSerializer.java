@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.serializer.type;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,10 +22,11 @@ public class BooleanSerializer implements TypeSerializer {
    * @param out The XML writer to serialize to.
    * @param value The object to get the value from.
    * @param locale The locale.
-   * @throws IOException If there was an I/O error serializing the value.
    */
-  public void serialize(final XmlWriter out, final Object value,
-    final Locale locale) throws IOException {
+  public void serialize(
+    final XmlWriter out,
+    final Object value,
+    final Locale locale) {
     if (value instanceof Boolean) {
       Boolean bool = (Boolean)value;
       if (bool.booleanValue()) {
@@ -45,7 +45,8 @@ public class BooleanSerializer implements TypeSerializer {
    * @param locale The locale.
    * @return The date format instance.
    */
-  protected DateFormat getDateFormat(final Locale locale) {
+  protected DateFormat getDateFormat(
+    final Locale locale) {
     return SimpleDateFormat.getDateInstance(dateStyle, locale);
   }
 
@@ -55,7 +56,8 @@ public class BooleanSerializer implements TypeSerializer {
    * 
    * @param styleName The name of the date format style;
    */
-  public void setDateStyle(final String styleName) {
+  public void setDateStyle(
+    final String styleName) {
     try {
       Field styleField = DateFormat.class.getField(styleName.toUpperCase());
       setDateStyle(styleField.getInt(DateFormat.class));
@@ -83,7 +85,8 @@ public class BooleanSerializer implements TypeSerializer {
    * 
    * @param dateStyle The date style.
    */
-  public void setDateStyle(final int dateStyle) {
+  public void setDateStyle(
+    final int dateStyle) {
     this.dateStyle = dateStyle;
   }
 

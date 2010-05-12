@@ -1,6 +1,7 @@
 package org.openjump.swing.factory.component;
 
 import java.awt.Component;
+
 import javax.swing.Icon;
 
 public interface ComponentFactory<T extends Component>

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.layout;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import com.revolsys.ui.html.view.Element;
@@ -24,7 +23,7 @@ import com.revolsys.xml.io.XmlWriter;
 
 public class RawLayout implements ElementContainerLayout {
   public void serialize(final XmlWriter out, final ElementContainer container)
-    throws IOException {
+    {
     for (Iterator elements = container.getElements().iterator(); elements.hasNext();) {
       Element element = (Element)elements.next();
       element.serialize(out);

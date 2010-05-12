@@ -20,5 +20,5 @@ public interface TypeSerializer {
    * @param locale The locale.
    * @throws IOException If there was an I/O error serializing the value.
    */
-  void serialize(XmlWriter out, Object value, Locale locale) throws IOException;
+  void serialize(XmlWriter out, Object value, Locale locale);
 }

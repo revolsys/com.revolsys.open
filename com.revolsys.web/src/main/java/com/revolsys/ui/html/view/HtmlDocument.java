@@ -21,8 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -33,7 +34,7 @@ import com.revolsys.xml.io.XmlWriter;
  */
 public class HtmlDocument extends ElementContainer {
 
-  private List styles = new ArrayList();
+  private List<BufferedReader> styles = new ArrayList<BufferedReader>();
 
   public void addStyle(final InputStream styleIn) {
     styles.add(new BufferedReader(new InputStreamReader(styleIn)));
@@ -43,7 +44,7 @@ public class HtmlDocument extends ElementContainer {
     styles.add(new BufferedReader(styleIn));
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.HTML);
 
     out.startTag(HtmlUtil.HEAD);
@@ -61,13 +62,16 @@ public class HtmlDocument extends ElementContainer {
     out.endTag(HtmlUtil.HTML);
   }
 
-  private void serializeStyles(final XmlWriter out) throws IOException {
-    for (Iterator styles = this.styles.iterator(); styles.hasNext();) {
-      BufferedReader reader = (BufferedReader)styles.next();
+  private void serializeStyles(final XmlWriter out) {
+    for (BufferedReader reader : this.styles) {
       out.startTag(HtmlUtil.STYLE);
-      for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-        out.text(line);
-        out.write('\n');
+      try {
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+          out.text(line);
+          out.write('\n');
+        }
+      } catch (IOException e) {
+        LoggerFactory.getLogger(getClass()).error("Cannot read style", out);
       }
       out.endTag(HtmlUtil.STYLE);
     }

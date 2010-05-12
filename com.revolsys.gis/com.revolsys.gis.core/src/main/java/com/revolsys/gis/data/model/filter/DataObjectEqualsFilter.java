@@ -5,7 +5,6 @@ import java.util.HashSet;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.Geometry;
 

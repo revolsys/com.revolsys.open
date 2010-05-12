@@ -20,7 +20,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
@@ -159,9 +158,8 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
    * Serialize the key on the object using the builder.
    * 
    * @param out The XML writer to serialize to.
-   * @throws IOException If an I/O error occured serializing the element.
    */
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     if (object != null) {
       builder.serialize(out, object, key, locale);
     }

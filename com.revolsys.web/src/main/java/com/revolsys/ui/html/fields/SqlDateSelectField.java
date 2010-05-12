@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -107,7 +106,7 @@ public class SqlDateSelectField extends Field {
     this.endYear = endYear;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     serializeSelect(out, MONTH_KEY, MONTH_OPTIONS);
     out.entityRef("nbsp");
     serializeSelect(out, DAY_KEY, DAY_OPTIONS);
@@ -116,7 +115,7 @@ public class SqlDateSelectField extends Field {
   }
 
   private void serializeSelect(final XmlWriter out, final String part,
-    final List options) throws IOException {
+    final List options) {
     String name = getName() + part;
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_ID, name);
@@ -126,7 +125,7 @@ public class SqlDateSelectField extends Field {
   }
 
   private void serializeOptions(final XmlWriter out, final String part,
-    final List options) throws IOException {
+    final List options) {
     String stringValue = "";
     if (part.equals(DAY_KEY)) {
       stringValue = dayStringValue;

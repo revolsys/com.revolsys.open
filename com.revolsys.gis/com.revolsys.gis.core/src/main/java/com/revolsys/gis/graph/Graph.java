@@ -74,6 +74,10 @@ public class Graph<T> {
 
   protected void add(
     final Node<T> node) {
+    if (node.getCoordinate().equals(new Coordinate(740953.3950366036,1049476.0169586174))) {
+      System.out.println();
+    }
+    
     nodes.put(node.getCoordinate(), node);
     if (nodeIndex != null) {
       nodeIndex.add(node);

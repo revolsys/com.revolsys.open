@@ -27,43 +27,52 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
 
 public class WebUiContext {
-  private static final ThreadLocal local = new ThreadLocal();
+  private static final ThreadLocal<WebUiContext> local = new ThreadLocal<WebUiContext>();
 
   private static final Logger log = Logger.getLogger(WebUiContext.class);
 
   private static ServletContext servletContext;
 
-  private Config config;
-
-  private String contextPath;
-
-  private Page page;
-
-  private Stack layouts = new Stack();
-
-  private Menu menu;
-
-  private HttpServletRequest request;
-
-  private HttpServletResponse response;
+  public static WebUiContext get() {
+    return local.get();
+  }
 
   public static ServletContext getServletContext() {
     return servletContext;
   }
 
-  public static void set(final WebUiContext context) {
+  public static void set(
+    final WebUiContext context) {
     local.set(context);
   }
 
-  public static void setServletContext(final ServletContext servletContext) {
+  public static void setServletContext(
+    final ServletContext servletContext) {
     WebUiContext.servletContext = servletContext;
   }
+
+  private Config config;
+
+  private String contextPath;
+
+  private final Stack layouts = new Stack();
+
+  private Menu menu;
+
+  private Page page;
+
+  private HttpServletRequest request;
+
+  private HttpServletResponse response;
 
   public WebUiContext() {
   }
 
-  public WebUiContext(final Config config, final String contextPath,
-    final Page page, final HttpServletRequest request,
+  public WebUiContext(
+    final Config config,
+    final String contextPath,
+    final Page page,
+    final HttpServletRequest request,
     final HttpServletResponse response) {
     this.config = config;
     this.contextPath = contextPath;
@@ -75,27 +84,27 @@ public class WebUiContext {
     this.response = response;
   }
 
-  public Object evaluateExpression(final String expression) {
-    try {
-      return evaluateExpression(ExpressionFactory.createExpression(expression));
-    } catch (Exception e) {
-      log.error("Unable to create expression " + expression + ": " + e.getMessage(), e);
-      return null;
-    }
-  }
-
-  public Object evaluateExpression(final Expression expression) {
-    JexlContext jexlContext = new JexlHttpServletRequestContext(request);
+  public Object evaluateExpression(
+    final Expression expression) {
+    final JexlContext jexlContext = new JexlHttpServletRequestContext(request);
     try {
       return expression.evaluate(jexlContext);
-    } catch (Exception e) {
-      log.error("Unable to evaluate expression " + expression.getExpression() + ": " + e.getMessage(), e);
+    } catch (final Exception e) {
+      log.error("Unable to evaluate expression " + expression.getExpression()
+        + ": " + e.getMessage(), e);
       return null;
     }
   }
 
-  public static WebUiContext get() {
-    return (WebUiContext)local.get();
+  public Object evaluateExpression(
+    final String expression) {
+    try {
+      return evaluateExpression(ExpressionFactory.createExpression(expression));
+    } catch (final Exception e) {
+      log.error("Unable to create expression " + expression + ": "
+        + e.getMessage(), e);
+      return null;
+    }
   }
 
   public Config getConfig() {
@@ -110,12 +119,13 @@ public class WebUiContext {
     return (Layout)layouts.peek();
   }
 
-  public Menu getMenu(final String name) {
-    return config.getMenu(name);
-  }
-
   public Menu getMenu() {
     return menu;
+  }
+
+  public Menu getMenu(
+    final String name) {
+    return config.getMenu(name);
   }
 
   public Page getPage() {
@@ -134,11 +144,13 @@ public class WebUiContext {
     return (Layout)layouts.pop();
   }
 
-  public void pushLayout(final Layout layout) {
+  public void pushLayout(
+    final Layout layout) {
     layouts.push(layout);
   }
 
-  public void setPage(final Page page) {
+  public void setPage(
+    final Page page) {
     this.page = page;
   }
 }

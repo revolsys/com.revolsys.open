@@ -15,11 +15,10 @@
  */
 package com.revolsys.ui.html.decorator;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.xml.io.XmlWriter;
 
 public interface Decorator {
-  void serialize(XmlWriter out, Element element) throws IOException;
+  void serialize(XmlWriter out, Element element);
 }

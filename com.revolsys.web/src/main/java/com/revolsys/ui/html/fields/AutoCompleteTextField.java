@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,7 +16,7 @@ public class AutoCompleteTextField extends TextField {
   public AutoCompleteTextField() {
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
     String url = dataUrl;
 

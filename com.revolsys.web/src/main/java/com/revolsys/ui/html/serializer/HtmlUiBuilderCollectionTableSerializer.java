@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.serializer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -70,7 +69,7 @@ public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializ
   }
 
   public void serializeHeaderCell(final XmlWriter out, final int col)
-    throws IOException {
+    {
     if (col < colCount) {
       String key = (String)keys.get(col);
       out.text(builder.getLabel(key));
@@ -80,7 +79,7 @@ public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializ
   }
 
   public void serializeBodyCell(final XmlWriter out, final int row,
-    final int col) throws IOException {
+    final int col) {
     if (col < colCount) {
       Object object = rows.get(row);
       builder.serialize(out, object, (String)keys.get(col), locale);
@@ -102,6 +101,6 @@ public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializ
   }
 
   public void serializeFooterCell(final XmlWriter out, final int row,
-    final int col) throws IOException {
+    final int col) {
   }
 }

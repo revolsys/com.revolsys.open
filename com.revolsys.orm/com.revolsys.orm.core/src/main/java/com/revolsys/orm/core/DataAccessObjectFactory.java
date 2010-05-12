@@ -25,16 +25,20 @@ public interface DataAccessObjectFactory {
   /**
    * Get a DataAcessObject for the specified Class.
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param objectClass The class.
    * @return The data access object for the class.
    */
-  DataAccessObject get(Class objectClass);
+  <T extends DataAccessObject<?>> T get(
+    Class<?> objectClass);
 
   /**
    * Get a DataAcessObject for the specified class name.
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param objectClassName The class name.
    * @return The data access object for the class name.
    */
-  DataAccessObject get(String objectClassName);
+  <T extends DataAccessObject<?>> T get(
+    String objectClassName);
 }

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -127,8 +126,8 @@ public class ElementContainer extends Element {
     return allFields;
   }
 
-  public Object getInitialValue(final Field field, HttpServletRequest request) {
-    return getContainer().getInitialValue(field, request);
+  public <T> T getInitialValue(final Field field, HttpServletRequest request) {
+    return (T)getContainer().getInitialValue(field, request);
   }
 
   /**
@@ -144,7 +143,7 @@ public class ElementContainer extends Element {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     layout.serialize(out, this);
   }
 

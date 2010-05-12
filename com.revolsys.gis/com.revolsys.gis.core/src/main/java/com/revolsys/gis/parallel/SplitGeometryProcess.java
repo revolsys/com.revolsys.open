@@ -236,7 +236,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
         lastIndex, null, newLines);
       for (final LineString newLine : newLines) {
         if (newLine.getLength() > 0) {
-          final DataObject newObject = DataObjectUtil.copy(object, newLine);
+          final DataObject newObject = createSplitObject(object, newLine);
           out.write(newObject);
         }
       }
@@ -247,6 +247,12 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
         createdStatistics.add(object, newLines.size());
       }
     }
+  }
+
+  protected DataObject createSplitObject(
+    final DataObject object,
+    final LineString newLine) {
+    return DataObjectUtil.copy(object, newLine);
   }
 
   public GeometryFactory getGeometryFactory() {

@@ -1,13 +1,10 @@
 package com.revolsys.ui.html.serializer.key;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import org.apache.log4j.Logger;
 
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.xml.io.XmlWriter;
@@ -18,10 +15,7 @@ import com.revolsys.xml.io.XmlWriter;
  * @author Paul Austin
  */
 public class DateKeySerializer implements KeySerializer {
-  /** The logger. */
-  private static final Logger log = Logger.getLogger(DateKeySerializer.class);
-
-  /** The date format style. */
+   /** The date format style. */
   private int dateStyle = DateFormat.DEFAULT;
 
   /**
@@ -31,10 +25,9 @@ public class DateKeySerializer implements KeySerializer {
    * @param object The object to get the value from.
    * @param key The key of the property on the object to serialize.
    * @param locale The locale.
-   * @throws IOException If there was an I/O error serializing the value.
    */
   public void serialize(final XmlWriter out, final Object object,
-    final String key, final Locale locale) throws IOException {
+    final String key, final Locale locale) {
     Object value = JavaBeanUtil.getProperty(object, key);
     DateFormat dateFormat = getDateFormat(locale);
     if (value == null) {

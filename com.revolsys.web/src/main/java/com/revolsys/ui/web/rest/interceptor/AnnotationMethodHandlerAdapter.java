@@ -19,10 +19,12 @@ package com.revolsys.ui.web.rest.interceptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -77,6 +79,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
@@ -312,10 +316,31 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
           }
         }
         if (new MediaType("application", "x-www-form-urlencoded").includes(contentType)) {
-          final FormHttpMessageConverter formConverter = new FormHttpMessageConverter();
-          final MultiValueMap<String, String> values = formConverter.readInternal(
-            MultiValueMap.class, inputMessage);
-           String body = values.getFirst("body");
+          Charset charset = contentType.getCharSet();
+          if (charset == null) {
+            charset = Charset.forName(WebUtils.DEFAULT_CHARACTER_ENCODING);
+          }
+          String urlBody = FileCopyUtils.copyToString(new InputStreamReader(
+            inputMessage.getBody(), charset));
+
+          String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
+
+          MultiValueMap<String, String> values = new LinkedMultiValueMap<String, String>(
+            pairs.length);
+
+          for (String pair : pairs) {
+            int idx = pair.indexOf('=');
+            if (idx == -1) {
+              values.add(URLDecoder.decode(pair, charset.name()), null);
+            } else {
+              String name = URLDecoder.decode(pair.substring(0, idx),
+                charset.name());
+              String value = URLDecoder.decode(pair.substring(idx + 1),
+                charset.name());
+              values.add(name, value);
+            }
+          }
+          String body = values.getFirst("body");
           if (body == null) {
             body = httpRequest.getParameter("body");
           }
@@ -325,11 +350,11 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
               defaultMediaType);
             headers.setContentType(contentType);
             final Charset charSet = contentType.getCharSet();
-            byte[] bytes; 
+            byte[] bytes;
             if (charSet == null) {
-              bytes= body.getBytes();
+              bytes = body.getBytes();
             } else {
-              bytes= body.getBytes(charSet);
+              bytes = body.getBytes(charSet);
             }
             final InputStream bodyIn = new ByteArrayInputStream(bytes);
             HttpInputMessage newInputMessage = new HttpInputMessage() {

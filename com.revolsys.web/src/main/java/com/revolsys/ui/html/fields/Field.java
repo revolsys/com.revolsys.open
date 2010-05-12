@@ -40,12 +40,15 @@ public abstract class Field extends Element {
   public Field() {
   }
 
-  public Field(final String name, final boolean required) {
+  public Field(
+    final String name,
+    final boolean required) {
     this.name = name;
     this.required = required;
   }
 
-  public void addValidationError(final String error) {
+  public void addValidationError(
+    final String error) {
     if (!hasValidationErrors()) {
       validationErrors = new ArrayList();
     }
@@ -60,10 +63,11 @@ public abstract class Field extends Element {
     return value != null;
   }
 
-  public Object getInitialValue(HttpServletRequest request) {
-    Object value = getContainer().getInitialValue(this, request);
+  public <T> T getInitialValue(
+    HttpServletRequest request) {
+    T value = (T)getContainer().getInitialValue(this, request);
     if (value == null) {
-      return initialValue;
+      return (T)initialValue;
     } else {
       return value;
     }
@@ -84,18 +88,21 @@ public abstract class Field extends Element {
     return readOnly;
   }
 
-  public void setName(String name) {
+  public void setName(
+    String name) {
     this.name = name;
   }
 
-  public void setRequired(boolean required) {
+  public void setRequired(
+    boolean required) {
     this.required = required;
   }
 
   /**
    * @param readOnly The readOnly to set.
    */
-  public final void setReadOnly(final boolean readOnly) {
+  public final void setReadOnly(
+    final boolean readOnly) {
     this.readOnly = readOnly;
   }
 
@@ -107,21 +114,25 @@ public abstract class Field extends Element {
     return true;
   }
 
-  public abstract void initialize(Form form, HttpServletRequest request);
+  public abstract void initialize(
+    Form form,
+    HttpServletRequest request);
 
-  public void postInit(final HttpServletRequest request) {
+  public void postInit(
+    final HttpServletRequest request) {
   }
 
   public String getName() {
     return name;
   }
 
-  public void setValue(final Object value) {
+  public void setValue(
+    final Object value) {
     this.value = value;
   }
 
-  public Object getValue() {
-    return value;
+  public <T> T getValue() {
+    return (T)value;
   }
 
   /**
@@ -134,7 +145,8 @@ public abstract class Field extends Element {
   /**
    * @param initialValue The initialValue to set.
    */
-  public void setInitialValue(Object initialValue) {
+  public void setInitialValue(
+    Object initialValue) {
     this.initialValue = initialValue;
   }
 

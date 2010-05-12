@@ -17,6 +17,7 @@ package com.revolsys.orm.hibernate.callback;
 
 import java.sql.SQLException;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
@@ -29,7 +30,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  * 
  * @author Paul Austin
  */
-public class HibernateNamedQueryCallback implements HibernateCallback {
+public class HibernateNamedQueryCallback implements HibernateCallback<Query> {
   /** The name of the query. */
   private String queryName;
 
@@ -43,13 +44,13 @@ public class HibernateNamedQueryCallback implements HibernateCallback {
   }
 
   /**
-   * Peform the action.
+   * Perform the action.
    * 
-   * @param session The hibernate session.
+   * @param session The Hibernate session.
    * @return The result of the action.
    * @throws SQLException If a SQL exception occurs.
    */
-  public Object doInHibernate(final Session session) throws SQLException {
+  public Query doInHibernate(final Session session) throws SQLException {
     return session.getNamedQuery(queryName);
   }
 }

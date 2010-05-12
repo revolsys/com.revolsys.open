@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
@@ -57,7 +56,7 @@ public class DetailView extends Element {
     this.numColumns = numColumns;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     int size = serializer.getSize();
     if (size > 0) {
       out.startTag(HtmlUtil.DIV);

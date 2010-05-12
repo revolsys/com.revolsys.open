@@ -1,5 +1,6 @@
 package com.revolsys.gis.moep.io;
 
+import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -73,6 +73,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private long position = 0;
 
+  private String mapsheet;
+
   public MoepBinaryIterator(
     final MoepDirectoryReader directoryReader,
     final String fileName,
@@ -106,7 +108,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
         originalFileType = "unknown";
       break;
     }
-    this.in = in;
+    this.in = new BufferedInputStream(in, 10000);
+    this.mapsheet = getMapsheetFromFileName(fileName);
     try {
       loadHeader();
     } catch (final IOException e) {
@@ -163,6 +166,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       final int featureType = featureKey % 10;
       final byte numBytes = (byte)read();
       final DataObject object = dataObjectFactory.createDataObject(MoepConstants.META_DATA);
+      object.setValue(MoepConstants.MAPSHEET_NAME, mapsheet);
       object.setValue(MoepConstants.FEATURE_CODE, featureCode);
       object.setValue(MoepConstants.ORIGINAL_FILE_TYPE, originalFileType);
       String attribute = null;

@@ -25,33 +25,39 @@ public class SpringDaoFactory implements BeanFactoryAware,
 
   /**
    * Get the {@link DataAccessObject} from the bean factory. The Data Access
-   * Object will be loaded from the bean "dao:" + objectClass.name.
+   * Object will be loaded from the bean objectClass.name+"-dao".
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param factory The springframework bean factory used to get the Data Access
    *          Objects.
    * @param objectClass The class of the entity to get the Data Access Object
    *          for.
    * @return The Data Access Object instance.
    */
-  public static DataAccessObject get(final BeanFactory factory,
-    final Class objectClass) {
-    return get(factory, objectClass.getName());
+  @SuppressWarnings("unchecked")
+  public static <T extends DataAccessObject<?>> T get(
+    final BeanFactory factory,
+    final Class<?> objectClass) {
+    return (T)get(factory, objectClass.getName());
   }
 
   /**
    * Get the {@link DataAccessObject} from the bean factory. The Data Access
-   * Object will be loaded from the bean "dao:" + objectClassName.
+   * Object will be loaded from the bean objectClassName+"-dao".
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param factory The springframework bean factory used to get the Data Access
    *          Objects.
    * @param objectClassName The name of the class of the entity to get the Data
    *          Access Object for.
    * @return The Data Access Object instance.
    */
-  public static DataAccessObject get(final BeanFactory factory,
+  @SuppressWarnings("unchecked")
+  public static <T extends DataAccessObject<?>> T get(
+    final BeanFactory factory,
     final String objectClassName) {
-    Object bean = factory.getBean("dao:" + objectClassName);
-    return get(bean);
+    Object bean = factory.getBean(objectClassName + "-dao");
+    return (T)get(bean);
   }
 
   /**
@@ -62,15 +68,18 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * instance of {@link DataAccessObject} it will be returned. Any other types
    * of objects will cause an {@link IllegalArgumentException} to be thrown.
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param bean The bean.
    * @return The DataAccessObject instance.
    */
-  private static DataAccessObject get(final Object bean) {
+  @SuppressWarnings("unchecked")
+  private static <T extends DataAccessObject<?>> T get(
+    final Object bean) {
     if (bean instanceof DaoProxyFactory) {
       DaoProxyFactory proxyFactory = (DaoProxyFactory)bean;
-      return proxyFactory.createDataAccessObject(null);
-    } else if (bean instanceof DataAccessObject) {
-      return (DataAccessObject)bean;
+      return (T)proxyFactory.createDataAccessObject(null);
+    } else if (bean instanceof DataAccessObject<?>) {
+      return (T)bean;
     }
     throw new IllegalArgumentException(bean.getClass().getName()
       + " is not a valid data access object");
@@ -88,7 +97,8 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * @param beanFactory The springframework bean factory used to get the Data
    *          Access Objects.
    */
-  public SpringDaoFactory(final BeanFactory beanFactory) {
+  public SpringDaoFactory(
+    final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
@@ -98,7 +108,8 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * @param beanFactory The springframework bean factory used to get the Data
    *          Access Objects.
    */
-  public void setBeanFactory(final BeanFactory beanFactory) {
+  public void setBeanFactory(
+    final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
@@ -106,23 +117,29 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * Get the {@link DataAccessObject} from the bean factory. The Data Access
    * Object will be loaded from the bean "dao:" + objectClass.name.
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param objectClass The class of the entity to get the Data Access Object
    *          for.
    * @return The Data Access Object instance.
    */
-  public DataAccessObject get(final Class objectClass) {
-    return get(beanFactory, objectClass.getName());
+  @SuppressWarnings("unchecked")
+  public <T extends DataAccessObject<?>> T get(
+    final Class<?> objectClass) {
+    return (T)get(beanFactory, objectClass.getName());
   }
 
   /**
    * Get the {@link DataAccessObject} from the bean factory. The Data Access
    * Object will be loaded from the bean "dao:" + objectClassName.
    * 
+   * @param <T> The DataAccessObject class expected to be returned.
    * @param objectClassName The name of the class of the entity to get the Data
    *          Access Object for.
    * @return The Data Access Object instance.
    */
-  public DataAccessObject get(final String objectClassName) {
-    return get(beanFactory, objectClassName);
+  @SuppressWarnings("unchecked")
+  public <T extends DataAccessObject<?>> T get(
+    final String objectClassName) {
+    return (T)get(beanFactory, objectClassName);
   }
 }

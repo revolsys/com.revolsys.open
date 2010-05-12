@@ -29,8 +29,9 @@ import java.util.List;
  * </p>
  * 
  * @author Paul Austin
+ * @param <T> The type of object to page.
  */
-public interface ResultPager {
+public interface ResultPager<T> {
   /**
    * Get the number of pages.
    * 
@@ -43,7 +44,7 @@ public interface ResultPager {
    * 
    * @return The list of objects in the current page.
    */
-  <T> List<T> getList();
+  List<T> getList();
 
   /**
    * Get the total number of results returned.
@@ -127,12 +128,14 @@ public interface ResultPager {
    * 
    * @param pageNumber The current page number.
    */
-  void setPageNumber(int pageNumber);
+  void setPageNumber(
+    int pageNumber);
 
   /**
    * Set the number of objects per page.
    * 
    * @param pageSize The number of objects per page.
    */
-  void setPageSize(int pageSize);
+  void setPageSize(
+    int pageSize);
 }

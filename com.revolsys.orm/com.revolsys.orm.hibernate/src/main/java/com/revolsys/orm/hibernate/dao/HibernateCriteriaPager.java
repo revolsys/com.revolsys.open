@@ -30,10 +30,11 @@ import com.revolsys.orm.core.ResultPager;
  * allows paging over a Hibernate {@link Query}.
  * 
  * @author Paul Austin
+ * @param <T> The type of results.
  */
-public class HibernateCriteriaPager implements ResultPager {
+public class HibernateCriteriaPager<T> implements ResultPager<T> {
   /** The objects in the current page. */
-  private List results;
+  private List<T> results;
 
   /** The number of objects in a page. */
   private int pageSize = 10;
@@ -90,7 +91,7 @@ public class HibernateCriteriaPager implements ResultPager {
    * 
    * @return The list of objects in the current page.
    */
-  public <T> List<T> getList() {
+  public List<T> getList() {
     if (results == null) {
       throw new IllegalStateException(
         "The page number must be set using setPageNumber");

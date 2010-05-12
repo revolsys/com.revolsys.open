@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -77,7 +76,7 @@ public class HiddenField extends Field {
     return valid;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeHiddenInput(out, getName(), inputValue);
   }
 }

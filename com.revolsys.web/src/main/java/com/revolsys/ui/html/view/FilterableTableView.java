@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,7 +64,7 @@ public class FilterableTableView extends ElementContainer {
     super.initialize(request);
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     int rowCount = model.getBodyRowCount();
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.DIV);
@@ -95,7 +94,7 @@ public class FilterableTableView extends ElementContainer {
     out.endTag(HtmlUtil.DIV);
   }
 
-  protected void serializeHeadings(final XmlWriter out) throws IOException {
+  protected void serializeHeadings(final XmlWriter out) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.THEAD);
     out.startTag(HtmlUtil.TR);
@@ -121,7 +120,7 @@ public class FilterableTableView extends ElementContainer {
     out.endTag(HtmlUtil.THEAD);
   }
 
-  protected void serializeRows(final XmlWriter out) throws IOException {
+  protected void serializeRows(final XmlWriter out) {
     for (Element element : getElements()) {
       element.serialize(out);
     }
@@ -135,7 +134,7 @@ public class FilterableTableView extends ElementContainer {
   }
 
   protected void serializeRow(final XmlWriter out, final int row,
-    final int rowCount) throws IOException {
+    final int rowCount) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
     String rowCss = "";
@@ -169,7 +168,7 @@ public class FilterableTableView extends ElementContainer {
     out.endTag(HtmlUtil.TR);
   }
 
-  protected void serializeFooter(final XmlWriter out) throws IOException {
+  protected void serializeFooter(final XmlWriter out) {
     int rowCount = model.getFooterRowCount();
     if (rowCount > 0) {
       out.startTag(HtmlUtil.TFOOT);
@@ -181,7 +180,7 @@ public class FilterableTableView extends ElementContainer {
   }
 
   protected void serializeFooterRow(final XmlWriter out, final int row,
-    final int rowCount) throws IOException {
+    final int rowCount) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
     String rowCss = "";

@@ -26,7 +26,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionStatus;
@@ -41,7 +42,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @version 1.0
  */
 public class TransactionFilter implements Filter {
-  private static final Logger log = Logger.getLogger(TransactionFilter.class);
+  private static final Logger log = LoggerFactory.getLogger(TransactionFilter.class);
 
   private WebApplicationContext applicationContext;
 
@@ -82,7 +83,7 @@ public class TransactionFilter implements Filter {
             cause = servletCause;
           }
         }
-        Log4jJ2eeUtil.logRequestException(log, (HttpServletRequest)request,
+        HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request,
           cause);
         if (cause instanceof RuntimeException) {
           throw (RuntimeException)cause;
@@ -96,7 +97,7 @@ public class TransactionFilter implements Filter {
           throw new ServletException(cause.getMessage(), cause);
         }
       } else {
-        Log4jJ2eeUtil.logRequestException(log, (HttpServletRequest)request,
+        HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request,
           cause);
         throw e;
       }

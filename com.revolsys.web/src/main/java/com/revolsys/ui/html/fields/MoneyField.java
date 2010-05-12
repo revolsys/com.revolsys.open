@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.io.IOException;
 
 import com.revolsys.xml.io.XmlWriter;
 
@@ -28,7 +27,7 @@ public class MoneyField extends BigDecimalField {
     super(name, 2, required);
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     out.write("$ ");
     super.serializeElement(out);
   }

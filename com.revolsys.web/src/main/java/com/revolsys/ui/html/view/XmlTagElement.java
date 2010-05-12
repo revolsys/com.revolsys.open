@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
@@ -40,7 +39,7 @@ public class XmlTagElement extends Element {
     this.content = content;
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeTag(out, tag, content);
   }
 }

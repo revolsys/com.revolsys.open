@@ -8,11 +8,7 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
-import org.springframework.core.PriorityOrdered;
 
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.tools.ThreadSharedAttributes;

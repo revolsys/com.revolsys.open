@@ -20,7 +20,7 @@ public class StringSerializer implements TypeSerializer {
    * @throws IOException If there was an I/O error serializing the value.
    */
   public void serialize(final XmlWriter out, final Object value,
-    final Locale locale) throws IOException {
+    final Locale locale) {
     String stringValue = value.toString();
     if (stringValue.length() == 0) {
       out.text('-');

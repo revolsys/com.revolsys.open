@@ -12,6 +12,8 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
   private static final Pattern FIND_NAME_PATTERN = Pattern.compile(".*("
     + BcgsConstants.REGEX_20000 + ").*");
 
+  public static final Bcgs20000RectangularMapGrid INSTANCE = new Bcgs20000RectangularMapGrid();
+
   @Override
   public String getFormattedMapTileName(
     String name) {

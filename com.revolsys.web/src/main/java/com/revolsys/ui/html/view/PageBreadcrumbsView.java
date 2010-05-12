@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.io.IOException;
-
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
@@ -43,7 +41,7 @@ public class PageBreadcrumbsView extends ObjectView {
     }
   }
 
-  public void serializeElement(final XmlWriter out) throws IOException {
+  public void serializeElement(final XmlWriter out) {
     Page page = (Page)getObject();
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
@@ -56,7 +54,7 @@ public class PageBreadcrumbsView extends ObjectView {
   }
 
   private void crumb(final XmlWriter out, final Page page, final boolean current)
-    throws IOException {
+    {
     if (page == null) {
       out.startTag(HtmlUtil.LI);
       out.startTag(HtmlUtil.A);

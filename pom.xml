@@ -168,8 +168,8 @@
     <cargo.tomcat.manager.url>http://localhost:8080/manager</cargo.tomcat.manager.url>
     <cargo.remote.username>admin</cargo.remote.username>
     <cargo.remote.password>manager</cargo.remote.password>
-    <org.slf4j.version>1.5.10</org.slf4j.version>
-		<org.springframework.version>3.0.1.RELEASE</org.springframework.version>
+    <org.slf4j.version>1.5.11</org.slf4j.version>
+		<org.springframework.version>3.0.2.RELEASE</org.springframework.version>
 		<org.springframework.security.version>3.0.2.RELEASE</org.springframework.security.version>
 	</properties>
 </project>

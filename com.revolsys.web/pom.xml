@@ -113,8 +113,4 @@
       <uniqueVersion>false</uniqueVersion>
   	</snapshotRepository>
   </distributionManagement>
-  <properties>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<org.springframework.version>3.0.1.RELEASE</org.springframework.version>
-	</properties>
 </project>

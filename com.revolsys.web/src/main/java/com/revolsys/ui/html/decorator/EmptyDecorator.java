@@ -15,14 +15,12 @@
  */
 package com.revolsys.ui.html.decorator;
 
-import java.io.IOException;
 
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.xml.io.XmlWriter;
 
 public class EmptyDecorator implements Decorator {
-  public void serialize(final XmlWriter out, final Element element)
-    throws IOException {
+  public void serialize(final XmlWriter out, final Element element) {
     element.serializeElement(out);
   }
 }

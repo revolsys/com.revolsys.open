@@ -534,7 +534,6 @@ public final class JtsGeometryUtil {
     return factory.createLinearRing(coordinates2d);
   }
 
-
   public static List<Coordinate> getCoordinateList(
     final LineString line) {
     return new ArrayList<Coordinate>(Arrays.asList(line.getCoordinates()));
@@ -1655,5 +1654,14 @@ public final class JtsGeometryUtil {
   }
 
   private JtsGeometryUtil() {
+  }
+
+  public static Collection<LineString> getLines(
+    MultiLineString multiLine) {
+    List<LineString> lines = new ArrayList<LineString>();
+    for (int i = 0; i < multiLine.getNumGeometries(); i++) {
+      lines.add((LineString)multiLine.getGeometryN(i));
+    }
+    return lines;
   }
 }
