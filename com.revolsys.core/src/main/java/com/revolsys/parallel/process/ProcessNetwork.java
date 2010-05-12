@@ -3,7 +3,9 @@ package com.revolsys.parallel.process;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
@@ -69,6 +71,10 @@ public class ProcessNetwork implements BeanPostProcessor {
 
   synchronized void removeProcess(
     final Process process) {
+    if (process instanceof AbstractProcess) {
+      AbstractProcess proc = (AbstractProcess)process;
+      proc.setProcessNetwork(null);
+    }
     processes.remove(process);
     count--;
     if (count == 0) {
@@ -86,7 +92,13 @@ public class ProcessNetwork implements BeanPostProcessor {
 
   public synchronized void start() {
     running = true;
-    for (final Thread thread : processes.values()) {
+    for (final Entry<Process, Thread> entry : processes.entrySet()) {
+      Process process = entry.getKey();
+      if (process instanceof AbstractProcess) {
+        AbstractProcess proc = (AbstractProcess)process;
+        proc.setProcessNetwork(this);
+      }
+      Thread thread = entry.getValue();
       startProcess(thread);
     }
   }
@@ -107,7 +119,7 @@ public class ProcessNetwork implements BeanPostProcessor {
   @SuppressWarnings("deprecation")
   @PreDestroy
   public void stop() {
-    final ArrayList<Thread> processesToStop = new ArrayList<Thread>(
+    final List<Thread> processesToStop = new ArrayList<Thread>(
       processes.values());
     for (final Thread thread : processesToStop) {
       if (thread.isAlive()) {
