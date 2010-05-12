@@ -65,7 +65,7 @@ public class JdbcAttribute extends Attribute {
     return columnIndex + 1;
   }
 
-  public final int setInsertPreparedStatementValue(
+  public  int setInsertPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
     final DataObject object)

@@ -1,6 +1,7 @@
 package com.revolsys.gis.oracle.esri;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.JdbcUtils;
@@ -75,17 +77,34 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
 
   @Override
   protected ArcSdeObjectIdJdbcAttribute clone() {
-    return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(), getScale(), isRequired(), getProperties(), schemaName, registrationId);
+    return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(),
+      getScale(), isRequired(), getProperties(), schemaName, registrationId);
   }
-  
+
+  /**
+   * Generate an OBJECT ID using ESRI's sde.version_user_ddl.next_row_id
+   * function.
+   */
   @Override
   public void addInsertStatementPlaceHolder(
     final StringBuffer sql,
     final boolean generateKeys) {
-    sql.append("NVL(?, sde.version_user_ddl.next_row_id('");
+    sql.append(" sde.version_user_ddl.next_row_id('");
     sql.append(schemaName);
     sql.append("', ");
     sql.append(registrationId);
-    sql.append("))");
+    sql.append(")");
+  }
+
+  /**
+   * Ignore any inserted value.
+   */
+  @Override
+  public int setInsertPreparedStatementValue(
+    PreparedStatement statement,
+    int parameterIndex,
+    DataObject object)
+    throws SQLException {
+    return parameterIndex;
   }
 }
