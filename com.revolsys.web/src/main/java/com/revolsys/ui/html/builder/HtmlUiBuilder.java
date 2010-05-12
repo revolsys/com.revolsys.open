@@ -94,11 +94,13 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
 
   private Map<String, String> fieldInstructions = new HashMap<String, String>();
 
-  private Map<String, Decorator> fieldLabels = new HashMap<String, Decorator>();
+  private final Map<String, Decorator> fieldLabels = new HashMap<String, Decorator>();
 
   private Map<String, Element> fields = new HashMap<String, Element>();
 
   protected String idParameterName;
+
+  protected String idPropertyName = "id";
 
   /** The map of key lists for list views. */
   private Map<String, List<String>> keyLists = new HashMap<String, List<String>>();
@@ -122,13 +124,13 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   protected String typeName;
 
   public HtmlUiBuilder() {
-    Class<?> clazz = getClass();
-    Method[] methods = clazz.getMethods();
+    final Class<?> clazz = getClass();
+    final Method[] methods = clazz.getMethods();
     for (int i = 0; i < methods.length; i++) {
-      Method method = methods[i];
-      String name = method.getName();
+      final Method method = methods[i];
+      final String name = method.getName();
 
-      Class<?>[] parameterTypes = method.getParameterTypes();
+      final Class<?>[] parameterTypes = method.getParameterTypes();
       if (parameterTypes.length == 2) {
         if (parameterTypes[0] == XmlWriter.class) {
           if (parameterTypes[1] == Object.class) {
@@ -161,7 +163,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public HtmlUiBuilder(
     final String typeName,
     final String title,
-    String pluralTitle) {
+    final String pluralTitle) {
     this();
     setTypeName(typeName);
     this.title = title;
@@ -178,7 +180,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final ElementContainer view,
     final String messageName,
     final Map<String, Object> variables) {
-    String message = getMessage(messageName, variables);
+    final String message = getMessage(messageName, variables);
     if (message != null) {
       view.add(new RawContent(message));
     }
@@ -199,7 +201,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String cssClass,
     final List<String> keys,
     final Locale locale) {
-    HtmlUiBuilderDetailSerializer model = new HtmlUiBuilderDetailSerializer(
+    final HtmlUiBuilderDetailSerializer model = new HtmlUiBuilderDetailSerializer(
       this, keys, locale);
     model.setObject(object);
     return new DetailView(model, cssClass);
@@ -219,7 +221,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final List<String> keys,
     final Locale locale) {
 
-    HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
+    final HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
       this, keys, locale);
     return new FilterableTableView(this, model, cssClass + " " + typeName,
       title, keys);
@@ -231,8 +233,28 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String title,
     final String keyList,
     final Locale locale) {
-    List<String> keyListkeyList = getKeyList(keyList);
+    final List<String> keyListkeyList = getKeyList(keyList);
     return createFilterableTableView(cssClass, title, keyListkeyList, locale);
+  }
+
+  /**
+   * Create a form for the object using the specified list of fields keys. The
+   * form is created without the form title.
+   * 
+   * @param <T> The type of form to return.
+   * @param object The object to create the form for.
+   * @param fieldKeys The list of keys for the fields to include on the form.
+   * @param locale The locale.
+   * @return The generated form.
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends Form> T createForm(
+    final Object object,
+    final List<String> fieldKeys,
+    final Locale locale) {
+    final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(),
+      fieldKeys, locale);
+    return (T)form;
   }
 
   public <F extends Form> F createForm(
@@ -240,8 +262,29 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String formName,
     final List<String> keys,
     final Locale locale) {
-    HtmlUiBuilderObjectForm form = new HtmlUiBuilderObjectForm(object, this,
-      formName, keys);
+    final HtmlUiBuilderObjectForm form = new HtmlUiBuilderObjectForm(object,
+      this, formName, keys);
+    return (F)form;
+  }
+
+  /**
+   * Create a form for the object using the specified list of fields keys. The
+   * form is created without the form title.
+   * 
+   * @param <T> The type of form to return.
+   * @param object The object to create the form for.
+   * @param keyListName The name of the list of keys for the fields to include
+   *          on the form.
+   * @param locale The locale.
+   * @return The generated form.
+   */
+  @SuppressWarnings("unchecked")
+  public <F extends Form> F createForm(
+    final Object object,
+    final String keyListName,
+    final Locale locale) {
+    final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(),
+      getKeyList(keyListName), locale);
     return (F)form;
   }
 
@@ -250,7 +293,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String formName,
     final String keyList,
     final Locale locale) {
-    List<String> keys = getKeyList(keyList);
+    final List<String> keys = getKeyList(keyList);
 
     return (F)createForm(object, formName, keys, locale);
   }
@@ -261,7 +304,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String title,
     final List<String> keys,
     final Locale locale) {
-    HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
+    final HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
       this, keys, locale);
     model.setRows(rows);
     return new TableView(model, cssClass + " " + typeName, title);
@@ -274,8 +317,15 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String title,
     final String keyListName,
     final Locale locale) {
-    List<String> keys = getKeyList(keyListName);
+    final List<String> keys = getKeyList(keyListName);
     return createTableView(rows, cssClass, title, keys, locale);
+  }
+
+  public <T> TableView createTableView(
+    final Collection<T> results,
+    final String keyListName,
+    final Locale locale) {
+    return createTableView(results, null, null, keyListName, locale);
   }
 
   /**
@@ -324,9 +374,9 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public HtmlUiBuilder getBuilder(
     final String className) {
     try {
-      Class<?> clazz = Class.forName(className);
+      final Class<?> clazz = Class.forName(className);
       return getBuilder(clazz);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       return null;
     }
   }
@@ -384,17 +434,17 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     if (key.equals("id")) {
       return new LongField("id", false);
     } else if (fields.containsKey(key)) {
-      Element field = fields.get(key);
+      final Element field = fields.get(key);
       return field.clone();
     } else {
-      TextField field = new TextField(key, false);
+      final TextField field = new TextField(key, false);
       return field;
     }
   }
 
   public String getFieldInstruction(
     final String key) {
-    return (String)fieldInstructions.get(key);
+    return fieldInstructions.get(key);
   }
 
   public Map<String, String> getFieldInstructions() {
@@ -404,11 +454,11 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public Decorator getFieldLabel(
     final String key,
     final boolean field) {
-    Map<String, Decorator> fieldLabels = getFieldLabels();
+    final Map<String, Decorator> fieldLabels = getFieldLabels();
     Decorator fieldLabel = fieldLabels.get(key);
     if (fieldLabel == null) {
-      String label = getLabel(key);
-      String instructions = getFieldInstruction(key);
+      final String label = getLabel(key);
+      final String instructions = getFieldInstruction(key);
       if (field) {
         fieldLabel = new FieldLabelDecorator(label, instructions);
       } else {
@@ -432,6 +482,10 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
    */
   public String getIdParameterName() {
     return idParameterName;
+  }
+
+  public String getIdPropertyName() {
+    return idPropertyName;
   }
 
   /**
@@ -537,13 +591,13 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public String getLabel(
     final String key,
     final Locale locale) {
-    String label = (String)getLabels().get(key);
+    String label = getLabels().get(key);
     if (label == null) {
-      Matcher subKeyMatcher = SUB_KEY_PATTERN.matcher(key);
+      final Matcher subKeyMatcher = SUB_KEY_PATTERN.matcher(key);
       if (subKeyMatcher.find() && subKeyMatcher.group(2) != null) {
         label = getLabel(subKeyMatcher.group(1));
       } else {
-        Matcher linkbKeyMatcher = LINK_KEY_PATTERN.matcher(key);
+        final Matcher linkbKeyMatcher = LINK_KEY_PATTERN.matcher(key);
         if (linkbKeyMatcher.find()) {
           label = getLabel(linkbKeyMatcher.group(2));
         } else {
@@ -561,22 +615,22 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
 
   public String getMessage(
     final String messageName) {
-    return (String)messages.get(messageName);
+    return messages.get(messageName);
   }
 
   public String getMessage(
     final String messageName,
     final Map<String, Object> variables) {
-    String message = getMessage(messageName);
+    final String message = getMessage(messageName);
     if (message != null) {
       try {
-        Expression expression = JexlUtil.createExpression(message);
+        final Expression expression = JexlUtil.createExpression(message);
         if (expression != null) {
-          JexlContext context = new HashMapContext();
+          final JexlContext context = new HashMapContext();
           context.setVars(variables);
           return (String)expression.evaluate(context);
         }
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -585,7 +639,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
 
   private String getNullLabel(
     final String key) {
-    return (String)nullLabels.get(key);
+    return nullLabels.get(key);
   }
 
   /**
@@ -597,14 +651,14 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
 
   public String getPageUrl(
     final String name) {
-    String url = pageUrls.get(name);
+    final String url = pageUrls.get(name);
     return url;
   }
 
   public String getPageUrl(
-    String name,
-    Map<String, ? extends Object> parameters) {
-    String url = pageUrls.get(name);
+    final String name,
+    final Map<String, ? extends Object> parameters) {
+    final String url = pageUrls.get(name);
     if (url == null) {
       return null;
     } else {
@@ -632,12 +686,12 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String url,
     final Map<String, ? extends Object> parameters) {
     try {
-      Expression expression = JexlUtil.createExpression(url);
+      final Expression expression = JexlUtil.createExpression(url);
       if (expression != null) {
         context.setAttributes(parameters);
         return (String)JexlUtil.evaluateExpression(context, expression);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
     } finally {
       context.clearAttributes();
     }
@@ -645,7 +699,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   }
 
   public boolean hasPageUrl(
-    String pageName) {
+    final String pageName) {
     return pageUrls.containsKey(pageName);
   }
 
@@ -679,38 +733,38 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
 
     if (object != null) {
 
-      int dotIndex = key.indexOf('.');
+      final int dotIndex = key.indexOf('.');
       if (dotIndex != -1) {
-        String keyName = key.substring(0, dotIndex);
-        String subKey = key.substring(dotIndex + 1);
+        final String keyName = key.substring(0, dotIndex);
+        final String subKey = key.substring(dotIndex + 1);
 
         try {
-          Object subObject = JavaBeanUtil.getProperty(object, keyName);
+          final Object subObject = JavaBeanUtil.getProperty(object, keyName);
           if (subObject != null) {
-            HtmlUiBuilder subBuilder = getBuilder(subObject);
+            final HtmlUiBuilder subBuilder = getBuilder(subObject);
             if (subBuilder != null) {
               subBuilder.serialize(out, subObject, subKey, locale);
               return;
             }
           }
-        } catch (IllegalArgumentException e) {
-          String message = object.getClass().getName()
+        } catch (final IllegalArgumentException e) {
+          final String message = object.getClass().getName()
             + " does not have a property " + keyName;
           log.error(e.getMessage(), e);
           out.element(HtmlUtil.B, message);
         }
       } else {
-        Object serializer = keySerializers.get(key);
+        final Object serializer = keySerializers.get(key);
         if (serializer == null) {
-          Matcher linkMatcher = LINK_KEY_PATTERN.matcher(key);
+          final Matcher linkMatcher = LINK_KEY_PATTERN.matcher(key);
           if (linkMatcher.matches()) {
-            String path = linkMatcher.group(1);
-            String textKey = linkMatcher.group(2);
+            final String path = linkMatcher.group(1);
+            final String textKey = linkMatcher.group(2);
 
-            Page page = WebUiContext.get().getPage();
+            final Page page = WebUiContext.get().getPage();
             Page linkPage = page.getPage(path);
             if (linkPage == null) {
-              String pageByName = pageUrls.get(path);
+              final String pageByName = pageUrls.get(path);
               if (pageByName != null) {
                 linkPage = new Page(null, null, pageByName, false);
               } else {
@@ -719,7 +773,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
             }
             if (linkPage != null) {
               out.startTag(HtmlUtil.A);
-              final Object id = JavaBeanUtil.getProperty(object, "id");
+              final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
               final Map<String, Object> parameters = Collections.singletonMap(
                 idParameterName, id);
               final String url = linkPage.getFullUrl(parameters);
@@ -730,11 +784,11 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
             return;
           } else {
             try {
-              Object value = JavaBeanUtil.getProperty(object, key);
+              final Object value = JavaBeanUtil.getProperty(object, key);
               if (value != null) {
-                TypeSerializer typeSerializer = (TypeSerializer)classSerializers.get(value.getClass());
+                final TypeSerializer typeSerializer = classSerializers.get(value.getClass());
                 if (typeSerializer == null) {
-                  String stringValue = value.toString();
+                  final String stringValue = value.toString();
                   if (stringValue.length() > 0) {
                     out.text(stringValue);
                     return;
@@ -744,8 +798,8 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
                   return;
                 }
               }
-            } catch (IllegalArgumentException e) {
-              String message = object.getClass().getName()
+            } catch (final IllegalArgumentException e) {
+              final String message = object.getClass().getName()
                 + " does not have a property " + key;
               log.error(e.getMessage(), e);
               out.element(HtmlUtil.B, message);
@@ -754,11 +808,11 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
           }
         } else {
           if (serializer instanceof TypeSerializer) {
-            TypeSerializer typeSerializer = (TypeSerializer)serializer;
+            final TypeSerializer typeSerializer = (TypeSerializer)serializer;
             typeSerializer.serialize(out, object, locale);
             return;
           } else if (serializer instanceof KeySerializer) {
-            KeySerializer keySerializer = (KeySerializer)serializer;
+            final KeySerializer keySerializer = (KeySerializer)serializer;
             keySerializer.serialize(out, object, key, locale);
             return;
           }
@@ -772,10 +826,11 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final XmlWriter out,
     final String pageName,
     final Object object) {
-    Object id = JavaBeanUtil.getProperty(object, "id");
+    final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
     if (id != null) {
-      Map<String, Object> parameters = Collections.singletonMap("id", id);
-      String url = getPageUrl(pageName, parameters);
+      final Map<String, Object> parameters = Collections.singletonMap(
+        idParameterName, id);
+      final String url = getPageUrl(pageName, parameters);
       HtmlUtil.serializeA(out, null, url, id);
     }
   }
@@ -783,20 +838,22 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public void serializeLink(
     final XmlWriter out,
     final String pageName,
-    final Object object) {
-    Object id = JavaBeanUtil.getProperty(object, "id");
-    Map<String, Object> parameters = Collections.singletonMap("id", id);
-    String url = getPageUrl(pageName, parameters);
-    HtmlUtil.serializeA(out, null, url, pageName);
+    final Long id) {
+    final Map<String, Long> parameters = Collections.singletonMap(
+      idParameterName, id);
+    final String url = getPageUrl(pageName, parameters);
+    HtmlUtil.serializeA(out, null, url, id);
   }
 
   public void serializeLink(
     final XmlWriter out,
     final String pageName,
-    final Long id) {
-    Map<String, Long> parameters = Collections.singletonMap("id", id);
-    String url = getPageUrl(pageName, parameters);
-    HtmlUtil.serializeA(out, null, url, id);
+    final Object object) {
+    final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
+    final Map<String, Object> parameters = Collections.singletonMap(
+      idParameterName, id);
+    final String url = getPageUrl(pageName, parameters);
+    HtmlUtil.serializeA(out, null, url, pageName);
   }
 
   /**
@@ -812,9 +869,9 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final XmlWriter out,
     final String key,
     final Locale locale) {
-    String nullLabel = getNullLabel(key);
+    final String nullLabel = getNullLabel(key);
     if (nullLabel == null) {
-      int dotIndex = key.lastIndexOf('.');
+      final int dotIndex = key.lastIndexOf('.');
       if (dotIndex == -1) {
         out.text("-");
       } else {
@@ -849,7 +906,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   }
 
   public void setFields(
-    Map<String, Element> fields) {
+    final Map<String, Element> fields) {
     this.fields = fields;
   }
 
@@ -859,6 +916,11 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public void setIdParameterName(
     final String idParameterName) {
     this.idParameterName = idParameterName;
+  }
+
+  public void setIdPropertyName(
+    final String idPropertyName) {
+    this.idPropertyName = idPropertyName;
   }
 
   /**
@@ -922,27 +984,27 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   }
 
   public void setPageUrls(
-    Map<String, String> pageUrls) {
+    final Map<String, String> pageUrls) {
     this.pageUrls = pageUrls;
   }
 
   public void setPluralTitle(
-    String pluralTitle) {
+    final String pluralTitle) {
     this.pluralTitle = pluralTitle;
   }
 
   public void setServletContext(
-    ServletContext servletContext) {
+    final ServletContext servletContext) {
     context = new HttpServletRequestJexlContext(servletContext);
   }
 
   public void setTitle(
-    String typeLabel) {
+    final String typeLabel) {
     this.title = typeLabel;
   }
 
   public void setTypeName(
-    String typeName) {
+    final String typeName) {
     this.typeName = typeName;
     if (idParameterName == null) {
       this.idParameterName = typeName + "Id";
@@ -952,53 +1014,5 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
   public boolean validateForm(
     final HtmlUiBuilderObjectForm form) {
     return true;
-  }
-
-  /**
-   * Create a form for the object using the specified list of fields keys. The
-   * form is created without the form title.
-   * 
-   * @param <T> The type of form to return.
-   * @param object The object to create the form for.
-   * @param fieldKeys The list of keys for the fields to include on the form.
-   * @param locale The locale.
-   * @return The generated form.
-   */
-  @SuppressWarnings("unchecked")
-  public <T extends Form> T createForm(
-    final Object object,
-    final List<String> fieldKeys,
-    final Locale locale) {
-    final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(),
-      fieldKeys, locale);
-    return (T)form;
-  }
-
-  /**
-   * Create a form for the object using the specified list of fields keys. The
-   * form is created without the form title.
-   * 
-   * @param <T> The type of form to return.
-   * @param object The object to create the form for.
-   * @param keyListName The name of the list of keys for the fields to include
-   *          on the form.
-   * @param locale The locale.
-   * @return The generated form.
-   */
-  @SuppressWarnings("unchecked")
-  public <F extends Form> F createForm(
-    final Object object,
-    final String keyListName,
-    final Locale locale) {
-    final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(),
-      getKeyList(keyListName), locale);
-    return (F)form;
-  }
-
-  public <T> TableView createTableView(
-    Collection<T> results,
-    String keyListName,
-    Locale locale) {
-    return createTableView(results, null, null, keyListName, locale);
   }
 }
