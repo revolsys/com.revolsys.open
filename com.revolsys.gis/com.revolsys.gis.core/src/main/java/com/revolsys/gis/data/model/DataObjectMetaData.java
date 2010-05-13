@@ -108,16 +108,19 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   DataType getAttributeType(
     int index);
 
+  DataType getAttributeType(
+    String name);
+
+  DataObjectFactory getDataObjectFactory();
+
+  DataObjectMetaDataFactory getDataObjectMetaDataFactory();
+
   DataObjectStore getDataObjectStore();
 
   Object getDefaultValue(
     String attributeName);
 
   Map<String, Object> getDefaultValues();
-
-  DataObjectFactory getDataObjectFactory();
-
-  DataObjectMetaDataFactory getDataObjectMetaDataFactory();
 
   Attribute getGeometryAttribute();
 

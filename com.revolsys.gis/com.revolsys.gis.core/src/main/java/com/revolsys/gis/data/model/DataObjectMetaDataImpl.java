@@ -81,6 +81,16 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     setIdAttributeIndex(metaData.getIdAttributeIndex());
   }
 
+  public DataType getAttributeType(
+    String name) {
+    final int index = getAttributeIndex(name);
+    if (index == -1) {
+      return null;
+    } else {
+      return getAttributeType(index);
+    }
+  }
+
   public DataObjectMetaDataImpl(
     final DataObjectStore dataObjectStore,
     final DataObjectStoreSchema schema,
