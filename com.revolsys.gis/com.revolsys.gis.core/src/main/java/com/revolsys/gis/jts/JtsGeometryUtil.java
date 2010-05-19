@@ -191,7 +191,7 @@ public final class JtsGeometryUtil {
     final Geometry newGeometry) {
     final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(oldGeometry);
     if (userData != null) {
-      newGeometry.setUserData(new HashMap<String, Object>(userData));
+      newGeometry.setUserData(new TreeMap<String, Object>(userData));
     }
   }
 

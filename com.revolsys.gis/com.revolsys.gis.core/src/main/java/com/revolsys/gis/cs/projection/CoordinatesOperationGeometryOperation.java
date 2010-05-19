@@ -2,8 +2,8 @@ package com.revolsys.gis.cs.projection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -41,7 +41,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     if (userData != null) {
       if (userData instanceof Map) {
         final Map attrs = (Map)userData;
-        newGeometry.setUserData(new HashMap(attrs));
+        newGeometry.setUserData(new TreeMap(attrs));
       } else {
         newGeometry.setUserData(userData);
       }
