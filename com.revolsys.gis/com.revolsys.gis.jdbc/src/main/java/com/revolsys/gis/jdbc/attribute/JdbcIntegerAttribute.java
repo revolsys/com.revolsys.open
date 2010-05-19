@@ -23,7 +23,7 @@ public class JdbcIntegerAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected JdbcIntegerAttribute clone() {
+  public JdbcIntegerAttribute clone() {
     return new JdbcIntegerAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
   }
   @Override

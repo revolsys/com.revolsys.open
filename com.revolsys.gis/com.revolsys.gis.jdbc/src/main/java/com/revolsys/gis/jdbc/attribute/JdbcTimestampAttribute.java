@@ -20,7 +20,7 @@ public class JdbcTimestampAttribute extends JdbcAttribute {
     super(name, DataTypes.DATE_TIME, sqlType, 0, 0, required, properties);
   }
   @Override
-  protected JdbcTimestampAttribute clone() {
+  public JdbcTimestampAttribute clone() {
     return new JdbcTimestampAttribute(getName(), getSqlType(), isRequired(), getProperties());
   }
   @Override

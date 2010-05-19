@@ -41,7 +41,6 @@ import java.awt.geom.Area;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -142,8 +141,8 @@ public class AnnotatedPointStyle implements Style {
   public static double angle(final Map<String, Object> values,
     final double defaultAngle) {
     Object orientation = values.get("orientation");
-    if (orientation instanceof BigDecimal) {
-      BigDecimal angle = (BigDecimal)orientation;
+    if (orientation instanceof Number) {
+      Number angle = (Number)orientation;
       return Angle.toRadians((450 - angle.doubleValue()) % 360);
     } else {
       return defaultAngle;
@@ -153,8 +152,8 @@ public class AnnotatedPointStyle implements Style {
   public static double height(final Map<String, Object> values,
     final double defaultHeight) {
     Object characterHeight = values.get("characterHeight");
-    if (characterHeight instanceof BigDecimal) {
-      BigDecimal height = (BigDecimal)characterHeight;
+    if (characterHeight instanceof Number) {
+      Number height = (Number)characterHeight;
       return height.doubleValue();
     } else {
       return defaultHeight;

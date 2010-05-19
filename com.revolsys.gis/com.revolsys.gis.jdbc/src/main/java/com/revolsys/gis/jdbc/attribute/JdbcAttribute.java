@@ -30,7 +30,7 @@ public class JdbcAttribute extends Attribute {
   }
 
   @Override
-  protected JdbcAttribute clone() {
+  public JdbcAttribute clone() {
     return new JdbcAttribute(getName(), getType(), getSqlType(), getLength(),
       getScale(), isRequired(), getProperties());
   }

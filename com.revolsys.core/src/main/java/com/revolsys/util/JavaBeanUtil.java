@@ -34,7 +34,7 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @param value The property value.
    */
-  public static void executeSetMethod(
+  public static void setProperty(
     final Object object,
     final String propertyName,
     final Object value) {

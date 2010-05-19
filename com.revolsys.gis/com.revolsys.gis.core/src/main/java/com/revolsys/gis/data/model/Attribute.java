@@ -196,7 +196,7 @@ public class Attribute implements Cloneable {
   }
 
   @Override
-  protected Attribute clone() {
+  public Attribute clone() {
     return new Attribute(this);
   }
 

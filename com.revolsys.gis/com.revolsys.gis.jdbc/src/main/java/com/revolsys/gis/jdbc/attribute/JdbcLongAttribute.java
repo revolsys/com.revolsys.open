@@ -22,7 +22,7 @@ public class JdbcLongAttribute extends JdbcAttribute {
     super(name, DataTypes.LONG, sqlType, length, 0, required, properties);
   }
   @Override
-  protected JdbcLongAttribute clone() {
+  public JdbcLongAttribute clone() {
     return new JdbcLongAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
   }
   @Override

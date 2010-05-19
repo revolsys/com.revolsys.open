@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -34,18 +35,6 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
     super(feature.getSchema());
     setAttributes(feature.getAttributes());
     this.type = type;
-  }
-
-  public Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> attributeNames) {
-    Map<String, Object> values = new HashMap<String, Object>();
-    for (CharSequence name : attributeNames) {
-      final Object value = getValue(name);
-      if (value != null) {
-        values.put(name.toString(), value);
-      }
-    }
-    return values;
   }
 
   public DataObjectFeature(
@@ -120,6 +109,18 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
     return (T)getAttribute(index);
   }
 
+  public Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> attributeNames) {
+    final Map<String, Object> values = new HashMap<String, Object>();
+    for (final CharSequence name : attributeNames) {
+      final Object value = getValue(name);
+      if (value != null) {
+        values.put(name.toString(), value);
+      }
+    }
+    return values;
+  }
+
   /**
    * Get the values of all attributes.
    * 
@@ -170,14 +171,12 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
     super.setAttribute(index, value);
   }
 
-  protected void updateState() {
-    switch (state) {
-      case Persisted:
-        state = DataObjectState.Modified;
-      break;
-      case Deleted:
-        throw new IllegalStateException(
-          "Cannot modify an object which has been deleted");
+  public void setValues(
+    final Map<String, ? extends Object> values) {
+    for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
+      final String name = defaultValue.getKey();
+      final Object value = defaultValue.getValue();
+      setValue(name, value);
     }
   }
 
@@ -203,5 +202,16 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
     }
     s.append(')');
     return s.toString();
+  }
+
+  protected void updateState() {
+    switch (state) {
+      case Persisted:
+        state = DataObjectState.Modified;
+      break;
+      case Deleted:
+        throw new IllegalStateException(
+          "Cannot modify an object which has been deleted");
+    }
   }
 }

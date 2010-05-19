@@ -97,7 +97,7 @@ public class HtmlUiBuilderObjectForm extends Form {
           if (propertyName != Form.FORM_TASK_PARAM) {
             Object value = field.getValue();
             try {
-              JavaBeanUtil.executeSetMethod(object, propertyName, value);
+              JavaBeanUtil.setProperty(object, propertyName, value);
             } catch (IllegalArgumentException e) {
               field.addValidationError(e.getMessage());
               valid = false;

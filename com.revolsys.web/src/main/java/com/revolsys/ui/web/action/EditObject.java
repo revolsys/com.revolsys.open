@@ -107,7 +107,7 @@ public class EditObject extends SpringFrameworkAction {
           Map.Entry entry = (Entry)attributes.next();
           String attrubuteName = (String)entry.getValue();
           String propertyName = (String)entry.getKey();
-          JavaBeanUtil.executeSetMethod(object, propertyName,
+          JavaBeanUtil.setProperty(object, propertyName,
             request.getAttribute(attrubuteName));
         }
         Long id = (Long)JavaBeanUtil.getProperty(object, "id");

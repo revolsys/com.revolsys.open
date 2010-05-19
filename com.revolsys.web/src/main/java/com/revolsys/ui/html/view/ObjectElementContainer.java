@@ -50,7 +50,7 @@ public class ObjectElementContainer extends ElementContainer {
           String propertyName = field.getName();
           Object value = field.getValue();
           try {
-            JavaBeanUtil.executeSetMethod(object, propertyName, value);
+            JavaBeanUtil.setProperty(object, propertyName, value);
           } catch (IllegalArgumentException e) {
             field.addValidationError(e.getMessage());
             valid = false;

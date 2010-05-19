@@ -1301,7 +1301,7 @@ public final class JtsGeometryUtil {
   @SuppressWarnings("unchecked")
   public static void setGeometryProperty(
     final Geometry geometry,
-    final String name,
+    final CharSequence name,
     final Object value) {
     Object userData = geometry.getUserData();
     if (!(userData instanceof Map)) {
@@ -1309,7 +1309,7 @@ public final class JtsGeometryUtil {
       geometry.setUserData(userData);
     }
     final Map<Object, Object> map = (Map<Object, Object>)userData;
-    map.put(name, value);
+    map.put(name.toString(), value);
 
   }
 

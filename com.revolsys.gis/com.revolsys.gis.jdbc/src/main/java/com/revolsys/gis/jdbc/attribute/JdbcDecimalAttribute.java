@@ -22,7 +22,7 @@ public class JdbcDecimalAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected JdbcDecimalAttribute clone() {
+  public JdbcDecimalAttribute clone() {
     return new JdbcDecimalAttribute(getName(), getSqlType(), getLength(), getScale(), isRequired(), getProperties());
   }
   

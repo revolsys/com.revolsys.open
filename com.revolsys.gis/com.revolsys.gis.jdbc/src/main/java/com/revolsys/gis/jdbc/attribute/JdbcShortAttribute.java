@@ -22,7 +22,7 @@ public class JdbcShortAttribute extends JdbcAttribute {
     super(name, DataTypes.SHORT, sqlType, length, 0, required, properties);
   }
   @Override
-  protected JdbcShortAttribute clone() {
+  public JdbcShortAttribute clone() {
     return new JdbcShortAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
   }
   @Override

@@ -58,7 +58,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected ArcSdeOracleStGeometryJdbcAttribute clone() {
+  public ArcSdeOracleStGeometryJdbcAttribute clone() {
     return new ArcSdeOracleStGeometryJdbcAttribute(getName(), getType(),
       getLength(), getScale(), isRequired(), getProperties(), spatialReference,
       dimension);

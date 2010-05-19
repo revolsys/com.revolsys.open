@@ -10,7 +10,7 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public CoordinatesList clone() {
-    return new DoubleCoordinatesList(getCoordinates(), getNumAxis());
+    return new DoubleCoordinatesList(getNumAxis(), getCoordinates());
   }
 
   public byte getNumAxis() {

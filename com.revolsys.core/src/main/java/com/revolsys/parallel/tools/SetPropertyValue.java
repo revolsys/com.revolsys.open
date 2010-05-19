@@ -24,7 +24,7 @@ public class SetPropertyValue {
   @PostConstruct
   public void init() {
     if (bean != null && propertyName != null) {
-      JavaBeanUtil.executeSetMethod(bean, propertyName, value);
+      JavaBeanUtil.setProperty(bean, propertyName, value);
     }
   }
 

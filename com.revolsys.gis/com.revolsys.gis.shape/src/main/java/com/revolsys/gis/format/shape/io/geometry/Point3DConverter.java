@@ -45,8 +45,8 @@ public class Point3DConverter implements ShapefileGeometryConverter {
     for (int i = 0; i < dimension; i++) {
       ordinates[i] = in.readLEDouble();
     }
-    final CoordinateSequence coordinates = new DoubleCoordinatesList(ordinates,
-      dimension);
+    final CoordinateSequence coordinates = new DoubleCoordinatesList(dimension,
+      ordinates);
     return geometryFactory.createPoint(coordinates);
   }
 

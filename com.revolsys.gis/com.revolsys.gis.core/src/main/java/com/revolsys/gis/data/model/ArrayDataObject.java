@@ -27,9 +27,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import sun.security.action.GetBooleanAction;
+
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -216,6 +225,18 @@ public class ArrayDataObject implements DataObject, Cloneable {
     }
   }
 
+  public Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> attributeNames) {
+    final Map<String, Object> values = new HashMap<String, Object>();
+    for (final CharSequence name : attributeNames) {
+      final Object value = getValue(name);
+      if (value != null) {
+        values.put(name.toString(), value);
+      }
+    }
+    return values;
+  }
+
   /**
    * Get the values of all attributes.
    * 
@@ -264,18 +285,6 @@ public class ArrayDataObject implements DataObject, Cloneable {
     setValue(index, id);
   }
 
-  public Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> attributeNames) {
-    Map<String, Object> values = new HashMap<String, Object>();
-    for (CharSequence name : attributeNames) {
-      final Object value = getValue(name);
-      if (value != null) {
-        values.put(name.toString(), value);
-      }
-    }
-    return values;
-  }
-
   public void setState(
     final DataObjectState state) {
     // TODO make this more secure
@@ -291,12 +300,44 @@ public class ArrayDataObject implements DataObject, Cloneable {
   public void setValue(
     final CharSequence name,
     final Object value) {
-    try {
-      final int index = metaData.getAttributeIndex(name);
+    final int index = metaData.getAttributeIndex(name);
+    if (index >= 0) {
       setValue(index, value);
-    } catch (final NullPointerException e) {
-      LOG.warn("Attribute " + metaData.getName() + "." + name
-        + " does not exist");
+    } else {
+
+      final int dotIndex = name.toString().indexOf('.');
+      if (dotIndex == -1) {
+
+      } else {
+        final CharSequence key = name.subSequence(0, dotIndex);
+        final CharSequence subKey = name.subSequence(dotIndex + 1,
+          name.length());
+        Object objectValue = getValue(key);
+        if (objectValue == null) {
+          final DataType attributeType = metaData.getAttributeType(key);
+          if (attributeType != null) {
+            if (attributeType.getJavaClass() == DataObject.class) {
+              final QName typeName = attributeType.getName();
+              final DataObjectMetaDataFactory metaDataFactory = metaData.getDataObjectMetaDataFactory();
+              final DataObjectMetaData subMetaData = metaDataFactory.getMetaData(typeName);
+              final DataObjectFactory dataObjectFactory = subMetaData.getDataObjectFactory();
+              final DataObject subObject = dataObjectFactory.createDataObject(subMetaData);
+              subObject.setValue(subKey, value);
+              setValue(key, subObject);
+            }
+          }
+        } else {
+          if (objectValue instanceof Geometry) {
+            Geometry geometry = (Geometry)objectValue;
+            JtsGeometryUtil.setGeometryProperty(geometry, subKey, value);
+          } else if (objectValue instanceof DataObject) {
+            DataObject object = (DataObject)objectValue;
+            object.setValue(subKey, value);
+          } else {
+            JavaBeanUtil.setProperty(objectValue, subKey.toString(), value);
+          }
+        }
+      }
     }
   }
 
@@ -312,6 +353,15 @@ public class ArrayDataObject implements DataObject, Cloneable {
     if (index >= 0) {
       updateState();
       attributes[index] = value;
+    }
+  }
+
+  public void setValues(
+    final Map<String, ? extends Object> values) {
+    for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
+      final String name = defaultValue.getKey();
+      final Object value = defaultValue.getValue();
+      setValue(name, value);
     }
   }
 

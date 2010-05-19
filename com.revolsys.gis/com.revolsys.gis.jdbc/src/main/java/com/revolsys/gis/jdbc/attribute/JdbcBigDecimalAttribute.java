@@ -21,7 +21,7 @@ public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
   }
 
   @Override
-  protected JdbcBigDecimalAttribute clone() {
+  public JdbcBigDecimalAttribute clone() {
     return new JdbcBigDecimalAttribute(getName(), getSqlType(), getLength(),
       getScale(), isRequired(), getProperties());
   }

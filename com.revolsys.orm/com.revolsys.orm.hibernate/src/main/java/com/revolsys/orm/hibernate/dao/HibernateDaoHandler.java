@@ -567,7 +567,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
   public void setProperty(
     final String property,
     final Object value) {
-    JavaBeanUtil.executeSetMethod(this, property, value);
+    JavaBeanUtil.setProperty(this, property, value);
   }
 
   public Object update(

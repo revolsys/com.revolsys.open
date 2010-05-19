@@ -76,7 +76,7 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected ArcSdeObjectIdJdbcAttribute clone() {
+  public ArcSdeObjectIdJdbcAttribute clone() {
     return new ArcSdeObjectIdJdbcAttribute(getName(), getType(), getLength(),
       getScale(), isRequired(), getProperties(), schemaName, registrationId);
   }

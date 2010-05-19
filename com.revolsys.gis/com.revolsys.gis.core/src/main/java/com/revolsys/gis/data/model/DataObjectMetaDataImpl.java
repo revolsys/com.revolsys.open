@@ -82,7 +82,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public DataType getAttributeType(
-    String name) {
+    CharSequence name) {
     final int index = getAttributeIndex(name);
     if (index == -1) {
       return null;

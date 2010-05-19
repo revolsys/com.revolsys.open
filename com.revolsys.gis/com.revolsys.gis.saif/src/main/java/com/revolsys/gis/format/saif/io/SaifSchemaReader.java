@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
@@ -114,7 +115,7 @@ public class SaifSchemaReader {
     currentClass.addSuperClass(superClass);
     for (final String name : superClass.getAttributeNames()) {
       final Attribute attribute = superClass.getAttribute(name);
-      currentClass.addAttribute(attribute);
+      currentClass.addAttribute(attribute.clone());
     }
     for (final Entry<String, Object> defaultValue : superClass.getDefaultValues()
       .entrySet()) {
@@ -391,17 +392,21 @@ public class SaifSchemaReader {
     throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
+      String attributeName = iterator.getStringValue();
       boolean hasMore = true;
+      List<QName> typeNames = new ArrayList<QName>();
+      List<Object> values = new ArrayList<Object>();
       while (hasMore) {
         switch (iterator.getNextEventType()) {
           case CsnIterator.CLASS_NAME:
             iterator.next();
-            iterator.getStringValue();
+            final QName typeName = iterator.getQNameValue();
+             typeNames.add(typeName);
           break;
           case CsnIterator.FORCE_TYPE:
             iterator.next();
             if (iterator.next() == CsnIterator.CLASS_NAME) {
-              iterator.getStringValue();
+              typeNames.add(iterator.getQNameValue());
             } else {
               throw new IllegalStateException("Expecting a class name");
             }
@@ -409,20 +414,60 @@ public class SaifSchemaReader {
           case CsnIterator.EXCLUDE_TYPE:
             iterator.next();
             if (iterator.next() == CsnIterator.CLASS_NAME) {
-              iterator.getStringValue();
+              typeNames.add(iterator.getQNameValue());
             } else {
               throw new IllegalStateException("Expecting a class name");
             }
           break;
           case CsnIterator.VALUE:
             iterator.next();
-            iterator.getValue();
+            values.add(iterator.getValue());
           break;
           default:
             hasMore = false;
           break;
         }
       }
+      attributeName = attributeName.replaceFirst("position.geometry",
+        "position");
+      int dotIndex = attributeName.indexOf('.');
+      if (dotIndex == -1) {
+        Attribute attribute = type.getAttribute(attributeName);
+        if (attribute != null) {
+          if (!typeNames.isEmpty()) {
+            attribute.setProperty(AttributeProperties.ALLOWED_TYPE_NAMES,
+              typeNames);
+          }
+          if (!values.isEmpty()) {
+            attribute.setProperty(AttributeProperties.ALLOWED_VALUES, values);
+          }
+        }
+      } else {
+        String key = attributeName.substring(0, dotIndex);
+        String subKey = attributeName.substring(dotIndex + 1);
+        Attribute attribute = type.getAttribute(key);
+        if (attribute != null) {
+          if (!typeNames.isEmpty()) {
+            Map<String, List<QName>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
+            if (allowedValues == null) {
+              allowedValues = new HashMap<String, List<QName>>();
+              attribute.setProperty(
+                AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES, allowedValues);
+            }
+            allowedValues.put(subKey, typeNames);
+          }
+          if (!values.isEmpty()) {
+            Map<String, List<Object>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_VALUES);
+            if (allowedValues == null) {
+              allowedValues = new HashMap<String, List<Object>>();
+              attribute.setProperty(
+                AttributeProperties.ATTRIBUTE_ALLOWED_VALUES, allowedValues);
+            }
+            allowedValues.put(subKey, values);
+          }
+        }
+      }
+
     }
   }
 

@@ -15,12 +15,12 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   public DoubleCoordinatesList(
     final CoordinatesList coordinatesList) {
-    this(coordinatesList.getCoordinates(), coordinatesList.getNumAxis());
+    this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
   }
 
   public DoubleCoordinatesList(
-    final double[] coordinates,
-    final int numAxis) {
+    final int numAxis,
+    final double... coordinates) {
     this.numAxis = (byte)numAxis;
     this.coordinates = coordinates;
   }

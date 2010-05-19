@@ -21,7 +21,7 @@ public class JdbcDateAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected JdbcDateAttribute clone() {
+  public JdbcDateAttribute clone() {
     return new JdbcDateAttribute(getName(), getSqlType(), isRequired(),
       getProperties());
   }

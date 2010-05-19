@@ -66,7 +66,7 @@ public class PackedCoordinateUtil {
       }
 
       final CoordinateSequence coordinates = new DoubleCoordinatesList(
-        oordinates, dimension);
+        dimension, oordinates);
       return coordinates;
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);

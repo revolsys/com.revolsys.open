@@ -62,6 +62,8 @@ public interface DataObject {
    */
   DataObjectMetaData getMetaData();
 
+  DataObjectState getState();
+
   /**
    * Get the value of the attribute with the specified name.
    * 
@@ -80,15 +82,15 @@ public interface DataObject {
   <T extends Object> T getValue(
     int index);
 
+  Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> attributeNames);
+
   /**
    * Get the values of all attributes.
    * 
    * @return The attribute value.
    */
   List<Object> getValues();
-
-  Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> attributeNames);
 
   /**
    * Checks to see if the metadata for this DataObject has an attribute with the
@@ -116,6 +118,9 @@ public interface DataObject {
   void setIdValue(
     Object id);
 
+  void setState(
+    final DataObjectState state);
+
   /**
    * Set the value of the attribute with the specified name.
    * 
@@ -136,8 +141,11 @@ public interface DataObject {
     int index,
     Object value);
 
-  public DataObjectState getState();
-
-  public void setState(
-    final DataObjectState state);
+  /**
+   * Set the values on the object based on the values in the map.
+   * 
+   * @param values The values to set.
+   */
+  void setValues(
+    Map<String, ? extends Object> values);
 }

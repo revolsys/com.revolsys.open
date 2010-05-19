@@ -43,8 +43,8 @@ public class Point2DMConverter implements ShapefileGeometryConverter {
     final double[] ordinates = new double[] {
       x, y, Double.NaN, m
     };
-    final CoordinateSequence coordinates = new DoubleCoordinatesList(ordinates,
-      4);
+    final CoordinateSequence coordinates = new DoubleCoordinatesList(4,
+      ordinates);
     return geometryFactory.createPoint(coordinates);
   }
 

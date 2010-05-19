@@ -40,7 +40,7 @@ public class DetailViewTag extends TagSupport {
         Object object = pageContext.findAttribute(name);
         if (object != null) {
           Writer out = pageContext.getOut();
-          JavaBeanUtil.executeSetMethod(model, "object", object);
+          JavaBeanUtil.setProperty(model, "object", object);
           DetailView view = new DetailView(model);
           view.serialize(out);
         }

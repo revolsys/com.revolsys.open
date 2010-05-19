@@ -48,8 +48,8 @@ public class Point2DConverter implements ShapefileGeometryConverter {
     final double[] ordinates = new double[] {
       x, y
     };
-    final CoordinateSequence coordinates = new DoubleCoordinatesList(ordinates,
-      2);
+    final CoordinateSequence coordinates = new DoubleCoordinatesList(2,
+      ordinates);
     return geometryFactory.createPoint(coordinates);
   }
 

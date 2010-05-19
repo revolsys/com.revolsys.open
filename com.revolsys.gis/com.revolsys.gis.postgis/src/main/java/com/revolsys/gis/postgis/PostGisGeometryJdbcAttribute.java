@@ -48,7 +48,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected JdbcAttribute clone() {
+  public JdbcAttribute clone() {
     return new PostGisGeometryJdbcAttribute(getName(), getType(), getLength(),
       getScale(), isRequired(), getProperties(), srid);
   }

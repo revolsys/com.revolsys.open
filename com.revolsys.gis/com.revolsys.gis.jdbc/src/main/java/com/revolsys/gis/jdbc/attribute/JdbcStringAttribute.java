@@ -20,7 +20,7 @@ public class JdbcStringAttribute extends JdbcAttribute {
     super(name, DataTypes.STRING, sqlType, length, 0, required, properties);
   }
   @Override
-  protected JdbcStringAttribute clone() {
+  public JdbcStringAttribute clone() {
     return new JdbcStringAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
   }
   @Override

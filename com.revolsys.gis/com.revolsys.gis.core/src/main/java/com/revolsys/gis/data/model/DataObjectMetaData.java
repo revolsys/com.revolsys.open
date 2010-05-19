@@ -109,7 +109,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
     int index);
 
   DataType getAttributeType(
-    String name);
+    CharSequence name);
 
   DataObjectFactory getDataObjectFactory();
 

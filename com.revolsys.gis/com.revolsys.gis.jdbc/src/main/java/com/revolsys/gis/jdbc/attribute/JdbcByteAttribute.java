@@ -23,7 +23,7 @@ public class JdbcByteAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected JdbcByteAttribute clone() {
+  public JdbcByteAttribute clone() {
     return new JdbcByteAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
   }
   

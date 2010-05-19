@@ -349,13 +349,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
               mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
               defaultMediaType);
             headers.setContentType(contentType);
-            final Charset charSet = contentType.getCharSet();
             byte[] bytes;
-            if (charSet == null) {
-              bytes = body.getBytes();
-            } else {
-              bytes = body.getBytes(charSet);
-            }
+            bytes = body.getBytes();
             final InputStream bodyIn = new ByteArrayInputStream(bytes);
             HttpInputMessage newInputMessage = new HttpInputMessage() {
 
@@ -365,11 +360,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
               public InputStream getBody()
                 throws IOException {
-                if (charSet == null) {
-                  return bodyIn;
-                } else {
-                  return bodyIn;
-                }
+                return bodyIn;
               }
             };
             for (HttpMessageConverter<?> messageConverter : messageConverters) {
