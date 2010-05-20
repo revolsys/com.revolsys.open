@@ -118,11 +118,11 @@ public class ProcessNetwork implements BeanPostProcessor {
 
   @SuppressWarnings("deprecation")
   @PreDestroy
-  public void stop() {
+  public synchronized void stop() {
     final List<Thread> processesToStop = new ArrayList<Thread>(
       processes.values());
     for (final Thread thread : processesToStop) {
-      if (thread.isAlive()) {
+      if (Thread.currentThread() != thread && thread.isAlive()) {
         thread.stop();
       }
     }

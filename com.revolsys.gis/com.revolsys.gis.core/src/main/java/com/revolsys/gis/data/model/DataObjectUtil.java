@@ -27,6 +27,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public final class DataObjectUtil {
@@ -97,7 +98,34 @@ public final class DataObjectUtil {
     return (T)propertyValue;
   }
 
+  public static void noop() {
+  }
+
+  public static void noopOnIdNull(
+    final DataObject object) {
+    if (object.getIdValue() == null) {
+      noop();
+    }
+  }
+
   private DataObjectUtil() {
   }
 
+  public static void noopOnCoordinateEqual2d(
+    DataObject object,
+    double x,
+    double y) {
+    DataObjectUtil.noopOnCoordinateEqual2d(object.getGeometryValue(), x, y);
+  }
+
+  public static void noopOnCoordinateEqual2d(
+    final Geometry geometry,
+    final double x,
+    final double y) {
+    final Coordinate coordinate1 = geometry.getCoordinate();
+    final Coordinate coordinate2 = new Coordinate(x, y);
+    if (coordinate1.equals2D(coordinate2)) {
+      noop();
+    }
+  }
 }

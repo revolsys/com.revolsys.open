@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -686,6 +685,15 @@ public final class JtsGeometryUtil {
     return (T)map.get(name);
   }
 
+  public static Collection<LineString> getLines(
+    final MultiLineString multiLine) {
+    final List<LineString> lines = new ArrayList<LineString>();
+    for (int i = 0; i < multiLine.getNumGeometries(); i++) {
+      lines.add((LineString)multiLine.getGeometryN(i));
+    }
+    return lines;
+  }
+
   public static List<LineSegment> getLineSegments(
     final CoordinateSequence coords) {
     final List<LineSegment> segments = new ArrayList<LineSegment>();
@@ -1175,6 +1183,7 @@ public final class JtsGeometryUtil {
     return newGeometry;
   }
 
+
   public static Coordinate offset(
     final Coordinate coordinate,
     final double angle,
@@ -1654,14 +1663,5 @@ public final class JtsGeometryUtil {
   }
 
   private JtsGeometryUtil() {
-  }
-
-  public static Collection<LineString> getLines(
-    MultiLineString multiLine) {
-    List<LineString> lines = new ArrayList<LineString>();
-    for (int i = 0; i < multiLine.getNumGeometries(); i++) {
-      lines.add((LineString)multiLine.getGeometryN(i));
-    }
-    return lines;
   }
 }
