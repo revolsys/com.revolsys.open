@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -59,8 +60,8 @@ public class GeometryHttpMessageConverter extends
         throw new HttpMessageNotReadableException("Cannot read data in format"
           + mediaType);
       } else {
-        final Reader<Geometry> reader = readerFactory.createGeometryReader(
-          body, charset);
+        final Reader<Geometry> reader = readerFactory.createGeometryReader(new InputStreamResource(
+          body));
         for (Geometry geometry : reader) {
           if (clazz.isAssignableFrom(geometry.getClass())) {
             return geometry;
@@ -105,8 +106,8 @@ public class GeometryHttpMessageConverter extends
           + " not supported");
       } else {
         String baseName = HttpRequestUtils.getRequestBaseFileName();
-        final Writer<Geometry> writer = writerFactory.createGeometryWriter(baseName,
-          body, charset);
+        final Writer<Geometry> writer = writerFactory.createGeometryWriter(
+          baseName, body, charset);
         writer.write(geometry);
         writer.close();
       }

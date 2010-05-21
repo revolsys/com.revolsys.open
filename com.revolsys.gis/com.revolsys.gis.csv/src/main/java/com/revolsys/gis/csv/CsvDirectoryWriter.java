@@ -2,7 +2,6 @@ package com.revolsys.gis.csv;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +14,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;
-
-  private boolean useZeroForNull = true;
 
   private final Map<DataObjectMetaData, CsvWriter> writers = new HashMap<DataObjectMetaData, CsvWriter>();
 
@@ -43,8 +40,9 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   public void flush() {
-    // TODO Auto-generated method stub
-
+    for (CsvWriter writer : writers.values()) {
+      writer.flush();
+    }
   }
 
   public String toString() {
@@ -58,8 +56,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     if (writer == null) {
       try {
 
-        final File file = new File(directory, metaData.getName()
-          .getLocalPart()
+        final File file = new File(directory, metaData.getName().toString()
           + ".csv");
         writer = new CsvWriter(metaData, new FileOutputStream(file));
         final Geometry geometry = object.getGeometryValue();
@@ -74,20 +71,12 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     return writer;
   }
 
-  public boolean isUseZeroForNull() {
-    return useZeroForNull;
-  }
-
   public void setDirectory(
     final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
   }
 
-  public void setUseZeroForNull(
-    final boolean useZeroForNull) {
-    this.useZeroForNull = useZeroForNull;
-  }
 
   public void write(
     final DataObject object) {

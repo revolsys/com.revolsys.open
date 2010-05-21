@@ -20,12 +20,14 @@
  */
 package com.revolsys.gis.gpx.io;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.AbstractReader;
@@ -45,9 +47,10 @@ public class GpxReader extends AbstractReader<DataObject> {
   private QName typeName;
 
   public GpxReader(
-    final InputStream in,
-    final DataObjectFactory dataObjectFactory) {
-    this(new InputStreamReader(in), dataObjectFactory);
+    
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory) throws IOException {
+    this(new InputStreamReader(resource.getInputStream()), dataObjectFactory);
   }
 
   public GpxReader(

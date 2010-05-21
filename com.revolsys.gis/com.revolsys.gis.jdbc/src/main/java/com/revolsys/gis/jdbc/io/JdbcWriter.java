@@ -45,13 +45,17 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private final JdbcDataObjectStore dataStore;
 
+  private Statistics deleteStatistics;
+
+  private boolean flushBetweenTypes = false;
+
   private String hints = null;
 
   private Statistics insertStatistics;
 
   private String label;
 
-  private QName lastTypeName;
+  private DataObjectMetaData lastMetaData;
 
   private boolean quoteColumnNames = true;
 
@@ -60,6 +64,12 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   private String sqlSuffix;
 
   private final Map<QName, Integer> typeCountMap = new LinkedHashMap<QName, Integer>();
+
+  private final Map<QName, Integer> typeDeleteBatchCountMap = new LinkedHashMap<QName, Integer>();
+
+  private final Map<QName, String> typeDeleteSqlMap = new LinkedHashMap<QName, String>();
+
+  private final Map<QName, PreparedStatement> typeDeleteStatementMap = new LinkedHashMap<QName, PreparedStatement>();
 
   private final Map<QName, Integer> typeInsertBatchCountMap = new LinkedHashMap<QName, Integer>();
 
@@ -79,15 +89,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private final Map<QName, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<QName, PreparedStatement>();
 
-  private final Map<QName, Integer> typeDeleteBatchCountMap = new LinkedHashMap<QName, Integer>();
-
-  private final Map<QName, String> typeDeleteSqlMap = new LinkedHashMap<QName, String>();
-
-  private final Map<QName, PreparedStatement> typeDeleteStatementMap = new LinkedHashMap<QName, PreparedStatement>();
-
   private Statistics updateStatistics;
-
-  private Statistics deleteStatistics;
 
   public JdbcWriter(
     final Connection connection,
@@ -99,10 +101,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     } else {
       setConnection(connection);
     }
-  }
-
-  public void flush() {
-
   }
 
   public JdbcWriter(
@@ -125,6 +123,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     attribute.addInsertStatementPlaceHolder(sqlBuffer, false);
   }
 
+  @Override
   public void close() {
     try {
 
@@ -173,6 +172,81 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  private void delete(
+    final DataObject object)
+    throws SQLException {
+    final DataObjectMetaData objectType = object.getMetaData();
+    final QName typeName = objectType.getName();
+    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    flushIfRequired(metaData);
+    PreparedStatement statement = typeDeleteStatementMap.get(typeName);
+    if (statement == null) {
+      final String sql = getDeleteSql(metaData);
+      try {
+        statement = connection.prepareStatement(sql);
+        typeDeleteStatementMap.put(typeName, statement);
+      } catch (final SQLException e) {
+        LOG.error(sql, e);
+      }
+    }
+    int parameterIndex = 1;
+    final JdbcAttribute idAttribute = (JdbcAttribute)metaData.getIdAttribute();
+    parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
+      parameterIndex, object);
+    statement.addBatch();
+    Integer batchCount = typeDeleteBatchCountMap.get(typeName);
+    if (batchCount == null) {
+      batchCount = 1;
+      typeDeleteBatchCountMap.put(typeName, 1);
+    } else {
+      batchCount += 1;
+      typeDeleteBatchCountMap.put(typeName, batchCount);
+    }
+    // TODO this locks code tables which prevents insert
+    // if (batchCount >= batchSize) {
+    // final String sql = getDeleteSql(metaData);
+    // processCurrentBatch(typeName, sql, statement, typeDeleteBatchCountMap,
+    // getDeleteStatistics());
+    // }
+  }
+
+  @Override
+  public void flush() {
+    flush(typeInsertSqlMap, typeInsertStatementMap, typeInsertBatchCountMap,
+      getInsertStatistics());
+    flush(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
+      typeInsertSequenceBatchCountMap, getInsertStatistics());
+    flush(typeUpdateSqlMap, typeUpdateStatementMap, typeUpdateBatchCountMap,
+      getUpdateStatistics());
+    flush(typeDeleteSqlMap, typeDeleteStatementMap, typeDeleteBatchCountMap,
+      getDeleteStatistics());
+  }
+
+  private void flush(
+    final Map<QName, String> sqlMap,
+    final Map<QName, PreparedStatement> statementMap,
+    final Map<QName, Integer> batchCountMap,
+    final Statistics statistics) {
+    for (final Entry<QName, PreparedStatement> entry : statementMap.entrySet()) {
+      final QName typeName = entry.getKey();
+      final PreparedStatement statement = entry.getValue();
+      final String sql = sqlMap.get(typeName);
+      try {
+        processCurrentBatch(typeName, sql, statement, batchCountMap, statistics);
+      } catch (final SQLException e) {
+        LOG.error("Unable to process batch: " + sql, e);
+      }
+    }
+  }
+
+  private void flushIfRequired(
+    final DataObjectMetaData metaData) {
+    if (flushBetweenTypes && metaData != lastMetaData) {
+      flush();
+      lastMetaData = metaData;
+    }
+  }
+
   public int getBatchSize() {
     return batchSize;
   }
@@ -189,6 +263,49 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   public DataSource getDataSource() {
     return dataSource;
+  }
+
+  private String getDeleteSql(
+    final DataObjectMetaData type) {
+    final QName typeName = type.getName();
+    final String tableName = getTableName(typeName);
+    String sql = typeDeleteSqlMap.get(typeName);
+    if (sql == null) {
+      final StringBuffer sqlBuffer = new StringBuffer();
+      if (sqlPrefix != null) {
+        sqlBuffer.append(sqlPrefix);
+      }
+      sqlBuffer.append("delete ");
+      if (hints != null) {
+        sqlBuffer.append(hints);
+      }
+      sqlBuffer.append(" from ");
+      sqlBuffer.append(tableName);
+      sqlBuffer.append(" where ");
+      final JdbcAttribute idAttribute = (JdbcAttribute)type.getIdAttribute();
+      addSqlColumEqualsPlaceholder(sqlBuffer, idAttribute);
+
+      sqlBuffer.append(" ");
+      if (sqlSuffix != null) {
+        sqlBuffer.append(sqlSuffix);
+      }
+      sql = sqlBuffer.toString();
+
+      typeDeleteSqlMap.put(typeName, sql);
+    }
+    return sql;
+  }
+
+  public Statistics getDeleteStatistics() {
+    if (deleteStatistics == null) {
+      if (label == null) {
+        deleteStatistics = new Statistics("Delete");
+      } else {
+        deleteStatistics = new Statistics(label + " Delete");
+      }
+      deleteStatistics.connect();
+    }
+    return deleteStatistics;
   }
 
   private String getGeneratePrimaryKeySql(
@@ -292,10 +409,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return label;
   }
 
-  public String toString() {
-    return null;
-  }
-
   public String getSqlPrefix() {
     return sqlPrefix;
   }
@@ -356,57 +469,17 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return updateStatistics;
   }
 
-  private String getDeleteSql(
-    final DataObjectMetaData type) {
-    final QName typeName = type.getName();
-    final String tableName = getTableName(typeName);
-    String sql = typeDeleteSqlMap.get(typeName);
-    if (sql == null) {
-      final StringBuffer sqlBuffer = new StringBuffer();
-      if (sqlPrefix != null) {
-        sqlBuffer.append(sqlPrefix);
-      }
-      sqlBuffer.append("delete ");
-      if (hints != null) {
-        sqlBuffer.append(hints);
-      }
-      sqlBuffer.append(" from ");
-      sqlBuffer.append(tableName);
-      sqlBuffer.append(" where ");
-      final JdbcAttribute idAttribute = (JdbcAttribute)type.getIdAttribute();
-      addSqlColumEqualsPlaceholder(sqlBuffer, idAttribute);
-
-      sqlBuffer.append(" ");
-      if (sqlSuffix != null) {
-        sqlBuffer.append(sqlSuffix);
-      }
-      sql = sqlBuffer.toString();
-
-      typeDeleteSqlMap.put(typeName, sql);
-    }
-    return sql;
-  }
-
-  public Statistics getDeleteStatistics() {
-    if (deleteStatistics == null) {
-      if (label == null) {
-        deleteStatistics = new Statistics("Delete");
-      } else {
-        deleteStatistics = new Statistics(label + " Delete");
-      }
-      deleteStatistics.connect();
-    }
-    return deleteStatistics;
-  }
-
   private void insert(
     final DataObject object)
     throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
     final QName typeName = objectType.getName();
     final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
-    final boolean hasId = metaData.getIdAttributeIndex() > -1;
-    final boolean hasIdValue = hasId && object.getIdValue() != null;
+    flushIfRequired(metaData);
+    final int idAttributeIndex = metaData.getIdAttributeIndex();
+    final boolean hasId = idAttributeIndex > -1;
+    final boolean hasIdValue = hasId
+      && object.getValue(idAttributeIndex) != null;
     if (!hasId || hasIdValue) {
       insert(object, typeName, metaData);
     } else {
@@ -491,6 +564,10 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  public boolean isFlushBetweenTypes() {
+    return flushBetweenTypes;
+  }
+
   public boolean isQuoteColumnNames() {
     return quoteColumnNames;
   }
@@ -548,6 +625,11 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  public void setFlushBetweenTypes(
+    final boolean flushBetweenTypes) {
+    this.flushBetweenTypes = flushBetweenTypes;
+  }
+
   /**
    * @param hints the hints to set
    */
@@ -576,12 +658,18 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     this.sqlSuffix = sqlSuffix;
   }
 
+  @Override
+  public String toString() {
+    return null;
+  }
+
   private void update(
     final DataObject object)
     throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
     final QName typeName = objectType.getName();
     final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    flushIfRequired(metaData);
     PreparedStatement statement = typeUpdateStatementMap.get(typeName);
     if (statement == null) {
       final String sql = getUpdateSql(metaData);
@@ -617,43 +705,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       processCurrentBatch(typeName, sql, statement, typeUpdateBatchCountMap,
         getUpdateStatistics());
     }
-  }
-
-  private void delete(
-    final DataObject object)
-    throws SQLException {
-    final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
-    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
-    PreparedStatement statement = typeDeleteStatementMap.get(typeName);
-    if (statement == null) {
-      final String sql = getDeleteSql(metaData);
-      try {
-        statement = connection.prepareStatement(sql);
-        typeDeleteStatementMap.put(typeName, statement);
-      } catch (final SQLException e) {
-        LOG.error(sql, e);
-      }
-    }
-    int parameterIndex = 1;
-    final JdbcAttribute idAttribute = (JdbcAttribute)metaData.getIdAttribute();
-    parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
-      parameterIndex, object);
-    statement.addBatch();
-    Integer batchCount = typeDeleteBatchCountMap.get(typeName);
-    if (batchCount == null) {
-      batchCount = 1;
-      typeDeleteBatchCountMap.put(typeName, 1);
-    } else {
-      batchCount += 1;
-      typeDeleteBatchCountMap.put(typeName, batchCount);
-    }
-    // TODO this locks code tables which prevents insert
-    // if (batchCount >= batchSize) {
-    // final String sql = getDeleteSql(metaData);
-    // processCurrentBatch(typeName, sql, statement, typeDeleteBatchCountMap,
-    // getDeleteStatistics());
-    // }
   }
 
   public synchronized void write(

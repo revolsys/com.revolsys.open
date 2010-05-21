@@ -69,6 +69,15 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
 
+  private boolean flushBetweenTypes;
+
+  public boolean isFlushBetweenTypes() {
+    return flushBetweenTypes;
+  }
+  public void setFlushBetweenTypes(
+    final boolean flushBetweenTypes) {
+    this.flushBetweenTypes = flushBetweenTypes;
+  }
   public JdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -161,6 +170,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     writer.setBatchSize(batchSize);
     writer.setHints(hints);
     writer.setLabel(label);
+    writer.setFlushBetweenTypes(flushBetweenTypes);
     return writer;
   }
 

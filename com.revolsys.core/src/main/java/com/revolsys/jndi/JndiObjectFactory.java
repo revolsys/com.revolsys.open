@@ -1,4 +1,4 @@
-package com.revolsys.gis.jdbc.io;
+package com.revolsys.jndi;
 
 import java.util.Hashtable;
 
@@ -7,14 +7,14 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.spi.NamingManager;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 
 public class JndiObjectFactory implements BeanFactoryAware, FactoryBean {
-  private static final Logger LOG = Logger.getLogger(JndiObjectFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JndiObjectFactory.class);
 
   private BeanFactory beanFactory;
 

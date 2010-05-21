@@ -1,11 +1,9 @@
 package com.revolsys.gis.csv;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Map;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractReader;
@@ -19,9 +17,9 @@ import com.revolsys.io.FileUtil;
 public class CsvReader extends AbstractReader<DataObject> implements
   DataObjectReader {
   public static DataObjectMetaData getMetaData(
-    final InputStream in) {
+    final Resource resource) {
     final CsvReader reader = (CsvReader)CsvReaderFactory.get()
-      .createDataObjectReader(in);
+      .createDataObjectReader(resource);
     final DataObjectMetaData metaData = reader.getMetaData();
     reader.close();
     return metaData;
@@ -29,48 +27,35 @@ public class CsvReader extends AbstractReader<DataObject> implements
 
   public static DataObjectMetaData getMetaData(
     final String resourceName) {
-    final InputStream in = CsvReader.class.getResourceAsStream(resourceName);
-    return getMetaData(in);
+    final ClassPathResource resource = new ClassPathResource(resourceName,
+      CsvReader.class);
+    return getMetaData(resource);
   }
 
   private DataObjectFactory dataObjectFactory;
 
-  private Reader in;
-
   private CsvIterator iterator;
+
+  private Resource resource;
 
   public CsvReader() {
     dataObjectFactory = new ArrayDataObjectFactory();
   }
 
   public CsvReader(
-    final InputStream in) {
-    this(in, new ArrayDataObjectFactory());
+    final Resource resource) {
+    this(resource, new ArrayDataObjectFactory());
   }
 
   public CsvReader(
-    final InputStream in,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    this.in = new InputStreamReader(in, CsvConstants.CHARACTER_SET);
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setResource(
-    Resource resource)
-    throws IOException {
-    this.in = new InputStreamReader(resource.getInputStream(),
-      CsvConstants.CHARACTER_SET);
-  }
-
-  public CsvReader(
-    final Reader in,
-    final DataObjectFactory dataObjectFactory) {
-    this.in = in;
+    this.resource = resource;
     this.dataObjectFactory = dataObjectFactory;
   }
 
   public void close() {
-    FileUtil.closeSilent(in);
+    iterator.close();
   }
 
   public DataObjectFactory getDataObjectFactory() {
@@ -89,13 +74,23 @@ public class CsvReader extends AbstractReader<DataObject> implements
   public CsvIterator iterator() {
     if (iterator == null) {
       try {
-        iterator = new CsvIterator(in, dataObjectFactory);
+        iterator = new CsvIterator(resource, dataObjectFactory);
       } catch (final IOException e) {
         throw new IllegalArgumentException("Unable to create Iterator:"
           + e.getMessage(), e);
       }
     }
     return iterator;
+  }
+
+  public void setDataObjectFactory(
+    final DataObjectFactory dataObjectFactory) {
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void setResource(
+    final Resource resource) {
+    this.resource = resource;
   }
 
 }

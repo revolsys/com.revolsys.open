@@ -263,7 +263,8 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     }
     MutablePropertyValues propertyValues = bd.getPropertyValues();
     PropertyValue propertyValue = new PropertyValue(property, value);
-    if (bd.getBeanClassName().equals(Parameter.class.getName())) {
+    final String beanClassName = bd.getBeanClassName();
+    if (Parameter.class.getName().equals(beanClassName)) {
       PropertyValue typeValue = propertyValues.getPropertyValue("type");
       if (typeValue != null) {
         String typeClassName = typeValue.getValue().toString();

@@ -1,6 +1,6 @@
 package com.revolsys.gis.kml.io;
 
-import java.io.Reader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +13,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -32,9 +33,10 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
   private static final Logger log = LoggerFactory.getLogger(KmlGeometryIterator.class);
 
   private static XMLStreamReader createXmlReader(
-    final Reader in) {
+    final Resource resource)
+    throws IOException {
     try {
-      return FACTORY.createXMLStreamReader(in);
+      return FACTORY.createXMLStreamReader(resource.getInputStream());
     } catch (final XMLStreamException e) {
       throw new IllegalArgumentException(e.getMessage(), e);
     }
@@ -52,15 +54,14 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
   private boolean loadNextObject = true;
 
   public KmlGeometryIterator(
-    final Reader in) {
-    this.in = createXmlReader(in);
+    final Resource resource) {
     try {
+      this.in = createXmlReader(resource);
       StaxUtils.skipToStartElement(this.in);
       StaxUtils.requireLocalName(this.in, Kml22Constants.KML);
       StaxUtils.skipToStartElement(this.in);
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new IllegalArgumentException("Unable to open resource " + resource);
     }
   }
 

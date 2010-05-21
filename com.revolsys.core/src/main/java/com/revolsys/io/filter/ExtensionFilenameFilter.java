@@ -43,61 +43,60 @@ public class ExtensionFilenameFilter implements FilenameFilter {
     }));
 
   /** The list of extensions to match. */
-  private final Set extensions = new HashSet();
+  private final Set<String> extensions = new HashSet<String>();
 
   /** Flag indicating if the filter can be modified. */
   private boolean readOnly = false;
 
   /**
-   * Construct a new ExtensionFilenameFilter with no file extenstions.
+   * Construct a new ExtensionFilenameFilter.
    */
   public ExtensionFilenameFilter() {
   }
 
   /**
-   * Construct a new ExtensionFilenameFilter with the file extensions.
-   * 
-   * @param extensions The file extensions.
-   */
-  public ExtensionFilenameFilter(
-    final Collection extensions) {
-    addExtensions(extensions);
-  }
-
-  /**
-   * Construct a new ExtensionFilenameFilter with the single file extension.
+   * Construct a new ExtensionFilenameFilter.
    * 
    * @param extensions The file extensions.
    * @param readOnly Flag indicating if the filter can be modified.
    */
   public ExtensionFilenameFilter(
-    final Collection extensions,
+    final boolean readOnly,
+    final String... extensions) {
+    this(Arrays.asList(extensions), readOnly);
+  }
+
+  /**
+   * Construct a new ExtensionFilenameFilters.
+   * 
+   * @param extensions The file extensions.
+   */
+  public ExtensionFilenameFilter(
+    final Collection<String> extensions) {
+    addExtensions(extensions);
+  }
+
+  /**
+   * Construct a new ExtensionFilenameFilter.
+   * 
+   * @param extensions The file extensions.
+   * @param readOnly Flag indicating if the filter can be modified.
+   */
+  public ExtensionFilenameFilter(
+    final Collection<String> extensions,
     final boolean readOnly) {
     addExtensions(extensions);
     this.readOnly = readOnly;
   }
 
   /**
-   * Construct a new ExtensionFilenameFilter with the single file extension.
+   * Construct a new ExtensionFilenameFilter.
    * 
-   * @param extension The file extension.
+   * @param extensions The file extensions.
    */
   public ExtensionFilenameFilter(
-    final String extension) {
-    addExtension(extension);
-  }
-
-  /**
-   * Construct a new ExtensionFilenameFilter with the single file extension.
-   * 
-   * @param extension The file extension.
-   * @param readOnly Flag indicating if the filter can be modified.
-   */
-  public ExtensionFilenameFilter(
-    final String extension,
-    final boolean readOnly) {
-    addExtension(extension);
-    this.readOnly = readOnly;
+    final String... extensions) {
+    this(Arrays.asList(extensions));
   }
 
   /**

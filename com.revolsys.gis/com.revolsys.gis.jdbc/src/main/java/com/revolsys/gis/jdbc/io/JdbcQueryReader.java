@@ -135,10 +135,9 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
    * @param tableNames the tableNames to set
    */
   public void setTableNames(
-    final List<String> tableNames) {
-    for (final String tableName : tableNames) {
-      final QName name = getQName(tableName);
-      addQuery(name, "SELECT * FROM " + tableName);
+    final List<QName> tableNames) {
+    for (final QName tableName : tableNames) {
+      addQuery(tableName, "SELECT * FROM " + getTableName(tableName));
     }
   }
 }

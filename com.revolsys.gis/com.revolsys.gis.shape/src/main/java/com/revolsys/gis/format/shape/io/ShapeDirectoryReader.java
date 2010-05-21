@@ -1,8 +1,8 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-dbase/trunk/src/main/java/com/revolsys/gis/format/xbase/io/XbaseDatasetReader.java $
+ * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/shape/io/MoepDirectoryReader.java $
  * $Author:paul.austin@revolsys.com $
- * $Date:2007-07-03 19:26:54 -0700 (Tue, 03 Jul 2007) $
- * $Revision:410 $
+ * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
+ * $Revision:265 $
 
  * Copyright 2004-2005 Revolution Systems Inc.
  * 
@@ -18,38 +18,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.gis.format.xbase.io;
+package com.revolsys.gis.format.shape.io;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import com.revolsys.gis.data.io.AbstractDirectoryReader;
 import com.revolsys.gis.data.io.DataObjectDirectoryReader;
 import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.io.filter.ExtensionFilenameFilter;
 
 /**
  * <p>
- * The XbaseDatasetReader is a {@link DataObjectReader} that can read .dbf data
+ * The MoepDirectoryReader is a {@link DataObjectReader} that can read .shp data
  * files contained in a single directory. The reader will iterate through the
- * .dbf files in alphabetical order returning all features.
+ * .shp files in alpabetical order returning all features.
  * </p>
  * <p>
  * See the {@link AbstractDirectoryReader} class for examples on how to use
- * directory readers.
+ * dataset readers.
  * </p>
  * 
  * @author Paul Austin
  * @see AbstractDirectoryReader
  */
-public class XbaseDatasetReader extends DataObjectDirectoryReader {
+public class ShapeDirectoryReader extends DataObjectDirectoryReader {
+  /** A filename filter matching .dbf files. */
+  private static final FilenameFilter SHP_FILTER = new ExtensionFilenameFilter(
+    "shp");
+
   /**
-   * Construct a new XbaseDatasetReader to read .dbf files from the specified
-   * directory.
+   * Construct a new ShapeDirectoryReader.
    * 
-   * @param directory The directory containing the .dbf files.
+   * @param directory The containing the .shp files.
    */
-  public XbaseDatasetReader(
+  public ShapeDirectoryReader(
     final File directory) {
-    setFileExtensions("dbf");
+    setFileExtensions("shp");
     setDirectory(directory);
   }
 }

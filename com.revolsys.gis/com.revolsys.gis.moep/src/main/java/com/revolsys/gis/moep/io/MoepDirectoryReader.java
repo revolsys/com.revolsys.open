@@ -5,21 +5,22 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.data.io.AbstractFileDatasetDataObjectReader;
-import com.revolsys.gis.data.io.DataObjectReader;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
+import com.revolsys.gis.data.io.DataObjectDirectoryReader;
+import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
-public class MoepDirectoryReader extends AbstractFileDatasetDataObjectReader
-  implements DataObjectMetaDataFactory {
+public class MoepDirectoryReader extends DataObjectDirectoryReader implements
+  DataObjectMetaDataFactory {
   private static final FilenameFilter BIN_FILTER = new ExtensionFilenameFilter(
     "bin");
 
@@ -32,12 +33,14 @@ public class MoepDirectoryReader extends AbstractFileDatasetDataObjectReader
   private Date submissionDate;
 
   public MoepDirectoryReader() {
+    setFileExtensions("bin");
   }
 
   public MoepDirectoryReader(
-    final File file)
+    final File directory)
     throws IOException {
-    super(file);
+    setFileExtensions("bin");
+    setDirectory(directory);
   }
 
   /**
@@ -48,20 +51,9 @@ public class MoepDirectoryReader extends AbstractFileDatasetDataObjectReader
    * @throws IOException If an I/O error occurs.
    */
   @Override
-  protected DataObjectReader createFileDataObjectReader(
-    final File file)
-    throws IOException {
-    return new MoepBinaryReader(this, file, new ArrayDataObjectFactory());
-  }
-
-  /**
-   * Get the list of .dbf files in the dataset.
-   * 
-   * @return The list of files.
-   */
-  @Override
-  protected List<File> getFiles() {
-    return Arrays.asList(getWorkingDirectory().listFiles(BIN_FILTER));
+  protected Reader<DataObject> createReader(
+    final Resource resource) {
+    return new MoepBinaryReader(this, resource, new ArrayDataObjectFactory());
   }
 
   public Date getIntegrationDate() {
@@ -90,12 +82,13 @@ public class MoepDirectoryReader extends AbstractFileDatasetDataObjectReader
   }
 
   @Override
-  protected void init()
-    throws IOException {
-    final File workingDirectory = getWorkingDirectory();
-    final String name = workingDirectory.getName();
-    final DataObjectReader supDataReader = createFileDataObjectReader(new File(
-      workingDirectory, name + "s.bin"));
+  public void setDirectory(
+    File directory) {
+    super.setDirectory(directory);
+    final String name = directory.getName();
+    final File file = new File(directory,
+      name + "s.bin");
+    final Reader<DataObject> supDataReader = createReader(new FileSystemResource(file));
     for (final DataObject supData : supDataReader) {
       final String featureCode = supData.getValue(MoepConstants.FEATURE_CODE);
       if (featureCode.equals("KN00020000")) {

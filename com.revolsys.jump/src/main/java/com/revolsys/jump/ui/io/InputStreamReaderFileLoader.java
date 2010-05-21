@@ -1,7 +1,8 @@
 package com.revolsys.jump.ui.io;
 
-import java.io.InputStream;
 import java.util.Map;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
@@ -23,8 +24,8 @@ public class InputStreamReaderFileLoader extends AbstractDataObjectFileLoader {
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  protected Reader<DataObject> createReader(final InputStream in,
+  protected Reader<DataObject> createReader(final Resource resource,
     final Map<String, Object> options) {
-    return readerFactory.createDataObjectReader(in, dataObjectFactory);
+    return readerFactory.createDataObjectReader(resource, dataObjectFactory);
   }
 }

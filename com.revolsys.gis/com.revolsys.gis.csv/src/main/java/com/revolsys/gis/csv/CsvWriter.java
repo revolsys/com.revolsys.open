@@ -17,14 +17,18 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
 public class CsvWriter extends AbstractWriter<DataObject> {
-  private final SimpleDateFormat dateFormat = new SimpleDateFormat(
+  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
     "yyyy-MM-dd'T'HH:mm:ss");
+  private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
+  "yyyy-MM-dd");
 
   private final WKTWriter geometryWriter = new WKTWriter(3);
 
   private final DataObjectMetaData metaData;
 
   private final BufferedWriter out;
+
+  boolean initialized = false;
 
   public CsvWriter(
     final DataObjectMetaData type,
@@ -69,15 +73,15 @@ public class CsvWriter extends AbstractWriter<DataObject> {
 
   private void newLine()
     throws IOException {
-    out.write('\n');
-  }
-
-  public void open() {
-    writeAttributeHeaders();
+    out.write("\r\n");
   }
 
   public void write(
     final DataObject object) {
+    if (!initialized) {
+      writeAttributeHeaders();
+      initialized = true;
+    }
     try {
       final int attributeCount = metaData.getAttributeCount();
       for (int i = 0; i < attributeCount; i++) {
@@ -142,9 +146,12 @@ public class CsvWriter extends AbstractWriter<DataObject> {
       } else if (value instanceof String) {
         final String string = (String)value;
         writeField(string, wrapChars);
+      } else if (value instanceof java.sql.Date) {
+        final String string = SQL_DATE_FORMAT.format(value);
+        writeField(string, wrapChars);
       } else if (value instanceof Date) {
         final Date date = (Date)value;
-        final String string = dateFormat.format(date);
+        final String string = DATE_FORMAT.format(date);
         writeField(string, wrapChars);
       } else {
         writeField(value.toString(), wrapChars);
@@ -167,7 +174,8 @@ public class CsvWriter extends AbstractWriter<DataObject> {
       if (value.length() == 0) {
         out.write(wrapChars);
         out.write(wrapChars);
-      } else if (value.indexOf(',') != -1 || value.indexOf('\n') != -1) {
+      } else if (value.indexOf(',') != -1 || value.indexOf('\n') != -1
+        || value.indexOf('"') != -1) {
         out.write(wrapChars);
         for (final char c : value.toCharArray()) {
           if (c == '"') {

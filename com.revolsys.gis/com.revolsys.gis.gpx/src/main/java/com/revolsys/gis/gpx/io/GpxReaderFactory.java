@@ -1,5 +1,9 @@
 package com.revolsys.gis.gpx.io;
 
+import java.io.IOException;
+
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
@@ -20,7 +24,8 @@ public class GpxReaderFactory extends AbstractDataObjectReaderFactory {
 
   public GpxReaderFactory() {
     super("GPS Exchange Format");
-    addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE, GpxConstants.FILE_EXTENSION);
+    addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE,
+      GpxConstants.FILE_EXTENSION);
   }
 
   /**
@@ -31,9 +36,14 @@ public class GpxReaderFactory extends AbstractDataObjectReaderFactory {
    * @return The reader for the file.
    */
   public Reader<DataObject> createDataObjectReader(
-    final java.io.Reader reader,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new GpxReader(reader, dataObjectFactory);
+    try {
+      return new GpxReader(resource, dataObjectFactory);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Unable to open resource " + resource,
+        e);
+    }
   }
 
 }

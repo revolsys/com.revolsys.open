@@ -9,11 +9,11 @@ import java.util.Set;
 
 public abstract class AbstractIoFactory implements IoFactory {
 
-  public final Set<String> fileExtensions = new HashSet<String>();
+  private final Set<String> fileExtensions = new HashSet<String>();
 
   private final Map<String, Set<String>> fileExtensionToMediaType = new HashMap<String, Set<String>>();
 
-  public final Set<String> mediaTypes = new HashSet<String>();
+  private final Set<String> mediaTypes = new HashSet<String>();
 
   private final Map<String, Set<String>> mediaTypeToFileExtension = new HashMap<String, Set<String>>();
 

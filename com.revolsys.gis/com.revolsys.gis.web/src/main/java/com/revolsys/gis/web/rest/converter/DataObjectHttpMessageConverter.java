@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -39,8 +40,7 @@ public class DataObjectHttpMessageConverter extends
 
   private List<String> requestAttributeNames = Arrays.asList(
     IoConstants.STYLE_URL_PROPERTY, IoConstants.JSONP_PROPERTY,
-    IoConstants.TITLE_PROPERTY,
-    IoConstants.DESCRIPTION_PROPERTY);
+    IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
 
   public DataObjectHttpMessageConverter() {
     super(DataObject.class,
@@ -74,8 +74,8 @@ public class DataObjectHttpMessageConverter extends
         throw new HttpMessageNotReadableException("Cannot read data in format"
           + mediaType);
       } else {
-        final Reader<DataObject> reader = readerFactory.createDataObjectReader(
-          body, charset);
+        final Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(
+          body));
         for (final DataObject dataObject : reader) {
           return dataObject;
         }

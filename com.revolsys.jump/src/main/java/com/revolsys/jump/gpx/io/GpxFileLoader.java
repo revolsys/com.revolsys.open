@@ -1,7 +1,8 @@
 package com.revolsys.jump.gpx.io;
 
-import java.io.InputStream;
 import java.util.Map;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
@@ -19,11 +20,10 @@ public class GpxFileLoader extends AbstractDataObjectFileLoader {
 
   @Override
   protected Reader<DataObject> createReader(
-    final InputStream in,
+    final Resource resource,
     final Map<String, Object> options) {
     FeatureDataObjectFactory factory = new FeatureDataObjectFactory();
-    Reader<DataObject> reader = GpxReaderFactory.get().createDataObjectReader(
-      in, factory);
+    Reader<DataObject> reader = GpxReaderFactory.get().createDataObjectReader(resource, factory);
     return reader;
   }
 

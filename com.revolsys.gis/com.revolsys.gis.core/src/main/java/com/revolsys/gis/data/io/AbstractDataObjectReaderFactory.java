@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -25,111 +27,58 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
   }
 
   /**
-   * Create a reader for the file using the ({@link ArrayDataObjectFactory}).
+   * Create a reader for the resource using the ({@link ArrayDataObjectFactory}
+   * ).
    * 
    * @param file The file to read.
    * @return The reader for the file.
    */
   public Reader<DataObject> createDataObjectReader(
-    final File file) {
-    return createDataObjectReader(file, DEFAULT_DATA_OBJECT_FACTORY);
+    final Resource resource) {
+    return createDataObjectReader(resource, DEFAULT_DATA_OBJECT_FACTORY);
 
   }
 
   /**
-   * Create a reader for the file using the specified data object
+   * Create a reader for the directory using the ({@link ArrayDataObjectFactory}
+   * ).
+   * 
+   * @param directory The directory to read.
+   * @return The reader for the file.
+   */
+  public Reader<DataObject> createDirectoryDataObjectReader(
+    final File directory) {
+    return createDirectoryDataObjectReader(directory,
+      DEFAULT_DATA_OBJECT_FACTORY);
+
+  }
+
+  /**
+   * Create a directory reader using the ({@link ArrayDataObjectFactory}).
+   * 
+   * @return The reader.
+   */
+  public Reader<DataObject> createDirectoryDataObjectReader() {
+    final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
+    directoryReader.setFileExtensions(getFileExtensions());
+    return directoryReader;
+  }
+
+  /**
+   * Create a reader for the directory using the specified data object
    * dataObjectFactory.
    * 
-   * @param file The file to read.
+   * @param directory directory file to read.
    * @param dataObjectFactory The dataObjectFactory used to create data objects.
    * @return The reader for the file.
    */
-  public Reader<DataObject> createDataObjectReader(
-    final File file,
+  public Reader<DataObject> createDirectoryDataObjectReader(
+    final File directory,
     final DataObjectFactory dataObjectFactory) {
-    try {
-      final FileInputStream in = new FileInputStream(file);
-      return createDataObjectReader(in, dataObjectFactory);
-    } catch (final FileNotFoundException e) {
-      throw new IllegalArgumentException("File does not exist:" + file, e);
-    }
-  }
-
-  /**
-   * Create a reader for the file using the ({@link ArrayDataObjectFactory}).
-   * 
-   * @param inputStream The file to read.
-   * @return The reader for the file.
-   */
-  public Reader<DataObject> createDataObjectReader(
-    final InputStream inputStream) {
-    return createDataObjectReader(inputStream, DEFAULT_DATA_OBJECT_FACTORY);
-
-  }
-
-  public Reader<DataObject> createDataObjectReader(
-    final InputStream in,
-    final Charset charset) {
-    return createDataObjectReader(in, charset, DEFAULT_DATA_OBJECT_FACTORY);
-  }
-
-  public Reader<DataObject> createDataObjectReader(
-    final InputStream in,
-    final Charset charset,
-    final DataObjectFactory dataObjectFactory) {
-    final InputStreamReader reader = new InputStreamReader(in, charset);
-    return createDataObjectReader(reader, dataObjectFactory);
-  }
-
-  /**
-   * Create a reader for the file using the specified data object
-   * dataObjectFactory.
-   * 
-   * @param inputStream The file to read.
-   * @param dataObjectFactory The dataObjectFactory used to create data objects.
-   * @return The reader for the file.
-   */
-  public Reader<DataObject> createDataObjectReader(
-    final InputStream inputStream,
-    final DataObjectFactory dataObjectFactory) {
-    return createDataObjectReader(inputStream, Charset.defaultCharset(),
-      dataObjectFactory);
-  }
-
-  public Reader<DataObject> createDataObjectReader(
-    final java.io.Reader in) {
-    return createDataObjectReader(in, DEFAULT_DATA_OBJECT_FACTORY);
-  }
-
-  /**
-   * Create a reader for the URL using the ({@link ArrayDataObjectFactory}).
-   * 
-   * @param url The URL to read.
-   * @return The reader for the URL.
-   */
-  public Reader<DataObject> createDataObjectReader(
-    final URL url) {
-    return createDataObjectReader(url, DEFAULT_DATA_OBJECT_FACTORY);
-
-  }
-
-  /**
-   * Create a reader for the URL using the specified data object
-   * dataObjectFactory.
-   * 
-   * @param url The file to read.
-   * @param dataObjectFactory The dataObjectFactory used to create data objects.
-   * @return The reader for the URL.
-   */
-  public Reader<DataObject> createDataObjectReader(
-    final URL url,
-    final DataObjectFactory dataObjectFactory) {
-    try {
-      final InputStream in = url.openStream();
-      return createDataObjectReader(in, dataObjectFactory);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to connect to URL:" + url, e);
-    }
+    final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
+    directoryReader.setFileExtensions(getFileExtensions());
+    directoryReader.setDirectory(directory);
+    return directoryReader;
   }
 
 }

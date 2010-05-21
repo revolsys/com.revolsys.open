@@ -1,7 +1,6 @@
 package com.revolsys.gis.format.xbase.io;
 
-import java.io.File;
-import java.io.InputStream;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
@@ -34,25 +33,11 @@ public class XBaseReaderFactory extends AbstractDataObjectReaderFactory {
     return null;
   }
   
-  @Override
   public Reader<DataObject> createDataObjectReader(
-    final File file,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new XBaseReader(file, dataObjectFactory);
+    return new XBaseReader(resource, dataObjectFactory);
   }
 
-  /**
-   * Create a reader for the file using the specified data object factory.
-   * 
-   * @param file The file to read.
-   * @param factory The factory used to create data objects.
-   * @return The reader for the file.
-   */
-  @Override
-  public Reader<DataObject> createDataObjectReader(
-    final InputStream in,
-    final DataObjectFactory dataObjectFactory) {
-    return new XBaseReader(in, dataObjectFactory);
-  }
 
 }

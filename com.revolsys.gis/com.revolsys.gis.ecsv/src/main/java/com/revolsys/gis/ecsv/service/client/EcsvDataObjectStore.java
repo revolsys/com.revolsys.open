@@ -22,6 +22,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.springframework.core.io.InputStreamResource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -137,7 +138,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
       final int statusCode = client.executeMethod(method);
       if (statusCode == HttpStatus.SC_OK) {
         final InputStream in = method.getResponseBodyAsStream();
-        return readerFactory.createDataObjectReader(in, getDataObjectFactory());
+        return readerFactory.createDataObjectReader(new InputStreamResource(in), getDataObjectFactory());
       } else {
         throw new IllegalArgumentException("Unnable to connect to server: "
           + statusCode);

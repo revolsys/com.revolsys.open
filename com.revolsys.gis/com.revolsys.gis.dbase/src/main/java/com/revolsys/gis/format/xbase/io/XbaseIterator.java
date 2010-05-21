@@ -1,6 +1,5 @@
 package com.revolsys.gis.format.xbase.io;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -13,6 +12,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -74,11 +76,15 @@ public class XbaseIterator implements Iterator<DataObject> {
   private short recordSize;
 
   public XbaseIterator(
-    final File file,
-    final DataObjectFactory factory)
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory)
     throws IOException {
-    this(new QName(FileUtil.getFileNamePrefix(file)), new EndianInputStream(
-      new FileInputStream(file)), factory);
+    this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
+    this.in = new EndianInputStream(resource.getInputStream());
+    this.dataObjectFactory = dataObjectFactory;
+    loadHeader();
+    readMetaData();
+    recordBuffer = new byte[recordSize];
   }
 
   public XbaseIterator(

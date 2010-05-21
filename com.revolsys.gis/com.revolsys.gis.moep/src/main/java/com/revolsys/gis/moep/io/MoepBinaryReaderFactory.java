@@ -1,7 +1,6 @@
 package com.revolsys.gis.moep.io;
 
-import java.io.File;
-import java.net.URL;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
@@ -28,24 +27,8 @@ public class MoepBinaryReaderFactory extends AbstractDataObjectReaderFactory {
   }
 
   public Reader<DataObject> createDataObjectReader(
-    java.io.Reader in,
-    DataObjectFactory factory) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Reader<DataObject> createDataObjectReader(
-    final File file,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new MoepBinaryReader(null, file, dataObjectFactory);
+    return new MoepBinaryReader(null, resource, dataObjectFactory);
   }
-
-
-  @Override
-  public Reader<DataObject> createDataObjectReader(
-    final URL url,
-    final DataObjectFactory dataObjectFactory) {
-    return new MoepBinaryReader(url, dataObjectFactory);
-  }
-
 }

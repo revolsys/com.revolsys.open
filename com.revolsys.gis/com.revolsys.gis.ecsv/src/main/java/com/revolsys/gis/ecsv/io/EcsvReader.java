@@ -1,10 +1,12 @@
 package com.revolsys.gis.ecsv.io;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.io.DataObjectReader;
@@ -17,9 +19,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class EcsvReader extends AbstractReader<DataObject> implements
   DataObjectReader {
   public static DataObjectMetaData getMetaData(
-    final InputStream in) {
+    final Resource resource) {
     final EcsvDataObjectReaderFactory ecsvDataObjectReaderFactory = EcsvDataObjectReaderFactory.INSTANCE;
-    final EcsvReader reader = (EcsvReader)ecsvDataObjectReaderFactory.createDataObjectReader(in);
+    final EcsvReader reader = (EcsvReader)ecsvDataObjectReaderFactory.createDataObjectReader(resource);
     final DataObjectMetaData metaData = reader.getMetaData();
     reader.close();
     return metaData;
@@ -27,8 +29,7 @@ public class EcsvReader extends AbstractReader<DataObject> implements
 
   public static DataObjectMetaData getMetaData(
     final String resourceName) {
-    final InputStream in = EcsvReader.class.getResourceAsStream(resourceName);
-    return getMetaData(in);
+    return getMetaData(new ClassPathResource(resourceName, EcsvReader.class));
   }
 
   private final DataObjectFactory dataObjectFactory;
@@ -40,9 +41,11 @@ public class EcsvReader extends AbstractReader<DataObject> implements
   private EcsvIterator iterator;
 
   public EcsvReader(
-    final InputStream in,
-    final DataObjectFactory dataObjectFactory) {
-    this.in = new InputStreamReader(in, EcsvConstants.CHARACTER_SET);
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory)
+    throws IOException {
+    this.in = new InputStreamReader(resource.getInputStream(),
+      EcsvConstants.CHARACTER_SET);
     this.dataObjectFactory = dataObjectFactory;
   }
 

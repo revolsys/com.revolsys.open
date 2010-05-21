@@ -1,13 +1,13 @@
 package com.revolsys.gis.format.shape.io;
 
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
@@ -45,25 +45,23 @@ public class ShapeIterator extends AbstractObjectWithProperties implements
   private XbaseIterator xbaseIterator;
 
   public ShapeIterator(
-    final File file,
+    final Resource resource,
     final DataObjectFactory factory)
     throws IOException {
     this.factory = factory;
-    final File parentFile = file.getParentFile();
-    final String baseName = FileUtil.getFileNamePrefix(file);
-    name = new QName(baseName);
-    final FileInputStream in = new FileInputStream(file);
-    this.in = new EndianInputStream(in);
+    final String baseName = FileUtil.getBaseName(resource.getFilename());
+    name = QName.valueOf(baseName);
+    this.in = new EndianInputStream(resource.getInputStream());
 
-    final File xbaseFile = new File(parentFile, baseName + ".dbf");
-    if (xbaseFile.exists()) {
-      xbaseIterator = new XbaseIterator(xbaseFile, factory);
+    final Resource xbaseResource = resource.createRelative(baseName + ".dbf");
+    if (xbaseResource.exists()) {
+      xbaseIterator = new XbaseIterator(xbaseResource, factory);
     }
-    final File projFile = new File(parentFile, baseName + ".prj");
-    if (projFile.exists()) {
+    final Resource projResource = resource.createRelative(baseName + ".prj");
+    if (projResource.exists()) {
       try {
         CoordinateSystem coordinateSystem = new WktCsParser(
-          new FileInputStream(projFile)).parse();
+          projResource.getInputStream()).parse();
         coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         final int crsId = EsriCoordinateSystems.getCrsId(coordinateSystem);
         if (crsId != 0) {

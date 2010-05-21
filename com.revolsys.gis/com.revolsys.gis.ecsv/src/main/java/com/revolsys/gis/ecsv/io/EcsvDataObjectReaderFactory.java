@@ -1,5 +1,9 @@
 package com.revolsys.gis.ecsv.io;
 
+import java.io.IOException;
+
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
@@ -25,8 +29,13 @@ public class EcsvDataObjectReaderFactory extends
    * @return The reader for the file.
    */
   public Reader<DataObject> createDataObjectReader(
-    java.io.Reader in,
+    Resource resource,
     DataObjectFactory dataObjectFactory) {
-    return new EcsvReader(in, dataObjectFactory);
+    try {
+      return new EcsvReader(resource, dataObjectFactory);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Unable to open resource " + resource,
+        e);
+    }
   }
 }

@@ -1,5 +1,7 @@
 package com.revolsys.gis.csv;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
@@ -26,9 +28,11 @@ public class CsvReaderFactory extends AbstractDataObjectReaderFactory {
   }
 
   public Reader<DataObject> createDataObjectReader(
-    final java.io.Reader in,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new CsvReader(in, dataObjectFactory);
+    final CsvReader reader = new CsvReader(resource, dataObjectFactory);
+    reader.setResource(resource);
+    return reader;
 
   }
 

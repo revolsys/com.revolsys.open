@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
@@ -28,12 +30,12 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    */
   public MoepBinaryReader(
     final MoepDirectoryReader moepDirectoryReader,
-    final File file,
+    final Resource resource,
     final DataObjectFactory factory) {
     try {
-      final InputStream in = new FileInputStream(file);
+      final InputStream in = resource.getInputStream();
       this.iterator = new MoepBinaryIterator(moepDirectoryReader,
-        file.getName(), in, factory);
+        resource.getFilename(), in, factory);
     } catch (final IOException e) {
     }
   }

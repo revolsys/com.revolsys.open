@@ -1,6 +1,6 @@
 package com.revolsys.gis.format.shape.io;
 
-import java.io.File;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
@@ -26,16 +26,9 @@ public class ShapeReaderFactory extends AbstractDataObjectReaderFactory {
     addMediaTypeAndFileExtension("application/x-shp", "shp");
   }
 
-  @Override
   public Reader<DataObject> createDataObjectReader(
-    final File file,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new ShapeReader(file, dataObjectFactory);
-  }
-
-  public Reader<DataObject> createDataObjectReader(
-    java.io.Reader in,
-    DataObjectFactory factory) {
-    throw new UnsupportedOperationException();
+    return new ShapeReader(resource, dataObjectFactory);
   }
 }

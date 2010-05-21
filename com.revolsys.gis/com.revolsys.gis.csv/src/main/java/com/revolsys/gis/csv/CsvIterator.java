@@ -2,7 +2,7 @@ package com.revolsys.gis.csv;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,12 +13,15 @@ import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.FileUtil;
 
 public class CsvIterator implements Iterator<DataObject> {
   /** The current database object. */
@@ -46,6 +49,8 @@ public class CsvIterator implements Iterator<DataObject> {
    */
   private int recordCount = 0;
 
+  private Resource resource;
+
   /**
    * Constructs CSVReader with supplied separator and quote char.
    * 
@@ -53,10 +58,12 @@ public class CsvIterator implements Iterator<DataObject> {
    * @throws IOException
    */
   public CsvIterator(
-    final Reader in,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory)
     throws IOException {
-    this.in = new BufferedReader(in);
+    this.resource = resource;
+    this.in = new BufferedReader(new InputStreamReader(
+      resource.getInputStream(), CsvConstants.CHARACTER_SET));
     this.dataObjectFactory = dataObjectFactory;
     readRecordHeader();
 
@@ -67,12 +74,9 @@ public class CsvIterator implements Iterator<DataObject> {
 
   /**
    * Closes the underlying reader.
-   * 
-   * @throws IOException if the close fails
    */
-  public void close()
-    throws IOException {
-    in.close();
+  public void close() {
+    FileUtil.closeSilent(in);
   }
 
   private void createMetaData()
@@ -86,7 +90,8 @@ public class CsvIterator implements Iterator<DataObject> {
 
       attributes.add(new Attribute(name, type, false));
     }
-    final QName typeName = new QName("object");
+    final String filename = FileUtil.getBaseName(resource.getFilename());
+    final QName typeName =  QName.valueOf(filename);
     metaData = new DataObjectMetaDataImpl(typeName, properties, attributes);
   }
 

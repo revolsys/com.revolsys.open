@@ -1,15 +1,10 @@
 package com.revolsys.jump.ui.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.xml.namespace.QName;
 
@@ -18,6 +13,8 @@ import org.openjump.core.model.OpenJumpTaskProperties;
 import org.openjump.core.ui.io.file.AbstractFileLayerLoader;
 import org.openjump.core.ui.util.TaskUtil;
 import org.openjump.util.UriUtil;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
@@ -52,13 +49,17 @@ public abstract class AbstractDataObjectFileLoader extends
    * @param description The file format name.
    * @param extensions The list of supported extensions.
    */
-  public AbstractDataObjectFileLoader(final WorkbenchContext workbenchContext,
-    final String description, final String... extensions) {
+  public AbstractDataObjectFileLoader(
+    final WorkbenchContext workbenchContext,
+    final String description,
+    final String... extensions) {
     super(description, Arrays.asList(extensions));
     this.workbenchContext = workbenchContext;
   }
 
-  public boolean open(final TaskMonitor monitor, final URI uri,
+  public boolean open(
+    final TaskMonitor monitor,
+    final URI uri,
     final Map<String, Object> options) {
     LayerManager layerManager = workbenchContext.getLayerManager();
     Task task = layerManager.getTask();
@@ -66,22 +67,8 @@ public abstract class AbstractDataObjectFileLoader extends
     layerManager.setFiringEvents(false);
 
     try {
-      InputStream in;
-      if (uri.getScheme().equals("zip")) {
-        File file = UriUtil.getZipFile(uri);
-        String compressedFile = UriUtil.getZipEntryName(uri);
-        ZipFile zipFile = new ZipFile(file);
-        ZipEntry entry = zipFile.getEntry(compressedFile);
-        if (entry == null) {
-          // TODO file does not exist message
-          return false;
-        }
-        in = zipFile.getInputStream(entry);
-      } else {
-        File file = new File(uri);
-        in = new FileInputStream(file);
-      }
-      FeatureCollection features = readFeatureCollection(srid, in, options);
+      FeatureCollection features = readFeatureCollection(srid, new UrlResource(
+        uri), options);
       if (features == null) {
         return false;
       }
@@ -99,7 +86,9 @@ public abstract class AbstractDataObjectFileLoader extends
     }
   }
 
-  private Layer createLayer(final LayerManager layerManager, final String name,
+  private Layer createLayer(
+    final LayerManager layerManager,
+    final String name,
     final FeatureCollection features) {
     Layer layer = new Layer(name, layerManager.generateLayerFillColor(),
       features, layerManager);
@@ -107,11 +96,14 @@ public abstract class AbstractDataObjectFileLoader extends
     return layer;
   }
 
-  protected FeatureCollection readFeatureCollection(final QName srid,
-    final InputStream in, final Map<String, Object> options) throws Exception {
-    try {
+  protected FeatureCollection readFeatureCollection(
+    final QName srid,
+    final Resource resource,
+    final Map<String, Object> options)
+    throws Exception {
 
-      Reader<DataObject> reader = createReader(in, options);
+    Reader<DataObject> reader = createReader(resource, options);
+    try {
 
       Iterator<DataObject> iterator = reader.iterator();
       if (iterator.hasNext()) {
@@ -129,11 +121,12 @@ public abstract class AbstractDataObjectFileLoader extends
         return null;
       }
     } finally {
-      in.close();
+      reader.close();
     }
   }
 
-  private GeometryOperation getProjection(final int sourceSrid,
+  private GeometryOperation getProjection(
+    final int sourceSrid,
     final int targetSrid) {
     GeometryOperation transformation = transformations.get(sourceSrid);
     if (transformation == null) {
@@ -144,7 +137,9 @@ public abstract class AbstractDataObjectFileLoader extends
     return transformation;
   }
 
-  private void addFeature(final QName srid, final DataObjectFeature feature,
+  private void addFeature(
+    final QName srid,
+    final DataObjectFeature feature,
     final FeatureCollection features) {
     Geometry geometry = feature.getGeometry();
     if (srid != null && geometry.getSRID() != EpsgConstants.getSrid(srid)) {
@@ -156,5 +151,6 @@ public abstract class AbstractDataObjectFileLoader extends
   }
 
   protected abstract Reader<DataObject> createReader(
-    final InputStream in, final Map<String, Object> options);
+    final Resource resource,
+    final Map<String, Object> options);
 }
