@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
@@ -26,19 +27,19 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
 
   private int currentQuery = -1;
 
-  private final DataObjectFactory dataObjectFactory;
+  private DataObjectFactory dataObjectFactory;
 
-  private final DataSource dataSource;
+  private DataSource dataSource;
 
-  private final JdbcDataObjectStore dataStore;
+  private JdbcDataObjectStore dataStore;
 
   private final int fetchSize;
 
-  private boolean hasNext = false;
+  private boolean hasNext = true;
 
   private DataObjectMetaData metaData;
 
-  private final List<JdbcQuery> queries;
+  private List<JdbcQuery> queries;
 
   private ResultSet resultSet;
 
@@ -67,11 +68,22 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
     this.fetchSize = fetchSize;
   }
 
+  @PreDestroy
   public void close() {
     JdbcUtils.close(statement, resultSet);
     if (dataSource != null) {
       JdbcUtils.close(connection);
     }
+    hasNext = false;
+    connection = null;
+    dataObjectFactory = null;
+    dataSource = null;
+    dataStore = null;
+    hasNext = false;
+    metaData = null;
+    queries = null;
+    resultSet = null;
+    statement = null;
   }
 
   protected String getErrorMessage() {
@@ -130,13 +142,16 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
   }
 
   public boolean hasNext() {
-    if (resultSet == null) {
-      resultSet = getNextResultSet();
-      if (this.resultSet == null) {
-        hasNext = false;
-        close();
-      } else {
-        hasNext = true;
+    if (hasNext && resultSet == null) {
+      try {
+        resultSet = getNextResultSet();
+      } finally {
+        if (this.resultSet == null) {
+          hasNext = false;
+          close();
+        } else {
+          hasNext = true;
+        }
       }
     }
     return hasNext;
@@ -173,7 +188,14 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
         return object;
       }
     } catch (final SQLException e) {
+      close();
       throw new RuntimeException(getErrorMessage(), e);
+    } catch (final RuntimeException e) {
+      close();
+      throw e;
+    } catch (final Error e) {
+      close();
+      throw e;
     }
   }
 

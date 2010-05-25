@@ -32,6 +32,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.util.ObjectUtils;
 
+import com.revolsys.jdbc.JdbcUtils;
+
 public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   Ordered {
   /** The logger for the instance. */
@@ -60,9 +62,10 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
    */
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) {
-    Map properties = new HashMap();
+    Map<String,String> properties = new HashMap<String,String>();
+    Connection connection  = null;
     try {
-      Connection connection = dataSource.getConnection();
+       connection = dataSource.getConnection();
       String sql = "SELECT " + keyColumnName + ", " + valueColumnName
         + " FROM " + tableName;
       Statement statement = connection.createStatement();
@@ -75,6 +78,8 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
 
     } catch (SQLException e) {
       throw new BeanInitializationException(e.getMessage(), e);
+    } finally {
+      JdbcUtils.close(connection);
     }
 
     processProperties(beanFactory, properties);

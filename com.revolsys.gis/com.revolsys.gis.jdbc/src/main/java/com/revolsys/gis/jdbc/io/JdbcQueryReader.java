@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.AbstractReader;
@@ -77,6 +78,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     addQuery(typeName, query, Arrays.asList(parameters));
   }
 
+  @PreDestroy
   public void close() {
     if (iterator != null) {
       iterator.close();
