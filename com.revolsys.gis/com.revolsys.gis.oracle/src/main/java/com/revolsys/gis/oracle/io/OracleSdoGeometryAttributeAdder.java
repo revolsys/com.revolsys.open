@@ -141,7 +141,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
         columnProperties);
 
       try {
-        final Connection connection = dataSource.getConnection();
+        final Connection connection = JdbcUtils.getConnection(dataSource);
         try {
           final String schemaName = schema.getName().toUpperCase();
           final String esriSridSql = "select TABLE_NAME, COLUMN_NAME, SRID, DIMINFO from ALL_SDO_GEOM_METADATA where OWNER = ?";

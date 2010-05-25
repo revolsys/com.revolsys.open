@@ -28,6 +28,9 @@ public final class JdbcUtils {
       try {
         connection.close();
       } catch (final SQLException e) {
+        LOG.debug("SQL error closing connection", e);
+      } catch (Throwable e) {
+        LOG.debug("Unknown error closing connection", e);
       }
     }
   }
@@ -54,6 +57,9 @@ public final class JdbcUtils {
       try {
         resultSet.close();
       } catch (final SQLException e) {
+        LOG.debug("SQL error closing result set", e);
+      } catch (Throwable e) {
+        LOG.debug("Unknown error closing result set", e);
       }
     }
   }
@@ -64,6 +70,9 @@ public final class JdbcUtils {
       try {
         statement.close();
       } catch (final SQLException e) {
+        LOG.debug("SQL error closing statement", e);
+      } catch (Throwable e) {
+        LOG.debug("Unknown error closing statement", e);
       }
     }
   }
@@ -134,7 +143,7 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection = dataSource.getConnection();
+    final Connection connection = getConnection(dataSource);
     try {
       return executeUpdate(connection, sql, parameters);
     } finally {
@@ -147,7 +156,9 @@ public final class JdbcUtils {
     try {
       return dataSource.getConnection();
     } catch (final SQLException e) {
-      throw new RuntimeException("Unable to get database connection", e);
+      throw new RuntimeException("SQL error getting connection from data source", e);
+    } catch (final Throwable e) {
+      throw new RuntimeException("Unknown getting connection from data source", e);
     }
   }
 
@@ -221,7 +232,7 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection = dataSource.getConnection();
+    final Connection connection =getConnection(dataSource);
     try {
       return selectDate(connection, sql, parameters);
     } finally {
@@ -273,7 +284,7 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection = dataSource.getConnection();
+    final Connection connection = getConnection(dataSource);
     try {
       return selectString(connection, sql, parameters);
     } finally {
@@ -325,7 +336,7 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection = dataSource.getConnection();
+    final Connection connection = getConnection(dataSource);
     try {
       return selectInt(connection, sql, parameters);
     } finally {
@@ -377,7 +388,7 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection = dataSource.getConnection();
+    final Connection connection = getConnection(dataSource);
     try {
       return selectLong(connection, sql, parameters);
     } finally {
@@ -416,7 +427,7 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection = dataSource.getConnection();
+    final Connection connection = getConnection(dataSource);
     try {
       return selectMap(connection, sql, parameters);
     } finally {

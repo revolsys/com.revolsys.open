@@ -56,7 +56,7 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
 
     if (dataSource != null) {
       try {
-        this.connection = dataSource.getConnection();
+        this.connection = JdbcUtils.getConnection(dataSource);
         this.connection.setAutoCommit(autoCommit);
       } catch (final SQLException e) {
         throw new IllegalArgumentException("Unable to create connection", e);

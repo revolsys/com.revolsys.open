@@ -65,7 +65,7 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
     Map<String,String> properties = new HashMap<String,String>();
     Connection connection  = null;
     try {
-       connection = dataSource.getConnection();
+       connection = JdbcUtils.getConnection(dataSource);
       String sql = "SELECT " + keyColumnName + ", " + valueColumnName
         + " FROM " + tableName;
       Statement statement = connection.createStatement();

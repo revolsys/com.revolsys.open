@@ -28,7 +28,7 @@ public class JdbcFactory {
   public static JdbcDataObjectStore createDataObjectStore(
     final DataSource dataSource) {
     try {
-      final Connection connection = dataSource.getConnection();
+      final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
         final DatabaseMetaData metaData = connection.getMetaData();
         final String productName = metaData.getDatabaseProductName();

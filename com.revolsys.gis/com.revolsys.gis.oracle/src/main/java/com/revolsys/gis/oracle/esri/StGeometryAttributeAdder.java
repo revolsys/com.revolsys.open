@@ -155,7 +155,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
         if (dataSource == null) {
           connection = this.connection;
         } else {
-          connection = dataSource.getConnection();
+          connection = JdbcUtils.getConnection(dataSource);
         }
         try {
           initializeEsriSridMap(schema, connection, esriColumnProperties);

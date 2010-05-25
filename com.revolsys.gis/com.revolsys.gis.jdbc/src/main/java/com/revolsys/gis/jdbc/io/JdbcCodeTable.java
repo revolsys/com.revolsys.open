@@ -126,7 +126,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     final List<Object> values) {
     try {
       init();
-      final Connection connection = dataSource.getConnection();
+      final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
         JdbcUtils.lockTable(connection, tableName);
         Number id = loadId(values, false);
@@ -239,7 +239,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   private void loadAll() {
     try {
-      final Connection connection = dataSource.getConnection();
+      final Connection connection = JdbcUtils.getConnection(dataSource);
 
       try {
         final PreparedStatement statement = connection.prepareStatement(allSql);
@@ -282,7 +282,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
       id = getIdByValue(values);
     } else {
       try {
-        final Connection connection = dataSource.getConnection();
+        final Connection connection = JdbcUtils.getConnection(dataSource);
         try {
           final PreparedStatement statement = connection.prepareStatement(idByValueSql);
           try {
@@ -325,7 +325,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
       values = getValueById(id);
     } else {
       try {
-        final Connection connection = dataSource.getConnection();
+        final Connection connection = JdbcUtils.getConnection(dataSource);
         try {
           final PreparedStatement statement = connection.prepareStatement(valueByIdSql);
           try {

@@ -60,7 +60,7 @@ public class SpatialReferenceCache {
       try {
         Connection connection = this.connection;
         if (dataSource != null) {
-          connection = dataSource.getConnection();
+          connection = JdbcUtils.getConnection(dataSource);
         }
         try {
           PreparedStatement statement = null;

@@ -618,7 +618,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     final DataSource dataSource) {
     this.dataSource = dataSource;
     try {
-      setConnection(dataSource.getConnection());
+      setConnection(JdbcUtils.getConnection(dataSource));
       connection.setAutoCommit(false);
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to create connection", e);
