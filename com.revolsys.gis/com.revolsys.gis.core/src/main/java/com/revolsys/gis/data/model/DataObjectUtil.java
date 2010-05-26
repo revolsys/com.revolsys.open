@@ -101,20 +101,10 @@ public final class DataObjectUtil {
   public static void noop() {
   }
 
-  public static void noopOnIdNull(
-    final DataObject object) {
-    if (object.getIdValue() == null) {
-      noop();
-    }
-  }
-
-  private DataObjectUtil() {
-  }
-
   public static void noopOnCoordinateEqual2d(
-    DataObject object,
-    double x,
-    double y) {
+    final DataObject object,
+    final double x,
+    final double y) {
     DataObjectUtil.noopOnCoordinateEqual2d(object.getGeometryValue(), x, y);
   }
 
@@ -127,5 +117,15 @@ public final class DataObjectUtil {
     if (coordinate1.equals2D(coordinate2)) {
       noop();
     }
+  }
+
+  public static void noopOnIdNull(
+    final DataObject object) {
+    if (object.getIdValue() == null) {
+      noop();
+    }
+  }
+
+  private DataObjectUtil() {
   }
 }
