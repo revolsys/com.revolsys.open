@@ -1,5 +1,5 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/shape/io/MoepDirectoryReader.java $
+ * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/shape/io/ShapeDirectoryReader.java $
  * $Author:paul.austin@revolsys.com $
  * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
  * $Revision:265 $
@@ -30,7 +30,7 @@ import com.revolsys.io.filter.ExtensionFilenameFilter;
 
 /**
  * <p>
- * The MoepDirectoryReader is a {@link DataObjectReader} that can read .shp data
+ * The ShapeDirectoryReader is a {@link DataObjectReader} that can read .shp data
  * files contained in a single directory. The reader will iterate through the
  * .shp files in alpabetical order returning all features.
  * </p>

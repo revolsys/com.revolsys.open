@@ -14,7 +14,7 @@
   <bean
     id="moepDirectoryReader"
     class="com.revolsys.gis.moep.io.MoepDirectoryReader"
-    p:file="moepDirectory"
+    p:directory="moepDirectory"
 
     lazy-init="true"
   />
