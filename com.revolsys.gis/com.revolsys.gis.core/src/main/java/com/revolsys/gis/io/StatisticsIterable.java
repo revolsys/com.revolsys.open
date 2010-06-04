@@ -2,6 +2,8 @@ package com.revolsys.gis.io;
 
 import java.util.Iterator;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -23,6 +25,14 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
 
   public Iterable<DataObject> getIterable() {
     return iterable;
+  }
+
+  @PostConstruct
+  public void init() {
+    if (this.statistics == null) {
+      setStatistics(new Statistics("Read " + beanName + " "
+        + iterable.toString()));
+    }
   }
 
   /**

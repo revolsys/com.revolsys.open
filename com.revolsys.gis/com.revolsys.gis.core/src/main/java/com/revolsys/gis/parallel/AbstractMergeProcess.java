@@ -19,6 +19,8 @@ public abstract class AbstractMergeProcess extends
 
   private Channel<DataObject> otherIn;
 
+  private int otherInBufferSize = 0;
+
   protected boolean acceptObject(
     final DataObject object) {
     return true;
@@ -158,8 +160,6 @@ public abstract class AbstractMergeProcess extends
   protected abstract void addSourceObject(
     DataObject object);
 
-  private int otherInBufferSize = 0;
-
   /**
    * @return the in
    */
@@ -174,6 +174,10 @@ public abstract class AbstractMergeProcess extends
       }
     }
     return otherIn;
+  }
+
+  public int getOtherInBufferSize() {
+    return otherInBufferSize;
   }
 
   protected abstract void processObjects(
@@ -318,6 +322,11 @@ public abstract class AbstractMergeProcess extends
     final Channel<DataObject> in) {
     this.otherIn = in;
     in.readConnect();
+  }
+
+  public void setOtherInBufferSize(
+    final int otherInBufferSize) {
+    this.otherInBufferSize = otherInBufferSize;
   }
 
   protected void setUp() {
