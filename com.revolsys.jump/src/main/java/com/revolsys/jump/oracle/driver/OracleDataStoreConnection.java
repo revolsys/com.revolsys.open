@@ -35,12 +35,6 @@ public class OracleDataStoreConnection implements DataStoreConnection {
     throws DataStoreException {
     try {
       String url = (String)params.getParameter(OracleDataStoreDriver.URL);
-      if (url == null) {
-        String host = (String)params.getParameter(OracleDataStoreDriver.HOST);
-        String db = (String)params.getParameter(OracleDataStoreDriver.DB);
-        String port = (String)params.getParameter(OracleDataStoreDriver.PORT);
-        url = "jdbc:oracle:thin:@" + host + ":" + port + ":" + db;
-      }
       schema = params.getParameter(OracleDataStoreDriver.SCHEMA)
         .toString()
         .toUpperCase();
@@ -50,14 +44,14 @@ public class OracleDataStoreConnection implements DataStoreConnection {
       if (schema == null) {
         schema = user;
       }
-      // TODO delete
 
       dataSource = new OracleDataSource();
       dataSource.setURL(url);
       dataSource.setUser(user);
       dataSource.setPassword(password);
       dataSource.setConnectionCachingEnabled(true);
-      dataStore = new OracleDataObjectStore(new FeatureDataObjectFactory(), dataSource);
+      dataStore = new OracleDataObjectStore(new FeatureDataObjectFactory(),
+        dataSource);
       dataStore.initialize();
       metaData = new JdbcDataStoreMetaData(dataStore, schema);
     } catch (SQLException e) {

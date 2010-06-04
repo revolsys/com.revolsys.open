@@ -108,6 +108,13 @@ public final class DataObjectUtil {
     DataObjectUtil.noopOnCoordinateEqual2d(object.getGeometryValue(), x, y);
   }
 
+  public static void noopOnModified(
+    final DataObject object) {
+    if (object.getState() == DataObjectState.Modified) {
+      DataObjectUtil.noop();
+    }
+  }
+
   public static void noopOnCoordinateEqual2d(
     final Geometry geometry,
     final double x,

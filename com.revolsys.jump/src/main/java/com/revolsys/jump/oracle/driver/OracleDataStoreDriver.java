@@ -10,23 +10,16 @@ public class OracleDataStoreDriver implements DataStoreDriver {
 
   public static final String USER = "user";
 
-  public static final String DB = "db";
-
-  public static final String PORT = "port";
-
-  public static final String HOST = "host";
-
   public static final String SCHEMA = "schema";
 
   public static final String URL = "url";
 
   private static final String[] PARAM_NAMES = {
-    URL, HOST, PORT, DB, SCHEMA, USER, PASSWORD
+    URL, SCHEMA, USER, PASSWORD
   };
 
   private static final Class<?>[] PARAM_TYPES = {
     String.class, String.class, String.class, String.class, String.class,
-    String.class, String.class, String.class,
   };
 
   private static final ParameterListSchema PARAMS_SCHEMA = new ParameterListSchema(
