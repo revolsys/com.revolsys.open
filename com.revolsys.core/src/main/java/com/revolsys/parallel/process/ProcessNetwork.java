@@ -16,6 +16,8 @@ import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.tools.ThreadSharedAttributes;
 
 public class ProcessNetwork implements BeanPostProcessor {
+  private Object waitMonitor = new Object();
+
   private int count = 0;
 
   private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
@@ -121,19 +123,27 @@ public class ProcessNetwork implements BeanPostProcessor {
   public synchronized void stop() {
     final List<Thread> processesToStop = new ArrayList<Thread>(
       processes.values());
-    for (final Thread thread : processesToStop) {
-      if (Thread.currentThread() != thread && thread.isAlive()) {
-        thread.stop();
+    try {
+      for (final Thread thread : processesToStop) {
+        if (Thread.currentThread() != thread && thread.isAlive()) {
+          thread.stop();
+        }
       }
+    } finally {
+      synchronized (waitMonitor) {
+        waitMonitor.notify();
+      }
+      finishRunning();
     }
-    finishRunning();
   }
 
   public synchronized void waitTillFinished() {
-    while (count > 0) {
-      try {
-        wait();
-      } catch (final InterruptedException e) {
+    synchronized (waitMonitor) {
+      while (count > 0) {
+        try {
+          waitMonitor.wait();
+        } catch (final InterruptedException e) {
+        }
       }
     }
     finishRunning();

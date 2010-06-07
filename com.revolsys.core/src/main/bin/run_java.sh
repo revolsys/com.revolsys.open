@@ -20,4 +20,4 @@ do
     fi
 done
 
-java -cp $LOCALCLASSPATH $*
+exec java -cp $LOCALCLASSPATH $*

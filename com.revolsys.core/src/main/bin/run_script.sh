@@ -8,4 +8,4 @@ if [ -f "$APP_HOME/etc/java_config.sh" ]; then
   . "$APP_HOME/etc/java_config.sh"
 fi
 
-"$BIN_DIR/run_java.sh" $JAVA_OPTS com.revolsys.parallel.tools.ScriptTool "-DapplicationHome=$APP_HOME" -s "$@"
+exec "$BIN_DIR/run_java.sh" $JAVA_OPTS com.revolsys.parallel.tools.ScriptTool "-DapplicationHome=$APP_HOME" -s "$@"
