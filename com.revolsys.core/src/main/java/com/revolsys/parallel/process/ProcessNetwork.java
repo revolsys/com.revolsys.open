@@ -16,7 +16,6 @@ import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.tools.ThreadSharedAttributes;
 
 public class ProcessNetwork implements BeanPostProcessor {
-  private Object waitMonitor = new Object();
 
   private int count = 0;
 
@@ -30,17 +29,19 @@ public class ProcessNetwork implements BeanPostProcessor {
     ThreadSharedAttributes.initialiseThreadGroup(threadGroup);
   }
 
-  public synchronized void addProcess(
+  public void addProcess(
     final Process process) {
-    if (!processes.containsKey(process)) {
-      final Runnable runnable = new ProcessRunnable(this, process);
-      final String name = process.toString();
-      final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
-        runnable);
-      final Thread thread = new Thread(threadGroup, appenderRunnable, name);
-      processes.put(process, thread);
-      if (running) {
-        startProcess(thread);
+    synchronized (processes) {
+      if (!processes.containsKey(process)) {
+        final Runnable runnable = new ProcessRunnable(this, process);
+        final String name = process.toString();
+        final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
+          runnable);
+        final Thread thread = new Thread(threadGroup, appenderRunnable, name);
+        processes.put(process, thread);
+        if (running) {
+          startProcess(thread);
+        }
       }
     }
   }
@@ -71,17 +72,19 @@ public class ProcessNetwork implements BeanPostProcessor {
     return bean;
   }
 
-  synchronized void removeProcess(
+  void removeProcess(
     final Process process) {
-    if (process instanceof AbstractProcess) {
-      AbstractProcess proc = (AbstractProcess)process;
-      proc.setProcessNetwork(null);
-    }
-    processes.remove(process);
-    count--;
-    if (count == 0) {
-      finishRunning();
-      notify();
+    synchronized (processes) {
+      if (process instanceof AbstractProcess) {
+        AbstractProcess proc = (AbstractProcess)process;
+        proc.setProcessNetwork(null);
+      }
+      processes.remove(process);
+      count--;
+      if (count == 0) {
+        finishRunning();
+        processes.notify();
+      }
     }
   }
 
@@ -92,22 +95,26 @@ public class ProcessNetwork implements BeanPostProcessor {
     }
   }
 
-  public synchronized void start() {
-    running = true;
-    for (final Entry<Process, Thread> entry : processes.entrySet()) {
-      Process process = entry.getKey();
-      if (process instanceof AbstractProcess) {
-        AbstractProcess proc = (AbstractProcess)process;
-        proc.setProcessNetwork(this);
+  public void start() {
+    synchronized (processes) {
+      running = true;
+      for (final Entry<Process, Thread> entry : processes.entrySet()) {
+        Process process = entry.getKey();
+        if (process instanceof AbstractProcess) {
+          AbstractProcess proc = (AbstractProcess)process;
+          proc.setProcessNetwork(this);
+        }
+        Thread thread = entry.getValue();
+        startProcess(thread);
       }
-      Thread thread = entry.getValue();
-      startProcess(thread);
     }
   }
 
-  public synchronized void startAndWait() {
-    start();
-    waitTillFinished();
+  public void startAndWait() {
+    synchronized (processes) {
+      start();
+      waitTillFinished();
+    }
   }
 
   private void startProcess(
@@ -120,32 +127,32 @@ public class ProcessNetwork implements BeanPostProcessor {
 
   @SuppressWarnings("deprecation")
   @PreDestroy
-  public synchronized void stop() {
-    final List<Thread> processesToStop = new ArrayList<Thread>(
-      processes.values());
-    try {
-      for (final Thread thread : processesToStop) {
-        if (Thread.currentThread() != thread && thread.isAlive()) {
-          thread.stop();
+  public void stop() {
+    synchronized (processes) {
+      final List<Thread> processesToStop = new ArrayList<Thread>(
+        processes.values());
+      try {
+        for (final Thread thread : processesToStop) {
+          if (Thread.currentThread() != thread && thread.isAlive()) {
+            thread.stop();
+          }
         }
+      } finally {
+        processes.notify();
+        finishRunning();
       }
-    } finally {
-      synchronized (waitMonitor) {
-        waitMonitor.notify();
-      }
-      finishRunning();
     }
   }
 
-  public synchronized void waitTillFinished() {
-    synchronized (waitMonitor) {
+  public void waitTillFinished() {
+    synchronized (processes) {
       while (count > 0) {
         try {
-          waitMonitor.wait();
+          processes.wait();
         } catch (final InterruptedException e) {
         }
       }
+      finishRunning();
     }
-    finishRunning();
   }
 }
