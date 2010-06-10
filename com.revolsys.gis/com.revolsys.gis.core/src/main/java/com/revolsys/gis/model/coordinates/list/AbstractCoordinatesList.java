@@ -1,8 +1,11 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.util.Iterator;
+
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList {
 
@@ -18,6 +21,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
       s.append(' ');
       s.append(coordinate);
     }
+  }
+
+  public Iterator<Coordinates> iterator() {
+    return new CoordinatesListCoordinatesIterator(this);
   }
 
   @Override
@@ -108,12 +115,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
 
   public double getY(
     final int index) {
-    return getValue(index,1);
+    return getValue(index, 1);
   }
 
   public double getZ(
     int index) {
-    return getValue(index,2);
+    return getValue(index, 2);
   }
 
   public void setX(
@@ -135,17 +142,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
   }
 
   public void makePrecise(
-    final PrecisionModel precisionModel) {
-    if (precisionModel.getType() == PrecisionModel.FIXED) {
-      for (int i = 0; i < size(); i++) {
-        double x = getX(i);
-        x = precisionModel.makePrecise(x);
-        setX(i, x);
-
-        double y = getY(i);
-        y = precisionModel.makePrecise(y);
-        setY(i, y);
-      }
+    final CoordinatesPrecisionModel precisionModel) {
+    InPlaceIterator iterator = new InPlaceIterator(this);
+    for (Coordinates point : iterator) {
+      precisionModel.makePrecise(point);
     }
   }
 
@@ -160,6 +160,16 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     setValue(i, 1, coordinate.y);
     if (getNumAxis() > 2) {
       setValue(i, 2, coordinate.z);
+    }
+  }
+
+  public void setCoordinates(
+    final int i,
+    final Coordinates point) {
+    setX(i, point.getX());
+    setY(i, point.getY());
+    if (getNumAxis() > 2) {
+      setZ(i, point.getZ());
     }
   }
 

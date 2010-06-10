@@ -21,11 +21,12 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   private final GeometryFactory geometryFactory;
@@ -42,7 +43,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     final int srid) {
     super(name, type, -1, length, scale, required, properties);
     this.srid = srid;
-    final PrecisionModel precisionModel = new PrecisionModel();
+    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
   }

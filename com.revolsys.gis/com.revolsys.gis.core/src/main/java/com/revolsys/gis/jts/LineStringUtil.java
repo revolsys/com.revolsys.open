@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.parallel.channel.Channel;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -33,6 +37,62 @@ public final class LineStringUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
+  /**
+   * Get the portion of the line segment between c1 and c2 which intersects the
+   * line string geometry. If there is no intersection null will be returned,
+   * otherwise a point, line, multi-point, multi-line, or multi-geometry
+   * containing point and lines depending on what intersections occur.
+   * 
+   * @param lineStart The coordinates of the start of the segment.
+   * @param lineEnd The coordinates of the end of the segment
+   * @param line The line to intersect.
+   * @return The geometry of the intersection.
+   */
+  public static Geometry intersection(
+    final Coordinates lineStart,
+    Coordinates lineEnd,
+    final LineString line) {
+    GeometryFactory factory = GeometryFactory.getFactory(line);
+    final CoordinatesPrecisionModel precisionModel = factory.getCoordinatesPrecisionModel();
+    List<List<Coordinates>> intersections = new ArrayList<List<Coordinates>>();
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Iterator<Coordinates> iterator = points.iterator();
+    Coordinates previousPoint = iterator.next();
+    while (iterator.hasNext()) {
+      Coordinates nextPoint = iterator.next();
+      List<Coordinates> intersectionPoints = LineSegmentUtil.intersection(
+        precisionModel, lineStart, lineEnd, previousPoint, nextPoint);
+      if (!intersectionPoints.isEmpty()) {
+        intersections.add(intersectionPoints);
+      }
+      previousPoint = nextPoint;
+    }
+
+    if (intersections.isEmpty()) {
+      return null;
+    } else if (intersections.size() == 1) {
+      final List<Coordinates> intersectionPoints = intersections.get(0);
+      if (intersectionPoints.size() == 1) {
+        Coordinates point = intersectionPoints.get(0);
+        return factory.createPoint(point);
+      } else {
+        return factory.createLineString(intersectionPoints);
+      }
+    } else {
+      final Collection<Geometry> geometries = new ArrayList<Geometry>();
+      for (List<Coordinates> intersection : intersections) {
+        if (intersection.size() == 1) {
+          Coordinates point = intersection.get(0);
+          geometries.add(factory.createPoint(point));
+        } else {
+          geometries.add(factory.createLineString(intersection));
+        }
+      }
+      final Geometry geometry = factory.buildGeometry(geometries);
+      return geometry.union();
+    }
+  }
+
   public static double distance(
     final double aX1,
     final double aY1,
@@ -44,10 +104,10 @@ public final class LineStringUtil {
     final double bY2) {
     if (aX1 == aX2 && aY1 == aY2) {
       // Segment 1 is a zero length do point line distance
-      return JtsGeometryUtil.distance(aX1, aY1, bX1, bY1, bX2, bY2);
+      return LineSegmentUtil.distance(bX1, bY1, bX2, bY2, aX1, aY1);
     } else if (bX1 == bX2 && aY1 == bY2) {
       // Segment 2 is a zero length do point line distance
-      return JtsGeometryUtil.distance(bX1, bY1, aX1, aY1, aX2, aY2);
+      return LineSegmentUtil.distance(aX1, aY1, aX2, aY2, bX1, bY1);
     } else {
 
       // AB and CD are line segments
@@ -72,10 +132,10 @@ public final class LineStringUtil {
         * (bX2 - bX1);
 
       if (rBottom == 0 || sBottom == 0) {
-        return Math.min(JtsGeometryUtil.distance(aX1, aY1, bX1, bY1, bX2, bY2),
-          Math.min(JtsGeometryUtil.distance(aX2, aY2, bX1, bY1, bX2, bY2),
-            Math.min(JtsGeometryUtil.distance(bX1, bY1, aX1, aY1, aX2, aY2),
-              JtsGeometryUtil.distance(bX2, bY2, aX1, aY1, aX2, aY2))));
+        return Math.min(LineSegmentUtil.distance(bX1, bY1, bX2, bY2, aX1, aY1),
+          Math.min(LineSegmentUtil.distance(bX1, bY1, bX2, bY2, aX2, aY2),
+            Math.min(LineSegmentUtil.distance(aX1, aY1, aX2, aY2, bX1, bY1),
+              LineSegmentUtil.distance(aX1, aY1, aX2, aY2, bX2, bY2))));
 
       } else {
         final double s = sTop / sBottom;
@@ -84,10 +144,10 @@ public final class LineStringUtil {
         if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
           // no intersection
           return Math.min(
-            JtsGeometryUtil.distance(aX1, aY1, bX1, bY1, bX2, bY2), Math.min(
-              JtsGeometryUtil.distance(aX2, aY2, bX1, bY1, bX2, bY2), Math.min(
-                JtsGeometryUtil.distance(bX1, bY1, aX1, aY1, aX2, aY2),
-                JtsGeometryUtil.distance(bX2, bY2, aX1, aY1, aX2, aY2))));
+            LineSegmentUtil.distance(bX1, bY1, bX2, bY2, aX1, aY1), Math.min(
+              LineSegmentUtil.distance(bX1, bY1, bX2, bY2, aX2, aY2), Math.min(
+                LineSegmentUtil.distance(aX1, aY1, aX2, aY2, bX1, bY1),
+                LineSegmentUtil.distance(aX1, aY1, aX2, aY2, bX2, bY2))));
         }
         return 0.0;
       }
@@ -501,7 +561,7 @@ public final class LineStringUtil {
     final CoordinateSequence coordinates2 = line2.getCoordinateSequence();
     final CoordinateSequence coordinates = CoordinateSequenceUtil.merge(
       coordinates1, coordinates2);
-    final GeometryFactory factory = line1.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
     line.setUserData(line1.getUserData());
     return line;
@@ -509,7 +569,7 @@ public final class LineStringUtil {
 
   public static LineString reverse(
     final LineString line) {
-    final GeometryFactory factory = line.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinateSequence coordinates = line.getCoordinateSequence();
     final CoordinatesList reverseCoordinates = CoordinateSequenceUtil.reverse(coordinates);
     final LineString newLine = factory.createLineString(reverseCoordinates);
@@ -526,7 +586,7 @@ public final class LineStringUtil {
     final CoordinateSequence coords = line.getCoordinateSequence();
     final CoordinateSequence newCoords = CoordinateSequenceUtil.subSequence(
       coords, fromCoordinate, fromIndex, length, toCoordinate);
-    final GeometryFactory factory = line.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final LineString newLine = factory.createLineString(newCoords);
     final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(line);
     newLine.setUserData(userData);

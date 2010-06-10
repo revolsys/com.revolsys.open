@@ -13,6 +13,25 @@ public class DoubleCoordinates extends AbstractCoordinates {
     this.coordinates = new double[dimension];
   }
 
+  public DoubleCoordinates(
+    Coordinates coordinates) {
+    this.coordinates = coordinates.getCoordinates();
+  }
+
+  @Override
+  public DoubleCoordinates clone() {
+    return new DoubleCoordinates(coordinates);
+  }
+
+  @Override
+  public double[] getCoordinates() {
+    double[] coordinates = new double[this.coordinates.length];
+    System.arraycopy(this.coordinates, 0, coordinates, 0,
+      this.coordinates.length);
+    return coordinates;
+  }
+
+  @Override
   public byte getNumAxis() {
     return (byte)coordinates.length;
   }
@@ -49,4 +68,5 @@ public class DoubleCoordinates extends AbstractCoordinates {
       return "";
     }
   }
+
 }

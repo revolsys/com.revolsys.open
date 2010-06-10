@@ -5,8 +5,8 @@ import java.util.NoSuchElementException;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 
-public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates implements
-  Iterator<Coordinates>, Iterable<Coordinates> {
+public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
+  implements Iterator<Coordinates>, Iterable<Coordinates> {
   private final CoordinateSequence coordinates;
 
   private int index = 0;
@@ -16,10 +16,23 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates i
     this.coordinates = coordinates;
   }
 
+  public CoordinateSequenceCoordinatesIterator(
+    final CoordinateSequence coordinates,
+    final int index) {
+    this.coordinates = coordinates;
+    this.index = index;
+  }
+
+  @Override
+  public CoordinateSequenceCoordinatesIterator clone() {
+    return new CoordinateSequenceCoordinatesIterator(coordinates, index);
+  }
+
   public int getIndex() {
     return index;
   }
 
+  @Override
   public byte getNumAxis() {
     return (byte)coordinates.getDimension();
   }

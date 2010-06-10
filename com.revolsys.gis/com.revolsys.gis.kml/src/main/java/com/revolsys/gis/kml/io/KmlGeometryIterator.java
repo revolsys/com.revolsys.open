@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.xml.io.StaxUtils;
@@ -24,7 +25,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 @SuppressWarnings("restriction")
 public class KmlGeometryIterator implements Iterator<Geometry> {
@@ -43,7 +43,7 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
   }
 
   private final GeometryFactory geometryFactory = new GeometryFactory(
-    Kml22Constants.COORDINATE_SYSTEM, new PrecisionModel());
+    Kml22Constants.COORDINATE_SYSTEM, new SimpleCoordinatesPrecisionModel());
 
   private Geometry currentGeometry;
 

@@ -4,17 +4,25 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 
 public class InPlaceIterator extends AbstractCoordinates implements
   Iterator<Coordinates>, Iterable<Coordinates> {
   private final CoordinatesList coordinates;
 
-  private int index = 0;
+  private int index = -1;
 
   public InPlaceIterator(
     final CoordinatesList coordinates) {
     this.coordinates = coordinates;
+  }
+
+  public InPlaceIterator(
+    CoordinatesList coordinates,
+    int index) {
+    this.coordinates = coordinates;
+    this.index = index;
   }
 
   public int getIndex() {
@@ -45,7 +53,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
   }
 
   public boolean hasNext() {
-    return index < coordinates.size() - 1;
+    return index < coordinates.size()-1;
   }
 
   public Iterator<Coordinates> iterator() {
@@ -103,4 +111,9 @@ public class InPlaceIterator extends AbstractCoordinates implements
       return "";
     }
   }
+  @Override
+  public InPlaceIterator clone() {
+    return new InPlaceIterator(coordinates, index);
+  }
+
 }

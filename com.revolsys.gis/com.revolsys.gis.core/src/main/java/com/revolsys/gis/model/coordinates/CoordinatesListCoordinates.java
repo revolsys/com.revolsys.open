@@ -19,10 +19,16 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     this.index = index;
   }
 
+  @Override
+  public CoordinatesListCoordinates clone() {
+    return new CoordinatesListCoordinates(coordinates, index);
+  }
+
   public int getIndex() {
     return index;
   }
 
+  @Override
   public byte getNumAxis() {
     return coordinates.getNumAxis();
   }
@@ -59,7 +65,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     if (numAxis > 0) {
       final double x = coordinates.getX(index);
       final StringBuffer s = new StringBuffer(String.valueOf(x));
-      double y = coordinates.getY(index);
+      final double y = coordinates.getY(index);
       s.append(',');
       s.append(y);
 
@@ -73,4 +79,5 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
       return "";
     }
   }
+
 }

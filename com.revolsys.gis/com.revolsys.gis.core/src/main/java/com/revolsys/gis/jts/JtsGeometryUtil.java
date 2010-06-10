@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
@@ -350,7 +351,7 @@ public final class JtsGeometryUtil {
     for (int i = 1; i < coordinates.size(); i++) {
       final double x2 = coordinates.getOrdinate(i, 0);
       final double y2 = coordinates.getOrdinate(i, 1);
-      final double distance = distance(x, y, x1, y1, x2, y2);
+      final double distance = LineSegmentUtil.distance(x1, y1, x2, y2, x, y);
       if (distance < minDistance) {
         if (distance <= tolerance) {
           return tolerance;
@@ -362,49 +363,6 @@ public final class JtsGeometryUtil {
       y1 = y2;
     }
     return minDistance;
-  }
-
-  public static double distance(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2) {
-    final double dx = x1 - x2;
-    final double dy = y1 - y2;
-
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  public static double distance(
-    final double x,
-    final double y,
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2) {
-    if (x1 == x2 && y1 == y2) {
-      return distance(x, y, x1, y1);
-    } else {
-      final double dxx1 = x - x1;
-      final double dx2x1 = x2 - x1;
-      final double dyy1 = y - y1;
-      final double dy2y1 = y2 - y1;
-      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1)
-        / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
-
-      if (r <= 0.0) {
-        return distance(x, y, x1, y1);
-      } else if (r >= 1.0) {
-        return distance(x, y, x2, y2);
-      } else {
-        final double dy1y = y1 - y;
-        final double dx1x = x1 - x;
-        final double s = (dy1y * dx2x1 - dx1x * dy2y1)
-          / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
-
-        return Math.abs(s) * Math.sqrt(dx2x1 * dx2x1 + dy2y1 * dy2y1);
-      }
-    }
   }
 
   public static boolean equalsExact3D(
@@ -1182,7 +1140,6 @@ public final class JtsGeometryUtil {
     makePrecise(precisionModel, newGeometry);
     return newGeometry;
   }
-
 
   public static Coordinate offset(
     final Coordinate coordinate,

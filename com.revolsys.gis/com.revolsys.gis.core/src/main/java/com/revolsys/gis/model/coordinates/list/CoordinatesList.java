@@ -1,10 +1,12 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
-public interface CoordinatesList extends CoordinateSequence {
+public interface CoordinatesList extends CoordinateSequence,
+  Iterable<Coordinates> {
   void copy(
     int sourceIndex,
     CoordinatesList target,
@@ -21,13 +23,17 @@ public interface CoordinatesList extends CoordinateSequence {
     int axisIndex);
 
   void makePrecise(
-    PrecisionModel precisionModel);
+    CoordinatesPrecisionModel precisionModel);
 
   CoordinatesList reverse();
 
   void setCoordinate(
     int i,
     Coordinate coordinate);
+
+  void setCoordinates(
+    int i,
+    Coordinates point);
 
   void setValue(
     int index,

@@ -13,6 +13,8 @@ import javax.sql.DataSource;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -73,9 +75,12 @@ public class SpatialReferenceCache {
             if (resultSet.next()) {
               final int srid = resultSet.getInt(10);
               final BigDecimal scale = resultSet.getBigDecimal(7);
+              final BigDecimal zScale = resultSet.getBigDecimal(8);
               final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-              final PrecisionModel precisionModel = new PrecisionModel(scale.intValue());
-              final GeometryFactory geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
+              final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+                scale.intValue(), zScale.intValue());
+              final GeometryFactory geometryFactory = new GeometryFactory(
+                coordinateSystem, precisionModel);
               spatialReference = new SpatialReference(geometryFactory);
               spatialReference.setEsriSrid(esriSrid);
               spatialReference.setName(resultSet.getString(2));
@@ -84,7 +89,7 @@ public class SpatialReferenceCache {
               spatialReference.setZOffset(resultSet.getBigDecimal(5));
               spatialReference.setMOffset(resultSet.getBigDecimal(6));
               spatialReference.setXyScale(scale);
-              spatialReference.setZScale(resultSet.getBigDecimal(8));
+              spatialReference.setZScale(zScale);
               spatialReference.setMScale(resultSet.getBigDecimal(9));
               spatialReference.setSrid(srid);
               spatialReference.setCsWkt(resultSet.getString(11));

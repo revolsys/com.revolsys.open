@@ -40,18 +40,19 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.xml.io.StaxUtils;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 @SuppressWarnings("restriction")
 public class GpxIterator implements Iterator<DataObject> {
@@ -77,7 +78,8 @@ public class GpxIterator implements Iterator<DataObject> {
   private File file;
 
   private final GeometryFactory geometryFactory = new GeometryFactory(
-    new PrecisionModel(), 4326);
+    EpsgCoordinateSystems.getCoordinateSystem(4326),
+    new SimpleCoordinatesPrecisionModel());
 
   private boolean hasNext = true;
 

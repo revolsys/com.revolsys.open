@@ -5,13 +5,14 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -19,7 +20,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class CoordinatesOperationGeometryOperation implements GeometryOperation {
   private final GeometryFactory geometryFactory;
@@ -58,7 +58,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
       CoordinatesListUtil.get(coordinates));
     final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
       newCoordinates);
-    final PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
+    final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     for (int i = 0; i < size; i++) {
       sourceCoordinates.setIndex(i);
       targetCoordinates.setIndex(i);

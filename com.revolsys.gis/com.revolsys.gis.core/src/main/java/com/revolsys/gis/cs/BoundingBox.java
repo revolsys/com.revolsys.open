@@ -10,6 +10,7 @@ import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -283,7 +284,7 @@ public class BoundingBox extends Envelope {
 
   public Geometry toGeometry() {
     final GeometryFactory factory = new GeometryFactory(coordinateSystem,
-      new PrecisionModel());
+      new SimpleCoordinatesPrecisionModel());
     final double minX = getMinX();
     final double minY = getMinY();
     final double maxX = getMaxX();
@@ -314,14 +315,14 @@ public class BoundingBox extends Envelope {
 
   public Polygon toPolygon(
     final int numSegments) {
-    return toPolygon(numSegments,numSegments);
+    return toPolygon(numSegments, numSegments);
   }
 
   public Polygon toPolygon(
     final int numX,
     final int numY) {
     final GeometryFactory factory = new GeometryFactory(coordinateSystem,
-      new PrecisionModel());
+      new SimpleCoordinatesPrecisionModel());
     return toPolygon(factory, numX, numY);
   }
 
@@ -342,8 +343,7 @@ public class BoundingBox extends Envelope {
     final double minY = getMinY();
     final double maxY = getMaxY();
     final int numCoordinates = 2 * (numX + numY) + 1;
-     CoordinatesList coordinates = new DoubleCoordinatesList(
-      numCoordinates, 2);
+    CoordinatesList coordinates = new DoubleCoordinatesList(numCoordinates, 2);
     for (int i = 0; i < numY; i++) {
       coordinates.setOrdinate(i, 0, minX);
       coordinates.setOrdinate(i, 1, minY + i * yStep);
@@ -359,12 +359,13 @@ public class BoundingBox extends Envelope {
     coordinates.setOrdinate(coordinates.size() - 1, 0, minX);
     coordinates.setOrdinate(coordinates.size() - 1, 1, minY);
     if (coordinateSystem != this.coordinateSystem) {
-      coordinates= CoordinatesListProjectionUtil.perform(coordinates, this.coordinateSystem, coordinateSystem);
+      coordinates = CoordinatesListProjectionUtil.perform(coordinates,
+        this.coordinateSystem, coordinateSystem);
     }
-    
-    coordinates.makePrecise(factory.getPrecisionModel());
+
+    coordinates.makePrecise(factory.getCoordinatesPrecisionModel());
     final LinearRing ring = factory.createLinearRing(coordinates);
-    
+
     final Polygon polygon = factory.createPolygon(ring, null);
     return polygon;
   }
@@ -374,4 +375,5 @@ public class BoundingBox extends Envelope {
     return "(" + getMinX() + "," + getMinY() + " " + getMaxX() + ","
       + getMaxY() + ")";
   }
+
 }

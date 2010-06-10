@@ -2,20 +2,33 @@ package com.revolsys.gis.model.coordinates;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 
-public class CoordinateListCoordinates extends AbstractCoordinates {
+public class CoordinateSequenceCoordinates extends AbstractCoordinates {
   private final CoordinateSequence coordinates;
 
   private int index = 0;
 
-  public CoordinateListCoordinates(
+  public CoordinateSequenceCoordinates(
     final CoordinateSequence coordinates) {
     this.coordinates = coordinates;
+  }
+
+  public CoordinateSequenceCoordinates(
+    final CoordinateSequence coordinates,
+    final int index) {
+    this.coordinates = coordinates;
+    this.index = index;
+  }
+
+  @Override
+  public CoordinateSequenceCoordinates clone() {
+    return new CoordinateSequenceCoordinates(coordinates, index);
   }
 
   public int getIndex() {
     return index;
   }
 
+  @Override
   public byte getNumAxis() {
     return (byte)coordinates.getDimension();
   }
@@ -50,4 +63,5 @@ public class CoordinateListCoordinates extends AbstractCoordinates {
   public String toString() {
     return coordinates.getCoordinate(index).toString();
   }
+
 }

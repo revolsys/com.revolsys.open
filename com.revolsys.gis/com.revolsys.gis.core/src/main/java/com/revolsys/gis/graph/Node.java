@@ -13,6 +13,8 @@ import java.util.Set;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
+import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -151,6 +153,9 @@ public class Node<T> implements Comparable<Node<T>> {
     return coordinate;
   }
 
+  public Coordinates getCoordinates() {
+    return new CoordinateCoordinates(coordinate);
+  }
   public int getDegree() {
     return inEdges.size() + outEdges.size();
   }

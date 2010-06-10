@@ -19,7 +19,9 @@ import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
@@ -294,7 +296,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final int centreX = readLEInt(in);
     final int centreY = readLEInt(in);
     center = new DoubleCoordinates(centreX, centreY);
-    final PrecisionModel precisionModel = new PrecisionModel(1);
+    CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(1);
     factory = new GeometryFactory(coordinateSystem, precisionModel);
   }
 

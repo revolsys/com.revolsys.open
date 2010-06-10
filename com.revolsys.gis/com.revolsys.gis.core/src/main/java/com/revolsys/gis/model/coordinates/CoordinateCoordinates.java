@@ -10,10 +10,17 @@ public class CoordinateCoordinates extends AbstractCoordinates {
     this.coordinate = coordinate;
   }
 
+  @Override
+  public CoordinateCoordinates clone() {
+    final Coordinate newCoordinate = new Coordinate(coordinate);
+    return new CoordinateCoordinates(newCoordinate);
+  }
+
   public Coordinate getCoordinate() {
     return coordinate;
   }
 
+  @Override
   public byte getNumAxis() {
     if (Double.isNaN(coordinate.z)) {
       return 2;

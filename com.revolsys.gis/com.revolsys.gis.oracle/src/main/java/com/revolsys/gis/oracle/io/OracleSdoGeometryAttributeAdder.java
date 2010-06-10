@@ -28,6 +28,8 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.JdbcConstants;
 import com.revolsys.gis.jdbc.io.SqlFunction;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -68,7 +70,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
     final double geometryScale = 1 / precision;
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-    final PrecisionModel precisionModel = new PrecisionModel(geometryScale);
+    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(geometryScale);
     final GeometryFactory geometryFactory = new GeometryFactory(
       coordinateSystem, precisionModel);
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
