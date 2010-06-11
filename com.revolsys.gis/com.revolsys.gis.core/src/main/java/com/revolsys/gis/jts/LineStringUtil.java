@@ -718,7 +718,37 @@ public final class LineStringUtil {
       final List<Coordinates> intersectionPoints = LineSegmentUtil.intersection(
         precisionModel, lineStart, lineEnd, previousPoint, nextPoint);
       if (!intersectionPoints.isEmpty()) {
-        intersections.add(intersectionPoints);
+        if (intersectionPoints.size() == 1 && !intersections.isEmpty()) {
+          Coordinates point = intersectionPoints.get(0);
+          List<Coordinates> lastIntersection = intersections.get(intersections.size() - 1);
+          if (!lastIntersection.contains(point)) {
+            intersections.add(intersectionPoints);
+          }
+        } else if (intersectionPoints.size() == 2 && !intersections.isEmpty()) {
+          Coordinates start = intersectionPoints.get(0);
+          Coordinates end = intersectionPoints.get(1);
+          List<Coordinates> lastIntersection = intersections.get(intersections.size() - 1);
+          if (lastIntersection.size() == 1) {
+            Coordinates point = lastIntersection.get(0);
+            if (start.equals2d(point) || end.equals2d(point)) {
+              intersections.set(intersections.size() - 1, intersectionPoints);
+            } else {
+              intersections.add(intersectionPoints);
+            }
+          } else {
+            Coordinates lastStart = lastIntersection.get(0);
+            Coordinates lastEnd = lastIntersection.get(lastIntersection.size() - 1);
+            if (start.equals2d(lastEnd)) {
+              lastIntersection.add(end);
+            } else if (end.equals2d(lastStart)) {
+              lastIntersection.add(0, start);
+            } else {
+              intersections.add(intersectionPoints);
+            }
+          }
+        } else {
+          intersections.add(intersectionPoints);
+        }
       }
       previousPoint = nextPoint;
     }

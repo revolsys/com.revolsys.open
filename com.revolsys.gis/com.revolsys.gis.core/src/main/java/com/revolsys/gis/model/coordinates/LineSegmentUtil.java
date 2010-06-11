@@ -1,13 +1,10 @@
 package com.revolsys.gis.model.coordinates;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.algorithm.NotRepresentableException;
+import com.revolsys.util.ListUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class LineSegmentUtil {
   /**
@@ -225,7 +222,7 @@ public class LineSegmentUtil {
           final Coordinates point2 = line2EndProjection.getProjectedPoint();
           return getUniqueCoordinates(line1Start, point2);
         } else {
-          return Collections.singletonList(line1Start);
+          return ListUtil.create(line1Start);
         }
       } else if (line1EndProjection.isPointOnLine()) {
         if (line2StartProjection.isPointOnLine()) {
@@ -235,7 +232,7 @@ public class LineSegmentUtil {
           final Coordinates point2 = line2EndProjection.getProjectedPoint();
           return getUniqueCoordinates(point2, line1End);
         } else {
-          return Collections.singletonList(line1End);
+          return ListUtil.create(line1End);
         }
       } else if (line2StartProjection.isPointOnLine()) {
         if (line2EndProjection.isPointOnLine()) {
@@ -244,19 +241,19 @@ public class LineSegmentUtil {
           final Coordinates point1 = line2StartProjection.getProjectedPoint();
           final Coordinates point2 = line2EndProjection.getProjectedPoint();
           if (factor1 == factor2) {
-            return Collections.singletonList(point1);
+            return ListUtil.create(point1);
           } else if (factor1 > factor2) {
-            return Arrays.asList(point2, point1);
+            return ListUtil.create(point2, point1);
           } else {
-            return Arrays.asList(point1, point2);
+            return ListUtil.create(point1, point2);
           }
         } else {
           final Coordinates point1 = line2StartProjection.getProjectedPoint();
-          return Collections.singletonList(point1);
+          return ListUtil.create(point1);
         }
       } else if (line2EndProjection.isPointOnLine()) {
         final Coordinates point2 = line2EndProjection.getProjectedPoint();
-        return Collections.singletonList(point2);
+        return ListUtil.create(point2);
       } else {
         // Check the orientations of the ends of each line in respect to the
         // other line
@@ -278,7 +275,7 @@ public class LineSegmentUtil {
             if (intersection != null) {
               Coordinates projectedCoordinate = project(precisionModel,
                 line1Start, line1End, intersection);
-              return Collections.singletonList(projectedCoordinate);
+              return ListUtil.create(projectedCoordinate);
             }
           }
         }
@@ -338,9 +335,9 @@ public class LineSegmentUtil {
     final Coordinates point1,
     final Coordinates point2) {
     if (point1.equals2d(point2)) {
-      return Collections.singletonList(point1);
+      return ListUtil.create(point1);
     } else {
-      return Arrays.asList(point1, point2);
+      return ListUtil.create(point1, point2);
     }
   }
 

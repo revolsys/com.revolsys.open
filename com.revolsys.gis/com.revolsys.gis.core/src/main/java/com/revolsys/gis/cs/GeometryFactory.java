@@ -80,7 +80,7 @@ public class GeometryFactory extends
       final Coordinates point0 = points.get(0);
       final byte numAxis = point0.getNumAxis();
 
-      coordinatesList = new DoubleCoordinatesList(numAxis, numPoints);
+      coordinatesList = new DoubleCoordinatesList(numPoints,numAxis );
       for (int i = 0; i < numPoints; i++) {
         final Coordinates point = points.get(i);
         coordinatesList.setPoint(i, point);

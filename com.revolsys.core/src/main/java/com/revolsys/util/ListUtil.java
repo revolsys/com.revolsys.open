@@ -13,6 +13,15 @@ public final class ListUtil {
     return newList;
   }
 
+  public static <T> List<T> create(
+    final T... values) {
+    final List<T> newList = new ArrayList<T>();
+    for (final T value : values) {
+      newList.add(value);
+    }
+    return newList;
+  }
+
   private ListUtil() {
   }
 }
