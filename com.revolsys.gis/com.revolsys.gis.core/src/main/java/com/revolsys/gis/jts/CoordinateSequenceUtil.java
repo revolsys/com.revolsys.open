@@ -28,79 +28,8 @@ public final class CoordinateSequenceUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static int append(
-    final CoordinateSequence src,
-    final CoordinateSequence dest,
-    final int startIndex) {
-    int coordIndex = startIndex;
-    final int srcDimension = src.getDimension();
-    final int destDimension = dest.getDimension();
-    final int dimension = Math.min(srcDimension, destDimension);
-    final int srcSize = src.size();
-    final int destSize = dest.size();
-    double previousX;
-    double previousY;
-    if (startIndex == 0) {
-      previousX = Double.NaN;
-      previousY = Double.NaN;
-    } else {
-      previousX = dest.getOrdinate(startIndex - 1, 0);
-      previousY = dest.getOrdinate(startIndex - 1, 1);
-    }
-    for (int i = 0; i < srcSize && coordIndex < destSize; i++) {
-      final double x = src.getOrdinate(i, 0);
-      final double y = src.getOrdinate(i, 1);
-      if (x != previousX && y != previousY) {
-        dest.setOrdinate(coordIndex, 0, x);
-        dest.setOrdinate(coordIndex, 1, y);
-        for (int d = 2; d < dimension; d++) {
-          final double ordinate = src.getOrdinate(i, d);
-          dest.setOrdinate(coordIndex, d, ordinate);
-        }
-        coordIndex++;
-      }
-      previousX = x;
-      previousY = y;
-    }
-    return coordIndex;
-  }
+ 
 
-  public static int appendReversed(
-    final CoordinateSequence src,
-    final CoordinateSequence dest,
-    final int startIndex) {
-    int coordIndex = startIndex;
-    final int srcDimension = src.getDimension();
-    final int destDimension = dest.getDimension();
-    final int dimension = Math.min(srcDimension, destDimension);
-    final int srcSize = src.size();
-    final int destSize = dest.size();
-    double previousX;
-    double previousY;
-    if (startIndex == 0) {
-      previousX = Double.NaN;
-      previousY = Double.NaN;
-    } else {
-      previousX = dest.getOrdinate(startIndex - 1, 0);
-      previousY = dest.getOrdinate(startIndex - 1, 1);
-    }
-    for (int i = srcSize - 1; i > -1 && coordIndex < destSize; i--) {
-      final double x = src.getOrdinate(i, 0);
-      final double y = src.getOrdinate(i, 1);
-      if (x != previousX && y != previousY) {
-        dest.setOrdinate(coordIndex, 0, x);
-        dest.setOrdinate(coordIndex, 1, y);
-        for (int d = 2; d < dimension; d++) {
-          final double ordinate = src.getOrdinate(i, d);
-          dest.setOrdinate(coordIndex, d, ordinate);
-        }
-        coordIndex++;
-      }
-      previousX = x;
-      previousY = y;
-    }
-    return coordIndex;
-  }
 
   /**
    * Copy length coordinates in src staring at srcPos to dest at destPo. This
@@ -147,32 +76,7 @@ public final class CoordinateSequenceUtil {
         1);
   }
 
-  public static boolean equalsCoordinates(
-    final CoordinateSequence coordinates,
-    final int index,
-    final double[] ordinates) {
-    for (int i = 0; i < ordinates.length; i++) {
-      final double ordinate = ordinates[i];
-      if (ordinate != coordinates.getOrdinate(index, i)) {
-        return false;
-      }
-    }
-    return true;
-  }
 
-  public static boolean equalsCoordinates(
-    final CoordinateSequence coordinates,
-    final int index1,
-    final int index2) {
-    for (int i = 0; i < coordinates.getDimension(); i++) {
-      final double ordinate1 = coordinates.getOrdinate(index1, i);
-      final double ordinate2 = coordinates.getOrdinate(index2, i);
-      if (ordinate1 != ordinate2) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   /**
    * Compare the coordinates of the two coordinate sequences up to the given
@@ -420,54 +324,6 @@ public final class CoordinateSequenceUtil {
       isCCW = (disc > 0);
     }
     return isCCW;
-  }
-
-  public static CoordinateSequence merge(
-    final CoordinateSequence coordinates1,
-    final CoordinateSequence coordinates2) {
-    final int dimension = Math.max(coordinates1.getDimension(),
-      coordinates2.getDimension());
-    final int maxSize = coordinates1.size() + coordinates2.size();
-    final CoordinatesList coordinates = new DoubleCoordinatesList(maxSize,
-      dimension);
-
-    int numCoords = 0;
-    final Coordinate coordinates1Start = coordinates1.getCoordinate(0);
-    final Coordinate coordinates1End = coordinates1.getCoordinate(coordinates1.size() - 1);
-    final Coordinate coordinates2Start = coordinates2.getCoordinate(0);
-    final Coordinate coordinates2End = coordinates2.getCoordinate(coordinates2.size() - 1);
-    if (coordinates1Start.equals2D(coordinates2End)) {
-      numCoords = append(coordinates2, coordinates, numCoords);
-      numCoords = append(coordinates1, coordinates, numCoords);
-    } else if (coordinates2Start.equals2D(coordinates1End)) {
-      numCoords = append(coordinates1, coordinates, numCoords);
-      numCoords = append(coordinates2, coordinates, numCoords);
-    } else if (coordinates1Start.equals2D(coordinates2Start)) {
-      numCoords = appendReversed(coordinates2, coordinates, numCoords);
-      numCoords = append(coordinates1, coordinates, numCoords);
-    } else if (coordinates1End.equals2D(coordinates2End)) {
-      numCoords = append(coordinates1, coordinates, numCoords);
-      numCoords = appendReversed(coordinates2, coordinates, numCoords);
-    } else {
-      throw new IllegalArgumentException("lines don't touch");
-
-    }
-    return trim(coordinates, numCoords);
-  }
-
-  public static CoordinateSequence merge(
-    final List<CoordinateSequence> coordinateSequences) {
-    final Iterator<CoordinateSequence> iterator = coordinateSequences.iterator();
-    if (!iterator.hasNext()) {
-      return null;
-    } else {
-      CoordinateSequence coordinates = iterator.next();
-      while (iterator.hasNext()) {
-        final CoordinateSequence nextCoordinates = iterator.next();
-        coordinates = merge(coordinates, nextCoordinates);
-      }
-      return coordinates;
-    }
   }
 
   public static int orientationIndex(

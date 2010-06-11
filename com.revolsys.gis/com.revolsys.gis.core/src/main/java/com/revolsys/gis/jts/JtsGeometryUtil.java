@@ -1341,64 +1341,6 @@ public final class JtsGeometryUtil {
     return lines;
   }
 
-  public static List<LineString> splitLineString(
-    final LineString line,
-    final Coordinate coordinate) {
-    final Map<String, Number> result = LineStringUtil.findClosestSegmentAndCoordinate(
-      line, coordinate);
-    final int segmentIndex = result.get("segmentIndex").intValue();
-    if (segmentIndex != -1) {
-      List<LineString> lines;
-      final int coordinateIndex = result.get("coordinateIndex").intValue();
-      final int coordinateDistance = result.get("coordinateDistance")
-        .intValue();
-      final int segmentDistance = result.get("segmentDistance").intValue();
-      if (coordinateIndex == 0) {
-        if (coordinateDistance == 0) {
-          return Collections.singletonList(line);
-        } else if (segmentDistance == 0) {
-          lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
-        } else {
-          final Coordinate c0 = line.getCoordinateN(0);
-          Coordinate c1;
-          int i = 1;
-          do {
-            c1 = line.getCoordinateN(i);
-            i++;
-          } while (c1.equals(c0));
-          if (Angle.isAcute(c1, c0, coordinate)) {
-            lines = JtsGeometryUtil.split(line, 0, coordinate);
-          } else {
-            return Collections.singletonList(line);
-          }
-        }
-      } else if (coordinateIndex == line.getNumPoints() - 1) {
-        if (coordinateDistance == 0) {
-          return Collections.singletonList(line);
-        } else if (segmentDistance == 0) {
-          lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
-        } else {
-          final Coordinate cn = line.getCoordinateN(line.getNumPoints() - 1);
-          Coordinate cn1;
-          int i = line.getNumPoints() - 2;
-          do {
-            cn1 = line.getCoordinateN(i);
-            i++;
-          } while (cn1.equals(cn));
-          if (Angle.isAcute(cn1, cn, coordinate)) {
-            lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
-          } else {
-            return Collections.singletonList(line);
-          }
-        }
-      } else {
-        lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
-      }
-      return lines;
-    }
-    return Collections.singletonList(line);
-  }
-
   public static List<Geometry> splitWhereCross(
     final LineString line1,
     final LineString line2) {

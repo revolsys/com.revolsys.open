@@ -321,71 +321,6 @@ public final class LineStringUtil {
 
   public static Map<String, Number> findClosestSegmentAndCoordinate(
     final LineString line,
-    final Coordinate coordinate) {
-    final Map<String, Number> result = new HashMap<String, Number>();
-    result.put(SEGMENT_INDEX, -1);
-    result.put(COORDINATE_INDEX, -1);
-    result.put(COORDINATE_DISTANCE, Double.MAX_VALUE);
-    result.put(SEGMENT_DISTANCE, Double.MAX_VALUE);
-    double closestDistance = Double.MAX_VALUE;
-    final CoordinateSequenceIndexLineSegmentIterator iterator = getLineSegmentIterator(line);
-    if (iterator.hasNext()) {
-      CoordinateSequenceIndexLineSegment segment = iterator.next();
-      final double previousCoordinateDistance = segment.getStartDistance(coordinate);
-      if (previousCoordinateDistance == 0) {
-        result.put(SEGMENT_INDEX, 0);
-        result.put(COORDINATE_INDEX, 0);
-        result.put(COORDINATE_DISTANCE, 0.0);
-        result.put(SEGMENT_DISTANCE, 0.0);
-      } else {
-        int i = 1;
-        while (segment != null) {
-          final double currentCoordinateDistance = segment.getEndDistance(coordinate);
-          if (currentCoordinateDistance == 0) {
-            result.put(SEGMENT_INDEX, i);
-            result.put(COORDINATE_INDEX, i);
-            result.put(COORDINATE_DISTANCE, 0.0);
-            result.put(SEGMENT_DISTANCE, 0.0);
-            return result;
-          }
-          final double distance = segment.getDistance(coordinate);
-          if (distance == 0) {
-            result.put(SEGMENT_INDEX, i - 1);
-            result.put(SEGMENT_DISTANCE, 0.0);
-            if (previousCoordinateDistance < currentCoordinateDistance) {
-              result.put(COORDINATE_INDEX, i - 1);
-              result.put(COORDINATE_DISTANCE, previousCoordinateDistance);
-            } else {
-              result.put(COORDINATE_INDEX, i);
-              result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
-            }
-            return result;
-          } else if (distance < closestDistance) {
-            result.put(SEGMENT_DISTANCE, distance);
-            closestDistance = distance;
-            result.put(SEGMENT_INDEX, i - 1);
-            if (previousCoordinateDistance < currentCoordinateDistance) {
-              result.put(COORDINATE_INDEX, i - 1);
-              result.put(COORDINATE_DISTANCE, previousCoordinateDistance);
-            } else {
-              result.put(COORDINATE_INDEX, i);
-              result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
-            }
-          }
-          if (iterator.hasNext()) {
-            i++;
-            segment = iterator.next();
-          } else {
-            segment = null;
-          }
-        }
-      }
-    }
-    return result;
-  }
-
-  public static Map<String, Number> findClosestSegmentAndCoordinate(
-    final LineString line,
     final Coordinates point) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return CoordinatesListUtil.findClosestSegmentAndCoordinate(points, point);
@@ -461,85 +396,6 @@ public final class LineStringUtil {
     return null;
   }
 
-  /**
-   * @param line
-   * @param coordinate
-   * @param tolerance
-   * @return
-   * @deprecated
-   */
-  public static Coordinate getClosestCoordinateOnLineString(
-    final LineString line,
-    final Coordinate coordinate,
-    final double tolerance) {
-    final Map<String, Number> result = LineStringUtil.findClosestSegmentAndCoordinate(
-      line, coordinate);
-    final int segmentIndex = result.get(SEGMENT_INDEX).intValue();
-    if (segmentIndex != -1) {
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
-      final int coordinateIndex = result.get(COORDINATE_INDEX).intValue();
-      final double coordinateDistance = result.get(COORDINATE_DISTANCE)
-        .doubleValue();
-      final double segmentDistance = result.get(SEGMENT_DISTANCE).doubleValue();
-      if (coordinateIndex == 0) {
-        final Coordinate c0 = coordinates.getCoordinate(0);
-        if (coordinateDistance < tolerance) {
-          return c0;
-        } else if (segmentDistance == 0) {
-          return coordinate;
-        } else {
-          Coordinate c1;
-          int i = 1;
-          do {
-            c1 = line.getCoordinateN(i);
-            i++;
-          } while (c1.equals(c0));
-          if (Angle.isAcute(c1, c0, coordinate)) {
-            final LineSegment3D lineSegment = new LineSegment3D(c0, c1);
-            return lineSegment.pointAlong3D(lineSegment.segmentFraction(coordinate));
-          } else {
-            return c0;
-          }
-        }
-      } else if (coordinateIndex == line.getNumPoints() - 1) {
-        final Coordinate cn = coordinates.getCoordinate(coordinates.size() - 1);
-        if (coordinateDistance == 0) {
-          return cn;
-        } else if (segmentDistance == 0) {
-          return coordinate;
-        } else {
-          Coordinate cn1;
-          int i = line.getNumPoints() - 2;
-          do {
-            cn1 = line.getCoordinateN(i);
-            i++;
-          } while (cn1.equals(cn));
-          if (Angle.isAcute(cn1, cn, coordinate)) {
-            final LineSegment3D lineSegment = new LineSegment3D(cn1, cn);
-            return lineSegment.pointAlong3D(lineSegment.segmentFraction(coordinate));
-          } else {
-            return cn;
-          }
-        }
-      } else {
-        final Coordinate cn1 = coordinates.getCoordinate(coordinateIndex - 1);
-        final double cn1Distance = coordinate.distance(cn1);
-        final Coordinate cn2 = coordinates.getCoordinate(coordinateIndex);
-        final double cn2Distance = coordinate.distance(cn2);
-        if (cn1Distance < cn2Distance) {
-          if (cn1Distance < tolerance) {
-            return cn1;
-          }
-        } else if (cn2Distance < tolerance) {
-          return cn2;
-        }
-        final LineSegment3D lineSegment = new LineSegment3D(cn1, cn2);
-        return lineSegment.pointAlong3D(lineSegment.segmentFraction(coordinate));
-      }
-    }
-    return null;
-  }
-
   public static double getElevation(
     final Coordinates coordinate,
     final Coordinates c0,
@@ -557,12 +413,6 @@ public final class LineStringUtil {
       length += line.getLength();
     }
     return length;
-  }
-
-  public static CoordinateSequenceIndexLineSegmentIterator getLineSegmentIterator(
-    final LineString line) {
-    return new CoordinateSequenceIndexLineSegmentIterator(
-      line.getCoordinateSequence());
   }
 
   public static boolean hasEqualExact2d(
@@ -816,10 +666,10 @@ public final class LineStringUtil {
   public static LineString merge(
     final LineString line1,
     final LineString line2) {
-    final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
-    final CoordinateSequence coordinates2 = line2.getCoordinateSequence();
-    final CoordinateSequence coordinates = CoordinateSequenceUtil.merge(
-      coordinates1, coordinates2);
+    final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
+    final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
+    final CoordinatesList coordinates = CoordinatesListUtil.merge(coordinates1,
+      coordinates2);
     final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
     line.setUserData(line1.getUserData());
@@ -829,8 +679,8 @@ public final class LineStringUtil {
   public static LineString reverse(
     final LineString line) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
-    final CoordinatesList reverseCoordinates = CoordinateSequenceUtil.reverse(coordinates);
+    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
+    final CoordinatesList reverseCoordinates = coordinates.reverse();
     final LineString newLine = factory.createLineString(reverseCoordinates);
     JtsGeometryUtil.copyUserData(line, newLine);
     return newLine;
