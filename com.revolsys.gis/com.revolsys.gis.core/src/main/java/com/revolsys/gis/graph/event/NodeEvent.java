@@ -5,7 +5,7 @@ import java.util.EventObject;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.graph.Node;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.Coordinates;
 
 public class NodeEvent<T> extends EventObject {
   public static final String NODE_ADDED = "Added";
@@ -16,7 +16,7 @@ public class NodeEvent<T> extends EventObject {
 
   private String action;
 
-  private final Coordinate coordinate;
+  private final Coordinates coordinates;
 
   private String notes;
 
@@ -27,7 +27,7 @@ public class NodeEvent<T> extends EventObject {
   public NodeEvent(
     final Node<T> node) {
     super(node);
-    this.coordinate = node.getCoordinate();
+    this.coordinates = node.getCoordinates();
   }
 
   public NodeEvent(
@@ -37,7 +37,7 @@ public class NodeEvent<T> extends EventObject {
     final String action,
     final String notes) {
     super(node);
-    this.coordinate = node.getCoordinate();
+    this.coordinates = node.getCoordinates();
     this.typeName = typeName;
     this.ruleName = ruleName;
     this.action = action;
@@ -49,7 +49,7 @@ public class NodeEvent<T> extends EventObject {
     final String ruleName,
     final String action) {
     super(node);
-    this.coordinate = node.getCoordinate();
+    this.coordinates = node.getCoordinates();
     this.ruleName = ruleName;
     this.action = action;
   }
@@ -58,8 +58,8 @@ public class NodeEvent<T> extends EventObject {
     return action;
   }
 
-  public Coordinate getCoordinate() {
-    return coordinate;
+  public Coordinates getCoordinates() {
+    return coordinates;
   }
 
   public Node<T> getNode() {

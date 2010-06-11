@@ -15,8 +15,10 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.vividsolutions.jts.algorithm.Angle;
@@ -364,6 +366,7 @@ public final class JtsGeometryUtil {
     }
     return minDistance;
   }
+
 
   public static boolean equalsExact3D(
     final Geometry geometry1,

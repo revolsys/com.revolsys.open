@@ -2,13 +2,14 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.NestedVisitor;
 import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class EdgeLessThanDistanceToNodeVisitor<T> extends
@@ -18,8 +19,8 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     final Node<T> node,
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Coordinate coordinate = node.getCoordinate();
-    final Envelope env = new Envelope(coordinate);
+    final Coordinates point = node.getCoordinates();
+    final Envelope env = new BoundingBox(point);
     env.expandBy(maxDistance);
     graph.getEdgeIndex().query(env,
       new EdgeLessThanDistanceToNodeVisitor<T>(node, maxDistance, results));
@@ -40,7 +41,8 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     super(matchVisitor);
     this.node = node;
     this.maxDistance = maxDistance;
-    this.envelope = new Envelope(node.getCoordinate());
+    final Coordinates point = node.getCoordinates();
+    this.envelope = new BoundingBox(point);
     this.envelope.expandBy(maxDistance);
   }
 

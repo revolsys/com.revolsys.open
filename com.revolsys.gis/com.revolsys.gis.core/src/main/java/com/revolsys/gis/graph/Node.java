@@ -11,22 +11,20 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
-import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class Node<T> implements Comparable<Node<T>> {
-
-  public static List<Coordinate> getCoordinates(
+  public static List<Coordinates> getCoordinates(
     final List<Node<DataObject>> nodes) {
-    final List<Coordinate> coordinates = new ArrayList(nodes.size());
+    final List<Coordinates> coordinates = new ArrayList(nodes.size());
     for (final Node<DataObject> node : nodes) {
-      final Coordinate coordinate = node.getCoordinate();
+      final Coordinates coordinate = node.getCoordinates();
       coordinates.add(coordinate);
     }
     return coordinates;
@@ -70,7 +68,7 @@ public class Node<T> implements Comparable<Node<T>> {
 
   private Map<String, Object> attributes = Collections.emptyMap();
 
-  private Coordinate coordinate;
+  private Coordinates coordinates;
 
   private List<Edge<T>> edges = new ArrayList<Edge<T>>();
 
@@ -82,9 +80,9 @@ public class Node<T> implements Comparable<Node<T>> {
 
   public Node(
     final Graph<T> graph,
-    final Coordinate coordinate) {
+    final Coordinates point) {
     this.graph = graph;
-    this.coordinate = coordinate;
+    this.coordinates = new DoubleCoordinates(point);
   }
 
   protected void addInEdge(
@@ -107,31 +105,30 @@ public class Node<T> implements Comparable<Node<T>> {
 
   public int compareTo(
     final Node<T> node) {
-    final Coordinate otherCoordinate = node.getCoordinate();
-    return coordinate.compareTo(otherCoordinate);
+    final Coordinates otherPoint = node.getCoordinates();
+    return coordinates.compareTo(otherPoint);
   }
 
   public boolean equalsCoordinate(
-    final Coordinate otherCoordinate) {
-    final Coordinate coordinate = getCoordinate();
-    return coordinate.equals2D(otherCoordinate);
+    final Coordinates otherPoint) {
+    return coordinates.equals2d(otherPoint);
   }
 
   public boolean equalsCoordinate(
     final double x,
     final double y) {
-    return coordinate.x == x && coordinate.y == y;
+    return coordinates.getX() == x && coordinates.getX() == y;
   }
 
   public boolean equalsCoordinate(
     final Node<T> node) {
-    final Coordinate otherCoordinate = node.getCoordinate();
-    return equalsCoordinate(otherCoordinate);
+    final Coordinates otherPoint = node.getCoordinates();
+    return equalsCoordinate(otherPoint);
   }
 
   public double getAngle(
     final Node<LineSegmentMatch> node) {
-    return Angle.angle(coordinate, node.getCoordinate());
+    return getCoordinates().angle2d(node.getCoordinates());
   }
 
   @SuppressWarnings("unchecked")
@@ -149,26 +146,24 @@ public class Node<T> implements Comparable<Node<T>> {
     return attributes;
   }
 
-  public Coordinate getCoordinate() {
-    return coordinate;
-  }
 
   public Coordinates getCoordinates() {
-    return new CoordinateCoordinates(coordinate);
+    return coordinates;
   }
+
   public int getDegree() {
     return inEdges.size() + outEdges.size();
   }
 
   /**
-   * Get the distance between this node and the coordinate.
+   * Get the distance between this node and the point coordinates.
    * 
-   * @param coordinate The coordinate.
+   * @param point The coordinates.
    * @return The distance.
    */
   public double getDistance(
-    final Coordinate coordinate) {
-    return this.coordinate.distance(coordinate);
+    final Coordinates point) {
+    return this.coordinates.distance(point);
   }
 
   /**
@@ -179,7 +174,8 @@ public class Node<T> implements Comparable<Node<T>> {
    */
   public double getDistance(
     final Geometry geometry) {
-    final Point point = geometry.getFactory().createPoint(coordinate);
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
+    final Point point = factory.createPoint(coordinates);
     return point.distance(geometry);
   }
 
@@ -191,8 +187,8 @@ public class Node<T> implements Comparable<Node<T>> {
    */
   public double getDistance(
     final Node<?> node) {
-    final Coordinate otherCoordinate = node.coordinate;
-    return getDistance(otherCoordinate);
+    final Coordinates otherPoint = node.getCoordinates();
+    return getDistance(otherPoint);
   }
 
   public int getEdgeIndex(
@@ -304,11 +300,11 @@ public class Node<T> implements Comparable<Node<T>> {
   }
 
   public boolean isRemoved() {
-    return coordinate == null;
+    return coordinates == null;
   }
 
   void remove() {
-    coordinate = null;
+    coordinates = null;
     edges = null;
     inEdges = null;
     outEdges = null;
@@ -388,7 +384,7 @@ public class Node<T> implements Comparable<Node<T>> {
 
   @Override
   public String toString() {
-    return getCoordinate().toString();
+    return getCoordinates().toString();
   }
 
   private void updateAttributes() {

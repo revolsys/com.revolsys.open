@@ -3,10 +3,10 @@ package com.revolsys.gis.algorithm.linematch;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineSegmentMatch {
@@ -16,8 +16,8 @@ public class LineSegmentMatch {
 
   public LineSegmentMatch(
     final GeometryFactory geometryFactory,
-    final Coordinate start,
-    final Coordinate end) {
+    final Coordinates start,
+    final Coordinates end) {
     this(new LineSegment(geometryFactory, start, end));
   }
 

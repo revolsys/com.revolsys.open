@@ -2,12 +2,13 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.NodeQuadTree;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -34,6 +35,8 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
 
   private final double maxDistance;
 
+  private GeometryFactory geometryFactory;
+
   public NodeLessThanDistanceOfGeometryVisitor(
     final Geometry geometry,
     final double maxDistance,
@@ -41,12 +44,13 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
+    this.geometryFactory = GeometryFactory.getFactory(geometry);
   }
 
   public boolean visit(
     final Node<T> node) {
-    final Coordinate coordinate = node.getCoordinate();
-    final Point point = geometry.getFactory().createPoint(coordinate);
+    final Coordinates coordinate = node.getCoordinates();
+    final Point point = geometryFactory.createPoint(coordinate);
     final double distance = geometry.distance(point);
     if (distance < maxDistance) {
       matchVisitor.visit(node);

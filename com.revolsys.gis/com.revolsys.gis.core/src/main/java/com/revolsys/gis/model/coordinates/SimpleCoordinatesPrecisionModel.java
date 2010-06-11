@@ -2,6 +2,8 @@ package com.revolsys.gis.model.coordinates;
 
 public class SimpleCoordinatesPrecisionModel implements
   CoordinatesPrecisionModel {
+  public static SimpleCoordinatesPrecisionModel FLOATING = new SimpleCoordinatesPrecisionModel();
+
   public static double makePrecise(
     final double value,
     final double scale) {

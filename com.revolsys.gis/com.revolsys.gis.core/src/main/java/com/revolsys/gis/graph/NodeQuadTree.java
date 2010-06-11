@@ -4,8 +4,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.visitor.Visitor;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.ItemVisitor;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -14,8 +15,8 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
 
   public Node<T> add(
     final Node<T> node) {
-    final Coordinate coordinate = node.getCoordinate();
-    final Envelope envelope = new Envelope(coordinate);
+    final Coordinates coordinate = node.getCoordinates();
+    final Envelope envelope = new BoundingBox(coordinate);
     insert(envelope, node);
     return node;
   }
@@ -28,11 +29,11 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
   }
 
   public Node<T> find(
-    final Coordinate coordinate) {
-    final Envelope envelope = new Envelope(coordinate);
+    final Coordinates coordinates) {
+    final Envelope envelope = new BoundingBox(coordinates);
     final List<Node<T>> nodes = query(envelope);
     for (final Node<T> node : nodes) {
-      if (node.getCoordinate().equals2D(coordinate)) {
+      if (node.getCoordinates().equals2d(coordinates)) {
         return node;
       }
     }
@@ -69,8 +70,8 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
   }
 
   public Node<T> remove(
-    final Coordinate coordinate) {
-    final Node<T> node = find(coordinate);
+    final Coordinates point) {
+    final Node<T> node = find(point);
     if (node != null) {
       remove(node);
       return node;
@@ -81,8 +82,8 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
 
   public void remove(
     final Node<T> node) {
-    final Coordinate coordinate = node.getCoordinate();
-    final Envelope envelope = new Envelope(coordinate);
+    final Coordinates point = node.getCoordinates();
+    final Envelope envelope = new BoundingBox(point);
     remove(envelope, node);
   }
 
@@ -92,5 +93,4 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
       remove(node);
     }
   }
-
 }

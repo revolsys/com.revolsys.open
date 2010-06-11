@@ -18,6 +18,7 @@ import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
@@ -203,14 +204,14 @@ public class Edge<T> implements AttributedObject {
   }
 
   public double distance(
-    final Coordinate coordinate) {
-    return JtsGeometryUtil.distance(coordinate, line);
+    final Coordinates point) {
+    return LineStringUtil.distance(point, line);
   }
 
   public double distance(
     final Node<T> node) {
-    final Coordinate coordinate = node.getCoordinate();
-    return distance(coordinate);
+    final Coordinates point = node.getCoordinates();
+    return distance(point);
   }
 
   public double getAngle(
@@ -373,16 +374,16 @@ public class Edge<T> implements AttributedObject {
   }
 
   public boolean isLessThanDistance(
-    final Coordinate coordinate,
+    final Coordinates point,
     final double distance) {
-    return JtsGeometryUtil.isLessThanDistance(coordinate, line, distance);
+    return LineStringUtil.distance(point, line, distance) < distance;
   }
 
   public boolean isLessThanDistance(
     final Node<T> node,
     final double distance) {
-    final Coordinate coordinate = node.getCoordinate();
-    return isLessThanDistance(coordinate, distance);
+    final Coordinates point = node.getCoordinates();
+    return isLessThanDistance(point, distance);
   }
 
   public boolean isRemoved() {
@@ -390,16 +391,16 @@ public class Edge<T> implements AttributedObject {
   }
 
   public boolean isWithinDistance(
-    final Coordinate coordinate,
+    final Coordinates point,
     final double distance) {
-    return JtsGeometryUtil.distance(coordinate, line, distance) <= distance;
+    return LineStringUtil.distance(point, line, distance) <= distance;
   }
 
   public boolean isWithinDistance(
     final Node<T> node,
     final double distance) {
-    final Coordinate coordinate = node.getCoordinate();
-    return isWithinDistance(coordinate, distance);
+    final Coordinates point = node.getCoordinates();
+    return isWithinDistance(point, distance);
   }
 
   void remove() {
@@ -437,8 +438,8 @@ public class Edge<T> implements AttributedObject {
     } else {
       final StringBuffer sb = new StringBuffer(getTypeName().toString());
       sb.append("[");
-      sb.append(fromNode.getCoordinate()).append(",");
-      sb.append(toNode.getCoordinate());
+      sb.append(fromNode.getCoordinates()).append(",");
+      sb.append(toNode.getCoordinates());
       sb.append("]");
       return sb.toString();
     }

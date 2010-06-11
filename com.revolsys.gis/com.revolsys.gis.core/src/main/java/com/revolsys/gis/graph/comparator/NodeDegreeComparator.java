@@ -3,6 +3,7 @@ package com.revolsys.gis.graph.comparator;
 import java.util.Comparator;
 
 import com.revolsys.gis.graph.Node;
+import com.revolsys.gis.model.coordinates.Coordinates;
 
 public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
 
@@ -23,7 +24,9 @@ public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
     final int degree1 = node1.getDegree();
     final int degree2 = node2.getDegree();
     if (degree1 == degree2) {
-      compare = node1.getCoordinate().compareTo(node2.getCoordinate());
+      final Coordinates point1 = node1.getCoordinates();
+      final Coordinates point2 = node2.getCoordinates();
+      compare = point1.compareTo(point2);
     } else if (degree1 < degree2) {
       compare = -1;
     } else {

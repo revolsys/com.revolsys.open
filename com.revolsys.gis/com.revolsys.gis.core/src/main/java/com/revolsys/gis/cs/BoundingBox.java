@@ -161,6 +161,11 @@ public class BoundingBox extends Envelope {
     this.coordinateSystem = coordinateSystem;
   }
 
+  public BoundingBox(
+    Coordinates point) {
+    super(point.getX(), point.getY(), point.getX(), point.getY());
+  }
+
   public BoundingBox convert(
     final CoordinateSystem coordinateSystem) {
     if (this.coordinateSystem == null || coordinateSystem == null

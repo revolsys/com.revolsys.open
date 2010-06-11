@@ -315,7 +315,7 @@ public class LineSegmentUtil {
     final double line2y1,
     final double line2x2,
     final double line2y2) {
-  double x = det(det(line1x1, line1y1, line1x2, line1y2), line1x1 - line1x2,
+    double x = det(det(line1x1, line1y1, line1x2, line1y2), line1x1 - line1x2,
       det(line2x1, line2y1, line2x2, line2y2), line2x1 - line2x2)
       / det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2, line2y1
         - line2y2);
@@ -375,6 +375,38 @@ public class LineSegmentUtil {
     } else {
       final double z = z1 + r * (z2 - z1);
       return new DoubleCoordinates(x, y, z);
+    }
+  }
+
+  public static Coordinates project(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final double r) {
+    Coordinates point = project(lineStart, lineEnd, r);
+    precisionModel.makePrecise(point);
+    return point;
+  }
+
+  public static Coordinates midPoint(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart,
+    final Coordinates lineEnd) {
+    return project(precisionModel, lineStart, lineEnd, 0.5);
+  }
+
+  public static Coordinates pointAlong(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point) {
+    double projectionFactor = projectionFactor(lineStart, lineEnd, point);
+    if (projectionFactor < 0.0) {
+      return lineStart;
+    } else if (projectionFactor > 1.0) {
+      return lineEnd;
+    } else {
+      return project(precisionModel, lineStart, lineEnd, projectionFactor);
     }
   }
 
@@ -478,5 +510,19 @@ public class LineSegmentUtil {
     final double length = dx * dx + dy * dy;
     final double r = ((x - x1) * dx + (y - y1) * dy) / length;
     return r;
+  }
+
+  public double segmentFraction(
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    Coordinates point) {
+    double segFrac = projectionFactor(lineStart, lineEnd, point);
+    if (segFrac < 0.0) {
+      return 0.0;
+    } else if (segFrac > 1.0) {
+      return 1.0;
+    } else {
+      return segFrac;
+    }
   }
 }

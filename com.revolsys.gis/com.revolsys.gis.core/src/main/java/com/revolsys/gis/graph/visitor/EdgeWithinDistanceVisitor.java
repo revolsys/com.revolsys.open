@@ -2,16 +2,16 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.NestedVisitor;
 import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
@@ -32,7 +32,7 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
     final Node<T> node,
     final double maxDistance) {
     final GeometryFactory geometryFactory = new GeometryFactory();
-    final Coordinate coordinate = node.getCoordinate();
+    final Coordinates coordinate = node.getCoordinates();
     final Geometry geometry = geometryFactory.createPoint(coordinate);
     return edgesWithiDistance(graph, geometry, maxDistance);
 

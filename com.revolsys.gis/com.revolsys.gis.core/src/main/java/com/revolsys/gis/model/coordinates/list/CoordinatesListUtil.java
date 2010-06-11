@@ -1,15 +1,26 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public class CoordinatesListUtil {
+  public static final String COORDINATE_DISTANCE = "coordinateDistance";
+
+  public static final String COORDINATE_INDEX = "coordinateIndex";
+
+  public static final String SEGMENT_DISTANCE = "segmentDistance";
+
+  public static final String SEGMENT_INDEX = "segmentIndex";
+
   public static int append(
     final CoordinatesList src,
     final CoordinatesList dest,
@@ -45,6 +56,72 @@ public class CoordinatesListUtil {
       previousY = y;
     }
     return coordIndex;
+  }
+
+  public static Map<String, Number> findClosestSegmentAndCoordinate(
+    final CoordinatesList points,
+    final Coordinates point) {
+    final Map<String, Number> result = new HashMap<String, Number>();
+    result.put(SEGMENT_INDEX, -1);
+    result.put(COORDINATE_INDEX, -1);
+    result.put(COORDINATE_DISTANCE, Double.MAX_VALUE);
+    result.put(SEGMENT_DISTANCE, Double.MAX_VALUE);
+    double closestDistance = Double.MAX_VALUE;
+    final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
+      points);
+    if (iterator.hasNext()) {
+      LineSegment segment = iterator.next();
+      final double previousCoordinateDistance = segment.getPoint(0).distance(point);
+      if (previousCoordinateDistance == 0) {
+        result.put(SEGMENT_INDEX, 0);
+        result.put(COORDINATE_INDEX, 0);
+        result.put(COORDINATE_DISTANCE, 0.0);
+        result.put(SEGMENT_DISTANCE, 0.0);
+      } else {
+        int i = 1;
+        while (segment != null) {
+          final double currentCoordinateDistance = segment.getPoint(1).distance(point);
+          if (currentCoordinateDistance == 0) {
+            result.put(SEGMENT_INDEX, i);
+            result.put(COORDINATE_INDEX, i);
+            result.put(COORDINATE_DISTANCE, 0.0);
+            result.put(SEGMENT_DISTANCE, 0.0);
+            return result;
+          }
+          final double distance = segment.distance(point);
+          if (distance == 0) {
+            result.put(SEGMENT_INDEX, i - 1);
+            result.put(SEGMENT_DISTANCE, 0.0);
+            if (previousCoordinateDistance < currentCoordinateDistance) {
+              result.put(COORDINATE_INDEX, i - 1);
+              result.put(COORDINATE_DISTANCE, previousCoordinateDistance);
+            } else {
+              result.put(COORDINATE_INDEX, i);
+              result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
+            }
+            return result;
+          } else if (distance < closestDistance) {
+            result.put(SEGMENT_DISTANCE, distance);
+            closestDistance = distance;
+            result.put(SEGMENT_INDEX, i - 1);
+            if (previousCoordinateDistance < currentCoordinateDistance) {
+              result.put(COORDINATE_INDEX, i - 1);
+              result.put(COORDINATE_DISTANCE, previousCoordinateDistance);
+            } else {
+              result.put(COORDINATE_INDEX, i);
+              result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
+            }
+          }
+          if (iterator.hasNext()) {
+            i++;
+            segment = iterator.next();
+          } else {
+            segment = null;
+          }
+        }
+      }
+    }
+    return result;
   }
 
   public static int appendReversed(
@@ -140,6 +217,39 @@ public class CoordinatesListUtil {
       }
       return coordinates;
     }
+  }
+
+  public static CoordinatesList subList(
+    final CoordinatesList points,
+    final Coordinates startPoint,
+    final int start,
+    final int length,
+    final Coordinates endPoint) {
+    final int dimension = points.getNumAxis();
+    int size = length;
+    int startIndex = 0;
+    int lastIndex = length;
+    if (startPoint != null) {
+      size++;
+      lastIndex++;
+      startIndex++;
+    }
+    if (endPoint != null) {
+      size++;
+    }
+    final CoordinatesList newPoints = new DoubleCoordinatesList(size, dimension);
+
+    if (startPoint != null) {
+      newPoints.setPoint(0, startPoint);
+    }
+
+    points.copy(start, newPoints, startIndex, dimension, length);
+
+    if (endPoint != null) {
+      newPoints.setPoint(lastIndex, endPoint);
+    }
+
+    return newPoints;
   }
 
   public static CoordinatesList trim(

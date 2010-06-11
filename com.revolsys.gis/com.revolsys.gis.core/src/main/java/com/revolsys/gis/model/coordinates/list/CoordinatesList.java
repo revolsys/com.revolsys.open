@@ -31,7 +31,7 @@ public interface CoordinatesList extends CoordinateSequence,
     int i,
     Coordinate coordinate);
 
-  void setCoordinates(
+  void setPoint(
     int i,
     Coordinates point);
 
@@ -76,4 +76,5 @@ public interface CoordinatesList extends CoordinateSequence,
     int index,
     double z);
 
+  Coordinates getPoint(int i);
 }

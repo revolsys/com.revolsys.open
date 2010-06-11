@@ -1,6 +1,9 @@
 package com.revolsys.gis.model.coordinates;
 
-public interface Coordinates {
+public interface Coordinates extends Comparable<Coordinates> {
+  double angle2d(
+    Coordinates other);
+
   Coordinates clone();
 
   double distance(

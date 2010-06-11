@@ -8,8 +8,8 @@ import com.revolsys.gis.graph.EdgeQuadTree;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
-import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.LineString;
 
 public class SplitCrossingEdgesVisitor<T> extends
@@ -61,7 +61,7 @@ public class SplitCrossingEdgesVisitor<T> extends
     for (final Edge<T> crossEdge : crossings) {
       if (!crossEdge.isRemoved()) {
         final LineString crossLine = crossEdge.getLine();
-        final Coordinate intersection = JtsGeometryUtil.getCrossingIntersection(
+        final Coordinates intersection = LineStringUtil.getCrossingIntersection(
           line, crossLine);
         if (intersection != null) {
           graph.getPrecisionModel().makePrecise(intersection);

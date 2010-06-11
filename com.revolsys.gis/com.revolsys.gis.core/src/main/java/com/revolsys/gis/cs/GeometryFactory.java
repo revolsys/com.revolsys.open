@@ -42,6 +42,14 @@ public class GeometryFactory extends
 
   private final CoordinateSystem coordinateSystem;
 
+  public GeometryFactory() {
+    super(
+      PrecisionModelUtil.getPrecisionModel(SimpleCoordinatesPrecisionModel.FLOATING),
+      0, DoubleCoordinatesListFactory.INSTANCE);
+    this.coordinateSystem = null;
+    this.coordinatesPrecisionModel = SimpleCoordinatesPrecisionModel.FLOATING;
+  }
+
   public GeometryFactory(
     final CoordinateSystem coordinateSystem) {
     this(coordinateSystem, new SimpleCoordinatesPrecisionModel());
@@ -75,7 +83,7 @@ public class GeometryFactory extends
       coordinatesList = new DoubleCoordinatesList(numAxis, numPoints);
       for (int i = 0; i < numPoints; i++) {
         final Coordinates point = points.get(i);
-        coordinatesList.setCoordinates(i, point);
+        coordinatesList.setPoint(i, point);
       }
     }
     return createLineString(coordinatesList);

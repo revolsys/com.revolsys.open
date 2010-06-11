@@ -3,6 +3,7 @@ package com.revolsys.gis.graph.comparator;
 import java.util.Comparator;
 
 import com.revolsys.gis.graph.Node;
+import com.revolsys.gis.model.coordinates.Coordinates;
 
 public class NodeDistanceComparator implements Comparator<Node<?>> {
 
@@ -30,7 +31,9 @@ public class NodeDistanceComparator implements Comparator<Node<?>> {
     final double distance1 = node1.getDistance(node);
     final double distance2 = node2.getDistance(node);
     if (distance1 == distance2) {
-      compare = node1.getCoordinate().compareTo(node2.getCoordinate());
+      final Coordinates point1 = node1.getCoordinates();
+      final Coordinates point2 = node2.getCoordinates();
+      compare = point1.compareTo(point2);
     } else if (distance1 < distance2) {
       compare = -1;
     } else {

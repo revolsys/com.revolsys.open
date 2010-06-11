@@ -1,23 +1,27 @@
 package com.revolsys.gis.model.geometry;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.Visitor;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-public class LineSegment implements CoordinateSequence {
+public class LineSegment extends AbstractCoordinatesList {
+  private static final GeometryFactory FACTORY = new GeometryFactory();
+
   public static void visit(
     final LineString line,
     final Visitor<LineSegment> visitor) {
-    final CoordinateSequence coords = line.getCoordinateSequence();
-    Coordinate previousCoordinate = coords.getCoordinate(0);
+    final CoordinatesList coords = CoordinatesListUtil.get(line);
+    Coordinates previousCoordinate = coords.getPoint(0);
     for (int i = 1; i < coords.size(); i++) {
-      final Coordinate coordinate = coords.getCoordinate(i);
-      final LineSegment segment = new LineSegment(line.getFactory(),
-        previousCoordinate, coordinate);
+      final Coordinates coordinate = coords.getPoint(i);
+      final LineSegment segment = new LineSegment(
+        GeometryFactory.getFactory(line), previousCoordinate, coordinate);
       if (segment.getLength() > 0) {
         if (!visitor.visit(segment)) {
           return;
@@ -27,66 +31,37 @@ public class LineSegment implements CoordinateSequence {
     }
   }
 
-  private final Coordinate coordinate1;
+  private final Coordinates coordinates1;
 
-  private final Coordinate coordinate2;
+  private final Coordinates coordinates2;
 
   private final GeometryFactory geometryFactory;
 
   private LineString line;
 
   public LineSegment(
+    final Coordinates coordinates1,
+    final Coordinates coordinates2) {
+    this(FACTORY, coordinates1, coordinates2);
+  }
+
+  public LineSegment(
     final GeometryFactory geometryFactory,
-    final Coordinate coordinate1,
-    final Coordinate coordinate2) {
+    final Coordinates coordinates1,
+    final Coordinates coordinates2) {
     this.geometryFactory = geometryFactory;
-    this.coordinate1 = coordinate1;
-    this.coordinate2 = coordinate2;
+    this.coordinates1 = coordinates1;
+    this.coordinates2 = coordinates2;
   }
 
   @Override
   public LineSegment clone() {
-    return new LineSegment(geometryFactory, coordinate1, coordinate2);
+    return new LineSegment(geometryFactory, coordinates1, coordinates2);
   }
 
   public double distance(
-    final Coordinate p) {
-    return CGAlgorithms.distancePointLine(p, coordinate1, coordinate2);
-  }
-
-  public Envelope expandEnvelope(
-    final Envelope env) {
-    env.expandToInclude(coordinate1);
-    env.expandToInclude(coordinate2);
-    return env;
-  }
-
-  public Coordinate getCoordinate(
-    final int i) {
-    switch (i) {
-      case 0:
-        return coordinate1;
-      case 1:
-        return coordinate2;
-      default:
-        return null;
-    }
-  }
-
-  public void getCoordinate(
-    final int index,
-    final Coordinate coord) {
-    final Coordinate coordinate = getCoordinate(index);
-    coord.setCoordinate(coordinate);
-  }
-
-  public Coordinate getCoordinateCopy(
-    final int i) {
-    return new Coordinate(getCoordinate(i));
-  }
-
-  public int getDimension() {
-    return 3;
+    final Coordinates p) {
+    return LineSegmentUtil.distance(p, coordinates1, coordinates2);
   }
 
   public Envelope getEnvelope() {
@@ -99,7 +74,7 @@ public class LineSegment implements CoordinateSequence {
    * @return the length of the line segment
    */
   public double getLength() {
-    return coordinate1.distance(coordinate2);
+    return coordinates1.distance(coordinates2);
   }
 
   public LineString getLine() {
@@ -109,99 +84,68 @@ public class LineSegment implements CoordinateSequence {
     return line;
   }
 
-  public double getOrdinate(
-    final int index,
-    final int ordinateIndex) {
-    final Coordinate coordinate = getCoordinate(index);
-    switch (ordinateIndex) {
-      case 0:
-        return coordinate.x;
-      case 1:
-        return coordinate.y;
-      case 2:
-        return coordinate.z;
-      default:
-        return 0;
-    }
-  }
-
-  public double getX(
-    final int index) {
-    return getOrdinate(index, 0);
-  }
-
-  public double getY(
-    final int index) {
-    return getOrdinate(index, 1);
-  }
-
-  public Coordinate project(
-    final Coordinate p) {
-    if (p.equals(coordinate1) || p.equals(coordinate2)) {
-      return new Coordinate(p);
-    }
-
-    final double r = projectionFactor(p);
-    final Coordinate coord = new Coordinate();
-    coord.x = coordinate1.x + r * (coordinate2.x - coordinate1.x);
-    coord.y = coordinate1.y + r * (coordinate2.y - coordinate1.y);
-    return coord;
+  public Coordinates project(
+    final Coordinates p) {
+    return LineSegmentUtil.project(coordinates1, coordinates2,
+      projectionFactor(p));
   }
 
   public double projectionFactor(
-    final Coordinate p) {
-    if (p.equals(coordinate1)) {
-      return 0.0;
-    }
-    if (p.equals(coordinate2)) {
-      return 1.0;
-    }
-    // Otherwise, use comp.graphics.algorithms Frequently Asked Questions method
-    /*
-     * AC dot AB r = --------- ||AB||^2 r has the following meaning: r=0 P = A
-     * r=1 P = B r<0 P is on the backward extension of AB r>1 P is on the
-     * forward extension of AB 0<r<1 P is interior to AB
-     */
-    final double dx = coordinate2.x - coordinate1.x;
-    final double dy = coordinate2.y - coordinate1.y;
-    final double len2 = dx * dx + dy * dy;
-    final double r = ((p.x - coordinate1.x) * dx + (p.y - coordinate1.y) * dy)
-      / len2;
-    return r;
-  }
-
-  public void setOrdinate(
-    final int index,
-    final int ordinateIndex,
-    final double value) {
-    final Coordinate coordinate = getCoordinate(index);
-    switch (ordinateIndex) {
-      case 0:
-        coordinate.x = value;
-      break;
-      case 1:
-        coordinate.y = value;
-      break;
-      case 2:
-        coordinate.z = value;
-      break;
-      default:
-      break;
-    }
+    final Coordinates p) {
+    return LineSegmentUtil.projectionFactor(coordinates1, coordinates2, p);
   }
 
   public int size() {
     return 2;
   }
 
-  public Coordinate[] toCoordinateArray() {
-    return new Coordinate[] {
-      coordinate1, coordinate2
-    };
-  }
-
   @Override
   public String toString() {
     return getLine().toString();
   }
+
+  public byte getNumAxis() {
+    return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
+  }
+
+  public double getValue(
+    int index,
+    int axisIndex) {
+    switch (index) {
+      case 0:
+        return coordinates1.getValue(axisIndex);
+      case 1:
+        return coordinates2.getValue(axisIndex);
+
+      default:
+        return 0;
+    }
+  }
+
+  public void setValue(
+    int index,
+    int axisIndex,
+    double value) {
+    switch (index) {
+      case 0:
+        coordinates1.setValue(axisIndex, value);
+      break;
+      case 1:
+        coordinates2.setValue(axisIndex, value);
+      break;
+      default:
+    }
+  }
+
+  public boolean contains(
+    Coordinates coordinate) {
+    if (getPoint(0).equals(coordinate)) {
+      return true;
+    } else if (getPoint(1).equals(coordinate)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }

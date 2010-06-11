@@ -3,8 +3,10 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Iterator;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList {
@@ -108,6 +110,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     return getValue(index, axisIndex);
   }
 
+  public Coordinates getPoint(
+    int i) {
+    return new CoordinatesListCoordinates(this, i);
+  }
+
   public double getX(
     final int index) {
     return getValue(index, 0);
@@ -163,7 +170,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
-  public void setCoordinates(
+  public void setPoint(
     final int i,
     final Coordinates point) {
     setX(i, point.getX());
@@ -203,7 +210,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     copy(sourceIndex, target, targetIndex, numAxis, count);
     return target;
   }
-
+ 
+  
   public Coordinate[] toCoordinateArray() {
     final Coordinate[] coordinateArray = new Coordinate[size()];
     for (int i = 0; i < coordinateArray.length; i++) {

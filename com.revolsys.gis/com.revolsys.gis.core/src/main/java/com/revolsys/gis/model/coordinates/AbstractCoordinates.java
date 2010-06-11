@@ -2,6 +2,45 @@ package com.revolsys.gis.model.coordinates;
 
 public abstract class AbstractCoordinates implements Coordinates {
 
+  public static int hashCode(
+    final double d) {
+    final long f = Double.doubleToLongBits(d);
+    return (int)(f ^ (f >>> 32));
+  }
+
+  /**
+   * Calculate the angle in radians on a 2D plan between this point and another
+   * point.
+   * 
+   * @param other The other point.
+   * @return The angle in radians.
+   */
+  public double angle2d(
+    final Coordinates other) {
+    final double dx = other.getX() - getX();
+    final double dy = other.getY() - getY();
+    return Math.atan2(dy, dx);
+  }
+
+  @Override
+  public abstract Coordinates clone();
+
+  public int compareTo(
+    final Coordinates other) {
+    final double x = getX();
+    final double y = getY();
+    final double otherX = getX();
+    final double otherY = getY();
+
+    if (x < otherX || y < otherY) {
+      return -1;
+    } else if (x > otherX || y > otherY) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
   public double distance(
     final Coordinates coordinates) {
     return CoordinatesUtil.distance(this, coordinates);
@@ -29,7 +68,7 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   public double[] getCoordinates() {
-    double[] coordinates = new double[getNumAxis()];
+    final double[] coordinates = new double[getNumAxis()];
     for (int i = 0; i < coordinates.length; i++) {
       coordinates[i] = getValue(i);
     }
@@ -52,6 +91,14 @@ public abstract class AbstractCoordinates implements Coordinates {
     return getValue(2);
   }
 
+  @Override
+  public int hashCode() {
+    int result = 17;
+    result = 37 * result + hashCode(getX());
+    result = 37 * result + hashCode(getY());
+    return result;
+  }
+
   public void setX(
     final double x) {
     setValue(0, x);
@@ -66,7 +113,4 @@ public abstract class AbstractCoordinates implements Coordinates {
     final double z) {
     setValue(2, z);
   }
-
-  @Override
-  public abstract Coordinates clone();
 }

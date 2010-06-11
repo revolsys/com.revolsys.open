@@ -1,5 +1,6 @@
 package com.revolsys.gis.jts;
 
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -24,6 +25,11 @@ public abstract class AbstractLineSegment implements LineSegment {
   }
 
   public double getDistance(
+    final Coordinates point) {
+    return getDistance(point.getX(), point.getY());
+  }
+
+  public double getDistance(
     final double x,
     final double y) {
     final double x1 = getStartX();
@@ -45,6 +51,11 @@ public abstract class AbstractLineSegment implements LineSegment {
   public double getEndDistance(
     final Coordinate coordinate) {
     return getEndDistance(coordinate.x, coordinate.y);
+  }
+
+  public double getEndDistance(
+    final Coordinates point) {
+    return getEndDistance(point.getX(), point.getY());
   }
 
   public double getEndDistance(
@@ -81,6 +92,11 @@ public abstract class AbstractLineSegment implements LineSegment {
   public double getStartDistance(
     final Coordinate coordinate) {
     return getStartDistance(coordinate.x, coordinate.y);
+  }
+
+  public double getStartDistance(
+    final Coordinates point) {
+    return getStartDistance(point.getX(), point.getY());
   }
 
   public double getStartDistance(

@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.linematch;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.vividsolutions.jts.geom.Envelope;
@@ -18,7 +19,7 @@ public class LineSegmentMatchWithinDistanceFilter implements
     final double maxDistance) {
     this.node = node;
     this.maxDistance = maxDistance;
-    this.envelope = new Envelope(node.getCoordinate());
+    this.envelope = new BoundingBox(node.getCoordinates());
     envelope.expandBy(maxDistance);
   }
 

@@ -18,6 +18,7 @@ import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
 import com.revolsys.filter.FilterUtil;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.FilterListVisitor;
 import com.revolsys.gis.data.visitor.Visitor;
@@ -31,12 +32,15 @@ import com.revolsys.gis.graph.visitor.DeleteEdgeVisitor;
 import com.revolsys.gis.graph.visitor.EdgeWithinDistanceVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
-import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.algorithm.Angle;
+import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -54,9 +58,9 @@ public class Graph<T> {
 
   private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<T>();
 
-  private final Map<Coordinate, Node<T>> nodes = new LinkedHashMap<Coordinate, Node<T>>();
+  private final Map<Coordinates, Node<T>> nodes = new LinkedHashMap<Coordinates, Node<T>>();
 
-  private PrecisionModel precisionModel = new PrecisionModel();
+  private CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
 
   protected void add(
     final Edge<T> edge) {
@@ -74,11 +78,7 @@ public class Graph<T> {
 
   protected void add(
     final Node<T> node) {
-    if (node.getCoordinate().equals(new Coordinate(740953.3950366036,1049476.0169586174))) {
-      System.out.println();
-    }
-    
-    nodes.put(node.getCoordinate(), node);
+    nodes.put(node.getCoordinates(), node);
     if (nodeIndex != null) {
       nodeIndex.add(node);
     }
@@ -93,28 +93,26 @@ public class Graph<T> {
   public Edge<T> add(
     final T object,
     final LineString line) {
-    final CoordinateSequence coords = line.getCoordinateSequence();
-    final Coordinate fromCoord = coords.getCoordinate(0);
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Coordinates from = points.getPoint(0);
 
-    Coordinate fromDirectionCoord = coords.getCoordinate(1);
+    Coordinates fromDirection = points.getPoint(1);
     int i = 2;
-    while (i < coords.size() && fromDirectionCoord.equals2D(fromCoord)) {
-      fromDirectionCoord = coords.getCoordinate(i);
+    while (i < points.size() && fromDirection.equals2d(from)) {
+      fromDirection = points.getPoint(i);
       i++;
     }
-    final Coordinate toCoord = coords.getCoordinate(coords.size() - 1);
-    i = coords.size() - 2;
-    Coordinate toDirectionCoord = coords.getCoordinate(i);
-    while (i > 0 && toDirectionCoord.equals2D(toCoord)) {
-      toDirectionCoord = coords.getCoordinate(i);
+    final Coordinates to = points.getPoint(points.size() - 1);
+    i = points.size() - 2;
+    Coordinates toDirection = points.getPoint(i);
+    while (i > 0 && toDirection.equals2d(to)) {
+      toDirection = points.getPoint(i);
       i--;
     }
-    final Node<T> fromNode = getNode(fromCoord);
-    final Node<T> toNode = getNode(toCoord);
-    final double fromAngle = MathUtil.angle(fromCoord.x, fromCoord.y,
-      fromDirectionCoord.x, fromDirectionCoord.y);
-    final double toAngle = MathUtil.angle(toCoord.x, toCoord.y,
-      toDirectionCoord.x, toDirectionCoord.y);
+    final Node<T> fromNode = getNode(from);
+    final Node<T> toNode = getNode(to);
+    final double fromAngle = from.angle2d(fromDirection);
+    final double toAngle = to.angle2d(toDirection);
     final Edge<T> edge = new Edge<T>(this, object, line, fromNode, fromAngle,
       toNode, toAngle);
     add(edge);
@@ -209,10 +207,23 @@ public class Graph<T> {
    * 
    * @param coordinate The coordinate to find the node for.
    * @return The nod or null if not found.
+   * @deprecated
    */
   public Node<T> findNode(
     final Coordinate coordinate) {
-    return nodes.get(coordinate);
+    return nodes.get(new CoordinateCoordinates(coordinate));
+  }
+
+  /**
+   * Find the node by point coordinates returning the node if it exists, null
+   * otherwise.
+   * 
+   * @param point The point coordinates to find the node for.
+   * @return The nod or null if not found.
+   */
+  public Node<T> findNode(
+    final Coordinates point) {
+    return nodes.get(point);
   }
 
   /**
@@ -221,14 +232,28 @@ public class Graph<T> {
    * @param coordinate The coordinate.
    * @param distance The distance.
    * @return The list of nodes.
-   */
+  * @deprecated
+    */
   public List<Node<T>> findNodes(
     final Coordinate coordinate,
     final double distance) {
+    return findNodes(new CoordinateCoordinates(coordinate), distance);
+  }
+
+  /**
+   * Find the nodes <= the distance of the specified point coordinates.
+   * 
+   * @param point The point coordinates.
+   * @param distance The distance.
+   * @return The list of nodes.
+   */
+  public List<Node<T>> findNodes(
+    final Coordinates point,
+    final double distance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
-      coordinate, distance, results);
-    final Envelope envelope = new Envelope(coordinate);
+      point, distance, results);
+    final Envelope envelope = new BoundingBox(point);
     envelope.expandBy(distance);
     getNodeIndex().query(envelope, visitor);
     return results.getList();
@@ -278,8 +303,8 @@ public class Graph<T> {
   public List<Node<T>> findNodes(
     final Node<T> node,
     final double distance) {
-    final Coordinate coordinate = node.getCoordinate();
-    return findNodes(coordinate, distance);
+    final Coordinates point = node.getCoordinates();
+    return findNodes(point, distance);
   }
 
   public List<Node<T>> findNodesOfDegree(
@@ -399,12 +424,24 @@ public class Graph<T> {
    * 
    * @param coordinate The coordinate to get the node for.
    * @return The node.
+   * @deprecated
    */
   public Node<T> getNode(
     final Coordinate coordinate) {
-    Node<T> node = findNode(coordinate);
+    return getNode(new CoordinateCoordinates(coordinate));
+  }
+
+  /**
+   * Get the node by point coordinates, creating one if it did not exist.
+   * 
+   * @param point The point coordinates to get the node for.
+   * @return The node.
+   */
+  public Node<T> getNode(
+    final Coordinates point) {
+    Node<T> node = findNode(point);
     if (node == null) {
-      node = new Node<T>(this, coordinate);
+      node = new Node<T>(this, point);
       add(node);
     }
     return node;
@@ -464,7 +501,7 @@ public class Graph<T> {
 
   }
 
-  public PrecisionModel getPrecisionModel() {
+  public CoordinatesPrecisionModel getPrecisionModel() {
     return precisionModel;
   }
 
@@ -576,7 +613,7 @@ public class Graph<T> {
     final Node<T> node) {
     if (!node.isRemoved()) {
       nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED, null);
-      nodes.remove(node.getCoordinate());
+      nodes.remove(node.getCoordinates());
       if (nodeIndex != null) {
         nodeIndex.remove(node);
       }
@@ -644,7 +681,7 @@ public class Graph<T> {
   }
 
   public void setPrecisionModel(
-    final PrecisionModel precisionModel) {
+    final CoordinatesPrecisionModel precisionModel) {
     this.precisionModel = precisionModel;
   }
 
@@ -652,11 +689,12 @@ public class Graph<T> {
     final Edge<T> edge,
     final Node<T> node) {
     if (!edge.isRemoved()) {
-      final Coordinate coordinate = node.getCoordinate();
+      final Coordinates point = node.getCoordinates();
       final LineString line = edge.getLine();
+      final CoordinatesList points = CoordinatesListUtil.get(line);
 
       final Map<String, Number> result = LineStringUtil.findClosestSegmentAndCoordinate(
-        line, coordinate);
+        line, point);
       final int segmentIndex = result.get("segmentIndex").intValue();
       if (segmentIndex != -1) {
         List<LineString> lines;
@@ -668,20 +706,20 @@ public class Graph<T> {
           if (coordinateDistance == 0) {
             return Collections.singletonList(edge);
           } else if (segmentDistance == 0) {
-            lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
+            lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Coordinate c0 = line.getCoordinateN(0);
-            Coordinate c1;
+            final Coordinates c0 = points.getPoint(0);
+            Coordinates c1;
             int i = 1;
             do {
-              c1 = line.getCoordinateN(i);
+              c1 = points.getPoint(i);
               i++;
             } while (c1.equals(c0));
-            if (Angle.isAcute(c1, c0, coordinate)) {
-              lines = JtsGeometryUtil.split(line, 0, coordinate);
+            if (CoordinatesUtil.isAcute(c1, c0, point)) {
+              lines = LineStringUtil.split(line, 0, point);
             } else if (edge.getFromNode().getDegree() == 1) {
-              final LineString newLine = JtsGeometryUtil.insert(line, 0,
-                coordinate);
+              final LineString newLine = LineStringUtil.insert(line, 0,
+                point);
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
@@ -691,27 +729,27 @@ public class Graph<T> {
           if (coordinateDistance == 0) {
             return Collections.singletonList(edge);
           } else if (segmentDistance == 0) {
-            lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
+            lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Coordinate cn = line.getCoordinateN(line.getNumPoints() - 1);
-            Coordinate cn1;
+            final Coordinates cn = points.getPoint(line.getNumPoints() - 1);
+            Coordinates cn1;
             int i = line.getNumPoints() - 2;
             do {
-              cn1 = line.getCoordinateN(i);
+              cn1 = points.getPoint(i);
               i++;
             } while (cn1.equals(cn));
-            if (Angle.isAcute(cn1, cn, coordinate)) {
-              lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
+            if (CoordinatesUtil.isAcute(cn1, cn, point)) {
+              lines = LineStringUtil.split(line, segmentIndex, point);
             } else if (edge.getToNode().getDegree() == 1) {
-              final LineString newLine = JtsGeometryUtil.insert(line,
-                line.getNumPoints(), coordinate);
+              final LineString newLine = LineStringUtil.insert(line,
+                line.getNumPoints(), point);
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
             }
           }
         } else {
-          lines = JtsGeometryUtil.split(line, segmentIndex, coordinate);
+          lines = LineStringUtil.split(line, segmentIndex, point);
         }
         final List<Edge<T>> newEdges = replaceEdge(edge, lines);
         return newEdges;
