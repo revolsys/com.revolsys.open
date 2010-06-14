@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -29,7 +31,7 @@ public final class JdbcUtils {
         connection.close();
       } catch (final SQLException e) {
         LOG.debug("SQL error closing connection", e);
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LOG.debug("Unknown error closing connection", e);
       }
     }
@@ -58,7 +60,7 @@ public final class JdbcUtils {
         resultSet.close();
       } catch (final SQLException e) {
         LOG.debug("SQL error closing result set", e);
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LOG.debug("Unknown error closing result set", e);
       }
     }
@@ -71,7 +73,7 @@ public final class JdbcUtils {
         statement.close();
       } catch (final SQLException e) {
         LOG.debug("SQL error closing statement", e);
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LOG.debug("Unknown error closing statement", e);
       }
     }
@@ -156,9 +158,11 @@ public final class JdbcUtils {
     try {
       return dataSource.getConnection();
     } catch (final SQLException e) {
-      throw new RuntimeException("SQL error getting connection from data source", e);
+      throw new RuntimeException(
+        "SQL error getting connection from data source", e);
     } catch (final Throwable e) {
-      throw new RuntimeException("Unknown getting connection from data source", e);
+      throw new RuntimeException("Unknown getting connection from data source",
+        e);
     }
   }
 
@@ -232,61 +236,9 @@ public final class JdbcUtils {
     final String sql,
     final Object... parameters)
     throws SQLException {
-    final Connection connection =getConnection(dataSource);
-    try {
-      return selectDate(connection, sql, parameters);
-    } finally {
-      close(connection);
-    }
-  }
-
-  public static String selectString(
-    final Connection connection,
-    final String sql,
-    final Object... parameters)
-    throws SQLException {
-    final PreparedStatement statement = connection.prepareStatement(sql);
-    try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-      }
-      final ResultSet resultSet = statement.executeQuery();
-      try {
-        if (resultSet.next()) {
-          return resultSet.getString(1);
-        } else {
-          throw new IllegalArgumentException("Value not found");
-        }
-      } finally {
-        close(resultSet);
-      }
-    } finally {
-      close(statement);
-    }
-  }
-
-  public static String selectString(
-    final DataSource dataSource,
-    final Connection connection,
-    final String sql,
-    final Object... parameters)
-    throws SQLException {
-    if (dataSource == null) {
-      return JdbcUtils.selectString(connection, sql, parameters);
-    } else {
-      return JdbcUtils.selectString(dataSource, sql, parameters);
-    }
-  }
-
-  public static String selectString(
-    final DataSource dataSource,
-    final String sql,
-    final Object... parameters)
-    throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
-      return selectString(connection, sql, parameters);
+      return selectDate(connection, sql, parameters);
     } finally {
       close(connection);
     }
@@ -341,6 +293,34 @@ public final class JdbcUtils {
       return selectInt(connection, sql, parameters);
     } finally {
       close(connection);
+    }
+  }
+
+  public static <T> List<T> selectList(
+    final Connection connection,
+    final String sql,
+    final int columnIndex,
+    final Object... parameters)
+    throws SQLException {
+    final List<T> results = new ArrayList<T>();
+    final PreparedStatement statement = connection.prepareStatement(sql);
+    try {
+      for (int i = 0; i < parameters.length; i++) {
+        final Object parameter = parameters[i];
+        statement.setObject(i + 1, parameter);
+      }
+      final ResultSet resultSet = statement.executeQuery();
+      try {
+        while (resultSet.next()) {
+          final T value = (T)resultSet.getObject(columnIndex);
+          results.add(value);
+        }
+        return results;
+      } finally {
+        close(resultSet);
+      }
+    } finally {
+      close(statement);
     }
   }
 
@@ -430,6 +410,58 @@ public final class JdbcUtils {
     final Connection connection = getConnection(dataSource);
     try {
       return selectMap(connection, sql, parameters);
+    } finally {
+      close(connection);
+    }
+  }
+
+  public static String selectString(
+    final Connection connection,
+    final String sql,
+    final Object... parameters)
+    throws SQLException {
+    final PreparedStatement statement = connection.prepareStatement(sql);
+    try {
+      for (int i = 0; i < parameters.length; i++) {
+        final Object parameter = parameters[i];
+        statement.setObject(i + 1, parameter);
+      }
+      final ResultSet resultSet = statement.executeQuery();
+      try {
+        if (resultSet.next()) {
+          return resultSet.getString(1);
+        } else {
+          throw new IllegalArgumentException("Value not found");
+        }
+      } finally {
+        close(resultSet);
+      }
+    } finally {
+      close(statement);
+    }
+  }
+
+  public static String selectString(
+    final DataSource dataSource,
+    final Connection connection,
+    final String sql,
+    final Object... parameters)
+    throws SQLException {
+    if (dataSource == null) {
+      return JdbcUtils.selectString(connection, sql, parameters);
+    } else {
+      return JdbcUtils.selectString(dataSource, sql, parameters);
+    }
+  }
+
+  public static String selectString(
+    final DataSource dataSource,
+    final String sql,
+    final Object... parameters)
+    throws SQLException {
+    final Connection connection = getConnection(dataSource);
+    try {
+      return selectString(connection, sql, parameters);
     } finally {
       close(connection);
     }
