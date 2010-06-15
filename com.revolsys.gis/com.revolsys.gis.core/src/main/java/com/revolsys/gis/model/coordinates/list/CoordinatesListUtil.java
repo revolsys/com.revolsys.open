@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -43,7 +43,7 @@ public class CoordinatesListUtil {
     for (int i = 0; i < srcSize && coordIndex < destSize; i++) {
       final double x = src.getX(i);
       final double y = src.getY(i);
-      if (x != previousX && y != previousY) {
+      if (x != previousX || y != previousY) {
         dest.setValue(coordIndex, 0, x);
         dest.setValue(coordIndex, 1, y);
         for (int d = 2; d < dimension; d++) {
@@ -146,7 +146,7 @@ public class CoordinatesListUtil {
     for (int i = srcSize - 1; i > -1 && coordIndex < destSize; i--) {
       final double x = src.getX(i);
       final double y = src.getY(i);
-      if (x != previousX && y != previousY) {
+      if (x != previousX || y != previousY) {
         dest.setValue(coordIndex, 0, x);
         dest.setValue(coordIndex, 1, y);
         for (int d = 2; d < dimension; d++) {
@@ -181,20 +181,21 @@ public class CoordinatesListUtil {
       dimension);
 
     int numCoords = 0;
-    final Coordinate coordinates1Start = coordinates1.getCoordinate(0);
-    final Coordinate coordinates1End = coordinates1.getCoordinate(coordinates1.size() - 1);
-    final Coordinate coordinates2Start = coordinates2.getCoordinate(0);
-    final Coordinate coordinates2End = coordinates2.getCoordinate(coordinates2.size() - 1);
-    if (coordinates1Start.equals2D(coordinates2End)) {
+    final Coordinates coordinates1Start = coordinates1.getPoint(0);
+    final Coordinates coordinates1End = coordinates1.getPoint(coordinates1.size() - 1);
+    final Coordinates coordinates2Start = coordinates2.getPoint(0);
+    final Coordinates coordinates2End = coordinates2.getPoint(coordinates2.size() - 1);
+    DataObjectUtil.noopOnCoordinateEqual2d(coordinates1End, 1335445.127, 1637621.46);
+    if (coordinates1Start.equals2d(coordinates2End)) {
       numCoords = append(coordinates2, coordinates, numCoords);
       numCoords = append(coordinates1, coordinates, numCoords);
-    } else if (coordinates2Start.equals2D(coordinates1End)) {
+    } else if (coordinates2Start.equals2d(coordinates1End)) {
       numCoords = append(coordinates1, coordinates, numCoords);
       numCoords = append(coordinates2, coordinates, numCoords);
-    } else if (coordinates1Start.equals2D(coordinates2Start)) {
+    } else if (coordinates1Start.equals2d(coordinates2Start)) {
       numCoords = appendReversed(coordinates2, coordinates, numCoords);
       numCoords = append(coordinates1, coordinates, numCoords);
-    } else if (coordinates1End.equals2D(coordinates2End)) {
+    } else if (coordinates1End.equals2d(coordinates2End)) {
       numCoords = append(coordinates1, coordinates, numCoords);
       numCoords = appendReversed(coordinates2, coordinates, numCoords);
     } else {

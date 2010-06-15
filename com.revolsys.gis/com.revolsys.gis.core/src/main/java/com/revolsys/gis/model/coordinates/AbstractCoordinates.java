@@ -46,6 +46,17 @@ public abstract class AbstractCoordinates implements Coordinates {
     return CoordinatesUtil.distance(this, coordinates);
   }
 
+  public boolean equals(
+    final double... coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      final double coordinate = coordinates[i];
+      if (coordinate != getValue(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @Override
   public boolean equals(
     final Object other) {

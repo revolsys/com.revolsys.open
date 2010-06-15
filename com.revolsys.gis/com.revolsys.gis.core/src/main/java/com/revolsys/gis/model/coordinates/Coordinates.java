@@ -9,6 +9,9 @@ public interface Coordinates extends Comparable<Coordinates> {
   double distance(
     Coordinates coordinates);
 
+  boolean equals(
+    double... coordinates);
+
   boolean equals2d(
     Coordinates coordinates);
 

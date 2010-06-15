@@ -26,6 +26,7 @@ import java.util.Map;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -134,5 +135,13 @@ public final class DataObjectUtil {
   }
 
   private DataObjectUtil() {
+  }
+
+  public static void noopOnCoordinateEqual2d(
+    Coordinates coordinates1End,
+    double... coordinates) {
+    if (coordinates1End.equals(coordinates)) {
+      noop();
+    }
   }
 }
