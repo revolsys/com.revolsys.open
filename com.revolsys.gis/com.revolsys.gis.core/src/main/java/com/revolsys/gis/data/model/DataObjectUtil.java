@@ -137,7 +137,7 @@ public final class DataObjectUtil {
   private DataObjectUtil() {
   }
 
-  public static void noopOnCoordinateEqual2d(
+  public static void noopOnCoordinateEqual(
     Coordinates coordinates1End,
     double... coordinates) {
     if (coordinates1End.equals(coordinates)) {

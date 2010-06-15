@@ -185,7 +185,6 @@ public class CoordinatesListUtil {
     final Coordinates coordinates1End = coordinates1.getPoint(coordinates1.size() - 1);
     final Coordinates coordinates2Start = coordinates2.getPoint(0);
     final Coordinates coordinates2End = coordinates2.getPoint(coordinates2.size() - 1);
-    DataObjectUtil.noopOnCoordinateEqual2d(coordinates1End, 1335445.127, 1637621.46);
     if (coordinates1Start.equals2d(coordinates2End)) {
       numCoords = append(coordinates2, coordinates, numCoords);
       numCoords = append(coordinates1, coordinates, numCoords);

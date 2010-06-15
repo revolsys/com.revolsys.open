@@ -14,7 +14,6 @@ public class DataObjectDirectoryReader extends
 
   protected Reader<DataObject> createReader(
     Resource resource) {
-    System.out.println(resource);
     final IoFactoryRegistry registry = IoFactoryRegistry.INSTANCE;
     final String filename = resource.getFilename();
     final String extension = FileUtil.getFileNameExtension(filename);
