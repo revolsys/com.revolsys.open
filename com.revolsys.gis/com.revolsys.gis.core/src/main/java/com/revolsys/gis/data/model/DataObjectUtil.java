@@ -146,10 +146,17 @@ public final class DataObjectUtil {
     }
   }
 
+  public static void noopOnInvalidGeometry(
+    final Geometry geometry) {
+    if (!geometry.isValid()) {
+      noop();
+    }
+  }
+
   public static void noopOnModified(
     final DataObject object) {
     if (object.getState() == DataObjectState.Modified) {
-      DataObjectUtil.noop();
+      noop();
     }
   }
 

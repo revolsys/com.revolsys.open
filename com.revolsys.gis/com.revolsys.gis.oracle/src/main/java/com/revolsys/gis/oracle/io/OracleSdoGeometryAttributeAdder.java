@@ -31,7 +31,6 @@ import com.revolsys.gis.jdbc.io.SqlFunction;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   private final DataSource dataSource;

@@ -29,7 +29,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   Iterator<DataObject> {

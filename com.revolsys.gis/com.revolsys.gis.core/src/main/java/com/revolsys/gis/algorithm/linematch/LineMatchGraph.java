@@ -652,15 +652,20 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   private void splitEdge(
     Edge<LineSegmentMatch> edge,
-    Collection<Node<LineSegmentMatch>> splitNodes) {
+    Set<Node<LineSegmentMatch>> splitNodes) {
+    final Node<LineSegmentMatch> fromNode = edge.getFromNode();
+    final Node<LineSegmentMatch> toNode = edge.getToNode();
+    splitNodes.remove(fromNode);
+    splitNodes.remove(toNode);
+
     if (!splitNodes.isEmpty()) {
       final LineSegmentMatch lineSegmentMatch = edge.getObject();
-      Node<LineSegmentMatch> previousNode = edge.getFromNode();
+      Node<LineSegmentMatch> previousNode = fromNode;
       for (Node<LineSegmentMatch> currentNode : splitNodes) {
         add(lineSegmentMatch, previousNode, currentNode);
         previousNode = currentNode;
       }
-      add(lineSegmentMatch, previousNode, edge.getToNode());
+      add(lineSegmentMatch, previousNode, toNode);
       remove(edge);
     }
   }
@@ -738,11 +743,9 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     final LineSegment segment = lineSegmentMatch.getSegment();
 
-    final Edge<LineSegmentMatch> edge1 = add(segment.getPoint(0),
-      coordinate);
+    final Edge<LineSegmentMatch> edge1 = add(segment.getPoint(0), coordinate);
     final LineSegmentMatch lineSegmentMatch1 = edge1.getObject();
-    final Edge<LineSegmentMatch> edge2 = add(coordinate,
-      segment.getPoint(1));
+    final Edge<LineSegmentMatch> edge2 = add(coordinate, segment.getPoint(1));
     final LineSegmentMatch lineSegmentMatch2 = edge2.getObject();
 
     for (int i = 0; i < lineSegmentMatch.getSegmentCount(); i++) {

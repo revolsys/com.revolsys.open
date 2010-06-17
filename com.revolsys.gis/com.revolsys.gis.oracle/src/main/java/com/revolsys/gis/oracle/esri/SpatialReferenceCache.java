@@ -16,7 +16,6 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class SpatialReferenceCache {
 

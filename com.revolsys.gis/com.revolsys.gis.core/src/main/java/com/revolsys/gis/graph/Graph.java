@@ -44,7 +44,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Graph<T> {
 
@@ -93,7 +92,7 @@ public class Graph<T> {
   public Edge<T> add(
     final T object,
     final LineString line) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Coordinates from = points.getPoint(0);
 
     Coordinates fromDirection = points.getPoint(1);

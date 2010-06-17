@@ -33,10 +33,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
-import sun.security.action.GetBooleanAction;
-
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;

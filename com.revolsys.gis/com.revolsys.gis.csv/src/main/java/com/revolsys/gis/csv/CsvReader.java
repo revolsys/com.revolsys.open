@@ -12,7 +12,6 @@ import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.io.FileUtil;
 
 public class CsvReader extends AbstractReader<DataObject> implements
   DataObjectReader {

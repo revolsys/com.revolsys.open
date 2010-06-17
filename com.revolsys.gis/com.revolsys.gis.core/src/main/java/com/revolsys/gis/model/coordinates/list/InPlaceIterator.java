@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 
 public class InPlaceIterator extends AbstractCoordinates implements

@@ -1,6 +1,5 @@
 package com.revolsys.gis.format.xbase.io;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -14,7 +13,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
