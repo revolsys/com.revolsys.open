@@ -18,8 +18,6 @@ package com.revolsys.util;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import com.vividsolutions.jts.algorithm.Angle;
-
 /**
  * The MathUtil class is a utility class for handling integer, percent and
  * currency BigDecimal values.
