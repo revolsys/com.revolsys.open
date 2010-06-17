@@ -4,9 +4,27 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.util.ListUtil;
+import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 
 public class LineSegmentUtil {
+  /**
+   * Calculate the counter clockwise angle in radians of the difference between
+   * the two vectors from the start point and line1End and line2End. The angle
+   * is relative to the vector from start to line1End. The angle will be in the
+   * range 0 -> 2 * PI.
+   * 
+   * @return The angle in radians.
+   */
+  public static double orientedAngleBetween2d(
+    Coordinates start,
+    Coordinates line1End,
+    Coordinates line2End) {
+    double angle1 = start.angle2d(line1End);
+    double angle2 = start.angle2d(line2End);
+     return MathUtil.orientedAngleBetween(angle1, angle2);
+  }
+
   /**
    * Calculate the distance between the line from lineStart to lineEnd and the
    * point.

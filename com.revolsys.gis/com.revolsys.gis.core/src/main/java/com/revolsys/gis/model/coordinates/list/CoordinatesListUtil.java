@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -58,6 +57,63 @@ public class CoordinatesListUtil {
     return coordIndex;
   }
 
+  public static int appendReversed(
+    final CoordinatesList src,
+    final CoordinatesList dest,
+    final int startIndex) {
+    int coordIndex = startIndex;
+    final int srcDimension = src.getDimension();
+    final int destDimension = dest.getDimension();
+    final int dimension = Math.min(srcDimension, destDimension);
+    final int srcSize = src.size();
+    final int destSize = dest.size();
+    double previousX;
+    double previousY;
+    if (startIndex == 0) {
+      previousX = Double.NaN;
+      previousY = Double.NaN;
+    } else {
+      previousX = dest.getX(startIndex - 1);
+      previousY = dest.getY(startIndex - 1);
+    }
+    for (int i = srcSize - 1; i > -1 && coordIndex < destSize; i--) {
+      final double x = src.getX(i);
+      final double y = src.getY(i);
+      if (x != previousX || y != previousY) {
+        dest.setValue(coordIndex, 0, x);
+        dest.setValue(coordIndex, 1, y);
+        for (int d = 2; d < dimension; d++) {
+          final double ordinate = src.getValue(i, d);
+          dest.setValue(coordIndex, d, ordinate);
+        }
+        coordIndex++;
+      }
+      previousX = x;
+      previousY = y;
+    }
+    return coordIndex;
+  }
+
+  public static CoordinatesList create(
+    final List<Coordinates> coordinateArray,
+    final int numAxis) {
+    CoordinatesList coordinatesList = new DoubleCoordinatesList(
+      coordinateArray.size(), numAxis);
+    int i = 0;
+    for (final Coordinates coordinates : coordinateArray) {
+      if (coordinates != null) {
+        for (int j = 0; j < coordinates.getNumAxis(); j++) {
+          coordinatesList.setOrdinate(i, j, coordinates.getValue(j));
+        }
+        i++;
+      }
+    }
+    if (i < coordinatesList.size()) {
+      coordinatesList = coordinatesList.subList(0, i);
+    }
+    return coordinatesList;
+  }
+
   public static Map<String, Number> findClosestSegmentAndCoordinate(
     final CoordinatesList points,
     final Coordinates point) {
@@ -71,7 +127,8 @@ public class CoordinatesListUtil {
       points);
     if (iterator.hasNext()) {
       LineSegment segment = iterator.next();
-      final double previousCoordinateDistance = segment.getPoint(0).distance(point);
+      final double previousCoordinateDistance = segment.getPoint(0).distance(
+        point);
       if (previousCoordinateDistance == 0) {
         result.put(SEGMENT_INDEX, 0);
         result.put(COORDINATE_INDEX, 0);
@@ -80,7 +137,8 @@ public class CoordinatesListUtil {
       } else {
         int i = 1;
         while (segment != null) {
-          final double currentCoordinateDistance = segment.getPoint(1).distance(point);
+          final double currentCoordinateDistance = segment.getPoint(1)
+            .distance(point);
           if (currentCoordinateDistance == 0) {
             result.put(SEGMENT_INDEX, i);
             result.put(COORDINATE_INDEX, i);
@@ -124,43 +182,6 @@ public class CoordinatesListUtil {
     return result;
   }
 
-  public static int appendReversed(
-    final CoordinatesList src,
-    final CoordinatesList dest,
-    final int startIndex) {
-    int coordIndex = startIndex;
-    final int srcDimension = src.getDimension();
-    final int destDimension = dest.getDimension();
-    final int dimension = Math.min(srcDimension, destDimension);
-    final int srcSize = src.size();
-    final int destSize = dest.size();
-    double previousX;
-    double previousY;
-    if (startIndex == 0) {
-      previousX = Double.NaN;
-      previousY = Double.NaN;
-    } else {
-      previousX = dest.getX(startIndex - 1);
-      previousY = dest.getY(startIndex - 1);
-    }
-    for (int i = srcSize - 1; i > -1 && coordIndex < destSize; i--) {
-      final double x = src.getX(i);
-      final double y = src.getY(i);
-      if (x != previousX || y != previousY) {
-        dest.setValue(coordIndex, 0, x);
-        dest.setValue(coordIndex, 1, y);
-        for (int d = 2; d < dimension; d++) {
-          final double ordinate = src.getValue(i, d);
-          dest.setValue(coordIndex, d, ordinate);
-        }
-        coordIndex++;
-      }
-      previousX = x;
-      previousY = y;
-    }
-    return coordIndex;
-  }
-
   public static final CoordinatesList get(
     final CoordinateSequence coordinateSequence) {
     if (coordinateSequence instanceof CoordinatesList) {
@@ -169,6 +190,16 @@ public class CoordinatesListUtil {
       return new CoordinateSequenceCoordinateList(coordinateSequence);
     }
 
+  }
+
+  public static CoordinatesList get(
+    final LineString line) {
+    return get(line.getCoordinateSequence());
+  }
+
+  public static CoordinatesList get(
+    final Point point) {
+    return get(point.getCoordinateSequence());
   }
 
   public static CoordinatesList merge(
@@ -260,35 +291,5 @@ public class CoordinatesListUtil {
     } else {
       return coordinates.subList(0, length);
     }
-  }
-
-  public static CoordinatesList get(
-    LineString line) {
-    return get(line.getCoordinateSequence());
-  }
-
-  public static CoordinatesList get(
-    Point point) {
-    return get(point.getCoordinateSequence());
-  }
-
-  public static CoordinatesList create(
-    List<Coordinates> coordinateArray,
-    int numAxis) {
-    CoordinatesList coordinatesList = new DoubleCoordinatesList(
-      coordinateArray.size(), numAxis);
-    int i = 0;
-    for (Coordinates coordinates : coordinateArray) {
-      if (coordinates != null) {
-        for (int j = 0; j < coordinates.getNumAxis(); j++) {
-          coordinatesList.setOrdinate(i, j, coordinates.getValue(j));
-        }
-        i++;
-      }
-    }
-    if (i < coordinatesList.size()) {
-      coordinatesList = coordinatesList.subList(0, i);
-    }
-    return coordinatesList;
   }
 }

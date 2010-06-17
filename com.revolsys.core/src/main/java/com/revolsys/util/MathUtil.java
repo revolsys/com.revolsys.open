@@ -18,6 +18,8 @@ package com.revolsys.util;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import com.vividsolutions.jts.algorithm.Angle;
+
 /**
  * The MathUtil class is a utility class for handling integer, percent and
  * currency BigDecimal values.
@@ -484,5 +486,21 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
+  }
+
+  public static double orientedAngleBetween(
+    double angle1,
+    double angle2) {
+    if (angle1 < 0) {
+      angle1 = Angle.PI_TIMES_2 + angle1;
+    }
+    if (angle2 < 0) {
+      angle2 = Angle.PI_TIMES_2 + angle2;
+    }
+    if (angle2 < angle1) {
+      angle2 = angle2 + Angle.PI_TIMES_2;
+    }
+    double angleBetween = angle2 - angle1;
+    return angleBetween;
   }
 }

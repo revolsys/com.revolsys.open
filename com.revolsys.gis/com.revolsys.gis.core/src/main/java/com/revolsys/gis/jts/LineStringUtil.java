@@ -17,6 +17,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -476,33 +477,24 @@ public final class LineStringUtil {
   public static LineString insert(
     final LineString line,
     final List<Coordinates> coordinates) {
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    final CoordinatesPrecisionModel precisionModel = factory.getCoordinatesPrecisionModel();
     final SpatialIndex index = new Quadtree();
     final List<LineSegment> segments = new LinkedList<LineSegment>();
 
-    GeometryFactory factory = GeometryFactory.getFactory(line);
     for (final LineSegment segment : new CoordinatesListIndexLineSegmentIterator(
       factory, CoordinatesListUtil.get(line))) {
       index.insert(segment.getEnvelope(), segment);
       segments.add(segment);
     }
 
-    for (final Coordinates coordinate : coordinates) {
-      final Envelope envelope = new BoundingBox(coordinate);
-      envelope.expandBy(2);
-      final List<LineSegment> matchedSegments = index.query(envelope);
+    for (final Coordinates point : coordinates) {
+      
       LineSegment matchedLineSegment = null;
-      double matchedDistance = Double.MAX_VALUE;
-      for (final LineSegment lineSegment : matchedSegments) {
-        final double distance = lineSegment.distance(coordinate);
-        if (distance < 2) {
-          if (matchedLineSegment == null || distance < matchedDistance) {
-            matchedLineSegment = lineSegment;
-            matchedDistance = distance;
-          }
-        }
-      }
+      matchedLineSegment = getLineSegment(precisionModel, point,
+        index);
       if (matchedLineSegment != null) {
-        if (!matchedLineSegment.contains(coordinate)) {
+        if (!matchedLineSegment.contains(point)) {
           final ListIterator<LineSegment> segmentIter = segments.listIterator();
           if (segmentIter.hasNext()) {
             LineSegment segment = segmentIter.next();
@@ -516,11 +508,11 @@ public final class LineStringUtil {
 
           index.remove(matchedLineSegment.getEnvelope(), matchedLineSegment);
           final LineSegment segment1 = new LineSegment(factory,
-            matchedLineSegment.getPoint(0), coordinate);
+            matchedLineSegment.getPoint(0), point);
           index.insert(segment1.getEnvelope(), segment1);
           segmentIter.add(segment1);
 
-          final LineSegment segment2 = new LineSegment(factory, coordinate,
+          final LineSegment segment2 = new LineSegment(factory, point,
             matchedLineSegment.getPoint(1));
           index.insert(segment2.getEnvelope(), segment2);
           segmentIter.add(segment2);
@@ -540,6 +532,21 @@ public final class LineStringUtil {
     }
     final LineString newLine = factory.createLineString(newCoordinates);
     return newLine;
+  }
+
+  private static LineSegment getLineSegment(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates point, SpatialIndex index) {
+    final Envelope envelope = new BoundingBox(point);
+    envelope.expandBy(10);
+    final List<LineSegment> segments = index.query(envelope);
+    for (final LineSegment lineSegment : segments) {
+      if (LineSegmentUtil.isPointOnLine(precisionModel,
+        lineSegment.getPoint(0), lineSegment.getPoint(1), point)) {
+        return lineSegment;
+      }
+    }
+    return null;
   }
 
   /**

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.util.JavaBeanUtil;
@@ -102,18 +103,19 @@ public final class DataObjectUtil {
   public static void noop() {
   }
 
+  public static void noopOnCoordinateEqual(
+    final Coordinates coordinates1End,
+    final double... coordinates) {
+    if (coordinates1End.equals(coordinates)) {
+      noop();
+    }
+  }
+
   public static void noopOnCoordinateEqual2d(
     final DataObject object,
     final double x,
     final double y) {
     DataObjectUtil.noopOnCoordinateEqual2d(object.getGeometryValue(), x, y);
-  }
-
-  public static void noopOnModified(
-    final DataObject object) {
-    if (object.getState() == DataObjectState.Modified) {
-      DataObjectUtil.noop();
-    }
   }
 
   public static void noopOnCoordinateEqual2d(
@@ -127,6 +129,16 @@ public final class DataObjectUtil {
     }
   }
 
+  public static void noopOnCoordinateEqual2d(
+    final Node<DataObject> node,
+    final double x,
+    final double y) {
+    if (node.equalsCoordinate(x, y)) {
+      noop();
+
+    }
+  }
+
   public static void noopOnIdNull(
     final DataObject object) {
     if (object.getIdValue() == null) {
@@ -134,14 +146,13 @@ public final class DataObjectUtil {
     }
   }
 
-  private DataObjectUtil() {
+  public static void noopOnModified(
+    final DataObject object) {
+    if (object.getState() == DataObjectState.Modified) {
+      DataObjectUtil.noop();
+    }
   }
 
-  public static void noopOnCoordinateEqual(
-    Coordinates coordinates1End,
-    double... coordinates) {
-    if (coordinates1End.equals(coordinates)) {
-      noop();
-    }
+  private DataObjectUtil() {
   }
 }

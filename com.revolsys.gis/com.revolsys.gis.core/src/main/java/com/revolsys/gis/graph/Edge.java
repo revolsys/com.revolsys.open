@@ -71,6 +71,18 @@ public class Edge<T> implements AttributedObject {
     return null;
   }
 
+  public static <T> Set<Edge<T>> getEdges(
+    final Collection<Edge<T>> edges,
+    final LineString line) {
+    final Set<Edge<T>> newEdges = new LinkedHashSet<Edge<T>>();
+    for (final Edge<T> edge : edges) {
+      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
+        newEdges.add(edge);
+      }
+    }
+    return newEdges;
+  }
+
   public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(
     final Node<T> node,
     final List<Edge<T>> edges) {

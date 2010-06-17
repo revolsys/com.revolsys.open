@@ -356,6 +356,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           + " interpretation " + interpretation);
       }
     }
-    return geometryFactory.createPolygon(exteriorRing, interiorRings);
+    final Polygon polygon = geometryFactory.createPolygon(exteriorRing, interiorRings);
+    return polygon;
   }
 }
