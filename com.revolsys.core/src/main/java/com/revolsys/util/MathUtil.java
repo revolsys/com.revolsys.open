@@ -62,6 +62,12 @@ public final class MathUtil {
   /** A 1000 percent. */
   public static final BigDecimal PERCENT100 = getPercent(1);
 
+  public static final double PI_OVER_2 = Math.PI / 2.0;
+
+  public static final double PI_OVER_4 = Math.PI / 4.0;
+
+  public static final double PI_TIMES_2 = 2.0 * Math.PI;
+
   /**
    * Calculate the angle of a coordinates
    * 
@@ -404,6 +410,22 @@ public final class MathUtil {
     return d1 + (d2 - d1) / 2;
   }
 
+  public static double orientedAngleBetween(
+    double angle1,
+    double angle2) {
+    if (angle1 < 0) {
+      angle1 = PI_TIMES_2 + angle1;
+    }
+    if (angle2 < 0) {
+      angle2 = PI_TIMES_2 + angle2;
+    }
+    if (angle2 < angle1) {
+      angle2 = angle2 + PI_TIMES_2;
+    }
+    final double angleBetween = angle2 - angle1;
+    return angleBetween;
+  }
+
   /**
    * Convert a BigDecimal decimal percent to a percent string suffixed by the
    * "%" sign.
@@ -428,11 +450,11 @@ public final class MathUtil {
     final BigDecimal decimalPercent,
     final int scale) {
     if (decimalPercent != null) {
-      DecimalFormat format = new DecimalFormat();
+      final DecimalFormat format = new DecimalFormat();
       format.setMinimumFractionDigits(0);
       format.setMaximumFractionDigits(scale);
-      String string = format.format(decimalPercent.multiply(new BigDecimal(100))
-        .setScale(scale, BigDecimal.ROUND_HALF_UP))
+      final String string = format.format(decimalPercent.multiply(
+        new BigDecimal(100)).setScale(scale, BigDecimal.ROUND_HALF_UP))
         + "%";
 
       return string;
@@ -486,21 +508,5 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
-  }
-
-  public static double orientedAngleBetween(
-    double angle1,
-    double angle2) {
-    if (angle1 < 0) {
-      angle1 = Angle.PI_TIMES_2 + angle1;
-    }
-    if (angle2 < 0) {
-      angle2 = Angle.PI_TIMES_2 + angle2;
-    }
-    if (angle2 < angle1) {
-      angle2 = angle2 + Angle.PI_TIMES_2;
-    }
-    double angleBetween = angle2 - angle1;
-    return angleBetween;
   }
 }
