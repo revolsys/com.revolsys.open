@@ -6,10 +6,13 @@ import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 public class PointConverter implements OsnConverter {
@@ -17,15 +20,19 @@ public class PointConverter implements OsnConverter {
 
   private final GeometryFactory geometryFactory;
 
+  private final CoordinatesPrecisionModel precisionModel;
+
   public PointConverter(
     final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+    precisionModel = geometryFactory.getCoordinatesPrecisionModel();
   }
 
   public PointConverter(
     final GeometryFactory geometryFactory,
     final String geometryClass) {
     this.geometryFactory = geometryFactory;
+    precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     this.geometryClass = geometryClass;
   }
 
@@ -38,7 +45,7 @@ public class PointConverter implements OsnConverter {
     String attributeName = iterator.nextAttributeName();
     while (attributeName != null) {
       if (attributeName.equals("coords")) {
-        Coordinate coordinate = null;
+        Coordinates coordinate = null;
         final QName coordTypeName = iterator.nextObjectName();
         if (coordTypeName.equals(new QName("Coord3D"))) {
           final double x = iterator.nextDoubleAttribute("c1");
@@ -47,16 +54,15 @@ public class PointConverter implements OsnConverter {
           if (z == 2147483648.0) {
             z = 0;
           }
-          coordinate = new Coordinate(x, y, z);
+          coordinate = new DoubleCoordinates(x, y, z);
         } else if (coordTypeName.equals(new QName("Coord2D"))) {
           final double x = iterator.nextDoubleAttribute("c1");
           final double y = iterator.nextDoubleAttribute("c2");
-          coordinate = new Coordinate(x, y);
+          coordinate = new DoubleCoordinates(x, y);
         } else {
           iterator.throwParseError("Expecting Coord2D or Coord3D");
         }
         iterator.nextEndObject();
-
         geometry = geometryFactory.createPoint(coordinate);
       } else {
         readAttribute(iterator, attributeName, values);

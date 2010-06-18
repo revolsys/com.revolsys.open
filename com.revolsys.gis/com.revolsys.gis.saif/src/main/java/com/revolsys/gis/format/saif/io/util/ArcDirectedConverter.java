@@ -3,7 +3,7 @@ package com.revolsys.gis.format.saif.io.util;
 import java.io.IOException;
 import java.util.Map;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.revolsys.gis.cs.GeometryFactory;
 
 public class ArcDirectedConverter extends ArcConverter {
 

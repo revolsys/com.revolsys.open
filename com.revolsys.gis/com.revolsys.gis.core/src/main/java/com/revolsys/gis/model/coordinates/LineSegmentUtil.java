@@ -22,7 +22,7 @@ public class LineSegmentUtil {
     Coordinates line2End) {
     double angle1 = start.angle2d(line1End);
     double angle2 = start.angle2d(line2End);
-     return MathUtil.orientedAngleBetween(angle1, angle2);
+    return MathUtil.orientedAngleBetween(angle1, angle2);
   }
 
   /**
@@ -463,6 +463,22 @@ public class LineSegmentUtil {
     final PointLineProjection pointLineProjection = getPointLineProjection(
       precisionModel, lineStart, lineEnd, point);
     return pointLineProjection.isPointOnLine();
+  }
+
+  public static boolean isPointOnLine(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point,
+    double maxDistance) {
+    double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
+    if (distance < maxDistance) {
+      double projectionFactor = projectionFactor(lineStart, lineEnd, point);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static PointLineProjection getPointLineProjection(

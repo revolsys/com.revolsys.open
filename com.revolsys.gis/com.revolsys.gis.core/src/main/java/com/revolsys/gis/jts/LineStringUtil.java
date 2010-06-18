@@ -486,11 +486,12 @@ public final class LineStringUtil {
     }
 
     for (final Coordinates point : coordinates) {
-      
+      // TODO make sure every coordinate matches
       LineSegment matchedLineSegment = null;
-      matchedLineSegment = getLineSegment(precisionModel, point,
-        index);
-      if (matchedLineSegment != null) {
+      matchedLineSegment = getLineSegment(precisionModel, point, index);
+      if (matchedLineSegment == null) {
+        System.out.println(getLineSegment(precisionModel, point, index));
+      } else {
         if (!matchedLineSegment.contains(point)) {
           final ListIterator<LineSegment> segmentIter = segments.listIterator();
           if (segmentIter.hasNext()) {
@@ -533,14 +534,17 @@ public final class LineStringUtil {
 
   private static LineSegment getLineSegment(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates point, SpatialIndex index) {
+    final Coordinates point,
+    SpatialIndex index) {
     final Envelope envelope = new BoundingBox(point);
-    envelope.expandBy(10);
+    envelope.expandBy(2);
     final List<LineSegment> segments = index.query(envelope);
     for (final LineSegment lineSegment : segments) {
-      if (LineSegmentUtil.isPointOnLine(precisionModel,
-        lineSegment.getPoint(0), lineSegment.getPoint(1), point)) {
-        return lineSegment;
+      if (lineSegment.getEnvelope().intersects(envelope)) {
+        if (LineSegmentUtil.isPointOnLine(precisionModel,
+          lineSegment.getPoint(0), lineSegment.getPoint(1), point, 2)) {
+          return lineSegment;
+        }
       }
     }
     return null;

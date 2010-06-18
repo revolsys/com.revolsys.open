@@ -11,7 +11,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -48,14 +47,14 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public CoordinateSequence perform(
-    final CoordinateSequence coordinates) {
-    final int dimension = coordinates.getDimension();
+  public CoordinatesList perform(
+    final CoordinatesList coordinates) {
+    final int numAxis = coordinates.getDimension();
     final int size = coordinates.size();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
-      dimension);
+      numAxis);
     final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
-      CoordinatesListUtil.get(coordinates));
+      coordinates);
     final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
       newCoordinates);
     final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
@@ -71,7 +70,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   public LinearRing perform(
     final LinearRing ring) {
     if (ring != null) {
-      final CoordinateSequence newCoordinates = perform(ring.getCoordinateSequence());
+      final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(ring));
       final LinearRing newRing = geometryFactory.createLinearRing(newCoordinates);
       addUserData(ring, newRing);
       return newRing;
@@ -83,7 +82,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   public LineString perform(
     final LineString line) {
     if (line != null) {
-      final CoordinateSequence newCoordinates = perform(line.getCoordinateSequence());
+      final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(line));
       final LineString newLine = geometryFactory.createLineString(newCoordinates);
       addUserData(line, newLine);
       return newLine;
@@ -149,7 +148,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   public Point perform(
     final Point point) {
     if (point != null) {
-      final CoordinateSequence newCoordinate = perform(point.getCoordinateSequence());
+      final CoordinatesList newCoordinate = perform(CoordinatesListUtil.get(point));
       final Point newPoint = geometryFactory.createPoint(newCoordinate);
       addUserData(point, newPoint);
       return newPoint;

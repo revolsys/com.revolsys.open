@@ -124,7 +124,7 @@ public class BoundingBox extends Envelope {
     final CoordinateSystem coordinateSystem,
     final double x,
     final double y) {
-    super(new Coordinate(x, y));
+    super(x,x,y,y);
     this.coordinateSystem = coordinateSystem;
   }
 
@@ -162,7 +162,7 @@ public class BoundingBox extends Envelope {
 
   public BoundingBox(
     Coordinates point) {
-    super(point.getX(), point.getY(), point.getX(), point.getY());
+    this(null,point.getX(), point.getY());
   }
 
   public BoundingBox convert(

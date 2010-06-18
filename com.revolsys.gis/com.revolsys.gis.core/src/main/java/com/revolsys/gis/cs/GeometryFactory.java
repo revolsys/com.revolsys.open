@@ -13,6 +13,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -64,10 +65,22 @@ public class GeometryFactory extends
     this.coordinatesPrecisionModel = coordinatesPrecisionModel;
   }
 
+  public LinearRing createLinearRing(
+    final CoordinatesList points) {
+    points.makePrecise(coordinatesPrecisionModel);
+    return super.createLinearRing(points);
+  }
+
   public LineString createLineString(
     final Coordinates... points) {
     final List<Coordinates> p = Arrays.asList(points);
     return createLineString(p);
+  }
+
+  public LineString createLineString(
+    final CoordinatesList points) {
+    points.makePrecise(coordinatesPrecisionModel);
+    return super.createLineString(points);
   }
 
   public LineString createLineString(
@@ -80,7 +93,7 @@ public class GeometryFactory extends
       final Coordinates point0 = points.get(0);
       final byte numAxis = point0.getNumAxis();
 
-      coordinatesList = new DoubleCoordinatesList(numPoints,numAxis );
+      coordinatesList = new DoubleCoordinatesList(numPoints, numAxis);
       for (int i = 0; i < numPoints; i++) {
         final Coordinates point = points.get(i);
         coordinatesList.setPoint(i, point);
@@ -89,13 +102,26 @@ public class GeometryFactory extends
     return createLineString(coordinatesList);
   }
 
+  public Geometry createMultiPoint(
+    final List<Point> points) {
+    final Point[] pointArray = com.vividsolutions.jts.geom.GeometryFactory.toPointArray(points);
+    return super.createMultiPoint(pointArray);
+  }
+
   public Point createPoint(
     final Coordinates point) {
     final byte numAxis = point.getNumAxis();
     final double[] coordinates = point.getCoordinates();
     final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
       numAxis, coordinates);
-    return createPoint(coordinatesList);
+    coordinatesList.makePrecise(coordinatesPrecisionModel);
+    return super.createPoint(coordinatesList);
+  }
+
+  public Point createPoint(
+    final CoordinatesList points) {
+    points.makePrecise(coordinatesPrecisionModel);
+    return super.createPoint(points);
   }
 
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {

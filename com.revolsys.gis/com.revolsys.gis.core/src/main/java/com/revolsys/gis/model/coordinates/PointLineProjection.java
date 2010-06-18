@@ -69,4 +69,16 @@ public class PointLineProjection {
     }
     return pointOnLine;
   }
+
+  public boolean isPointOnLine(
+    double maxDistance) {
+      double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
+      if (distance < maxDistance) {
+        double projectionFactor = getProjectionFactor();
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+         return true;
+        }
+      }
+    return false;
+  }
 }

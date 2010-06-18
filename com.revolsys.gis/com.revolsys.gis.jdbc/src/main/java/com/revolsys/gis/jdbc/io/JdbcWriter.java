@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.io.AbstractWriter;

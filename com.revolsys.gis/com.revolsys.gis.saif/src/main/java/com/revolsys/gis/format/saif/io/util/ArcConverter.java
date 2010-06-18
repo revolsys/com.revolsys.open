@@ -8,10 +8,11 @@ import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateArrays;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class ArcConverter implements OsnConverter {
@@ -40,7 +41,7 @@ public class ArcConverter implements OsnConverter {
     LineString geometry = null;
     while (attributeName != null) {
       if (attributeName.equals("pointList")) {
-        final List<Coordinate> coordinates = new ArrayList<Coordinate>();
+        final List<Coordinates> coordinates = new ArrayList<Coordinates>();
         while (iterator.next() != OsnIterator.END_LIST) {
           final QName pointName = iterator.nextObjectName();
           if (!pointName.equals(new QName("Point"))) {
@@ -55,18 +56,18 @@ public class ArcConverter implements OsnConverter {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
             final double z = iterator.nextDoubleAttribute("c3");
-            coordinates.add(new Coordinate(x, y, z));
+            coordinates.add(new DoubleCoordinates(x, y, z));
           } else if (coordTypeName.equals(new QName("Coord2D"))) {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
-            coordinates.add(new Coordinate(x, y));
+            coordinates.add(new DoubleCoordinates(x, y));
           } else {
             iterator.throwParseError("Expecting Coord2D or Coord3D");
           }
           iterator.nextEndObject();
           iterator.nextEndObject();
         }
-        geometry = geometryFactory.createLineString(CoordinateArrays.toCoordinateArray(coordinates));
+        geometry = geometryFactory.createLineString(coordinates);
       } else {
         readAttribute(iterator, attributeName, values);
       }
