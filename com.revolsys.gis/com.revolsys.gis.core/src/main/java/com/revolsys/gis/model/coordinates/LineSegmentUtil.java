@@ -68,7 +68,7 @@ public class LineSegmentUtil {
     final double x,
     final double y) {
     if (x1 == x2 && y1 == y2) {
-      return CoordinatesUtil.distance(x, y, x1, y1);
+      return MathUtil.distance(x, y, x1, y1);
     } else {
       final double dxx1 = x - x1;
       final double dx2x1 = x2 - x1;
@@ -78,9 +78,9 @@ public class LineSegmentUtil {
         / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
 
       if (r <= 0.0) {
-        return CoordinatesUtil.distance(x, y, x1, y1);
+        return MathUtil.distance(x, y, x1, y1);
       } else if (r >= 1.0) {
-        return CoordinatesUtil.distance(x, y, x2, y2);
+        return MathUtil.distance(x, y, x2, y2);
       } else {
         final double dy1y = y1 - y;
         final double dx1x = x1 - x;

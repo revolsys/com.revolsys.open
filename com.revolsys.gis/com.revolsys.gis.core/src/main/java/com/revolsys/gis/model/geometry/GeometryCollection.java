@@ -1,9 +1,8 @@
 package com.revolsys.gis.model.geometry;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import com.vividsolutions.jts.geom.Geometry;
-
-public class GeometryCollection extends ArrayList<Geometry> {
+public interface GeometryCollection<T extends Geometry> extends Geometry,
+  List<T> {
 
 }

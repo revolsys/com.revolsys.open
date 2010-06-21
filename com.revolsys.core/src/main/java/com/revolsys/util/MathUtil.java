@@ -402,6 +402,21 @@ public final class MathUtil {
     return getInteger(integer).toString();
   }
 
+  public static boolean isAcute(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2,
+    final double x3,
+    final double y3) {
+    final double dx0 = x1 - x2;
+    final double dy0 = y1 - y2;
+    final double dx1 = x3 - x2;
+    final double dy1 = y3 - y2;
+    final double dotprod = dx0 * dx1 + dy0 * dy1;
+    return dotprod > 0;
+  }
+
   public static double midpoint(
     final double d1,
     final double d2) {
@@ -506,5 +521,15 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
+  }
+
+  public static double angle2d(
+    final double x1,
+    final double x2,
+    final double y1,
+    final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    return Math.atan2(dy, dx);
   }
 }
