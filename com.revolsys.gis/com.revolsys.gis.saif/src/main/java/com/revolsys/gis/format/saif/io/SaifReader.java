@@ -113,7 +113,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   /** The directory the SAIF archive is extracted to. */
   private File saifArchiveDirectory;
 
-  private int srid = 0;
+  private int srid = 26910;
 
   /** Mapping between type names and file names. */
   private final Map<QName, String> typeNameFileNameMap = new HashMap<QName, String>();

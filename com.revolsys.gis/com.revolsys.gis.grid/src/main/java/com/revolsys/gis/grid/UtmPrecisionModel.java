@@ -1,5 +1,7 @@
 package com.revolsys.gis.grid;
 
+import javax.annotation.PostConstruct;
+
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
@@ -28,11 +30,27 @@ public class UtmPrecisionModel extends PrecisionModel implements
   private SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
     1000, 1);
 
+  private CoordinateSystem utmCoordinateSystem;
+
+  private int utmSrid;
+
+  private CoordinatesOperation toUtm;
+
+  private CoordinatesOperation toCs;
+
   public UtmPrecisionModel() {
   }
 
   public int getSrid() {
     return srid;
+  }
+
+  @PostConstruct
+  public void initialize() {
+    toUtm = ProjectionFactory.getCoordinatesOperation(coordinateSystem,
+      utmCoordinateSystem);
+    toCs = ProjectionFactory.getCoordinatesOperation(utmCoordinateSystem,
+      coordinateSystem);
   }
 
   @Override
@@ -56,6 +74,12 @@ public class UtmPrecisionModel extends PrecisionModel implements
     coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
   }
 
+  public void setUtmSrid(
+    final int utmSrid) {
+    this.utmSrid = utmSrid;
+    utmCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(utmSrid);
+  }
+
   public Coordinates getPreciseCoordinates(
     final Coordinates coordinates) {
     Coordinates newCoordinates = new DoubleCoordinates(coordinates);
@@ -67,35 +91,21 @@ public class UtmPrecisionModel extends PrecisionModel implements
     Coordinates coordinates) {
     double lon;
     double lat;
-    final DoubleCoordinates geoCoordinates = new DoubleCoordinates(2);
-    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final CoordinatesOperation geoOp = ProjectionFactory.getCoordinatesOperation(
-        projectedCoordinateSystem,
-        projectedCoordinateSystem.getGeographicCoordinateSystem());
-      geoOp.perform(coordinates, geoCoordinates);
-
-      lon = geoCoordinates.getX();
-      lat = geoCoordinates.getY();
+    if (coordinateSystem.equals(utmCoordinateSystem)) {
+      utmPrecisionModel.makePrecise(coordinates);
     } else {
-      lon = coordinates.getX();
-      lat = coordinates.getY();
-    }
-    final int utmSrid = utmGrid.getNad83Srid(lon, lat);
-    if (srid != utmSrid) {
-      final ProjectedCoordinateSystem utmCoordinateSystem = (ProjectedCoordinateSystem)EpsgCoordinateSystems.getCoordinateSystem(utmSrid);
-      final CoordinatesOperation toUtm = ProjectionFactory.getCoordinatesOperation(
-        utmCoordinateSystem.getGeographicCoordinateSystem(),
-        utmCoordinateSystem);
-       final Coordinates utmCoordinates = new DoubleCoordinates(
+      final Coordinates utmCoordinates = new DoubleCoordinates(
         coordinates.getNumAxis());
-      toUtm.perform(geoCoordinates, utmCoordinates);
+      toUtm.perform(coordinates, utmCoordinates);
       utmPrecisionModel.makePrecise(utmCoordinates);
-      final CoordinatesOperation toCs = ProjectionFactory.getCoordinatesOperation(
-        utmCoordinateSystem, coordinateSystem);
-      toCs.perform(utmCoordinates, coordinates);
-    }
 
-    precisionModel.makePrecise(coordinates);
+      toCs.perform(utmCoordinates, coordinates);
+      precisionModel.makePrecise(coordinates);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "UTM-Fixed(0.001,1)";
   }
 }
