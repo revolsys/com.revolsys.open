@@ -93,19 +93,19 @@ public class Graph<T> {
     final T object,
     final LineString line) {
      final CoordinatesList points = CoordinatesListUtil.get(line);
-    final Coordinates from = points.getPoint(0);
+    final Coordinates from = points.get(0);
 
-    Coordinates fromDirection = points.getPoint(1);
+    Coordinates fromDirection = points.get(1);
     int i = 2;
     while (i < points.size() && fromDirection.equals2d(from)) {
-      fromDirection = points.getPoint(i);
+      fromDirection = points.get(i);
       i++;
     }
-    final Coordinates to = points.getPoint(points.size() - 1);
+    final Coordinates to = points.get(points.size() - 1);
     i = points.size() - 2;
-    Coordinates toDirection = points.getPoint(i);
+    Coordinates toDirection = points.get(i);
     while (i > 0 && toDirection.equals2d(to)) {
-      toDirection = points.getPoint(i);
+      toDirection = points.get(i);
       i--;
     }
     final Node<T> fromNode = getNode(from);
@@ -707,11 +707,11 @@ public class Graph<T> {
           } else if (segmentDistance == 0) {
             lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Coordinates c0 = points.getPoint(0);
+            final Coordinates c0 = points.get(0);
             Coordinates c1;
             int i = 1;
             do {
-              c1 = points.getPoint(i);
+              c1 = points.get(i);
               i++;
             } while (c1.equals(c0));
             if (CoordinatesUtil.isAcute(c1, c0, point)) {
@@ -730,11 +730,11 @@ public class Graph<T> {
           } else if (segmentDistance == 0) {
             lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Coordinates cn = points.getPoint(line.getNumPoints() - 1);
+            final Coordinates cn = points.get(line.getNumPoints() - 1);
             Coordinates cn1;
             int i = line.getNumPoints() - 2;
             do {
-              cn1 = points.getPoint(i);
+              cn1 = points.get(i);
               i++;
             } while (cn1.equals(cn));
             if (CoordinatesUtil.isAcute(cn1, cn, point)) {

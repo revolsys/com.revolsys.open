@@ -3,7 +3,6 @@ package com.revolsys.gis.grid;
 import javax.annotation.PostConstruct;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;

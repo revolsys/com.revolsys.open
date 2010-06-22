@@ -127,7 +127,7 @@ public class CoordinatesListUtil {
       points);
     if (iterator.hasNext()) {
       LineSegment segment = iterator.next();
-      final double previousCoordinateDistance = segment.getPoint(0).distance(
+      final double previousCoordinateDistance = segment.get(0).distance(
         point);
       if (previousCoordinateDistance == 0) {
         result.put(SEGMENT_INDEX, 0);
@@ -137,7 +137,7 @@ public class CoordinatesListUtil {
       } else {
         int i = 1;
         while (segment != null) {
-          final double currentCoordinateDistance = segment.getPoint(1)
+          final double currentCoordinateDistance = segment.get(1)
             .distance(point);
           if (currentCoordinateDistance == 0) {
             result.put(SEGMENT_INDEX, i);
@@ -212,10 +212,10 @@ public class CoordinatesListUtil {
       dimension);
 
     int numCoords = 0;
-    final Coordinates coordinates1Start = coordinates1.getPoint(0);
-    final Coordinates coordinates1End = coordinates1.getPoint(coordinates1.size() - 1);
-    final Coordinates coordinates2Start = coordinates2.getPoint(0);
-    final Coordinates coordinates2End = coordinates2.getPoint(coordinates2.size() - 1);
+    final Coordinates coordinates1Start = coordinates1.get(0);
+    final Coordinates coordinates1End = coordinates1.get(coordinates1.size() - 1);
+    final Coordinates coordinates2Start = coordinates2.get(0);
+    final Coordinates coordinates2End = coordinates2.get(coordinates2.size() - 1);
     if (coordinates1Start.equals2d(coordinates2End)) {
       numCoords = append(coordinates2, coordinates, numCoords);
       numCoords = append(coordinates1, coordinates, numCoords);

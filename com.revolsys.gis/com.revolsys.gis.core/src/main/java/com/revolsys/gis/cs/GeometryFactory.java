@@ -18,7 +18,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class GeometryFactory extends
-  com.vividsolutions.jts.geom.GeometryFactory {
+  com.vividsolutions.jts.geom.GeometryFactory implements
+  CoordinatesPrecisionModel {
 
   public static GeometryFactory getFactory(
     final Geometry geometry) {
@@ -136,6 +137,16 @@ public class GeometryFactory extends
   public String toString() {
     return coordinateSystem.getName() + ", precision="
       + getCoordinatesPrecisionModel();
+  }
+
+  public Coordinates getPreciseCoordinates(
+    Coordinates point) {
+    return coordinatesPrecisionModel.getPreciseCoordinates(point);
+  }
+
+  public void makePrecise(
+    Coordinates point) {
+    coordinatesPrecisionModel.makePrecise(point);
   }
 
 }

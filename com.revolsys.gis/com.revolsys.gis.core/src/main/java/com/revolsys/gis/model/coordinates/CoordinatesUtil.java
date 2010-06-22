@@ -48,7 +48,7 @@ public class CoordinatesUtil {
       return null;
     } else {
       CoordinatesList points = CoordinatesListUtil.get(point);
-      return points.getPoint(0);
+      return points.get(0);
     }
   }
   public static Coordinates get(
@@ -57,7 +57,7 @@ public class CoordinatesUtil {
       return null;
     } else {
       CoordinatesList points = CoordinatesListUtil.get(line);
-      return points.getPoint(0);
+      return points.get(0);
     }
   }
 }

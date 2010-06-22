@@ -16,8 +16,10 @@ import javax.xml.namespace.QName;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -202,6 +204,7 @@ public class Edge<T> implements AttributedObject {
     final double toAngle) {
     this.graph = graph;
     this.fromNode = fromNode;
+    DataObjectUtil.noopOnCoordinateEqual2d(fromNode,   552414.0, 6140310.0);
     this.fromAngle = fromAngle;
     this.toNode = toNode;
     this.toAngle = toAngle;

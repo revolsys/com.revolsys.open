@@ -17,9 +17,9 @@ public class LineSegment extends AbstractCoordinatesList {
     final LineString line,
     final Visitor<LineSegment> visitor) {
     final CoordinatesList coords = CoordinatesListUtil.get(line);
-    Coordinates previousCoordinate = coords.getPoint(0);
+    Coordinates previousCoordinate = coords.get(0);
     for (int i = 1; i < coords.size(); i++) {
-      final Coordinates coordinate = coords.getPoint(i);
+      final Coordinates coordinate = coords.get(i);
       final LineSegment segment = new LineSegment(
         GeometryFactory.getFactory(line), previousCoordinate, coordinate);
       if (segment.getLength() > 0) {
@@ -139,9 +139,9 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public boolean contains(
     Coordinates coordinate) {
-    if (getPoint(0).equals(coordinate)) {
+    if (get(0).equals(coordinate)) {
       return true;
-    } else if (getPoint(1).equals(coordinate)) {
+    } else if (get(1).equals(coordinate)) {
       return true;
     } else {
       return false;

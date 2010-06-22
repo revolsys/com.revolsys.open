@@ -76,5 +76,5 @@ public interface CoordinatesList extends CoordinateSequence,
     int index,
     double z);
 
-  Coordinates getPoint(int i);
+  Coordinates get(int i);
 }

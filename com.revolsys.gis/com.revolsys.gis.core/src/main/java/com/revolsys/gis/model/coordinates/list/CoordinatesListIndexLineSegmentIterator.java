@@ -37,8 +37,8 @@ public class CoordinatesListIndexLineSegmentIterator implements
 
   public LineSegment next() {
     index++;
-    return new LineSegment(factory, points.getPoint(index),
-      points.getPoint(index + 1));
+    return new LineSegment(factory, points.get(index),
+      points.get(index + 1));
   }
 
   public void remove() {

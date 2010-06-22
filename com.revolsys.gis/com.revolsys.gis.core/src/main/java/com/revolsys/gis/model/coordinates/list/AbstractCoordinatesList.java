@@ -109,7 +109,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     return getValue(index, axisIndex);
   }
 
-  public Coordinates getPoint(
+  public Coordinates get(
     int i) {
     return new CoordinatesListCoordinates(this, i);
   }

@@ -13,6 +13,7 @@ import java.util.Map;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -20,6 +21,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -45,6 +47,35 @@ public final class LineStringUtil {
     final Coordinates point,
     final LineString line) {
     return distance(point, line, 0.0);
+  }
+
+  /**
+   * Check to see if the point is on any of the segments of the line.
+   * 
+   * @param line The line.
+   * @param point The point.
+   * @return True if the point is on the line, false otherwise.
+   * @see LineSegmentUtil#isPointOnLine(CoordinatesPrecisionModel, Coordinates,
+   *      Coordinates, Coordinates)
+   */
+  public static boolean isPointOnLine(
+    final LineString line,
+    final Coordinates point) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
+      points);
+    final CoordinatesListCoordinates lineEnd = new CoordinatesListCoordinates(
+      points);
+    for (int i = 1; i < points.size(); i++) {
+      lineStart.setIndex(i - 1);
+      lineEnd.setIndex(i);
+      if (LineSegmentUtil.isPointOnLine(factory, lineStart, lineEnd, point)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -339,7 +370,7 @@ public final class LineStringUtil {
         .doubleValue();
       final double segmentDistance = result.get(SEGMENT_DISTANCE).doubleValue();
       if (coordinateIndex == 0) {
-        final Coordinates c0 = coordinates.getPoint(0);
+        final Coordinates c0 = coordinates.get(0);
         if (coordinateDistance < tolerance) {
           return c0;
         } else if (segmentDistance == 0) {
@@ -348,7 +379,7 @@ public final class LineStringUtil {
           Coordinates c1;
           int i = 1;
           do {
-            c1 = coordinates.getPoint(i);
+            c1 = coordinates.get(i);
             i++;
           } while (c1.equals(c0));
           if (CoordinatesUtil.isAcute(c1, c0, point)) {
@@ -358,7 +389,7 @@ public final class LineStringUtil {
           }
         }
       } else if (coordinateIndex == line.getNumPoints() - 1) {
-        final Coordinates cn = coordinates.getPoint(coordinates.size() - 1);
+        final Coordinates cn = coordinates.get(coordinates.size() - 1);
         if (coordinateDistance == 0) {
           return cn;
         } else if (segmentDistance == 0) {
@@ -367,7 +398,7 @@ public final class LineStringUtil {
           Coordinates cn1;
           int i = line.getNumPoints() - 2;
           do {
-            cn1 = coordinates.getPoint(i);
+            cn1 = coordinates.get(i);
             i++;
           } while (cn1.equals(cn));
           if (CoordinatesUtil.isAcute(cn1, cn, point)) {
@@ -377,9 +408,9 @@ public final class LineStringUtil {
           }
         }
       } else {
-        final Coordinates cn1 = coordinates.getPoint(coordinateIndex - 1);
+        final Coordinates cn1 = coordinates.get(coordinateIndex - 1);
         final double cn1Distance = point.distance(cn1);
-        final Coordinates cn2 = coordinates.getPoint(coordinateIndex);
+        final Coordinates cn2 = coordinates.get(coordinateIndex);
         final double cn2Distance = point.distance(cn2);
         if (cn1Distance < cn2Distance) {
           if (cn1Distance < tolerance) {
@@ -455,7 +486,7 @@ public final class LineStringUtil {
       if (i == index) {
         newPoints.setPoint(i, point);
       } else {
-        newPoints.setPoint(i, points.getPoint(j));
+        newPoints.setPoint(i, points.get(j));
         j++;
       }
     }
@@ -475,7 +506,6 @@ public final class LineStringUtil {
     final LineString line,
     final List<Coordinates> coordinates) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
-    final CoordinatesPrecisionModel precisionModel = factory.getCoordinatesPrecisionModel();
     final SpatialIndex index = new Quadtree();
     final List<LineSegment> segments = new LinkedList<LineSegment>();
 
@@ -488,9 +518,9 @@ public final class LineStringUtil {
     for (final Coordinates point : coordinates) {
       // TODO make sure every coordinate matches
       LineSegment matchedLineSegment = null;
-      matchedLineSegment = getLineSegment(precisionModel, point, index);
+      matchedLineSegment = getLineSegment(point, index);
       if (matchedLineSegment == null) {
-        System.out.println(getLineSegment(precisionModel, point, index));
+        System.out.println(getLineSegment(point, index));
       } else {
         if (!matchedLineSegment.contains(point)) {
           final ListIterator<LineSegment> segmentIter = segments.listIterator();
@@ -506,12 +536,12 @@ public final class LineStringUtil {
 
           index.remove(matchedLineSegment.getEnvelope(), matchedLineSegment);
           final LineSegment segment1 = new LineSegment(factory,
-            matchedLineSegment.getPoint(0), point);
+            matchedLineSegment.get(0), point);
           index.insert(segment1.getEnvelope(), segment1);
           segmentIter.add(segment1);
 
           final LineSegment segment2 = new LineSegment(factory, point,
-            matchedLineSegment.getPoint(1));
+            matchedLineSegment.get(1));
           index.insert(segment2.getEnvelope(), segment2);
           segmentIter.add(segment2);
         }
@@ -521,11 +551,11 @@ public final class LineStringUtil {
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(
       segments.size() + 1, dimension);
     final LineSegment firstSegment = segments.get(0);
-    newCoordinates.setPoint(0, firstSegment.getPoint(0));
+    newCoordinates.setPoint(0, firstSegment.get(0));
 
     int i = 1;
     for (final LineSegment lineSegment : segments) {
-      newCoordinates.setPoint(i, lineSegment.getPoint(1));
+      newCoordinates.setPoint(i, lineSegment.get(1));
       i++;
     }
     final LineString newLine = factory.createLineString(newCoordinates);
@@ -533,7 +563,6 @@ public final class LineStringUtil {
   }
 
   private static LineSegment getLineSegment(
-    final CoordinatesPrecisionModel precisionModel,
     final Coordinates point,
     SpatialIndex index) {
     final Envelope envelope = new BoundingBox(point);
@@ -541,8 +570,8 @@ public final class LineStringUtil {
     final List<LineSegment> segments = index.query(envelope);
     for (final LineSegment lineSegment : segments) {
       if (lineSegment.getEnvelope().intersects(envelope)) {
-        if (LineSegmentUtil.isPointOnLine(precisionModel,
-          lineSegment.getPoint(0), lineSegment.getPoint(1), point, 2)) {
+        if (LineSegmentUtil.isPointOnLine(lineSegment.get(0),
+          lineSegment.get(1), point, 2)) {
           return lineSegment;
         }
       }
@@ -713,11 +742,11 @@ public final class LineStringUtil {
         } else if (segmentDistance == 0) {
           lines = split(line, segmentIndex, point);
         } else {
-          final Coordinates c0 = points.getPoint(0);
+          final Coordinates c0 = points.get(0);
           Coordinates c1;
           int i = 1;
           do {
-            c1 = points.getPoint(i);
+            c1 = points.get(i);
             i++;
           } while (c1.equals(c0));
           if (CoordinatesUtil.isAcute(c1, c0, point)) {
@@ -732,11 +761,11 @@ public final class LineStringUtil {
         } else if (segmentDistance == 0) {
           lines = split(line, segmentIndex, point);
         } else {
-          final Coordinates cn = points.getPoint(points.size() - 1);
+          final Coordinates cn = points.get(points.size() - 1);
           Coordinates cn1;
           int i = points.size() - 2;
           do {
-            cn1 = points.getPoint(i);
+            cn1 = points.get(i);
             i++;
           } while (cn1.equals(cn));
           if (CoordinatesUtil.isAcute(cn1, cn, point)) {
@@ -759,7 +788,7 @@ public final class LineStringUtil {
     final Coordinates point) {
     final List<LineString> lines = new ArrayList<LineString>();
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    final boolean containsPoint = point.equals(points.getPoint(segmentIndex));
+    final boolean containsPoint = point.equals(points.get(segmentIndex));
     final int numAxis = points.getNumAxis();
     int coords1Size;
     int coords2Size = points.size() - segmentIndex;
@@ -780,8 +809,8 @@ public final class LineStringUtil {
       points1.setPoint(coords1Size - 1, point);
       points2.setPoint(0, point);
       if (points1.getDimension() > 2) {
-        final Coordinates previous = points1.getPoint(segmentIndex);
-        final Coordinates next = points.getPoint(segmentIndex + 1);
+        final Coordinates previous = points1.get(segmentIndex);
+        final Coordinates next = points.get(segmentIndex + 1);
         final double z = getElevation(point, previous, next);
         points1.setZ(coords1Size - 1, z);
         points2.setZ(0, z);

@@ -446,8 +446,33 @@ public class LineSegmentUtil {
     }
   }
 
+  public static boolean isPointOnLineMiddle(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point) {
+    if (point.equals2d(lineStart)) {
+      return false;
+    } else if (point.equals2d(lineEnd)) {
+      return false;
+    } else {
+      double projectionFactor = projectionFactor(lineStart, lineEnd, point);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        final Coordinates projectedPoint = project(lineStart, lineEnd,
+          projectionFactor);
+        precisionModel.makePrecise(projectedPoint);
+        if (projectedPoint.equals2d(point)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   /**
-   * Check to see if the point is on the line between lineStart and lineEnd.
+   * Check to see if the point is on the line between lineStart and lineEnd
+   * using the precision model to see if a line split at the projection of the
+   * point on the line would be the same point.
    * 
    * @param precisionModel The precision model.
    * @param lineStart The point at the start of the line.
@@ -460,13 +485,31 @@ public class LineSegmentUtil {
     final Coordinates lineStart,
     final Coordinates lineEnd,
     final Coordinates point) {
-    final PointLineProjection pointLineProjection = getPointLineProjection(
-      precisionModel, lineStart, lineEnd, point);
-    return pointLineProjection.isPointOnLine();
+    double projectionFactor = projectionFactor(lineStart, lineEnd, point);
+    if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+      final Coordinates projectedPoint = project(lineStart, lineEnd,
+        projectionFactor);
+      precisionModel.makePrecise(projectedPoint);
+      if (projectedPoint.equals2d(point)) {
+        return true;
+      }
+    }
+    return false;
   }
 
+  /**
+   * Check to see if the point in relation to the line between lineStart and
+   * lineEnd is between the line end points and is within the maxDistance from
+   * the line.
+   * 
+   * @param precisionModel The precision model.
+   * @param lineStart The point at the start of the line.
+   * @param lineEnd The point at the end of the line.
+   * @param maxDistance The distance the point must be less than from the line.
+   * @param point The point.
+   * @return True if the point is on the line.
+   */
   public static boolean isPointOnLine(
-    final CoordinatesPrecisionModel precisionModel,
     final Coordinates lineStart,
     final Coordinates lineEnd,
     final Coordinates point,
@@ -479,6 +522,27 @@ public class LineSegmentUtil {
       }
     }
     return false;
+  }
+
+  public static boolean isPointOnLineMiddle(
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point,
+    double maxDistance) {
+    if (point.equals2d(lineStart)) {
+      return false;
+    } else if (point.equals2d(lineEnd)) {
+      return false;
+    } else {
+      double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
+      if (distance < maxDistance) {
+        double projectionFactor = projectionFactor(lineStart, lineEnd, point);
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   public static PointLineProjection getPointLineProjection(

@@ -130,7 +130,7 @@ public final class DataObjectUtil {
   }
 
   public static void noopOnCoordinateEqual2d(
-    final Node<DataObject> node,
+    final Node<?> node,
     final double x,
     final double y) {
     if (node.equalsCoordinate(x, y)) {

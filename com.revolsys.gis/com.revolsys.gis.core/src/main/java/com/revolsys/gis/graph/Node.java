@@ -117,7 +117,7 @@ public class Node<T> implements Comparable<Node<T>> {
   public boolean equalsCoordinate(
     final double x,
     final double y) {
-    return coordinates.getX() == x && coordinates.getX() == y;
+    return coordinates.getX() == x && coordinates.getY() == y;
   }
 
   public boolean equalsCoordinate(
