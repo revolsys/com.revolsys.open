@@ -204,7 +204,6 @@ public class Edge<T> implements AttributedObject {
     final double toAngle) {
     this.graph = graph;
     this.fromNode = fromNode;
-    DataObjectUtil.noopOnCoordinateEqual2d(fromNode,   552414.0, 6140310.0);
     this.fromAngle = fromAngle;
     this.toNode = toNode;
     this.toAngle = toAngle;
