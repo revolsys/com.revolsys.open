@@ -45,7 +45,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     T object,
     LineString line) {
     this.geometryFactory = geometryFactory;
-    add(object, line);
+    addLine(object, line);
   }
 
   public LineMatchGraph(
@@ -76,7 +76,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     if (edge == null) {
       final LineSegmentMatch lineSegmentMatch = new LineSegmentMatch(
         geometryFactory, startNode.getCoordinates(), endNode.getCoordinates());
-      edge = add(lineSegmentMatch, lineSegmentMatch.getLine());
+      edge = addLine(lineSegmentMatch, lineSegmentMatch.getLine());
     }
     return edge;
   }
@@ -92,7 +92,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return edge;
   }
 
-  public boolean add(
+  public boolean addLine(
     final T object,
     final LineString line) {
     if (add(line)) {
