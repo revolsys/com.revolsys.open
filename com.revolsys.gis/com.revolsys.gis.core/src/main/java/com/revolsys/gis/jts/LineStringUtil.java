@@ -426,11 +426,18 @@ public final class LineStringUtil {
   }
 
   public static double getElevation(
-    final Coordinates coordinate,
-    final Coordinates c0,
-    final Coordinates c1) {
-    final double fraction = coordinate.distance(c0) / c0.distance(c1);
-    final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * (fraction);
+    final Coordinates point,
+    final Coordinates point1,
+    final Coordinates point2) {
+    final double z1 = point1.getZ();
+    final double z2 = point2.getZ();
+    final double fraction;
+    if (point1.equals2d(point2)) {
+      fraction = 0.5;
+    } else {
+      fraction = point.distance(point1) / point1.distance(point2);
+    }
+    final double z = z1 + (z2 - z1) * (fraction);
     return z;
   }
 

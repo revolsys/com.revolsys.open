@@ -1,5 +1,7 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import com.revolsys.gis.util.NoOp;
+
 public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   double[] coordinates;

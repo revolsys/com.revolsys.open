@@ -12,7 +12,8 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.LineString;
 
 public class ArcConverter implements OsnConverter {
@@ -102,26 +103,28 @@ public class ArcConverter implements OsnConverter {
     final boolean writeAttributes)
     throws IOException {
     if (object instanceof LineString) {
-      final LineString lineString = (LineString)object;
+      final LineString line = (LineString)object;
       serializer.startObject(geometryType);
 
       serializer.attributeName("pointList");
       serializer.startCollection("List");
-      final Coordinate[] coords = lineString.getCoordinates();
-      for (int i = 0; i < coords.length; i++) {
-        final Coordinate coordinate = coords[i];
+      CoordinatesList points = CoordinatesListUtil.get(line);
+      for (int i = 0; i < points.size(); i++) {
         serializer.startObject("Point");
         serializer.attributeName("coords");
-        if (Double.isNaN(coordinate.z)) {
+        final double x = points.getX(i);
+        final double y = points.getY(i);
+        final double z = points.getZ(i);
+        if (Double.isNaN(z)) {
           serializer.startObject("Coord2D");
-          serializer.attribute("c1", coordinate.x, true);
-          serializer.attribute("c2", coordinate.y, false);
+          serializer.attribute("c1", x, true);
+          serializer.attribute("c2", y, false);
           serializer.endObject();
         } else {
           serializer.startObject("Coord3D");
-          serializer.attribute("c1", coordinate.x, true);
-          serializer.attribute("c2", coordinate.y, true);
-          serializer.attribute("c3", coordinate.z, false);
+          serializer.attribute("c1", x, true);
+          serializer.attribute("c2", y, true);
+          serializer.attribute("c3", z, false);
           serializer.endObject();
         }
         serializer.endAttribute();
@@ -131,7 +134,7 @@ public class ArcConverter implements OsnConverter {
       serializer.endAttribute();
       if (writeAttributes) {
         writeAttributes(serializer,
-          JtsGeometryUtil.getGeometryProperties(lineString));
+          JtsGeometryUtil.getGeometryProperties(line));
       }
       serializer.endObject();
     }

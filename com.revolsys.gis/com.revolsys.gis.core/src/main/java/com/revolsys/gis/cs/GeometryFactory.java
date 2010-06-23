@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
@@ -81,7 +82,8 @@ public class GeometryFactory extends
   public LineString createLineString(
     final CoordinatesList points) {
     points.makePrecise(coordinatesPrecisionModel);
-    return super.createLineString(points);
+    final LineString line = super.createLineString(points);
+    return line;
   }
 
   public LineString createLineString(
@@ -100,7 +102,8 @@ public class GeometryFactory extends
         coordinatesList.setPoint(i, point);
       }
     }
-    return createLineString(coordinatesList);
+    final LineString line = createLineString(coordinatesList);
+    return line;
   }
 
   public Geometry createMultiPoint(

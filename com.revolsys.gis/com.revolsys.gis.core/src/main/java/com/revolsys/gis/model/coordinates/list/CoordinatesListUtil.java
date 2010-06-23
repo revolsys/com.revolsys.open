@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -127,8 +128,7 @@ public class CoordinatesListUtil {
       points);
     if (iterator.hasNext()) {
       LineSegment segment = iterator.next();
-      final double previousCoordinateDistance = segment.get(0).distance(
-        point);
+      final double previousCoordinateDistance = segment.get(0).distance(point);
       if (previousCoordinateDistance == 0) {
         result.put(SEGMENT_INDEX, 0);
         result.put(COORDINATE_INDEX, 0);
@@ -137,8 +137,8 @@ public class CoordinatesListUtil {
       } else {
         int i = 1;
         while (segment != null) {
-          final double currentCoordinateDistance = segment.get(1)
-            .distance(point);
+          final double currentCoordinateDistance = segment.get(1).distance(
+            point);
           if (currentCoordinateDistance == 0) {
             result.put(SEGMENT_INDEX, i);
             result.put(COORDINATE_INDEX, i);
@@ -200,6 +200,24 @@ public class CoordinatesListUtil {
   public static CoordinatesList get(
     final Point point) {
     return get(point.getCoordinateSequence());
+  }
+
+  public static double length2d(
+    final CoordinatesList points) {
+    double length = 0;
+    final int size = points.size();
+    if (size > 1) {
+      double x1 = points.getX(0);
+      double y1 = points.getY(0);
+      for (int i = 1; i < size; i++) {
+        final double x2 = points.getX(i);
+        final double y2 = points.getY(i);
+        length += MathUtil.distance(x1, y1, x2, y2);
+        x1 = x2;
+        y1 = y2;
+      }
+    }
+    return length;
   }
 
   public static CoordinatesList merge(
