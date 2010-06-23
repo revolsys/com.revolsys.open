@@ -76,7 +76,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     if (edge == null) {
       final LineSegmentMatch lineSegmentMatch = new LineSegmentMatch(
         geometryFactory, startNode.getCoordinates(), endNode.getCoordinates());
-      edge = addLine(lineSegmentMatch, lineSegmentMatch.getLine());
+      edge = add(lineSegmentMatch, lineSegmentMatch.getLine());
     }
     return edge;
   }

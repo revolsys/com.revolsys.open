@@ -89,7 +89,7 @@ public class Graph<T> {
     nodeListeners.add(listener);
   }
 
-  public Edge<T> addLine(
+  public Edge<T> add(
     final T object,
     final LineString line) {
      final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -543,7 +543,7 @@ public class Graph<T> {
       final LineString newLine = LineStringUtil.merge(line1, line2);
 
       final T mergedObject = clone(object1, newLine);
-      final Edge<T> newEdge = addLine(mergedObject, newLine);
+      final Edge<T> newEdge = add(mergedObject, newLine);
       return newEdge;
     } else {
       return null;
@@ -639,7 +639,7 @@ public class Graph<T> {
       for (int i = 0; i < lines.getNumGeometries(); i++) {
         final LineString line = (LineString)lines.getGeometryN(i);
         final T newObject = clone(object, line);
-        final Edge<T> newEdge = addLine(newObject, line);
+        final Edge<T> newEdge = add(newObject, line);
         edges.add(newEdge);
       }
       return edges;
@@ -655,7 +655,7 @@ public class Graph<T> {
       final T object = edge.getObject();
       remove(edge);
       final T newObject = clone(object, line);
-      return addLine(newObject, line);
+      return add(newObject, line);
     } else {
       return null;
     }
@@ -670,7 +670,7 @@ public class Graph<T> {
       remove(edge);
       for (final LineString line : lines) {
         final T newObject = clone(object, line);
-        final Edge<T> newEdge = addLine(newObject, line);
+        final Edge<T> newEdge = add(newObject, line);
         edges.add(newEdge);
       }
       return edges;
