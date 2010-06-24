@@ -65,11 +65,17 @@ public final class LineStringUtil {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
       points);
+    if (point.equals2d(lineStart)) {
+      return true;
+    }
     final CoordinatesListCoordinates lineEnd = new CoordinatesListCoordinates(
       points);
     for (int i = 1; i < points.size(); i++) {
       lineStart.setIndex(i - 1);
       lineEnd.setIndex(i);
+      if (point.equals2d(lineEnd)) {
+        return true;
+      }
       if (LineSegmentUtil.isPointOnLine(factory, lineStart, lineEnd, point)) {
         return true;
       }

@@ -449,10 +449,11 @@ public class Edge<T> implements AttributedObject {
       return "Removed";
     } else {
       final StringBuffer sb = new StringBuffer(getTypeName().toString());
-      sb.append("[");
-      sb.append(fromNode.getCoordinates()).append(",");
-      sb.append(toNode.getCoordinates());
-      sb.append("]");
+      sb.append("LINESTRING(");
+      sb.append(fromNode.getCoordinates().toString().replaceAll(",", " "));
+      sb.append(",");
+      sb.append(toNode.getCoordinates().toString().replaceAll(",", " "));
+      sb.append(")");
       return sb.toString();
     }
   }

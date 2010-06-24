@@ -92,7 +92,7 @@ public class Graph<T> {
   public Edge<T> add(
     final T object,
     final LineString line) {
-     final CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesList points = CoordinatesListUtil.get(line);
     final Coordinates from = points.get(0);
 
     Coordinates fromDirection = points.get(1);
@@ -231,8 +231,8 @@ public class Graph<T> {
    * @param coordinate The coordinate.
    * @param distance The distance.
    * @return The list of nodes.
-  * @deprecated
-    */
+   * @deprecated
+   */
   public List<Node<T>> findNodes(
     final Coordinate coordinate,
     final double distance) {
@@ -552,6 +552,37 @@ public class Graph<T> {
   }
 
   /**
+   * Move the node and all its edges to the new node.
+   * 
+   * @param node The node to move.
+   * @param newNode The new node to move it to
+   */
+  public void moveNode(
+    final Node<T> node,
+    final Node<T> newNode) {
+    if (!node.isRemoved() && !newNode.isRemoved()) {
+      if (!node.equals(newNode)) {
+        final Coordinates newPoint = newNode.getCoordinates();
+        final List<Edge<T>> edges = new ArrayList<Edge<T>>(node.getEdges());
+        for (final Edge<T> edge : edges) {
+          if (!edge.isRemoved()) {
+            final LineString line = edge.getLine();
+            LineString newLine;
+            if (edge.isForwards(node)) {
+              newLine = LineStringUtil.subLineString(line, newPoint, 1,
+                line.getNumPoints() - 1, null);
+            } else {
+              newLine = LineStringUtil.subLineString(line, null, 0,
+                line.getNumPoints() - 1, newPoint);
+            }
+            replaceEdge(edge, newLine);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Merge the two edges into a single edge, removing the old edges and node if
    * required from the graph and adding a new edge to the graph.
    * 
@@ -717,8 +748,7 @@ public class Graph<T> {
             if (CoordinatesUtil.isAcute(c1, c0, point)) {
               lines = LineStringUtil.split(line, 0, point);
             } else if (edge.getFromNode().getDegree() == 1) {
-              final LineString newLine = LineStringUtil.insert(line, 0,
-                point);
+              final LineString newLine = LineStringUtil.insert(line, 0, point);
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
