@@ -200,7 +200,7 @@ public class Page extends Component {
   }
 
   public String getFullUrl(
-    final Map<String, Object> parameters) {
+    final Map<String, ? extends Object> parameters) {
     final WebUiContext context = WebUiContext.get();
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
       parameters);
