@@ -649,6 +649,25 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     return nullLabels;
   }
 
+  private Page getPage(
+    final String path) {
+    Page linkPage = null;
+    final WebUiContext webUiContext = WebUiContext.get();
+    if (webUiContext != null) {
+      final Page page = webUiContext.getPage();
+      linkPage = page.getPage(path);
+    }
+    if (linkPage == null) {
+      final String pageByName = pageUrls.get(path);
+      if (pageByName != null) {
+        linkPage = new Page(null, null, pageByName, false);
+      } else {
+        linkPage = new Page(null, null, path, false);
+      }
+    }
+    return linkPage;
+  }
+
   public String getPageUrl(
     final String name) {
     final String url = pageUrls.get(name);
@@ -768,7 +787,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
             final String textKey = linkMatcher.group(2);
 
             final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
-            Page linkPage = getPage(path);
+            final Page linkPage = getPage(path);
             if (linkPage != null) {
               out.startTag(HtmlUtil.A);
               final Map<String, Object> parameters = Collections.singletonMap(
@@ -819,36 +838,17 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     serializeNullLabel(out, key, locale);
   }
 
-  public void serializeLink(
+  public void serializeIdLink(
     final XmlWriter out,
     final String path,
-    final Long id) {
-    Page page = getPage(path);
+    final Object id) {
+    final Page page = getPage(path);
     if (page != null) {
-      final Map<String, Long> parameters = Collections.singletonMap(
+      final Map<String, Object> parameters = Collections.singletonMap(
         idParameterName, id);
       final String url = page.getFullUrl(parameters);
       HtmlUtil.serializeA(out, null, url, id);
     }
-  }
-
-  private Page getPage(
-    final String path) {
-    Page linkPage = null;
-    final WebUiContext webUiContext = WebUiContext.get();
-    if (webUiContext != null) {
-      final Page page = webUiContext.getPage();
-      linkPage = page.getPage(path);
-    }
-    if (linkPage == null) {
-      final String pageByName = pageUrls.get(path);
-      if (pageByName != null) {
-        linkPage = new Page(null, null, pageByName, false);
-      } else {
-        linkPage = new Page(null, null, path, false);
-      }
-    }
-    return linkPage;
   }
 
   public void serializeLink(
@@ -856,7 +856,7 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final String pageName,
     final Object object) {
     final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
-    Page page = getPage(pageName);
+    final Page page = getPage(pageName);
     if (page != null) {
       final Map<String, Object> parameters = Collections.singletonMap(
         idParameterName, id);
