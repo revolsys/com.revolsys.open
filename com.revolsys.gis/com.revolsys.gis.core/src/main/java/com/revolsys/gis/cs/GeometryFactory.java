@@ -12,6 +12,7 @@ import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
+import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -102,8 +103,7 @@ public class GeometryFactory extends
         coordinatesList.setPoint(i, point);
       }
     }
-    final LineString line = createLineString(coordinatesList);
-    return line;
+    return createLineString(coordinatesList);
   }
 
   public Geometry createMultiPoint(

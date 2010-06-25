@@ -278,23 +278,31 @@ public class CoordinatesListUtil {
     int size = length;
     int startIndex = 0;
     int lastIndex = length;
+    boolean startEqual = false;
+    boolean endEqual = false;
     if (startPoint != null) {
-      size++;
-      lastIndex++;
-      startIndex++;
+      startEqual = startPoint.equals2d(points.get(start));
+      if (!startEqual) {
+        size++;
+        lastIndex++;
+        startIndex++;
+      }
     }
     if (endPoint != null) {
-      size++;
+      endEqual = endPoint.equals2d(points.get(start +length - 1));
+      if (!endEqual) {
+        size++;
+      }
     }
     final CoordinatesList newPoints = new DoubleCoordinatesList(size, dimension);
 
-    if (startPoint != null) {
+    if (!startEqual && startPoint != null) {
       newPoints.setPoint(0, startPoint);
     }
 
     points.copy(start, newPoints, startIndex, dimension, length);
 
-    if (endPoint != null) {
+    if (!endEqual && endPoint != null) {
       newPoints.setPoint(lastIndex, endPoint);
     }
 
