@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class Node<T> implements Comparable<Node<T>> {
   public static List<Coordinates> getCoordinates(
-    final List<Node<DataObject>> nodes) {
+    final Collection<Node<DataObject>> nodes) {
     final List<Coordinates> coordinates = new ArrayList(nodes.size());
     for (final Node<DataObject> node : nodes) {
       final Coordinates coordinate = node.getCoordinates();

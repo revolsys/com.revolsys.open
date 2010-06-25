@@ -532,10 +532,8 @@ public final class LineStringUtil {
       // TODO make sure every coordinate matches
       LineSegment matchedLineSegment = null;
       matchedLineSegment = getLineSegment(point, index);
-      if (matchedLineSegment == null) {
-        System.out.println(getLineSegment(point, index));
-      } else {
-        if (!matchedLineSegment.contains(point)) {
+      if (matchedLineSegment != null) {
+         if (!matchedLineSegment.contains(point)) {
           final ListIterator<LineSegment> segmentIter = segments.listIterator();
           if (segmentIter.hasNext()) {
             LineSegment segment = segmentIter.next();

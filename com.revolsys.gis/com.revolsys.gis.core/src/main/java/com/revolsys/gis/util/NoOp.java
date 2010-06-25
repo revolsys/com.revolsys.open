@@ -67,6 +67,13 @@ public class NoOp {
     }
   }
 
+  public static void isNull(
+    final Object value) {
+    if (value == null) {
+      noOp();
+    }
+  }
+
   public static void modified(
     final DataObject object) {
     if (object.getState() == DataObjectState.Modified) {
