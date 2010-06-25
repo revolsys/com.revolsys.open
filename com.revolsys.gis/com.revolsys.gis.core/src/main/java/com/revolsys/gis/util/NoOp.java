@@ -1,7 +1,10 @@
 package com.revolsys.gis.util;
 
+import javax.xml.namespace.QName;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -24,6 +27,14 @@ public class NoOp {
     final Coordinates coordinates1End,
     final double... coordinates) {
     if (coordinates1End.equals(coordinates)) {
+      noOp();
+    }
+  }
+
+  public static void equals(
+    final Object object1,
+    final Object object2) {
+    if (object1.equals(object2)) {
       noOp();
     }
   }
@@ -89,6 +100,20 @@ public class NoOp {
   }
 
   public static void noOp() {
+  }
+
+  public static void typeName(
+    final DataObject object,
+    final QName typeName) {
+    final QName typeName2 = object.getMetaData().getName();
+    equals(typeName2, typeName);
+  }
+
+  public static void typeName(
+    final Edge<?> edge,
+    final QName typeName) {
+    final QName typeName2 = edge.getTypeName();
+    equals(typeName2, typeName);
   }
 
   public static void zeroLegthLine(
