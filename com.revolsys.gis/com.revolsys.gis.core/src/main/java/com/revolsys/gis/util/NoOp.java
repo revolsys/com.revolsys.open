@@ -13,7 +13,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class NoOp {
 
-  public static void equal2d(
+  public static void equals(
     final Coordinate point,
     final double x,
     final double y) {
@@ -32,35 +32,31 @@ public class NoOp {
   }
 
   public static void equals(
-    final Object object1,
-    final Object object2) {
-    if (object1.equals(object2)) {
-      noOp();
-    }
-  }
-
-  public static void equals2d(
     final DataObject object,
     final double x,
     final double y) {
-    equals2d(object.getGeometryValue(), x, y);
+    equals(object.getGeometryValue(), x, y);
   }
 
-  public static void equals2d(
+  public static void equals(
     final Geometry geometry,
     final double x,
     final double y) {
     final Coordinate coordinate1 = geometry.getCoordinate();
-    equal2d(coordinate1, x, y);
+    equals(coordinate1, x, y);
   }
 
-  public static void equals2d(
+  public static void equals(
     final Node<?> node,
-    final double x,
-    final double y) {
-    if (node.equalsCoordinate(x, y)) {
-      noOp();
+    final double... coordinates) {
+    equals(node.getCoordinates(), coordinates);
+  }
 
+  public static void equals(
+    final Object object1,
+    final Object object2) {
+    if (object1.equals(object2)) {
+      noOp();
     }
   }
 

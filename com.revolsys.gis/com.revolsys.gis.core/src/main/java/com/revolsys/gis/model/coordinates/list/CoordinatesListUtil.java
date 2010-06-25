@@ -136,6 +136,7 @@ public class CoordinatesListUtil {
         result.put(SEGMENT_DISTANCE, 0.0);
       } else {
         int i = 1;
+
         while (segment != null) {
           final double currentCoordinateDistance = segment.get(1).distance(
             point);
@@ -289,7 +290,7 @@ public class CoordinatesListUtil {
       }
     }
     if (endPoint != null) {
-      endEqual = endPoint.equals2d(points.get(start +length - 1));
+      endEqual = endPoint.equals2d(points.get(start + length - 1));
       if (!endEqual) {
         size++;
       }

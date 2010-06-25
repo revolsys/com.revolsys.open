@@ -61,7 +61,7 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public double distance(
     final Coordinates p) {
-    return LineSegmentUtil.distance(p, coordinates1, coordinates2);
+    return LineSegmentUtil.distance( coordinates1, coordinates2,p);
   }
 
   public Envelope getEnvelope() {
