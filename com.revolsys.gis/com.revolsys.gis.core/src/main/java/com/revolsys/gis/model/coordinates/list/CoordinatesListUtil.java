@@ -248,7 +248,7 @@ public class CoordinatesListUtil {
       numCoords = append(coordinates1, coordinates, numCoords);
       numCoords = appendReversed(coordinates2, coordinates, numCoords);
     } else {
-      throw new IllegalArgumentException("lines don't touch");
+      throw new IllegalArgumentException("lines don't touch\n" + coordinates1 +"\n" + coordinates2);
 
     }
     return trim(coordinates, numCoords);
