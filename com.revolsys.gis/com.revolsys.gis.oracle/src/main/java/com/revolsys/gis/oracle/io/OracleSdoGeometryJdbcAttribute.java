@@ -84,7 +84,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(
+  public synchronized int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
     final DataObject object)
@@ -96,7 +96,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setInsertPreparedStatementValue(
+  public synchronized int setInsertPreparedStatementValue(
     PreparedStatement statement,
     int parameterIndex,
     DataObject object)
@@ -116,7 +116,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setPreparedStatementValue(
+  public synchronized int setPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
     final Object value)
@@ -133,7 +133,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return parameterIndex + 1;
   }
 
-  public Object toJava(
+  public synchronized Object toJava(
     final Object object)
     throws SQLException {
     if (object instanceof STRUCT) {
@@ -157,7 +157,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   }
 
-  public STRUCT toJdbc(
+  public synchronized STRUCT toJdbc(
     final Connection connection,
     final Object object, int dimension)
     throws SQLException {
