@@ -5,6 +5,11 @@ import java.util.Comparator;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 
+/**
+ * Compare the distance of nodes from a given node.
+ * 
+ * @author paustin
+ */
 public class NodeDistanceComparator implements Comparator<Node<?>> {
 
   private final boolean invert;

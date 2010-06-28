@@ -65,6 +65,9 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     final int index,
     final int axisIndex,
     final double value) {
+    if (axisIndex < 2) {
+      NoOp.equals(value, 1.0);
+    }
     final byte numAxis = getNumAxis();
     if (axisIndex < numAxis) {
       coordinates[index * numAxis + axisIndex] = value;

@@ -1,5 +1,7 @@
 package com.revolsys.gis.model.coordinates;
 
+import com.revolsys.util.MathUtil;
+
 public abstract class AbstractCoordinates implements Coordinates {
 
   public static int hashCode(
@@ -29,16 +31,12 @@ public abstract class AbstractCoordinates implements Coordinates {
     final Coordinates other) {
     final double x = getX();
     final double y = getY();
-    final double otherX = getX();
-    final double otherY = getY();
+    final double distance = MathUtil.distance(0, 0, x, y);
 
-    if (x < otherX || y < otherY) {
-      return -1;
-    } else if (x > otherX || y > otherY) {
-      return 1;
-    } else {
-      return 0;
-    }
+    final double otherX = other.getX();
+    final double otherY = other.getY();
+    final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
+    return Double.compare(distance, otherDistance);
   }
 
   public double distance(
