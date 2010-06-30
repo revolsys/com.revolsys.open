@@ -100,13 +100,21 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
   @SuppressWarnings("unchecked")
   public <T> T getValue(
     final CharSequence name) {
-    return (T)getAttribute(name.toString());
+    try {
+      return (T)getAttribute(name.toString());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
   public <T extends Object> T getValue(
     final int index) {
-    return (T)getAttribute(index);
+    try {
+      return (T)getAttribute(index);
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
   }
 
   public Map<String, Object> getValueMap(
