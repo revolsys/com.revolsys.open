@@ -146,7 +146,6 @@ public class Node<T> implements Comparable<Node<T>> {
     return attributes;
   }
 
-
   public Coordinates getCoordinates() {
     return coordinates;
   }
@@ -207,6 +206,20 @@ public class Node<T> implements Comparable<Node<T>> {
   public Collection<Edge<T>> getEdgesTo(
     final Node<T> node) {
     return getEdgesBetween(this, node);
+  }
+
+  public boolean hasEdgeTo(
+    final Node<T> node) {
+    if (node == this) {
+      return false;
+    } else {
+      for (Edge<T> edge : getEdges()) {
+        if (edge.hasNode(node)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -300,11 +313,10 @@ public class Node<T> implements Comparable<Node<T>> {
   }
 
   public boolean isRemoved() {
-    return coordinates == null;
+    return edges == null;
   }
 
   void remove() {
-    coordinates = null;
     edges = null;
     inEdges = null;
     outEdges = null;
@@ -384,7 +396,11 @@ public class Node<T> implements Comparable<Node<T>> {
 
   @Override
   public String toString() {
-    return getCoordinates().toString();
+    if (isRemoved()) {
+      return "removed:" + getCoordinates().toString();
+    } else {
+      return getCoordinates().toString();
+    }
   }
 
   private void updateAttributes() {

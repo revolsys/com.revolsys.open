@@ -8,22 +8,20 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
-public class Edge<T> implements AttributedObject {
+public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public static <T> void addEdgeToEdgesByLine(
     final Node<T> node,
@@ -44,6 +42,18 @@ public class Edge<T> implements AttributedObject {
     }
     edges.add(edge);
     lineEdgeMap.put(line, edges);
+  }
+
+  public static <T> Set<Edge<T>> getEdges(
+    final Collection<Edge<T>> edges,
+    final LineString line) {
+    final Set<Edge<T>> newEdges = new LinkedHashSet<Edge<T>>();
+    for (final Edge<T> edge : edges) {
+      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
+        newEdges.add(edge);
+      }
+    }
+    return newEdges;
   }
 
   public static <T> List<Edge<T>> getEdges(
@@ -69,18 +79,6 @@ public class Edge<T> implements AttributedObject {
       }
     }
     return null;
-  }
-
-  public static <T> Set<Edge<T>> getEdges(
-    final Collection<Edge<T>> edges,
-    final LineString line) {
-    final Set<Edge<T>> newEdges = new LinkedHashSet<Edge<T>>();
-    for (final Edge<T> edge : edges) {
-      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
-        newEdges.add(edge);
-      }
-    }
-    return newEdges;
   }
 
   public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(
@@ -215,9 +213,20 @@ public class Edge<T> implements AttributedObject {
     toNode.addInEdge(this);
   }
 
+  public int compareTo(
+    final Edge<T> edge) {
+    final Node<T> fromNode = edge.getFromNode();
+    return getFromNode().compareTo(fromNode);
+  }
+
   public double distance(
     final Coordinates point) {
     return LineStringUtil.distance(point, line);
+  }
+
+  public double distance(
+    final Edge<LineSegmentMatch> edge) {
+    return getLine().distance(edge.getLine());
   }
 
   public double distance(
@@ -399,7 +408,7 @@ public class Edge<T> implements AttributedObject {
   }
 
   public boolean isRemoved() {
-    return fromNode == null;
+    return line == null;
   }
 
   public boolean isWithinDistance(
@@ -422,10 +431,7 @@ public class Edge<T> implements AttributedObject {
     if (toNode != null) {
       toNode.remove(this);
     }
-    fromNode = null;
-    toNode = null;
     line = null;
-    object = null;
     length = 0;
   }
 
@@ -445,27 +451,23 @@ public class Edge<T> implements AttributedObject {
 
   @Override
   public String toString() {
+    final StringBuffer sb = new StringBuffer(getTypeName().toString());
+    sb.append(' ');
     if (isRemoved()) {
-      return "Removed";
+      sb.insert(0, "Removed: ");
     } else {
-      final StringBuffer sb = new StringBuffer(getTypeName().toString());
       sb.append("LINESTRING(");
-      sb.append(fromNode.getCoordinates().toString().replaceAll(",", " "));
+      sb.append(getFromNode().getCoordinates().toString().replaceAll(",", " "));
       sb.append(",");
-      sb.append(toNode.getCoordinates().toString().replaceAll(",", " "));
+      sb.append(getToNode().getCoordinates().toString().replaceAll(",", " "));
       sb.append(")");
-      return sb.toString();
     }
+    return sb.toString();
   }
 
   public boolean touches(
     final Edge<DataObject> edge) {
     final Collection<Node<T>> nodes1 = getCommonNodes(edge);
     return !nodes1.isEmpty();
-  }
-
-  public double distance(
-    Edge<LineSegmentMatch> edge) {
-    return getLine().distance(edge.getLine());
   }
 }

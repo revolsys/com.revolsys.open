@@ -7,6 +7,8 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -115,6 +117,18 @@ public class NoOp {
   public static void zeroLegthLine(
     final LineString line) {
     if (line.getLength() == 0) {
+      noOp();
+    }
+  }
+
+  public static void equals(
+    LineString line,
+    double x1,
+    double y1,
+    double x2,
+    double y2) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    if (points.get(0).equals(x1,y1) && points.get(points.size()-1).equals(x2,y2)) {
       noOp();
     }
   }

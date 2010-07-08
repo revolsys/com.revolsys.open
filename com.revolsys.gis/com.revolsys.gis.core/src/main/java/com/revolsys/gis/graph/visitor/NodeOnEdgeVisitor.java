@@ -1,5 +1,6 @@
 package com.revolsys.gis.graph.visitor;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -25,9 +26,11 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
     boundingBox.expandBy(maxDistance);
     final EdgeQuadTree<T> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node,
-      boundingBox, results);
+      boundingBox, maxDistance, results);
     index.query(boundingBox, visitor);
-    return results.getList();
+    final List<Edge<T>> edges = results.getList();
+    Collections.sort(edges);
+    return edges;
 
   }
 
@@ -37,13 +40,17 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
 
   private BoundingBox boundingBox;
 
+  private double maxDistance;
+
   public NodeOnEdgeVisitor(
     final Node<T> node,
     final BoundingBox boundingBox,
+    final double maxDistance,
     final Visitor<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.node = node;
     this.boundingBox = boundingBox;
+    this.maxDistance = maxDistance;
     this.point = node.getCoordinates();
   }
 
@@ -53,7 +60,7 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
     if (!edge.hasNode(node)) {
       final LineString line = edge.getLine();
       if (line.getEnvelopeInternal().intersects(boundingBox)) {
-        if (LineStringUtil.isPointOnLine(line, point)) {
+        if (LineStringUtil.isPointOnLine(line, point, maxDistance)) {
           super.visit(edge);
         }
       }

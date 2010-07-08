@@ -85,6 +85,42 @@ public final class LineStringUtil {
   }
 
   /**
+   * Check to see if the point is on any of the segments of the line.
+   * 
+   * @param line The line.
+   * @param point The point.
+   * @param maxDistance The maximum distance the point can be from the line.
+   * @return True if the point is on the line, false otherwise.
+   * @see LineSegmentUtil#isPointOnLine(Coordinates, Coordinates, Coordinates,
+   *      double)
+   */
+  public static boolean isPointOnLine(
+    final LineString line,
+    final Coordinates point,
+    double maxDistance) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
+      points);
+    if (point.equals2d(lineStart)) {
+      return true;
+    }
+    final CoordinatesListCoordinates lineEnd = new CoordinatesListCoordinates(
+      points);
+    for (int i = 1; i < points.size(); i++) {
+      lineStart.setIndex(i - 1);
+      lineEnd.setIndex(i);
+      if (point.equals2d(lineEnd)) {
+        return true;
+      }
+      if (LineSegmentUtil.isPointOnLine(lineStart, lineEnd, point, maxDistance)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Get the coordinate where two lines cross, or null if they don't cross.
    * 
    * @param line1 The first line.
@@ -533,7 +569,7 @@ public final class LineStringUtil {
       LineSegment matchedLineSegment = null;
       matchedLineSegment = getLineSegment(point, index);
       if (matchedLineSegment != null) {
-         if (!matchedLineSegment.contains(point)) {
+        if (!matchedLineSegment.contains(point)) {
           final ListIterator<LineSegment> segmentIter = segments.listIterator();
           if (segmentIter.hasNext()) {
             LineSegment segment = segmentIter.next();

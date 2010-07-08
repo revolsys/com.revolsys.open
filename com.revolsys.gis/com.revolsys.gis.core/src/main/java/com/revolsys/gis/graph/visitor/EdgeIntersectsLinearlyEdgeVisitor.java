@@ -1,5 +1,6 @@
 package com.revolsys.gis.graph.visitor;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.gis.data.visitor.CreateListVisitor;
@@ -22,7 +23,9 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
     final Envelope env = line.getEnvelopeInternal();
     final EdgeQuadTree<T> index = graph.getEdgeIndex();
     index.query(env, new EdgeIntersectsLinearlyEdgeVisitor<T>(edge, results));
-    return results.getList();
+    final List<Edge<T>> edges = results.getList();
+    Collections.sort(edges);
+    return edges;
 
   }
 

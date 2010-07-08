@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
@@ -33,14 +33,12 @@ import com.revolsys.gis.graph.visitor.EdgeWithinDistanceVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -51,13 +49,13 @@ public class Graph<T> {
 
   private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
 
-  private final Set<Edge<T>> edges = new LinkedHashSet<Edge<T>>();
+  private final Set<Edge<T>> edges = new TreeSet<Edge<T>>();
 
   private NodeQuadTree<T> nodeIndex;
 
   private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<T>();
 
-  private final Map<Coordinates, Node<T>> nodes = new LinkedHashMap<Coordinates, Node<T>>();
+  private final Map<Coordinates, Node<T>> nodes = new TreeMap<Coordinates, Node<T>>();
 
   private CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
 
@@ -191,26 +189,15 @@ public class Graph<T> {
     final EdgeVisitor<T> visitor) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     queryEdges(visitor, results);
-    return results.getList();
+    final List<Edge<T>> edges = results.getList();
+    Collections.sort(edges);
+    return edges;
   }
 
   public List<Edge<T>> findEdges(
     final Node<T> node,
     final double distance) {
     return EdgeWithinDistanceVisitor.edgesWithinDistance(this, node, distance);
-  }
-
-  /**
-   * Find the node by coordinate returning the node if it exists, null
-   * otherwise.
-   * 
-   * @param coordinate The coordinate to find the node for.
-   * @return The nod or null if not found.
-   * @deprecated
-   */
-  public Node<T> findNode(
-    final Coordinate coordinate) {
-    return nodes.get(new CoordinateCoordinates(coordinate));
   }
 
   /**
@@ -223,20 +210,6 @@ public class Graph<T> {
   public Node<T> findNode(
     final Coordinates point) {
     return nodes.get(point);
-  }
-
-  /**
-   * Find the nodes <= the distance of the specified coordinate.
-   * 
-   * @param coordinate The coordinate.
-   * @param distance The distance.
-   * @return The list of nodes.
-   * @deprecated
-   */
-  public List<Node<T>> findNodes(
-    final Coordinate coordinate,
-    final double distance) {
-    return findNodes(new CoordinateCoordinates(coordinate), distance);
   }
 
   /**
@@ -255,7 +228,9 @@ public class Graph<T> {
     final Envelope envelope = new BoundingBox(point);
     envelope.expandBy(distance);
     getNodeIndex().query(envelope, visitor);
-    return results.getList();
+    final List<Node<T>> nodes = results.getList();
+    Collections.sort(nodes);
+    return nodes;
   }
 
   /**
@@ -289,7 +264,9 @@ public class Graph<T> {
     final Envelope envelope = geometry.getEnvelopeInternal();
     envelope.expandBy(distance);
     getNodeIndex().query(envelope, visitor);
-    return results.getList();
+    final List<Node<T>> nodes = results.getList();
+    Collections.sort(nodes);
+    return nodes;
   }
 
   /**
@@ -385,7 +362,9 @@ public class Graph<T> {
     final EdgeQuadTree<T> edgeIndex = getEdgeIndex();
     edgeIndex.query(envelope, results);
     final List<Edge<T>> targetEdges = results.getResults();
-    if (comparator != null) {
+    if (comparator == null) {
+      Collections.sort(targetEdges);
+    } else {
       Collections.sort(targetEdges, comparator);
     }
     return targetEdges;
@@ -407,7 +386,9 @@ public class Graph<T> {
       filter);
     final EdgeQuadTree<T> edgeIndex = getEdgeIndex();
     edgeIndex.query(envelope, results);
-    return results.getResults();
+    final List<Edge<T>> edges = results.getResults();
+    Collections.sort(edges);
+    return edges;
 
   }
 
@@ -416,18 +397,6 @@ public class Graph<T> {
     final Geometry geometry) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return getEdges(filter, envelope);
-  }
-
-  /**
-   * Get the node by coordinate, creating one if it did not exist.
-   * 
-   * @param coordinate The coordinate to get the node for.
-   * @return The node.
-   * @deprecated
-   */
-  public Node<T> getNode(
-    final Coordinate coordinate) {
-    return getNode(new CoordinateCoordinates(coordinate));
   }
 
   /**
@@ -496,7 +465,9 @@ public class Graph<T> {
       filter);
     final NodeQuadTree<T> nodeIndex = getNodeIndex();
     nodeIndex.query(envelope, results);
-    return results.getResults();
+    final List<Node<T>> nodes = results.getResults();
+    Collections.sort(nodes);
+    return nodes;
 
   }
 
@@ -801,7 +772,9 @@ public class Graph<T> {
     final Visitor<Edge<T>> visitor) {
     final List<Edge<T>> edges = new LinkedList<Edge<T>>();
     copyEdges(filter, edges);
-    if (comparator != null) {
+    if (comparator == null) {
+      Collections.sort(edges);
+    } else {
       Collections.sort(edges, comparator);
     }
     final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
@@ -811,12 +784,16 @@ public class Graph<T> {
         final String action = edgeEvent.getAction();
         if (action.equals(EdgeEvent.EDGE_ADDED)) {
           edges.add(edge);
-          if (comparator != null) {
+          if (comparator == null) {
+            Collections.sort(edges);
+          } else {
             Collections.sort(edges, comparator);
           }
         } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
           edges.remove(edge);
-          if (comparator != null) {
+          if (comparator == null) {
+            Collections.sort(edges);
+          } else {
             Collections.sort(edges, comparator);
           }
         }
@@ -862,7 +839,9 @@ public class Graph<T> {
     final Visitor<Node<T>> visitor) {
     final List<Node<T>> nodes = new LinkedList<Node<T>>();
     copyNodes(filter, nodes);
-    if (comparator != null) {
+    if (comparator == null) {
+      Collections.sort(nodes);
+    } else {
       Collections.sort(nodes, comparator);
     }
 
@@ -873,12 +852,16 @@ public class Graph<T> {
         final String action = nodeEvent.getAction();
         if (action.equals(NodeEvent.NODE_ADDED)) {
           nodes.add(node);
-          if (comparator != null) {
+          if (comparator == null) {
+            Collections.sort(nodes);
+          } else {
             Collections.sort(nodes, comparator);
           }
         } else if (action.equals(NodeEvent.NODE_REMOVED)) {
           nodes.remove(node);
-          if (comparator != null) {
+          if (comparator == null) {
+            Collections.sort(nodes);
+          } else {
             Collections.sort(nodes, comparator);
           }
         }

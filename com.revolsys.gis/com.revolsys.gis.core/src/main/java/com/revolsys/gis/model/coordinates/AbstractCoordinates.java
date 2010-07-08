@@ -36,7 +36,13 @@ public abstract class AbstractCoordinates implements Coordinates {
     final double otherX = other.getX();
     final double otherY = other.getY();
     final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
-    return Double.compare(distance, otherDistance);
+    final int distanceCompare = Double.compare(distance, otherDistance);
+    if (distanceCompare == 0) {
+      final int yCompare = Double.compare(y, otherY);
+      return yCompare;
+    } else {
+      return distanceCompare;
+    }
   }
 
   public double distance(

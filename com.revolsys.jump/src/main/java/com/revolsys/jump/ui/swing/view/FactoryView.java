@@ -26,6 +26,5 @@ public class FactoryView extends View {
 
   
   public void finalize() {
-    System.out.println(factory);
   }
 }
