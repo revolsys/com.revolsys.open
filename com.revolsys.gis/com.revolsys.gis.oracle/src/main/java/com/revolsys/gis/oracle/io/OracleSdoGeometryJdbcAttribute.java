@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.python.modules.synchronize;
+
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.spatial.geometry.JGeometry;
 import oracle.sql.ARRAY;
@@ -61,7 +63,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final GeometryFactory geometryFactory,
     final int dimension) {
     super(name, type, sqlType, length, scale, required, properties);
-     this.geometryFactory = geometryFactory;
+    this.geometryFactory = geometryFactory;
     this.coordinateSystem = geometryFactory.getCoordinateSystem();
     this.dimension = dimension;
     this.precisionModels = new PrecisionModel[dimension];
@@ -79,9 +81,9 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   @Override
   public OracleSdoGeometryJdbcAttribute clone() {
-    return new OracleSdoGeometryJdbcAttribute( getName(),
-      getType(), getSqlType(), getLength(), getScale(), isRequired(),
-      getProperties(), geometryFactory, dimension);
+    return new OracleSdoGeometryJdbcAttribute(getName(), getType(),
+      getSqlType(), getLength(), getScale(), isRequired(), getProperties(),
+      geometryFactory, dimension);
   }
 
   @Override
@@ -103,7 +105,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public synchronized int setAttributeValueFromResultSet(
+  public int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
     final DataObject object)
@@ -130,7 +132,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public synchronized int setInsertPreparedStatementValue(
+  public int setInsertPreparedStatementValue(
     PreparedStatement statement,
     int parameterIndex,
     DataObject object)
@@ -141,16 +143,18 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      final Connection connection = statement.getConnection();
-      final STRUCT oracleValue = toJdbc(connection, value, dimension);
-      ((OraclePreparedStatement)statement).setSTRUCT(parameterIndex,
-        oracleValue);
+      synchronized (STRUCT.class) {
+        final Connection connection = statement.getConnection();
+        final STRUCT oracleValue = toJdbc(connection, value, dimension);
+        ((OraclePreparedStatement)statement).setSTRUCT(parameterIndex,
+          oracleValue);
+      }
     }
     return parameterIndex + 1;
   }
 
   @Override
-  public synchronized int setPreparedStatementValue(
+  public int setPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
     final Object value)
@@ -159,10 +163,12 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      final Connection connection = statement.getConnection();
-      final STRUCT oracleValue = toJdbc(connection, value, 2);
-      ((OraclePreparedStatement)statement).setSTRUCT(parameterIndex,
-        oracleValue);
+      synchronized (STRUCT.class) {
+        final Connection connection = statement.getConnection();
+        final STRUCT oracleValue = toJdbc(connection, value, 2);
+        ((OraclePreparedStatement)statement).setSTRUCT(parameterIndex,
+          oracleValue);
+      }
     }
     return parameterIndex + 1;
   }
@@ -191,7 +197,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   //
   // }
 
-  public synchronized STRUCT toJdbc(
+  private STRUCT toJdbc(
     final Connection connection,
     final Object object,
     int dimension)
