@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.python.modules.synchronize;
-
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.spatial.geometry.JGeometry;
 import oracle.sql.ARRAY;
