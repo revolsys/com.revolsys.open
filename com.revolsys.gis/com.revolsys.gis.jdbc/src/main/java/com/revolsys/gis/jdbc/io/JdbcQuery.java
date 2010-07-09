@@ -8,9 +8,67 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.JdbcUtils;
 
 public class JdbcQuery {
+  public static void addColumnNames(
+    final StringBuffer sql,
+    final DataObjectMetaData metaData,
+    final String tablePrefix) {
+    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+      if (i > 0) {
+        sql.append(", ");
+      }
+      final Attribute attribute = metaData.getAttribute(i);
+      if (attribute instanceof JdbcAttribute) {
+        final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+        jdbcAttribute.addColumnName(sql, tablePrefix);
+      }
+    }
+  }
+
+  public static void addColumnsAndTableName(
+    final StringBuffer sql,
+    final DataObjectMetaData metaData,
+    final String tablePrefix) {
+    final QName typeName = metaData.getName();
+    sql.append("SELECT ");
+    addColumnNames(sql, metaData, tablePrefix);
+    sql.append(" FROM ");
+    final String tableName = JdbcUtils.getTableName(typeName);
+    sql.append(tableName);
+    sql.append(" ");
+    sql.append(tablePrefix);
+  }
+
+  public static JdbcQuery createQuery(
+    final DataObjectMetaData metaData) {
+    final String tablePrefix = "T";
+    return createQuery(metaData, tablePrefix);
+  }
+
+  public static JdbcQuery createQuery(
+    final DataObjectMetaData metaData,
+    final String tablePrefix) {
+    final StringBuffer sql = new StringBuffer();
+    addColumnsAndTableName(sql, metaData, tablePrefix);
+    return new JdbcQuery(metaData, sql.toString());
+  }
+
+  public static JdbcQuery createQuery(
+    final DataObjectStore dataStore,
+    final QName typeName) {
+    final DataObjectMetaData metaData = dataStore.getMetaData(typeName);
+    return createQuery(metaData);
+  }
+
+  private DataObjectMetaData metaData;
+
   private List<JdbcAttribute> parameterAttributes = new ArrayList<JdbcAttribute>();
 
   private List<Object> parameters = new ArrayList<Object>();
@@ -22,6 +80,19 @@ public class JdbcQuery {
   private QName typeName;
 
   public JdbcQuery() {
+  }
+
+  public JdbcQuery(
+    final DataObjectMetaData metaData,
+    final String sql) {
+    this(metaData.getName(), sql);
+    this.metaData = metaData;
+  }
+
+  public JdbcQuery(
+    final DataObjectMetaData metaData) {
+    this(metaData.getName());
+    this.metaData = metaData;
   }
 
   public JdbcQuery(
@@ -78,6 +149,10 @@ public class JdbcQuery {
     parameterAttributes.add(attribute);
   }
 
+  public DataObjectMetaData getMetaData() {
+    return metaData;
+  }
+
   public List<JdbcAttribute> getParameterAttributes() {
     return parameterAttributes;
   }
@@ -113,6 +188,11 @@ public class JdbcQuery {
       }
 
     }
+  }
+
+  public void setMetaData(
+    final DataObjectMetaData metaData) {
+    this.metaData = metaData;
   }
 
   public void setParameterAttributes(

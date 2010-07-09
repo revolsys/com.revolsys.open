@@ -114,12 +114,16 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
             resultSet = statement.executeQuery();
             final ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
             final QName tableName = query.getTableName();
-            if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
-              this.metaData = dataStore.getMetaData(tableName);
-            } else {
-              this.metaData = dataStore.getMetaData(tableName,
-                resultSetMetaData);
+            DataObjectMetaData metaData = query.getMetaData();
+            if (metaData == null) {
+              if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
+                this.metaData = dataStore.getMetaData(tableName);
+              } else {
+                this.metaData = dataStore.getMetaData(tableName,
+                  resultSetMetaData);
+              }
             }
+            this.metaData = metaData;
 
             final QName typeName = query.getTypeName();
             if (typeName != null) {

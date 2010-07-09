@@ -74,10 +74,12 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   public boolean isFlushBetweenTypes() {
     return flushBetweenTypes;
   }
+
   public void setFlushBetweenTypes(
     final boolean flushBetweenTypes) {
     this.flushBetweenTypes = flushBetweenTypes;
   }
+
   public JdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -277,7 +279,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
           throw new IllegalArgumentException(typeName
             + " does not have a primary key");
         }
-        final String tableName = getTableName(typeName);
+        final String tableName = JdbcUtils.getTableName(typeName);
 
         final String idAttributeName = metaData.getIdAttributeName();
         sql = "SELECT * FROM " + tableName + " WHERE " + idAttributeName
@@ -351,7 +353,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   protected String getSequenceInsertSql(
     final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
-    final String tableName = getTableName(typeName);
+    final String tableName = JdbcUtils.getTableName(typeName);
     String sql = sequenceTypeSqlMap.get(typeName);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
@@ -411,17 +413,6 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   public String getSqlSuffix() {
     return sqlSuffix;
-  }
-
-  private String getTableName(
-    final QName typeName) {
-    final String namespaceURI = typeName.getNamespaceURI();
-    final String localPart = typeName.getLocalPart();
-    if (namespaceURI == "") {
-      return localPart;
-    } else {
-      return namespaceURI + "." + localPart;
-    }
   }
 
   public synchronized JdbcWriter getWriter() {
@@ -651,7 +642,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   public Reader<DataObject> query(
     final QName typeName) {
-    final String tableName = getTableName(typeName);
+    final String tableName = JdbcUtils.getTableName(typeName);
     final JdbcQueryReader reader = createReader(typeName, "SELECT * FROM "
       + tableName);
     return reader;
@@ -676,10 +667,8 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
 
-    final StringBuffer sql = new StringBuffer("SELECT * FROM ");
-    sql.append(typeName.getNamespaceURI());
-    sql.append(".");
-    sql.append(typeName.getLocalPart());
+    final StringBuffer sql = new StringBuffer();
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
     final JdbcQueryReader reader = createReader();
     final SqlFunction intersectsFunction = geometryAttribute.getProperty(JdbcConstants.FUNCTION_INTERSECTS);
     sql.append(" WHERE ");
@@ -690,7 +679,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
       sql.append(" AND ");
       sql.append(whereClause);
     }
-    final JdbcQuery query = new JdbcQuery(typeName, sql.toString());
+    final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
     query.addParameter(geometry, geometryAttribute);
     reader.addQuery(query);
     return reader;

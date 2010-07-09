@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
+import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
@@ -469,5 +470,16 @@ public final class JdbcUtils {
 
   private JdbcUtils() {
 
+  }
+
+  public static String getTableName(
+    final QName typeName) {
+    final String namespaceURI = typeName.getNamespaceURI();
+    final String localPart = typeName.getLocalPart();
+    if (namespaceURI == "") {
+      return localPart;
+    } else {
+      return namespaceURI + "." + localPart;
+    }
   }
 }

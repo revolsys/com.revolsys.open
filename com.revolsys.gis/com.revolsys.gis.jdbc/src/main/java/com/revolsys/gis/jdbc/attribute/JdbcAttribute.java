@@ -41,6 +41,15 @@ public class JdbcAttribute extends Attribute {
     addStatementPlaceHolder(sql);
   }
 
+  public void addColumnName(
+    final StringBuffer sql, final String tablePrefix) {
+    if (tablePrefix != null) {
+      sql.append(tablePrefix);
+      sql.append(".");
+    }
+    sql.append(getName());
+  }
+
   public void addSelectStatementPlaceHolder(
     final StringBuffer sql) {
     addStatementPlaceHolder(sql);
@@ -65,7 +74,7 @@ public class JdbcAttribute extends Attribute {
     return columnIndex + 1;
   }
 
-  public  int setInsertPreparedStatementValue(
+  public int setInsertPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
     final DataObject object)
