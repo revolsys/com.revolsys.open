@@ -36,7 +36,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
  * @author paustin
  * @version 1.0
@@ -46,20 +45,26 @@ public class TransactionFilter implements Filter {
 
   private WebApplicationContext applicationContext;
 
-  public void init(final FilterConfig config) throws ServletException {
+  public void init(
+    final FilterConfig config)
+    throws ServletException {
     ServletContext servletContext = config.getServletContext();
     applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
   }
-  
-  public void doFilter(final ServletRequest request,
-    final ServletResponse response, final FilterChain filterChain)
-    throws IOException, ServletException {
+
+  public void doFilter(
+    final ServletRequest request,
+    final ServletResponse response,
+    final FilterChain filterChain)
+    throws IOException,
+    ServletException {
     AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)applicationContext.getBean("transactionManager");
     TransactionTemplate template = new TransactionTemplate(transactionManager);
 
     try {
-      template.execute(new TransactionCallback() {
-        public Object doInTransaction(final TransactionStatus transaction) {
+      template.execute(new TransactionCallback<Object>() {
+        public Object doInTransaction(
+          final TransactionStatus transaction) {
           try {
             filterChain.doFilter(request, response);
             DefaultTransactionStatus defStatus = (DefaultTransactionStatus)transaction;
@@ -83,8 +88,8 @@ public class TransactionFilter implements Filter {
             cause = servletCause;
           }
         }
-        HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request,
-          cause);
+        HttpServletLogUtil.logRequestException(log,
+          (HttpServletRequest)request, cause);
         if (cause instanceof RuntimeException) {
           throw (RuntimeException)cause;
         } else if (cause instanceof Error) {
@@ -97,8 +102,8 @@ public class TransactionFilter implements Filter {
           throw new ServletException(cause.getMessage(), cause);
         }
       } else {
-        HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request,
-          cause);
+        HttpServletLogUtil.logRequestException(log,
+          (HttpServletRequest)request, cause);
         throw e;
       }
     }

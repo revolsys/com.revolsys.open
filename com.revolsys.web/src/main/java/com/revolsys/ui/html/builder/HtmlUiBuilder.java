@@ -655,7 +655,9 @@ public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
     final WebUiContext webUiContext = WebUiContext.get();
     if (webUiContext != null) {
       final Page page = webUiContext.getPage();
-      linkPage = page.getPage(path);
+      if (page != null) {
+        linkPage = page.getPage(path);
+      }
     }
     if (linkPage == null) {
       final String pageByName = pageUrls.get(path);

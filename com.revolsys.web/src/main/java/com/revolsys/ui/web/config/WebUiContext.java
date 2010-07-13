@@ -34,7 +34,8 @@ public class WebUiContext {
   private static ServletContext servletContext;
 
   public static WebUiContext get() {
-    return local.get();
+    final WebUiContext context = local.get();
+    return context;
   }
 
   public static ServletContext getServletContext() {
@@ -101,8 +102,8 @@ public class WebUiContext {
     try {
       return evaluateExpression(ExpressionFactory.createExpression(expression));
     } catch (final Exception e) {
-      log.error("Unable to create expression " + expression + ": "
-        + e.getMessage(), e);
+      log.error(
+        "Unable to create expression " + expression + ": " + e.getMessage(), e);
       return null;
     }
   }

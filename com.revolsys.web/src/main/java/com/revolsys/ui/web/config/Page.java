@@ -174,8 +174,18 @@ public class Page extends Component {
     if (parent != null) {
       return parent.getAbsolutePath() + path;
     } else {
-      return WebUiContext.get().getConfig().getBasePath() + path;
+      final WebUiContext uiContext = WebUiContext.get();
+      if (uiContext != null) {
+        final Config config = uiContext.getConfig();
+        if (config != null) {
+          final String basePath = config.getBasePath();
+          if (basePath != null) {
+            return basePath + path;
+          }
+        }
+      }
     }
+    return path;
   }
 
   public List getArguments() {
