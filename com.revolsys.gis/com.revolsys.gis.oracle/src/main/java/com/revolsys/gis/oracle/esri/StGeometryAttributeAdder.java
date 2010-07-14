@@ -94,7 +94,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
 
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
-      "SDE.ST_INTERSECTS(", ") = 1"));
+      "SDE.ST_ENVINTERSECTS(", ") = 1"));
     if (spatialReference != null) {
       final int srid = spatialReference.getSrid();
       attribute.setProperty(AttributeProperties.SRID,

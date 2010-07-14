@@ -71,15 +71,69 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
+  public void addColumnName(
+    StringBuffer sql,
+    String tablePrefix) {
+    sql.append(tablePrefix);
+    sql.append(".GEOMETRY.ENTITY, ");
+    sql.append(tablePrefix);
+    sql.append(".GEOMETRY.NUMPTS, ");
+    sql.append(tablePrefix);
+    sql.append(".GEOMETRY.POINTS");
+  }
+
+  @Override
   public int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
     final DataObject object)
     throws SQLException {
-    final Object oracleValue = resultSet.getObject(columnIndex);
-    final Object value = toJava(oracleValue);
-    object.setValue(getIndex(), value);
-    return columnIndex + 1;
+    final Geometry geometry;
+
+    final int entity = resultSet.getInt(columnIndex);
+    if (!resultSet.wasNull()) {
+      final int numPoints = resultSet.getInt(columnIndex + 1);
+      final byte[] pointData = resultSet.getBytes(columnIndex+2);
+
+      final Double xOffset = spatialReference.getXOffset();
+      final Double yOffset = spatialReference.getYOffset();
+      final Double xyScale = spatialReference.getXyScale();
+      final Double zScale = spatialReference.getZScale();
+      final Double zOffset = spatialReference.getZOffset();
+      final Double mScale = spatialReference.getMScale();
+      final Double mOffset = spatialReference.getMOffset();
+
+//       final byte[] pointData = points.getBytes(1, (int)points.length());
+      final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      switch (entity) {
+        case ArcSdeConstants.ST_GEOMETRY_POINT:
+          final CoordinateSequence pointCoordinates = PackedCoordinateUtil.getCoordinateSequence(
+            numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
+            mScale, pointData);
+          geometry = geometryFactory.createPoint(pointCoordinates);
+        break;
+        case ArcSdeConstants.ST_GEOMETRY_LINESTRING:
+          final CoordinateSequence lineCoordinates = PackedCoordinateUtil.getCoordinateSequence(
+            numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
+            mScale, pointData);
+          geometry = geometryFactory.createLineString(lineCoordinates);
+        break;
+        case ArcSdeConstants.ST_GEOMETRY_POLYGON:
+          final CoordinateSequence polygonCoordinates = PackedCoordinateUtil.getCoordinateSequence(
+            numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
+            mScale, pointData);
+          // TODO holes
+          geometry = geometryFactory.createPolygon(
+            geometryFactory.createLinearRing(polygonCoordinates), null);
+        break;
+        // TODO multi geometries
+        default:
+          throw new IllegalArgumentException(
+            "Unknown ST_GEOMETRY entity type: " + entity);
+      }
+      object.setValue(getIndex(), geometry);
+    }
+    return columnIndex + 3;
   }
 
   @Override
@@ -196,46 +250,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final STRUCT struct = (STRUCT)object;
       final SQLName sqlTypeName = struct.getDescriptor().getSQLName();
       if (sqlTypeName.getName().equals("SDE.ST_GEOMETRY")) {
-        final Object[] attributes = struct.getAttributes();
 
-        final int entity = ((Number)attributes[0]).intValue();
-        final int numPoints = ((Number)attributes[1]).intValue();
-        final Blob points = (Blob)attributes[13];
-
-        final Double xOffset = spatialReference.getXOffset();
-        final Double yOffset = spatialReference.getYOffset();
-        final Double xyScale = spatialReference.getXyScale();
-        final Double zScale = spatialReference.getZScale();
-        final Double zOffset = spatialReference.getZOffset();
-        final Double mScale = spatialReference.getMScale();
-        final Double mOffset = spatialReference.getMOffset();
-
-        final byte[] pointData = points.getBytes(1, (int)points.length());
-        final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
-        switch (entity) {
-          case ArcSdeConstants.ST_GEOMETRY_POINT:
-            final CoordinateSequence pointCoordinates = PackedCoordinateUtil.getCoordinateSequence(
-              numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-              mScale, pointData);
-            return geometryFactory.createPoint(pointCoordinates);
-          case ArcSdeConstants.ST_GEOMETRY_LINESTRING:
-            final CoordinateSequence lineCoordinates = PackedCoordinateUtil.getCoordinateSequence(
-              numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-              mScale, pointData);
-            return geometryFactory.createLineString(lineCoordinates);
-          case ArcSdeConstants.ST_GEOMETRY_POLYGON:
-            final CoordinateSequence polygonCoordinates = PackedCoordinateUtil.getCoordinateSequence(
-              numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-              mScale, pointData);
-            // TODO holes
-            return geometryFactory.createPolygon(
-              geometryFactory.createLinearRing(polygonCoordinates), null);
-
-            // TODO multi geometries
-          default:
-            throw new IllegalArgumentException(
-              "Unknown ST_GEOMETRY entity type: " + entity);
-        }
       }
     }
     return object;
