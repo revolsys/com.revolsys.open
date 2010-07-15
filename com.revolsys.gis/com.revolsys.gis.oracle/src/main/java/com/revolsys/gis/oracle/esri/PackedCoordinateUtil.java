@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -13,7 +14,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class PackedCoordinateUtil {
-  public static CoordinateSequence getCoordinateSequence(
+  public static CoordinatesList getCoordinatesList(
     final int numPoints,
     final Double xOffset,
     final Double yOffset,
@@ -23,8 +24,23 @@ public class PackedCoordinateUtil {
     final Double mOffset,
     final Double mScale,
     final byte[] packedCoordinates) {
-    final InputStream ins = new ByteArrayInputStream(packedCoordinates);
-    final PackedIntegerInputStream in = new PackedIntegerInputStream(ins);
+    final InputStream inputStream = new ByteArrayInputStream(packedCoordinates);
+    return getCoordinatesList(numPoints, xOffset, yOffset, xyScale, zOffset,
+      zScale, mOffset, mScale, inputStream);
+  }
+
+  public static CoordinatesList getCoordinatesList(
+    final int numPoints,
+    final Double xOffset,
+    final Double yOffset,
+    final Double xyScale,
+    final Double zOffset,
+    final Double zScale,
+    final Double mOffset,
+    final Double mScale,
+    final InputStream inputStream) {
+    final PackedIntegerInputStream in = new PackedIntegerInputStream(
+      inputStream);
 
     try {
       final long packedByteLength = in.readLong5();
@@ -65,13 +81,13 @@ public class PackedCoordinateUtil {
           mScale);
       }
 
-      final CoordinateSequence coordinates = new DoubleCoordinatesList(
-        dimension, oordinates);
+      final CoordinatesList coordinates = new DoubleCoordinatesList(dimension,
+        oordinates);
       return coordinates;
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);
     } finally {
-      FileUtil.closeSilent(ins);
+      FileUtil.closeSilent(inputStream);
     }
   }
 
@@ -108,10 +124,10 @@ public class PackedCoordinateUtil {
     out.writeLong(annotationDimension);
     out.writeLong(shapeFlags);
 
-    long previousX = writeOrdinate(out, coordinates, Math.round(xOffset
-      * xyScale), xyScale, 0, 0);
-    long previousY = writeOrdinate(out, coordinates, Math.round(yOffset
-      * xyScale), xyScale, 0, 1);
+    long previousX = writeOrdinate(out, coordinates,
+      Math.round(xOffset * xyScale), xyScale, 0, 0);
+    long previousY = writeOrdinate(out, coordinates,
+      Math.round(yOffset * xyScale), xyScale, 0, 1);
 
     for (int i = 1; i < numCoordinates; i++) {
       previousX = writeOrdinate(out, coordinates, previousX, xyScale, i, 0);
@@ -119,16 +135,16 @@ public class PackedCoordinateUtil {
     }
     if (hasZ) {
       if (dimension > 2) {
-        writeCoordinates(out, coordinates, numCoordinates, Math.round(zOffset
-          * zScale), zScale, 2);
+        writeCoordinates(out, coordinates, numCoordinates,
+          Math.round(zOffset * zScale), zScale, 2);
       } else {
         writeZeroCoordinates(out, numCoordinates, Math.round(zOffset * zScale));
       }
     }
     if (hasM) {
       if (dimension > 3) {
-        writeCoordinates(out, coordinates, numCoordinates, Math.round(mOffset
-          * mScale), mScale, 2);
+        writeCoordinates(out, coordinates, numCoordinates,
+          Math.round(mOffset * mScale), mScale, 2);
       } else {
         writeZeroCoordinates(out, numCoordinates, Math.round(mOffset * mScale));
       }

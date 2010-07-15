@@ -1,5 +1,7 @@
 package com.revolsys.gis.oracle.esri;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,9 +11,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import oracle.sql.SQLName;
-import oracle.sql.STRUCT;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
@@ -19,6 +18,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jts.CoordinateSequenceUtil;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -93,7 +93,8 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
     final int entity = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);
-      final byte[] pointData = resultSet.getBytes(columnIndex+2);
+      final Blob blob = resultSet.getBlob(columnIndex + 2);
+      InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(), 32000);
 
       final Double xOffset = spatialReference.getXOffset();
       final Double yOffset = spatialReference.getYOffset();
@@ -103,25 +104,24 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final Double mScale = spatialReference.getMScale();
       final Double mOffset = spatialReference.getMOffset();
 
-//       final byte[] pointData = points.getBytes(1, (int)points.length());
       final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       switch (entity) {
         case ArcSdeConstants.ST_GEOMETRY_POINT:
-          final CoordinateSequence pointCoordinates = PackedCoordinateUtil.getCoordinateSequence(
+          final CoordinatesList pointCoordinates = PackedCoordinateUtil.getCoordinatesList(
             numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-            mScale, pointData);
+            mScale, pointsIn);
           geometry = geometryFactory.createPoint(pointCoordinates);
         break;
         case ArcSdeConstants.ST_GEOMETRY_LINESTRING:
-          final CoordinateSequence lineCoordinates = PackedCoordinateUtil.getCoordinateSequence(
+          final CoordinatesList lineCoordinates = PackedCoordinateUtil.getCoordinatesList(
             numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-            mScale, pointData);
+            mScale, pointsIn);
           geometry = geometryFactory.createLineString(lineCoordinates);
         break;
         case ArcSdeConstants.ST_GEOMETRY_POLYGON:
-          final CoordinateSequence polygonCoordinates = PackedCoordinateUtil.getCoordinateSequence(
+          final CoordinatesList polygonCoordinates = PackedCoordinateUtil.getCoordinatesList(
             numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-            mScale, pointData);
+            mScale, pointsIn);
           // TODO holes
           geometry = geometryFactory.createPolygon(
             geometryFactory.createLinearRing(polygonCoordinates), null);
@@ -241,19 +241,5 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       throw new IllegalArgumentException("Geometry cannot be null");
     }
     return index;
-  }
-
-  public Object toJava(
-    final Object object)
-    throws SQLException {
-    if (object instanceof STRUCT) {
-      final STRUCT struct = (STRUCT)object;
-      final SQLName sqlTypeName = struct.getDescriptor().getSQLName();
-      if (sqlTypeName.getName().equals("SDE.ST_GEOMETRY")) {
-
-      }
-    }
-    return object;
-
   }
 }
