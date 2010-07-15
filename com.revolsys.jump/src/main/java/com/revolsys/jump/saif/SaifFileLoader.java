@@ -98,8 +98,7 @@ public class SaifFileLoader implements FileLayerLoader {
       LayerManager layerManager = primaryTask.getLayerManager();
       layerManager.addCategory(categoryName);
 
-      StyleFileFactory styleFactory = new StyleFileFactory(
-        ClassLoader.getSystemResourceAsStream("trimStyle.csv"));
+      StyleFileFactory styleFactory = new StyleFileFactory(getClass().getResourceAsStream("trimStyle.csv"));
       try {
         List<QName> typeNames = new ArrayList<QName>(saifReader.getTypeNames());
         Collections.reverse(typeNames);

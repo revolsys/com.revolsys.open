@@ -37,7 +37,8 @@ public class StyleFileFactory {
 
   private Map<String, Integer> headerIndexes = new HashMap<String, Integer>();
 
-  public StyleFileFactory(final File file) {
+  public StyleFileFactory(
+    final File file) {
     if (file.exists()) {
       try {
         open(new FileInputStream(file));
@@ -47,11 +48,15 @@ public class StyleFileFactory {
     }
   }
 
-  public StyleFileFactory(final InputStream in) {
-    open(in);
+  public StyleFileFactory(
+    final InputStream in) {
+    if (in != null) {
+      open(in);
+    }
   }
 
-  private void open(final InputStream in) {
+  private void open(
+    final InputStream in) {
     try {
       BufferedReader reader = new BufferedReader(new InputStreamReader(in));
       CSVReader csvReader = new CSVReader(reader);
@@ -100,17 +105,21 @@ public class StyleFileFactory {
     }
   }
 
-  private Boolean getBooleanValue(final String[] values, final String name) {
+  private Boolean getBooleanValue(
+    final String[] values,
+    final String name) {
     String value = getValue(values, name);
     return Boolean.valueOf(value);
   }
 
-  private boolean addFilterTheme(final String typeName,
+  private boolean addFilterTheme(
+    final String typeName,
     final FilterTheme filterTheme) {
     return getFilterThemes(typeName).add(filterTheme);
   }
 
-  public static NameValueFeatureFilter toNameValueFilter(final String string) {
+  public static NameValueFeatureFilter toNameValueFilter(
+    final String string) {
     if (string == null || string.trim().length() == 0) {
       return null;
     } else {
@@ -135,8 +144,10 @@ public class StyleFileFactory {
     }
   }
 
-  private BasicStyle createStyle(final String colorString,
-    final String lineWidth, final String linePattern) {
+  private BasicStyle createStyle(
+    final String colorString,
+    final String lineWidth,
+    final String linePattern) {
     Color color = getColor(colorString);
     BasicStyle style = new BasicStyle(color);
     style.setFillColor(color);
@@ -154,7 +165,8 @@ public class StyleFileFactory {
     return style;
   }
 
-  private Color getColor(final String colorString) {
+  private Color getColor(
+    final String colorString) {
     Map<String, Color> colorMap = new HashMap<String, Color>();
     colorMap.put("red", new Color(255, 0, 0));
     colorMap.put("black", new Color(0, 0, 0));
@@ -171,7 +183,8 @@ public class StyleFileFactory {
     }
   }
 
-  private void setHeaders(final String[] headers) {
+  private void setHeaders(
+    final String[] headers) {
     for (int i = 0; i < headers.length; i++) {
       String name = headers[i];
       headerIndexes.put(name.replaceAll("\"", ""), i);
@@ -179,7 +192,9 @@ public class StyleFileFactory {
 
   }
 
-  private String getValue(final String[] values, final String name) {
+  private String getValue(
+    final String[] values,
+    final String name) {
     Integer headerIndex = headerIndexes.get(name);
     if (headerIndex == null) {
       return null;
@@ -194,11 +209,13 @@ public class StyleFileFactory {
     return value;
   }
 
-  public BasicStyle getDefaultStyle(final String typeName) {
+  public BasicStyle getDefaultStyle(
+    final String typeName) {
     return defaultStyles.get(typeName);
   }
 
-  public boolean getLayerVisible(final String typeName) {
+  public boolean getLayerVisible(
+    final String typeName) {
     Boolean visible = layerVisible.get(typeName);
     if (visible != null) {
       return visible;
@@ -207,7 +224,8 @@ public class StyleFileFactory {
     }
   }
 
-  public List<FilterTheme> getFilterThemes(final String typeName) {
+  public List<FilterTheme> getFilterThemes(
+    final String typeName) {
     List<FilterTheme> themes = filterThemes.get(typeName);
     if (themes == null) {
       themes = new ArrayList<FilterTheme>();
