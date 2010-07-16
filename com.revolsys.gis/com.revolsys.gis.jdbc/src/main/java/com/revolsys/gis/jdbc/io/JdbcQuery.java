@@ -243,4 +243,9 @@ public class JdbcQuery {
     final String typeNameString) {
     this.typeName = QName.valueOf(typeNameString);
   }
+  
+  @Override
+  public String toString() {
+    return getSql() +"\n"+ getParameters();
+  }
 }

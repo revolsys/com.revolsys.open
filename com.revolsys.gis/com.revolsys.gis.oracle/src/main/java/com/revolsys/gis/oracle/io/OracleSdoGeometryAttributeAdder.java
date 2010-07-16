@@ -69,7 +69,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
     final double geometryScale = 1 / precision;
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(geometryScale);
+    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+      geometryScale);
     final GeometryFactory geometryFactory = new GeometryFactory(
       coordinateSystem, precisionModel);
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
@@ -78,6 +79,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
+    attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
+      "SDO_GEOM.SDO_BUFFER(", "," + precision + ")"));
     attribute.setProperty(AttributeProperties.SRID, srid);
     attribute.setProperty(AttributeProperties.COORDINATE_SYSTEM,
       coordinateSystem);
