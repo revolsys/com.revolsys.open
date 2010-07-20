@@ -39,8 +39,10 @@ public class HtmlUiBuilderObjectForm extends Form {
 
   private Object object;
 
-  public HtmlUiBuilderObjectForm(final Object object,
-    final HtmlUiBuilder uiBuilder, final List<String> fieldKeys) {
+  public HtmlUiBuilderObjectForm(
+    final Object object,
+    final HtmlUiBuilder uiBuilder,
+    final List<String> fieldKeys) {
     super(uiBuilder.getTypeName());
     this.object = object;
     this.builder = uiBuilder;
@@ -48,8 +50,10 @@ public class HtmlUiBuilderObjectForm extends Form {
     this.fieldKeys = fieldKeys;
   }
 
-  public HtmlUiBuilderObjectForm(final Object object,
-    final HtmlUiBuilder uiBuilder, final String formName,
+  public HtmlUiBuilderObjectForm(
+    final Object object,
+    final HtmlUiBuilder uiBuilder,
+    final String formName,
     final List<String> fieldKeys) {
     super(formName);
     this.object = object;
@@ -58,7 +62,8 @@ public class HtmlUiBuilderObjectForm extends Form {
     this.fieldKeys = fieldKeys;
   }
 
-  public Object getInitialValue(final Field field,
+  public Object getInitialValue(
+    final Field field,
     final HttpServletRequest request) {
     if (object != null) {
       String propertyName = field.getName();
@@ -73,15 +78,22 @@ public class HtmlUiBuilderObjectForm extends Form {
     return null;
   }
 
-  public void initialize(final HttpServletRequest request) {
+  public void initialize(
+    final HttpServletRequest request) {
     for (String key : fieldKeys) {
-      Element field = builder.getField(request, key);
-      if (field instanceof SetObject) {
-        ((SetObject)field).setObject(object);
-      }
-      if (field != null) {
-        Decorator label = builder.getFieldLabel(key, (field instanceof Field));
-        add(field, label);
+      if (!getFieldNames().contains(key)) {
+        Element field = builder.getField(request, key);
+        if (field instanceof SetObject) {
+          ((SetObject)field).setObject(object);
+        }
+        if (field != null) {
+          if (!getElements().contains(field)) {
+            Decorator label = builder.getFieldLabel(key,
+              (field instanceof Field));
+
+            add(field, label);
+          }
+        }
       }
     }
     builder.initializeForm(this, request);
@@ -94,7 +106,8 @@ public class HtmlUiBuilderObjectForm extends Form {
       for (Field field : getFields().values()) {
         if (!field.hasValidationErrors() && !field.isReadOnly()) {
           String propertyName = field.getName();
-          if (propertyName != Form.FORM_TASK_PARAM) {
+          if (propertyName != Form.FORM_TASK_PARAM
+            && fieldKeys.contains(propertyName)) {
             Object value = field.getValue();
             try {
               JavaBeanUtil.setProperty(object, propertyName, value);
@@ -113,10 +126,11 @@ public class HtmlUiBuilderObjectForm extends Form {
     return valid;
   }
 
-  public void setFieldKeys(final List fieldKeys) {
+  public void setFieldKeys(
+    final List fieldKeys) {
     this.fieldKeys = fieldKeys;
   }
-  
+
   public Object getObject() {
     return object;
   }

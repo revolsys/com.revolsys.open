@@ -1,4 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys</groupId>
   <artifactId>com.revolsys</artifactId>
@@ -6,10 +10,10 @@
   <name>Revolution Systems Open Library</name>
   <version>TRUNK-SNAPSHOT</version>
   <scm>
-  	<connection>scm:svn:http://open.revolsys.com/svn/repos/com.revolsys/</connection>
-  	<developerConnection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/com.revolsys/</developerConnection>
-  	<tag>trunk</tag>
-  	<url>https://secure.revolsys.com/websvn/listing.php?repname=open.revolsys.com&amp;path=%2Fcom.revolsys%2F&amp;rev=0&amp;sc=0</url>
+    <connection>scm:svn:http://open.revolsys.com/svn/repos/com.revolsys/</connection>
+    <developerConnection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/com.revolsys/</developerConnection>
+    <tag>trunk</tag>
+    <url>https://secure.revolsys.com/websvn/listing.php?repname=open.revolsys.com&amp;path=%2Fcom.revolsys%2F&amp;rev=0&amp;sc=0</url>
   </scm>
   <modules>
     <module>com.revolsys.core</module>
@@ -19,8 +23,8 @@
     <module>com.revolsys.jump</module>
   </modules>
   <organization>
-  	<name>Revolution Systems Inc.</name>
-  	<url>http://www.revolsys.com/</url>
+    <name>Revolution Systems Inc.</name>
+    <url>http://www.revolsys.com/</url>
   </organization>
   <build>
     <plugins>
@@ -32,51 +36,59 @@
           <target>1.5</target>
         </configuration>
       </plugin>
+      <!-- <plugin> <groupId>com.springsource.bundlor</groupId> <artifactId>com.springsource.bundlor.maven</artifactId> 
+        <version>1.0.0.RELEASE</version> <executions> <execution> <id>bundlor</id> <goals> 
+        <goal>bundlor</goal> </goals> <phase>process-classes</phase> </execution> </executions> 
+        <configuration> <manifestTemplate> Bundle-ManifestVersion: 2 Bundle-Name: ${project.name} 
+        Bundle-Vendor: ${osgi.bundle.vendor} Bundle-SymbolicName: ${project.artifactId} Bundle-Version: 
+        ${project.version} </manifestTemplate> </configuration> </plugin> -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3</version>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.1.0</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <goals>
+              <goal>bundle</goal>
+            </goals>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
         <configuration>
-          <archive>
-            <manifestEntries>
-              <Specification-Title>${project.name}</Specification-Title>
-              <Specification-Vendor>Revolution Systems Inc.</Specification-Vendor>
-              <Specification-Version>${project.version}</Specification-Version>
-              <Implementation-Title>${project.name}</Implementation-Title>
-              <Implementation-Vendor>Revolution Systems Inc.</Implementation-Vendor>
-              <Implementation-Version>${buildNumber}</Implementation-Version>
-            </manifestEntries>
-          </archive>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName><Implementation-Build>${buildNumber}</Implementation-Build>
+          </instructions>
         </configuration>
       </plugin>
       <plugin>
-	      <groupId>org.codehaus.mojo</groupId>
-	      <artifactId>buildnumber-maven-plugin</artifactId>
-	      <version>1.0-beta-4</version>
-	      <executions>
-	        <execution>
-	          <phase>validate</phase>        
-	          <goals>
-	            <goal>create</goal>
-	          </goals>
-	        </execution>
-	      </executions>
-	      <configuration>
-	        <doUpdate>true</doUpdate>
-	        <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
-	        <revisionOnScmFailure>true</revisionOnScmFailure>
-	      </configuration>
-	    </plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.0-beta-4</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doUpdate>true</doUpdate>
+          <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+          <revisionOnScmFailure>true</revisionOnScmFailure>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
     <profile>
       <id>cargo-tomcat6</id>
       <activation>
-      <property>
-        <name>cargo.contextPath</name>
-      </property>
+        <property>
+          <name>cargo.contextPath</name>
+        </property>
       </activation>
       <build>
         <plugins>
@@ -119,57 +131,71 @@
 
   <repositories>
     <repository>
-        <id>open.revolsys.com</id>
-        <url>http://open.revolsys.com/m2/repository/</url>
-        <releases>
-           <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>        
-     </repository>
+      <id>open.revolsys.com</id>
+      <url>http://open.revolsys.com/m2/repository/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
     <repository>
-        <id>snapshot.open.revolsys.com</id>
-        <url>http://open.revolsys.com/m2/snapshotRepository/</url>
-        <releases>
-           <enabled>false</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>        
-     </repository>
-     <repository>
-       <id>JBOSS</id>
-       <name>JBoss Repository</name>
-       <url>http://repository.jboss.org/maven2/</url>
-       <releases>
-       </releases>
-       <snapshots>
-       	<enabled>false</enabled>
-       </snapshots>
-     </repository>
+      <id>snapshot.open.revolsys.com</id>
+      <url>http://open.revolsys.com/m2/snapshotRepository/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>JBOSS</id>
+      <name>JBoss Repository</name>
+      <url>http://repository.jboss.org/maven2/</url>
+      <releases>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>com.springsource.repository.bundles.release</id>
+      <name>SpringSource Enterprise Bundle Repository</name>
+      <url>http://repository.springsource.com/maven/bundles/release</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>safehaus-repository</id>
+      <name>Safehaus Repository</name>
+      <url>http://m2.safehaus.org</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <distributionManagement>
-  	<repository>
-  		<id>open.revolsys.com</id>
-  		<name>Revolution Systems Maven Repository</name>
-  		<url>file:../../maven/com.revolsys.open/repository/</url>
-  	</repository>
-  	<snapshotRepository>
-  		<id>snapshots-open.revolsys.com</id>
-  		<name>Revolution Systems Maven Snapshot Repository</name>
-  		<url>file:../../maven/com.revolsys.open/snapshotRepository/</url>
+    <repository>
+      <id>open.revolsys.com</id>
+      <name>Revolution Systems Maven Repository</name>
+      <url>file:../../maven/com.revolsys.open/repository/</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots-open.revolsys.com</id>
+      <name>Revolution Systems Maven Snapshot Repository</name>
+      <url>file:../../maven/com.revolsys.open/snapshotRepository/</url>
       <uniqueVersion>false</uniqueVersion>
-  	</snapshotRepository>
+    </snapshotRepository>
   </distributionManagement>
   <properties>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cargo.tomcat.manager.url>http://localhost:8080/manager</cargo.tomcat.manager.url>
     <cargo.remote.username>admin</cargo.remote.username>
     <cargo.remote.password>manager</cargo.remote.password>
     <org.slf4j.version>1.5.11</org.slf4j.version>
-		<org.springframework.version>3.0.2.RELEASE</org.springframework.version>
-		<org.springframework.security.version>3.0.2.RELEASE</org.springframework.security.version>
-	</properties>
+    <org.springframework.version>3.0.2.RELEASE</org.springframework.version>
+    <org.springframework.security.version>3.0.2.RELEASE</org.springframework.security.version>
+    <osgi.bundle.vendor>${project.organization.name}</osgi.bundle.vendor>
+  </properties>
 </project>
