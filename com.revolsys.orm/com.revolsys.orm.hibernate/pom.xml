@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
@@ -8,9 +10,9 @@
   <version>TRUNK-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
-  	<artifactId>com.revolsys.orm</artifactId>
-  	<groupId>com.revolsys.orm</groupId>
-  	<version>TRUNK-SNAPSHOT</version>
+    <artifactId>com.revolsys.orm</artifactId>
+    <groupId>com.revolsys.orm</groupId>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>
@@ -35,67 +37,39 @@
       <artifactId>hibernate-core</artifactId>
       <version>3.3.2.GA</version>
       <exclusions>
-      	<exclusion>
-      		<artifactId>slf4j-api</artifactId>
-      		<groupId>org.slf4j</groupId>
-      	</exclusion>
+        <exclusion>
+          <artifactId>slf4j-api</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-    	<groupId>javassist</groupId>
-    	<artifactId>javassist</artifactId>
-    	<version>3.8.0.GA</version>
+      <groupId>javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.8.0.GA</version>
     </dependency>
     <dependency>
-    	<groupId>org.springframework.security</groupId>
-    	<artifactId>spring-security-core</artifactId>
-    	<version>${org.springframework.security.version}</version>
-    	<scope>provided</scope>
-    	<exclusions>
-    		<exclusion>
-    			<artifactId>spring-core</artifactId>
-    			<groupId>org.springframework</groupId>
-    		</exclusion>
-    		<exclusion>
-    			<artifactId>spring-beans</artifactId>
-    			<groupId>org.springframework</groupId>
-    		</exclusion>
-    		<exclusion>
-    			<artifactId>commons-logging</artifactId>
-    			<groupId>commons-logging</groupId>
-    		</exclusion>
-    		<exclusion>
-    			<artifactId>spring-context</artifactId>
-    			<groupId>org.springframework</groupId>
-    		</exclusion>
-    		<exclusion>
-    			<artifactId>spring-aop</artifactId>
-    			<groupId>org.springframework</groupId>
-    		</exclusion>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>org.springframework.security.core</artifactId>
+      <version>${org.springframework.security.version}</version>
+      <scope>provided</scope>
+      <exclusions>
         <exclusion>
-          <artifactId>spring-tx</artifactId>
-          <groupId>org.springframework</groupId>
+          <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+          <groupId>org.apache.commons</groupId>
         </exclusion>
-    		<exclusion>
-    			<artifactId>spring-support</artifactId>
-    			<groupId>org.springframework</groupId>
-    		</exclusion>
-    		<exclusion>
-    			<artifactId>commons-collections</artifactId>
-    			<groupId>commons-collections</groupId>
-    		</exclusion>
-    	</exclusions>
+      </exclusions>
     </dependency>
     <dependency>
-    	<groupId>org.springframework</groupId>
-    	<artifactId>spring-web</artifactId>
-    	<version>${org.springframework.version}</version>
-    	<exclusions>
-    		<exclusion>
-    			<artifactId>commons-logging</artifactId>
-    			<groupId>commons-logging</groupId>
-    		</exclusion>
-    	</exclusions>
+      <groupId>org.springframework</groupId>
+      <artifactId>org.springframework.web</artifactId>
+      <version>${org.springframework.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

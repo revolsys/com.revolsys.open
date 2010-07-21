@@ -22,10 +22,8 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
-
   public void registerCustomEditors(
     PropertyEditorRegistry registry) {
     registry.registerCustomEditor(QName.class, new QNameEditor());
-
   }
 }

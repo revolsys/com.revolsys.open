@@ -104,7 +104,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
+      <artifactId>org.springframework.context</artifactId>
       <version>${org.springframework.version}</version>
       <exclusions>
         <exclusion>
@@ -121,7 +121,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
+      <artifactId>org.springframework.web</artifactId>
       <version>${org.springframework.version}</version>
       <scope>provided</scope>
       <exclusions>
