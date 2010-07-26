@@ -329,7 +329,8 @@ public class OsnSerializer {
     final String string)
     throws IOException {
     write('"');
-    final String escapedString = string.replaceAll("(\\\\)?\\x22", "\\\\\"");
+    String escapedString = string.replaceAll("\\\\", "\\\\\\\\");
+    escapedString = escapedString.replaceAll("(\\\\)?\\x22", "\\\\\"");
     write(escapedString);
     write('"');
   }
