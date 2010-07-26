@@ -1,4 +1,4 @@
-package com.revolsys.parallel.tools;
+package com.revolsys.spring.factory;
 
 import org.springframework.beans.factory.FactoryBean;
 

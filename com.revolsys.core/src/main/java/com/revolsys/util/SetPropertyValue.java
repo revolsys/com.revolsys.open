@@ -1,8 +1,7 @@
-package com.revolsys.parallel.tools;
+package com.revolsys.util;
 
 import javax.annotation.PostConstruct;
 
-import com.revolsys.util.JavaBeanUtil;
 
 public class SetPropertyValue {
 

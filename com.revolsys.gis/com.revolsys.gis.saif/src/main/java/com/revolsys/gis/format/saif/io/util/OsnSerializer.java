@@ -20,6 +20,9 @@
  */
 package com.revolsys.gis.format.saif.io.util;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
@@ -33,6 +36,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -52,33 +58,50 @@ public class OsnSerializer {
 
   private static final String DOCUMENT_SCOPE = "document";
 
+  private static final Logger LOG = LoggerFactory.getLogger(OsnSerializer.class);
+
   private static final QName SPATIAL_OBJECT = new QName("SpatialObject");
 
   private final OsnConverterRegistry converters;
 
   private boolean endElement = false;
 
+  private File file;
+
   private String indent = "";
 
   private boolean indentEnabled = true;
 
+  private short index = 0;
+
   private final String lineSeparator;
 
-  private final OutputStream out;
+  private long maxSize = Long.MAX_VALUE;
+
+  private OutputStream out;
+
+  private final String prefix;
 
   private final LinkedList<Object> scope = new LinkedList<Object>();
+
+  private int size = 0;
 
   private final QName typeName;
 
   public OsnSerializer(
     final QName typeName,
-    final OutputStream out,
-    final int srid) {
+    final File file,
+    final long maxSize,
+    final OsnConverterRegistry converters)
+    throws IOException {
     this.typeName = typeName;
-    this.out = out;
+    this.file = file;
+    this.maxSize = maxSize;
+    this.converters = converters;
+    prefix = ObjectSetUtil.getObjectSubsetPrefix(file);
+    openFile();
     scope.addLast(DOCUMENT_SCOPE);
     lineSeparator = "\r\n";
-    converters = new OsnConverterRegistry(srid);
   }
 
   public void attribute(
@@ -153,7 +176,7 @@ public class OsnSerializer {
         this.scope.removeLast();
       }
     }
-    out.write('\n');
+    write('\n');
     out.close();
   }
 
@@ -206,13 +229,31 @@ public class OsnSerializer {
     return indentEnabled;
   }
 
+  private void openFile()
+    throws IOException {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Creating object subset '" + file.getName() + "'");
+    }
+    out = new BufferedOutputStream(new FileOutputStream(file), 4096);
+  }
+
+  private void openNextFile()
+    throws IOException {
+    out.flush();
+    out.close();
+    index++;
+    final String fileName = ObjectSetUtil.getObjectSubsetName(prefix, index);
+    file = new File(file.getParentFile(), fileName);
+    size = 0;
+    openFile();
+  }
+
   public void serialize(
     final DataObject object)
     throws IOException {
     serializeStartObject(object);
     serializeAttributes(object);
     endObject();
-    out.flush();
   }
 
   private void serialize(
@@ -337,8 +378,10 @@ public class OsnSerializer {
               final Object parent = scopes.next();
               if (parent instanceof DataObject) {
                 final DataObject parentObject = (DataObject)parent;
-                if (parentObject.getMetaData().getName().getLocalPart().equals(
-                  "TextOnCurve")) {
+                if (parentObject.getMetaData()
+                  .getName()
+                  .getLocalPart()
+                  .equals("TextOnCurve")) {
                   endLine();
                 }
               }
@@ -368,6 +411,10 @@ public class OsnSerializer {
   public void serializeDataObject(
     final DataObject object)
     throws IOException {
+    if (size >= maxSize) {
+      openNextFile();
+      size = 0;
+    }
     serialize(object);
   }
 
@@ -470,16 +517,32 @@ public class OsnSerializer {
     return typeName.toString();
   }
 
-  private void write(
-    final char b)
+  public void write(
+    final byte[] b)
+    throws IOException {
+    write(b, 0, b.length);
+  }
+
+  public void write(
+    final byte[] b,
+    final int off,
+    final int len)
+    throws IOException {
+    out.write(b, off, len);
+    size += len;
+  }
+
+  public void write(
+    final int b)
     throws IOException {
     out.write(b);
+    size += 1;
   }
 
   public void write(
     final String s)
     throws IOException {
     final byte[] bytes = s.getBytes();
-    out.write(bytes, 0, bytes.length);
+    write(bytes, 0, bytes.length);
   }
 }

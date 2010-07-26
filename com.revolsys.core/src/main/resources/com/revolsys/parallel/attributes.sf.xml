@@ -34,7 +34,7 @@
   <context:annotation-config />
 
   <bean
-    class="com.revolsys.parallel.tools.AttributesBeanConfigurer"
+    class="com.revolsys.spring.config.AttributesBeanConfigurer"
     p:ignoreInvalidKeys="true"
     p:ignoreUnresolvablePlaceholders="true"
   />

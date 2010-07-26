@@ -372,10 +372,13 @@ public class OsnIterator implements Iterator<Object> {
     return ((BigDecimal)value).intValue();
   }
 
-  private int getNextCharacter()
-    throws IOException {
+  private int getNextCharacter() {
     if (bufferIndex == bufferLength) {
-      bufferLength = in.read(buffer);
+      try {
+        bufferLength = in.read(buffer);
+      } catch (IOException e) {
+        return -1;
+      }
       if (bufferLength == -1) {
         return -1;
       } else {
@@ -694,8 +697,7 @@ public class OsnIterator implements Iterator<Object> {
     value = token;
   }
 
-  private int skipWhitespace()
-    throws IOException {
+  public int skipWhitespace() {
     int c = currentCharacter;
     while (c != -1 && IS_WHITESPACE_CHARACTER[c]) {
       if (c == '\n') {

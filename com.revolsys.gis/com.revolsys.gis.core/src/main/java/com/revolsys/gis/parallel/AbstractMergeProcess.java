@@ -2,12 +2,13 @@ package com.revolsys.gis.parallel;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.ArrayUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.parallel.channel.Buffer;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
-import com.revolsys.parallel.channel.MultiChannelReadSelector;
+import com.revolsys.parallel.channel.MultiInputSelector;
+import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public abstract class AbstractMergeProcess extends
@@ -193,7 +194,7 @@ public abstract class AbstractMergeProcess extends
     try {
       DataObjectMetaData currentType = null;
       QName currentTypeName = null;
-      final Channel<DataObject>[] channels = Channel.createArray(in, otherIn);
+      final Channel<DataObject>[] channels = ArrayUtil.create(in, otherIn);
 
       final boolean[] guard = new boolean[] {
         true, true
@@ -262,7 +263,7 @@ public abstract class AbstractMergeProcess extends
         objects[OTHER_INDEX] = null;
       }
       try {
-        final MultiChannelReadSelector alt = new MultiChannelReadSelector();
+        final MultiInputSelector alt = new MultiInputSelector();
         final boolean running = true;
         while (running) {
           final int channelIndex = alt.select(channels, guard, 1000);

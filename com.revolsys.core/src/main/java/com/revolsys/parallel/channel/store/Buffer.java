@@ -1,6 +1,8 @@
-package com.revolsys.parallel.channel;
+package com.revolsys.parallel.channel.store;
 
 import java.util.LinkedList;
+
+import com.revolsys.parallel.channel.ChannelDataStore;
 
 /**
  * <h2>Description</h2>

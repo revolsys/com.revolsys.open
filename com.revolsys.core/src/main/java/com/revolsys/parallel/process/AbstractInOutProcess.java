@@ -2,9 +2,9 @@ package com.revolsys.parallel.process;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.parallel.channel.Buffer;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
+import com.revolsys.parallel.channel.store.Buffer;
 
 public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
   InOutProcess<T> {
@@ -40,7 +40,7 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
         final Channel<T> channel = new Channel<T>(channelName);
         setIn(channel);
       } else {
-        
+
         final Buffer<T> buffer = new Buffer<T>(inBufferSize);
         final Channel<T> channel = new Channel<T>(channelName, buffer);
         setIn(channel);
@@ -111,7 +111,6 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
     final Channel<T> out) {
     this.out = out;
     out.writeConnect();
-
   }
 
   public int getInBufferSize() {

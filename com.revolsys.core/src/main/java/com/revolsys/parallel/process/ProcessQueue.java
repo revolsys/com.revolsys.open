@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.revolsys.parallel.channel.Buffer;
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.store.Buffer;
 
 public class ProcessQueue {
   private Buffer<Process> processBuffer = new Buffer<Process>(200);

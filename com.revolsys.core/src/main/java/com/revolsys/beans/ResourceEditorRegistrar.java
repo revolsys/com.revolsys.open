@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.revolsys.parallel.process;
+package com.revolsys.beans;
 
 import javax.xml.namespace.QName;
 

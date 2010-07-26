@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
@@ -12,10 +13,27 @@ import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 public class OsnConverterRegistry {
   private final Map<QName, OsnConverter> converters = new HashMap<QName, OsnConverter>();
 
+  public OsnConverterRegistry() {
+    final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+      1);
+    final GeometryFactory geometryFactory = new GeometryFactory(precisionModel);
+
+    init(geometryFactory);
+ }
+
   public OsnConverterRegistry(
     final int srid) {
-    final GeometryFactory geometryFactory = new GeometryFactory(EpsgCoordinateSystems.getCoordinateSystem(srid),
-      new SimpleCoordinatesPrecisionModel(1));
+    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
+    final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+      1);
+    final GeometryFactory geometryFactory = new GeometryFactory(
+      coordinateSystem, precisionModel);
+
+    init(geometryFactory);
+  }
+
+  public void init(
+    final GeometryFactory geometryFactory) {
     addConverter("Date", new DateConverter());
     addConverter("SpatialObject", new SpatialObjectConverter(this));
     addConverter("Arc", new ArcConverter(geometryFactory));

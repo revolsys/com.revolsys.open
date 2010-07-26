@@ -1,4 +1,4 @@
-package com.revolsys.parallel.tools;
+package com.revolsys.spring.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,6 +23,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
 
+import com.revolsys.collection.AttributeMap;
+import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.spring.factory.Parameter;
+import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
+
 public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   BeanFactoryAware, BeanNameAware, PriorityOrdered {
 
@@ -44,9 +49,9 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   private String beanNameSeparator = DEFAULT_BEAN_NAME_SEPARATOR;
 
-  private boolean ignoreInvalidKeys = false;
+  private boolean ignoreInvalidKeys = true;
 
-  private boolean ignoreUnresolvablePlaceholders;
+  private boolean ignoreUnresolvablePlaceholders = true;
 
   private String nullValue;
 
@@ -55,6 +60,14 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   private String placeholderPrefix = DEFAULT_PLACEHOLDER_PREFIX;
 
   private String placeholderSuffix = DEFAULT_PLACEHOLDER_SUFFIX;
+
+  public AttributesBeanConfigurer() {
+  }
+
+  public AttributesBeanConfigurer(
+    Map<String, Object> attributes) {
+    this.attributes.putAll(attributes);
+  }
 
   public Map<String, Object> getAttributes() {
     return attributes;
@@ -147,7 +160,36 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     throws BeansException {
 
     int separatorIndex = key.indexOf(this.beanNameSeparator);
-    if (separatorIndex != -1) {
+    if (separatorIndex == -1) {
+      String beanName = key;
+      BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
+      try {
+        Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
+        if (Parameter.class.isAssignableFrom(beanClass)) {
+          while (beanDefinition.getOriginatingBeanDefinition() != null) {
+            beanDefinition = beanDefinition.getOriginatingBeanDefinition();
+          }
+          MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+          PropertyValue propertyValue = new PropertyValue("value", value);
+          PropertyValue typeValue = propertyValues.getPropertyValue("type");
+          if (typeValue != null) {
+            String typeClassName = typeValue.getValue().toString();
+            try {
+              Class<?> typeClass = Class.forName(typeClassName);
+
+              Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
+                value, typeClass);
+              propertyValue = new PropertyValue("value", convertedValue);
+            } catch (Throwable e) {
+              LOG.error("Unable to set " + beanName + ".value=" + value, e);
+            }
+          }
+          propertyValues.addPropertyValue(propertyValue);
+        }
+      } catch (ClassNotFoundException e) {
+        LOG.error("Unable to set " + beanName + ".value=" + value, e);
+      }
+    } else {
       String beanName = key.substring(0, separatorIndex);
       String beanProperty = key.substring(separatorIndex + 1);
       setAttributeValue(factory, beanName, beanProperty, value);

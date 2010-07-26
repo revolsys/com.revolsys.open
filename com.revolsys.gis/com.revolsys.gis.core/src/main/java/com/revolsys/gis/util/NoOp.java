@@ -133,4 +133,11 @@ public class NoOp {
     }
   }
 
+  public static void nan(
+    double value) {
+    if (Double.isNaN(value)) {
+      noOp();
+    }
+  }
+
 }

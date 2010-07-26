@@ -1,4 +1,4 @@
-package com.revolsys.parallel.tools;
+package com.revolsys.spring.util;
 
 import java.util.HashSet;
 import java.util.Map;

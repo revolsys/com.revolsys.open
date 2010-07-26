@@ -12,8 +12,8 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
-import com.revolsys.parallel.tools.ThreadSharedAttributes;
 
 public class ProcessNetwork implements BeanPostProcessor {
 

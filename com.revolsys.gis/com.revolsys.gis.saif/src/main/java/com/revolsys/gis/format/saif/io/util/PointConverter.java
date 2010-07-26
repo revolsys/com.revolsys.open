@@ -11,7 +11,8 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.vividsolutions.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -89,21 +90,29 @@ public class PointConverter implements OsnConverter {
     throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
-      final Coordinate coordinate = point.getCoordinate();
+      final CoordinatesList points = CoordinatesListUtil.get(point);
+
+      int numAxis = points.getNumAxis();
+      final double x = points.getX(0);
+      final double y = points.getY(0);
+      final double z = points.getZ(0);
       serializer.startObject(geometryClass);
       serializer.attributeName("coords");
-      if (Double.isNaN(coordinate.z)) {
+      if (numAxis == 2) {
         serializer.startObject("Coord2D");
-        serializer.attribute("c1", coordinate.x, true);
-        serializer.attribute("c2", coordinate.y, false);
-        serializer.endObject();
+        serializer.attribute("c1", x, true);
+        serializer.attribute("c2", y, false);
       } else {
         serializer.startObject("Coord3D");
-        serializer.attribute("c1", coordinate.x, true);
-        serializer.attribute("c2", coordinate.y, true);
-        serializer.attribute("c3", coordinate.z, false);
-        serializer.endObject();
+        serializer.attribute("c1", x, true);
+        serializer.attribute("c2", y, true);
+        if (Double.isNaN(z)) {
+          serializer.attribute("c3", 0, false);
+        } else {
+          serializer.attribute("c3", z, false);
+        }
       }
+      serializer.endObject();
       serializer.endAttribute();
 
       final Map<String, Object> values = JtsGeometryUtil.getGeometryProperties(point);

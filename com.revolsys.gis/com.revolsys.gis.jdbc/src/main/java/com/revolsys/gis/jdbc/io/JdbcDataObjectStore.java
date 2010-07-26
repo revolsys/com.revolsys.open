@@ -19,6 +19,7 @@ import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.Reader;
@@ -36,7 +37,6 @@ import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.parallel.tools.ThreadSharedAttributes;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 

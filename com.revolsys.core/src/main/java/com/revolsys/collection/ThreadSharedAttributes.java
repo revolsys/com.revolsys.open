@@ -1,4 +1,4 @@
-package com.revolsys.parallel.tools;
+package com.revolsys.collection;
 
 import java.util.HashMap;
 import java.util.Map;

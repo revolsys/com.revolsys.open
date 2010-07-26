@@ -1,8 +1,13 @@
 package com.revolsys.parallel.channel;
 
-public class Channel<T> implements AltingChannelInput {
+import com.revolsys.parallel.channel.store.ZeroBuffer;
+
+public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   /** The Alternative class which will control the selection */
-  protected MultiChannelReadSelector alt;
+  protected MultiInputSelector alt;
+
+  /** Flag indicating if the channel has been closed. */
+  private boolean closed = false;
 
   /** The ChannelDataStore used to store the data for the Channel */
   protected ChannelDataStore<T> data;
@@ -10,25 +15,23 @@ public class Channel<T> implements AltingChannelInput {
   /** The monitor reads must synchronize on */
   protected Object monitor = new Object();
 
-  /** The monitor reads must synchronize on */
-  protected Object readMonitor = new Object();
-
-  /** The monitor writes must synchronize on */
-  protected Object writeMonitor = new Object();
-
-  /** Number of writers connected to the channel. */
-  private int numWriters = 0;
+  /** The name of the channel. */
+  private String name;
 
   /** Number of readers connected to the channel. */
   private int numReaders = 0;
 
-  /** Flag indicating if the channel has been closed. */
-  private boolean closed = false;
+  /** Number of writers connected to the channel. */
+  private int numWriters = 0;
+
+  /** The monitor reads must synchronize on */
+  protected Object readMonitor = new Object();
 
   /** Flag indicating if the channel is closed for writing. */
   private boolean writeClosed;
 
-  private String name;
+  /** The monitor writes must synchronize on */
+  protected Object writeMonitor = new Object();
 
   /**
    * Constructs a new Channel<T> with a ZeroBuffer ChannelDataStore.
@@ -43,25 +46,56 @@ public class Channel<T> implements AltingChannelInput {
    * @param data The ChannelDataStore used to store the data for the Channel
    */
   public Channel(
-    ChannelDataStore<T> data) {
+    final ChannelDataStore<T> data) {
     this.data = data;
   }
 
   public Channel(
-    String name) {
+    final String name) {
     this();
     this.name = name;
   }
 
   public Channel(
-    String name,
-    ChannelDataStore<T> data) {
+    final String name,
+    final ChannelDataStore<T> data) {
     this.name = name;
     this.data = data;
   }
 
+  public void close() {
+    closed = true;
+  }
+
+  public boolean disable() {
+    alt = null;
+    return (data.getState() != ChannelDataStore.EMPTY);
+  }
+
+  public synchronized boolean enable(
+    final MultiInputSelector alt) {
+    if (data.getState() == ChannelDataStore.EMPTY) {
+      this.alt = alt;
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public String getName() {
     return name;
+  }
+
+  public boolean isClosed() {
+    if (!closed) {
+      if (writeClosed) {
+        if (data.getState() == ChannelDataStore.EMPTY) {
+          close();
+        }
+      }
+    }
+
+    return closed;
   }
 
   /**
@@ -79,12 +113,13 @@ public class Channel<T> implements AltingChannelInput {
    * Reads an Object from the Channel. This method also ensures only one of the
    * readers can actually be reading at any time. All other readers are blocked
    * until it completes the read. If no data is available to be read after the
-   * timeout the method will return.
+   * timeout the method will return null.
    * 
+   * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
   public T read(
-    int timeout) {
+    final long timeout) {
     synchronized (readMonitor) {
       synchronized (monitor) {
         if (isClosed()) {
@@ -96,49 +131,15 @@ public class Channel<T> implements AltingChannelInput {
             if (isClosed()) {
               throw new ClosedException();
             }
-          } catch (InterruptedException e) {
+          } catch (final InterruptedException e) {
           }
         }
         if (data.getState() == ChannelDataStore.EMPTY) {
           return null;
         } else {
-          T value = data.get();
+          final T value = data.get();
           monitor.notifyAll();
           return value;
-        }
-      }
-    }
-  }
-
-  /**
-   * Writes an Object to the Channel. This method also ensures only one of the
-   * writers can actually be writing at any time. All other writers are blocked
-   * until it completes the write.
-   * 
-   * @param value The object to write to the Channel.
-   */
-  public void write(
-    T value) {
-    synchronized (writeMonitor) {
-      synchronized (monitor) {
-        if (closed) {
-          throw new ClosedException();
-        }
-        MultiChannelReadSelector tempAlt = alt;
-        data.put(value);
-        if (tempAlt != null) {
-          tempAlt.schedule();
-        } else {
-          monitor.notifyAll();
-        }
-        if (data.getState() == ChannelDataStore.FULL) {
-          try {
-            monitor.wait();
-            if (closed) {
-              throw new ClosedException();
-            }
-          } catch (InterruptedException e) {
-          }
         }
       }
     }
@@ -168,6 +169,49 @@ public class Channel<T> implements AltingChannelInput {
     }
   }
 
+  @Override
+  public String toString() {
+    if (name == null) {
+      return data.toString();
+    } else {
+      return name;
+    }
+  }
+
+  /**
+   * Writes an Object to the Channel. This method also ensures only one of the
+   * writers can actually be writing at any time. All other writers are blocked
+   * until it completes the write.
+   * 
+   * @param value The object to write to the Channel.
+   */
+  public void write(
+    final T value) {
+    synchronized (writeMonitor) {
+      synchronized (monitor) {
+        if (closed) {
+          throw new ClosedException();
+        }
+        final MultiInputSelector tempAlt = alt;
+        data.put(value);
+        if (tempAlt != null) {
+          tempAlt.schedule();
+        } else {
+          monitor.notifyAll();
+        }
+        if (data.getState() == ChannelDataStore.FULL) {
+          try {
+            monitor.wait();
+            if (closed) {
+              throw new ClosedException();
+            }
+          } catch (final InterruptedException e) {
+          }
+        }
+      }
+    }
+  }
+
   public void writeConnect() {
     synchronized (monitor) {
       if (writeClosed) {
@@ -185,7 +229,7 @@ public class Channel<T> implements AltingChannelInput {
         numWriters--;
         if (numWriters <= 0) {
           writeClosed = true;
-          MultiChannelReadSelector tempAlt = alt;
+          final MultiInputSelector tempAlt = alt;
           if (tempAlt != null) {
             tempAlt.closeChannel();
           } else {
@@ -194,51 +238,6 @@ public class Channel<T> implements AltingChannelInput {
         }
       }
 
-    }
-  }
-
-  public synchronized boolean enable(
-    MultiChannelReadSelector alt) {
-    if (data.getState() == ChannelDataStore.EMPTY) {
-      this.alt = alt;
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  public boolean disable() {
-    alt = null;
-    return (data.getState() != ChannelDataStore.EMPTY);
-  }
-
-  public boolean isClosed() {
-    if (!closed) {
-      if (writeClosed) {
-        if (data.getState() == ChannelDataStore.EMPTY) {
-          close();
-        }
-      }
-    }
-
-    return closed;
-  }
-
-  public static <T> T[] createArray(
-    T... o) {
-    return o;
-  }
-
-  public void close() {
-    closed = true;
-  }
-
-  @Override
-  public String toString() {
-    if (name == null) {
-      return data.toString();
-    } else {
-      return name + "=" + data;
     }
   }
 }

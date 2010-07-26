@@ -21,12 +21,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
+import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMap;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInProcess;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
-import com.revolsys.parallel.tools.ThreadSharedAttributes;
 import com.revolsys.util.JexlUtil;
 
 public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements

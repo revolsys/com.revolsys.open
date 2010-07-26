@@ -1,6 +1,6 @@
 package com.revolsys.parallel.channel;
 
-public class Timer implements AltingChannelInput {
+public class Timer implements SelectableInput {
   private long time;
 
   public Timer(long time) {
@@ -11,7 +11,7 @@ public class Timer implements AltingChannelInput {
     return isTimeout();
   }
 
-  public boolean enable(final MultiChannelReadSelector alt) {
+  public boolean enable(final MultiInputSelector alt) {
     return isTimeout();
   }
 

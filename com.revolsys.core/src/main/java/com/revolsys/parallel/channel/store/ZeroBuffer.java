@@ -1,4 +1,6 @@
-package com.revolsys.parallel.channel;
+package com.revolsys.parallel.channel.store;
+
+import com.revolsys.parallel.channel.ChannelDataStore;
 
 /**
  * <H2>Description</H2>

@@ -109,32 +109,35 @@ public class ArcConverter implements OsnConverter {
       serializer.attributeName("pointList");
       serializer.startCollection("List");
       CoordinatesList points = CoordinatesListUtil.get(line);
+      int numAxis = points.getNumAxis();
       for (int i = 0; i < points.size(); i++) {
         serializer.startObject("Point");
         serializer.attributeName("coords");
         final double x = points.getX(i);
         final double y = points.getY(i);
         final double z = points.getZ(i);
-        if (Double.isNaN(z)) {
+        if (numAxis == 2) {
           serializer.startObject("Coord2D");
           serializer.attribute("c1", x, true);
           serializer.attribute("c2", y, false);
-          serializer.endObject();
         } else {
           serializer.startObject("Coord3D");
           serializer.attribute("c1", x, true);
           serializer.attribute("c2", y, true);
-          serializer.attribute("c3", z, false);
-          serializer.endObject();
+          if (Double.isNaN(z)) {
+            serializer.attribute("c3", 0, false);
+          } else {
+            serializer.attribute("c3", z, false);
+          }
         }
+        serializer.endObject();
         serializer.endAttribute();
         serializer.endObject();
       }
       serializer.endCollection();
       serializer.endAttribute();
       if (writeAttributes) {
-        writeAttributes(serializer,
-          JtsGeometryUtil.getGeometryProperties(line));
+        writeAttributes(serializer, JtsGeometryUtil.getGeometryProperties(line));
       }
       serializer.endObject();
     }

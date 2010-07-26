@@ -189,7 +189,7 @@ public class OsnReader implements DataObjectReader {
     return false;
   }
 
-   public DataObject next() {
+  public DataObject next() {
     if (hasNext()) {
       nextChecked = false;
       return (DataObject)getDataObject();

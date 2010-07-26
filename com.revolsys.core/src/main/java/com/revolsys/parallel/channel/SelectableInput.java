@@ -1,10 +1,10 @@
 package com.revolsys.parallel.channel;
 
-public interface AltingChannelInput {
+public interface SelectableInput {
   int EMPTY = 0;
   int AVAILABLE = 1;
   int CLOSED = 2;
-  boolean enable(MultiChannelReadSelector alt);
+  boolean enable(MultiInputSelector alt);
 
   boolean disable();
   

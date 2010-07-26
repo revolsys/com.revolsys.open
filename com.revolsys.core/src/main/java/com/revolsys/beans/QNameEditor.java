@@ -1,4 +1,4 @@
-package com.revolsys.parallel.process;
+package com.revolsys.beans;
 
 import java.beans.PropertyEditorSupport;
 

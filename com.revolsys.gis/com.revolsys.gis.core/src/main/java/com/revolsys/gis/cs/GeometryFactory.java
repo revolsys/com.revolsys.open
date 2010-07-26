@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
@@ -12,7 +11,6 @@ import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
-import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -66,6 +64,14 @@ public class GeometryFactory extends
       coordinateSystem.getId(), new DoubleCoordinatesListFactory());
     this.coordinateSystem = coordinateSystem;
     this.coordinatesPrecisionModel = coordinatesPrecisionModel;
+  }
+
+  public GeometryFactory(
+    final SimpleCoordinatesPrecisionModel coordinatesPrecisionModel) {
+    super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel), 0,
+      new DoubleCoordinatesListFactory());
+    this.coordinatesPrecisionModel = coordinatesPrecisionModel;
+    this.coordinateSystem = null;
   }
 
   public LinearRing createLinearRing(
@@ -136,20 +142,20 @@ public class GeometryFactory extends
     return coordinateSystem;
   }
 
-  @Override
-  public String toString() {
-    return coordinateSystem.getName() + ", precision="
-      + getCoordinatesPrecisionModel();
-  }
-
   public Coordinates getPreciseCoordinates(
-    Coordinates point) {
+    final Coordinates point) {
     return coordinatesPrecisionModel.getPreciseCoordinates(point);
   }
 
   public void makePrecise(
-    Coordinates point) {
+    final Coordinates point) {
     coordinatesPrecisionModel.makePrecise(point);
+  }
+
+  @Override
+  public String toString() {
+    return coordinateSystem.getName() + ", precision="
+      + getCoordinatesPrecisionModel();
   }
 
 }

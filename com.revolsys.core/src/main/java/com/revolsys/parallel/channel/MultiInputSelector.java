@@ -1,19 +1,19 @@
 package com.revolsys.parallel.channel;
 
-public class MultiChannelReadSelector {
+public class MultiInputSelector {
   private int enabledChannels = 0;
 
   private long maxWait;
 
-  public synchronized int select(AltingChannelInput... c) {
+  public synchronized int select(SelectableInput... c) {
     return select(Long.MAX_VALUE, c);
   }
 
-  public synchronized int select(long msecs, AltingChannelInput... c) {
+  public synchronized int select(long msecs, SelectableInput... c) {
     return select(msecs, 0, c);
   }
 
-  public synchronized int select(long msecs, int nsecs, AltingChannelInput... c) {
+  public synchronized int select(long msecs, int nsecs, SelectableInput... c) {
     if (!enableChannels(c)) {
       try {
         if (msecs == 0)
@@ -24,7 +24,7 @@ public class MultiChannelReadSelector {
     return disableChannels(c);
   }
 
-  public synchronized int select(AltingChannelInput[] c, boolean skip) {
+  public synchronized int select(SelectableInput[] c, boolean skip) {
     if (skip) {
       enableChannels(c);
       return disableChannels(c);
@@ -33,16 +33,16 @@ public class MultiChannelReadSelector {
     }
   }
 
-  public synchronized int select(AltingChannelInput[] c, boolean[] guard) {
+  public synchronized int select(SelectableInput[] c, boolean[] guard) {
     return select(c, guard, Long.MAX_VALUE);
   }
 
-  public synchronized int select(AltingChannelInput[] c, boolean[] guard,
+  public synchronized int select(SelectableInput[] c, boolean[] guard,
     long msecs) {
     return select(c, guard, msecs, 0);
   }
 
-  public synchronized int select(AltingChannelInput[] c, boolean[] guard,
+  public synchronized int select(SelectableInput[] c, boolean[] guard,
     long msecs, int nsecs) {
     if (!enableChannels(c, guard)) {
       try {
@@ -53,7 +53,7 @@ public class MultiChannelReadSelector {
     return disableChannels(c, guard);
   }
 
-  public synchronized int select(AltingChannelInput[] c, boolean[] guard,
+  public synchronized int select(SelectableInput[] c, boolean[] guard,
     boolean skip) {
     if (skip) {
       enableChannels(c, guard);
@@ -63,12 +63,12 @@ public class MultiChannelReadSelector {
     }
   }
 
-  private boolean enableChannels(AltingChannelInput[] channels) {
+  private boolean enableChannels(SelectableInput[] channels) {
     enabledChannels = 0;
     maxWait = Long.MAX_VALUE;
     int closedCount = 0;
     for (int i = 0; i < channels.length; i++) {
-      AltingChannelInput channel = channels[i];
+      SelectableInput channel = channels[i];
       if (!channel.isClosed()) {
         if (channel.enable(this)) {
           enabledChannels++;
@@ -84,13 +84,13 @@ public class MultiChannelReadSelector {
     return closedCount == channels.length;
   }
 
-  private boolean enableChannels(AltingChannelInput[] channels, boolean[] guard) {
+  private boolean enableChannels(SelectableInput[] channels, boolean[] guard) {
     enabledChannels = 0;
     maxWait = Long.MAX_VALUE;
     int closedCount = 0;
     int activeChannelCount = 0;
     for (int i = 0; i < channels.length; i++) {
-      AltingChannelInput channel = channels[i];
+      SelectableInput channel = channels[i];
       if (guard[i]) {
         activeChannelCount++;
         if (!channel.isClosed()) {
@@ -109,11 +109,11 @@ public class MultiChannelReadSelector {
     return closedCount == activeChannelCount;
   }
 
-  private int disableChannels(AltingChannelInput[] channels) {
+  private int disableChannels(SelectableInput[] channels) {
     int closedCount = 0;
     int selected = -1;
     for (int i = channels.length - 1; i >= 0; i--) {
-      AltingChannelInput channel = channels[i];
+      SelectableInput channel = channels[i];
       if (channel.disable()) {
         selected = i;
       } else if (channel.isClosed()) {
@@ -128,11 +128,11 @@ public class MultiChannelReadSelector {
 
   }
 
-  private int disableChannels(AltingChannelInput[] channels, boolean[] guard) {
+  private int disableChannels(SelectableInput[] channels, boolean[] guard) {
     int closedCount = 0;
     int selected = -1;
     for (int i = channels.length - 1; i >= 0; i--) {
-      AltingChannelInput channel = channels[i];
+      SelectableInput channel = channels[i];
       if (guard[i] && channel.disable()) {
         selected = i;
       } else if (channel == null || channel.isClosed()) {

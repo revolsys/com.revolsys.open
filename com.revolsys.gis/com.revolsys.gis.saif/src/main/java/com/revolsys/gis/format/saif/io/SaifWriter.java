@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -44,8 +44,8 @@ import org.apache.log4j.Logger;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
-import com.revolsys.gis.format.saif.io.util.ObjectSetOutputStream;
 import com.revolsys.gis.format.saif.io.util.ObjectSetUtil;
+import com.revolsys.gis.format.saif.io.util.OsnConverterRegistry;
 import com.revolsys.gis.format.saif.io.util.OsnSerializer;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
@@ -68,6 +68,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   private DataObjectMetaData annotatedSpatialDataSetType;
 
   private final Map<QName, String> compositeTypeNames = new HashMap<QName, String>();
+
+  protected OsnConverterRegistry converters = new OsnConverterRegistry();
 
   private DataObjectMetaDataFactory dataObjectMetaDataFactory;
 
@@ -95,9 +97,6 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   private final Map<QName, OsnSerializer> serializers = new HashMap<QName, OsnSerializer>();
 
   private DataObjectMetaData spatialDataSetType;
-
-  // TODO read from file
-  private final int srid = 26910;
 
   private File tempDirectory;
 
@@ -130,15 +129,12 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     compositeTypeNames.put(QName.valueOf(typeName), compositeTypeName);
   }
 
-  public void flush() {
-  }
-
   protected void addExport(
     final QName typeName,
     final QName compositeType,
     final String objectSubset) {
     if (!exports.containsKey(typeName)) {
-      Map<String, Object> export = new HashMap<String, Object>();
+      final Map<String, Object> export = new HashMap<String, Object>();
       exports.put(typeName, export);
       final String referenceId = getObjectIdentifier(typeName);
       export.put("referenceId", referenceId);
@@ -199,27 +195,24 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   private void createExports()
     throws IOException {
     final File exportsFile = new File(tempDirectory, "exports.dir");
-    OsnSerializer exportsSerializer = createSerializer(new QName(
-      "ExportedObject"), new FileOutputStream(exportsFile));
+    final OsnSerializer exportsSerializer = createSerializer(new QName(
+      "ExportedObject"), exportsFile, Long.MAX_VALUE);
     exportsSerializer.startObject("ExportedObjects");
     exportsSerializer.attributeName("handles");
     exportsSerializer.startCollection("Set");
-    for (Map<String, Object> export : exports.values()) {
-      QName compositeType = (QName)export.get("compositeType");
-      String referenceId = (String)export.get("referenceId");
-      String objectSubset = (String)export.get("objectSubset");
+    writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
+      "globmeta.osn");
+    for (final Map<String, Object> export : exports.values()) {
+      final QName compositeType = (QName)export.get("compositeType");
+      final String referenceId = (String)export.get("referenceId");
+      final String objectSubset = (String)export.get("objectSubset");
       String compositeTypeName = compositeType.getLocalPart();
       final String compositeNamespace = compositeType.getNamespaceURI();
       if (compositeNamespace != "") {
         compositeTypeName += "::" + compositeNamespace;
       }
-      exportsSerializer.startObject("ExportedObjectHandle");
-      exportsSerializer.attribute("referenceID", referenceId, true);
-      exportsSerializer.attribute("type", compositeTypeName, true);
-      exportsSerializer.attribute("objectSubset", objectSubset, true);
-      exportsSerializer.attribute("offset", new BigDecimal("0"), true);
-      exportsSerializer.attribute("sharable", Boolean.FALSE, true);
-      exportsSerializer.endObject();
+      writeExport(exportsSerializer, referenceId, compositeTypeName,
+        objectSubset);
     }
     exportsSerializer.close();
   }
@@ -233,6 +226,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
       final PrintStream out = new PrintStream(new FileOutputStream(file));
       try {
         out.print(typeName);
+        out.print("(handles:Set{})");
       } finally {
         out.close();
       }
@@ -245,7 +239,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
         addExport(GLOBAL_METADATA, GLOBAL_METADATA, "globmeta.osn");
         final File metaFile = new File(tempDirectory, "globmeta.osn");
         final OsnSerializer serializer = createSerializer(GLOBAL_METADATA,
-          new FileOutputStream(metaFile));
+          metaFile, Long.MAX_VALUE);
         serializer.startObject("GlobalMetadata");
         serializer.attribute("objectIdentifier", "GlobalMetadata", true);
 
@@ -254,16 +248,16 @@ public class SaifWriter extends AbstractWriter<DataObject> {
         final Date creationTimestamp = new Date(System.currentTimeMillis());
         serializer.attribute("year", new BigDecimal(
           creationTimestamp.getYear() + 1900), true);
-        serializer.attribute("month", new BigDecimal(
-          creationTimestamp.getMonth() + 1), true);
+        serializer.attribute("month",
+          new BigDecimal(creationTimestamp.getMonth() + 1), true);
         serializer.attribute("day",
           new BigDecimal(creationTimestamp.getDate()), true);
-        serializer.attribute("hour", new BigDecimal(
-          creationTimestamp.getHours()), true);
-        serializer.attribute("minute", new BigDecimal(
-          creationTimestamp.getMinutes()), true);
-        serializer.attribute("second", new BigDecimal(
-          creationTimestamp.getSeconds()), true);
+        serializer.attribute("hour",
+          new BigDecimal(creationTimestamp.getHours()), true);
+        serializer.attribute("minute",
+          new BigDecimal(creationTimestamp.getMinutes()), true);
+        serializer.attribute("second",
+          new BigDecimal(creationTimestamp.getSeconds()), true);
         serializer.endObject();
 
         serializer.attributeName("saifProfile");
@@ -301,10 +295,16 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   protected OsnSerializer createSerializer(
     final QName typeName,
-    final OutputStream out) {
-    final OsnSerializer serializer = new OsnSerializer(typeName, out, srid);
+    final File file,
+    final long maxSize)
+    throws IOException {
+    final OsnSerializer serializer = new OsnSerializer(typeName, file, maxSize,
+      converters);
     serializer.setIndentEnabled(indentEnabled);
     return serializer;
+  }
+
+  public void flush() {
   }
 
   private DataObjectMetaData getCompositeType(
@@ -390,11 +390,11 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           if (maxSubsetSize != Long.MAX_VALUE) {
             FileUtil.deleteFiles(tempDirectory,
               ObjectSetUtil.getObjectSubsetPrefix(objectSubsetName) + "...osn");
-            serializer = createSerializer(typeName, new ObjectSetOutputStream(
-              new File(tempDirectory, objectSubsetName), maxSubsetSize));
+            serializer = createSerializer(typeName, new File(tempDirectory,
+              objectSubsetName), maxSubsetSize);
           } else {
-            serializer = createSerializer(typeName, new FileOutputStream(
-              new File(tempDirectory, objectSubsetName)));
+            serializer = createSerializer(typeName, new File(tempDirectory,
+              objectSubsetName), Long.MAX_VALUE);
           }
           if (compositeType.isInstanceOf(annotatedSpatialDataSetType)) {
             serializer.startObject(compositeType.getName());
@@ -418,18 +418,18 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           addExport(typeName, compositeType.getName(), objectSubsetName);
           serializers.put(typeName, serializer);
         } else if (typeName.equals("ImportedObjects")) {
-          serializer = createSerializer(new QName("ImportedObject"),
-            new FileOutputStream(new File(tempDirectory, "imports.dir")));
+          serializer = createSerializer(new QName("ImportedObject"), new File(
+            tempDirectory, "imports.dir"), Long.MAX_VALUE);
           serializers.put(typeName, serializer);
         } else if (typeName.getLocalPart().endsWith(
           "InternallyReferencedObjects")) {
           serializer = createSerializer(
-            new QName("InternallyReferencedObject"), new FileOutputStream(
-              new File(tempDirectory, "internal.dir")));
+            new QName("InternallyReferencedObject"), new File(tempDirectory,
+              "internal.dir"), Long.MAX_VALUE);
           serializers.put(typeName, serializer);
         } else if (typeName.getLocalPart().endsWith("GlobalMetadata")) {
-          serializer = createSerializer(GLOBAL_METADATA, new FileOutputStream(
-            new File(tempDirectory, "globmeta.osn")));
+          serializer = createSerializer(GLOBAL_METADATA, new File(
+            tempDirectory, "globmeta.osn"), Long.MAX_VALUE);
           addExport(typeName, typeName, "globmeta.osn");
           serializers.put(typeName, serializer);
         }
@@ -438,10 +438,6 @@ public class SaifWriter extends AbstractWriter<DataObject> {
       }
     }
     return serializer;
-  }
-
-  public String toString() {
-    return file.getAbsolutePath();
   }
 
   public File getTempDirectory() {
@@ -614,6 +610,10 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   }
 
+  public String toString() {
+    return file.getAbsolutePath();
+  }
+
   /*
    * (non-Javadoc)
    * @see
@@ -636,6 +636,21 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     } catch (final IOException e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  public void writeExport(
+    final OsnSerializer exportsSerializer,
+    final String referenceId,
+    final String compositeTypeName,
+    final String objectSubset)
+    throws IOException {
+    exportsSerializer.startObject("ExportedObjectHandle");
+    exportsSerializer.attribute("referenceID", referenceId, true);
+    exportsSerializer.attribute("type", compositeTypeName, true);
+    exportsSerializer.attribute("objectSubset", objectSubset, true);
+    exportsSerializer.attribute("offset", new BigDecimal("0"), true);
+    exportsSerializer.attribute("sharable", Boolean.FALSE, true);
+    exportsSerializer.endObject();
   }
 
 }
