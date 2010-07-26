@@ -16,6 +16,7 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.vividsolutions.jts.algorithm.Angle;
@@ -860,20 +861,20 @@ public final class JtsGeometryUtil {
     final LineString line,
     final int index,
     final Coordinate coordinate) {
-    final CoordinateSequence coords = line.getCoordinateSequence();
-    final CoordinateSequence newCoords = new DoubleCoordinatesList(
+    final CoordinatesList coords = CoordinatesListUtil.get(line.getCoordinateSequence());
+    final CoordinatesList newCoords = new DoubleCoordinatesList(
       coords.size() + 1, coords.getDimension());
     int j = 0;
     for (int i = 0; i < newCoords.size(); i++) {
       if (i == index) {
-        newCoords.setOrdinate(i, 0, coordinate.x);
-        newCoords.setOrdinate(i, 1, coordinate.y);
+        newCoords.setX(i,  coordinate.x);
+        newCoords.setY(i,  coordinate.y);
         if (newCoords.getDimension() > 2) {
-          newCoords.setOrdinate(i, 2, coordinate.z);
+          newCoords.setZ(i,  coordinate.z);
         }
       } else {
         for (int o = 0; o < newCoords.getDimension(); o++) {
-          newCoords.setOrdinate(i, o, coords.getOrdinate(j, o));
+          newCoords.setValue(i, o, coords.getValue(j, o));
         }
         j++;
       }

@@ -99,10 +99,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     return coordinates;
   }
 
+  @Deprecated
   public int getDimension() {
     return getNumAxis();
   }
 
+  @Deprecated
   public double getOrdinate(
     final int index,
     final int axisIndex) {
@@ -179,6 +181,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
+  @Deprecated
   public void setOrdinate(
     final int index,
     final int axisIndex,

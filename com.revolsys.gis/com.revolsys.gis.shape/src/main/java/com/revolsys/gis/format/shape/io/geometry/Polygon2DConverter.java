@@ -7,10 +7,10 @@ import java.util.List;
 import com.revolsys.gis.format.shape.io.ShapeConstants;
 import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianOutput;
-import com.revolsys.gis.jts.CoordinateSequenceUtil;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -48,11 +48,11 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
     final int[] partIndex = ShapefileGeometryUtil.readPartIndex(in, numParts,
       numPoints);
 
-    final CoordinateSequence[] parts = ShapefileGeometryUtil.createCoordinateSequences(
+    final CoordinatesList[] parts = ShapefileGeometryUtil.createCoordinatesLists(
       partIndex, 2);
 
     ShapefileGeometryUtil.readPoints(in, partIndex, parts);
-    final CoordinateSequence exteriorCoords = parts[0];
+    final CoordinatesList exteriorCoords = parts[0];
     final LinearRing shell = geometryFactory.createLinearRing(exteriorCoords);
     final LinearRing[] holes = new LinearRing[parts.length - 1];
     for (int j = 0; j < holes.length; j++) {
@@ -72,19 +72,18 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
 
       final int numHoles = polygon.getNumInteriorRing();
 
-      final List<CoordinateSequence> rings = new ArrayList<CoordinateSequence>();
-      CoordinateSequence exteroirCoords = polygon.getExteriorRing()
-        .getCoordinateSequence();
+      final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
+      CoordinatesList exteroirCoords = CoordinatesListUtil.get(polygon.getExteriorRing());
       if (JtsGeometryUtil.isCCW(exteroirCoords)) {
-        exteroirCoords = CoordinateSequenceUtil.reverse(exteroirCoords);
+        exteroirCoords = exteroirCoords.reverse();
       }
       rings.add(exteroirCoords);
       numPoints += exteroirCoords.size();
       for (int i = 0; i < numHoles; i++) {
         final LineString interior = polygon.getInteriorRingN(i);
-        CoordinateSequence interiorCoords = interior.getCoordinateSequence();
+        CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
         if (!JtsGeometryUtil.isCCW(interiorCoords)) {
-          interiorCoords = CoordinateSequenceUtil.reverse(interiorCoords);
+          interiorCoords = interiorCoords.reverse();
         }
         rings.add(interiorCoords);
         numPoints += interiorCoords.size();
@@ -100,12 +99,12 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
       out.writeLEInt(numPoints);
 
       int partIndex = 0;
-      for (final CoordinateSequence ring : rings) {
+      for (final CoordinatesList ring : rings) {
         out.writeLEInt(partIndex);
         partIndex += ring.size();
       }
 
-      for (final CoordinateSequence ring : rings) {
+      for (final CoordinatesList ring : rings) {
         ShapefileGeometryUtil.write2DCoordinates(out, ring);
       }
     } else {

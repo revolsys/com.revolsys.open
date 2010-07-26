@@ -16,7 +16,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -84,9 +83,6 @@ public class Node<T> implements Comparable<Node<T>> {
     final Coordinates point) {
     this.graph = graph;
     this.coordinates = new DoubleCoordinates(point);
-    if (point.getNumAxis() >2) {
-    NoOp.nan(point.getZ());
-    }
   }
 
   protected void addInEdge(

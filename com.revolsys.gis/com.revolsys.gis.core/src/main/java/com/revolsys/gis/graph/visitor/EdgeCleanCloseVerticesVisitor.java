@@ -11,6 +11,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -133,14 +134,14 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
       }
       if (!removeIndicies.isEmpty()) {
         final int dimension = coordinates.getDimension();
-        final CoordinateSequence newCoordinates = new DoubleCoordinatesList(
+        final CoordinatesList newCoordinates = new DoubleCoordinatesList(
           numCoordinates - removeIndicies.size(), dimension);
         int k = 0;
         for (int j = 0; j < numCoordinates; j++) {
           if (!removeIndicies.contains(j)) {
             for (int d = 0; d < dimension; d++) {
               final double ordinate = coordinates.getOrdinate(j, d);
-              newCoordinates.setOrdinate(k, d, ordinate);
+              newCoordinates.setValue(k, d, ordinate);
             }
             k++;
           }

@@ -349,19 +349,19 @@ public class BoundingBox extends Envelope {
     final int numCoordinates = 2 * (numX + numY) + 1;
     CoordinatesList coordinates = new DoubleCoordinatesList(numCoordinates, 2);
     for (int i = 0; i < numY; i++) {
-      coordinates.setOrdinate(i, 0, minX);
-      coordinates.setOrdinate(i, 1, minY + i * yStep);
-      coordinates.setOrdinate(numY + numX + i, 0, maxX);
-      coordinates.setOrdinate(numY + numX + i, 1, minY + (numY - i) * yStep);
+      coordinates.setX(i,  minX);
+      coordinates.setY(i,  minY + i * yStep);
+      coordinates.setX(numY + numX + i, maxX);
+      coordinates.setY(numY + numX + i,  minY + (numY - i) * yStep);
     }
     for (int i = 0; i < numX; i++) {
-      coordinates.setOrdinate(numY + i, 0, minX + i * xStep);
-      coordinates.setOrdinate(numY + i, 1, maxY);
-      coordinates.setOrdinate(2 * numY + numX + i, 0, minX + (numX - i) * xStep);
-      coordinates.setOrdinate(2 * numY + numX + i, 1, minY);
+      coordinates.setX(numY + i,  minX + i * xStep);
+      coordinates.setY(numY + i,  maxY);
+      coordinates.setX(2 * numY + numX + i,  minX + (numX - i) * xStep);
+      coordinates.setY(2 * numY + numX + i,  minY);
     }
-    coordinates.setOrdinate(coordinates.size() - 1, 0, minX);
-    coordinates.setOrdinate(coordinates.size() - 1, 1, minY);
+    coordinates.setX(coordinates.size() - 1, minX);
+    coordinates.setY(coordinates.size() - 1, minY);
     if (coordinateSystem != this.coordinateSystem) {
       coordinates = CoordinatesListProjectionUtil.perform(coordinates,
         this.coordinateSystem, coordinateSystem);

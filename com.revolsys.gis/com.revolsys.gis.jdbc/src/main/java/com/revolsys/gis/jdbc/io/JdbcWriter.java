@@ -727,8 +727,12 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
         default:
           throw new IllegalStateException("State not known");
       }
-    } catch (final Throwable t) {
-      LOG.error("Unable to write: " + object, t);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException("Unable to write", e);
     }
   }
 }

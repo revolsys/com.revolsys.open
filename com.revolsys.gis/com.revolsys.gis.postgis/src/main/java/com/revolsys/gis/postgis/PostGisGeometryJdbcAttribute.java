@@ -130,12 +130,12 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
       points.length, dimension);
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
-      coordinates.setValue(i, 0, point.x);
-      coordinates.setValue(i, 1, point.y);
+      coordinates.setX(i,  point.x);
+      coordinates.setY(i,  point.y);
       if (dimension > 3) {
-        coordinates.setOrdinate(i, 2, point.z);
+        coordinates.setZ(i,  point.z);
         if (dimension > 4) {
-          coordinates.setOrdinate(i, 3, point.m);
+          coordinates.setValue(i, 3, point.m);
         }
       }
     }

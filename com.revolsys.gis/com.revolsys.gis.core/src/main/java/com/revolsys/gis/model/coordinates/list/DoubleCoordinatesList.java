@@ -1,5 +1,6 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import com.revolsys.gis.util.NoOp;
 
 public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
@@ -64,7 +65,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     final int index,
     final int axisIndex,
     final double value) {
-     final byte numAxis = getNumAxis();
+    final byte numAxis = getNumAxis();
     if (axisIndex < numAxis) {
       coordinates[index * numAxis + axisIndex] = value;
     }

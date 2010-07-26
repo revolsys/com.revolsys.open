@@ -104,7 +104,7 @@ public class CoordinatesListUtil {
     for (final Coordinates coordinates : coordinateArray) {
       if (coordinates != null) {
         for (int j = 0; j < coordinates.getNumAxis(); j++) {
-          coordinatesList.setOrdinate(i, j, coordinates.getValue(j));
+          coordinatesList.setValue(i, j, coordinates.getValue(j));
         }
         i++;
       }

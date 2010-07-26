@@ -5,9 +5,9 @@ import java.io.IOException;
 import com.revolsys.gis.format.shape.io.ShapeConstants;
 import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianOutput;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -40,7 +40,7 @@ public class MultiPoint3DConverter implements ShapefileGeometryConverter {
     final int numPoints = in.readLEInt();
     final byte dimension = 3;
     // TODO check for 4 dimension
-    final CoordinateSequence coordinates = new DoubleCoordinatesList(numPoints,
+    final CoordinatesList coordinates = new DoubleCoordinatesList(numPoints,
       dimension);
     ShapefileGeometryUtil.readCoordinates(in, coordinates);
     ShapefileGeometryUtil.readCoordinates(in, coordinates, 2);

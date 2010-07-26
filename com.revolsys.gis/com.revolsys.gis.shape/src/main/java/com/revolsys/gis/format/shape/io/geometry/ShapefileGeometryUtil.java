@@ -4,19 +4,20 @@ import java.io.IOException;
 
 import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianOutput;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 public final class ShapefileGeometryUtil {
-  public static CoordinateSequence[] createCoordinateSequences(
+  public static CoordinatesList[] createCoordinatesLists(
     final int[] partIndex,
     final int dimension) {
-    final CoordinateSequence[] parts = new CoordinateSequence[partIndex.length];
+    final CoordinatesList[] parts = new CoordinatesList[partIndex.length];
     for (int i = 0; i < partIndex.length; i++) {
       final int partNumPoints = partIndex[i];
       parts[i] = new DoubleCoordinatesList(partNumPoints, dimension);
@@ -26,36 +27,36 @@ public final class ShapefileGeometryUtil {
 
   public static void readCoordinates(
     final EndianInput in,
-    final CoordinateSequence coordinates)
+    final CoordinatesList coordinates)
     throws IOException {
     for (int j = 0; j < coordinates.size(); j++) {
       final double x = in.readLEDouble();
       final double y = in.readLEDouble();
-      coordinates.setOrdinate(j, 0, x);
-      coordinates.setOrdinate(j, 1, y);
+      coordinates.setX(j, x);
+      coordinates.setY(j, y);
     }
   }
 
   public static void readCoordinates(
     final EndianInput in,
-    final CoordinateSequence coordinates,
+    final CoordinatesList coordinates,
     final int ordinate)
     throws IOException {
     for (int j = 0; j < coordinates.size(); j++) {
       final double d = in.readLEDouble();
-      coordinates.setOrdinate(j, ordinate, d);
+      coordinates.setValue(j, ordinate, d);
     }
   }
 
   public static void readCoordinates(
     final EndianInput in,
     final int[] partIndex,
-    final CoordinateSequence[] coordinateSequences,
+    final CoordinatesList[] coordinateSequences,
     final int ordinate)
     throws IOException {
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     for (int i = 0; i < partIndex.length; i++) {
-      final CoordinateSequence coordinates = coordinateSequences[i];
+      final CoordinatesList coordinates = coordinateSequences[i];
       readCoordinates(in, coordinates, ordinate);
     }
   }
@@ -79,10 +80,10 @@ public final class ShapefileGeometryUtil {
   public static void readPoints(
     final EndianInput in,
     final int[] partIndex,
-    final CoordinateSequence[] coordinateSequences)
+    final CoordinatesList[] coordinateSequences)
     throws IOException {
     for (int i = 0; i < partIndex.length; i++) {
-      final CoordinateSequence coordinates = coordinateSequences[i];
+      final CoordinatesList coordinates = coordinateSequences[i];
       readCoordinates(in, coordinates);
     }
   }
@@ -100,11 +101,11 @@ public final class ShapefileGeometryUtil {
 
   public static void write2DCoordinates(
     final EndianOutput out,
-    final CoordinateSequence coordinates)
+    final CoordinatesList coordinates)
     throws IOException {
     for (int i = 0; i < coordinates.size(); i++) {
-      out.writeLEDouble(coordinates.getOrdinate(i, 0));
-      out.writeLEDouble(coordinates.getOrdinate(i, 1));
+      out.writeLEDouble(coordinates.getX(i));
+      out.writeLEDouble(coordinates.getY(i));
     }
   }
 
@@ -112,7 +113,7 @@ public final class ShapefileGeometryUtil {
     final EndianOutput out,
     final LineString line)
     throws IOException {
-    final CoordinateSequence coordinateSequence = line.getCoordinateSequence();
+    final CoordinatesList coordinateSequence = CoordinatesListUtil.get(line);
     write2DCoordinates(out, coordinateSequence);
   }
 
@@ -132,10 +133,10 @@ public final class ShapefileGeometryUtil {
     throws IOException {
     double minZ = Double.MAX_VALUE;
     double maxZ = Double.MIN_VALUE;
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
-    if (coordinates.getDimension() == 3) {
+    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
+    if (coordinates.getNumAxis() == 3) {
       for (int i = 0; i < coordinates.size(); i++) {
-        final double z = coordinates.getOrdinate(i, 2);
+        final double z = coordinates.getZ(i);
         if (!Double.isNaN(z)) {
           minZ = Math.min(minZ, z);
           maxZ = Math.max(maxZ, z);
@@ -157,10 +158,10 @@ public final class ShapefileGeometryUtil {
     double maxZ = Double.MIN_VALUE;
     for (int n = 0; n < multiLine.getNumGeometries(); n++) {
       final LineString line = (LineString)multiLine.getGeometryN(n);
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
-      if (coordinates.getDimension() == 3) {
+      final CoordinatesList coordinates = CoordinatesListUtil.get(line);
+      if (coordinates.getNumAxis() == 3) {
         for (int i = 0; i < coordinates.size(); i++) {
-          final double z = coordinates.getOrdinate(i, 2);
+          final double z = coordinates.getZ(i);
           if (!Double.isNaN(z)) {
             minZ = Math.min(minZ, z);
             maxZ = Math.max(maxZ, z);
@@ -179,11 +180,11 @@ public final class ShapefileGeometryUtil {
 
   public static void writeCoordinateZValues(
     final EndianOutput out,
-    final CoordinateSequence coordinates)
+    final CoordinatesList coordinates)
     throws IOException {
-    if (coordinates.getDimension() == 3) {
+    if (coordinates.getNumAxis() == 3) {
       for (int i = 0; i < coordinates.size(); i++) {
-        final double z = coordinates.getOrdinate(i, 2);
+        final double z = coordinates.getZ(i);
         if (!Double.isNaN(z)) {
           out.writeLEDouble(z);
         } else {
@@ -202,7 +203,7 @@ public final class ShapefileGeometryUtil {
     final LineString line)
     throws IOException {
     writeCoordinateZRange(out, line);
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
+    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     writeCoordinateZValues(out, coordinates);
   }
 
@@ -213,7 +214,7 @@ public final class ShapefileGeometryUtil {
     writeCoordinateZRange(out, multiLine);
     for (int n = 0; n < multiLine.getNumGeometries(); n++) {
       final LineString line = (LineString)multiLine.getGeometryN(n);
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
+      final CoordinatesList coordinates = CoordinatesListUtil.get(line);
       writeCoordinateZValues(out, coordinates);
     }
   }
