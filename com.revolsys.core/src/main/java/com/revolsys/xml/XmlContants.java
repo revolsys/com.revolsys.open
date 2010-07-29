@@ -33,4 +33,10 @@ public final class XmlContants {
 
   /** The XML Namespace URI for XML Namespaces. */
   public static final String XMLNS_NS_URI = "http://www.w3.org/2000/xmlns/";
+
+  /** The XML Namespace prefix for XML Namespaces. */
+  public static final String XML_SCHEMA_NAMESPACE_PREFIX = "xs";
+
+  /** The XML Namespace URI for XML Namespaces. */
+  public static final String XML_SCHEMA_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema";
 }

@@ -157,7 +157,12 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     reader.addQuery(typeName, query, parameters);
     return reader;
   }
-
+  protected JdbcQueryReader createReader(
+    final JdbcQuery query) {
+    final JdbcQueryReader reader = createReader();
+    reader.addQuery(query);
+    return reader;
+  }
   protected JdbcQueryReader createReader(
     final QName typeName,
     final String query,
@@ -643,8 +648,11 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   public Reader<DataObject> query(
     final QName typeName) {
     final String tableName = JdbcUtils.getTableName(typeName);
-    final JdbcQueryReader reader = createReader(typeName, "SELECT * FROM "
-      + tableName);
+    final DataObjectMetaData metaData = getMetaData(typeName);
+     final StringBuffer sql = new StringBuffer();
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
+    JdbcQuery query = new JdbcQuery(metaData, sql.toString());
+    final JdbcQueryReader reader = createReader(query);
     return reader;
   }
 

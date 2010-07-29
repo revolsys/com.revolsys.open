@@ -92,7 +92,7 @@ throw new IllegalArgumentException("Data Store not found for " + productName);
   }
 
   public JdbcDataObjectStore createDataObjectStore() {
-    return null;
+    return createDataObjectStore(getDataSource());
   }
 
   public JdbcWriter createWriter() {

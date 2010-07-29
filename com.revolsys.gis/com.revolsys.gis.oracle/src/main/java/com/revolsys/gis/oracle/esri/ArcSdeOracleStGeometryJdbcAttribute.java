@@ -13,6 +13,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
@@ -55,6 +56,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
     this.spatialReference = spatialReference;
     this.geometryFactory = spatialReference.getGeometryFactory();
     this.dimension = dimension;
+    setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
   }
 
   @Override

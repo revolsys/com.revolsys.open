@@ -18,6 +18,7 @@ import org.postgis.Polygon;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
@@ -46,7 +47,8 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
-  }
+    setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+    }
 
   @Override
   public JdbcAttribute clone() {

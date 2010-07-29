@@ -248,4 +248,16 @@ public class JdbcQuery {
   public String toString() {
     return getSql() +"\n"+ getParameters();
   }
+
+  public static String getTableName(
+    final QName typeName) {
+    String tableName;
+    final String namespaceURI = typeName.getNamespaceURI();
+    if (namespaceURI != "") {
+      tableName = namespaceURI + "." + typeName.getLocalPart();
+    } else {
+      tableName = typeName.getLocalPart();
+    }
+    return tableName;
+  }
 }

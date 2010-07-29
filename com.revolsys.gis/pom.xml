@@ -29,6 +29,7 @@
     <module>com.revolsys.gis.html</module>
     <module>com.revolsys.gis.web</module>
     <module>com.revolsys.gis.dgn</module>
+    <module>com.revolsys.gis.esri.gdb.xml</module>
 <!--     <module>com.revolsys.gis.server</module> -->
   </modules>
   <organization>

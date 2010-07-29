@@ -67,7 +67,7 @@ public class GeometryFactory extends
   }
 
   public GeometryFactory(
-    final SimpleCoordinatesPrecisionModel coordinatesPrecisionModel) {
+    final CoordinatesPrecisionModel coordinatesPrecisionModel) {
     super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel), 0,
       new DoubleCoordinatesListFactory());
     this.coordinatesPrecisionModel = coordinatesPrecisionModel;

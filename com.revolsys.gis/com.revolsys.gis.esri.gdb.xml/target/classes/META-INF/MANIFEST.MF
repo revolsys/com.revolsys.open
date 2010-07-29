@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Export-Package: com.revolsys.gis.esri.gdb.xml;uses:="com.revolsys.gis.
+ data.model.types,javax.xml.namespace,com.revolsys.gis.cs,com.revolsys
+ .gis.data.model,com.revolsys.io,com.revolsys.gis.esri.gdb.xml.type,co
+ m.revolsys.xml,com.revolsys.xml.io,com.revolsys.gis.cs.esri,com.revol
+ sys.gis.cs.epsg,com.revolsys.gis.data.io",com.revolsys.gis.esri.gdb.x
+ ml.type;uses:="com.revolsys.gis.data.model.types,com.revolsys.gis.esr
+ i.gdb.xml,com.revolsys.xml,com.revolsys.xml.io,javax.xml.namespace"
+Built-By: paustin
+Tool: Bnd-0.0.357
+Bundle-Name: Revolution Systems GIS ESRI Geodatabase (XML)
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: Revolution Systems Inc.
+Build-Jdk: 1.6.0_20
+Bundle-Version: 0.0.0.TRUNK-SNAPSHOT
+Bnd-LastModified: 1280425465565
+Bundle-ManifestVersion: 2
+Import-Package: com.revolsys.gis.cs,com.revolsys.gis.cs.epsg,com.revol
+ sys.gis.cs.esri,com.revolsys.gis.data.io,com.revolsys.gis.data.model,
+ com.revolsys.gis.data.model.types,com.revolsys.gis.esri.gdb.xml,com.r
+ evolsys.gis.esri.gdb.xml.type,com.revolsys.io,com.revolsys.xml,com.re
+ volsys.xml.io,javax.xml.namespace
+Implementation-Build: 2563
+Bundle-SymbolicName: com.revolsys.gis.esri.gdb.xml
+Bundle-DocURL: http://www.revolsys.com/
+

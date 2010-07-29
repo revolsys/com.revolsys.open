@@ -1281,17 +1281,23 @@ public class XmlWriter extends Writer {
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
         final String prefix = namespaceMap.get(namespaceUri);
-        if (prefix.length() == 0) {
-          out.write(" xmlns");
-
-        } else {
-          out.write(" xmlns:");
-          out.write(prefix);
-        }
-        out.write("=\"");
-        writeAttributeValue(namespaceUri);
-        out.write("\"");
+        writeNamespaceAttribute(namespaceUri, prefix);
       }
     }
+  }
+
+  public void writeNamespaceAttribute(
+    final String namespaceUri,
+    final String prefix) {
+    if (prefix.length() == 0) {
+      out.write(" xmlns");
+
+    } else {
+      out.write(" xmlns:");
+      out.write(prefix);
+    }
+    out.write("=\"");
+    writeAttributeValue(namespaceUri);
+    out.write("\"");
   }
 }

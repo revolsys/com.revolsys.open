@@ -8,6 +8,9 @@ public interface AttributeProperties {
   QName COORDINATE_SYSTEM = new QName("http://gis.revolsys.com/",
     "coordinateSystem");
 
+  QName GEOMETRY_FACTORY = new QName("http://gis.revolsys.com/",
+    "geometryFactory");
+
   QName ALLOWED_VALUES = new QName("http://gis.revolsys.com/", "allowedValues");
 
   QName ATTRIBUTE_ALLOWED_VALUES = new QName("http://gis.revolsys.com/",

@@ -106,6 +106,18 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
           final JdbcQuery query = queries.get(currentQuery);
           sql = query.getSql();
           try {
+            final QName tableName = query.getTableName();
+            DataObjectMetaData metaData = query.getMetaData();
+            if (metaData == null) {
+              if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
+                metaData = dataStore.getMetaData(tableName);
+                StringBuffer newSql = new StringBuffer("SELECT ");
+                JdbcQuery.addColumnNames(newSql, metaData, JdbcQuery.getTableName(tableName));
+                newSql.append(" FROM ");
+                newSql.append(sql.substring(14));
+                sql = newSql.toString();
+              }
+            }
             statement = connection.prepareStatement(sql);
             statement.setFetchSize(fetchSize);
 
@@ -113,15 +125,9 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
 
             resultSet = statement.executeQuery();
             final ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            final QName tableName = query.getTableName();
-            DataObjectMetaData metaData = query.getMetaData();
+
             if (metaData == null) {
-              if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
-                this.metaData = dataStore.getMetaData(tableName);
-              } else {
-                this.metaData = dataStore.getMetaData(tableName,
-                  resultSetMetaData);
-              }
+              metaData = dataStore.getMetaData(tableName, resultSetMetaData);
             }
             this.metaData = metaData;
 

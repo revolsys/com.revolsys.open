@@ -26,18 +26,6 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     }
   }
 
-  public static String getTableName(
-    final QName typeName) {
-    String tableName;
-    final String namespaceURI = typeName.getNamespaceURI();
-    if (namespaceURI != "") {
-      tableName = namespaceURI + "." + typeName.getLocalPart();
-    } else {
-      tableName = typeName.getLocalPart();
-    }
-    return tableName;
-  }
-
   private boolean autoCommit = false;
 
   private final JdbcDataObjectStore dataStore;
@@ -139,7 +127,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   public void setTableNames(
     final List<QName> tableNames) {
     for (final QName tableName : tableNames) {
-      addQuery(tableName, "SELECT * FROM " + getTableName(tableName));
+      addQuery(tableName, "SELECT * FROM " + JdbcQuery.getTableName(tableName));
     }
   }
 }

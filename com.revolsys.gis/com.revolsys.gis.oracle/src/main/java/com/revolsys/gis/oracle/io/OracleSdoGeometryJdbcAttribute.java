@@ -16,6 +16,7 @@ import oracle.sql.STRUCT;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
@@ -75,6 +76,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         precisionModels[i] = new PrecisionModel();
       }
     }
+    setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
   }
 
   @Override

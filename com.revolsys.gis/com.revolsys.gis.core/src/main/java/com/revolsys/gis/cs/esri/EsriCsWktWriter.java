@@ -1,6 +1,7 @@
 package com.revolsys.gis.cs.esri;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.Map.Entry;
 
@@ -15,6 +16,15 @@ import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.Spheroid;
 
 public class EsriCsWktWriter {
+
+  public static String toWkt(
+    final CoordinateSystem coordinateSystem) {
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter out = new PrintWriter(stringWriter);
+    write(out, coordinateSystem);
+    return stringWriter.toString();
+  }
+
   public static void write(
     final PrintWriter out,
     final AngularUnit unit) {

@@ -28,8 +28,11 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -38,10 +41,10 @@ import com.revolsys.gis.format.shape.io.geometry.JtsGeometryConverter;
 import com.revolsys.gis.format.xbase.io.XbaseFileReader;
 import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author Paul Austin
@@ -56,6 +59,8 @@ public class ShapeFileReader extends XbaseFileReader {
   private File shapeFile;
 
   private int srid;
+
+  private GeometryFactory geometryFactory;
 
   public ShapeFileReader() {
   }
@@ -139,7 +144,9 @@ public class ShapeFileReader extends XbaseFileReader {
     throws IOException {
     final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)super.loadSchema(in);
     type.setGeometryAttributeIndex(type.getAttributeCount());
-    type.addAttribute("geometry", DataTypes.GEOMETRY, true);
+    final Attribute attribute = type.addAttribute("geometry",
+      DataTypes.GEOMETRY, true);
+    attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return type;
   }
 
@@ -149,18 +156,22 @@ public class ShapeFileReader extends XbaseFileReader {
     final File file = getFile();
     File projFile = new File(file.getParentFile(),
       FileUtil.getFileNamePrefix(file) + ".prj");
+    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
+    geometryFactory = new GeometryFactory(precisionModel);
     if (projFile.exists()) {
       try {
         final CoordinateSystem coordinateSystem = new WktCsParser(
           new FileInputStream(projFile)).parse();
-        srid = EsriCoordinateSystems.getCrsId(EsriCoordinateSystems.getCoordinateSystem(coordinateSystem));
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        srid = EsriCoordinateSystems.getCrsId(esriCoordinateSystem);
+        geometryFactory = new GeometryFactory(esriCoordinateSystem,
+          precisionModel);
       } catch (IOException e) {
         log.error("Unable to read projection file: " + projFile);
       }
     }
-    final PrecisionModel precisionModel = new PrecisionModel();
-    geometryReader = new JtsGeometryConverter(new GeometryFactory(
-      precisionModel, srid));
+
+    geometryReader = new JtsGeometryConverter(geometryFactory);
     super.open();
     try {
       final FileInputStream fileIn = new FileInputStream(shapeFile);
