@@ -6,6 +6,7 @@ import java.util.List;
 import com.revolsys.util.ListUtil;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class LineSegmentUtil {
   /**
@@ -23,6 +24,15 @@ public class LineSegmentUtil {
     double angle1 = start.angle2d(line1End);
     double angle2 = start.angle2d(line2End);
     return MathUtil.orientedAngleBetween(angle1, angle2);
+  }
+
+  public static double getElevation(
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point) {
+    final double fraction = point.distance(lineStart) / lineStart.distance(lineEnd);
+    final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ()) * (fraction);
+    return z;
   }
 
   /**
@@ -619,5 +629,15 @@ public class LineSegmentUtil {
     } else {
       return segFrac;
     }
+  }
+
+  public static void addElevation(
+    CoordinatesPrecisionModel precisionModel,
+    Coordinates lineStart,
+    Coordinates lineEnd,
+    Coordinates point) {
+    double z = getElevation(lineStart, lineEnd, point);
+    point.setZ(z);
+    precisionModel.makePrecise(point);
   }
 }

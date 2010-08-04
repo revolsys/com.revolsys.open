@@ -80,4 +80,8 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     }
   }
 
+  public void next() {
+    index++;
+  }
+
 }

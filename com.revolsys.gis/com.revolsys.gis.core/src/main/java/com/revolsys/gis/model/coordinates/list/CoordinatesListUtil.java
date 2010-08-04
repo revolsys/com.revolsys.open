@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -20,6 +23,29 @@ public class CoordinatesListUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
+
+  public static void addElevation(
+    final CoordinatesPrecisionModel precisionModel,
+    final Coordinates coordinate,
+    final CoordinatesList line) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
+      points, 0);
+    CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
+      points, 0);
+    for (int i = 1; i < points.size(); i++) {
+      currentCoordinate.next();
+
+      if (LineSegmentUtil.isPointOnLine(precisionModel, previousCoordinate,
+        currentCoordinate, coordinate)) {
+        LineSegmentUtil.addElevation(precisionModel, previousCoordinate,
+          currentCoordinate, coordinate);
+        return;
+      }
+      previousCoordinate.next();
+    }
+
+  }
 
   public static int append(
     final CoordinatesList src,
@@ -248,7 +274,8 @@ public class CoordinatesListUtil {
       numCoords = append(coordinates1, coordinates, numCoords);
       numCoords = appendReversed(coordinates2, coordinates, numCoords);
     } else {
-      throw new IllegalArgumentException("lines don't touch\n" + coordinates1 +"\n" + coordinates2);
+      throw new IllegalArgumentException("lines don't touch\n" + coordinates1
+        + "\n" + coordinates2);
 
     }
     return trim(coordinates, numCoords);

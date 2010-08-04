@@ -49,6 +49,16 @@ public final class LineStringUtil {
     return distance(point, line, 0.0);
   }
 
+  public static void addElevation(
+    final Coordinates coordinate,
+    final LineString line) {
+    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
+    GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
+    CoordinatesListUtil.addElevation(precisionModel, coordinate, coordinates);
+
+  }
+
   /**
    * Check to see if the point is on any of the segments of the line.
    * 
