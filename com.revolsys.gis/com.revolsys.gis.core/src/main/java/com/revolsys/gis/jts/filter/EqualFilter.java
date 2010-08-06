@@ -23,16 +23,16 @@ package com.revolsys.gis.jts.filter;
 import com.revolsys.filter.Filter;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class EqualFilter implements Filter<Geometry> {
-  private final Geometry geometry;
+public class EqualFilter<T extends Geometry> implements Filter<T> {
+  private final T geometry;
 
   public EqualFilter(
-    final Geometry geometry) {
+    final T geometry) {
     this.geometry = geometry;
   }
 
   public boolean accept(
-    final Geometry geometry) {
+    final T geometry) {
     if (this.geometry.equals(geometry)) {
       return true;
     } else {
@@ -40,7 +40,7 @@ public class EqualFilter implements Filter<Geometry> {
     }
   }
 
-  public Geometry getGeometry() {
+  public T getGeometry() {
     return geometry;
   }
 }

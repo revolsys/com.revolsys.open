@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,6 +67,21 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
       }
     }
     return filteredEdges;
+  }
+
+  public List<Edge<T>> replace(
+    final LineString... lines) {
+    return replace(Arrays.asList(lines));
+  }
+
+  public List<Edge<T>> replace(
+    final List<LineString> lines) {
+    if (isRemoved()) {
+      return Collections.emptyList();
+    } else {
+      final Graph<T> graph = getGraph();
+      return graph.replaceEdge(this, lines);
+    }
   }
 
   public static <T> Set<Edge<T>> getEdges(
@@ -215,8 +231,34 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public int compareTo(
     final Edge<T> edge) {
-    final Node<T> fromNode = edge.getFromNode();
-    return getFromNode().compareTo(fromNode);
+    if (this == edge) {
+      return 0;
+    } else {
+      final Node<T> otherFromNode = edge.getFromNode();
+      final Node<T> fromNode = getFromNode();
+      final int fromCompare = fromNode.compareTo(otherFromNode);
+      if (fromCompare == 0) {
+        final Node<T> otherToNode = edge.getToNode();
+        final Node<T> toNode = getToNode();
+        final int toCompare = toNode.compareTo(otherToNode);
+        if (toCompare == 0) {
+          double otherLength = edge.getLength();
+          double length = getLength();
+          final int lengthCompare = Double.compare(length, otherLength);
+          if (lengthCompare == 0) {
+            String name = toSuperString();
+            String otherName = edge.toSuperString();
+            final int nameCompare = name.compareTo(otherName);
+            return nameCompare;
+          }
+          return lengthCompare;
+        } else {
+          return toCompare;
+        }
+      } else {
+        return fromCompare;
+      }
+    }
   }
 
   public double distance(
@@ -424,7 +466,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return isWithinDistance(point, distance);
   }
 
-  void remove() {
+  public void remove() {
+    graph.remove(this);
+  }
+
+  void remove(
+    Graph<T> graph) {
     if (fromNode != null) {
       fromNode.remove(this);
     }
@@ -447,6 +494,10 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
       attributes = new HashMap<String, Object>();
     }
     attributes.put(name, value);
+  }
+
+  private String toSuperString() {
+    return super.toString();
   }
 
   @Override

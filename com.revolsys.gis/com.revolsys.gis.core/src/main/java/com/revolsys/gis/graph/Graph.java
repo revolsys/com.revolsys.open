@@ -68,7 +68,7 @@ public class Graph<T> {
     edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_ADDED, null);
   }
 
-  public void add(
+  public void addEdgeListener(
     final EdgeEventListener<T> listener) {
     edgeListeners.add(listener);
   }
@@ -601,7 +601,7 @@ public class Graph<T> {
       if (edgeIndex != null) {
         edgeIndex.remove(edge);
       }
-      edge.remove();
+      edge.remove(this);
     }
   }
 
@@ -770,11 +770,9 @@ public class Graph<T> {
     final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator,
     final Visitor<Edge<T>> visitor) {
-    final List<Edge<T>> edges = new LinkedList<Edge<T>>();
+    final LinkedList<Edge<T>> edges = new LinkedList<Edge<T>>();
     copyEdges(filter, edges);
-    if (comparator == null) {
-      Collections.sort(edges);
-    } else {
+    if (comparator != null) {
       Collections.sort(edges, comparator);
     }
     final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
@@ -783,7 +781,7 @@ public class Graph<T> {
         final Edge<T> edge = edgeEvent.getEdge();
         final String action = edgeEvent.getAction();
         if (action.equals(EdgeEvent.EDGE_ADDED)) {
-          edges.add(edge);
+          edges.addFirst(edge);
           if (comparator == null) {
             Collections.sort(edges);
           } else {
@@ -791,11 +789,6 @@ public class Graph<T> {
           }
         } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
           edges.remove(edge);
-          if (comparator == null) {
-            Collections.sort(edges);
-          } else {
-            Collections.sort(edges, comparator);
-          }
         }
       }
     };
@@ -839,9 +832,7 @@ public class Graph<T> {
     final Visitor<Node<T>> visitor) {
     final List<Node<T>> nodes = new LinkedList<Node<T>>();
     copyNodes(filter, nodes);
-    if (comparator == null) {
-      Collections.sort(nodes);
-    } else {
+    if (comparator != null) {
       Collections.sort(nodes, comparator);
     }
 
@@ -859,11 +850,6 @@ public class Graph<T> {
           }
         } else if (action.equals(NodeEvent.NODE_REMOVED)) {
           nodes.remove(node);
-          if (comparator == null) {
-            Collections.sort(nodes);
-          } else {
-            Collections.sort(nodes, comparator);
-          }
         }
       }
     };
