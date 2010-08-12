@@ -306,7 +306,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
     switch (shapeType) {
       case ShapeConstants.POINT_Z_SHAPE:
       case ShapeConstants.MULTI_POINT_Z_SHAPE:
-      case ShapeConstants.POLY_LINE_Z_SHAPE:
+      case ShapeConstants.POLYLINE_Z_SHAPE:
       case ShapeConstants.POLYGON_Z_SHAPE:
         inOut.writeLEDouble(zMin);
         inOut.writeLEDouble(zMax);

@@ -24,23 +24,31 @@ public class SimpleCoordinatesPrecisionModel implements
   }
 
   public SimpleCoordinatesPrecisionModel(
-    double scale) {
+    final double scale) {
     this.scaleXY = scale;
     this.scaleZ = scale;
   }
 
   public SimpleCoordinatesPrecisionModel(
-    double scaleXY,
-    double scaleZ) {
+    final double scaleXY,
+    final double scaleZ) {
     this.scaleXY = scaleXY;
     this.scaleZ = scaleZ;
   }
 
   public Coordinates getPreciseCoordinates(
     final Coordinates coordinates) {
-    Coordinates newCoordinates = new DoubleCoordinates(coordinates);
+    final Coordinates newCoordinates = new DoubleCoordinates(coordinates);
     makePrecise(newCoordinates);
     return newCoordinates;
+  }
+
+  public double getScaleXY() {
+    return scaleXY;
+  }
+
+  public double getScaleZ() {
+    return scaleZ;
   }
 
   public void makePrecise(
@@ -63,21 +71,13 @@ public class SimpleCoordinatesPrecisionModel implements
     }
   }
 
-  public double getScaleXY() {
-    return scaleXY;
-  }
-
   public void setScaleXY(
-    double scaleXY) {
+    final double scaleXY) {
     this.scaleXY = scaleXY;
   }
 
-  public double getScaleZ() {
-    return scaleZ;
-  }
-
   public void setScaleZ(
-    double scaleZ) {
+    final double scaleZ) {
     this.scaleZ = scaleZ;
   }
 

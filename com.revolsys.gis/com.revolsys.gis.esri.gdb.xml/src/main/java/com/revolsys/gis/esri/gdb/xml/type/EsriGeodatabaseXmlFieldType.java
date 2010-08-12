@@ -15,4 +15,8 @@ public interface EsriGeodatabaseXmlFieldType {
 
   DataType getDataType();
 
+  boolean isUsePrecision();
+
+  int getFixedLength();
+
 }

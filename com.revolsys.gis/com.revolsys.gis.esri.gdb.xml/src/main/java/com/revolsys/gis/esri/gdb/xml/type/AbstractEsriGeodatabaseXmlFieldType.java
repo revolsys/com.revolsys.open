@@ -6,13 +6,21 @@ import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
 
 public abstract class AbstractEsriGeodatabaseXmlFieldType implements
-  EsriGeodatabaseXmlFieldType {
+  EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
 
   private String esriFieldTypeName;
 
   private String xmlSchemaTypeName;
 
   private DataType dataType;
+
+  public boolean isUsePrecision() {
+    return false;
+  }
+
+  public int getFixedLength() {
+    return -1;
+  }
 
   public AbstractEsriGeodatabaseXmlFieldType(
     DataType dataType,
@@ -30,10 +38,15 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
     if (value == null) {
       out.attribute(XsiConstants.NIL, true);
     } else {
-      out.attribute(XsiConstants.TYPE, xmlSchemaTypeName);
+      out.attribute(XsiConstants.TYPE, getType(value));
       writeValueText(out, value);
     }
     out.endTag(EsriGeodatabaseXmlConstants.VALUE);
+  }
+
+  protected String getType(
+    Object value) {
+    return xmlSchemaTypeName;
   }
 
   protected abstract void writeValueText(

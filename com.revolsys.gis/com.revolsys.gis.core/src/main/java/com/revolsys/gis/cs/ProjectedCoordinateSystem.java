@@ -1,10 +1,11 @@
 package com.revolsys.gis.cs;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
@@ -28,7 +29,9 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final String name;
 
-  private final Map<String, Object> parameters = new TreeMap<String, Object>();
+  private final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+
+  private final Map<String, Object> lowerParameters = new TreeMap<String, Object>();
 
   private final Projection projection;
 
@@ -48,7 +51,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     this.area = area;
     this.geographicCoordinateSystem = geographicCoordinateSystem;
     this.projection = projection;
-    this.parameters.putAll(parameters);
+    setParameters(parameters);
     this.linearUnit = linearUnit;
     if (axis != null && !axis.isEmpty()) {
       this.axis.add(axis.get(0));
@@ -56,6 +59,14 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
     this.authority = authority;
     this.deprecated = deprecated;
+  }
+
+  public void setParameters(
+    final Map<String, Object> parameters) {
+    this.parameters.putAll(parameters);
+    for (Entry<String, Object> param : parameters.entrySet()) {
+      lowerParameters.put(param.getKey().toLowerCase(), param.getValue());
+    }
   }
 
   public ProjectedCoordinateSystem(
@@ -71,7 +82,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     this.name = name;
     this.geographicCoordinateSystem = geographicCoordinateSystem;
     this.projection = projection;
-    this.parameters.putAll(parameters);
+    setParameters(parameters);
     this.linearUnit = linearUnit;
     if (axis != null && !axis.isEmpty()) {
       this.axis.add(axis.get(0));
@@ -97,7 +108,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!equals(projection, cs.projection)) {
         return false;
-      } else if (!equals(parameters, cs.parameters)) {
+      } else if (!equals(lowerParameters, cs.lowerParameters)) {
         return false;
       } else if (!equals(linearUnit, cs.linearUnit)) {
         return false;
@@ -200,12 +211,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     if (projection != null) {
       result = prime * result + projection.hashCode();
     }
-    if (parameters != null) {
-      for (Entry<String, Object> entry : parameters.entrySet()) {
-        final String key = entry.getKey();
-        result = prime * result + key.toLowerCase().hashCode();
-        result = prime * result + entry.getValue().hashCode();
-      }
+    for (Entry<String, Object> entry : lowerParameters.entrySet()) {
+      final String key = entry.getKey();
+      result = prime * result + key.hashCode();
+      result = prime * result + entry.getValue().hashCode();
     }
     if (linearUnit != null) {
       result = prime * result + linearUnit.hashCode();

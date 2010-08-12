@@ -71,12 +71,12 @@ public class JtsGeometryConverter {
         return new Point2DMConverter(geometryFactory).read(in, recordLength);
       case ShapeConstants.MULTI_POINT_Z_SHAPE:
         return new Point3DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLY_LINE_SHAPE:
+      case ShapeConstants.POLYLINE_SHAPE:
         return new LineString2DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLY_LINE_M_SHAPE:
+      case ShapeConstants.POLYLINE_M_SHAPE:
         return new LineString2DMConverter(geometryFactory).read(in,
           recordLength);
-      case ShapeConstants.POLY_LINE_Z_SHAPE:
+      case ShapeConstants.POLYLINE_Z_SHAPE:
         return new LineString3DConverter(geometryFactory).read(in, recordLength);
       case ShapeConstants.POLYGON_SHAPE:
         return new Polygon2DConverter(geometryFactory).read(in, recordLength);
@@ -150,12 +150,12 @@ public class JtsGeometryConverter {
     final Envelope envelope = line.getEnvelopeInternal();
     final Coordinate[] coordinates = line.getCoordinates();
     if (coordinates.length > 0) {
-      if (shapeType == ShapeConstants.POLY_LINE_SHAPE
+      if (shapeType == ShapeConstants.POLYLINE_SHAPE
         || Double.isNaN(coordinates[0].z)) {
         final int recordLength = (4 * MathUtil.BYTES_IN_INT + (4 + 2 * coordinates.length)
           * MathUtil.BYTES_IN_DOUBLE) / 2;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapeConstants.POLY_LINE_SHAPE);
+        out.writeLEInt(ShapeConstants.POLYLINE_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(1);
         out.writeLEInt(coordinates.length);
@@ -166,12 +166,12 @@ public class JtsGeometryConverter {
           out.writeLEDouble(coordinate.x);
           out.writeLEDouble(coordinate.y);
         }
-        return ShapeConstants.POLY_LINE_SHAPE;
+        return ShapeConstants.POLYLINE_SHAPE;
       } else {
         final int recordLength = (4 * MathUtil.BYTES_IN_INT + (8 + 2 * coordinates.length)
           * MathUtil.BYTES_IN_DOUBLE) / 2;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapeConstants.POLY_LINE_Z_SHAPE);
+        out.writeLEInt(ShapeConstants.POLYLINE_Z_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(1);
         out.writeLEInt(coordinates.length);
@@ -200,7 +200,7 @@ public class JtsGeometryConverter {
         out.writeLEDouble(minZ);
         out.writeLEDouble(maxZ);
         out.seek(endIndex);
-        return ShapeConstants.POLY_LINE_Z_SHAPE;
+        return ShapeConstants.POLYLINE_Z_SHAPE;
       }
     } else {
       return writeNull(out);

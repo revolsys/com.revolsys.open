@@ -15,34 +15,50 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
   private Map<DataType, EsriGeodatabaseXmlFieldType> typeMapping = new HashMap<DataType, EsriGeodatabaseXmlFieldType>();
 
   public EsriGeodatabaseXmlFieldTypeRegistry() {
-    addSimpleType(DataTypes.ANY_URI, FIELD_TYPE_STRING);
-    addSimpleType(DataTypes.BASE64_BINARY, null);
-    addSimpleType(DataTypes.BOOLEAN, FIELD_TYPE_STRING);
-    addSimpleType(DataTypes.BYTE, FIELD_TYPE_SMALL_INTEGER);
-    addSimpleType(DataTypes.DATE, FIELD_TYPE_DATE);
-    addSimpleType(DataTypes.DATE_TIME, FIELD_TYPE_DATE);
-    addSimpleType(DataTypes.DECIMAL, FIELD_TYPE_DOUBLE);
-    addSimpleType(DataTypes.DOUBLE, FIELD_TYPE_DOUBLE);
-    addSimpleType(DataTypes.FLOAT, FIELD_TYPE_SINGLE);
-    addSimpleType(DataTypes.INT, FIELD_TYPE_INTEGER);
-    addSimpleType(DataTypes.INTEGER, FIELD_TYPE_INTEGER);
-    addSimpleType(DataTypes.LONG, FIELD_TYPE_INTEGER);
-    addSimpleType(DataTypes.QNAME, FIELD_TYPE_STRING);
-    addSimpleType(DataTypes.SHORT, FIELD_TYPE_SMALL_INTEGER);
-    addSimpleType(DataTypes.STRING, FIELD_TYPE_STRING);
-  }
-
-  public void addSimpleType(
-    final DataType dataType,
-    final String esriFieldType) {
-    final SimpleEsriGeodatabaseXmlFieldType fieldType = new SimpleEsriGeodatabaseXmlFieldType(
-      esriFieldType, dataType);
-    addFieldType(fieldType);
+    addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.ANY_URI,
+      false));
+    addFieldType(new SimpleFieldType(null, DataTypes.BASE64_BINARY, false));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.BOOLEAN,
+      false));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_SMALL_INTEGER, DataTypes.BYTE,
+      "xs:short", true, 2));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_DATE, DataTypes.DATE, false, 36));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_DATE, DataTypes.DATE_TIME,
+      true, 36));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_DOUBLE, DataTypes.DECIMAL,
+      "xs:double", true, 8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_DOUBLE, DataTypes.DOUBLE, true,
+      8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_SINGLE, DataTypes.FLOAT,
+      "xs:double", true, 4));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INT, true, 8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INTEGER,
+      "xs:int", true, 8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.LONG,
+      "xs:int", true, 8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.QNAME,
+      "xs:string", true, -1));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_SMALL_INTEGER, DataTypes.SHORT,
+      true, 2));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.STRING, false));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
+      DataTypes.GEOMETRY));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY, DataTypes.POINT));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
+      DataTypes.LINESTRING));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
+      DataTypes.POLYGON));
   }
 
   public void addFieldType(
-    final SimpleEsriGeodatabaseXmlFieldType fieldType) {
+    final EsriGeodatabaseXmlFieldType fieldType) {
     final DataType dataType = fieldType.getDataType();
+    addFieldType(dataType, fieldType);
+  }
+
+  public void addFieldType(
+    final DataType dataType,
+    final EsriGeodatabaseXmlFieldType fieldType) {
     typeMapping.put(dataType, fieldType);
   }
 

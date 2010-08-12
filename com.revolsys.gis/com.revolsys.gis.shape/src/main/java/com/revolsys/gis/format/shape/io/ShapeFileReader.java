@@ -36,6 +36,7 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.JtsGeometryConverter;
 import com.revolsys.gis.format.xbase.io.XbaseFileReader;
@@ -61,6 +62,8 @@ public class ShapeFileReader extends XbaseFileReader {
   private int srid;
 
   private GeometryFactory geometryFactory;
+
+  private DataType dataType;
 
   public ShapeFileReader() {
   }
@@ -123,11 +126,15 @@ public class ShapeFileReader extends XbaseFileReader {
    */
   private void loadHeader()
     throws IOException {
-    in.readInt();
+    final int fileCode = in.readInt();
     in.skipBytes(20);
-    in.readInt();
-    in.readLEInt();
-    in.readLEInt();
+    final int fileLength = in.readInt();
+    final int version = in.readLEInt();
+    final int shapeType = in.readLEInt();
+    dataType = ShapeConstants.DATA_TYPE_MAP.get(shapeType);
+    if (dataType == null) {
+      dataType = DataTypes.GEOMETRY;
+    }
     in.readDouble();
     in.readDouble();
     in.readDouble();
@@ -144,8 +151,7 @@ public class ShapeFileReader extends XbaseFileReader {
     throws IOException {
     final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)super.loadSchema(in);
     type.setGeometryAttributeIndex(type.getAttributeCount());
-    final Attribute attribute = type.addAttribute("geometry",
-      DataTypes.GEOMETRY, true);
+    final Attribute attribute = type.addAttribute("geometry", dataType, true);
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return type;
   }

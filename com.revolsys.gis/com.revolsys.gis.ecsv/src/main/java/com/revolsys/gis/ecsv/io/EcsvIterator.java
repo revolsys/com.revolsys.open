@@ -356,7 +356,7 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
         value = QName.valueOf(string);
       } else if (type == DataTypes.DECIMAL) {
         value = new BigDecimal(string);
-      } else if (type == DataTypes.GEOMETRY) {
+      } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
         try {
           value = geometryReader.read(string);
         } catch (final com.vividsolutions.jts.io.ParseException e) {
@@ -378,7 +378,7 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
         value = string;
       }
     } else {
-      if (type == DataTypes.GEOMETRY) {
+      if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
         value = emptyGeometry;
       }
     }

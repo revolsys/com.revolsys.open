@@ -128,6 +128,9 @@ public class XmlWriter extends Writer {
   /** The map of XML Namespace URIs to prefixes. */
   private final Map<String, String> namespaceMap = new HashMap<String, String>();
 
+  /** The string of characters to use for a new line. */
+  private final String newLine = "\n";
+
   /** The underlying writer to write to. */
   private final PrintWriter out;
 
@@ -719,7 +722,7 @@ public class XmlWriter extends Writer {
    */
   public void newLine() {
     closeStartTag();
-    out.write('\n');
+    out.write(newLine);
   }
 
   /**
@@ -1222,7 +1225,7 @@ public class XmlWriter extends Writer {
    */
   private void writeEndIndent() {
     if (!elementHasContent) {
-      out.write('\n');
+      out.write(newLine);
       if (indent) {
         final int depth = elementStack.size() - 1;
         for (int i = 0; i < depth; i++) {
@@ -1238,7 +1241,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If an I/O exception occurs.
    */
   private void writeIndent() {
-    out.write('\n');
+    out.write(newLine);
     if (indent) {
       final int depth = elementStack.size();
       for (int i = 0; i < depth; i++) {
@@ -1268,6 +1271,21 @@ public class XmlWriter extends Writer {
     out.write(name);
   }
 
+  public void writeNamespaceAttribute(
+    final String namespaceUri,
+    final String prefix) {
+    if (prefix.length() == 0) {
+      out.write(" xmlns");
+
+    } else {
+      out.write(" xmlns:");
+      out.write(prefix);
+    }
+    out.write("=\"");
+    writeAttributeValue(namespaceUri);
+    out.write("\"");
+  }
+
   /**
    * Write the XML namespace declarations for an element.
    * 
@@ -1284,20 +1302,5 @@ public class XmlWriter extends Writer {
         writeNamespaceAttribute(namespaceUri, prefix);
       }
     }
-  }
-
-  public void writeNamespaceAttribute(
-    final String namespaceUri,
-    final String prefix) {
-    if (prefix.length() == 0) {
-      out.write(" xmlns");
-
-    } else {
-      out.write(" xmlns:");
-      out.write(prefix);
-    }
-    out.write("=\"");
-    writeAttributeValue(namespaceUri);
-    out.write("\"");
   }
 }

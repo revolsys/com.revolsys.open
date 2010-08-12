@@ -39,7 +39,6 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   public OracleSdoGeometryAttributeAdder(
     final DataSource dataSource) {
-    super(DataTypes.GEOMETRY);
     this.dataSource = dataSource;
   }
 
@@ -72,7 +71,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
       geometryScale);
     final GeometryFactory geometryFactory = new GeometryFactory(
-      coordinateSystem, precisionModel);
+      coordinateSystem, precisionModel, dimension);
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
       DataTypes.GEOMETRY, sqlType, length, scale, required, null,
       geometryFactory, dimension);

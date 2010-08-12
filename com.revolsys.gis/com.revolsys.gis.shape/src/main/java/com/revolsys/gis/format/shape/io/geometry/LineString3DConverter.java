@@ -31,7 +31,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapeConstants.POLY_LINE_Z_SHAPE;
+    return ShapeConstants.POLYLINE_Z_SHAPE;
   }
 
   /*
@@ -124,7 +124,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     final int recordLength = ((3 + numGeometries) * MathUtil.BYTES_IN_INT + (6 + 3 * numCoordinates)
       * MathUtil.BYTES_IN_DOUBLE) / 2;
     out.writeInt(recordLength);
-    out.writeLEInt(ShapeConstants.POLY_LINE_Z_SHAPE);
+    out.writeLEInt(ShapeConstants.POLYLINE_Z_SHAPE);
     final Envelope envelope = geometry.getEnvelopeInternal();
     ShapefileGeometryUtil.writeEnvelope(out, envelope);
     out.writeLEInt(numGeometries);

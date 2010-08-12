@@ -31,7 +31,7 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapeConstants.POLY_LINE_SHAPE;
+    return ShapeConstants.POLYLINE_SHAPE;
   }
 
   public Geometry read(

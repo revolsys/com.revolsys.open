@@ -647,7 +647,6 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   public Reader<DataObject> query(
     final QName typeName) {
-    final String tableName = JdbcUtils.getTableName(typeName);
     final DataObjectMetaData metaData = getMetaData(typeName);
      final StringBuffer sql = new StringBuffer();
     JdbcQuery.addColumnsAndTableName(sql, metaData, "T");

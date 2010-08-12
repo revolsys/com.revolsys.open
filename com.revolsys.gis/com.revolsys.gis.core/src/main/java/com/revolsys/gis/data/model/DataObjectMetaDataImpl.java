@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectMetaDataImpl implements DataObjectMetaData,
   Comparable<DataObjectMetaData>, Cloneable {
@@ -154,7 +154,9 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     attributes.add(attribute);
     attributeMap.put(name, attribute);
     attributeIdMap.put(name, attributeIdMap.size());
-    if (attribute.getType() == DataTypes.GEOMETRY) {
+    final DataType dataType = attribute.getType();
+    final Class<?> dataClass = dataType.getJavaClass();
+    if (Geometry.class.isAssignableFrom(dataClass)) {
       geometryAttributeIndexes.add(index);
       geometryAttributeNames.add(name);
       if (geometryAttributeIndex == -1) {
@@ -512,7 +514,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void setProperty(
     final String name,
     final Object value) {
-     properties.put(name, value);
+    properties.put(name, value);
   }
 
   @Override

@@ -19,6 +19,10 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public final class DataTypes {
 
@@ -62,6 +66,23 @@ public final class DataTypes {
 
   public static final DataType GEOMETRY = new SimpleDataType("geometry",
     Geometry.class);
+
+  public static final DataType POINT = new SimpleDataType("point", Point.class);
+
+  public static final DataType LINESTRING = new SimpleDataType("line",
+    LineString.class);
+
+  public static final DataType POLYLINE = new SimpleDataType("polyline",
+    MultiLineString.class);
+
+  public static final DataType POLYGON = new SimpleDataType("polygon",
+    Polygon.class);
+
+  public static final DataType MULTI_POINT = new SimpleDataType("multiPoint",
+    Point.class);
+
+  public static final DataType MULTI_POLYGON = new SimpleDataType(
+    "multiPolygon", Polygon.class);
 
   public static final DataType INT = new SimpleDataType("int", Integer.class);
 

@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel {
+  private int numAxis = 2;
 
   public static GeometryFactory getFactory(
     final Geometry geometry) {
@@ -74,6 +75,26 @@ public class GeometryFactory extends
     this.coordinateSystem = null;
   }
 
+  public GeometryFactory(
+    CoordinateSystem coordinateSystem,
+    CoordinatesPrecisionModel precisionModel,
+    int numAxis) {
+    this(coordinateSystem, precisionModel);
+    this.numAxis = numAxis;
+  }
+
+  public GeometryFactory(
+    GeometryFactory geometryFactory,
+    int numAxis) {
+    this(geometryFactory.getCoordinateSystem(),
+      geometryFactory.getCoordinatesPrecisionModel());
+    this.numAxis = numAxis;
+  }
+
+  protected int getNumAxis() {
+    return numAxis;
+  }
+
   public LinearRing createLinearRing(
     final CoordinatesList points) {
     points.makePrecise(coordinatesPrecisionModel);
@@ -91,6 +112,10 @@ public class GeometryFactory extends
     points.makePrecise(coordinatesPrecisionModel);
     final LineString line = super.createLineString(points);
     return line;
+  }
+
+  public boolean hasZ() {
+    return numAxis > 2;
   }
 
   public LineString createLineString(
@@ -158,4 +183,13 @@ public class GeometryFactory extends
       + getCoordinatesPrecisionModel();
   }
 
+  public double getScaleXY() {
+    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
+    return precisionModel.getScaleXY();
+  }
+
+  public double getScaleZ() {
+    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
+    return precisionModel.getScaleZ();
+  }
 }

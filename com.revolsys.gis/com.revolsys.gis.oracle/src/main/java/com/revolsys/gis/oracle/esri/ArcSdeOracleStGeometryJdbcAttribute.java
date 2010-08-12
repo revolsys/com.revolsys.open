@@ -34,8 +34,9 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   public static final QName ESRI_SCHEMA_PROPERTY = new QName(
     ArcSdeOracleStGeometryJdbcAttribute.class.getName());
 
-  public static final String ESRI_SRID_PROPERTY = ArcSdeOracleStGeometryJdbcAttribute.class.getName()
-    + ".esriSrid";
+  public static final String ESRI_SRID_PROPERTY = "esriSrid";
+
+  public static final String DATA_TYPE = "dataType";
 
   private final int dimension;
 
@@ -54,7 +55,8 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
     final int dimension) {
     super(name, type, -1, length, scale, required, properties);
     this.spatialReference = spatialReference;
-    this.geometryFactory = spatialReference.getGeometryFactory();
+    this.geometryFactory = new GeometryFactory(
+      spatialReference.getGeometryFactory(), dimension);
     this.dimension = dimension;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
   }

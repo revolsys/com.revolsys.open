@@ -1,6 +1,8 @@
 package com.revolsys.gis.postgis;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
@@ -9,6 +11,7 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.JdbcConstants;
@@ -17,11 +20,22 @@ import com.revolsys.jdbc.JdbcUtils;
 
 public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
 
+  private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<String, DataType>();
+  
+  static {
+    DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
+    DATA_TYPE_MAP.put("POINT", DataTypes.POINT);
+    DATA_TYPE_MAP.put("LINESTRING", DataTypes.POLYLINE);
+    DATA_TYPE_MAP.put("POLYGON", DataTypes.POLYLINE);
+    DATA_TYPE_MAP.put("MULTIPOINT", DataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.POLYLINE);
+    DATA_TYPE_MAP.put("MULTIPOLYGON", DataTypes.MULTI_POLYGON);
+  }
+
   private final DataSource dataSource;
 
   public PostGisGeometryAttributeAdder(
     final DataSource dataSource) {
-    super(DataTypes.GEOMETRY);
     this.dataSource = dataSource;
   }
 
@@ -41,11 +55,14 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
     final String tableName = typeName.getLocalPart().toLowerCase();
     final String columnName = name.toLowerCase();
     try {
-      final String sql = "select SRID from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
-      final int srid = JdbcUtils.selectInt(dataSource, sql, owner, tableName,
-        columnName);
+      final String sql = "select SRID, TYPE from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+      final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
+        owner, tableName, columnName);
+      int srid = (Integer)values.get("srid");
+      String type = (String)values.get("type");
+      final DataType dataType = DATA_TYPE_MAP.get(type);
       final Attribute attribute = new PostGisGeometryJdbcAttribute(name,
-        DataTypes.GEOMETRY, length, scale, required, null, srid);
+        dataType, length, scale, required, null, srid);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "SDE.ST_INTERSECTS(", ") = 1"));
