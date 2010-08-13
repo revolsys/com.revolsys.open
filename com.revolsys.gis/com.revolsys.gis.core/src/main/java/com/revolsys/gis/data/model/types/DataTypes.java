@@ -69,11 +69,11 @@ public final class DataTypes {
 
   public static final DataType POINT = new SimpleDataType("point", Point.class);
 
-  public static final DataType LINESTRING = new SimpleDataType("line",
+  public static final DataType LINESTRING = new SimpleDataType("lineString",
     LineString.class);
 
-  public static final DataType POLYLINE = new SimpleDataType("polyline",
-    MultiLineString.class);
+  public static final DataType MULTI_LINESTRING = new SimpleDataType(
+    "multiLineString", MultiLineString.class);
 
   public static final DataType POLYGON = new SimpleDataType("polygon",
     Polygon.class);

@@ -187,13 +187,27 @@ public interface EsriGeodatabaseXmlConstants {
 
   String PATH_ARRAY_TYPE = "esri:ArrayOfPath";
 
+  QName PATH = new QName("Path");
+
+  String PATH_TYPE = "esri:Path";
+
   QName POINT = new QName("Point");
 
   QName POINT_ARRAY = new QName("PointArray");
 
   String POINT_ARRAY_TYPE = "esri:ArrayOfPoint";
 
+  QName RING_ARRAY = new QName("RingArray");
+
+  String RING_ARRAY_TYPE = "esri:ArrayOfRing";
+
+  QName RING = new QName("Ring");
+
+  String RING_TYPE = "esri:Ring";
+
   String POINT_N_TYPE = "esri:PointN";
+
+  String POLYGON_N_TYPE = "esri:PolygonN";
 
   QName PRECISION = new QName("Precision");
 

@@ -28,6 +28,12 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.xml.XmlContants;
 import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class EsriGeodatabaseXmlDataObjectWriter extends
   AbstractWriter<DataObject> implements EsriGeodatabaseXmlConstants {
@@ -49,6 +55,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
   private EsriGeodatabaseXmlFieldTypeRegistry fieldTypes = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
+  private String geometryType;
+
   public EsriGeodatabaseXmlDataObjectWriter(
     DataObjectMetaData metaData,
     final Writer out) {
@@ -56,7 +64,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     this.out = new XmlWriter(out);
   }
 
-  private void writeHeader() {
+  private void writeHeader(
+    Geometry geometry) {
     opened = true;
     out.startDocument();
     out.startTag(new QName(namespaceUri, WORKSPACE, "esri"));
@@ -76,14 +85,15 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
     out.startTag(DATASET_DEFINITIONS);
     out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
-    writeDataElement(metaData);
+    writeDataElement(metaData, geometry);
     out.endTag(DATASET_DEFINITIONS);
 
     out.endTag(WORKSPACE_DEFINITION);
   }
 
   private void writeDataElement(
-    DataObjectMetaData metaData) {
+    DataObjectMetaData metaData,
+    Geometry geometry) {
     final String dataElementType;
     Attribute geometryAttribute = metaData.getGeometryAttribute();
     boolean hasGeometry = false;
@@ -92,6 +102,32 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
       geometryDataType = geometryAttribute.getType();
       if (fieldTypes.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
+
+        if (geometryDataType.equals(DataTypes.POINT)) {
+          geometryType = GEOMETRY_TYPE_POINT;
+        } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+          geometryType = GEOMETRY_TYPE_MULTI_POINT;
+        } else if (geometryDataType.equals(DataTypes.LINESTRING)) {
+          geometryType = GEOMETRY_TYPE_POLYLINE;
+        } else if (geometryDataType.equals(DataTypes.MULTI_LINESTRING)) {
+          geometryType = GEOMETRY_TYPE_POLYLINE;
+        } else if (geometryDataType.equals(DataTypes.POLYGON)) {
+          geometryType = GEOMETRY_TYPE_POLYGON;
+        } else {
+          if (geometry instanceof Point) {
+            geometryType = GEOMETRY_TYPE_POINT;
+          } else if (geometry instanceof MultiPoint) {
+            geometryType = GEOMETRY_TYPE_MULTI_POINT;
+          } else if (geometry instanceof LineString) {
+            geometryType = GEOMETRY_TYPE_POLYLINE;
+          } else if (geometry instanceof MultiLineString) {
+            geometryType = GEOMETRY_TYPE_POLYLINE;
+          } else if (geometry instanceof Polygon) {
+            geometryType = GEOMETRY_TYPE_POLYGON;
+          } else {
+            hasGeometry = false;
+          }
+        }
       }
     }
 
@@ -163,18 +199,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(CONTROLLER_MEMBERSHIPS);
     if (hasGeometry) {
       out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
-      if (geometryDataType.equals(DataTypes.POINT)) {
-        out.element(SHAPE_TYPE, GEOMETRY_TYPE_POINT);
-      } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
-        out.element(SHAPE_TYPE, GEOMETRY_TYPE_MULTI_POINT);
-      } else if (geometryDataType.equals(DataTypes.LINESTRING)) {
-        out.element(SHAPE_TYPE, GEOMETRY_TYPE_POLYLINE);
-      } else if (geometryDataType.equals(DataTypes.POLYGON)) {
-        out.element(SHAPE_TYPE, GEOMETRY_TYPE_POLYGON);
-      } else {
-        // TODO unknown shape type
-        out.element(SHAPE_TYPE, GEOMETRY_TYPE_POINT);
-      }
+      out.element(SHAPE_TYPE, geometryType);
       out.element(SHAPE_FIELD_NAME, geometryAttribute.getName());
       GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       out.element(HAS_M, false);
@@ -300,19 +325,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
           out.element(AVG_NUM_POINTS, 0);
 
-          DataType geometryDataType = attribute.getType();
-          if (geometryDataType.equals(DataTypes.POINT)) {
-            out.element(GEOMETRY_TYPE, GEOMETRY_TYPE_POINT);
-          } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
-            out.element(GEOMETRY_TYPE, GEOMETRY_TYPE_MULTI_POINT);
-          } else if (geometryDataType.equals(DataTypes.LINESTRING)) {
-            out.element(GEOMETRY_TYPE, GEOMETRY_TYPE_POLYLINE);
-          } else if (geometryDataType.equals(DataTypes.POLYGON)) {
-            out.element(GEOMETRY_TYPE, GEOMETRY_TYPE_POLYGON);
-          } else {
-            // TODO unknown shape type
-            out.element(GEOMETRY_TYPE, GEOMETRY_TYPE_POINT);
-          }
+          out.element(GEOMETRY_TYPE, geometryType);
           out.element(HAS_M, false);
           out.element(HAS_Z, geometryFactory.hasZ());
 
@@ -342,7 +355,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
   public void close() {
     if (!opened) {
-      writeHeader();
+      writeHeader(null);
     }
 
     writeFooter();
@@ -360,7 +373,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
   public void write(
     final DataObject object) {
     if (!opened) {
-      writeHeader();
+      writeHeader(object.getGeometryValue());
       writeWorkspaceDataHeader();
     }
     out.startTag(RECORD);

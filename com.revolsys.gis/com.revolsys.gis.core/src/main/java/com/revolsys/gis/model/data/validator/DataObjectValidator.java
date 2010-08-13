@@ -62,7 +62,7 @@ public class DataObjectValidator {
     setObjectValidator(DataTypes.DATE, new DateAttributeValidator());
     setObjectValidator(DataTypes.GEOMETRY, new GeometryAttributeValidator());
     setObjectValidator(DataTypes.POINT, new GeometryAttributeValidator());
-    setObjectValidator(DataTypes.POLYLINE, new GeometryAttributeValidator());
+    setObjectValidator(DataTypes.MULTI_LINESTRING, new GeometryAttributeValidator());
     setObjectValidator(DataTypes.POLYGON, new GeometryAttributeValidator());
     setObjectValidator(DataTypes.MULTI_POINT, new GeometryAttributeValidator());
     setObjectValidator(DataTypes.MULTI_POLYGON, new GeometryAttributeValidator());
