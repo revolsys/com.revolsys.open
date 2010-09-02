@@ -42,7 +42,7 @@ public class ThreadSharedAttributes {
     synchronized (attributes) {
       final T value = (T)attributes.get(name);
       if (value == null) {
-        return getDefaultAttribute(name);
+        return (T)getDefaultAttribute(name);
       }
       return value;
     }
