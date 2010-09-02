@@ -16,6 +16,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.ShortNameProperty;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
@@ -91,7 +92,7 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
       addAttributeAdder("NCHAR", attributeAdder);
       addAttributeAdder("VARCHAR", attributeAdder);
       addAttributeAdder("VARCHAR2", attributeAdder);
-      addAttributeAdder("NVARCHAR2", attributeAdder);
+      addAttributeAdder("NVARCHAR2", new JdbcAttributeAdder(DataTypes.STRING));
       addAttributeAdder("LONG", attributeAdder);
       addAttributeAdder("CLOB", attributeAdder);
       addAttributeAdder("NCLOB", attributeAdder);

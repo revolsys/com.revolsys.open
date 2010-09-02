@@ -22,7 +22,7 @@ public class DataObjectMetaDataFeatureSchema extends FeatureSchema {
     final String geometryAttribute) {
     this.metaData = metaData;
     name = metaData.getName().getLocalPart();
-    int i = 0;
+     int i = 0;
     for (String name : metaData.getAttributeNames()) {
       AttributeType attributeType = AttributeType.OBJECT;
       if (geometryAttribute != null && name.equals(geometryAttribute)) {
@@ -45,6 +45,8 @@ public class DataObjectMetaDataFeatureSchema extends FeatureSchema {
           attributeType = AttributeType.DATE;
         } else if (type == DataTypes.BOOLEAN) {
           attributeType = AttributeType.STRING;
+        } else if (Geometry.class.isAssignableFrom(typeClass)) {
+          attributeType = AttributeType.GEOMETRY;
         }
       }
       i++;

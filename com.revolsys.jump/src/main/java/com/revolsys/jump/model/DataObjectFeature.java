@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.types.DataType;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.feature.AttributeType;
 import com.vividsolutions.jump.feature.BasicFeature;
@@ -60,9 +62,13 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
   public Feature clone(
     final boolean deep) {
     final DataObjectMetaDataFeatureSchema schema = (DataObjectMetaDataFeatureSchema)getSchema();
+    final DataObjectMetaData metaData = getMetaData();
     final Feature clone = new DataObjectFeature(schema);
     for (int i = 0; i < schema.getAttributeCount(); i++) {
-      if (schema.getAttributeType(i) == AttributeType.GEOMETRY) {
+      Attribute attribute = metaData.getAttribute(i);
+      DataType dataType = attribute.getType();
+      Class<?> dataClass = dataType.getJavaClass();
+      if (Geometry.class.isAssignableFrom(dataClass)) {
         final Geometry geometry = getGeometryValue();
         if (deep) {
           clone.setAttribute(i, geometry.clone());

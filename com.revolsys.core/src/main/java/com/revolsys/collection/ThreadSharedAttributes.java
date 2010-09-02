@@ -10,6 +10,8 @@ public class ThreadSharedAttributes {
 
   private static Map<ThreadGroup, Map<Object, Object>> threadGroupAttributes = new WeakHashMap<ThreadGroup, Map<Object, Object>>();
 
+  private static Map<Object, Object> defaultAttributes = new WeakHashMap<Object, Object>();
+
   public static void clearAttributes() {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
@@ -33,6 +35,28 @@ public class ThreadSharedAttributes {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T getThreadGroupAttribute(
+    final Object name) {
+    final Map<Object, Object> attributes = getThreadGroupAttributes();
+    synchronized (attributes) {
+      final T value = (T)attributes.get(name);
+      if (value == null) {
+        return getDefaultAttribute(name);
+      }
+      return value;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T getDefaultAttribute(
+    final Object name) {
+    synchronized (defaultAttributes) {
+      final T value = (T)defaultAttributes.get(name);
+      return value;
+    }
+  }
+
   public static Map<String, Object> getAttributes() {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
@@ -52,19 +76,25 @@ public class ThreadSharedAttributes {
   private static Map<Object, Object> getLocalAttributes() {
     Map<Object, Object> attributes = threadAttributes.get();
     if (attributes == null) {
-      synchronized (threadGroupAttributes) {
-        final Thread thread = Thread.currentThread();
-        final ThreadGroup threadGroup = thread.getThreadGroup();
-        if (threadGroup != null) {
-          attributes = threadGroupAttributes.get(threadGroup);
-        }
-        if (attributes == null) {
-          attributes = new HashMap<Object, Object>();
-        }
-        threadAttributes.set(attributes);
-      }
+      attributes = getThreadGroupAttributes();
+      threadAttributes.set(attributes);
     }
     return attributes;
+  }
+
+  public static Map<Object, Object> getThreadGroupAttributes() {
+    synchronized (threadGroupAttributes) {
+      Map<Object, Object> attributes = null;
+      final Thread thread = Thread.currentThread();
+      final ThreadGroup threadGroup = thread.getThreadGroup();
+      if (threadGroup != null) {
+        attributes = threadGroupAttributes.get(threadGroup);
+      }
+      if (attributes == null) {
+        attributes = new HashMap<Object, Object>(defaultAttributes);
+      }
+      return attributes;
+    }
   }
 
   public static void initialiseThreadGroup(
@@ -88,7 +118,22 @@ public class ThreadSharedAttributes {
     final Map<? extends Object, Object> values) {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
-      attributes.putAll(attributes);
+      attributes.putAll(values);
+    }
+  }
+
+  public static void setDefaultAttribute(
+    final Object name,
+    final Object value) {
+    synchronized (defaultAttributes) {
+      defaultAttributes.put(name, value);
+    }
+  }
+
+  public static void setDefaultAttributes(
+    final Map<? extends Object, Object> values) {
+    synchronized (defaultAttributes) {
+      defaultAttributes.putAll(values);
     }
   }
 }
