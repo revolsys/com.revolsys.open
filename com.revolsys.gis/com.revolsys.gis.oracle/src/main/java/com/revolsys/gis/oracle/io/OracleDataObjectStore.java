@@ -9,9 +9,12 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -19,8 +22,11 @@ import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.gis.jdbc.io.JdbcConstants;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.gis.jdbc.io.JdbcQueryReader;
+import com.revolsys.gis.jdbc.io.SqlFunction;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
@@ -142,31 +148,33 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     final String geometryColumnName = geometryAttribute.getName();
+    CoordinateSystem coordinateSystem = geometryAttribute.getProperty(AttributeProperties.COORDINATE_SYSTEM);
 
     final double x1 = envelope.getMinX();
     final double y1 = envelope.getMinY();
     final double x2 = envelope.getMaxX();
     final double y2 = envelope.getMaxY();
-    final String sql = "SELECT * FROM "
-      + typeName.getNamespaceURI()
-      + "."
-      + typeName.getLocalPart()
-      + " WHERE "
-      + " SDO_RELATE("
+
+    final StringBuffer sql = new StringBuffer();
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
+    sql.append(" WHERE ");
+    sql.append(" SDO_RELATE("
       + geometryColumnName
       + ","
       +
 
       "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))"
-      + ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
+      + ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
     final List<Object> parameters = new ArrayList<Object>();
-    parameters.add(3005);
+    parameters.add(coordinateSystem.getId());
     parameters.add(x1);
     parameters.add(y1);
     parameters.add(x2);
     parameters.add(y2);
     final JdbcQueryReader reader = createReader();
-    reader.addQuery(typeName, sql, parameters);
+    JdbcQuery query = new JdbcQuery(metaData, sql.toString(),
+      coordinateSystem.getId(), x1, y1, x2, y2);
+    reader.addQuery(query);
     return reader;
   }
 

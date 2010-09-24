@@ -55,6 +55,8 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   private String[] excludeTablePatterns = new String[0];
 
+  private boolean flushBetweenTypes;
+
   private String hints;
 
   private String label;
@@ -68,17 +70,6 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
   private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
-
-  private boolean flushBetweenTypes;
-
-  public boolean isFlushBetweenTypes() {
-    return flushBetweenTypes;
-  }
-
-  public void setFlushBetweenTypes(
-    final boolean flushBetweenTypes) {
-    this.flushBetweenTypes = flushBetweenTypes;
-  }
 
   public JdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -150,6 +141,28 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   protected JdbcQueryReader createReader(
+    final DataObjectMetaData metaData,
+    final String sql,
+    final List<Object> parameters) {
+    final JdbcQuery query = new JdbcQuery(metaData, sql, parameters);
+    return createReader(query);
+  }
+
+  protected JdbcQueryReader createReader(
+    final DataObjectMetaData metaData,
+    final String query,
+    final Object... parameters) {
+    return createReader(metaData, query, Arrays.asList(parameters));
+  }
+
+  protected JdbcQueryReader createReader(
+    final JdbcQuery query) {
+    final JdbcQueryReader reader = createReader();
+    reader.addQuery(query);
+    return reader;
+  }
+
+  protected JdbcQueryReader createReader(
     final QName typeName,
     final String query,
     final List<Object> parameters) {
@@ -157,12 +170,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     reader.addQuery(typeName, query, parameters);
     return reader;
   }
-  protected JdbcQueryReader createReader(
-    final JdbcQuery query) {
-    final JdbcQueryReader reader = createReader();
-    reader.addQuery(query);
-    return reader;
-  }
+
   protected JdbcQueryReader createReader(
     final QName typeName,
     final String query,
@@ -284,13 +292,17 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
           throw new IllegalArgumentException(typeName
             + " does not have a primary key");
         }
-        final String tableName = JdbcUtils.getTableName(typeName);
-
+       
         final String idAttributeName = metaData.getIdAttributeName();
-        sql = "SELECT * FROM " + tableName + " WHERE " + idAttributeName
-          + " = ?";
 
-        typeLoadSql.put(typeName, sql);
+        final StringBuffer sqlBuffer = new StringBuffer();
+        JdbcQuery.addColumnsAndTableName(sqlBuffer, metaData, "T");
+        sqlBuffer.append(" WHERE ");
+
+        sqlBuffer.append(idAttributeName);
+        sqlBuffer.append(" = ?");
+
+        typeLoadSql.put(typeName, sqlBuffer.toString());
       }
     }
     return sql;
@@ -320,11 +332,11 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
       }
       final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
       if (properties != null) {
-        for (Entry<String, Object> entry : properties.entrySet()) {
-          String key = entry.getKey();
-          Object value = entry.getValue();
+        for (final Entry<String, Object> entry : properties.entrySet()) {
+          final String key = entry.getKey();
+          final Object value = entry.getValue();
           if (value instanceof DataObjectMetaDataProperty) {
-            DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
+            final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
             final DataObjectMetaDataProperty clonedProperty = property.clone();
             clonedProperty.setMetaData(metaData);
           } else {
@@ -454,6 +466,10 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     return metaData.getIdAttributeIndex() != -1;
   }
 
+  public boolean isFlushBetweenTypes() {
+    return flushBetweenTypes;
+  }
+
   @Override
   public DataObject load(
     final QName typeName,
@@ -462,7 +478,9 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     if (sql == null) {
       return null;
     } else {
-      final JdbcQueryReader reader = createReader(typeName, sql, id);
+      final DataObjectMetaData metaData = getMetaData(typeName);
+
+      final JdbcQueryReader reader = createReader(metaData, sql, id);
       try {
         final Iterator<DataObject> iterator = reader.iterator();
         if (iterator.hasNext()) {
@@ -648,9 +666,9 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   public Reader<DataObject> query(
     final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
-     final StringBuffer sql = new StringBuffer();
+    final StringBuffer sql = new StringBuffer();
     JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
-    JdbcQuery query = new JdbcQuery(metaData, sql.toString());
+    final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
     final JdbcQueryReader reader = createReader(query);
     return reader;
   }
@@ -749,6 +767,11 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   public void setExcludeTablePatterns(
     final String... excludeTablePatterns) {
     this.excludeTablePatterns = excludeTablePatterns;
+  }
+
+  public void setFlushBetweenTypes(
+    final boolean flushBetweenTypes) {
+    this.flushBetweenTypes = flushBetweenTypes;
   }
 
   public void setHints(

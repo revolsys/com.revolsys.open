@@ -9,11 +9,16 @@ import java.util.TreeMap;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
@@ -156,6 +161,16 @@ public abstract class AbstractDataObjectStore extends
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
+
+  public Reader<DataObject> query(
+    final QName typeName,
+    final BoundingBox boundingBox) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    CoordinateSystem coordinateSystem = geometryAttribute.getProperty(AttributeProperties.COORDINATE_SYSTEM);
+    Envelope envelope = boundingBox.convert(coordinateSystem);
+    return query(typeName, envelope);
+  }
 
   public void setSchemaMap(
     final Map<String, DataObjectStoreSchema> schemaMap) {

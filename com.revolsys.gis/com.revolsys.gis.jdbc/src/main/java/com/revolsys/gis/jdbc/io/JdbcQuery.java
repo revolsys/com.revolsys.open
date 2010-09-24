@@ -90,6 +90,22 @@ public class JdbcQuery {
   }
 
   public JdbcQuery(
+    final DataObjectMetaData metaData,
+    final String sql,
+    Object... parameters) {
+    this(metaData.getName(), sql, parameters);
+    this.metaData = metaData;
+  }
+
+  public JdbcQuery(
+    final DataObjectMetaData metaData,
+    final String sql,
+    List<Object> parameters) {
+    this(metaData.getName(), sql, parameters);
+    this.metaData = metaData;
+  }
+
+  public JdbcQuery(
     final DataObjectMetaData metaData) {
     this(metaData.getName());
     this.metaData = metaData;
@@ -243,10 +259,10 @@ public class JdbcQuery {
     final String typeNameString) {
     this.typeName = QName.valueOf(typeNameString);
   }
-  
+
   @Override
   public String toString() {
-    return getSql() +"\n"+ getParameters();
+    return getSql() + "\n" + getParameters();
   }
 
   public static String getTableName(

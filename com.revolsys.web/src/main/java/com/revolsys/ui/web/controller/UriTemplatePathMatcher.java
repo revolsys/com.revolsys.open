@@ -1,6 +1,7 @@
 package com.revolsys.ui.web.controller;
 
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,10 +67,10 @@ public class UriTemplatePathMatcher implements PathMatcher {
   }
 
   public Map<String, String> extractUriTemplateVariables(
-    String arg0,
-    String arg1) {
-    // TODO Auto-generated method stub
-    return null;
+    String pattern,
+    String path) {
+    Map<String, String> variables = new LinkedHashMap<String, String>();
+    return variables;
   }
 
   public Comparator<String> getPatternComparator(

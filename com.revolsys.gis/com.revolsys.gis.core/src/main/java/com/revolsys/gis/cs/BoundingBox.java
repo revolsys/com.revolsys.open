@@ -6,6 +6,7 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -404,4 +405,19 @@ public class BoundingBox extends Envelope {
       + getMaxY() + ")";
   }
 
+  public static BoundingBox parse(
+    String bbox) {
+    String[] args = bbox.split(",");
+    if (args.length == 4) {
+      double x1 = Double.valueOf(args[0]);
+      double y1 = Double.valueOf(args[1]);
+      double x2 = Double.valueOf(args[2]);
+      double y2 = Double.valueOf(args[3]);
+      return new BoundingBox(EpsgCoordinateSystems.getCoordinateSystem(4326),
+        x1, y1, x2, y2);
+    } else {
+      throw new IllegalArgumentException(
+        "BBOX must have match <minX>,<minY>,<maxX>,<maxY> not " + bbox);
+    }
+  }
 }

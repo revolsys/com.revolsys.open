@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -79,6 +80,10 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   Reader<DataObject> query(
     QName typeName);
+
+  Reader<DataObject> query(
+    QName typeName,
+    BoundingBox boundingBox);
 
   Reader<DataObject> query(
     QName typeName,
