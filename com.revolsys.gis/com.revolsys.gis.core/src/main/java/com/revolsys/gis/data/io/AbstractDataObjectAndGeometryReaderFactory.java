@@ -8,7 +8,6 @@ import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
-import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectAndGeometryReaderFactory extends
   AbstractDataObjectReaderFactory implements GeometryReaderFactory {
@@ -20,13 +19,13 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     super(name);
   }
 
-  public Reader<Geometry> createGeometryReader(
+  public GeometryReader createGeometryReader(
     Resource resource) {
     final Reader<DataObject> dataObjectReader = createDataObjectReader(resource);
     final Iterator<DataObject> dataObjectIterator = dataObjectReader.iterator();
     final DataObjectGeometryIterator iterator = new DataObjectGeometryIterator(
       dataObjectIterator);
-    final IteratorReader<Geometry> geometryReader = new IteratorReader<Geometry>(
+    final GeometryReader geometryReader = new GeometryReader(
       iterator);
     return geometryReader;
   }

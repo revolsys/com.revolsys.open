@@ -26,7 +26,7 @@ import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public interface DataObject {
+public interface DataObject extends Map<String,Object>{
   /**
    * Create a clone of the data object.
    * 

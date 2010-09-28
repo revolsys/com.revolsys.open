@@ -1,7 +1,10 @@
 package com.revolsys.gis.cs;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -14,13 +17,26 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel {
-  private int numAxis = 2;
+  public static MultiPolygon createMultiPolygon(
+    final List<Polygon> polygons) {
+    final Polygon[] polygonArray = toPolygonArray(polygons);
+    if (polygons.isEmpty()) {
+      return new GeometryFactory().createMultiPolygon(polygonArray);
+    } else {
+      final GeometryFactory factory = getFactory(polygons.get(0));
+      return factory.createMultiPolygon(polygonArray);
+    }
+  }
 
   public static GeometryFactory getFactory(
     final Geometry geometry) {
@@ -41,9 +57,20 @@ public class GeometryFactory extends
     }
   }
 
+  private static Set<Class<?>> getGeometryClassSet(
+    final List<? extends Geometry> geometries) {
+    final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
+    for (final Geometry geometry : geometries) {
+      classes.add(geometry.getClass());
+    }
+    return classes;
+  }
+
   private final CoordinatesPrecisionModel coordinatesPrecisionModel;
 
   private final CoordinateSystem coordinateSystem;
+
+  private int numAxis = 2;
 
   public GeometryFactory() {
     super(
@@ -51,6 +78,14 @@ public class GeometryFactory extends
       0, DoubleCoordinatesListFactory.INSTANCE);
     this.coordinateSystem = null;
     this.coordinatesPrecisionModel = SimpleCoordinatesPrecisionModel.FLOATING;
+  }
+
+  public GeometryFactory(
+    final CoordinatesPrecisionModel coordinatesPrecisionModel) {
+    super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel), 0,
+      new DoubleCoordinatesListFactory());
+    this.coordinatesPrecisionModel = coordinatesPrecisionModel;
+    this.coordinateSystem = null;
   }
 
   public GeometryFactory(
@@ -68,31 +103,41 @@ public class GeometryFactory extends
   }
 
   public GeometryFactory(
-    final CoordinatesPrecisionModel coordinatesPrecisionModel) {
-    super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel), 0,
-      new DoubleCoordinatesListFactory());
-    this.coordinatesPrecisionModel = coordinatesPrecisionModel;
-    this.coordinateSystem = null;
-  }
-
-  public GeometryFactory(
-    CoordinateSystem coordinateSystem,
-    CoordinatesPrecisionModel precisionModel,
-    int numAxis) {
+    final CoordinateSystem coordinateSystem,
+    final CoordinatesPrecisionModel precisionModel,
+    final int numAxis) {
     this(coordinateSystem, precisionModel);
     this.numAxis = numAxis;
   }
 
   public GeometryFactory(
-    GeometryFactory geometryFactory,
-    int numAxis) {
+    final GeometryFactory geometryFactory,
+    final int numAxis) {
     this(geometryFactory.getCoordinateSystem(),
       geometryFactory.getCoordinatesPrecisionModel());
     this.numAxis = numAxis;
   }
 
-  protected int getNumAxis() {
-    return numAxis;
+  @SuppressWarnings("unchecked")
+  public Geometry createGeometry(
+    final List<? extends Geometry> geometries) {
+    if (geometries == null || geometries.size() == 0) {
+      return createGeometryCollection(null);
+    } else if (geometries.size() == 1) {
+      return geometries.get(0);
+    } else {
+      final Set<Class<?>> classes = getGeometryClassSet(geometries);
+      if (classes.equals(Collections.singleton(Point.class))) {
+        return createMultiPoint((List<Point>)geometries);
+      } else if (classes.equals(Collections.singleton(LineString.class))) {
+        return createMultiLineString((List<LineString>)geometries);
+      } else if (classes.equals(Collections.singleton(Polygon.class))) {
+        return createMultiPolygon((List<Polygon>)geometries);
+      } else {
+        final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
+        return createGeometryCollection(geometryArray);
+      }
+    }
   }
 
   public LinearRing createLinearRing(
@@ -114,10 +159,6 @@ public class GeometryFactory extends
     return line;
   }
 
-  public boolean hasZ() {
-    return numAxis > 2;
-  }
-
   public LineString createLineString(
     final List<Coordinates> points) {
     CoordinatesList coordinatesList;
@@ -137,10 +178,16 @@ public class GeometryFactory extends
     return createLineString(coordinatesList);
   }
 
-  public Geometry createMultiPoint(
+  public MultiLineString createMultiLineString(
+    final List<LineString> lines) {
+    final LineString[] lineArray = toLineStringArray(lines);
+    return createMultiLineString(lineArray);
+  }
+
+  public MultiPoint createMultiPoint(
     final List<Point> points) {
-    final Point[] pointArray = com.vividsolutions.jts.geom.GeometryFactory.toPointArray(points);
-    return super.createMultiPoint(pointArray);
+    final Point[] pointArray = toPointArray(points);
+    return createMultiPoint(pointArray);
   }
 
   public Point createPoint(
@@ -167,9 +214,27 @@ public class GeometryFactory extends
     return coordinateSystem;
   }
 
+  protected int getNumAxis() {
+    return numAxis;
+  }
+
   public Coordinates getPreciseCoordinates(
     final Coordinates point) {
     return coordinatesPrecisionModel.getPreciseCoordinates(point);
+  }
+
+  public double getScaleXY() {
+    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
+    return precisionModel.getScaleXY();
+  }
+
+  public double getScaleZ() {
+    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
+    return precisionModel.getScaleZ();
+  }
+
+  public boolean hasZ() {
+    return numAxis > 2;
   }
 
   public void makePrecise(
@@ -181,15 +246,5 @@ public class GeometryFactory extends
   public String toString() {
     return coordinateSystem.getName() + ", precision="
       + getCoordinatesPrecisionModel();
-  }
-
-  public double getScaleXY() {
-    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
-    return precisionModel.getScaleXY();
-  }
-
-  public double getScaleZ() {
-    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
-    return precisionModel.getScaleZ();
   }
 }

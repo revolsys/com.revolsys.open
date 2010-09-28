@@ -3,6 +3,8 @@ package com.revolsys.gis.ecsv.io;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +28,9 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
 public class EcsvWriter extends AbstractWriter<DataObject> {
+  private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
+    "#.#########################");
+
   private final List<QName> attributeHeaderTypes = Arrays.asList(new QName[] {
     EcsvConstants.ATTRIBUTE_NAME, EcsvConstants.ATTRIBUTE_TYPE,
     EcsvConstants.ATTRIBUTE_LENGTH, EcsvConstants.ATTRIBUTE_SCALE,
@@ -39,9 +44,9 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
 
   private final DataObjectMetaData metaData;
 
-  private final PrintWriter out;
-
   private boolean open;
+
+  private final PrintWriter out;
 
   public EcsvWriter(
     final DataObjectMetaData metaData,
@@ -57,21 +62,24 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
 
   }
 
-  public void flush() {
-    out.flush();
-  }
-
+  @Override
   public void close() {
     out.close();
   }
 
-  public String toString() {
-    return metaData.getName().toString();
+  @Override
+  public void flush() {
+    out.flush();
   }
 
   private void newLine()
     throws IOException {
     out.write('\n');
+  }
+
+  @Override
+  public String toString() {
+    return metaData.getName().toString();
   }
 
   public void write(
@@ -183,6 +191,8 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
         final Date date = (Date)value;
         final String string = dateFormat.format(date);
         writeField(string, wrapChars);
+      } else if (value instanceof Number) {
+        writeField(NUMBER_FORMAT.format(value), wrapChars);
       } else {
         writeField(value.toString(), wrapChars);
       }

@@ -2,6 +2,8 @@ package com.revolsys.gis.html;
 
 import java.io.Writer;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -13,24 +15,26 @@ import com.revolsys.util.HtmlUtil;
 import com.revolsys.xml.io.XmlWriter;
 
 public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
+  private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
+    "#.#########################");
+
+  private String cssClass;
+
+  private final DataObjectMetaData metaData;
 
   private boolean opened = false;
 
   /** The writer */
   private XmlWriter out;
 
+  private boolean singleObject;
+
   private String title;
 
   private boolean wrap = true;
 
-  private String cssClass;
-
-  private DataObjectMetaData metaData;
-
-  private boolean singleObject;
-
   public XhtmlDataObjectWriter(
-    DataObjectMetaData metaData,
+    final DataObjectMetaData metaData,
     final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
@@ -39,6 +43,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
   /**
    * Closes the underlying writer.
    */
+  @Override
   public void close() {
     if (out != null) {
       try {
@@ -53,19 +58,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void writeFooter() {
-    if (opened) {
-      out.endTag(HtmlUtil.TBODY);
-      out.endTag(HtmlUtil.TABLE);
-      out.endTag(HtmlUtil.DIV);
-      out.endTag(HtmlUtil.DIV);
-      if (wrap) {
-        out.endTag(HtmlUtil.BODY);
-        out.endTag(HtmlUtil.HTML);
-      }
-    }
-  }
-
+  @Override
   public void flush() {
     out.flush();
   }
@@ -100,6 +93,8 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
         out.startTag(HtmlUtil.TD);
         if (value instanceof URI) {
           HtmlUtil.serializeA(out, null, value, value);
+        } else if (value instanceof Number) {
+          out.text(NUMBER_FORMAT.format(value));
         } else {
           out.text(value);
         }
@@ -113,6 +108,8 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
         out.startTag(HtmlUtil.TD);
         if (value instanceof URI) {
           HtmlUtil.serializeA(out, null, value, value);
+        } else if (value instanceof Number) {
+          out.text(NUMBER_FORMAT.format(value));
         } else {
           out.text(value);
         }
@@ -120,6 +117,19 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
       }
       out.endTag(HtmlUtil.TR);
 
+    }
+  }
+
+  private void writeFooter() {
+    if (opened) {
+      out.endTag(HtmlUtil.TBODY);
+      out.endTag(HtmlUtil.TABLE);
+      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlUtil.DIV);
+      if (wrap) {
+        out.endTag(HtmlUtil.BODY);
+        out.endTag(HtmlUtil.HTML);
+      }
     }
   }
 
@@ -155,7 +165,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
 
       out.startTag(HtmlUtil.THEAD);
       out.startTag(HtmlUtil.TR);
-      for (String name : metaData.getAttributeNames()) {
+      for (final String name : metaData.getAttributeNames()) {
         out.element(HtmlUtil.TD, name);
       }
       out.endTag(HtmlUtil.TR);

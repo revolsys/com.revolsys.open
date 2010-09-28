@@ -32,7 +32,6 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
     HttpServletResponse response,
     Object handler)
     throws ServletException {
-    // TODO implement caching of attributes
     String path = urlPathHelper.getLookupPathForRequest(request);
     for (Entry<String, Map<String, Object>> mapping : attributeMappings.entrySet()) {
       String pattern = mapping.getKey();

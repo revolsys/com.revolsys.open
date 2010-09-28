@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -29,7 +30,6 @@ import com.vividsolutions.jts.geom.Dimension;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.IntersectionMatrix;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
@@ -234,7 +234,7 @@ public final class JtsGeometryUtil {
     if (lines.isEmpty()) {
       return null;
     } else {
-      final GeometryFactory factory = lines.get(0).getFactory();
+      final GeometryFactory factory = GeometryFactory.getFactory(lines.get(0));
       final LineString[] lineArray = new LineString[lines.size()];
       lines.toArray(lineArray);
       return factory.createMultiLineString(lineArray);
@@ -245,7 +245,7 @@ public final class JtsGeometryUtil {
     final LineString line,
     final int orientation,
     final double distance) {
-    final GeometryFactory factory = line.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinateSequence coordinates = line.getCoordinateSequence();
     final List<Coordinate> newCoordinates = new ArrayList<Coordinate>();
     Coordinate coordinate = coordinates.getCoordinate(0);
@@ -296,7 +296,7 @@ public final class JtsGeometryUtil {
 
   public static Polygon createPolygon(
     final MultiLineString multiLine) {
-    final GeometryFactory factory = multiLine.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(multiLine);
     final Coordinate[] coordinates = getMergeLine(multiLine).getCoordinates();
     final LinearRing linearRing = factory.createLinearRing(coordinates);
     final Polygon polygon = factory.createPolygon(linearRing, null);
@@ -327,7 +327,7 @@ public final class JtsGeometryUtil {
   public static double distance(
     final Coordinate coordinate,
     final Geometry geometry) {
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
     final Point point = factory.createPoint(coordinate);
     return point.distance(geometry);
   }
@@ -364,7 +364,6 @@ public final class JtsGeometryUtil {
     }
     return minDistance;
   }
-
 
   public static boolean equalsExact3D(
     final Geometry geometry1,
@@ -461,7 +460,7 @@ public final class JtsGeometryUtil {
 
   public static Geometry get2DGeometry(
     final Geometry geometry) {
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       return factory.createPoint(get2DCoordinates(point.getCoordinateSequence()));
@@ -488,7 +487,7 @@ public final class JtsGeometryUtil {
     final LinearRing ring) {
     final CoordinateSequence coordinates = ring.getCoordinateSequence();
     final CoordinateSequence coordinates2d = get2DCoordinates(coordinates);
-    final GeometryFactory factory = ring.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(ring);
     return factory.createLinearRing(coordinates2d);
   }
 
@@ -699,7 +698,7 @@ public final class JtsGeometryUtil {
       previousCoordinate = coordinate;
     }
     if (newCoords.size() > 1) {
-      return createLineString(line1.getFactory(), newCoords);
+      return createLineString(GeometryFactory.getFactory(line1), newCoords);
     } else {
       return null;
     }
@@ -867,10 +866,10 @@ public final class JtsGeometryUtil {
     int j = 0;
     for (int i = 0; i < newCoords.size(); i++) {
       if (i == index) {
-        newCoords.setX(i,  coordinate.x);
-        newCoords.setY(i,  coordinate.y);
+        newCoords.setX(i, coordinate.x);
+        newCoords.setY(i, coordinate.y);
         if (newCoords.getDimension() > 2) {
-          newCoords.setZ(i,  coordinate.z);
+          newCoords.setZ(i, coordinate.z);
         }
       } else {
         for (int o = 0; o < newCoords.getDimension(); o++) {
@@ -879,7 +878,7 @@ public final class JtsGeometryUtil {
         j++;
       }
     }
-    final GeometryFactory factory = line.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final LineString newLine = factory.createLineString(newCoords);
     return newLine;
   }
@@ -1065,7 +1064,7 @@ public final class JtsGeometryUtil {
     final Coordinate coordinate,
     final LineString line,
     final double maxDistance) {
-    final GeometryFactory factory = line.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final Point point = factory.createPoint(coordinate);
     final double distance = line.distance(point);
     return distance < maxDistance;
@@ -1089,7 +1088,7 @@ public final class JtsGeometryUtil {
     final Coordinate coordinate,
     final LineString line,
     final double maxDistance) {
-    final GeometryFactory factory = line.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final Point point = factory.createPoint(coordinate);
     final double distance = line.distance(point);
     return distance <= maxDistance;
@@ -1239,7 +1238,7 @@ public final class JtsGeometryUtil {
 
   public static Polygon reversePolygon(
     final Polygon polygon) {
-    final GeometryFactory factory = polygon.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(polygon);
     final LineString exteriorRing = polygon.getExteriorRing();
     final CoordinateSequence oldCoordinates = exteriorRing.getCoordinateSequence();
     final CoordinatesList newCoordinates = CoordinateSequenceUtil.reverse(oldCoordinates);
@@ -1321,7 +1320,7 @@ public final class JtsGeometryUtil {
         coords2.size());
     }
 
-    final GeometryFactory geometryFactory = line.getFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
 
     if (coords1Size > 1) {
       final LineString line1 = geometryFactory.createLineString(coords1);
@@ -1396,8 +1395,8 @@ public final class JtsGeometryUtil {
       geometries.add(line1);
       geometries.add(line2);
     } else {
-      geometries.add(getGeometries(line1.getFactory(), coords1, intersectCoords));
-      geometries.add(getGeometries(line2.getFactory(), coords2, intersectCoords));
+      geometries.add(getGeometries(GeometryFactory.getFactory(line1), coords1, intersectCoords));
+      geometries.add(getGeometries(GeometryFactory.getFactory(line2), coords2, intersectCoords));
     }
 
     return geometries;
@@ -1452,7 +1451,7 @@ public final class JtsGeometryUtil {
 
   public static LinearRing to2D(
     final LinearRing geometry) {
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory =GeometryFactory.getFactory(geometry);
     final CoordinateSequence coordinates = geometry.getCoordinateSequence();
     final CoordinateSequence newCoordinates = to2D(coordinates);
     final LinearRing newGeometry = factory.createLinearRing(newCoordinates);
@@ -1462,7 +1461,7 @@ public final class JtsGeometryUtil {
 
   public static LineString to2D(
     final LineString geometry) {
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
     final CoordinateSequence coordinates = geometry.getCoordinateSequence();
     final CoordinateSequence newCoordinates = to2D(coordinates);
     final LineString newGeometry = factory.createLineString(newCoordinates);
@@ -1472,7 +1471,7 @@ public final class JtsGeometryUtil {
 
   public static MultiPoint to2D(
     final MultiPoint geometry) {
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
     final Point[] points = new Point[geometry.getNumGeometries()];
     for (int i = 0; i < points.length; i++) {
       final Point point = (Point)geometry.getGeometryN(i);
@@ -1485,7 +1484,7 @@ public final class JtsGeometryUtil {
 
   public static Point to2D(
     final Point geometry) {
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
     final CoordinateSequence coordinates = geometry.getCoordinateSequence();
     final CoordinateSequence newCoordinates = to2D(coordinates);
     final Point newGeometry = factory.createPoint(newCoordinates);
@@ -1496,7 +1495,7 @@ public final class JtsGeometryUtil {
   public static Geometry to2D(
     final Polygon geometry) {
 
-    final GeometryFactory factory = geometry.getFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
 
     final LinearRing shell = to2D((LinearRing)geometry.getExteriorRing());
     final LinearRing[] holes = new LinearRing[geometry.getNumInteriorRing()];
@@ -1563,5 +1562,17 @@ public final class JtsGeometryUtil {
   }
 
   private JtsGeometryUtil() {
+  }
+
+  public static Geometry unionAll(
+    List<Geometry> geometries) {
+    GeometryFactory.toGeometryArray(geometries);
+    final GeometryFactory factory = GeometryFactory.getFactory(geometries.get(0));
+    final Geometry geometry = factory.createGeometry(geometries);
+    if (geometry.getNumGeometries() == 1) {
+      return geometry;
+    } else {
+      return geometry.union();
+    }
   }
 }

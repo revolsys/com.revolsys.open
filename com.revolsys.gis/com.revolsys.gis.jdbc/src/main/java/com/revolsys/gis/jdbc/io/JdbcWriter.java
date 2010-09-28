@@ -580,7 +580,10 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     final Map<QName, Integer> batchCountMap,
     final Statistics statistics)
     throws SQLException {
-    final int batchCount = batchCountMap.get(typeName);
+     Integer batchCount = batchCountMap.get(typeName);
+    if (batchCount == null) {
+      batchCount = 0;
+    }
     try {
       Integer typeCount = typeCountMap.get(typeName);
       if (typeCount == null) {

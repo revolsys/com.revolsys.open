@@ -54,7 +54,7 @@ public interface Kml22Constants {
 
   QName MIN_LOD_PIXELS = new QName(KML_NS_URI, "minLodPixels");
 
-  QName MULTI_GEOMETRY = new QName(KML_NS_URI, "MultiGeomentry");
+  QName MULTI_GEOMETRY = new QName(KML_NS_URI, "MultiGeometry");
 
   QName NAME = new QName(KML_NS_URI, "name");
 

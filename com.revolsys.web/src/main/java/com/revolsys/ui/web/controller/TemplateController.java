@@ -35,15 +35,19 @@ public class TemplateController extends AbstractController {
     final HttpServletRequest request,
     final HttpServletResponse response)
     throws Exception {
+    String path = urlPathHelper.getOriginatingRequestUri(request);
+    String contextPath = urlPathHelper.getOriginatingContextPath(request);
+    path = path.substring(contextPath.length());
+
+    String viewName = this.viewName;
+    viewName = viewName.replaceAll("\\[PATH\\]", path);
+    
     final ModelAndView view = new ModelAndView(viewName);
     for (Entry<String, Object> attribute : attributes.entrySet()) {
       String attributeName = attribute.getKey();
       Object attributeValue = attribute.getValue();
       if (attributeValue instanceof String) {
-        String path = urlPathHelper.getOriginatingRequestUri(request);
-        String contextPath = urlPathHelper.getOriginatingContextPath(request);
-        path = path.substring(contextPath.length());
-        attributeValue = ((String)attributeValue).replaceAll("\\[PATH\\]", path);
+         attributeValue = ((String)attributeValue).replaceAll("\\[PATH\\]", path);
       }
       view.addObject(attributeName, attributeValue);
     }

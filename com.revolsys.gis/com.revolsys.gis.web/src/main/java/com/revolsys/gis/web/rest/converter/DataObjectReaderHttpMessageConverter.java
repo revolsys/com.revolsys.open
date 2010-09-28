@@ -1,13 +1,17 @@
 package com.revolsys.gis.web.rest.converter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -15,7 +19,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
+import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.IoConstants;
@@ -33,8 +39,41 @@ public class DataObjectReaderHttpMessageConverter extends
   private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
   public DataObjectReaderHttpMessageConverter() {
-    super(DataObjectReader.class, null,
+    super(DataObjectReader.class,
+      IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectReaderFactory.class),
       IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
+  }
+
+  @Override
+  public DataObjectReader read(
+    Class<? extends DataObjectReader> clazz,
+    HttpInputMessage inputMessage)
+    throws IOException,
+    HttpMessageNotReadableException {
+    try {
+      final HttpHeaders headers = inputMessage.getHeaders();
+      final MediaType mediaType = headers.getContentType();
+      Charset charset = mediaType.getCharSet();
+      if (charset == null) {
+        charset = DEFAULT_CHARSET;
+      }
+      final InputStream body = inputMessage.getBody();
+      final String mediaTypeString = mediaType.getType() + "/"
+        + mediaType.getSubtype();
+      final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByMediaType(
+        DataObjectReaderFactory.class, mediaTypeString);
+      if (readerFactory == null) {
+        throw new HttpMessageNotReadableException("Cannot read data in format"
+          + mediaType);
+      } else {
+        final Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(
+          body));
+
+        return (DataObjectReader)reader;
+      }
+    } catch (final IOException e) {
+      throw new HttpMessageNotReadableException("Error reading data", e);
+    }
   }
 
   @Override

@@ -3,12 +3,15 @@ package com.revolsys.jump.model;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectEntry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.types.DataType;
@@ -228,4 +231,13 @@ public class DataObjectFeature extends BasicFeature implements DataObject {
           "Cannot modify an object which has been deleted");
     }
   }
+  @Override
+  public Set<Entry<String, Object>> entrySet() {
+    Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String,Object>>();
+    for(int i = 0; i < getAttributes().length; i++) {
+      entries.add(new DataObjectEntry(this, i));
+    }
+    return entries;
+  }
+
 }

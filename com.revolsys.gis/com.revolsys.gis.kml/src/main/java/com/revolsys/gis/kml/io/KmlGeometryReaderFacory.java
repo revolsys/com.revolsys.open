@@ -2,7 +2,7 @@ package com.revolsys.gis.kml.io;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.IteratorReader;
+import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.vividsolutions.jts.geom.Geometry;
@@ -15,10 +15,10 @@ public class KmlGeometryReaderFacory extends AbstractGeometryReaderFactory {
       Kml22Constants.FILE_EXTENSION);
   }
 
-  public Reader<Geometry> createGeometryReader(
+  public GeometryReader createGeometryReader(
     Resource resource) {
     final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
-    return new IteratorReader<Geometry>(iterator);
+    return new GeometryReader(iterator);
   }
 
 }

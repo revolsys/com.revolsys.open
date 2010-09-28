@@ -76,10 +76,14 @@ public class DataObjectHttpMessageConverter extends
       } else {
         final Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(
           body));
-        for (final DataObject dataObject : reader) {
-          return dataObject;
+        try {
+          for (final DataObject dataObject : reader) {
+            return dataObject;
+          }
+          return null;
+        } finally {
+          reader.close();
         }
-        return null;
       }
     } catch (final IOException e) {
       throw new HttpMessageNotReadableException("Error reading data", e);
@@ -117,9 +121,15 @@ public class DataObjectHttpMessageConverter extends
         throw new IllegalArgumentException("Media type " + actualMediaType
           + " not supported");
       } else {
-        final DataObjectMetaData metaData = dataObject.getMetaData();
-        final String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
+        final DataObjectMetaData metaData = dataObject.getMetaData();
+
+        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        String baseName = (String)requestAttributes.getAttribute(
+          "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
+        if (baseName == null) {
+          baseName = HttpRequestUtils.getRequestBaseFileName();
+        }
         final String fileName = baseName + "."
           + writerFactory.getFileExtension(mediaTypeString);
         headers.set("Content-Disposition", "inline; filename=" + fileName);
@@ -136,8 +146,7 @@ public class DataObjectHttpMessageConverter extends
           writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
             coordinateSystem);
         }
-        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
+         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }

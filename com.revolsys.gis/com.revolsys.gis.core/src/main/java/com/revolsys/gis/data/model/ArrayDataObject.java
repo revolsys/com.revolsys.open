@@ -22,12 +22,14 @@ package com.revolsys.gis.data.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -44,7 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Paul Austin
  */
-public class ArrayDataObject implements DataObject, Cloneable {
+public class ArrayDataObject extends AbstractMap<String,Object> implements DataObject, Cloneable {
   /** The log instance. */
   private static final Logger LOG = Logger.getLogger(ArrayDataObject.class);
 
@@ -394,5 +396,14 @@ public class ArrayDataObject implements DataObject, Cloneable {
         throw new IllegalStateException(
           "Cannot modify an object which has been deleted");
     }
+  }
+
+  @Override
+  public Set<Entry<String, Object>> entrySet() {
+    Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String,Object>>();
+    for(int i = 0; i < attributes.length; i++) {
+      entries.add(new DataObjectEntry(this, i));
+    }
+    return entries;
   }
 }
