@@ -12,6 +12,9 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.json.JsonWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -45,7 +48,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
 
   private void coordinate(
     final CoordinatesList coordinates,
-    int i) {
+    final int i) {
     final double x = coordinates.getX(i);
     out.print('[');
     out.value(x);
@@ -54,7 +57,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     out.print(',');
     out.value(y);
 
-    double z = coordinates.getZ(i);
+    final double z = coordinates.getZ(i);
     if (!Double.isNaN(z)) {
       out.print(',');
       out.value(z);
@@ -81,6 +84,27 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     coordinates(coordinates);
   }
 
+  public void coordinates(
+    final Point point) {
+    final CoordinatesList coordinates = CoordinatesListUtil.get(point);
+    coordinate(coordinates, 0);
+  }
+
+  public void coordinates(
+    final Polygon polygon) {
+    out.startList();
+    out.indent();
+
+    final LineString exteriorRing = polygon.getExteriorRing();
+    coordinates(exteriorRing);
+    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+      final LineString interiorRing = polygon.getInteriorRingN(i);
+      coordinates(interiorRing);
+    }
+
+    out.endList();
+  }
+
   @Override
   public void flush() {
     out.flush();
@@ -98,44 +122,107 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
       polygon(polygon);
+    } else if (geometry instanceof MultiPoint) {
+      final MultiPoint multiPoint = (MultiPoint)geometry;
+      multiPoint(multiPoint);
+    } else if (geometry instanceof MultiLineString) {
+      final MultiLineString multiLine = (MultiLineString)geometry;
+      multiLineString(multiLine);
+    } else if (geometry instanceof MultiPolygon) {
+      final MultiPolygon multiPolygon = (MultiPolygon)geometry;
+      multiPolygon(multiPolygon);
     }
     out.endObject();
   }
 
   private void line(
     final LineString line) {
-    type("LineString");
+    type(GeoJsonConstants.LINE_STRING);
     out.endAttribute();
-    out.label("coordinates");
+    out.label(GeoJsonConstants.COORDINATES);
     coordinates(line);
+  }
+
+  private void multiLineString(
+    final MultiLineString multiLineString) {
+    type(GeoJsonConstants.MULTI_LINE_STRING);
+
+    out.endAttribute();
+    out.label(GeoJsonConstants.COORDINATES);
+    out.startList();
+    out.indent();
+    for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+      final LineString lineString = (LineString)multiLineString.getGeometryN(i);
+      coordinates(lineString);
+    }
+    out.endList();
+  }
+
+  private void multiPoint(
+    final MultiPoint multiPoint) {
+    type(GeoJsonConstants.MULTI_POINT);
+
+    out.endAttribute();
+    out.label(GeoJsonConstants.COORDINATES);
+    out.startList();
+    out.indent();
+    for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+      final Point point = (Point)multiPoint.getGeometryN(i);
+      coordinates(point);
+    }
+    out.endList();
+  }
+
+  private void multiPolygon(
+    final MultiPolygon multiPolygon) {
+    type(GeoJsonConstants.MULTI_POLYGON);
+
+    out.endAttribute();
+    out.label(GeoJsonConstants.COORDINATES);
+    out.startList();
+    out.indent();
+    for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+      final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
+      coordinates(polygon);
+    }
+    out.endList();
   }
 
   private void point(
     final Point point) {
-    type("Point");
+    type(GeoJsonConstants.POINT);
     out.endAttribute();
-    final CoordinatesList coordinates = CoordinatesListUtil.get(point);
-    out.label("coordinates");
-    coordinate(coordinates, 0);
+    out.label(GeoJsonConstants.COORDINATES);
+    coordinates(point);
   }
 
   private void polygon(
     final Polygon polygon) {
-    type("Polygon");
+    type(GeoJsonConstants.POLYGON);
 
     out.endAttribute();
-    out.label("coordinates");
-    final LineString exteriorRing = polygon.getExteriorRing();
-    coordinates(exteriorRing);
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      LineString interiorRing = polygon.getInteriorRingN(i);
-      coordinates(interiorRing);
-    }
+    out.label(GeoJsonConstants.COORDINATES);
+    coordinates(polygon);
+  }
+
+  private void srid(
+    final int srid) {
+    final String urn = "urn:ogc:def:crs:EPSG::" + srid;
+    out.label(GeoJsonConstants.CRS);
+    out.startObject();
+    type(GeoJsonConstants.NAME);
+    out.endAttribute();
+    out.label(GeoJsonConstants.PROPERTIES);
+    out.startObject();
+    out.label(GeoJsonConstants.NAME);
+    out.value(urn);
+    out.endObject();
+    out.endObject();
   }
 
   private void type(
     final String type) {
-    out.label("type");
+    out.label(GeoJsonConstants.TYPE);
     out.value(type);
   }
 
@@ -148,20 +235,20 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
       initialized = true;
     }
     out.startObject();
-    type("Feature");
+    type(GeoJsonConstants.FEATURE);
 
     final DataObjectMetaData metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
     if (geometryIndex != -1) {
       final Geometry geometry = object.getValue(geometryIndex);
       out.endAttribute();
-      out.label("geometry");
+      out.label(GeoJsonConstants.GEOMETRY);
       geometry(geometry);
     }
     final int numAttributes = metaData.getAttributeCount();
     if (numAttributes > 1 || numAttributes == 1 && geometryIndex == -1) {
       out.endAttribute();
-      out.label("properties");
+      out.label(GeoJsonConstants.PROPERTIES);
       out.startObject();
       int lastIndex = numAttributes - 1;
       if (lastIndex == geometryIndex) {
@@ -199,29 +286,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
       out.print('(');
     }
     out.startObject();
-    type("FeatureCollection");
-    Integer srid = getProperty(IoConstants.SRID_PROPERTY);
+    type(GeoJsonConstants.FEATURE_COLLECTION);
+    final Integer srid = getProperty(IoConstants.SRID_PROPERTY);
     if (srid != null && srid != 0) {
       out.endAttribute();
       srid(srid);
     }
     out.endAttribute();
-    out.label("features");
+    out.label(GeoJsonConstants.FEATURES);
     out.startList();
-  }
-
-  private void srid(
-    int srid) {
-    String urn = "urn:ogc:def:crs:EPSG::" + srid;
-    out.label("crs");
-    out.startObject();
-    type("name");
-    out.endAttribute();
-    out.label("properties");
-    out.startObject();
-    out.label("name");
-    out.value(urn);
-    out.endObject();
-    out.endObject();
   }
 }
