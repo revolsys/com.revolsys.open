@@ -156,6 +156,21 @@ public final class StaxUtils {
   }
 
   /**
+   * Skip all events until the next end element event.
+   * 
+   * @param parser The STAX XML parser.
+   * @throws XMLStreamException If an exception processing the XML occurs.
+   */
+  public static void skipToEndElement(
+    final XMLStreamReader parser,
+    final QName name)
+    throws XMLStreamException {
+    while (!parser.isEndElement() || !parser.getName().equals(name)) {
+      parser.next();
+    }
+  }
+
+  /**
    * Skip all events until the next start element event.
    * 
    * @param parser The STAX XML parser.

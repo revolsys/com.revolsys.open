@@ -18,6 +18,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
@@ -130,9 +131,15 @@ public class DataObjectHttpMessageConverter extends
         if (baseName == null) {
           baseName = HttpRequestUtils.getRequestBaseFileName();
         }
+        String contentDisposition = (String)requestAttributes.getAttribute(
+          "contentDisposition", RequestAttributes.SCOPE_REQUEST);
+        if (contentDisposition == null) {
+          contentDisposition = "attachment";
+        }
         final String fileName = baseName + "."
           + writerFactory.getFileExtension(mediaTypeString);
-        headers.set("Content-Disposition", "inline; filename=" + fileName);
+        headers.set("Content-Disposition", contentDisposition + "; filename="
+          + fileName);
 
         final OutputStream body = outputMessage.getBody();
         final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
@@ -140,13 +147,15 @@ public class DataObjectHttpMessageConverter extends
 
         final Geometry geometry = dataObject.getGeometryValue();
         if (geometry != null) {
+          final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
           final CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
           writer.setProperty(IoConstants.SRID_PROPERTY,
             coordinateSystem.getId());
           writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
             coordinateSystem);
+          writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         }
-         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
+        if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }

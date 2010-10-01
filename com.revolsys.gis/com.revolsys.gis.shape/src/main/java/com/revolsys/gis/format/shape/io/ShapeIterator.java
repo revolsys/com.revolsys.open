@@ -10,6 +10,7 @@ import javax.xml.namespace.QName;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
@@ -20,11 +21,12 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.JtsGeometryConverter;
 import com.revolsys.gis.format.xbase.io.XbaseIterator;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class ShapeIterator extends AbstractObjectWithProperties implements
@@ -34,7 +36,8 @@ public class ShapeIterator extends AbstractObjectWithProperties implements
 
   private DataObjectFactory factory;
 
-  private JtsGeometryConverter geometryReader;
+  private JtsGeometryConverter geometryReader = new JtsGeometryConverter(
+    new GeometryFactory(EpsgCoordinateSystems.getCoordinateSystem(4326)));
 
   private EndianInputStream in;
 
@@ -68,9 +71,9 @@ public class ShapeIterator extends AbstractObjectWithProperties implements
           coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
         }
         setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY, coordinateSystem);
-        final PrecisionModel precisionModel = new PrecisionModel();
+        final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
         geometryReader = new JtsGeometryConverter(new GeometryFactory(
-          precisionModel, crsId));
+          coordinateSystem, precisionModel));
       } catch (final Exception e) {
         e.printStackTrace();
       }
@@ -111,9 +114,6 @@ public class ShapeIterator extends AbstractObjectWithProperties implements
     final InputStream in,
     final XbaseIterator xbaseIterator) {
     this.name = name;
-    final PrecisionModel precisionModel = new PrecisionModel();
-    geometryReader = new JtsGeometryConverter(new GeometryFactory(
-      precisionModel, 4326));
     try {
       this.in = new EndianInputStream(in);
       this.xbaseIterator = xbaseIterator;

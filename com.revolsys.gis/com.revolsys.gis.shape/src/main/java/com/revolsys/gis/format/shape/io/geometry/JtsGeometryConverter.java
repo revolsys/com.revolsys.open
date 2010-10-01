@@ -22,6 +22,7 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapeConstants;
 import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianInputOutput;
@@ -30,19 +31,16 @@ import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class JtsGeometryConverter {
-  private GeometryFactory geometryFactory = new GeometryFactory(
-    new PrecisionModel());
+  private final GeometryFactory geometryFactory;
 
   public JtsGeometryConverter() {
-    this(new GeometryFactory(new PrecisionModel()));
+    this(new GeometryFactory());
   }
 
   public JtsGeometryConverter(
@@ -84,6 +82,8 @@ public class JtsGeometryConverter {
         return new Polygon2DMConverter(geometryFactory).read(in, recordLength);
       case ShapeConstants.POLYGON_Z_SHAPE:
         return new Polygon3DConverter(geometryFactory).read(in, recordLength);
+      case ShapeConstants.MULTI_PATCH_SHAPE:
+        return new MultiPolygonConverter(geometryFactory).read(in, recordLength);
       default:
       break;
     }

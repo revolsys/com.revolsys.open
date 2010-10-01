@@ -115,7 +115,7 @@ public abstract class AbstractLineSegment implements LineSegment {
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer("LINESTRING(");
+    final StringBuffer string = new StringBuffer("LINE_STRING(");
     string.append(getStartOrdinate(0));
     for (int i = 1; i < getDimension(); i++) {
       string.append(' ');

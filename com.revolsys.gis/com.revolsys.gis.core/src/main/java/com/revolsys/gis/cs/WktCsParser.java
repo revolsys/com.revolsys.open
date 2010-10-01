@@ -200,9 +200,19 @@ public class WktCsParser {
     if (index < values.size()) {
       authority = (Authority)values.get(index);
     }
-    return new GeographicCoordinateSystem(
-      Integer.parseInt(authority.getCode()), name, datum, primeMeridian,
-      angularUnit, axis, authority);
+    final int authorityId;
+    if (authority == null) {
+      authorityId = 0;
+    } else {
+      final String authorityCode = authority.getCode();
+      if (authorityCode == null) {
+        authorityId = 0;
+      } else {
+        authorityId = Integer.parseInt(authorityCode);
+      }
+    }
+    return new GeographicCoordinateSystem(authorityId, name, datum,
+      primeMeridian, angularUnit, axis, authority);
   }
 
   private LinearUnit processLinearUnit(

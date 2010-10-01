@@ -318,7 +318,7 @@ public class OsnIterator implements Iterator<Object> {
     }
     final StringBuffer name = new StringBuffer();
     int c = currentCharacter;
-    while (IS_NAME_CHARACTER[c]) {
+    while (c!= -1 && IS_NAME_CHARACTER[c]) {
       name.append((char)c);
       c = getNextCharacter();
     }

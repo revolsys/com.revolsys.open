@@ -41,6 +41,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.LineString2DConverter;
 import com.revolsys.gis.format.shape.io.geometry.LineString3DConverter;
+import com.revolsys.gis.format.shape.io.geometry.MultiPolygonConverter;
 import com.revolsys.gis.format.shape.io.geometry.Point2DConverter;
 import com.revolsys.gis.format.shape.io.geometry.Point3DConverter;
 import com.revolsys.gis.format.shape.io.geometry.Polygon2DConverter;
@@ -59,6 +60,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -147,9 +149,9 @@ public class ShapeFileWriter extends XbaseFileWriter {
     if (metaData != null) {
       if (!metaData.hasAttribute(geometryPropertyName)) {
         metaData.addAttribute(geometryPropertyName, DataTypes.GEOMETRY, true);
+        addField(new FieldDefinition(geometryPropertyName,
+          FieldDefinition.OBJECT_TYPE, 0));
       }
-      addField(new FieldDefinition(geometryPropertyName,
-        FieldDefinition.OBJECT_TYPE, 0));
     }
     indexFile = FileUtil.getFileWithExtension(shapeFile, "shx");
     final boolean indexExists = indexFile.exists();
@@ -251,6 +253,8 @@ public class ShapeFileWriter extends XbaseFileWriter {
       } else {
         geometryConverter = new Polygon3DConverter();
       }
+    } else if (geometry instanceof MultiPolygon) {
+      geometryConverter = new MultiPolygonConverter();
     } else {
       throw new RuntimeException("Not supported" + geometry.getClass());
     }

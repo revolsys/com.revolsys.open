@@ -27,17 +27,6 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel {
-  public static MultiPolygon createMultiPolygon(
-    final List<Polygon> polygons) {
-    final Polygon[] polygonArray = toPolygonArray(polygons);
-    if (polygons.isEmpty()) {
-      return new GeometryFactory().createMultiPolygon(polygonArray);
-    } else {
-      final GeometryFactory factory = getFactory(polygons.get(0));
-      return factory.createMultiPolygon(polygonArray);
-    }
-  }
-
   public static GeometryFactory getFactory(
     final Geometry geometry) {
     final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
@@ -64,6 +53,24 @@ public class GeometryFactory extends
       classes.add(geometry.getClass());
     }
     return classes;
+  }
+
+  public static MultiPolygon toMultiPolygon(
+    final List<Polygon> polygons) {
+    final GeometryFactory geometryFactory;
+    if (polygons.isEmpty()) {
+      geometryFactory = new GeometryFactory();
+    } else {
+      geometryFactory = getFactory(polygons.get(0));
+    }
+    return toMultiPolygon(geometryFactory, polygons);
+  }
+
+  public static MultiPolygon toMultiPolygon(
+    final GeometryFactory geometryFactory,
+    final List<Polygon> polygons) {
+    final Polygon[] polygonArray = toPolygonArray(polygons);
+    return geometryFactory.createMultiPolygon(polygonArray);
   }
 
   private final CoordinatesPrecisionModel coordinatesPrecisionModel;
@@ -190,6 +197,11 @@ public class GeometryFactory extends
     return createMultiPoint(pointArray);
   }
 
+  public MultiPolygon createMultiPolygon(
+    final List<Polygon> polygons) {
+    return toMultiPolygon(this, polygons);
+  }
+
   public Point createPoint(
     final Coordinates point) {
     final byte numAxis = point.getNumAxis();
@@ -204,6 +216,31 @@ public class GeometryFactory extends
     final CoordinatesList points) {
     points.makePrecise(coordinatesPrecisionModel);
     return super.createPoint(points);
+  }
+
+  public Polygon createPolygon(
+    final CoordinatesList... rings) {
+    return createPolygon(Arrays.asList(rings));
+  }
+
+  public Polygon createPolygonFromLinearRings(
+    final List<LinearRing> rings) {
+    final LinearRing exteriorRing = rings.get(0);
+    final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
+    for (int i = 1; i < rings.size(); i++) {
+      interiorRings[i - 1] = rings.get(i);
+    }
+    return createPolygon(exteriorRing, interiorRings);
+  }
+
+  public Polygon createPolygon(
+    final List<CoordinatesList> rings) {
+    final LinearRing exteriorRing = createLinearRing(rings.get(0));
+    final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
+    for (int i = 1; i < rings.size(); i++) {
+      interiorRings[i - 1] = createLinearRing(rings.get(i));
+    }
+    return createPolygon(exteriorRing, interiorRings);
   }
 
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {

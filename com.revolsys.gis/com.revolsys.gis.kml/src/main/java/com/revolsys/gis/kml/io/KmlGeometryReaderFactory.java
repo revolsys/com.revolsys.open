@@ -7,9 +7,9 @@ import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class KmlGeometryReaderFacory extends AbstractGeometryReaderFactory {
+public class KmlGeometryReaderFactory extends AbstractGeometryReaderFactory {
 
-  public KmlGeometryReaderFacory() {
+  public KmlGeometryReaderFactory() {
     super(Kml22Constants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(Kml22Constants.MEDIA_TYPE,
       Kml22Constants.FILE_EXTENSION);

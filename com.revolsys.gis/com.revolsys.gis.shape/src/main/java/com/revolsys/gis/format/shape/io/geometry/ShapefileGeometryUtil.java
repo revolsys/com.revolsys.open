@@ -1,6 +1,7 @@
 package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianOutput;
@@ -77,6 +78,18 @@ public final class ShapefileGeometryUtil {
     return partIndex;
   }
 
+  public static int[] readIntArray(
+    final EndianInput in,
+    final int count)
+    throws IOException {
+    final int[] values = new int[count];
+    for (int i = 0; i < count; i++) {
+      final int value = in.readLEInt();
+      values[i] = value;
+     }
+    return values;
+  }
+
   public static void readPoints(
     final EndianInput in,
     final int[] partIndex,
@@ -124,6 +137,24 @@ public final class ShapefileGeometryUtil {
     for (int i = 0; i < multiLine.getNumGeometries(); i++) {
       final LineString line = (LineString)multiLine.getGeometryN(i);
       write2DCoordinates(out, line);
+    }
+  }
+
+  public static void writeCoordinateZRange(
+    final EndianOutput out,
+    final List<CoordinatesList> pointsList)
+    throws IOException {
+    double minZ = Double.MAX_VALUE;
+    double maxZ = Double.MIN_VALUE;
+    for (final CoordinatesList ring : pointsList) {
+      for (int i = 0; i < ring.size(); i++) {
+        double z = ring.getOrdinate(i, 2);
+        if (Double.isNaN(z)) {
+          z = 0;
+        }
+        minZ = Math.min(z, minZ);
+        maxZ = Math.max(z, maxZ);
+      }
     }
   }
 
@@ -216,6 +247,16 @@ public final class ShapefileGeometryUtil {
       final LineString line = (LineString)multiLine.getGeometryN(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(line);
       writeCoordinateZValues(out, coordinates);
+    }
+  }
+
+  public static void writeCoordinateZValues(
+    final EndianOutput out,
+    final List<CoordinatesList> pointsList)
+    throws IOException {
+    writeCoordinateZRange(out, pointsList);
+    for (CoordinatesList points : pointsList) {
+      writeCoordinateZValues(out, points);
     }
   }
 

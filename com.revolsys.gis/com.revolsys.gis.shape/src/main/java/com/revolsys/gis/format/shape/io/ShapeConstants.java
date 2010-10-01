@@ -33,6 +33,11 @@ public class ShapeConstants {
 
   public static final int MULTI_PATCH_SHAPE = 31;
 
+
+  public static final int OUTER_RING = 2;
+
+  public static final int INNER_RING = 3;
+
   public static final int MULTI_POINT_M_SHAPE = 28;
 
   public static final int MULTI_POINT_SHAPE = 8;

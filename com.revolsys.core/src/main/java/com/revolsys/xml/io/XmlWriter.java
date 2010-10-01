@@ -225,7 +225,7 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -239,7 +239,21 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
+   * @throws IOException If there was an error writing.
+   * @throws IllegalStateException If a start tag is not open.
+   */
+  public void attribute(
+    final QName attribute,
+    final byte value) {
+    attribute(attribute, String.valueOf(value));
+  }
+
+  /**
+   * Add an attribute to the current open tag.
+   * 
+   * @param attribute The QName of the attribute.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -253,7 +267,7 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -267,7 +281,7 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -281,7 +295,7 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -295,7 +309,7 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -311,7 +325,7 @@ public class XmlWriter extends Writer {
    * Add an attribute to the current open tag.
    * 
    * @param attribute The QName of the attribute.
-   * @param value The attrubute value.
+   * @param value The attribute value.
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
@@ -355,7 +369,7 @@ public class XmlWriter extends Writer {
   }
 
   /**
-   * Check that it is valid to write an attrubute. A attribute declaration can
+   * Check that it is valid to write an attribute. A attribute declaration can
    * only be written if there is a start tag that is open.
    * 
    * @throws IllegalStateException If a start tag is not open.
@@ -907,7 +921,17 @@ public class XmlWriter extends Writer {
     writeName(element);
     elementHasContent = false;
   }
-
+  /**
+   * Write the start tag for an element.
+   * 
+   * @param namespaceUri The namespace URI.
+  * @param localPart The local name.
+   * @throws IOException If there was a problem writing the element.
+   */
+  public void startTag(
+    final String namespaceUri, final String localPart) {
+    startTag(new QName(namespaceUri,localPart));
+  }
   /**
    * Write the boolean value as the content of a tag with special characters
    * escaped.

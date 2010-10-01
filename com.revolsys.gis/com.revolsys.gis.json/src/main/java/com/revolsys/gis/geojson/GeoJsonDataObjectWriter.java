@@ -99,6 +99,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     coordinates(exteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       final LineString interiorRing = polygon.getInteriorRingN(i);
+      out.endAttribute();
       coordinates(interiorRing);
     }
 
@@ -151,9 +152,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     out.label(GeoJsonConstants.COORDINATES);
     out.startList();
     out.indent();
-    for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-      final LineString lineString = (LineString)multiLineString.getGeometryN(i);
-      coordinates(lineString);
+    final int numGeometries = multiLineString.getNumGeometries();
+    if (numGeometries > 0) {
+      coordinates((LineString)multiLineString.getGeometryN(0));
+      for (int i = 1; i < numGeometries; i++) {
+        final LineString lineString = (LineString)multiLineString.getGeometryN(i);
+        out.endAttribute();
+        coordinates(lineString);
+      }
     }
     out.endList();
   }
@@ -166,9 +172,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     out.label(GeoJsonConstants.COORDINATES);
     out.startList();
     out.indent();
-    for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
-      final Point point = (Point)multiPoint.getGeometryN(i);
-      coordinates(point);
+    final int numGeometries = multiPoint.getNumGeometries();
+    if (numGeometries > 0) {
+      coordinates((Point)multiPoint.getGeometryN(0));
+      for (int i = 1; i < numGeometries; i++) {
+        final Point point = (Point)multiPoint.getGeometryN(i);
+        out.endAttribute();
+        coordinates(point);
+      }
     }
     out.endList();
   }
@@ -181,9 +192,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> {
     out.label(GeoJsonConstants.COORDINATES);
     out.startList();
     out.indent();
-    for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-      final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
-      coordinates(polygon);
+    final int numGeometries = multiPolygon.getNumGeometries();
+    if (numGeometries > 0) {
+      coordinates((Polygon)multiPolygon.getGeometryN(0));
+      for (int i = 1; i < numGeometries; i++) {
+        final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
+        out.endAttribute();
+        coordinates(polygon);
+      }
     }
     out.endList();
   }

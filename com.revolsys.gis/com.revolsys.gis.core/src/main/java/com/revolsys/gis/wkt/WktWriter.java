@@ -150,12 +150,12 @@ public class WktWriter {
     LineString line,
     int dimension) {
     if (line.isEmpty()) {
-      out.print("LINESTRING EMPTY");
+      out.print("LINE_STRING EMPTY");
     } else {
       if (dimension > 2) {
-        out.print("LINESTRING Z");
+        out.print("LINE_STRING Z");
       } else {
-        out.print("LINESTRING");
+        out.print("LINE_STRING");
       }
       final CoordinateSequence coordinates = line.getCoordinateSequence();
       write(out, coordinates, dimension);

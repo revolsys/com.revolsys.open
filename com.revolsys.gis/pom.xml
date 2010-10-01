@@ -16,6 +16,7 @@
     <module>com.revolsys.gis.dbase</module>
     <module>com.revolsys.gis.ecsv</module>
     <module>com.revolsys.gis.gpx</module>
+    <module>com.revolsys.gis.gml</module>
     <module>com.revolsys.gis.jdbc</module>
     <module>com.revolsys.gis.json</module>
     <module>com.revolsys.gis.kml</module>

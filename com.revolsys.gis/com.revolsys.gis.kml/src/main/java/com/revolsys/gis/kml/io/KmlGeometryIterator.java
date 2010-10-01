@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 @SuppressWarnings("restriction")
-public class KmlGeometryIterator implements Iterator<Geometry> {
+public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   private static final Logger log = LoggerFactory.getLogger(KmlGeometryIterator.class);
@@ -45,7 +45,7 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
   private Geometry currentGeometry;
 
   private final GeometryFactory geometryFactory = new GeometryFactory(
-    Kml22Constants.COORDINATE_SYSTEM, new SimpleCoordinatesPrecisionModel());
+    COORDINATE_SYSTEM, new SimpleCoordinatesPrecisionModel());
 
   private boolean hasNext = true;
 
@@ -58,7 +58,7 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
     try {
       this.in = createXmlReader(resource);
       StaxUtils.skipToStartElement(this.in);
-      StaxUtils.requireLocalName(this.in, Kml22Constants.KML);
+      StaxUtils.requireLocalName(this.in, KML);
       StaxUtils.skipToStartElement(this.in);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Unable to open resource " + resource);
@@ -109,7 +109,7 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
 
   private CoordinatesList parseCoordinates()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.COORDINATES);
+    StaxUtils.requireLocalName(in, COORDINATES);
     final String coordinatesListString = StaxUtils.getElementText(in);
     final String[] coordinatesListArray = coordinatesListString.trim().split(
       "\\s+");
@@ -124,6 +124,7 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
         coordinatesList.setValue(i, ordinateIndex, Double.valueOf(coordinate));
       }
     }
+    StaxUtils.skipToEndElement(in, COORDINATES);
     return coordinatesList;
   }
 
@@ -133,13 +134,13 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
       StaxUtils.skipToStartElement(in);
     }
     while (in.getEventType() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.MULTI_GEOMETRY)) {
+      if (StaxUtils.matchElementLocalName(in, MULTI_GEOMETRY)) {
         return parseMultiGeometry();
-      } else if (StaxUtils.matchElementLocalName(in, Kml22Constants.POINT)) {
+      } else if (StaxUtils.matchElementLocalName(in, POINT)) {
         return parsePoint();
-      } else if (StaxUtils.matchElementLocalName(in, Kml22Constants.LINE_STRING)) {
+      } else if (StaxUtils.matchElementLocalName(in, LINE_STRING)) {
         return parseLineString();
-      } else if (StaxUtils.matchElementLocalName(in, Kml22Constants.POLYGON)) {
+      } else if (StaxUtils.matchElementLocalName(in, POLYGON)) {
         return parsePolygon();
       } else {
         while (in.next() != XMLStreamConstants.START_ELEMENT
@@ -153,105 +154,120 @@ public class KmlGeometryIterator implements Iterator<Geometry> {
 
   private LinearRing parseInnerBoundary()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.INNER_BOUNDARY_IS);
+    LinearRing ring = null;
+    StaxUtils.requireLocalName(in, INNER_BOUNDARY_IS);
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.LINEAR_RING)) {
-        return parseLinearRing();
+      if (ring == null && StaxUtils.matchElementLocalName(in, LINEAR_RING)) {
+        ring = parseLinearRing();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    return null;
+    StaxUtils.skipToEndElement(in, INNER_BOUNDARY_IS);
+    return ring;
   }
 
   private LinearRing parseLinearRing()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.LINEAR_RING);
+    StaxUtils.requireLocalName(in, LINEAR_RING);
     CoordinatesList cooordinatesList = null;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.COORDINATES)) {
+      if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    return geometryFactory.createLinearRing(cooordinatesList);
+    final LinearRing ring = geometryFactory.createLinearRing(cooordinatesList);
+    StaxUtils.skipToEndElement(in, LINEAR_RING);
+    return ring;
   }
 
   private LineString parseLineString()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.LINE_STRING);
+    StaxUtils.requireLocalName(in, LINE_STRING);
     CoordinatesList cooordinatesList = null;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.COORDINATES)) {
+      if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    return geometryFactory.createLineString(cooordinatesList);
+    final LineString lineString = geometryFactory.createLineString(cooordinatesList);
+    StaxUtils.skipToEndElement(in, LINE_STRING);
+    return lineString;
   }
 
   private Geometry parseMultiGeometry()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.MULTI_GEOMETRY);
+    StaxUtils.requireLocalName(in, MULTI_GEOMETRY);
     final List<Geometry> geometries = new ArrayList<Geometry>();
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Geometry geometry = parseGeometry();
-      geometries.add(geometry);
-      StaxUtils.skipWhitespace(in);
+      if (geometry != null) {
+        geometries.add(geometry);
+      }
     }
-    return geometryFactory.createGeometry(geometries);
+    final Geometry geometryCollection = geometryFactory.createGeometry(geometries);
+    StaxUtils.skipToEndElement(in, MULTI_GEOMETRY);
+    return geometryCollection;
   }
 
   private LinearRing parseOuterBoundary()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.OUTER_BOUNDARY_IS);
+    StaxUtils.requireLocalName(in, OUTER_BOUNDARY_IS);
+    LinearRing ring = null;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.LINEAR_RING)) {
-        return parseLinearRing();
+      if (ring == null && StaxUtils.matchElementLocalName(in, LINEAR_RING)) {
+        ring = parseLinearRing();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    return null;
+    StaxUtils.skipToEndElement(in, OUTER_BOUNDARY_IS);
+    return ring;
   }
 
   private Point parsePoint()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.POINT);
+    StaxUtils.requireLocalName(in, POINT);
     CoordinatesList cooordinatesList = null;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.COORDINATES)) {
+      if (cooordinatesList == null && StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    return geometryFactory.createPoint(cooordinatesList);
+    final Point point = geometryFactory.createPoint(cooordinatesList);
+    StaxUtils.skipToEndElement(in, POINT);
+    return point;
   }
 
   private Polygon parsePolygon()
     throws XMLStreamException {
-    StaxUtils.requireLocalName(in, Kml22Constants.POLYGON);
-    LinearRing exteriorRing = null;
-    final List<LinearRing> interiorRings = new ArrayList<LinearRing>();
+    StaxUtils.requireLocalName(in, POLYGON);
+    final List<LinearRing> rings = new ArrayList<LinearRing>();
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, Kml22Constants.OUTER_BOUNDARY_IS)) {
-        exteriorRing = parseOuterBoundary();
-      } else if (StaxUtils.matchElementLocalName(in,
-        Kml22Constants.INNER_BOUNDARY_IS)) {
+      if (rings.isEmpty()) {
+        if (StaxUtils.matchElementLocalName(in, OUTER_BOUNDARY_IS)) {
+          rings.add(parseOuterBoundary());
+        } else {
+          StaxUtils.skipSubTree(in);
+        }
+      } else if (StaxUtils.matchElementLocalName(in, INNER_BOUNDARY_IS)) {
         final LinearRing innerRing = parseInnerBoundary();
         if (innerRing != null) {
-          interiorRings.add(innerRing);
+          rings.add(innerRing);
         }
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    return geometryFactory.createPolygon(
-      exteriorRing,
-      com.vividsolutions.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
+    final Polygon polygon = geometryFactory.createPolygonFromLinearRings(rings);
+    StaxUtils.skipToEndElement(in, POLYGON);
+    return polygon;
   }
 
   public void remove() {
