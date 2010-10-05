@@ -27,7 +27,7 @@ public interface GeoJsonConstants {
 
   String LINE_STRING = "LineString";
 
-  String MEDIA_TYPE = "text/x-geojson";
+  String MEDIA_TYPE = "application/x-geo+json";
 
   String MULTI_LINE_STRING = "MultiLineString";
 
