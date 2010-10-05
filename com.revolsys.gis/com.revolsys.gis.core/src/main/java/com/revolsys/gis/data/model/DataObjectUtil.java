@@ -23,13 +23,20 @@ package com.revolsys.gis.data.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public final class DataObjectUtil {
+
+  public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
+    new QName("http://open.revolsys.com/", "Feature", "rso"), new Attribute(
+      "geometry", DataTypes.GEOMETRY, true));
 
   /**
    * Create a copy of the data object replacing the geometry with the new

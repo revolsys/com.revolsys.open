@@ -25,6 +25,19 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
+  public static final CoordinatesList parse(
+    String value,
+    String separator,
+    int numAxis) {
+    final String[] values = value.split(separator);
+    final double[] coordinates = new double[values.length];
+    for (int i = 0; i < values.length; i++) {
+      String string = values[i];
+      coordinates[i] = Double.parseDouble(string);
+    }
+    return new DoubleCoordinatesList(numAxis, coordinates);
+  }
+
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates coordinate,

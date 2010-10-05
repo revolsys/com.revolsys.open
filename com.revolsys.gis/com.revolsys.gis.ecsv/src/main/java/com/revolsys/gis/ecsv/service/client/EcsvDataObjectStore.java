@@ -34,7 +34,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.ecsv.io.EcsvConstants;
-import com.revolsys.gis.ecsv.io.EcsvDataObjectReaderFactory;
+import com.revolsys.gis.ecsv.io.EcsvIoFactory;
 import com.revolsys.gis.ecsv.service.EcsvServiceConstants;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -71,7 +71,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
 
   private final String password;
 
-  private final EcsvDataObjectReaderFactory readerFactory = EcsvDataObjectReaderFactory.INSTANCE;
+  private final EcsvIoFactory ioFactory = EcsvIoFactory.INSTANCE;
 
   private final URI uri;
 
@@ -138,7 +138,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
       final int statusCode = client.executeMethod(method);
       if (statusCode == HttpStatus.SC_OK) {
         final InputStream in = method.getResponseBodyAsStream();
-        return (DataObjectReader)readerFactory.createDataObjectReader(
+        return (DataObjectReader)ioFactory.createDataObjectReader(
           new InputStreamResource(in), getDataObjectFactory());
       } else {
         throw new IllegalArgumentException("Unnable to connect to server: "

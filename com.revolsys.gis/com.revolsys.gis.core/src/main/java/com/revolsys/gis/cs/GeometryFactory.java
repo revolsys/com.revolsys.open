@@ -163,7 +163,9 @@ public class GeometryFactory extends
 
   public LineString createLineString(
     final CoordinatesList points) {
-    points.makePrecise(coordinatesPrecisionModel);
+    if (points != null) {
+      points.makePrecise(coordinatesPrecisionModel);
+    }
     final LineString line = super.createLineString(points);
     return line;
   }
@@ -270,36 +272,43 @@ public class GeometryFactory extends
 
   public Point createPoint(
     final CoordinatesList points) {
-    points.makePrecise(coordinatesPrecisionModel);
+    if (points != null) {
+      points.makePrecise(coordinatesPrecisionModel);
+    }
     return super.createPoint(points);
   }
 
   public Polygon createPolygon(
     final CoordinatesList... rings) {
-    return createPolygon(Arrays.asList(rings));
+    final List<CoordinatesList> ringList = Arrays.asList(rings);
+    return createPolygon(ringList);
   }
 
-  public Polygon createPolygonFromLinearRings(
-    final List<LinearRing> rings) {
-    final LinearRing exteriorRing = rings.get(0);
+  public Polygon createPolygon(
+    final List<?> rings) {
+    final LinearRing exteriorRing = getLinearRing(rings, 0);
     final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
     for (int i = 1; i < rings.size(); i++) {
-      interiorRings[i - 1] = rings.get(i);
+      interiorRings[i - 1] = getLinearRing(rings, i);
     }
     return createPolygon(exteriorRing, interiorRings);
   }
 
-  public Polygon createPolygon(
-    final List<CoordinatesList> rings) {
-    if (rings == null || rings.isEmpty()) {
-      return createPolygon(null, null);
+  private LinearRing getLinearRing(
+    final List<?> rings,
+    final int index) {
+    Object ring = rings.get(index);
+    if (ring instanceof LinearRing) {
+      return (LinearRing)ring;
+
+    } else if (ring instanceof CoordinatesList) {
+      CoordinatesList points = (CoordinatesList)ring;
+      return createLinearRing(points);
+    } else if (ring instanceof CoordinateSequence) {
+      CoordinateSequence points = (CoordinateSequence)ring;
+      return createLinearRing(points);
     } else {
-      final LinearRing exteriorRing = createLinearRing(rings.get(0));
-      final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
-      for (int i = 1; i < rings.size(); i++) {
-        interiorRings[i - 1] = createLinearRing(rings.get(i));
-      }
-      return createPolygon(exteriorRing, interiorRings);
+      return null;
     }
   }
 

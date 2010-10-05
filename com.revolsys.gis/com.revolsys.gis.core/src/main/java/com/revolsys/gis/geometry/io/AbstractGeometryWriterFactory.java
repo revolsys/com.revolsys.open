@@ -1,18 +1,35 @@
 package com.revolsys.gis.geometry.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
+import com.revolsys.spring.SpringUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
   implements GeometryWriterFactory {
+
+  public static Writer<Geometry> createWriter(
+    Resource resource) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final GeometryWriterFactory writerFactory = ioFactoryRegistry.getFactoryByResource(
+      GeometryWriterFactory.class, resource);
+    if (writerFactory == null) {
+      return null;
+    } else {
+      final Writer<Geometry> writer = writerFactory.createGeometryWriter(resource);
+      return writer;
+    }
+  }
 
   public AbstractGeometryWriterFactory(
     final String name) {
@@ -20,32 +37,35 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
   }
 
   /**
-   * Create a reader for the file using the ({@link ArrayGeometryFactory}).
+   * Create a writer to write to the specified resource.
    * 
-   * @param file The file to read.
-   * @return The reader for the file.
+   * @param resource The resource to write to.
+   * @return The writer.
    */
   public Writer<Geometry> createGeometryWriter(
-    final File file) {
+    final Resource resource) {
     try {
-      final FileOutputStream in = new FileOutputStream(file);
-      final String baseName = FileUtil.getBaseName(file);
-      return createGeometryWriter(baseName, in);
-    } catch (final FileNotFoundException e) {
-      throw new IllegalArgumentException("File does not exist:" + file, e);
+      final OutputStream out = SpringUtil.getOutputStream(resource);
+      final String fileName = resource.getFilename();
+      final String baseName = FileUtil.getBaseName(fileName);
+      return createGeometryWriter(baseName, out);
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Error opening resource " + resource,
+        e);
     }
   }
 
   /**
    * Create a reader for the file using the ({@link ArrayGeometryFactory}).
    * 
-   * @param inputStream The file to read.
-   * @return The reader for the file.
+   * @param baseName The base file name to write to.
+   * @param out The output stream to write to.
+   * @return The writer.
    */
   public Writer<Geometry> createGeometryWriter(
     String baseName,
-    final OutputStream inputStream) {
-    return createGeometryWriter(baseName, inputStream, Charset.forName("UTF-8"));
+    final OutputStream out) {
+    return createGeometryWriter(baseName, out, Charset.forName("UTF-8"));
 
   }
 

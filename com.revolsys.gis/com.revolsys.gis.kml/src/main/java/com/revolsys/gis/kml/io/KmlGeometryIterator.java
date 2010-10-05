@@ -1,12 +1,10 @@
 package com.revolsys.gis.kml.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -28,19 +26,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 @SuppressWarnings("restriction")
 public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
-  private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
-
   private static final Logger log = LoggerFactory.getLogger(KmlGeometryIterator.class);
-
-  private static XMLStreamReader createXmlReader(
-    final Resource resource)
-    throws IOException {
-    try {
-      return FACTORY.createXMLStreamReader(resource.getInputStream());
-    } catch (final XMLStreamException e) {
-      throw new IllegalArgumentException(e.getMessage(), e);
-    }
-  }
 
   private Geometry currentGeometry;
 
@@ -56,7 +42,7 @@ public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
   public KmlGeometryIterator(
     final Resource resource) {
     try {
-      this.in = createXmlReader(resource);
+      this.in = StaxUtils.createXmlReader(resource);
       StaxUtils.skipToStartElement(this.in);
       StaxUtils.requireLocalName(this.in, KML);
       StaxUtils.skipToStartElement(this.in);
@@ -265,7 +251,7 @@ public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
         StaxUtils.skipSubTree(in);
       }
     }
-    final Polygon polygon = geometryFactory.createPolygonFromLinearRings(rings);
+    final Polygon polygon = geometryFactory.createPolygon(rings);
     StaxUtils.skipToEndElement(in, POLYGON);
     return polygon;
   }

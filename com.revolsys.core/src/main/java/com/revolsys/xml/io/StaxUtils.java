@@ -15,11 +15,19 @@
  */
 package com.revolsys.xml.io;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.springframework.core.io.Resource;
 
 /**
  * The StaxUtils class provides utility methods for processing XML using the
@@ -29,6 +37,26 @@ import javax.xml.stream.XMLStreamWriter;
  */
 @SuppressWarnings("restriction")
 public final class StaxUtils {
+  private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
+
+  public static void closeSilent(
+    final XMLStreamReader in) {
+    try {
+      in.close();
+    } catch (final XMLStreamException e) {
+    }
+  }
+
+  public static XMLStreamReader createXmlReader(
+    final Resource resource)
+    throws IOException {
+    try {
+      return StaxUtils.FACTORY.createXMLStreamReader(resource.getInputStream());
+    } catch (final XMLStreamException e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
+
   public static double getDoubleAttribute(
     final XMLStreamReader parser,
     final String namespaceUri,
@@ -168,6 +196,7 @@ public final class StaxUtils {
     while (!parser.isEndElement() || !parser.getName().equals(name)) {
       parser.next();
     }
+    parser.next();
   }
 
   /**
@@ -185,6 +214,95 @@ public final class StaxUtils {
       }
     }
     return parser.getEventType();
+  }
+
+  /**
+   * Skip all events until the next start element event which is for an element
+   * with one of the elementNames.
+   * 
+   * @param parser The STAX XML parser.
+   * @param elementNames The names of the elements to find
+   * @return The name of the matching element, null if end of document is
+   *         reached.
+   * @throws XMLStreamException If an exception processing the XML occurs.
+   */
+  public static boolean skipToStartElements(
+    final XMLStreamReader parser,
+    final Collection<QName> elementNames)
+    throws XMLStreamException {
+    QName elementName = null;
+    do {
+      while (parser.next() != XMLStreamConstants.START_ELEMENT) {
+        if (parser.getEventType() == XMLStreamConstants.END_DOCUMENT) {
+          return false;
+        }
+      }
+      elementName = parser.getName();
+    } while (!elementNames.contains(elementName));
+    return true;
+  }
+
+  /**
+   * Skip all events until the next start element which is a child of the
+   * current element has one of the elementNames.
+   * 
+   * @param parser The STAX XML parser.
+   * @param elementNames The names of the elements to find
+   * @return True if one of the elements was found.
+   * @throws XMLStreamException If an exception processing the XML occurs.
+   */
+  public static boolean skipToChildStartElements(
+    final XMLStreamReader parser,
+    final QName... elementNames)
+    throws XMLStreamException {
+    final List<QName> names = Arrays.asList(elementNames);
+    return skipToChildStartElements(parser, names);
+  }
+
+  /**
+   * Skip all events until the next start element which is a child of the
+   * current element has one of the elementNames.
+   * 
+   * @param parser The STAX XML parser.
+   * @param elementNames The names of the elements to find
+   * @return True if one of the elements was found.
+   * @throws XMLStreamException If an exception processing the XML occurs.
+   */
+  public static boolean skipToChildStartElements(
+    final XMLStreamReader parser,
+    final Collection<QName> elementNames)
+    throws XMLStreamException {
+    int count = 0;
+    QName elementName = null;
+    if (parser.isEndElement()) {
+      elementName = parser.getName();
+      if (elementNames.contains(elementName)) {
+        parser.nextTag();
+      } else {
+        return false;
+      }
+    }
+    if (parser.isStartElement()) {
+      elementName = parser.getName();
+      if (elementNames.contains(elementName)) {
+        return true;
+      }
+    }
+    do {
+      while (parser.next() != XMLStreamConstants.START_ELEMENT) {
+        if (parser.getEventType() == XMLStreamConstants.END_DOCUMENT) {
+          return false;
+        } else if (parser.isEndElement()) {
+          if (count == 0) {
+            return false;
+          }
+          count--;
+        }
+      }
+      count++;
+      elementName = parser.getName();
+    } while (!elementNames.contains(elementName));
+    return true;
   }
 
   /**

@@ -12,6 +12,7 @@ import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -56,7 +57,7 @@ public class WktIterator extends AbstractObjectWithProperties implements
   }
 
   public DataObjectMetaData getMetaData() {
-    return WktConstants.META_DATA;
+    return DataObjectUtil.GEOMETRY_META_DATA;
   }
 
   public boolean hasNext() {

@@ -1,20 +1,24 @@
 package com.revolsys.gis.data.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.spring.SpringUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectAndGeometryIoFactory extends
@@ -27,15 +31,24 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     super(name);
   }
 
+  /**
+   * Create a writer to write to the specified resource.
+   * 
+   * @param metaData The metaData for the type of data to write.
+   * @param resource The resource to write to.
+   * @return The writer.
+   */
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final File file) {
+    DataObjectMetaData metaData,
+    final Resource resource) {
     try {
-      final FileOutputStream out = new FileOutputStream(file);
-      final String baseName = FileUtil.getBaseName(file);
+      final OutputStream out = SpringUtil.getOutputStream(resource);
+      final String fileName = resource.getFilename();
+      final String baseName = FileUtil.getBaseName(fileName);
       return createDataObjectWriter(baseName, metaData, out);
     } catch (final IOException e) {
-      throw new IllegalArgumentException("Error writing to file:" + file, e);
+      throw new IllegalArgumentException("Error opening resource " + resource,
+        e);
     }
   }
 
@@ -48,9 +61,9 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
   }
 
   public Writer<Geometry> createGeometryWriter(
-    final File file) {
+    final Resource resource) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      DataObjectWriterGeometryWriter.META_DATA, file);
+      DataObjectUtil.GEOMETRY_META_DATA, resource);
     return createGeometryWriter(dataObjectWriter);
   }
 
@@ -58,7 +71,7 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     final String baseName,
     final OutputStream out) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      baseName, DataObjectWriterGeometryWriter.META_DATA, out);
+      baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
     return createGeometryWriter(dataObjectWriter);
   }
 
@@ -67,7 +80,7 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     final OutputStream out,
     final Charset charset) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      baseName, DataObjectWriterGeometryWriter.META_DATA, out, charset);
+      baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
     return createGeometryWriter(dataObjectWriter);
   }
 

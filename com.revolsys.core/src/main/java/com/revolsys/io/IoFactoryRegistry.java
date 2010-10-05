@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 public class IoFactoryRegistry {
   public static final IoFactoryRegistry INSTANCE = new IoFactoryRegistry();
@@ -130,9 +131,17 @@ public class IoFactoryRegistry {
     return (Map<String, F>)factoriesByMediaType;
   }
 
+  public <F extends IoFactory> F getFactoryByResource(
+    final Class<F> factoryClass,
+    final Resource resource) {
+    final String fileName = resource.getFilename();
+    return getFactoryByFileExtension(factoryClass,fileName);
+  }
+
   public <F extends IoFactory> F getFactoryByFileExtension(
     final Class<F> factoryClass,
-    final String fileExtension) {
+    final String fileName) {
+    final String fileExtension = FileUtil.getFileNameExtension(fileName);
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtension(factoryClass);
     return factoriesByFileExtension.get(fileExtension);
   }
