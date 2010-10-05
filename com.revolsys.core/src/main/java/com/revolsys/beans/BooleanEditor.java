@@ -2,8 +2,6 @@ package com.revolsys.beans;
 
 import java.beans.PropertyEditorSupport;
 
-import javax.xml.namespace.QName;
-
 public class BooleanEditor extends PropertyEditorSupport {
   public BooleanEditor() {
   }

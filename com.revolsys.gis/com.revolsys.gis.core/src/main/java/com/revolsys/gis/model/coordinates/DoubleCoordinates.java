@@ -1,11 +1,20 @@
 package com.revolsys.gis.model.coordinates;
 
+import java.util.List;
+
+import com.revolsys.util.MathUtil;
+
 public class DoubleCoordinates extends AbstractCoordinates {
   private final double[] coordinates;
 
   public DoubleCoordinates(
-    final double... ordinates) {
-    this.coordinates = ordinates;
+    final Coordinates coordinates) {
+    this.coordinates = coordinates.getCoordinates();
+  }
+
+  public DoubleCoordinates(
+    final double... coordinates) {
+    this.coordinates = coordinates;
   }
 
   public DoubleCoordinates(
@@ -14,8 +23,8 @@ public class DoubleCoordinates extends AbstractCoordinates {
   }
 
   public DoubleCoordinates(
-    Coordinates coordinates) {
-    this.coordinates = coordinates.getCoordinates();
+    final List<Number> coordinates) {
+    this(MathUtil.toDoubleArray(coordinates));
   }
 
   @Override
@@ -25,7 +34,7 @@ public class DoubleCoordinates extends AbstractCoordinates {
 
   @Override
   public double[] getCoordinates() {
-    double[] coordinates = new double[this.coordinates.length];
+    final double[] coordinates = new double[this.coordinates.length];
     System.arraycopy(this.coordinates, 0, coordinates, 0,
       this.coordinates.length);
     return coordinates;

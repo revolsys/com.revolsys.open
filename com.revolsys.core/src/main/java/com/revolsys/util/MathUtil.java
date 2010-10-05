@@ -17,6 +17,7 @@ package com.revolsys.util;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.List;
 
 /**
  * The MathUtil class is a utility class for handling integer, percent and
@@ -122,6 +123,16 @@ public final class MathUtil {
     final double angle1 = angle(x2, y2, x1, y1);
     final double angle2 = angle(x2, y2, x3, y3);
     return angleDiff(angle1, angle2);
+  }
+
+  public static double angle2d(
+    final double x1,
+    final double x2,
+    final double y1,
+    final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    return Math.atan2(dy, dx);
   }
 
   public static double angleDegrees(
@@ -517,19 +528,19 @@ public final class MathUtil {
       * Math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
   }
 
+  public static double[] toDoubleArray(
+    final List<? extends Number> numbers) {
+    final double[] doubles = new double[numbers.size()];
+    for (int i = 0; i < doubles.length; i++) {
+      final Number number = numbers.get(i);
+      doubles[i] = number.doubleValue();
+    }
+    return doubles;
+  }
+
   /**
    * Construct a new MathUtil.
    */
   private MathUtil() {
-  }
-
-  public static double angle2d(
-    final double x1,
-    final double x2,
-    final double y1,
-    final double y2) {
-    final double dx = x2 - x1;
-    final double dy = y2 - y1;
-    return Math.atan2(dy, dx);
   }
 }

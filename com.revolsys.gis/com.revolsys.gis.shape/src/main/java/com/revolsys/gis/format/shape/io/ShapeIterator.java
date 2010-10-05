@@ -3,7 +3,6 @@ package com.revolsys.gis.format.shape.io;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
@@ -14,6 +13,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -27,10 +27,9 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class ShapeIterator extends AbstractObjectWithProperties implements
-  Iterator<DataObject> {
+  DataObjectIterator {
 
   private DataObject currentObject;
 

@@ -1,41 +1,55 @@
 package com.revolsys.gis.geojson;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 public interface GeoJsonConstants {
- 
-  String DESCRIPTION = "GeoJSON";
-
-  String FILE_EXTENSION = "geojson";
-
-  String MEDIA_TYPE = "text/x-geojson";
-
-  String POLYGON = "Polygon";
-
-  String MULTI_POLYGON = "MultiPolygon";
-
-  String POINT = "Point";
-
-  String MULTI_POINT = "MultiPoint";
-
-  String LINE_STRING = "LineString";
-
-  String MULTI_LINE_STRING = "LineString";
 
   String COORDINATES = "coordinates";
 
-  String TYPE = "type";
+  String CRS = "crs";
+
+  String DESCRIPTION = "GeoJSON";
 
   String FEATURE = "Feature";
 
-  public static final String NAME = "name";
+  String FEATURE_COLLECTION = "FeatureCollection";
 
-  public static final String CRS = "crs";
+  String FEATURES = "features";
 
-  public static final String FEATURES = "features";
+  String FILE_EXTENSION = "geojson";
 
-  public static final String FEATURE_COLLECTION = "FeatureCollection";
+  String GEOMETRY = "geometry";
 
-  public static final String PROPERTIES = "properties";
+  String GEOMETRY_COLLECTION = "GeometryCollection";
 
-  public static final String GEOMETRY = "geometry";
+  String LINE_STRING = "LineString";
+
+  String MEDIA_TYPE = "text/x-geojson";
+
+  String MULTI_LINE_STRING = "MultiLineString";
+
+  String MULTI_POINT = "MultiPoint";
+
+  String MULTI_POLYGON = "MultiPolygon";
+
+  String NAME = "name";
+
+  String POINT = "Point";
+
+  String POLYGON = "Polygon";
+
+  String PROPERTIES = "properties";
+
+  String TYPE = "type";
+
+  Set<String> OBJECT_TYPE_NAMES = new TreeSet<String>(Arrays.asList(FEATURE,
+    FEATURE_COLLECTION, POINT, LINE_STRING, POLYGON, MULTI_POINT,
+    MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION));
+
+  Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<String>(Arrays.asList(POINT,
+    LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON,
+    GEOMETRY_COLLECTION));
 }

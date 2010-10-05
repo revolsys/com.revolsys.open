@@ -2,14 +2,13 @@ package com.revolsys.gis.ecsv.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +17,12 @@ import java.util.NoSuchElementException;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -30,11 +33,10 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTReader;
 
 public class EcsvIterator extends AbstractObjectWithProperties implements
-  Iterator<DataObject> {
+  DataObjectIterator {
   private static final Logger LOG = Logger.getLogger(EcsvIterator.class);
 
   /** The values for each record header type. */
@@ -76,22 +78,22 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
    * @throws IOException
    */
   public EcsvIterator(
-    final Reader in,
-    final GeometryFactory geometryFactory,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory)
     throws IOException {
-    this.in = new BufferedReader(in);
+    this.in = new BufferedReader(new InputStreamReader(
+      resource.getInputStream()));
     this.dataObjectFactory = dataObjectFactory;
     readFileProperties();
     readRecordHeader();
-    GeometryFactory geomFactory = geometryFactory;
+    GeometryFactory geomFactory = new GeometryFactory();
     final QName srid = getProperty(EcsvConstants.SRID);
     if (srid != null) {
       final Integer sridNum = Integer.valueOf(srid.getLocalPart());
+      final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(sridNum);
       setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
-        EpsgCoordinateSystems.getCoordinateSystem(sridNum));
-      geomFactory = new GeometryFactory(geometryFactory.getPrecisionModel(),
-        sridNum);
+        coordinateSystem);
+      geomFactory = new GeometryFactory(coordinateSystem);
 
     }
     geometryReader = new WKTReader(geomFactory);
@@ -241,8 +243,9 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
           object.setValue(i, value);
         }
       } catch (final Throwable e) {
-        LOG.error("Value " + string + " invalid for field "
-          + metaData.getAttributeName(i) + " for record " + recordCount, e);
+        LOG.error(
+          "Value " + string + " invalid for field "
+            + metaData.getAttributeName(i) + " for record " + recordCount, e);
       }
     }
     return object;

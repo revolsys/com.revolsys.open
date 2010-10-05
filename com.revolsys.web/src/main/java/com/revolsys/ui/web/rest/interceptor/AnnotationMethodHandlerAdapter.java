@@ -111,6 +111,8 @@ import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestScope;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.HandlerAdapter;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -284,12 +286,13 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       final HttpServletRequest httpRequest = ((ServletWebRequest)webRequest).getRequest();
       MediaType contentType = MediaTypeUtil.getContentType(httpRequest);
       if (contentType == null) {
-        contentType = new MediaType("application", "x-www-form-urlencoded");
+        contentType = MediaType.APPLICATION_FORM_URLENCODED;
       }
-      if (!new MediaType("application", "x-www-form-urlencoded").includes(contentType)) {
+      if (!MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)
+        && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
         contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
           mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
-          defaultMediaType);
+          defaultMediaType, "");
       }
 
       final HttpHeaders headers = inputMessage.getHeaders();
@@ -315,7 +318,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
             return messageConverter.read(paramType, inputMessage);
           }
         }
-        if (new MediaType("application", "x-www-form-urlencoded").includes(contentType)) {
+        String body = null;
+        if (MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)) {
           Charset charset = contentType.getCharSet();
           if (charset == null) {
             charset = Charset.forName(WebUtils.DEFAULT_CHARACTER_ENCODING);
@@ -340,33 +344,57 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
               values.add(name, value);
             }
           }
-          String body = values.getFirst("body");
-          if (body == null) {
-            body = httpRequest.getParameter("body");
+          body = values.getFirst("body");
+        } else if (httpRequest instanceof MultipartHttpServletRequest) {
+          MultipartHttpServletRequest multiPartRequest = (MultipartHttpServletRequest)httpRequest;
+          final MultipartFile bodyFile = multiPartRequest.getFile("body");
+          contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
+            mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
+            defaultMediaType, bodyFile.getOriginalFilename());
+          headers.setContentType(contentType);
+          HttpInputMessage newInputMessage = new HttpInputMessage() {
+            public HttpHeaders getHeaders() {
+              return headers;
+            }
+
+            public InputStream getBody()
+              throws IOException {
+              return bodyFile.getInputStream();
+            }
+          };
+          for (HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter.canRead(paramType, contentType)) {
+              return messageConverter.read(paramType, newInputMessage);
+            }
           }
-          if (body != null) {
-            contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
-              mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
-              defaultMediaType);
-            headers.setContentType(contentType);
-            byte[] bytes;
-            bytes = body.getBytes();
-            final InputStream bodyIn = new ByteArrayInputStream(bytes);
-            HttpInputMessage newInputMessage = new HttpInputMessage() {
 
-              public HttpHeaders getHeaders() {
-                return headers;
-              }
+        }
+        if (body == null) {
+          body = httpRequest.getParameter("body");
+        }
 
-              public InputStream getBody()
-                throws IOException {
-                return bodyIn;
-              }
-            };
-            for (HttpMessageConverter<?> messageConverter : messageConverters) {
-              if (messageConverter.canRead(paramType, contentType)) {
-                return messageConverter.read(paramType, newInputMessage);
-              }
+        if (body != null) {
+          contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
+            mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
+            defaultMediaType, "");
+          headers.setContentType(contentType);
+          byte[] bytes;
+          bytes = body.getBytes();
+          final InputStream bodyIn = new ByteArrayInputStream(bytes);
+          HttpInputMessage newInputMessage = new HttpInputMessage() {
+
+            public HttpHeaders getHeaders() {
+              return headers;
+            }
+
+            public InputStream getBody()
+              throws IOException {
+              return bodyIn;
+            }
+          };
+          for (HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter.canRead(paramType, contentType)) {
+              return messageConverter.read(paramType, newInputMessage);
             }
           }
         }
@@ -585,7 +613,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     }
 
     @Override
-    @SuppressWarnings( {
+    @SuppressWarnings({
       "unchecked"
     })
     protected String resolvePathVariable(
@@ -957,8 +985,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     return -1;
   }
 
-  private List<String> mediaTypeOrder = Arrays.asList("pathExtension",
-    "parameter", "acceptHeader", "defaultMediaType");
+  private List<String> mediaTypeOrder = Arrays.asList("fileName",
+    "pathExtension", "parameter", "acceptHeader", "defaultMediaType");
 
   public List<String> getMediaTypeOrder() {
     return mediaTypeOrder;
@@ -1145,9 +1173,9 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
   /**
    * Sets the default content type.
    * <p>
-   * This content type will be used when file extension, parameter, nor {@code
-   * Accept} header define a content-type, either through being disabled or
-   * empty.
+   * This content type will be used when file extension, parameter, nor
+   * {@code Accept} header define a content-type, either through being disabled
+   * or empty.
    */
   public void setDefaultMediaType(
     final MediaType defaultContentType) {

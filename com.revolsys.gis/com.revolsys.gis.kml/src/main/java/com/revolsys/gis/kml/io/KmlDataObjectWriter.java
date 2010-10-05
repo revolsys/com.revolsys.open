@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
@@ -74,7 +76,9 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
     int idIndex = metaData.getIdAttributeIndex();
     if (idIndex != -1) {
       final Object id = object.getValue(idIndex);
-      writer.element(Kml22Constants.NAME, metaData.getName() + " " + id);
+      final QName name = metaData.getName();
+      final String localName = name.getLocalPart();
+      writer.element(Kml22Constants.NAME, localName + " " + id);
     }
     String description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
     if (description != null) {

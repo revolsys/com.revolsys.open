@@ -25,6 +25,7 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.springframework.core.io.InputStreamResource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -34,7 +35,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.ecsv.io.EcsvConstants;
 import com.revolsys.gis.ecsv.io.EcsvDataObjectReaderFactory;
-import com.revolsys.gis.ecsv.io.EcsvReader;
 import com.revolsys.gis.ecsv.service.EcsvServiceConstants;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -94,14 +94,14 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     this.password = password;
   }
 
-  protected Reader createReader(
+  protected DataObjectReader createReader(
     final String path) {
     final Map<String, String> params = Collections.emptyMap();
     return createReader(path, params);
 
   }
 
-  protected Reader createReader(
+  protected DataObjectReader createReader(
     final String path,
     final Map<String, String> parameters) {
 
@@ -138,7 +138,8 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
       final int statusCode = client.executeMethod(method);
       if (statusCode == HttpStatus.SC_OK) {
         final InputStream in = method.getResponseBodyAsStream();
-        return readerFactory.createDataObjectReader(new InputStreamResource(in), getDataObjectFactory());
+        return (DataObjectReader)readerFactory.createDataObjectReader(
+          new InputStreamResource(in), getDataObjectFactory());
       } else {
         throw new IllegalArgumentException("Unnable to connect to server: "
           + statusCode);
@@ -172,28 +173,31 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     final String namespacePath = getPath(namespaceUri);
     final String name = typeName.getLocalPart();
     final String path = namespacePath + "/" + name;
-    final Reader reader = createReader(path, Collections.singletonMap("action",
-      "metaData"));
+    final DataObjectReader reader = createReader(path,
+      Collections.singletonMap("action", "metaData"));
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
-      getSchema(namespaceUri), ((EcsvReader)reader).getMetaData());
+      getSchema(namespaceUri), reader.getMetaData());
     reader.close();
     return metaData;
   }
 
   @Override
   protected void loadSchemaDataObjectMetaData(
-    final DataObjectStoreSchema schema, Map<QName, DataObjectMetaData> metaDataMap) {
+    final DataObjectStoreSchema schema,
+    Map<QName, DataObjectMetaData> metaDataMap) {
   }
 
   @Override
-  protected  void loadSchemas(Map<String, DataObjectStoreSchema> schemaMap) {
+  protected void loadSchemas(
+    Map<String, DataObjectStoreSchema> schemaMap) {
     final Reader<DataObject> reader = createReader("");
     if (reader != null) {
       for (final DataObject object : reader) {
         final String path = object.getValue(EcsvServiceConstants.PATH_ATTR);
         final String namespaceUri = object.getValue(EcsvServiceConstants.NAMESPACE_URI_ATTR);
         namespacePaths.put(namespaceUri, path);
-        schemaMap.put(namespaceUri, new DataObjectStoreSchema(this, namespaceUri));
+        schemaMap.put(namespaceUri, new DataObjectStoreSchema(this,
+          namespaceUri));
       }
     }
   }
@@ -226,9 +230,11 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     final String path = getPath(typeName.getNamespaceURI()) + "/"
       + typeName.getLocalPart();
     final Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("filter", "intersects(GEOMETRY,rectangle("
-      + envelope.getMinX() + "," + envelope.getMinY() + ","
-      + envelope.getMaxX() + "," + envelope.getMaxY() + "))");
+    parameters.put(
+      "filter",
+      "intersects(GEOMETRY,rectangle(" + envelope.getMinX() + ","
+        + envelope.getMinY() + "," + envelope.getMaxX() + ","
+        + envelope.getMaxY() + "))");
     return createReader(path, parameters);
   }
 
@@ -239,10 +245,11 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
 
     return query(typeName, envelope);
   }
+
   public DataObject query(
     QName typeName,
     String queryString,
     Object... arguments) {
-   throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException();
   }
 }

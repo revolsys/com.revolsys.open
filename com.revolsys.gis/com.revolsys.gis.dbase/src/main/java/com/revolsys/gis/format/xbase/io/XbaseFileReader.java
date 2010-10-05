@@ -444,5 +444,4 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     throws IOException {
     in.skipBytes(recordBuffer.length);
   }
-
 }

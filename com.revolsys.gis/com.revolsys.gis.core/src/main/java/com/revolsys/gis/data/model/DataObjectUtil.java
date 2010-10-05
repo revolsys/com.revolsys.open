@@ -26,7 +26,6 @@ import java.util.Map;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 

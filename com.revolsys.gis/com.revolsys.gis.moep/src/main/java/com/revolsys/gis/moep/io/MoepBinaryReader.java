@@ -81,4 +81,5 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
   public Iterator iterator() {
     return iterator;
   }
+
 }

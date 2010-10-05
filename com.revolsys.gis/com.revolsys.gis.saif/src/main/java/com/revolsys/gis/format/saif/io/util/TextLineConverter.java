@@ -2,8 +2,8 @@ package com.revolsys.gis.format.saif.io.util;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 

@@ -6,7 +6,6 @@ import java.util.List;
 import com.revolsys.util.ListUtil;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class LineSegmentUtil {
   /**

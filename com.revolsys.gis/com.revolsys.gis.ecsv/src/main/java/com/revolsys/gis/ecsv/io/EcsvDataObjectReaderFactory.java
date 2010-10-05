@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
+import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -32,10 +33,11 @@ public class EcsvDataObjectReaderFactory extends
     Resource resource,
     DataObjectFactory dataObjectFactory) {
     try {
-      return new EcsvReader(resource, dataObjectFactory);
+      final EcsvIterator iterator = new EcsvIterator(resource, dataObjectFactory);
+      return new DataObjectIteratorReader(iterator);
     } catch (IOException e) {
-      throw new IllegalArgumentException("Unable to open resource " + resource,
-        e);
+      throw new RuntimeException("Unable to create reader for " + resource, e);
     }
+
   }
 }

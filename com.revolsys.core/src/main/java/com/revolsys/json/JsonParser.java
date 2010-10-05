@@ -1,10 +1,15 @@
 package com.revolsys.json;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileUtil;
 
@@ -26,10 +31,22 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   private final Reader reader;
 
   public JsonParser(
+    Resource in)
+    throws IOException {
+    this(in.getInputStream());
+  }
+
+  public JsonParser(
+    InputStream in)
+    throws IOException {
+    this(new InputStreamReader(in));
+  }
+
+  public JsonParser(
     final Reader reader)
     throws IOException {
-    this.reader = reader;
-    currentCharacter = reader.read();
+    this.reader = new BufferedReader(reader);
+    currentCharacter = this.reader.read();
   }
 
   public void close() {
@@ -46,7 +63,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   }
 
   public boolean hasNext() {
-    return nextEvent != EventType.endDocument;
+    return currentEvent != EventType.endDocument;
   }
 
   private void moveNext() {
@@ -212,6 +229,11 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   }
 
   public void remove() {
+  }
+
+  @Override
+  public String toString() {
+    return currentEvent + " : " + currentValue;
   }
 
   private void skipWhitespace()

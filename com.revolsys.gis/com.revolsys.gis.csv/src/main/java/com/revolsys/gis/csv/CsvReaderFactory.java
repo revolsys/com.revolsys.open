@@ -1,8 +1,11 @@
 package com.revolsys.gis.csv;
 
+import java.io.IOException;
+
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -30,10 +33,11 @@ public class CsvReaderFactory extends AbstractDataObjectReaderFactory {
   public Reader<DataObject> createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    final CsvReader reader = new CsvReader(resource, dataObjectFactory);
-    reader.setResource(resource);
-    return reader;
-
+    try {
+      final CsvIterator iterator = new CsvIterator(resource, dataObjectFactory);
+      return new DataObjectIteratorReader(iterator);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to create reader for " + resource, e);
+    }
   }
-
 }

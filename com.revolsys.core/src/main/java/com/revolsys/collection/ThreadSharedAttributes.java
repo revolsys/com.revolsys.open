@@ -2,8 +2,8 @@ package com.revolsys.collection;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.Map.Entry;
+import java.util.WeakHashMap;
 
 public class ThreadSharedAttributes {
   private static ThreadLocal<Map<Object, Object>> threadAttributes = new ThreadLocal<Map<Object, Object>>();

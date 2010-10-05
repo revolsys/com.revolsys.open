@@ -1,6 +1,5 @@
 package com.revolsys.parallel.channel;
 
-import com.revolsys.parallel.channel.store.ZeroBuffer;
 
 public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
   /** Flag indicating if the channel has been closed. */

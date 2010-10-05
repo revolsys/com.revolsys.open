@@ -12,8 +12,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.revolsys.gis.cs.AngularUnit;
 import com.revolsys.gis.cs.CoordinateSystem;

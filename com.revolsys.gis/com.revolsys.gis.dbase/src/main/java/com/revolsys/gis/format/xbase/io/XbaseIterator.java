@@ -7,13 +7,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -23,7 +23,7 @@ import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.FileUtil;
 
-public class XbaseIterator implements Iterator<DataObject> {
+public class XbaseIterator implements DataObjectIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();

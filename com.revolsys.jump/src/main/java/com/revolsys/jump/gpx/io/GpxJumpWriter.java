@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.ecsv.io.EcsvWriter;
 import com.revolsys.gis.gpx.io.GpxWriter;
 import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.FeatureSchemaClassDefinition;

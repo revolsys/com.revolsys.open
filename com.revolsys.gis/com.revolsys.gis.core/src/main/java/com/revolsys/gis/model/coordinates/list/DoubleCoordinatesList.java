@@ -1,6 +1,8 @@
 package com.revolsys.gis.model.coordinates.list;
 
-import com.revolsys.gis.util.NoOp;
+import java.util.List;
+
+import com.revolsys.util.MathUtil;
 
 public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
@@ -9,15 +11,15 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   private final byte numAxis;
 
   public DoubleCoordinatesList(
-    final CoordinatesList coordinatesList,
-    int numAxis) {
-    this(coordinatesList.size(), numAxis);
-    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
+    final CoordinatesList coordinatesList) {
+    this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
   }
 
   public DoubleCoordinatesList(
-    final CoordinatesList coordinatesList) {
-    this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
+    final CoordinatesList coordinatesList,
+    final int numAxis) {
+    this(coordinatesList.size(), numAxis);
+    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
   }
 
   public DoubleCoordinatesList(
@@ -32,6 +34,12 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     final int numAxis) {
     this.coordinates = new double[size * numAxis];
     this.numAxis = (byte)numAxis;
+  }
+
+  public DoubleCoordinatesList(
+    final int numAxis,
+    final List<Number> coordinates) {
+    this(numAxis, MathUtil.toDoubleArray(coordinates));
   }
 
   @Override

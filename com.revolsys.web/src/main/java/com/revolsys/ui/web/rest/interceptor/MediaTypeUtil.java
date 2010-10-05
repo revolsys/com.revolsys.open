@@ -80,13 +80,19 @@ public class MediaTypeUtil {
     final List<String> mediaTypeOrder,
     UrlPathHelper urlPathHelper,
     String parameterName,
-    MediaType defaultMediaType) {
+    MediaType defaultMediaType, String fileName) {
     for (String source : mediaTypeOrder) {
-      if (source.equals("pathExtension")) {
-        final String requestUri = urlPathHelper.getRequestUri(request);
-        final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+      if (source.equals("fileName")) {
         final MediaType mediaType = getMediaTypeFromFilename(
-          extensionToMediaTypeMap, filename);
+          extensionToMediaTypeMap, fileName);
+        if (mediaType != null) {
+          return mediaType;
+        }
+      } else if (source.equals("pathExtension")) {
+        final String requestUri = urlPathHelper.getRequestUri(request);
+        final String pathFileName = WebUtils.extractFullFilenameFromUrlPath(requestUri);
+        final MediaType mediaType = getMediaTypeFromFilename(
+          extensionToMediaTypeMap, pathFileName);
         if (mediaType != null) {
           return mediaType;
         }

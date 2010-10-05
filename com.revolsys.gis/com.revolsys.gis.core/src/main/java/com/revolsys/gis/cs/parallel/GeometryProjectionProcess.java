@@ -3,8 +3,6 @@ package com.revolsys.gis.cs.parallel;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;

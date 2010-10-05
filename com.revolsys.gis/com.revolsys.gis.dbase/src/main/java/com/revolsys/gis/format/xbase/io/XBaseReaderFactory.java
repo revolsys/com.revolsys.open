@@ -1,8 +1,11 @@
 package com.revolsys.gis.format.xbase.io;
 
+import java.io.IOException;
+
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -27,16 +30,17 @@ public class XBaseReaderFactory extends AbstractDataObjectReaderFactory {
     addMediaTypeAndFileExtension("application/dbf", "dbf");
   }
 
-  public Reader<DataObject> createDataObjectReader(
-    java.io.Reader in,
-    DataObjectFactory factory) {
-    return null;
-  }
   
   public Reader<DataObject> createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new XBaseReader(resource, dataObjectFactory);
+    try {
+      XbaseIterator iterator = new XbaseIterator(resource, dataObjectFactory);
+
+      return new DataObjectIteratorReader(iterator);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to create reader for " + resource, e);
+    }
   }
 
 

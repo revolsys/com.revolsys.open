@@ -14,6 +14,8 @@ import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -168,32 +170,82 @@ public class GeometryFactory extends
 
   public LineString createLineString(
     final List<Coordinates> points) {
-    CoordinatesList coordinatesList;
-    final int numPoints = points.size();
-    if (numPoints == 0) {
-      coordinatesList = null;
+    if (points == null || points.isEmpty()) {
+      return createLineString((CoordinateSequence)null);
     } else {
-      final Coordinates point0 = points.get(0);
-      final byte numAxis = point0.getNumAxis();
+      CoordinatesList coordinatesList;
+      final int numPoints = points.size();
+      if (numPoints == 0) {
+        coordinatesList = null;
+      } else {
+        final Coordinates point0 = points.get(0);
+        final byte numAxis = point0.getNumAxis();
 
-      coordinatesList = new DoubleCoordinatesList(numPoints, numAxis);
-      for (int i = 0; i < numPoints; i++) {
-        final Coordinates point = points.get(i);
-        coordinatesList.setPoint(i, point);
+        coordinatesList = new DoubleCoordinatesList(numPoints, numAxis);
+        for (int i = 0; i < numPoints; i++) {
+          final Coordinates point = points.get(i);
+          coordinatesList.setPoint(i, point);
+        }
       }
+      return createLineString(coordinatesList);
     }
-    return createLineString(coordinatesList);
   }
 
   public MultiLineString createMultiLineString(
-    final List<LineString> lines) {
-    final LineString[] lineArray = toLineStringArray(lines);
+    final List<?> lines) {
+    final LineString[] lineArray = toLineStringArray(this, lines);
     return createMultiLineString(lineArray);
   }
 
+  public static Point[] toPointArray(
+    GeometryFactory factory,
+    List<?> points) {
+    Point[] pointArray = new Point[points.size()];
+    for (int i = 0; i < points.size(); i++) {
+      Object value = points.get(i);
+      if (value instanceof Point) {
+        Point point = (Point)value;
+        pointArray[i] = point;
+      } else if (value instanceof Coordinates) {
+        Coordinates coordinates = (Coordinates)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      } else if (value instanceof Coordinate) {
+        Coordinate coordinate = (Coordinate)value;
+        pointArray[i] = factory.createPoint(coordinate);
+      } else if (value instanceof CoordinatesList) {
+        CoordinatesList coordinates = (CoordinatesList)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      } else if (value instanceof CoordinateSequence) {
+        CoordinateSequence coordinates = (CoordinateSequence)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      }
+    }
+    return pointArray;
+  }
+
+  public static LineString[] toLineStringArray(
+    GeometryFactory factory,
+    List<?> lines) {
+    LineString[] lineStrings = new LineString[lines.size()];
+    for (int i = 0; i < lines.size(); i++) {
+      Object value = lines.get(i);
+      if (value instanceof LineString) {
+        LineString lineString = (LineString)value;
+        lineStrings[i] = lineString;
+      } else if (value instanceof CoordinatesList) {
+        CoordinatesList coordinates = (CoordinatesList)value;
+        lineStrings[i] = factory.createLineString(coordinates);
+      } else if (value instanceof CoordinateSequence) {
+        CoordinateSequence coordinates = (CoordinateSequence)value;
+        lineStrings[i] = factory.createLineString(coordinates);
+      }
+    }
+    return lineStrings;
+  }
+
   public MultiPoint createMultiPoint(
-    final List<Point> points) {
-    final Point[] pointArray = toPointArray(points);
+    final List<?> points) {
+    final Point[] pointArray = toPointArray(this, points);
     return createMultiPoint(pointArray);
   }
 
@@ -204,12 +256,16 @@ public class GeometryFactory extends
 
   public Point createPoint(
     final Coordinates point) {
-    final byte numAxis = point.getNumAxis();
-    final double[] coordinates = point.getCoordinates();
-    final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
-      numAxis, coordinates);
-    coordinatesList.makePrecise(coordinatesPrecisionModel);
-    return super.createPoint(coordinatesList);
+    if (point == null) {
+      return createPoint((Coordinate)null);
+    } else {
+      final byte numAxis = point.getNumAxis();
+      final double[] coordinates = point.getCoordinates();
+      final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
+        numAxis, coordinates);
+      coordinatesList.makePrecise(coordinatesPrecisionModel);
+      return super.createPoint(coordinatesList);
+    }
   }
 
   public Point createPoint(
@@ -235,12 +291,16 @@ public class GeometryFactory extends
 
   public Polygon createPolygon(
     final List<CoordinatesList> rings) {
-    final LinearRing exteriorRing = createLinearRing(rings.get(0));
-    final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
-    for (int i = 1; i < rings.size(); i++) {
-      interiorRings[i - 1] = createLinearRing(rings.get(i));
+    if (rings == null || rings.isEmpty()) {
+      return createPolygon(null, null);
+    } else {
+      final LinearRing exteriorRing = createLinearRing(rings.get(0));
+      final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
+      for (int i = 1; i < rings.size(); i++) {
+        interiorRings[i - 1] = createLinearRing(rings.get(i));
+      }
+      return createPolygon(exteriorRing, interiorRings);
     }
-    return createPolygon(exteriorRing, interiorRings);
   }
 
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {

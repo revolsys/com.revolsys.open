@@ -2,8 +2,8 @@ package com.revolsys.gis.model.data.equals;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class MapEquals implements Equals<Map<String, Object>> {
   private EqualsRegistry equalsRegistry;

@@ -6,7 +6,6 @@ import org.openjump.core.ui.io.file.FileLayerLoader;
 
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.ecsv.io.EcsvConstants;
-import com.revolsys.gis.ecsv.io.EcsvDataObjectReaderFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
 import com.revolsys.jump.ui.io.InputStreamReaderFileLoader;

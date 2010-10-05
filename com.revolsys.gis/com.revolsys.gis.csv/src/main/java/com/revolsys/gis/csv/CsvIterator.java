@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -15,6 +14,7 @@ import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -23,7 +23,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
 
-public class CsvIterator implements Iterator<DataObject> {
+public class CsvIterator implements DataObjectIterator {
   /** The current database object. */
   private DataObject currentObject;
 

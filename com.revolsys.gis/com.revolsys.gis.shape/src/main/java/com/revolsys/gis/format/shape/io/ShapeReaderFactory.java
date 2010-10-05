@@ -1,8 +1,11 @@
 package com.revolsys.gis.format.shape.io;
 
+import java.io.IOException;
+
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -29,6 +32,12 @@ public class ShapeReaderFactory extends AbstractDataObjectReaderFactory {
   public Reader<DataObject> createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new ShapeReader(resource, dataObjectFactory);
+    try {
+      ShapeIterator iterator = new ShapeIterator(resource, dataObjectFactory);
+
+      return new DataObjectIteratorReader(iterator);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to create reader for " + resource, e);
+    }
   }
 }

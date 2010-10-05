@@ -11,7 +11,6 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.JdbcUtils;
 
