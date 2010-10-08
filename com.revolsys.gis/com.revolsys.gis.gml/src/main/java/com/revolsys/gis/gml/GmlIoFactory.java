@@ -13,27 +13,31 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.Writer;
 
-public class GmlDataObjectWriterFactory extends
-  AbstractDataObjectAndGeometryWriterFactory implements GeometryReaderFactory {
-  public GmlDataObjectWriterFactory() {
+public class GmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
+  implements GeometryReaderFactory {
+  public GmlIoFactory() {
     super(GmlConstants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(GmlConstants.MEDIA_TYPE,
       GmlConstants.FILE_EXTENSION);
   }
 
   public Writer<DataObject> createDataObjectWriter(
-    String baseName,
-    DataObjectMetaData metaData,
-    OutputStream outputStream,
-    Charset charset) {
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
     return new GmlDataObjectWriter(metaData, writer);
   }
 
   public GeometryReader createGeometryReader(
-    Resource resource) {
+    final Resource resource) {
     final GmlGeometryIterator iterator = new GmlGeometryIterator(resource);
     return new GeometryReader(iterator);
+  }
+
+  public boolean isBinary() {
+    return false;
   }
 }

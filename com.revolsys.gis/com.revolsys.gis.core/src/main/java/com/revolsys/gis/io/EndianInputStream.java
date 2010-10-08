@@ -24,6 +24,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.revolsys.io.EndianInput;
+
 public class EndianInputStream extends DataInputStream implements EndianInput {
   public EndianInputStream(
     final InputStream in) {

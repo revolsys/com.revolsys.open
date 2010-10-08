@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryIoFactory;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.io.Reader;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -22,7 +22,7 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
   public static final WktIoFactory INSTANCE = new WktIoFactory();
 
   public WktIoFactory() {
-    super(WktConstants.DESCRIPTION);
+    super(WktConstants.DESCRIPTION, false);
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
   }
 
@@ -35,11 +35,11 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
       outputStream, charset));
   }
 
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     Resource resource,
     DataObjectFactory factory) {
     try {
-      final WktIterator iterator = new WktIterator(factory, resource);
+      final WktDataObjectIterator iterator = new WktDataObjectIterator(factory, resource);
 
       return new DataObjectIteratorReader(iterator);
     } catch (IOException e) {

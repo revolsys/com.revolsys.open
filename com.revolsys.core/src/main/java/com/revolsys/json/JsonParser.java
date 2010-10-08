@@ -24,6 +24,8 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
 
   private Object currentValue;
 
+  private int depth;
+
   private EventType nextEvent = EventType.startDocument;
 
   private Object nextValue;
@@ -31,13 +33,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   private final Reader reader;
 
   public JsonParser(
-    Resource in)
-    throws IOException {
-    this(in.getInputStream());
-  }
-
-  public JsonParser(
-    InputStream in)
+    final InputStream in)
     throws IOException {
     this(new InputStreamReader(in));
   }
@@ -49,8 +45,18 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     currentCharacter = this.reader.read();
   }
 
+  public JsonParser(
+    final Resource in)
+    throws IOException {
+    this(in.getInputStream());
+  }
+
   public void close() {
     FileUtil.closeSilent(reader);
+  }
+
+  public int getDepth() {
+    return depth;
   }
 
   public EventType getEvent() {
@@ -82,10 +88,12 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
         case '{':
           nextEvent = EventType.startObject;
           currentCharacter = reader.read();
+          depth++;
         break;
         case '}':
           nextEvent = EventType.endObject;
           currentCharacter = reader.read();
+          depth--;
         break;
         case '[':
           nextEvent = EventType.startArray;
@@ -231,15 +239,15 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   public void remove() {
   }
 
-  @Override
-  public String toString() {
-    return currentEvent + " : " + currentValue;
-  }
-
   private void skipWhitespace()
     throws IOException {
     while (Character.isWhitespace(currentCharacter)) {
       currentCharacter = reader.read();
     }
+  }
+
+  @Override
+  public String toString() {
+    return currentEvent + " : " + currentValue;
   }
 }

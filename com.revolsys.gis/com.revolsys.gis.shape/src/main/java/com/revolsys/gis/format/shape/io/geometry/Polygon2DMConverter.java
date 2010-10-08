@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.format.shape.io.ShapeConstants;
-import com.revolsys.gis.io.EndianInput;
+import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -35,7 +35,7 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapeConstants.POLYGON_Z_SHAPE;
+    return ShapefileConstants.POLYGON_Z_SHAPE;
   }
 
   public Geometry read(

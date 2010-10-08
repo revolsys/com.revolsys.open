@@ -1,7 +1,5 @@
 package com.revolsys.parallel.process;
 
-import java.lang.reflect.Method;
-
 import org.apache.commons.beanutils.MethodUtils;
 
 import com.revolsys.util.ExceptionUtil;
@@ -19,12 +17,10 @@ public class InvokeMethodRunnable implements Runnable {
   /** The object to invoke the method on. */
   private Object object;
 
-  /** The method to invoke. */
-  private Method method;
-
   /** The parameters to pass to the method. */
   private Object[] parameters;
 
+  /** The name of the method to invoke. */
   private String methodName;
 
   /**

@@ -6,8 +6,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.io.Reader;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
 public class XBaseReaderFactory extends AbstractDataObjectReaderFactory {
@@ -25,13 +24,13 @@ public class XBaseReaderFactory extends AbstractDataObjectReaderFactory {
   }
 
   public XBaseReaderFactory() {
-    super("dBase");
+    super("dBase", true);
     addMediaTypeAndFileExtension("application/dbase", "dbf");
     addMediaTypeAndFileExtension("application/dbf", "dbf");
   }
 
   
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {

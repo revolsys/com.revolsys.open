@@ -2,6 +2,14 @@
 <gml:FeatureCollection
   xmlns:gml="http://www.opengis.net/gml"
 >
+  <gml:boundedBy>
+    <gml:Envelope
+      srsName="urn:ogc:def:crs:EPSG:6.6:4326"
+    >
+      <gml:lowerCorner>-180.0 -90.0</gml:lowerCorner>
+      <gml:upperCorner>180.0 90.0</gml:upperCorner>
+    </gml:Envelope>
+  </gml:boundedBy>
   <gml:featureMembers>
     <rso:Feature
       xmlns:rso="http://open.revolsys.com/"

@@ -1,5 +1,6 @@
 package com.revolsys.jump.ecsv;
 
+import java.util.List;
 import java.util.Set;
 
 import org.openjump.core.ui.io.file.FileLayerLoader;
@@ -32,7 +33,7 @@ public class EcsvExtension extends Extension {
     final Set<DataObjectReaderFactory> factories = IoFactoryRegistry.INSTANCE.getFactories(DataObjectReaderFactory.class);
     for (DataObjectReaderFactory factory : factories) {
       final String name = factory.getName();
-      final Set<String> fileExtensions = factory.getFileExtensions();
+      final List<String> fileExtensions = factory.getFileExtensions();
       InputStreamReaderFileLoader loader = new InputStreamReaderFileLoader(
         workbenchContext, factory, dataObjectFactory, name,
         fileExtensions.toArray(new String[0]));

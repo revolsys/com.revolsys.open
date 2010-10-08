@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryIoFactory;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.io.Reader;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -22,7 +22,7 @@ public class EcsvIoFactory extends
   public static final EcsvIoFactory INSTANCE = new EcsvIoFactory();
 
   public EcsvIoFactory() {
-    super(EcsvConstants.DESCRIPTION);
+    super(EcsvConstants.DESCRIPTION, false);
     addMediaTypeAndFileExtension(EcsvConstants.MEDIA_TYPE,
       EcsvConstants.FILE_EXTENSION);
   }
@@ -34,7 +34,7 @@ public class EcsvIoFactory extends
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     Resource resource,
     DataObjectFactory dataObjectFactory) {
     try {

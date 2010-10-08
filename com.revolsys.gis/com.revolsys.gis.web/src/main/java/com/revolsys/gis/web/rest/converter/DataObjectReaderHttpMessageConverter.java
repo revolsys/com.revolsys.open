@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -15,8 +14,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
@@ -27,6 +28,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
+import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -36,7 +38,9 @@ public class DataObjectReaderHttpMessageConverter extends
 
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-  private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private GeometryFactory geometryFactory;
+
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
   public DataObjectReaderHttpMessageConverter() {
     super(DataObjectReader.class,
@@ -44,10 +48,14 @@ public class DataObjectReaderHttpMessageConverter extends
       IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
   @Override
   public DataObjectReader read(
-    Class<? extends DataObjectReader> clazz,
-    HttpInputMessage inputMessage)
+    final Class<? extends DataObjectReader> clazz,
+    final HttpInputMessage inputMessage)
     throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -67,13 +75,25 @@ public class DataObjectReaderHttpMessageConverter extends
           + mediaType);
       } else {
         final Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(
-          body));
+          "dataObjectInput", body));
 
+        GeometryFactory factory = geometryFactory;
+        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        final String srid = requestAttributes.getParameter("srid");
+        if (srid != null && srid.trim().length() > 0) {
+          factory = GeometryFactory.getFactory(Integer.parseInt(srid));
+        }
+        reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         return (DataObjectReader)reader;
       }
     } catch (final IOException e) {
       throw new HttpMessageNotReadableException("Error reading data", e);
     }
+  }
+
+  public void setGeometryFactory(
+    final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   @Override
@@ -104,7 +124,7 @@ public class DataObjectReaderHttpMessageConverter extends
       } else {
 
         final DataObjectMetaData metaData = reader.getMetaData();
-        String baseName = HttpRequestUtils.getRequestBaseFileName();
+        final String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
         final String fileName = baseName + "."
           + writerFactory.getFileExtension(mediaTypeString);
@@ -123,16 +143,13 @@ public class DataObjectReaderHttpMessageConverter extends
         if (callback != null) {
           writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
         }
-        Iterator<DataObject> iterator = reader.iterator();
+        final Iterator<DataObject> iterator = reader.iterator();
         if (iterator.hasNext()) {
           DataObject dataObject = iterator.next();
-          Geometry geometry = dataObject.getGeometryValue();
+          final Geometry geometry = dataObject.getGeometryValue();
           if (geometry != null) {
-            CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-            writer.setProperty(IoConstants.SRID_PROPERTY,
-              coordinateSystem.getId());
-            writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
-              coordinateSystem);
+            final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+            writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
           }
 
           writer.write(dataObject);

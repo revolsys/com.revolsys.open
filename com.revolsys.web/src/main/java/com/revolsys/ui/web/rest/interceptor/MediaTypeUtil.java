@@ -21,18 +21,19 @@ public class MediaTypeUtil {
     Map<String, MediaType> extensionToMediaTypeMap,
     final String filename) {
     String extension = StringUtils.getFilenameExtension(filename);
-    if (!StringUtils.hasText(extension)) {
-      return null;
-    }
-    extension = extension.toLowerCase(Locale.ENGLISH);
-    final MediaType mediaType = extensionToMediaTypeMap.get(extension);
-    return mediaType;
+    return getMediaTypeFromParameter(extensionToMediaTypeMap, extension);
   }
 
   public static MediaType getMediaTypeFromParameter(
     Map<String, MediaType> extensionToMediaTypeMap,
-    final String parameterValue) {
-    return extensionToMediaTypeMap.get(parameterValue.toLowerCase(Locale.ENGLISH));
+    final String extension) {
+    if (!StringUtils.hasText(extension)) {
+      return null;
+    } else {
+      String lowerExtension = extension.toLowerCase(Locale.ENGLISH);
+      final MediaType mediaType = extensionToMediaTypeMap.get(lowerExtension);
+      return mediaType;
+    }
   }
 
   public static List<MediaType> getAcceptedMediaTypes(
@@ -80,7 +81,8 @@ public class MediaTypeUtil {
     final List<String> mediaTypeOrder,
     UrlPathHelper urlPathHelper,
     String parameterName,
-    MediaType defaultMediaType, String fileName) {
+    MediaType defaultMediaType,
+    String fileName) {
     for (String source : mediaTypeOrder) {
       if (source.equals("fileName")) {
         final MediaType mediaType = getMediaTypeFromFilename(

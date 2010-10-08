@@ -42,4 +42,8 @@ public class GeoJsonIoFactory extends
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
   }
+
+  public boolean isBinary() {
+    return false;
+  }
 }

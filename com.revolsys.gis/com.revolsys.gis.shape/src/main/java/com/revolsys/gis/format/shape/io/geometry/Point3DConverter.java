@@ -2,10 +2,10 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
-import com.revolsys.gis.format.shape.io.ShapeConstants;
-import com.revolsys.gis.io.EndianInput;
+import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.io.EndianInput;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -30,7 +30,7 @@ public class Point3DConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapeConstants.POINT_Z_SHAPE;
+    return ShapefileConstants.POINT_Z_SHAPE;
   }
 
   public Geometry read(

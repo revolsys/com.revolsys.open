@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -26,6 +27,7 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.Spheroid;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 public final class EpsgCoordinateSystems {
   private static Map<Integer, AngularUnit> angularCoordinateSystemUnits = new HashMap<Integer, AngularUnit>();
@@ -105,12 +107,39 @@ public final class EpsgCoordinateSystems {
   }
 
   public static CoordinateSystem getCoordinateSystem(
+    final Geometry geometry) {
+    return getCoordinateSystem(geometry.getSRID());
+  }
+
+  public static CoordinateSystem getCoordinateSystem(
     final int crsId) {
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return coordinateSystem;
   }
 
   public static Set<CoordinateSystem> getCoordinateSystems() {
+    return coordinateSystems;
+  }
+
+  /**
+   * Get the coordinate systems for the list of coordinate system identifiers.
+   * Null identifiers will be ignored. If the coordinate system does not exist
+   * then it will be ignored.
+   * 
+   * @param coordinateSystemIds The coordinate system identifiers.
+   * @return The list of coordinate systems.
+   */
+  public static List<CoordinateSystem> getCoordinateSystems(
+    final Collection<Integer> coordinateSystemIds) {
+    final List<CoordinateSystem> coordinateSystems = new ArrayList<CoordinateSystem>();
+    for (final Integer coordinateSystemId : coordinateSystemIds) {
+      if (coordinateSystemId != null) {
+        final CoordinateSystem coordinateSystem = getCoordinateSystem(coordinateSystemId);
+        if (coordinateSystem != null) {
+          coordinateSystems.add(coordinateSystem);
+        }
+      }
+    }
     return coordinateSystems;
   }
 

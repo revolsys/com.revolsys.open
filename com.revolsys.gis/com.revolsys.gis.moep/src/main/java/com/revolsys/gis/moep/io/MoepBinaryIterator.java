@@ -288,8 +288,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final double longitude = bcgsGrid.getLongitude(mapsheet) - 0.1;
     final int crsId = utmGrid.getNad83Srid(longitude, latitude);
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
-    setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY, coordinateSystem);
-
+  
     final String submissionDateString = readString(6);
 
     final int centreX = readLEInt(in);
@@ -297,6 +296,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     center = new DoubleCoordinates(centreX, centreY);
     CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(1);
     factory = new GeometryFactory(coordinateSystem, precisionModel);
+    setProperty(IoConstants.GEOMETRY_FACTORY, factory);
   }
 
   protected DataObject loadNextRecord() {

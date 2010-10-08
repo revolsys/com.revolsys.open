@@ -90,11 +90,8 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
     final QName srid = getProperty(EcsvConstants.SRID);
     if (srid != null) {
       final Integer sridNum = Integer.valueOf(srid.getLocalPart());
-      final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(sridNum);
-      setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
-        coordinateSystem);
-      geomFactory = new GeometryFactory(coordinateSystem);
-
+      geomFactory = GeometryFactory.getFactory(sridNum);
+      setProperty(IoConstants.GEOMETRY_FACTORY, geomFactory);
     }
     geometryReader = new WKTReader(geomFactory);
     emptyGeometry = geomFactory.createPoint((Coordinate)null);

@@ -52,4 +52,7 @@ public interface GeoJsonConstants {
   Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<String>(Arrays.asList(POINT,
     LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON,
     GEOMETRY_COLLECTION));
+
+  public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
+  public static final String EPSG = "EPSG:";
 }

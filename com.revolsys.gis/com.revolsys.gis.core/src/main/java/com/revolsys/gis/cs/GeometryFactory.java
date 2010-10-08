@@ -2,8 +2,10 @@ package com.revolsys.gis.cs;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
@@ -29,6 +31,8 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel {
+  private static Map<Integer, GeometryFactory> factories = new HashMap<Integer, GeometryFactory>();
+
   public static GeometryFactory getFactory(
     final Geometry geometry) {
     final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
@@ -48,6 +52,17 @@ public class GeometryFactory extends
     }
   }
 
+  public static GeometryFactory getFactory(
+    final int srid) {
+    GeometryFactory factory = factories.get(srid);
+    if (factory == null) {
+      factory = new GeometryFactory(
+        EpsgCoordinateSystems.getCoordinateSystem(srid));
+      factories.put(srid, factory);
+    }
+    return factory;
+  }
+
   private static Set<Class<?>> getGeometryClassSet(
     final List<? extends Geometry> geometries) {
     final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
@@ -55,6 +70,33 @@ public class GeometryFactory extends
       classes.add(geometry.getClass());
     }
     return classes;
+  }
+
+  public static LineString[] toLineStringArray(
+    final GeometryFactory factory,
+    final List<?> lines) {
+    final LineString[] lineStrings = new LineString[lines.size()];
+    for (int i = 0; i < lines.size(); i++) {
+      final Object value = lines.get(i);
+      if (value instanceof LineString) {
+        final LineString lineString = (LineString)value;
+        lineStrings[i] = lineString;
+      } else if (value instanceof CoordinatesList) {
+        final CoordinatesList coordinates = (CoordinatesList)value;
+        lineStrings[i] = factory.createLineString(coordinates);
+      } else if (value instanceof CoordinateSequence) {
+        final CoordinateSequence coordinates = (CoordinateSequence)value;
+        lineStrings[i] = factory.createLineString(coordinates);
+      }
+    }
+    return lineStrings;
+  }
+
+  public static MultiPolygon toMultiPolygon(
+    final GeometryFactory geometryFactory,
+    final List<Polygon> polygons) {
+    final Polygon[] polygonArray = toPolygonArray(polygons);
+    return geometryFactory.createMultiPolygon(polygonArray);
   }
 
   public static MultiPolygon toMultiPolygon(
@@ -68,11 +110,30 @@ public class GeometryFactory extends
     return toMultiPolygon(geometryFactory, polygons);
   }
 
-  public static MultiPolygon toMultiPolygon(
-    final GeometryFactory geometryFactory,
-    final List<Polygon> polygons) {
-    final Polygon[] polygonArray = toPolygonArray(polygons);
-    return geometryFactory.createMultiPolygon(polygonArray);
+  public static Point[] toPointArray(
+    final GeometryFactory factory,
+    final List<?> points) {
+    final Point[] pointArray = new Point[points.size()];
+    for (int i = 0; i < points.size(); i++) {
+      final Object value = points.get(i);
+      if (value instanceof Point) {
+        final Point point = (Point)value;
+        pointArray[i] = point;
+      } else if (value instanceof Coordinates) {
+        final Coordinates coordinates = (Coordinates)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      } else if (value instanceof Coordinate) {
+        final Coordinate coordinate = (Coordinate)value;
+        pointArray[i] = factory.createPoint(coordinate);
+      } else if (value instanceof CoordinatesList) {
+        final CoordinatesList coordinates = (CoordinatesList)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      } else if (value instanceof CoordinateSequence) {
+        final CoordinateSequence coordinates = (CoordinateSequence)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      }
+    }
+    return pointArray;
   }
 
   private final CoordinatesPrecisionModel coordinatesPrecisionModel;
@@ -137,9 +198,9 @@ public class GeometryFactory extends
     } else {
       final Set<Class<?>> classes = getGeometryClassSet(geometries);
       if (classes.equals(Collections.singleton(Point.class))) {
-        return createMultiPoint((List<Point>)geometries);
+        return createMultiPoint(geometries);
       } else if (classes.equals(Collections.singleton(LineString.class))) {
-        return createMultiLineString((List<LineString>)geometries);
+        return createMultiLineString(geometries);
       } else if (classes.equals(Collections.singleton(Polygon.class))) {
         return createMultiPolygon((List<Polygon>)geometries);
       } else {
@@ -199,52 +260,6 @@ public class GeometryFactory extends
     return createMultiLineString(lineArray);
   }
 
-  public static Point[] toPointArray(
-    GeometryFactory factory,
-    List<?> points) {
-    Point[] pointArray = new Point[points.size()];
-    for (int i = 0; i < points.size(); i++) {
-      Object value = points.get(i);
-      if (value instanceof Point) {
-        Point point = (Point)value;
-        pointArray[i] = point;
-      } else if (value instanceof Coordinates) {
-        Coordinates coordinates = (Coordinates)value;
-        pointArray[i] = factory.createPoint(coordinates);
-      } else if (value instanceof Coordinate) {
-        Coordinate coordinate = (Coordinate)value;
-        pointArray[i] = factory.createPoint(coordinate);
-      } else if (value instanceof CoordinatesList) {
-        CoordinatesList coordinates = (CoordinatesList)value;
-        pointArray[i] = factory.createPoint(coordinates);
-      } else if (value instanceof CoordinateSequence) {
-        CoordinateSequence coordinates = (CoordinateSequence)value;
-        pointArray[i] = factory.createPoint(coordinates);
-      }
-    }
-    return pointArray;
-  }
-
-  public static LineString[] toLineStringArray(
-    GeometryFactory factory,
-    List<?> lines) {
-    LineString[] lineStrings = new LineString[lines.size()];
-    for (int i = 0; i < lines.size(); i++) {
-      Object value = lines.get(i);
-      if (value instanceof LineString) {
-        LineString lineString = (LineString)value;
-        lineStrings[i] = lineString;
-      } else if (value instanceof CoordinatesList) {
-        CoordinatesList coordinates = (CoordinatesList)value;
-        lineStrings[i] = factory.createLineString(coordinates);
-      } else if (value instanceof CoordinateSequence) {
-        CoordinateSequence coordinates = (CoordinateSequence)value;
-        lineStrings[i] = factory.createLineString(coordinates);
-      }
-    }
-    return lineStrings;
-  }
-
   public MultiPoint createMultiPoint(
     final List<?> points) {
     final Point[] pointArray = toPointArray(this, points);
@@ -294,30 +309,30 @@ public class GeometryFactory extends
     return createPolygon(exteriorRing, interiorRings);
   }
 
-  private LinearRing getLinearRing(
-    final List<?> rings,
-    final int index) {
-    Object ring = rings.get(index);
-    if (ring instanceof LinearRing) {
-      return (LinearRing)ring;
-
-    } else if (ring instanceof CoordinatesList) {
-      CoordinatesList points = (CoordinatesList)ring;
-      return createLinearRing(points);
-    } else if (ring instanceof CoordinateSequence) {
-      CoordinateSequence points = (CoordinateSequence)ring;
-      return createLinearRing(points);
-    } else {
-      return null;
-    }
-  }
-
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
     return coordinatesPrecisionModel;
   }
 
   public CoordinateSystem getCoordinateSystem() {
     return coordinateSystem;
+  }
+
+  private LinearRing getLinearRing(
+    final List<?> rings,
+    final int index) {
+    final Object ring = rings.get(index);
+    if (ring instanceof LinearRing) {
+      return (LinearRing)ring;
+
+    } else if (ring instanceof CoordinatesList) {
+      final CoordinatesList points = (CoordinatesList)ring;
+      return createLinearRing(points);
+    } else if (ring instanceof CoordinateSequence) {
+      final CoordinateSequence points = (CoordinateSequence)ring;
+      return createLinearRing(points);
+    } else {
+      return null;
+    }
   }
 
   protected int getNumAxis() {

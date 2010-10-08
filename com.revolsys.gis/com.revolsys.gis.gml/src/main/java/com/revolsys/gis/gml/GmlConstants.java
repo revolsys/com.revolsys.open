@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-public interface GmlConstants {  
+public interface GmlConstants {
   String _NS_PREFIX = "gml";
 
   String _NS_URI = "http://www.opengis.net/gml";
@@ -59,7 +59,7 @@ public interface GmlConstants {
 
   QName POS_LIST = new QName(_NS_URI, "posList", _NS_PREFIX);
 
-  QName SRS_NAME = new QName(_NS_URI, "srsName", _NS_PREFIX);
+  QName SRS_NAME = new QName("srsName");
 
   QName SURFACE_MEMBERS = new QName(_NS_URI, "surfaceMembers", _NS_PREFIX);
 
@@ -68,5 +68,9 @@ public interface GmlConstants {
   Set<QName> GEOMETRY_TYPE_NAMES = new LinkedHashSet<QName>(Arrays.asList(
     POINT, LINE_STRING, POLYGON, MULTI_POINT, MULTI_CURVE, MULTI_SURFACE,
     MULTI_GEOMETRY));
+
+  Set<QName> ENVELOPE_AND_GEOMETRY_TYPE_NAMES = new LinkedHashSet<QName>(
+    Arrays.asList(ENVELOPE, POINT, LINE_STRING, POLYGON, MULTI_POINT,
+      MULTI_CURVE, MULTI_SURFACE, MULTI_GEOMETRY));
 
 }

@@ -2,9 +2,11 @@ package com.revolsys.io;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -75,7 +77,7 @@ public class IoFactoryRegistry {
         final Set<IoFactory> factories = getFactories(ioInterface);
         if (factories.add(factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
-            final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtension(ioInterface);
+            final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
           }
           final Map<String, IoFactory> factoriesByMediaType = getFactoriesByMediaType(ioInterface);
@@ -110,7 +112,7 @@ public class IoFactoryRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  private synchronized <F extends IoFactory> Map<String, F> getFactoriesByFileExtension(
+  public synchronized <F extends IoFactory> Map<String, F> getFactoriesByFileExtensionMap(
     final Class<F> factoryClass) {
     Map<String, IoFactory> factoriesByFileExtension = classFactoriesByFileExtension.get(factoryClass);
     if (factoriesByFileExtension == null) {
@@ -120,8 +122,22 @@ public class IoFactoryRegistry {
     return (Map<String, F>)factoriesByFileExtension;
   }
 
+  public <F extends IoFactory> List<F> getFactoriesByFileExtension(
+    final Class<F> factoryClass,
+    final List<String> fileExtensions) {
+    final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
+    final List<F> factories = new ArrayList<F>();
+    for (final String fileExtension : fileExtensions) {
+      final F factory = factoriesByFileExtension.get(fileExtension);
+      if (factory != null) {
+        factories.add(factory);
+      }
+    }
+    return factories;
+  }
+
   @SuppressWarnings("unchecked")
-  private synchronized <F extends IoFactory> Map<String, F> getFactoriesByMediaType(
+  public synchronized <F extends IoFactory> Map<String, F> getFactoriesByMediaType(
     final Class<F> factoryClass) {
     Map<String, IoFactory> factoriesByMediaType = classFactoriesByMediaType.get(factoryClass);
     if (factoriesByMediaType == null) {
@@ -131,19 +147,18 @@ public class IoFactoryRegistry {
     return (Map<String, F>)factoriesByMediaType;
   }
 
-  public <F extends IoFactory> F getFactoryByResource(
+  public <F extends IoFactory> F getFactoryByFileExtension(
     final Class<F> factoryClass,
-    final Resource resource) {
-    final String fileName = resource.getFilename();
-    return getFactoryByFileExtension(factoryClass,fileName);
+    final String fileExtension) {
+    final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
+    return factoriesByFileExtension.get(fileExtension);
   }
 
-  public <F extends IoFactory> F getFactoryByFileExtension(
+  public <F extends IoFactory> F getFactoryByFileName(
     final Class<F> factoryClass,
     final String fileName) {
     final String fileExtension = FileUtil.getFileNameExtension(fileName);
-    final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtension(factoryClass);
-    return factoriesByFileExtension.get(fileExtension);
+    return getFactoryByFileExtension(factoryClass, fileExtension);
   }
 
   public <F extends IoFactory> F getFactoryByMediaType(
@@ -153,9 +168,16 @@ public class IoFactoryRegistry {
     return factoriesByMediaType.get(mediaType);
   }
 
+  public <F extends IoFactory> F getFactoryByResource(
+    final Class<F> factoryClass,
+    final Resource resource) {
+    final String fileName = resource.getFilename();
+    return getFactoryByFileName(factoryClass, fileName);
+  }
+
   public <F extends IoFactory> Set<String> getFileExtensions(
     final Class<F> factoryClass) {
-    final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtension(factoryClass);
+    final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
     return factoriesByFileExtension.keySet();
   }
 

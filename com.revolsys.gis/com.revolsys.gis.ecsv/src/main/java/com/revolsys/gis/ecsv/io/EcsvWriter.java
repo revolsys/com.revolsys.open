@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -57,7 +58,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final Integer srid = geometryAttribute.getProperty(AttributeProperties.SRID);
-      setProperty(IoConstants.SRID_PROPERTY, srid);
+      setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(srid));
     }
 
   }

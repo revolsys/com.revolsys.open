@@ -109,6 +109,8 @@ import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.bind.support.WebArgumentResolver;
 import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.RequestScope;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
@@ -985,8 +987,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     return -1;
   }
 
-  private List<String> mediaTypeOrder = Arrays.asList("fileName",
-    "pathExtension", "parameter", "acceptHeader", "defaultMediaType");
+  private List<String> mediaTypeOrder = Arrays.asList("parameter", "fileName",
+    "pathExtension", "acceptHeader", "defaultMediaType");
 
   public List<String> getMediaTypeOrder() {
     return mediaTypeOrder;
@@ -1066,15 +1068,21 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       methodResolver);
     final ServletWebRequest webRequest = new ServletWebRequest(request,
       response);
-    final ExtendedModelMap implicitModel = new BindingAwareModelMap();
+    RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    try {
+      RequestContextHolder.setRequestAttributes(webRequest);
+      final ExtendedModelMap implicitModel = new BindingAwareModelMap();
 
-    final Object result = methodInvoker.invokeHandlerMethod(handlerMethod,
-      handler, webRequest, implicitModel);
-    final ModelAndView mav = methodInvoker.getModelAndView(handlerMethod,
-      handler.getClass(), result, implicitModel, webRequest);
-    methodInvoker.updateModelAttributes(handler, (mav != null ? mav.getModel()
-      : null), implicitModel, webRequest);
-    return mav;
+      final Object result = methodInvoker.invokeHandlerMethod(handlerMethod,
+        handler, webRequest, implicitModel);
+      final ModelAndView mav = methodInvoker.getModelAndView(handlerMethod,
+        handler.getClass(), result, implicitModel, webRequest);
+      methodInvoker.updateModelAttributes(handler,
+        (mav != null ? mav.getModel() : null), implicitModel, webRequest);
+      return mav;
+    } finally {
+      RequestContextHolder.setRequestAttributes(requestAttributes);
+    }
   }
 
   /**

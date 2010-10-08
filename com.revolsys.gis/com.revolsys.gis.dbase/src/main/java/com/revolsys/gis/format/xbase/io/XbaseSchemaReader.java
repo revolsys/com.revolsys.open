@@ -7,7 +7,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.io.EndianInput;
+import com.revolsys.io.EndianInput;
 
 public class XbaseSchemaReader {
   private List<FieldDefinition> fieldDefinitions;

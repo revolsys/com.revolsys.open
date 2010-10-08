@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
@@ -61,7 +62,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
         writer = new CsvWriter(metaData, new FileOutputStream(file));
         final Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
-          writer.setProperty(IoConstants.SRID_PROPERTY, geometry.getSRID());
+          writer.setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(geometry));
         }
         writers.put(metaData, writer);
       } catch (final IOException e) {

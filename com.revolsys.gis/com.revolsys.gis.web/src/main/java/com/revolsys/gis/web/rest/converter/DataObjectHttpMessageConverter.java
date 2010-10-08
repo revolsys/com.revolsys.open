@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -16,6 +15,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -28,6 +28,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
+import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -36,6 +37,8 @@ public class DataObjectHttpMessageConverter extends
   AbstractHttpMessageConverter<DataObject> {
 
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
+  private GeometryFactory geometryFactory;
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
@@ -47,6 +50,10 @@ public class DataObjectHttpMessageConverter extends
     super(DataObject.class,
       IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectReaderFactory.class),
       IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   public List<String> getRequestAttributeNames() {
@@ -76,7 +83,14 @@ public class DataObjectHttpMessageConverter extends
           + mediaType);
       } else {
         final Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(
-          body));
+          "dataObjectInput", body));
+        GeometryFactory factory = geometryFactory;
+        final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        final String srid = requestAttributes.getParameter("srid");
+        if (srid != null && srid.trim().length() > 0) {
+          factory = GeometryFactory.getFactory(Integer.parseInt(srid));
+        }
+        reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         try {
           for (final DataObject dataObject : reader) {
             return dataObject;
@@ -89,6 +103,11 @@ public class DataObjectHttpMessageConverter extends
     } catch (final IOException e) {
       throw new HttpMessageNotReadableException("Error reading data", e);
     }
+  }
+
+  public void setGeometryFactory(
+    final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   public void setRequestAttributeNames(
@@ -148,11 +167,6 @@ public class DataObjectHttpMessageConverter extends
         final Geometry geometry = dataObject.getGeometryValue();
         if (geometry != null) {
           final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-          final CoordinateSystem coordinateSystem = GeometryProjectionUtil.getCoordinateSystem(geometry);
-          writer.setProperty(IoConstants.SRID_PROPERTY,
-            coordinateSystem.getId());
-          writer.setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
-            coordinateSystem);
           writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         }
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",

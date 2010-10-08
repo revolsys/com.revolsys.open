@@ -16,19 +16,20 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
+import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectAndGeometryIoFactory extends
-  AbstractDataObjectAndGeometryReaderFactory implements DataObjectWriterFactory {
+  AbstractDataObjectReaderFactory implements DataObjectWriterFactory, GeometryWriterFactory {
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
   public AbstractDataObjectAndGeometryIoFactory(
-    final String name) {
-    super(name);
+    final String name, boolean binary) {
+    super(name,binary);
   }
 
   /**

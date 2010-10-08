@@ -4,12 +4,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Iterator;
 
-import org.springframework.core.io.InputStreamResource;
-
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.io.FileUtil;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
+import com.revolsys.spring.InputStreamResource;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDataset;
@@ -30,8 +30,9 @@ public class DataObjectFeatureIsJumpReader implements JUMPReader {
 
   public FeatureCollection read(final DriverProperties dp) throws Exception {
     String fileName = dp.getProperty("File");
+    final String localFileName = FileUtil.getFileName(fileName);
     InputStream in = new FileInputStream(fileName);
-    Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(in),
+    Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(localFileName,in),
       dataObjectFactory);
 
     Iterator<DataObject> featureIter = reader.iterator();

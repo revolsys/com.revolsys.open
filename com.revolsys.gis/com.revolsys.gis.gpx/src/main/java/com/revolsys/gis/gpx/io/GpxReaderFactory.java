@@ -1,12 +1,14 @@
 package com.revolsys.gis.gpx.io;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.gis.data.io.Reader;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.io.DataObjectIterator;
+import com.revolsys.gis.data.io.DataObjectIteratorReader;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
 public class GpxReaderFactory extends AbstractDataObjectReaderFactory {
@@ -23,7 +25,7 @@ public class GpxReaderFactory extends AbstractDataObjectReaderFactory {
   }
 
   public GpxReaderFactory() {
-    super("GPS Exchange Format");
+    super("GPS Exchange Format", false);
     addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE,
       GpxConstants.FILE_EXTENSION);
   }
@@ -35,15 +37,15 @@ public class GpxReaderFactory extends AbstractDataObjectReaderFactory {
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
-      return new GpxReader(resource, dataObjectFactory);
+      DataObjectIterator iterator = new GpxIterator(new InputStreamReader(resource.getInputStream()), dataObjectFactory, null);
+      return new DataObjectIteratorReader(iterator);
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to open resource " + resource,
         e);
     }
   }
-
 }

@@ -3,8 +3,7 @@ package com.revolsys.gis.moep.io;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.gis.data.io.Reader;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
 public class MoepBinaryReaderFactory extends AbstractDataObjectReaderFactory {
@@ -22,11 +21,11 @@ public class MoepBinaryReaderFactory extends AbstractDataObjectReaderFactory {
   }
 
   public MoepBinaryReaderFactory() {
-    super("MOEP (BC Ministry of Environment and Parks)");
+    super("MOEP (BC Ministry of Environment and Parks)", true);
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");
   }
 
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     return new MoepBinaryReader(null, resource, dataObjectFactory);

@@ -23,10 +23,10 @@ package com.revolsys.gis.format.shape.io.geometry;
 import java.io.IOException;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.format.shape.io.ShapeConstants;
-import com.revolsys.gis.io.EndianInput;
+import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianInputOutput;
 import com.revolsys.gis.io.LittleEndianRandomAccessFile;
+import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -55,34 +55,34 @@ public class JtsGeometryConverter {
     final int recordLength = in.readInt();
     final int shapeType = in.readLEInt();
     switch (shapeType) {
-      case ShapeConstants.NULL_SHAPE:
+      case ShapefileConstants.NULL_SHAPE:
         return null;
-      case ShapeConstants.POINT_SHAPE:
+      case ShapefileConstants.POINT_SHAPE:
         return new Point2DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POINT_M_SHAPE:
+      case ShapefileConstants.POINT_M_SHAPE:
         return new Point2DMConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POINT_Z_SHAPE:
+      case ShapefileConstants.POINT_Z_SHAPE:
         return new Point3DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.MULTI_POINT_SHAPE:
+      case ShapefileConstants.MULTI_POINT_SHAPE:
         return new Point2DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.MULTI_POINT_M_SHAPE:
+      case ShapefileConstants.MULTI_POINT_M_SHAPE:
         return new Point2DMConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.MULTI_POINT_Z_SHAPE:
+      case ShapefileConstants.MULTI_POINT_Z_SHAPE:
         return new Point3DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLYLINE_SHAPE:
+      case ShapefileConstants.POLYLINE_SHAPE:
         return new LineString2DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLYLINE_M_SHAPE:
+      case ShapefileConstants.POLYLINE_M_SHAPE:
         return new LineString2DMConverter(geometryFactory).read(in,
           recordLength);
-      case ShapeConstants.POLYLINE_Z_SHAPE:
+      case ShapefileConstants.POLYLINE_Z_SHAPE:
         return new LineString3DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLYGON_SHAPE:
+      case ShapefileConstants.POLYGON_SHAPE:
         return new Polygon2DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLYGON_M_SHAPE:
+      case ShapefileConstants.POLYGON_M_SHAPE:
         return new Polygon2DMConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.POLYGON_Z_SHAPE:
+      case ShapefileConstants.POLYGON_Z_SHAPE:
         return new Polygon3DConverter(geometryFactory).read(in, recordLength);
-      case ShapeConstants.MULTI_PATCH_SHAPE:
+      case ShapefileConstants.MULTI_PATCH_SHAPE:
         return new MultiPolygonConverter(geometryFactory).read(in, recordLength);
       default:
       break;
@@ -138,7 +138,7 @@ public class JtsGeometryConverter {
       envelope.expandToInclude(polygon.getEnvelopeInternal());
       return writePolygon(out, polygon, shapeType);
     } else {
-      return ShapeConstants.UNKNOWN_SHAPE;
+      return ShapefileConstants.UNKNOWN_SHAPE;
     }
   }
 
@@ -150,12 +150,12 @@ public class JtsGeometryConverter {
     final Envelope envelope = line.getEnvelopeInternal();
     final Coordinate[] coordinates = line.getCoordinates();
     if (coordinates.length > 0) {
-      if (shapeType == ShapeConstants.POLYLINE_SHAPE
+      if (shapeType == ShapefileConstants.POLYLINE_SHAPE
         || Double.isNaN(coordinates[0].z)) {
         final int recordLength = (4 * MathUtil.BYTES_IN_INT + (4 + 2 * coordinates.length)
           * MathUtil.BYTES_IN_DOUBLE) / 2;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapeConstants.POLYLINE_SHAPE);
+        out.writeLEInt(ShapefileConstants.POLYLINE_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(1);
         out.writeLEInt(coordinates.length);
@@ -166,12 +166,12 @@ public class JtsGeometryConverter {
           out.writeLEDouble(coordinate.x);
           out.writeLEDouble(coordinate.y);
         }
-        return ShapeConstants.POLYLINE_SHAPE;
+        return ShapefileConstants.POLYLINE_SHAPE;
       } else {
         final int recordLength = (4 * MathUtil.BYTES_IN_INT + (8 + 2 * coordinates.length)
           * MathUtil.BYTES_IN_DOUBLE) / 2;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapeConstants.POLYLINE_Z_SHAPE);
+        out.writeLEInt(ShapefileConstants.POLYLINE_Z_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(1);
         out.writeLEInt(coordinates.length);
@@ -200,7 +200,7 @@ public class JtsGeometryConverter {
         out.writeLEDouble(minZ);
         out.writeLEDouble(maxZ);
         out.seek(endIndex);
-        return ShapeConstants.POLYLINE_Z_SHAPE;
+        return ShapefileConstants.POLYLINE_Z_SHAPE;
       }
     } else {
       return writeNull(out);
@@ -215,11 +215,11 @@ public class JtsGeometryConverter {
     final com.vividsolutions.jts.geom.Envelope envelope = point.getEnvelopeInternal();
     final Coordinate[] coordinates = point.getCoordinates();
     if (coordinates.length > 0) {
-      if (shapeType == ShapeConstants.MULTI_POINT_SHAPE
+      if (shapeType == ShapefileConstants.MULTI_POINT_SHAPE
         || Double.isNaN(coordinates[0].z)) {
         final int recordLength = 20 + coordinates.length * 8;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapeConstants.MULTI_POINT_SHAPE);
+        out.writeLEInt(ShapefileConstants.MULTI_POINT_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(coordinates.length);
 
@@ -228,11 +228,11 @@ public class JtsGeometryConverter {
           out.writeLEDouble(coordinate.x);
           out.writeLEDouble(coordinate.y);
         }
-        return ShapeConstants.MULTI_POINT_SHAPE;
+        return ShapefileConstants.MULTI_POINT_SHAPE;
       } else {
         final int recordLength = 28 + coordinates.length * 12;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapeConstants.MULTI_POINT_Z_SHAPE);
+        out.writeLEInt(ShapefileConstants.MULTI_POINT_Z_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(coordinates.length);
 
@@ -259,7 +259,7 @@ public class JtsGeometryConverter {
         out.writeLEDouble(minZ);
         out.writeLEDouble(maxZ);
         out.seek(endIndex);
-        return ShapeConstants.MULTI_POINT_Z_SHAPE;
+        return ShapefileConstants.MULTI_POINT_Z_SHAPE;
       }
     } else {
       return writeNull(out);
@@ -271,8 +271,8 @@ public class JtsGeometryConverter {
     throws IOException {
     final int recordLength = MathUtil.BYTES_IN_INT;
     out.writeInt(recordLength);
-    out.writeLEInt(ShapeConstants.NULL_SHAPE);
-    return ShapeConstants.NULL_SHAPE;
+    out.writeLEInt(ShapefileConstants.NULL_SHAPE);
+    return ShapefileConstants.NULL_SHAPE;
   }
 
   private int writePoint(
@@ -281,24 +281,24 @@ public class JtsGeometryConverter {
     final int shapeType)
     throws IOException {
     final Coordinate coordinate = point.getCoordinate();
-    if (shapeType == ShapeConstants.POINT_SHAPE || Double.isNaN(coordinate.z)) {
+    if (shapeType == ShapefileConstants.POINT_SHAPE || Double.isNaN(coordinate.z)) {
       final int recordLength = 10; // (BYTES_IN_INT + 2 * BYTES_IN_DOUBLE) /
       // BYTES_IN_SHORT;
       out.writeInt(recordLength);
-      out.writeLEInt(ShapeConstants.POINT_SHAPE);
+      out.writeLEInt(ShapefileConstants.POINT_SHAPE);
       out.writeLEDouble(coordinate.x);
       out.writeLEDouble(coordinate.y);
-      return ShapeConstants.POINT_SHAPE;
+      return ShapefileConstants.POINT_SHAPE;
     } else {
       final int recordLength = 18; // (BYTES_IN_INT + 2 * BYTES_IN_DOUBLE) /
       // BYTES_IN_SHORT;
       out.writeInt(recordLength);
-      out.writeLEInt(ShapeConstants.POINT_Z_SHAPE);
+      out.writeLEInt(ShapefileConstants.POINT_Z_SHAPE);
       out.writeLEDouble(coordinate.x);
       out.writeLEDouble(coordinate.y);
       out.writeLEDouble(coordinate.z);
       out.writeLEDouble(0);
-      return ShapeConstants.POINT_Z_SHAPE;
+      return ShapefileConstants.POINT_Z_SHAPE;
     }
   }
 
@@ -317,13 +317,13 @@ public class JtsGeometryConverter {
       int recordLength = (4 + numParts) * MathUtil.BYTES_IN_INT + 4
         * MathUtil.BYTES_IN_DOUBLE;
       int dimension = 2;
-      if (shapeType == ShapeConstants.UNKNOWN_SHAPE) {
-        if (shapeType == ShapeConstants.POLYGON_SHAPE
+      if (shapeType == ShapefileConstants.UNKNOWN_SHAPE) {
+        if (shapeType == ShapefileConstants.POLYGON_SHAPE
           || Double.isNaN(polygon.getCoordinate().z)) {
-          shapeType = ShapeConstants.POLYGON_SHAPE;
+          shapeType = ShapefileConstants.POLYGON_SHAPE;
         } else {
           dimension = 3;
-          shapeType = ShapeConstants.POLYGON_Z_SHAPE;
+          shapeType = ShapefileConstants.POLYGON_Z_SHAPE;
           recordLength += 2 * MathUtil.BYTES_IN_DOUBLE; // For minZ + maxZ
         }
       }
@@ -346,7 +346,7 @@ public class JtsGeometryConverter {
 
       write2DCoordinates(out, coordinates);
 
-      if (shapeType == ShapeConstants.POLYGON_Z_SHAPE) {
+      if (shapeType == ShapefileConstants.POLYGON_Z_SHAPE) {
         final long zRangePos = out.getFilePointer();
         out.writeLEDouble(0);
         out.writeLEDouble(0);

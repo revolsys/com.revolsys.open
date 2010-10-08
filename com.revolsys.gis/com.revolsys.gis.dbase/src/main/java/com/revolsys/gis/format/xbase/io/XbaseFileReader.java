@@ -42,8 +42,8 @@ import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.io.DataObjectReader;
-import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 
 public class XbaseFileReader extends AbstractReader<DataObject> implements

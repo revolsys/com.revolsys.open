@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.format.shape.io.ShapeConstants;
-import com.revolsys.gis.io.EndianInput;
+import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -33,7 +33,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapeConstants.MULTI_PATCH_SHAPE;
+    return ShapefileConstants.MULTI_PATCH_SHAPE;
   }
 
   public Geometry read(
@@ -112,11 +112,11 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
         if (exteriorRing.getDimension() > 2) {
           hasZ = true;
         }
-        numPoints += addPart(ShapeConstants.OUTER_RING, numPoints, partIndexes,
+        numPoints += addPart(ShapefileConstants.OUTER_RING, numPoints, partIndexes,
           partTypes, partPoints, exteriorRing);
         for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
           LineString innerRing = polygon.getInteriorRingN(j);
-          numPoints += addPart(ShapeConstants.INNER_RING, numPoints,
+          numPoints += addPart(ShapefileConstants.INNER_RING, numPoints,
             partIndexes, partTypes, partPoints, innerRing);
         }
       }

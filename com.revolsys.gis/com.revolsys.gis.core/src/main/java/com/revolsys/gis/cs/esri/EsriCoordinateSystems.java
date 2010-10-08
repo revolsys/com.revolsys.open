@@ -43,14 +43,18 @@ public class EsriCoordinateSystems {
 
   public static CoordinateSystem getCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
-    CoordinateSystem coordinateSystem2 = coordinateSystems.get(coordinateSystem);
-    if (coordinateSystem2 == null) {
-      coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
+    if (coordinateSystem == null) {
+      return null;
+    } else {
+      CoordinateSystem coordinateSystem2 = coordinateSystems.get(coordinateSystem);
       if (coordinateSystem2 == null) {
-        return coordinateSystem;
+        coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
+        if (coordinateSystem2 == null) {
+          return coordinateSystem;
+        }
       }
+      return coordinateSystem2;
     }
-    return coordinateSystem2;
   }
 
   public static CoordinateSystem getCoordinateSystem(

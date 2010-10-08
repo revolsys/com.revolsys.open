@@ -29,6 +29,29 @@ public class BoundingBox extends Envelope {
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;
 
+  public static BoundingBox getBoundingBox(
+    final Geometry geometry) {
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    return new BoundingBox(coordinateSystem, geometry.getEnvelopeInternal());
+  }
+
+  public static BoundingBox parse(
+    final String bbox) {
+    final String[] args = bbox.split(",");
+    if (args.length == 4) {
+      final double x1 = Double.valueOf(args[0]);
+      final double y1 = Double.valueOf(args[1]);
+      final double x2 = Double.valueOf(args[2]);
+      final double y2 = Double.valueOf(args[3]);
+      return new BoundingBox(EpsgCoordinateSystems.getCoordinateSystem(4326),
+        x1, y1, x2, y2);
+    } else {
+      throw new IllegalArgumentException(
+        "BBOX must have match <minX>,<minY>,<maxX>,<maxY> not " + bbox);
+    }
+  }
+
   /** The coordinate system. */
   private CoordinateSystem coordinateSystem;
 
@@ -298,7 +321,7 @@ public class BoundingBox extends Envelope {
     final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(coordinateSystem);
     if (isNull() || convertedBoundingBox.isNull()
-      || !intersects(convertedBoundingBox)) {
+      || !intersects((Envelope)convertedBoundingBox)) {
       return new BoundingBox(coordinateSystem);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
@@ -308,6 +331,12 @@ public class BoundingBox extends Envelope {
       return new BoundingBox(coordinateSystem, intMinX, intMinY, intMaxX,
         intMaxY);
     }
+  }
+
+  public boolean intersects(
+    final BoundingBox boundingBox) {
+    final BoundingBox convertedBoundingBox = boundingBox.convert(coordinateSystem);
+    return intersects((Envelope)convertedBoundingBox);
   }
 
   public Geometry toGeometry() {
@@ -403,21 +432,5 @@ public class BoundingBox extends Envelope {
   public String toString() {
     return "(" + getMinX() + "," + getMinY() + " " + getMaxX() + ","
       + getMaxY() + ")";
-  }
-
-  public static BoundingBox parse(
-    String bbox) {
-    String[] args = bbox.split(",");
-    if (args.length == 4) {
-      double x1 = Double.valueOf(args[0]);
-      double y1 = Double.valueOf(args[1]);
-      double x2 = Double.valueOf(args[2]);
-      double y2 = Double.valueOf(args[3]);
-      return new BoundingBox(EpsgCoordinateSystems.getCoordinateSystem(4326),
-        x1, y1, x2, y2);
-    } else {
-      throw new IllegalArgumentException(
-        "BBOX must have match <minX>,<minY>,<maxX>,<maxY> not " + bbox);
-    }
   }
 }

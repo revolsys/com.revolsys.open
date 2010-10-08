@@ -58,6 +58,15 @@ public final class FileUtil {
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
 
+  public static void closeSilent(
+    final EndianInput in) {
+    try {
+      in.close();
+    } catch (final IOException e) {
+    }
+
+  }
+
   /**
    * Close the input stream without throwing an I/O exception if the close
    * failed. The error will be logged instead.
@@ -249,10 +258,7 @@ public final class FileUtil {
       out = null;
     } finally {
       if (out != null) {
-        try {
-          out.close();
-        } catch (final Exception ex) {
-        }
+        FileUtil.closeSilent(out);
       }
     }
   }
@@ -390,15 +396,6 @@ public final class FileUtil {
     }
   }
 
-  private static String getCanonicalPath(
-    final File file) {
-    try {
-      return file.getCanonicalPath();
-    } catch (IOException e) {
-      return file.getAbsolutePath();
-    }
-  }
-
   /**
    * Add the file to be deleted on exit. If the file is a directory the
    * directory and it's contents will be deleted.
@@ -462,6 +459,15 @@ public final class FileUtil {
       return fileName.substring(0, dotIndex);
     } else {
       return fileName;
+    }
+  }
+
+  private static String getCanonicalPath(
+    final File file) {
+    try {
+      return file.getCanonicalPath();
+    } catch (final IOException e) {
+      return file.getAbsolutePath();
     }
   }
 

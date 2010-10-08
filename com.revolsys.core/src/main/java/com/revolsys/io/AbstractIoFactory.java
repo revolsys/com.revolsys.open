@@ -1,15 +1,17 @@
 package com.revolsys.io;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractIoFactory implements IoFactory {
 
-  private final Set<String> fileExtensions = new HashSet<String>();
+  private final List<String> fileExtensions = new ArrayList<String>();
 
   private final Map<String, Set<String>> fileExtensionToMediaType = new HashMap<String, Set<String>>();
 
@@ -61,7 +63,7 @@ public abstract class AbstractIoFactory implements IoFactory {
     }
   }
 
-  public Set<String> getFileExtensions() {
+  public List<String> getFileExtensions() {
     return fileExtensions;
   }
 

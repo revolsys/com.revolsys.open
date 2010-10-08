@@ -26,17 +26,20 @@ import java.util.Map;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 
-public class ShapeConstants {
+public class ShapefileConstants {
   public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();
+
+  public static final String DESCRIPTION = "ESRI Shapefile";
 
   public static final int FILE_CODE = 9994;
 
-  public static final int MULTI_PATCH_SHAPE = 31;
-
-
-  public static final int OUTER_RING = 2;
+  public static final String FILE_EXTENSION = "shp";
 
   public static final int INNER_RING = 3;
+
+  public static final String MIME_TYPE = "application/x-shp";
+
+  public static final int MULTI_PATCH_SHAPE = 31;
 
   public static final int MULTI_POINT_M_SHAPE = 28;
 
@@ -46,23 +49,25 @@ public class ShapeConstants {
 
   public static final int NULL_SHAPE = 0;
 
+  public static final int OUTER_RING = 2;
+
   public static final int POINT_M_SHAPE = 21;
 
   public static final int POINT_SHAPE = 1;
 
   public static final int POINT_Z_SHAPE = 11;
 
-  public static final int POLYLINE_M_SHAPE = 23;
-
-  public static final int POLYLINE_SHAPE = 3;
-
-  public static final int POLYLINE_Z_SHAPE = 13;
-
   public static final int POLYGON_M_SHAPE = 25;
 
   public static final int POLYGON_SHAPE = 5;
 
   public static final int POLYGON_Z_SHAPE = 15;
+
+  public static final int POLYLINE_M_SHAPE = 23;
+
+  public static final int POLYLINE_SHAPE = 3;
+
+  public static final int POLYLINE_Z_SHAPE = 13;
 
   public static final int UNKNOWN_SHAPE = -1;
 

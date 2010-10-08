@@ -5,18 +5,31 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
+import org.springframework.core.io.Resource;
+
+import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryIoFactory;
+import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.io.ZipDataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
 
-public class ShapeZipWriterFactory extends
-  AbstractDataObjectAndGeometryWriterFactory {
-  public ShapeZipWriterFactory() {
-    super("ESRI Shapefile ZIP");
+public class ShapefileZipIoFactory extends
+  AbstractDataObjectAndGeometryIoFactory {
+
+  public ShapefileZipIoFactory() {
+    super("ESRI Shapefile ZIP", true);
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
+  }
+
+  public DataObjectReader createDataObjectReader(
+    Resource resource,
+    DataObjectFactory factory) {
+    return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
+      factory);
   }
 
   public Writer<DataObject> createDataObjectWriter(

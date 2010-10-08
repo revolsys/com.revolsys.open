@@ -11,7 +11,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import org.springframework.core.io.Resource;
 
 public class ZipUtil {
   /**
@@ -123,6 +126,32 @@ public class ZipUtil {
     }
     zipFile.close();
     return entryNames;
+  }
+
+  public static File unzipFile(
+    Resource resource)
+    throws IOException {
+    File directory = FileUtil.createTempDirectory(resource.getFilename(),
+      ".zip");
+    final InputStream in = resource.getInputStream();
+    final ZipInputStream zipIn = new ZipInputStream(in);
+    try {
+      ZipEntry entry;
+      while ((entry = zipIn.getNextEntry()) != null) {
+        final String entryName = entry.getName();
+        final File outputFile = new File(directory, entryName);
+        outputFile.getParentFile().mkdirs();
+        FileUtil.copy(zipIn, outputFile);
+        zipIn.closeEntry();
+      }
+      FileUtil.closeSilent(zipIn);
+      return directory;
+
+    } catch (IOException e) {
+      FileUtil.closeSilent(zipIn);
+      FileUtil.deleteDirectory(directory);
+      throw e;
+    }
   }
 
 }

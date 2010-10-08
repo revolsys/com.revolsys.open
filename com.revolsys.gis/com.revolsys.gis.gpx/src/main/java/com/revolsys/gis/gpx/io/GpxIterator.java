@@ -42,8 +42,10 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
@@ -55,7 +57,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 @SuppressWarnings("restriction")
-public class GpxIterator implements Iterator<DataObject> {
+public class GpxIterator implements DataObjectIterator {
   private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
 
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
@@ -360,6 +362,10 @@ public class GpxIterator implements Iterator<DataObject> {
       StaxUtils.skipSubTree(in);
       StaxUtils.skipToStartElement(in);
     }
+  }
+
+  public DataObjectMetaData getMetaData() {
+    return GpxConstants.GPX_TYPE;
   }
 
 }

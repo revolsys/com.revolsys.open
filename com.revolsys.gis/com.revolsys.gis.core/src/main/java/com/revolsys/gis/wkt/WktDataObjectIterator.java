@@ -7,35 +7,29 @@ import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-public class WktIterator extends AbstractObjectWithProperties implements
-  DataObjectIterator {
-
-  private DataObject currentObject;
+public class WktDataObjectIterator extends AbstractIterator<DataObject>
+  implements DataObjectIterator {
 
   private final DataObjectFactory factory;
 
-  private boolean hasNext = true;
-
   private final BufferedReader in;
-
-  private boolean initialized;
 
   private WKTReader wktReader;
 
-  public WktIterator(
+  public WktDataObjectIterator(
     final DataObjectFactory factory,
     final Resource resource)
     throws IOException {
@@ -44,67 +38,42 @@ public class WktIterator extends AbstractObjectWithProperties implements
       resource.getInputStream()));
   }
 
-  public void close() {
-    hasNext = false;
+  @Override
+  protected void doClose() {
     FileUtil.closeSilent(in);
   }
 
   @Override
-  protected void finalize()
-    throws Throwable {
-
-    close();
+  protected void doInit() {
+    GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    if (geometryFactory == null) {
+      geometryFactory = new GeometryFactory();
+    }
+    wktReader = new WKTReader(geometryFactory);
   }
 
   public DataObjectMetaData getMetaData() {
     return DataObjectUtil.GEOMETRY_META_DATA;
   }
 
-  public boolean hasNext() {
-    if (!initialized) {
-      init();
-    }
-    return hasNext;
-  }
-
-  private void init() {
-    initialized = true;
-    GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-    if (geometryFactory == null) {
-      geometryFactory = new GeometryFactory();
-    }
-    wktReader = new WKTReader(geometryFactory);
-    readNext();
-  }
-
-  public DataObject next() {
-    if (!hasNext) {
-      throw new NoSuchElementException("No more elements");
-    } else {
-      final DataObject object = currentObject;
-      readNext();
-      return object;
-    }
-  }
-
-  private void readNext() {
+  @Override
+  protected DataObject getNext() {
     try {
       final Geometry geometry = wktReader.read(in);
       if (geometry == null) {
-        close();
+        throw new NoSuchElementException();
       } else {
-        currentObject = factory.createDataObject(getMetaData());
-        currentObject.setGeometryValue(geometry);
+        final DataObject object = factory.createDataObject(getMetaData());
+        object.setGeometryValue(geometry);
+        return object;
       }
-    } catch (ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      hasNext = false;
-      close();
+    } catch (final ParseException e) {
+      throw new RuntimeException("Error reading geometry ", e);
     }
 
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

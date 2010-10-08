@@ -2,9 +2,9 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
-import com.revolsys.gis.format.shape.io.ShapeConstants;
-import com.revolsys.gis.io.EndianInput;
+import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
+import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -31,7 +31,7 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapeConstants.POLYLINE_SHAPE;
+    return ShapefileConstants.POLYLINE_SHAPE;
   }
 
   public Geometry read(

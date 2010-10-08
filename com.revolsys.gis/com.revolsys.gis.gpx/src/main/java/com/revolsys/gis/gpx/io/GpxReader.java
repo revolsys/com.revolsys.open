@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.model.DataObject;
@@ -47,9 +48,10 @@ public class GpxReader extends AbstractReader<DataObject> {
   private QName typeName;
 
   public GpxReader(
-    
+
     final Resource resource,
-    final DataObjectFactory dataObjectFactory) throws IOException {
+    final DataObjectFactory dataObjectFactory)
+    throws IOException {
     this(new InputStreamReader(resource.getInputStream()), dataObjectFactory);
   }
 
@@ -59,8 +61,7 @@ public class GpxReader extends AbstractReader<DataObject> {
     this.in = in;
     this.dataObjectFactory = dataObjectFactory;
     this.iterator = new GpxIterator(in, dataObjectFactory, typeName);
-    setProperty(IoConstants.COORDINATE_SYSTEM_PROPERTY,
-      EpsgCoordinateSystems.getCoordinateSystem(4326));
+    setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(4326));
 
   }
 

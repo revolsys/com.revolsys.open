@@ -6,8 +6,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.io.Reader;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
 public class CsvReaderFactory extends AbstractDataObjectReaderFactory {
@@ -25,12 +24,12 @@ public class CsvReaderFactory extends AbstractDataObjectReaderFactory {
   }
 
   public CsvReaderFactory() {
-    super(CsvConstants.DESCRIPTION);
+    super(CsvConstants.DESCRIPTION, false);
     addMediaTypeAndFileExtension(com.revolsys.csv.CsvConstants.MEDIA_TYPE,
       com.revolsys.csv.CsvConstants.FILE_EXTENSION);
   }
 
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {

@@ -1,18 +1,21 @@
 package com.revolsys.gis.data.io;
 
 import java.io.File;
+import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.IoFactory;
 
 public interface DataObjectReaderFactory extends IoFactory {
-  Reader<DataObject> createDataObjectReader(
+
+  DataObjectReader createDataObjectReader(
     Resource resource);
 
-  Reader<DataObject> createDataObjectReader(
+  DataObjectReader createDataObjectReader(
     Resource resource,
     DataObjectFactory factory);
 
@@ -25,4 +28,10 @@ public interface DataObjectReaderFactory extends IoFactory {
     File file,
     DataObjectFactory factory);
 
+  Set<CoordinateSystem> getCoordinateSystems();
+
+  boolean isBinary();
+
+  boolean isCoordinateSystemSupported(
+    CoordinateSystem coordinateSystem);
 }

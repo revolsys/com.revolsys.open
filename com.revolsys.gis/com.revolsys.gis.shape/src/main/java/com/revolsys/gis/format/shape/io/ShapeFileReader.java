@@ -40,10 +40,10 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.JtsGeometryConverter;
 import com.revolsys.gis.format.xbase.io.XbaseFileReader;
-import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
+import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 
@@ -131,7 +131,7 @@ public class ShapeFileReader extends XbaseFileReader {
     final int fileLength = in.readInt();
     final int version = in.readLEInt();
     final int shapeType = in.readLEInt();
-    dataType = ShapeConstants.DATA_TYPE_MAP.get(shapeType);
+    dataType = ShapefileConstants.DATA_TYPE_MAP.get(shapeType);
     if (dataType == null) {
       dataType = DataTypes.GEOMETRY;
     }

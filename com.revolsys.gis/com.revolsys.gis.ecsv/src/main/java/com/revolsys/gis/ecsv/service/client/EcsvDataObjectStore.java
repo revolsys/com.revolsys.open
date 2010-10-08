@@ -22,7 +22,6 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.springframework.core.io.InputStreamResource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectReader;
@@ -36,6 +35,8 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.ecsv.io.EcsvConstants;
 import com.revolsys.gis.ecsv.io.EcsvIoFactory;
 import com.revolsys.gis.ecsv.service.EcsvServiceConstants;
+import com.revolsys.io.FileUtil;
+import com.revolsys.spring.InputStreamResource;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -137,9 +138,10 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     try {
       final int statusCode = client.executeMethod(method);
       if (statusCode == HttpStatus.SC_OK) {
+        String fileName = FileUtil.getFileName(path);
         final InputStream in = method.getResponseBodyAsStream();
         return (DataObjectReader)ioFactory.createDataObjectReader(
-          new InputStreamResource(in), getDataObjectFactory());
+          new InputStreamResource(fileName,in), getDataObjectFactory());
       } else {
         throw new IllegalArgumentException("Unnable to connect to server: "
           + statusCode);

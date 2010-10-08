@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystems;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
@@ -67,8 +68,6 @@ import com.vividsolutions.jts.geom.Polygon;
 public class ShapeFileWriter extends XbaseFileWriter {
   private static final Logger LOG = Logger.getLogger(ShapeFileWriter.class);
 
-  private int crsId;
-
   private Envelope envelope = new Envelope();
 
   private ShapefileGeometryWriter geometryConverter;
@@ -90,6 +89,8 @@ public class ShapeFileWriter extends XbaseFileWriter {
   private double zMin = 0; // Double.MAX_VALUE;
 
   private CoordinateSystem coordinateSystem;
+
+  private GeometryFactory geometryFactory;
 
   public ShapeFileWriter(
     final File file)
@@ -132,6 +133,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
   protected void init()
     throws IOException {
     super.init();
+
     final boolean shapeExists = shapeFile.exists();
     if (isAppend() && shapeExists) {
       final LittleEndianRandomAccessFile out = new LittleEndianRandomAccessFile(
@@ -169,24 +171,21 @@ public class ShapeFileWriter extends XbaseFileWriter {
       writeHeader(indexOut);
     }
 
-    Integer srid = getProperty(IoConstants.SRID_PROPERTY);
-    if (srid != null && srid > 0) {
-      this.coordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-        "EPSG", String.valueOf(srid)));
-      if (coordinateSystem != null) {
-        File prjFile = FileUtil.getFileWithExtension(shapeFile, "prj");
-        try {
-          final PrintWriter out = new PrintWriter(new FileWriter(prjFile));
-          CoordinateSystem coordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-            "ESRI", String.valueOf(srid)));
-          EsriCsWktWriter.write(out, coordinateSystem);
-          out.close();
-        } catch (final IOException e) {
-          LOG.error("Unable to create .prj file: " + prjFile, e);
-        }
+    GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+     if (geometryFactory != null) {
+      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      int srid = coordinateSystem.getId();
+      File prjFile = FileUtil.getFileWithExtension(shapeFile, "prj");
+      try {
+        final PrintWriter out = new PrintWriter(new FileWriter(prjFile));
+        CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
+          "ESRI", String.valueOf(srid)));
+        EsriCsWktWriter.write(out, esriCoordinateSystem);
+        out.close();
+      } catch (final IOException e) {
+        LOG.error("Unable to create .prj file: " + prjFile, e);
       }
     }
-
   }
 
   @Override
@@ -295,7 +294,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
       inOut = new LittleEndianRandomAccessFile(file, "rw");
     }
 
-    int shapeType = ShapeConstants.NULL_SHAPE;
+    int shapeType = ShapefileConstants.NULL_SHAPE;
     if (geometryConverter != null) {
       shapeType = geometryConverter.getShapeType();
     }
@@ -308,10 +307,10 @@ public class ShapeFileWriter extends XbaseFileWriter {
     inOut.writeLEDouble(envelope.getMaxX());
     inOut.writeLEDouble(envelope.getMaxY());
     switch (shapeType) {
-      case ShapeConstants.POINT_Z_SHAPE:
-      case ShapeConstants.MULTI_POINT_Z_SHAPE:
-      case ShapeConstants.POLYLINE_Z_SHAPE:
-      case ShapeConstants.POLYGON_Z_SHAPE:
+      case ShapefileConstants.POINT_Z_SHAPE:
+      case ShapefileConstants.MULTI_POINT_Z_SHAPE:
+      case ShapefileConstants.POLYLINE_Z_SHAPE:
+      case ShapefileConstants.POLYGON_Z_SHAPE:
         inOut.writeLEDouble(zMin);
         inOut.writeLEDouble(zMax);
       break;
@@ -359,12 +358,12 @@ public class ShapeFileWriter extends XbaseFileWriter {
   private void writeHeader(
     final EndianOutput out)
     throws IOException {
-    out.writeInt(ShapeConstants.FILE_CODE);
+    out.writeInt(ShapefileConstants.FILE_CODE);
     for (int i = 0; i < 5; i++) {
       out.writeInt(0);
     }
     out.writeInt(0); // File length updated on close
-    out.writeLEInt(ShapeConstants.VERSION);
+    out.writeLEInt(ShapefileConstants.VERSION);
     out.writeLEInt(0); // Shape Type updated on close
     // shape type and bounding box will be updated on file close
     for (int i = 0; i < 8; i++) {
@@ -377,7 +376,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
     throws IOException {
     final int recordLength = MathUtil.BYTES_IN_INT;
     out.writeInt(recordLength);
-    out.writeLEInt(ShapeConstants.NULL_SHAPE);
-    return ShapeConstants.NULL_SHAPE;
+    out.writeLEInt(ShapefileConstants.NULL_SHAPE);
+    return ShapefileConstants.NULL_SHAPE;
   }
 }

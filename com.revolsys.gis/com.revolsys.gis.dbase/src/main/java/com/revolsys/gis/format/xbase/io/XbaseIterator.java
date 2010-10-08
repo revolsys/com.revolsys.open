@@ -8,22 +8,25 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.io.EndianInput;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 
-public class XbaseIterator implements DataObjectIterator {
+public class XbaseIterator extends AbstractIterator<DataObject> implements
+  DataObjectIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();
@@ -53,15 +56,11 @@ public class XbaseIterator implements DataObjectIterator {
 
   private int currentDeletedCount = 0;
 
-  private DataObject currentObject;
-
   private final DataObjectFactory dataObjectFactory;
 
   private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
   private int deletedCount = 0;
-
-  private boolean hasNext = true;
 
   private final EndianInput in;
 
@@ -69,9 +68,11 @@ public class XbaseIterator implements DataObjectIterator {
 
   private final QName name;
 
-  private final byte[] recordBuffer;
+  private byte[] recordBuffer;
 
   private short recordSize;
+
+  private Runnable initCallback;
 
   public XbaseIterator(
     final Resource resource,
@@ -80,9 +81,6 @@ public class XbaseIterator implements DataObjectIterator {
     this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
     this.in = new EndianInputStream(resource.getInputStream());
     this.dataObjectFactory = dataObjectFactory;
-    loadHeader();
-    readMetaData();
-    recordBuffer = new byte[recordSize];
   }
 
   public XbaseIterator(
@@ -98,13 +96,16 @@ public class XbaseIterator implements DataObjectIterator {
     recordBuffer = new byte[recordSize];
   }
 
-  public void close() {
-    currentObject = null;
-    try {
-      in.close();
-    } catch (final IOException e) {
-    }
+  public XbaseIterator(
+    Resource in,
+    DataObjectFactory dataObjectFactory,
+    Runnable initCallback) throws IOException {
+    this (in, dataObjectFactory);
+    this.initCallback = initCallback;
+  }
 
+  protected void doClose() {
+    FileUtil.closeSilent(in);
   }
 
   private Boolean getBoolean(
@@ -189,23 +190,12 @@ public class XbaseIterator implements DataObjectIterator {
     return new String(recordBuffer, startIndex, len).trim();
   }
 
-  public boolean hasNext() {
-    if (!hasNext) {
-      return false;
-    } else {
-      if (currentObject == null) {
-        readNextRecord();
-      }
-      return hasNext;
-    }
-  }
-
-  protected void loadDataObject()
+  protected DataObject loadDataObject()
     throws IOException {
     if (in.read(recordBuffer) != recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of file");
     }
-    currentObject = dataObjectFactory.createDataObject(metaData);
+    DataObject object = dataObjectFactory.createDataObject(metaData);
     int startIndex = 0;
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       int len = metaData.getAttributeLength(i);
@@ -227,8 +217,9 @@ public class XbaseIterator implements DataObjectIterator {
         value = getDate(startIndex, len);
       }
       startIndex += len;
-      currentObject.setValue(i, value);
+      object.setValue(i, value);
     }
+    return object;
   }
 
   /**
@@ -248,16 +239,6 @@ public class XbaseIterator implements DataObjectIterator {
 
     this.recordSize = (short)(in.readLEShort() - 1);
     in.skipBytes(20);
-  }
-
-  public DataObject next() {
-    if (hasNext()) {
-      final DataObject object = currentObject;
-      readNextRecord();
-      return object;
-    } else {
-      return null;
-    }
   }
 
   private void readMetaData()
@@ -291,26 +272,25 @@ public class XbaseIterator implements DataObjectIterator {
     }
   }
 
-  protected void readNextRecord() {
+  protected DataObject getNext() {
     try {
+      DataObject object = null;
       deletedCount = currentDeletedCount;
       currentDeletedCount = 0;
       int deleteFlag = ' ';
       do {
         deleteFlag = in.read();
         if (deleteFlag == -1) {
-          currentObject = null;
-          hasNext = false;
-          close();
-          return;
+          throw new NoSuchElementException();
         }
         if (deleteFlag == ' ') {
-          loadDataObject();
+          object = loadDataObject();
         } else if (deleteFlag != 0x1A) {
           currentDeletedCount++;
           in.read(recordBuffer);
         }
       } while (deleteFlag == '*');
+      return object;
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -319,4 +299,19 @@ public class XbaseIterator implements DataObjectIterator {
   public void remove() {
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  protected void doInit() {
+    try {
+      loadHeader();
+      readMetaData();
+      recordBuffer = new byte[recordSize];
+      if (initCallback != null) {
+        initCallback.run();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error initializing file ", e);
+    }
+  }
+
 }

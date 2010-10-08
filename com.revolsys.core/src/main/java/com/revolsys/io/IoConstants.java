@@ -1,8 +1,6 @@
 package com.revolsys.io;
 
 public interface IoConstants {
-  String COORDINATE_SYSTEM_PROPERTY = "com.revolsys.io.coordinateSystem";
-
   String CSS_CLASS_PROPERTY = "com.revolsys.io.cssClass";
 
   String DESCRIPTION_PROPERTY = "com.revolsys.io.description";
@@ -14,8 +12,6 @@ public interface IoConstants {
   String JSONP_PROPERTY = "com.revolsys.io.jsonp";
 
   String SINGLE_OBJECT_PROPERTY = "com.revolsys.io.singleObject";
-
-  String SRID_PROPERTY = "com.revolsys.io.srid";
 
   String STYLE_URL_PROPERTY = "com.revolsys.io.styleUrl";
 

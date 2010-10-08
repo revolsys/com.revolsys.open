@@ -1,7 +1,7 @@
 package com.revolsys.gis.kml.io;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -9,12 +9,10 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.xml.io.StaxUtils;
@@ -25,71 +23,49 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 @SuppressWarnings("restriction")
-public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
-  private static final Logger log = LoggerFactory.getLogger(KmlGeometryIterator.class);
-
-  private Geometry currentGeometry;
-
+public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
+  Kml22Constants {
   private final GeometryFactory geometryFactory = new GeometryFactory(
-    COORDINATE_SYSTEM, new SimpleCoordinatesPrecisionModel());
-
-  private boolean hasNext = true;
+    COORDINATE_SYSTEM);
 
   private final XMLStreamReader in;
-
-  private boolean loadNextObject = true;
 
   public KmlGeometryIterator(
     final Resource resource) {
     try {
       this.in = StaxUtils.createXmlReader(resource);
-      StaxUtils.skipToStartElement(this.in);
-      StaxUtils.requireLocalName(this.in, KML);
-      StaxUtils.skipToStartElement(this.in);
-    } catch (final Exception e) {
+    } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to open resource " + resource);
     }
   }
 
-  public void close() {
+  @Override
+  protected void doClose() {
+    StaxUtils.closeSilent(in);
+  }
+
+  @Override
+  protected void doInit() {
     try {
-      in.close();
+      StaxUtils.skipToStartElement(this.in);
+      StaxUtils.requireLocalName(this.in, KML);
+      StaxUtils.skipToStartElement(this.in);
     } catch (final XMLStreamException e) {
-      log.error(e.getMessage(), e);
-    }
-
-  }
-
-  public boolean hasNext() {
-    if (!hasNext) {
-      return false;
-    } else if (loadNextObject) {
-      return loadNextRecord();
-    } else {
-      return true;
+      throw new RuntimeException("Error initializing file ", e);
     }
   }
 
-  protected boolean loadNextRecord() {
+  @Override
+  protected Geometry getNext() {
     try {
-      currentGeometry = parseGeometry();
-      loadNextObject = false;
-      if (currentGeometry == null) {
-        close();
-        hasNext = false;
+      final Geometry geometry = parseGeometry();
+      if (geometry == null) {
+        throw new NoSuchElementException();
+      } else {
+        return geometry;
       }
-      return hasNext;
     } catch (final XMLStreamException e) {
       throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-
-  public Geometry next() {
-    if (hasNext()) {
-      loadNextObject = true;
-      return currentGeometry;
-    } else {
-      throw new NoSuchElementException();
     }
   }
 
@@ -220,7 +196,8 @@ public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
     StaxUtils.requireLocalName(in, POINT);
     CoordinatesList cooordinatesList = null;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (cooordinatesList == null && StaxUtils.matchElementLocalName(in, COORDINATES)) {
+      if (cooordinatesList == null
+        && StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
@@ -256,6 +233,7 @@ public class KmlGeometryIterator implements Iterator<Geometry>, Kml22Constants {
     return polygon;
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

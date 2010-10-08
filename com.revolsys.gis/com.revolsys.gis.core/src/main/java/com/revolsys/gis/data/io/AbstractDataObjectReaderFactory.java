@@ -1,24 +1,55 @@
 package com.revolsys.gis.data.io;
 
 import java.io.File;
+import java.util.Iterator;
 
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.io.AbstractIoFactory;
+import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
+import com.revolsys.io.IoFactoryRegistry;
 
-public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
+public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryReaderFactory
   implements DataObjectReaderFactory {
   /** The default data object dataObjectFactory instance. */
   private static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
 
-  public AbstractDataObjectReaderFactory(
-    final String name) {
-    super(name);
+  public static DataObjectReader dataObjectReader(
+    Resource resource) {
+    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    if (readerFactory == null) {
+      return null;
+    } else {
+      final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
+      return reader;
+    }
   }
 
+  protected static DataObjectReaderFactory getDataObjectReaderFactory(
+    Resource resource) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      DataObjectReaderFactory.class, resource);
+    return readerFactory;
+  }
+
+  public AbstractDataObjectReaderFactory(
+    final String name, boolean binary) {
+    super(name, binary);
+  }
+
+  public GeometryReader createGeometryReader(
+    Resource resource) {
+    final Reader<DataObject> dataObjectReader = createDataObjectReader(resource);
+    final Iterator<DataObject> dataObjectIterator = dataObjectReader.iterator();
+    final DataObjectGeometryIterator iterator = new DataObjectGeometryIterator(
+      dataObjectIterator);
+    final GeometryReader geometryReader = new GeometryReader(
+      iterator);
+    return geometryReader;
+  }
   /**
    * Create a reader for the resource using the ({@link ArrayDataObjectFactory}
    * ).
@@ -26,7 +57,7 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
    * @param file The file to read.
    * @return The reader for the file.
    */
-  public Reader<DataObject> createDataObjectReader(
+  public DataObjectReader createDataObjectReader(
     final Resource resource) {
     return createDataObjectReader(resource, DEFAULT_DATA_OBJECT_FACTORY);
 

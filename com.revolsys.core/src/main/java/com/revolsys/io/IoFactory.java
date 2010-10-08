@@ -1,12 +1,13 @@
 package com.revolsys.io;
 
+import java.util.List;
 import java.util.Set;
 
 public interface IoFactory {
   String getFileExtension(
     String mediaType);
 
-  Set<String> getFileExtensions();
+  List<String> getFileExtensions();
 
   String getMediaType(
     String fileExtension);
