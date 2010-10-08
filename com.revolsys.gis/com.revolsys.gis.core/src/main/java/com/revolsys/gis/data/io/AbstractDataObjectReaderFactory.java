@@ -3,6 +3,7 @@ package com.revolsys.gis.data.io;
 import java.io.File;
 import java.util.Iterator;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -11,13 +12,26 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
-public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryReaderFactory
-  implements DataObjectReaderFactory {
+public abstract class AbstractDataObjectReaderFactory extends
+  AbstractGeometryReaderFactory implements DataObjectReaderFactory {
   /** The default data object dataObjectFactory instance. */
   private static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
 
   public static DataObjectReader dataObjectReader(
-    Resource resource) {
+    final FileSystemResource resource,
+    final DataObjectFactory factory) {
+    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    if (readerFactory == null) {
+      return null;
+    } else {
+      final DataObjectReader reader = readerFactory.createDataObjectReader(
+        resource, factory);
+      return reader;
+    }
+  }
+
+  public static DataObjectReader dataObjectReader(
+    final Resource resource) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
@@ -28,7 +42,7 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryRe
   }
 
   protected static DataObjectReaderFactory getDataObjectReaderFactory(
-    Resource resource) {
+    final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
     final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
       DataObjectReaderFactory.class, resource);
@@ -36,20 +50,11 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryRe
   }
 
   public AbstractDataObjectReaderFactory(
-    final String name, boolean binary) {
+    final String name,
+    final boolean binary) {
     super(name, binary);
   }
 
-  public GeometryReader createGeometryReader(
-    Resource resource) {
-    final Reader<DataObject> dataObjectReader = createDataObjectReader(resource);
-    final Iterator<DataObject> dataObjectIterator = dataObjectReader.iterator();
-    final DataObjectGeometryIterator iterator = new DataObjectGeometryIterator(
-      dataObjectIterator);
-    final GeometryReader geometryReader = new GeometryReader(
-      iterator);
-    return geometryReader;
-  }
   /**
    * Create a reader for the resource using the ({@link ArrayDataObjectFactory}
    * ).
@@ -61,6 +66,17 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryRe
     final Resource resource) {
     return createDataObjectReader(resource, DEFAULT_DATA_OBJECT_FACTORY);
 
+  }
+
+  /**
+   * Create a directory reader using the ({@link ArrayDataObjectFactory}).
+   * 
+   * @return The reader.
+   */
+  public Reader<DataObject> createDirectoryDataObjectReader() {
+    final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
+    directoryReader.setFileExtensions(getFileExtensions());
+    return directoryReader;
   }
 
   /**
@@ -78,17 +94,6 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryRe
   }
 
   /**
-   * Create a directory reader using the ({@link ArrayDataObjectFactory}).
-   * 
-   * @return The reader.
-   */
-  public Reader<DataObject> createDirectoryDataObjectReader() {
-    final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
-    directoryReader.setFileExtensions(getFileExtensions());
-    return directoryReader;
-  }
-
-  /**
    * Create a reader for the directory using the specified data object
    * dataObjectFactory.
    * 
@@ -103,6 +108,16 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractGeometryRe
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
     return directoryReader;
+  }
+
+  public GeometryReader createGeometryReader(
+    final Resource resource) {
+    final Reader<DataObject> dataObjectReader = createDataObjectReader(resource);
+    final Iterator<DataObject> dataObjectIterator = dataObjectReader.iterator();
+    final DataObjectGeometryIterator iterator = new DataObjectGeometryIterator(
+      dataObjectIterator);
+    final GeometryReader geometryReader = new GeometryReader(iterator);
+    return geometryReader;
   }
 
 }

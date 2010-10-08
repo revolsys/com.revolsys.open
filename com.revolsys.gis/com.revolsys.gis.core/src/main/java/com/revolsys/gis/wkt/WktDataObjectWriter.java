@@ -31,7 +31,10 @@ public class WktDataObjectWriter extends AbstractWriter<DataObject> {
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final Integer srid = geometryAttribute.getProperty(AttributeProperties.SRID);
-      setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(srid));
+      if (srid != null) {
+        setProperty(IoConstants.GEOMETRY_FACTORY,
+          GeometryFactory.getFactory(srid));
+      }
     }
 
   }

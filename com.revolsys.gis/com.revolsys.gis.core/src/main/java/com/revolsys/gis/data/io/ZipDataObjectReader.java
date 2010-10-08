@@ -27,11 +27,11 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
       final String baseName = FileUtil.getBaseName(resource.getFilename());
       String zipEntryName = baseName + "." + fileExtension;
       directory = ZipUtil.unzipFile(resource);
-      if (!openFile(resource, zipEntryName)) {
+      if (!openFile(resource, factory, zipEntryName)) {
         final String[] files = directory.list(new ExtensionFilenameFilter(
           fileExtension));
         if (files != null && files.length == 1) {
-          openFile(resource, files[0]);
+          openFile(resource, factory, files[0]);
         }
       }
       if (reader == null) {
@@ -48,11 +48,13 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
 
   protected boolean openFile(
     Resource resource,
+    DataObjectFactory factory,
     final String zipEntryName) {
     File file = new File(directory, zipEntryName);
     if (file.exists()) {
       FileSystemResource fileResource = new FileSystemResource(file);
-      reader = AbstractDataObjectReaderFactory.dataObjectReader(fileResource);
+      reader = AbstractDataObjectReaderFactory.dataObjectReader(fileResource,
+        factory);
       if (reader == null) {
         close();
         throw new IllegalArgumentException("Cannot create reader for file "

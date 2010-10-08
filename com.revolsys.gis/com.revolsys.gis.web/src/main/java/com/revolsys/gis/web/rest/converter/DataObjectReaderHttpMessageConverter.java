@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -37,6 +39,19 @@ public class DataObjectReaderHttpMessageConverter extends
   AbstractHttpMessageConverter<DataObjectReader> {
 
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
+  private List<String> requestAttributeNames = Arrays.asList(IoConstants.SINGLE_OBJECT_PROPERTY,
+    IoConstants.STYLE_URL_PROPERTY, IoConstants.JSONP_PROPERTY,
+    IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
+
+  public List<String> getRequestAttributeNames() {
+    return requestAttributeNames;
+  }
+
+  public void setRequestAttributeNames(
+    List<String> requestAttributeNames) {
+    this.requestAttributeNames = requestAttributeNames;
+  }
 
   private GeometryFactory geometryFactory;
 
@@ -124,16 +139,26 @@ public class DataObjectReaderHttpMessageConverter extends
       } else {
 
         final DataObjectMetaData metaData = reader.getMetaData();
-        final String baseName = HttpRequestUtils.getRequestBaseFileName();
         final HttpHeaders headers = outputMessage.getHeaders();
+        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        String baseName = (String)requestAttributes.getAttribute(
+          "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
+        if (baseName == null) {
+          baseName = HttpRequestUtils.getRequestBaseFileName();
+        }
+        String contentDisposition = (String)requestAttributes.getAttribute(
+          "contentDisposition", RequestAttributes.SCOPE_REQUEST);
+        if (contentDisposition == null) {
+          contentDisposition = "attachment";
+        }
         final String fileName = baseName + "."
           + writerFactory.getFileExtension(mediaTypeString);
-        headers.set("Content-Disposition", "inline; filename=" + fileName);
+        headers.set("Content-Disposition", contentDisposition + "; filename="
+          + fileName);
 
         final OutputStream body = outputMessage.getBody();
         final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
           baseName, metaData, body, charset);
-        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
@@ -142,6 +167,13 @@ public class DataObjectReaderHttpMessageConverter extends
           RequestAttributes.SCOPE_REQUEST);
         if (callback != null) {
           writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
+        }
+        for (final String attributeName : requestAttributeNames) {
+          final Object value = requestAttributes.getAttribute(attributeName,
+            RequestAttributes.SCOPE_REQUEST);
+          if (value != null) {
+            writer.setProperty(attributeName, value);
+          }
         }
         final Iterator<DataObject> iterator = reader.iterator();
         if (iterator.hasNext()) {
