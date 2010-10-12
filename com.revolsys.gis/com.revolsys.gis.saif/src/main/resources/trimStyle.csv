@@ -1,382 +1,384 @@
-FACT FCODE,TRIMX FCODE,Class,Label,Attributes,Color,LineWidth,LinePattern,Visible
-,,Airfield,Retired,updateHistory.retirementHistory!=,red,0.25,"3,3",FALSE
-AQ00550001,AQ00550001,Airfield,Airfield Abandoned,airfieldType=abandoned,red,0.25,,TRUE
-AQ00450000,AQ00450000,Airfield,Airfield,airfieldType=airFacility,red,0.25,,TRUE
-AQ00500000,AQ00500000,Airfield,Airport,airfieldType=airport,red,0.25,,TRUE
-AQ00550000,AQ00550000,Airfield,Airstrip,airfieldType=airstrip,red,0.25,,TRUE
-,,Airfield,,,red,0.25,,TRUE
-,,AreaOfExclusion,Retired,updateHistory.retirementHistory!=,red,0.25,"3,3",FALSE
-HC90000000,HC90000000,AreaOfExclusion,,,red,0.5,"0.5,1.5",TRUE
-,,AreaOfIndefiniteContours,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-HC90000100,HC90000100,AreaOfIndefiniteContours,,,black,0.5,"0.5,1.5",TRUE
-,,AreaSymbol,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-GB90000000,GB90000000,AreaSymbol,Inundated Land (symbol),,,,,TRUE
-GC90100000,GC90100000,AreaSymbol,Marsh (symbol),,,,,TRUE
-GC90200000,GC90200000,AreaSymbol,Swamp (symbol),,,,,TRUE
-GE90100000,GE90100000,AreaSymbol,Sand/Gravel Bar (symbol),,,,,TRUE
-HB90000000,HB90000000,AreaSymbol,Slide (symbol),,,,,TRUE
-HB90000000,HB90000000,AreaSymbol,Slide (symbol),,,,,TRUE
-HB90000110,,AreaSymbol,Slide Enhanced (symbol),,,,,TRUE
-JA90100000,JA90100000,AreaSymbol,Cutblock (symbol),,,,,TRUE
-JA90200000,JA90200000,AreaSymbol,Cutblock Regenerating (symbol),,,,,TRUE
-JA90300000,JA90300000,AreaSymbol,Selective Log (symbol),,,,,TRUE
-JA90400000,JA90400000,AreaSymbol,Windfall (symbol),,,,,TRUE
-JA90500000,JA90500000,AreaSymbol,Burn (symbol),,,,,TRUE
-JA90600000,JA90600000,AreaSymbol,Burn Regenerating (symbol),,,,,TRUE
-,,BeaverDam,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-GA08450110,GA08450110,BeaverDam,,,black,0.25,,TRUE
-,,Breakline,,,black,0.25,,FALSE
-,,Breakline,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-HA90200000,HA90200000,Breakline,Sharp Breakline ,breaklineType=sharp,black,0.25,,TRUE
-HA90200110,HA90200110,Breakline,Round Breakline,breaklineType=round,brown,0.25,,TRUE
-HA90200120,HA90200120,Breakline,Hypsographic Breakline,breaklineType=hypsographic,purple,0.25,,TRUE
-HA90200130,HA90200130,Breakline,Hydrographic Breakline,breaklineType=hydrographic,blue,0.25,,TRUE
-HA90200140,HA90200140,Breakline,Anthropogenic Breakline,breaklineType=anthropogenic,orange,0.25,,TRUE
-,,Breakwater,,,brown,0.25,,TRUE
-,,Breakwater,Retired,updateHistory.retirementHistory!=,brown,0.25,"3,3",FALSE
-GE03050110,GE03050110,Breakwater,Breakwater,,brown,0.25,,TRUE
-GE03050120,GE03050120,Breakwater,Breakwater (symbolized),,,,,TRUE
-,,Brodge,,,black,0.25,,TRUE
-,,Bridge,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-DD93200000,DD93200000,Bridge,Trestle - rail,bridgeType=rail,black,0.25,,TRUE
-DD93250000,DD93250000,Bridge,Bridge - road,bridgeType=road,black,0.25,,TRUE
-DD93250100,DD93250100,Bridge,Bridge  (symbolized),,,,,TRUE
-DD93250110,DD93250110,Bridge,Bridge - Crossing (symbolized),,,,,TRUE
-,,Building,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-BA01450000,BA01450000,Building,Barn,,,,,TRUE
-BA12800000,BA12800000,Building,Greenhouse,,,,,TRUE
-BA90000000,BA90000000,Building,Barn (symbolized),,,,,TRUE
-BA90000110,BA90000110,Building,Silo (symbolized),,,,,TRUE
-BA90100000,BA90100000,Building,Greenhouse (symbolized),,,,,TRUE
-BC29250000,BC29250000,Building,Communications (symbolized),,,,,TRUE
-BE05900000,BE05900000,Building,College,,,,,TRUE
-BE16200000,BE16200000,Building,Library,,,,,TRUE
-BE26000000,BE26000000,Building,School,,,,,TRUE
-BE32400000,BE32400000,Building,University,,,,,TRUE
-BE90700000,BE90700000,Building,Library (symbolized),,,,,TRUE
-BE90800000,BE90800000,Building,College (symbolized),,,,,TRUE
-BE90900000,BE90900000,Building,School (symbolized),,,,,TRUE
-BE91000000,BE91000000,Building,University (symbolized),,,,,TRUE
-BF01850000,BF01850000,Building,Customs Office,,,,,TRUE
-BF05550000,BF05550000,Building,City Hall,,,,,TRUE
-BF07550000,BF07550000,Building,Court House,,,,,TRUE
-BF11000000,BF11000000,Building,Fire Station,,,,,TRUE
-BF20950000,BF20950000,Building,Penitentiary,,,,,TRUE
-BF22000000,BF22000000,Building,Police Station,,,,,TRUE
-BF22250000,BF22250000,Building,PostOffice,,,,,TRUE
-BF90100000,BF90100000,Building,Customs Office (symbolized),,,,,TRUE
-BF90200000,BF90200000,Building,Fire Station (symbolized),,,,,TRUE
-BF90400000,BF90400000,Building,Penitentiary (symbolized),,,,,TRUE
-BF90500000,BF90500000,Building,Police Station (symbolized),,,,,TRUE
-BF90600000,BF90600000,Building,Post Office (symbolized),,,,,TRUE
-BF91200000,BF91200000,Building,City Hall (symbolized),,,,,TRUE
-BF91300000,BF91300000,Building,Court House (symbolized),,,,,TRUE
-BH13950000,BH13950000,Building,Hospital,,,,,TRUE
-BH90300000,BH90300000,Building,Hospital (symbolized),,,,,TRUE
-BM05300000,BM05300000,Building,Church,,,,,TRUE
-BM91100000,BM91100000,Building,Church (symbolized),,,,,TRUE
-BQ30750140,BQ30750140,Building,Ferry Terminal,,,,,TRUE
-BQ90750140,BQ90750140,Building,Ferry Terminal (symbolized),,,,,TRUE
-BR90000000,BR90000000,Building,Building,,,,,TRUE
-BR90000110,BR90000110,Building,Building (symbolized),,,,,TRUE
-CG33250000,CG33250000,Building,Weigh Scale,,,,,TRUE
-CG33250100,CG33250100,Building,Weigh Scale (symbolized),,,,,TRUE
-CQ16350000,CQ16350000,Building,Lighthouse (symbolized),,,,,TRUE
-CR01600120,CR01600120,Building,Road Barrier (symbolized),,,,,TRUE
-DD31000000,DD31000000,Building,Toll Gate,,,,,TRUE
-DD91000000,DD91000000,Building,Toll Gate (symbolized),,,,,TRUE
-,,BuiltupArea,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-AR03400000,AR03400000,BuiltupArea,,,black,0.25,,TRUE
-,,CadastralPoint,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-FD90500000,FD90500000,CadastralPoint,Cadastral Point,,,,,TRUE
-,,Canal,,,blue,0.25,,TRUE
-,,Canal,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-GA03950000,GA03950000,Canal,Canal,canalType=canal,blue,0.25,,TRUE
-GA05200000,GA05200000,Canal,Channel,canalType=channel,blue,0.25,,TRUE
-GA05200110,GA05200110,Canal,Channel Right Bank,canalType=channelRighttBank,blue,0.25,,TRUE
-GA05200120,GA05200120,Canal,Channel Left Bank,canalType=channelLeftBank,blue,0.25,,TRUE
-GA08800110,GA08800110,Canal,Ditch,canalType=ditch,blue,0.25,,TRUE
-GA08800130,GA08800130,Canal,Ditch Indefinite,canalType=ditchIndefinite,blue,0.25,,TRUE
-GA11500000,GA11500000,Canal,Flume,canalType=flume,blue,0.25,,TRUE
-GA93950110,GA93950110,Canal,Canal Left Bank,canalType=canalLeftBank,blue,0.25,,TRUE
-GA93950120,GA93950120,Canal,Canal Right Bank,canalType=canalRightBank,blue,0.25,,TRUE
-,,CliffScarp,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-HB05650000,HB05650000,CliffScarp,Cliff Scarp,,,,,TRUE
-,,CliffTerrainDropOff,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-HB05650100,HB05650100,CliffTerrainDropOff,Cliff Dropoff Definite,,,,,TRUE
-HB05650200,HB05650200,CliffTerrainDropOff,Cliff Dropoff Indefinite,,,,,TRUE
-,,Coastline,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-GG05800000,GG05800000,Coastline,Coastline Definite,,,,,TRUE
-GG95800130,GG95800130,Coastline,Coastline Indefinite,,,,,TRUE
-FB18450000,FB18450000,ControlPoint,Horizontal,,,,,TRUE
-FB18650000,FB18650000,ControlPoint,Vertical,,,,,TRUE
-,,CorridorLandmark,,,black,0.25,,TRUE
-,,CorridorLandmark,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-AR27550100,AR27550100,CorridorLandmark,Pipeline Right of Way,corridorLandmarkType=rightOfWayPipeline,black,0.25,,TRUE
-CL27800000,CL27800000,CorridorLandmark,Ski Lift,corridorLandmarkType=skiLift,black,0.25,,TRUE
-CQ00300000,CQ00300000,CorridorLandmark,Aerial Cableway,corridorLandmarkType=aerialCableway,black,0.25,,TRUE
-CQ06400000,CQ06400000,CorridorLandmark,Conveyor,corridorLandmarkType=conveyor,black,0.25,,TRUE
-EA03800000,EA03800000,CorridorLandmark,Cable,corridorLandmarkType=cable,black,0.25,,TRUE
-EA16400120,EA16400120,CorridorLandmark,Transmission Line,corridorLandmarkType=transmissionLine,black,0.25,,TRUE
-EA21400000,EA21400000,CorridorLandmark,Pipeline,corridorLandmarkType=pipeline,black,0.25,,TRUE
-FA02650000,FA02650000,CorridorLandmark,Boundary International,corridorLandmarkType=boundaryInternational,black,0.25,,TRUE
-FA02700000,FA02700000,CorridorLandmark,Boundary Interprovincial,corridorLandmarkType=boundaryInterprovincial,black,0.25,,TRUE
-JA08400000,JA08400000,CorridorLandmark,Cut Line/Seismic Line,corridorLandmarkType=cutLineSeismicLine,black,0.25,,TRUE
-DD08500000,DD08500000,Culvert,Culvert,,,,,TRUE
-DD98500000,DD98500000,Culvert,Culvert (symbolized),,,,,TRUE
-,,DamSection,,,black,0.25,,TRUE
-GA08450000,GA08450000,DamSection,Dam Top,damSectionType=top,black,0.25,,TRUE
-GA28550000,GA28550000,DamSection,Spillway/Penstock,damSectionType=spillwayPenstock,black,0.25,,TRUE
-GA98450000,GA98450000,DamSection,Dam,damSectionType=,black,0.25,,TRUE
-GA98450100,GA98450100,DamSection,Dam base,damSectionType=base,black,0.25,,TRUE
-,,DEMPoint,,,black,0.25,,FALSE
-,,DEMPoint,Retired,updateHistory.retirementHistory!=,black,0.25,,FALSE
-HA90100000,HA90100000,DEMPoint,DEM Spot Elevation,demPointType=spotHeight,black,0.25,,TRUE
-HA90100110,HA90100110,DEMPoint,DEM Spot Elevation  Indefinite ,demPointType=indefinite,brown,0.25,,TRUE
-HA90300000,HA90300000,DEMPoint,DEM Spot Elevation Hybrid,demPointType=hybrid,red,0.25,,TRUE
-HA90400000,,DEMPoint,DEM Spot Elevation Check,demPointType=precise,purple,0.25,,TRUE
-AB33850000,AB33850000,DesignatedArea,Yard,,,,,TRUE
-AB33850110,AB33850110,DesignatedArea,Auto Wrecker,,,,,TRUE
-AB33850140,AB33850140,DesignatedArea,LumberYard,,,,,TRUE
-AB33850150,AB33850150,DesignatedArea,StockYard,,,,,TRUE
-AF11150000,AF11150000,DesignatedArea,Fish Hatchery,,,,,TRUE
-AG09850000,AG09850000,DesignatedArea,Electrical Substation Complex,,,,,TRUE
-AJ00650000,AJ00650000,DesignatedArea,Ammunition Dump,,,,,TRUE
-AJ01650000,AJ01650000,DesignatedArea,Military Establishment,,,,,TRUE
-AL03900000,AL03900000,DesignatedArea,Campground/Campsite,,,,,TRUE
-AL09000000,AL09000000,DesignatedArea,Drivein Theatre,,,,,TRUE
-AL09000009,AL09000009,DesignatedArea,Oil or Gas Work Camp,,,,,TRUE
-AL10250000,AL10250000,DesignatedArea,Exhibition Grounds,,,,,TRUE
-AL12350000,AL12350000,DesignatedArea,Golf Course,,,,,TRUE
-AL20150000,AL20150000,DesignatedArea,Park/Picnic Area,,,,,TRUE
-AL21900000,AL21900000,DesignatedArea,Sports Field,,,,,TRUE
-AL22650000,AL22650000,DesignatedArea,Race Track,,,,,TRUE
-AL22650110,AL22650110,DesignatedArea,Sport Track,,,,,TRUE
-AL23300120,AL23300120,DesignatedArea,Driving Range,,,,,TRUE
-AL23300140,AL23300140,DesignatedArea,Rifle Range,,,,,TRUE
-AL33900000,AL33900000,DesignatedArea,Zoo,,,,,TRUE
-AM04560000,AM04560000,DesignatedArea,Cemetery,,,,,TRUE
-AN31950000,AN31950000,DesignatedArea,Trailer Park,,,,,TRUE
-AP09200000,AP09200000,DesignatedArea,Dump,,,,,TRUE
-AP26750000,AP26750000,DesignatedArea,Sewage Treatment Area,,,,,TRUE
-AS90000000,AS90000000,DesignatedArea,Designated Area,,,,,TRUE
-EA26700110,EA26700110,DesignatedArea,Settling Pond,,,,,TRUE
-EA32550120,EA32550120,DesignatedArea,Petroleum Valve,,,,,TRUE
-GE00100001,GE00100001,DesignatedArea,Riparian Zone,,,,,TRUE
-CG09100000,CG09100000,Dock,Drydock,,,,,TRUE
-CQ08850130,CQ08850130,Dock,Ferry Dock,,,,,TRUE
-CQ08850160,CQ08850160,Dock,Marina Dock,,,,,TRUE
-CQ21250000,CQ21250000,Dock,Pier/Wharf,,,,,TRUE
-CQ90000120,CQ90000120,Dock,Pier/Wharf (symbolized),,,,,TRUE
-GE09400000,GE09400000,Dyke,Dyke,,,,,TRUE
-DD08350000,DD08350000,Earthwork,Cut Earthwork,,,,,TRUE
-DD09950000,DD09950000,Earthwork,Fill Embankment,,,,,TRUE
-HB10200000,HB10200000,Esker,Esker,,,,,TRUE
-AG17600000,AG17600000,ExtractionSite,Open Pit Mine,,,,,TRUE
-AG17750000,AG17750000,ExtractionSite,Underground Mine,,,,,TRUE
-AG21550000,AG21550000,ExtractionSite,Gravel/Sand Pit,,,,,TRUE
-AG21550001,AG21550001,ExtractionSite,Abandoned Pit,,,,,TRUE
-AG21550110,AG21550110,ExtractionSite,Gravel/Sand Pit  (symbolized),,,,,TRUE
-AG97800000,AG97800000,ExtractionSite,Underground Mine  (symbolized),,,,,TRUE
-GB22500000,GB22500000,ExtractionSite,Quarry,,,,,TRUE
-GA10450000,GA10450000,Falls,Falls,,,,,TRUE
-GA10450110,GA10450110,Falls,Falls (symbolized),,,,,TRUE
-CR10750000,CR10750000,Fence,Fence,,,,,TRUE
-AQ10800000,AQ10800000,FerryRoute,Ferry Route,,,,,TRUE
-,,FloodedLand,,,,,,TRUE
-,,FloodedLand,Retired,updateHistory.retirementHistory!=,blue,0.25,"3,3",TRUE
-GB11350110,GB11350110,FloodedLand,Inundated Land,floodedLandType=,blue,0.25,,TRUE
-GC17100000,GC17100000,FloodedLand,Marsh,floodedLandType=marsh,blue,0.25,,TRUE
-GC30050000,GC30050000,FloodedLand,Swamp,floodedLandType=swamp,blue,0.25,,TRUE
-GE90200000,GE90200000,FlowDirectionIndicator,Flow Arrow,,,,,TRUE
-GE90200110,GE90200110,FlowDirectionIndicator,Arrowhead,,,,,TRUE
-DD93100000,DD93100000,Footbridge,Footbridge,,,,,TRUE
-AQ13450000,AQ13450000,Helipad,Helipad (symbolized),,,,,TRUE
-,,IceMass,,,,,,TRUE
-,,IceMass,Retired,updateHistory.retirementHistory!=,blue,0.25,"1,1",FALSE
-GD12300000,GD12300000,IceMass,Glacier,iceMassType=glacier,blue,0.25,"1,1",TRUE
-GD14450000,GD14450000,IceMass,Icefield,iceMassType=icefield,brown,0.25,"3,1.5",TRUE
-GE14850000,GE14850000,Island,Island,,blue,0.25,,TRUE
-GE14850000,GE14850000,Island,Retired,updateHistory.retirementHistory!=,blue,0.25,"3,3",FALSE
-GE94850000,GE94850000,Island,Island (symbolized),,,,,TRUE
-GE94850100,GE94850100,Island,IslandPositionApproximate (symbolized),,,,,TRUE
-,,LakeReservoir,,,,,,TRUE
-,,LakeReservoir,Retired,updateHistory.retirementHistory!=,blue,0.25,"3,3",FALSE
-GB15300000,GB15300000,LakeReservoir,Lake Definite,"lakeReservoirType=lake,lakeReservoirQualifier=definite",blue,0.25,,TRUE
-GB15300130,GB15300130,LakeReservoir,Lake Indefinite,"lakeReservoirType=lake,lakeReservoirQualifier=indefinite",black,0.25,,TRUE
-GB15300140,GB15300140,LakeReservoir,Lake Intermittent,"lakeReservoirType=lake,lakeReservoirQualifier=intermittent",purple,0.25,"3,1.5",TRUE
-GB24300000,GB24300000,LakeReservoir,Reservoir Definite,"lakeReservoirType=reservoir,lakeReservoirQualifier=definite",red,0.25,,TRUE
-GB90100000,GB90100000,LakeReservoir,Reservoir Indefinite,"lakeReservoirType=reservoir,lakeReservoirQualifier=indefinite",red,0.25,"3,1.5",TRUE
-GB90100110,GB90100110,LakeReservoir,Reservoir Intermittent,"lakeReservoirType=reservoir,lakeReservoirQualifier=intermittent",red,0.5,"0.5,0.5",TRUE
-GB90100120,GB90100120,LakeReservoir,Reservoir Proposed Max Res Level,lakeReservoirType=proposedMaxResLevel,red,0.5,"0.5,0.5",TRUE
-,,LandCover,,,green,0.25,,TRUE
-,,LandCover,Retired,updateHistory.retirementHistory!=,green,0.25,"3,3",FALSE
-FI92100030,FI92100030,LandCover,Log Landing,,,,,TRUE
-FI92100130,FI92100130,LandCover,Log Landing (symbolized),,,,,TRUE
-JA05600100,JA05600100,LandCover,Opening,,,,,TRUE
-JA05600110,JA05600110,LandCover,Opening (symbolized),,,,,TRUE
-JA13300000,JA13300000,LandCover,Cutblock,,,,,TRUE
-JA13300200,JA13300200,LandCover,Selective Log,,,,,TRUE
-JA13300300,JA13300300,LandCover,Windfall,,,,,TRUE
-JA13300400,JA13300400,LandCover,Burn,,,,,TRUE
-JA13300500,JA13300500,LandCover,Burn Regenerating,,,,,TRUE
-JA23750000,JA23750000,LandCover,Cutblock Regenerating,,,,,TRUE
-JA31500110,JA31500110,LandCover,Snag (symbolized),,,,,TRUE
-JA33750000,JA33750000,LandCover,Wooded Area,,,,,TRUE
-JA92050100,JA92050100,LandCover,Lone Tree (symbolized),,,,,TRUE
-JB19150000,JB19150000,LandCover,Nursery,,,,,TRUE
-JB19650000,JB19650000,LandCover,Orchard,,,,,TRUE
-JB32800000,JB32800000,LandCover,Vineyard,,,,,TRUE
-JD12700000,JD12700000,LandCover,Grassland,,,,,TRUE
-JD26200000,JD26200000,LandCover,Scrub,,,,,TRUE
-HB15850000,HB15850000,LavaBed,Lava Bed,,,,,TRUE
-FB18500000,FB18500000,Monument,Intl Boundary Monument,,,,,TRUE
-FB18550000,FB18550000,Monument,Prov Boundary Monument,,,,,TRUE
-HB18700000,HB18700000,Moraine,Moraine,,,,,TRUE
-GF28750000,,N/A,Spring (symbolized),,,,,TRUE
-WA24850000,,N/A,River/Stream Enhanced Definite,,,,,TRUE
-WA24850140,,N/A,River/Stream Enhanced Indefinite,,,,,TRUE
-WA24850150,,N/A,River/Stream Enhanced Intermittent,,,,,TRUE
-FR00010100,FR00010100,NoJoinSymbol,No Join (symbol),,,,,TRUE
-CG03550000,CG03550000,NonCorridorLandmark,Burner (symbolized),,,,,TRUE
-CG07600000,CG07600000,NonCorridorLandmark,Crane Permanent (symbolized),,,,,TRUE
-CG12150000,CG12150000,NonCorridorLandmark,Gas Well (symbolized),,,,,TRUE
-CG19600000,CG19600000,NonCorridorLandmark,Oil Well (symbolized),,,,,TRUE
-CG33360000,CG33360000,NonCorridorLandmark,Well Hole (Surface only),,,,,TRUE
-CQ01850000,CQ01850000,NonCorridorLandmark,Beacon (symbolized),,,,,TRUE
-FE90000110,FE90000110,ObservationPoint,Stream Survey Point,,,,,TRUE
-KB14250000,KB14250000,OtherText,Hydrographic,,,,,TRUE
-KC14300000,KC14300000,OtherText,Hypsographic Excluding Contour Numbers,,,,,TRUE
-KC14300130,KC14300130,OtherText,Hypsographic Contour Numbers,,,,,TRUE
-KC14300310,KC14300310,OtherText,Landcover,,,,,TRUE
-KC14300320,KC14300320,OtherText,Landform,,,,,TRUE
-KC90000000,KC90000000,OtherText,Aerial Triangulation,,,,,TRUE
-KC90100000,KC90100000,OtherText,Transportation - Not R&R,,,,,TRUE
-KC90200000,KC90200000,OtherText,Landmark,,,,,TRUE
-KC91000000,KC91000000,OtherText,Generic,,,,,TRUE
-KN00020000,KN00020000,OtherText,History Tracking,,,,,TRUE
-FD21100000,FD21100000,PhotoCentre,PhotoCentre,,,,,TRUE
-AG21270000,,Pile,Pile,,,,,TRUE
-,AG21275000,Pile,Pile,,,,,TRUE
-,,RailLine,,,,,,
-,,RailLine,Retired,updateHistory.retirementHistory!=,red,0.25,"3,3",FALSE
-DE22850000,DE22850000,RailLine,Double Track,,,,,TRUE
-DE22850110,DE22850110,RailLine,LightRailTransitDouble elevated,,,,,TRUE
-DE22850120,DE22850120,RailLine,LightRailTransitDouble surface,,,,,TRUE
-DE22850130,DE22850130,RailLine,LightRailTransitDouble underground,,,,,TRUE
-DE22900000,DE22900000,RailLine,Multiple Track,,,,,TRUE
-DE22950000,DE22950000,RailLine,Single Track,,,,,TRUE
-DE22950001,DE22950001,RailLine,Abandoned Track,rail,,,,TRUE
-DE22950110,DE22950110,RailLine,LightRailTransitSingle elevated,,,,,TRUE
-DE22950120,DE22950120,RailLine,LightRailTransitSingle surface,,,,,TRUE
-DE22950130,DE22950130,RailLine,LightRailTransitSingle underground,,,,,TRUE
-DF28850000,DF28850000,RailLine,Spur,,,,,TRUE
-GA23500000,GA23500000,Rapids,Rapids,,,,,TRUE
-GA23500110,GA23500110,Rapids,Rapids,,,,,TRUE
-DD24600000,DD24600000,RetainingWall,Retaining Wall,,,,,TRUE
-HB06650100,HB06650100,Ridge,Ridge definite,,,,,TRUE
-HB06650200,HB06650200,Ridge,Ridge indefinite,,,,,TRUE
-,,RiverStream,,,blue,0.25,,TRUE
-,,RiverStream,Retired,updateHistory.retirementHistory!=,blue,0.25,"3,3",FALSE
-GA24850145,GA24850145,RiverStream,River connector,riverStreamType=connector,blue,0.25,,TRUE
-GA24850000,GA24850000,RiverStream,River Definite,riverStreamType=definite,blue,0.25,,TRUE
-GA24850130,GA24850130,RiverStream,River dry,riverStreamType=dry,blue,0.25,"1.5,1.5",TRUE
-GA24850140,GA24850140,RiverStream,River indefinite,riverStreamType=indefinite,black,0.25,,TRUE
-GA24850150,GA24850150,RiverStream,River intermittent,riverStreamType=intermittent,blue,0.25,"3,1.5",TRUE
-GA90000110,GA90000110,RiverStream,River Left Bank,riverStreamType=leftBank,blue,0.25,,TRUE
-GA90000120,GA90000120,RiverStream,River Right Bank,riverStreamType=rightBank,blue,0.25,,TRUE
-,,Road,,,red,0.25,,TRUE
-,,Road,Retired,updateHistory.retirementHistory!=,red,0.25,"3,3",FALSE
-DA25150120,DA25150120,Road,Decommissioned,surfaceType=decommissioned,orange,0.25,"1.5,1.5",TRUE
-DA25000110,DA25000110,Road,Loose1LaneTwoWay,"surfaceType=loose,numberOfLanes=1,divided=false,underConstruction=false",orange,0.25,"3,1.5",TRUE
-DA25000160,DA25000160,Road,Loose1LaneTwoWayUnderConstruction,"surfaceType=loose,numberOfLanes=1,divided=false,underConstruction=true",orange,0.25,"3,1,2,1",TRUE
-DA25150140,DA25150140,Road,Loose1LaneOneWay,"surfaceType=loose,numberOfLanes=1,travelDirection=oneWay",?,?,?,TRUE
-DA25000120,DA25000120,Road,Loose2LanesTwoWay,"surfaceType=loose,numberOfLanes=2,divided=false,underConstruction=false",orange,0.25,,TRUE
-DA25000170,DA25000170,Road,Loose2LanesTwoWayUnderConstruction,"surfaceType=loose,numberOfLanes=2,divided=false,underConstruction=true",orange,0.25,"0.5,0.5",TRUE
-DA25150150,DA25150150,Road,Loose2LanesOneWay,"surfaceType=loose,numberOfLanes=2,travelDirection=oneWay",?,?,?,TRUE
-DA25000130,DA25000130,Road,Loose3LanesTwoWay,"surfaceType=loose,numberOfLanes=3,divided=false,underConstruction=false",?,?,?,TRUE
-DA25000220,DA25000220,Road,Loose4LanesTwoWay,"surfaceType=loose,numberOfLanes=4,divided=false,underConstruction=false",?,?,?,TRUE
-DA25150100,DA25150100,Road,Overgrown,surfaceType=overgrown,brown,0.25,"1.5,1.5",TRUE
-DA25100180,DA25100180,Road,Paved1LaneTwoWay,"surfaceType=paved,numberOfLanes=1,divided=false,underConstruction=false",red,0.25,,TRUE
-DA25100320,DA25100320,Road,Paved1LaneTwoWayUnderConstruction,"surfaceType=paved,numberOfLanes=1,divided=false,underConstruction=true",red,0.25,"3,1.5",TRUE
-DA25100370,DA25100370,Road,Paved1LaneOneWay,"surfaceType=paved,numberOfLanes=1,travelDirection=oneWay,underConstruction=false",?,?,?,TRUE
-DA25050180,DA25050180,Road,Paved2LanesTwoWayDivided,"surfaceType=paved,numberOfLanes=2,divided=true,underConstruction=false",red,0.25,,TRUE
-DA25050310,DA25050310,Road,Paved2LanesTwoWayDividedUnderConstruction,"surfaceType=paved,numberOfLanes=2,divided=true,underConstruction=true",red,0.25,"3,1.5",TRUE
-DA25100190,DA25100190,Road,Paved2LanesOneWay,"surfaceType=paved,numberOfLanes=2,travelDirection=oneWay,underConstruction=false",brown,0.25,"3,2,0.5,2,0.5,2",TRUE
-DA25100330,DA25100330,Road,Paved2LanesOneWayUnderConstruction,"surfaceType=paved,numberOfLanes=2,travelDirection=oneWay,underConstruction=true",brown,0.25,"0.5,0.5",TRUE
-DA25100200,DA25100200,Road,Paved3LanesTwoWay,"surfaceType=paved,numberOfLanes=3,divided=false,underConstruction=false",purple,0.25,"3,1.5",TRUE
-DA25100340,DA25100340,Road,Paved3LanesTwoWayUnderConstruction,"surfaceType=paved,numberOfLanes=3,divided=false,underConstruction=true",brown,0.25,"3,1,2,1",TRUE
-DA25100380,DA25100380,Road,Paved3LanesOneWay,"surfaceType=paved,numberOfLanes=3,travelDirection=oneWay,underConstruction=false",?,?,?,TRUE
-DA25100210,DA25100210,Road,Paved4LanesTwoWay,"surfaceType=paved,numberOfLanes=4,divided=false,underConstruction=false",purple,0.25,"1.5,1.5",TRUE
-DA25100350,DA25100350,Road,Paved4LanesTwoWayUnderConstruction,"surfaceType=paved,numberOfLanes=4,divided=false,underConstruction=true",purple,0.25,"0.5,0.5",TRUE
-DA25050190,DA25050190,Road,Paved4LanesTwoWayDivided,"surfaceType=paved,numberOfLanes=4,divided=true,underConstruction=false",purple,0.25,"3,2,0.5,2,0.5,2",TRUE
-DA25050320,DA25050320,Road,Paved4LanesTwoWayDividedUnderConstruction,"surfaceType=paved,numberOfLanes=4,divided=true,underConstruction=true",purple,0.25,"3,1,2,1",TRUE
-DA25100390,DA25100390,Road,Paved4LanesOneWay,"surfaceType=paved,numberOfLanes=4,travelDirection=oneWay,underConstruction=false",?,?,?,TRUE
-DA25100220,DA25100220,Road,Paved6LanesTwoWay,"surfaceType=paved,numberOfLanes=6,divided=false,underConstruction=false",green,0.25,"1.5,1.5",TRUE
-DA25100360,DA25100360,Road,Paved6LanesTwoWayUnderConstruction,"surfaceType=paved,numberOfLanes=6,divided=false,underConstruction=true",green,0.25,"0.5,0.5",TRUE
-DA25050200,DA25050200,Road,Paved6LanesTwoWayDivided,"surfaceType=paved,numberOfLanes=6,divided=true,underConstruction=false",purple,0.25,"3,2,0.5,2,0.5,2",TRUE
-DA25050330,DA25050330,Road,Paved6LanesTwoWayDividedUnderConstruction,"surfaceType=paved,numberOfLanes=6,divided=true,underConstruction=true",green,0.25,"3,1,2,1",TRUE
-DA25150000,DA25150000,Road,Rough,surfaceType=rough,orange,0.25,"1.5,1.5",TRUE
-DA25200000,DA25200000,Road,Seasonal1LaneTwoWay (Winter Road),surfaceType=seasonal,?,?,?,TRUE
-DA24900900,DA24900900,Road,Unknown Road,surfaceType=unknown,red,0.25,,TRUE
-HB25000100,HB25000100,RockBluff,Rock Bluff,,,,,TRUE
-HB25400000,HB25400000,RockOutcrop,Rock Outcrop,,,,,TRUE
-HB25400100,HB25400100,RockOutcrop,RockOutcrop (symbolized),,,,,TRUE
-,,SandGravelBar,,,brown,0.25,,TRUE
-,,SandGravelBar,Retired,updateHistory.retirementHistory!=,brown,0.25,"3,3",FALSE
-BB01350001,,SandGravelBar,Top of Bank,sandGravelBarType=sandGravelBar,brown,0.25,"3,3",TRUE
-GE25850000,GE25850000,SandGravelBar,Sand/Gravel Bar,sandGravelBarType=sandGravelBar,brown,0.25,"3,3",TRUE
-GE25850250,GE25850250,SandGravelBar,Top of Bank,sandGravelBarType=topOfBank,brown,0.25,"3,3",TRUE
-HB26150000,HB26150000,Scree,Scree,,,,,TRUE
-GE26250000,GE26250000,SeaWall,Sea Wall,,,,,TRUE
-HB27550000,HB27550000,Sinkhole,Sinkhole (symbolized),,,,,TRUE
-CL27750000,CL27750000,SkiJump,Ski Jump,,,,,TRUE
-,,Slide,,,black,0.25,"3,2,.5,2,3",TRUE
-,,Slide,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-HB27900000,HB27900000,Slide,Slide,,,,,TRUE
-HB27900100,,Slide,Slide Enhanced,,,,,TRUE
-,,Snowshed,,,black,0.25,,TRUE
-,,Snowshed,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-DD28350000,DD28350000,Snowshed,Snowshed,,black,0.25,,TRUE
-HA28700000,HA28700000,SpotElevation,Spot Height,,,,,TRUE
-HA33100000,HA33100000,SpotElevation,Water Level,,,,,TRUE
-HB18800000,HB18800000,SpotElevation,Mountain Peak (symbolized),,,,,TRUE
-,,TailingArea,,,black,0.25,"3,1.5",TRUE
-,,TailingArea,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-AP30300000,AP30300000,TailingArea,Tailing Area,,black,0.25,"3,1.5",TRUE
-,,TailingPond,,,black,0.25,,TRUE
-,,TailingPond,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-AP90300100,AP90300100,TailingPond,Tailing Pond,,black,0.25,,TRUE
-,,Tank,,,black,0.25,,TRUE
-,,Tank,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-EA30400000,EA30400000,Tank,Tank,,black,0.25,,TRUE
-EA90000000,EA90000000,Tank,Tank (symbolized),,,,,TRUE
-KC90300000,KC90300000,Toponymy,Toponymy,,,,,TRUE
-BF10950120,BF10950120,Tower,Fire Lookout Tower (symbolized),,,,,TRUE
-CC31150000,CC31150000,Tower,Unspecified Tower (symbolized),,,,,TRUE
-CC31150110,CC31150110,Tower,Microwave Tower (symbolized),,,,,TRUE
-CC90000000,CC90000000,Tower,Transmission Tower (symbolized),,,,,TRUE
-CG28300000,CG28300000,Tower,Smokestack/Chimney (symbolized),,,,,TRUE
-,,Trail,,,brown,0.25,"1.5,1.5",TRUE
-,,Trail,Retired,updateHistory.retirementHistory!=,brown,0.25,"3,3",FALSE
-DD31700000,DD31700000,Trail,Trail ,trailType=,brown,0.25,"1.5,1.5",TRUE
-DD31700120,DD31700120,Trail,Trail skid,trailType=skid,brown,0.25,"1.5,1.5",TRUE
-,,TrimContour,Retired,updateHistory.retirementHistory!=,brown,0.25,"3,3",FALSE
-HA90001140,HA90001140,TrimContour,Indefinite Depression Contour,"indexContour=false,position.qualifier=indefinite,position.form=depression",brown,0.25,,TRUE
-HA90001130,HA90001130,TrimContour,Intermediate Depression Contour,"indexContour=false,position.form=depression",brown,0.25,,TRUE
-HA90001110,HA90001110,TrimContour,Indefinite Intermediate Contour,"indexContour=false,position.qualifier=indefinite",brown,0.25,,TRUE
-HA90001000,HA90001000,TrimContour,Intermediate Contour,indexContour=false,brown,0.25,,TRUE
-HA90000140,HA90000140,TrimContour,Indefinite Depression Index Contour,"indexContour=true,position.form=depression,position.qualifier=indefinite",black,0.25,,TRUE
-HA90000130,HA90000130,TrimContour,Index Depression Contour,"indexContour=true,position.form=depression",black,0.25,,TRUE
-HA90000110,HA90000110,TrimContour,Indefinite  Index Contour,"indexContour=true,position.qualifier=indefinite",black,0.25,,TRUE
-HA90000000,HA90000000,TrimContour,Index Contour,indexContour=true,black,0.25,,TRUE
-,,TrimContour,,,brown,0.25,,FALSE
-,,Tunnel,,,black,0.25,,TRUE
-,,Tunnel,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-DD93220000,DD93220000,Tunnel,Tunnel,,black,0.25,,TRUE
-,,Turntable,,,black,0.25,,TRUE
-,,Turntable,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-DD32300000,DD32300000,Turntable,Turntable (symbolized),,black,0.25,,TRUE
-,,VolcanicCrater,,,black,0.25,"3,1.5",TRUE
-,,VolcanicCrater,Retired,updateHistory.retirementHistory!=,black,0.25,"3,3",FALSE
-HB07650130,HB07650130,VolcanicCrater,Volcanic Crater,,black,0.25,"3,1.5",TRUE
+"FACT FCODE","TRIMX FCODE","Class","Label","Attributes","Color","LineWidth","LinePattern","Visible"
+,,"Airfield","Retired","updateHistory.retirementHistory!=","red",0.25,"3,3",FALSE
+"AQ00550001","AQ00550001","Airfield","Airfield Abandoned","airfieldType=abandoned","red",0.25,,TRUE
+"AQ00450000","AQ00450000","Airfield","Airfield","airfieldType=airFacility","red",0.25,,TRUE
+"AQ00500000","AQ00500000","Airfield","Airport","airfieldType=airport","red",0.25,,TRUE
+"AQ00550000","AQ00550000","Airfield","Airstrip","airfieldType=airstrip","red",0.25,,TRUE
+,,"Airfield",,,"red",0.25,,TRUE
+"HC90000000","HC90000000","AreaOfExclusion",,,"red",0.5,"0.5,1.5",TRUE
+,,"AreaOfExclusion","Active","updateHistory.retirementHistory=","darkgray",0.25,"3,3",FALSE
+,,"AreaOfExclusion","Retired","updateHistory.retirementHistory!=","red",0.25,"3,3",FALSE
+"HC90000100","HC90000100","AreaOfIndefiniteContours",,,"red",0.5,"0.5,1.5",TRUE
+,,"AreaOfIndefiniteContours","Active","updateHistory.retirementHistory=","red",0.5,"3,3",TRUE
+,,"AreaOfIndefiniteContours","Retired","updateHistory.retirementHistory!=","darkgray",0.25,"3,3",FALSE
+,,"AreaSymbol","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"GB90000000","GB90000000","AreaSymbol","Inundated Land (symbol)",,,,,TRUE
+"GC90100000","GC90100000","AreaSymbol","Marsh (symbol)",,,,,TRUE
+"GC90200000","GC90200000","AreaSymbol","Swamp (symbol)",,,,,TRUE
+"GE90100000","GE90100000","AreaSymbol","Sand/Gravel Bar (symbol)",,,,,TRUE
+"HB90000000","HB90000000","AreaSymbol","Slide (symbol)",,,,,TRUE
+"HB90000000","HB90000000","AreaSymbol","Slide (symbol)",,,,,TRUE
+"HB90000110",,"AreaSymbol","Slide Enhanced (symbol)",,,,,TRUE
+"JA90100000","JA90100000","AreaSymbol","Cutblock (symbol)",,,,,TRUE
+"JA90200000","JA90200000","AreaSymbol","Cutblock Regenerating (symbol)",,,,,TRUE
+"JA90300000","JA90300000","AreaSymbol","Selective Log (symbol)",,,,,TRUE
+"JA90400000","JA90400000","AreaSymbol","Windfall (symbol)",,,,,TRUE
+"JA90500000","JA90500000","AreaSymbol","Burn (symbol)",,,,,TRUE
+"JA90600000","JA90600000","AreaSymbol","Burn Regenerating (symbol)",,,,,TRUE
+,,"BeaverDam","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"GA08450110","GA08450110","BeaverDam",,,"black",0.25,,TRUE
+,,"Breakline",,,"black",0.25,,FALSE
+,,"Breakline","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"HA90200000","HA90200000","Breakline","Sharp Breakline ","breaklineType=sharp","black",0.25,,TRUE
+"HA90200110","HA90200110","Breakline","Round Breakline","breaklineType=round","brown",0.25,,TRUE
+"HA90200120","HA90200120","Breakline","Hypsographic Breakline","breaklineType=hypsographic","purple",0.25,,TRUE
+"HA90200130","HA90200130","Breakline","Hydrographic Breakline","breaklineType=hydrographic","blue",0.25,,TRUE
+"HA90200140","HA90200140","Breakline","Anthropogenic Breakline","breaklineType=anthropogenic","orange",0.25,,TRUE
+,,"Breakwater",,,"brown",0.25,,TRUE
+,,"Breakwater","Retired","updateHistory.retirementHistory!=","brown",0.25,"3,3",FALSE
+"GE03050110","GE03050110","Breakwater","Breakwater",,"brown",0.25,,TRUE
+"GE03050120","GE03050120","Breakwater","Breakwater (symbolized)",,,,,TRUE
+,,"Brodge",,,"black",0.25,,TRUE
+,,"Bridge","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"DD93200000","DD93200000","Bridge","Trestle - rail","bridgeType=rail","black",0.25,,TRUE
+"DD93250000","DD93250000","Bridge","Bridge - road","bridgeType=road","black",0.25,,TRUE
+"DD93250100","DD93250100","Bridge","Bridge  (symbolized)",,,,,TRUE
+"DD93250110","DD93250110","Bridge","Bridge - Crossing (symbolized)",,,,,TRUE
+,,"Building","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"BA01450000","BA01450000","Building","Barn",,,,,TRUE
+"BA12800000","BA12800000","Building","Greenhouse",,,,,TRUE
+"BA90000000","BA90000000","Building","Barn (symbolized)",,,,,TRUE
+"BA90000110","BA90000110","Building","Silo (symbolized)",,,,,TRUE
+"BA90100000","BA90100000","Building","Greenhouse (symbolized)",,,,,TRUE
+"BC29250000","BC29250000","Building","Communications (symbolized)",,,,,TRUE
+"BE05900000","BE05900000","Building","College",,,,,TRUE
+"BE16200000","BE16200000","Building","Library",,,,,TRUE
+"BE26000000","BE26000000","Building","School",,,,,TRUE
+"BE32400000","BE32400000","Building","University",,,,,TRUE
+"BE90700000","BE90700000","Building","Library (symbolized)",,,,,TRUE
+"BE90800000","BE90800000","Building","College (symbolized)",,,,,TRUE
+"BE90900000","BE90900000","Building","School (symbolized)",,,,,TRUE
+"BE91000000","BE91000000","Building","University (symbolized)",,,,,TRUE
+"BF01850000","BF01850000","Building","Customs Office",,,,,TRUE
+"BF05550000","BF05550000","Building","City Hall",,,,,TRUE
+"BF07550000","BF07550000","Building","Court House",,,,,TRUE
+"BF11000000","BF11000000","Building","Fire Station",,,,,TRUE
+"BF20950000","BF20950000","Building","Penitentiary",,,,,TRUE
+"BF22000000","BF22000000","Building","Police Station",,,,,TRUE
+"BF22250000","BF22250000","Building","PostOffice",,,,,TRUE
+"BF90100000","BF90100000","Building","Customs Office (symbolized)",,,,,TRUE
+"BF90200000","BF90200000","Building","Fire Station (symbolized)",,,,,TRUE
+"BF90400000","BF90400000","Building","Penitentiary (symbolized)",,,,,TRUE
+"BF90500000","BF90500000","Building","Police Station (symbolized)",,,,,TRUE
+"BF90600000","BF90600000","Building","Post Office (symbolized)",,,,,TRUE
+"BF91200000","BF91200000","Building","City Hall (symbolized)",,,,,TRUE
+"BF91300000","BF91300000","Building","Court House (symbolized)",,,,,TRUE
+"BH13950000","BH13950000","Building","Hospital",,,,,TRUE
+"BH90300000","BH90300000","Building","Hospital (symbolized)",,,,,TRUE
+"BM05300000","BM05300000","Building","Church",,,,,TRUE
+"BM91100000","BM91100000","Building","Church (symbolized)",,,,,TRUE
+"BQ30750140","BQ30750140","Building","Ferry Terminal",,,,,TRUE
+"BQ90750140","BQ90750140","Building","Ferry Terminal (symbolized)",,,,,TRUE
+"BR90000000","BR90000000","Building","Building",,,,,TRUE
+"BR90000110","BR90000110","Building","Building (symbolized)",,,,,TRUE
+"CG33250000","CG33250000","Building","Weigh Scale",,,,,TRUE
+"CG33250100","CG33250100","Building","Weigh Scale (symbolized)",,,,,TRUE
+"CQ16350000","CQ16350000","Building","Lighthouse (symbolized)",,,,,TRUE
+"CR01600120","CR01600120","Building","Road Barrier (symbolized)",,,,,TRUE
+"DD31000000","DD31000000","Building","Toll Gate",,,,,TRUE
+"DD91000000","DD91000000","Building","Toll Gate (symbolized)",,,,,TRUE
+,,"BuiltupArea","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"AR03400000","AR03400000","BuiltupArea",,,"black",0.25,,TRUE
+,,"CadastralPoint","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"FD90500000","FD90500000","CadastralPoint","Cadastral Point",,,,,TRUE
+,,"Canal",,,"blue",0.25,,TRUE
+,,"Canal","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"GA03950000","GA03950000","Canal","Canal","canalType=canal","blue",0.25,,TRUE
+"GA05200000","GA05200000","Canal","Channel","canalType=channel","blue",0.25,,TRUE
+"GA05200110","GA05200110","Canal","Channel Right Bank","canalType=channelRighttBank","blue",0.25,,TRUE
+"GA05200120","GA05200120","Canal","Channel Left Bank","canalType=channelLeftBank","blue",0.25,,TRUE
+"GA08800110","GA08800110","Canal","Ditch","canalType=ditch","blue",0.25,,TRUE
+"GA08800130","GA08800130","Canal","Ditch Indefinite","canalType=ditchIndefinite","blue",0.25,,TRUE
+"GA11500000","GA11500000","Canal","Flume","canalType=flume","blue",0.25,,TRUE
+"GA93950110","GA93950110","Canal","Canal Left Bank","canalType=canalLeftBank","blue",0.25,,TRUE
+"GA93950120","GA93950120","Canal","Canal Right Bank","canalType=canalRightBank","blue",0.25,,TRUE
+,,"CliffScarp","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"HB05650000","HB05650000","CliffScarp","Cliff Scarp",,,,,TRUE
+,,"CliffTerrainDropOff","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"HB05650100","HB05650100","CliffTerrainDropOff","Cliff Dropoff Definite",,,,,TRUE
+"HB05650200","HB05650200","CliffTerrainDropOff","Cliff Dropoff Indefinite",,,,,TRUE
+,,"Coastline","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"GG05800000","GG05800000","Coastline","Coastline Definite",,,,,TRUE
+"GG95800130","GG95800130","Coastline","Coastline Indefinite",,,,,TRUE
+"FB18450000","FB18450000","ControlPoint","Horizontal",,,,,TRUE
+"FB18650000","FB18650000","ControlPoint","Vertical",,,,,TRUE
+,,"CorridorLandmark",,,"black",0.25,,TRUE
+,,"CorridorLandmark","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"AR27550100","AR27550100","CorridorLandmark","Pipeline Right of Way","corridorLandmarkType=rightOfWayPipeline","black",0.25,,TRUE
+"CL27800000","CL27800000","CorridorLandmark","Ski Lift","corridorLandmarkType=skiLift","black",0.25,,TRUE
+"CQ00300000","CQ00300000","CorridorLandmark","Aerial Cableway","corridorLandmarkType=aerialCableway","black",0.25,,TRUE
+"CQ06400000","CQ06400000","CorridorLandmark","Conveyor","corridorLandmarkType=conveyor","black",0.25,,TRUE
+"EA03800000","EA03800000","CorridorLandmark","Cable","corridorLandmarkType=cable","black",0.25,,TRUE
+"EA16400120","EA16400120","CorridorLandmark","Transmission Line","corridorLandmarkType=transmissionLine","black",0.25,,TRUE
+"EA21400000","EA21400000","CorridorLandmark","Pipeline","corridorLandmarkType=pipeline","black",0.25,,TRUE
+"FA02650000","FA02650000","CorridorLandmark","Boundary International","corridorLandmarkType=boundaryInternational","black",0.25,,TRUE
+"FA02700000","FA02700000","CorridorLandmark","Boundary Interprovincial","corridorLandmarkType=boundaryInterprovincial","black",0.25,,TRUE
+"JA08400000","JA08400000","CorridorLandmark","Cut Line/Seismic Line","corridorLandmarkType=cutLineSeismicLine","black",0.25,,TRUE
+"DD08500000","DD08500000","Culvert","Culvert",,,,,TRUE
+"DD98500000","DD98500000","Culvert","Culvert (symbolized)",,,,,TRUE
+,,"DamSection",,,"black",0.25,,TRUE
+"GA08450000","GA08450000","DamSection","Dam Top","damSectionType=top","black",0.25,,TRUE
+"GA28550000","GA28550000","DamSection","Spillway/Penstock","damSectionType=spillwayPenstock","black",0.25,,TRUE
+"GA98450000","GA98450000","DamSection","Dam","damSectionType=","black",0.25,,TRUE
+"GA98450100","GA98450100","DamSection","Dam base","damSectionType=base","black",0.25,,TRUE
+,,"DEMPoint",,,"black",0.25,,FALSE
+,,"DEMPoint","Retired","updateHistory.retirementHistory!=","black",0.25,,FALSE
+"HA90100000","HA90100000","DEMPoint","DEM Spot Elevation","demPointType=spotHeight","black",0.25,,TRUE
+"HA90100110","HA90100110","DEMPoint","DEM Spot Elevation  Indefinite ","demPointType=indefinite","brown",0.25,,TRUE
+"HA90300000","HA90300000","DEMPoint","DEM Spot Elevation Hybrid","demPointType=hybrid","red",0.25,,TRUE
+"HA90400000",,"DEMPoint","DEM Spot Elevation Check","demPointType=precise","purple",0.25,,TRUE
+"AB33850000","AB33850000","DesignatedArea","Yard",,,,,TRUE
+"AB33850110","AB33850110","DesignatedArea","Auto Wrecker",,,,,TRUE
+"AB33850140","AB33850140","DesignatedArea","LumberYard",,,,,TRUE
+"AB33850150","AB33850150","DesignatedArea","StockYard",,,,,TRUE
+"AF11150000","AF11150000","DesignatedArea","Fish Hatchery",,,,,TRUE
+"AG09850000","AG09850000","DesignatedArea","Electrical Substation Complex",,,,,TRUE
+"AJ00650000","AJ00650000","DesignatedArea","Ammunition Dump",,,,,TRUE
+"AJ01650000","AJ01650000","DesignatedArea","Military Establishment",,,,,TRUE
+"AL03900000","AL03900000","DesignatedArea","Campground/Campsite",,,,,TRUE
+"AL09000000","AL09000000","DesignatedArea","Drivein Theatre",,,,,TRUE
+"AL09000009","AL09000009","DesignatedArea","Oil or Gas Work Camp",,,,,TRUE
+"AL10250000","AL10250000","DesignatedArea","Exhibition Grounds",,,,,TRUE
+"AL12350000","AL12350000","DesignatedArea","Golf Course",,,,,TRUE
+"AL20150000","AL20150000","DesignatedArea","Park/Picnic Area",,,,,TRUE
+"AL21900000","AL21900000","DesignatedArea","Sports Field",,,,,TRUE
+"AL22650000","AL22650000","DesignatedArea","Race Track",,,,,TRUE
+"AL22650110","AL22650110","DesignatedArea","Sport Track",,,,,TRUE
+"AL23300120","AL23300120","DesignatedArea","Driving Range",,,,,TRUE
+"AL23300140","AL23300140","DesignatedArea","Rifle Range",,,,,TRUE
+"AL33900000","AL33900000","DesignatedArea","Zoo",,,,,TRUE
+"AM04560000","AM04560000","DesignatedArea","Cemetery",,,,,TRUE
+"AN31950000","AN31950000","DesignatedArea","Trailer Park",,,,,TRUE
+"AP09200000","AP09200000","DesignatedArea","Dump",,,,,TRUE
+"AP26750000","AP26750000","DesignatedArea","Sewage Treatment Area",,,,,TRUE
+"AS90000000","AS90000000","DesignatedArea","Designated Area",,,,,TRUE
+"EA26700110","EA26700110","DesignatedArea","Settling Pond",,,,,TRUE
+"EA32550120","EA32550120","DesignatedArea","Petroleum Valve",,,,,TRUE
+"GE00100001","GE00100001","DesignatedArea","Riparian Zone",,,,,TRUE
+"CG09100000","CG09100000","Dock","Drydock",,,,,TRUE
+"CQ08850130","CQ08850130","Dock","Ferry Dock",,,,,TRUE
+"CQ08850160","CQ08850160","Dock","Marina Dock",,,,,TRUE
+"CQ21250000","CQ21250000","Dock","Pier/Wharf",,,,,TRUE
+"CQ90000120","CQ90000120","Dock","Pier/Wharf (symbolized)",,,,,TRUE
+"GE09400000","GE09400000","Dyke","Dyke",,,,,TRUE
+"DD08350000","DD08350000","Earthwork","Cut Earthwork",,,,,TRUE
+"DD09950000","DD09950000","Earthwork","Fill Embankment",,,,,TRUE
+"HB10200000","HB10200000","Esker","Esker",,,,,TRUE
+"AG17600000","AG17600000","ExtractionSite","Open Pit Mine",,,,,TRUE
+"AG17750000","AG17750000","ExtractionSite","Underground Mine",,,,,TRUE
+"AG21550000","AG21550000","ExtractionSite","Gravel/Sand Pit",,,,,TRUE
+"AG21550001","AG21550001","ExtractionSite","Abandoned Pit",,,,,TRUE
+"AG21550110","AG21550110","ExtractionSite","Gravel/Sand Pit  (symbolized)",,,,,TRUE
+"AG97800000","AG97800000","ExtractionSite","Underground Mine  (symbolized)",,,,,TRUE
+"GB22500000","GB22500000","ExtractionSite","Quarry",,,,,TRUE
+"GA10450000","GA10450000","Falls","Falls",,,,,TRUE
+"GA10450110","GA10450110","Falls","Falls (symbolized)",,,,,TRUE
+"CR10750000","CR10750000","Fence","Fence",,,,,TRUE
+"AQ10800000","AQ10800000","FerryRoute","Ferry Route",,,,,TRUE
+,,"FloodedLand",,,,,,TRUE
+,,"FloodedLand","Retired","updateHistory.retirementHistory!=","blue",0.25,"3,3",TRUE
+"GB11350110","GB11350110","FloodedLand","Inundated Land","floodedLandType=","blue",0.25,,TRUE
+"GC17100000","GC17100000","FloodedLand","Marsh","floodedLandType=marsh","blue",0.25,,TRUE
+"GC30050000","GC30050000","FloodedLand","Swamp","floodedLandType=swamp","blue",0.25,,TRUE
+"GE90200000","GE90200000","FlowDirectionIndicator","Flow Arrow",,,,,TRUE
+"GE90200110","GE90200110","FlowDirectionIndicator","Arrowhead",,,,,TRUE
+"DD93100000","DD93100000","Footbridge","Footbridge",,,,,TRUE
+"AQ13450000","AQ13450000","Helipad","Helipad (symbolized)",,,,,TRUE
+,,"IceMass",,,,,,TRUE
+,,"IceMass","Retired","updateHistory.retirementHistory!=","blue",0.25,"1,1",FALSE
+"GD12300000","GD12300000","IceMass","Glacier","iceMassType=glacier","blue",0.25,"1,1",TRUE
+"GD14450000","GD14450000","IceMass","Icefield","iceMassType=icefield","brown",0.25,"3,1.5",TRUE
+"GE14850000","GE14850000","Island","Island",,"blue",0.25,,TRUE
+"GE14850000","GE14850000","Island","Retired","updateHistory.retirementHistory!=","blue",0.25,"3,3",FALSE
+"GE94850000","GE94850000","Island","Island (symbolized)",,,,,TRUE
+"GE94850100","GE94850100","Island","IslandPositionApproximate (symbolized)",,,,,TRUE
+,,"LakeReservoir",,,,,,TRUE
+,,"LakeReservoir","Retired","updateHistory.retirementHistory!=","blue",0.25,"3,3",FALSE
+"GB15300000","GB15300000","LakeReservoir","Lake Definite","lakeReservoirType=lake,lakeReservoirQualifier=definite","blue",0.25,,TRUE
+"GB15300130","GB15300130","LakeReservoir","Lake Indefinite","lakeReservoirType=lake,lakeReservoirQualifier=indefinite","black",0.25,,TRUE
+"GB15300140","GB15300140","LakeReservoir","Lake Intermittent","lakeReservoirType=lake,lakeReservoirQualifier=intermittent","purple",0.25,"3,1.5",TRUE
+"GB24300000","GB24300000","LakeReservoir","Reservoir Definite","lakeReservoirType=reservoir,lakeReservoirQualifier=definite","red",0.25,,TRUE
+"GB90100000","GB90100000","LakeReservoir","Reservoir Indefinite","lakeReservoirType=reservoir,lakeReservoirQualifier=indefinite","red",0.25,"3,1.5",TRUE
+"GB90100110","GB90100110","LakeReservoir","Reservoir Intermittent","lakeReservoirType=reservoir,lakeReservoirQualifier=intermittent","red",0.5,"0.5,0.5",TRUE
+"GB90100120","GB90100120","LakeReservoir","Reservoir Proposed Max Res Level","lakeReservoirType=proposedMaxResLevel","red",0.5,"0.5,0.5",TRUE
+,,"LandCover",,,"green",0.25,,TRUE
+,,"LandCover","Retired","updateHistory.retirementHistory!=","green",0.25,"3,3",FALSE
+"FI92100030","FI92100030","LandCover","Log Landing",,,,,TRUE
+"FI92100130","FI92100130","LandCover","Log Landing (symbolized)",,,,,TRUE
+"JA05600100","JA05600100","LandCover","Opening",,,,,TRUE
+"JA05600110","JA05600110","LandCover","Opening (symbolized)",,,,,TRUE
+"JA13300000","JA13300000","LandCover","Cutblock",,,,,TRUE
+"JA13300200","JA13300200","LandCover","Selective Log",,,,,TRUE
+"JA13300300","JA13300300","LandCover","Windfall",,,,,TRUE
+"JA13300400","JA13300400","LandCover","Burn",,,,,TRUE
+"JA13300500","JA13300500","LandCover","Burn Regenerating",,,,,TRUE
+"JA23750000","JA23750000","LandCover","Cutblock Regenerating",,,,,TRUE
+"JA31500110","JA31500110","LandCover","Snag (symbolized)",,,,,TRUE
+"JA33750000","JA33750000","LandCover","Wooded Area",,,,,TRUE
+"JA92050100","JA92050100","LandCover","Lone Tree (symbolized)",,,,,TRUE
+"JB19150000","JB19150000","LandCover","Nursery",,,,,TRUE
+"JB19650000","JB19650000","LandCover","Orchard",,,,,TRUE
+"JB32800000","JB32800000","LandCover","Vineyard",,,,,TRUE
+"JD12700000","JD12700000","LandCover","Grassland",,,,,TRUE
+"JD26200000","JD26200000","LandCover","Scrub",,,,,TRUE
+"HB15850000","HB15850000","LavaBed","Lava Bed",,,,,TRUE
+"FB18500000","FB18500000","Monument","Intl Boundary Monument",,,,,TRUE
+"FB18550000","FB18550000","Monument","Prov Boundary Monument",,,,,TRUE
+"HB18700000","HB18700000","Moraine","Moraine",,,,,TRUE
+"GF28750000",,"N/A","Spring (symbolized)",,,,,TRUE
+"WA24850000",,"N/A","River/Stream Enhanced Definite",,,,,TRUE
+"WA24850140",,"N/A","River/Stream Enhanced Indefinite",,,,,TRUE
+"WA24850150",,"N/A","River/Stream Enhanced Intermittent",,,,,TRUE
+"FR00010100","FR00010100","NoJoinSymbol","No Join (symbol)",,,,,TRUE
+"CG03550000","CG03550000","NonCorridorLandmark","Burner (symbolized)",,,,,TRUE
+"CG07600000","CG07600000","NonCorridorLandmark","Crane Permanent (symbolized)",,,,,TRUE
+"CG12150000","CG12150000","NonCorridorLandmark","Gas Well (symbolized)",,,,,TRUE
+"CG19600000","CG19600000","NonCorridorLandmark","Oil Well (symbolized)",,,,,TRUE
+"CG33360000","CG33360000","NonCorridorLandmark","Well Hole (Surface only)",,,,,TRUE
+"CQ01850000","CQ01850000","NonCorridorLandmark","Beacon (symbolized)",,,,,TRUE
+"FE90000110","FE90000110","ObservationPoint","Stream Survey Point",,,,,TRUE
+"KB14250000","KB14250000","OtherText","Hydrographic",,,,,TRUE
+"KC14300000","KC14300000","OtherText","Hypsographic Excluding Contour Numbers",,,,,TRUE
+"KC14300130","KC14300130","OtherText","Hypsographic Contour Numbers",,,,,TRUE
+"KC14300310","KC14300310","OtherText","Landcover",,,,,TRUE
+"KC14300320","KC14300320","OtherText","Landform",,,,,TRUE
+"KC90000000","KC90000000","OtherText","Aerial Triangulation",,,,,TRUE
+"KC90100000","KC90100000","OtherText","Transportation - Not R&R",,,,,TRUE
+"KC90200000","KC90200000","OtherText","Landmark",,,,,TRUE
+"KC91000000","KC91000000","OtherText","Generic",,,,,TRUE
+"KN00020000","KN00020000","OtherText","History Tracking",,,,,TRUE
+"FD21100000","FD21100000","PhotoCentre","PhotoCentre",,,,,TRUE
+"AG21270000",,"Pile","Pile",,,,,TRUE
+,"AG21275000","Pile","Pile",,,,,TRUE
+,,"RailLine",,,,,,
+,,"RailLine","Retired","updateHistory.retirementHistory!=","red",0.25,"3,3",FALSE
+"DE22850000","DE22850000","RailLine","Double Track",,,,,TRUE
+"DE22850110","DE22850110","RailLine","LightRailTransitDouble elevated",,,,,TRUE
+"DE22850120","DE22850120","RailLine","LightRailTransitDouble surface",,,,,TRUE
+"DE22850130","DE22850130","RailLine","LightRailTransitDouble underground",,,,,TRUE
+"DE22900000","DE22900000","RailLine","Multiple Track",,,,,TRUE
+"DE22950000","DE22950000","RailLine","Single Track",,,,,TRUE
+"DE22950001","DE22950001","RailLine","Abandoned Track","rail",,,,TRUE
+"DE22950110","DE22950110","RailLine","LightRailTransitSingle elevated",,,,,TRUE
+"DE22950120","DE22950120","RailLine","LightRailTransitSingle surface",,,,,TRUE
+"DE22950130","DE22950130","RailLine","LightRailTransitSingle underground",,,,,TRUE
+"DF28850000","DF28850000","RailLine","Spur",,,,,TRUE
+"GA23500000","GA23500000","Rapids","Rapids",,,,,TRUE
+"GA23500110","GA23500110","Rapids","Rapids",,,,,TRUE
+"DD24600000","DD24600000","RetainingWall","Retaining Wall",,,,,TRUE
+"HB06650100","HB06650100","Ridge","Ridge definite",,,,,TRUE
+"HB06650200","HB06650200","Ridge","Ridge indefinite",,,,,TRUE
+,,"RiverStream",,,"blue",0.25,,TRUE
+,,"RiverStream","Retired","updateHistory.retirementHistory!=","blue",0.25,"3,3",FALSE
+"GA24850145","GA24850145","RiverStream","River connector","riverStreamType=connector","blue",0.25,,TRUE
+"GA24850000","GA24850000","RiverStream","River Definite","riverStreamType=definite","blue",0.25,,TRUE
+"GA24850130","GA24850130","RiverStream","River dry","riverStreamType=dry","blue",0.25,"1.5,1.5",TRUE
+"GA24850140","GA24850140","RiverStream","River indefinite","riverStreamType=indefinite","black",0.25,,TRUE
+"GA24850150","GA24850150","RiverStream","River intermittent","riverStreamType=intermittent","blue",0.25,"3,1.5",TRUE
+"GA90000110","GA90000110","RiverStream","River Left Bank","riverStreamType=leftBank","blue",0.25,,TRUE
+"GA90000120","GA90000120","RiverStream","River Right Bank","riverStreamType=rightBank","blue",0.25,,TRUE
+,,"Road",,,"red",0.25,,TRUE
+,,"Road","Retired","updateHistory.retirementHistory!=","red",0.25,"3,3",FALSE
+"DA25150120","DA25150120","Road","Decommissioned","surfaceType=decommissioned","orange",0.25,"1.5,1.5",TRUE
+"DA25000110","DA25000110","Road","Loose1LaneTwoWay","surfaceType=loose,numberOfLanes=1,divided=false,underConstruction=false","orange",0.25,"3,1.5",TRUE
+"DA25000160","DA25000160","Road","Loose1LaneTwoWayUnderConstruction","surfaceType=loose,numberOfLanes=1,divided=false,underConstruction=true","orange",0.25,"3,1,2,1",TRUE
+"DA25150140","DA25150140","Road","Loose1LaneOneWay","surfaceType=loose,numberOfLanes=1,travelDirection=oneWay","?","?","?",TRUE
+"DA25000120","DA25000120","Road","Loose2LanesTwoWay","surfaceType=loose,numberOfLanes=2,divided=false,underConstruction=false","orange",0.25,,TRUE
+"DA25000170","DA25000170","Road","Loose2LanesTwoWayUnderConstruction","surfaceType=loose,numberOfLanes=2,divided=false,underConstruction=true","orange",0.25,"0.5,0.5",TRUE
+"DA25150150","DA25150150","Road","Loose2LanesOneWay","surfaceType=loose,numberOfLanes=2,travelDirection=oneWay","?","?","?",TRUE
+"DA25000130","DA25000130","Road","Loose3LanesTwoWay","surfaceType=loose,numberOfLanes=3,divided=false,underConstruction=false","?","?","?",TRUE
+"DA25000220","DA25000220","Road","Loose4LanesTwoWay","surfaceType=loose,numberOfLanes=4,divided=false,underConstruction=false","?","?","?",TRUE
+"DA25150100","DA25150100","Road","Overgrown","surfaceType=overgrown","brown",0.25,"1.5,1.5",TRUE
+"DA25100180","DA25100180","Road","Paved1LaneTwoWay","surfaceType=paved,numberOfLanes=1,divided=false,underConstruction=false","red",0.25,,TRUE
+"DA25100320","DA25100320","Road","Paved1LaneTwoWayUnderConstruction","surfaceType=paved,numberOfLanes=1,divided=false,underConstruction=true","red",0.25,"3,1.5",TRUE
+"DA25100370","DA25100370","Road","Paved1LaneOneWay","surfaceType=paved,numberOfLanes=1,travelDirection=oneWay,underConstruction=false","?","?","?",TRUE
+"DA25050180","DA25050180","Road","Paved2LanesTwoWayDivided","surfaceType=paved,numberOfLanes=2,divided=true,underConstruction=false","red",0.25,,TRUE
+"DA25050310","DA25050310","Road","Paved2LanesTwoWayDividedUnderConstruction","surfaceType=paved,numberOfLanes=2,divided=true,underConstruction=true","red",0.25,"3,1.5",TRUE
+"DA25100190","DA25100190","Road","Paved2LanesOneWay","surfaceType=paved,numberOfLanes=2,travelDirection=oneWay,underConstruction=false","brown",0.25,"3,2,0.5,2,0.5,2",TRUE
+"DA25100330","DA25100330","Road","Paved2LanesOneWayUnderConstruction","surfaceType=paved,numberOfLanes=2,travelDirection=oneWay,underConstruction=true","brown",0.25,"0.5,0.5",TRUE
+"DA25100200","DA25100200","Road","Paved3LanesTwoWay","surfaceType=paved,numberOfLanes=3,divided=false,underConstruction=false","purple",0.25,"3,1.5",TRUE
+"DA25100340","DA25100340","Road","Paved3LanesTwoWayUnderConstruction","surfaceType=paved,numberOfLanes=3,divided=false,underConstruction=true","brown",0.25,"3,1,2,1",TRUE
+"DA25100380","DA25100380","Road","Paved3LanesOneWay","surfaceType=paved,numberOfLanes=3,travelDirection=oneWay,underConstruction=false","?","?","?",TRUE
+"DA25100210","DA25100210","Road","Paved4LanesTwoWay","surfaceType=paved,numberOfLanes=4,divided=false,underConstruction=false","purple",0.25,"1.5,1.5",TRUE
+"DA25100350","DA25100350","Road","Paved4LanesTwoWayUnderConstruction","surfaceType=paved,numberOfLanes=4,divided=false,underConstruction=true","purple",0.25,"0.5,0.5",TRUE
+"DA25050190","DA25050190","Road","Paved4LanesTwoWayDivided","surfaceType=paved,numberOfLanes=4,divided=true,underConstruction=false","purple",0.25,"3,2,0.5,2,0.5,2",TRUE
+"DA25050320","DA25050320","Road","Paved4LanesTwoWayDividedUnderConstruction","surfaceType=paved,numberOfLanes=4,divided=true,underConstruction=true","purple",0.25,"3,1,2,1",TRUE
+"DA25100390","DA25100390","Road","Paved4LanesOneWay","surfaceType=paved,numberOfLanes=4,travelDirection=oneWay,underConstruction=false","?","?","?",TRUE
+"DA25100220","DA25100220","Road","Paved6LanesTwoWay","surfaceType=paved,numberOfLanes=6,divided=false,underConstruction=false","green",0.25,"1.5,1.5",TRUE
+"DA25100360","DA25100360","Road","Paved6LanesTwoWayUnderConstruction","surfaceType=paved,numberOfLanes=6,divided=false,underConstruction=true","green",0.25,"0.5,0.5",TRUE
+"DA25050200","DA25050200","Road","Paved6LanesTwoWayDivided","surfaceType=paved,numberOfLanes=6,divided=true,underConstruction=false","purple",0.25,"3,2,0.5,2,0.5,2",TRUE
+"DA25050330","DA25050330","Road","Paved6LanesTwoWayDividedUnderConstruction","surfaceType=paved,numberOfLanes=6,divided=true,underConstruction=true","green",0.25,"3,1,2,1",TRUE
+"DA25150000","DA25150000","Road","Rough","surfaceType=rough","orange",0.25,"1.5,1.5",TRUE
+"DA25200000","DA25200000","Road","Seasonal1LaneTwoWay (Winter Road)","surfaceType=seasonal","?","?","?",TRUE
+"DA24900900","DA24900900","Road","Unknown Road","surfaceType=unknown","red",0.25,,TRUE
+"HB25000100","HB25000100","RockBluff","Rock Bluff",,,,,TRUE
+"HB25400000","HB25400000","RockOutcrop","Rock Outcrop",,,,,TRUE
+"HB25400100","HB25400100","RockOutcrop","RockOutcrop (symbolized)",,,,,TRUE
+,,"SandGravelBar",,,"brown",0.25,,TRUE
+,,"SandGravelBar","Retired","updateHistory.retirementHistory!=","brown",0.25,"3,3",FALSE
+"BB01350001",,"SandGravelBar","Top of Bank","sandGravelBarType=sandGravelBar","brown",0.25,"3,3",TRUE
+"GE25850000","GE25850000","SandGravelBar","Sand/Gravel Bar","sandGravelBarType=sandGravelBar","brown",0.25,"3,3",TRUE
+"GE25850250","GE25850250","SandGravelBar","Top of Bank","sandGravelBarType=topOfBank","brown",0.25,"3,3",TRUE
+"HB26150000","HB26150000","Scree","Scree",,,,,TRUE
+"GE26250000","GE26250000","SeaWall","Sea Wall",,,,,TRUE
+"HB27550000","HB27550000","Sinkhole","Sinkhole (symbolized)",,,,,TRUE
+"CL27750000","CL27750000","SkiJump","Ski Jump",,,,,TRUE
+,,"Slide",,,"black",0.25,"3,2,.5,2,3",TRUE
+,,"Slide","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"HB27900000","HB27900000","Slide","Slide",,,,,TRUE
+"HB27900100",,"Slide","Slide Enhanced",,,,,TRUE
+,,"Snowshed",,,"black",0.25,,TRUE
+,,"Snowshed","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"DD28350000","DD28350000","Snowshed","Snowshed",,"black",0.25,,TRUE
+"HA28700000","HA28700000","SpotElevation","Spot Height",,,,,TRUE
+"HA33100000","HA33100000","SpotElevation","Water Level",,,,,TRUE
+"HB18800000","HB18800000","SpotElevation","Mountain Peak (symbolized)",,,,,TRUE
+,,"TailingArea",,,"black",0.25,"3,1.5",TRUE
+,,"TailingArea","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"AP30300000","AP30300000","TailingArea","Tailing Area",,"black",0.25,"3,1.5",TRUE
+,,"TailingPond",,,"black",0.25,,TRUE
+,,"TailingPond","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"AP90300100","AP90300100","TailingPond","Tailing Pond",,"black",0.25,,TRUE
+,,"Tank",,,"black",0.25,,TRUE
+,,"Tank","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"EA30400000","EA30400000","Tank","Tank",,"black",0.25,,TRUE
+"EA90000000","EA90000000","Tank","Tank (symbolized)",,,,,TRUE
+"KC90300000","KC90300000","Toponymy","Toponymy",,,,,TRUE
+"BF10950120","BF10950120","Tower","Fire Lookout Tower (symbolized)",,,,,TRUE
+"CC31150000","CC31150000","Tower","Unspecified Tower (symbolized)",,,,,TRUE
+"CC31150110","CC31150110","Tower","Microwave Tower (symbolized)",,,,,TRUE
+"CC90000000","CC90000000","Tower","Transmission Tower (symbolized)",,,,,TRUE
+"CG28300000","CG28300000","Tower","Smokestack/Chimney (symbolized)",,,,,TRUE
+,,"Trail",,,"brown",0.25,"1.5,1.5",TRUE
+,,"Trail","Retired","updateHistory.retirementHistory!=","brown",0.25,"3,3",FALSE
+"DD31700000","DD31700000","Trail","Trail ","trailType=","brown",0.25,"1.5,1.5",TRUE
+"DD31700120","DD31700120","Trail","Trail skid","trailType=skid","brown",0.25,"1.5,1.5",TRUE
+,,"TrimContour","Retired","updateHistory.retirementHistory!=","brown",0.25,"3,3",FALSE
+"HA90001140","HA90001140","TrimContour","Indefinite Depression Contour","indexContour=false,position.qualifier=indefinite,position.form=depression","brown",0.25,,TRUE
+"HA90001130","HA90001130","TrimContour","Intermediate Depression Contour","indexContour=false,position.form=depression","brown",0.25,,TRUE
+"HA90001110","HA90001110","TrimContour","Indefinite Intermediate Contour","indexContour=false,position.qualifier=indefinite","brown",0.25,,TRUE
+"HA90001000","HA90001000","TrimContour","Intermediate Contour","indexContour=false","brown",0.25,,TRUE
+"HA90000140","HA90000140","TrimContour","Indefinite Depression Index Contour","indexContour=true,position.form=depression,position.qualifier=indefinite","black",0.25,,TRUE
+"HA90000130","HA90000130","TrimContour","Index Depression Contour","indexContour=true,position.form=depression","black",0.25,,TRUE
+"HA90000110","HA90000110","TrimContour","Indefinite  Index Contour","indexContour=true,position.qualifier=indefinite","black",0.25,,TRUE
+"HA90000000","HA90000000","TrimContour","Index Contour","indexContour=true","black",0.25,,TRUE
+,,"TrimContour",,,"brown",0.25,,FALSE
+,,"Tunnel",,,"black",0.25,,TRUE
+,,"Tunnel","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"DD93220000","DD93220000","Tunnel","Tunnel",,"black",0.25,,TRUE
+,,"Turntable",,,"black",0.25,,TRUE
+,,"Turntable","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"DD32300000","DD32300000","Turntable","Turntable (symbolized)",,"black",0.25,,TRUE
+,,"VolcanicCrater",,,"black",0.25,"3,1.5",TRUE
+,,"VolcanicCrater","Retired","updateHistory.retirementHistory!=","black",0.25,"3,3",FALSE
+"HB07650130","HB07650130","VolcanicCrater","Volcanic Crater",,"black",0.25,"3,1.5",TRUE

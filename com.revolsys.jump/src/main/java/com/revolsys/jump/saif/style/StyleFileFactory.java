@@ -170,6 +170,7 @@ public class StyleFileFactory {
     Map<String, Color> colorMap = new HashMap<String, Color>();
     colorMap.put("red", new Color(255, 0, 0));
     colorMap.put("black", new Color(0, 0, 0));
+    colorMap.put("darkgray", new Color(169, 169, 169));
     colorMap.put("blue", new Color(0, 0, 255));
     colorMap.put("brown", new Color(165, 42, 42));
     colorMap.put("green", new Color(0, 255, 0));
