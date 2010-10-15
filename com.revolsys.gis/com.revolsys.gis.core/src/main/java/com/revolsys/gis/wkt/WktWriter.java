@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -238,7 +239,7 @@ public class WktWriter {
     int dimension = 0;
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry subGeometry = geometry.getGeometryN(i);
-      final int geometryDimension = subGeometry.getDimension();
+      final int geometryDimension = CoordinatesListUtil.get(subGeometry).getNumAxis();
       dimension = Math.max(dimension, geometryDimension);
     }
     return dimension;

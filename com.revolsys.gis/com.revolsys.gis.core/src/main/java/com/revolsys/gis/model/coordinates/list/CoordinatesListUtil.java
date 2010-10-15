@@ -13,8 +13,10 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class CoordinatesListUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -25,27 +27,14 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static final CoordinatesList parse(
-    String value,
-    String separator,
-    int numAxis) {
-    final String[] values = value.split(separator);
-    final double[] coordinates = new double[values.length];
-    for (int i = 0; i < values.length; i++) {
-      String string = values[i];
-      coordinates[i] = Double.parseDouble(string);
-    }
-    return new DoubleCoordinatesList(numAxis, coordinates);
-  }
-
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates coordinate,
     final CoordinatesList line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
+    final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
       points, 0);
-    CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
+    final CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
       points, 0);
     for (int i = 1; i < points.size(); i++) {
       currentCoordinate.next();
@@ -59,125 +48,6 @@ public class CoordinatesListUtil {
       previousCoordinate.next();
     }
 
-  }
-
-  public static boolean equals2dCoordinate(
-    final CoordinatesList coordinates,
-    final int index,
-    final double x,
-    final double y) {
-    return coordinates.getX(index) == x && coordinates.getY(index) == y;
-  }
-
-  public static boolean isCCW(
-    final CoordinatesList ring) {
-    // # of points without closing endpoint
-    final int nPts = ring.size() - 1;
-
-    // find highest point
-    double hiPtX = ring.getX(0);
-    double hiPtY = ring.getY(0);
-    int hiIndex = 0;
-    for (int i = 1; i <= nPts; i++) {
-      final double x = ring.getX(i);
-      final double y = ring.getY(i);
-      if (y > hiPtY) {
-        hiPtX = x;
-        hiPtY = y;
-        hiIndex = i;
-      }
-    }
-
-    // find distinct point before highest point
-    int iPrev = hiIndex;
-    do {
-      iPrev = iPrev - 1;
-      if (iPrev < 0) {
-        iPrev = nPts;
-      }
-    } while (equals2dCoordinate(ring, iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
-
-    // find distinct point after highest point
-    int iNext = hiIndex;
-    do {
-      iNext = (iNext + 1) % nPts;
-    } while (equals2dCoordinate(ring, iNext, hiPtX, hiPtY) && iNext != hiIndex);
-
-    /**
-     * This check catches cases where the ring contains an A-B-A configuration
-     * of points. This can happen if the ring does not contain 3 distinct points
-     * (including the case where the input array has fewer than 4 elements), or
-     * it contains coincident line segments.
-     */
-    if (equals2dCoordinate(ring, iPrev, hiPtX, hiPtY)
-      || equals2dCoordinate(ring, iNext, hiPtX, hiPtY)
-      || equals2dCoordinates(ring, iPrev, iNext)) {
-      return false;
-    }
-
-    final int disc = orientationIndex(ring, iPrev, hiIndex, iNext);
-
-    /**
-     * If disc is exactly 0, lines are collinear. There are two possible cases:
-     * (1) the lines lie along the x axis in opposite directions (2) the lines
-     * lie on top of one another (1) is handled by checking if next is left of
-     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
-     * for it (Might want to assert this)
-     */
-    boolean isCCW = false;
-    if (disc == 0) {
-      // poly is CCW if prev x is right of next x
-      isCCW = (ring.getOrdinate(iPrev, 0) > ring.getOrdinate(iPrev, 1));
-    } else {
-      // if area is positive, points are ordered CCW
-      isCCW = (disc > 0);
-    }
-    return isCCW;
-  }
-
-  public static int orientationIndex(
-    final CoordinatesList ring,
-    final int index1,
-    final int index2,
-    final int index) {
-    return orientationIndex(ring.getX(index1), ring.getY(index1),
-      ring.getX(index2), ring.getY(index2), ring.getX(index), ring.getY(index));
-  }
-
-  /**
-   * Returns the index of the direction of the point <code>q</code> relative to
-   * a vector specified by <code>p1-p2</code>.
-   * 
-   * @param p1 the origin point of the vector
-   * @param p2 the final point of the vector
-   * @param q the point to compute the direction to
-   * @return 1 if q is counter-clockwise (left) from p1-p2
-   * @return -1 if q is clockwise (right) from p1-p2
-   * @return 0 if q is collinear with p1-p2
-   */
-  public static int orientationIndex(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
-    // travelling along p1->p2, turn counter clockwise to get to q return 1,
-    // travelling along p1->p2, turn clockwise to get to q return -1,
-    // p1, p2 and q are colinear return 0.
-    final double dx1 = x2 - x1;
-    final double dy1 = y2 - y1;
-    final double dx2 = x - x2;
-    final double dy2 = y - y2;
-    return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
-  }
-
-  public static boolean equals2dCoordinates(
-    final CoordinatesList coordinates,
-    final int index1,
-    final int index2) {
-    return coordinates.getX(index1) == coordinates.getOrdinate(index2, 0)
-      && coordinates.getY(index1) == coordinates.getOrdinate(index2, 1);
   }
 
   public static int append(
@@ -274,6 +144,22 @@ public class CoordinatesListUtil {
     return coordinatesList;
   }
 
+  public static boolean equals2dCoordinate(
+    final CoordinatesList coordinates,
+    final int index,
+    final double x,
+    final double y) {
+    return coordinates.getX(index) == x && coordinates.getY(index) == y;
+  }
+
+  public static boolean equals2dCoordinates(
+    final CoordinatesList coordinates,
+    final int index1,
+    final int index2) {
+    return coordinates.getX(index1) == coordinates.getOrdinate(index2, 0)
+      && coordinates.getY(index1) == coordinates.getOrdinate(index2, 1);
+  }
+
   public static Map<String, Number> findClosestSegmentAndCoordinate(
     final CoordinatesList points,
     final Coordinates point) {
@@ -353,6 +239,24 @@ public class CoordinatesListUtil {
   }
 
   public static CoordinatesList get(
+    final Geometry geometry) {
+    if (geometry == null) {
+      return null;
+    } else if (geometry instanceof Point) {
+      return get((Point)geometry);
+    } else if (geometry instanceof LineString) {
+      return get((LineString)geometry);
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      return get(polygon);
+    } else if (geometry.getNumGeometries() > 0) {
+      return get(geometry.getGeometryN(0));
+    } else {
+      return null;
+    }
+  }
+
+  public static CoordinatesList get(
     final LineString line) {
     return get(line.getCoordinateSequence());
   }
@@ -360,6 +264,81 @@ public class CoordinatesListUtil {
   public static CoordinatesList get(
     final Point point) {
     return get(point.getCoordinateSequence());
+  }
+
+  private static CoordinatesList get(
+    final Polygon polygon) {
+    if (polygon == null) {
+      return null;
+    } else {
+      return get(polygon.getExteriorRing());
+    }
+  }
+
+  public static boolean isCCW(
+    final CoordinatesList ring) {
+    // # of points without closing endpoint
+    final int nPts = ring.size() - 1;
+
+    // find highest point
+    double hiPtX = ring.getX(0);
+    double hiPtY = ring.getY(0);
+    int hiIndex = 0;
+    for (int i = 1; i <= nPts; i++) {
+      final double x = ring.getX(i);
+      final double y = ring.getY(i);
+      if (y > hiPtY) {
+        hiPtX = x;
+        hiPtY = y;
+        hiIndex = i;
+      }
+    }
+
+    // find distinct point before highest point
+    int iPrev = hiIndex;
+    do {
+      iPrev = iPrev - 1;
+      if (iPrev < 0) {
+        iPrev = nPts;
+      }
+    } while (equals2dCoordinate(ring, iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
+
+    // find distinct point after highest point
+    int iNext = hiIndex;
+    do {
+      iNext = (iNext + 1) % nPts;
+    } while (equals2dCoordinate(ring, iNext, hiPtX, hiPtY) && iNext != hiIndex);
+
+    /**
+     * This check catches cases where the ring contains an A-B-A configuration
+     * of points. This can happen if the ring does not contain 3 distinct points
+     * (including the case where the input array has fewer than 4 elements), or
+     * it contains coincident line segments.
+     */
+    if (equals2dCoordinate(ring, iPrev, hiPtX, hiPtY)
+      || equals2dCoordinate(ring, iNext, hiPtX, hiPtY)
+      || equals2dCoordinates(ring, iPrev, iNext)) {
+      return false;
+    }
+
+    final int disc = orientationIndex(ring, iPrev, hiIndex, iNext);
+
+    /**
+     * If disc is exactly 0, lines are collinear. There are two possible cases:
+     * (1) the lines lie along the x axis in opposite directions (2) the lines
+     * lie on top of one another (1) is handled by checking if next is left of
+     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
+     * for it (Might want to assert this)
+     */
+    boolean isCCW = false;
+    if (disc == 0) {
+      // poly is CCW if prev x is right of next x
+      isCCW = (ring.getOrdinate(iPrev, 0) > ring.getOrdinate(iPrev, 1));
+    } else {
+      // if area is positive, points are ordered CCW
+      isCCW = (disc > 0);
+    }
+    return isCCW;
   }
 
   public static double length2d(
@@ -427,6 +406,56 @@ public class CoordinatesListUtil {
       }
       return coordinates;
     }
+  }
+
+  public static int orientationIndex(
+    final CoordinatesList ring,
+    final int index1,
+    final int index2,
+    final int index) {
+    return orientationIndex(ring.getX(index1), ring.getY(index1),
+      ring.getX(index2), ring.getY(index2), ring.getX(index), ring.getY(index));
+  }
+
+  /**
+   * Returns the index of the direction of the point <code>q</code> relative to
+   * a vector specified by <code>p1-p2</code>.
+   * 
+   * @param p1 the origin point of the vector
+   * @param p2 the final point of the vector
+   * @param q the point to compute the direction to
+   * @return 1 if q is counter-clockwise (left) from p1-p2
+   * @return -1 if q is clockwise (right) from p1-p2
+   * @return 0 if q is collinear with p1-p2
+   */
+  public static int orientationIndex(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2,
+    final double x,
+    final double y) {
+    // travelling along p1->p2, turn counter clockwise to get to q return 1,
+    // travelling along p1->p2, turn clockwise to get to q return -1,
+    // p1, p2 and q are colinear return 0.
+    final double dx1 = x2 - x1;
+    final double dy1 = y2 - y1;
+    final double dx2 = x - x2;
+    final double dy2 = y - y2;
+    return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
+  }
+
+  public static final CoordinatesList parse(
+    final String value,
+    final String separator,
+    final int numAxis) {
+    final String[] values = value.split(separator);
+    final double[] coordinates = new double[values.length];
+    for (int i = 0; i < values.length; i++) {
+      final String string = values[i];
+      coordinates[i] = Double.parseDouble(string);
+    }
+    return new DoubleCoordinatesList(numAxis, coordinates);
   }
 
   public static CoordinatesList subList(

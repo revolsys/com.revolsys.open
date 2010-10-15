@@ -20,6 +20,7 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,9 @@ import com.revolsys.gis.data.model.types.DataType;
  * @see DataObjectMetaData
  */
 public class Attribute implements Cloneable {
+  /** The description of the attribute. */
+  private String description;
+
   private int index;
 
   /** The maximum length of an attribute value. */
@@ -62,6 +66,7 @@ public class Attribute implements Cloneable {
   public Attribute(
     final Attribute attribute) {
     this.name = attribute.getName();
+    this.description = attribute.getDescription();
     this.type = attribute.getType();
     this.required = attribute.isRequired();
     this.length = attribute.getLength();
@@ -90,7 +95,7 @@ public class Attribute implements Cloneable {
     final String name,
     final DataType type,
     final boolean required) {
-    this(name, type, required, null);
+    this(name, type, 0, 0, required, null, null);
   }
 
   /**
@@ -184,15 +189,48 @@ public class Attribute implements Cloneable {
     final int scale,
     final boolean required,
     final Map<QName, Object> properties) {
+    this(name, type, length, scale, required, null, properties);
+
+  }
+
+  /**
+   * Construct a new attribute.
+   * 
+   * @param name The name of the attribute.
+   * @param type The data type of the attribute value.
+   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param scale The maximum number of decimal places.
+   * @param required The flag indicating if a value is required for the
+   *          attribute.
+   * @param properties The meta data properties about the attribute.
+   */
+  public Attribute(
+    final String name,
+    final DataType type,
+    final int length,
+    final int scale,
+    final boolean required,
+    final String description,
+    final Map<QName, Object> properties) {
     this.name = name;
+    this.description = description;
     this.type = type;
     this.required = required;
     this.length = length;
     this.scale = scale;
-    if (properties != null) {
+    this.description = description;
+     if (properties != null) {
       this.properties.putAll(properties);
     }
 
+  }
+
+  public Attribute(
+    String name,
+    DataType dataType,
+    boolean required,
+    String description) {
+    this(name, dataType, 0, 0, required, description, null);
   }
 
   @Override
@@ -209,6 +247,10 @@ public class Attribute implements Cloneable {
     } else {
       return false;
     }
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   public int getIndex() {
