@@ -90,7 +90,7 @@ public final class CaseConverter {
     if (words.size() == 0) {
       return "";
     } else if (words.size() == 1) {
-      return words.get(0);
+      return captialize(words.get(0));
     } else {
       final StringBuffer result = new StringBuffer();
       final Iterator<String> iter = words.iterator();

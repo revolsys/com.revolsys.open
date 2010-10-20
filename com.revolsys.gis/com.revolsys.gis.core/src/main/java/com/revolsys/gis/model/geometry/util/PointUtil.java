@@ -1,6 +1,8 @@
 package com.revolsys.gis.model.geometry.util;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.vividsolutions.jts.geom.Envelope;
@@ -11,11 +13,14 @@ public class PointUtil {
 
   public static Point getPointWithin(
     Polygon polygon) {
+    final GeometryFactory factory = GeometryFactory.getFactory(polygon);
     Point centroid = polygon.getCentroid();
     if (centroid.within(polygon)) {
-      return centroid;
+      Coordinates coordinates = CoordinatesUtil.get(centroid);
+      CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
+        coordinates.getX(), coordinates.getY());
+      return factory.createPoint(coordinatesList);
     } else {
-      final GeometryFactory factory = GeometryFactory.getFactory(polygon);
       final Envelope envelope = polygon.getEnvelopeInternal();
       Point point = createRandomPoint(factory, envelope);
       int i = 1;

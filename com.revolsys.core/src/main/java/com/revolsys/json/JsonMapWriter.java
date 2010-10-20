@@ -15,6 +15,8 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   boolean written = false;
 
+  private boolean singleObject;
+
   public JsonMapWriter(
     final Writer out) {
     this.out = new PrintWriter(out);
@@ -26,7 +28,10 @@ public class JsonMapWriter extends AbstractMapWriter {
       this.out.print(callback);
       this.out.print('(');
     }
-    this.out.print("{\"items\": [\n");
+    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!singleObject) {
+      this.out.print("{\"items\": [\n");
+    }
     written = true;
   }
 
@@ -36,7 +41,9 @@ public class JsonMapWriter extends AbstractMapWriter {
   public void close() {
     if (out != null) {
       try {
-        out.print("\n]}\n");
+        if (!singleObject) {
+          out.print("\n]}\n");
+        }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
           out.print(");\n");

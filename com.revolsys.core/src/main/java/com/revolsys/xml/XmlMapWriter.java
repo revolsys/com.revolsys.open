@@ -20,6 +20,8 @@ public class XmlMapWriter extends AbstractMapWriter {
 
   private boolean opened;
 
+  private boolean singleObject;
+
   public XmlMapWriter(
     final Writer out) {
     this.out = new XmlWriter(out);
@@ -42,7 +44,9 @@ public class XmlMapWriter extends AbstractMapWriter {
     if (out != null) {
       try {
         if (opened) {
-          out.endTag();
+          if (!singleObject) {
+            out.endTag();
+          }
           out.endDocument();
         }
       } finally {
@@ -77,17 +81,20 @@ public class XmlMapWriter extends AbstractMapWriter {
     for (final Entry<String, ? extends Object> field : values.entrySet()) {
       final Object key = field.getKey();
       final Object value = field.getValue();
-      out.startTag(new QName(key.toString()));
+      final QName tagName = new QName(key.toString());
       if (value instanceof Map) {
-        Map map = (Map)value;
+        Map<String, ?> map = (Map<String, ?>)value;
+        out.startTag(tagName);
         map(map);
+        out.endTag();
       } else if (value instanceof List) {
-        List list = (List)value;
+        List<?> list = (List<?>)value;
+        out.startTag(tagName);
         list(list);
+        out.endTag();
       } else {
-        out.text(value);
+        out.nillableElement(tagName, value);
       }
-      out.endTag();
     }
     out.endTag();
   }
@@ -96,10 +103,10 @@ public class XmlMapWriter extends AbstractMapWriter {
     List<? extends Object> list) {
     for (Object value : list) {
       if (value instanceof Map) {
-        Map map = (Map)value;
+        Map<String, ?> map = (Map<String, ?>)value;
         map(map);
       } else if (value instanceof List) {
-        List subList = (List)value;
+        List<?> subList = (List<?>)value;
         list(subList);
       } else {
         out.startTag(new QName("item"));
@@ -111,6 +118,9 @@ public class XmlMapWriter extends AbstractMapWriter {
 
   private void writeHeader() {
     out.startDocument("UTF-8", "1.0");
-    out.startTag(new QName("items"));
+    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!singleObject) {
+      out.startTag(new QName("items"));
+    }
   }
 }

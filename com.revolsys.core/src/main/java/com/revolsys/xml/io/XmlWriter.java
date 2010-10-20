@@ -30,6 +30,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.xml.XsiConstants;
+
 /**
  * <p>
  * The XmlWriter class is a subclass of {@link Writer} that provides additional
@@ -541,17 +543,22 @@ public class XmlWriter extends Writer {
   }
 
   /**
-   * Write the element with the specified content.
+   * Write the element with the specified content, if null xsi:nil attribute
+   * will be set.
    * 
    * @param element The QName of the tag.
    * @param content The body context for the element.
    * @throws IOException If there was a problem writing the element.
    */
-  public void element(
+  public void nillableElement(
     final QName element,
-    final String content) {
+    final Object content) {
     startTag(element);
-    text(content);
+    if (content == null) {
+attribute(XsiConstants.NIL  , "true");
+    } else {
+      text(content.toString());
+    }
     endTag(element);
   }
 
@@ -921,17 +928,20 @@ public class XmlWriter extends Writer {
     writeName(element);
     elementHasContent = false;
   }
+
   /**
    * Write the start tag for an element.
    * 
    * @param namespaceUri The namespace URI.
-  * @param localPart The local name.
+   * @param localPart The local name.
    * @throws IOException If there was a problem writing the element.
    */
   public void startTag(
-    final String namespaceUri, final String localPart) {
-    startTag(new QName(namespaceUri,localPart));
+    final String namespaceUri,
+    final String localPart) {
+    startTag(new QName(namespaceUri, localPart));
   }
+
   /**
    * Write the boolean value as the content of a tag with special characters
    * escaped.

@@ -102,7 +102,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
           }
           writer.startTag(Kml22Constants.DATA);
           writer.attribute(Kml22Constants.NAME, name);
-          writer.text(value);
+          writer.nillableElement(Kml22Constants.VALUE, value);
           writer.endTag(Kml22Constants.DATA);
         }
       }

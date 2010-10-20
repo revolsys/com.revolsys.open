@@ -49,7 +49,8 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
     final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
       body, charset));
     writer.setProperty(IoConstants.INDENT_PROPERTY, true);
-    final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+      final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     final String callback = (String)requestAttributes.getAttribute("jsonp",
       RequestAttributes.SCOPE_REQUEST);
     if (callback != null) {
