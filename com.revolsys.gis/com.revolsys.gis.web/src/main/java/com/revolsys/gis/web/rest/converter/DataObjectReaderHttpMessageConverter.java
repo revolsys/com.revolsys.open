@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -163,8 +165,11 @@ public class DataObjectReaderHttpMessageConverter extends
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }
-        final String callback = (String)requestAttributes.getAttribute("jsonp",
-          RequestAttributes.SCOPE_REQUEST);
+        HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+        String callback = request.getParameter("jsonp");
+        if (callback == null) {
+          callback = request.getParameter("callback");
+        }
         if (callback != null) {
           writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
         }

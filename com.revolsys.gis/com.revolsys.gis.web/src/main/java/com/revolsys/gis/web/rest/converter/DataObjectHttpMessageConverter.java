@@ -7,6 +7,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -17,9 +19,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectWriterFactory;
 import com.revolsys.gis.data.io.Reader;
@@ -181,6 +181,14 @@ public class DataObjectHttpMessageConverter extends
           }
         }
         writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+        HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+        String callback = request.getParameter("jsonp");
+        if (callback == null) {
+          callback = request.getParameter("callback");
+        }
+        if (callback != null) {
+          writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
+        }
         writer.write(dataObject);
         writer.close();
       }

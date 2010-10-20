@@ -17,6 +17,7 @@ package com.revolsys.ui.html.view;
 
 
 import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.xml.io.XmlWriter;
 
 public class PathBreadcrumbView extends Element {
@@ -69,12 +70,12 @@ public class PathBreadcrumbView extends Element {
         String segment = segments[i];
         crumbPath += "/" + segment;
         out.startTag(HtmlUtil.LI);
-        HtmlUtil.serializeA(out, null, crumbPath, segment);
+        HtmlUtil.serializeA(out, null, crumbPath, CaseConverter.toCapitalizedWords(segment));
         out.endTag(HtmlUtil.LI);
       }
       String segment = segments[segments.length - 1];
       out.startTag(HtmlUtil.LI);
-      out.text(segment);
+      out.text(CaseConverter.toCapitalizedWords(segment));
       out.endTag(HtmlUtil.LI);
     }
 

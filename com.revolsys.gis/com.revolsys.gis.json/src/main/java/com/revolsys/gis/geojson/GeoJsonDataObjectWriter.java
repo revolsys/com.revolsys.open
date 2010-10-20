@@ -19,12 +19,15 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> implements GeoJsonConstants {
+public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
+  implements GeoJsonConstants {
 
   boolean initialized = false;
 
   /** The writer */
   private JsonWriter out;
+
+  private boolean singleObject;
 
   public GeoJsonDataObjectWriter(
     final Writer out) {
@@ -253,7 +256,9 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> implemen
     }
     out.startObject();
     type(FEATURE);
-
+    if (singleObject) {
+      writeSrid();
+    }
     final DataObjectMetaData metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
     if (geometryIndex != -1) {
@@ -288,8 +293,10 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> implemen
   }
 
   private void writeFooter() {
-    out.endList();
-    out.endObject();
+    if (!singleObject) {
+      out.endList();
+      out.endObject();
+    }
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
       out.print(");");
@@ -302,8 +309,18 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> implemen
       out.print(callback);
       out.print('(');
     }
-    out.startObject();
-    type(FEATURE_COLLECTION);
+    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!singleObject) {
+      out.startObject();
+      type(FEATURE_COLLECTION);
+      writeSrid();
+      out.endAttribute();
+      out.label(FEATURES);
+      out.startList();
+    }
+  }
+
+  private void writeSrid() {
     final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (geometryFactory != null) {
       int srid = geometryFactory.getSRID();
@@ -312,8 +329,5 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject> implemen
         srid(srid);
       }
     }
-    out.endAttribute();
-    out.label(FEATURES);
-    out.startList();
   }
 }

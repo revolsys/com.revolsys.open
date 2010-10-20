@@ -302,7 +302,8 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
         sqlBuffer.append(idAttributeName);
         sqlBuffer.append(" = ?");
 
-        typeLoadSql.put(typeName, sqlBuffer.toString());
+        sql = sqlBuffer.toString();
+        typeLoadSql.put(typeName, sql);
       }
     }
     return sql;
