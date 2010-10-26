@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +13,12 @@ public class ListDataObjectReader extends AbstractReader<DataObject> implements
   private DataObjectMetaData metaData;
 
   private List<DataObject> objects = new ArrayList<DataObject>();
+
+  public ListDataObjectReader(
+    final DataObjectMetaData metaData,
+    final DataObject... objects) {
+    this(metaData, Arrays.asList(objects));
+  }
 
   public ListDataObjectReader(
     final DataObjectMetaData metaData,

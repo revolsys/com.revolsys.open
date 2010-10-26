@@ -83,4 +83,13 @@ public interface Kml22Constants {
   QName WEST = new QName(KML_NS_URI, "west");
 
   QName OPEN = new QName(KML_NS_URI, "open");
+
+  String PLACEMARK_DESCRIPTION_PROPERTY = "java:"
+    + Kml22Constants.class.getName() + ".PlacemarkDescription";
+
+  String DOCUMENT_DESCRIPTION_PROPERTY = "java:"
+    + Kml22Constants.class.getName() + ".DocumentDescription";
+
+  String DOCUMENT_NAME_PROPERTY = "java:" + Kml22Constants.class.getName()
+    + ".DocumentName";
 }

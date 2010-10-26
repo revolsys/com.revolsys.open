@@ -42,9 +42,10 @@ public class DataObjectReaderHttpMessageConverter extends
 
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-  private List<String> requestAttributeNames = Arrays.asList(IoConstants.SINGLE_OBJECT_PROPERTY,
-    IoConstants.STYLE_URL_PROPERTY, IoConstants.JSONP_PROPERTY,
-    IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
+  private List<String> requestAttributeNames = Arrays.asList(
+    IoConstants.SINGLE_OBJECT_PROPERTY, IoConstants.STYLE_URL_PROPERTY,
+    IoConstants.JSONP_PROPERTY, IoConstants.TITLE_PROPERTY,
+    IoConstants.DESCRIPTION_PROPERTY);
 
   public List<String> getRequestAttributeNames() {
     return requestAttributeNames;
@@ -173,13 +174,15 @@ public class DataObjectReaderHttpMessageConverter extends
         if (callback != null) {
           writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
         }
-        for (final String attributeName : requestAttributeNames) {
+        for (final String attributeName : requestAttributes.getAttributeNames(RequestAttributes.SCOPE_REQUEST)) {
           final Object value = requestAttributes.getAttribute(attributeName,
             RequestAttributes.SCOPE_REQUEST);
-          if (value != null) {
+          if (value != null && attributeName.startsWith("java:")
+            || requestAttributeNames.contains(attributeName)) {
             writer.setProperty(attributeName, value);
           }
         }
+
         final Iterator<DataObject> iterator = reader.iterator();
         if (iterator.hasNext()) {
           DataObject dataObject = iterator.next();

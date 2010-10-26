@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.xml.io.XmlWriter;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -113,9 +114,23 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         } else if (geoGraphicsGeom instanceof Polygon) {
           final Polygon polygon = (Polygon)geoGraphicsGeom;
           writePolygon(polygon);
+        } else if (geoGraphicsGeom instanceof GeometryCollection) {
+          final GeometryCollection collection = (GeometryCollection)geoGraphicsGeom;
+          writeMultiGeometry(collection);
         }
       }
     }
+  }
+
+  private void writeMultiGeometry(
+    GeometryCollection collection) {
+    startTag(MULTI_GEOMETRY);
+    for (int i = 0; i < collection.getNumGeometries(); i++) {
+      Geometry geometry = collection.getGeometryN(i);
+      writeGeometry(geometry);
+    }
+    endTag(MULTI_GEOMETRY);
+
   }
 
   public void writeLatLonBox(

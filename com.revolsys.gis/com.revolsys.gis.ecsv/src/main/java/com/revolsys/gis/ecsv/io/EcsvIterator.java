@@ -19,9 +19,7 @@ import javax.xml.namespace.QName;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -29,11 +27,11 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.ecsv.io.type.EcsvGeometryFieldType;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
 
 public class EcsvIterator extends AbstractObjectWithProperties implements
   DataObjectIterator {
@@ -54,8 +52,7 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
   /** An empty geometry. */
   private final Geometry emptyGeometry;
 
-  /** A reader for WKT Geometry. */
-  private final WKTReader geometryReader;
+  private final EcsvGeometryFieldType geometryFieldType;
 
   /** Flag indicating if there are more records to be read. */
   private boolean hasNext = true;
@@ -93,7 +90,7 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
       geomFactory = GeometryFactory.getFactory(sridNum);
       setProperty(IoConstants.GEOMETRY_FACTORY, geomFactory);
     }
-    geometryReader = new WKTReader(geomFactory);
+    geometryFieldType = new EcsvGeometryFieldType(geomFactory);
     emptyGeometry = geomFactory.createPoint((Coordinate)null);
     if (hasNext) {
       readNextObject();
@@ -357,12 +354,7 @@ public class EcsvIterator extends AbstractObjectWithProperties implements
       } else if (type == DataTypes.DECIMAL) {
         value = new BigDecimal(string);
       } else if (Geometry.class.isAssignableFrom(type.getJavaClass())) {
-        try {
-          value = geometryReader.read(string);
-        } catch (final com.vividsolutions.jts.io.ParseException e) {
-          throw new IllegalArgumentException(string
-            + " is not a valid GEOMETRY");
-        }
+        value = geometryFieldType.parseValue(string);
       } else if (type == DataTypes.LIST) {
         if (string != null) {
           try {

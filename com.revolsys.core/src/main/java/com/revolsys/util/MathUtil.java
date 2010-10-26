@@ -538,6 +538,15 @@ public final class MathUtil {
     return doubles;
   }
 
+  public static double[] toDoubleArray(
+    final String[] values) {
+    final double[] doubles = new double[values.length];
+    for (int i = 0; i < doubles.length; i++) {
+      doubles[i] = Double.valueOf(values[i]);
+    }
+    return doubles;
+  }
+
   /**
    * Construct a new MathUtil.
    */

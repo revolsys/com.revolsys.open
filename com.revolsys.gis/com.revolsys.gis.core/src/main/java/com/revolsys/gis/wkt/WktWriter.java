@@ -226,7 +226,7 @@ public class WktWriter {
       write(out, coordinates, 0, dimension);
       for (int i = 1; i < multiPoint.getNumGeometries(); i++) {
         out.print(',');
-        point = (Point)multiPoint.getGeometryN(0);
+        point = (Point)multiPoint.getGeometryN(i);
         coordinates = point.getCoordinateSequence();
         write(out, coordinates, 0, dimension);
       }
@@ -270,7 +270,7 @@ public class WktWriter {
       write(out, coordinates, 0, dimension);
       for (int i = 1; i < multiLineString.getNumGeometries(); i++) {
         out.print(',');
-        line = (LineString)multiLineString.getGeometryN(0);
+        line = (LineString)multiLineString.getGeometryN(i);
         coordinates = line.getCoordinateSequence();
         write(out, coordinates, 0, dimension);
       }
@@ -302,7 +302,7 @@ public class WktWriter {
       writePolygon(out, polygon, dimension);
       for (int i = 1; i < multiPolygon.getNumGeometries(); i++) {
         out.print(',');
-        polygon = (Polygon)multiPolygon.getGeometryN(0);
+        polygon = (Polygon)multiPolygon.getGeometryN(i);
         writePolygon(out, polygon, dimension);
       }
       out.print(')');
@@ -333,7 +333,7 @@ public class WktWriter {
       write(out, geometry, dimension);
       for (int i = 1; i < multiGeometry.getNumGeometries(); i++) {
         out.print(',');
-        geometry = multiGeometry.getGeometryN(0);
+        geometry = multiGeometry.getGeometryN(i);
         write(out, geometry, dimension);
       }
       out.print(')');

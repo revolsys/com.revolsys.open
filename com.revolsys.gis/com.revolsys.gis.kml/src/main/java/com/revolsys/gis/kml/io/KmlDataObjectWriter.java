@@ -41,6 +41,14 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
     writer.startTag(Kml22Constants.KML);
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
       writer.startTag(Kml22Constants.DOCUMENT);
+      String name = getProperty(Kml22Constants.DOCUMENT_NAME_PROPERTY);
+      if (name != null) {
+        writer.element(Kml22Constants.NAME, name);
+      }
+      String description = getProperty(Kml22Constants.DOCUMENT_DESCRIPTION_PROPERTY);
+      if (description != null) {
+        writer.element(Kml22Constants.DESCRIPTION, description);
+      }
       writer.element(Kml22Constants.OPEN, 1);
     }
   }
@@ -80,7 +88,10 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
       final String localName = name.getLocalPart();
       writer.element(Kml22Constants.NAME, localName + " " + id);
     }
-    String description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
+    String description = getProperty(Kml22Constants.PLACEMARK_DESCRIPTION_PROPERTY);
+    if (description == null) {
+      description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
+    }
     if (description != null) {
       writer.startTag(Kml22Constants.DESCRIPTION);
       writer.cdata(description);

@@ -65,6 +65,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
         final int srid = Integer.parseInt(srsName.substring("urn:ogc:def:crs:EPSG:6.6:".length()));
         final GeometryFactory factory = GeometryFactory.getFactory(srid);
         return factory;
+      } else if (srsName.startsWith("EPSG:")) {
+        final int srid = Integer.parseInt(srsName.substring("EPSG:".length()));
+        final GeometryFactory factory = GeometryFactory.getFactory(srid);
+        return factory;
       } else {
         return geometryFactory;
       }
@@ -89,6 +93,28 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   }
 
+  private CoordinatesList readCoordinates()
+    throws XMLStreamException {
+    String decimal = in.getAttributeValue(null, "decimal");
+    if (decimal == null) {
+      decimal = ".";
+    }
+    String coordSeperator = in.getAttributeValue(null, "coordSeperator");
+    if (coordSeperator == null) {
+      coordSeperator = ",";
+    }
+    String toupleSeperator = in.getAttributeValue(null, "toupleSeperator");
+    if (toupleSeperator == null) {
+      toupleSeperator = " ";
+    }
+    final String value = in.getElementText();
+
+    final CoordinatesList points = CoordinatesListUtil.parse(value, decimal,
+      coordSeperator, toupleSeperator);
+    StaxUtils.skipToEndElement(in);
+    return points;
+  }
+
   private Geometry readGeometry(
     final GeometryFactory geometryFactory)
     throws XMLStreamException {
@@ -101,10 +127,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
       return readPolygon(geometryFactory);
     } else if (typeName.equals(MULTI_POINT)) {
       return readMultiPoint(geometryFactory);
-    } else if (typeName.equals(MULTI_CURVE)) {
-      return readMultiCurve(geometryFactory);
-    } else if (typeName.equals(MULTI_SURFACE)) {
-      return readMultiSurface(geometryFactory);
+    } else if (typeName.equals(MULTI_LINE_STRING)) {
+      return readMultiLineString(geometryFactory);
+    } else if (typeName.equals(MULTI_POLYGON)) {
+      return readMultiPolygon(geometryFactory);
     } else if (typeName.equals(MULTI_GEOMETRY)) {
       return readMultiGeometry(geometryFactory);
     } else {
@@ -120,6 +146,11 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     if (StaxUtils.skipToChildStartElements(in, POS_LIST)) {
       points = readPosList();
       StaxUtils.skipToEndElement(in, LINEAR_RING);
+    } else if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
+      points = readCoordinates();
+      StaxUtils.skipToEndElement(in, LINEAR_RING);
+    } else {
+      StaxUtils.skipToEndElement(in, LINEAR_RING);
     }
     return factory.createLinearRing(points);
   }
@@ -132,11 +163,25 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     if (StaxUtils.skipToChildStartElements(in, POS_LIST)) {
       points = readPosList();
       StaxUtils.skipToEndElement(in, LINE_STRING);
+    } else if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
+      points = readCoordinates();
+      StaxUtils.skipToEndElement(in, LINE_STRING);
+    } else {
+      StaxUtils.skipToEndElement(in, LINE_STRING);
     }
     return factory.createLineString(points);
   }
 
-  private MultiLineString readMultiCurve(
+  private Geometry readMultiGeometry(
+    final GeometryFactory geometryFactory)
+    throws XMLStreamException {
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final List<Geometry> geometries = new ArrayList<Geometry>();
+    StaxUtils.skipSubTree(in);
+    return factory.createGeometry(geometries);
+  }
+
+  private MultiLineString readMultiLineString(
     final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
@@ -147,17 +192,8 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
         lines.add(line);
       }
     }
-    StaxUtils.skipToEndElement(in, MULTI_CURVE);
+    StaxUtils.skipToEndElement(in, MULTI_LINE_STRING);
     return factory.createMultiLineString(lines);
-  }
-
-  private Geometry readMultiGeometry(
-    final GeometryFactory geometryFactory)
-    throws XMLStreamException {
-    final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    final List<Geometry> geometries = new ArrayList<Geometry>();
-    StaxUtils.skipSubTree(in);
-    return factory.createGeometry(geometries);
   }
 
   private MultiPoint readMultiPoint(
@@ -175,7 +211,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return factory.createMultiPoint(points);
   }
 
-  private MultiPolygon readMultiSurface(
+  private MultiPolygon readMultiPolygon(
     final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
@@ -186,7 +222,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
         polygons.add(polygon);
       }
     }
-    StaxUtils.skipToEndElement(in, MULTI_SURFACE);
+    StaxUtils.skipToEndElement(in, MULTI_POLYGON);
     return factory.createMultiPolygon(polygons);
   }
 
@@ -197,6 +233,11 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     CoordinatesList points = null;
     if (StaxUtils.skipToChildStartElements(in, POS)) {
       points = readPosList();
+      StaxUtils.skipToEndElement(in, POINT);
+    } else if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
+      points = readCoordinates();
+      StaxUtils.skipToEndElement(in, POINT);
+    } else {
       StaxUtils.skipToEndElement(in, POINT);
     }
     return factory.createPoint(points);

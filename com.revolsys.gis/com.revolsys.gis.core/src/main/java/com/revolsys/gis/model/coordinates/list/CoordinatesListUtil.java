@@ -1,9 +1,13 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.xml.sax.SAXException;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
@@ -507,5 +511,53 @@ public class CoordinatesListUtil {
     } else {
       return coordinates.subList(0, length);
     }
+  }
+
+  public static CoordinatesList parse(
+    String value,
+    String decimal,
+    String coordSeperator,
+    String toupleSeperator) {
+
+    toupleSeperator = toupleSeperator.replaceAll("\\", "\\\\");
+    toupleSeperator = toupleSeperator.replaceAll("\\.", "\\\\.");
+    Pattern touplePattern = Pattern.compile("\\s*" + toupleSeperator + "\\s*");
+    String[] touples = touplePattern.split(value);
+
+    coordSeperator = coordSeperator.replaceAll("\\", "\\\\");
+    coordSeperator = coordSeperator.replaceAll("\\.", "\\\\.");
+    Pattern coordinatePattern = Pattern.compile("\\s*" + coordSeperator
+      + "\\s*");
+
+    int numAxis = 0;
+    List<double[]> listOfCoordinateArrays = new ArrayList<double[]>();
+    if (touples.length == 0) {
+      return null;
+    } else {
+      for (String touple : touples) {
+        final String[] values = coordinatePattern.split(touple);
+        if (values.length > 0) {
+          double[] coordinates = MathUtil.toDoubleArray(values);
+          numAxis  =Math.max(numAxis, coordinates.length);
+          listOfCoordinateArrays.add(coordinates);
+        }
+      }
+    }
+    
+
+    return toCoordinateList(numAxis,listOfCoordinateArrays);
+  }
+
+  public static CoordinatesList toCoordinateList(
+    int numAxis, List<double[]> listOfCoordinateArrays) {
+    CoordinatesList points = new DoubleCoordinatesList(listOfCoordinateArrays.size(), numAxis);
+    for (int i = 0; i < listOfCoordinateArrays.size(); i++) {
+      double[]coordinates = listOfCoordinateArrays.get(i);
+      for (int j = 0; j < coordinates.length; j++) {
+        double value = coordinates[j];
+        points.setValue(i, i, value);
+      }
+    }
+    return points;
   }
 }

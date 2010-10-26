@@ -110,6 +110,11 @@ public class GeometryFactory extends
     return toMultiPolygon(geometryFactory, polygons);
   }
 
+  public static MultiPolygon toMultiPolygon(
+    final Polygon... polygons) {
+    return toMultiPolygon(Arrays.asList(polygons));
+  }
+
   public static Point[] toPointArray(
     final GeometryFactory factory,
     final List<?> points) {

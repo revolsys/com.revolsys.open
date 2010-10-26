@@ -22,11 +22,10 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.wkt.WktWriter;
+import com.revolsys.gis.ecsv.io.type.EcsvGeometryFieldType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTWriter;
 
 public class EcsvWriter extends AbstractWriter<DataObject> {
   private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
@@ -41,7 +40,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
   private final SimpleDateFormat dateFormat = new SimpleDateFormat(
     "yyyy-MM-dd'T'HH:mm:ss");
 
-  private final WKTWriter geometryWriter = new WKTWriter(3);
+  private final EcsvGeometryFieldType geometryFieldType = new EcsvGeometryFieldType();
 
   private final DataObjectMetaData metaData;
 
@@ -186,7 +185,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
       } else if (value instanceof Geometry) {
         final Geometry geometry = (Geometry)value;
         out.write('"');
-        WktWriter.write(out, geometry);
+        geometryFieldType.write(out, geometry);
         out.write('"');
       } else if (value instanceof String) {
         final String string = (String)value;
@@ -243,7 +242,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
         final String defaultPrefix = "com.revolsys.io.";
         if (name.startsWith(defaultPrefix)) {
           writeFileProperty(name.substring(defaultPrefix.length()), value);
-        } else {
+        } else if (!name.startsWith("java:")) {
           writeFileProperty(name, value);
         }
       }
