@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.ecsv.io.EcsvWriter;
+import com.revolsys.gis.ecsv.io.EcsvDataObjectWriter;
 import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.FeatureSchemaClassDefinition;
 import com.vividsolutions.jump.feature.Feature;
@@ -27,7 +27,7 @@ public class EcsvJumpWriter implements JUMPWriter {
 
     DataObjectMetaData type = new FeatureSchemaClassDefinition(
       featureCollection.getFeatureSchema(), fileName);
-    EcsvWriter writer = new EcsvWriter(type, out);
+    EcsvDataObjectWriter writer = new EcsvDataObjectWriter(type, out);
     
     List<Feature> features = featureCollection.getFeatures();
     for (Feature feature : features) {

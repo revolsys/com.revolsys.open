@@ -50,7 +50,7 @@ public class EcsvIoFactory extends
     DataObjectMetaData metaData,
     OutputStream outputStream,
     Charset charset) {
-    return new EcsvWriter(metaData, new OutputStreamWriter(outputStream,
+    return new EcsvDataObjectWriter(metaData, new OutputStreamWriter(outputStream,
       charset));
   }
 }

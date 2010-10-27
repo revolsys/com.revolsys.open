@@ -26,11 +26,11 @@ public class EcsvMultipleWriter extends AbstractMultipleWriter {
   protected Writer<DataObject> createWriter(
     final DataObjectMetaData metaData) {
     try {
-      EcsvWriter writer;
+      EcsvDataObjectWriter writer;
       final File file = new File(directory, metaData.getName().getLocalPart()
         + "." + EcsvConstants.FILE_EXTENSION);
       final FileOutputStream out = new FileOutputStream(file);
-      writer = new EcsvWriter(metaData, new OutputStreamWriter(out, EcsvConstants.CHARACTER_SET));
+      writer = new EcsvDataObjectWriter(metaData, new OutputStreamWriter(out, EcsvConstants.CHARACTER_SET));
       return writer;
     } catch (final IOException e) {
       throw new IllegalArgumentException(e.getMessage(), e);

@@ -1,7 +1,6 @@
 package com.revolsys.gis.ecsv.io;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -27,7 +26,7 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class EcsvWriter extends AbstractWriter<DataObject> {
+public class EcsvDataObjectWriter extends AbstractWriter<DataObject> {
   private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
     "#.#########################");
 
@@ -48,7 +47,7 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
 
   private final PrintWriter out;
 
-  public EcsvWriter(
+  public EcsvDataObjectWriter(
     final DataObjectMetaData metaData,
     final java.io.Writer out) {
     this.metaData = metaData;
@@ -75,9 +74,8 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
     out.flush();
   }
 
-  private void newLine()
-    throws IOException {
-    out.write('\n');
+  private void newLine() {
+    out.print('\n');
   }
 
   @Override
@@ -92,83 +90,71 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
       writeFileProperties();
       writeAttributeHeaders();
     }
-    try {
-      final int attributeCount = metaData.getAttributeCount();
-      for (int i = 0; i < attributeCount; i++) {
-        final Object value = object.getValue(i);
-        writeField(value);
-        if (i < attributeCount - 1) {
-          out.write(',');
-        }
+    final int attributeCount = metaData.getAttributeCount();
+    for (int i = 0; i < attributeCount; i++) {
+      final Object value = object.getValue(i);
+      writeField(value);
+      if (i < attributeCount - 1) {
+        out.print(',');
       }
-      newLine();
-    } catch (final IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
-
+    newLine();
   }
 
   private void writeAttributeHeaders() {
-    try {
-      final int numAttributes = metaData.getAttributeCount();
-      for (int i = 0; i < numAttributes; i++) {
-        final String name = metaData.getAttributeName(i);
-        writeField(name);
-        if (i < numAttributes - 1) {
-          out.write(',');
-        }
+    final int numAttributes = metaData.getAttributeCount();
+    for (int i = 0; i < numAttributes; i++) {
+      final String name = metaData.getAttributeName(i);
+      writeField(name);
+      if (i < numAttributes - 1) {
+        out.print(',');
       }
-      newLine();
-      for (int i = 0; i < numAttributes; i++) {
-        final DataType type = metaData.getAttributeType(i);
-        writeField(type.getName());
-        if (i < numAttributes - 1) {
-          out.write(',');
-        }
-      }
-      newLine();
-      for (int i = 0; i < numAttributes; i++) {
-        final Integer length = metaData.getAttributeLength(i);
-        writeField(length);
-        if (i < numAttributes - 1) {
-          out.write(',');
-        }
-      }
-      newLine();
-      for (int i = 0; i < numAttributes; i++) {
-        final Integer scale = metaData.getAttributeScale(i);
-        writeField(scale);
-        if (i < numAttributes - 1) {
-          out.write(',');
-        }
-      }
-      newLine();
-      for (int i = 0; i < numAttributes; i++) {
-        final Boolean required = metaData.isAttributeRequired(i);
-        writeField(required);
-        if (i < numAttributes - 1) {
-          out.write(',');
-        }
-      }
-      newLine();
-      newLine();
-    } catch (final IOException e) {
-      e.printStackTrace();
     }
+    newLine();
+    for (int i = 0; i < numAttributes; i++) {
+      final DataType type = metaData.getAttributeType(i);
+      writeField(type.getName());
+      if (i < numAttributes - 1) {
+        out.print(',');
+      }
+    }
+    newLine();
+    for (int i = 0; i < numAttributes; i++) {
+      final Integer length = metaData.getAttributeLength(i);
+      writeField(length);
+      if (i < numAttributes - 1) {
+        out.print(',');
+      }
+    }
+    newLine();
+    for (int i = 0; i < numAttributes; i++) {
+      final Integer scale = metaData.getAttributeScale(i);
+      writeField(scale);
+      if (i < numAttributes - 1) {
+        out.print(',');
+      }
+    }
+    newLine();
+    for (int i = 0; i < numAttributes; i++) {
+      final Boolean required = metaData.isAttributeRequired(i);
+      writeField(required);
+      if (i < numAttributes - 1) {
+        out.print(',');
+      }
+    }
+    newLine();
+    newLine();
   }
 
   private void writeField(
-    final Object value)
-    throws IOException {
+    final Object value) {
     writeField(value, "\"");
   }
 
   @SuppressWarnings("unchecked")
   private void writeField(
     final Object value,
-    final String wrapChars)
-    throws IOException {
+    final String wrapChars) {
     if (value != null) {
       if (value instanceof Collection) {
         final Collection<Object> collection = (Collection<Object>)value;
@@ -203,16 +189,14 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
   }
 
   private void writeField(
-    final String value)
-    throws IOException {
+    final String value) {
     final String wrapChars = "\"";
     writeField(value, wrapChars);
   }
 
   private void writeField(
     final String value,
-    final String wrapChars)
-    throws IOException {
+    final String wrapChars) {
     if (value != null) {
       if (value.length() == 0) {
         out.write(wrapChars);
@@ -235,29 +219,24 @@ public class EcsvWriter extends AbstractWriter<DataObject> {
   }
 
   private void writeFileProperties() {
-    try {
-      for (final Entry<String, Object> property : getProperties().entrySet()) {
-        final String name = property.getKey();
-        final Object value = property.getValue();
-        final String defaultPrefix = "com.revolsys.io.";
-        if (name.startsWith(defaultPrefix)) {
-          writeFileProperty(name.substring(defaultPrefix.length()), value);
-        } else if (!name.startsWith("java:")) {
-          writeFileProperty(name, value);
-        }
+    for (final Entry<String, Object> property : getProperties().entrySet()) {
+      final String name = property.getKey();
+      final Object value = property.getValue();
+      final String defaultPrefix = "com.revolsys.io.";
+      if (name.startsWith(defaultPrefix)) {
+        writeFileProperty(name.substring(defaultPrefix.length()), value);
+      } else if (!name.startsWith("java:")) {
+        writeFileProperty(name, value);
       }
-      writeFileProperty(EcsvConstants.ATTRIBUTE_HEADER_TYPES,
-        attributeHeaderTypes);
-      newLine();
-    } catch (final IOException e) {
-      e.printStackTrace();
     }
+    writeFileProperty(EcsvConstants.ATTRIBUTE_HEADER_TYPES,
+      attributeHeaderTypes);
+    newLine();
   }
 
   private void writeFileProperty(
     final String name,
-    final Object value)
-    throws IOException {
+    final Object value) {
     if (value != null) {
       final DataType dataType = DataTypes.getType(value.getClass());
       final QName type = dataType.getName();
