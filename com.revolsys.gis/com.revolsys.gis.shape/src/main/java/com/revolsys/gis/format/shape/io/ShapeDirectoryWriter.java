@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.core.io.FileSystemResource;
+
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
@@ -17,7 +21,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private boolean useZeroForNull = true;
 
-  private final Map<DataObjectMetaData, ShapeFileWriter> writers = new HashMap<DataObjectMetaData, ShapeFileWriter>();
+  private final Map<DataObjectMetaData, Writer<DataObject>> writers = new HashMap<DataObjectMetaData, Writer<DataObject>>();
 
   public ShapeDirectoryWriter() {
   }
@@ -28,7 +32,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   public void close() {
-    for (final ShapeFileWriter writer : writers.values()) {
+    for (final Writer<DataObject> writer : writers.values()) {
       try {
         writer.close();
       } catch (final RuntimeException e) {
@@ -50,25 +54,21 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     return directory.getAbsolutePath();
   }
 
-  private ShapeFileWriter getWriter(
+  private Writer<DataObject> getWriter(
     final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
-    ShapeFileWriter writer = writers.get(metaData);
+    Writer<DataObject> writer = writers.get(metaData);
     if (writer == null) {
-      try {
-
-        writer = new ShapeFileWriter(new File(directory, metaData.getName()
-          .getLocalPart()
-          + ".shp"), metaData);
-        writer.setUseZeroForNull(useZeroForNull);
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry != null) {
-          setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(geometry));
-        }
-        writers.put(metaData, writer);
-      } catch (final IOException e) {
-        throw new IllegalArgumentException(e.getMessage(), e);
+      File file = new File(directory, metaData.getName().getLocalPart()
+        + ".shp");
+      writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
+        new FileSystemResource(file));
+      final Geometry geometry = object.getGeometryValue();
+      if (geometry != null) {
+        setProperty(IoConstants.GEOMETRY_FACTORY,
+          GeometryFactory.getFactory(geometry));
       }
+      writers.put(metaData, writer);
     }
     return writer;
   }
@@ -91,7 +91,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   public void write(
     final DataObject object) {
 
-    final ShapeFileWriter writer = getWriter(object);
+    final Writer<DataObject> writer = getWriter(object);
     writer.write(object);
   }
 

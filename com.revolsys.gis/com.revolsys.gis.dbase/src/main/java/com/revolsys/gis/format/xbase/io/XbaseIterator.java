@@ -91,16 +91,15 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     this.name = name;
     this.in = in;
     this.dataObjectFactory = dataObjectFactory;
-    loadHeader();
-    readMetaData();
-    recordBuffer = new byte[recordSize];
+    doInit();
   }
 
   public XbaseIterator(
     Resource in,
     DataObjectFactory dataObjectFactory,
-    Runnable initCallback) throws IOException {
-    this (in, dataObjectFactory);
+    Runnable initCallback)
+    throws IOException {
+    this(in, dataObjectFactory);
     this.initCallback = initCallback;
   }
 
@@ -282,14 +281,16 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
         deleteFlag = in.read();
         if (deleteFlag == -1) {
           throw new NoSuchElementException();
-        }
-        if (deleteFlag == ' ') {
+        } else if (deleteFlag == ' ') {
           object = loadDataObject();
         } else if (deleteFlag != 0x1A) {
           currentDeletedCount++;
           in.read(recordBuffer);
         }
       } while (deleteFlag == '*');
+      if (object == null) {
+        throw new NoSuchElementException();
+      }
       return object;
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);

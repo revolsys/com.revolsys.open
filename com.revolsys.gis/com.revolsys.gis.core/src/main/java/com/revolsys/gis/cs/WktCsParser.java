@@ -271,9 +271,16 @@ public class WktCsParser {
         authority = (Authority)value;
       }
     }
-    return new ProjectedCoordinateSystem(Integer.parseInt(authority.getCode()),
-      name, geographicCoordinateSystem, projection, parameters, linearUnit,
-      axis, authority);
+    int srid = -1;
+    if (authority != null) {
+      final String code = authority.getCode();
+      if (code != null) {
+        srid = Integer.parseInt(code);
+      }
+    }
+    return new ProjectedCoordinateSystem(srid, name,
+      geographicCoordinateSystem, projection, parameters, linearUnit, axis,
+      authority);
   }
 
   private Projection processProjection(

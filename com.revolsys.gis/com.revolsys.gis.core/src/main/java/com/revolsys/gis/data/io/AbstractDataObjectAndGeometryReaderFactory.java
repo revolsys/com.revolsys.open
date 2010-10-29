@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.io;
 
 import java.io.File;
+import java.util.Iterator;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -8,11 +9,11 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.io.AbstractIoFactory;
+import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
-public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
-  implements DataObjectReaderFactory {
+public abstract class AbstractDataObjectAndGeometryReaderFactory extends
+  AbstractGeometryReaderFactory implements DataObjectReaderFactory {
   /** The default data object dataObjectFactory instance. */
   private static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
 
@@ -48,17 +49,10 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
     return readerFactory;
   }
 
-  private final boolean binary;
-
-  public AbstractDataObjectReaderFactory(
+  public AbstractDataObjectAndGeometryReaderFactory(
     final String name,
     final boolean binary) {
-    super(name);
-    this.binary = binary;
-  }
-
-  public boolean isBinary() {
-   return binary;
+    super(name, binary);
   }
 
   /**
@@ -115,4 +109,15 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
     directoryReader.setDirectory(directory);
     return directoryReader;
   }
+
+  public GeometryReader createGeometryReader(
+    final Resource resource) {
+    final Reader<DataObject> dataObjectReader = createDataObjectReader(resource);
+    final Iterator<DataObject> dataObjectIterator = dataObjectReader.iterator();
+    final DataObjectGeometryIterator iterator = new DataObjectGeometryIterator(
+      dataObjectIterator);
+    final GeometryReader geometryReader = new GeometryReader(iterator);
+    return geometryReader;
+  }
+
 }

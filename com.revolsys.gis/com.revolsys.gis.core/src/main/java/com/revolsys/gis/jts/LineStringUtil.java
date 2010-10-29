@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -30,6 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geomgraph.GeometryGraph;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
@@ -56,6 +59,21 @@ public final class LineStringUtil {
     final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     CoordinatesListUtil.addElevation(precisionModel, coordinate, coordinates);
 
+  }
+
+  public static boolean intersects(
+    LineString line1,
+    LineString line2) {
+    if (line1.getEnvelopeInternal().intersects(line2.getEnvelopeInternal())) {
+      LineMatchGraph<LineString> graph = new LineMatchGraph<LineString>(
+        line2);
+      for (LineString line : new LineStringCoordinatesListIterator(line1)) {
+        if (graph.add(line)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**

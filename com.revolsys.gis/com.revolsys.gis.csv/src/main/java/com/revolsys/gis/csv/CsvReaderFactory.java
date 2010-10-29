@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
-public class CsvReaderFactory extends AbstractDataObjectReaderFactory {
+public class CsvReaderFactory extends AbstractDataObjectAndGeometryReaderFactory {
 
   /** The factory instance. */
   public static final CsvReaderFactory INSTANCE = new CsvReaderFactory();

@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -37,17 +37,17 @@ public class Point3DConverter implements ShapefileGeometryConverter {
     final EndianInput in,
     final long recordLength)
     throws IOException {
-    byte dimension = 3;
-    if (recordLength == 36) {
-      dimension = 4;
+    byte numAxis = 3;
+    if (recordLength == 18) {
+      numAxis = 4;
     }
-    final double[] ordinates = new double[dimension];
-    for (int i = 0; i < dimension; i++) {
-      ordinates[i] = in.readLEDouble();
+    final double[] coordinates = new double[numAxis];
+    for (int i = 0; i < numAxis; i++) {
+      coordinates[i] = in.readLEDouble();
     }
-    final CoordinateSequence coordinates = new DoubleCoordinatesList(dimension,
-      ordinates);
-    return geometryFactory.createPoint(coordinates);
+    final CoordinatesList points = new DoubleCoordinatesList(numAxis,
+      coordinates);
+    return geometryFactory.createPoint(points);
   }
 
   public void write(

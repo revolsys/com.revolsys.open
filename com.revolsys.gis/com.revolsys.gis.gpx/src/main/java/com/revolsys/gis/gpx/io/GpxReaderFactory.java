@@ -5,13 +5,13 @@ import java.io.InputStreamReader;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
-public class GpxReaderFactory extends AbstractDataObjectReaderFactory {
+public class GpxReaderFactory extends AbstractDataObjectAndGeometryReaderFactory {
   /** The factory instance. */
   public static final GpxReaderFactory INSTANCE = new GpxReaderFactory();
 

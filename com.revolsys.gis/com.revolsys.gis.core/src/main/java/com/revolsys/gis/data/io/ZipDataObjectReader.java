@@ -53,7 +53,7 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
     File file = new File(directory, zipEntryName);
     if (file.exists()) {
       FileSystemResource fileResource = new FileSystemResource(file);
-      reader = AbstractDataObjectReaderFactory.dataObjectReader(fileResource,
+      reader = AbstractDataObjectAndGeometryReaderFactory.dataObjectReader(fileResource,
         factory);
       if (reader == null) {
         close();

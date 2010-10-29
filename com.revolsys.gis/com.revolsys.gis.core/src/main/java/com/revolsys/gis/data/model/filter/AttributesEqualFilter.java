@@ -10,17 +10,10 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class AttributesEqualFilter implements Filter<DataObject> {
   public static boolean accept(
-    DataObject object1,
-    DataObject object2,
-    String... attributeNames) {
-    return accept(object1, object2, Arrays.asList(attributeNames));
-  }
-
-  public static boolean accept(
-    DataObject object1,
-    DataObject object2,
-    Collection<String> attributeNames) {
-    for (String attributeName : attributeNames) {
+    final DataObject object1,
+    final DataObject object2,
+    final Collection<String> attributeNames) {
+    for (final String attributeName : attributeNames) {
       final Object value1 = DataObjectUtil.getAttributeByPath(object1,
         attributeName);
       final Object value2 = DataObjectUtil.getAttributeByPath(object2,
@@ -33,15 +26,28 @@ public class AttributesEqualFilter implements Filter<DataObject> {
     return true;
   }
 
-  private Collection<String> attributeNames;
+  public static boolean accept(
+    final DataObject object1,
+    final DataObject object2,
+    final String... attributeNames) {
+    return accept(object1, object2, Arrays.asList(attributeNames));
+  }
 
-  private DataObject object;
+  private final Collection<String> attributeNames;
+
+  private final DataObject object;
 
   public AttributesEqualFilter(
-    DataObject object,
-    Collection<String> attributeNames) {
+    final DataObject object,
+    final Collection<String> attributeNames) {
     this.attributeNames = attributeNames;
     this.object = object;
+  }
+
+  public AttributesEqualFilter(
+    final DataObject object,
+    final String... attributeNames) {
+    this(object, Arrays.asList(attributeNames));
   }
 
   public boolean accept(

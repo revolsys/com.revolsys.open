@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.data.model.DataObject;
+
 public class FilterUtil {
   public static <T> List<T> filter(
     final Collection<T> collection,
@@ -62,5 +64,16 @@ public class FilterUtil {
         iterator.remove();
       }
     }
+  }
+
+  public static <T> boolean matches(
+    List<T> objects,
+    Filter<T> filter) {
+    for (T object : objects) {
+      if (filter.accept(object)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

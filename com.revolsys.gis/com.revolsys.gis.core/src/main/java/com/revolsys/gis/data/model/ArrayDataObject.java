@@ -46,7 +46,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author Paul Austin
  */
-public class ArrayDataObject extends AbstractMap<String,Object> implements DataObject, Cloneable {
+public class ArrayDataObject extends AbstractMap<String, Object> implements
+  DataObject, Cloneable {
   /** The log instance. */
   private static final Logger LOG = Logger.getLogger(ArrayDataObject.class);
 
@@ -68,6 +69,17 @@ public class ArrayDataObject extends AbstractMap<String,Object> implements DataO
   public ArrayDataObject(
     final DataObject object) {
     this(object.getMetaData(), object);
+  }
+
+  @Override
+  public boolean equals(
+    Object o) {
+    return this == o;
+  }
+
+  @Override
+  public int hashCode() {
+    return attributes.hashCode();
   }
 
   /**
@@ -400,8 +412,8 @@ public class ArrayDataObject extends AbstractMap<String,Object> implements DataO
 
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String,Object>>();
-    for(int i = 0; i < attributes.length; i++) {
+    Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
+    for (int i = 0; i < attributes.length; i++) {
       entries.add(new DataObjectEntry(this, i));
     }
     return entries;

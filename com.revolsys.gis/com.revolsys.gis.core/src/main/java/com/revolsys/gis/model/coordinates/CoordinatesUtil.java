@@ -4,6 +4,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
@@ -43,20 +44,11 @@ public class CoordinatesUtil {
   }
 
   public static Coordinates get(
-    Point point) {
-    if (point.isEmpty()) {
+    Geometry geometry) {
+    if (geometry.isEmpty()) {
       return null;
     } else {
-      CoordinatesList points = CoordinatesListUtil.get(point);
-      return points.get(0);
-    }
-  }
-  public static Coordinates get(
-    LineString line) {
-    if (line.isEmpty()) {
-      return null;
-    } else {
-      CoordinatesList points = CoordinatesListUtil.get(line);
+      CoordinatesList points = CoordinatesListUtil.get(geometry);
       return points.get(0);
     }
   }

@@ -2,8 +2,6 @@ package com.revolsys.gis.data.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -15,21 +13,19 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
-import com.vividsolutions.jts.geom.Geometry;
 
-public abstract class AbstractDataObjectAndGeometryIoFactory extends
-  AbstractDataObjectAndGeometryReaderFactory implements DataObjectWriterFactory, GeometryWriterFactory {
+public abstract class AbstractDataObjectIoFactory extends
+  AbstractDataObjectReaderFactory implements DataObjectWriterFactory {
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractDataObjectAndGeometryIoFactory(
-    final String name, boolean binary) {
-    super(name,binary);
+  public AbstractDataObjectIoFactory(
+    final String name,
+    final boolean binary) {
+    super(name, binary);
   }
 
   /**
@@ -40,7 +36,7 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
    * @return The writer.
    */
   public Writer<DataObject> createDataObjectWriter(
-    DataObjectMetaData metaData,
+    final DataObjectMetaData metaData,
     final Resource resource) {
     try {
       final OutputStream out = SpringUtil.getOutputStream(resource);
@@ -59,37 +55,6 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
-  }
-
-  public Writer<Geometry> createGeometryWriter(
-    final Resource resource) {
-    final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      DataObjectUtil.GEOMETRY_META_DATA, resource);
-    return createGeometryWriter(dataObjectWriter);
-  }
-
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
-    final OutputStream out) {
-    final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
-    return createGeometryWriter(dataObjectWriter);
-  }
-
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
-    final OutputStream out,
-    final Charset charset) {
-    final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
-      baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
-    return createGeometryWriter(dataObjectWriter);
-  }
-
-  public Writer<Geometry> createGeometryWriter(
-    final Writer<DataObject> dataObjectWriter) {
-    final Writer<Geometry> geometryWriter = new DataObjectWriterGeometryWriter(
-      dataObjectWriter);
-    return geometryWriter;
   }
 
   public Set<CoordinateSystem> getCoordinateSystems() {

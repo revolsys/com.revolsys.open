@@ -21,6 +21,7 @@
 package com.revolsys.gis.io;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -44,6 +45,9 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     final int b2 = read();
     final int b3 = read();
     final int b4 = read();
+    if ((b1 | b2 | b3 | b4) < 0) {
+      throw new EOFException();
+    }
     final int value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
 
     return value;
@@ -62,6 +66,9 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     throws IOException {
     final int b1 = read();
     final int b2 = read();
+    if ((b1 | b2) < 0) {
+      throw new EOFException();
+    }
     final int value = (b2 << 8) + b1;
     return (short)value;
   }

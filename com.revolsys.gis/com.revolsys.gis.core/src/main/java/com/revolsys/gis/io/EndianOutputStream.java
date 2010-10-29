@@ -40,12 +40,17 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   public void flush() {
     try {
       out.flush();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   public long getFilePointer()
+    throws IOException {
+    return written;
+  }
+
+  public long length()
     throws IOException {
     return written;
   }

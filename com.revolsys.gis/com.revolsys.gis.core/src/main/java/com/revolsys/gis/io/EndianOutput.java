@@ -11,6 +11,9 @@ public interface EndianOutput {
   long getFilePointer()
     throws IOException;
 
+  long length()
+    throws IOException;
+
   /**
    * Write a big endian int.
    * 

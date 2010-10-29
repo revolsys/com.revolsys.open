@@ -11,21 +11,32 @@ public class StaticMethodFilter<T> implements Filter<T> {
 
   private String methodName;
 
+  private Object[] args;
+
   public StaticMethodFilter() {
   }
 
   public StaticMethodFilter(
     final Class<?> methodClass,
-    final String methodName) {
+    final String methodName,
+    Object... args) {
     this.methodClass = methodClass;
     this.methodName = methodName;
+    this.args = args;
     initialize();
   }
 
   public boolean accept(
     final T object) {
     try {
-      return (Boolean)method.invoke(null, object);
+      if (args.length == 0) {
+        return (Boolean)method.invoke(null, object);
+      } else {
+        final Object[] newArgs = new Object[args.length + 1];
+        System.arraycopy(args, 0, newArgs, 0, args.length);
+        newArgs[args.length] = object;
+        return (Boolean)method.invoke(null, newArgs);
+      }
     } catch (final RuntimeException e) {
       throw e;
     } catch (final Error e) {
@@ -48,7 +59,7 @@ public class StaticMethodFilter<T> implements Filter<T> {
     final Method[] methods = methodClass.getMethods();
     for (final Method method : methods) {
       if (method.getName().equals(methodName)
-        && method.getParameterTypes().length == 1) {
+        && method.getParameterTypes().length == 1 + args.length) {
         if (this.method != null) {
           throw new IllegalArgumentException("Multiple method match for "
             + methodClass + "." + methodName);

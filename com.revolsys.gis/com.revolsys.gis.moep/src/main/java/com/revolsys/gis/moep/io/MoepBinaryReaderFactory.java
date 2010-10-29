@@ -2,11 +2,11 @@ package com.revolsys.gis.moep.io;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
-public class MoepBinaryReaderFactory extends AbstractDataObjectReaderFactory {
+public class MoepBinaryReaderFactory extends AbstractDataObjectAndGeometryReaderFactory {
 
   /** The factory instance. */
   public static final MoepBinaryReaderFactory INSTANCE = new MoepBinaryReaderFactory();

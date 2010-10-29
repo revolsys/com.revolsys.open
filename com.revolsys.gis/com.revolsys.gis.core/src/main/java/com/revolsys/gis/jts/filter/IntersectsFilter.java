@@ -18,41 +18,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.gis.data.model.filter;
+package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
-public class GeometryFilter<G extends Geometry> implements Filter<DataObject> {
-  private Filter<G> filter;
+public class IntersectsFilter<T extends Geometry> implements Filter<T> {
+  private Geometry geometry;
 
-  public GeometryFilter() {
+  private PreparedGeometry preparedGeometry;
+
+  public IntersectsFilter() {
   }
 
-  public Filter<G> getFilter() {
-    return filter;
+  public IntersectsFilter(
+    final Geometry geometry) {
+    setGeometry(geometry);
   }
 
-  public void setFilter(
-    Filter<G> filter) {
-    this.filter = filter;
-  }
-
-  public GeometryFilter(
-    final Filter<G> filter) {
-    this.filter = filter;
-  }
-
-  @SuppressWarnings("unchecked")
   public boolean accept(
-    final DataObject object) {
-    final G geometry = (G)object.getGeometryValue();
-    if (filter.accept(geometry)) {
+    final T geometry) {
+    if (preparedGeometry.intersects(geometry)) {
       return true;
     } else {
       return false;
     }
   }
 
+  public Geometry getGeometry() {
+    return geometry;
+  }
+
+  public void setGeometry(
+    final Geometry geometry) {
+    this.geometry = geometry;
+    this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
+  }
+
+  @Override
+  public String toString() {
+    return "Intersects(" + geometry + ")";
+  }
 }
