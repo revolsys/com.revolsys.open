@@ -7,18 +7,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.openjump.core.model.OpenJumpTaskProperties;
 import org.openjump.core.ui.io.file.FileLayerLoader;
 import org.openjump.core.ui.io.file.Option;
 import org.openjump.core.ui.util.TaskUtil;
 import org.openjump.util.UriUtil;
 
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.cs.projection.GeometryOperation;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.moep.io.MoepBinaryReader;
@@ -63,15 +59,8 @@ public class MoepFileLayerLoader implements FileLayerLoader {
     final Map<String, Object> options) {
     try {
 
-      CoordinateSystem coordinateSystem = null;
-
-      int srid = 0;
-      QName srName = workbenchContext.getTask().getProperty(
-        OpenJumpTaskProperties.SRID);
-      if (srName != null) {
-        srid = Integer.parseInt(srName.getLocalPart());
-        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-      }
+      GeometryFactory globalGeometryFactory = workbenchContext.getTask()
+        .getProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY);
       FeatureDataObjectFactory factory = new FeatureDataObjectFactory();
       Reader<DataObject> reader = new MoepBinaryReader(uri.toURL(), factory);
       String name = UriUtil.getFileNameWithoutExtension(uri);
@@ -80,24 +69,11 @@ public class MoepFileLayerLoader implements FileLayerLoader {
         MoepConstants.META_DATA, "geometry");
       final FeatureCollection features = new FeatureDataset(featureSchema);
 
-      GeometryOperation geometryOperation = null;
       for (DataObject object : reader) {
         final Geometry geometry = object.getGeometryValue();
-        final int geometrySrid = geometry.getSRID();
-        if (srid != 0) {
-          if (geometryOperation != null) {
-            Geometry newGeometry = geometryOperation.perform(geometry);
-            object.setGeometryValue(newGeometry);
-          } else {
-            if (geometrySrid != srid) {
-              CoordinateSystem geometryCs = EpsgCoordinateSystems.getCoordinateSystem(geometrySrid);
-              geometryOperation = ProjectionFactory.getGeometryOperation(
-                geometryCs, coordinateSystem);
-              Geometry newGeometry = geometryOperation.perform(geometry);
-              object.setGeometryValue(newGeometry);
-            }
-          }
-        }
+        Geometry newGeometry =  GeometryProjectionUtil.perform(geometry,
+          globalGeometryFactory);
+        object.setGeometryValue(newGeometry);
         DataObjectFeature feature = (DataObjectFeature)object;
         features.add(feature);
       }

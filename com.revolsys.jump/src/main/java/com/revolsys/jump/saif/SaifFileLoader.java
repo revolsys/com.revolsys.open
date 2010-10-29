@@ -13,16 +13,17 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 import javax.xml.namespace.QName;
 
-import org.openjump.core.ccordsys.epsg.EpsgConstants;
 import org.openjump.core.model.OpenJumpTaskProperties;
 import org.openjump.core.ui.io.file.FileLayerLoader;
 import org.openjump.core.ui.io.file.Option;
 
-import com.revolsys.gis.cs.projection.GeometryOperation;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.format.saif.io.OsnReader;
 import com.revolsys.gis.format.saif.io.SaifReader;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jump.model.DataObjectFeature;
 import com.revolsys.jump.model.DataObjectMetaDataFeatureSchema;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
@@ -74,7 +75,7 @@ public class SaifFileLoader implements FileLayerLoader {
     final URI uri,
     final Map<String, Object> options) {
     Task primaryTask = context.getWorkbenchContext().getTask();
-    QName taskSrid = primaryTask.getProperty(OpenJumpTaskProperties.SRID);
+    GeometryFactory geometryFactory = primaryTask.getProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY);
     try {
       File file = new File(uri);
       String categoryName = com.revolsys.io.FileUtil.getFileNamePrefix(file);
@@ -84,21 +85,18 @@ public class SaifFileLoader implements FileLayerLoader {
       saifReader.setFactory(factory);
       saifReader.open();
       int saifSrid = saifReader.getSrid();
-      GeometryOperation transform = null;
-      if (taskSrid != null) {
-        int taskSridNum = EpsgConstants.getSrid(taskSrid);
-        if (saifSrid != 0 && taskSridNum != saifSrid) {
-          transform = GeometryProjectionUtil.getGeometryOperation(saifSrid,
-            taskSridNum);
-        }
-      } else {
-        primaryTask.setProperty(OpenJumpTaskProperties.SRID,
-          EpsgConstants.getSrid(saifSrid));
+      if (geometryFactory == null) {
+        geometryFactory = new GeometryFactory(
+          EpsgCoordinateSystems.getCoordinateSystem(saifSrid),
+          new SimpleCoordinatesPrecisionModel(1, 1));
+        primaryTask.setProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY,
+          geometryFactory);
       }
       LayerManager layerManager = primaryTask.getLayerManager();
       layerManager.addCategory(categoryName);
 
-      StyleFileFactory styleFactory = new StyleFileFactory(getClass().getResourceAsStream("/trimStyle.csv"));
+      StyleFileFactory styleFactory = new StyleFileFactory(
+        getClass().getResourceAsStream("/trimStyle.csv"));
       try {
         List<QName> typeNames = new ArrayList<QName>(saifReader.getTypeNames());
         Collections.reverse(typeNames);
@@ -108,8 +106,8 @@ public class SaifFileLoader implements FileLayerLoader {
           OsnReader reader = saifReader.getOsnReader(className, factory);
           reader.setFactory(factory);
           try {
-            addLayer(monitor, transform, categoryName, layerManager, reader,
-              context.getWorkbenchFrame(), styleFactory);
+            addLayer(monitor, geometryFactory, categoryName, layerManager,
+              reader, context.getWorkbenchFrame(), styleFactory);
           } finally {
             reader.close();
           }
@@ -138,7 +136,7 @@ public class SaifFileLoader implements FileLayerLoader {
 
   private void addLayer(
     final TaskMonitor monitor,
-    final GeometryOperation geometryTransform,
+    final GeometryFactory geometryFactory,
     final String categoryName,
     final LayerManager layerManager,
     final OsnReader reader,
@@ -161,11 +159,11 @@ public class SaifFileLoader implements FileLayerLoader {
         layerManager.addLayerable(categoryName, layer);
         setLayerStyle(layer, layerName, featureSchema, styleFactory);
 
-        addFeature(features, feature, geometryTransform);
+        addFeature(features, feature, geometryFactory);
         while (reader.hasNext() && !monitor.isCancelRequested()) {
           monitor.report("Loading " + layerName + " " + ++count);
           feature = (DataObjectFeature)reader.next();
-          addFeature(features, feature, geometryTransform);
+          addFeature(features, feature, geometryFactory);
           numRead++;
         }
         layer.setName(layerName);
@@ -178,9 +176,9 @@ public class SaifFileLoader implements FileLayerLoader {
   private void addFeature(
     final FeatureCollection features,
     final DataObjectFeature feature,
-    final GeometryOperation geometryTransform) {
+    final GeometryFactory geometryFactory) {
     Geometry geometry = feature.getGeometry();
-    geometry = GeometryProjectionUtil.perform(geometryTransform, geometry);
+    geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);
     feature.setGeometry(geometry);
     features.add(feature);
   }

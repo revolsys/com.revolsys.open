@@ -17,6 +17,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
+import com.vividsolutions.jts.geom.Geometry;
 
 public final class ProjectionFactory {
   /** The map from projection names to projection classes. */
@@ -40,123 +41,20 @@ public final class ProjectionFactory {
       LambertConicConformal.class);
   }
 
-  /**
-   * Return a geometry operation which convert between the source and target
-   * coordinate systems. The geometry operation will create a new geometry
-   * instead of modifying the existing geometry.
-   * 
-   * @param sourceCoordinateSystem The source coordinate system.
-   * @param targetCoordinateSystem The target coordinate system.
-   * @return The geometry operation.
-   */
-  public static GeometryOperation getGeometryOperation(
-    final CoordinateSystem sourceCoordinateSystem,
-    final CoordinateSystem targetCoordinateSystem) {
-    return getGeometryOperation(sourceCoordinateSystem, targetCoordinateSystem,
-      new GeometryFactory(targetCoordinateSystem));
-  }
-
-  /**
-   * Return a geometry operation which convert between the source and target
-   * coordinate systems. The geometry operation will create a new geometry
-   * instead of modifying the existing geometry. All coordinates in the geometry
-   * will be made precise using the precision model of the geometry factory.
-   * 
-   * @param sourceCoordinateSystem The source coordinate system.
-   * @param targetGeometryFactory The geometry factory.
-   * @return The geometry operation.
-   */
-  public static GeometryOperation getGeometryOperation(
-    final CoordinateSystem sourceCoordinateSystem,
+  public static <T extends Geometry> T convert(
+    final T geometry,
     final GeometryFactory targetGeometryFactory) {
-    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
-    final CoordinatesOperation operation = getCoordinatesOperation(sourceCoordinateSystem, targetCoordinateSystem);
-    if (operation == null) {
-      return null;
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    if (geometryFactory == geometryFactory) {
+      return geometry;
     } else {
-      return new CoordinatesOperationGeometryOperation(operation,
+      final GeometryOperation operation = getGeometryOperation(geometryFactory,
         targetGeometryFactory);
-    }
-  }
-  /**
-   * Return a geometry operation which convert between the source and target
-   * coordinate systems. The geometry operation will create a new geometry
-   * instead of modifying the existing geometry. All coordinates in the geometry
-   * will be made precise using the precision model of the geometry factory.
-   * 
-   * @param sourceCoordinateSystem The source coordinate system.
-   * @param targetCoordinateSystem The target coordinate system.
-   * @param geometryFactory The geometry factory.
-   * @return The geometry operation.
-   */
-  public static GeometryOperation getGeometryOperation(
-    final CoordinateSystem cs1,
-    final CoordinateSystem cs2,
-    final GeometryFactory geometryFactory) {
-    final CoordinatesOperation operation = getCoordinatesOperation(cs1, cs2);
-    if (operation == null) {
-      return null;
-    } else {
-      return new CoordinatesOperationGeometryOperation(operation,
-        geometryFactory);
-    }
-  }
-
-  /**
-   * Get the operation to convert coordinates to geographics coordinates.
-   * 
-   * @param coordinateSystem The coordinate system.
-   * @return The coordinates operation.
-   */
-  public static CoordinatesOperation getInverseCoordinatesOperation(
-    final CoordinateSystem coordinateSystem) {
-    final CoordinatesProjection projection = getCoordinatesProjection(coordinateSystem);
-    if (projection == null) {
-      return null;
-    } else {
-      return new InverseOperation(projection);
-    }
-  }
-
-  /**
-   * Get the operation to convert coordinates to geographics coordinates.
-   * 
-   * @param coordinateSystem The coordinate system.
-   * @return The coordinates operation.
-   */
-  public static CoordinatesOperation getToGeographicsCoordinatesOperation(
-    final CoordinateSystem coordinateSystem) {
-    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
-      CoordinatesOperation operation = getInverseCoordinatesOperation(projectedCs);
-      final GeographicCoordinateSystem geographicsCoordinateSystem = projectedCs.getGeographicCoordinateSystem();
-
-      final Unit<Angle> angularUnit = geographicsCoordinateSystem.getUnit();
-      if (angularUnit.equals(SI.RADIAN)) {
-        return operation;
+      if (operation == null) {
+        return geometry;
       } else {
-        return new ChainedCoordinatesOperation(operation,
-          new UnitConverstionOperation(SI.RADIAN, angularUnit));
+        return operation.perform(geometry);
       }
-    } else {
-      return new CopyOperation();
-    }
-  }
-
-  /**
-   * Get the operation to convert geographics coordinates to projected
-   * coordinates.
-   * 
-   * @param coordinateSystem The coordinate system.
-   * @return The coordinates operation.
-   */
-  public static CoordinatesOperation getProjectCoordinatesOperation(
-    final CoordinateSystem coordinateSystem) {
-    final CoordinatesProjection projection = getCoordinatesProjection(coordinateSystem);
-    if (projection == null) {
-      return new CopyOperation();
-    } else {
-      return new ProjectOperation(projection);
     }
   }
 
@@ -236,7 +134,7 @@ public final class ProjectionFactory {
   public static CoordinatesProjection getCoordinatesProjection(
     final CoordinateSystem coordinateSystem) {
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
       final Projection projection = projectedCoordinateSystem.getProjection();
       final String projectionName = projection.getName();
       final Class<? extends CoordinatesProjection> projectionClass = projectionClasses.get(projectionName);
@@ -271,6 +169,135 @@ public final class ProjectionFactory {
       }
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Return a geometry operation which convert between the source and target
+   * coordinate systems. The geometry operation will create a new geometry
+   * instead of modifying the existing geometry.
+   * 
+   * @param sourceCoordinateSystem The source coordinate system.
+   * @param targetCoordinateSystem The target coordinate system.
+   * @return The geometry operation.
+   */
+  public static GeometryOperation getGeometryOperation(
+    final CoordinateSystem sourceCoordinateSystem,
+    final CoordinateSystem targetCoordinateSystem) {
+    return getGeometryOperation(sourceCoordinateSystem, targetCoordinateSystem,
+      new GeometryFactory(targetCoordinateSystem));
+  }
+
+  /**
+   * Return a geometry operation which convert between the source and target
+   * coordinate systems. The geometry operation will create a new geometry
+   * instead of modifying the existing geometry. All coordinates in the geometry
+   * will be made precise using the precision model of the geometry factory.
+   * 
+   * @param sourceCoordinateSystem The source coordinate system.
+   * @param targetCoordinateSystem The target coordinate system.
+   * @param geometryFactory The geometry factory.
+   * @return The geometry operation.
+   */
+  public static GeometryOperation getGeometryOperation(
+    final CoordinateSystem cs1,
+    final CoordinateSystem cs2,
+    final GeometryFactory geometryFactory) {
+    final CoordinatesOperation operation = getCoordinatesOperation(cs1, cs2);
+    if (operation == null) {
+      return null;
+    } else {
+      return new CoordinatesOperationGeometryOperation(operation,
+        geometryFactory);
+    }
+  }
+
+  /**
+   * Return a geometry operation which convert between the source and target
+   * coordinate systems. The geometry operation will create a new geometry
+   * instead of modifying the existing geometry. All coordinates in the geometry
+   * will be made precise using the precision model of the geometry factory.
+   * 
+   * @param sourceCoordinateSystem The source coordinate system.
+   * @param targetGeometryFactory The geometry factory.
+   * @return The geometry operation.
+   */
+  public static GeometryOperation getGeometryOperation(
+    final CoordinateSystem sourceCoordinateSystem,
+    final GeometryFactory targetGeometryFactory) {
+    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
+    final CoordinatesOperation operation = getCoordinatesOperation(
+      sourceCoordinateSystem, targetCoordinateSystem);
+    if (operation == null) {
+      return null;
+    } else {
+      return new CoordinatesOperationGeometryOperation(operation,
+        targetGeometryFactory);
+    }
+  }
+
+  public static GeometryOperation getGeometryOperation(
+    final GeometryFactory sourceGeometryFactory,
+    final GeometryFactory targetGeometryFactory) {
+    final CoordinateSystem sourceCoodinateSystem = sourceGeometryFactory.getCoordinateSystem();
+    return getGeometryOperation(sourceCoodinateSystem, targetGeometryFactory);
+  }
+
+  /**
+   * Get the operation to convert coordinates to geographics coordinates.
+   * 
+   * @param coordinateSystem The coordinate system.
+   * @return The coordinates operation.
+   */
+  public static CoordinatesOperation getInverseCoordinatesOperation(
+    final CoordinateSystem coordinateSystem) {
+    final CoordinatesProjection projection = getCoordinatesProjection(coordinateSystem);
+    if (projection == null) {
+      return null;
+    } else {
+      return new InverseOperation(projection);
+    }
+  }
+
+  /**
+   * Get the operation to convert geographics coordinates to projected
+   * coordinates.
+   * 
+   * @param coordinateSystem The coordinate system.
+   * @return The coordinates operation.
+   */
+  public static CoordinatesOperation getProjectCoordinatesOperation(
+    final CoordinateSystem coordinateSystem) {
+    final CoordinatesProjection projection = getCoordinatesProjection(coordinateSystem);
+    if (projection == null) {
+      return new CopyOperation();
+    } else {
+      return new ProjectOperation(projection);
+    }
+  }
+
+  /**
+   * Get the operation to convert coordinates to geographics coordinates.
+   * 
+   * @param coordinateSystem The coordinate system.
+   * @return The coordinates operation.
+   */
+  public static CoordinatesOperation getToGeographicsCoordinatesOperation(
+    final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
+      final CoordinatesOperation operation = getInverseCoordinatesOperation(projectedCs);
+      final GeographicCoordinateSystem geographicsCoordinateSystem = projectedCs.getGeographicCoordinateSystem();
+
+      final Unit<Angle> angularUnit = geographicsCoordinateSystem.getUnit();
+      if (angularUnit.equals(SI.RADIAN)) {
+        return operation;
+      } else {
+        return new ChainedCoordinatesOperation(operation,
+          new UnitConverstionOperation(SI.RADIAN, angularUnit));
+      }
+    } else {
+      return new CopyOperation();
     }
   }
 

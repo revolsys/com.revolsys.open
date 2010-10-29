@@ -12,9 +12,11 @@ import java.util.List;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryOperation;
+import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
@@ -73,8 +75,9 @@ public class GridRenderer implements Renderer {
     if (!gridLayer.isVisible()) {
       return false;
     }
-    if (!gridLayer.getLayerManager().getLayerables(Layerable.class).contains(
-      gridLayer)) {
+    if (!gridLayer.getLayerManager()
+      .getLayerables(Layerable.class)
+      .contains(gridLayer)) {
       return false;
     }
     return withinVisibleScaleRange();
@@ -104,17 +107,10 @@ public class GridRenderer implements Renderer {
     final Graphics2D graphics) {
     Viewport viewport = layerViewPanel.getViewport();
     Envelope envelope = viewport.getEnvelopeInModelCoordinates();
-    int srid = gridLayer.getSrid();
-    if (srid != 0) {
-      GeometryOperation operation = null;
-      CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-      BoundingBox boundingBox = new BoundingBox(coordinateSystem, envelope);
-      if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-        ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
-        final GeographicCoordinateSystem geoCs = projectedCs.getGeographicCoordinateSystem();
-        operation = ProjectionFactory.getGeometryOperation(geoCs,
-          coordinateSystem);
-      }
+    final GeometryFactory geometryFactory = gridLayer.getGeometryFactory();
+    if (geometryFactory != null) {
+      BoundingBox boundingBox = new BoundingBox(
+        geometryFactory.getCoordinateSystem(), envelope);
 
       RectangularMapGrid grid = gridLayer.getGrid();
       List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
@@ -123,9 +119,7 @@ public class GridRenderer implements Renderer {
           return;
         }
         Polygon polygon = tile.getPolygon(100);
-        if (operation != null) {
-          polygon = operation.perform(polygon);
-        }
+        polygon = GeometryProjectionUtil.perform(polygon, geometryFactory);
         paint(viewport, graphics, polygon);
 
         Point centroid = polygon.getCentroid();
@@ -149,8 +143,9 @@ public class GridRenderer implements Renderer {
 
     try {
       viewport.getModelToViewTransform().transform(modelPoint, viewPoint);
-      layout.draw(graphics, (float)viewPoint.getX()
-        - layout.getVisibleAdvance() / 2, (float)viewPoint.getY());
+      layout.draw(graphics,
+        (float)viewPoint.getX() - layout.getVisibleAdvance() / 2,
+        (float)viewPoint.getY());
     } catch (NoninvertibleTransformException e) {
     }
   }

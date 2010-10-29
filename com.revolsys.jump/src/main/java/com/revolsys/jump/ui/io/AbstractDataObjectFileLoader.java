@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
-import org.openjump.core.ccordsys.epsg.EpsgConstants;
 import org.openjump.core.model.OpenJumpTaskProperties;
 import org.openjump.core.ui.io.file.AbstractFileLayerLoader;
 import org.openjump.core.ui.util.TaskUtil;
@@ -16,6 +13,7 @@ import org.openjump.util.UriUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.Reader;
@@ -63,12 +61,12 @@ public abstract class AbstractDataObjectFileLoader extends
     final Map<String, Object> options) {
     LayerManager layerManager = workbenchContext.getLayerManager();
     Task task = layerManager.getTask();
-    QName srid = task.getProperty(OpenJumpTaskProperties.SRID);
+    GeometryFactory geometryFactory = task.getProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY);
     layerManager.setFiringEvents(false);
 
     try {
-      FeatureCollection features = readFeatureCollection(srid, new UrlResource(
-        uri), options);
+      FeatureCollection features = readFeatureCollection(geometryFactory,
+        new UrlResource(uri), options);
       if (features == null) {
         return false;
       }
@@ -97,7 +95,7 @@ public abstract class AbstractDataObjectFileLoader extends
   }
 
   protected FeatureCollection readFeatureCollection(
-    final QName srid,
+    GeometryFactory geometryFactory,
     final Resource resource,
     final Map<String, Object> options)
     throws Exception {
@@ -110,10 +108,10 @@ public abstract class AbstractDataObjectFileLoader extends
         DataObjectFeature feature = (DataObjectFeature)iterator.next();
         FeatureSchema schema = feature.getSchema();
         FeatureCollection features = new FeatureDataset(schema);
-        addFeature(srid, feature, features);
+        geometryFactory = addFeature(geometryFactory, feature, features);
         while (iterator.hasNext()) {
           feature = (DataObjectFeature)iterator.next();
-          addFeature(srid, feature, features);
+          geometryFactory = addFeature(geometryFactory, feature, features);
 
         }
         return features;
@@ -125,29 +123,24 @@ public abstract class AbstractDataObjectFileLoader extends
     }
   }
 
-  private GeometryOperation getProjection(
-    final int sourceSrid,
-    final int targetSrid) {
-    GeometryOperation transformation = transformations.get(sourceSrid);
-    if (transformation == null) {
-      transformation = GeometryProjectionUtil.getGeometryOperation(sourceSrid,
-        targetSrid);
-      transformations.put(sourceSrid, transformation);
-    }
-    return transformation;
-  }
-
-  private void addFeature(
-    final QName srid,
+  private GeometryFactory addFeature(
+    GeometryFactory geometryFactory,
     final DataObjectFeature feature,
     final FeatureCollection features) {
     Geometry geometry = feature.getGeometry();
-    if (srid != null && geometry.getSRID() != EpsgConstants.getSrid(srid)) {
-      GeometryOperation transform = getProjection(feature.getGeometry()
-        .getSRID(), EpsgConstants.getSrid(srid));
-      feature.setGeometry(transform.perform(geometry));
+    if (geometryFactory == null) {
+      geometryFactory = GeometryFactory.getFactory(geometry);
+      if (geometryFactory != null) {
+        LayerManager layerManager = workbenchContext.getLayerManager();
+        Task task = layerManager.getTask();
+        task.setProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY,
+          geometryFactory);
+      }
     }
+    geometry =  GeometryProjectionUtil.perform(geometry, geometryFactory);
+    feature.setGeometry(geometry);
     features.add(feature);
+    return geometryFactory;
   }
 
   protected abstract Reader<DataObject> createReader(

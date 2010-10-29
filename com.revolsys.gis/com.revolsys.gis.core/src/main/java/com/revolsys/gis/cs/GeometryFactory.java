@@ -35,19 +35,24 @@ public class GeometryFactory extends
 
   public static GeometryFactory getFactory(
     final Geometry geometry) {
-    final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
-    if (factory instanceof GeometryFactory) {
-      return (GeometryFactory)factory;
+    if (geometry == null) {
+      return null;
     } else {
-      final int srid = factory.getSRID();
-      final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-      final PrecisionModel precisionModel = factory.getPrecisionModel();
-      if (precisionModel.isFloating()) {
-        return new GeometryFactory(coordinateSystem);
+      final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
+      if (factory instanceof GeometryFactory) {
+        return (GeometryFactory)factory;
       } else {
-        final CoordinatesPrecisionModel coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
-          precisionModel.getScale());
-        return new GeometryFactory(coordinateSystem, coordinatesPrecisionModel);
+        final int srid = factory.getSRID();
+        final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
+        final PrecisionModel precisionModel = factory.getPrecisionModel();
+        if (precisionModel.isFloating()) {
+          return new GeometryFactory(coordinateSystem);
+        } else {
+          final CoordinatesPrecisionModel coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
+            precisionModel.getScale());
+          return new GeometryFactory(coordinateSystem,
+            coordinatesPrecisionModel);
+        }
       }
     }
   }

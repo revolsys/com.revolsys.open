@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryIoFactory;
@@ -43,9 +44,11 @@ public class ShapefileZipIoFactory extends
     } catch (IOException e) {
       throw new RuntimeException("Unable to create temporary directory", e);
     }
-    File tempFile = new File(directory, baseName + ".shp");
+    Resource tempResource = new FileSystemResource(new File(directory, baseName
+      + ".shp"));
     try {
-      Writer<DataObject> shapeWriter = new ShapeFileWriter(tempFile, metaData);
+      Writer<DataObject> shapeWriter = new ShapefileDataObjectWriter(metaData,
+        tempResource);
       return new ZipWriter<DataObject>(directory, shapeWriter, outputStream);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create shape writer", e);

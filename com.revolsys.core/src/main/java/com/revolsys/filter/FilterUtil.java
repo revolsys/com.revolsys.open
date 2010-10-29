@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.data.model.DataObject;
-
 public class FilterUtil {
   public static <T> List<T> filter(
     final Collection<T> collection,

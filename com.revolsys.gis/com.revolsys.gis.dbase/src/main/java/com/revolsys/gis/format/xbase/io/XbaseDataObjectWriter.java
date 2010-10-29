@@ -20,11 +20,7 @@
  */
 package com.revolsys.gis.format.xbase.io;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -34,23 +30,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.format.shape.io.ShapefileConstants;
-import com.revolsys.gis.io.EndianInputOutput;
-import com.revolsys.gis.io.EndianOutput;
-import com.revolsys.gis.io.EndianOutputStream;
-import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
-import com.revolsys.io.FileUtil;
 import com.revolsys.spring.NonExistingResource;
-import com.revolsys.spring.SpringUtil;
 
 public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   private static final Logger log = Logger.getLogger(XbaseDataObjectWriter.class);

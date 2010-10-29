@@ -2,17 +2,10 @@ package com.revolsys.jump.ui.model;
 
 import java.awt.geom.NoninvertibleTransformException;
 
-import javax.xml.namespace.QName;
-
-import org.openjump.core.ccordsys.epsg.EpsgConstants;
 import org.openjump.core.model.OpenJumpTaskProperties;
 
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.cs.projection.GeometryOperation;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jump.util.Blackboard;
@@ -47,38 +40,21 @@ public class GridLayer extends AbstractLayerable {
     return grid;
   }
 
-  public int getSrid() {
-    QName srid = getTask().getProperty(OpenJumpTaskProperties.SRID);
-    if (srid == null) {
-      return 0;
-    } else {
-      return EpsgConstants.getSrid(srid);
-    }
+  public GeometryFactory getGeometryFactory() {
+    return (GeometryFactory)getTask().getProperty(
+      OpenJumpTaskProperties.GEOMETRY_FACTORY);
   }
 
   public void zoomToSheet(
     final String sheet) {
-    final int srid = getSrid();
-    if (srid != 0) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
       LayerViewPanel layerViewPanel = context.getLayerViewPanel();
       Viewport viewport = layerViewPanel.getViewport();
       try {
-        CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-        GeographicCoordinateSystem geographicCs;
-        GeometryOperation operation = null;
-        if (coordinateSystem instanceof GeographicCoordinateSystem) {
-          geographicCs = (GeographicCoordinateSystem)coordinateSystem;
-        } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-          geographicCs = ((ProjectedCoordinateSystem)coordinateSystem).getGeographicCoordinateSystem();
-          operation = ProjectionFactory.getGeometryOperation(geographicCs,
-            coordinateSystem);
-        } else {
-          return;
-        }
         Polygon polygon = grid.getTileByName(sheet).getPolygon(50);
-        if (operation != null) {
-          polygon = operation.perform(polygon);
-        }
+
+        polygon =  GeometryProjectionUtil.perform(polygon, geometryFactory);
         viewport.zoom(polygon.getEnvelopeInternal());
       } catch (NoninvertibleTransformException e) {
       }
