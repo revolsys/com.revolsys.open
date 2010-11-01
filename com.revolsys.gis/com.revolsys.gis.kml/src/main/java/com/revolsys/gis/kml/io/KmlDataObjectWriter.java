@@ -12,7 +12,8 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
+public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
+  Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
   static {
@@ -38,18 +39,24 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
   private void writeHeader() {
     opened = true;
     writer.startDocument();
-    writer.startTag(Kml22Constants.KML);
+    writer.startTag(KML);
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-      writer.startTag(Kml22Constants.DOCUMENT);
-      String name = getProperty(Kml22Constants.DOCUMENT_NAME_PROPERTY);
+      writer.startTag(DOCUMENT);
+      String name = getProperty(DOCUMENT_NAME_PROPERTY);
       if (name != null) {
-        writer.element(Kml22Constants.NAME, name);
+        writer.element(NAME, name);
       }
-      String description = getProperty(Kml22Constants.DOCUMENT_DESCRIPTION_PROPERTY);
+      String snippet = getProperty(SNIPPET_PROPERTY);
+      if (snippet != null) {
+        writer.startTag(SNIPPET);
+        writer.text(snippet);
+        writer.endTag(SNIPPET);
+      }
+      String description = getProperty(DOCUMENT_DESCRIPTION_PROPERTY);
       if (description != null) {
-        writer.element(Kml22Constants.DESCRIPTION, description);
+        writer.element(DESCRIPTION, description);
       }
-      writer.element(Kml22Constants.OPEN, 1);
+      writer.element(OPEN, 1);
     }
   }
 
@@ -58,9 +65,9 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
       writeHeader();
     }
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-      writer.endTag(Kml22Constants.DOCUMENT);
+      writer.endTag(DOCUMENT);
     }
-    writer.endTag(Kml22Constants.KML);
+    writer.endTag(KML);
     writer.endDocument();
     writer.close();
   }
@@ -78,7 +85,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
     if (!opened) {
       writeHeader();
     }
-    writer.startTag(Kml22Constants.PLACEMARK);
+    writer.startTag(PLACEMARK);
     final DataObjectMetaData metaData = object.getMetaData();
     int geometryIndex = metaData.getGeometryAttributeIndex();
     int idIndex = metaData.getIdAttributeIndex();
@@ -86,20 +93,26 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
       final Object id = object.getValue(idIndex);
       final QName name = metaData.getName();
       final String localName = name.getLocalPart();
-      writer.element(Kml22Constants.NAME, localName + " " + id);
+      writer.element(NAME, localName + " " + id);
     }
-    String description = getProperty(Kml22Constants.PLACEMARK_DESCRIPTION_PROPERTY);
+    String snippet = getProperty(SNIPPET_PROPERTY);
+    if (snippet != null) {
+      writer.startTag(SNIPPET);
+      writer.text(snippet);
+      writer.endTag(SNIPPET);
+    }
+    String description = getProperty(PLACEMARK_DESCRIPTION_PROPERTY);
     if (description == null) {
       description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
     }
     if (description != null) {
-      writer.startTag(Kml22Constants.DESCRIPTION);
+      writer.startTag(DESCRIPTION);
       writer.cdata(description);
-      writer.endTag(Kml22Constants.DESCRIPTION);
+      writer.endTag(DESCRIPTION);
     }
     String styleUrl = getProperty(IoConstants.STYLE_URL_PROPERTY);
     if (styleUrl != null) {
-      writer.element(Kml22Constants.STYLE_URL, styleUrl);
+      writer.element(STYLE_URL, styleUrl);
     }
     boolean hasValues = false;
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
@@ -109,17 +122,17 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> {
         if (value != null) {
           if (!hasValues) {
             hasValues = true;
-            writer.startTag(Kml22Constants.EXTENDED_DATA);
+            writer.startTag(EXTENDED_DATA);
           }
-          writer.startTag(Kml22Constants.DATA);
-          writer.attribute(Kml22Constants.NAME, name);
-          writer.nillableElement(Kml22Constants.VALUE, value);
-          writer.endTag(Kml22Constants.DATA);
+          writer.startTag(DATA);
+          writer.attribute(NAME, name);
+          writer.nillableElement(VALUE, value);
+          writer.endTag(DATA);
         }
       }
     }
     if (hasValues) {
-      writer.endTag(Kml22Constants.EXTENDED_DATA);
+      writer.endTag(EXTENDED_DATA);
     }
     if (geometryIndex != -1) {
       final Geometry geometry = object.getValue(geometryIndex);

@@ -50,6 +50,8 @@ public interface Kml22Constants {
 
   QName LOD = new QName(KML_NS_URI, "Lod");
 
+  QName MAX_LINES = new QName("maxLines");
+
   QName MAX_LOD_PIXELS = new QName(KML_NS_URI, "maxLodPixels");
 
   QName MIN_LOD_PIXELS = new QName(KML_NS_URI, "minLodPixels");
@@ -72,6 +74,8 @@ public interface Kml22Constants {
 
   QName REGION = new QName(KML_NS_URI, "Region");
 
+  QName SNIPPET = new QName(KML_NS_URI, "Snippet");
+
   QName SOUTH = new QName(KML_NS_URI, "south");
 
   QName STYLE_URL = new QName(KML_NS_URI, "styleUrl");
@@ -92,4 +96,7 @@ public interface Kml22Constants {
 
   String DOCUMENT_NAME_PROPERTY = "java:" + Kml22Constants.class.getName()
     + ".DocumentName";
+
+  String SNIPPET_PROPERTY = "java:" + Kml22Constants.class.getName()
+    + ".Snippet";
 }
