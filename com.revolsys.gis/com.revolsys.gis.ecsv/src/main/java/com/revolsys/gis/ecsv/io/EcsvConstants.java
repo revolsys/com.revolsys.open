@@ -40,7 +40,7 @@ public interface EcsvConstants extends EcsvProperties {
 
   String TYPE_PARAMETER_END = ">";
 
-  String MEDIA_TYPE = "text/x-e-csv";
+  String MEDIA_TYPE = "text/x-ecsv";
 
   String MULTI_LINE_LIST_END = "]";
 

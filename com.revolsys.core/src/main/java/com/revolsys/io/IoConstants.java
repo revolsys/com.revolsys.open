@@ -1,21 +1,26 @@
 package com.revolsys.io;
 
 public interface IoConstants {
-  String CSS_CLASS_PROPERTY = "com.revolsys.io.cssClass";
+  String CSS_CLASS_PROPERTY = "java:" + IoConstants.class.getName()
+    + ".cssClass";
 
-  String DESCRIPTION_PROPERTY = "com.revolsys.io.description";
+  String DESCRIPTION_PROPERTY = "java:" + IoConstants.class.getName()
+    + ".description";
 
-  String GEOMETRY_FACTORY = "com.revolsys.io.geometryFactory";
+  String GEOMETRY_FACTORY = "java:" + IoConstants.class.getName()
+    + ".geometryFactory";
 
-  String INDENT_PROPERTY = "com.revolsys.io.indent";
+  String INDENT_PROPERTY = "java:" + IoConstants.class.getName() + ".indent";
 
-  String JSONP_PROPERTY = "com.revolsys.io.jsonp";
+  String JSONP_PROPERTY = "java:" + IoConstants.class.getName() + ".jsonp";
 
-  String SINGLE_OBJECT_PROPERTY = "com.revolsys.io.singleObject";
+  String SINGLE_OBJECT_PROPERTY = "java:" + IoConstants.class.getName()
+    + ".singleObject";
 
-  String STYLE_URL_PROPERTY = "com.revolsys.io.styleUrl";
+  String STYLE_URL_PROPERTY = "java:" + IoConstants.class.getName()
+    + ".styleUrl";
 
-  String TITLE_PROPERTY = "com.revolsys.io.title";
+  String TITLE_PROPERTY = "java:" + IoConstants.class.getName() + ".title";
 
-  String WRAP_PROPERTY = "com.revolsys.io.wrap";
+  String WRAP_PROPERTY = "java:" + IoConstants.class.getName() + ".wrap";
 }

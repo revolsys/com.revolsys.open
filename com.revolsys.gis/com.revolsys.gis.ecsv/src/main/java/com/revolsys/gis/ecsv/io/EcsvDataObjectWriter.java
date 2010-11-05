@@ -18,6 +18,7 @@ import com.revolsys.gis.ecsv.io.type.EcsvFieldType;
 import com.revolsys.gis.ecsv.io.type.EcsvFieldTypeRegistry;
 import com.revolsys.gis.ecsv.io.type.StringFieldType;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.IoConstants;
 
 public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
   EcsvConstants {
@@ -168,13 +169,15 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
         writeProperty(name.substring(defaultPrefix.length()), value);
       } else if (!name.startsWith("java:")) {
         writeProperty(name, value);
+      } else if (name.equals(IoConstants.GEOMETRY_FACTORY)) {
+        writeGeometryFactoryProperty((GeometryFactory)value);
       }
     }
   }
 
   private void writeHeader() {
     writeProperty(ECSV_VERSION, VERSION_1_0_0_DRAFT1);
-    
+
     writeFileProperties();
     writeTypeDefinition(metaData);
     writeDataStart(metaData);
@@ -208,7 +211,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     final String propertyName,
     final QName typeName,
     final String collectionStart) {
-    final String type = LIST_TYPE+ TYPE_PARAMETER_START + typeName
+    final String type = LIST_TYPE + TYPE_PARAMETER_START + typeName
       + TYPE_PARAMETER_END;
     writeMultiLineStart(propertyName, type, collectionStart);
   }
@@ -256,13 +259,13 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     final QName type,
     final Object value) {
     if (value != null) {
+      StringFieldType.writeQuotedString(out, name);
+      out.write(FIELD_SEPARATOR);
       final DataType dataType = DataTypes.getType(value.getClass());
       EcsvFieldType fieldType = EcsvFieldTypeRegistry.INSTANCE.getFieldType(dataType);
       if (fieldType == null) {
         fieldType = new StringFieldType();
       }
-      StringFieldType.writeQuotedString(out, name);
-      out.write(FIELD_SEPARATOR);
       writeField(DataTypes.QNAME, type);
       out.write(FIELD_SEPARATOR);
       fieldType.writeValue(out, value);
@@ -279,16 +282,23 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      writeGeometryFactoryProperty(geometryFactory);
+    }
+
+    writeAttributeHeaders(metaData);
+
+    writeMapEnd();
+  }
+
+  private void writeGeometryFactoryProperty(
+    final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
       final int srid = geometryFactory.getSRID();
       final double scaleXY = geometryFactory.getScaleXY();
       final double scaleZ = geometryFactory.getScaleZ();
       writeProperty(EcsvProperties.GEOMETRY_FACTORY_PROPERTY,
         GEOMETRY_FACTORY_TYPE, Arrays.asList(srid, scaleXY, scaleZ));
     }
-
-    writeAttributeHeaders(metaData);
-
-    writeMapEnd();
   }
 
 }

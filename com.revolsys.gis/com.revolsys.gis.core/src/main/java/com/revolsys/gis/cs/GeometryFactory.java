@@ -392,7 +392,8 @@ public class GeometryFactory extends
 
   @Override
   public String toString() {
-    return coordinateSystem.getName() + ", precision="
-      + getCoordinatesPrecisionModel();
+    return "(" + coordinateSystem.getId() + ","
+      + coordinatesPrecisionModel.getScaleXY() + ","
+      + coordinatesPrecisionModel.getScaleZ() + ")";
   }
 }

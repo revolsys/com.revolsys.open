@@ -12,10 +12,21 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
 
   public static final EcsvFieldTypeRegistry INSTANCE = new EcsvFieldTypeRegistry();
 
-  private Map<DataType, EcsvFieldType> typeMapping = new HashMap<DataType, EcsvFieldType>();
+  private GeometryFactory geometryFactory;
+
+  private final Map<DataType, EcsvFieldType> typeMapping = new HashMap<DataType, EcsvFieldType>();
 
   public EcsvFieldTypeRegistry() {
-    GeometryFactory geometryFactory = new GeometryFactory();
+    this(null);
+  }
+
+  public EcsvFieldTypeRegistry(
+    final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      this.geometryFactory = new GeometryFactory();
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
     addFieldType(new UriFieldType());
     addFieldType(new Base64BinaryFieldType());
     addFieldType(new BooleanFieldType());
@@ -34,16 +45,14 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
     addFieldType(new CollectionFieldType(DataTypes.COLLECTION));
     addFieldType(new CollectionFieldType(DataTypes.LIST));
     addFieldType(new CollectionFieldType(DataTypes.SET));
-    addFieldType(new EcsvGeometryFieldType(DataTypes.GEOMETRY,geometryFactory));
-    addFieldType(new EcsvGeometryFieldType(DataTypes.POINT,geometryFactory));
-    addFieldType(new EcsvGeometryFieldType(DataTypes.LINE_STRING,geometryFactory));
-    addFieldType(new EcsvGeometryFieldType(DataTypes.POLYGON,geometryFactory));
-  }
-
-  public void addFieldType(
-    final EcsvFieldType fieldType) {
-    final DataType dataType = fieldType.getDataType();
-    addFieldType(dataType, fieldType);
+    addFieldType(new EcsvGeometryFieldType(DataTypes.GEOMETRY,
+      this.geometryFactory));
+    addFieldType(new EcsvGeometryFieldType(DataTypes.POINT,
+      this.geometryFactory));
+    addFieldType(new EcsvGeometryFieldType(DataTypes.LINE_STRING,
+      this.geometryFactory));
+    addFieldType(new EcsvGeometryFieldType(DataTypes.POLYGON,
+      this.geometryFactory));
   }
 
   public void addFieldType(
@@ -52,8 +61,14 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
     typeMapping.put(dataType, fieldType);
   }
 
+  public void addFieldType(
+    final EcsvFieldType fieldType) {
+    final DataType dataType = fieldType.getDataType();
+    addFieldType(dataType, fieldType);
+  }
+
   public EcsvFieldType getFieldType(
-    DataType dataType) {
+    final DataType dataType) {
     final EcsvFieldType fieldType = typeMapping.get(dataType);
     if (fieldType == null) {
       return new StringFieldType();
