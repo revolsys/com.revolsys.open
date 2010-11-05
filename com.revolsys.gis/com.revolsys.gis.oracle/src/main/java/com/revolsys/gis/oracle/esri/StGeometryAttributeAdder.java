@@ -13,6 +13,8 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
@@ -22,6 +24,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.JdbcConstants;
 import com.revolsys.gis.jdbc.io.SqlFunction;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class StGeometryAttributeAdder extends JdbcAttributeAdder {
@@ -101,9 +104,13 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
         "SDE.ST_BUFFER(", ")"));
       if (spatialReference != null) {
         final int srid = spatialReference.getSrid();
-        attribute.setProperty(AttributeProperties.SRID, srid);
-        attribute.setProperty(AttributeProperties.COORDINATE_SYSTEM,
-          EpsgCoordinateSystems.getCoordinateSystem(srid));
+        final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
+        final Double scaleXy = spatialReference.getXyScale();
+        final Double scaleZ = spatialReference.getZScale();
+        GeometryFactory geometryFactory = new GeometryFactory(coordinateSystem,
+          new SimpleCoordinatesPrecisionModel(scaleXy, scaleZ));
+        attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+          geometryFactory);
       }
       return attribute;
     } else {

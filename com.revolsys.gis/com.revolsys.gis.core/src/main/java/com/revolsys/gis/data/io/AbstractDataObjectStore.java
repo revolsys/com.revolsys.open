@@ -10,7 +10,7 @@ import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -167,8 +167,8 @@ public abstract class AbstractDataObjectStore extends
     final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
-    CoordinateSystem coordinateSystem = geometryAttribute.getProperty(AttributeProperties.COORDINATE_SYSTEM);
-    Envelope envelope = boundingBox.convert(coordinateSystem);
+    GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+    Envelope envelope = boundingBox.convert(geometryFactory);
     return query(typeName, envelope);
   }
 

@@ -165,9 +165,9 @@ public class Attribute implements Cloneable {
   public Attribute(
     final String name,
     final DataType type,
-    final int length,
-    final int scale,
-    final boolean required) {
+    final Integer length,
+    final Integer scale,
+    final Boolean required) {
     this(name, type, length, scale, required, null);
   }
 
@@ -185,9 +185,9 @@ public class Attribute implements Cloneable {
   public Attribute(
     final String name,
     final DataType type,
-    final int length,
-    final int scale,
-    final boolean required,
+    final Integer length,
+    final Integer scale,
+    final Boolean required,
     final Map<QName, Object> properties) {
     this(name, type, length, scale, required, null, properties);
 
@@ -207,19 +207,25 @@ public class Attribute implements Cloneable {
   public Attribute(
     final String name,
     final DataType type,
-    final int length,
-    final int scale,
-    final boolean required,
+    final Integer length,
+    final Integer scale,
+    final Boolean required,
     final String description,
     final Map<QName, Object> properties) {
     this.name = name;
     this.description = description;
     this.type = type;
-    this.required = required;
-    this.length = length;
-    this.scale = scale;
+    if (required != null) {
+      this.required = required;
+    }
+    if (length != null) {
+      this.length = length;
+    }
+    if (scale != null) {
+      this.scale = scale;
+    }
     this.description = description;
-     if (properties != null) {
+    if (properties != null) {
       this.properties.putAll(properties);
     }
 

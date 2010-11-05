@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
@@ -145,7 +146,7 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     final String geometryColumnName = geometryAttribute.getName();
-    CoordinateSystem coordinateSystem = geometryAttribute.getProperty(AttributeProperties.COORDINATE_SYSTEM);
+    GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
 
     final double x1 = envelope.getMinX();
     final double y1 = envelope.getMinY();
@@ -162,15 +163,9 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
 
       "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))"
       + ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-    final List<Object> parameters = new ArrayList<Object>();
-    parameters.add(coordinateSystem.getId());
-    parameters.add(x1);
-    parameters.add(y1);
-    parameters.add(x2);
-    parameters.add(y2);
     final JdbcQueryReader reader = createReader();
     JdbcQuery query = new JdbcQuery(metaData, sql.toString(),
-      coordinateSystem.getId(), x1, y1, x2, y2);
+      geometryFactory.getSRID(), x1, y1, x2, y2);
     reader.addQuery(query);
     return reader;
   }

@@ -38,6 +38,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
     String attributeName,
     Object defaultValue);
 
+  DataObjectMetaData clone();
+
   DataObject createDataObject();
 
   Attribute getAttribute(

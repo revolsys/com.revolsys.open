@@ -2,14 +2,7 @@ package com.revolsys.gis.ecsv.io;
 
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
@@ -21,25 +14,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.ecsv.io.type.EcsvGeometryFieldType;
+import com.revolsys.gis.ecsv.io.type.EcsvFieldType;
+import com.revolsys.gis.ecsv.io.type.EcsvFieldTypeRegistry;
+import com.revolsys.gis.ecsv.io.type.StringFieldType;
 import com.revolsys.io.AbstractWriter;
-import com.revolsys.io.IoConstants;
-import com.vividsolutions.jts.geom.Geometry;
 
-public class EcsvDataObjectWriter extends AbstractWriter<DataObject> {
-  private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
-    "#.#########################");
-
-  private final List<QName> attributeHeaderTypes = Arrays.asList(new QName[] {
-    EcsvConstants.ATTRIBUTE_NAME, EcsvConstants.ATTRIBUTE_TYPE,
-    EcsvConstants.ATTRIBUTE_LENGTH, EcsvConstants.ATTRIBUTE_SCALE,
-    EcsvConstants.ATTRIBUTE_REQUIRED
-  });
-
-  private final SimpleDateFormat dateFormat = new SimpleDateFormat(
-    "yyyy-MM-dd'T'HH:mm:ss");
-
-  private final EcsvGeometryFieldType geometryFieldType = new EcsvGeometryFieldType();
+public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
+  EcsvConstants {
 
   private final DataObjectMetaData metaData;
 
@@ -52,20 +33,12 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> {
     final java.io.Writer out) {
     this.metaData = metaData;
     this.out = new PrintWriter(new BufferedWriter(out));
-    setProperty(EcsvConstants.TYPE_NAME, metaData.getName());
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
-    if (geometryAttribute != null) {
-      final Integer srid = geometryAttribute.getProperty(AttributeProperties.SRID);
-      if (srid != null) {
-        setProperty(IoConstants.GEOMETRY_FACTORY,
-          GeometryFactory.getFactory(srid));
-      }
-    }
 
   }
 
   @Override
   public void close() {
+    out.print(MULTI_LINE_LIST_END);
     out.close();
   }
 
@@ -75,7 +48,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   private void newLine() {
-    out.print('\n');
+    out.print(RECORD_SEPARATOR);
   }
 
   @Override
@@ -87,133 +60,101 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> {
     final DataObject object) {
     if (!open) {
       open = true;
-      writeFileProperties();
-      writeAttributeHeaders();
+      writeHeader();
     }
     final int attributeCount = metaData.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
-      writeField(value);
+      final DataType dataType = metaData.getAttributeType(i);
+      writeField(dataType, value);
       if (i < attributeCount - 1) {
-        out.print(',');
+        out.print(FIELD_SEPARATOR);
       }
     }
     newLine();
   }
 
-  private void writeAttributeHeaders() {
+  private void writeAttributeHeaders(
+    final DataObjectMetaData metaData) {
+    writeMapStart(ATTRIBUTE_PROPERTIES);
+    writeMultiLineListStart(EcsvProperties.ATTRIBUTE_NAME, DataTypes.STRING,
+      COLLECTION_START);
     final int numAttributes = metaData.getAttributeCount();
     for (int i = 0; i < numAttributes; i++) {
       final String name = metaData.getAttributeName(i);
-      writeField(name);
+      writeField(DataTypes.STRING, name);
       if (i < numAttributes - 1) {
-        out.print(',');
+        out.print(FIELD_SEPARATOR);
       }
     }
     newLine();
+    writeMultiLineEnd(COLLECTION_END);
+
+    writeMultiLineListStart(EcsvProperties.ATTRIBUTE_TYPE, DataTypes.QNAME,
+      COLLECTION_START);
     for (int i = 0; i < numAttributes; i++) {
       final DataType type = metaData.getAttributeType(i);
-      writeField(type.getName());
+      writeField(DataTypes.QNAME, type.getName());
       if (i < numAttributes - 1) {
-        out.print(',');
+        out.print(FIELD_SEPARATOR);
       }
     }
     newLine();
+    writeMultiLineEnd(COLLECTION_END);
+
+    writeMultiLineListStart(EcsvProperties.ATTRIBUTE_LENGTH, DataTypes.INT,
+      COLLECTION_START);
     for (int i = 0; i < numAttributes; i++) {
       final Integer length = metaData.getAttributeLength(i);
-      writeField(length);
+      writeField(DataTypes.INTEGER, length);
       if (i < numAttributes - 1) {
-        out.print(',');
+        out.print(FIELD_SEPARATOR);
       }
     }
     newLine();
+    writeMultiLineEnd(COLLECTION_END);
+
+    writeMultiLineListStart(EcsvProperties.ATTRIBUTE_SCALE, DataTypes.INT,
+      COLLECTION_START);
     for (int i = 0; i < numAttributes; i++) {
       final Integer scale = metaData.getAttributeScale(i);
-      writeField(scale);
+      writeField(DataTypes.INTEGER, scale);
       if (i < numAttributes - 1) {
-        out.print(',');
+        out.print(FIELD_SEPARATOR);
       }
     }
     newLine();
+    writeMultiLineEnd(COLLECTION_END);
+
+    writeMultiLineListStart(EcsvProperties.ATTRIBUTE_REQUIRED,
+      DataTypes.BOOLEAN, COLLECTION_START);
     for (int i = 0; i < numAttributes; i++) {
       final Boolean required = metaData.isAttributeRequired(i);
-      writeField(required);
+      writeField(DataTypes.BOOLEAN, required);
       if (i < numAttributes - 1) {
-        out.print(',');
+        out.print(FIELD_SEPARATOR);
       }
     }
     newLine();
-    newLine();
+    writeMultiLineEnd(COLLECTION_END);
+
+    writeMapEnd();
+  }
+
+  private void writeDataStart(
+    final DataObjectMetaData metaData) {
+    writeMultiLineListStart(RECORDS, metaData.getName(), MULTI_LINE_LIST_START);
   }
 
   private void writeField(
+    final DataType dataType,
     final Object value) {
-    writeField(value, "\"");
-  }
-
-  @SuppressWarnings("unchecked")
-  private void writeField(
-    final Object value,
-    final String wrapChars) {
     if (value != null) {
-      if (value instanceof Collection) {
-        final Collection<Object> collection = (Collection<Object>)value;
-        out.write(wrapChars);
-        final Iterator<Object> iterator = collection.iterator();
-        while (iterator.hasNext()) {
-          final Object object = iterator.next();
-          writeField(object, wrapChars + wrapChars);
-          if (iterator.hasNext()) {
-            out.write(',');
-          }
-        }
-        out.write(wrapChars);
-      } else if (value instanceof Geometry) {
-        final Geometry geometry = (Geometry)value;
-        out.write('"');
-        geometryFieldType.write(out, geometry);
-        out.write('"');
-      } else if (value instanceof String) {
-        final String string = (String)value;
-        writeField(string, wrapChars);
-      } else if (value instanceof Date) {
-        final Date date = (Date)value;
-        final String string = dateFormat.format(date);
-        writeField(string, wrapChars);
-      } else if (value instanceof Number) {
-        writeField(NUMBER_FORMAT.format(value), wrapChars);
+      final EcsvFieldType fieldType = EcsvFieldTypeRegistry.INSTANCE.getFieldType(dataType);
+      if (fieldType == null) {
+        StringFieldType.writeQuotedString(out, value);
       } else {
-        writeField(value.toString(), wrapChars);
-      }
-    }
-  }
-
-  private void writeField(
-    final String value) {
-    final String wrapChars = "\"";
-    writeField(value, wrapChars);
-  }
-
-  private void writeField(
-    final String value,
-    final String wrapChars) {
-    if (value != null) {
-      if (value.length() == 0) {
-        out.write(wrapChars);
-        out.write(wrapChars);
-      } else if (value.indexOf(',') != -1 || value.indexOf('\n') != -1) {
-        out.write(wrapChars);
-        for (final char c : value.toCharArray()) {
-          if (c == '"') {
-            out.write(wrapChars);
-            out.write(wrapChars);
-          } else {
-            out.write(c);
-          }
-        }
-        out.write(wrapChars);
-      } else {
-        out.write(value);
+        fieldType.writeValue(out, value);
       }
     }
   }
@@ -224,29 +165,130 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> {
       final Object value = property.getValue();
       final String defaultPrefix = "com.revolsys.io.";
       if (name.startsWith(defaultPrefix)) {
-        writeFileProperty(name.substring(defaultPrefix.length()), value);
+        writeProperty(name.substring(defaultPrefix.length()), value);
       } else if (!name.startsWith("java:")) {
-        writeFileProperty(name, value);
+        writeProperty(name, value);
       }
     }
-    writeFileProperty(EcsvConstants.ATTRIBUTE_HEADER_TYPES,
-      attributeHeaderTypes);
+  }
+
+  private void writeHeader() {
+    writeProperty(ECSV_VERSION, VERSION_1_0_0_DRAFT1);
+    
+    writeFileProperties();
+    writeTypeDefinition(metaData);
+    writeDataStart(metaData);
+  }
+
+  private void writeMapEnd() {
+    out.write(MAP_END);
     newLine();
   }
 
-  private void writeFileProperty(
+  private void writeMapStart(
+    final String propertyName) {
+    writeMultiLineStart(propertyName, MAP_TYPE, MAP_START);
+  }
+
+  private void writeMultiLineEnd(
+    final String collectionStart) {
+    out.write(collectionStart);
+    newLine();
+  }
+
+  private void writeMultiLineListStart(
+    final String propertyName,
+    final DataType dataType,
+    final String collectionStart) {
+    final QName typeName = dataType.getName();
+    writeMultiLineListStart(propertyName, typeName, collectionStart);
+  }
+
+  private void writeMultiLineListStart(
+    final String propertyName,
+    final QName typeName,
+    final String collectionStart) {
+    final String type = LIST_TYPE+ TYPE_PARAMETER_START + typeName
+      + TYPE_PARAMETER_END;
+    writeMultiLineStart(propertyName, type, collectionStart);
+  }
+
+  private void writeMultiLineStart(
+    final String propertyName,
+    final QName typeName,
+    final String collectionStart) {
+    writeMultiLineStart(propertyName, typeName.toString(), collectionStart);
+  }
+
+  private void writeMultiLineStart(
+    final String propertyName,
+    final String typeName,
+    final String collectionStart) {
+    StringFieldType.writeQuotedString(out, propertyName);
+    out.print(FIELD_SEPARATOR);
+    StringFieldType.writeQuotedString(out, typeName);
+    out.print(FIELD_SEPARATOR);
+    out.print(collectionStart);
+    newLine();
+  }
+
+  private void writeProperty(
     final String name,
     final Object value) {
     if (value != null) {
       final DataType dataType = DataTypes.getType(value.getClass());
-      final QName type = dataType.getName();
-      writeField(name);
-      out.write(',');
-      writeField(type);
-      out.write(',');
-      writeField(value);
+      EcsvFieldType fieldType = EcsvFieldTypeRegistry.INSTANCE.getFieldType(dataType);
+      if (fieldType == null) {
+        fieldType = new StringFieldType();
+      }
+      final QName type = fieldType.getTypeName();
+      StringFieldType.writeQuotedString(out, name);
+      out.write(FIELD_SEPARATOR);
+      writeField(DataTypes.QNAME, type);
+      out.write(FIELD_SEPARATOR);
+      fieldType.writeValue(out, value);
       newLine();
     }
+  }
+
+  private void writeProperty(
+    final String name,
+    final QName type,
+    final Object value) {
+    if (value != null) {
+      final DataType dataType = DataTypes.getType(value.getClass());
+      EcsvFieldType fieldType = EcsvFieldTypeRegistry.INSTANCE.getFieldType(dataType);
+      if (fieldType == null) {
+        fieldType = new StringFieldType();
+      }
+      StringFieldType.writeQuotedString(out, name);
+      out.write(FIELD_SEPARATOR);
+      writeField(DataTypes.QNAME, type);
+      out.write(FIELD_SEPARATOR);
+      fieldType.writeValue(out, value);
+      newLine();
+    }
+  }
+
+  private void writeTypeDefinition(
+    final DataObjectMetaData metaData) {
+
+    writeMapStart(TYPE_DEFINITION);
+
+    writeProperty(EcsvProperties.NAME, metaData.getName());
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    if (geometryAttribute != null) {
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final int srid = geometryFactory.getSRID();
+      final double scaleXY = geometryFactory.getScaleXY();
+      final double scaleZ = geometryFactory.getScaleZ();
+      writeProperty(EcsvProperties.GEOMETRY_FACTORY_PROPERTY,
+        GEOMETRY_FACTORY_TYPE, Arrays.asList(srid, scaleXY, scaleZ));
+    }
+
+    writeAttributeHeaders(metaData);
+
+    writeMapEnd();
   }
 
 }

@@ -88,6 +88,10 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     return autoCommit;
   }
 
+  public void open() {
+    iterator.hasNext();
+  }
+
   public Iterator<DataObject> iterator() {
     initialize();
     if (iterator == null) {

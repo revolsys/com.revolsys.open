@@ -107,9 +107,9 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
           geometryType = GEOMETRY_TYPE_POINT;
         } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
           geometryType = GEOMETRY_TYPE_MULTI_POINT;
-        } else if (geometryDataType.equals(DataTypes.LINESTRING)) {
+        } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
           geometryType = GEOMETRY_TYPE_POLYLINE;
-        } else if (geometryDataType.equals(DataTypes.MULTI_LINESTRING)) {
+        } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
           geometryType = GEOMETRY_TYPE_POLYLINE;
         } else if (geometryDataType.equals(DataTypes.POLYGON)) {
           geometryType = GEOMETRY_TYPE_POLYGON;

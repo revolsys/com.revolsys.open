@@ -683,7 +683,7 @@ public class Base64 {
    * /rfcs/rfc3548.html</a>. Notice that the last two bytes become "hyphen" and
    * "underscore" instead of "plus" and "slash."
    */
-  private final static byte[] _URL_SAFE_ALPHABET = {
+  final static byte[] _URL_SAFE_ALPHABET = {
     (byte)'A', (byte)'B', (byte)'C', (byte)'D', (byte)'E', (byte)'F',
     (byte)'G', (byte)'H', (byte)'I', (byte)'J', (byte)'K', (byte)'L',
     (byte)'M', (byte)'N', (byte)'O', (byte)'P', (byte)'Q', (byte)'R',

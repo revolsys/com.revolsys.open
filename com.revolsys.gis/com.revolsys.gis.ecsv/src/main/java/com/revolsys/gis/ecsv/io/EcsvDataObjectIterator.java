@@ -1,0 +1,443 @@
+package com.revolsys.gis.ecsv.io;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import javax.xml.namespace.QName;
+
+import org.apache.log4j.Logger;
+import org.springframework.core.io.Resource;
+
+import com.revolsys.collection.AbstractIterator;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.DataObjectIterator;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectFactory;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.ecsv.io.type.EcsvFieldType;
+import com.revolsys.gis.ecsv.io.type.EcsvFieldTypeRegistry;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
+
+public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
+  implements DataObjectIterator, EcsvConstants {
+  private static final Logger LOG = Logger.getLogger(EcsvDataObjectIterator.class);
+
+  private DataObjectFactory dataObjectFactory;
+
+  /** The reader to */
+  private BufferedReader in;
+
+  /** The metadata for the data being read by this iterator. */
+  private DataObjectMetaData metaData;
+
+  /**
+   * The current record number.
+   */
+  private int recordCount = 0;
+
+  private Resource resource;
+
+  private Map<QName, DataObjectMetaData> metaDataMap = new HashMap<QName, DataObjectMetaData>();
+
+  /**
+   * Constructs CSVReader with supplied separator and quote char.
+   * 
+   * @param reader
+   * @throws IOException
+   */
+  public EcsvDataObjectIterator(
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory)
+    throws IOException {
+    this.resource = resource;
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  protected void doInit() {
+    try {
+      this.in = new BufferedReader(new InputStreamReader(
+        resource.getInputStream()));
+      readFileProperties();
+      readRecordHeader();
+      GeometryFactory geomFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+      if (geomFactory == null) {
+        geomFactory = new GeometryFactory();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to read file " + resource, e);
+    }
+  }
+
+  /**
+   * Closes the underlying reader.
+   * 
+   * @throws IOException if the close fails
+   */
+  protected void doClose() {
+    FileUtil.closeSilent(in);
+  }
+
+  public DataObjectMetaData getMetaData() {
+    return metaData;
+  }
+
+  /**
+   * Reads the next line from the file.
+   * 
+   * @return the next line from the file without trailing newline
+   * @throws IOException if bad things happen during the read
+   */
+  private String getNextLine()
+    throws IOException {
+    final String nextLine = in.readLine();
+    return nextLine;
+  }
+
+  /**
+   * Parse a record containing an array of String values into a DataObject with
+   * the strings converted to the objects based on the attribute data type.
+   * 
+   * @param record The record.
+   * @return The DataObject.
+   */
+  private DataObject parseDataObject(
+    final String[] record) {
+    recordCount++;
+    final DataObject object = dataObjectFactory.createDataObject(metaData);
+    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+      final DataType type = metaData.getAttributeType(i);
+      String string = null;
+      if (i < record.length) {
+        string = record[i];
+      }
+      try {
+        final Object value = parseValue(type, string, null);
+        if (value != null) {
+          object.setValue(i, value);
+        }
+      } catch (final Throwable e) {
+        LOG.error(
+          "Value " + string + " invalid for field "
+            + metaData.getAttributeName(i) + " for record " + recordCount, e);
+      }
+    }
+    return object;
+  }
+
+  /**
+   * Parses an incoming String and returns an array of elements.
+   * 
+   * @param nextLine the string to parse
+   * @return the comma-tokenized list of elements, or null if nextLine is null
+   * @throws IOException if bad things happen during the read
+   */
+  private String[] parseLine(
+    final String nextLine,
+    final boolean readLine)
+    throws IOException {
+    String line = nextLine;
+    if (line.length() == 0) {
+      return new String[0];
+    } else {
+
+      final List<String> fields = new ArrayList<String>();
+      StringBuffer sb = new StringBuffer();
+      boolean inQuotes = false;
+      boolean hadQuotes = false;
+      do {
+        if (inQuotes && readLine) {
+          sb.append("\n");
+          line = getNextLine();
+          if (line == null) {
+            break;
+          }
+        }
+        for (int i = 0; i < line.length(); i++) {
+          final char c = line.charAt(i);
+          if (c == DOUBLE_QUOTE) {
+            hadQuotes = true;
+            if (inQuotes && line.length() > (i + 1)
+              && line.charAt(i + 1) == DOUBLE_QUOTE) {
+              sb.append(line.charAt(i + 1));
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+              if (i > 2 && line.charAt(i - 1) != FIELD_SEPARATOR
+                && line.length() > (i + 1)
+                && line.charAt(i + 1) != FIELD_SEPARATOR) {
+                sb.append(c);
+              }
+            }
+          } else if (c == FIELD_SEPARATOR && !inQuotes) {
+            hadQuotes = false;
+            if (hadQuotes || sb.length() > 0) {
+              fields.add(sb.toString());
+            } else {
+              fields.add(null);
+            }
+            sb = new StringBuffer();
+          } else {
+            sb.append(c);
+          }
+        }
+      } while (inQuotes);
+      if (sb.length() > 0 || fields.size() > 0) {
+        if (hadQuotes || sb.length() > 0) {
+          fields.add(sb.toString());
+        } else {
+          fields.add(null);
+        }
+      }
+      return fields.toArray(new String[0]);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private Object parseValue(
+    final DataType type,
+    final String text,
+    String[] record)
+    throws IOException {
+    if (type.equals(DataTypes.MAP)) {
+      return readMap();
+    } else {
+      final EcsvFieldType fieldType = EcsvFieldTypeRegistry.INSTANCE.getFieldType(type);
+      return fieldType.parseValue(text);
+    }
+  }
+
+  private void readFileProperties()
+    throws IOException {
+    String[] record = readNextRecord();
+    while (record != null) {
+      if (record.length >= 3) {
+        final String name = record[0];
+        if (name.equals(RECORDS)) {
+          QName typeName = getTypeNameParameter(record[1]);
+          metaData = metaDataMap.get(typeName);
+          if (metaData == null) {
+            throw new IllegalArgumentException("No typeDefinition for "
+              + typeName);
+          }
+          return;
+        } else if (name.equals(TYPE_DEFINITION)) {
+          final Object value = parseValue(record);
+          addMetaData((Map<String, Object>)value);
+
+        } else {
+          final Object value = parseValue(record);
+          setProperty(name, value);
+        }
+      } else if (record.length < 3) {
+        throw new IllegalArgumentException(
+          "Expecting a name, type, value triplet not" + Arrays.toString(record));
+      }
+      record = readNextRecord();
+    }
+  }
+
+  private QName getTypeNameParameter(
+    String type) {
+    type = type.substring(type.indexOf(TYPE_PARAMETER_START) + 1,
+      type.indexOf(TYPE_PARAMETER_END));
+    QName typeName = QName.valueOf(type);
+    return typeName;
+  }
+
+  private void addMetaData(
+    Map<String, Object> map) {
+    final QName typeName = (QName)map.get(NAME);
+    final List<Attribute> attributes = new ArrayList<Attribute>();
+    Map<String, List<?>> attributeProperties = (Map<String, List<?>>)map.get(ATTRIBUTE_PROPERTIES);
+    if (attributeProperties != null) {
+      final List<?> names = attributeProperties.get(EcsvProperties.ATTRIBUTE_NAME);
+      if (names != null) {
+        for (int i = 0; i < names.size(); i++) {
+          final String name = (String)names.get(i);
+          final QName attributeTypeName = getAttributeHeader(
+            attributeProperties, EcsvProperties.ATTRIBUTE_TYPE, i);
+          final Integer attributeLength = getAttributeHeader(
+            attributeProperties, EcsvProperties.ATTRIBUTE_LENGTH, i);
+          final Integer attributeScale = getAttributeHeader(
+            attributeProperties, EcsvProperties.ATTRIBUTE_SCALE, i);
+          final Boolean attributeTypeRequired = getAttributeHeader(
+            attributeProperties, EcsvProperties.ATTRIBUTE_REQUIRED, i);
+          DataType type = null;
+          if (attributeTypeName != null) {
+            type = DataTypes.getType(attributeTypeName);
+          }
+          if (type == null) {
+            type = DataTypes.STRING;
+          }
+          attributes.add(new Attribute(name, type, attributeLength,
+            attributeScale, attributeTypeRequired));
+        }
+      }
+    }
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+      typeName, getProperties(), attributes);
+    metaDataMap.put(typeName, metaData);
+  }
+
+  private <V> V getAttributeHeader(
+    Map<String, List<?>> attributeProperties,
+    String attributeType,
+    int i) {
+    List<?> values = attributeProperties.get(attributeType);
+    if (values == null) {
+      return null;
+    } else {
+      return (V)values.get(i);
+    }
+  }
+
+  private Object parseValue(
+    String[] record)
+    throws IOException {
+    final String type = record[1];
+    final String text = record[2];
+    if (type.startsWith("List<")) {
+      final QName typeName = QName.valueOf(type.substring(5, type.indexOf(">")));
+      final DataType dataType = DataTypes.getType(typeName);
+      if (text.equals(COLLECTION_START)) {
+        return parseCommaList(dataType, record);
+      } else {
+        // return parseMultiLineList(typeName, record);
+        return null;
+      }
+    } else {
+      final QName typeName = QName.valueOf(type);
+      final DataType dataType = DataTypes.getType(typeName);
+      final Object value = parseValue(dataType, text, record);
+      return value;
+    }
+  }
+
+  private Object parseCommaList(
+    DataType dataType,
+    String[] record)
+    throws IOException {
+    List<Object> values = new ArrayList<Object>();
+    int offset = 3;
+    do {
+      for (int i = offset; i < record.length; i++) {
+        String text = record[i];
+        if (text.equals(COLLECTION_END)) {
+          return values;
+        } else {
+          Object value = parseValue(dataType, text, null);
+          values.add(value);
+        }
+      }
+      record = readNextRecord();
+      offset = 0;
+    } while (record != null);
+    return values;
+  }
+
+  private boolean isBlockEnd(
+    String[] record,
+    String endCharacter) {
+    if (record != null) {
+      if (record.length > 1) {
+        return false;
+      } else if (record.length == 1) {
+        if (!record[0].equals(endCharacter)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private Object readMap()
+    throws IOException {
+    Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    String[] record = readNextRecord();
+    while (!isBlockEnd(record, MAP_END)) {
+      if (record.length == 3) {
+        final String name = record[0];
+        final Object value = parseValue(record);
+        properties.put(name, value);
+      }
+      record = readNextRecord();
+    }
+    return properties;
+  }
+
+  protected DataObject getNext() {
+    try {
+      final String[] record = readNextRecord();
+      if (record != null && record.length > 0) {
+        if (record.length > 1 || !record[0].equals(MULTI_LINE_LIST_END)) {
+          return parseDataObject(record);
+        }
+      }
+      throw new NoSuchElementException();
+    } catch (final IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Reads the next line from the buffer and converts to a string array.
+   * 
+   * @return a string array with each comma-separated element as a separate
+   *         entry.
+   * @throws IOException if bad things happen during the read
+   */
+  private String[] readNextRecord()
+    throws IOException {
+    final String nextLine = getNextLine();
+    if (nextLine == null) {
+      return null;
+    } else {
+      return parseLine(nextLine, true);
+    }
+  }
+
+  /**
+   * Read the record header block.
+   * 
+   * @throws IOException If there was an error reading the header.
+   */
+  private void readRecordHeader()
+    throws IOException {
+    // if (hasNext) {
+    // int headerIndex = 0;
+    // for (String[] line = readNextRecord(); line != null && line.length > 0;
+    // line = readNextRecord()) {
+    // final List<String> attributeHeaderTypeNames =
+    // getProperty(EcsvProperties.ATTRIBUTE_HEADER_TYPES);
+    // final List<QName> attributeHeaderTypes = parseListValue(
+    // attributeHeaderTypeNames, DataTypes.QNAME);
+    // if (headerIndex < attributeHeaderTypes.size()) {
+    // final QName headerType = attributeHeaderTypes.get(headerIndex);
+    // attributeHeaderValues.put(headerType, Arrays.asList(line));
+    // headerIndex++;
+    // }
+    // }
+    // // createMetaData();
+    // }
+  }
+
+  /**
+   * Removing items from the iterator is not supported.
+   */
+  public void remove() {
+    throw new UnsupportedOperationException();
+  }
+}

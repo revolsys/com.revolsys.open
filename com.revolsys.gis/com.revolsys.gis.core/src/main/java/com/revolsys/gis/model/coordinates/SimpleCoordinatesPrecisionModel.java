@@ -7,7 +7,7 @@ public class SimpleCoordinatesPrecisionModel implements
   public static double makePrecise(
     final double value,
     final double scale) {
-    if (Double.isNaN(scale)) {
+    if (scale <= 0) {
       return value;
     } else if (Double.isNaN(value)) {
       return value;
@@ -16,9 +16,9 @@ public class SimpleCoordinatesPrecisionModel implements
     }
   }
 
-  private double scaleXY = Double.NaN;
+  private double scaleXY = 0;
 
-  private double scaleZ = Double.NaN;
+  private double scaleZ = 0;
 
   public SimpleCoordinatesPrecisionModel() {
   }
@@ -53,7 +53,7 @@ public class SimpleCoordinatesPrecisionModel implements
 
   public void makePrecise(
     final Coordinates coordinates) {
-    if (!Double.isNaN(scaleXY)) {
+    if (scaleXY >0) {
       final double x = coordinates.getX();
       final double newX = makePrecise(x, scaleXY);
       coordinates.setX(newX);
@@ -62,7 +62,7 @@ public class SimpleCoordinatesPrecisionModel implements
       final double newY = makePrecise(y, scaleXY);
       coordinates.setY(newY);
     }
-    if (!Double.isNaN(scaleZ)) {
+    if (scaleZ > 0) {
       if (coordinates.getNumAxis() > 2) {
         final double z = coordinates.getZ();
         final double newZ = makePrecise(z, scaleZ);
@@ -83,9 +83,9 @@ public class SimpleCoordinatesPrecisionModel implements
 
   @Override
   public String toString() {
-    if (Double.isNaN(scaleXY)) {
+    if (scaleXY <=0) {
       return "floating";
-    } else if (Double.isNaN(scaleZ)) {
+    } else if (scaleZ > 0) {
       return "fixed(" + scaleXY + ")";
     } else {
       return "fixed(" + scaleXY + "," + scaleZ + ")";

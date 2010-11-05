@@ -53,7 +53,7 @@ public final class ArcSdeConstants {
         "Unable to create SQL name for SDE.ST_GEOMETRY");
     }
     DATA_TYPE_MAP.put(POINT, DataTypes.POINT);
-    DATA_TYPE_MAP.put(LINESTRING, DataTypes.LINESTRING);
+    DATA_TYPE_MAP.put(LINESTRING, DataTypes.LINE_STRING);
     DATA_TYPE_MAP.put(POLYGON, DataTypes.POLYGON);
   }
 

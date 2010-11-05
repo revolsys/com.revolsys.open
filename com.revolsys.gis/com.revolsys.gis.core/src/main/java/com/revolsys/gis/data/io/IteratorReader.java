@@ -27,6 +27,10 @@ public class IteratorReader<T> extends AbstractReader<T> {
     return iterator;
   }
 
+  public void open() {
+    iterator.hasNext();
+  }
+
   @Override
   public void setProperty(
     String name,

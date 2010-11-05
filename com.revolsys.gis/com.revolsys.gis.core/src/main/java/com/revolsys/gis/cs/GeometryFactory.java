@@ -97,10 +97,27 @@ public class GeometryFactory extends
     return lineStrings;
   }
 
+  public static Polygon[] toPolygonArray(
+    final GeometryFactory factory,
+    final List<?> polygonList) {
+    final Polygon[] polygons = new Polygon[polygonList.size()];
+    for (int i = 0; i < polygonList.size(); i++) {
+      final Object value = polygonList.get(i);
+      if (value instanceof Polygon) {
+        final Polygon polygon = (Polygon)value;
+        polygons[i] = polygon;
+      } else if (value instanceof List) {
+        final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
+        polygons[i] = factory.createPolygon(coordinateList);
+      }
+    }
+    return polygons;
+  }
+
   public static MultiPolygon toMultiPolygon(
     final GeometryFactory geometryFactory,
-    final List<Polygon> polygons) {
-    final Polygon[] polygonArray = toPolygonArray(polygons);
+    final List<?> polygons) {
+    final Polygon[] polygonArray = toPolygonArray(geometryFactory, polygons);
     return geometryFactory.createMultiPolygon(polygonArray);
   }
 
@@ -277,7 +294,7 @@ public class GeometryFactory extends
   }
 
   public MultiPolygon createMultiPolygon(
-    final List<Polygon> polygons) {
+    final List<?> polygons) {
     return toMultiPolygon(this, polygons);
   }
 

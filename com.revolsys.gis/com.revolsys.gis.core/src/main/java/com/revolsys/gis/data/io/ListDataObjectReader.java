@@ -40,4 +40,6 @@ public class ListDataObjectReader extends AbstractReader<DataObject> implements
     return objects.iterator();
   }
 
+  public void open() {
+  }
 }

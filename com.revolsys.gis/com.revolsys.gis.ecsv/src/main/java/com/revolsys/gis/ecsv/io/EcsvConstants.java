@@ -4,40 +4,49 @@ import java.nio.charset.Charset;
 
 import javax.xml.namespace.QName;
 
-public interface EcsvConstants {
-  String NS_PREFIX = "";
+public interface EcsvConstants extends EcsvProperties {
+  String _NS_PREFIX = "";
 
-  String NS_URI = "";
-
-  String ATTRIBUTE_HEADER_TYPES = "attributeHeaderTypes";
-
-  QName ATTRIBUTE_LENGTH = new QName(NS_URI, "attributeLength", NS_PREFIX);
-
-  QName ATTRIBUTE_NAME = new QName(NS_URI, "attributeName", NS_PREFIX);
-
-  QName ATTRIBUTE_REQUIRED = new QName(NS_URI, "attributeRequired", NS_PREFIX);
-
-  QName ATTRIBUTE_SCALE = new QName(NS_URI, "attributeScale", NS_PREFIX);
-
-  QName ATTRIBUTE_TYPE = new QName(NS_URI, "attributeType", NS_PREFIX);
+  String _NS_URI = "";
 
   Charset CHARACTER_SET = Charset.forName("UTF-8");
 
+  String COLLECTION_END = ")";
+
+  String COLLECTION_START = "(";
+
   String DESCRIPTION = "Enhanced CSV";
+
+  char DOUBLE_QUOTE = '"';
+
+  String DOUBLE_QUOTE_ESCAPE = "\"\"";
 
   char FIELD_SEPARATOR = ',';
 
   String FILE_EXTENSION = "ecsv";
 
-  QName META_DATA = new QName(NS_URI, "metaData", NS_PREFIX);
+  QName GEOMETRY_FACTORY_TYPE = new QName(_NS_URI, "GeometryFactory",
+    _NS_PREFIX);
 
-  QName META_DATA_TYPE_NAME = new QName(NS_URI, "metaDataTypeName", NS_PREFIX);
+  QName LIST_TYPE = new QName(_NS_URI, "List", _NS_PREFIX);
 
-  char QUOTE_CHARACTER = '"';
+  QName MAP_TYPE = new QName(_NS_URI, "Map", _NS_PREFIX);
 
-  String SRID = "srid";
+  String MAP_END = "}";
 
-  String TYPE_NAME = "typeName";
+  String MAP_START = "{";
 
-  String MEDIA_TYPE = "text/x-ecsv";
+  String TYPE_PARAMETER_START = "<";
+
+  String TYPE_PARAMETER_END = ">";
+
+  String MEDIA_TYPE = "text/x-e-csv";
+
+  String MULTI_LINE_LIST_END = "]";
+
+  String MULTI_LINE_LIST_START = "[";
+
+  String RECORD_SEPARATOR = "\n";
+
+  String VERSION_1_0_0_DRAFT1 = "1.0.0.DRAFT1";
 }

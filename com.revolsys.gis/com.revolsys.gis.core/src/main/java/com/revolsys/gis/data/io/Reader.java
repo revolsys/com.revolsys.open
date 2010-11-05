@@ -54,6 +54,11 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties{
   void close();
 
   /**
+   * Open the reader so that it is ready to be read from.
+   */
+  void open();
+  
+  /**
    * Return a new iterator for type T at the first item to read. Subsequent
    * calls to this method must return a new iterator. Implementors of this are
    * responsible for cleaning up the iterator when the hasNext or next method on

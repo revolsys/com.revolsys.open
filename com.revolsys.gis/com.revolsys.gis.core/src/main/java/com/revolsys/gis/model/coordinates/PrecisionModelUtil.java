@@ -10,7 +10,7 @@ public class PrecisionModelUtil {
     } else if (coordinatesPrecisionModel instanceof SimpleCoordinatesPrecisionModel) {
       SimpleCoordinatesPrecisionModel simpleModel = (SimpleCoordinatesPrecisionModel)coordinatesPrecisionModel;
       final double scaleXY = simpleModel.getScaleXY();
-      if (Double.isNaN(scaleXY)) {
+      if (scaleXY <= 0) {
         return new PrecisionModel();
       } else {
         return new PrecisionModel(scaleXY);

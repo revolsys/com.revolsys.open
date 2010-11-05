@@ -223,6 +223,11 @@ public class BoundingBox extends Envelope {
     }
   }
 
+  public BoundingBox convert(
+    final GeometryFactory geometryFactory) {
+    return convert(geometryFactory.getCoordinateSystem());
+  }
+
   @Override
   public boolean equals(
     final Object other) {

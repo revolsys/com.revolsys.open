@@ -3,7 +3,6 @@ package com.revolsys.gis.data.io;
 import java.util.Iterator;
 import java.util.Map;
 
-
 public class DelegatingReader<T> extends AbstractReader<T> {
   private Reader<T> reader;
 
@@ -35,6 +34,10 @@ public class DelegatingReader<T> extends AbstractReader<T> {
   }
 
   protected void doClose() {
+  }
+
+  public void open() {
+    reader.open();
   }
 
   @Override

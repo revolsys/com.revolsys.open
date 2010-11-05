@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -21,14 +22,14 @@ import com.revolsys.jdbc.JdbcUtils;
 public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<String, DataType>();
-  
+
   static {
     DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
     DATA_TYPE_MAP.put("POINT", DataTypes.POINT);
-    DATA_TYPE_MAP.put("LINE_STRING", DataTypes.MULTI_LINESTRING);
-    DATA_TYPE_MAP.put("POLYGON", DataTypes.MULTI_LINESTRING);
+    DATA_TYPE_MAP.put("LINE_STRING", DataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put("POLYGON", DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put("MULTIPOINT", DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.MULTI_LINESTRING);
+    DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put("MULTIPOLYGON", DataTypes.MULTI_POLYGON);
   }
 
@@ -66,9 +67,8 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "SDE.ST_INTERSECTS(", ") = 1"));
-      attribute.setProperty(AttributeProperties.SRID, srid);
-      attribute.setProperty(AttributeProperties.COORDINATE_SYSTEM,
-        EpsgCoordinateSystems.getCoordinateSystem(srid));
+      attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        GeometryFactory.getFactory(srid));
       return attribute;
     } catch (final SQLException e) {
       throw new IllegalArgumentException(

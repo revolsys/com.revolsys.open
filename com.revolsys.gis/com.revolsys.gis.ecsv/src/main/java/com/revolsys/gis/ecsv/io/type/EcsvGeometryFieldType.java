@@ -3,11 +3,19 @@ package com.revolsys.gis.ecsv.io.type;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.xml.namespace.QName;
+
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -19,18 +27,26 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EcsvGeometryFieldType implements EcsvFieldType {
+public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
   private final NumberFormat FORMAT = new DecimalFormat(
     "#.#########################");
 
   private GeometryFactory geometryFactory;
 
-  public EcsvGeometryFieldType() {
-  }
+  private QName typeName;
 
   public EcsvGeometryFieldType(
+    final DataType dataType,
     final GeometryFactory geometryFactory) {
+    super(dataType);
     this.geometryFactory = geometryFactory;
+    this.typeName = new QName(_NS_URI, dataType.getName().getLocalPart(),
+      _NS_PREFIX);
+  }
+
+  @Override
+  public QName getTypeName() {
+    return typeName;
   }
 
   private int getDimension(
@@ -52,9 +68,9 @@ public class EcsvGeometryFieldType implements EcsvFieldType {
       if (endAxisIndex == -1) {
         throw new IllegalArgumentException("Expecting ]");
       } else {
-        final Pattern pattern = Pattern.compile("^\\[([^,\\],)*Z(,[^,\\])*)\\]");
+        final Pattern pattern = Pattern.compile("^\\[([^,\\]],)*Z(,[^,\\]])*\\]");
         final boolean zFound = pattern.matcher(text).find();
-        text.delete(0, endAxisIndex);
+        text.delete(0, endAxisIndex + 1);
         if (zFound) {
           return 3;
         }
@@ -85,11 +101,12 @@ public class EcsvGeometryFieldType implements EcsvFieldType {
         throw new IllegalArgumentException("Expecting )");
       } else {
         final String coordinatesText = text.substring(1, endIndex);
-        text.delete(0, endIndex);
+        text.delete(0, endIndex + 1);
         return CoordinatesListUtil.parse(coordinatesText, ",", numAxis);
       }
     } else {
-      throw new IllegalArgumentException("Expecting start of coordinates '('");
+      throw new IllegalArgumentException(
+        "Expecting start of coordinates '(' not" + text);
     }
   }
 
@@ -117,32 +134,132 @@ public class EcsvGeometryFieldType implements EcsvFieldType {
 
   public Object parseValue(
     final String value) {
-    final StringBuffer text = new StringBuffer(value);
+    if (StringUtils.hasLength(value)) {
+      final StringBuffer text = new StringBuffer(value);
+      switch (text.charAt(0)) {
+        case 'P':
+          text.delete(0, 1);
+          return parsePoint(text);
+        case 'L':
+          text.delete(0, 1);
+          return parseLineString(text);
+        case 'A':
+          text.delete(0, 1);
+          return parsePolygon(text);
+        case 'M':
+          text.delete(0, 1);
+          return parseMultiGeometry(text);
+        default:
+          throw new IllegalArgumentException("Unknown geometry type");
+      }
+    } else {
+      return geometryFactory.createPoint((Coordinates)null);
+    }
+  }
+
+  private Object parseMultiGeometry(
+    StringBuffer text) {
     switch (text.charAt(0)) {
       case 'P':
         text.delete(0, 1);
-        return parsePoint(text);
+        return parseMultiPoint(text);
       case 'L':
         text.delete(0, 1);
-        return parseLineString(text);
+        return parseMultiLineString(text);
       case 'A':
         text.delete(0, 1);
-        // TODO return parsePolygon(text);
-      case 'M':
-        text.delete(0, 1);
-        // TODO return parseMultiGeometry(text);
+        return parseMultiPolygon(text);
       default:
         throw new IllegalArgumentException("Unknown geometry type");
     }
   }
 
-  public void write(
-    final PrintWriter out,
-    final Geometry geometry) {
-    if (geometry != null) {
-      final int dimension = Math.min(getDimension(geometry), 3);
-      writeGeometry(out, geometry, dimension);
+  private Object parseMultiPoint(
+    StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    List<CoordinatesList> points = parseParts(text, numAxis);
+    return geometryFactory.createMultiPoint(points);
+  }
+
+  private Object parseMultiLineString(
+    StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    List<CoordinatesList> lines = parseParts(text, numAxis);
+    return geometryFactory.createMultiLineString(lines);
+  }
+
+  private Object parsePolygon(
+    StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    List<CoordinatesList> parts = parseParts(text, numAxis);
+    return geometryFactory.createPolygon(parts);
+  }
+
+  private Object parseMultiPolygon(
+    StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    List<List<CoordinatesList>> parts = parsePartsList(text, numAxis);
+    return geometryFactory.createMultiPolygon(parts);
+  }
+
+  private List<CoordinatesList> parseParts(
+    StringBuffer text,
+    final int numAxis) {
+    List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
+    final char firstChar = text.charAt(0);
+    switch (firstChar) {
+      case '(':
+        do {
+          text.delete(0, 1);
+          CoordinatesList coordinates = parseCoordinates(text, numAxis);
+          lines.add(coordinates);
+        } while (text.charAt(0) == ',');
+        if (text.charAt(0) == ')') {
+          text.delete(0, 1);
+        } else {
+          throw new IllegalArgumentException("Expecting ) not" + text);
+        }
+      break;
+      case ')':
+        text.delete(0, 2);
+      break;
+
+      default:
+        throw new IllegalArgumentException("Expecting ( not" + text);
     }
+    return lines;
+  }
+
+  private List<List<CoordinatesList>> parsePartsList(
+    StringBuffer text,
+    final int numAxis) {
+    List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
+    final char firstChar = text.charAt(0);
+    switch (firstChar) {
+      case '(':
+        do {
+          text.delete(0, 1);
+          List<CoordinatesList> parts = parseParts(text, numAxis);
+          partsList.add(parts);
+        } while (text.charAt(0) == ',');
+        if (text.charAt(0) == ')') {
+          text.delete(0, 1);
+        } else {
+          throw new IllegalArgumentException("Expecting ) not" + text);
+        }
+      break;
+      case ')':
+        text.delete(0, 2);
+      break;
+
+      default:
+        throw new IllegalArgumentException("Expecting ( not" + text);
+    }
+    return partsList;
   }
 
   private void writeCoordinate(
@@ -203,6 +320,7 @@ public class EcsvGeometryFieldType implements EcsvFieldType {
     final LineString shell = polygon.getExteriorRing();
     writeCoordinates(out, shell, dimension);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+      out.print(',');
       final LineString hole = polygon.getInteriorRingN(i);
       writeCoordinates(out, hole, dimension);
     }
@@ -358,8 +476,14 @@ public class EcsvGeometryFieldType implements EcsvFieldType {
 
   public void writeValue(
     final PrintWriter out,
-    final Object value) {
-    // TODO Auto-generated method stub
-
+    final Object object) {
+    if (object instanceof Geometry) {
+      out.print(DOUBLE_QUOTE);
+      final Geometry geometry = (Geometry)object;
+      final int numAxis = Math.min(getDimension(geometry), 3);
+      writeGeometry(out, geometry, numAxis);
+      out.print(DOUBLE_QUOTE);
+    }
   }
+
 }

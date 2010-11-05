@@ -10,6 +10,8 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -29,6 +31,8 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
 
   private WKTReader wktReader;
 
+  private DataObjectMetaData metaData;
+
   public WktDataObjectIterator(
     final DataObjectFactory factory,
     final Resource resource)
@@ -36,6 +40,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
     this.factory = factory;
     this.in = new BufferedReader(new InputStreamReader(
       resource.getInputStream()));
+    metaData = DataObjectUtil.GEOMETRY_META_DATA.clone();
   }
 
   @Override
@@ -49,11 +54,16 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
     if (geometryFactory == null) {
       geometryFactory = new GeometryFactory();
     }
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    if (geometryAttribute != null) {
+      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        geometryFactory);
+    }
     wktReader = new WKTReader(geometryFactory);
   }
 
   public DataObjectMetaData getMetaData() {
-    return DataObjectUtil.GEOMETRY_META_DATA;
+    return metaData;
   }
 
   @Override

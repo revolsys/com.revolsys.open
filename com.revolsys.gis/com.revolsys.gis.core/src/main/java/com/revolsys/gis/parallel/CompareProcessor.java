@@ -57,7 +57,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     lineLogMetaData.addAttribute(new Attribute("message", DataTypes.STRING,
       254, true));
     lineLogMetaData.addAttribute(new Attribute("geometry",
-      DataTypes.LINESTRING, true));
+      DataTypes.LINE_STRING, true));
     LINE_LOG_METADATA = lineLogMetaData;
   }
 

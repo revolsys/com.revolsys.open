@@ -30,7 +30,7 @@ public class GmlFieldTypeRegistry {
     addFieldType(new SimpleFieldType(DataTypes.STRING));
     addFieldType(new GmlGeometryFieldType(DataTypes.GEOMETRY));
     addFieldType(new GmlGeometryFieldType(DataTypes.POINT));
-    addFieldType(new GmlGeometryFieldType(DataTypes.LINESTRING));
+    addFieldType(new GmlGeometryFieldType(DataTypes.LINE_STRING));
     addFieldType(new GmlGeometryFieldType(DataTypes.POLYGON));
   }
 

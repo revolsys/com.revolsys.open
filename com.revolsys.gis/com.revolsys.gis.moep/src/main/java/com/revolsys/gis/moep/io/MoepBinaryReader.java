@@ -73,6 +73,10 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
     return iterator.getProperties();
   }
 
+  public void open() {
+    iterator.hasNext();
+  }
+
   /**
    * Get the iterator for the MOEP file.
    * 

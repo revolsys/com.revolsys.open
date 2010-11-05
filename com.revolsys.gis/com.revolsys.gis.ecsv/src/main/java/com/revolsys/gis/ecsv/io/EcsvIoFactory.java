@@ -38,7 +38,7 @@ public class EcsvIoFactory extends
     Resource resource,
     DataObjectFactory dataObjectFactory) {
     try {
-      final EcsvIterator iterator = new EcsvIterator(resource, dataObjectFactory);
+      final EcsvDataObjectIterator iterator = new EcsvDataObjectIterator(resource, dataObjectFactory);
       return new DataObjectIteratorReader(iterator);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);

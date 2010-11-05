@@ -156,6 +156,10 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
     return fileList;
   }
 
+  public void open() {
+    hasNext();
+  }
+
   /**
    * Check to see if the reader has more data objects to be read.
    * 

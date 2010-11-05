@@ -42,9 +42,9 @@ public final class DataTypes {
   static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
 
   public static final DataType COLLECTION = new CollectionDataType(
-    "collection", Collection.class, OBJECT);
+    "Collection", Collection.class, OBJECT);
 
-  public static final DataType DATA_OBJECT = new SimpleDataType("dataObject",
+  public static final DataType DATA_OBJECT = new SimpleDataType("DataObject",
     DataObject.class);
 
   public static final DataType DATE = new SimpleDataType("date",
@@ -64,32 +64,32 @@ public final class DataTypes {
 
   public static final DataType FLOAT = new SimpleDataType("float", Float.class);
 
-  public static final DataType GEOMETRY = new SimpleDataType("geometry",
+  public static final DataType GEOMETRY = new SimpleDataType("Geometry",
     Geometry.class);
 
-  public static final DataType POINT = new SimpleDataType("point", Point.class);
+  public static final DataType POINT = new SimpleDataType("Point", Point.class);
 
-  public static final DataType LINESTRING = new SimpleDataType("lineString",
+  public static final DataType LINE_STRING = new SimpleDataType("LineString",
     LineString.class);
 
-  public static final DataType MULTI_LINESTRING = new SimpleDataType(
-    "multiLineString", MultiLineString.class);
+  public static final DataType MULTI_LINE_STRING = new SimpleDataType(
+    "MultiLineString", MultiLineString.class);
 
-  public static final DataType POLYGON = new SimpleDataType("polygon",
+  public static final DataType POLYGON = new SimpleDataType("Polygon",
     Polygon.class);
 
-  public static final DataType MULTI_POINT = new SimpleDataType("multiPoint",
+  public static final DataType MULTI_POINT = new SimpleDataType("MultiPoint",
     Point.class);
 
   public static final DataType MULTI_POLYGON = new SimpleDataType(
-    "multiPolygon", Polygon.class);
+    "MultiPolygon", Polygon.class);
 
   public static final DataType INT = new SimpleDataType("int", Integer.class);
 
   public static final DataType INTEGER = new SimpleDataType("integer",
     BigInteger.class);
 
-  public static final DataType LIST = new CollectionDataType("list",
+  public static final DataType LIST = new CollectionDataType("List",
     List.class, OBJECT);
 
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
@@ -100,16 +100,18 @@ public final class DataTypes {
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
-  public static final DataType RELATION = new CollectionDataType("relation",
+  public static final DataType RELATION = new CollectionDataType("Relation",
     Collection.class, OBJECT);
 
-  public static final DataType SET = new CollectionDataType("set", Set.class,
+  public static final DataType SET = new CollectionDataType("Set", Set.class,
     OBJECT);
 
   public static final DataType SHORT = new SimpleDataType("short", Short.class);
 
   public static final DataType STRING = new SimpleDataType("string",
     String.class);
+
+  public static final DataType MAP = new SimpleDataType("Map", Map.class);
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();

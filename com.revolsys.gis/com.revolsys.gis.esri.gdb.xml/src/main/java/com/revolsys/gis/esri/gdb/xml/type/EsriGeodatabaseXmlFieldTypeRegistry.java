@@ -45,7 +45,7 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
       DataTypes.GEOMETRY));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY, DataTypes.POINT));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
-      DataTypes.LINESTRING));
+      DataTypes.LINE_STRING));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
       DataTypes.POLYGON));
   }
