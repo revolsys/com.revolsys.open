@@ -78,7 +78,8 @@ public class SaifFileLoader implements FileLayerLoader {
     GeometryFactory geometryFactory = primaryTask.getProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY);
     try {
       File file = new File(uri);
-      String categoryName = com.revolsys.io.FileUtil.getFileNamePrefix(file);
+      final String baseName = com.revolsys.io.FileUtil.getFileNamePrefix(file);
+      String categoryName = baseName;
       monitor.report("Opening File " + file.getName());
       SaifReader saifReader = new SaifReader(file);
       FeatureDataObjectFactory factory = new FeatureDataObjectFactory();
@@ -93,6 +94,11 @@ public class SaifFileLoader implements FileLayerLoader {
           geometryFactory);
       }
       LayerManager layerManager = primaryTask.getLayerManager();
+      int i = 0;
+      while (layerManager.getCategory(categoryName) != null) {
+        i++;
+        categoryName = categoryName + "_" + i;
+      }
       layerManager.addCategory(categoryName);
 
       StyleFileFactory styleFactory = new StyleFileFactory(

@@ -118,8 +118,7 @@ public class GridRenderer implements Renderer {
         if (cancelled) {
           return;
         }
-        Polygon polygon = tile.getPolygon(100);
-        polygon = GeometryProjectionUtil.perform(polygon, geometryFactory);
+        Polygon polygon = tile.getPolygon(geometryFactory,100);
         paint(viewport, graphics, polygon);
 
         Point centroid = polygon.getCentroid();

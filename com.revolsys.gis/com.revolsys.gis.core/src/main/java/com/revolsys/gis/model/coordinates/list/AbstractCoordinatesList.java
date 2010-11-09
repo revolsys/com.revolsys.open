@@ -226,7 +226,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
   public String toString() {
     final byte numAxis = getNumAxis();
     if (numAxis > 0) {
-      final StringBuffer s = new StringBuffer("LINE_STRING(");
+      final StringBuffer s = new StringBuffer("LINESTRING(");
       append(s, 0, numAxis);
       for (int i = 1; i < size(); i++) {
         s.append(',');
@@ -235,7 +235,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
       s.append(')');
       return s.toString();
     } else {
-      return "LINE_STRING EMPTY";
+      return "LINESTRING EMPTY";
     }
   }
 }

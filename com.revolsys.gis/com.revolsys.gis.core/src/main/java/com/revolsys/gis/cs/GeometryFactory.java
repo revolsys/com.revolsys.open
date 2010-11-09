@@ -42,16 +42,20 @@ public class GeometryFactory extends
       if (factory instanceof GeometryFactory) {
         return (GeometryFactory)factory;
       } else {
-        final int srid = factory.getSRID();
+        final int srid = geometry.getSRID();
         final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-        final PrecisionModel precisionModel = factory.getPrecisionModel();
-        if (precisionModel.isFloating()) {
-          return new GeometryFactory(coordinateSystem);
+        if (coordinateSystem == null) {
+          return null;
         } else {
-          final CoordinatesPrecisionModel coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
-            precisionModel.getScale());
-          return new GeometryFactory(coordinateSystem,
-            coordinatesPrecisionModel);
+          final PrecisionModel precisionModel = factory.getPrecisionModel();
+          if (precisionModel.isFloating()) {
+            return new GeometryFactory(coordinateSystem);
+          } else {
+            final CoordinatesPrecisionModel coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
+              precisionModel.getScale());
+            return new GeometryFactory(coordinateSystem,
+              coordinatesPrecisionModel);
+          }
         }
       }
     }

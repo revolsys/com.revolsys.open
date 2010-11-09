@@ -45,7 +45,7 @@ public final class ProjectionFactory {
     final T geometry,
     final GeometryFactory targetGeometryFactory) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-    if (geometryFactory == geometryFactory) {
+    if (geometryFactory == targetGeometryFactory) {
       return geometry;
     } else {
       final GeometryOperation operation = getGeometryOperation(geometryFactory,

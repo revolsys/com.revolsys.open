@@ -383,6 +383,12 @@ public class BoundingBox extends Envelope {
 
   public Polygon toPolygon(
     final GeometryFactory factory,
+    final int numSegments) {
+    return toPolygon(factory, numSegments, numSegments);
+  }
+
+  public Polygon toPolygon(
+    final GeometryFactory factory,
     final int numX,
     final int numY) {
     final CoordinateSystem coordinateSystem = factory.getCoordinateSystem();

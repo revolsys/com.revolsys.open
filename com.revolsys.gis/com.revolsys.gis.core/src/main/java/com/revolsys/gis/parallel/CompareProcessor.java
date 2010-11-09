@@ -82,11 +82,20 @@ public class CompareProcessor extends AbstractMergeProcess {
   private Statistics duplicateOtherStatistics = new Statistics(
     "Duplicate Other");
 
+  private Statistics excludeNotEqualSourceStatistics = new Statistics(
+    "Exclude Not Equal Source");
+
+  private Statistics excludeNotEqualOtherStatistics = new Statistics(
+    "Exclude Not Equal Other");
+
   private String label;
 
   private Channel<DataObject> logOut;
 
-  private Statistics notEqualStatistics = new Statistics("Not Equal");
+  private Statistics notEqualSourceStatistics = new Statistics(
+    "Not Equal Source");
+
+  private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
 
   private DataObjectQuadTree otherIndex = new DataObjectQuadTree();
 
@@ -101,50 +110,46 @@ public class CompareProcessor extends AbstractMergeProcess {
   @Override
   protected void addOtherObject(
     final DataObject object) {
-    if (excludeFilter != null && !excludeFilter.accept(object)) {
-      final Geometry geometry = object.getGeometryValue();
-      if (geometry instanceof Point) {
-        boolean add = true;
-        if (cleanDuplicatePoints) {
-          final List<DataObject> objects = otherPointMap.getObjects(object);
-          if (!objects.isEmpty()) {
-            final Filter<DataObject> filter = equalFilterFactory.create(object);
-            add = !FilterUtil.matches(objects, filter);
-          }
-          if (add) {
-            otherPointMap.add(object);
-          } else {
-            duplicateOtherStatistics.add(object);
-          }
+    final Geometry geometry = object.getGeometryValue();
+    if (geometry instanceof Point) {
+      boolean add = true;
+      if (cleanDuplicatePoints) {
+        final List<DataObject> objects = otherPointMap.getObjects(object);
+        if (!objects.isEmpty()) {
+          final Filter<DataObject> filter = equalFilterFactory.create(object);
+          add = !FilterUtil.matches(objects, filter);
         }
-      } else if (geometry instanceof LineString) {
-        otherIndex.insert(object);
+        if (add) {
+          otherPointMap.add(object);
+        } else {
+          duplicateOtherStatistics.add(object);
+        }
       }
+    } else if (geometry instanceof LineString) {
+      otherIndex.insert(object);
     }
   }
 
   @Override
   protected void addSourceObject(
     final DataObject object) {
-    if (excludeFilter != null && !excludeFilter.accept(object)) {
-      final Geometry geometry = object.getGeometryValue();
-      if (geometry instanceof Point) {
-        boolean add = true;
-        if (cleanDuplicatePoints) {
-          final List<DataObject> objects = sourcePointMap.getObjects(object);
-          if (!objects.isEmpty()) {
-            final Filter<DataObject> filter = equalFilterFactory.create(object);
-            add = !FilterUtil.matches(objects, filter);
-          }
+    final Geometry geometry = object.getGeometryValue();
+    if (geometry instanceof Point) {
+      boolean add = true;
+      if (cleanDuplicatePoints) {
+        final List<DataObject> objects = sourcePointMap.getObjects(object);
+        if (!objects.isEmpty()) {
+          final Filter<DataObject> filter = equalFilterFactory.create(object);
+          add = !FilterUtil.matches(objects, filter);
         }
-        if (add) {
-          sourcePointMap.add(object);
-        } else {
-          duplicateSourceStatistics.add(object);
-        }
-      } else if (geometry instanceof LineString) {
-        sourceObjects.add(object);
       }
+      if (add) {
+        sourcePointMap.add(object);
+      } else {
+        duplicateSourceStatistics.add(object);
+      }
+    } else if (geometry instanceof LineString) {
+      sourceObjects.add(object);
     }
   }
 
@@ -167,20 +172,19 @@ public class CompareProcessor extends AbstractMergeProcess {
     return logOut;
   }
 
-  public Statistics getNotEqualStatistics() {
-    return notEqualStatistics;
-  }
-
   private void logError(
     final DataObject object,
-    final String message) {
-    notEqualStatistics.add(object);
-    Geometry geometry = object.getGeometryValue();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      Geometry subGeometry = geometry.getGeometryN(i);
-      if (subGeometry == null) {
-        System.err.println("Null geometry");
+    final String message,
+    boolean source) {
+    if (excludeFilter == null || !excludeFilter.accept(object)) {
+      if (source) {
+        notEqualSourceStatistics.add(object);
       } else {
+        notEqualOtherStatistics.add(object);
+      }
+      Geometry geometry = object.getGeometryValue();
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        Geometry subGeometry = geometry.getGeometryN(i);
         DataObject logObject;
         if (subGeometry instanceof LineString) {
           logObject = new ArrayDataObject(LINE_LOG_METADATA);
@@ -189,15 +193,20 @@ public class CompareProcessor extends AbstractMergeProcess {
         } else if (subGeometry instanceof MultiPoint) {
           logObject = new ArrayDataObject(POINT_LOG_METADATA);
         } else {
-          logObject = null;
+          return;
         }
         logObject.setValue("type", object.getMetaData().getName());
         logObject.setValue("message", message);
         logObject.setGeometryValue(subGeometry);
         logOut.write(logObject);
       }
+    } else {
+      if (source) {
+        excludeNotEqualSourceStatistics.add(object);
+      } else {
+        excludeNotEqualOtherStatistics.add(object);
+      }
     }
-
   }
 
   private void processExactPointMatch(
@@ -222,7 +231,8 @@ public class CompareProcessor extends AbstractMergeProcess {
   private void processExactLineMatch(
     final DataObject sourceObject) {
     LineString sourceLine = sourceObject.getGeometryValue();
-    final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(sourceLine,3);
+    final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
+      sourceLine, 3);
     final Filter<DataObject> geometryFilter = new GeometryFilter<LineString>(
       lineEqualFilter);
     final Filter<DataObject> equalFilter = equalFilterFactory.create(sourceObject);
@@ -247,10 +257,9 @@ public class CompareProcessor extends AbstractMergeProcess {
   protected void processObjects(
     final DataObjectMetaData metaData,
     final Channel<DataObject> out) {
-    System.out.println(metaData.getName());
     if (otherIndex.size() + otherPointMap.size() == 0) {
       for (final DataObject object : sourceObjects) {
-        logError(object, "Source missing in Other");
+        logError(object, "Source missing in Other", true);
       }
     } else {
       processExactPointMatches();
@@ -258,13 +267,13 @@ public class CompareProcessor extends AbstractMergeProcess {
       processPartialMatches();
     }
     for (final DataObject object : otherIndex.queryAll()) {
-      logError(object, "Other missing in Source");
+      logError(object, "Other missing in Source", false);
     }
     for (final DataObject object : otherPointMap.getAll()) {
-      logError(object, "Other missing in Source");
+      logError(object, "Other missing in Source", false);
     }
     for (final DataObject object : sourceObjects) {
-      logError(object, "Source missing in Other");
+      logError(object, "Source missing in Other", true);
     }
     sourceObjects.clear();
     otherIndex = new DataObjectQuadTree();
@@ -373,21 +382,15 @@ public class CompareProcessor extends AbstractMergeProcess {
     logOut.writeConnect();
   }
 
-  public void setNotEqualStatistics(
-    final Statistics notEqualStatistics) {
-    this.notEqualStatistics = notEqualStatistics;
-  }
-
   @Override
   protected void setUp() {
-    if (equalStatistics != null) {
-      equalStatistics.connect();
-    }
-    if (notEqualStatistics != null) {
-      notEqualStatistics.connect();
-    }
+    equalStatistics.connect();
+    notEqualSourceStatistics.connect();
+    notEqualOtherStatistics.connect();
     duplicateSourceStatistics.connect();
     duplicateOtherStatistics.connect();
+    excludeNotEqualSourceStatistics.connect();
+    excludeNotEqualOtherStatistics.connect();
   }
 
   @Override
@@ -398,8 +401,18 @@ public class CompareProcessor extends AbstractMergeProcess {
     otherPointMap = null;
     otherIndex = null;
     equalStatistics.disconnect();
-    notEqualStatistics.disconnect();
+    notEqualSourceStatistics.disconnect();
+    notEqualOtherStatistics.disconnect();
     duplicateSourceStatistics.disconnect();
     duplicateOtherStatistics.disconnect();
+    excludeNotEqualSourceStatistics.disconnect();
+    excludeNotEqualOtherStatistics.disconnect();
+    equalStatistics = null;
+    notEqualSourceStatistics = null;
+    notEqualOtherStatistics = null;
+    duplicateSourceStatistics = null;
+    duplicateOtherStatistics = null;
+    excludeNotEqualSourceStatistics = null;
+    excludeNotEqualOtherStatistics = null;
   }
 }

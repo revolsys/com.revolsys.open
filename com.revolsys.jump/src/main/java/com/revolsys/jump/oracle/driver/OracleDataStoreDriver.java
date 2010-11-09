@@ -4,6 +4,7 @@ import com.vividsolutions.jump.datastore.DataStoreConnection;
 import com.vividsolutions.jump.datastore.DataStoreDriver;
 import com.vividsolutions.jump.parameter.ParameterList;
 import com.vividsolutions.jump.parameter.ParameterListSchema;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
 
 public class OracleDataStoreDriver implements DataStoreDriver {
   public static final String PASSWORD = "password";
@@ -25,10 +26,17 @@ public class OracleDataStoreDriver implements DataStoreDriver {
   private static final ParameterListSchema PARAMS_SCHEMA = new ParameterListSchema(
     PARAM_NAMES, PARAM_TYPES);
 
+  private WorkbenchContext workbenchContext;
+
+  public OracleDataStoreDriver(
+    WorkbenchContext workbenchContext) {
+    this.workbenchContext= workbenchContext;
+  }
+
   public DataStoreConnection createConnection(
     final ParameterList params)
     throws Exception {
-    return new OracleDataStoreConnection(params);
+    return new OracleDataStoreConnection(workbenchContext,params);
   }
 
   public String getName() {

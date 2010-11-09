@@ -7,6 +7,7 @@ import org.openjump.core.model.OpenJumpTaskProperties;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.grid.RectangularMapGrid;
+import com.revolsys.gis.grid.RectangularMapTile;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jump.util.Blackboard;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
@@ -52,9 +53,9 @@ public class GridLayer extends AbstractLayerable {
       LayerViewPanel layerViewPanel = context.getLayerViewPanel();
       Viewport viewport = layerViewPanel.getViewport();
       try {
-        Polygon polygon = grid.getTileByName(sheet).getPolygon(50);
+        final RectangularMapTile tile = grid.getTileByName(sheet);
+        Polygon polygon = tile.getPolygon(geometryFactory, 50);
 
-        polygon =  GeometryProjectionUtil.perform(polygon, geometryFactory);
         viewport.zoom(polygon.getEnvelopeInternal());
       } catch (NoninvertibleTransformException e) {
       }

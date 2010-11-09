@@ -20,11 +20,14 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -292,7 +295,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
           throw new IllegalArgumentException(typeName
             + " does not have a primary key");
         }
-       
+
         final String idAttributeName = metaData.getIdAttributeName();
 
         final StringBuffer sqlBuffer = new StringBuffer();
@@ -688,11 +691,12 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   public Reader<DataObject> query(
     final QName typeName,
-    final Geometry geometry,
+    Geometry geometry,
     final String whereClause) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
-
+    final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+    geometry = ProjectionFactory.convert(geometry, geometryFactory);
     final StringBuffer sql = new StringBuffer();
     JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
     final JdbcQueryReader reader = createReader();

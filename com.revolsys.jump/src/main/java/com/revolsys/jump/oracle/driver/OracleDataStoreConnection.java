@@ -4,8 +4,11 @@ import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
+import org.openjump.core.model.OpenJumpTaskProperties;
+
 import oracle.jdbc.pool.OracleDataSource;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
@@ -19,6 +22,8 @@ import com.vividsolutions.jump.datastore.Query;
 import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.io.FeatureInputStream;
 import com.vividsolutions.jump.parameter.ParameterList;
+import com.vividsolutions.jump.workbench.WorkbenchContext;
+import com.vividsolutions.jump.workbench.model.Task;
 
 public class OracleDataStoreConnection implements DataStoreConnection {
 
@@ -30,9 +35,13 @@ public class OracleDataStoreConnection implements DataStoreConnection {
 
   private String schema;
 
+  private Task task;
+
   public OracleDataStoreConnection(
+    WorkbenchContext workbenchContext,
     final ParameterList params)
     throws DataStoreException {
+    this.task = workbenchContext.getTask();
     try {
       String url = (String)params.getParameter(OracleDataStoreDriver.URL);
       schema = params.getParameter(OracleDataStoreDriver.SCHEMA)
@@ -101,8 +110,10 @@ public class OracleDataStoreConnection implements DataStoreConnection {
     QName typeName = new QName(schema, datasetName);
     Geometry filterGeometry = query.getFilterGeometry();
     String condition = query.getCondition();
+    GeometryFactory geometryFactory = task.getProperty(OpenJumpTaskProperties.GEOMETRY_FACTORY);
     JdbcDataObjectStoreInputStream ifs = new JdbcDataObjectStoreInputStream(
-      dataStore, typeName, featureSchema, filterGeometry, condition);
+      dataStore, geometryFactory, typeName, featureSchema, filterGeometry,
+      condition);
     return ifs;
   }
 

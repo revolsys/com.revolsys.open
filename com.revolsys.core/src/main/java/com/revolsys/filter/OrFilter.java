@@ -6,7 +6,10 @@ import java.util.Collection;
 import java.util.List;
 
 public class OrFilter<T> implements Filter<T> {
-  private final List<Filter<T>> filters = new ArrayList<Filter<T>>();
+  private List<Filter<T>> filters = new ArrayList<Filter<T>>();
+
+  public OrFilter() {
+  }
 
   public OrFilter(
     final Collection<Filter<T>> filters) {
@@ -26,6 +29,15 @@ public class OrFilter<T> implements Filter<T> {
       }
     }
     return false;
+  }
+
+  public List<Filter<T>> getFilters() {
+    return filters;
+  }
+
+  public void setFilters(
+    List<Filter<T>> filters) {
+    this.filters = filters;
   }
 
   @Override
