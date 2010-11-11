@@ -36,6 +36,7 @@ import com.revolsys.gis.ecsv.io.EcsvConstants;
 import com.revolsys.gis.ecsv.io.EcsvIoFactory;
 import com.revolsys.gis.ecsv.service.EcsvServiceConstants;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Writer;
 import com.revolsys.spring.InputStreamResource;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -44,6 +45,10 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
   public static final EcsvDataObjectStore create(
     final URI uri) {
     return new EcsvDataObjectStore(uri, new ArrayDataObjectFactory());
+  }
+
+  public Writer<DataObject> createWriter() {
+    return null;
   }
 
   public static final EcsvDataObjectStore create(
@@ -141,7 +146,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
         String fileName = FileUtil.getFileName(path);
         final InputStream in = method.getResponseBodyAsStream();
         return (DataObjectReader)ioFactory.createDataObjectReader(
-          new InputStreamResource(fileName,in), getDataObjectFactory());
+          new InputStreamResource(fileName, in), getDataObjectFactory());
       } else {
         throw new IllegalArgumentException("Unnable to connect to server: "
           + statusCode);

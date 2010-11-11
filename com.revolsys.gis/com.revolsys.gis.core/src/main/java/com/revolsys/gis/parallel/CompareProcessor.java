@@ -24,7 +24,6 @@ import com.revolsys.gis.data.model.filter.GeometryFilter;
 import com.revolsys.gis.data.model.filter.LineIntersectsFilter;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.jts.filter.LineEqualFilter;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.util.NoOp;
 import com.revolsys.parallel.channel.Channel;
@@ -36,11 +35,11 @@ import com.vividsolutions.jts.geom.Point;
 
 public class CompareProcessor extends AbstractMergeProcess {
 
-  private static final DataObjectMetaData POINT_LOG_METADATA;
-
   private static final DataObjectMetaData LINE_LOG_METADATA;
+
+  private static final DataObjectMetaData POINT_LOG_METADATA;
   static {
-    DataObjectMetaDataImpl pointLogMetaData = new DataObjectMetaDataImpl(
+    final DataObjectMetaDataImpl pointLogMetaData = new DataObjectMetaDataImpl(
       new QName("CompareLogPoint"));
     pointLogMetaData.addAttribute(new Attribute("type", DataTypes.STRING, 50,
       true));
@@ -50,7 +49,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       DataTypes.MULTI_POINT, true));
     POINT_LOG_METADATA = pointLogMetaData;
 
-    DataObjectMetaDataImpl lineLogMetaData = new DataObjectMetaDataImpl(
+    final DataObjectMetaDataImpl lineLogMetaData = new DataObjectMetaDataImpl(
       new QName("CompareLogLine"));
     lineLogMetaData.addAttribute(new Attribute("type", DataTypes.STRING, 50,
       true));
@@ -61,51 +60,42 @@ public class CompareProcessor extends AbstractMergeProcess {
     LINE_LOG_METADATA = lineLogMetaData;
   }
 
-  private Factory<Filter<DataObject>, DataObject> equalFilterFactory;
-
-  private Filter<DataObject> excludeFilter;
-
-  public Filter<DataObject> getExcludeFilter() {
-    return excludeFilter;
-  }
-
-  public void setExcludeFilter(
-    Filter<DataObject> excludeFilter) {
-    this.excludeFilter = excludeFilter;
-  }
-
-  private Statistics equalStatistics = new Statistics("Equal");
-
-  private Statistics duplicateSourceStatistics = new Statistics(
-    "Duplicate Source");
+  private final boolean cleanDuplicatePoints = true;
 
   private Statistics duplicateOtherStatistics = new Statistics(
     "Duplicate Other");
 
-  private Statistics excludeNotEqualSourceStatistics = new Statistics(
-    "Exclude Not Equal Source");
+  private Statistics duplicateSourceStatistics = new Statistics(
+    "Duplicate Source");
+
+  private Factory<Filter<DataObject>, DataObject> equalFilterFactory;
+
+  private Statistics equalStatistics = new Statistics("Equal");
+
+  private Filter<DataObject> excludeFilter;
 
   private Statistics excludeNotEqualOtherStatistics = new Statistics(
     "Exclude Not Equal Other");
+
+  private Statistics excludeNotEqualSourceStatistics = new Statistics(
+    "Exclude Not Equal Source");
 
   private String label;
 
   private Channel<DataObject> logOut;
 
+  private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
+
   private Statistics notEqualSourceStatistics = new Statistics(
     "Not Equal Source");
-
-  private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
 
   private DataObjectQuadTree otherIndex = new DataObjectQuadTree();
 
   private PointDataObjectMap otherPointMap = new PointDataObjectMap();
 
-  private PointDataObjectMap sourcePointMap = new PointDataObjectMap();
-
   private Set<DataObject> sourceObjects = new LinkedHashSet<DataObject>();
 
-  private boolean cleanDuplicatePoints = true;
+  private final PointDataObjectMap sourcePointMap = new PointDataObjectMap();
 
   @Override
   protected void addOtherObject(
@@ -153,12 +143,32 @@ public class CompareProcessor extends AbstractMergeProcess {
     }
   }
 
+  public Statistics getDuplicateOtherStatistics() {
+    return duplicateOtherStatistics;
+  }
+
+  public Statistics getDuplicateSourceStatistics() {
+    return duplicateSourceStatistics;
+  }
+
   public Factory<Filter<DataObject>, DataObject> getEqualFilterFactory() {
     return equalFilterFactory;
   }
 
   public Statistics getEqualStatistics() {
     return equalStatistics;
+  }
+
+  public Filter<DataObject> getExcludeFilter() {
+    return excludeFilter;
+  }
+
+  public Statistics getExcludeNotEqualOtherStatistics() {
+    return excludeNotEqualOtherStatistics;
+  }
+
+  public Statistics getExcludeNotEqualSourceStatistics() {
+    return excludeNotEqualSourceStatistics;
   }
 
   public String getLabel() {
@@ -172,19 +182,27 @@ public class CompareProcessor extends AbstractMergeProcess {
     return logOut;
   }
 
+  public Statistics getNotEqualOtherStatistics() {
+    return notEqualOtherStatistics;
+  }
+
+  public Statistics getNotEqualSourceStatistics() {
+    return notEqualSourceStatistics;
+  }
+
   private void logError(
     final DataObject object,
     final String message,
-    boolean source) {
+    final boolean source) {
     if (excludeFilter == null || !excludeFilter.accept(object)) {
       if (source) {
         notEqualSourceStatistics.add(object);
       } else {
         notEqualOtherStatistics.add(object);
       }
-      Geometry geometry = object.getGeometryValue();
+      final Geometry geometry = object.getGeometryValue();
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        Geometry subGeometry = geometry.getGeometryN(i);
+        final Geometry subGeometry = geometry.getGeometryN(i);
         DataObject logObject;
         if (subGeometry instanceof LineString) {
           logObject = new ArrayDataObject(LINE_LOG_METADATA);
@@ -209,28 +227,9 @@ public class CompareProcessor extends AbstractMergeProcess {
     }
   }
 
-  private void processExactPointMatch(
-    final DataObject sourceObject) {
-    final Filter<DataObject> equalFilter = equalFilterFactory.create(sourceObject);
-    final DataObject otherObject = otherPointMap.getFirstMatch(sourceObject,
-      equalFilter);
-    if (otherObject != null) {
-      equalStatistics.add(sourceObject);
-      removeObject(sourceObject);
-      removeOtherObject(otherObject);
-    }
-  }
-
-  private void processExactPointMatches() {
-    for (final DataObject object : new ArrayList<DataObject>(
-      sourcePointMap.getAll())) {
-      processExactPointMatch(object);
-    }
-  }
-
   private void processExactLineMatch(
     final DataObject sourceObject) {
-    LineString sourceLine = sourceObject.getGeometryValue();
+    final LineString sourceLine = sourceObject.getGeometryValue();
     final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
       sourceLine, 3);
     final Filter<DataObject> geometryFilter = new GeometryFilter<LineString>(
@@ -250,6 +249,25 @@ public class CompareProcessor extends AbstractMergeProcess {
   private void processExactLineMatches() {
     for (final DataObject object : new ArrayList<DataObject>(sourceObjects)) {
       processExactLineMatch(object);
+    }
+  }
+
+  private void processExactPointMatch(
+    final DataObject sourceObject) {
+    final Filter<DataObject> equalFilter = equalFilterFactory.create(sourceObject);
+    final DataObject otherObject = otherPointMap.getFirstMatch(sourceObject,
+      equalFilter);
+    if (otherObject != null) {
+      equalStatistics.add(sourceObject);
+      removeObject(sourceObject);
+      removeOtherObject(otherObject);
+    }
+  }
+
+  private void processExactPointMatches() {
+    for (final DataObject object : new ArrayList<DataObject>(
+      sourcePointMap.getAll())) {
+      processExactPointMatch(object);
     }
   }
 
@@ -352,7 +370,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     if (geometry instanceof Point) {
       otherPointMap.remove(object);
     } else {
-      int size = otherIndex.size();
+      final int size = otherIndex.size();
       otherIndex.remove(object);
       NoOp.equals(size, otherIndex.size());
     }
@@ -363,9 +381,9 @@ public class CompareProcessor extends AbstractMergeProcess {
     this.equalFilterFactory = equalFilterFactory;
   }
 
-  public void setEqualStatistics(
-    final Statistics equalStatistics) {
-    this.equalStatistics = equalStatistics;
+  public void setExcludeFilter(
+    final Filter<DataObject> excludeFilter) {
+    this.excludeFilter = excludeFilter;
   }
 
   public void setLabel(

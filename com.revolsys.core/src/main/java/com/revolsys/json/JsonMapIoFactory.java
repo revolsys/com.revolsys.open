@@ -10,19 +10,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.revolsys.io.AbstractIoFactory;
+import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.MapReader;
 import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 
-public class JsonMapIoFactory extends AbstractIoFactory implements
-  MapReaderFactory, MapWriterFactory {
+public class JsonMapIoFactory extends AbstractMapReaderFactory implements
+  MapWriterFactory {
   public JsonMapIoFactory() {
     super("JSON");
     addMediaTypeAndFileExtension("application/json", "json");
   }
 
-  public MapReader getReader(
+  public MapReader createMapReader(
     final Reader in) {
     return new JsonMapReader(in);
   }

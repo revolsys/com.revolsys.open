@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -19,6 +20,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   DataObject create(
     QName typeName);
+
+  Writer<DataObject> createWriter();
 
   void delete(
     DataObject object);
@@ -93,14 +96,14 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
     QName typeName,
     Geometry geometry);
 
+  DataObject query(
+    QName typeName,
+    String queryString,
+    Object... arguments);
+
   void update(
     DataObject object);
 
   void updateAll(
     Collection<DataObject> objects);
-
-  DataObject query(
-    QName typeName,
-    String queryString,
-    Object... arguments);
 }

@@ -29,7 +29,7 @@ public class LineSegmentUtilTest {
     final String extension = FileUtil.getFileNameExtension(filename);
     final MapReaderFactory factory = registry.getFactoryByFileExtension(
       MapReaderFactory.class, extension);
-    final MapReader reader = factory.getReader(new InputStreamReader(
+    final MapReader reader = factory.createMapReader(new InputStreamReader(
       resource.getInputStream()));
     for (Map<String, Object> testCase : reader) {
       String name = (String)testCase.get("name");

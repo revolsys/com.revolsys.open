@@ -1,6 +1,7 @@
 package com.revolsys.gis.kml.io;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -39,6 +40,15 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
   }
 
+  public KmlGeometryIterator(
+    final Reader reader) {
+    try {
+      this.in = StaxUtils.createXmlReader(reader);
+     } catch (final IOException e) {
+      throw new IllegalArgumentException("Unable to open resource " + reader);
+    }
+  }
+
   @Override
   protected void doClose() {
     StaxUtils.closeSilent(in);
@@ -47,8 +57,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   @Override
   protected void doInit() {
     try {
-      StaxUtils.skipToStartElement(this.in);
-      StaxUtils.requireLocalName(this.in, KML);
+//      StaxUtils.skipToStartElement(this.in);
+//      StaxUtils.requireLocalName(this.in, KML);
       StaxUtils.skipToStartElement(this.in);
     } catch (final XMLStreamException e) {
       throw new RuntimeException("Error initializing file ", e);
@@ -86,7 +96,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         coordinatesList.setValue(i, ordinateIndex, Double.valueOf(coordinate));
       }
     }
-    StaxUtils.skipToEndElement(in, COORDINATES);
+    StaxUtils.skipToEndElementByLocalName(in, COORDINATES);
     return coordinatesList;
   }
 
@@ -125,7 +135,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         StaxUtils.skipSubTree(in);
       }
     }
-    StaxUtils.skipToEndElement(in, INNER_BOUNDARY_IS);
+    StaxUtils.skipToEndElementByLocalName(in, INNER_BOUNDARY_IS);
     return ring;
   }
 
@@ -141,7 +151,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     final LinearRing ring = geometryFactory.createLinearRing(cooordinatesList);
-    StaxUtils.skipToEndElement(in, LINEAR_RING);
+    StaxUtils.skipToEndElementByLocalName(in, LINEAR_RING);
     return ring;
   }
 
@@ -157,7 +167,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     final LineString lineString = geometryFactory.createLineString(cooordinatesList);
-    StaxUtils.skipToEndElement(in, LINE_STRING);
+    StaxUtils.skipToEndElementByLocalName(in, LINE_STRING);
     return lineString;
   }
 
@@ -172,7 +182,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     final Geometry geometryCollection = geometryFactory.createGeometry(geometries);
-    StaxUtils.skipToEndElement(in, MULTI_GEOMETRY);
+    StaxUtils.skipToEndElementByLocalName(in, MULTI_GEOMETRY);
     return geometryCollection;
   }
 
@@ -187,7 +197,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         StaxUtils.skipSubTree(in);
       }
     }
-    StaxUtils.skipToEndElement(in, OUTER_BOUNDARY_IS);
+    StaxUtils.skipToEndElementByLocalName(in, OUTER_BOUNDARY_IS);
     return ring;
   }
 
@@ -204,7 +214,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     final Point point = geometryFactory.createPoint(cooordinatesList);
-    StaxUtils.skipToEndElement(in, POINT);
+    StaxUtils.skipToEndElementByLocalName(in, POINT);
     return point;
   }
 
@@ -229,7 +239,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     final Polygon polygon = geometryFactory.createPolygon(rings);
-    StaxUtils.skipToEndElement(in, POLYGON);
+    StaxUtils.skipToEndElementByLocalName(in, POLYGON);
     return polygon;
   }
 

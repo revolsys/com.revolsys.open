@@ -16,6 +16,7 @@
 package com.revolsys.xml.io;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +53,16 @@ public final class StaxUtils {
     throws IOException {
     try {
       return StaxUtils.FACTORY.createXMLStreamReader(resource.getInputStream());
+    } catch (final XMLStreamException e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
+
+  public static XMLStreamReader createXmlReader(
+    final Reader reader)
+    throws IOException {
+    try {
+      return StaxUtils.FACTORY.createXMLStreamReader(reader);
     } catch (final XMLStreamException e) {
       throw new IllegalArgumentException(e.getMessage(), e);
     }
@@ -194,6 +205,21 @@ public final class StaxUtils {
     final QName name)
     throws XMLStreamException {
     while (!parser.isEndElement() || !parser.getName().equals(name)) {
+      parser.next();
+    }
+    parser.next();
+  }
+  /**
+   * Skip all events until the next end element event.
+   * 
+   * @param parser The STAX XML parser.
+   * @throws XMLStreamException If an exception processing the XML occurs.
+   */
+  public static void skipToEndElementByLocalName(
+    final XMLStreamReader parser,
+    final QName name)
+    throws XMLStreamException {
+    while (!parser.isEndElement() || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
       parser.next();
     }
     parser.next();

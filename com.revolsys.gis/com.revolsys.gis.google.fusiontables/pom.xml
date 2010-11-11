@@ -5,24 +5,11 @@
     <groupId>com.revolsys.gis</groupId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
-  <groupId>com.revolsys.gis.google.fusiontables</groupId>
+  <groupId>com.revolsys.gis</groupId>
   <artifactId>com.revolsys.gis.google.fusiontables</artifactId>
+  <name>GIS Google Fusion Tables</name>
   <version>TRUNK-SNAPSHOT</version>
   <dependencies>
-  	<dependency>
-  		<groupId>com.revolsys.gis</groupId>
-  		<artifactId>com.revolsys.gis.core</artifactId>
-  		<version>TRUNK-SNAPSHOT</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.google.api.client</groupId>
-  		<artifactId>google-api-client-util</artifactId>
-  		<version>1.2.0-alpha</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
-  	</dependency>
   	<dependency>
   		<groupId>com.google.api.client</groupId>
   		<artifactId>google-api-client</artifactId>
@@ -35,6 +22,13 @@
   				<groupId>commons-logging</groupId>
   			</exclusion>
   		</exclusions>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.revolsys.gis</groupId>
+  		<artifactId>com.revolsys.gis.kml</artifactId>
+  		<version>TRUNK-SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
   	</dependency>
   </dependencies>
 </project>
