@@ -14,6 +14,8 @@ import com.revolsys.gis.data.model.DataObjectUtil;
  * @author Paul Austin
  */
 public class AttributeValuesFilter implements Filter<DataObject> {
+  private boolean allowNulls;
+
   /** The attributeName name, or path to match. */
   private String attributeName;
 
@@ -30,12 +32,28 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * Construct a new AttributeValuesFilter.
    * 
    * @param attributeName The attribute name.
+   * @param values The list of values.
+   */
+  public AttributeValuesFilter(
+    final String attributeName,
+    final boolean allowNulls,
+    final List<Object> values) {
+    this.attributeName = attributeName;
+    this.values = values;
+    this.allowNulls = allowNulls;
+  }
+
+  /**
+   * Construct a new AttributeValuesFilter.
+   * 
+   * @param attributeName The attribute name.
    * @param values The array of values.
    */
   public AttributeValuesFilter(
-    String attributeName,
-    Object... values) {
-    this(attributeName, Arrays.asList(values));
+    final String attributeName,
+    final boolean allowNulls,
+    final Object... values) {
+    this(attributeName, allowNulls, Arrays.asList(values));
   }
 
   /**
@@ -45,10 +63,22 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param values The list of values.
    */
   public AttributeValuesFilter(
-    String attributeName,
-    List<Object> values) {
+    final String attributeName,
+    final List<Object> values) {
     this.attributeName = attributeName;
     this.values = values;
+  }
+
+  /**
+   * Construct a new AttributeValuesFilter.
+   * 
+   * @param attributeName The attribute name.
+   * @param values The array of values.
+   */
+  public AttributeValuesFilter(
+    final String attributeName,
+    final Object... values) {
+    this(attributeName, Arrays.asList(values));
   }
 
   /**
@@ -62,7 +92,11 @@ public class AttributeValuesFilter implements Filter<DataObject> {
     final Object propertyValue = DataObjectUtil.getAttributeByPath(object,
       attributeName);
     if (propertyValue == null) {
-      return false;
+      if (allowNulls) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return values.contains(propertyValue);
     }
@@ -82,6 +116,15 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    */
   public List<Object> getValues() {
     return values;
+  }
+
+  public boolean isAllowNulls() {
+    return allowNulls;
+  }
+
+  public void setAllowNulls(
+    final boolean allowNulls) {
+    this.allowNulls = allowNulls;
   }
 
   /**

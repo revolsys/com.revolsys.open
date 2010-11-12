@@ -21,10 +21,11 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.filter.GeometryFilter;
-import com.revolsys.gis.data.model.filter.LineIntersectsFilter;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
+import com.revolsys.gis.jts.filter.LineIntersectsFilter;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.util.NoOp;
 import com.revolsys.parallel.channel.Channel;
 import com.vividsolutions.jts.geom.Geometry;
@@ -258,9 +259,17 @@ public class CompareProcessor extends AbstractMergeProcess {
     final DataObject otherObject = otherPointMap.getFirstMatch(sourceObject,
       equalFilter);
     if (otherObject != null) {
-      equalStatistics.add(sourceObject);
-      removeObject(sourceObject);
-      removeOtherObject(otherObject);
+      Point sourcePoint = sourceObject.getGeometryValue();
+      double sourceZ = CoordinatesListUtil.get(sourcePoint).getZ(0);
+
+      Point otherPoint = otherObject.getGeometryValue();
+      double otherZ = CoordinatesListUtil.get(otherPoint).getZ(0);
+
+      if (sourceZ == otherZ || Double.isNaN(sourceZ) && Double.isNaN(otherZ)) {
+        equalStatistics.add(sourceObject);
+        removeObject(sourceObject);
+        removeOtherObject(otherObject);
+      }
     }
   }
 

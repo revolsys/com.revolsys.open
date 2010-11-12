@@ -30,7 +30,7 @@ public class DataObjectGeometryEquals2DExactFilter implements
   private final Geometry geometry;
 
   /**
-   * Construct a new LessThanDistanceFilter.
+   * Construct a new LineStringLessThanDistanceFilter.
    * 
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance
