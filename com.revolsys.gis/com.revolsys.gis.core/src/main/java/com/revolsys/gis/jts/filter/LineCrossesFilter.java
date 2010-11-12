@@ -29,7 +29,7 @@ public class LineCrossesFilter implements Filter<LineString> {
   private final LineString geometry;
 
   /**
-   * Construct a new LessThanDistanceFilter.
+   * Construct a new LineStringLessThanDistanceFilter.
    * 
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance

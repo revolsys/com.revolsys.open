@@ -31,7 +31,7 @@ public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
   private final double maxDistance;
 
   /**
-   * Construct a new LessThanDistanceFilter.
+   * Construct a new LineStringLessThanDistanceFilter.
    * 
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance

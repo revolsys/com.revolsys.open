@@ -23,38 +23,40 @@ package com.revolsys.gis.jts.filter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-public class LessThanDistanceFilter implements Filter<LineString> {
-  private final Envelope envelope;
+public class LineStringLessThanDistanceFilter implements Filter<LineString> {
+  private Envelope envelope;
 
   /** The geometry to compare the data objects to to. */
-  private final LineString geometry;
+  private LineString geometry;
 
-  /** The maximum maxDistance the object can be from the source geometry. */
-  private final double maxDistance;
+  /** The maximum distance the object can be from the source geometry. */
+  private double distance;
+
+  public LineStringLessThanDistanceFilter() {
+  }
 
   /**
-   * Construct a new LessThanDistanceFilter.
+   * Construct a new LineStringLessThanDistanceFilter.
    * 
    * @param geometry The geometry to compare the data objects to to.
-   * @param maxDistance
+   * @param distance
    */
-  public LessThanDistanceFilter(
+  public LineStringLessThanDistanceFilter(
     final LineString geometry,
-    final double maxDistance) {
-    this.geometry = geometry;
-    this.maxDistance = maxDistance;
-    this.envelope = new Envelope(geometry.getEnvelopeInternal());
-    this.envelope.expandBy(maxDistance);
+    final double distance) {
+    this.distance = distance;
+    setGeometry(geometry);
   }
 
   public boolean accept(
-    final LineString geometry) {
-    if (geometry.getEnvelopeInternal().intersects(envelope)) {
-      final double distance = LineStringUtil.distance(geometry, this.geometry,
-        maxDistance);
-      if (distance < maxDistance) {
+    final LineString line) {
+    if (line.getEnvelopeInternal().intersects(envelope)) {
+      double distance = LineStringUtil.distance(line, this.geometry,
+        this.distance);
+      if (distance < this.distance) {
         return true;
       } else {
         return false;
@@ -62,6 +64,7 @@ public class LessThanDistanceFilter implements Filter<LineString> {
     } else {
       return false;
     }
+
   }
 
   public Envelope getEnvelope() {
@@ -78,11 +81,23 @@ public class LessThanDistanceFilter implements Filter<LineString> {
   }
 
   /**
-   * Get the maximum maxDistance the object can be from the source geometry.
+   * Get the maximum distance the object can be from the source geometry.
    * 
-   * @return The maximum maxDistance the object can be from the source geometry.
+   * @return The maximum distance the object can be from the source geometry.
    */
-  public double getMaxDistance() {
-    return maxDistance;
+  public double getDistance() {
+    return distance;
+  }
+
+  public void setGeometry(
+    final LineString geometry) {
+    this.geometry = geometry;
+    this.envelope = new Envelope(geometry.getEnvelopeInternal());
+    this.envelope.expandBy(distance);
+  }
+
+  public void setDistance(
+    final double distance) {
+    this.distance = distance;
   }
 }
