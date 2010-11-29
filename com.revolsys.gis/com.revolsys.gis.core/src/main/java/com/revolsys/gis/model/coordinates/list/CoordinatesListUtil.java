@@ -519,12 +519,12 @@ public class CoordinatesListUtil {
     String coordSeperator,
     String toupleSeperator) {
 
-    toupleSeperator = toupleSeperator.replaceAll("\\", "\\\\");
+    toupleSeperator = toupleSeperator.replaceAll("\\\\","\\\\\\\\");
     toupleSeperator = toupleSeperator.replaceAll("\\.", "\\\\.");
     Pattern touplePattern = Pattern.compile("\\s*" + toupleSeperator + "\\s*");
     String[] touples = touplePattern.split(value);
 
-    coordSeperator = coordSeperator.replaceAll("\\", "\\\\");
+    coordSeperator = coordSeperator.replaceAll("\\\\","\\\\\\\\");
     coordSeperator = coordSeperator.replaceAll("\\.", "\\\\.");
     Pattern coordinatePattern = Pattern.compile("\\s*" + coordSeperator
       + "\\s*");
@@ -555,7 +555,7 @@ public class CoordinatesListUtil {
       double[]coordinates = listOfCoordinateArrays.get(i);
       for (int j = 0; j < coordinates.length; j++) {
         double value = coordinates[j];
-        points.setValue(i, i, value);
+        points.setValue(i, j, value);
       }
     }
     return points;
