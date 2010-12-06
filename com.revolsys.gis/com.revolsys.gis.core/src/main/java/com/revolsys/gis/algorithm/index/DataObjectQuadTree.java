@@ -51,7 +51,7 @@ public class DataObjectQuadTree extends Quadtree {
   public void query(
     final Envelope searchEnv,
     final Visitor<DataObject> visitor) {
-    final IndexItemVisitor<DataObject> itemVisitor = new IndexItemVisitor<DataObject>(
+    final IndexItemVisitor itemVisitor = new IndexItemVisitor(searchEnv,
       visitor);
     super.query(searchEnv, itemVisitor);
   }

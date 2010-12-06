@@ -1,6 +1,8 @@
 package com.revolsys.gis.algorithm.index;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.visitor.Visitor;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.ItemVisitor;
 
 /**
@@ -10,16 +12,21 @@ import com.vividsolutions.jts.index.ItemVisitor;
  * @author Paul Austin
  * @param <T> The type of item to visit.
  */
-public class IndexItemVisitor<T> implements ItemVisitor {
-  private final Visitor<T> visitor;
+public class IndexItemVisitor implements ItemVisitor {
+  private final Visitor<DataObject> visitor;
 
-  public IndexItemVisitor(
-    final Visitor<T> visitor) {
+  private Envelope envelope;
+
+  public IndexItemVisitor(Envelope envelope, final Visitor<DataObject> visitor) {
+    this.envelope = envelope;
     this.visitor = visitor;
   }
 
-  public void visitItem(
-    final Object item) {
-    visitor.visit((T)item);
+  public void visitItem(final Object item) {
+    DataObject object = (DataObject)item;
+    Envelope envelope = object.getGeometryValue().getEnvelopeInternal();
+    if (envelope.intersects(this.envelope)) {
+      visitor.visit(object);
+    }
   }
 }

@@ -35,6 +35,13 @@ public class NoOp {
 
   public static void equals(
     final DataObject object,
+    final Double x,
+    final Double y) {
+    equals(object.getGeometryValue(), x, y);
+  }
+
+  public static void equals(
+    final DataObject object,
     final double x,
     final double y) {
     equals(object.getGeometryValue(), x, y);
@@ -121,7 +128,7 @@ public class NoOp {
     }
   }
 
-  public static void equals(
+  public static boolean equals(
     LineString line,
     double x1,
     double y1,
@@ -130,6 +137,9 @@ public class NoOp {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     if (points.get(0).equals(x1,y1) && points.get(points.size()-1).equals(x2,y2)) {
       noOp();
+      return true;
+    } else {
+      return false;
     }
   }
 

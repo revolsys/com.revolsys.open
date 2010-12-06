@@ -1,5 +1,7 @@
 package com.revolsys.filter;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,7 +25,8 @@ public class AndFilter<T> implements Filter<T> {
     for (final Filter<T> filter : filters) {
       final boolean accept = filter.accept(object);
       if (!accept) {
-        return false;
+    
+   return false;
       }
     }
     return true;
