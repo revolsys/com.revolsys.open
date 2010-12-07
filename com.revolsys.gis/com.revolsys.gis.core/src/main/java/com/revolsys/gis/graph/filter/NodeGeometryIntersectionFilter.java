@@ -11,24 +11,26 @@ import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 public class NodeGeometryIntersectionFilter<T> implements Filter<Node<T>> {
 
-  private final Geometry geometry;
+  private GeometryFactory geometryFactory;
 
-  private final GeometryFactory geometryFactory;
+  private PreparedGeometry preparedGeometry;
 
-  private final PreparedGeometry preparedGeometry;
-
-  public NodeGeometryIntersectionFilter(
-    final Geometry geometry) {
-    this.geometry = geometry;
-    this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
-    this.geometryFactory = GeometryFactory.getFactory(geometry);
+  public NodeGeometryIntersectionFilter() {
   }
 
-  public boolean accept(
-    final Node<T> node) {
+  public NodeGeometryIntersectionFilter(final Geometry geometry) {
+    setGeometry(geometry);
+  }
+
+  public boolean accept(final Node<T> node) {
     final Coordinates coordinates = node.getCoordinates();
     final Point point = geometryFactory.createPoint(coordinates);
     final boolean intersects = preparedGeometry.intersects(point);
     return intersects;
+  }
+
+  public void setGeometry(final Geometry geometry) {
+    this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
+    this.geometryFactory = GeometryFactory.getFactory(geometry);
   }
 }
