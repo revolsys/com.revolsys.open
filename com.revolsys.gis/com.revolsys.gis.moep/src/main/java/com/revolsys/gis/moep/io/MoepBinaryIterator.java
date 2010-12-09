@@ -215,7 +215,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
             JtsGeometryUtil.setGeometryProperty(textPoint,
               MoepConstants.FONT_NAME, fontName);
             if (attribute.length() > 3) {
-              final String other = new String(attribute.substring(3, 5).trim());
+              final String other = new String(attribute.substring(3, Math.min(attribute.length(), 5)).trim());
               JtsGeometryUtil.setGeometryProperty(textPoint,
                 MoepConstants.OTHER, other);
             }

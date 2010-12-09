@@ -57,6 +57,10 @@ public class SetBeanProperties implements BeanFactoryPostProcessor,
     throws BeansException {
     for (Entry<String, String> beanPropertyName : beanPropertyNames.entrySet()) {
       String beanName = beanPropertyName.getKey();
+      String[] aliases = beanFactory.getAliases(beanName);
+      if (aliases.length > 0) {
+        beanName = aliases[0];
+      }
       String propertyName = beanPropertyName.getValue();
       BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
       beanDefinition.setLazyInit(false);
