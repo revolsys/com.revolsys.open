@@ -10,23 +10,27 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
-  public Polygon getPolygon(
-    final String mapTileName,
+  public Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem) {
     return getPolygon(mapTileName, new GeometryFactory(coordinateSystem));
   }
 
-  public Polygon getPolygon(
-    String mapTileName,
-    GeometryFactory geometryFactory) {
+  public Polygon getPolygon(String mapTileName, GeometryFactory geometryFactory) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();
     final Polygon polygon = boundingBox.toPolygon(geometryFactory);
     return polygon;
   }
 
-  public String getMapTileName(
-    final Geometry geometry) {
+  public Polygon getPolygon(final String mapTileName,
+    final GeometryFactory geometryFactory, int numX, int numY) {
+    final RectangularMapTile mapTile = getTileByName(mapTileName);
+    final BoundingBox boundingBox = mapTile.getBoundingBox();
+    final Polygon polygon = boundingBox.toPolygon(geometryFactory, numX, numY);
+    return polygon;
+  }
+
+  public String getMapTileName(final Geometry geometry) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     final Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
       coordinateSystem);

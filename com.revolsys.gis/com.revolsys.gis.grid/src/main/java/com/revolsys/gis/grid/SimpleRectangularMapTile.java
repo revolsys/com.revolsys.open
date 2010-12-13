@@ -14,11 +14,8 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
 
   private final String name;
 
-  public SimpleRectangularMapTile(
-    final RectangularMapGrid grid,
-    final String formattedName,
-    final String name,
-    final BoundingBox boundingBox) {
+  public SimpleRectangularMapTile(final RectangularMapGrid grid,
+    final String formattedName, final String name, final BoundingBox boundingBox) {
     this.grid = grid;
     this.name = name;
     this.formattedName = formattedName;
@@ -41,16 +38,23 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
     return name;
   }
 
-  public Polygon getPolygon(
-    final GeometryFactory factory,
-    final int numPoints) {
+  public Polygon getPolygon(final GeometryFactory factory, final int numPoints) {
     return boundingBox.toPolygon(factory, numPoints);
   }
 
-  public Polygon getPolygon(
-    final int numPoints) {
+  public Polygon getPolygon(final GeometryFactory factory,
+    final int numXPoints, final int numYPoints) {
+    return boundingBox.toPolygon(factory, numXPoints, numYPoints);
+  }
+
+  public Polygon getPolygon(final int numPoints) {
     final GeometryFactory factory = GeometryFactory.getFactory(4326);
     return getPolygon(factory, numPoints);
+  }
+
+  public Polygon getPolygon(final int numXPoints, final int numYPoints) {
+    final GeometryFactory factory = GeometryFactory.getFactory(4326);
+    return getPolygon(factory, numXPoints, numYPoints);
   }
 
   @Override

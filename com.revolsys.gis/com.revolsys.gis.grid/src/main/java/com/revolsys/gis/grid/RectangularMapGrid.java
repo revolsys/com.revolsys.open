@@ -10,32 +10,26 @@ import com.vividsolutions.jts.geom.Polygon;
 public interface RectangularMapGrid {
   CoordinateSystem getCoordinateSystem();
 
-  String getFormattedMapTileName(
-    String name);
+  String getFormattedMapTileName(String name);
 
-  public String getMapTileName(
-    final double x,
-    final double y);
+  String getMapTileName(final double x, final double y);
 
-  RectangularMapTile getTileByLocation(
-    double x,
-    double y);
+  RectangularMapTile getTileByLocation(double x, double y);
 
-  RectangularMapTile getTileByName(
-    String name);
+  RectangularMapTile getTileByName(String name);
 
   double getTileHeight();
 
-  List<RectangularMapTile> getTiles(
-    final BoundingBox boundingBox);
+  List<RectangularMapTile> getTiles(final BoundingBox boundingBox);
 
   double getTileWidth();
 
-  public Polygon getPolygon(
-    final String mapTileName,
+  Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem);
 
-  public Polygon getPolygon(
-    final String mapTileName,
+  Polygon getPolygon(final String mapTileName,
     final GeometryFactory geometryFactory);
+
+  Polygon getPolygon(final String mapTileName,
+    final GeometryFactory geometryFactory, int numX, int numY);
 }
