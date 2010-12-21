@@ -12,7 +12,6 @@ import com.revolsys.gis.jts.CoordinateDistanceComparator;
 import com.revolsys.gis.jts.CoordinateSequenceUtil;
 import com.revolsys.gis.jts.LineSegment3D;
 import com.revolsys.gis.jts.LineSegmentIndex;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.parallel.channel.Channel;
@@ -94,6 +93,20 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
     return tolerance;
   }
 
+  private boolean isWithinDistanceOfBoundary(final Coordinate nextCoordinate) {
+    final Envelope envelope = new Envelope(nextCoordinate);
+    envelope.expandBy(1);
+    @SuppressWarnings("unchecked")
+    final List<LineSegment3D> lines = index.query(envelope);
+    for (final LineSegment3D line : lines) {
+      if (line.distance(nextCoordinate) <= 1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   @Override
   protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
@@ -123,7 +136,19 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       if (line.isWithinDistance(this.geometry, 0)) {
-        split(out, object, line);
+        final List<DataObject> newObjects = split(object, line);
+        for (final DataObject newObject : newObjects) {
+          out.write(newObject);
+        }
+        if (newObjects.size() > 1) {
+          if (notWrittenStatistics != null) {
+            notWrittenStatistics.add(object);
+          }
+          if (createdStatistics != null) {
+            createdStatistics.add(object, newObjects.size());
+          }
+        }
+
       } else {
         out.write(object);
       }
@@ -165,7 +190,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
     this.tolerance = tolerance;
   }
 
-  private void split(final Channel<DataObject> out, final DataObject object,
+  protected List<DataObject> split(final DataObject object,
     final LineString line) {
     final PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
@@ -186,8 +211,8 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
         }
         int j = 0;
         for (final Coordinate intersection : intersections) {
-          if (!isWithinDistanceOfBoundary(c0)
-            && !isWithinDistanceOfBoundary(c1)) {
+          if (!(isWithinDistanceOfBoundary(c0)
+            && isWithinDistanceOfBoundary(c1))) {
             if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
             } else if (i == lastIndex
               && intersection.distance(lastCoordinate) < tolerance) {
@@ -234,36 +259,19 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
       }
       c0 = c1;
     }
+    final List<DataObject> newObjects = new ArrayList<DataObject>();
     if (newLines.isEmpty()) {
-      out.write(object);
+      newObjects.add(object);
     } else {
       createLineString(line, coordinates, startCoordinate, startIndex,
         lastIndex, null, newLines);
       for (final LineString newLine : newLines) {
         if (newLine.getLength() > 0) {
           final DataObject newObject = createSplitObject(object, newLine);
-          out.write(newObject);
+          newObjects.add(newObject);
         }
       }
-      if (notWrittenStatistics != null) {
-        notWrittenStatistics.add(object);
-      }
-      if (createdStatistics != null) {
-        createdStatistics.add(object, newLines.size());
-      }
     }
-  }
-
-  private boolean isWithinDistanceOfBoundary(Coordinate nextCoordinate) {
-    Envelope envelope = new Envelope(nextCoordinate);
-    envelope.expandBy(1);
-    List<LineSegment3D> lines = index.query(envelope);
-    for (LineSegment3D line : lines) {
-      if (line.distance(nextCoordinate) <= 1) {
-        return true;
-      }
-    }
-
-    return false;
+    return newObjects;
   }
 }

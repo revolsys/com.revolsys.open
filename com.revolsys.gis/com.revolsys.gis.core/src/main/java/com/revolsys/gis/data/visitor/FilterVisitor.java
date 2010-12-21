@@ -19,17 +19,6 @@ public class FilterVisitor<T> extends NestedVisitor<T> {
     if (filter.accept(item)) {
       return super.visit(item);
     } else {
-      if (item instanceof DataObject) {
-        DataObject object = (DataObject)item;
-        Geometry geometry = object.getGeometryValue();
-        if (geometry instanceof LineString) {
-          LineString line = (LineString)geometry;
-          if (NoOp.equals(line, 514661.0, 5992002.0, 514861, 5992798)) {
-            filter.accept(item);
-          }
-
-        }
-      }
       return true;
     }
   }

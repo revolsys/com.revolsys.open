@@ -146,40 +146,31 @@ public class OsnIterator implements Iterator<Object> {
 
   private Object value;
 
-  public OsnIterator(
-    final File directory,
-    final String fileName)
+  public OsnIterator(final File directory, final String fileName)
     throws IOException {
     this(fileName, new ObjectSetInputStream(directory, fileName));
   }
 
-  public OsnIterator(
-    final String fileName,
-    final InputStream in)
+  public OsnIterator(final String fileName, final InputStream in)
     throws IOException {
     this.in = new BufferedInputStream(in);
     this.fileName = fileName;
     scopeStack.push(IN_DOCUMENT);
   }
 
-  public OsnIterator(
-    final ZipFile zipFile,
-    final String fileName)
+  public OsnIterator(final ZipFile zipFile, final String fileName)
     throws IOException {
     this(fileName, new ObjectSetInputStream(zipFile, fileName));
   }
 
-  private void checkStartCollection(
-    final String name)
-    throws IOException {
+  private void checkStartCollection(final String name) throws IOException {
     skipWhitespace();
     if (!isNextCharacter('{')) {
       throw new IllegalStateException("Expecting a '{' to start a " + name);
     }
   }
 
-  private Object checkStartObject()
-    throws IOException {
+  private Object checkStartObject() throws IOException {
     skipWhitespace();
     if (isNextCharacter('(')) {
       scopeStack.push(IN_OBJECT);
@@ -189,13 +180,11 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  public void close()
-    throws IOException {
+  public void close() throws IOException {
     in.close();
   }
 
-  private Object findAttributeName()
-    throws IOException {
+  private Object findAttributeName() throws IOException {
     value = findLowerName(true);
     if (value == null) {
       return UNKNOWN;
@@ -210,8 +199,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private String findClassName()
-    throws IOException {
+  private String findClassName() throws IOException {
     final String className = findUpperName(true);
     // If the class name is fullowed by '::' get and return the schema name
     if (currentCharacter == ':' && getNextCharacter() == ':') {
@@ -223,8 +211,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private Object findEndCollection()
-    throws IOException {
+  private Object findEndCollection() throws IOException {
     if (isNextCharacter('}')) {
       final Object scope = scopeStack.pop();
       if (scope == IN_LIST) {
@@ -241,8 +228,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private Object findEndObject()
-    throws IOException {
+  private Object findEndObject() throws IOException {
     if (isNextCharacter(')')) {
       scopeStack.pop();
       return END_OBJECT;
@@ -251,8 +237,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private Object findExpression()
-    throws IOException {
+  private Object findExpression() throws IOException {
     Object eventType = UNKNOWN;
     final int c = currentCharacter;
     if (IS_NUMBER_CHARACTER[c]) {
@@ -299,9 +284,7 @@ public class OsnIterator implements Iterator<Object> {
     return eventType;
   }
 
-  private String findLowerName(
-    final boolean tokenStart)
-    throws IOException {
+  private String findLowerName(final boolean tokenStart) throws IOException {
     if (IS_LOWER_CASE_CHARACTER[currentCharacter]) {
       return findName(tokenStart);
     } else {
@@ -309,24 +292,21 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private String findName(
-    final boolean tokenStart)
-    throws IOException {
+  private String findName(final boolean tokenStart) throws IOException {
     if (tokenStart) {
       lineNumber = currentLineNumber;
       columnNumber = currentColumnNumber;
     }
     final StringBuffer name = new StringBuffer();
     int c = currentCharacter;
-    while (c!= -1 && IS_NAME_CHARACTER[c]) {
+    while (c != -1 && IS_NAME_CHARACTER[c]) {
       name.append((char)c);
       c = getNextCharacter();
     }
     return name.toString().intern();
   }
 
-  private Object findStartObject()
-    throws IOException {
+  private Object findStartObject() throws IOException {
     value = findClassName();
     if (value == null) {
       return UNKNOWN;
@@ -335,9 +315,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private String findUpperName(
-    final boolean tokenStart)
-    throws IOException {
+  private String findUpperName(final boolean tokenStart) throws IOException {
     if (IS_UPPER_CASE_CHARACTER[currentCharacter]) {
       return findName(tokenStart);
     } else {
@@ -418,9 +396,7 @@ public class OsnIterator implements Iterator<Object> {
     return true;
   }
 
-  private boolean isNextCharacter(
-    final int c)
-    throws IOException {
+  private boolean isNextCharacter(final int c) throws IOException {
     if (currentCharacter == c) {
       getNextCharacter();
       return true;
@@ -470,8 +446,7 @@ public class OsnIterator implements Iterator<Object> {
     return getStringValue();
   }
 
-  public Boolean nextBooleanAttribute(
-    final String name) {
+  public Boolean nextBooleanAttribute(final String name) {
     final String attributeName = nextAttributeName();
     if (attributeName == null || !attributeName.equals(name)) {
       throwParseError("Expecting attribute " + name);
@@ -490,8 +465,7 @@ public class OsnIterator implements Iterator<Object> {
     return getBooleanValue();
   }
 
-  public double nextDoubleAttribute(
-    final String name) {
+  public double nextDoubleAttribute(final String name) {
     final String attributeName = nextAttributeName();
     if (attributeName == null || !attributeName.equals(name)) {
       throwParseError("Expecting attribute " + name);
@@ -544,8 +518,7 @@ public class OsnIterator implements Iterator<Object> {
     return getQNameValue();
   }
 
-  public String nextStringAttribute(
-    final String name) {
+  public String nextStringAttribute(final String name) {
     final String attributeName = nextAttributeName();
     if (attributeName == null) {
       return null;
@@ -585,8 +558,7 @@ public class OsnIterator implements Iterator<Object> {
     return getValue();
   }
 
-  private void processAttribute()
-    throws IOException {
+  private void processAttribute() throws IOException {
     scopeStack.pop();
     eventType = findExpression();
     if (eventType == UNKNOWN) {
@@ -594,8 +566,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private Object processDigitString()
-    throws IOException {
+  private Object processDigitString() throws IOException {
     final StringBuffer number = new StringBuffer();
     int c = currentCharacter;
     while (IS_NUMBER_CHARACTER[(char)c]) {
@@ -609,16 +580,14 @@ public class OsnIterator implements Iterator<Object> {
     return eventType;
   }
 
-  private void processDocument()
-    throws IOException {
+  private void processDocument() throws IOException {
     eventType = findStartObject();
     if (eventType == UNKNOWN) {
       throwParseError("Expecting start of an object definition");
     }
   }
 
-  private void processList()
-    throws IOException {
+  private void processList() throws IOException {
     eventType = findExpression();
     if (eventType == UNKNOWN) {
       eventType = findEndCollection();
@@ -628,8 +597,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private void processObject()
-    throws IOException {
+  private void processObject() throws IOException {
     skipWhitespace();
     eventType = findAttributeName();
     if (eventType == UNKNOWN) {
@@ -641,8 +609,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private void processRelation()
-    throws IOException {
+  private void processRelation() throws IOException {
     eventType = findStartObject();
     if (eventType == UNKNOWN) {
       eventType = findEndCollection();
@@ -652,8 +619,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private void processSet()
-    throws IOException {
+  private void processSet() throws IOException {
     if (eventType == UNKNOWN) {
       eventType = findEndCollection();
       if (eventType == UNKNOWN) {
@@ -662,8 +628,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
-  private Object processTextString()
-    throws IOException {
+  private Object processTextString() throws IOException {
     lineNumber = currentLineNumber;
     columnNumber = currentColumnNumber;
 
@@ -692,8 +657,7 @@ public class OsnIterator implements Iterator<Object> {
     throw new UnsupportedOperationException();
   }
 
-  private void setNextToken(
-    final Object token) {
+  private void setNextToken(final Object token) {
     value = token;
   }
 
@@ -721,14 +685,12 @@ public class OsnIterator implements Iterator<Object> {
     return c;
   }
 
-  public void throwParseError(
-    final String message) {
-    throw new ParseException(toString(), message
-      + " got '"
-      + (char)currentCharacter
-      + "' context="
-      + new String(buffer, Math.max(bufferIndex - 10, 0), Math.min(
-        bufferIndex + 10, bufferLength - 1)));
+  public void throwParseError(final String message) {
+    int startIndex = Math.max(bufferIndex - 40, 0);
+    int endIndex = Math.min(80, bufferLength - 1 - startIndex);
+    throw new ParseException(toString(), message + " got '"
+      + (char)currentCharacter + "' context="
+      + new String(buffer, startIndex, endIndex));
   }
 
   @Override

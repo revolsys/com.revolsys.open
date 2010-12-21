@@ -239,7 +239,6 @@ public class CompareProcessor extends AbstractMergeProcess {
     final Filter<DataObject> filter = new AndFilter<DataObject>(equalFilter,
       geometryFilter);
 
-    NoOp.equals(sourceLine, 514661.0, 5992002.0, 514861, 5992798);
     final DataObject otherObject = otherIndex.queryFirst(sourceObject, filter);
     if (otherObject != null) {
       equalStatistics.add(sourceObject);
@@ -380,9 +379,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     if (geometry instanceof Point) {
       otherPointMap.remove(object);
     } else {
-      final int size = otherIndex.size();
       otherIndex.remove(object);
-      NoOp.equals(size, otherIndex.size());
     }
   }
 
