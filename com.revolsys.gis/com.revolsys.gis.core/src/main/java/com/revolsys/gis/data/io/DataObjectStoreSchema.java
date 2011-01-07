@@ -77,6 +77,9 @@ public class DataObjectStoreSchema {
   }
 
   public List<DataObjectMetaData> getTypes() {
+    if (metaDataCache.isEmpty()) {
+      dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+    }
     return new ArrayList(metaDataCache.values());
   }
 

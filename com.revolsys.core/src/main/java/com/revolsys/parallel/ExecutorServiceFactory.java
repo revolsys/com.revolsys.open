@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class ExecutorServiceFactory {
   private static final Object SYNC = new Object();
@@ -23,13 +24,19 @@ public class ExecutorServiceFactory {
     }
   }
 
-  public static void setDefaultExecutorService(
-    ExecutorService executorService) {
+  public static void setDefaultExecutorService(ExecutorService executorService) {
     ThreadSharedAttributes.setDefaultAttribute(KEY, executorService);
   }
 
-  public static void setThreadExecutorService(
-    ExecutorService executorService) {
+  public static void setThreadExecutorService(ExecutorService executorService) {
     ThreadSharedAttributes.setAttribute(KEY, executorService);
+  }
+
+  public static final void invokeMethod(final Object object,
+    final String methodName, final Object... args) {
+    ExecutorService executorService = getExecutorService();
+    InvokeMethodRunnable task = new InvokeMethodRunnable(object, methodName,
+      args);
+    executorService.execute(task);
   }
 }

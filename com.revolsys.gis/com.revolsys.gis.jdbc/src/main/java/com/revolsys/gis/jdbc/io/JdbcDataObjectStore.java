@@ -616,8 +616,9 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
         try {
           while (schemaRs.next()) {
             final String schemaName = schemaRs.getString("TABLE_SCHEM");
-            schemaMap.put(schemaName, new DataObjectStoreSchema(this,
-              schemaName));
+            DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
+              schemaName);
+            schemaMap.put(schemaName, schema);
           }
         } finally {
           JdbcUtils.close(schemaRs);

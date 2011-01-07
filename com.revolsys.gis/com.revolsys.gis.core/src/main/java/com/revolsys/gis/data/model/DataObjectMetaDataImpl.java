@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.types.DataType;
@@ -75,14 +77,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   private final List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
 
-  public DataObjectMetaDataImpl(
-    final DataObjectMetaData metaData) {
+  public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
     this(metaData.getName(), metaData.getProperties(), metaData.getAttributes());
     setIdAttributeIndex(metaData.getIdAttributeIndex());
   }
 
-  public DataType getAttributeType(
-    CharSequence name) {
+  public DataType getAttributeType(CharSequence name) {
     final int index = getAttributeIndex(name);
     if (index == -1) {
       return null;
@@ -91,54 +91,42 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
-  public DataObjectMetaDataImpl(
-    final DataObjectStore dataObjectStore,
-    final DataObjectStoreSchema schema,
-    final DataObjectMetaData metaData) {
+  public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
+    final DataObjectStoreSchema schema, final DataObjectMetaData metaData) {
     this(metaData);
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
   }
 
-  public DataObjectMetaDataImpl(
-    final DataObjectStore dataObjectStore,
-    final DataObjectStoreSchema schema,
-    final QName typeName) {
+  public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
+    final DataObjectStoreSchema schema, final QName typeName) {
     this(typeName);
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
   }
 
-  public DataObjectMetaDataImpl(
-    final QName name) {
+  public DataObjectMetaDataImpl(final QName name) {
     this.name = name;
   }
 
-  public DataObjectMetaDataImpl(
-    final QName name,
-    final Attribute... attributes) {
+  public DataObjectMetaDataImpl(final QName name, final Attribute... attributes) {
     this(name, null, attributes);
   }
 
-  public DataObjectMetaDataImpl(
-    final QName name,
+  public DataObjectMetaDataImpl(final QName name,
     final List<Attribute> attributes) {
     this(name, null, attributes);
   }
 
-  public DataObjectMetaDataImpl(
-    final QName name,
-    final Map<String, Object> properties,
-    final Attribute... attributes) {
+  public DataObjectMetaDataImpl(final QName name,
+    final Map<String, Object> properties, final Attribute... attributes) {
     this(name, properties, Arrays.asList(attributes));
   }
 
-  public DataObjectMetaDataImpl(
-    final QName name,
-    final Map<String, Object> properties,
-    final List<Attribute> attributes) {
+  public DataObjectMetaDataImpl(final QName name,
+    final Map<String, Object> properties, final List<Attribute> attributes) {
     this.name = name;
     for (final Attribute attribute : attributes) {
       addAttribute(attribute.clone());
@@ -146,8 +134,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     cloneProperties(properties);
   }
 
-  public void addAttribute(
-    final Attribute attribute) {
+  public void addAttribute(final Attribute attribute) {
     final int index = attributeNames.size();
     final String name = attribute.getName();
     attributeNames.add(name);
@@ -155,62 +142,54 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     attributeMap.put(name, attribute);
     attributeIdMap.put(name, attributeIdMap.size());
     final DataType dataType = attribute.getType();
-    final Class<?> dataClass = dataType.getJavaClass();
-    if (Geometry.class.isAssignableFrom(dataClass)) {
-      geometryAttributeIndexes.add(index);
-      geometryAttributeNames.add(name);
-      if (geometryAttributeIndex == -1) {
-        geometryAttributeIndex = index;
+    if (dataType == null) {
+LoggerFactory.getLogger(getClass()).debug(attribute.toString());
+    } else {
+      final Class<?> dataClass = dataType.getJavaClass();
+      if (Geometry.class.isAssignableFrom(dataClass)) {
+        geometryAttributeIndexes.add(index);
+        geometryAttributeNames.add(name);
+        if (geometryAttributeIndex == -1) {
+          geometryAttributeIndex = index;
+        }
       }
     }
     attribute.setIndex(index);
   }
 
-  public Attribute addAttribute(
-    final String name,
-    final DataType type,
+  public Attribute addAttribute(final String name, final DataType type,
     final boolean required) {
     final Attribute attribute = new Attribute(name, type, required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public Attribute addAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final boolean required) {
+  public Attribute addAttribute(final String name, final DataType type,
+    final int length, final boolean required) {
     final Attribute attribute = new Attribute(name, type, length, required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public Attribute addAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final int scale,
-    final boolean required) {
+  public Attribute addAttribute(final String name, final DataType type,
+    final int length, final int scale, final boolean required) {
     final Attribute attribute = new Attribute(name, type, length, scale,
       required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public void addDefaultValue(
-    final String attributeName,
+  public void addDefaultValue(final String attributeName,
     final Object defaultValue) {
     defaultValues.put(attributeName, defaultValue);
   }
 
-  public void addRestriction(
-    final String attributePath,
+  public void addRestriction(final String attributePath,
     final Collection<Object> values) {
     restrictions.put(attributePath, values);
   }
 
-  public void addSuperClass(
-    final DataObjectMetaData superClass) {
+  public void addSuperClass(final DataObjectMetaData superClass) {
     if (!superClasses.contains(superClass)) {
       superClasses.add(superClass);
     }
@@ -225,8 +204,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return metaData;
   }
 
-  public void cloneProperties(
-    final Map<String, Object> properties) {
+  public void cloneProperties(final Map<String, Object> properties) {
     if (properties != null) {
       for (final Entry<String, Object> property : properties.entrySet()) {
         final String propertyName = property.getKey();
@@ -243,8 +221,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
-  public int compareTo(
-    final DataObjectMetaData other) {
+  public int compareTo(final DataObjectMetaData other) {
     if (name == null) {
       return 1;
     }
@@ -256,18 +233,15 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   @Override
-  public boolean equals(
-    final Object other) {
+  public boolean equals(final Object other) {
     return compareTo((DataObjectMetaData)other) == 0;
   }
 
-  public Attribute getAttribute(
-    final CharSequence name) {
+  public Attribute getAttribute(final CharSequence name) {
     return attributeMap.get(name.toString());
   }
 
-  public Attribute getAttribute(
-    final int i) {
+  public Attribute getAttribute(final int i) {
     return attributes.get(i);
   }
 
@@ -275,8 +249,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return attributes.size();
   }
 
-  public int getAttributeIndex(
-    final CharSequence name) {
+  public int getAttributeIndex(final CharSequence name) {
     final Integer attributeId = attributeIdMap.get(name.toString());
     if (attributeId == null) {
       return -1;
@@ -285,8 +258,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
-  public int getAttributeLength(
-    final int i) {
+  public int getAttributeLength(final int i) {
     try {
       final Attribute attribute = attributes.get(i);
       return attribute.getLength();
@@ -295,8 +267,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
-  public String getAttributeName(
-    final int i) {
+  public String getAttributeName(final int i) {
     try {
       if (i == -1) {
         return null;
@@ -317,14 +288,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return attributes;
   }
 
-  public int getAttributeScale(
-    final int i) {
+  public int getAttributeScale(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getScale();
   }
 
-  public DataType getAttributeType(
-    final int i) {
+  public DataType getAttributeType(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getType();
   }
@@ -345,8 +314,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return dataObjectStore;
   }
 
-  public Object getDefaultValue(
-    final String attributeName) {
+  public Object getDefaultValue(final String attributeName) {
     return defaultValues.get(attributeName);
   }
 
@@ -399,8 +367,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getProperty(
-    final String name) {
+  public <V> V getProperty(final String name) {
     return (V)properties.get(name);
   }
 
@@ -412,8 +379,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return schema;
   }
 
-  public boolean hasAttribute(
-    final CharSequence name) {
+  public boolean hasAttribute(final CharSequence name) {
     return attributeMap.containsKey(name.toString());
   }
 
@@ -422,14 +388,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return name.hashCode();
   }
 
-  public boolean isAttributeRequired(
-    final int i) {
+  public boolean isAttributeRequired(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.isRequired();
   }
 
-  public boolean isInstanceOf(
-    final DataObjectMetaData classDefinition) {
+  public boolean isInstanceOf(final DataObjectMetaData classDefinition) {
     if (classDefinition == null) {
       return false;
     }
@@ -444,8 +408,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return false;
   }
 
-  public void replaceAttribute(
-    final Attribute attribute,
+  public void replaceAttribute(final Attribute attribute,
     final Attribute newAttribute) {
     final String name = attribute.getName();
     final String newName = newAttribute.getName();
@@ -467,13 +430,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   /**
    * @param geometryAttributeIndex the geometryAttributeIndex to set
    */
-  public void setGeometryAttributeIndex(
-    final int geometryAttributeIndex) {
+  public void setGeometryAttributeIndex(final int geometryAttributeIndex) {
     this.geometryAttributeIndex = geometryAttributeIndex;
   }
 
-  public void setGeometryAttributeName(
-    final String name) {
+  public void setGeometryAttributeName(final String name) {
     final int id = getAttributeIndex(name);
     setGeometryAttributeIndex(id);
   }
@@ -481,24 +442,20 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   /**
    * @param idAttributeIndex the idAttributeIndex to set
    */
-  public void setIdAttributeIndex(
-    final int idAttributeIndex) {
+  public void setIdAttributeIndex(final int idAttributeIndex) {
     this.idAttributeIndex = idAttributeIndex;
   }
 
-  public void setIdAttributeName(
-    final String name) {
+  public void setIdAttributeName(final String name) {
     final int id = getAttributeIndex(name);
     setIdAttributeIndex(id);
   }
 
-  public void setName(
-    final QName name) {
+  public void setName(final QName name) {
     this.name = name;
   }
 
-  public void setProperties(
-    final Map<String, Object> properties) {
+  public void setProperties(final Map<String, Object> properties) {
     if (properties != null) {
       this.properties.putAll(properties);
       for (final Entry<String, Object> propertyIter : properties.entrySet()) {
@@ -511,9 +468,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   }
 
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     properties.put(name, value);
   }
 

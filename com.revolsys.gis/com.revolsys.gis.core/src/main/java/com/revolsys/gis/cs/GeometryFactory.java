@@ -73,7 +73,8 @@ public class GeometryFactory extends
 
   public static GeometryFactory getFactory(final int srid, final int scale) {
     GeometryFactory factory = new GeometryFactory(
-      EpsgCoordinateSystems.getCoordinateSystem(srid), new SimpleCoordinatesPrecisionModel(scale));
+      EpsgCoordinateSystems.getCoordinateSystem(srid),
+      new SimpleCoordinatesPrecisionModel(scale));
     return factory;
   }
 
@@ -211,6 +212,13 @@ public class GeometryFactory extends
     this(geometryFactory.getCoordinateSystem(),
       geometryFactory.getCoordinatesPrecisionModel());
     this.numAxis = numAxis;
+  }
+
+  public GeometryFactory(CoordinatesPrecisionModel precisionModel, int dimension) {
+    super(PrecisionModelUtil.getPrecisionModel(precisionModel), 0,
+      DoubleCoordinatesListFactory.INSTANCE);
+    this.coordinateSystem = null;
+    this.coordinatesPrecisionModel = precisionModel;
   }
 
   @SuppressWarnings("unchecked")
@@ -380,7 +388,7 @@ public class GeometryFactory extends
   }
 
   public Point createPoint(double x, double y) {
-    DoubleCoordinates coordinates = new DoubleCoordinates(x,y);
+    DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
     return createPoint(coordinates);
   }
 }

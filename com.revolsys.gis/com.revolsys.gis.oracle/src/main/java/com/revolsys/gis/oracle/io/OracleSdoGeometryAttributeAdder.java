@@ -37,18 +37,13 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
 
-  public OracleSdoGeometryAttributeAdder(
-    final DataSource dataSource) {
+  public OracleSdoGeometryAttributeAdder(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
   @Override
-  public Attribute addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final int sqlType,
-    final int length,
-    final int scale,
+  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, final int sqlType, final int length, final int scale,
     final boolean required) {
     final QName typeName = metaData.getName();
     final String columnName = name.toUpperCase();
@@ -70,8 +65,13 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
       geometryScale);
-    final GeometryFactory geometryFactory = new GeometryFactory(
-      coordinateSystem, precisionModel, dimension);
+    final GeometryFactory geometryFactory;
+    if (coordinateSystem == null) {
+      geometryFactory = new GeometryFactory(precisionModel, dimension);
+    } else {
+      geometryFactory = new GeometryFactory(coordinateSystem, precisionModel,
+        dimension);
+    }
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
       DataTypes.GEOMETRY, sqlType, length, scale, required, null,
       geometryFactory, dimension);
@@ -80,17 +80,13 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
     attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
       "SDO_GEOM.SDO_BUFFER(", "," + precision + ")"));
-    attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
-     geometryFactory);
-     return attribute;
+    attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+    return attribute;
 
   }
 
-  private Object getColumnProperty(
-    final DataObjectStoreSchema schema,
-    final QName typeName,
-    final String columnName,
-    final String propertyName) {
+  private Object getColumnProperty(final DataObjectStoreSchema schema,
+    final QName typeName, final String columnName, final String propertyName) {
     final Map<QName, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
     final Map<String, Map<String, Object>> columnsProperties = columnProperties.get(typeName);
     if (columnsProperties != null) {
@@ -103,11 +99,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     return null;
   }
 
-  private double getDoubleColumnProperty(
-    final DataObjectStoreSchema schema,
-    final QName typeName,
-    final String columnName,
-    final String propertyName) {
+  private double getDoubleColumnProperty(final DataObjectStoreSchema schema,
+    final QName typeName, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typeName, columnName,
       propertyName);
     if (value instanceof Number) {
@@ -118,11 +111,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private int getIntegerColumnProperty(
-    final DataObjectStoreSchema schema,
-    final QName typeName,
-    final String columnName,
-    final String propertyName) {
+  private int getIntegerColumnProperty(final DataObjectStoreSchema schema,
+    final QName typeName, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typeName, columnName,
       propertyName);
     if (value instanceof Number) {
@@ -134,8 +124,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public void initialize(
-    final DataObjectStoreSchema schema) {
+  public void initialize(final DataObjectStoreSchema schema) {
     Map<QName, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
     if (columnProperties == null) {
       columnProperties = new HashMap<QName, Map<String, Map<String, Object>>>();
@@ -192,11 +181,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private void setColumnProperty(
     final Map<QName, Map<String, Map<String, Object>>> esriColumnProperties,
-    final String schemaName,
-    final String tableName,
-    final String columnName,
-    final String propertyName,
-    final Object propertyValue) {
+    final String schemaName, final String tableName, final String columnName,
+    final String propertyName, final Object propertyValue) {
     final QName typeName = new QName(schemaName, tableName);
     Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typeName);
     if (typeColumnMap == null) {
