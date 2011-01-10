@@ -842,4 +842,12 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     final DataObject object) {
     getWriter().write(object);
   }
+  @Override
+  public String toString() {
+    if (label == null) {
+    return super.toString();
+    } else {
+      return label;
+    }
+  }
 }

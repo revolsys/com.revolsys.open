@@ -7,10 +7,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 public final class CollectionUtil {
-  public static <T1, T2> Map<T1, T2> createMap(
-    final List<T1> sourceValues,
+  public static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues,
     final List<T2> targetValues) {
     final Map<T1, T2> map = new HashMap<T1, T2>();
     for (int i = 0; i < sourceValues.size() && i < targetValues.size(); i++) {
@@ -21,8 +22,32 @@ public final class CollectionUtil {
     return map;
   }
 
-  public static Map<String, String> toMap(
-    final String string) {
+  public static <T> T get(final Collection<T> collection, final int index) {
+    int i = 0;
+    for (final T object : collection) {
+      if (i == index) {
+        return object;
+      } else {
+        i++;
+      }
+    }
+    throw new ArrayIndexOutOfBoundsException(index);
+  }
+
+  public static Map<String, Object> toMap(final Preferences preferences) {
+    try {
+      final Map<String, Object> map = new HashMap<String, Object>();
+      for (final String name : preferences.keys()) {
+        final Object value = preferences.get(name, null);
+        map.put(name, value);
+      }
+      return map;
+    } catch (final BackingStoreException e) {
+      throw new RuntimeException("Unable to get preferences " + e);
+    }
+  }
+
+  public static Map<String, String> toMap(final String string) {
     if (string == null) {
       return Collections.emptyMap();
     } else {
@@ -49,8 +74,7 @@ public final class CollectionUtil {
    * @param separator The separator.
    * @return The string.
    */
-  public static String toString(
-    final Collection<? extends Object> values) {
+  public static String toString(final Collection<? extends Object> values) {
     return toString(values, ",");
   }
 
@@ -62,8 +86,7 @@ public final class CollectionUtil {
    * @param separator The separator.
    * @return The string.
    */
-  public static String toString(
-    final Collection<? extends Object> values,
+  public static String toString(final Collection<? extends Object> values,
     final String separator) {
     if (values == null) {
       return null;
@@ -83,19 +106,5 @@ public final class CollectionUtil {
   }
 
   private CollectionUtil() {
-  }
-
-  public static <T> T get(
-    Collection<T> collection,
-    int index) {
-     int i = 0;
-    for (T object : collection) {
-      if (i == index) {
-        return object;
-      } else {
-        i++;
-      }
-    }
-    throw new ArrayIndexOutOfBoundsException(index);
   }
 }

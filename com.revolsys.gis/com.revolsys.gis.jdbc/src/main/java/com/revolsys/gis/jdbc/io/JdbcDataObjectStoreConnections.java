@@ -2,17 +2,20 @@ package com.revolsys.gis.jdbc.io;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.sql.DataSource;
-
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.util.CollectionUtil;
 
 public class JdbcDataObjectStoreConnections {
 
   private static JdbcDataObjectStoreConnections INSTANCE = new JdbcDataObjectStoreConnections();
+
+  private Map<String, JdbcDataObjectStore> dataStores = new HashMap<String, JdbcDataObjectStore>();
 
   public static JdbcDataObjectStoreConnections get() {
     return INSTANCE;
@@ -43,13 +46,20 @@ public class JdbcDataObjectStoreConnections {
   }
 
   private DataObjectStore getDataObjectStore(final String connectionName) {
-    final Preferences preferences = getPreferences(connectionName);
-    final DataSource dataSource = null;
-    if (dataSource == null) {
-      return null;
-    } else {
-      return JdbcFactory.createDataObjectStore(dataSource);
+    JdbcDataObjectStore dataStore = dataStores.get(connectionName);
+    if (dataStore == null) {
+      final Preferences preferences = getPreferences(connectionName);
+      Map<String, Object> config = CollectionUtil.toMap(preferences);
+      String productName = (String)config.get("productName");
+      if (productName == null) {
+        return null;
+      } else {
+        dataStore = JdbcFactory.createDataObjectStore(connectionName,
+          productName, config);
+        dataStores.put(connectionName, dataStore);
+      }
     }
+    return dataStore;
   }
 
   public List<DataObjectStore> getDataObjectStores() {
