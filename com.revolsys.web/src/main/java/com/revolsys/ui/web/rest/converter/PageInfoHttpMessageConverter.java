@@ -5,12 +5,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,15 +27,20 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
+import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;
 import com.revolsys.ui.model.ParameterInfo;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
+import com.revolsys.xml.XmlContants;
 import com.revolsys.xml.io.XmlWriter;
+import com.revolsys.xml.wadl.WadlConstants;
 
 public class PageInfoHttpMessageConverter extends
-  AbstractHttpMessageConverter<PageInfo> {
+  AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
+  private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
+
   private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
@@ -44,9 +49,9 @@ public class PageInfoHttpMessageConverter extends
 
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
 
-  private static final Collection<?> WRITE_MEDIA_TYPES = Arrays.asList(
+  private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays.asList(
     MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML,
-    "application/vnd.sun.wadl+xml", TEXT_URI_LIST, MediaType.APPLICATION_JSON,
+    APPLICATION_VND_SUN_WADL_XML, TEXT_URI_LIST, MediaType.APPLICATION_JSON,
     MediaType.TEXT_XML);
 
   public PageInfoHttpMessageConverter() {
@@ -62,9 +67,7 @@ public class PageInfoHttpMessageConverter extends
       if (charset == null) {
         charset = DEFAULT_CHARSET;
       }
-      // } else if (MediaType.APPLICATION_WADL_XML.equals(mediaType)) {
-      // return describe(variant);
-      // } else
+
       HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
       String path = urlPathHelper.getOriginatingRequestUri(request);
       if (!path.endsWith("/")) {
@@ -74,7 +77,9 @@ public class PageInfoHttpMessageConverter extends
       headers.setContentType(mediaType);
 
       final OutputStream out = outputMessage.getBody();
-      if (MediaType.TEXT_HTML.equals(mediaType)
+      if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {
+        writeWadl(out, path, pageInfo);
+      } else if (MediaType.TEXT_HTML.equals(mediaType)
         || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
         writeHtml(out, path, pageInfo);
       } else if (TEXT_URI_LIST.equals(mediaType)) {
@@ -86,11 +91,57 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
+  private void writeWadl(OutputStream out, String path, PageInfo pageInfo) {
+    XmlWriter writer = new XmlWriter(out);
+    writer.startDocument();
+    writer.startTag(APPLICATION);
+    
+
+    writer.startTag(RESOURCES);
+    writeWadlResource(writer, path, pageInfo, true);
+    writer.endTag(RESOURCES);
+
+    writer.endTag(APPLICATION);
+    writer.endDocument();
+    writer.close();
+  }
+
+  private void writeWadlResource(XmlWriter writer, String path,
+    PageInfo pageInfo, boolean writeChildren) {
+    writer.startTag(RESOURCE);
+    writer.attribute(PATH, path);
+    writeWadlDoc(writer, pageInfo);
+    if (writeChildren) {
+      for (Entry<String, PageInfo> childPage : pageInfo.getPages().entrySet()) {
+        String childPath = childPage.getKey();
+        PageInfo childPageInfo = childPage.getValue();
+        writeWadlResource(writer, childPath, childPageInfo, false);
+      }
+    }
+    writer.endTag(RESOURCE);
+  }
+
+  private void writeWadlDoc(XmlWriter writer, PageInfo pageInfo) {
+    for (DocInfo documentation : pageInfo.getDocumentation()) {
+      String title = documentation.getTitle();
+      String description = documentation.getDescription();
+      if (title != null && description != null) {
+        writer.startTag(DOC);
+        Locale locale = documentation.getLocale();
+        if (locale != null) {
+          writer.attribute(XmlContants.XML_LANG, locale);
+        }
+        writer.attribute(TITLE, title);
+        writer.text(description);
+        writer.endTag(DOC);
+      }
+    }
+  }
+
   private void writeHtml(OutputStream out, String path, PageInfo pageInfo) {
     XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "bodyContent");
-    writer.element(HtmlUtil.H1, pageInfo.getTitle());
+    writer.element(HtmlUtil.H2, pageInfo.getTitle());
     String description = pageInfo.getDescription();
     if (description != null) {
       writer.element(HtmlUtil.P, description);
@@ -105,7 +156,7 @@ public class PageInfoHttpMessageConverter extends
     if (!pages.isEmpty()) {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "resources");
-      writer.element(HtmlUtil.H2, "Resources");
+      writer.element(HtmlUtil.H3, "Resources");
       writer.startTag(HtmlUtil.DL);
       for (Entry<String, PageInfo> childPage : pages.entrySet()) {
         String childPath = childPage.getKey();
@@ -153,6 +204,7 @@ public class PageInfoHttpMessageConverter extends
       writer.endTag(HtmlUtil.DIV);
     }
     writer.endTag(HtmlUtil.DIV);
+    writer.endDocument();
     writer.close();
   }
 

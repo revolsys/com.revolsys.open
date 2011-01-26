@@ -33,22 +33,32 @@ import com.revolsys.ui.html.view.PathBreadcrumbView;
 
 public class BreadcrumbController implements Controller {
 
-  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+  private boolean addSlash;
 
   public BreadcrumbController() {
     urlPathHelper.setAlwaysUseFullPath(true);
   }
 
-  public ModelAndView handleRequest(
-    final HttpServletRequest request,
-    final HttpServletResponse response)
-    throws Exception {
-    String path = urlPathHelper.getOriginatingRequestUri(request);
-    String contextPath = urlPathHelper.getOriginatingContextPath(request);
-    PathBreadcrumbView view = new PathBreadcrumbView(contextPath, path);
-    PrintWriter writer = response.getWriter();
+  public ModelAndView handleRequest(final HttpServletRequest request,
+    final HttpServletResponse response) throws Exception {
+    final String path = urlPathHelper.getOriginatingRequestUri(request);
+    final String contextPath = urlPathHelper.getOriginatingContextPath(request);
+    final PathBreadcrumbView view = new PathBreadcrumbView(contextPath, path,
+      addSlash);
+    final PrintWriter writer = response.getWriter();
     view.serialize(writer, false);
     writer.flush();
     return null;
   }
+
+  public boolean isAddSlash() {
+    return addSlash;
+  }
+
+  public void setAddSlash(final boolean addSlash) {
+    this.addSlash = addSlash;
+  }
+
 }

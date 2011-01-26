@@ -15,6 +15,8 @@
  */
 package com.revolsys.xml;
 
+import javax.xml.namespace.QName;
+
 /**
  * The XmlConstants class defines some useful constants for XML namespaces.
  * 
@@ -39,4 +41,7 @@ public final class XmlContants {
 
   /** The XML Namespace URI for XML Namespaces. */
   public static final String XML_SCHEMA_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema";
+
+  public static final QName XML_LANG = new QName(XML_NS_URI, "lang",
+    XML_NS_PREFIX);
 }

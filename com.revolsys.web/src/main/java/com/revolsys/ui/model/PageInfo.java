@@ -9,10 +9,7 @@ import java.util.Map;
 
 import org.springframework.http.MediaType;
 
-public class PageInfo {
-  private String title;
-
-  private String description;
+public class PageInfo extends AbstractDocumentedObject {
 
   private Map<String, PageInfo> pages = new LinkedHashMap<String, PageInfo>();
 
@@ -28,8 +25,7 @@ public class PageInfo {
   }
 
   public PageInfo(final PageInfo pageInfo) {
-    this.title = pageInfo.getTitle();
-    this.description = pageInfo.getDescription();
+    super(pageInfo);
     this.methods.addAll(pageInfo.getMethods());
     this.pages.putAll(pageInfo.getPages());
     this.parameters.putAll(pageInfo.getParametersMap());
@@ -43,8 +39,8 @@ public class PageInfo {
 
   public PageInfo(final String title, final String description,
     final String... methods) {
-    this.title = title;
-    this.description = description;
+    setTitle(title);
+    setDescription(description);
     this.methods.addAll(Arrays.asList(methods));
   }
 
@@ -67,10 +63,6 @@ public class PageInfo {
   @Override
   public PageInfo clone() {
     return new PageInfo(this);
-  }
-
-  public String getDescription() {
-    return description;
   }
 
   public List<MediaType> getInputContentTypes() {
@@ -97,12 +89,9 @@ public class PageInfo {
     return parameters;
   }
 
-  public String getTitle() {
-    return title;
-  }
-
+  @Override
   public void setDescription(final String description) {
-    this.description = description;
+    super.setDescription(description);
   }
 
   public void setInputContentTypes(final List<MediaType> inputContentTypes) {
@@ -121,7 +110,8 @@ public class PageInfo {
     this.parameters = parameters;
   }
 
+  @Override
   public void setTitle(final String title) {
-    this.title = title;
+    super.setTitle(title);
   }
 }

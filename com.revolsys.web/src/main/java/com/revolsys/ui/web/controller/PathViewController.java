@@ -20,7 +20,6 @@
  */
 package com.revolsys.ui.web.controller;
 
-
 import java.io.IOException;
 import java.util.Collection;
 
@@ -35,14 +34,40 @@ import org.springframework.web.servlet.mvc.Controller;
 
 public class PathViewController implements Controller {
 
+  public static boolean include(final HttpServletRequest request,
+    final HttpServletResponse response, final Object object)
+    throws IOException, ServletException {
+    if (object == null) {
+      return false;
+    } else {
+      try {
+        final String path = object.toString();
+        final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
+        if (requestDispatcher == null) {
+          return false;
+        } else {
+          requestDispatcher.include(new HttpServletRequestWrapper(request) {
+            @Override
+            public String getPathInfo() {
+              return path;
+            }
+          }, response);
+        }
+      } catch (final ServletException e) {
+        e.printStackTrace();
+      }
+      return true;
+    }
+  }
+
   public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
-    String attributeName = request.getParameter("attributeName");
+    final String attributeName = request.getParameter("attributeName");
     if (attributeName != null) {
-      Object attribute = request.getAttribute(attributeName);
+      final Object attribute = request.getAttribute(attributeName);
       if (attribute instanceof Collection) {
-        Collection collection = (Collection)attribute;
-        for (Object object : collection) {
+        final Collection collection = (Collection)attribute;
+        for (final Object object : collection) {
           include(request, response, object);
         }
       } else {
@@ -50,25 +75,6 @@ public class PathViewController implements Controller {
       }
     }
     return null;
-  }
-
-  private void include(final HttpServletRequest request,
-    final HttpServletResponse response, final Object object)
-    throws IOException, ServletException {
-    if (object != null) {
-      try {
-        final String path = object.toString();
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
-        
-        requestDispatcher.include(new HttpServletRequestWrapper(request) {
-          public String getPathInfo() {
-            return path;
-          }
-        }, response);
-      } catch (ServletException e) {
-        e.printStackTrace();
-      }
-    }
   }
 
 }

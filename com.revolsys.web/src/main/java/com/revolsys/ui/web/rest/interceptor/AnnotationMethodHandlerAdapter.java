@@ -63,7 +63,6 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -71,7 +70,6 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.util.AntPathMatcher;
@@ -453,8 +451,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
       if (returnValue != null
         && AnnotationUtils.findAnnotation(handlerMethod, ResponseBody.class) != null) {
-        handleResponseBody(returnValue, webRequest);
-        return null;
+        View view = handleResponseBody(returnValue, webRequest);
+        return new ModelAndView(view).addAllObjects(implicitModel);
       }
 
       if (returnValue instanceof ModelAndView) {
@@ -495,8 +493,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       }
     }
 
-    @SuppressWarnings("unchecked")
-    private void handleResponseBody(final Object returnValue,
+    private View handleResponseBody(final Object returnValue,
       final ServletWebRequest webRequest) throws ServletException, IOException {
 
       final HttpServletRequest request = webRequest.getRequest();
@@ -511,20 +508,18 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       if (acceptedMediaTypes.isEmpty()) {
         acceptedMediaTypes = Collections.singletonList(MediaType.ALL);
       }
-      final HttpOutputMessage outputMessage = new ServletServerHttpResponse(
-        webRequest.getResponse());
       final Class<?> returnValueType = returnValue.getClass();
       final Set<MediaType> allSupportedMediaTypes = new LinkedHashSet<MediaType>();
       if (messageConverters != null) {
         for (final MediaType acceptedMediaType : acceptedMediaTypes) {
-          for (final HttpMessageConverter messageConverter : messageConverters) {
+          for (final HttpMessageConverter<?> messageConverter : messageConverters) {
             allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
             if (messageConverter.canWrite(returnValueType, acceptedMediaType)) {
               MediaType mediaType = getMediaType(
                 messageConverter.getSupportedMediaTypes(), acceptedMediaType);
-              messageConverter.write(returnValue, mediaType, outputMessage);
               this.responseArgumentUsed = true;
-              return;
+              return new HttpMessageConverterView(messageConverter, mediaType,
+                returnValue);
             }
           }
         }
