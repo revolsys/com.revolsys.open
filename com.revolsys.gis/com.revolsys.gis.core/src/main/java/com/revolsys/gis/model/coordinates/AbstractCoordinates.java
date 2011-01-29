@@ -91,7 +91,7 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   public byte getNumAxis() {
-    return 0;
+    return 2;
   }
 
   public double getX() {
@@ -128,4 +128,23 @@ public abstract class AbstractCoordinates implements Coordinates {
     final double z) {
     setValue(2, z);
   }
+  
+
+  @Override
+  public String toString() {
+    final byte numAxis = getNumAxis();
+    double[] coordinates = getCoordinates();
+    if (numAxis > 0) {
+      final StringBuffer s = new StringBuffer(String.valueOf(coordinates[0]));
+      for (int i = 1; i < numAxis; i++) {
+        final Double ordinate = coordinates[i];
+        s.append(',');
+        s.append(ordinate);
+      }
+      return s.toString();
+    } else {
+      return "";
+    }
+  }
+
 }

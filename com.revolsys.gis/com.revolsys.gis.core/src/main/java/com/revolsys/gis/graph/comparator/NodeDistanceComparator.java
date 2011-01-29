@@ -33,11 +33,11 @@ public class NodeDistanceComparator implements Comparator<Node<?>> {
     final Node<?> node1,
     final Node<?> node2) {
     int compare;
-    final double distance1 = node1.getDistance(node);
-    final double distance2 = node2.getDistance(node);
+    final double distance1 = node1.distance(node);
+    final double distance2 = node2.distance(node);
     if (distance1 == distance2) {
-      final Coordinates point1 = node1.getCoordinates();
-      final Coordinates point2 = node2.getCoordinates();
+      final Coordinates point1 = node1;
+      final Coordinates point2 = node2;
       compare = point1.compareTo(point2);
     } else if (distance1 < distance2) {
       compare = -1;

@@ -10,34 +10,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-public class Node<T> implements Comparable<Node<T>> {
+public class Node<T> extends AbstractCoordinates {
   public static List<Coordinates> getCoordinates(
     final Collection<Node<DataObject>> nodes) {
-    final List<Coordinates> coordinates = new ArrayList(nodes.size());
+    final List<Coordinates> points = new ArrayList<Coordinates>(nodes.size());
     for (final Node<DataObject> node : nodes) {
-      final Coordinates coordinate = node.getCoordinates();
-      coordinates.add(coordinate);
+      final Coordinates point = node.clone();
+      points.add(point);
     }
-    return coordinates;
+    return points;
   }
 
-  public static <V> int getEdgeIndex(
-    final List<Edge<V>> edges,
+  public static <V> int getEdgeIndex(final List<Edge<V>> edges,
     final Edge<V> edge) {
     return edges.indexOf(edge);
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(
-    final Node<T> node0,
+  public static <T> Collection<Edge<T>> getEdgesBetween(final Node<T> node0,
     final Node<T> node1) {
     if (node1 == null) {
       return Collections.emptyList();
@@ -58,8 +56,7 @@ public class Node<T> implements Comparable<Node<T>> {
     return commonEdges;
   }
 
-  public static <V> Edge<V> getNextEdge(
-    final List<Edge<V>> edges,
+  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,
     final Edge<V> edge) {
     final int index = getEdgeIndex(edges, edge);
     final int nextIndex = (index + 1) % edges.size();
@@ -67,8 +64,6 @@ public class Node<T> implements Comparable<Node<T>> {
   }
 
   private Map<String, Object> attributes = Collections.emptyMap();
-
-  private Coordinates coordinates;
 
   private List<Edge<T>> edges = new ArrayList<Edge<T>>();
 
@@ -78,15 +73,13 @@ public class Node<T> implements Comparable<Node<T>> {
 
   private List<Edge<T>> outEdges = new ArrayList<Edge<T>>();
 
-  public Node(
-    final Graph<T> graph,
-    final Coordinates point) {
+  public Node(final Graph<T> graph, final Coordinates point) {
     this.graph = graph;
-    this.coordinates = new DoubleCoordinates(point);
+    this.x = point.getX();
+    this.y = point.getY();
   }
 
-  protected void addInEdge(
-    final Edge<T> edge) {
+  protected void addInEdge(final Edge<T> edge) {
     edges.clear();
     inEdges.add(edge);
     final EdgeToAngleComparator<T> comparator = EdgeToAngleComparator.get();
@@ -94,8 +87,7 @@ public class Node<T> implements Comparable<Node<T>> {
     updateAttributes();
   }
 
-  protected void addOutEdge(
-    final Edge<T> edge) {
+  protected void addOutEdge(final Edge<T> edge) {
     edges.clear();
     outEdges.add(edge);
     final EdgeFromAngleComparator<T> comparator = EdgeFromAngleComparator.get();
@@ -103,37 +95,16 @@ public class Node<T> implements Comparable<Node<T>> {
     updateAttributes();
   }
 
-  public int compareTo(
-    final Node<T> node) {
-    final Coordinates otherPoint = node.getCoordinates();
-    return coordinates.compareTo(otherPoint);
+  public int compareTo(final Node<T> node) {
+    return compareTo((Coordinates)node);
   }
 
-  public boolean equalsCoordinate(
-    final Coordinates otherPoint) {
-    return coordinates.equals2d(otherPoint);
-  }
-
-  public boolean equalsCoordinate(
-    final double x,
-    final double y) {
-    return coordinates.getX() == x && coordinates.getY() == y;
-  }
-
-  public boolean equalsCoordinate(
-    final Node<T> node) {
-    final Coordinates otherPoint = node.getCoordinates();
-    return equalsCoordinate(otherPoint);
-  }
-
-  public double getAngle(
-    final Node<LineSegmentMatch> node) {
-    return getCoordinates().angle2d(node.getCoordinates());
+  public boolean equalsCoordinate(final double x, final double y) {
+    return this.x == x && this.y == y;
   }
 
   @SuppressWarnings("unchecked")
-  public <D> D getAttribute(
-    final String name) {
+  public <D> D getAttribute(final String name) {
     Object value = attributes.get(name);
     if (value instanceof ObjectAttributeProxy) {
       final ObjectAttributeProxy proxy = (ObjectAttributeProxy)value;
@@ -146,23 +117,8 @@ public class Node<T> implements Comparable<Node<T>> {
     return attributes;
   }
 
-  public Coordinates getCoordinates() {
-    return coordinates;
-  }
-
   public int getDegree() {
     return inEdges.size() + outEdges.size();
-  }
-
-  /**
-   * Get the distance between this node and the point coordinates.
-   * 
-   * @param point The coordinates.
-   * @return The distance.
-   */
-  public double getDistance(
-    final Coordinates point) {
-    return this.coordinates.distance(point);
   }
 
   /**
@@ -171,27 +127,13 @@ public class Node<T> implements Comparable<Node<T>> {
    * @param geometry The geometry.
    * @return The distance.
    */
-  public double getDistance(
-    final Geometry geometry) {
+  public double getDistance(final Geometry geometry) {
     final GeometryFactory factory = GeometryFactory.getFactory(geometry);
-    final Point point = factory.createPoint(coordinates);
+    final Point point = factory.createPoint(this);
     return point.distance(geometry);
   }
 
-  /**
-   * Get the distance between this node and the node.
-   * 
-   * @param node The node.
-   * @return The distance.
-   */
-  public double getDistance(
-    final Node<?> node) {
-    final Coordinates otherPoint = node.getCoordinates();
-    return getDistance(otherPoint);
-  }
-
-  public int getEdgeIndex(
-    final Edge<T> edge) {
+  public int getEdgeIndex(final Edge<T> edge) {
     final List<Edge<T>> edges = getEdges();
     return getEdgeIndex(edges, edge);
   }
@@ -203,13 +145,11 @@ public class Node<T> implements Comparable<Node<T>> {
     return new ArrayList<Edge<T>>(edges);
   }
 
-  public Collection<Edge<T>> getEdgesTo(
-    final Node<T> node) {
+  public Collection<Edge<T>> getEdgesTo(final Node<T> node) {
     return getEdgesBetween(this, node);
   }
 
-  public boolean hasEdgeTo(
-    final Node<T> node) {
+  public boolean hasEdgeTo(final Node<T> node) {
     if (node == this) {
       return false;
     } else {
@@ -230,8 +170,7 @@ public class Node<T> implements Comparable<Node<T>> {
    * @param attributeName The attribute name.
    * @return The list of edges without the attribute.
    */
-  public List<Edge<T>> getEdgesWithoutAttribute(
-    final String attributeName) {
+  public List<Edge<T>> getEdgesWithoutAttribute(final String attributeName) {
     final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : getEdges()) {
       if (edge.getAttribute(attributeName) == null) {
@@ -245,8 +184,7 @@ public class Node<T> implements Comparable<Node<T>> {
     return graph;
   }
 
-  public int getInEdgeIndex(
-    final Edge<T> edge) {
+  public int getInEdgeIndex(final Edge<T> edge) {
     return inEdges.indexOf(edge);
   }
 
@@ -254,28 +192,24 @@ public class Node<T> implements Comparable<Node<T>> {
     return inEdges;
   }
 
-  public Edge<T> getNextEdge(
-    final Edge<T> edge) {
+  public Edge<T> getNextEdge(final Edge<T> edge) {
     final List<Edge<T>> edges = getEdges();
     return getNextEdge(edges, edge);
   }
 
-  public Edge<T> getNextInEdge(
-    final Edge<T> edge) {
+  public Edge<T> getNextInEdge(final Edge<T> edge) {
     final int index = getInEdgeIndex(edge);
     final int nextIndex = (index + 1) % inEdges.size();
     return inEdges.get(nextIndex);
   }
 
-  public Edge<T> getNextOutEdge(
-    final Edge<T> edge) {
+  public Edge<T> getNextOutEdge(final Edge<T> edge) {
     final int index = getOutEdgeIndex(edge);
     final int nextIndex = (index + 1) % outEdges.size();
     return outEdges.get(nextIndex);
   }
 
-  public int getOutEdgeIndex(
-    final Edge<T> edge) {
+  public int getOutEdgeIndex(final Edge<T> edge) {
     return outEdges.indexOf(edge);
   }
 
@@ -283,8 +217,7 @@ public class Node<T> implements Comparable<Node<T>> {
     return outEdges;
   }
 
-  public List<Edge<T>> getOutEdgesTo(
-    final Node<T> node) {
+  public List<Edge<T>> getOutEdgesTo(final Node<T> node) {
     final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : outEdges) {
       if (edge.getToNode() == node) {
@@ -294,13 +227,11 @@ public class Node<T> implements Comparable<Node<T>> {
     return edges;
   }
 
-  public boolean hasAttribute(
-    final String name) {
+  public boolean hasAttribute(final String name) {
     return attributes.containsKey(name);
   }
 
-  public boolean hasEdge(
-    final Edge<T> edge) {
+  public boolean hasEdge(final Edge<T> edge) {
     return edges.contains(edge);
   }
 
@@ -323,8 +254,7 @@ public class Node<T> implements Comparable<Node<T>> {
     attributes = null;
   }
 
-  public void remove(
-    final Edge<T> edge) {
+  public void remove(final Edge<T> edge) {
     if (!isRemoved()) {
       edges.remove(edge);
       inEdges.remove(edge);
@@ -337,9 +267,7 @@ public class Node<T> implements Comparable<Node<T>> {
     }
   }
 
-  public void setAttribute(
-    final String name,
-    final Object value) {
+  public void setAttribute(final String name, final Object value) {
     if (attributes.isEmpty()) {
       attributes = new HashMap<String, Object>();
     }
@@ -410,6 +338,38 @@ public class Node<T> implements Comparable<Node<T>> {
         proxy.clearValue();
       }
     }
+  }
+
+  private double x;
+
+  private double y;
+
+  public double getValue(int index) {
+    switch (index) {
+      case 0:
+        return x;
+      case 1:
+        return y;
+
+      default:
+        return Double.NaN;
+    }
+  }
+
+  public void setValue(int index, double value) {
+    switch (index) {
+      case 0:
+        x = value;
+      break;
+      case 1:
+        y = value;
+      break;
+    }
+  }
+
+  @Override
+  public Coordinates clone() {
+    return new DoubleCoordinates(x, y);
   }
 
 }

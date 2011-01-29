@@ -273,7 +273,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public double distance(
     final Node<T> node) {
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     return distance(point);
   }
 
@@ -445,7 +445,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   public boolean isLessThanDistance(
     final Node<T> node,
     final double distance) {
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     return isLessThanDistance(point, distance);
   }
 
@@ -462,7 +462,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   public boolean isWithinDistance(
     final Node<T> node,
     final double distance) {
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     return isWithinDistance(point, distance);
   }
 
@@ -508,9 +508,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
       sb.insert(0, "Removed: ");
     } else {
       sb.append("LINE_STRING(");
-      sb.append(getFromNode().getCoordinates().toString().replaceAll(",", " "));
+      sb.append(getFromNode().toString().replaceAll(",", " "));
       sb.append(",");
-      sb.append(getToNode().getCoordinates().toString().replaceAll(",", " "));
+      sb.append(getToNode().toString().replaceAll(",", " "));
       sb.append(")");
     }
     return sb.toString();

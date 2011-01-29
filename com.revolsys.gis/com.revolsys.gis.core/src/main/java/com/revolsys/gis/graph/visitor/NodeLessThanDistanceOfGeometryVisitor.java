@@ -49,7 +49,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
 
   public boolean visit(
     final Node<T> node) {
-    final Coordinates coordinate = node.getCoordinates();
+    final Coordinates coordinate = node;
     final Point point = geometryFactory.createPoint(coordinate);
     final double distance = geometry.distance(point);
     if (distance < maxDistance) {

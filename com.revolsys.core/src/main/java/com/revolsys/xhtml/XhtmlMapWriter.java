@@ -83,7 +83,6 @@ public class XhtmlMapWriter extends AbstractMapWriter {
         writeHeader();
       }
       out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "bodyContent");
       out.element(HtmlUtil.H1, title);
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "objectView");

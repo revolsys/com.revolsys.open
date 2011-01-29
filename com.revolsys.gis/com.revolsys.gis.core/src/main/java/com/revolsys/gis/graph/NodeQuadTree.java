@@ -15,7 +15,7 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
 
   public Node<T> add(
     final Node<T> node) {
-    final Coordinates coordinate = node.getCoordinates();
+    final Coordinates coordinate = node;
     final Envelope envelope = new BoundingBox(coordinate);
     insert(envelope, node);
     return node;
@@ -33,7 +33,7 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
     final Envelope envelope = new BoundingBox(coordinates);
     final List<Node<T>> nodes = query(envelope);
     for (final Node<T> node : nodes) {
-      if (node.getCoordinates().equals2d(coordinates)) {
+      if (node.equals2d(coordinates)) {
         return node;
       }
     }
@@ -82,7 +82,7 @@ public class NodeQuadTree<T> extends Quadtree implements Iterable<Node<T>> {
 
   public void remove(
     final Node<T> node) {
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     final Envelope envelope = new BoundingBox(point);
     remove(envelope, node);
   }

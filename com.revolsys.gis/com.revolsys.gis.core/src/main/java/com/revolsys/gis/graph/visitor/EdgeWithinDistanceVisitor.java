@@ -32,7 +32,7 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
     final Node<T> node,
     final double maxDistance) {
     final GeometryFactory geometryFactory = new GeometryFactory();
-    final Coordinates coordinate = node.getCoordinates();
+    final Coordinates coordinate = node;
     final Geometry geometry = geometryFactory.createPoint(coordinate);
     return edgesWithiDistance(graph, geometry, maxDistance);
 

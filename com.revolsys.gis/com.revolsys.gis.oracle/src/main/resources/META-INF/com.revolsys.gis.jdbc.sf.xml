@@ -15,14 +15,22 @@
     class="com.revolsys.gis.jdbc.io.JdbcFactory"
     factory-method="register"
   >
-    <constructor-arg value="Oracle" />
-    <constructor-arg value="com.revolsys.gis.oracle.io.OracleDataObjectStore" />
-  </bean>  
+    <constructor-arg
+      value="Oracle" />
+    <constructor-arg
+      value="com.revolsys.gis.oracle.io.OracleDataObjectStore" />
+  </bean>
   <bean
     class="com.revolsys.gis.jdbc.io.JdbcFactory"
     factory-method="register"
   >
-    <constructor-arg value="Oracle" />
-    <constructor-arg value="com.revolsys.gis.oracle.io.OracleDataSourceFactory" />
-  </bean>  
+    <constructor-arg
+      value="Oracle" />
+    <constructor-arg>
+      <bean
+        class="com.revolsys.gis.oracle.io.OracleDataSourceFactory" />
+    </constructor-arg>
+    <constructor-arg
+      value="#{T(com.revolsys.gis.oracle.io.OracleDataSourceFactory).URL_PATTERNS}" />
+  </bean>
 </beans>

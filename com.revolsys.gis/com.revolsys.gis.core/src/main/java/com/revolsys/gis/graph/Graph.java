@@ -39,6 +39,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -75,7 +76,7 @@ public class Graph<T> {
 
   protected void add(
     final Node<T> node) {
-    nodes.put(node.getCoordinates(), node);
+    nodes.put(node, node);
     if (nodeIndex != null) {
       nodeIndex.add(node);
     }
@@ -279,7 +280,7 @@ public class Graph<T> {
   public List<Node<T>> findNodes(
     final Node<T> node,
     final double distance) {
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     return findNodes(point, distance);
   }
 
@@ -301,7 +302,7 @@ public class Graph<T> {
     double closestDistance = Double.MAX_VALUE;
     for (final Node<T> matchNode : nodes) {
       if (matchNode != node) {
-        final double distance = node.getDistance(matchNode);
+        final double distance = node.distance(matchNode);
         if (distance < closestDistance) {
           closestDistance = distance;
         }
@@ -533,7 +534,7 @@ public class Graph<T> {
     final Node<T> newNode) {
     if (!node.isRemoved() && !newNode.isRemoved()) {
       if (!node.equals(newNode)) {
-        final Coordinates newPoint = newNode.getCoordinates();
+        final Coordinates newPoint = newNode;
         final List<Edge<T>> edges = new ArrayList<Edge<T>>(node.getEdges());
         for (final Edge<T> edge : edges) {
           if (!edge.isRemoved()) {
@@ -614,7 +615,7 @@ public class Graph<T> {
     final Node<T> node) {
     if (!node.isRemoved()) {
       nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED, null);
-      nodes.remove(node.getCoordinates());
+      nodes.remove(node);
       if (nodeIndex != null) {
         nodeIndex.remove(node);
       }
@@ -690,7 +691,7 @@ public class Graph<T> {
     final Edge<T> edge,
     final Node<T> node) {
     if (!edge.isRemoved()) {
-      final Coordinates point = node.getCoordinates();
+      final Coordinates point = node;
       final LineString line = edge.getLine();
       final CoordinatesList points = CoordinatesListUtil.get(line);
 
@@ -891,5 +892,11 @@ public class Graph<T> {
     final Visitor<Node<T>> visitor,
     final Comparator<Node<T>> comparator) {
     visitNodes(null, comparator, visitor);
+  }
+
+  public List<Edge<T>> getEdges(Edge<T> edge) {
+    Envelope envelope = edge.getEnvelope();
+    EdgeQuadTree<T> edgeIndex = getEdgeIndex();
+    return edgeIndex.query(envelope);
   }
 }

@@ -1,6 +1,7 @@
 package com.revolsys.gis.cs;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -127,10 +128,10 @@ public class GeometryFactory extends
   }
 
   public static Point[] toPointArray(final GeometryFactory factory,
-    final List<?> points) {
+    final Collection<?> points) {
     final Point[] pointArray = new Point[points.size()];
-    for (int i = 0; i < points.size(); i++) {
-      final Object value = points.get(i);
+    int i = 0;
+    for (Object value : points) {
       if (value instanceof Point) {
         final Point point = (Point)value;
         pointArray[i] = point;
@@ -147,6 +148,7 @@ public class GeometryFactory extends
         final CoordinateSequence coordinates = (CoordinateSequence)value;
         pointArray[i] = factory.createPoint(coordinates);
       }
+      i++;
     }
     return pointArray;
   }
@@ -287,7 +289,7 @@ public class GeometryFactory extends
     return createMultiLineString(lineArray);
   }
 
-  public MultiPoint createMultiPoint(final List<?> points) {
+  public MultiPoint createMultiPoint(final Collection<?> points) {
     final Point[] pointArray = toPointArray(this, points);
     return createMultiPoint(pointArray);
   }
@@ -390,5 +392,9 @@ public class GeometryFactory extends
   public Point createPoint(double x, double y) {
     DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
     return createPoint(coordinates);
+  }
+
+  public Geometry createEmptyGeometry() {
+    return createPoint((Coordinate)null);
   }
 }

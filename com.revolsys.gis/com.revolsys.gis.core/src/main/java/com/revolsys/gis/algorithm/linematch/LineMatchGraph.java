@@ -75,7 +75,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
     if (edge == null) {
       final LineSegmentMatch lineSegmentMatch = new LineSegmentMatch(
-        geometryFactory, startNode.getCoordinates(), endNode.getCoordinates());
+        geometryFactory, startNode, endNode);
       edge = add(lineSegmentMatch, lineSegmentMatch.getLine());
     }
     return edge;
@@ -305,11 +305,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
             && !processedEdges.contains(edge)) {
             if (lineSegmentMatch.hasMatches(index)) {
               if (coordinates.isEmpty()) {
-                final Coordinates startCoordinate = currentNode.getCoordinates();
+                final Coordinates startCoordinate = currentNode;
                 coordinates.add(startCoordinate);
               }
               final Node<LineSegmentMatch> toNode = edge.getOppositeNode(currentNode);
-              final Coordinates toCoordinate = toNode.getCoordinates();
+              final Coordinates toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
               createLine(lines, coordinates);
@@ -353,11 +353,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
             && !processedEdges.contains(edge)) {
             if (lineSegmentMatch.hasMatches(index1, index2)) {
               if (coordinates.isEmpty()) {
-                final Coordinates startCoordinate = currentNode.getCoordinates();
+                final Coordinates startCoordinate = currentNode;
                 coordinates.add(startCoordinate);
               }
               final Node<LineSegmentMatch> toNode = edge.getToNode();
-              final Coordinates toCoordinate = toNode.getCoordinates();
+              final Coordinates toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
               createLine(lines, coordinates);
@@ -413,11 +413,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
             && !processedEdges.contains(edge)) {
             if (!lineSegmentMatch.hasMatches(index)) {
               if (coordinates.isEmpty()) {
-                final Coordinates startCoordinate = currentNode.getCoordinates();
+                final Coordinates startCoordinate = currentNode;
                 coordinates.add(startCoordinate);
               }
               final Node<LineSegmentMatch> toNode = edge.getToNode();
-              final Coordinates toCoordinate = toNode.getCoordinates();
+              final Coordinates toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
               createLine(lines, coordinates);
@@ -453,11 +453,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
             && !processedEdges.contains(edge)) {
             if (!lineSegmentMatch.hasMatches(index1, index2)) {
               if (coordinates.isEmpty()) {
-                final Coordinates startCoordinate = currentNode.getCoordinates();
+                final Coordinates startCoordinate = currentNode;
                 coordinates.add(startCoordinate);
               }
               final Node<LineSegmentMatch> toNode = edge.getToNode();
-              final Coordinates toCoordinate = toNode.getCoordinates();
+              final Coordinates toCoordinate = toNode;
               coordinates.add(toCoordinate);
             } else {
               createLine(lines, coordinates);
@@ -616,15 +616,15 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
               Set<Node<LineSegmentMatch>> splitNodes = new TreeSet<Node<LineSegmentMatch>>(
                 new NodeDistanceComparator(edge.getFromNode()));
               final Node<LineSegmentMatch> edgeFrom = edge.getFromNode();
-              final Coordinates lineStart = edgeFrom.getCoordinates();
+              final Coordinates lineStart = edgeFrom;
               final Node<LineSegmentMatch> edgeTo = edge.getToNode();
-              final Coordinates lineEnd = edgeTo.getCoordinates();
+              final Coordinates lineEnd = edgeTo;
 
               for (Edge<LineSegmentMatch> matchEdge : matchEdges) {
                 final Node<LineSegmentMatch> edge2From = matchEdge.getFromNode();
-                final Coordinates line2Start = edge2From.getCoordinates();
+                final Coordinates line2Start = edge2From;
                 final Node<LineSegmentMatch> edge2To = matchEdge.getToNode();
-                final Coordinates line2End = edge2To.getCoordinates();
+                final Coordinates line2End = edge2To;
                 Set<Node<LineSegmentMatch>> matchSplitNodes = new TreeSet<Node<LineSegmentMatch>>(
                   new NodeDistanceComparator(edge2From));
                 if (LineSegmentUtil.isPointOnLineMiddle(lineStart, lineEnd,
@@ -741,8 +741,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     for (int i = 0; i < lineSegmentMatch.getSegmentCount(); i++) {
       if (lineSegmentMatch.hasSegment(i)) {
         final LineSegment realSegment = lineSegmentMatch.getSegment(i);
-        final Coordinates coordinate0 = realSegment.project(from.getCoordinates());
-        final Coordinates coordinate1 = realSegment.project(to.getCoordinates());
+        final Coordinates coordinate0 = realSegment.project(from);
+        final Coordinates coordinate1 = realSegment.project(to);
 
         final LineSegment newSegment = new LineSegment(geometryFactory,
           coordinate0, coordinate1);
@@ -756,7 +756,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   public List<Edge<LineSegmentMatch>> splitEdge(
     final Edge<LineSegmentMatch> edge,
     final Node<LineSegmentMatch> node) {
-    final Coordinates coordinate = node.getCoordinates();
+    final Coordinates coordinate = node;
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     final LineSegment segment = lineSegmentMatch.getSegment();
 

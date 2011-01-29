@@ -1,8 +1,11 @@
 package com.revolsys.gis.model.geometry;
 
+import java.util.List;
+
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -13,8 +16,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineSegment extends AbstractCoordinatesList {
   private static final GeometryFactory FACTORY = new GeometryFactory();
 
-  public static void visit(
-    final LineString line,
+  public static void visit(final LineString line,
     final Visitor<LineSegment> visitor) {
     final CoordinatesList coords = CoordinatesListUtil.get(line);
     Coordinates previousCoordinate = coords.get(0);
@@ -39,16 +41,13 @@ public class LineSegment extends AbstractCoordinatesList {
 
   private LineString line;
 
-  public LineSegment(
-    final Coordinates coordinates1,
+  public LineSegment(final Coordinates coordinates1,
     final Coordinates coordinates2) {
     this(FACTORY, coordinates1, coordinates2);
   }
 
-  public LineSegment(
-    final GeometryFactory geometryFactory,
-    final Coordinates coordinates1,
-    final Coordinates coordinates2) {
+  public LineSegment(final GeometryFactory geometryFactory,
+    final Coordinates coordinates1, final Coordinates coordinates2) {
     this.geometryFactory = geometryFactory;
     this.coordinates1 = coordinates1;
     this.coordinates2 = coordinates2;
@@ -59,9 +58,8 @@ public class LineSegment extends AbstractCoordinatesList {
     return new LineSegment(geometryFactory, coordinates1, coordinates2);
   }
 
-  public double distance(
-    final Coordinates p) {
-    return LineSegmentUtil.distance( coordinates1, coordinates2,p);
+  public double distance(final Coordinates p) {
+    return LineSegmentUtil.distance(coordinates1, coordinates2, p);
   }
 
   public Envelope getEnvelope() {
@@ -84,14 +82,12 @@ public class LineSegment extends AbstractCoordinatesList {
     return line;
   }
 
-  public Coordinates project(
-    final Coordinates p) {
+  public Coordinates project(final Coordinates p) {
     return LineSegmentUtil.project(coordinates1, coordinates2,
       projectionFactor(p));
   }
 
-  public double projectionFactor(
-    final Coordinates p) {
+  public double projectionFactor(final Coordinates p) {
     return LineSegmentUtil.projectionFactor(coordinates1, coordinates2, p);
   }
 
@@ -108,9 +104,7 @@ public class LineSegment extends AbstractCoordinatesList {
     return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
   }
 
-  public double getValue(
-    int index,
-    int axisIndex) {
+  public double getValue(int index, int axisIndex) {
     switch (index) {
       case 0:
         return coordinates1.getValue(axisIndex);
@@ -122,10 +116,7 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
-  public void setValue(
-    int index,
-    int axisIndex,
-    double value) {
+  public void setValue(int index, int axisIndex, double value) {
     switch (index) {
       case 0:
         coordinates1.setValue(axisIndex, value);
@@ -137,8 +128,7 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
-  public boolean contains(
-    Coordinates coordinate) {
+  public boolean contains(Coordinates coordinate) {
     if (get(0).equals(coordinate)) {
       return true;
     } else if (get(1).equals(coordinate)) {
@@ -146,6 +136,17 @@ public class LineSegment extends AbstractCoordinatesList {
     } else {
       return false;
     }
+  }
+
+  public Coordinates intersection(LineSegment lineSegment2) {
+    return LineSegmentUtil.intersection(coordinates1, coordinates2,
+      lineSegment2.coordinates1, lineSegment2.coordinates2);
+  }
+
+  public List<Coordinates> intersection(CoordinatesPrecisionModel precisionModel,
+    LineSegment lineSegment2) {
+    return LineSegmentUtil.intersection(precisionModel,coordinates1, coordinates2,
+      lineSegment2.coordinates1, lineSegment2.coordinates2);
   }
 
 }

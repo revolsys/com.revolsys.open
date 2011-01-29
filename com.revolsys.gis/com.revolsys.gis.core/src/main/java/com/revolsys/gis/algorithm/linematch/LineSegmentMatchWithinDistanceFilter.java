@@ -19,7 +19,7 @@ public class LineSegmentMatchWithinDistanceFilter implements
     final double maxDistance) {
     this.node = node;
     this.maxDistance = maxDistance;
-    this.envelope = new BoundingBox(node.getCoordinates());
+    this.envelope = new BoundingBox(node);
     envelope.expandBy(maxDistance);
   }
 

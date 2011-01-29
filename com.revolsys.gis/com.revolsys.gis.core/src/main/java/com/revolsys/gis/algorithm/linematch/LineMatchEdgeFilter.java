@@ -15,9 +15,9 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
     if (distance == 0) {
       return 0;
     } else if (distance < tolerance) {
-      if (distance == node.getDistance(edge.getFromNode())) {
+      if (distance == node.distance(edge.getFromNode())) {
         return Double.MAX_VALUE;
-      } else if (distance == node.getDistance(edge.getToNode())) {
+      } else if (distance == node.distance(edge.getToNode())) {
         return Double.MAX_VALUE;
       } else {
         return distance;

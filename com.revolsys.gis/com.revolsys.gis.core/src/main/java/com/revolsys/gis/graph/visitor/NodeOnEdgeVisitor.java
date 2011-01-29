@@ -21,7 +21,7 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
     final Node<T> node,
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     final BoundingBox boundingBox = new BoundingBox(point);
     boundingBox.expandBy(maxDistance);
     final EdgeQuadTree<T> index = graph.getEdgeIndex();
@@ -51,7 +51,7 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
     this.node = node;
     this.boundingBox = boundingBox;
     this.maxDistance = maxDistance;
-    this.point = node.getCoordinates();
+    this.point = node;
   }
 
   @Override

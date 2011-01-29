@@ -33,7 +33,7 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements
 
   public boolean visit(
     final Node<T> node) {
-    final Coordinates coordinate = node.getCoordinates();
+    final Coordinates coordinate = node;
     final double distance = this.coordinates.distance(coordinate);
     if (distance <= maxDistance) {
       matchVisitor.visit(node);

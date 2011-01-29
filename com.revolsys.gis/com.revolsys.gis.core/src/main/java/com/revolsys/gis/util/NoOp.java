@@ -58,7 +58,7 @@ public class NoOp {
   public static void equals(
     final Node<?> node,
     final double... coordinates) {
-    equals(node.getCoordinates(), coordinates);
+    equals((Coordinates)node, coordinates);
   }
 
   public static void equals(

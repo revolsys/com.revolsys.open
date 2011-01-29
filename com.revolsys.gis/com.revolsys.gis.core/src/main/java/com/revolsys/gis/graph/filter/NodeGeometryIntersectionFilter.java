@@ -23,7 +23,7 @@ public class NodeGeometryIntersectionFilter<T> implements Filter<Node<T>> {
   }
 
   public boolean accept(final Node<T> node) {
-    final Coordinates coordinates = node.getCoordinates();
+    final Coordinates coordinates = node;
     final Point point = geometryFactory.createPoint(coordinates);
     final boolean intersects = preparedGeometry.intersects(point);
     return intersects;

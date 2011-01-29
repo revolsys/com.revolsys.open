@@ -51,7 +51,7 @@ public final class LineStringUtil {
     CoordinatesListUtil.addElevation(precisionModel, coordinate, coordinates);
 
   }
-
+  
   public static double distance(final Coordinates point,
     final Geometry geometry, final double tolerance) {
     final double x = point.getX();

@@ -141,7 +141,7 @@ public class PageInfoHttpMessageConverter extends
   private void writeHtml(OutputStream out, String path, PageInfo pageInfo) {
     XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
-    writer.element(HtmlUtil.H2, pageInfo.getTitle());
+    writer.element(HtmlUtil.H1, pageInfo.getTitle());
     String description = pageInfo.getDescription();
     if (description != null) {
       writer.element(HtmlUtil.P, description);
@@ -156,7 +156,7 @@ public class PageInfoHttpMessageConverter extends
     if (!pages.isEmpty()) {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "resources");
-      writer.element(HtmlUtil.H3, "Resources");
+      writer.element(HtmlUtil.H2, "Resources");
       writer.startTag(HtmlUtil.DL);
       for (Entry<String, PageInfo> childPage : pages.entrySet()) {
         String childPath = childPage.getKey();

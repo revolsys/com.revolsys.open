@@ -50,7 +50,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
     final List<LineString> lines = new ArrayList<LineString>();
 
     while (currentNode != null) {
-      final Coordinates coordinate = currentNode.getCoordinates();
+      final Coordinates coordinate = currentNode;
       coordinates.add(coordinate);
       final Edge<LineSegmentMatch> edge = graph.getUnprocessedEdgeWithSegment(
         currentNode, index, processedEdges);

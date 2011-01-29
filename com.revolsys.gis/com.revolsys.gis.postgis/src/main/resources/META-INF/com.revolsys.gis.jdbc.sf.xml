@@ -18,4 +18,17 @@
     <constructor-arg value="PostgreSQL" />
     <constructor-arg value="com.revolsys.gis.postgis.PostGisDataObjectStore" />
   </bean>  
+  <bean
+    class="com.revolsys.gis.jdbc.io.JdbcFactory"
+    factory-method="register"
+  >
+    <constructor-arg
+      value="PostgreSQL" />
+    <constructor-arg>
+      <bean
+        class="com.revolsys.gis.postgis.PostgreSqlDataSourceFactory" />
+    </constructor-arg>
+    <constructor-arg
+      value="#{T(com.revolsys.gis.postgis.PostgreSqlDataSourceFactory).URL_PATTERNS}" />
+  </bean>
 </beans>

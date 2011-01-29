@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -18,7 +21,9 @@ public class JdbcFactory {
 
   private static Map<String, Class<JdbcDataObjectStore>> dataObjectStoreClassNames = new HashMap<String, Class<JdbcDataObjectStore>>();
 
-  private static Map<String, Class<DataSourceFactory>> dataSourceFactoryClassNames = new HashMap<String, Class<DataSourceFactory>>();
+  private static Map<String, DataSourceFactory> dataSourceFactoriesByProductName = new HashMap<String, DataSourceFactory>();
+
+  private static Map<Pattern, DataSourceFactory> dataSourceFactoryUrlPatterns = new HashMap<Pattern, DataSourceFactory>();
 
   public static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
 
@@ -56,10 +61,10 @@ public class JdbcFactory {
     }
   }
 
-  public static JdbcDataObjectStore createDataObjectStore(final String connectionName,
-    final String productName, final Map<String, Object> config) {
-    final DataSource dataSource = createDataSource(productName,
-      config);
+  public static JdbcDataObjectStore createDataObjectStore(
+    final String connectionName, final String productName,
+    final Map<String, Object> config) {
+    final DataSource dataSource = createDataSource(productName, config);
     if (dataSource == null) {
       return null;
     } else {
@@ -72,20 +77,41 @@ public class JdbcFactory {
   public static DataSource createDataSource(final String productName,
     final Map<String, Object> config) {
     try {
-      final Class<DataSourceFactory> dataSourceFactoryClass = dataSourceFactoryClassNames.get(productName);
-      if (dataSourceFactoryClass == null) {
+      final DataSourceFactory dataSourceFactory = dataSourceFactoriesByProductName.get(productName);
+      if (dataSourceFactory == null) {
         throw new IllegalArgumentException("Data Source Factory not found for "
           + productName);
       } else {
-        final DataSourceFactory dataSourceFactory = dataSourceFactoryClass.newInstance();
         return dataSourceFactory.createDataSource(config);
       }
-    } catch (final InstantiationException e) {
-      throw new RuntimeException("Unable to instantiate", e);
-    } catch (final IllegalAccessException e) {
-      throw new RuntimeException("Unable to instantiate", e);
     } catch (final SQLException e) {
-      throw new RuntimeException("Unable to detect database version", e);
+      throw new RuntimeException("Unable to create data source", e);
+    }
+  }
+
+  public static DataSource createDataSource(final Map<String, Object> config) {
+    try {
+      final String url = (String)config.get("url");
+      DataSourceFactory dataSourceFactory = getDataSourceFactory(url);
+      return dataSourceFactory.createDataSource(config);
+    } catch (final SQLException e) {
+      throw new RuntimeException("Unable to create data source", e);
+    }
+  }
+
+  public static DataSourceFactory getDataSourceFactory(final String url) {
+    if (url == null) {
+      throw new IllegalArgumentException("The url parameter must be specified");
+    } else {
+      for (Entry<Pattern, DataSourceFactory> entry : dataSourceFactoryUrlPatterns.entrySet()) {
+        Pattern pattern = entry.getKey();
+        DataSourceFactory dataSourceFactory = entry.getValue();
+        if (pattern.matcher(url).matches()) {
+          return dataSourceFactory;
+        }
+      }
+      throw new IllegalArgumentException("Data Source Factory not found for "
+        + url);
     }
   }
 
@@ -97,14 +123,20 @@ public class JdbcFactory {
         dataObjectStoreClassNames.put(productName,
           (Class<JdbcDataObjectStore>)clazz);
       }
-      if (DataSourceFactory.class.isAssignableFrom(clazz)) {
-        dataSourceFactoryClassNames.put(productName,
-          (Class<DataSourceFactory>)clazz);
-      }
       return clazz;
     } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException("Unable to register " + productName, e);
     }
+  }
+
+  public static DataSourceFactory register(final String productName,
+    DataSourceFactory dataSourceFactory, List<String> patterns) {
+    dataSourceFactoriesByProductName.put(productName, dataSourceFactory);
+    for (String regex : patterns) {
+      dataSourceFactoryUrlPatterns.put(Pattern.compile(regex),
+        dataSourceFactory);
+    }
+    return dataSourceFactory;
   }
 
   private DataObjectFactory dataObjectFactory;

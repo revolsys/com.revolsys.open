@@ -48,7 +48,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
 
   public boolean visit(
     final Node<T> node) {
-    final Coordinates coordinates = node.getCoordinates();
+    final Coordinates coordinates = node;
     final Point point = geometryFactory.createPoint(coordinates);
     final double distance = geometry.distance(point);
     if (distance <= maxDistance) {

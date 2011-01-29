@@ -14,16 +14,14 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 public class EdgeQuadTree<T> extends Quadtree implements Iterable<Edge<T>> {
 
-  public Edge<T> add(
-    final Edge<T> edge) {
+  public Edge<T> add(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final Envelope envelope = line.getEnvelopeInternal();
     insert(envelope, edge);
     return edge;
   }
 
-  public void addAll(
-    final Collection<Edge<T>> edges) {
+  public void addAll(final Collection<Edge<T>> edges) {
     for (final Edge<T> edge : edges) {
       add(edge);
     }
@@ -35,18 +33,21 @@ public class EdgeQuadTree<T> extends Quadtree implements Iterable<Edge<T>> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<Edge<T>> query(
-    final Envelope searchEnv) {
-    return super.query(searchEnv);
+  public List<Edge<T>> query(final Envelope searchEnv) {
+    List<Edge<T>> edges = super.query(searchEnv);
+    for (Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
+      Edge<T> edge = edgeIter.next();
+      if (!edge.getEnvelope().intersects(searchEnv)) {
+        edgeIter.remove();
+      }
+    }
+    return edges;
   }
 
-  public void query(
-    final Envelope searchEnv,
-    final Visitor<Edge<T>> visitor) {
+  public void query(final Envelope searchEnv, final Visitor<Edge<T>> visitor) {
     super.query(searchEnv, new ItemVisitor() {
       @SuppressWarnings("unchecked")
-      public void visitItem(
-        final Object item) {
+      public void visitItem(final Object item) {
         visitor.visit((Edge<T>)item);
       }
     });
@@ -58,8 +59,7 @@ public class EdgeQuadTree<T> extends Quadtree implements Iterable<Edge<T>> {
     return super.queryAll();
   }
 
-  public List<Edge<T>> queryCrosses(
-    final LineString line) {
+  public List<Edge<T>> queryCrosses(final LineString line) {
     final PreparedGeometry preparedLine = PreparedGeometryFactory.prepare(line);
     final Envelope envelope = line.getEnvelopeInternal();
     final List<Edge<T>> edges = query(envelope);
@@ -74,15 +74,13 @@ public class EdgeQuadTree<T> extends Quadtree implements Iterable<Edge<T>> {
     return edges;
   }
 
-  public void remove(
-    final Edge<T> edge) {
+  public void remove(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final Envelope envelope = line.getEnvelopeInternal();
     remove(envelope, edge);
   }
 
-  public void removeAll(
-    final Collection<Edge<T>> edges) {
+  public void removeAll(final Collection<Edge<T>> edges) {
     for (final Edge<T> edge : edges) {
       remove(edge);
     }

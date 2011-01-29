@@ -41,7 +41,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
 
   public boolean visit(
     final Node<T> node) {
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     if (LineStringUtil.isPointOnLine(line, point)) {
       matchVisitor.visit(node);
     }

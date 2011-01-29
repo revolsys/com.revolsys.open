@@ -19,7 +19,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     final Node<T> node,
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     final Envelope env = new BoundingBox(point);
     env.expandBy(maxDistance);
     graph.getEdgeIndex().query(env,
@@ -41,7 +41,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     super(matchVisitor);
     this.node = node;
     this.maxDistance = maxDistance;
-    final Coordinates point = node.getCoordinates();
+    final Coordinates point = node;
     this.envelope = new BoundingBox(point);
     this.envelope.expandBy(maxDistance);
   }
