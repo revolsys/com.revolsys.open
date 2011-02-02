@@ -18,38 +18,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.gis.data.model.filter;
+package com.revolsys.gis.jts.filter;
+
+import java.util.Collections;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.model.data.equals.Geometry2DEquals;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectGeometryEquals2DExactFilter implements
-  Filter<DataObject> {
-  private final Geometry geometry;
+public class Equals2DFilter<T extends Geometry> implements Filter<T> {
+  private final T geometry;
 
-  public DataObjectGeometryEquals2DExactFilter(
-    final Geometry geometry) {
+  public Equals2DFilter(
+    final T geometry) {
     this.geometry = geometry;
   }
 
   public boolean accept(
-    final DataObject object) {
-    final Geometry matchGeometry = object.getGeometryValue();
-    if (geometry.equalsExact(matchGeometry)) {
+    final T geometry) {
+    if (Geometry2DEquals.INSTANCE.equals(this.geometry, geometry, Collections.<String>emptySet())) {
       return true;
     } else {
       return false;
     }
   }
 
-  /**
-   * Get the geometry to compare the data objects to to.
-   * 
-   * @return The geometry to compare the data objects to to.
-   */
-  public Geometry getGeometry() {
+  public T getGeometry() {
     return geometry;
   }
-
 }

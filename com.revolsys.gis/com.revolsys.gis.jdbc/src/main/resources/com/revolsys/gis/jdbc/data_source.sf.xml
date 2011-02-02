@@ -1,0 +1,2494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:p="http://www.springframework.org/schema/p"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util-3.0.xsd
+  "
+>
+  <bean
+    id="jdbcDataSource"
+    class="com.revolsys.gis.jdbc.io.JdbcDataSourceFactoryBean"
+    p:dataSourceName="tro"
+    p:url="jdbc:postgresql://localhost:5432/dra"
+    p:user="dra"
+    p:password="tdnmatm1"
+    lazy-init="true"
+  >
+    <property name="connectionProperties">
+      <props>
+        <prop key="defaultRowPrefetch">1000</prop>
+        <prop key="oracle.jdbc.StreamChunkSize">32000</prop>
+      </props>
+    </property>
+    <property name="connectionCachingEnabled" value="true" />
+    <property name="connectionCacheProperties">
+      <props>
+        <prop key="MinLimit">0</prop>
+        <prop key="MaxLimit">100</prop>
+        <prop key="InactivityTimeout">10</prop>
+      </props>
+    </property>
+  </bean>
+  
+  <util:map id="trimObservationCodeTableAuditColumns">
+    <entry key="WHO_CREATED" value="USER" />
+    <entry key="WHEN_CREATED" value="SYSDATE" />
+    <entry key="WHO_UPDATED" value="USER" />
+    <entry key="WHEN_UPDATED" value="SYSDATE" />
+  </util:map>
+  
+  <bean
+    id="troDataObjectStore"
+    class="com.revolsys.jndi.JndiObjectFactory"
+    p:beanName="troDataObjectStoreTemplate"
+    p:jndiUrl="java:comp/env/tro/dataStore"
+    lazy-init="true"
+  />
+
+  <bean
+    id="troDataObjectStoreTemplate"
+    class="com.revolsys.gis.jdbc.io.JdbcFactory"
+    factory-method="createDataObjectStore"
+    lazy-init="true"
+
+    p:batchSize="2000"
+    p:label="TRO"
+  >
+    <constructor-arg ref="troDataSource" />
+    <property name="commonMetaDataProperties">
+      <list>
+        <bean
+          class="ca.bc.gov.basemap.tro.property.TroDataObjectLifeCycleProperty"
+          p:creationPropertyPath="CREATE_TRANSACTION_ID"
+          p:creationDatePropertyPath="CREATE_TRANSACTION_ID.WHEN_CREATED"
+          p:creationSourceDatePropertyPath="CREATE_SOURCE_DATE"
+          p:retirementPropertyPath="RETIRE_TRANSACTION_ID"
+          p:retirementDatePropertyPath="RETIRE_TRANSACTION_ID.WHEN_CREATED"
+			    p:mapsheet-ref="bcgs20kMapsheet"
+			    p:transactionManager-ref="troTransactionManager"
+        >
+          <property name="creationAttributeNames">
+            <list>
+              <value>CREATE_TRANSACTION_ID</value>
+              <value>CREATE_SOURCE_DATE</value>
+              <value>CREATE_REPLACE_IND</value>
+            </list>
+          </property>
+          <property name="retirementAttributeNames">
+            <list>
+              <value>RETIRE_TRANSACTION_ID</value>
+              <value>RETIRE_SOURCE_DATE</value>
+              <value>RETIRE_REPLACE_IND</value>
+            </list>
+          </property>
+        </bean>
+        <bean
+          class="ca.bc.gov.basemap.property.PrimaryLineProperty">
+          <property name="primaryFilter">
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+              p:attributeName="DISPLAY_CODE_ID"
+            >
+              <property name="values">
+	              <list>
+	                <value>primaryCurve</value>
+	                <value>primaryLine</value>
+	              </list>
+	            </property>
+            </bean>
+          </property>
+        </bean>
+      </list>
+    </property>
+    <property name="typeMetaDataProperties">
+      <map>
+        <entry key="{TRIM}TRO_AIRFIELD_LINE">
+          <list>
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_AFL"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_AREA_OF_EXCLUSION_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_AOEL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:dem="true"
+
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_AREA_INDEFNT_CONTOUR_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_AICL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:dem="true"
+
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_AREA_SYMBOL_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ASP"
+          
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_BEAVER_DAM_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BDL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_PBL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:dem="true"
+              
+            />
+          </list>
+        </entry>
+            
+        <entry key="{TRIM}TRO_BREAKWATER_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BW"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_BREAKWATER_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BW"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_BRIDGE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BRL"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_BUILDING_LINE">
+          <list>
+<!--
+          p:maxArea="100000"
+ -->
+           <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BU"
+          
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_BUILDING_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BU"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_BUILTUP_AREA_LINE">
+          <list>
+          
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BAL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_CADASTRAL_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CDP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_CANAL_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CNL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="false"
+            >
+              <property name="polygonalFilters">
+                <list>
+                  <bean
+                    class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+                    p:attributeName="CANAL_CODE_ID"
+                  >
+                    <property name="values">
+                      <set>
+                        <value>channelLeftBank</value>
+                        <value>channelRightBan</value>
+                        <value>canalLeftBank</value>
+                        <value>canalRightBank</value>
+                      </set>
+                    </property>
+                  </bean>
+                </list>
+              </property>
+              <property name="equalFeatureCodes">
+                <list>
+                  <list>
+                    <value>GA93950120</value>
+                    <value>GA93950110</value>
+                  </list>
+                  <list>
+                    <value>GA95200120</value>
+                    <value>GA95200110</value>
+                  </list>
+                </list>
+              </property>
+              <property name="reversedFeatureCodes">
+                <list>
+                  <value>GA93950120</value>
+                  <value>GA95200120</value>
+                </list>
+              </property>
+            </bean>
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              
+            >
+              <property name="demFilterTypeTemplates">
+                <map>
+                  <entry value="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic">
+                    <key>
+                      <bean
+                        class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+                        p:attributeName="CANAL_CODE_ID"
+                      >
+                        <property name="values">
+                          <set>
+                            <value>canal</value>
+                            <value>canalLeftBank</value>
+                            <value>canalRightBank</value>
+                            <value>ditch</value>
+                          </set>
+                        </property>
+                      </bean>
+                    </key>
+                  </entry>
+                </map>
+              </property>
+            </bean>
+<!--
+          p:subTypePolygonsDistinct="false"
+          
+        >
+          <property name="nestedFeatureTypes">
+            <set>
+              <value>Island</value>
+              <value>SandGravelBar</value>
+              <value>GFT_LAND_FORM_SP</value>
+            </set>
+          </property>
+        </bean>
+-->
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_CLIFF_SCARP_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CSL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hypsographic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_CLIFF_TERRAIN_DROP_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CTDL"
+            />
+<!--
+          p:rightDownhill="true"
+-->
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=sharp"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_COAST_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_CONTROL_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CNP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_CORRIDOR_LANDMARK_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+            />
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CRLML"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_CULVERT_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CVTP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_DAM_SECTION_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DMS"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_DAM_SECTION_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DMS"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_DEM_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DP"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:dem="true"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_DESIGNATED_AREA_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DAL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              
+            >
+              <property name="demFilterTypeTemplates">
+                <map>
+                  <entry value="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic">
+                    <key>
+                      <bean
+                        class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+                        p:attributeName="DESIGNATED_AREA_CODE_ID"
+                      >
+                        <property name="values">
+                          <set>
+                            <value>settlingPond</value>
+                          </set>
+                        </property>
+                      </bean>
+                    </key>
+                  </entry>
+                </map>
+              </property>
+            </bean>
+          </list>
+        </entry>
+                
+        <entry key="{TRIM}TRO_DOCK_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DK"
+            />
+          </list>
+        </entry>
+                
+        <entry key="{TRIM}TRO_DOCK_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DK"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_DYKE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DYL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_EARTHWORK_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_EWL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=anthropogenic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_ESKER_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ESKL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_EXTRACTION_SITE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ES"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              
+            >
+              <property name="demFilterTypeTemplates">
+                <map>
+                  <entry value="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=anthropogenic">
+                    <key>
+                      <bean
+                        class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+                        p:attributeName="EXTRACTION_SITE_CODE_ID"
+                      >
+                        <property name="values">
+                          <set>
+                            <value>abandonedPit</value>
+                          </set>
+                        </property>
+                      </bean>
+                    </key>
+                  </entry>
+                  <entry value="{TRIM}TRO_AREA_OF_EXCLUSION_LINE">
+                    <key>
+                      <bean
+                        class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+                        p:attributeName="EXTRACTION_SITE_CODE_ID"
+                      >
+                        <property name="values">
+                          <set>
+                            <value>gravelSand</value>
+                            <value>openPitMine</value>
+                            <value>quarry</value>
+                          </set>
+                        </property>
+                      </bean>
+                    </key>
+                  </entry>
+                </map>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_EXTRACTION_SITE_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ES"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_FALLS_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FAL"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_FALLS_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FAL"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_FENCE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FNL"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_FERRY_ROUTE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FRL"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_FLOODED_LAND_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FLL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            >
+              <property name="permittedNestedPolygonFilters">
+                <list>
+                  <bean
+                    class="com.revolsys.gis.data.model.filter.TypeNamesFilter"
+                  >
+                    <property name="typeNames">
+                      <set>
+                        <value>{TRIM}TRO_ISLAND_LINE</value>
+                        <value>{TRIM}TRO_LAKE_RESERVOIR_LINE</value>
+                      </set>
+                    </property>
+                  </bean>
+                </list>
+              </property>
+            </bean>
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_FLOW_DIRECTION_IND_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FDIP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_FOOTBRIDGE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FL"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_HELIPAD_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_HP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_ICE_MASS_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_IML"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_AREA_INDEFNT_CONTOUR_LINE"
+              
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_ISLAND_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_IL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            >
+              <property name="permittedNestedPolygonFilters">
+                <list>
+                  <bean
+                    class="com.revolsys.gis.data.model.filter.TypeNamesFilter"
+                  >
+                    <property name="typeNames">
+                      <set>
+                        <value>{TRIM}TRO_FLOODED_LAND_LINE</value>
+                      </set>
+                    </property>
+                  </bean>
+                </list>
+              </property>
+            </bean>
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_ISLAND_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_IL"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_LAKE_RESERVOIR_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LRL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            >
+              <property name="permittedNestedPolygonFilters">
+                <list>
+                  <bean
+                    class="com.revolsys.gis.data.model.filter.TypeNamesFilter"
+                  >
+                    <property name="typeNames">
+                      <set>
+                        <value>{TRIM}TRO_FLOODED_LAND_LINE</value>
+                        <value>{TRIM}TRO_ISLAND_LINE</value>
+                      </set>
+                    </property>
+                  </bean>
+                </list>
+              </property>
+            </bean>
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+<!--
+          <property name="nestedFeatureTypes">
+            <set>
+              <value>FloodedLand</value>
+              <value>Island</value>
+              <value>SandGravelBar</value>
+              <value>GFT_LAND_FORM_SP</value>
+              <value>GFT_WATER_BODY_SP</value>
+            </set>
+          </property>
+        </bean>
+-->
+        
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_LAND_COVER_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LRC"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_LAND_COVER_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LRC"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_LAVA_BED_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LBL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hypsographic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_MONUMENT_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_MONP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_MORAINE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ML"
+            />
+          <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hypsographic"
+              
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_NO_JOIN_SYMBOL_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_NJSP"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_NON_CORRIDOR_LANDMRK_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_NCLP"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_OTHER_TEXT_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_OTP"
+            />
+            <bean
+              class="ca.bc.gov.basemap.tro.model.properties.AnnotationProperty"
+            />
+<!--
+          <property name="retireFromArchiveSubTypes">
+            <set>
+              <value>historyTracking</value>
+              <value>hypsographicContourNumbers</value>
+              <value>hypsographicExcludingContourNumbers</value>
+            </set>
+          </property>
+        </bean>
+        -->
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_OTHER_TEXT_ELEMENT_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_OTEL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.tro.model.properties.AnnotationProperty"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_OBSERVATION_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_OBP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_PHOTO_CENTRE_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_PCP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_PILE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_PL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_AREA_OF_EXCLUSION_LINE"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_RAIL_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RAL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=anthropogenic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_RAPIDS_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RAP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_RAPIDS_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RAP"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_RETAINING_WALL_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RWL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=anthropogenic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_RIDGE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RDGL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=sharp"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_RIVER_STREAM_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RSL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="false"
+            >
+              <property name="polygonalFilters">
+                <list>
+                  <bean
+                    class="com.revolsys.gis.jdbc.data.model.filter.DataObjectCodeTableValueFilter"
+                    p:attributeName="RIVER_STREAM_CODE_ID"
+                  >
+                    <property name="values">
+                      <set>
+                        <value>leftBank</value>
+                        <value>rightBank</value>
+                      </set>
+                    </property>
+                  </bean>
+                </list>
+              </property>
+              <property name="equalFeatureCodes">
+                <list>
+                  <list>
+                    <value>GA90000120</value>
+                    <value>GA90000110</value>
+                  </list>
+                  <list>
+                    <value>GA95200120</value>
+                    <value>GA95200110</value>
+                  </list>
+                </list>
+              </property>
+              <property name="reversedFeatureCodes">
+                <list>
+                  <value>GA90000120</value>
+                </list>
+              </property>
+              <property name="permittedNestedPolygonFilters">
+                <list>
+                  <bean
+                    class="com.revolsys.gis.data.model.filter.TypeNamesFilter"
+                  >
+                    <property name="typeNames">
+                      <set>
+                        <value>{TRIM}TRO_ISLAND_LINE</value>
+                        <value>{TRIM}TRO_SAND_GRAVEL_BAR_LINE</value>
+                      </set>
+                    </property>
+                  </bean>
+                </list>
+              </property>
+            </bean>
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+<!--
+                    p:subTypePolygonsDistinct="false"
+          <property name="nestedFeatureTypes">
+            <set>
+              <value>Island</value>
+              <value>SandGravelBar</value>
+           </set>
+          </property>
+        </bean>
+        -->
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_ROAD_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RDL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=anthropogenic"
+              
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_ROCK_BLUFF_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RBL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=sharp"
+              
+            />
+<!--
+          p:leftDownhill="true"
+-->          
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_ROCK_OUTCROP_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RO"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_ROCK_OUTCROP_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RO"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SAND_GRAVEL_BAR_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SGBL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SCREE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SCRL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hypsographic"
+              
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SEA_WALL_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SWL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+<!--
+          p:leftDownhill="true"
+-->
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SINKHOLE_POINT">
+          <list>
+          <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SHP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SKI_JUMP_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SJL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SLIDE_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hypsographic"
+              
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SNOWSHED_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SNWL"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_SPOT_ELEVATION_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SEP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_TAILING_AREA_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TAL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_TAILING_POND_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TPL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hydrographic"
+              
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_TANK_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TK"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_TANK_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TK"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_TOPONYMY_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TPNP"
+            />
+            <bean
+              class="ca.bc.gov.basemap.tro.model.properties.AnnotationProperty"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_TOPONYMY_ELEMENT_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TPNEL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.tro.model.properties.AnnotationProperty"
+            />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_TOWER_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TWRP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_TRAIL_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TRL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=anthropogenic"
+              
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_CONTOUR_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CNTRL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.GeometryIntegrationProperty"
+              p:integratesWithOtherTypes="false"
+            />
+<!--
+          p:retireAllFromArchive="true"
+          p:verticallyIntegrated="false"
+  -->
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_TUNNEL_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TUNL"
+            />
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_TURNTABLE_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TBLP"
+            />
+          </list>
+        </entry>
+          
+        <entry key="{TRIM}TRO_VOLCANIC_CRATER_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_VCL"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.PolygonProperty"
+              p:polygonal="true"
+            />
+            <bean
+              class="ca.bc.gov.basemap.property.DemProperty"
+              p:demTypeTemplate="{TRIM}TRO_PHYSICAL_BREAKLINE_LINE.BREAKLINE_CODE_ID=hypsographic"
+              
+            />
+          </list>
+        </entry>
+        
+<!-- Code tables -->
+        <entry key="{TRIM}TRO_TRANSACTIONS">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_T"
+            />
+            <ref bean="troTransactionManager" />
+          </list>
+        </entry>
+
+        <entry key="{TRIM}TRO_AIRFIELD_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_AFC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        
+        <entry key="{TRIM}TRO_AREA_SYMBOL_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_AST"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_BREAKLINE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_BRIDGE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BRC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_BUILDING_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_BUC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_CANAL_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_CLIFF_TERRAIN_DROP_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CDPC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_CONFIDENCE_LEVEL_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_COORDINATE_ACCURACY_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CAC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>PERCENTILE</value>
+                  <value>HORIZONTAL</value>
+                  <value>VERTICAL</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_COORDINATE_SYSTEM_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CSC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>CODE</value>
+                  <value>HORIZONTAL_DATUM</value>
+                  <value>VERTICAL_DATUM</value>
+                  <value>UNITS</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_CONFIDENCE_REASON_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CRC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_CONTROL_POINT_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CPC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_CORRIDOR_LANDMARK_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_CLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DAM_SECTION_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DMSC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DEM_POINT_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DPC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DESIGNATED_AREA_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DAC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DATA_CAPTURE_METHOD_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DCMC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DATA_SUPPLIER_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DSC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>CATEGORY</value>
+                  <value>DETAIL</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DISPLAY_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DSPC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_DOCK_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_DKC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_EARTHWORK_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_EWC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_EXTRACTION_SITE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ESC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_FLOODED_LAND_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_FLOW_DIRECTION_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FDC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_FLOW_INDICATOR_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_FIC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_ICE_MASS_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_IMC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_ISOLINE_FORM_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_IFC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_LAKE_RESERVOIR_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LRC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_LAKE_RESERVOIR_QUALIF_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LRQC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_LAND_COVER_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_LCC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_MONUMENT_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_MC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_NON_CORRIDOR_LANDMARK_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_NCLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_NORTH_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_NC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_OBSERVATION_POINT_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_OPC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_ORIGINAL_FILE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_OFC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_RAIL_LINE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_RAIL_LINE_LOCATION_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RLLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_RIDGE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_RIVER_STREAM_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_RSC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_SAND_GRAVEL_BAR_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SGBC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_SPOT_HEIGHT_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SHC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_ROAD_SURFACE_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_SC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_TOWER_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_TRAIL_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TRLC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_TEXT_ATTRIBUTES">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TXA"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="false"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>FONT_FAMILY</value>
+                  <value>FONT_SIZE</value>
+                  <value>FONT_WEIGHT</value>
+                  <value>FONT_STYLE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_TEXT_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TXC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_ROAD_TRAVEL_DIRECTION_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TDC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_TRAVERSAL_DIRECTION_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_TDC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_Z_VALUE_DERIVED_CODE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_ZVDC"
+            />
+            <bean
+              class="com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty"
+              p:auditColumns-ref="trimObservationCodeTableAuditColumns"
+              p:loadAll="true"
+            >
+              <property name="valueColumns">
+                <list>
+                  <value>VALUE</value>
+                </list>
+              </property>
+            </bean>
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_MAPSHEET_POLY">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_MP"
+            />
+            <bean
+					    class="ca.bc.gov.basemap.tro.io.TroMapsheetManager"
+					    p:loadAll="true"
+					  >
+					    <property name="valueColumns">
+					      <list>
+					        <value>MAP_NAME</value>
+					      </list>
+					    </property>
+					  </bean>
+          </list>
+         </entry>
+        <entry key="{TRIM}TRO_QA_LOG_POINT">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_QL"
+            />
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_QA_LOG_LINE">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_QL"
+            />
+          </list>
+        </entry>
+        <entry key="{TRIM}TRO_QA_LOG_POLY">
+          <list>
+            <bean
+              class="com.revolsys.gis.data.model.ShortNameProperty"
+              p:shortName="TRO_QL"
+            />
+          </list>
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean
+    id="troMapsheetManager"
+    class="ca.bc.gov.basemap.tro.io.TroMapsheetManager"
+    factory-method="getManager"
+    lazy-init="true"
+  >
+    <constructor-arg ref="troDataObjectStore" />
+  </bean>
+
+  <bean
+    id="troTransactionManager"
+    class="com.revolsys.jndi.JndiObjectFactory"
+    p:beanName="troTransactionManagerTemplate"
+    p:jndiUrl="java:comp/env/tro/transactionManager"
+    lazy-init="true"
+  />
+  
+  <bean
+    id="troTransactionManagerTemplate"
+    class="ca.bc.gov.basemap.tro.io.TransactionManager"
+    lazy-init="true"
+  >
+	   <property name="columnAliases">
+	     <list>
+	       <value>CREATE_TRANSACTION_ID</value>
+	       <value>RETIRE_TRANSACTION_ID</value>
+	     </list>
+	   </property>
+  </bean>
+  
+  <bean
+    id="troLog"
+    class="ca.bc.gov.basemap.io.DatabaseLog"
+    lazy-init="true"
+    
+    p:out="#{troWriterProcess.in}"
+    p:tableNameAttribute="TABLE_NAME"
+    p:ruleNameAttribute="RULE_NAME"
+    p:actionNameAttribute="ACTION_NAME"
+    p:notesAttribute="NOTES"
+  >
+	   <property name="defaultValues">
+	     <map>
+	       <entry key="MAP_NAME" value-ref="bcgs20kMapsheet" />
+	     </map>
+	   </property>
+	   <property name="geometryMetaDataMap">
+	     <map>
+	       <entry
+	         key="com.vividsolutions.jts.geom.Point"
+	         value="#{troDataObjectStore.getMetaData('{TRIM}TRO_QA_LOG_POINT')}"
+	       />
+	       <entry
+	         key="com.vividsolutions.jts.geom.LineString"
+	         value="#{troDataObjectStore.getMetaData('{TRIM}TRO_QA_LOG_LINE')}"
+	       />
+	       <entry
+	         key="com.vividsolutions.jts.geom.Polygon"
+	         value="#{troDataObjectStore.getMetaData('{TRIM}TRO_QA_LOG_POLY')}"
+	       />
+	     </map>
+	   </property>
+  </bean>
+</beans>

@@ -507,7 +507,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     if (isRemoved()) {
       sb.insert(0, "Removed: ");
     } else {
-      sb.append("LINE_STRING(");
+      sb.append("LINESTRING(");
       sb.append(getFromNode().toString().replaceAll(",", " "));
       sb.append(",");
       sb.append(getToNode().toString().replaceAll(",", " "));

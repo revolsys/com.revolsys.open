@@ -148,4 +148,15 @@ public class LineSegmentMatch {
   public String toString() {
     return segment.toString();
   }
+
+  public boolean hasOtherSegment(int index) {
+    for (int i = 0; i < segments.size();i++) {
+      if (i != index) {
+        if (segments.get(i) != null) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

@@ -4,11 +4,18 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectGeometryValueFilter implements Filter<DataObject> {
+public class GeometryValueFilter implements Filter<DataObject> {
   private Geometry geometry;
 
-  public boolean accept(
-    final DataObject object) {
+  public GeometryValueFilter(DataObject object) {
+    this(object.getGeometryValue());
+  }
+
+  public GeometryValueFilter(Geometry geometry) {
+    this.geometry = geometry;
+  }
+
+  public boolean accept(final DataObject object) {
     final Geometry value = object.getGeometryValue();
     if (value == geometry) {
       return true;

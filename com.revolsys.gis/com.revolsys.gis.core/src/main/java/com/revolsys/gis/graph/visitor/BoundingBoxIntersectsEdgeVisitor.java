@@ -31,7 +31,9 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends NestedVisitor<Edge<T>> 
       boundingBox, results);
     final EdgeQuadTree<T> index = graph.getEdgeIndex();
     index.query(boundingBox, visitor);
-    return results.getList();
+    List<Edge<T>> list = results.getList();
+    list.remove(edge);
+    return list;
 
   }
 

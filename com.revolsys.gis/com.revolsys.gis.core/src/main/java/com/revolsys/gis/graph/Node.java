@@ -327,7 +327,7 @@ public class Node<T> extends AbstractCoordinates {
     if (isRemoved()) {
       return "removed:" + getCoordinates().toString();
     } else {
-      return getCoordinates().toString();
+      return super.toString();
     }
   }
 
