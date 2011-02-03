@@ -33,6 +33,12 @@ public class JdbcFactory {
   }
 
   public static JdbcDataObjectStore createDataObjectStore(
+    final Map<String, Object> config) {
+    DataSource dataSource = createDataSource(config);
+    return createDataObjectStore(dataSource);
+  }
+
+  public static JdbcDataObjectStore createDataObjectStore(
     final DataSource dataSource) {
     try {
       final Connection connection = JdbcUtils.getConnection(dataSource);

@@ -74,23 +74,19 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
 
   private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
 
+  private List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
+
   public JdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
 
-  public JdbcDataObjectStore(
-    final DataObjectFactory dataObjectFactory) {
+  public JdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
   }
 
-  protected void addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final String dataType,
-    final int sqlType,
-    final int length,
-    final int scale,
-    final boolean required) {
+  protected void addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, final String dataType, final int sqlType,
+    final int length, final int scale, final boolean required) {
     JdbcAttributeAdder attributeAdder = attributeAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
@@ -99,11 +95,8 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
       required);
   }
 
-  protected void addAttribute(
-    final ResultSetMetaData resultSetMetaData,
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final int i)
+  protected void addAttribute(final ResultSetMetaData resultSetMetaData,
+    final DataObjectMetaDataImpl metaData, final String name, final int i)
     throws SQLException {
     final String dataType = resultSetMetaData.getColumnTypeName(i);
     final int sqlType = resultSetMetaData.getColumnType(i);
@@ -113,14 +106,12 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     addAttribute(metaData, name, dataType, sqlType, length, scale, required);
   }
 
-  public void addAttributeAdder(
-    final String sqlTypeName,
+  public void addAttributeAdder(final String sqlTypeName,
     final JdbcAttributeAdder adder) {
     attributeAdders.put(sqlTypeName, adder);
   }
 
-  public void addCodeTable(
-    final JdbcCodeTableProperty codeTable) {
+  public void addCodeTable(final JdbcCodeTableProperty codeTable) {
     final String idColumn = codeTable.getIdColumn();
     this.columnToTableMap.put(idColumn, codeTable);
     for (final String alias : codeTable.getColumnAliases()) {
@@ -143,41 +134,32 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     return reader;
   }
 
-  protected JdbcQueryReader createReader(
-    final DataObjectMetaData metaData,
-    final String sql,
-    final List<Object> parameters) {
+  protected JdbcQueryReader createReader(final DataObjectMetaData metaData,
+    final String sql, final List<Object> parameters) {
     final JdbcQuery query = new JdbcQuery(metaData, sql, parameters);
     return createReader(query);
   }
 
-  protected JdbcQueryReader createReader(
-    final DataObjectMetaData metaData,
-    final String query,
-    final Object... parameters) {
+  protected JdbcQueryReader createReader(final DataObjectMetaData metaData,
+    final String query, final Object... parameters) {
     return createReader(metaData, query, Arrays.asList(parameters));
   }
 
-  protected JdbcQueryReader createReader(
-    final JdbcQuery query) {
+  protected JdbcQueryReader createReader(final JdbcQuery query) {
     final JdbcQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
   }
 
-  protected JdbcQueryReader createReader(
-    final QName typeName,
-    final String query,
-    final List<Object> parameters) {
+  protected JdbcQueryReader createReader(final QName typeName,
+    final String query, final List<Object> parameters) {
     final JdbcQueryReader reader = createReader();
     reader.addQuery(typeName, query, parameters);
     return reader;
   }
 
-  protected JdbcQueryReader createReader(
-    final QName typeName,
-    final String query,
-    final Object... parameters) {
+  protected JdbcQueryReader createReader(final QName typeName,
+    final String query, final Object... parameters) {
     return createReader(typeName, query, Arrays.asList(parameters));
   }
 
@@ -193,8 +175,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public void delete(
-    final DataObject object) {
+  public void delete(final DataObject object) {
     if (object.getState() == DataObjectState.Persisted) {
       object.setState(DataObjectState.Deleted);
       getWriter().write(object);
@@ -202,17 +183,14 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public void deleteAll(
-    final Collection<DataObject> objects) {
+  public void deleteAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       delete(object);
     }
   }
 
-  public JdbcAttribute getAttribute(
-    final String schemaName,
-    final String tableName,
-    final String columnName) {
+  public JdbcAttribute getAttribute(final String schemaName,
+    final String tableName, final String columnName) {
     final QName typeName = new QName(schemaName, tableName);
     final DataObjectMetaData metaData = getMetaData(typeName);
     if (metaData == null) {
@@ -228,8 +206,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public CodeTable getCodeTable(
-    final QName typeName) {
+  public CodeTable getCodeTable(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     if (metaData == null) {
       return null;
@@ -240,15 +217,13 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public CodeTable getCodeTableByColumn(
-    final String columnName) {
+  public CodeTable getCodeTableByColumn(final String columnName) {
     final CodeTable codeTable = columnToTableMap.get(columnName);
     return codeTable;
 
   }
 
-  public List<String> getColumnNames(
-    final QName typeName) {
+  public List<String> getColumnNames(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     return metaData.getAttributeNames();
   }
@@ -269,8 +244,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  public String getGeneratePrimaryKeySql(
-    final DataObjectMetaData metaData) {
+  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     throw new UnsupportedOperationException(
       "Cannot create SQL to generate Primary Key for " + metaData);
   }
@@ -283,8 +257,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     return label;
   }
 
-  protected String getLoadSql(
-    final QName typeName) {
+  protected String getLoadSql(final QName typeName) {
     String sql = typeLoadSql.get(typeName);
     if (sql == null) {
       final DataObjectMetaData metaData = getMetaData(typeName);
@@ -299,7 +272,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
         final String idAttributeName = metaData.getIdAttributeName();
 
         final StringBuffer sqlBuffer = new StringBuffer();
-        JdbcQuery.addColumnsAndTableName(sqlBuffer, metaData, "T");
+        JdbcQuery.addColumnsAndTableName(sqlBuffer, metaData, "T", null);
         sqlBuffer.append(" WHERE ");
 
         sqlBuffer.append(idAttributeName);
@@ -312,8 +285,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     return sql;
   }
 
-  public DataObjectMetaData getMetaData(
-    final QName typeName,
+  public DataObjectMetaData getMetaData(final QName typeName,
     final ResultSetMetaData resultSetMetaData) {
     try {
       final String schemaName = typeName.getNamespaceURI();
@@ -356,14 +328,11 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  public abstract long getNextPrimaryKey(
-    final DataObjectMetaData type);
+  public abstract long getNextPrimaryKey(final DataObjectMetaData type);
 
-  public abstract long getNextPrimaryKey(
-    final String sequenceName);
+  public abstract long getNextPrimaryKey(final String sequenceName);
 
-  private QName getQName(
-    final Object name) {
+  private QName getQName(final Object name) {
     if (name instanceof QName) {
       return (QName)name;
     } else {
@@ -371,8 +340,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  protected String getSequenceInsertSql(
-    final DataObjectMetaData metaData) {
+  protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String tableName = JdbcUtils.getTableName(typeName);
     String sql = sequenceTypeSqlMap.get(typeName);
@@ -412,8 +380,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     return sql;
   }
 
-  private <T> T getSharedAttribute(
-    final String name) {
+  private <T> T getSharedAttribute(final String name) {
     final Map<String, Object> sharedAttributes = getSharedAttributes();
     final T value = (T)sharedAttributes.get(name);
     return value;
@@ -450,22 +417,19 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public void insert(
-    final DataObject object) {
+  public void insert(final DataObject object) {
     getWriter().write(object);
   }
 
   @Override
-  public void insertAll(
-    final Collection<DataObject> objects) {
+  public void insertAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
   }
 
   @Override
-  public boolean isEditable(
-    final QName typeName) {
+  public boolean isEditable(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     return metaData.getIdAttributeIndex() != -1;
   }
@@ -475,9 +439,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public DataObject load(
-    final QName typeName,
-    final Object id) {
+  public DataObject load(final QName typeName, final Object id) {
     final String sql = getLoadSql(typeName);
     if (sql == null) {
       return null;
@@ -499,8 +461,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private synchronized String loadIdColumnName(
-    final String schemaName,
+  private synchronized String loadIdColumnName(final String schemaName,
     final String tableName) {
     final Connection connection = getDbConnection();
     try {
@@ -543,7 +504,8 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
       try {
         while (tablesRs.next()) {
           final String tableName = tablesRs.getString("TABLE_NAME");
-          boolean excluded = false;
+          final String tableType = tablesRs.getString("TABLE_TYPE");
+          boolean excluded = !tableTypes.contains(tableType);
           for (final String pattern : excludeTablePatterns) {
             if (tableName.matches(pattern)) {
               excluded = true;
@@ -605,8 +567,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  protected void loadSchemas(
-    final Map<String, DataObjectStoreSchema> schemaMap) {
+  protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
     try {
       final Connection connection = getDbConnection();
       try {
@@ -631,8 +592,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  protected List<QName> loadTypeNames(
-    final String namespace) {
+  protected List<QName> loadTypeNames(final String namespace) {
     try {
       final Connection connection = getDbConnection();
       try {
@@ -668,38 +628,31 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     final DataObjectMetaDataImpl metaData) {
   }
 
-  public Reader<DataObject> query(
-    final QName typeName) {
+  public Reader<DataObject> query(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
     final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
     final JdbcQueryReader reader = createReader(query);
     return reader;
   }
 
-  public Reader<DataObject> query(
-    final QName typeName,
-    final Envelope envelope) {
+  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
     return null;
   }
 
-  public Reader<DataObject> query(
-    final QName typeName,
-    final Geometry geometry) {
+  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
     return query(typeName, geometry, null);
   }
 
-  public Reader<DataObject> query(
-    final QName typeName,
-    Geometry geometry,
+  public Reader<DataObject> query(final QName typeName, Geometry geometry,
     final String whereClause) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
     geometry = ProjectionFactory.convert(geometry, geometryFactory);
     final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
     final JdbcQueryReader reader = createReader();
     final SqlFunction intersectsFunction = geometryAttribute.getProperty(JdbcConstants.FUNCTION_INTERSECTS);
     sql.append(" WHERE ");
@@ -716,9 +669,7 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     return reader;
   }
 
-  public DataObject query(
-    final QName typeName,
-    final String queryString,
+  public DataObject query(final QName typeName, final String queryString,
     final Object... arguments) {
     final JdbcQueryReader reader = createReader(typeName, queryString,
       arguments);
@@ -735,21 +686,18 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  protected void releaseConnection(
-    final Connection connection) {
+  protected void releaseConnection(final Connection connection) {
     if (dataSource != null) {
       JdbcUtils.close(connection);
     }
 
   }
 
-  public void setBatchSize(
-    final int batchSize) {
+  public void setBatchSize(final int batchSize) {
     this.batchSize = batchSize;
   }
 
-  public void setCodeTables(
-    final List<JdbcCodeTableProperty> codeTables) {
+  public void setCodeTables(final List<JdbcCodeTableProperty> codeTables) {
     for (final JdbcCodeTableProperty codeTable : codeTables) {
       addCodeTable(codeTable);
     }
@@ -760,38 +708,31 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
-  public void setConnection(
-    final Connection connection) {
+  public void setConnection(final Connection connection) {
     this.connection = connection;
   }
 
-  public void setDataSource(
-    final DataSource dataSource) {
+  public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
-  public void setExcludeTablePatterns(
-    final String... excludeTablePatterns) {
+  public void setExcludeTablePatterns(final String... excludeTablePatterns) {
     this.excludeTablePatterns = excludeTablePatterns;
   }
 
-  public void setFlushBetweenTypes(
-    final boolean flushBetweenTypes) {
+  public void setFlushBetweenTypes(final boolean flushBetweenTypes) {
     this.flushBetweenTypes = flushBetweenTypes;
   }
 
-  public void setHints(
-    final String hints) {
+  public void setHints(final String hints) {
     this.hints = hints;
   }
 
-  public void setLabel(
-    final String label) {
+  public void setLabel(final String label) {
     this.label = label;
   }
 
-  private void setMetaDataProperties(
-    final DataObjectMetaDataImpl metaData) {
+  private void setMetaDataProperties(final DataObjectMetaDataImpl metaData) {
     final QName typeName = metaData.getName();
     for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
       final DataObjectMetaDataProperty clonedProperty = property.clone();
@@ -803,20 +744,16 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private void setSharedAttribute(
-    final String name,
-    final Object value) {
+  private void setSharedAttribute(final String name, final Object value) {
     final Map<String, Object> sharedAttributes = getSharedAttributes();
     sharedAttributes.put(name, value);
   }
 
-  public void setSqlPrefix(
-    final String sqlPrefix) {
+  public void setSqlPrefix(final String sqlPrefix) {
     this.sqlPrefix = sqlPrefix;
   }
 
-  public void setSqlSuffix(
-    final String sqlSuffix) {
+  public void setSqlSuffix(final String sqlSuffix) {
     this.sqlSuffix = sqlSuffix;
   }
 
@@ -838,14 +775,14 @@ public abstract class JdbcDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public void update(
-    final DataObject object) {
+  public void update(final DataObject object) {
     getWriter().write(object);
   }
+
   @Override
   public String toString() {
     if (label == null) {
-    return super.toString();
+      return super.toString();
     } else {
       return label;
     }

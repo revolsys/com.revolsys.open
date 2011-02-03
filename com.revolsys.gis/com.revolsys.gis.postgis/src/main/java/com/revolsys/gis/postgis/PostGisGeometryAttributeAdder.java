@@ -26,7 +26,7 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
   static {
     DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
     DATA_TYPE_MAP.put("POINT", DataTypes.POINT);
-    DATA_TYPE_MAP.put("LINE_STRING", DataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put("LINESTRING", DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put("POLYGON", DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put("MULTIPOINT", DataTypes.MULTI_POINT);
     DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.MULTI_LINE_STRING);
@@ -66,7 +66,7 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
         dataType, length, scale, required, null, srid);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
-        "SDE.ST_INTERSECTS(", ") = 1"));
+        "intersects(", ")"));
       attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         GeometryFactory.getFactory(srid));
       return attribute;

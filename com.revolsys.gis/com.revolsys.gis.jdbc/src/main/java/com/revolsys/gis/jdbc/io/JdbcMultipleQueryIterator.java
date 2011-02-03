@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,7 +26,7 @@ import com.revolsys.jdbc.JdbcUtils;
 public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
   private Connection connection;
 
-  private int currentQuery = -1;
+  private int currentQueryIndex = -1;
 
   private DataObjectFactory dataObjectFactory;
 
@@ -45,11 +46,10 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
 
   private PreparedStatement statement;
 
-  public JdbcMultipleQueryIterator(
-    final JdbcDataObjectStore dataStore,
-    final List<JdbcQuery> queries,
-    final boolean autoCommit,
-    final int fetchSize) {
+  private List<Attribute> attributes = new ArrayList<Attribute>();
+
+  public JdbcMultipleQueryIterator(final JdbcDataObjectStore dataStore,
+    final List<JdbcQuery> queries, final boolean autoCommit, final int fetchSize) {
     super();
     this.connection = dataStore.getConnection();
     this.dataSource = dataStore.getDataSource();
@@ -87,7 +87,7 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
   }
 
   protected String getErrorMessage() {
-    return queries.get(currentQuery).getSql();
+    return queries.get(currentQueryIndex).getSql();
   }
 
   protected DataObjectMetaData getMetaData() {
@@ -101,18 +101,19 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
     String sql = null;
     try {
       do {
-        if (++currentQuery < queries.size()) {
+        if (++currentQueryIndex < queries.size()) {
           JdbcUtils.close(statement, resultSet);
-          final JdbcQuery query = queries.get(currentQuery);
-          sql = query.getSql();
+          final JdbcQuery currentQuery = queries.get(currentQueryIndex);
+          sql = currentQuery.getSql();
           try {
-            final QName tableName = query.getTableName();
-            DataObjectMetaData metaData = query.getMetaData();
+            final QName tableName = currentQuery.getTableName();
+            DataObjectMetaData metaData = currentQuery.getMetaData();
             if (metaData == null) {
               if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
                 metaData = dataStore.getMetaData(tableName);
                 StringBuffer newSql = new StringBuffer("SELECT ");
-                JdbcQuery.addColumnNames(newSql, metaData, JdbcQuery.getTableName(tableName));
+                JdbcQuery.addColumnNames(newSql, metaData,
+                  JdbcQuery.getTableName(tableName));
                 newSql.append(" FROM ");
                 newSql.append(sql.substring(14));
                 sql = newSql.toString();
@@ -121,7 +122,7 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
             statement = connection.prepareStatement(sql);
             statement.setFetchSize(fetchSize);
 
-            query.setPreparedStatementParameters(statement);
+            currentQuery.setPreparedStatementParameters(statement);
 
             resultSet = statement.executeQuery();
             final ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -130,8 +131,18 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
               metaData = dataStore.getMetaData(tableName, resultSetMetaData);
             }
             this.metaData = metaData;
+            List<String> attributeNames = currentQuery.getAttributeNames();
+            if (attributeNames.isEmpty()) {
+              this.attributes = metaData.getAttributes();
+            }
+            for (String attributeName : attributeNames) {
+              Attribute attribute = metaData.getAttribute(attributeName);
+              if (attribute != null) {
+                attributes.add(attribute);
+              }
+            }
 
-            final QName typeName = query.getTypeName();
+            final QName typeName = currentQuery.getTypeName();
             if (typeName != null) {
               final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).clone();
               newMetaData.setName(typeName);
@@ -175,7 +186,8 @@ public class JdbcMultipleQueryIterator implements Iterator<DataObject> {
         final DataObjectMetaData metaData = getMetaData();
         final DataObject object = dataObjectFactory.createDataObject(metaData);
         int columnIndex = 1;
-        for (final Attribute attribute : metaData.getAttributes()) {
+
+        for (final Attribute attribute : attributes) {
           final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
           try {
             columnIndex = jdbcAttribute.setAttributeValueFromResultSet(

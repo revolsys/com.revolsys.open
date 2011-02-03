@@ -1,4 +1,4 @@
-package com.revolsys.jump.oracle.driver;
+package com.revolsys.jump.jdbc;
 
 import com.vividsolutions.jump.datastore.DataStoreConnection;
 import com.vividsolutions.jump.datastore.DataStoreDriver;
@@ -6,7 +6,7 @@ import com.vividsolutions.jump.parameter.ParameterList;
 import com.vividsolutions.jump.parameter.ParameterListSchema;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 
-public class OracleDataStoreDriver implements DataStoreDriver {
+public class JdbcDataStoreDriver implements DataStoreDriver {
   public static final String PASSWORD = "password";
 
   public static final String USER = "user";
@@ -28,19 +28,17 @@ public class OracleDataStoreDriver implements DataStoreDriver {
 
   private WorkbenchContext workbenchContext;
 
-  public OracleDataStoreDriver(
-    WorkbenchContext workbenchContext) {
-    this.workbenchContext= workbenchContext;
+  public JdbcDataStoreDriver(WorkbenchContext workbenchContext) {
+    this.workbenchContext = workbenchContext;
   }
 
-  public DataStoreConnection createConnection(
-    final ParameterList params)
+  public DataStoreConnection createConnection(final ParameterList params)
     throws Exception {
-    return new OracleDataStoreConnection(workbenchContext,params);
+    return new JdbcDataStoreConnection(workbenchContext, params);
   }
 
   public String getName() {
-    return "Oracle";
+    return "JDBC";
   }
 
   public ParameterListSchema getParameterListSchema() {
@@ -52,11 +50,6 @@ public class OracleDataStoreDriver implements DataStoreDriver {
   }
 
   public boolean isAvailable() {
-    try {
-      Class.forName("oracle.jdbc.driver.OracleDriver");
-      return true;
-    } catch (ClassNotFoundException e) {
-      return false;
-    }
+    return true;
   }
 }

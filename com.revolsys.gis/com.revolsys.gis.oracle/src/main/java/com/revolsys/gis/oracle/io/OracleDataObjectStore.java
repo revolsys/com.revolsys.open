@@ -154,7 +154,7 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
     final double y2 = envelope.getMaxY();
 
     final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T");
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
     sql.append(" WHERE ");
     sql.append(" SDO_RELATE("
       + geometryColumnName

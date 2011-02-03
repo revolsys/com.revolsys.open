@@ -16,8 +16,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 public class JdbcQueryReader extends AbstractReader<DataObject> implements
   DataObjectReader {
 
-  public static QName getQName(
-    final String tableName) {
+  public static QName getQName(final String tableName) {
     final String[] parts = tableName.split("\\.");
     if (parts.length == 1) {
       return new QName(parts[0]);
@@ -28,7 +27,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
 
   private boolean autoCommit = false;
 
-  private final JdbcDataObjectStore dataStore;
+  private JdbcDataObjectStore dataStore;
 
   private int fetchSize = 10;
 
@@ -36,32 +35,27 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
 
   private JdbcMultipleQueryIterator iterator;
 
-  public JdbcQueryReader(
-    final JdbcDataObjectStore dataStore) {
+  public JdbcQueryReader() {
+  }
+
+  public JdbcQueryReader(final JdbcDataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
 
-  public void addQuery(
-    final JdbcQuery query) {
+  public void addQuery(final JdbcQuery query) {
     queries.add(query);
   }
 
-  public void addQuery(
-    final QName typeName,
-    final String query) {
+  public void addQuery(final QName typeName, final String query) {
     addQuery(new JdbcQuery(typeName, query));
   }
 
-  public void addQuery(
-    final QName typeName,
-    final String query,
+  public void addQuery(final QName typeName, final String query,
     final List<Object> parameters) {
     addQuery(new JdbcQuery(typeName, query, parameters));
   }
 
-  public void addQuery(
-    final QName typeName,
-    final String query,
+  public void addQuery(final QName typeName, final String query,
     final Object... parameters) {
     addQuery(typeName, query, Arrays.asList(parameters));
   }
@@ -73,7 +67,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     }
   }
 
-  public JdbcDataObjectStore getDataObjectStore() {
+  public JdbcDataObjectStore getDataStore() {
     return dataStore;
   }
 
@@ -81,15 +75,15 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     return fetchSize;
   }
 
+  public DataObjectMetaData getMetaData() {
+    return ((JdbcMultipleQueryIterator)iterator()).getMetaData();
+  }
+
   protected void initialize() {
   }
 
   public boolean isAutoCommit() {
     return autoCommit;
-  }
-
-  public void open() {
-    iterator.hasNext();
   }
 
   public Iterator<DataObject> iterator() {
@@ -101,25 +95,26 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     return iterator;
   }
 
-  public DataObjectMetaData getMetaData() {
-    return ((JdbcMultipleQueryIterator)iterator()).getMetaData();
+  public void open() {
+    iterator.hasNext();
   }
 
-  public void setAutoCommit(
-    final boolean autoCommit) {
+  public void setAutoCommit(final boolean autoCommit) {
     this.autoCommit = autoCommit;
   }
 
-  public void setFetchSize(
-    final int fetchSize) {
+  public void setDataStore(final JdbcDataObjectStore dataStore) {
+    this.dataStore = dataStore;
+  }
+
+  public void setFetchSize(final int fetchSize) {
     this.fetchSize = fetchSize;
   }
 
   /**
    * @param queries the queries to set
    */
-  public void setQueries(
-    final List<JdbcQuery> queries) {
+  public void setQueries(final List<JdbcQuery> queries) {
     for (final JdbcQuery query : queries) {
       addQuery(query);
     }
@@ -128,8 +123,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   /**
    * @param tableNames the tableNames to set
    */
-  public void setTableNames(
-    final List<QName> tableNames) {
+  public void setTableNames(final List<QName> tableNames) {
     for (final QName tableName : tableNames) {
       addQuery(tableName, "SELECT * FROM " + JdbcQuery.getTableName(tableName));
     }

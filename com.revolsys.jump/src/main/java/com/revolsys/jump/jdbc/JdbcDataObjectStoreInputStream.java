@@ -1,4 +1,4 @@
-package com.revolsys.jump.oracle.driver;
+package com.revolsys.jump.jdbc;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -16,7 +16,7 @@ import com.vividsolutions.jump.feature.FeatureSchema;
 import com.vividsolutions.jump.io.BaseFeatureInputStream;
 
 /**
- * Reads features from an Oracle database.
+ * Reads features from an JDBC database.
  */
 public class JdbcDataObjectStoreInputStream extends BaseFeatureInputStream {
   private FeatureSchema featureSchema;

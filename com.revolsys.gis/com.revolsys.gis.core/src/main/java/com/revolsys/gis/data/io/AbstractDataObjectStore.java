@@ -23,12 +23,11 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
 
-  private final DataObjectFactory dataObjectFactory;
+  private DataObjectFactory dataObjectFactory;
 
   private Map<String, DataObjectStoreSchema> schemaMap = new TreeMap<String, DataObjectStoreSchema>();
 
-  public AbstractDataObjectStore(
-    final DataObjectFactory dataObjectFactory) {
+  public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
@@ -36,8 +35,7 @@ public abstract class AbstractDataObjectStore extends
   public void close() {
   }
 
-  public DataObject create(
-    final QName typeName) {
+  public DataObject create(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     if (metaData == null) {
       return null;
@@ -46,20 +44,17 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public void delete(
-    final DataObject object) {
+  public void delete(final DataObject object) {
     throw new UnsupportedOperationException("Delete not supported");
   }
 
-  public void deleteAll(
-    final Collection<DataObject> objects) {
+  public void deleteAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       delete(object);
     }
   }
 
-  protected DataObjectMetaData findMetaData(
-    final QName typeName) {
+  protected DataObjectMetaData findMetaData(final QName typeName) {
     final String schemaName = typeName.getNamespaceURI();
     final DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
@@ -69,13 +64,11 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public CodeTable getCodeTable(
-    final QName typeName) {
+  public CodeTable getCodeTable(final QName typeName) {
     return null;
   }
 
-  public CodeTable getCodeTableByColumn(
-    final String columnName) {
+  public CodeTable getCodeTableByColumn(final String columnName) {
     return null;
   }
 
@@ -83,8 +76,7 @@ public abstract class AbstractDataObjectStore extends
     return this.dataObjectFactory;
   }
 
-  public DataObjectMetaData getMetaData(
-    final QName typeName) {
+  public DataObjectMetaData getMetaData(final QName typeName) {
     final String schemaName = typeName.getNamespaceURI();
     final DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
@@ -94,8 +86,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public DataObjectStoreSchema getSchema(
-    final String schemaName) {
+  public DataObjectStoreSchema getSchema(final String schemaName) {
     synchronized (schemaMap) {
       if (schemaMap.isEmpty()) {
         loadSchemas(schemaMap);
@@ -117,14 +108,12 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public List<QName> getTypeNames(
-    final String schemaName) {
+  public List<QName> getTypeNames(final String schemaName) {
     final DataObjectStoreSchema schema = getSchema(schemaName);
     return schema.getTypeNames();
   }
 
-  public List<DataObjectMetaData> getTypes(
-    final String namespace) {
+  public List<DataObjectMetaData> getTypes(final String namespace) {
     final List<DataObjectMetaData> types = new ArrayList<DataObjectMetaData>();
     for (final QName typeName : getTypeNames(namespace)) {
       types.add(getMetaData(typeName));
@@ -132,58 +121,52 @@ public abstract class AbstractDataObjectStore extends
     return types;
   }
 
-  public void insert(
-    final DataObject dataObject) {
+  public void insert(final DataObject dataObject) {
     throw new UnsupportedOperationException("Insert not supported");
   }
 
-  public void insertAll(
-    final Collection<DataObject> objects) {
+  public void insertAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
   }
 
-  public boolean isEditable(
-    final QName typeName) {
+  public boolean isEditable(final QName typeName) {
     return false;
   }
 
-  public DataObject load(
-    final QName typeName,
-    final Object id) {
+  public DataObject load(final QName typeName, final Object id) {
     throw new UnsupportedOperationException("Load not supported");
   }
 
   protected abstract void loadSchemaDataObjectMetaData(
-    DataObjectStoreSchema schema,
-    Map<QName, DataObjectMetaData> metaDataMap);
+    DataObjectStoreSchema schema, Map<QName, DataObjectMetaData> metaDataMap);
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
 
-  public Reader<DataObject> query(
-    final QName typeName,
+  public Reader<DataObject> query(final QName typeName,
     final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
-    GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-    Envelope envelope = boundingBox.convert(geometryFactory);
+    final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+    final Envelope envelope = boundingBox.convert(geometryFactory);
     return query(typeName, envelope);
   }
 
-  public void setSchemaMap(
-    final Map<String, DataObjectStoreSchema> schemaMap) {
+  public void setDataObjectFactory(final DataObjectFactory dataObjectFactory) {
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void setSchemaMap(final Map<String, DataObjectStoreSchema> schemaMap) {
     this.schemaMap = new DataObjectStoreSchemaMapProxy(this, schemaMap);
   }
 
-  public void update(
-    final DataObject object) {
+  public void update(final DataObject object) {
     throw new UnsupportedOperationException("Update not supported");
   }
 
-  public void updateAll(
-    final Collection<DataObject> objects) {
+  public void updateAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       update(object);
     }

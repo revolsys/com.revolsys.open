@@ -99,8 +99,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   private final PointDataObjectMap sourcePointMap = new PointDataObjectMap();
 
   @Override
-  protected void addOtherObject(
-    final DataObject object) {
+  protected void addOtherObject(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof Point) {
       boolean add = true;
@@ -122,8 +121,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   @Override
-  protected void addSourceObject(
-    final DataObject object) {
+  protected void addSourceObject(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof Point) {
       boolean add = true;
@@ -191,9 +189,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     return notEqualSourceStatistics;
   }
 
-  private void logError(
-    final DataObject object,
-    final String message,
+  private void logError(final DataObject object, final String message,
     final boolean source) {
     if (excludeFilter == null || !excludeFilter.accept(object)) {
       if (source) {
@@ -228,8 +224,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     }
   }
 
-  private void processExactLineMatch(
-    final DataObject sourceObject) {
+  private void processExactLineMatch(final DataObject sourceObject) {
     final LineString sourceLine = sourceObject.getGeometryValue();
     final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
       sourceLine, 3);
@@ -253,8 +248,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     }
   }
 
-  private void processExactPointMatch(
-    final DataObject sourceObject) {
+  private void processExactPointMatch(final DataObject sourceObject) {
     final Filter<DataObject> equalFilter = equalFilterFactory.create(sourceObject);
     final DataObject otherObject = otherPointMap.getFirstMatch(sourceObject,
       equalFilter);
@@ -281,8 +275,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   @Override
-  protected void processObjects(
-    final DataObjectMetaData metaData,
+  protected void processObjects(final DataObjectMetaData metaData,
     final Channel<DataObject> out) {
     if (otherIndex.size() + otherPointMap.size() == 0) {
       for (final DataObject object : sourceObjects) {
@@ -307,8 +300,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     otherPointMap.clear();
   }
 
-  private void processPartialMatch(
-    final DataObject sourceObject) {
+  private void processPartialMatch(final DataObject sourceObject) {
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
     if (sourceGeometry instanceof LineString) {
       final LineString sourceLine = (LineString)sourceGeometry;
@@ -368,13 +360,11 @@ public class CompareProcessor extends AbstractMergeProcess {
     }
   }
 
-  private void removeObject(
-    final DataObject object) {
+  private void removeObject(final DataObject object) {
     sourceObjects.remove(object);
   }
 
-  private void removeOtherObject(
-    final DataObject object) {
+  private void removeOtherObject(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof Point) {
       otherPointMap.remove(object);
@@ -388,21 +378,18 @@ public class CompareProcessor extends AbstractMergeProcess {
     this.equalFilterFactory = equalFilterFactory;
   }
 
-  public void setExcludeFilter(
-    final Filter<DataObject> excludeFilter) {
+  public void setExcludeFilter(final Filter<DataObject> excludeFilter) {
     this.excludeFilter = excludeFilter;
   }
 
-  public void setLabel(
-    final String label) {
+  public void setLabel(final String label) {
     this.label = label;
   }
 
   /**
    * @param logOut the logOut to set
    */
-  public void setLogOut(
-    final Channel<DataObject> logOut) {
+  public void setLogOut(final Channel<DataObject> logOut) {
     this.logOut = logOut;
     logOut.writeConnect();
   }
@@ -420,7 +407,9 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   @Override
   protected void tearDown() {
-    logOut.writeDisconnect();
+    if (logOut != null) {
+      logOut.writeDisconnect();
+    }
     sourceObjects = null;
     sourcePointMap.clear();
     otherPointMap = null;

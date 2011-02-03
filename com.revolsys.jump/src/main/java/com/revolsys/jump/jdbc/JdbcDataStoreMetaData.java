@@ -1,4 +1,4 @@
-package com.revolsys.jump.oracle.driver;
+package com.revolsys.jump.jdbc;
 
 import java.util.HashMap;
 import java.util.List;

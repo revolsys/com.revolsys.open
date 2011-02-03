@@ -1,16 +1,18 @@
-package com.revolsys.jump.oracle.driver;
+package com.revolsys.jump.jdbc;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import org.openjump.core.model.OpenJumpTaskProperties;
 
-import oracle.jdbc.pool.OracleDataSource;
-
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.jdbc.io.DataSourceFactory;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.gis.oracle.io.OracleDataObjectStore;
+import com.revolsys.gis.jdbc.io.JdbcFactory;
 import com.revolsys.jump.model.FeatureDataObjectFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jump.datastore.AdhocQuery;
@@ -25,46 +27,48 @@ import com.vividsolutions.jump.parameter.ParameterList;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.model.Task;
 
-public class OracleDataStoreConnection implements DataStoreConnection {
+public class JdbcDataStoreConnection implements DataStoreConnection {
 
   private JdbcDataStoreMetaData metaData;
 
   private JdbcDataObjectStore dataStore;
 
-  private OracleDataSource dataSource;
+  private DataSource dataSource;
 
   private String schema;
 
   private Task task;
 
-  public OracleDataStoreConnection(
-    WorkbenchContext workbenchContext,
-    final ParameterList params)
-    throws DataStoreException {
+  private DataSourceFactory dataSourceFactory;
+
+  public JdbcDataStoreConnection(WorkbenchContext workbenchContext,
+    final ParameterList params) throws DataStoreException {
     this.task = workbenchContext.getTask();
+    String url = (String)params.getParameter(JdbcDataStoreDriver.URL);
+    schema = params.getParameter(JdbcDataStoreDriver.SCHEMA)
+      .toString();
+
+    String username = (String)params.getParameter(JdbcDataStoreDriver.USER);
+    String password = (String)params.getParameter(JdbcDataStoreDriver.PASSWORD);
+    if (schema == null) {
+      schema = username;
+    }
+
+    Map<String, Object> config = new HashMap<String, Object>();
+    config.put("url", url);
+    config.put("username", username);
+    config.put("password", password);
+
     try {
-      String url = (String)params.getParameter(OracleDataStoreDriver.URL);
-      schema = params.getParameter(OracleDataStoreDriver.SCHEMA)
-        .toString()
-        .toUpperCase();
+      dataSourceFactory = JdbcFactory.getDataSourceFactory(url);
+      dataSource = dataSourceFactory.createDataSource(config);
+      dataStore = JdbcFactory.createDataObjectStore(dataSource);
+      dataStore.setDataObjectFactory(new FeatureDataObjectFactory());
 
-      String user = (String)params.getParameter(OracleDataStoreDriver.USER);
-      String password = (String)params.getParameter(OracleDataStoreDriver.PASSWORD);
-      if (schema == null) {
-        schema = user;
-      }
-
-      dataSource = new OracleDataSource();
-      dataSource.setURL(url);
-      dataSource.setUser(user);
-      dataSource.setPassword(password);
-      dataSource.setConnectionCachingEnabled(true);
-      dataStore = new OracleDataObjectStore(new FeatureDataObjectFactory(),
-        dataSource);
       dataStore.initialize();
       metaData = new JdbcDataStoreMetaData(dataStore, schema);
     } catch (SQLException e) {
-      throw new DataStoreException(e.getMessage(), e);
+      throw new DataStoreException(e);
     }
   }
 
@@ -72,20 +76,17 @@ public class OracleDataStoreConnection implements DataStoreConnection {
     return dataStore;
   }
 
-  public void close()
-    throws DataStoreException {
+  public void close() throws DataStoreException {
     try {
-      dataSource.close();
+      dataSourceFactory.closeDataSource(dataSource);
+    } finally {
       dataSource = null;
       dataStore = null;
       metaData = null;
-    } catch (SQLException e) {
-      throw new DataStoreException(e.getMessage(), e);
     }
   }
 
-  public FeatureInputStream execute(
-    final Query query) {
+  public FeatureInputStream execute(final Query query) {
     if (query instanceof FilterQuery) {
       return executeFilterQuery((FilterQuery)query);
     }
@@ -102,8 +103,7 @@ public class OracleDataStoreConnection implements DataStoreConnection {
    * @param query the query to execute
    * @return the results of the query
    */
-  public FeatureInputStream executeFilterQuery(
-    final FilterQuery query) {
+  public FeatureInputStream executeFilterQuery(final FilterQuery query) {
     String datasetName = query.getDatasetName();
     FeatureSchema featureSchema = metaData.getFeatureSchema(datasetName,
       query.getGeometryAttributeName());
@@ -117,8 +117,7 @@ public class OracleDataStoreConnection implements DataStoreConnection {
     return ifs;
   }
 
-  public FeatureInputStream executeAdhocQuery(
-    final AdhocQuery query) {
+  public FeatureInputStream executeAdhocQuery(final AdhocQuery query) {
     query.getQuery();
 
     return null;
@@ -128,8 +127,7 @@ public class OracleDataStoreConnection implements DataStoreConnection {
     return metaData;
   }
 
-  public boolean isClosed()
-    throws DataStoreException {
+  public boolean isClosed() throws DataStoreException {
     return dataSource == null;
   }
 }
