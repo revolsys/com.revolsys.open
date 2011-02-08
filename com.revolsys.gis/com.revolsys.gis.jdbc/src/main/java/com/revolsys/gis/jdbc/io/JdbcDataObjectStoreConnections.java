@@ -50,7 +50,7 @@ public class JdbcDataObjectStoreConnections {
     if (dataStore == null) {
       final Preferences preferences = getPreferences(connectionName);
       Map<String, Object> config = CollectionUtil.toMap(preferences);
-      String productName = (String)config.get("productName");
+      String productName = (String)config.remove("productName");
       if (productName == null) {
         return null;
       } else {

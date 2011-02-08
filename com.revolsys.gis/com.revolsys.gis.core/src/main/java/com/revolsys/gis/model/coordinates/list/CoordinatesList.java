@@ -7,74 +7,55 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 
 public interface CoordinatesList extends CoordinateSequence,
   Iterable<Coordinates> {
-  void copy(
-    int sourceIndex,
-    CoordinatesList target,
-    int targetIndex,
-    int numAxis,
-    int count);
+  void copy(int sourceIndex, CoordinatesList target, int targetIndex,
+    int numAxis, int count);
 
   double[] getCoordinates();
 
   byte getNumAxis();
 
-  double getValue(
-    int index,
-    int axisIndex);
+  double getValue(int index, int axisIndex);
 
-  void makePrecise(
-    CoordinatesPrecisionModel precisionModel);
+  void makePrecise(CoordinatesPrecisionModel precisionModel);
+
+  boolean equals(CoordinatesList coordinatesList);
 
   CoordinatesList reverse();
 
-  void setCoordinate(
-    int i,
-    Coordinate coordinate);
+  void setCoordinate(int i, Coordinate coordinate);
 
-  void setPoint(
-    int i,
-    Coordinates point);
+  boolean startsWith(CoordinatesList coordinatesList, int numAxis);
 
-  void setValue(
-    int index,
-    int axisIndex,
-    double value);
+  void setPoint(int i, Coordinates point);
 
-  CoordinatesList subList(
-    int index,
+  void setValue(int index, int axisIndex, double value);
+
+  CoordinatesList subList(int index, int count);
+
+  CoordinatesList subList(int length, int index, int count);
+
+  CoordinatesList subList(int length, int sourceIndex, int targetIndex,
     int count);
 
-  CoordinatesList subList(
-    int length,
-    int index,
-    int count);
+  boolean equal(int index, CoordinatesList other, int otherIndex);
 
-  CoordinatesList subList(
-    int length,
-    int sourceIndex,
-    int targetIndex,
-    int count);
+  boolean equal(int index, CoordinatesList other, int otherIndex, int numAxis);
 
-  double getX(
-    int index);
+  double distance(int index, CoordinatesList other, int otherIndex);
 
-  double getY(
-    int index);
+  double getX(int index);
 
-  double getZ(
-    int index);
+  double getY(int index);
 
-  void setX(
-    int index,
-    double x);
+  double getZ(int index);
 
-  void setY(
-    int index,
-    double y);
+  void setX(int index, double x);
 
-  void setZ(
-    int index,
-    double z);
+  void setY(int index, double y);
+
+  void setZ(int index, double z);
 
   Coordinates get(int i);
+
+  int size();
 }

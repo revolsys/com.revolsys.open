@@ -13,10 +13,11 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T> {
   /** The map of filters to channels. */
   private Map<Filter<T>, Channel<T>> filters = new LinkedHashMap<Filter<T>, Channel<T>>();
 
-  protected void process(
-    Channel<T> in,
-    Channel<T> out,
-    T object) {
+  @Override
+  protected void preRun(Channel<T> in, Channel<T> out) {
+  }
+
+  protected void process(Channel<T> in, Channel<T> out, T object) {
     for (Entry<Filter<T>, Channel<T>> entry : filters.entrySet()) {
       Filter<T> filter = entry.getKey();
       Channel<T> filterOut = entry.getValue();
@@ -39,9 +40,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T> {
     }
   }
 
-  protected boolean processFilter(
-    final T object,
-    final Filter<T> filter,
+  protected boolean processFilter(final T object, final Filter<T> filter,
     final Channel<T> filterOut) {
     if (filter.accept(object)) {
       if (filterOut != null) {
@@ -63,9 +62,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T> {
    * @param filter The filter.
    * @param channel The channel.
    */
-  private void addFiler(
-    final Filter<T> filter,
-    final Channel<T> channel) {
+  private void addFiler(final Filter<T> filter, final Channel<T> channel) {
     filters.put(filter, channel);
     if (channel != null) {
       channel.writeConnect();
@@ -82,8 +79,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T> {
   /**
    * @param filters the filters to set
    */
-  public void setFilters(
-    Map<Filter<T>, Channel<T>> filters) {
+  public void setFilters(Map<Filter<T>, Channel<T>> filters) {
     for (Entry<Filter<T>, Channel<T>> filterEntry : filters.entrySet()) {
       Filter<T> filter = filterEntry.getKey();
       Channel<T> channel = filterEntry.getValue();

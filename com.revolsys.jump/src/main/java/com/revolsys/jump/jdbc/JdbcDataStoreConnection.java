@@ -79,6 +79,7 @@ public class JdbcDataStoreConnection implements DataStoreConnection {
   public void close() throws DataStoreException {
     try {
       dataSourceFactory.closeDataSource(dataSource);
+      dataStore.close();
     } finally {
       dataSource = null;
       dataStore = null;

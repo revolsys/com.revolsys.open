@@ -19,7 +19,7 @@ public class NumberEquals implements Equals<Object> {
         return Double.compare(((Number)object1).doubleValue(),
           Double.parseDouble(object2.toString())) == 0;
       }
-    } else if (object2 instanceof Boolean) {
+    } else if (object2 instanceof Number) {
       return Double.compare(((Number)object2).doubleValue(),
         Double.parseDouble(object1.toString())) == 0;
     } else {

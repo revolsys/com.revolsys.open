@@ -6,7 +6,7 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 
-public class GeometryEquals implements Equals<Geometry> {
+public class Geometry3DExactEquals implements Equals<Geometry> {
   private EqualsRegistry equalsRegistry;
 
   public boolean equals(

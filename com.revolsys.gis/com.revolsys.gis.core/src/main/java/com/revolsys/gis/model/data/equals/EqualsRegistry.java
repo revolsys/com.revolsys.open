@@ -31,7 +31,7 @@ public class EqualsRegistry implements Equals<Object> {
     register(Byte.class, new NumberEquals());
     register(Integer.class, new NumberEquals());
     register(Short.class, new NumberEquals());
-    register(Geometry.class, new GeometryEquals());
+    register(Geometry.class, new Geometry3DExactEquals());
     register(Map.class, new MapEquals());
     register(List.class, new ListEquals());
     register(DataObject.class, new DataObjectEquals());

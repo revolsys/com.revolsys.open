@@ -21,7 +21,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
@@ -90,6 +89,15 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     }
   }
 
+  public boolean addLine(final T object, final MultiLineString line) {
+    if (add(line)) {
+      addObject(object);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private void addObject(final T object) {
     final int index = startNodes.size() - 1;
     for (int i = objects.size(); i < index; i++) {
@@ -101,7 +109,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   public List<T> getObjects() {
     return new ArrayList<T>(objects);
   }
-  
+
   public T getObject(int index) {
     if (index < objects.size()) {
       return objects.get(index);
@@ -167,6 +175,12 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public boolean cleanOverlappingMatches() {
+    MultiLineString lines = getOverlappingMatches();
+    return lines.isEmpty();
+  }
+
+  public MultiLineString getOverlappingMatches() {
+    List<LineString> overlappingLines = new ArrayList<LineString>();
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(0)) {
@@ -197,7 +211,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
                 }
               }
               if (lineSegmentMatch.getMatchCount(0) > 2) {
-                return false;
+                overlappingLines.add(lineSegmentMatch.getLine());
               }
             }
             processedEdges.add(edge);
@@ -207,7 +221,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         currentNode = nextNode;
       }
     }
-    return true;
+    MultiLineString lines = geometryFactory.createMultiLineString(overlappingLines);
+    return lines;
   }
 
   private void createLine(final List<LineString> lines,
@@ -666,8 +681,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public boolean isFullyMatched(final int index) {
-    final Geometry difference = getNonMatchedLines(index);
-    if (difference == null || difference.isEmpty()) {
+    final MultiLineString difference = getNonMatchedLines(index);
+    if (difference.isEmpty()) {
       return true;
     } else {
       return false;
@@ -723,4 +738,5 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     remove(edge);
     return Arrays.asList(edge1, edge2);
   }
+
 }

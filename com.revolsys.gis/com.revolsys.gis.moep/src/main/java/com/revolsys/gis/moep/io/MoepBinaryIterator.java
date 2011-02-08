@@ -76,10 +76,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private String mapsheet;
 
-  public MoepBinaryIterator(
-    final MoepDirectoryReader directoryReader,
-    final String fileName,
-    final InputStream in,
+  public MoepBinaryIterator(final MoepDirectoryReader directoryReader,
+    final String fileName, final InputStream in,
     final DataObjectFactory dataObjectFactory) {
     this.directoryReader = directoryReader;
     this.dataObjectFactory = dataObjectFactory;
@@ -122,8 +120,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     FileUtil.closeSilent(in);
   }
 
-  private String getMapsheetFromFileName(
-    final String fileName) {
+  private String getMapsheetFromFileName(final String fileName) {
     final File file = new File(fileName);
     final String baseName = FileUtil.getFileNamePrefix(file);
     final Pattern pattern = Pattern.compile("\\d{2,3}[a-z]\\d{3}");
@@ -145,8 +142,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
-  protected DataObject loadDataObject()
-    throws IOException {
+  protected DataObject loadDataObject() throws IOException {
     final int featureKey = read();
     if (featureKey != 255) {
 
@@ -215,7 +211,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
             JtsGeometryUtil.setGeometryProperty(textPoint,
               MoepConstants.FONT_NAME, fontName);
             if (attribute.length() > 3) {
-              final String other = new String(attribute.substring(3, Math.min(attribute.length(), 5)).trim());
+              final String other = new String(attribute.substring(3,
+                Math.min(attribute.length(), 5)).trim());
               JtsGeometryUtil.setGeometryProperty(textPoint,
                 MoepConstants.OTHER, other);
             }
@@ -251,6 +248,9 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
         case 'Y':
           setRetirementHistory(object, MoepConstants.DELETION_WITH_REPLACEMENT);
         break;
+        default:
+          setAdmissionHistory(object, MoepConstants.ADDITION_MODIFIED);
+        break;
       }
       currentDataObject = object;
       loadNextObject = false;
@@ -262,8 +262,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
-  private double getAngle(
-    double angle) {
+  private double getAngle(double angle) {
     double orientation = (90 - angle) % 360;
     if (orientation < 0) {
       orientation = 360 + orientation;
@@ -271,8 +270,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     return orientation;
   }
 
-  private void loadHeader()
-    throws IOException {
+  private void loadHeader() throws IOException {
     fileType = (byte)read();
     if ((fileType / 100) == 0) {
       coordinateBytes = 2;
@@ -288,13 +286,14 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final double longitude = bcgsGrid.getLongitude(mapsheet) - 0.1;
     final int crsId = utmGrid.getNad83Srid(longitude, latitude);
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
-  
+
     final String submissionDateString = readString(6);
 
     final int centreX = readLEInt(in);
     final int centreY = readLEInt(in);
     center = new DoubleCoordinates(centreX, centreY);
-    CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(1);
+    CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+      1);
     factory = new GeometryFactory(coordinateSystem, precisionModel);
     setProperty(IoConstants.GEOMETRY_FACTORY, factory);
   }
@@ -322,15 +321,12 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
-  private int read()
-    throws IOException {
+  private int read() throws IOException {
     position++;
     return in.read();
   }
 
-  private LineString readContourLine(
-    final int numCoords)
-    throws IOException {
+  private LineString readContourLine(final int numCoords) throws IOException {
     final CoordinatesList coords = new DoubleCoordinatesList(numCoords, 2);
     for (int i = 0; i < numCoords; i++) {
       readCoordinate(in, coords, i);
@@ -338,11 +334,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     return factory.createLineString(coords);
   }
 
-  private void readCoordinate(
-    final InputStream in,
-    final CoordinatesList coords,
-    final int index)
-    throws IOException {
+  private void readCoordinate(final InputStream in,
+    final CoordinatesList coords, final int index) throws IOException {
     for (int i = 0; i < 2; i++) {
       int coordinate;
       if (coordinateBytes == 2) {
@@ -358,9 +351,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
-  private int readLEInt(
-    final InputStream in)
-    throws IOException {
+  private int readLEInt(final InputStream in) throws IOException {
     final int ch1 = in.read();
     final int ch2 = in.read();
     final int ch3 = in.read();
@@ -373,9 +364,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   }
 
-  private short readLEShort(
-    final InputStream in)
-    throws IOException {
+  private short readLEShort(final InputStream in) throws IOException {
     final int ch1 = in.read();
     final int ch2 = in.read();
     position += 2;
@@ -386,9 +375,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   }
 
-  private void readLineString(
-    final int extraParams,
-    final DataObject object)
+  private void readLineString(final int extraParams, final DataObject object)
     throws IOException {
     int numCoords = 0;
     if (extraParams == 2 || extraParams == 4) {
@@ -409,17 +396,13 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
-  private Point readPoint(
-    final InputStream in)
-    throws IOException {
+  private Point readPoint(final InputStream in) throws IOException {
     final CoordinatesList coords = new DoubleCoordinatesList(1, 3);
     readCoordinate(in, coords, 0);
     return factory.createPoint(coords);
   }
 
-  private LineString readSimpleLine(
-    final int numCoords)
-    throws IOException {
+  private LineString readSimpleLine(final int numCoords) throws IOException {
     final CoordinatesList coords = new DoubleCoordinatesList(numCoords, 3);
     for (int i = 0; i < numCoords; i++) {
       readCoordinate(in, coords, i);
@@ -427,9 +410,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     return factory.createLineString(coords);
   }
 
-  private String readString(
-    final int length)
-    throws IOException {
+  private String readString(final int length) throws IOException {
     final int read = in.read(buffer, 0, length);
     if (read > -1) {
       position += read;
@@ -442,8 +423,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   public void remove() {
   }
 
-  private void setAdmissionHistory(
-    final DataObject object,
+  private void setAdmissionHistory(final DataObject object,
     final String reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.ADMIT_SOURCE_DATE,
@@ -458,8 +438,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     object.setValue(MoepConstants.ADMIT_REASON_FOR_CHANGE, reasonForChange);
   }
 
-  private void setRetirementHistory(
-    final DataObject object,
+  private void setRetirementHistory(final DataObject object,
     final String reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.RETIRE_SOURCE_DATE,
