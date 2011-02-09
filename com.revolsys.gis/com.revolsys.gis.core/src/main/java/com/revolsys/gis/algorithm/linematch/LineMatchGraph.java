@@ -110,6 +110,16 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return new ArrayList<T>(objects);
   }
 
+  public List<T> getMatchedObjects() {
+    ArrayList<T> matchedObjects = new ArrayList<T>();
+    for (T object : objects) {
+      if (object != null) {
+        matchedObjects.add(object);
+      }
+    }
+    return matchedObjects;
+  }
+
   public T getObject(int index) {
     if (index < objects.size()) {
       return objects.get(index);
