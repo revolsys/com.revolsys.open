@@ -18,11 +18,72 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
 
   private boolean waitForExecutionToFinish = false;
 
-  private Set<UUID> executions = new LinkedHashSet<UUID>();
+  private final Set<UUID> executions = new LinkedHashSet<UUID>();
 
   private long waitTime = 1000;
 
+  public AbstractResetableProcess() {
+  }
+
+  public AbstractResetableProcess(final long waitTime) {
+    this.waitTime = waitTime;
+  }
+
+  protected abstract boolean execute();
+
+  protected void finishExecution(final UUID id) {
+    synchronized (executions) {
+      executions.remove(id);
+      executions.notifyAll();
+    }
+  }
+
+  @ManagedAttribute
+  public int getExecutionCount() {
+    return executions.size();
+  }
+
+  @ManagedAttribute
+  public String getStatus() {
+    return status;
+  }
+
+  public long getWaitTime() {
+    return waitTime;
+  }
+
+  /**
+   * The hard reset causes the scheduler loop to restart ignoring all current
+   * executing requests. Upon reset the counts of executing requests and the
+   * status of all jobs will be updated to ensure consistency.
+   */
+  @ManagedOperation
+  public void hardReset() {
+    waitForExecutionToFinish = false;
+    pause = false;
+    reset = true;
+  }
+
+  /**
+   * The pause causes the scheduler to sleep until a soft or hard reset is
+   * initiated.
+   */
+  @ManagedOperation
+  public void pause() {
+    pause = true;
+  }
+
+  protected void postRun() {
+  }
+
+  protected void preRun() {
+  }
+
+  protected void reset() {
+  }
+
   public void run() {
+    preRun();
     running = true;
     try {
       while (running) {
@@ -41,7 +102,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
             synchronized (this) {
               try {
                 wait(waitTime);
-              } catch (InterruptedException e) {
+              } catch (final InterruptedException e) {
               }
             }
           }
@@ -54,75 +115,21 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
         }
       }
     } finally {
-      running = false;
-      status = "terminated";
-    }
-  }
-
-  protected void waitOnExecutions() {
-    synchronized (executions) {
-      status = "waiting on executions";
       try {
-        executions.wait(waitTime);
-      } catch (InterruptedException e) {
+        postRun();
+      } finally {
+        running = false;
+        status = "terminated";
       }
     }
-  }
-
-  protected abstract boolean execute();
-
-  protected void reset() {
-  }
-
-  @ManagedAttribute
-  public int getExecutionCount() {
-    return executions.size();
-  }
-
-  protected UUID startExecution() {
-    synchronized (executions) {
-      UUID id = UUID.randomUUID();
-      executions.add(id);
-      executions.notifyAll();
-      return id;
-    }
-  }
-
-  protected void finishExecution(final UUID id) {
-    synchronized (executions) {
-      executions.remove(id);
-      executions.notifyAll();
-    }
-  }
-
-  @ManagedAttribute
-  public String getStatus() {
-    return status;
   }
 
   protected void setStatus(final String status) {
     this.status = status;
   }
 
-  /**
-   * The pause causes the scheduler to sleep until a soft or hard reset is
-   * initiated.
-   */
-  @ManagedOperation
-  public void pause() {
-    pause = true;
-  }
-
-  /**
-   * The hard reset causes the scheduler loop to restart ignoring all current
-   * executing requests. Upon reset the counts of executing requests and the
-   * status of all jobs will be updated to ensure consistency.
-   */
-  @ManagedOperation
-  public void hardReset() {
-    waitForExecutionToFinish = false;
-    pause = false;
-    reset = true;
+  public void setWaitTime(final long waitTime) {
+    this.waitTime = waitTime;
   }
 
   /**
@@ -137,13 +144,23 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
     reset = true;
   }
 
-  public long getWaitTime() {
-    return waitTime;
+  protected UUID startExecution() {
+    synchronized (executions) {
+      final UUID id = UUID.randomUUID();
+      executions.add(id);
+      executions.notifyAll();
+      return id;
+    }
   }
 
-  public void setWaitTime(
-    long waitTime) {
-    this.waitTime = waitTime;
+  protected void waitOnExecutions() {
+    synchronized (executions) {
+      status = "waiting on executions";
+      try {
+        executions.wait(waitTime);
+      } catch (final InterruptedException e) {
+      }
+    }
   }
-  
+
 }

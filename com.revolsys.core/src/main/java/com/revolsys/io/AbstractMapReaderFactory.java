@@ -15,17 +15,6 @@ public abstract class AbstractMapReaderFactory extends AbstractIoFactory
   }
 
   public static MapReader mapReader(
-    final FileSystemResource resource) {
-    final MapReaderFactory readerFactory = getMapReaderFactory(resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final MapReader reader = readerFactory.createMapReader(resource);
-      return reader;
-    }
-  }
-
-  public static MapReader mapReader(
     final Resource resource) {
     final MapReaderFactory readerFactory = getMapReaderFactory(resource);
     if (readerFactory == null) {
