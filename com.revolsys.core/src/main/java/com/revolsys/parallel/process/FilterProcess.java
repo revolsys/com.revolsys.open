@@ -2,7 +2,7 @@ package com.revolsys.parallel.process;
 
 import com.revolsys.filter.Filter;
 
-public class FilterProcess<T> extends BaseInOutProcess<T> {
+public class FilterProcess<T> extends BaseInOutProcess<T,T> {
   private Filter<T> filter;
 
   private boolean invert = false;

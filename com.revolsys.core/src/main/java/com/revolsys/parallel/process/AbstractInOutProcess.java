@@ -6,23 +6,21 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
 
-public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
-  InOutProcess<T> {
+public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
+  implements InOutProcess<I, O> {
 
-  private Channel<T> in;
+  private Channel<I> in;
 
   private int inBufferSize = 0;
 
-  private Channel<T> out;
+  private Channel<O> out;
 
   private int outBufferSize = 0;
 
   public AbstractInOutProcess() {
   }
 
-  public AbstractInOutProcess(
-    final Channel<T> in,
-    final Channel<T> out) {
+  public AbstractInOutProcess(final Channel<I> in, final Channel<O> out) {
     this.in = in;
     this.out = out;
   }
@@ -33,16 +31,16 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
   /**
    * @return the in
    */
-  public Channel<T> getIn() {
+  public Channel<I> getIn() {
     if (in == null) {
       final String channelName = getBeanName() + ".in";
       if (inBufferSize < 1) {
-        final Channel<T> channel = new Channel<T>(channelName);
+        final Channel<I> channel = new Channel<I>(channelName);
         setIn(channel);
       } else {
 
-        final Buffer<T> buffer = new Buffer<T>(inBufferSize);
-        final Channel<T> channel = new Channel<T>(channelName, buffer);
+        final Buffer<I> buffer = new Buffer<I>(inBufferSize);
+        final Channel<I> channel = new Channel<I>(channelName, buffer);
         setIn(channel);
       }
     }
@@ -52,13 +50,13 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
   /**
    * @return the out
    */
-  public Channel<T> getOut() {
+  public Channel<O> getOut() {
     if (out == null) {
       final String channelName = getBeanName() + ".out";
       if (outBufferSize < 1) {
-        setOut(new Channel<T>(channelName));
+        setOut(new Channel<O>(channelName));
       } else {
-        setOut(new Channel<T>(channelName, new Buffer<T>(outBufferSize)));
+        setOut(new Channel<O>(channelName, new Buffer<O>(outBufferSize)));
       }
     }
     return out;
@@ -91,15 +89,12 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
     }
   }
 
-  protected abstract void run(
-    Channel<T> in,
-    Channel<T> out);
+  protected abstract void run(Channel<I> in, Channel<O> out);
 
   /**
    * @param in the in to set
    */
-  public void setIn(
-    final Channel<T> in) {
+  public void setIn(final Channel<I> in) {
     this.in = in;
     in.readConnect();
   }
@@ -107,8 +102,7 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
   /**
    * @param out the out to set
    */
-  public void setOut(
-    final Channel<T> out) {
+  public void setOut(final Channel<O> out) {
     this.out = out;
     out.writeConnect();
   }
@@ -117,8 +111,7 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
     return inBufferSize;
   }
 
-  public void setInBufferSize(
-    int inBufferSize) {
+  public void setInBufferSize(int inBufferSize) {
     this.inBufferSize = inBufferSize;
   }
 
@@ -126,8 +119,7 @@ public abstract class AbstractInOutProcess<T> extends AbstractProcess implements
     return outBufferSize;
   }
 
-  public void setOutBufferSize(
-    int outBufferSize) {
+  public void setOutBufferSize(int outBufferSize) {
     this.outBufferSize = outBufferSize;
   }
 

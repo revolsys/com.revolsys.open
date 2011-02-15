@@ -12,7 +12,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ValidateGeometryRange extends BaseInOutProcess<DataObject> {
+public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObject> {
   private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;

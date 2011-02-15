@@ -2,18 +2,16 @@ package com.revolsys.parallel.process;
 
 import com.revolsys.parallel.channel.Channel;
 
-public class BaseInOutProcess<T> extends AbstractInOutProcess<T> {
+public class BaseInOutProcess<I, O> extends AbstractInOutProcess<I, O> {
   private boolean running = false;
 
   @Override
-  protected final void run(
-    final Channel<T> in,
-    final Channel<T> out) {
+  protected final void run(final Channel<I> in, final Channel<O> out) {
     running = true;
     try {
       preRun(in, out);
       while (running) {
-        T object = in.read();
+        I object = in.read();
         if (object != null) {
           process(in, out, object);
         }
@@ -27,20 +25,14 @@ public class BaseInOutProcess<T> extends AbstractInOutProcess<T> {
     }
   }
 
-  protected void process(
-    final Channel<T> in,
-    final Channel<T> out,
-    final T object) {
+  protected void process(final Channel<I> in, final Channel<O> out,
+    final I object) {
   }
 
-  protected void preRun(
-    final Channel<T> in,
-    final Channel<T> out) {
+  protected void preRun(final Channel<I> in, final Channel<O> out) {
   }
 
-  protected void postRun(
-    final Channel<T> in,
-    final Channel<T> out) {
+  protected void postRun(final Channel<I> in, final Channel<O> out) {
   }
 
 }

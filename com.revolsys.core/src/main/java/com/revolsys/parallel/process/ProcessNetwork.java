@@ -11,11 +11,14 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 
-public class ProcessNetwork implements BeanPostProcessor {
+public class ProcessNetwork implements BeanPostProcessor,
+  ApplicationListener<ContextRefreshedEvent> {
 
   private int count = 0;
 
@@ -25,12 +28,13 @@ public class ProcessNetwork implements BeanPostProcessor {
 
   private final ThreadGroup threadGroup = new ThreadGroup("Processes");
 
+  private boolean autoStart;
+
   public ProcessNetwork() {
     ThreadSharedAttributes.initialiseThreadGroup(threadGroup);
   }
 
-  public void addProcess(
-    final Process process) {
+  public void addProcess(final Process process) {
     synchronized (processes) {
       if (!processes.containsKey(process)) {
         final Runnable runnable = new ProcessRunnable(this, process);
@@ -54,10 +58,8 @@ public class ProcessNetwork implements BeanPostProcessor {
     return processes.keySet();
   }
 
-  public Object postProcessAfterInitialization(
-    final Object bean,
-    final String beanName)
-    throws BeansException {
+  public Object postProcessAfterInitialization(final Object bean,
+    final String beanName) throws BeansException {
     if (bean instanceof Process) {
       final Process process = (Process)bean;
       addProcess(process);
@@ -65,15 +67,12 @@ public class ProcessNetwork implements BeanPostProcessor {
     return bean;
   }
 
-  public Object postProcessBeforeInitialization(
-    final Object bean,
-    final String beanName)
-    throws BeansException {
+  public Object postProcessBeforeInitialization(final Object bean,
+    final String beanName) throws BeansException {
     return bean;
   }
 
-  void removeProcess(
-    final Process process) {
+  void removeProcess(final Process process) {
     synchronized (processes) {
       if (process instanceof AbstractProcess) {
         AbstractProcess proc = (AbstractProcess)process;
@@ -88,8 +87,7 @@ public class ProcessNetwork implements BeanPostProcessor {
     }
   }
 
-  public void setProcesses(
-    final Collection<Process> processes) {
+  public void setProcesses(final Collection<Process> processes) {
     for (final Process process : processes) {
       addProcess(process);
     }
@@ -117,8 +115,7 @@ public class ProcessNetwork implements BeanPostProcessor {
     }
   }
 
-  private void startProcess(
-    final Thread thread) {
+  private void startProcess(final Thread thread) {
     if (!thread.isAlive()) {
       thread.start();
       count++;
@@ -154,5 +151,19 @@ public class ProcessNetwork implements BeanPostProcessor {
       }
       finishRunning();
     }
+  }
+
+  public void onApplicationEvent(ContextRefreshedEvent event) {
+    if (autoStart) {
+      start();
+    }
+  }
+
+  public boolean isAutoStart() {
+    return autoStart;
+  }
+
+  public void setAutoStart(boolean autoStart) {
+    this.autoStart = autoStart;
   }
 }

@@ -2,7 +2,7 @@ package com.revolsys.parallel.process;
 
 import com.revolsys.parallel.channel.Channel;
 
-public final class Delta<T> extends BaseInOutProcess<T> {
+public final class Delta<T> extends BaseInOutProcess<T,T> {
 
   /** The second output Channel<T> */
   private Channel<T> out2;

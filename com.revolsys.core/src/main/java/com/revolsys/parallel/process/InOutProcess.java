@@ -1,6 +1,4 @@
 package com.revolsys.parallel.process;
 
-
-public interface InOutProcess<T> extends InProcess<T>,
-  OutProcess<T> {
+public interface InOutProcess<I, O> extends InProcess<I>, OutProcess<O> {
 }

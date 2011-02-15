@@ -5,7 +5,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class StatisticsProcess extends BaseInOutProcess<DataObject> {
+public class StatisticsProcess extends BaseInOutProcess<DataObject,DataObject> {
 
   private Statistics statistics;
 

@@ -9,7 +9,7 @@ import com.revolsys.gis.model.data.validator.DataObjectValidator;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class DataObjectValidationProcess extends BaseInOutProcess<DataObject> {
+public class DataObjectValidationProcess extends BaseInOutProcess<DataObject,DataObject> {
   private final DataObjectValidator validator = new DataObjectValidator();
 
   @Override

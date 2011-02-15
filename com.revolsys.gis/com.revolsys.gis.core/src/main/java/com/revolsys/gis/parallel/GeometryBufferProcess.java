@@ -6,7 +6,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryBufferProcess extends BaseInOutProcess<DataObject> {
+public class GeometryBufferProcess extends BaseInOutProcess<DataObject,DataObject> {
 
   private int buffer;
 

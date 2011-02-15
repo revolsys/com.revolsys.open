@@ -17,7 +17,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class DataObjectConverterProcess extends BaseInOutProcess<DataObject> {
+public class DataObjectConverterProcess extends BaseInOutProcess<DataObject,DataObject> {
   private static final Logger LOG = LoggerFactory.getLogger(DataObjectConverterProcess.class);
 
   private Converter<DataObject, DataObject> defaultConverter;

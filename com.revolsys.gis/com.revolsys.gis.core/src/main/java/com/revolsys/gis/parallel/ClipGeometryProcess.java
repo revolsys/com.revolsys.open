@@ -9,7 +9,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ClipGeometryProcess extends BaseInOutProcess<DataObject> {
+public class ClipGeometryProcess extends BaseInOutProcess<DataObject,DataObject> {
 
   private Polygon clipPolygon;
 

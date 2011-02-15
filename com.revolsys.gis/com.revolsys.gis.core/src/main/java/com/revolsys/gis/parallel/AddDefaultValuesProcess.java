@@ -37,7 +37,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
-public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject> {
+public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,DataObject> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
   private Set<String> excludedAttributeNames = new HashSet<String>();

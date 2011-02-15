@@ -27,6 +27,8 @@ public class Buffer<T> extends ChannelDataStore<T> {
   /** The max size of the Buffer */
   private int maxSize;
 
+  private boolean discardIfFull;
+
   /**
    * Construct a new Buffer with no maximum size.
    */
@@ -70,7 +72,9 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * @param value The object to put in the Buffer
    */
   protected synchronized void put(T value) {
-    buffer.addLast(value);
+    if (maxSize > 0 && buffer.size() < maxSize) {
+      buffer.addLast(value);
+    }
   }
 
   /**
@@ -82,7 +86,7 @@ public class Buffer<T> extends ChannelDataStore<T> {
   protected synchronized int getState() {
     if (buffer.isEmpty()) {
       return EMPTY;
-    } else if (maxSize > 0 && buffer.size() == maxSize) {
+    } else if (!discardIfFull && maxSize > 0 && buffer.size() == maxSize) {
       return FULL;
     } else {
       return NONEMPTYFULL;

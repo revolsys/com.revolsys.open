@@ -3,7 +3,7 @@ package com.revolsys.parallel.process;
 import org.springframework.beans.factory.BeanNameAware;
 
 public abstract class AbstractProcess implements Process, BeanNameAware {
-  private String beanName;
+  private String beanName = getClass().getName();
 
   private ProcessNetwork processNetwork;
 
@@ -18,16 +18,14 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
     return processNetwork;
   }
 
-  public void setBeanName(
-    final String beanName) {
+  public void setBeanName(final String beanName) {
     this.beanName = beanName;
   }
 
   /**
    * @param processNetwork the processNetwork to set
    */
-  public void setProcessNetwork(
-    final ProcessNetwork processNetwork) {
+  public void setProcessNetwork(final ProcessNetwork processNetwork) {
     this.processNetwork = processNetwork;
     if (processNetwork != null) {
       processNetwork.addProcess(this);

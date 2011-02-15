@@ -9,7 +9,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
-public class MultipleFilterProcess<T> extends BaseInOutProcess<T> {
+public class MultipleFilterProcess<T> extends BaseInOutProcess<T,T> {
   /** The map of filters to channels. */
   private Map<Filter<T>, Channel<T>> filters = new LinkedHashMap<Filter<T>, Channel<T>>();
 

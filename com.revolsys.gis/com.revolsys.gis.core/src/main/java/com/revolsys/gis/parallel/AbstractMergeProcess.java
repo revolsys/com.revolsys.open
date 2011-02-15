@@ -12,7 +12,7 @@ import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public abstract class AbstractMergeProcess extends
-  AbstractInOutProcess<DataObject> {
+  AbstractInOutProcess<DataObject,DataObject> {
 
   private static final int OTHER_INDEX = 1;
 

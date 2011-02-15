@@ -6,7 +6,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class ConverterProcess extends BaseInOutProcess<DataObject> {
+public class ConverterProcess extends BaseInOutProcess<DataObject,DataObject> {
 
   private Converter<DataObject, DataObject> converter;
 

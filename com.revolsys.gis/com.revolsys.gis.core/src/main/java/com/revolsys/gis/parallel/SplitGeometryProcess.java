@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class SplitGeometryProcess extends BaseInOutProcess<DataObject> {
+public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject> {
   /** The statistics to record the number new observations created. */
   private Statistics createdStatistics;
 
