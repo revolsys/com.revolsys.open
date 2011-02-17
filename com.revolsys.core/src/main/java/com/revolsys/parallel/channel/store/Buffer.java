@@ -1,6 +1,7 @@
 package com.revolsys.parallel.channel.store;
 
 import java.util.LinkedList;
+import java.util.Queue;
 
 import com.revolsys.parallel.channel.ChannelDataStore;
 
@@ -10,8 +11,7 @@ import com.revolsys.parallel.channel.ChannelDataStore;
  * The Buffer class is an implementation of ChannelDataStore which allows more
  * than one Object to be sent across the Channel at any one time. The Buffer
  * will store the Objects and allow them to be read in the same order as they
- * were written. A Buffer of size 0 acts the same as the ZeroBuffer
- * ChannelDataStore.
+ * were written. 
  * </p>
  * <p>
  * The getState method will return EMPTY if the Channel does not contain any
@@ -22,7 +22,7 @@ import com.revolsys.parallel.channel.ChannelDataStore;
  */
 public class Buffer<T> extends ChannelDataStore<T> {
   /** The storage for the buffered Objects */
-  private LinkedList<T> buffer = new LinkedList<T>();
+  private Queue<T> buffer = new LinkedList<T>();
 
   /** The max size of the Buffer */
   private int maxSize;
@@ -33,15 +33,36 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * Construct a new Buffer with no maximum size.
    */
   public Buffer() {
+    this(0);
   }
 
   /**
-   * Construct a new Buffer with the specified size.
+   * Construct a new Buffer with the specified maximum size.
    * 
-   * @param size The number of Objects the Buffer can store
+   * @param maxSize The maximum number of Objects the Buffer can store
    */
-  public Buffer(int size) {
-    this.maxSize = size;
+  public Buffer(int maxSize) {
+    this(new LinkedList<T>(), maxSize);
+  }
+
+  /**
+   * Construct a new Buffer with the specified maximum size.
+   * 
+   * @param buffer The buffer to store the elements in.
+   * @param size The maximum number of Objects the Buffer can store
+   */
+  public Buffer(Queue<T> buffer, int maxSize) {
+    this.buffer = buffer;
+    this.maxSize = maxSize;
+  }
+
+  /**
+   * Construct a new Buffer with the no maximum size.
+   * 
+   * @param buffer The buffer to store the elements in.
+   */
+  public Buffer(Queue<T> buffer) {
+    this(buffer, 0);
   }
 
   /**
@@ -57,7 +78,7 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * @return The next available Object from the Buffer
    */
   protected synchronized T get() {
-    return buffer.removeFirst();
+    return buffer.remove();
   }
 
   /**
@@ -72,8 +93,8 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * @param value The object to put in the Buffer
    */
   protected synchronized void put(T value) {
-    if (maxSize > 0 && buffer.size() < maxSize) {
-      buffer.addLast(value);
+    if (maxSize == 0 || buffer.size() < maxSize) {
+      buffer.offer(value);
     }
   }
 

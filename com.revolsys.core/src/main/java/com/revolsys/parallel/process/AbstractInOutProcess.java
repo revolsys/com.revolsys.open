@@ -3,8 +3,10 @@ package com.revolsys.parallel.process;
 import org.apache.log4j.Logger;
 
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.ChannelDataStore;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
+import com.revolsys.parallel.channel.store.ZeroBuffer;
 
 public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   implements InOutProcess<I, O> {
@@ -34,17 +36,31 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<I> getIn() {
     if (in == null) {
       final String channelName = getBeanName() + ".in";
-      if (inBufferSize < 1) {
-        final Channel<I> channel = new Channel<I>(channelName);
-        setIn(channel);
-      } else {
-
-        final Buffer<I> buffer = new Buffer<I>(inBufferSize);
-        final Channel<I> channel = new Channel<I>(channelName, buffer);
-        setIn(channel);
-      }
+      final ChannelDataStore<I> buffer = createInDataStore();
+      final Channel<I> channel = new Channel<I>(channelName, buffer);
+      setIn(channel);
     }
     return in;
+  }
+
+  protected ChannelDataStore<I> createInDataStore() {
+    if (inBufferSize == 0) {
+      return new ZeroBuffer<I>();
+    } else if (inBufferSize < 0) {
+      return new Buffer<I>();
+    } else {
+      return new Buffer<I>(inBufferSize);
+    }
+  }
+
+  protected ChannelDataStore<O> createOutDataStore() {
+    if (outBufferSize == 0) {
+      return new ZeroBuffer<O>();
+    } else if (outBufferSize < 0) {
+      return new Buffer<O>();
+    } else {
+      return new Buffer<O>(outBufferSize);
+    }
   }
 
   /**
@@ -53,11 +69,9 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<O> getOut() {
     if (out == null) {
       final String channelName = getBeanName() + ".out";
-      if (outBufferSize < 1) {
-        setOut(new Channel<O>(channelName));
-      } else {
-        setOut(new Channel<O>(channelName, new Buffer<O>(outBufferSize)));
-      }
+      final ChannelDataStore<O> buffer = createOutDataStore();
+      final Channel<O> channel = new Channel<O>(channelName, buffer);
+      setOut(channel);
     }
     return out;
   }
