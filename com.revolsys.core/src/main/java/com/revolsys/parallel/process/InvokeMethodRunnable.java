@@ -57,4 +57,9 @@ public class InvokeMethodRunnable implements Runnable {
       ExceptionUtil.throwUncheckedException(e);
     }
   }
+
+  @Override
+  public String toString() {
+    return object.getClass() + "." + methodName + parameters;
+  }
 }

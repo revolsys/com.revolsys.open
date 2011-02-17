@@ -74,10 +74,7 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   void removeProcess(final Process process) {
     synchronized (processes) {
-      if (process instanceof AbstractProcess) {
-        AbstractProcess proc = (AbstractProcess)process;
-        proc.setProcessNetwork(null);
-      }
+      process.setProcessNetwork(null);
       processes.remove(process);
       count--;
       if (count == 0) {
@@ -98,10 +95,7 @@ public class ProcessNetwork implements BeanPostProcessor,
       running = true;
       for (final Entry<Process, Thread> entry : processes.entrySet()) {
         Process process = entry.getKey();
-        if (process instanceof AbstractProcess) {
-          AbstractProcess proc = (AbstractProcess)process;
-          proc.setProcessNetwork(this);
-        }
+        process.setProcessNetwork(this);
         Thread thread = entry.getValue();
         startProcess(thread);
       }

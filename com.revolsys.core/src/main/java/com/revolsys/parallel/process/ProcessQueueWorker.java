@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
-public class ProcessQueueWorker extends Thread implements Process {
+public class ProcessQueueWorker extends Thread {
   private ProcessQueue queue;
 
   private Channel<Process> in;

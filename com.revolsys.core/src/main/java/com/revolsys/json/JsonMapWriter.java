@@ -1,6 +1,7 @@
 package com.revolsys.json;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
@@ -9,6 +10,13 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 
 public class JsonMapWriter extends AbstractMapWriter {
+  public static String toString(Map<String, ? extends Object> values) {
+    StringWriter writer = new StringWriter();
+    JsonWriter jsonWriter = new JsonWriter(writer);
+    jsonWriter.write(values);
+    jsonWriter.close();
+    return writer.toString();
+  }
 
   /** The writer */
   private PrintWriter out;
@@ -17,8 +25,7 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   private boolean singleObject;
 
-  public JsonMapWriter(
-    final Writer out) {
+  public JsonMapWriter(final Writer out) {
     this.out = new PrintWriter(out);
   }
 
@@ -59,8 +66,7 @@ public class JsonMapWriter extends AbstractMapWriter {
     out.flush();
   }
 
-  public void write(
-    final Map<String, ? extends Object> values) {
+  public void write(final Map<String, ? extends Object> values) {
     if (written) {
       out.print(",\n");
     } else {

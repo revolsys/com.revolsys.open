@@ -1,5 +1,7 @@
 package com.revolsys.json;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,8 +11,7 @@ import com.revolsys.json.JsonParser.EventType;
 import com.revolsys.util.MathUtil;
 
 public final class JsonParserUtil {
-  public static List<Object> getArray(
-    final JsonParser parser) {
+  public static List<Object> getArray(final JsonParser parser) {
     if (parser.getEvent() == EventType.startArray || parser.hasNext()
       && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
@@ -36,8 +37,7 @@ public final class JsonParserUtil {
 
   }
 
-  public static Map<String, Object> getMap(
-    final JsonParser parser) {
+  public static Map<String, Object> getMap(final JsonParser parser) {
     if (parser.getEvent() == EventType.startObject || parser.hasNext()
       && parser.next() == EventType.startObject) {
       EventType event = parser.getEvent();
@@ -69,8 +69,7 @@ public final class JsonParserUtil {
 
   }
 
-  public static String getString(
-    final JsonParser parser) {
+  public static String getString(final JsonParser parser) {
     if (parser.getEvent() == EventType.string || parser.hasNext()
       && parser.next() == EventType.string) {
       return parser.getValue();
@@ -86,8 +85,7 @@ public final class JsonParserUtil {
    * @param parser The parser.
    * @param attributeName The name of the attribute to skip through.
    */
-  public static void skipToAttribute(
-    final JsonParser parser,
+  public static void skipToAttribute(final JsonParser parser,
     final String attributeName) {
     while (parser.hasNext()) {
       EventType eventType = parser.next();
@@ -102,8 +100,7 @@ public final class JsonParserUtil {
     }
   }
 
-  public static String skipToNextAttribute(
-    final JsonParser parser) {
+  public static String skipToNextAttribute(final JsonParser parser) {
     int objectCount = 0;
     while (parser.hasNext()) {
       EventType eventType = parser.next();
@@ -125,8 +122,7 @@ public final class JsonParserUtil {
     return null;
   }
 
-  public static double[] getDoubleArray(
-    final JsonParser parser) {
+  public static double[] getDoubleArray(final JsonParser parser) {
     if (parser.getEvent() == EventType.startArray || parser.hasNext()
       && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
@@ -153,9 +149,26 @@ public final class JsonParserUtil {
     }
   }
 
+  public static <V> V read(InputStream in) {
+    try {
+      JsonParser parser = new JsonParser(in);
+      try {
+        if (parser.hasNext()) {
+          EventType event = parser.next();
+          if (event == EventType.startDocument) {
+            return (V)getValue(parser);
+          }
+        }
+        return null;
+      } finally {
+        parser.close();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to read JSON object", e);
+    }
+  }
 
-  public static Object getValue(
-    final JsonParser parser) {
+  public static Object getValue(final JsonParser parser) {
     // TODO empty array
     if (parser.hasNext()) {
       final EventType event = parser.next();

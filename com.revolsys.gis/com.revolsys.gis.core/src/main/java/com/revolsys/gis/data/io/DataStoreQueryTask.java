@@ -6,10 +6,10 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.parallel.process.Process;
+import com.revolsys.parallel.process.AbstractProcess;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class DataStoreQueryTask implements Process {
+public class DataStoreQueryTask extends AbstractProcess {
 
   private final DataObjectStore dataStore;
 

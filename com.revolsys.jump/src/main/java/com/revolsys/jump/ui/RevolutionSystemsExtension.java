@@ -5,8 +5,11 @@ import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 
+import org.openjump.core.ui.io.file.FileLayerLoader;
+
 import net.infonode.util.Direction;
 
+import com.revolsys.jump.saif.SaifFileLoader;
 import com.revolsys.jump.ui.builder.DateTimeUiBuilder;
 import com.revolsys.jump.ui.builder.DateUIBuilder;
 import com.revolsys.jump.ui.builder.FeatureUiBuilder;
@@ -32,6 +35,7 @@ import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.workbench.WorkbenchContext;
 import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
+import com.vividsolutions.jump.workbench.registry.Registry;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.WorkbenchFrame;
 import com.vividsolutions.jump.workbench.ui.plugin.FeatureInstaller;
@@ -116,6 +120,12 @@ public class RevolutionSystemsExtension extends Extension {
     workbenchFrame.getNodeClassToPopupMenuMap().put(GridLayer.class,
       gridLayerPopupMenu);
     new ZoomToGridLayerSheet().initialize(context);
+    
+    WorkbenchContext workbenchContext = context.getWorkbenchContext();
+    SaifFileLoader loader = new SaifFileLoader(context);
+    Registry registry = workbenchContext.getRegistry();
+    registry.createEntry(FileLayerLoader.KEY, loader);
+
   }
 
 }

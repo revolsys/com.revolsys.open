@@ -1,21 +1,27 @@
 package com.revolsys.ui.web.rest.converter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
+import com.revolsys.json.JsonParserUtil;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 
 public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
@@ -25,17 +31,30 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
   private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
   public MapHttpMessageConverter() {
-    super(Map.class, null,
+    super(Map.class, Collections.singleton(MediaType.APPLICATION_JSON),
       IoFactoryRegistry.INSTANCE.getMediaTypes(MapWriterFactory.class));
+  }
+
+  @Override
+  public Map read(Class<? extends Map> clazz, HttpInputMessage inputMessage)
+    throws IOException, HttpMessageNotReadableException {
+    try {
+      Map<String, Object> map = new HashMap<String, Object>();
+      InputStream in = inputMessage.getBody();
+      Map<String, Object> readMap = JsonParserUtil.read(in);
+      if (readMap != null) {
+        map.putAll(readMap);
+      }
+      return map;
+    } catch (Throwable e) {
+      throw new HttpMessageNotReadableException(e.getMessage(), e);
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public void write(
-    final Map map,
-    final MediaType mediaType,
-    final HttpOutputMessage outputMessage)
-    throws IOException,
+  public void write(final Map map, final MediaType mediaType,
+    final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     Charset charset = mediaType.getCharSet();
     if (charset == null) {
