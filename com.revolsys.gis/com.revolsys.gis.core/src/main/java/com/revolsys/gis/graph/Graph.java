@@ -39,7 +39,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
