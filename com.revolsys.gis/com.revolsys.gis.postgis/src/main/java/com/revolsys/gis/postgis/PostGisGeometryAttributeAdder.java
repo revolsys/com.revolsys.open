@@ -7,8 +7,10 @@ import java.util.Map;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -20,6 +22,8 @@ import com.revolsys.gis.jdbc.io.SqlFunction;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PostGisGeometryAttributeAdder.class);
 
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<String, DataType>();
 
@@ -35,18 +39,13 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  public PostGisGeometryAttributeAdder(
-    final DataSource dataSource) {
+  public PostGisGeometryAttributeAdder(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
   @Override
-  public Attribute addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final int sqlType,
-    final int length,
-    final int scale,
+  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, final int sqlType, final int length, final int scale,
     final boolean required) {
     final QName typeName = metaData.getName();
     String owner = typeName.getNamespaceURI().toLowerCase();
@@ -71,9 +70,12 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
         GeometryFactory.getFactory(srid));
       return attribute;
     } catch (final SQLException e) {
-      throw new IllegalArgumentException(
-        "Attribute not registered in GEOMETRY_COLUMN table " + owner + "."
-          + tableName + "." + name, e);
+      LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner
+        + "." + tableName + "." + name, e);
+      return null;
+    } catch (final Throwable e) {
+      LOG.error("Error registering attribute " + name, e);
+      return null;
     }
   }
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -50,13 +51,15 @@ public class JdbcDataObjectStoreConnections {
     if (dataStore == null) {
       final Preferences preferences = getPreferences(connectionName);
       Map<String, Object> config = CollectionUtil.toMap(preferences);
-      String productName = (String)config.remove("productName");
-      if (productName == null) {
-        return null;
-      } else {
-        dataStore = JdbcFactory.createDataObjectStore(connectionName,
-          productName, config);
-        dataStores.put(connectionName, dataStore);
+      config.remove("productName");
+      try {
+        if (config.get("url") != null) {
+          dataStore = JdbcFactory.createDataObjectStore(config);
+          dataStore.setLabel(connectionName);
+          dataStores.put(connectionName, dataStore);
+        }
+      } catch (Throwable t) {
+        t.printStackTrace();
       }
     }
     return dataStore;
@@ -81,5 +84,12 @@ public class JdbcDataObjectStoreConnections {
   @Override
   public String toString() {
     return "JDBC Connections";
+  }
+
+  public void createConnection(String connectionName, Map<String, String> config) {
+    final Preferences preferences = getPreferences(connectionName);
+    for (Entry<String, String> param : config.entrySet()) {
+      preferences.put(param.getKey(), param.getValue());
+    }
   }
 }

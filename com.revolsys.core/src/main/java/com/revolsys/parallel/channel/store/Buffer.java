@@ -11,7 +11,7 @@ import com.revolsys.parallel.channel.ChannelDataStore;
  * The Buffer class is an implementation of ChannelDataStore which allows more
  * than one Object to be sent across the Channel at any one time. The Buffer
  * will store the Objects and allow them to be read in the same order as they
- * were written. 
+ * were written.
  * </p>
  * <p>
  * The getState method will return EMPTY if the Channel does not contain any
@@ -157,5 +157,10 @@ public class Buffer<T> extends ChannelDataStore<T> {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public String toString() {
+    return buffer.toString();
   }
 }

@@ -45,20 +45,16 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * 
    * @param data The ChannelDataStore used to store the data for the Channel
    */
-  public Channel(
-    final ChannelDataStore<T> data) {
+  public Channel(final ChannelDataStore<T> data) {
     this.data = data;
   }
 
-  public Channel(
-    final String name) {
+  public Channel(final String name) {
     this();
     this.name = name;
   }
 
-  public Channel(
-    final String name,
-    final ChannelDataStore<T> data) {
+  public Channel(final String name, final ChannelDataStore<T> data) {
     this.name = name;
     this.data = data;
   }
@@ -72,8 +68,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     return (data.getState() != ChannelDataStore.EMPTY);
   }
 
-  public synchronized boolean enable(
-    final MultiInputSelector alt) {
+  public synchronized boolean enable(final MultiInputSelector alt) {
     if (data.getState() == ChannelDataStore.EMPTY) {
       this.alt = alt;
       return false;
@@ -118,8 +113,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
-  public T read(
-    final long timeout) {
+  public T read(final long timeout) {
     synchronized (readMonitor) {
       synchronized (monitor) {
         if (isClosed()) {
@@ -185,8 +179,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * 
    * @param value The object to write to the Channel.
    */
-  public void write(
-    final T value) {
+  public void write(final T value) {
     synchronized (writeMonitor) {
       synchronized (monitor) {
         if (closed) {

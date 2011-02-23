@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.BeansException;
@@ -26,12 +27,13 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   boolean running = false;
 
-  private final ThreadGroup threadGroup = new ThreadGroup("Processes");
+  private ThreadGroup threadGroup;
 
   private boolean autoStart;
 
+  private String name = "processNetwork";
+
   public ProcessNetwork() {
-    ThreadSharedAttributes.initialiseThreadGroup(threadGroup);
   }
 
   public void addProcess(final Process process) {
@@ -54,8 +56,32 @@ public class ProcessNetwork implements BeanPostProcessor,
     running = false;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public Collection<Process> getProcesses() {
     return processes.keySet();
+  }
+
+  public ThreadGroup getThreadGroup() {
+    return threadGroup;
+  }
+
+  @PostConstruct
+  public void init() {
+    threadGroup = new ThreadGroup(name);
+    ThreadSharedAttributes.initialiseThreadGroup(threadGroup);
+  }
+
+  public boolean isAutoStart() {
+    return autoStart;
+  }
+
+  public void onApplicationEvent(final ContextRefreshedEvent event) {
+    if (autoStart) {
+      start();
+    }
   }
 
   public Object postProcessAfterInitialization(final Object bean,
@@ -84,6 +110,14 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
+  public void setAutoStart(final boolean autoStart) {
+    this.autoStart = autoStart;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
   public void setProcesses(final Collection<Process> processes) {
     for (final Process process : processes) {
       addProcess(process);
@@ -94,9 +128,9 @@ public class ProcessNetwork implements BeanPostProcessor,
     synchronized (processes) {
       running = true;
       for (final Entry<Process, Thread> entry : processes.entrySet()) {
-        Process process = entry.getKey();
+        final Process process = entry.getKey();
         process.setProcessNetwork(this);
-        Thread thread = entry.getValue();
+        final Thread thread = entry.getValue();
         startProcess(thread);
       }
     }
@@ -147,17 +181,8 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
-  public void onApplicationEvent(ContextRefreshedEvent event) {
-    if (autoStart) {
-      start();
-    }
-  }
-
-  public boolean isAutoStart() {
-    return autoStart;
-  }
-
-  public void setAutoStart(boolean autoStart) {
-    this.autoStart = autoStart;
+  @Override
+  public String toString() {
+    return name;
   }
 }
