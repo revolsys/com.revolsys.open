@@ -12,6 +12,7 @@
   <bean
     id="com.revolsys.parallel.process.ProcessNetwork"
     class="com.revolsys.parallel.process.ProcessNetwork"
+    name="processNetwork"
     p:autoStart="true"
     p:name="processNetwork" />
 </beans>

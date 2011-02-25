@@ -11,6 +11,7 @@
 
   <bean
     id="com.revolsys.parallel.process.ProcessNetwork"
+    name="processNetwork"
     class="com.revolsys.parallel.process.ProcessNetwork"
     p:name="processNetwork" />
 </beans>
