@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.xml.namespace.QName;
+
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -19,54 +21,52 @@ public class Statistics {
 
   private int providerCount = 0;
 
-  public Statistics(
-    final String message) {
+  public Statistics(final String message) {
     this(Statistics.class.getName(), message);
   }
 
-  public Statistics(
-    final String category,
-    final String message) {
+  public Statistics(final String category, final String message) {
     log = Logger.getLogger(category);
     this.message = message;
   }
 
-  public void add(
-    final DataObject object) {
+  public void add(final DataObject object) {
     final DataObjectMetaData type = object.getMetaData();
     add(type);
 
   }
 
-  public void add(
-    final DataObject object,
-    final long count) {
+  public void add(final DataObject object, final long count) {
     final DataObjectMetaData type = object.getMetaData();
     add(type, count);
 
   }
 
-  public void add(
-    final DataObjectMetaData type) {
-    final String name = type.getName().toString();
+  public void add(final DataObjectMetaData type) {
+    final QName typeName = type.getName();
+    add(typeName);
+  }
+
+  public void add(final DataObjectMetaData type, final long count) {
+    final QName typeName = type.getName();
+    add(typeName, count);
+  }
+
+  public void add(final QName typeName) {
+    final String name = typeName.toString();
     add(name);
   }
 
-  public void add(
-    final DataObjectMetaData type,
-    final long count) {
-    final String name = type.getName().toString();
+  public void add(final QName typeName, final long count) {
+    final String name = typeName.toString();
     add(name, count);
   }
 
-  public void add(
-    final String name) {
+  public void add(final String name) {
     add(name, 1);
   }
 
-  public synchronized void add(
-    final String name,
-    final long count) {
+  public synchronized void add(final String name, final long count) {
     final Long oldCount = counts.get(name);
     if (oldCount == null) {
       counts.put(name, count);
@@ -86,8 +86,7 @@ public class Statistics {
     }
   }
 
-  public Long get(
-    final String name) {
+  public Long get(final String name) {
     if (name != null) {
       final Long count = counts.get(name);
       return count;
