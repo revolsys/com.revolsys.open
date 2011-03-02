@@ -1,14 +1,23 @@
 package com.revolsys.json;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public final class JsonWriterUtil {
-  public static void write(
-    final PrintWriter out,
+
+  public static String toString(Map<String, ? extends Object> values) {
+    StringWriter writer = new StringWriter();
+    PrintWriter printWriter = new PrintWriter(writer);
+    write(printWriter, values);
+    printWriter.close();
+    return writer.toString();
+  }
+
+  public static void write(final PrintWriter out,
     final List<? extends Object> values) {
     startList(out);
     int i = 0;
@@ -28,18 +37,15 @@ public final class JsonWriterUtil {
     endList(out);
   }
 
-  public static void startList(
-    final PrintWriter out) {
+  public static void startList(final PrintWriter out) {
     out.print("[\n");
   }
 
-  public static void endList(
-    final PrintWriter out) {
+  public static void endList(final PrintWriter out) {
     out.print("]\n");
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final Map<String, ? extends Object> values) {
 
     startObject(out);
@@ -65,32 +71,25 @@ public final class JsonWriterUtil {
     endObject(out);
   }
 
-  public static void endAttribute(
-    final PrintWriter out) {
+  public static void endAttribute(final PrintWriter out) {
     out.print(",\n");
   }
 
-  public static void endObject(
-    final PrintWriter out) {
+  public static void endObject(final PrintWriter out) {
     out.print("\n}\n");
   }
 
-  public static void startObject(
-    final PrintWriter out) {
+  public static void startObject(final PrintWriter out) {
     out.print("{\n");
   }
 
-  public static void label(
-    final PrintWriter out,
-    final String key) {
+  public static void label(final PrintWriter out, final String key) {
     write(out, key);
     out.print(":");
   }
 
   @SuppressWarnings("unchecked")
-  public static void write(
-    final PrintWriter out,
-    final Object value) {
+  public static void write(final PrintWriter out, final Object value) {
     if (value == null) {
       out.print("null");
     } else if (value instanceof Boolean) {
@@ -114,8 +113,7 @@ public final class JsonWriterUtil {
 
   }
 
-  public static void charSequence(
-    final PrintWriter out,
+  public static void charSequence(final PrintWriter out,
     final CharSequence string) {
     for (int i = 0; i < string.length(); i++) {
       final char c = string.charAt(i);

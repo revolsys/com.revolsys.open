@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -34,8 +33,7 @@ public class HttpMessageConverterView extends AbstractView {
   private final Object returnValue;
 
   public HttpMessageConverterView(final HttpMessageConverter messageConverter,
-     final MediaType mediaType,
-    final Object returnValue) {
+    final MediaType mediaType, final Object returnValue) {
     this.messageConverter = messageConverter;
     this.mediaType = mediaType;
     this.returnValue = returnValue;
@@ -49,7 +47,6 @@ public class HttpMessageConverterView extends AbstractView {
     return messageConverter;
   }
 
-
   public Object getReturnValue() {
     return returnValue;
   }
@@ -59,7 +56,7 @@ public class HttpMessageConverterView extends AbstractView {
     final HttpServletRequest request, final HttpServletResponse response)
     throws Exception {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-  
+
     String path = (String)requestAttributes.getAttribute(
       "httpMessageConverterTemplatePath", RequestAttributes.SCOPE_REQUEST);
     if (path == null
@@ -67,7 +64,8 @@ public class HttpMessageConverterView extends AbstractView {
         .contains(mediaType)) {
       render(response);
     } else {
-       final HttpMessageConverterView savedView = getMessageConverterView();
+      response.setContentType(mediaType.toString());
+      final HttpMessageConverterView savedView = getMessageConverterView();
       requestAttributes.setAttribute(NAME, this,
         RequestAttributes.SCOPE_REQUEST);
       if (!PathViewController.include(request, response, path)) {
@@ -79,6 +77,7 @@ public class HttpMessageConverterView extends AbstractView {
   }
 
   public void render(final HttpServletResponse response) throws IOException {
-    messageConverter.write(returnValue, mediaType, new ServletServerHttpResponse(response));
+    messageConverter.write(returnValue, mediaType,
+      new ServletServerHttpResponse(response));
   }
 }

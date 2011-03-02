@@ -2,6 +2,9 @@ package com.revolsys.json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -149,7 +152,18 @@ public final class JsonParserUtil {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V> V read(String in) {
+    return (V)read(new StringReader(in));
+  }
+
+  @SuppressWarnings("unchecked")
   public static <V> V read(InputStream in) {
+    return (V)read(new InputStreamReader(in));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V read(Reader in) {
     try {
       JsonParser parser = new JsonParser(in);
       try {

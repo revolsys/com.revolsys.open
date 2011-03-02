@@ -9,10 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.MapReader;
-import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 

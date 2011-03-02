@@ -114,4 +114,12 @@ public class PageInfo extends AbstractDocumentedObject {
   public void setTitle(final String title) {
     super.setTitle(title);
   }
+
+  public void setInputContentTypes(MediaType... inputContentTypes) {
+    ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
+    for (MediaType mediaType : inputContentTypes) {
+      mediaTypes.add(mediaType);
+    }
+    setInputContentTypes(mediaTypes);
+  }
 }
