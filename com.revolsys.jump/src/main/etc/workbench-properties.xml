@@ -1,8 +1,0 @@
-<workbench>
-  <extension>com.revolsys.jump.ui.RevolutionSystemsExtension</extension>
-  <extension>com.revolsys.jump.gpx.GpxExtension</extension>
-  <extension>com.revolsys.jump.saif.SaifFileExtension</extension>
-  <extension>com.revolsys.jump.jdbc.JdbcExtension</extension>
-  <extension>com.revolsys.jump.ecsv.EcsvExtension</extension>
-  <extension>ca.bc.gov.trim.TrimExtension</extension>
-</workbench>
