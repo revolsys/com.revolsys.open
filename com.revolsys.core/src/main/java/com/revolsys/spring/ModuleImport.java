@@ -1,6 +1,7 @@
 package com.revolsys.spring;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,9 +29,13 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor {
 
   private List<String> exportBeanNames = Collections.emptyList();
 
-  private Map<String, Object> parameters;
+  private boolean exportAllBeans = false;
+
+  private Map<String, Object> parameters = new HashMap<String, Object>();
 
   private Resource resource;
+
+  private boolean enabled = true;
 
   private ResourceEditorRegistrar resourceEditorRegistrar = new ResourceEditorRegistrar();
 
@@ -40,7 +45,11 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor {
       final DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
 
       beanFactory.addPropertyEditorRegistrar(resourceEditorRegistrar);
-      applicationContext.addBeanFactoryPostProcessor(new AttributesBeanConfigurer(parameters));
+      if (parameters != null && !parameters.isEmpty()) {
+        AttributesBeanConfigurer attributesConfig = new AttributesBeanConfigurer(
+          parameters);
+        applicationContext.addBeanFactoryPostProcessor(attributesConfig);
+      }
       final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
         applicationContext);
       beanReader.loadBeanDefinitions(resource);
@@ -69,31 +78,46 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor {
     return resourceEditorRegistrar;
   }
 
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public boolean isExportAllBeans() {
+    return exportAllBeans;
+  }
+
+
   public void postProcessBeanDefinitionRegistry(
-    final BeanDefinitionRegistry registry)
-    throws BeansException {
-    final GenericApplicationContext beanFactory = getApplicationContext();
-    for (final String beanName : exportBeanNames) {
-      final String alias = beanName;
-      registerTargetBeanDefinition(registry, beanFactory, beanName, alias);
-    }
-    
-    for (final Entry<String,String> exportBeanAlias : exportBeanAliases.entrySet()) {
-      String beanName = exportBeanAlias.getKey();
-      final String alias = exportBeanAlias.getValue();
-      registerTargetBeanDefinition(registry, beanFactory, beanName, alias);
+    final BeanDefinitionRegistry registry) throws BeansException {
+    if (enabled) {
+      final GenericApplicationContext beanFactory = getApplicationContext();
+      if (exportAllBeans) {
+        for (final String beanName : beanFactory.getBeanDefinitionNames()) {
+          registerTargetBeanDefinition(registry, beanFactory, beanName,
+            beanName);
+        }
+      } else {
+        for (final String beanName : exportBeanNames) {
+          registerTargetBeanDefinition(registry, beanFactory, beanName,
+            beanName);
+        }
+      }
+
+      for (final Entry<String, String> exportBeanAlias : exportBeanAliases.entrySet()) {
+        final String beanName = exportBeanAlias.getKey();
+        final String alias = exportBeanAlias.getValue();
+        registerTargetBeanDefinition(registry, beanFactory, beanName, alias);
+      }
     }
   }
 
   public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory)
-    throws BeansException {
+    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
   }
 
   private void registerTargetBeanDefinition(
     final BeanDefinitionRegistry registry,
-    final GenericApplicationContext beanFactory,
-    final String beanName,
+    final GenericApplicationContext beanFactory, final String beanName,
     final String alias) {
     final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
     if (beanDefinition != null) {
@@ -109,23 +133,28 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor {
     }
   }
 
-  public void setExportBeanAliases(
-    final Map<String, String> exportBeanAliases) {
+  public void setEnabled(final boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public void setExportAllBeans(final boolean exportAllBeans) {
+    this.exportAllBeans = exportAllBeans;
+  }
+
+  public void setExportBeanAliases(final Map<String, String> exportBeanAliases) {
     this.exportBeanAliases = exportBeanAliases;
   }
 
-  public void setExportBeanNames(
-    final List<String> exportBeanNames) {
+  public void setExportBeanNames(final List<String> exportBeanNames) {
     this.exportBeanNames = exportBeanNames;
   }
 
-  public void setParameters(
-    final Map<String, Object> parameters) {
+
+  public void setParameters(final Map<String, Object> parameters) {
     this.parameters = parameters;
   }
 
-  public void setResource(
-    final Resource resource) {
+  public void setResource(final Resource resource) {
     this.resource = resource;
   }
 

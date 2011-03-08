@@ -41,7 +41,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   private static final Logger LOG = LoggerFactory.getLogger(AttributesBeanConfigurer.class);
 
-  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+  private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
   private BeanFactory beanFactory;
 
@@ -64,9 +64,10 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   public AttributesBeanConfigurer() {
   }
 
-  public AttributesBeanConfigurer(
-    Map<String, Object> attributes) {
-    this.attributes.putAll(attributes);
+  public AttributesBeanConfigurer(final Map<String, Object> attributes) {
+    if (attributes != null) {
+      this.attributes.putAll(attributes);
+    }
   }
 
   public Map<String, Object> getAttributes() {
@@ -110,26 +111,25 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   }
 
   public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory)
-    throws BeansException {
-    Map<String, Object> attributes = new LinkedHashMap<String, Object>(
+    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    final Map<String, Object> attributes = new LinkedHashMap<String, Object>(
       getAttributes());
     attributes.putAll(ThreadSharedAttributes.getAttributes());
 
-    String[] beanNames = beanFactory.getBeanDefinitionNames();
+    final String[] beanNames = beanFactory.getBeanDefinitionNames();
     for (int i = 0; i < beanNames.length; i++) {
       // Check that we're not parsing our own bean definition,
       // to avoid failing on unresolvable placeholders in properties file
       // locations.
-      String beanName = beanNames[i];
+      final String beanName = beanNames[i];
       if (!(beanName.equals(this.beanName))) {
-        BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
-        String beanClassName = bd.getBeanClassName();
+        final BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+        final String beanClassName = bd.getBeanClassName();
 
         if (beanClassName != null) {
           if (beanClassName.equals(AttributeMap.class.getName())) {
             processPlaceholderAttributes(beanFactory, beanName, attributes);
-            Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
             attributes.putAll(otherAttributes);
           } else if (beanClassName.equals(org.springframework.beans.factory.config.MapFactoryBean.class.getName())) {
             final PropertyValue targetMapClass = bd.getPropertyValues()
@@ -138,7 +138,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
               final Object mapClass = targetMapClass.getValue();
               if (AttributeMap.class.getName().equals(mapClass)) {
                 processPlaceholderAttributes(beanFactory, beanName, attributes);
-                Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+                final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
                 attributes.putAll(otherAttributes);
               }
             }
@@ -153,45 +153,42 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   /**
    * Process the given key as 'beanName.property' entry.
    */
-  protected void processOverride(
-    final ConfigurableListableBeanFactory factory,
-    final String key,
-    final Object value)
-    throws BeansException {
+  protected void processOverride(final ConfigurableListableBeanFactory factory,
+    final String key, final Object value) throws BeansException {
 
-    int separatorIndex = key.indexOf(this.beanNameSeparator);
+    final int separatorIndex = key.indexOf(this.beanNameSeparator);
     if (separatorIndex == -1) {
-      String beanName = key;
+      final String beanName = key;
       BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
       try {
-        Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
+        final Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
         if (Parameter.class.isAssignableFrom(beanClass)) {
           while (beanDefinition.getOriginatingBeanDefinition() != null) {
             beanDefinition = beanDefinition.getOriginatingBeanDefinition();
           }
-          MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+          final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
           PropertyValue propertyValue = new PropertyValue("value", value);
-          PropertyValue typeValue = propertyValues.getPropertyValue("type");
+          final PropertyValue typeValue = propertyValues.getPropertyValue("type");
           if (typeValue != null) {
-            String typeClassName = typeValue.getValue().toString();
+            final String typeClassName = typeValue.getValue().toString();
             try {
-              Class<?> typeClass = Class.forName(typeClassName);
+              final Class<?> typeClass = Class.forName(typeClassName);
 
-              Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
+              final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
                 value, typeClass);
               propertyValue = new PropertyValue("value", convertedValue);
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
               LOG.error("Unable to set " + beanName + ".value=" + value, e);
             }
           }
           propertyValues.addPropertyValue(propertyValue);
         }
-      } catch (ClassNotFoundException e) {
+      } catch (final ClassNotFoundException e) {
         LOG.error("Unable to set " + beanName + ".value=" + value, e);
       }
     } else {
-      String beanName = key.substring(0, separatorIndex);
-      String beanProperty = key.substring(separatorIndex + 1);
+      final String beanName = key.substring(0, separatorIndex);
+      final String beanProperty = key.substring(separatorIndex + 1);
       setAttributeValue(factory, beanName, beanProperty, value);
       if (LOG.isDebugEnabled()) {
         LOG.debug("Property '" + key + "' set to value [" + value + "]");
@@ -201,16 +198,15 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   protected void processOverrideAttributes(
     final ConfigurableListableBeanFactory beanFactory,
-    final Map<String, Object> attributes)
-    throws BeansException {
+    final Map<String, Object> attributes) throws BeansException {
 
-    for (Entry<String, Object> attribute : attributes.entrySet()) {
-      String key = attribute.getKey();
-      Object value = attribute.getValue();
+    for (final Entry<String, Object> attribute : attributes.entrySet()) {
+      final String key = attribute.getKey();
+      final Object value = attribute.getValue();
       try {
         processOverride(beanFactory, key, value);
-      } catch (BeansException ex) {
-        String msg = "Could not process key '" + key
+      } catch (final BeansException ex) {
+        final String msg = "Could not process key '" + key
           + "' in PropertyOverrideConfigurer";
         if (!this.ignoreInvalidKeys) {
           throw new BeanInitializationException(msg, ex);
@@ -224,24 +220,24 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   protected void processPlaceholderAttributes(
     final ConfigurableListableBeanFactory beanFactory,
-    final Map<String, Object> attributes)
-    throws BeansException {
+    final Map<String, Object> attributes) throws BeansException {
 
-    StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(
+    final StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(
       placeholderPrefix, placeholderSuffix, ignoreUnresolvablePlaceholders,
       nullValue, attributes);
-    BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(valueResolver);
+    final BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(
+      valueResolver);
 
-    String[] beanNames = beanFactory.getBeanDefinitionNames();
+    final String[] beanNames = beanFactory.getBeanDefinitionNames();
     for (int i = 0; i < beanNames.length; i++) {
       // Check that we're not parsing our own bean definition,
       // to avoid failing on unresolvable placeholders in properties file
       // locations.
       if (!(beanNames[i].equals(this.beanName) && beanFactory.equals(this.beanFactory))) {
-        BeanDefinition bd = beanFactory.getBeanDefinition(beanNames[i]);
+        final BeanDefinition bd = beanFactory.getBeanDefinition(beanNames[i]);
         try {
           visitor.visitBeanDefinition(bd);
-        } catch (BeanDefinitionStoreException ex) {
+        } catch (final BeanDefinitionStoreException ex) {
           throw new BeanDefinitionStoreException(bd.getResourceDescription(),
             beanNames[i], ex.getMessage());
         }
@@ -254,24 +250,23 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   }
 
   protected void processPlaceholderAttributes(
-    final ConfigurableListableBeanFactory beanFactory,
-    final String beanName,
-    final Map<String, Object> attributes)
-    throws BeansException {
+    final ConfigurableListableBeanFactory beanFactory, final String beanName,
+    final Map<String, Object> attributes) throws BeansException {
 
-    StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(
+    final StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(
       placeholderPrefix, placeholderSuffix, ignoreUnresolvablePlaceholders,
       nullValue, attributes);
-    BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(valueResolver);
+    final BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(
+      valueResolver);
 
     // Check that we're not parsing our own bean definition,
     // to avoid failing on unresolvable placeholders in properties file
     // locations.
     if (!(beanName.equals(this.beanName) && beanFactory.equals(this.beanFactory))) {
-      BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+      final BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
       try {
         visitor.visitBeanDefinition(bd);
-      } catch (BeanDefinitionStoreException ex) {
+      } catch (final BeanDefinitionStoreException ex) {
         throw new BeanDefinitionStoreException(bd.getResourceDescription(),
           beanName, ex.getMessage());
       }
@@ -282,8 +277,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     beanFactory.resolveAliases(valueResolver);
   }
 
-  public void setAttributes(
-    final Map<String, ? extends Object> attributes) {
+  public void setAttributes(final Map<String, ? extends Object> attributes) {
     this.attributes.clear();
     if (attributes != null) {
       this.attributes.putAll(attributes);
@@ -294,29 +288,27 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
    * Apply the given property value to the corresponding bean.
    */
   protected void setAttributeValue(
-    final ConfigurableListableBeanFactory factory,
-    final String beanName,
-    final String property,
-    final Object value) {
+    final ConfigurableListableBeanFactory factory, final String beanName,
+    final String property, final Object value) {
 
     BeanDefinition bd = factory.getBeanDefinition(beanName);
     while (bd.getOriginatingBeanDefinition() != null) {
       bd = bd.getOriginatingBeanDefinition();
     }
-    MutablePropertyValues propertyValues = bd.getPropertyValues();
+    final MutablePropertyValues propertyValues = bd.getPropertyValues();
     PropertyValue propertyValue = new PropertyValue(property, value);
     final String beanClassName = bd.getBeanClassName();
     if (Parameter.class.getName().equals(beanClassName)) {
-      PropertyValue typeValue = propertyValues.getPropertyValue("type");
+      final PropertyValue typeValue = propertyValues.getPropertyValue("type");
       if (typeValue != null) {
-        String typeClassName = typeValue.getValue().toString();
+        final String typeClassName = typeValue.getValue().toString();
         try {
-          Class<?> typeClass = Class.forName(typeClassName);
+          final Class<?> typeClass = Class.forName(typeClassName);
 
-          Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
+          final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
             value, typeClass);
           propertyValue = new PropertyValue(property, convertedValue);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
           LOG.error("Unable to set " + beanName + "." + property + "=" + value,
             e);
         }
@@ -325,13 +317,11 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     propertyValues.addPropertyValue(propertyValue);
   }
 
-  public void setBeanFactory(
-    final BeanFactory beanFactory) {
+  public void setBeanFactory(final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
-  public void setBeanName(
-    final String beanName) {
+  public void setBeanName(final String beanName) {
     this.beanName = beanName;
   }
 
@@ -339,8 +329,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
    * Set the separator to expect between bean name and property path. Default is
    * a dot (".").
    */
-  public void setBeanNameSeparator(
-    final String beanNameSeparator) {
+  public void setBeanNameSeparator(final String beanNameSeparator) {
     this.beanNameSeparator = beanNameSeparator;
   }
 
@@ -351,8 +340,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
    * format will just be logged as warning. This allows to have arbitrary other
    * keys in a properties file.
    */
-  public void setIgnoreInvalidKeys(
-    final boolean ignoreInvalidKeys) {
+  public void setIgnoreInvalidKeys(final boolean ignoreInvalidKeys) {
     this.ignoreInvalidKeys = ignoreInvalidKeys;
   }
 
@@ -361,23 +349,19 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
   }
 
-  public void setNullValue(
-    final String nullValue) {
+  public void setNullValue(final String nullValue) {
     this.nullValue = nullValue;
   }
 
-  public void setOrder(
-    final int order) {
+  public void setOrder(final int order) {
     this.order = order;
   }
 
-  public void setPlaceholderPrefix(
-    final String placeholderPrefix) {
+  public void setPlaceholderPrefix(final String placeholderPrefix) {
     this.placeholderPrefix = placeholderPrefix;
   }
 
-  public void setPlaceholderSuffix(
-    final String placeholderSuffix) {
+  public void setPlaceholderSuffix(final String placeholderSuffix) {
     this.placeholderSuffix = placeholderSuffix;
   }
 
