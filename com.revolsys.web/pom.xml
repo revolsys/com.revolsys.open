@@ -86,6 +86,47 @@
       <artifactId>com.springsource.org.apache.commons.io</artifactId>
       <version>1.4.0</version>
     </dependency>
+    <dependency>
+    	<groupId>org.springframework.security</groupId>
+    	<artifactId>spring-security-web</artifactId>
+    	<version>${org.springframework.version}</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    	<exclusions>
+    		<exclusion>
+    			<artifactId>spring-expression</artifactId>
+    			<groupId>org.springframework</groupId>
+    		</exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-tx</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-web</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+        	<artifactId>aspectjrt</artifactId>
+        	<groupId>org.aspectj</groupId>
+        </exclusion>
+        <exclusion>
+        	<artifactId>aspectjweaver</artifactId>
+        	<groupId>org.aspectj</groupId>
+        </exclusion>
+    	</exclusions>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>

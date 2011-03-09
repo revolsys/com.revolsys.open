@@ -52,7 +52,7 @@ public class PathAliasController implements Controller {
 
   public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
-    String path = request.getPathInfo();
+    String path = request.getServletPath() + request.getPathInfo();
     if (path.startsWith(prefix)) {
       path = path.replaceFirst(prefix, aliasPrefix);
       include(request, response, path);
