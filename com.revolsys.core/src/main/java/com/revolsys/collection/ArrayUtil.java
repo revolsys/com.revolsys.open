@@ -1,10 +1,11 @@
 package com.revolsys.collection;
 
+import java.util.Collection;
 import java.util.List;
 
 public class ArrayUtil {
   public static <T> T[] create(
-    final List<T> list) {
+    final Collection<T> list) {
     if (list == null) {
       return null;
     } else {
