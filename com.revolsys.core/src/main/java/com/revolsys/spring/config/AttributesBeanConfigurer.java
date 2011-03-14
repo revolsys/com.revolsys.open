@@ -19,12 +19,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionVisitor;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
 
 import com.revolsys.collection.AttributeMap;
 import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.factory.Parameter;
 import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
 
@@ -127,27 +129,45 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
         final String beanClassName = bd.getBeanClassName();
 
         if (beanClassName != null) {
-          if (beanClassName.equals(AttributeMap.class.getName())) {
-            processPlaceholderAttributes(beanFactory, beanName, attributes);
-            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
-            attributes.putAll(otherAttributes);
-          } else if (beanClassName.equals(org.springframework.beans.factory.config.MapFactoryBean.class.getName())) {
-            final PropertyValue targetMapClass = bd.getPropertyValues()
-              .getPropertyValue("targetMapClass");
-            if (targetMapClass != null) {
-              final Object mapClass = targetMapClass.getValue();
-              if (AttributeMap.class.getName().equals(mapClass)) {
-                processPlaceholderAttributes(beanFactory, beanName, attributes);
-                final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
-                attributes.putAll(otherAttributes);
-              }
-            }
+          addAttributes(attributes, beanFactory, bd, beanName, beanClassName);
+          if (beanClassName.equals(TargetBeanFactoryBean.class.getName())) {
+            final MutablePropertyValues propertyValues = bd.getPropertyValues();
+            BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues.getPropertyValue(
+              "targetBeanDefinition")
+              .getValue();
+            String targetBeanClassName = targetBeanDefinition.getBeanClassName();
+            addAttributes(attributes, beanFactory, targetBeanDefinition,
+              beanName, targetBeanClassName);
           }
         }
       }
     }
     processOverrideAttributes(beanFactory, attributes);
     processPlaceholderAttributes(beanFactory, attributes);
+  }
+
+  protected void addAttributes(final Map<String, Object> attributes,
+    final ConfigurableListableBeanFactory beanFactory,
+    final BeanDefinition beanDefinition, final String beanName,
+    final String beanClassName) {
+    if (beanClassName != null) {
+      if (beanClassName.equals(AttributeMap.class.getName())) {
+        processPlaceholderAttributes(beanFactory, beanName, attributes);
+        final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+        attributes.putAll(otherAttributes);
+      } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
+        final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        final PropertyValue targetMapClass = propertyValues.getPropertyValue("targetMapClass");
+        if (targetMapClass != null) {
+          final Object mapClass = targetMapClass.getValue();
+          if (AttributeMap.class.getName().equals(mapClass)) {
+            processPlaceholderAttributes(beanFactory, beanName, attributes);
+            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+            attributes.putAll(otherAttributes);
+          }
+        }
+      }
+    }
   }
 
   /**

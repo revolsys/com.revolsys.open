@@ -9,7 +9,6 @@ import java.util.LinkedHashSet;
 
 import org.springframework.beans.factory.FactoryBean;
 
-import com.revolsys.collection.ArrayUtil;
 import com.revolsys.io.filter.DirectoryFilenameFilter;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
@@ -25,7 +24,8 @@ public class ClassLoaderFactoryBean implements FactoryBean<ClassLoader> {
 
   public ClassLoader getObject() throws Exception {
     if (classLoader == null) {
-      URL[] urls = ArrayUtil.create(mergedUrls);
+      URL[] urls = new URL[mergedUrls.size()];
+      urls = mergedUrls.toArray(urls);
       Class<? extends ClassLoaderFactoryBean> clazz = getClass();
       ClassLoader parentClassLoader = clazz.getClassLoader();
       classLoader = new URLClassLoader(urls, parentClassLoader);

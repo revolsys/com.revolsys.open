@@ -1,8 +1,8 @@
 package com.revolsys.spring;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
 
@@ -10,14 +10,16 @@ public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
 
   private String targetBeanName;
 
+  private BeanDefinition targetBeanDefinition;
+
   @Override
   protected Object createInstance() {
     return this.targetBeanFactory.getBean(this.targetBeanName);
   }
 
   @Override
-  public Class getObjectType() {
-    return ObjectFactory.class;
+  public Class<?> getObjectType() {
+    return Object.class;
   }
 
   public BeanFactory getTargetBeanFactory() {
@@ -28,13 +30,19 @@ public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
     return targetBeanName;
   }
 
-  public void setTargetBeanFactory(
-    final BeanFactory targetBeanFactory) {
+  public BeanDefinition getTargetBeanDefinition() {
+    return targetBeanDefinition;
+  }
+
+  public void setTargetBeanDefinition(BeanDefinition targetBeanDefinition) {
+    this.targetBeanDefinition = targetBeanDefinition;
+  }
+
+  public void setTargetBeanFactory(final BeanFactory targetBeanFactory) {
     this.targetBeanFactory = targetBeanFactory;
   }
 
-  public void setTargetBeanName(
-    final String targetBeanName) {
+  public void setTargetBeanName(final String targetBeanName) {
     this.targetBeanName = targetBeanName;
   }
 }
