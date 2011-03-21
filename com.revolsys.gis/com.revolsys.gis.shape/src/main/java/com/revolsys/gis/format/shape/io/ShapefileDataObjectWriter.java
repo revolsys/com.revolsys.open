@@ -89,17 +89,14 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private GeometryFactory geometryFactory;
 
-  public ShapefileDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource)
-    throws IOException {
+  public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
+    final Resource resource) throws IOException {
     super(metaData, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
   }
 
   @Override
-  protected void preFirstWrite(
-    DataObject object) throws IOException {
+  protected void preFirstWrite(DataObject object) throws IOException {
     if (geometryFactory == null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
@@ -107,10 +104,9 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       }
     }
     createPrjFile(geometryFactory);
-     }
+  }
 
-  protected void init()
-    throws IOException {
+  protected void init() throws IOException {
     super.init();
 
     this.out = new ResourceEndianOutput(resource);
@@ -120,6 +116,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     if (metaData != null) {
       if (!metaData.hasAttribute(geometryPropertyName)) {
         metaData.addAttribute(geometryPropertyName, DataTypes.GEOMETRY, true);
+      }
+      if (!hasField(geometryPropertyName)) {
         addField(new FieldDefinition(geometryPropertyName,
           FieldDefinition.OBJECT_TYPE, 0));
       }
@@ -133,10 +131,9 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     }
 
     geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-   }
+  }
 
-  private void createPrjFile(
-    GeometryFactory geometryFactory)
+  private void createPrjFile(GeometryFactory geometryFactory)
     throws IOException {
     if (geometryFactory != null) {
       CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -160,11 +157,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected int addDbaseField(
-    final String name,
-    final Class<?> typeJavaClass,
-    final int length,
-    final int scale) {
+  protected int addDbaseField(final String name, final Class<?> typeJavaClass,
+    final int length, final int scale) {
     if (Geometry.class.isAssignableFrom(typeJavaClass)) {
       addField(new FieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0));
       return 0;
@@ -178,7 +172,9 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     super.close();
     try {
       updateHeader(out);
-      updateHeader(indexOut);
+      if (indexOut != null) {
+        updateHeader(indexOut);
+      }
     } catch (final IOException e) {
       LOG.error(e.getMessage(), e);
     } finally {
@@ -187,8 +183,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     }
   }
 
-  private void createGeometryWriter(
-    final Geometry geometry) {
+  private void createGeometryWriter(final Geometry geometry) {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       final CoordinateSequence coordinates = point.getCoordinateSequence();
@@ -230,9 +225,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     }
   }
 
-  private void updateHeader(
-    final ResourceEndianOutput out)
-    throws IOException {
+  private void updateHeader(final ResourceEndianOutput out) throws IOException {
 
     int shapeType = ShapefileConstants.NULL_SHAPE;
     if (geometryConverter != null) {
@@ -266,10 +259,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected boolean writeField(
-    final DataObject object,
-    final FieldDefinition field)
-    throws IOException {
+  protected boolean writeField(final DataObject object,
+    final FieldDefinition field) throws IOException {
     if (field.getName() == geometryPropertyName) {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
@@ -285,9 +276,11 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         geometryConverter.write(out, geometry);
 
         recordNumber++;
-        final long recordLength = out.getFilePointer() - recordIndex;
-        indexOut.writeInt((int)(recordIndex / MathUtil.BYTES_IN_SHORT));
-        indexOut.writeInt((int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4);
+        if (indexOut != null) {
+          final long recordLength = out.getFilePointer() - recordIndex;
+          indexOut.writeInt((int)(recordIndex / MathUtil.BYTES_IN_SHORT));
+          indexOut.writeInt((int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4);
+        }
       }
       return true;
     } else {
@@ -295,9 +288,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     }
   }
 
-  private void writeHeader(
-    final EndianOutput out)
-    throws IOException {
+  private void writeHeader(final EndianOutput out) throws IOException {
     out.writeInt(ShapefileConstants.FILE_CODE);
     for (int i = 0; i < 5; i++) {
       out.writeInt(0);
@@ -311,9 +302,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     }
   }
 
-  private int writeNull(
-    final EndianOutput out)
-    throws IOException {
+  private int writeNull(final EndianOutput out) throws IOException {
     final int recordLength = MathUtil.BYTES_IN_INT;
     out.writeInt(recordLength);
     out.writeLEInt(ShapefileConstants.NULL_SHAPE);

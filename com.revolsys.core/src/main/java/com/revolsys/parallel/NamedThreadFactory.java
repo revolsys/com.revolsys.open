@@ -17,7 +17,14 @@ public class NamedThreadFactory implements ThreadFactory {
 
   private String threadNamePrefix;
 
+  private int priority;
+
   public NamedThreadFactory() {
+    this(Thread.NORM_PRIORITY);
+  }
+
+  public NamedThreadFactory(final int priority) {
+    this.priority = priority;
     final SecurityManager securityManager = System.getSecurityManager();
     if (securityManager == null) {
       final Thread currentThread = Thread.currentThread();
@@ -36,6 +43,10 @@ public class NamedThreadFactory implements ThreadFactory {
     return parentGroup;
   }
 
+  public int getPriority() {
+    return priority;
+  }
+
   public Thread newThread(final Runnable runnable) {
     synchronized (threadNumber) {
       if (group == null) {
@@ -50,9 +61,7 @@ public class NamedThreadFactory implements ThreadFactory {
     if (thread.isDaemon()) {
       thread.setDaemon(false);
     }
-    if (thread.getPriority() != Thread.NORM_PRIORITY) {
-      thread.setPriority(Thread.NORM_PRIORITY);
-    }
+    thread.setPriority(priority);
     return thread;
   }
 
@@ -62,6 +71,10 @@ public class NamedThreadFactory implements ThreadFactory {
 
   public void setParentGroup(final ThreadGroup parentGroup) {
     this.parentGroup = parentGroup;
+  }
+
+  public void setPriority(final int priority) {
+    this.priority = priority;
   }
 
 }

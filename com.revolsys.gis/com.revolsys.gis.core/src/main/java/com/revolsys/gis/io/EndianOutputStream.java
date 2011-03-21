@@ -31,8 +31,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
 
   private long written = 0;
 
-  public EndianOutputStream(
-    final OutputStream out) {
+  public EndianOutputStream(final OutputStream out) {
     this.out = out;
   }
 
@@ -45,45 +44,41 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     }
   }
 
-  public long getFilePointer()
-    throws IOException {
+  @Override
+  public void close() throws IOException {
+    flush();
+    out.close();
+    super.close();
+  }
+
+  public long getFilePointer() throws IOException {
     return written;
   }
 
-  public long length()
-    throws IOException {
+  public long length() throws IOException {
     return written;
   }
 
   @Override
-  public void write(
-    final byte[] b)
-    throws IOException {
+  public void write(final byte[] b) throws IOException {
     out.write(b);
     written += b.length;
   }
 
   @Override
-  public void write(
-    final byte[] b,
-    final int off,
-    final int len)
+  public void write(final byte[] b, final int off, final int len)
     throws IOException {
     out.write(b, off, len);
     written += len;
   }
 
   @Override
-  public void write(
-    final int b)
-    throws IOException {
+  public void write(final int b) throws IOException {
     out.write(b);
     written++;
   }
 
-  public final void writeBytes(
-    final String s)
-    throws IOException {
+  public final void writeBytes(final String s) throws IOException {
     final int len = s.length();
     final byte[] buffer = new byte[len];
     int count = 0;
@@ -100,23 +95,17 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     }
   }
 
-  public void writeDouble(
-    final double d)
-    throws IOException {
+  public void writeDouble(final double d) throws IOException {
     final long l = Double.doubleToLongBits(d);
     writeLong(l);
   }
 
-  public void writeFloat(
-    final float f)
-    throws IOException {
+  public void writeFloat(final float f) throws IOException {
     final int i = Float.floatToIntBits(f);
     writeInt(i);
   }
 
-  public void writeInt(
-    final int i)
-    throws IOException {
+  public void writeInt(final int i) throws IOException {
     writeBuffer[0] = (byte)(i >>> 24);
     writeBuffer[1] = (byte)(i >>> 16);
     writeBuffer[2] = (byte)(i >>> 8);
@@ -124,23 +113,17 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     write(writeBuffer, 0, 4);
   }
 
-  public void writeLEDouble(
-    final double d)
-    throws IOException {
+  public void writeLEDouble(final double d) throws IOException {
     final long l = Double.doubleToLongBits(d);
     writeLELong(l);
   }
 
-  public void writeLEFloat(
-    final float f)
-    throws IOException {
+  public void writeLEFloat(final float f) throws IOException {
     final int i = Float.floatToIntBits(f);
     writeLEInt(i);
   }
 
-  public void writeLEInt(
-    final int i)
-    throws IOException {
+  public void writeLEInt(final int i) throws IOException {
     writeBuffer[0] = (byte)(i >>> 0);
     writeBuffer[1] = (byte)(i >>> 8);
     writeBuffer[2] = (byte)(i >>> 16);
@@ -148,9 +131,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     write(writeBuffer, 0, 4);
   }
 
-  public void writeLELong(
-    final long l)
-    throws IOException {
+  public void writeLELong(final long l) throws IOException {
     writeBuffer[0] = (byte)(l >>> 0);
     writeBuffer[1] = (byte)(l >>> 8);
     writeBuffer[2] = (byte)(l >>> 16);
@@ -162,17 +143,13 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     write(writeBuffer, 0, 8);
   }
 
-  public void writeLEShort(
-    final short s)
-    throws IOException {
+  public void writeLEShort(final short s) throws IOException {
     writeBuffer[0] = (byte)(s >>> 0);
     writeBuffer[1] = (byte)(s >>> 8);
     write(writeBuffer, 0, 2);
   }
 
-  public void writeLong(
-    final long l)
-    throws IOException {
+  public void writeLong(final long l) throws IOException {
     writeBuffer[0] = (byte)(l >>> 56);
     writeBuffer[1] = (byte)(l >>> 48);
     writeBuffer[2] = (byte)(l >>> 40);
@@ -184,9 +161,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     write(writeBuffer, 0, 8);
   }
 
-  public void writeShort(
-    final short s)
-    throws IOException {
+  public void writeShort(final short s) throws IOException {
     writeBuffer[0] = (byte)(s >>> 8);
     writeBuffer[1] = (byte)(s >>> 0);
     write(writeBuffer, 0, 2);

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.springframework.core.io.AbstractResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
 public class OutputStreamResource extends AbstractResource {
@@ -18,18 +17,15 @@ public class OutputStreamResource extends AbstractResource {
 
   private boolean read;
 
-  public OutputStreamResource(
-    String filename,
-    OutputStream outputStream,
+  public OutputStreamResource(String filename, OutputStream outputStream,
     String description) {
     this.filename = filename;
     this.outputStream = outputStream;
     this.description = description;
   }
 
-  public OutputStreamResource(
-    String filename,
-    OutputStream outputStream) {
+  public OutputStreamResource(String filename, OutputStream outputStream) {
+    this.outputStream = outputStream;
     this.filename = filename;
   }
 
@@ -54,15 +50,12 @@ public class OutputStreamResource extends AbstractResource {
   }
 
   @Override
-  public String getFilename()
-    throws IllegalStateException {
+  public String getFilename() throws IllegalStateException {
     return filename;
   }
 
   @Override
-  public Resource createRelative(
-    String relativePath)
-    throws IOException {
+  public Resource createRelative(String relativePath) throws IOException {
     return new NonExistingResource();
   }
 
@@ -71,17 +64,8 @@ public class OutputStreamResource extends AbstractResource {
   }
 
   @Override
-  public boolean equals(
-    Object object) {
-    if (object != this) {
-      if (object instanceof OutputStreamResource) {
-        OutputStreamResource resource = (OutputStreamResource)object;
-        return resource.getOutputStream().equals(getOutputStream());
-      } else {
-        return false;
-      }
-    }
-    return true;
+  public boolean equals(Object object) {
+    return (object == this);
   }
 
   @Override
@@ -89,8 +73,7 @@ public class OutputStreamResource extends AbstractResource {
     return outputStream.hashCode();
   }
 
-  public InputStream getInputStream()
-    throws IOException {
+  public InputStream getInputStream() throws IOException {
     throw new IllegalArgumentException("No input stream exists");
   }
 }

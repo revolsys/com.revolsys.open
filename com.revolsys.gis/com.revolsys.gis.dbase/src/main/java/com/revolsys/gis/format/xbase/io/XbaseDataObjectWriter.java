@@ -45,6 +45,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private final List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
 
+  private final List<String> fieldNames = new ArrayList<String>();
+
   private Resource resource;
 
   private DataObjectMetaData metaData;
@@ -57,8 +59,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private boolean initialized;
 
-  public XbaseDataObjectWriter(
-    final DataObjectMetaData metaData,
+  public XbaseDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
     this.metaData = metaData;
     this.resource = resource;
@@ -68,11 +69,9 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     out.flush();
   }
 
-  protected int addDbaseField(
-    final String name,
-    final Class<?> typeJavaClass,
-    final int length,
-    final int scale) {
+  protected int addDbaseField(final String name, final Class<?> typeJavaClass,
+    final int length, final int scale) {
+
     FieldDefinition field = null;
     if (typeJavaClass == String.class) {
       if (length > 254) {
@@ -115,23 +114,29 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected boolean addField(
-    final FieldDefinition field) {
-    return fields.add(field);
+  protected boolean hasField(final String name) {
+    return fieldNames.contains(name);
+  }
+
+  protected void addField(final FieldDefinition field) {
+    fieldNames.add(field.getName());
+    fields.add(field);
   }
 
   public void close() {
     try {
-      try {
-        out.write(0x1a);
-        out.seek(1);
-        final Date now = new Date();
-        out.write(now.getYear());
-        out.write(now.getMonth() + 1);
-        out.write(now.getDate());
-        out.writeLEInt(numRecords);
-      } finally {
-        out.close();
+      if (out != null) {
+        try {
+          out.write(0x1a);
+          out.seek(1);
+          final Date now = new Date();
+          out.write(now.getYear());
+          out.write(now.getMonth() + 1);
+          out.write(now.getDate());
+          out.writeLEInt(numRecords);
+        } finally {
+          out.close();
+        }
       }
     } catch (final IOException e) {
       throw new RuntimeException(e);
@@ -146,14 +151,13 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return resource.toString();
   }
 
-  protected void init()
-    throws IOException {
+  protected void init() throws IOException {
     if (!initialized) {
       initialized = true;
       if (!(resource instanceof NonExistingResource)) {
         this.out = new ResourceEndianOutput(resource);
+        writeHeader();
       }
-      writeHeader();
     }
   }
 
@@ -161,13 +165,11 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return useZeroForNull;
   }
 
-  public void setUseZeroForNull(
-    final boolean useZeroForNull) {
+  public void setUseZeroForNull(final boolean useZeroForNull) {
     this.useZeroForNull = useZeroForNull;
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     try {
       if (!initialized) {
         init();
@@ -188,93 +190,93 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected void preFirstWrite(
-    DataObject object) throws IOException {
-   }
+  protected void preFirstWrite(DataObject object) throws IOException {
+  }
 
-  protected boolean writeField(
-    final DataObject object,
-    final FieldDefinition field)
-    throws IOException {
-    final Object value = object.getValue(field.getName());
+  protected boolean writeField(final DataObject object,
+    final FieldDefinition field) throws IOException {
+    if (out == null) {
+      return true;
+    } else {
+      final Object value = object.getValue(field.getName());
 
-    switch (field.getType()) {
-      case FieldDefinition.NUMBER_TYPE:
-        String numString = "";
-        if (value == null) {
-          if (useZeroForNull) {
-            numString = field.getNumberFormat().format(0);
+      switch (field.getType()) {
+        case FieldDefinition.NUMBER_TYPE:
+          String numString = "";
+          if (value == null) {
+            if (useZeroForNull) {
+              numString = field.getNumberFormat().format(0);
+            }
+          } else {
+            numString = field.getNumberFormat().format(value);
           }
-        } else {
-          numString = field.getNumberFormat().format(value);
-        }
-        for (int i = numString.length(); i < field.getLength(); i++) {
-          out.write(' ');
-        }
-        out.writeBytes(numString);
-        return true;
-      case FieldDefinition.FLOAT_TYPE:
-        String floatString = "";
-        if (value != null) {
-          floatString = value.toString();
-        }
-        for (int i = floatString.length(); i < field.getLength(); i++) {
-          out.write(' ');
-        }
-        out.writeBytes(floatString);
-        return true;
-
-      case FieldDefinition.CHARACTER_TYPE:
-        String string = "";
-        if (value != null) {
-          string = value.toString();
-        }
-        if (string.length() > field.getLength()) {
-          out.writeBytes(string.substring(0, field.getLength()));
-        } else {
-          out.writeBytes(string);
-          for (int i = string.length(); i < field.getLength(); i++) {
+          for (int i = numString.length(); i < field.getLength(); i++) {
             out.write(' ');
           }
-        }
-        return true;
+          out.writeBytes(numString);
+          return true;
+        case FieldDefinition.FLOAT_TYPE:
+          String floatString = "";
+          if (value != null) {
+            floatString = value.toString();
+          }
+          for (int i = floatString.length(); i < field.getLength(); i++) {
+            out.write(' ');
+          }
+          out.writeBytes(floatString);
+          return true;
 
-      case FieldDefinition.DATE_TYPE:
-        if (value instanceof Date) {
-          final Date date = (Date)value;
-          final DateFormat format = new SimpleDateFormat("yyyyMMdd");
-          final String dateString = format.format(date);
-          out.writeBytes(dateString);
+        case FieldDefinition.CHARACTER_TYPE:
+          String string = "";
+          if (value != null) {
+            string = value.toString();
+          }
+          if (string.length() > field.getLength()) {
+            out.writeBytes(string.substring(0, field.getLength()));
+          } else {
+            out.writeBytes(string);
+            for (int i = string.length(); i < field.getLength(); i++) {
+              out.write(' ');
+            }
+          }
+          return true;
 
-        } else if (value != null) {
-          out.writeBytes(value.toString().substring(0, 8));
-        } else {
-          out.writeBytes("        ");
-        }
-        return true;
+        case FieldDefinition.DATE_TYPE:
+          if (value instanceof Date) {
+            final Date date = (Date)value;
+            final DateFormat format = new SimpleDateFormat("yyyyMMdd");
+            final String dateString = format.format(date);
+            out.writeBytes(dateString);
 
-      case FieldDefinition.LOGICAL_TYPE:
-        boolean logical = false;
-        if (value instanceof Boolean) {
-          final Boolean boolVal = (Boolean)value;
-          logical = boolVal.booleanValue();
-        } else if (value != null) {
-          logical = Boolean.getBoolean(value.toString());
-        }
-        if (logical) {
-          out.write('T');
-        } else {
-          out.write('F');
-        }
-        return true;
+          } else if (value != null) {
+            out.writeBytes(value.toString().substring(0, 8));
+          } else {
+            out.writeBytes("        ");
+          }
+          return true;
 
-      default:
-        return false;
+        case FieldDefinition.LOGICAL_TYPE:
+          boolean logical = false;
+          if (value instanceof Boolean) {
+            final Boolean boolVal = (Boolean)value;
+            logical = boolVal.booleanValue();
+          } else if (value != null) {
+            logical = Boolean.getBoolean(value.toString());
+          }
+          if (logical) {
+            out.write('T');
+          } else {
+            out.write('F');
+          }
+          return true;
+
+        default:
+          return false;
+      }
     }
   }
 
-  private void writeHeader()
-    throws IOException {
+  private void writeHeader() throws IOException {
     if (out != null) {
       int recordLength = 1;
 
