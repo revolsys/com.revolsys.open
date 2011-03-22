@@ -91,6 +91,8 @@ public class FieldDefinition {
         for (int i = 0; i < decimalPlaces; i++) {
           format.append("0");
         }
+      } else {
+        format.append(".#");
       }
       numberFormat = new DecimalFormat(format.toString());
     }

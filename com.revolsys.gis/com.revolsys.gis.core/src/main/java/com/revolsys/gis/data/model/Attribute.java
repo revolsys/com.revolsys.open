@@ -20,7 +20,6 @@
  */
 package com.revolsys.gis.data.model;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,8 +62,7 @@ public class Attribute implements Cloneable {
   public Attribute() {
   }
 
-  public Attribute(
-    final Attribute attribute) {
+  public Attribute(final Attribute attribute) {
     this.name = attribute.getName();
     this.description = attribute.getDescription();
     this.type = attribute.getType();
@@ -78,8 +76,7 @@ public class Attribute implements Cloneable {
 
   }
 
-  public Attribute(
-    final int index) {
+  public Attribute(final int index) {
     this.index = index;
   }
 
@@ -91,9 +88,7 @@ public class Attribute implements Cloneable {
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
+  public Attribute(final String name, final DataType type,
     final boolean required) {
     this(name, type, 0, 0, required, null, null);
   }
@@ -108,11 +103,8 @@ public class Attribute implements Cloneable {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
-    final boolean required,
-    final Map<QName, Object> properties) {
+  public Attribute(final String name, final DataType type,
+    final boolean required, final Map<QName, Object> properties) {
     this(name, type, 0, 0, required, properties);
   }
 
@@ -125,12 +117,14 @@ public class Attribute implements Cloneable {
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
-    final int length,
+  public Attribute(final String name, final DataType type, final int length,
     final boolean required) {
-    this(name, type, length, required, null);
+    this(name, type, length, 0, required, null, null);
+  }
+
+  public Attribute(final String name, final DataType type, final int length,
+    final boolean required, final String description) {
+    this(name, type, length, 0, required, description, null);
   }
 
   /**
@@ -144,12 +138,8 @@ public class Attribute implements Cloneable {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final boolean required,
-    final Map<QName, Object> properties) {
+  public Attribute(final String name, final DataType type, final int length,
+    final boolean required, final Map<QName, Object> properties) {
     this(name, type, length, 0, required, properties);
   }
 
@@ -162,12 +152,8 @@ public class Attribute implements Cloneable {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
-    final Integer length,
-    final Integer scale,
-    final Boolean required) {
+  public Attribute(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required) {
     this(name, type, length, scale, required, null);
   }
 
@@ -182,12 +168,8 @@ public class Attribute implements Cloneable {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
-    final Integer length,
-    final Integer scale,
-    final Boolean required,
+  public Attribute(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
     final Map<QName, Object> properties) {
     this(name, type, length, scale, required, null, properties);
 
@@ -204,14 +186,9 @@ public class Attribute implements Cloneable {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public Attribute(
-    final String name,
-    final DataType type,
-    final Integer length,
-    final Integer scale,
-    final Boolean required,
-    final String description,
-    final Map<QName, Object> properties) {
+  public Attribute(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
+    final String description, final Map<QName, Object> properties) {
     this.name = name;
     this.description = description;
     this.type = type;
@@ -231,10 +208,7 @@ public class Attribute implements Cloneable {
 
   }
 
-  public Attribute(
-    String name,
-    DataType dataType,
-    boolean required,
+  public Attribute(String name, DataType dataType, boolean required,
     String description) {
     this(name, dataType, 0, 0, required, description, null);
   }
@@ -245,8 +219,7 @@ public class Attribute implements Cloneable {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object instanceof Attribute) {
       final Attribute attribute = (Attribute)object;
       return (name.equals(attribute.getName()));
@@ -299,8 +272,7 @@ public class Attribute implements Cloneable {
    * @return The property value.
    */
   @SuppressWarnings("unchecked")
-  public <V> V getProperty(
-    final QName name) {
+  public <V> V getProperty(final QName name) {
     return (V)properties.get(name);
   }
 
@@ -341,14 +313,11 @@ public class Attribute implements Cloneable {
     return required;
   }
 
-  void setIndex(
-    final int index) {
+  void setIndex(final int index) {
     this.index = index;
   }
 
-  public void setProperty(
-    final QName name,
-    final Object value) {
+  public void setProperty(final QName name, final Object value) {
     properties.put(name, value);
   }
 

@@ -70,12 +70,12 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   protected int addDbaseField(final String name, final Class<?> typeJavaClass,
-    final int length, final int scale) {
+    int length, final int scale) {
 
     FieldDefinition field = null;
     if (typeJavaClass == String.class) {
-      if (length > 254) {
-        field = new FieldDefinition(name, FieldDefinition.MEMO_TYPE, 10);
+      if (length > 254 || length == 0) {
+        field = new FieldDefinition(name, FieldDefinition.CHARACTER_TYPE, 254);
       } else {
         field = new FieldDefinition(name, FieldDefinition.CHARACTER_TYPE,
           length);
@@ -86,14 +86,13 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (typeJavaClass == java.sql.Date.class) {
       field = new FieldDefinition(name, FieldDefinition.DATE_TYPE, 8);
     } else if (typeJavaClass == BigDecimal.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length,
-        scale);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18, scale);
     } else if (typeJavaClass == BigInteger.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Float.class) {
-      field = new FieldDefinition(name, FieldDefinition.FLOAT_TYPE, 20);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Double.class) {
-      field = new FieldDefinition(name, FieldDefinition.FLOAT_TYPE, 20);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Byte.class) {
       field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 3);
     } else if (typeJavaClass == Short.class) {
@@ -101,17 +100,13 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (typeJavaClass == Integer.class) {
       field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 10);
     } else if (typeJavaClass == Long.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 19);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
     } else {
       log.warn("Writing " + typeJavaClass + " is not supported");
       field = new FieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
     }
-    if (field != null) {
-      addField(field);
-      return field.getLength();
-    } else {
-      return 0;
-    }
+    addField(field);
+    return field.getLength();
   }
 
   protected boolean hasField(final String name) {
@@ -200,6 +195,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     } else {
       final Object value = object.getValue(field.getName());
 
+      final int fieldLength = field.getLength();
       switch (field.getType()) {
         case FieldDefinition.NUMBER_TYPE:
           String numString = "";
@@ -210,8 +206,14 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           } else {
             numString = field.getNumberFormat().format(value);
           }
-          for (int i = numString.length(); i < field.getLength(); i++) {
-            out.write(' ');
+          if (numString.length() > fieldLength) {
+            for (int i = 0; i < fieldLength; i++) {
+              out.write('9');
+            }
+          } else {
+            for (int i = numString.length(); i < fieldLength; i++) {
+              out.write(' ');
+            }
           }
           out.writeBytes(numString);
           return true;
@@ -220,7 +222,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             floatString = value.toString();
           }
-          for (int i = floatString.length(); i < field.getLength(); i++) {
+          for (int i = floatString.length(); i < fieldLength; i++) {
             out.write(' ');
           }
           out.writeBytes(floatString);
@@ -231,11 +233,11 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             string = value.toString();
           }
-          if (string.length() > field.getLength()) {
-            out.writeBytes(string.substring(0, field.getLength()));
+          if (string.length() > fieldLength) {
+            out.writeBytes(string.substring(0, fieldLength));
           } else {
             out.writeBytes(string);
-            for (int i = string.length(); i < field.getLength(); i++) {
+            for (int i = string.length(); i < fieldLength; i++) {
               out.write(' ');
             }
           }
@@ -318,14 +320,15 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
       int offset = 1;
       for (final FieldDefinition field : fields) {
         if (field.getDataType() != DataTypes.OBJECT) {
-          String name = field.getName();
+          String name = field.getName().toUpperCase();
           if (name.length() > 10) {
             name = name.substring(0, 10);
           }
           final int length = field.getLength();
           final int decimalPlaces = field.getDecimalPlaces();
-          out.writeBytes(name.toUpperCase());
-          for (int i = name.length(); i < 11; i++) {
+          out.writeBytes(name);
+          int numPad = 11 - name.length();
+          for (int i = 0; i < numPad; i++) {
             out.write(0);
           }
           out.write(field.getType());
