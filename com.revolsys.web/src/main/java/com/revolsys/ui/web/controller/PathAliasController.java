@@ -1,6 +1,8 @@
 package com.revolsys.ui.web.controller;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
@@ -25,12 +28,27 @@ public class PathAliasController implements Controller {
       if (requestDispatcher == null) {
         return false;
       } else {
-        requestDispatcher.include(new HttpServletRequestWrapper(request) {
-          @Override
-          public String getPathInfo() {
-            return path;
-          }
-        }, response);
+        final HttpServletRequest wrappedRequest;
+        if (request instanceof DefaultMultipartHttpServletRequest) {
+          DefaultMultipartHttpServletRequest multiPartRequest = (DefaultMultipartHttpServletRequest)request;
+          wrappedRequest = new DefaultMultipartHttpServletRequest(
+            multiPartRequest, multiPartRequest.getMultiFileMap(),
+            new HashMap<String, String[]>()) {
+            @Override
+            public String getPathInfo() {
+              return path;
+            }
+          };
+        } else {
+          wrappedRequest = new HttpServletRequestWrapper(request) {
+            @Override
+            public String getPathInfo() {
+              return path;
+            }
+          };
+        }
+
+        requestDispatcher.include(wrappedRequest, response);
       }
     } catch (final ServletException e) {
       LOG.error("Unable to include path " + path, e);
