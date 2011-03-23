@@ -1,7 +1,6 @@
 package com.revolsys.ui.web.controller;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
@@ -15,12 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
+import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 
 public class PathAliasController implements Controller {
 
   private static final Logger LOG = LoggerFactory.getLogger(PathAliasController.class);
 
-  public static boolean include(final HttpServletRequest request,
+  public static boolean forward(final HttpServletRequest request,
     final HttpServletResponse response, final String path) throws IOException,
     ServletException {
     try {
@@ -48,7 +48,7 @@ public class PathAliasController implements Controller {
           };
         }
 
-        requestDispatcher.include(wrappedRequest, response);
+        requestDispatcher.forward(wrappedRequest, response);
       }
     } catch (final ServletException e) {
       LOG.error("Unable to include path " + path, e);
@@ -73,7 +73,11 @@ public class PathAliasController implements Controller {
     String path = request.getServletPath() + request.getPathInfo();
     if (path.startsWith(prefix)) {
       path = path.replaceFirst(prefix, aliasPrefix);
-      include(request, response, path);
+      if (forward(request, response, path)) {
+        return null;
+      } else {
+        throw new NoSuchRequestHandlingMethodException(request);
+      }
     }
     return null;
   }
