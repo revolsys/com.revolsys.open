@@ -15,6 +15,7 @@ import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequ
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.util.WebUtils;
 
 public class PathAliasController implements Controller {
 
@@ -47,8 +48,16 @@ public class PathAliasController implements Controller {
             }
           };
         }
+        Object forwardPath = request.getAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE);
+        if (forwardPath == null) {
+          String originalUri = request.getRequestURI();
+          wrappedRequest.setAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE,
+            originalUri);
+        }
 
         requestDispatcher.forward(wrappedRequest, response);
+        wrappedRequest.setAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE,
+          forwardPath);
       }
     } catch (final ServletException e) {
       LOG.error("Unable to include path " + path, e);
