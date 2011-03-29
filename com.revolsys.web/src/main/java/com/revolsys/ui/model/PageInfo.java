@@ -21,6 +21,8 @@ public class PageInfo extends AbstractDocumentedObject {
 
   private List<MediaType> inputContentTypes = new ArrayList<MediaType>();
 
+  private String url;
+
   public PageInfo() {
   }
 
@@ -89,6 +91,10 @@ public class PageInfo extends AbstractDocumentedObject {
     return parameters;
   }
 
+  public String getUrl() {
+    return url;
+  }
+
   @Override
   public void setDescription(final String description) {
     super.setDescription(description);
@@ -96,6 +102,14 @@ public class PageInfo extends AbstractDocumentedObject {
 
   public void setInputContentTypes(final List<MediaType> inputContentTypes) {
     this.inputContentTypes = inputContentTypes;
+  }
+
+  public void setInputContentTypes(final MediaType... inputContentTypes) {
+    final ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
+    for (final MediaType mediaType : inputContentTypes) {
+      mediaTypes.add(mediaType);
+    }
+    setInputContentTypes(mediaTypes);
   }
 
   public void setMediaTypes(final List<MediaType> mediaTypes) {
@@ -115,11 +129,7 @@ public class PageInfo extends AbstractDocumentedObject {
     super.setTitle(title);
   }
 
-  public void setInputContentTypes(MediaType... inputContentTypes) {
-    ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
-    for (MediaType mediaType : inputContentTypes) {
-      mediaTypes.add(mediaType);
-    }
-    setInputContentTypes(mediaTypes);
+  public void setUrl(final String url) {
+    this.url = url;
   }
 }

@@ -78,6 +78,10 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
     if (callback != null) {
       writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
     }
+    final Object title = request.getAttribute(IoConstants.TITLE_PROPERTY);
+    if (title != null) {
+      writer.setProperty(IoConstants.TITLE_PROPERTY, title);
+    }
     writer.write(map);
     writer.close();
   }

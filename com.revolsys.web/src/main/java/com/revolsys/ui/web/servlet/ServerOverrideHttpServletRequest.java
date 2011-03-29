@@ -1,17 +1,53 @@
 package com.revolsys.ui.web.servlet;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper {
   private String serverUrl;
+  
+  private int serverPort;
+
+  private String serverName;
+
+  private String scheme;
 
   public ServerOverrideHttpServletRequest(final String serverUrl,
     HttpServletRequest request) {
     super(request);
     this.serverUrl = serverUrl;
+    try {
+      URL url = new URL(serverUrl);
+      scheme = url.getProtocol();
+      serverName = url.getHost();
+      serverPort = url.getPort();
+      if (serverPort == -1) {
+        serverPort = url.getDefaultPort();
+      }
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException("Invalid URL " + serverUrl);
+    }
+    
   }
 
+  @Override
+  public int getServerPort() {
+    return serverPort;
+  }
+  
+  @Override
+  public String getScheme() {
+    return scheme;
+  }
+  
+  @Override
+  public String getServerName() {
+    return serverName;
+  }
+  
   @Override
   public StringBuffer getRequestURL() {
     StringBuffer url = new StringBuffer(serverUrl);

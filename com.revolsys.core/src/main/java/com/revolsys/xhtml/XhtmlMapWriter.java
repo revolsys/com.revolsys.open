@@ -24,8 +24,7 @@ public class XhtmlMapWriter extends AbstractMapWriter {
 
   private boolean wrap = true;
 
-  public XhtmlMapWriter(
-    final Writer out) {
+  public XhtmlMapWriter(final Writer out) {
     this.out = new XmlWriter(out);
 
   }
@@ -59,9 +58,7 @@ public class XhtmlMapWriter extends AbstractMapWriter {
     out.flush();
   }
 
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     if (name.equals(IoConstants.WRAP_PROPERTY)) {
       wrap = Boolean.valueOf(value.toString());
     } else if (name.equals(IoConstants.TITLE_PROPERTY)) {
@@ -70,20 +67,23 @@ public class XhtmlMapWriter extends AbstractMapWriter {
     super.setProperty(name, value);
   }
 
-  public void write(
-    final Map<String, ? extends Object> values) {
+  public void write(final Map<String, ? extends Object> values) {
     if (!opened) {
-      if (values instanceof NamedObject) {
-        String name = ((NamedObject)values).getName();
-        if (name != null) {
-          this.title = name;
+      if (title == null) {
+        if (values instanceof NamedObject) {
+          String name = ((NamedObject)values).getName();
+          if (name != null) {
+            this.title = name;
+          }
         }
       }
       if (wrap) {
         writeHeader();
       }
       out.startTag(HtmlUtil.DIV);
-      out.element(HtmlUtil.H1, title);
+      if (title != null) {
+        out.element(HtmlUtil.H1, title);
+      }
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "objectView");
       out.startTag(HtmlUtil.TABLE);

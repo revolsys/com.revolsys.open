@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
+import com.revolsys.io.NamedLinkedHashMap;
 import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;
 import com.revolsys.ui.model.ParameterInfo;
@@ -41,7 +43,7 @@ public class PageInfoHttpMessageConverter extends
   AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
 
-  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
@@ -53,6 +55,16 @@ public class PageInfoHttpMessageConverter extends
     MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML,
     APPLICATION_VND_SUN_WADL_XML, TEXT_URI_LIST, MediaType.APPLICATION_JSON,
     MediaType.TEXT_XML);
+
+  private static Map<MediaType, String> MEDIA_TYPE_TO_EXTENSION_MAP = new HashMap<MediaType, String>();
+  static {
+    MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.APPLICATION_XHTML_XML, ".html");
+    MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.TEXT_HTML, ".html");
+    MEDIA_TYPE_TO_EXTENSION_MAP.put(APPLICATION_VND_SUN_WADL_XML, ".wadl");
+    MEDIA_TYPE_TO_EXTENSION_MAP.put(TEXT_URI_LIST, ".uri-list");
+    MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.APPLICATION_JSON, ".json");
+    MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.TEXT_XML, ".xml");
+  }
 
   public PageInfoHttpMessageConverter() {
     super(PageInfo.class, Collections.emptySet(), WRITE_MEDIA_TYPES);
@@ -68,104 +80,70 @@ public class PageInfoHttpMessageConverter extends
         charset = DEFAULT_CHARSET;
       }
 
-      HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-      String path = urlPathHelper.getOriginatingRequestUri(request);
-      if (!path.endsWith("/")) {
-        path += "/";
+      final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+
+      String url = pageInfo.getUrl();
+      if (url == null) {
+        url = HttpRequestUtils.getServerUrl();
+        url += urlPathHelper.getOriginatingRequestUri(request);
       }
-      HttpHeaders headers = outputMessage.getHeaders();
+      if (url.charAt(url.length() - 1) != '/') {
+        url += '/';
+      }
+
+      final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
+      if (extension != null) {
+        url = url.replaceAll(extension + "/?$", "/");
+      }
+      final HttpHeaders headers = outputMessage.getHeaders();
       headers.setContentType(mediaType);
 
       final OutputStream out = outputMessage.getBody();
       if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {
-        writeWadl(out, path, pageInfo);
+        writeWadl(out, url, pageInfo);
       } else if (MediaType.TEXT_HTML.equals(mediaType)
         || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
-        writeHtml(out, path, pageInfo);
+        writeHtml(out, url, pageInfo);
       } else if (TEXT_URI_LIST.equals(mediaType)) {
-        writeUriList(out, path, pageInfo);
+        writeUriList(out, url, pageInfo);
         // return getUriListRepresentation();
       } else {
-        writeResourceList(mediaType, charset, out, path, pageInfo);
+        writeResourceList(mediaType, charset, out, url, pageInfo);
       }
     }
   }
 
-  private void writeWadl(OutputStream out, String path, PageInfo pageInfo) {
-    XmlWriter writer = new XmlWriter(out);
-    writer.startDocument();
-    writer.startTag(APPLICATION);
-    
-
-    writer.startTag(RESOURCES);
-    writeWadlResource(writer, path, pageInfo, true);
-    writer.endTag(RESOURCES);
-
-    writer.endTag(APPLICATION);
-    writer.endDocument();
-    writer.close();
-  }
-
-  private void writeWadlResource(XmlWriter writer, String path,
-    PageInfo pageInfo, boolean writeChildren) {
-    writer.startTag(RESOURCE);
-    writer.attribute(PATH, path);
-    writeWadlDoc(writer, pageInfo);
-    if (writeChildren) {
-      for (Entry<String, PageInfo> childPage : pageInfo.getPages().entrySet()) {
-        String childPath = childPage.getKey();
-        PageInfo childPageInfo = childPage.getValue();
-        writeWadlResource(writer, childPath, childPageInfo, false);
-      }
-    }
-    writer.endTag(RESOURCE);
-  }
-
-  private void writeWadlDoc(XmlWriter writer, PageInfo pageInfo) {
-    for (DocInfo documentation : pageInfo.getDocumentation()) {
-      String title = documentation.getTitle();
-      String description = documentation.getDescription();
-      if (title != null && description != null) {
-        writer.startTag(DOC);
-        Locale locale = documentation.getLocale();
-        if (locale != null) {
-          writer.attribute(XmlContants.XML_LANG, locale);
-        }
-        writer.attribute(TITLE, title);
-        writer.text(description);
-        writer.endTag(DOC);
-      }
-    }
-  }
-
-  private void writeHtml(OutputStream out, String path, PageInfo pageInfo) {
-    XmlWriter writer = new XmlWriter(out);
+  @SuppressWarnings("unchecked")
+  private void writeHtml(final OutputStream out, final String url,
+    final PageInfo pageInfo) {
+    final XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
     writer.element(HtmlUtil.H1, pageInfo.getTitle());
-    String description = pageInfo.getDescription();
+    final String description = pageInfo.getDescription();
     if (description != null) {
       writer.element(HtmlUtil.P, description);
     }
 
-    HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-    for (String method : pageInfo.getMethods()) {
-      writeMethod(writer, path, pageInfo, method, request.getParameterMap());
+    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    for (final String method : pageInfo.getMethods()) {
+      final Map<String, Object> parameterMap = request.getParameterMap();
+      writeMethod(writer, url, pageInfo, method, parameterMap);
     }
 
-    Map<String, PageInfo> pages = pageInfo.getPages();
+    final Map<String, PageInfo> pages = pageInfo.getPages();
     if (!pages.isEmpty()) {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "resources");
       writer.element(HtmlUtil.H2, "Resources");
       writer.startTag(HtmlUtil.DL);
-      for (Entry<String, PageInfo> childPage : pages.entrySet()) {
-        String childPath = childPage.getKey();
-        PageInfo childPageInfo = childPage.getValue();
+      for (final Entry<String, PageInfo> childPage : pages.entrySet()) {
+        final String childPath = childPage.getKey();
+        final PageInfo childPageInfo = childPage.getValue();
         String childUri;
         if (childPath.startsWith("/")) {
           childUri = childPath;
         } else {
-          childUri = path + childPath;
+          childUri = url + childPath;
         }
 
         // Reference childReference = reference.clone();
@@ -174,11 +152,11 @@ public class PageInfoHttpMessageConverter extends
         // childReference.addSegment(childPathElement);
         // }
         writer.startTag(HtmlUtil.DT);
-        String childTitle = childPageInfo.getTitle();
+        final String childTitle = childPageInfo.getTitle();
         HtmlUtil.serializeA(writer, null, childUri, childTitle);
         writer.endTag(HtmlUtil.DT);
-        boolean isTemplate = childPath.matches(".*(\\{[^\\}]+\\}.*)+");
-        String childDescription = childPageInfo.getDescription();
+        final boolean isTemplate = childPath.matches(".*(\\{[^\\}]+\\}.*)+");
+        final String childDescription = childPageInfo.getDescription();
         if (childDescription != null || isTemplate) {
           writer.startTag(HtmlUtil.DD);
           if (childDescription != null) {
@@ -188,9 +166,10 @@ public class PageInfoHttpMessageConverter extends
             writer.startTag(HtmlUtil.FORM);
             writer.attribute(HtmlUtil.ATTR_ACTION, childUri);
             writer.attribute(HtmlUtil.ATTR_METHOD, "get");
-            for (String pathElement : childPath.split("/")) {
+            for (final String pathElement : childPath.split("/")) {
               if (pathElement.matches("\\{[^\\}]+\\}")) {
-                String name = pathElement.substring(1, pathElement.length() - 1);
+                final String name = pathElement.substring(1,
+                  pathElement.length() - 1);
                 HtmlUtil.serializeTextInput(writer, name, name, 20, 255);
               }
             }
@@ -208,59 +187,25 @@ public class PageInfoHttpMessageConverter extends
     writer.close();
   }
 
-  private void writeMethod(final XmlWriter writer, String path,
-    PageInfo pageInfo, final String method, Map<String, Object> values) {
-    Collection<ParameterInfo> parameters = pageInfo.getParameters();
-    boolean hasParameters = !parameters.isEmpty();
-    if (hasParameters) {
-      String title = method;
-      writer.element(HtmlUtil.H2, title);
+  private void writeHtmlField(final XmlWriter writer, final String name,
+    final Map<String, ?> formValues) {
+    final Object value = formValues.get(name);
+    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.LABEL);
 
-      if (hasParameters) {
-        writer.startTag(HtmlUtil.FORM);
-        writer.attribute(HtmlUtil.ATTR_ACTION, path);
-        if (method.equals("post")) {
-          boolean isFormData = false;
-          for (MediaType mediaType : pageInfo.getInputContentTypes()) {
-            if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)) {
-              isFormData = true;
-            }
-          }
-          if (isFormData) {
-            writer.attribute(HtmlUtil.ATTR_ENCTYPE,
-              MediaType.MULTIPART_FORM_DATA.toString());
-          }
-        }
-        writer.attribute(HtmlUtil.ATTR_METHOD, method);
-        writer.startTag(HtmlUtil.DL);
-        for (ParameterInfo parameter : parameters) {
-          String parameterName = parameter.getName();
-          List<Object> options = parameter.getAllowedValues();
-          if (options.isEmpty()) {
-            if (parameter.getType().equals("xsd:base64Binary")) {
-              writeHtmlFileField(writer, parameterName, values);
-            } else {
-              writeHtmlField(writer, parameterName, values);
-            }
-          } else {
-            writeHtmlSelect(writer, parameterName, values,
-              !parameter.isRequired(), options);
-          }
-        }
-      }
-      List<MediaType> mediaTypes = pageInfo.getMediaTypes();
-      if (!mediaTypes.isEmpty()) {
-        writeHtmlSelect(writer, "format", values, false, mediaTypes);
-      }
-      writer.endTag(HtmlUtil.DL);
-      HtmlUtil.serializeSubmitInput(writer, "Submit", "submit");
-      writer.endTag(HtmlUtil.FORM);
-    }
+    writer.attribute(HtmlUtil.ATTR_FOR, name);
+    writer.text(CaseConverter.toCapitalizedWords(name));
+    writer.endTag(HtmlUtil.LABEL);
+    writer.endTag(HtmlUtil.DT);
+
+    writer.startTag(HtmlUtil.DD);
+    HtmlUtil.serializeTextInput(writer, name, value, 50, 255);
+    writer.endTag(HtmlUtil.DD);
   }
 
   private void writeHtmlFileField(final XmlWriter writer, final String name,
     final Map<String, ?> formValues) {
-    Object value = formValues.get(name);
+    final Object value = formValues.get(name);
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
 
@@ -277,7 +222,7 @@ public class PageInfoHttpMessageConverter extends
   private void writeHtmlSelect(final XmlWriter writer, final String name,
     final Map<String, ?> formValues, final boolean optional,
     final List<? extends Object> values) {
-    Object value = formValues.get(name);
+    final Object value = formValues.get(name);
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
 
@@ -291,24 +236,60 @@ public class PageInfoHttpMessageConverter extends
     writer.endTag(HtmlUtil.DD);
   }
 
-  private void writeHtmlField(final XmlWriter writer, final String name,
-    final Map<String, ?> formValues) {
-    Object value = formValues.get(name);
-    writer.startTag(HtmlUtil.DT);
-    writer.startTag(HtmlUtil.LABEL);
+  private void writeMethod(final XmlWriter writer, final String url,
+    final PageInfo pageInfo, final String method,
+    final Map<String, Object> values) {
+    final Collection<ParameterInfo> parameters = pageInfo.getParameters();
+    final boolean hasParameters = !parameters.isEmpty();
+    if (hasParameters) {
+      final String title = method;
+      writer.element(HtmlUtil.H2, title);
 
-    writer.attribute(HtmlUtil.ATTR_FOR, name);
-    writer.text(CaseConverter.toCapitalizedWords(name));
-    writer.endTag(HtmlUtil.LABEL);
-    writer.endTag(HtmlUtil.DT);
-
-    writer.startTag(HtmlUtil.DD);
-    HtmlUtil.serializeTextInput(writer, name, value, 50, 255);
-    writer.endTag(HtmlUtil.DD);
+      if (hasParameters) {
+        writer.startTag(HtmlUtil.FORM);
+        writer.attribute(HtmlUtil.ATTR_ACTION, url);
+        if (method.equals("post")) {
+          boolean isFormData = false;
+          for (final MediaType mediaType : pageInfo.getInputContentTypes()) {
+            if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)) {
+              isFormData = true;
+            }
+          }
+          if (isFormData) {
+            writer.attribute(HtmlUtil.ATTR_ENCTYPE,
+              MediaType.MULTIPART_FORM_DATA.toString());
+          }
+        }
+        writer.attribute(HtmlUtil.ATTR_METHOD, method);
+        writer.startTag(HtmlUtil.DL);
+        for (final ParameterInfo parameter : parameters) {
+          final String parameterName = parameter.getName();
+          final List<Object> options = parameter.getAllowedValues();
+          if (options.isEmpty()) {
+            if (parameter.getType().equals("xsd:base64Binary")) {
+              writeHtmlFileField(writer, parameterName, values);
+            } else {
+              writeHtmlField(writer, parameterName, values);
+            }
+          } else {
+            writeHtmlSelect(writer, parameterName, values,
+              !parameter.isRequired(), options);
+          }
+        }
+      }
+      final List<MediaType> mediaTypes = pageInfo.getMediaTypes();
+      if (!mediaTypes.isEmpty()) {
+        writeHtmlSelect(writer, "format", values, false, mediaTypes);
+      }
+      writer.endTag(HtmlUtil.DL);
+      HtmlUtil.serializeSubmitInput(writer, "Submit", "submit");
+      writer.endTag(HtmlUtil.FORM);
+    }
   }
 
-  public void writeResourceList(final MediaType mediaType, Charset charset,
-    final OutputStream out, String path, final PageInfo pageInfo) {
+  public void writeResourceList(final MediaType mediaType,
+    final Charset charset, final OutputStream out, final String url,
+    final PageInfo pageInfo) {
 
     final String mediaTypeString = mediaType.getType() + "/"
       + mediaType.getSubtype();
@@ -332,12 +313,13 @@ public class PageInfoHttpMessageConverter extends
         .entrySet()) {
         final String childPath = childPage.getKey();
         final PageInfo childPageInfo = childPage.getValue();
-        final Map<String, String> childPageMap = new LinkedHashMap<String, String>();
+        final Map<String, String> childPageMap = new NamedLinkedHashMap<String, String>(
+          "resource");
         String childUri;
         if (childPath.startsWith("/")) {
           childUri = childPath;
         } else {
-          childUri = path + childPath;
+          childUri = url + childPath;
         }
         childPageMap.put("resourceUri", childUri);
         childPageMap.put("title", childPageInfo.getTitle());
@@ -348,7 +330,7 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  private void writeUriList(final OutputStream out, String path,
+  private void writeUriList(final OutputStream out, final String url,
     final PageInfo pageInfo) throws IOException {
     final Writer writer = new OutputStreamWriter(out,
       Charset.forName("US-ASCII"));
@@ -359,13 +341,61 @@ public class PageInfoHttpMessageConverter extends
         if (childPath.startsWith("/")) {
           childUri = childPath;
         } else {
-          childUri = path + childPath;
+          childUri = url + childPath;
         }
-        writer.write(path + childUri);
+        writer.write(url + childUri);
         writer.write("\r\n");
       }
     } finally {
       FileUtil.closeSilent(writer);
     }
+  }
+
+  private void writeWadl(final OutputStream out, final String url,
+    final PageInfo pageInfo) {
+    final XmlWriter writer = new XmlWriter(out);
+    writer.startDocument();
+    writer.startTag(APPLICATION);
+
+    writer.startTag(RESOURCES);
+    writeWadlResource(writer, url, pageInfo, true);
+    writer.endTag(RESOURCES);
+
+    writer.endTag(APPLICATION);
+    writer.endDocument();
+    writer.close();
+  }
+
+  private void writeWadlDoc(final XmlWriter writer, final PageInfo pageInfo) {
+    for (final DocInfo documentation : pageInfo.getDocumentation()) {
+      final String title = documentation.getTitle();
+      final String description = documentation.getDescription();
+      if (title != null && description != null) {
+        writer.startTag(DOC);
+        final Locale locale = documentation.getLocale();
+        if (locale != null) {
+          writer.attribute(XmlContants.XML_LANG, locale);
+        }
+        writer.attribute(TITLE, title);
+        writer.text(description);
+        writer.endTag(DOC);
+      }
+    }
+  }
+
+  private void writeWadlResource(final XmlWriter writer, final String url,
+    final PageInfo pageInfo, final boolean writeChildren) {
+    writer.startTag(RESOURCE);
+    writer.attribute(PATH, url);
+    writeWadlDoc(writer, pageInfo);
+    if (writeChildren) {
+      for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
+        .entrySet()) {
+        final String childPath = childPage.getKey();
+        final PageInfo childPageInfo = childPage.getValue();
+        writeWadlResource(writer, childPath, childPageInfo, false);
+      }
+    }
+    writer.endTag(RESOURCE);
   }
 }

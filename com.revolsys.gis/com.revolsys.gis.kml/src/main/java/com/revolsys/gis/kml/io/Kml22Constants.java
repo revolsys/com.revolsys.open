@@ -80,6 +80,8 @@ public interface Kml22Constants {
 
   QName STYLE_URL = new QName(KML_NS_URI, "styleUrl");
 
+  QName STYLE = new QName(KML_NS_URI, "Style");
+
   QName VALUE = new QName(KML_NS_URI, "value");
 
   QName VIEW_REFRESH_MODE = new QName(KML_NS_URI, "viewRefreshMode");
@@ -96,6 +98,9 @@ public interface Kml22Constants {
 
   String DOCUMENT_NAME_PROPERTY = "java:" + Kml22Constants.class.getName()
     + ".DocumentName";
+
+  String STYLE_PROPERTY = "java:" + Kml22Constants.class.getName()
+    + ".Style";
 
   String SNIPPET_PROPERTY = "java:" + Kml22Constants.class.getName()
     + ".Snippet";
