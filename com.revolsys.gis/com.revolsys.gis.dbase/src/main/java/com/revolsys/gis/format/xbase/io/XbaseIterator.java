@@ -74,31 +74,23 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private Runnable initCallback;
 
-  public XbaseIterator(
-    final Resource resource,
-    final DataObjectFactory dataObjectFactory)
-    throws IOException {
+  public XbaseIterator(final Resource resource,
+    final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
     this.in = new EndianInputStream(resource.getInputStream());
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  public XbaseIterator(
-    final QName name,
-    final EndianInput in,
-    final DataObjectFactory dataObjectFactory)
-    throws IOException {
+  public XbaseIterator(final QName name, final EndianInput in,
+    final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = name;
     this.in = in;
     this.dataObjectFactory = dataObjectFactory;
     doInit();
   }
 
-  public XbaseIterator(
-    Resource in,
-    DataObjectFactory dataObjectFactory,
-    Runnable initCallback)
-    throws IOException {
+  public XbaseIterator(Resource in, DataObjectFactory dataObjectFactory,
+    Runnable initCallback) throws IOException {
     this(in, dataObjectFactory);
     this.initCallback = initCallback;
   }
@@ -107,8 +99,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     FileUtil.closeSilent(in);
   }
 
-  private Boolean getBoolean(
-    final int startIndex) {
+  private Boolean getBoolean(final int startIndex) {
     final char c = (char)recordBuffer[startIndex];
     switch (c) {
       case 't':
@@ -127,15 +118,13 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     }
   }
 
-  private Date getDate(
-    final int startIndex,
-    final int len) {
+  private Date getDate(final int startIndex, final int len) {
     final String dateString = getString(startIndex, len);
     if (dateString.trim().length() == 0) {
       return null;
     } else {
       try {
-        return dateFormat.parse(dateString);
+        return new java.sql.Date(dateFormat.parse(dateString).getTime());
       } catch (final ParseException e) {
         throw new IllegalStateException("'" + dateString
           + "' is not a date in 'YYYYMMDD' format");
@@ -147,9 +136,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     return deletedCount;
   }
 
-  private Object getMemo(
-    final int startIndex,
-    final int len)
+  private Object getMemo(final int startIndex, final int len)
     throws IOException {
     return null;
     /*
@@ -172,9 +159,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     return metaData;
   }
 
-  private BigDecimal getNumber(
-    final int startIndex,
-    final int len) {
+  private BigDecimal getNumber(final int startIndex, final int len) {
     BigDecimal number = null;
     final String numberString = getString(startIndex, len);
     if (numberString.trim().length() != 0) {
@@ -183,14 +168,11 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     return number;
   }
 
-  private String getString(
-    final int startIndex,
-    final int len) {
+  private String getString(final int startIndex, final int len) {
     return new String(recordBuffer, startIndex, len).trim();
   }
 
-  protected DataObject loadDataObject()
-    throws IOException {
+  protected DataObject loadDataObject() throws IOException {
     if (in.read(recordBuffer) != recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of file");
     }
@@ -226,8 +208,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
    * 
    * @throws IOException If an I/O error occurs.
    */
-  private void loadHeader()
-    throws IOException {
+  private void loadHeader() throws IOException {
     in.read();
     final int y = in.read();
     final int m = in.read();
@@ -240,8 +221,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     in.skipBytes(20);
   }
 
-  private void readMetaData()
-    throws IOException {
+  private void readMetaData() throws IOException {
     metaData = new DataObjectMetaDataImpl(name);
     int b = in.read();
     while (b != 0x0D) {

@@ -83,7 +83,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
     } else if (typeJavaClass == Boolean.class) {
       field = new FieldDefinition(name, FieldDefinition.LOGICAL_TYPE, 1);
-    } else if (typeJavaClass == java.sql.Date.class) {
+    } else if (typeJavaClass == Date.class) {
       field = new FieldDefinition(name, FieldDefinition.DATE_TYPE, 8);
     } else if (typeJavaClass == BigDecimal.class) {
       field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18, scale);
@@ -250,10 +250,10 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             final String dateString = format.format(date);
             out.writeBytes(dateString);
 
-          } else if (value != null) {
-            out.writeBytes(value.toString().substring(0, 8));
-          } else {
+          } else if (value == null) {
             out.writeBytes("        ");
+          } else {
+            out.writeBytes(value.toString().substring(0, 8));
           }
           return true;
 

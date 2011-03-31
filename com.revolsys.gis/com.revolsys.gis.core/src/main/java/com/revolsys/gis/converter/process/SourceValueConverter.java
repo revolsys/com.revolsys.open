@@ -13,18 +13,15 @@ public class SourceValueConverter implements
   public SourceValueConverter() {
   }
 
-  public SourceValueConverter(
-    final String targetAttributeName,
+  public SourceValueConverter(final String targetAttributeName,
     final Converter<DataObject, ? extends Object> sourceValueConverter) {
     this.targetAttributeName = targetAttributeName;
     this.sourceValueConverter = sourceValueConverter;
-  }
+  } 
 
-  public void process(
-    final DataObject source,
-    final DataObject target) {
+  public void process(final DataObject source, final DataObject target) {
     final Object value = sourceValueConverter.convert(source);
-    if (value != null) {
+    if (value != null && (!(value instanceof String) || !("".equals(value)))) {
       target.setValue(targetAttributeName, value);
     }
   }

@@ -27,9 +27,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.FileSystemResource;
@@ -56,7 +60,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   private File directory;
 
   /** The files to be read by this reader. */
-  private Iterator<File> fileIterator;
+  private Iterator<Entry<File, Reader<T>>> readerIterator;
 
   /** The filter used to select files from the directory. */
   private FilenameFilter fileNameFilter;
@@ -69,6 +73,8 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /** The logging instance. */
   private final Logger log = Logger.getLogger(getClass());
+
+  private Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
 
   /**
    * Construct a new AbstractDirectoryReader.
@@ -91,8 +97,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * @param file The file to read.
    * @return The reader for the file.
    */
-  protected abstract Reader<T> createReader(
-    Resource file);
+  protected abstract Reader<T> createReader(Resource file);
 
   /**
    * Get the list of base file names to read.
@@ -156,7 +161,17 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
     return fileList;
   }
 
+  @PostConstruct
   public void open() {
+    for (File file : getFiles()) {
+      final FileSystemResource resource = new FileSystemResource(file);
+      Reader<T> reader = createReader(resource);
+      reader.open();
+      if (reader != null) {
+        readers.put(file, reader);
+      }
+    }
+    readerIterator = readers.entrySet().iterator();
     hasNext();
   }
 
@@ -167,7 +182,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    */
   public boolean hasNext() {
     while (hasNext && (currentIterator == null || !currentIterator.hasNext())) {
-      if (fileIterator.hasNext()) {
+      if (readerIterator.hasNext()) {
         if (currentReader != null) {
           try {
             currentReader.close();
@@ -175,14 +190,12 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
             log.warn(t.getMessage(), t);
           }
         }
-        currentFile = fileIterator.next();
+        Entry<File, Reader<T>> entry = readerIterator.next();
+        currentFile = entry.getKey();
         try {
-          currentReader = createReader(new FileSystemResource(currentFile));
-          if (currentReader != null) {
-            currentIterator = currentReader.iterator();
-          } else {
-            currentIterator = null;
-          }
+          currentReader = entry.getValue();
+          currentIterator = currentReader.iterator();
+          hasNext = currentIterator.hasNext();
         } catch (final Throwable e) {
           hasNext = false;
           log.error(e.getMessage(), e);
@@ -229,8 +242,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * 
    * @param baseFileNames The list of base file names to read.
    */
-  public void setBaseFileNames(
-    final List<String> baseFileNames) {
+  public void setBaseFileNames(final List<String> baseFileNames) {
     this.baseFileNames = baseFileNames;
   }
 
@@ -239,25 +251,22 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * 
    * @param directory The directory containing the files to read.
    */
-  public void setDirectory(
-    final File directory) {
+  public void setDirectory(final File directory) {
     if (!directory.isDirectory()) {
       throw new IllegalArgumentException("File must exist and be a directory "
         + directory);
     } else {
       this.directory = directory;
       files = getFiles();
-      fileIterator = files.iterator();
+
     }
   }
 
-  public void setFileExtensions(
-    final Collection<String> fileExtensions) {
+  public void setFileExtensions(final Collection<String> fileExtensions) {
     this.fileNameFilter = new ExtensionFilenameFilter(fileExtensions);
   }
 
-  public void setFileExtensions(
-    final String... fileExtensions) {
+  public void setFileExtensions(final String... fileExtensions) {
     setFileExtensions(Arrays.asList(fileExtensions));
   }
 
@@ -266,8 +275,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * 
    * @param fileNameFilter The filter used to select files from the directory.
    */
-  public void setFileNameFilter(
-    final FilenameFilter fileNameFilter) {
+  public void setFileNameFilter(final FilenameFilter fileNameFilter) {
     this.fileNameFilter = fileNameFilter;
   }
 

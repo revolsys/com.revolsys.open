@@ -5,11 +5,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 
 public class DataObjectIteratorReader extends IteratorReader<DataObject>
   implements DataObjectReader {
-
-  private DataObjectMetaData metaData;
-
-  public DataObjectIteratorReader(
-    DataObjectIterator iterator) {
+  public DataObjectIteratorReader(DataObjectIterator iterator) {
     super(iterator);
   }
 

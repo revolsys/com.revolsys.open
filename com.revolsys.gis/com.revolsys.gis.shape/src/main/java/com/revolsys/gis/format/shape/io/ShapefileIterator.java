@@ -35,9 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ShapefileIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
 
-  private DataObject currentObject;
-
-  private final DataObjectFactory factory;
+  private final DataObjectFactory dataObjectFactory;
 
   private JtsGeometryConverter geometryReader;
 
@@ -51,15 +49,17 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private XbaseIterator xbaseIterator;
 
-  public ShapefileIterator(
-    final Resource resource,
-    final DataObjectFactory factory)
-    throws IOException {
-    this.factory = factory;
+  public ShapefileIterator(final Resource resource,
+    final DataObjectFactory factory) throws IOException {
+    this.dataObjectFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     name = QName.valueOf(baseName);
     this.in = new EndianInputStream(resource.getInputStream());
     this.resource = resource;
+  }
+
+  public DataObjectFactory getDataObjectFactory() {
+    return dataObjectFactory;
   }
 
   @Override
@@ -76,8 +76,9 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
       final Resource xbaseResource = this.resource.createRelative(name.getLocalPart()
         + ".dbf");
       if (xbaseResource.exists()) {
-        xbaseIterator = new XbaseIterator(xbaseResource, this.factory,
-          new InvokeMethodRunnable(this, "updateMetaData"));
+        xbaseIterator = new XbaseIterator(xbaseResource,
+          this.dataObjectFactory, new InvokeMethodRunnable(this,
+            "updateMetaData"));
       }
       GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
       final Resource projResource = this.resource.createRelative(name.getLocalPart()
@@ -134,7 +135,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           throw new NoSuchElementException();
         }
       } else {
-        object = factory.createDataObject(metaData);
+        object = dataObjectFactory.createDataObject(metaData);
       }
 
       final Geometry geometry = geometryReader.readGeometry(in);
@@ -152,21 +153,20 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
    * 
    * @throws IOException If an I/O error occurs.
    */
-  private void loadHeader()
-    throws IOException {
+  private void loadHeader() throws IOException {
     in.readInt();
     in.skipBytes(20);
-    in.readInt();
-    in.readLEInt();
-    in.readLEInt();
-    in.readDouble();
-    in.readDouble();
-    in.readDouble();
-    in.readDouble();
-    in.readDouble();
-    in.readDouble();
-    in.readDouble();
-    in.readDouble();
+    int fileLength = in.readInt();
+    int version = in.readLEInt();
+    int shapeType = in.readLEInt();
+    double minX = in.readLEDouble();
+    double minY = in.readLEDouble();
+    double maxX = in.readLEDouble();
+    double maxY = in.readLEDouble();
+    double minZ = in.readLEDouble();
+    double maxZ = in.readLEDouble();
+    double minM = in.readLEDouble();
+    double maxM = in.readLEDouble();
   }
 
   public void updateMetaData() {

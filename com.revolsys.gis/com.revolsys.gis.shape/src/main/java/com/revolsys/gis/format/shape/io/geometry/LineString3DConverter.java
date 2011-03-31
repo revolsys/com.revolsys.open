@@ -21,8 +21,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public LineString3DConverter(
-    final GeometryFactory geometryFactory) {
+  public LineString3DConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
@@ -40,9 +39,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
    * com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryConverter#read
    * (int, com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile)
    */
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     // skip bounding box;
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -65,10 +62,10 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
       final Coordinate coordinate = coordinates[i];
       coordinate.z = z;
     }
-    // if (startIndex + (recordLength * 2) < endIndex) {
-    // // skip min/max M + m values
-    // in.skipBytes((2 + numPoints) * MathUtil.BYTES_IN_DOUBLE);
-    // }
+    if (recordLength == 38 + 2 * numParts + 16 * numPoints) {
+      in.skipBytes((2 + numPoints) * MathUtil.BYTES_IN_DOUBLE);
+    }
+
     if (numParts == 1) {
       return geometryFactory.createLineString(coordinates);
     } else {
@@ -93,9 +90,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
    * (com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile,
    * com.vividsolutions.jts.geom.Geometry)
    */
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -115,10 +110,8 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private void writePolyLineZHeader(
-    final EndianOutput out,
-    final Geometry geometry)
-    throws IOException {
+  private void writePolyLineZHeader(final EndianOutput out,
+    final Geometry geometry) throws IOException {
     final int numCoordinates = geometry.getNumPoints();
     final int numGeometries = geometry.getNumGeometries();
     final int recordLength = ((3 + numGeometries) * MathUtil.BYTES_IN_INT + (6 + 3 * numCoordinates)

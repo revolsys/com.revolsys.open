@@ -6,8 +6,7 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryProjectionUtil {
-  public static CoordinateSystem getCoordinateSystem(
-    final Geometry geometry) {
+  public static CoordinateSystem getCoordinateSystem(final Geometry geometry) {
     com.vividsolutions.jts.geom.GeometryFactory geometryFactory = geometry.getFactory();
     if (geometryFactory instanceof GeometryFactory) {
       GeometryFactory factory = (GeometryFactory)geometryFactory;
@@ -17,9 +16,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    T geometry,
-    int srid) {
+  public static <T extends Geometry> T perform(T geometry, int srid) {
     final int geometrySrid = geometry.getSRID();
     if (geometrySrid == 0) {
       return geometry;
@@ -30,21 +27,23 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    T geometry,
+  public static <T extends Geometry> T perform(T geometry,
     GeometryFactory geometryFactory) {
-    final int geometrySrid = geometry.getSRID();
-    if (geometrySrid == 0) {
-      return geometry;
+    if (geometry == null) {
+      return null;
     } else {
-      final GeometryOperation operation = getGeometryOperation(geometrySrid,
-        geometryFactory);
-      return perform(operation, geometry);
+      final int geometrySrid = geometry.getSRID();
+      if (geometrySrid == 0) {
+        return geometry;
+      } else {
+        final GeometryOperation operation = getGeometryOperation(geometrySrid,
+          geometryFactory);
+        return perform(operation, geometry);
+      }
     }
   }
 
-  public static <T extends Geometry> T perform(
-    T geometry,
+  public static <T extends Geometry> T perform(T geometry,
     CoordinateSystem coordinateSystem) {
     final int geometrySrid = geometry.getSRID();
     if (geometrySrid == 0) {
@@ -56,8 +55,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    T geometry,
+  public static <T extends Geometry> T perform(T geometry,
     final CoordinateSystem fromCoordinateSystem,
     final CoordinateSystem toCoordinateSystem) {
     if (fromCoordinateSystem == null || toCoordinateSystem == null) {
@@ -69,8 +67,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    GeometryOperation operation,
+  public static <T extends Geometry> T perform(GeometryOperation operation,
     T geometry) {
     if (operation == null) {
       return geometry;
@@ -79,8 +76,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static GeometryOperation getGeometryOperation(
-    int sourceSrid,
+  public static GeometryOperation getGeometryOperation(int sourceSrid,
     int targetSrid) {
     if (sourceSrid == 0 || targetSrid == 0) {
       return null;
@@ -90,8 +86,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static GeometryOperation getGeometryOperation(
-    int fromSrid,
+  public static GeometryOperation getGeometryOperation(int fromSrid,
     final CoordinateSystem toCoordinateSystem) {
     if (fromSrid == 0 || toCoordinateSystem == null) {
       return null;
@@ -102,8 +97,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static GeometryOperation getGeometryOperation(
-    int fromSrid,
+  public static GeometryOperation getGeometryOperation(int fromSrid,
     final GeometryFactory toGeometryFactory) {
     if (fromSrid == 0) {
       return null;

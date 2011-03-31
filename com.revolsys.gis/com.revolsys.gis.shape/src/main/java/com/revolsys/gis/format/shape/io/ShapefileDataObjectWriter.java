@@ -51,6 +51,8 @@ import com.revolsys.gis.format.xbase.io.FieldDefinition;
 import com.revolsys.gis.format.xbase.io.XbaseDataObjectWriter;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
@@ -184,36 +186,28 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   private void createGeometryWriter(final Geometry geometry) {
+    final CoordinatesList points = CoordinatesListUtil.get(geometry);
+    final byte numAxis = points.getNumAxis();
     if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      final CoordinateSequence coordinates = point.getCoordinateSequence();
-      if (coordinates.getDimension() == 2) {
+      if (numAxis == 2) {
         geometryConverter = new Point2DConverter();
       } else {
         geometryConverter = new Point3DConverter();
       }
     } else if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry;
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
-      if (coordinates.getDimension() == 2) {
+      if (numAxis == 2) {
         geometryConverter = new LineString2DConverter();
       } else {
         geometryConverter = new LineString3DConverter();
       }
     } else if (geometry instanceof MultiLineString) {
-      final MultiLineString multiLine = (MultiLineString)geometry;
-      final LineString line = (LineString)multiLine.getGeometryN(0);
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
-      if (coordinates.getDimension() == 2) {
+      if (numAxis == 2) {
         geometryConverter = new LineString2DConverter();
       } else {
         geometryConverter = new LineString3DConverter();
       }
     } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      final LineString line = polygon.getExteriorRing();
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
-      if (coordinates.getDimension() == 2) {
+      if (numAxis == 2) {
         geometryConverter = new Polygon2DConverter();
       } else {
         geometryConverter = new Polygon3DConverter();

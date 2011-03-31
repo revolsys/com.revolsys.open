@@ -27,6 +27,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
@@ -43,6 +44,24 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   private static final int SIMPLE_LINE = 2;
 
   private static final int TEXT = 6;
+
+  public static void setGeometryProperties(final DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+    JtsGeometryUtil.setGeometryProperty(geometry, "orientation",
+      object.getValue(MoepConstants.ANGLE));
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
+      MoepConstants.TEXT_GROUP, object.getValue(MoepConstants.TEXT_GROUP));
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "text",
+      object.getValue(MoepConstants.TEXT));
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "textType",
+      "TextLine");
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "fontName",
+      object.getValue(MoepConstants.FONT_NAME));
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
+      "characterHeight", object.getValue(MoepConstants.FONT_SIZE));
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "other",
+      object.getValue(MoepConstants.FONT_WEIGHT));
+  }
 
   private char actionName;
 
@@ -74,7 +93,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private long position = 0;
 
-  private String mapsheet;
+  private final String mapsheet;
 
   public MoepBinaryIterator(final MoepDirectoryReader directoryReader,
     final String fileName, final InputStream in,
@@ -118,6 +137,14 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   public void close() {
     FileUtil.closeSilent(in);
+  }
+
+  private double getAngle(final double angle) {
+    double orientation = (90 - angle) % 360;
+    if (orientation < 0) {
+      orientation = 360 + orientation;
+    }
+    return orientation;
   }
 
   private String getMapsheetFromFileName(final String fileName) {
@@ -169,7 +196,6 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       String attribute = null;
       if (numBytes > 0) {
         attribute = readString(numBytes);
-        object.setValue(MoepConstants.ATTRIBUTE, attribute);
       }
       switch (featureType) {
         case POINT:
@@ -198,58 +224,53 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(textPoint);
           if (extraParams == 1) {
             final int angle = readLEInt(in);
-            final double orientation = getAngle(((double)angle) / 10000.0);
+            final double orientation = getAngle((angle) / 10000.0);
             object.setValue(MoepConstants.ANGLE, orientation);
-            JtsGeometryUtil.setGeometryProperty(textPoint,
-              MoepConstants.ORIENTATION, orientation);
           }
           final int fontSize = readLEShort(in);
           final int numChars = read();
           final String text = readString(numChars);
-          if (attribute != null) {
+          if (attribute == null) {
+            object.setValue(MoepConstants.FONT_NAME, "31");
+            object.setValue(MoepConstants.FONT_WEIGHT, "0");
+          } else {
             final String fontName = new String(attribute.substring(0, 3).trim());
-            JtsGeometryUtil.setGeometryProperty(textPoint,
-              MoepConstants.FONT_NAME, fontName);
+            object.setValue(MoepConstants.FONT_NAME, fontName);
             if (attribute.length() > 3) {
               final String other = new String(attribute.substring(3,
                 Math.min(attribute.length(), 5)).trim());
-              JtsGeometryUtil.setGeometryProperty(textPoint,
-                MoepConstants.OTHER, other);
+              object.setValue(MoepConstants.FONT_WEIGHT, other);
+            } else {
+              object.setValue(MoepConstants.FONT_WEIGHT, "0");
             }
             if (attribute.length() > 5) {
               final String textGroup = new String(attribute.substring(4, 9)
                 .trim());
-              JtsGeometryUtil.setGeometryProperty(textPoint,
-                MoepConstants.TEXT_GROUP, textGroup);
+              object.setValue(MoepConstants.TEXT_GROUP, textGroup);
             }
-
-            object.setValue(MoepConstants.ATTRIBUTE, null);
           }
-          JtsGeometryUtil.setGeometryProperty(textPoint,
-            MoepConstants.CHARACTER_HEIGHT, fontSize);
+          object.setValue(MoepConstants.FONT_SIZE, fontSize);
           object.setValue(MoepConstants.TEXT, text);
-          JtsGeometryUtil.setGeometryProperty(textPoint, MoepConstants.TEXT,
-            text);
-          JtsGeometryUtil.setGeometryProperty(textPoint, "textType", "TextLine");
+
+          setGeometryProperties(object);
         break;
       }
 
       switch (actionName) {
         case 'W':
-          setAdmissionHistory(object, MoepConstants.ADDITION_NEW);
+          setAdmissionHistory(object, actionName);
         break;
         case 'Z':
-          setAdmissionHistory(object, MoepConstants.ADDITION_MODIFIED);
+          setAdmissionHistory(object, actionName);
         break;
         case 'X':
-          setRetirementHistory(object,
-            MoepConstants.DELETION_WITHOUT_REPLACEMENT);
+          setRetirementHistory(object, actionName);
         break;
         case 'Y':
-          setRetirementHistory(object, MoepConstants.DELETION_WITH_REPLACEMENT);
+          setRetirementHistory(object, actionName);
         break;
         default:
-          setAdmissionHistory(object, MoepConstants.ADDITION_MODIFIED);
+          setAdmissionHistory(object, 'W');
         break;
       }
       currentDataObject = object;
@@ -260,14 +281,6 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       hasNext = false;
       return null;
     }
-  }
-
-  private double getAngle(double angle) {
-    double orientation = (90 - angle) % 360;
-    if (orientation < 0) {
-      orientation = 360 + orientation;
-    }
-    return orientation;
   }
 
   private void loadHeader() throws IOException {
@@ -292,7 +305,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final int centreX = readLEInt(in);
     final int centreY = readLEInt(in);
     center = new DoubleCoordinates(centreX, centreY);
-    CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
       1);
     factory = new GeometryFactory(coordinateSystem, precisionModel);
     setProperty(IoConstants.GEOMETRY_FACTORY, factory);
@@ -388,7 +401,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       final int z = readLEShort(in);
       final LineString line = readContourLine(numCoords);
       object.setGeometryValue(line);
-      object.setValue("elevation", new Integer(z));
+      object.setValue(MoepConstants.ELEVATION, new Integer(z));
 
     } else {
       final LineString line = readSimpleLine(numCoords);
@@ -424,7 +437,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   }
 
   private void setAdmissionHistory(final DataObject object,
-    final String reasonForChange) {
+    final char reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.ADMIT_SOURCE_DATE,
         directoryReader.getSubmissionDate());
@@ -435,11 +448,12 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       object.setValue(MoepConstants.ADMIT_SPECIFICATIONS_RELEASE,
         directoryReader.getSpecificationsRelease());
     }
-    object.setValue(MoepConstants.ADMIT_REASON_FOR_CHANGE, reasonForChange);
+    object.setValue(MoepConstants.ADMIT_REASON_FOR_CHANGE,
+      String.valueOf(reasonForChange));
   }
 
   private void setRetirementHistory(final DataObject object,
-    final String reasonForChange) {
+    final char reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.RETIRE_SOURCE_DATE,
         directoryReader.getSubmissionDate());
@@ -450,6 +464,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       object.setValue(MoepConstants.RETIRE_SPECIFICATIONS_RELEASE,
         directoryReader.getSpecificationsRelease());
     }
-    object.setValue(MoepConstants.RETIRE_REASON_FOR_CHANGE, reasonForChange);
+    object.setValue(MoepConstants.RETIRE_REASON_FOR_CHANGE,
+      String.valueOf(reasonForChange));
   }
 }

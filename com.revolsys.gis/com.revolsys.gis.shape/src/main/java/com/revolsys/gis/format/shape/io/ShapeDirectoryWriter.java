@@ -59,7 +59,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     final DataObjectMetaData metaData = object.getMetaData();
     Writer<DataObject> writer = writers.get(metaData);
     if (writer == null) {
-      File file = new File(directory, metaData.getName().getLocalPart()
+      File file = new File(directory, getFileName(metaData)
         + ".shp");
       writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
         new FileSystemResource(file));
@@ -71,6 +71,10 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       writers.put(metaData, writer);
     }
     return writer;
+  }
+
+  protected String getFileName(final DataObjectMetaData metaData) {
+    return metaData.getName().getLocalPart();
   }
 
   public boolean isUseZeroForNull() {
