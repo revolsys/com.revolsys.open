@@ -1,39 +1,49 @@
 package com.revolsys.gis.graph.visitor;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.gis.graph.event.EdgeEventListenerList;
+import com.revolsys.util.ObjectProcessor;
 
-public class EdgeLessThanLengthVisitor<T> implements Visitor<Edge<T>> {
+public class EdgeLessThanLengthVisitor extends
+  AbstractEdgeListenerVisitor<DataObject> implements
+  ObjectProcessor<DataObjectGraph> {
 
-  private final EdgeEventListenerList<T> listeners = new EdgeEventListenerList<T>();
+  private double minLength;
 
-  private final double minLength;
+  private Visitor<Edge<DataObject>> visitor;
 
-  private Visitor<Edge<T>> visitor;
+  public EdgeLessThanLengthVisitor() {
+  }
 
-  public EdgeLessThanLengthVisitor(
-    final double minLength) {
+  public EdgeLessThanLengthVisitor(final double minLength) {
     this.minLength = minLength;
   }
 
-  public EdgeLessThanLengthVisitor(
-    final double minLength,
-    final Visitor<Edge<T>> visitor) {
+  public EdgeLessThanLengthVisitor(final double minLength,
+    final Visitor<Edge<DataObject>> visitor) {
     this.minLength = minLength;
     this.visitor = visitor;
   }
 
-  public EdgeEventListenerList<T> getListeners() {
-    return listeners;
+  public double getMinLength() {
+    return minLength;
   }
 
-  public boolean visit(
-    final Edge<T> edge) {
+  public void process(final DataObjectGraph graph) {
+    graph.visitEdges(this);
+  }
+
+  public void setMinLength(final double minLength) {
+    this.minLength = minLength;
+  }
+
+  public boolean visit(final Edge<DataObject> edge) {
     final double length = edge.getLength();
     if (length < minLength) {
-      listeners.edgeEvent(edge, "Edge less than length", "Review", length
-        + " < " + minLength);
+      edgeEvent(edge, "Edge less than length", "Review", length + " < "
+        + minLength);
       if (visitor != null) {
         visitor.visit(edge);
       }

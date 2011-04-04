@@ -2,6 +2,7 @@ package com.revolsys.gis.jdbc.data.model.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.filter.Filter;
@@ -27,17 +28,19 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
   public DataObjectCodeTableValueFilter() {
   }
 
-  public DataObjectCodeTableValueFilter(
-    final String attributeName,
+  public DataObjectCodeTableValueFilter(final String attributeName,
     final List<Object> values) {
     this.attributeName = attributeName;
     this.values.addAll(values);
   }
 
-  public DataObjectCodeTableValueFilter(
-    final String attributeName,
+  public DataObjectCodeTableValueFilter(final String attributeName,
     final Object... values) {
     this(attributeName, Arrays.asList(values));
+  }
+
+  public void setValue(Object value) {
+    setValues(Collections.singletonList(value));
   }
 
   /**
@@ -46,8 +49,7 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Object propertyValue = object.getValue(attributeName);
     if (values.contains(propertyValue)) {
       return true;
@@ -86,25 +88,23 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
     return values;
   }
 
-  public void setAttributeName(
-    final String attributeName) {
+  public void setAttributeName(final String attributeName) {
     this.attributeName = attributeName;
   }
 
   /**
    * @param name the name to set
    */
-  public void setName(
-    final String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
   /**
    * @param values the values to set
    */
-  public void setValues(
-    final List<Object> values) {
-    this.values = values;
+  public void setValues(final List<Object> values) {
+    this.values.clear();
+    this.values.addAll(values);
   }
 
   /**
