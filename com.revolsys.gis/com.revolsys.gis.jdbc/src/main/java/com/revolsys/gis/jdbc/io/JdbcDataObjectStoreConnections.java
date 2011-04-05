@@ -1,5 +1,6 @@
 package com.revolsys.gis.jdbc.io;
 
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,14 +10,23 @@ import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.revolsys.gis.data.io.DataObjectStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.util.CollectionUtil;
 
-public class JdbcDataObjectStoreConnections {
+public class JdbcDataObjectStoreConnections implements
+  PropertyChangeSupportProxy {
+
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcDataObjectStoreConnections.class);
 
   private static JdbcDataObjectStoreConnections INSTANCE = new JdbcDataObjectStoreConnections();
 
   private Map<String, JdbcDataObjectStore> dataStores = new HashMap<String, JdbcDataObjectStore>();
+
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
 
   public static JdbcDataObjectStoreConnections get() {
     return INSTANCE;
@@ -46,30 +56,32 @@ public class JdbcDataObjectStoreConnections {
     }
   }
 
-  private DataObjectStore getDataObjectStore(final String connectionName) {
+  private JdbcDataObjectStore getDataObjectStore(final String connectionName) {
     JdbcDataObjectStore dataStore = dataStores.get(connectionName);
     if (dataStore == null) {
       final Preferences preferences = getPreferences(connectionName);
       Map<String, Object> config = CollectionUtil.toMap(preferences);
       config.remove("productName");
       try {
-        if (config.get("url") != null) {
-          dataStore = JdbcFactory.createDataObjectStore(config);
-          dataStore.setLabel(connectionName);
+        if (config.get("url") == null) {
+          LOG.error("No JDBC URL set for " + connectionName);
+          preferences.removeNode();
+        } else {
+          dataStore = new LazyJdbcDataObjectStore(connectionName, config);
           dataStores.put(connectionName, dataStore);
         }
       } catch (Throwable t) {
-        t.printStackTrace();
+        LOG.error("Unable to create data store " + connectionName, t);
       }
     }
     return dataStore;
   }
 
-  public List<DataObjectStore> getDataObjectStores() {
-    final List<DataObjectStore> dataObjectStores = new ArrayList<DataObjectStore>();
+  public List<JdbcDataObjectStore> getDataObjectStores() {
+    final List<JdbcDataObjectStore> dataObjectStores = new ArrayList<JdbcDataObjectStore>();
     final List<String> connectionNames = getConnectionNames();
     for (final String connectionName : connectionNames) {
-      final DataObjectStore dataObjectStore = getDataObjectStore(connectionName);
+      final JdbcDataObjectStore dataObjectStore = getDataObjectStore(connectionName);
       if (dataObjectStore != null) {
         dataObjectStores.add(dataObjectStore);
       }
@@ -91,5 +103,11 @@ public class JdbcDataObjectStoreConnections {
     for (Entry<String, String> param : config.entrySet()) {
       preferences.put(param.getKey(), param.getValue());
     }
+    propertyChangeSupport.firePropertyChange(connectionName, null, preferences);
+
+  }
+
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
   }
 }

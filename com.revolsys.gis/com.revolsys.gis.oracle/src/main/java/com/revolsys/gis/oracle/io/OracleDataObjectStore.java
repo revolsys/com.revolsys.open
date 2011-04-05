@@ -2,14 +2,11 @@ package com.revolsys.gis.oracle.io;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -22,7 +19,7 @@ import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.gis.jdbc.io.JdbcQueryReader;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
@@ -31,29 +28,26 @@ import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class OracleDataObjectStore extends JdbcDataObjectStore {
+public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
 
   public OracleDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
 
-  public OracleDataObjectStore(
-    final DataObjectFactory dataObjectFactory) {
+  public OracleDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
     setExcludeTablePatterns(".*\\$");
   }
 
-  public OracleDataObjectStore(
-    final DataObjectFactory dataObjectFactory,
+  public OracleDataObjectStore(final DataObjectFactory dataObjectFactory,
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(
-    final DataObjectMetaData metaData) {
+  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     final String shortName = ShortNameProperty.getShortName(metaData);
     if (shortName == null) {
       ShortNameProperty.getShortName(metaData);
@@ -63,17 +57,13 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
     return shortName + "_SEQ.NEXTVAL";
   }
 
-  @Override
-  public long getNextPrimaryKey(
-    final DataObjectMetaData metaData) {
+  public long getNextPrimaryKey(final DataObjectMetaData metaData) {
     final String shortName = ShortNameProperty.getShortName(metaData);
     final String sequenceName = shortName + "_SEQ";
     return getNextPrimaryKey(sequenceName);
   }
 
-  @Override
-  public long getNextPrimaryKey(
-    final String sequenceName) {
+  public long getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
     try {
       return JdbcUtils.selectLong(getDataSource(), getConnection(), sql);
@@ -140,9 +130,7 @@ public class OracleDataObjectStore extends JdbcDataObjectStore {
   }
 
   @Override
-  public Reader query(
-    final QName typeName,
-    final Envelope envelope) {
+  public Reader query(final QName typeName, final Envelope envelope) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     final String geometryColumnName = geometryAttribute.getName();

@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -26,6 +27,10 @@ public abstract class AbstractDataObjectStore extends
   private DataObjectFactory dataObjectFactory;
 
   private Map<String, DataObjectStoreSchema> schemaMap = new TreeMap<String, DataObjectStoreSchema>();
+
+  public AbstractDataObjectStore() {
+    this(new ArrayDataObjectFactory());
+  }
 
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;

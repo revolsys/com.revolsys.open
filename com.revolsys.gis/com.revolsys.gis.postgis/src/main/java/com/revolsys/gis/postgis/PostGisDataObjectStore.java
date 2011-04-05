@@ -16,31 +16,28 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class PostGisDataObjectStore extends JdbcDataObjectStore {
+public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public PostGisDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
 
-  public PostGisDataObjectStore(
-    final DataObjectFactory dataObjectFactory) {
+  public PostGisDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
   }
 
-  public PostGisDataObjectStore(
-    final DataObjectFactory dataObjectFactory,
+  public PostGisDataObjectStore(final DataObjectFactory dataObjectFactory,
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(
-    final DataObjectMetaData metaData) {
+  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String schema = typeName.getNamespaceURI();
     final String tableName = typeName.getLocalPart();
@@ -49,17 +46,13 @@ public class PostGisDataObjectStore extends JdbcDataObjectStore {
       + "_seq')";
   }
 
-  @Override
-  public long getNextPrimaryKey(
-    final DataObjectMetaData metaData) {
+  public long getNextPrimaryKey(final DataObjectMetaData metaData) {
     final String shortName = ShortNameProperty.getShortName(metaData);
     final String sequenceName = shortName + "_SEQ";
     return getNextPrimaryKey(sequenceName);
   }
 
-  @Override
-  public long getNextPrimaryKey(
-    final String sequenceName) {
+  public long getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
     try {
       return JdbcUtils.selectLong(getDataSource(), getConnection(), sql,
@@ -116,9 +109,7 @@ public class PostGisDataObjectStore extends JdbcDataObjectStore {
   }
 
   @Override
-  public Reader<DataObject> query(
-    final QName typeName,
-    final Envelope envelope) {
+  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
     final double x1 = envelope.getMinX();
     final double y1 = envelope.getMinY();
     final double x2 = envelope.getMaxX();
