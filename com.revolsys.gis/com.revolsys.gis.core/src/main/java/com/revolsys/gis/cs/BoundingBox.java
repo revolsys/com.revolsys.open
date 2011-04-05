@@ -174,6 +174,14 @@ public class BoundingBox extends Envelope {
     this.maxZ = Double.NaN;
   }
 
+  public BoundingBox(final GeometryFactory geometryFactory, final double x1,
+    final double y1, final double x2, final double y2) {
+    super(x1, x2, y1, y2);
+    this.coordinateSystem = geometryFactory.getCoordinateSystem();
+    this.minZ = Double.NaN;
+    this.maxZ = Double.NaN;
+  }
+
   /**
    * Construct a new Bounding Box.
    * 
@@ -186,6 +194,10 @@ public class BoundingBox extends Envelope {
     this.coordinateSystem = coordinateSystem;
     this.minZ = Double.NaN;
     this.maxZ = Double.NaN;
+  }
+
+  public BoundingBox(GeometryFactory geometryFactory, BoundingBox boundingBox) {
+    this(geometryFactory.getCoordinateSystem(), boundingBox);
   }
 
   public BoundingBox convert(final CoordinateSystem coordinateSystem) {
@@ -375,7 +387,7 @@ public class BoundingBox extends Envelope {
     int i = 0;
 
     for (int j = 0; j < numX; j++) {
-      coordinates.setX(i, maxX -  j * xStep);
+      coordinates.setX(i, maxX - j * xStep);
       coordinates.setY(i, minY);
       i++;
     }

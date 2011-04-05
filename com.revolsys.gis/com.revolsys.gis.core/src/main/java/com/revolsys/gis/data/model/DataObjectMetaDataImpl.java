@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.types.DataType;
@@ -57,6 +58,16 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
+
+  public GeometryFactory getGeometryFactory() {
+    Attribute geometryAttribute = getGeometryAttribute();
+    if (geometryAttribute == null) {
+      return null;
+    } else {
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      return geometryFactory;
+    }
+  }
 
   private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
@@ -143,7 +154,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     attributeIdMap.put(name, attributeIdMap.size());
     final DataType dataType = attribute.getType();
     if (dataType == null) {
-LoggerFactory.getLogger(getClass()).debug(attribute.toString());
+      LoggerFactory.getLogger(getClass()).debug(attribute.toString());
     } else {
       final Class<?> dataClass = dataType.getJavaClass();
       if (Geometry.class.isAssignableFrom(dataClass)) {

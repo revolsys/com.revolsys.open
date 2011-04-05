@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ObjectWithProperties;
@@ -125,6 +126,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   Map<String, Object> getDefaultValues();
 
   Attribute getGeometryAttribute();
+
+  GeometryFactory getGeometryFactory();
 
   /**
    * Get the index of the primary Geometry attribute.

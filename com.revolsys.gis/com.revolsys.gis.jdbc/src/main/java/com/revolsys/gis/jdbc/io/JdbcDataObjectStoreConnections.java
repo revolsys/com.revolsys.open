@@ -56,7 +56,7 @@ public class JdbcDataObjectStoreConnections implements
     }
   }
 
-  private JdbcDataObjectStore getDataObjectStore(final String connectionName) {
+  public JdbcDataObjectStore getDataObjectStore(final String connectionName) {
     JdbcDataObjectStore dataStore = dataStores.get(connectionName);
     if (dataStore == null) {
       final Preferences preferences = getPreferences(connectionName);
