@@ -35,17 +35,11 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final Projection projection;
 
-  public ProjectedCoordinateSystem(
-    final int id,
-    final String name,
+  public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem,
-    final Area area,
-    final Projection projection,
-    final Map<String, Object> parameters,
-    final LinearUnit linearUnit,
-    final List<Axis> axis,
-    final Authority authority,
-    final boolean deprecated) {
+    final Area area, final Projection projection,
+    final Map<String, Object> parameters, final LinearUnit linearUnit,
+    final List<Axis> axis, final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.area = area;
@@ -61,22 +55,17 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     this.deprecated = deprecated;
   }
 
-  public void setParameters(
-    final Map<String, Object> parameters) {
+  public void setParameters(final Map<String, Object> parameters) {
     this.parameters.putAll(parameters);
     for (Entry<String, Object> param : parameters.entrySet()) {
       lowerParameters.put(param.getKey().toLowerCase(), param.getValue());
     }
   }
 
-  public ProjectedCoordinateSystem(
-    final int id,
-    final String name,
+  public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem,
-    final Projection projection,
-    final Map<String, Object> parameters,
-    final LinearUnit linearUnit,
-    final List<Axis> axis,
+    final Projection projection, final Map<String, Object> parameters,
+    final LinearUnit linearUnit, final List<Axis> axis,
     final Authority authority) {
     this.id = id;
     this.name = name;
@@ -96,8 +85,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {
@@ -122,9 +110,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  private boolean equals(
-    final Object object1,
-    final Object object2) {
+  private boolean equals(final Object object1, final Object object2) {
     if (object1 == object2) {
       return true;
     } else if (object1 == null || object2 == null) {
@@ -140,14 +126,20 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public BoundingBox getAreaBoundingBox() {
     BoundingBox boundingBox;
-    if (area != null) {
-      final Envelope latLonBounds = area.getLatLonBounds();
-      boundingBox = new BoundingBox(geographicCoordinateSystem, latLonBounds);
+    final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.getGeometryFactory();
+    if (area == null) {
+      boundingBox = new BoundingBox(geographicGeometryFactory, -180, -90, 180,
+        90);
     } else {
-      boundingBox = new BoundingBox(this, -180, -90, 180, 90);
+      final Envelope latLonBounds = area.getLatLonBounds();
+      boundingBox = new BoundingBox(geographicGeometryFactory, latLonBounds);
     }
-    final BoundingBox projectedBoundingBox = boundingBox.convert(this);
+    final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());
     return projectedBoundingBox;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.getFactory(this);
   }
 
   public Authority getAuthority() {
@@ -158,8 +150,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return axis;
   }
 
-  public double getDoubleParameter(
-    final String key) {
+  public double getDoubleParameter(final String key) {
     final Number value = getParameter(key);
     if (value == null) {
       return Double.NaN;
@@ -185,8 +176,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getParameter(
-    final String key) {
+  public <V> V getParameter(final String key) {
     return (V)parameters.get(key);
   }
 

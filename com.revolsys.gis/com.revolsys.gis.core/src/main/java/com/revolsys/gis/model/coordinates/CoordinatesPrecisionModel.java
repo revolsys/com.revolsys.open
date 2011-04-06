@@ -10,4 +10,6 @@ public interface CoordinatesPrecisionModel {
 
   void makePrecise(
     Coordinates coordinates);
+  
+  boolean isFloating();
 }

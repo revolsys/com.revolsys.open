@@ -80,15 +80,18 @@ public class SimpleCoordinatesPrecisionModel implements
     final double scaleZ) {
     this.scaleZ = scaleZ;
   }
-
   @Override
   public String toString() {
-    if (scaleXY <=0) {
+    if (isFloating()) {
       return "floating";
     } else if (scaleZ > 0) {
       return "fixed(" + scaleXY + ")";
     } else {
-      return "fixed(" + scaleXY + "," + scaleZ + ")";
+      return "fixed[" + scaleXY + "," + scaleZ + "]";
     }
+  }
+
+  public boolean isFloating() {
+    return scaleXY <=0;
   }
 }

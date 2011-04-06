@@ -7,12 +7,15 @@ import java.util.regex.Pattern;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
+
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
     + NtsConstants.REGEX_1000000 + ".*");
@@ -27,9 +30,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     this(NtsConstants.WIDTH_1000000, NtsConstants.HEIGHT_1000000);
   }
 
-  public Nts1000000RectangularMapGrid(
-    final double width,
-    final double height) {
+  public Nts1000000RectangularMapGrid(final double width, final double height) {
     this.tileWidth = width;
     this.tileHeight = height;
   }
@@ -38,46 +39,41 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return COORDINATE_SYSTEM;
   }
 
-  public BoundingBox getBoundingBox(
-    final String mapTileName) {
-    final double lat = getLatitude(mapTileName);
-    final double lon = getLongitude(mapTileName);
-    return new BoundingBox(getCoordinateSystem(), lon, lat, lon - tileWidth,
-      lat + tileHeight);
+  public GeometryFactory getGeometryFactory() {
+    return GEOMETRY_FACTORY;
   }
 
-  public double getLatitude(
-    final int block) {
+  public BoundingBox getBoundingBox(final String mapTileName) {
+    final double lat = getLatitude(mapTileName);
+    final double lon = getLongitude(mapTileName);
+    return new BoundingBox(getGeometryFactory(), lon, lat, lon - tileWidth, lat + tileHeight);
+  }
+
+  public double getLatitude(final int block) {
     final int index = block % 10;
     return NtsConstants.MAX_LATITUDE + index * NtsConstants.HEIGHT_1000000;
   }
 
-  public double getLatitude(
-    final String mapTileName) {
+  public double getLatitude(final String mapTileName) {
     final int block = getNtsBlock(mapTileName);
     return getLatitude(block);
   }
 
-  public double getLongitude(
-    final int block) {
+  public double getLongitude(final int block) {
     final int index = block / 10;
     return NtsConstants.MAX_LONGITUDE - index * NtsConstants.WIDTH_1000000;
   }
 
-  public double getLongitude(
-    final String mapTileName) {
+  public double getLongitude(final String mapTileName) {
     final int block = getNtsBlock(mapTileName);
     return getLongitude(block);
   }
 
-  public String getFormattedMapTileName(
-    String name) {
+  public String getFormattedMapTileName(String name) {
     return name;
   }
 
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     final int lonRound = (int)Math.ceil(x);
     final int lonRowIndex = (int)(lonRound - NtsConstants.MAX_LONGITUDE);
     final int lonIndexCol = (int)(-lonRowIndex / NtsConstants.WIDTH_1000000);
@@ -101,9 +97,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(
-    final String sheet,
-    final int east,
+  public String getMapTileName(final String sheet, final int east,
     final int north) {
     final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
       * getTileHeight());
@@ -111,8 +105,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return getMapTileName(lon, lat);
   }
 
-  public int getNtsBlock(
-    final String mapTileName) {
+  public int getNtsBlock(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String name = matcher.group(1);
@@ -134,9 +127,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   // return null;
   // }
 
-  public RectangularMapTile getTileByLocation(
-    final double x,
-    final double y) {
+  public RectangularMapTile getTileByLocation(final double x, final double y) {
     final String mapTileName = getMapTileName(x, y);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
@@ -144,8 +135,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
       mapTileName, boundingBox);
   }
 
-  public RectangularMapTile getTileByName(
-    final String mapTileName) {
+  public RectangularMapTile getTileByName(final String mapTileName) {
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
     final double lon = boundingBox.getMaxX();
     final double lat = boundingBox.getMinY();
@@ -159,9 +149,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return tileHeight;
   }
 
-  public List<RectangularMapTile> getTiles(
-    final BoundingBox boundingBox) {
-    final BoundingBox envelope = boundingBox.convert(getCoordinateSystem());
+  public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
+    final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / tileWidth);
     final double minX = minXCeil * tileWidth;
@@ -193,13 +182,11 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return tileWidth;
   }
 
-  public void setPrecisionModel(
-    final PrecisionModel precisionModel) {
+  public void setPrecisionModel(final PrecisionModel precisionModel) {
     this.precisionModel = precisionModel;
   }
 
-  public int getBlock(
-    final String sheet) {
+  public int getBlock(final String sheet) {
     return Integer.parseInt(sheet.substring(0, sheet.length() - 4));
   }
 }

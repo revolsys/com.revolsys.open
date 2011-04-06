@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -12,6 +13,8 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
+
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   public static final double MIN_LAT = -80;
 
@@ -23,11 +26,10 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private final double tileWidth = 6;
 
-  public BoundingBox getBoundingBox(
-    final String mapTileName) {
+  public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBox(COORDINATE_SYSTEM, lon, lat, lon - tileWidth, lat
+    return new BoundingBox(GEOMETRY_FACTORY, lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 
@@ -35,24 +37,23 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return COORDINATE_SYSTEM;
   }
 
-  public String getFormattedMapTileName(
-    final String name) {
+  public static GeometryFactory getGeometryFactory() {
+    return GEOMETRY_FACTORY;
+  }
+
+  public String getFormattedMapTileName(final String name) {
     return name.toUpperCase();
   }
 
-  public int getHorizontalZone(
-    final double lat,
-    final double lon) {
+  public int getHorizontalZone(final double lat, final double lon) {
     return getHorizontalZone(getMapTileName(lon, lat));
   }
 
-  public int getHorizontalZone(
-    final String sheet) {
+  public int getHorizontalZone(final String sheet) {
     return Integer.parseInt(sheet.substring(0, sheet.length() - 1));
   }
 
-  public double getLatitude(
-    final String mapTileName) {
+  public double getLatitude(final String mapTileName) {
     final char zone = getVerticalZone(mapTileName);
     int row;
     if (zone == 'x') {
@@ -67,15 +68,12 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return MIN_LAT + row * tileHeight;
   }
 
-  public double getLongitude(
-    final String sheet) {
+  public double getLongitude(final String sheet) {
     final int zone = getHorizontalZone(sheet);
     return MIN_LON + (zone - 1) * tileWidth;
   }
 
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     char letter;
     if (y >= 72) {
       letter = 'x';
@@ -105,9 +103,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(
-    final String sheet,
-    final int east,
+  public String getMapTileName(final String sheet, final int east,
     final int north) {
     final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
       * getTileHeight());
@@ -115,14 +111,11 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return getMapTileName(lon, lat);
   }
 
-  public int getNad83Srid(
-    final double lon,
-    final double lat) {
+  public int getNad83Srid(final double lon, final double lat) {
     return getNad83Srid(getMapTileName(lon, lat));
   }
 
-  public int getNad83Srid(
-    final String sheet) {
+  public int getNad83Srid(final String sheet) {
     final int horizontalZone = getHorizontalZone(sheet);
     final int verticalZone = getVerticalZone(sheet);
     if (horizontalZone < 24 && verticalZone >= 'n') {
@@ -137,9 +130,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return precisionModel;
   }
 
-  public RectangularMapTile getTileByLocation(
-    final double x,
-    final double y) {
+  public RectangularMapTile getTileByLocation(final double x, final double y) {
     final String mapTileName = getMapTileName(x, y);
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
@@ -147,8 +138,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       mapTileName, boundingBox);
   }
 
-  public RectangularMapTile getTileByName(
-    final String mapTileName) {
+  public RectangularMapTile getTileByName(final String mapTileName) {
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
     final double lon = boundingBox.getMaxX();
     final double lat = boundingBox.getMinY();
@@ -162,9 +152,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return tileHeight;
   }
 
-  public List<RectangularMapTile> getTiles(
-    final BoundingBox boundingBox) {
-    final Envelope envelope = boundingBox.convert(EpsgCoordinateSystems.getCoordinateSystem(4326));
+  public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
+    final Envelope envelope = boundingBox.convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / tileWidth);
     final double minX = minXCeil * tileWidth;
@@ -196,13 +185,11 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return tileWidth;
   }
 
-  public char getVerticalZone(
-    final String sheet) {
+  public char getVerticalZone(final String sheet) {
     return Character.toLowerCase(sheet.charAt(sheet.length() - 1));
   }
 
-  public void setPrecisionModel(
-    final PrecisionModel precisionModel) {
+  public void setPrecisionModel(final PrecisionModel precisionModel) {
     this.precisionModel = precisionModel;
   }
 }

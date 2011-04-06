@@ -6,18 +6,15 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
@@ -31,8 +28,7 @@ public class BoundingBox extends Envelope {
 
   public static BoundingBox getBoundingBox(final Geometry geometry) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    return new BoundingBox(coordinateSystem, geometry.getEnvelopeInternal());
+    return new BoundingBox(geometryFactory, geometry.getEnvelopeInternal());
   }
 
   public static BoundingBox parse(final String bbox) {
@@ -42,20 +38,18 @@ public class BoundingBox extends Envelope {
       final double y1 = Double.valueOf(args[1]);
       final double x2 = Double.valueOf(args[2]);
       final double y2 = Double.valueOf(args[3]);
-      return new BoundingBox(EpsgCoordinateSystems.getCoordinateSystem(4326),
-        x1, y1, x2, y2);
+      return new BoundingBox(GeometryFactory.getFactory(4326), x1, y1, x2, y2);
     } else {
       throw new IllegalArgumentException(
         "BBOX must have match <minX>,<minY>,<maxX>,<maxY> not " + bbox);
     }
   }
 
-  /** The coordinate system. */
-  private CoordinateSystem coordinateSystem;
-
   private double maxZ;
 
   private double minZ;
+
+  private GeometryFactory geometryFactory;
 
   /**
    * Construct a new Bounding Box.
@@ -64,9 +58,13 @@ public class BoundingBox extends Envelope {
    */
   public BoundingBox(final BoundingBox boundingBox) {
     super(boundingBox);
-    this.coordinateSystem = boundingBox.getCoordinateSystem();
+    this.geometryFactory = boundingBox.getGeometryFactory();
     this.minZ = boundingBox.getMinZ();
     this.maxZ = boundingBox.getMaxZ();
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   public BoundingBox(final Coordinates point) {
@@ -76,36 +74,35 @@ public class BoundingBox extends Envelope {
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system.
+   * @param geometryFactory The geometry factory.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem) {
-    this.coordinateSystem = coordinateSystem;
+  public BoundingBox(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system to convert the bounding box
-   *          to.
+   * @param geometryFactory The geometry factory to convert the bounding box to.
    * @param boundingBox The bounding box.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem,
+  public BoundingBox(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox) {
-    this.coordinateSystem = coordinateSystem;
+    this.geometryFactory = geometryFactory;
     this.minZ = boundingBox.getMinZ();
     this.maxZ = boundingBox.getMaxZ();
-    if (coordinateSystem == null) {
+    if (geometryFactory == null) {
       throw new IllegalArgumentException(
-        "A bounding box must have a coordinate system");
-    } else if (boundingBox.coordinateSystem == null) {
+        "A bounding box must have a geometry factory");
+    } else if (boundingBox.geometryFactory == null) {
       expandToInclude((Envelope)boundingBox);
-    } else if (boundingBox.coordinateSystem.equals(coordinateSystem)) {
-      this.coordinateSystem = boundingBox.coordinateSystem;
+    } else if (boundingBox.geometryFactory.equals(geometryFactory)) {
+      this.geometryFactory = boundingBox.geometryFactory;
       expandToInclude((Envelope)boundingBox);
     } else {
       final Polygon polygon = boundingBox.toPolygon();
       final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
-        boundingBox.coordinateSystem, coordinateSystem);
+        boundingBox.geometryFactory, geometryFactory);
       if (operation != null) {
         final Polygon projectedPolygon = operation.perform(polygon);
         final Envelope envelope = projectedPolygon.getEnvelopeInternal();
@@ -119,13 +116,13 @@ public class BoundingBox extends Envelope {
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system.
+   * @param geometryFactory The geometry factory.
    * @param coordinate The coordinate.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem,
+  public BoundingBox(final GeometryFactory geometryFactory,
     final Coordinate coordinate) {
     super(coordinate);
-    this.coordinateSystem = coordinateSystem;
+    this.geometryFactory = geometryFactory;
     this.minZ = coordinate.z;
     this.maxZ = coordinate.z;
   }
@@ -133,14 +130,14 @@ public class BoundingBox extends Envelope {
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system.
+   * @param geometryFactory The geometry factory.
    * @param coordinate1 The first coordinate.
    * @param coordinate2 The second coordinate.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem,
+  public BoundingBox(final GeometryFactory geometryFactory,
     final Coordinate coordinate1, final Coordinate coordinate2) {
     super(coordinate1, coordinate2);
-    this.coordinateSystem = coordinateSystem;
+    this.geometryFactory = geometryFactory;
     this.minZ = Math.min(coordinate1.z, coordinate2.z);
     this.maxZ = Math.max(coordinate1.z, coordinate2.z);
   }
@@ -148,36 +145,28 @@ public class BoundingBox extends Envelope {
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system.
+   * @param geometryFactory The geometry factory.
    * @param x The x value.
    * @param y The y value.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem, final double x,
+  public BoundingBox(final GeometryFactory geometryFactory, final double x,
     final double y) {
-    this(coordinateSystem, x, y, x, y);
+    this(geometryFactory, x, y, x, y);
   }
 
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system.
+   * @param geometryFactory The geometry factory.
    * @param x1 The first x coordinate.
    * @param y1 The first y coordinate.
    * @param x2 The second x coordinate.
    * @param y2 The second y coordinate.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem, final double x1,
-    final double y1, final double x2, final double y2) {
-    super(x1, x2, y1, y2);
-    this.coordinateSystem = coordinateSystem;
-    this.minZ = Double.NaN;
-    this.maxZ = Double.NaN;
-  }
-
   public BoundingBox(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
     super(x1, x2, y1, y2);
-    this.coordinateSystem = geometryFactory.getCoordinateSystem();
+    this.geometryFactory = geometryFactory;
     this.minZ = Double.NaN;
     this.maxZ = Double.NaN;
   }
@@ -185,48 +174,40 @@ public class BoundingBox extends Envelope {
   /**
    * Construct a new Bounding Box.
    * 
-   * @param coordinateSystem The coordinate system.
+   * @param geometryFactory The geometry factory.
    * @param envelope The envelope.
    */
-  public BoundingBox(final CoordinateSystem coordinateSystem,
+  public BoundingBox(final GeometryFactory geometryFactory,
     final Envelope envelope) {
     super(envelope);
-    this.coordinateSystem = coordinateSystem;
+    this.geometryFactory = geometryFactory;
     this.minZ = Double.NaN;
     this.maxZ = Double.NaN;
   }
 
-  public BoundingBox(GeometryFactory geometryFactory, BoundingBox boundingBox) {
-    this(geometryFactory.getCoordinateSystem(), boundingBox);
-  }
-
-  public BoundingBox convert(final CoordinateSystem coordinateSystem) {
-    if (this.coordinateSystem == null || coordinateSystem == null
-      || this.coordinateSystem.equals(coordinateSystem)) {
+  public BoundingBox convert(final GeometryFactory geometryFactory) {
+    if (this.geometryFactory == null || geometryFactory == null
+      || this.geometryFactory.equals(geometryFactory)) {
       return new BoundingBox(this);
     } else {
       final Polygon polygon = toPolygon();
       final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
-        this.coordinateSystem, coordinateSystem);
+        this.geometryFactory, geometryFactory);
       if (operation != null) {
         final Polygon projectedPolygon = operation.perform(polygon);
         final Envelope envelope = projectedPolygon.getEnvelopeInternal();
-        return new BoundingBox(coordinateSystem, envelope);
+        return new BoundingBox(geometryFactory, envelope);
       } else {
         return new BoundingBox(this);
       }
     }
   }
 
-  public BoundingBox convert(final GeometryFactory geometryFactory) {
-    return convert(geometryFactory.getCoordinateSystem());
-  }
-
   @Override
   public boolean equals(final Object other) {
     if (other instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)other;
-      return coordinateSystem.equals(boundingBox.getCoordinateSystem())
+      return geometryFactory.equals(boundingBox.getGeometryFactory())
         && getMaxX() == boundingBox.getMaxX()
         && getMaxY() == boundingBox.getMaxY()
         && getMinX() == boundingBox.getMinX()
@@ -237,7 +218,7 @@ public class BoundingBox extends Envelope {
   }
 
   public void expandToInclude(final BoundingBox other) {
-    super.expandToInclude(other.convert(coordinateSystem));
+    super.expandToInclude(other.convert(geometryFactory));
   }
 
   public void expandToInclude(final Coordinates coordinates) {
@@ -267,26 +248,26 @@ public class BoundingBox extends Envelope {
   }
 
   /**
-   * Get the coordinate system.
+   * Get the geometry factory.
    * 
-   * @return The coordinate system.
+   * @return The geometry factory.
    */
   public CoordinateSystem getCoordinateSystem() {
-    return coordinateSystem;
+    return geometryFactory.getCoordinateSystem();
   }
 
   public Measurable<Length> getHeightLength() {
     final double height = getHeight();
-    return Measure.valueOf(height, coordinateSystem.getLengthUnit());
+    return Measure.valueOf(height, getCoordinateSystem().getLengthUnit());
   }
 
   public <Q extends Quantity> Measurable<Q> getMaximumX() {
-    final Unit<Q> unit = coordinateSystem.getUnit();
+    final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMaxX(), unit);
   }
 
   public <Q extends Quantity> Measurable<Q> getMaximumY() {
-    final Unit<Q> unit = coordinateSystem.getUnit();
+    final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMaxY(), unit);
   }
 
@@ -295,12 +276,12 @@ public class BoundingBox extends Envelope {
   }
 
   public <Q extends Quantity> Measurable<Q> getMinimumX() {
-    final Unit<Q> unit = coordinateSystem.getUnit();
+    final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMinX(), unit);
   }
 
   public <Q extends Quantity> Measurable<Q> getMinimumY() {
-    final Unit<Q> unit = coordinateSystem.getUnit();
+    final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMinY(), unit);
   }
 
@@ -310,32 +291,30 @@ public class BoundingBox extends Envelope {
 
   public Measurable<Length> getWidthLength() {
     final double width = getWidth();
-    return Measure.valueOf(width, coordinateSystem.getLengthUnit());
+    return Measure.valueOf(width, getCoordinateSystem().getLengthUnit());
   }
 
   public BoundingBox intersection(final BoundingBox boundingBox) {
-    final BoundingBox convertedBoundingBox = boundingBox.convert(coordinateSystem);
+    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isNull() || convertedBoundingBox.isNull()
       || !intersects((Envelope)convertedBoundingBox)) {
-      return new BoundingBox(coordinateSystem);
+      return new BoundingBox(geometryFactory);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
       final double intMinY = Math.max(getMinY(), convertedBoundingBox.getMinY());
       final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
       final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
-      return new BoundingBox(coordinateSystem, intMinX, intMinY, intMaxX,
+      return new BoundingBox(geometryFactory, intMinX, intMinY, intMaxX,
         intMaxY);
     }
   }
 
   public boolean intersects(final BoundingBox boundingBox) {
-    final BoundingBox convertedBoundingBox = boundingBox.convert(coordinateSystem);
+    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     return intersects((Envelope)convertedBoundingBox);
   }
 
   public Geometry toGeometry() {
-    final GeometryFactory factory = new GeometryFactory(coordinateSystem,
-      new SimpleCoordinatesPrecisionModel());
     final double minX = getMinX();
     final double minY = getMinY();
     final double maxX = getMaxX();
@@ -343,21 +322,15 @@ public class BoundingBox extends Envelope {
     final double width = getWidth();
     final double height = getHeight();
     if (width == 0 && height == 0) {
-      return factory.createPoint(new Coordinate(minX, minY));
+      return geometryFactory.createPoint(new DoubleCoordinatesList(2, minX,
+        minY));
+    } else if (width == 0 || height == 0) {
+      return geometryFactory.createLineString(new DoubleCoordinatesList(2,
+        minX, minY, maxX, maxY));
+    } else {
+      return geometryFactory.createPolygon(new DoubleCoordinatesList(2, minX,
+        minY, minX, maxY, maxX, maxY, maxX, minY, minX, minY));
     }
-
-    if (width == 0 || height == 0) {
-      return factory.createLineString(new Coordinate[] {
-        new Coordinate(minX, minY), new Coordinate(maxX, maxY)
-      });
-    }
-
-    return factory.createPolygon(
-      factory.createLinearRing(new Coordinate[] {
-        new Coordinate(minX, minY), new Coordinate(minX, maxY),
-        new Coordinate(maxX, maxY), new Coordinate(maxX, minY),
-        new Coordinate(minX, minY)
-      }), null);
   }
 
   public Polygon toPolygon() {
@@ -373,9 +346,8 @@ public class BoundingBox extends Envelope {
     return toPolygon(factory, numSegments, numSegments);
   }
 
-  public Polygon toPolygon(final GeometryFactory factory, final int numX,
-    final int numY) {
-    final CoordinateSystem coordinateSystem = factory.getCoordinateSystem();
+  public Polygon toPolygon(final GeometryFactory geometryFactory,
+    final int numX, final int numY) {
     final double xStep = getWidth() / numX;
     final double yStep = getHeight() / numY;
     final double minX = getMinX();
@@ -408,15 +380,13 @@ public class BoundingBox extends Envelope {
     }
     coordinates.setX(coordinates.size() - 1, maxX);
     coordinates.setY(coordinates.size() - 1, minY);
-    if (coordinateSystem != this.coordinateSystem) {
+    if (geometryFactory != this.geometryFactory) {
       coordinates = CoordinatesListProjectionUtil.perform(coordinates,
-        this.coordinateSystem, coordinateSystem);
+        this.geometryFactory.getCoordinateSystem(),
+        geometryFactory.getCoordinateSystem());
     }
 
-    coordinates.makePrecise(factory.getCoordinatesPrecisionModel());
-    final LinearRing ring = factory.createLinearRing(coordinates);
-
-    final Polygon polygon = factory.createPolygon(ring, null);
+    final Polygon polygon = geometryFactory.createPolygon(coordinates);
     return polygon;
   }
 
@@ -425,9 +395,7 @@ public class BoundingBox extends Envelope {
   }
 
   public Polygon toPolygon(final int numX, final int numY) {
-    final GeometryFactory factory = new GeometryFactory(coordinateSystem,
-      new SimpleCoordinatesPrecisionModel());
-    return toPolygon(factory, numX, numY);
+    return toPolygon(geometryFactory, numX, numY);
   }
 
   @Override

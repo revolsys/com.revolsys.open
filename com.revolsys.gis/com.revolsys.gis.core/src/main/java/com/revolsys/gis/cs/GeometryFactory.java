@@ -65,11 +65,22 @@ public class GeometryFactory extends
   public static GeometryFactory getFactory(final int srid) {
     GeometryFactory factory = factories.get(srid);
     if (factory == null) {
-      factory = new GeometryFactory(
-        EpsgCoordinateSystems.getCoordinateSystem(srid));
-      factories.put(srid, factory);
+      factory = getFactory(EpsgCoordinateSystems.getCoordinateSystem(srid));
     }
     return factory;
+  }
+
+  public static GeometryFactory getFactory(
+    final CoordinateSystem coordinateSystem) {
+    int srid = coordinateSystem.getId();
+    synchronized (factories) {
+      GeometryFactory factory = factories.get(srid);
+      if (factory == null) {
+        factory = new GeometryFactory(coordinateSystem);
+        factories.put(srid, factory);
+      }
+      return factory;
+    }
   }
 
   public static GeometryFactory getFactory(final int srid, final int scale) {
@@ -384,9 +395,16 @@ public class GeometryFactory extends
 
   @Override
   public String toString() {
-    return "(" + coordinateSystem.getId() + ","
-      + coordinatesPrecisionModel.getScaleXY() + ","
-      + coordinatesPrecisionModel.getScaleZ() + ")";
+    if (coordinatesPrecisionModel.isFloating()) {
+      return coordinateSystem.getName() + " (" + coordinateSystem.getId() + ")";
+    } else {
+      return coordinateSystem.getName() + " (" + coordinateSystem.getId()
+        + ") " + coordinatesPrecisionModel;
+    }
+  }
+
+  public boolean isFloating() {
+    return coordinatesPrecisionModel.isFloating();
   }
 
   public Point createPoint(double x, double y) {

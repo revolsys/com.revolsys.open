@@ -105,11 +105,16 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   public BoundingBox getAreaBoundingBox() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (area != null) {
-      return new BoundingBox(this, area.getLatLonBounds());
+      return new BoundingBox(geometryFactory, area.getLatLonBounds());
     } else {
-      return new BoundingBox(this, -180, -90, 180, 90);
+      return new BoundingBox(geometryFactory, -180, -90, 180, 90);
     }
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.getFactory(this);
   }
 
   public Authority getAuthority() {
