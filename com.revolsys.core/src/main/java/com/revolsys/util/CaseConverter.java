@@ -21,8 +21,8 @@ public final class CaseConverter {
     if (text == null) {
       return Collections.emptyList();
     } else {
-      final Pattern p = Pattern.compile("([A-Z]+)$" + "|" + "([A-Z]+)[ _]"
-        + "|" + "([a-zA-Z][^A-Z _]*)");
+      final Pattern p = Pattern.compile("([\\p{Lu}\\d']+)$" + "|" + "([\\p{Lu}\\d']+)[ _]"
+        + "|" + "([\\p{L}\\d'][^\\p{Lu} _]*)");
       final Matcher m = p.matcher(text);
       final List<String> words = new ArrayList<String>();
       while (m.find()) {
