@@ -2,9 +2,11 @@ package com.revolsys.spring;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -49,8 +51,14 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
 
   private String beanName;
 
+  private Set<String> beanNamesNotToExport = new HashSet<String>();
+
   public void setBeanName(String beanName) {
     this.beanName = beanName;
+  }
+
+  public ModuleImport() {
+    beanNamesNotToExport.add("com.revolsys.spring.config.AttributesBeanConfigurer");
   }
 
   protected void afterPostProcessBeanDefinitionRegistry(
@@ -74,6 +82,7 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
         if (beanClassName.equals(AttributeMap.class.getName())) {
           registerTargetBeanDefinition(applicationContext, parentBeanFactory,
             beanName, beanName);
+          beanNamesNotToExport.add(beanName);
         } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
           final PropertyValue targetMapClass = beanDefinition.getPropertyValues()
             .getPropertyValue("targetMapClass");
@@ -82,6 +91,7 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
             if (AttributeMap.class.getName().equals(mapClass)) {
               registerTargetBeanDefinition(applicationContext,
                 parentBeanFactory, beanName, beanName);
+              beanNamesNotToExport.add(beanName);
             }
           }
         }
@@ -93,6 +103,7 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
       for (final String beanName : importBeanNames) {
         registerTargetBeanDefinition(applicationContext, parentBeanFactory,
           beanName, beanName);
+        beanNamesNotToExport.add(beanName);
       }
       final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
         applicationContext);
@@ -145,23 +156,32 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
       final GenericApplicationContext beanFactory = getApplicationContext(registry);
       if (exportAllBeans) {
         for (final String beanName : beanFactory.getBeanDefinitionNames()) {
-          registerTargetBeanDefinition(registry, beanFactory, beanName,
-            beanName);
-          for (final String alias : beanFactory.getAliases(beanName)) {
-            registerTargetBeanDefinition(registry, beanFactory, beanName, alias);
+          if (!beanNamesNotToExport.contains(beanName)) {
+            registerTargetBeanDefinition(registry, beanFactory, beanName,
+              beanName);
+            for (final String alias : beanFactory.getAliases(beanName)) {
+              if (!beanNamesNotToExport.contains(alias)) {
+                registerTargetBeanDefinition(registry, beanFactory, beanName,
+                  alias);
+              }
+            }
           }
         }
       } else {
         for (final String beanName : exportBeanNames) {
-          registerTargetBeanDefinition(registry, beanFactory, beanName,
-            beanName);
+          if (!beanNamesNotToExport.contains(beanName)) {
+            registerTargetBeanDefinition(registry, beanFactory, beanName,
+              beanName);
+          }
         }
       }
 
       for (final Entry<String, String> exportBeanAlias : exportBeanAliases.entrySet()) {
         final String beanName = exportBeanAlias.getKey();
         final String alias = exportBeanAlias.getValue();
-        registerTargetBeanDefinition(registry, beanFactory, beanName, alias);
+        if (!beanNamesNotToExport.contains(alias)) {
+          registerTargetBeanDefinition(registry, beanFactory, beanName, alias);
+        }
       }
       afterPostProcessBeanDefinitionRegistry(registry);
     }
@@ -192,7 +212,8 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
       proxyBeanDefinition.setBeanClass(TargetBeanFactoryBean.class);
       final MutablePropertyValues values = new MutablePropertyValues();
       final String beanClassName = beanDefinition.getBeanClassName();
-      final PropertyValue beanDefinitionProperty = new PropertyValue("targetBeanDefinition", beanDefinition);
+      final PropertyValue beanDefinitionProperty = new PropertyValue(
+        "targetBeanDefinition", beanDefinition);
       beanDefinitionProperty.setConvertedValue(beanDefinition);
       values.addPropertyValue(beanDefinitionProperty);
       values.addPropertyValue("targetBeanName", beanName);

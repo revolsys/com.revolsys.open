@@ -318,23 +318,25 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     final MutablePropertyValues propertyValues = bd.getPropertyValues();
     PropertyValue propertyValue = new PropertyValue(property, value);
     final String beanClassName = bd.getBeanClassName();
-    if (Parameter.class.getName().equals(beanClassName)) {
-      final PropertyValue typeValue = propertyValues.getPropertyValue("type");
-      if (typeValue != null) {
-        final String typeClassName = typeValue.getValue().toString();
-        try {
-          final Class<?> typeClass = Class.forName(typeClassName);
+    if (!TargetBeanFactoryBean.class.getName().equals(beanClassName)) {
+      if (Parameter.class.getName().equals(beanClassName)) {
+        final PropertyValue typeValue = propertyValues.getPropertyValue("type");
+        if (typeValue != null) {
+          final String typeClassName = typeValue.getValue().toString();
+          try {
+            final Class<?> typeClass = Class.forName(typeClassName);
 
-          final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
-            value, typeClass);
-          propertyValue = new PropertyValue(property, convertedValue);
-        } catch (final Throwable e) {
-          LOG.error("Unable to set " + beanName + "." + property + "=" + value,
-            e);
+            final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
+              value, typeClass);
+            propertyValue = new PropertyValue(property, convertedValue);
+          } catch (final Throwable e) {
+            LOG.error("Unable to set " + beanName + "." + property + "="
+              + value, e);
+          }
         }
       }
+      propertyValues.addPropertyValue(propertyValue);
     }
-    propertyValues.addPropertyValue(propertyValue);
   }
 
   public void setBeanFactory(final BeanFactory beanFactory) {
