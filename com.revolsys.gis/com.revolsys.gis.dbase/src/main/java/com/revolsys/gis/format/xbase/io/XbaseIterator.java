@@ -120,7 +120,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private Date getDate(final int startIndex, final int len) {
     final String dateString = getString(startIndex, len);
-    if (dateString.trim().length() == 0) {
+    if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
       try {

@@ -47,13 +47,15 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   public static void setGeometryProperties(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    Double angle = object.getValue(MoepConstants.ANGLE);
+    Number angle = object.getValue(MoepConstants.ANGLE);
     if (angle != null) {
-      double orientation = getAngle(angle);
+      double orientation = getAngle(angle.doubleValue());
       JtsGeometryUtil.setGeometryProperty(geometry, "orientation", orientation);
     }
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
       MoepConstants.TEXT_GROUP, object.getValue(MoepConstants.TEXT_GROUP));
+    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
+      MoepConstants.TEXT_INDEX, object.getValue(MoepConstants.TEXT_INDEX));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "text",
       object.getValue(MoepConstants.TEXT));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "textType",
@@ -207,7 +209,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(point);
           if (extraParams == 1 || extraParams == 3) {
             final int angleInt = readLEInt(in);
-            final double angle = ((double)angleInt) / 10000;
+            final int angle = angleInt / 10000;
             object.setValue(MoepConstants.ANGLE, angle);
           }
         break;
@@ -227,8 +229,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(textPoint);
           if (extraParams == 1) {
             final int angleInt = readLEInt(in);
-            double angle = angleInt / 10000.0;
-//            final double orientation = getAngle((angle) / 10000.0);
+            int angle = angleInt / 10000;
             object.setValue(MoepConstants.ANGLE, angle);
           }
           final int fontSize = readLEShort(in);
