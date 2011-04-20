@@ -63,34 +63,40 @@ public final class MoepConstants {
 
   public static final String TEXT_GROUP = "TEXT_GROUP";
 
+  public static final String TEXT_INDEX = "TEXT_INDEX";
+
   static {
-    final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(TYPE_NAME);
+    META_DATA = createMetaData(TYPE_NAME);
+  }
+
+  public static DataObjectMetaDataImpl createMetaData(final QName typeName) {
+    final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(typeName);
     type.addAttribute(FEATURE_CODE, DataTypes.STRING, 10, true);
     type.addAttribute(MAPSHEET_NAME, DataTypes.STRING, 7, false);
     type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, 20, true);
     type.addAttribute(ANGLE, DataTypes.DECIMAL, false);
     type.addAttribute(ELEVATION, DataTypes.DECIMAL, false);
-    type.addAttribute(TEXT_GROUP, DataTypes.STRING, 3, false);
+    type.addAttribute(TEXT_GROUP, DataTypes.DECIMAL, false);
+    type.addAttribute(TEXT_INDEX, DataTypes.DECIMAL, false);
     type.addAttribute(TEXT, DataTypes.STRING, 200, false);
     type.addAttribute(FONT_NAME, DataTypes.STRING, 10, false);
     type.addAttribute(FONT_SIZE, DataTypes.DECIMAL, false);
     type.addAttribute(FONT_WEIGHT, DataTypes.STRING, 10, false);
     type.addAttribute(ORIGINAL_FILE_TYPE, DataTypes.STRING, 20, false);
     type.addAttribute(ADMIT_SOURCE_DATE, DataTypes.DATE, false);
-    type.addAttribute(ADMIT_INTEGRATION_DATE, DataTypes.DATE, false);
     type.addAttribute(ADMIT_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
+    type.addAttribute(ADMIT_INTEGRATION_DATE, DataTypes.DATE, false);
     type.addAttribute(ADMIT_REVISION_KEY, DataTypes.STRING, 10, false);
     type.addAttribute(ADMIT_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10, false);
     type.addAttribute(RETIRE_SOURCE_DATE, DataTypes.DATE, false);
-    type.addAttribute(RETIRE_INTEGRATION_DATE, DataTypes.DATE, false);
     type.addAttribute(RETIRE_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
+    type.addAttribute(RETIRE_INTEGRATION_DATE, DataTypes.DATE, false);
     type.addAttribute(RETIRE_REVISION_KEY, DataTypes.STRING, 10, false);
     type.addAttribute(RETIRE_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10,
       false);
     type.addAttribute(GEOMETRY, DataTypes.GEOMETRY, true);
     type.setGeometryAttributeName(GEOMETRY);
-    META_DATA = type;
-
+    return type;
   }
 
   private MoepConstants() {

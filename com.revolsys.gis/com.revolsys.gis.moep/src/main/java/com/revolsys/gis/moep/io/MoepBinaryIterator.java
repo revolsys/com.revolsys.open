@@ -47,8 +47,11 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   public static void setGeometryProperties(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    JtsGeometryUtil.setGeometryProperty(geometry, "orientation",
-      object.getValue(MoepConstants.ANGLE));
+    Double angle = object.getValue(MoepConstants.ANGLE);
+    if (angle != null) {
+      double orientation = getAngle(angle);
+      JtsGeometryUtil.setGeometryProperty(geometry, "orientation", orientation);
+    }
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
       MoepConstants.TEXT_GROUP, object.getValue(MoepConstants.TEXT_GROUP));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "text",
@@ -139,7 +142,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     FileUtil.closeSilent(in);
   }
 
-  private double getAngle(final double angle) {
+  private static double getAngle(final double angle) {
     double orientation = (90 - angle) % 360;
     if (orientation < 0) {
       orientation = 360 + orientation;
@@ -203,9 +206,9 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           final Point point = readPoint(in);
           object.setGeometryValue(point);
           if (extraParams == 1 || extraParams == 3) {
-            final int angle = readLEInt(in);
-            object.setValue(MoepConstants.ANGLE, new Double(
-              getAngle(((double)angle) / 10000)));
+            final int angleInt = readLEInt(in);
+            final double angle = ((double)angleInt) / 10000;
+            object.setValue(MoepConstants.ANGLE, angle);
           }
         break;
         case CONSTRUCTION_LINE:
@@ -223,9 +226,10 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           final Point textPoint = readPoint(in);
           object.setGeometryValue(textPoint);
           if (extraParams == 1) {
-            final int angle = readLEInt(in);
-            final double orientation = getAngle((angle) / 10000.0);
-            object.setValue(MoepConstants.ANGLE, orientation);
+            final int angleInt = readLEInt(in);
+            double angle = angleInt / 10000.0;
+//            final double orientation = getAngle((angle) / 10000.0);
+            object.setValue(MoepConstants.ANGLE, angle);
           }
           final int fontSize = readLEShort(in);
           final int numChars = read();

@@ -15,20 +15,17 @@ public class GetDataObjectValue implements Converter<DataObject, Object> {
   public GetDataObjectValue() {
   }
 
-  public GetDataObjectValue(
-    final String attributePath) {
+  public GetDataObjectValue(final String attributePath) {
     this.attributePath = attributePath;
   }
 
-  public GetDataObjectValue(
-    final String attributePath,
+  public GetDataObjectValue(final String attributePath,
     final Map<? extends Object, ? extends Object> valueMap) {
     this.attributePath = attributePath;
     this.valueMap = valueMap;
   }
 
-  public Object convert(
-    final DataObject source) {
+  public Object convert(final DataObject source) {
     Object value = DataObjectUtil.getAttributeByPath(source, attributePath);
     if (!valueMap.isEmpty()) {
       if (valueMap.containsKey(value)) {
