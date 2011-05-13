@@ -22,6 +22,7 @@
     <module>com.revolsys.gis.kml</module>
     <module>com.revolsys.gis.mdb</module>
     <module>com.revolsys.gis.moep</module>
+    <module>com.revolsys.gis.mysql</module>
     <module>com.revolsys.gis.oracle</module>
     <module>com.revolsys.gis.postgis</module>
     <module>com.revolsys.gis.saif</module>
