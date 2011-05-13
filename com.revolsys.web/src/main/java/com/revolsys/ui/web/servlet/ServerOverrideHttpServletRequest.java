@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper {
   private String serverUrl;
 
+  private String secureServerUrl;
+
   private int serverPort;
 
   private String serverName;
@@ -27,8 +29,10 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
       if (serverPort == -1) {
         serverPort = url.getDefaultPort();
         this.serverUrl = scheme + "://" + serverName;
+        this.secureServerUrl = "https://" + serverName;
       } else {
         this.serverUrl = scheme + "://" + serverName + ":" + serverPort;
+        this.secureServerUrl = "https://" + serverName;
       }
     } catch (MalformedURLException e) {
       throw new IllegalArgumentException("Invalid URL " + serverUrl);
@@ -42,17 +46,19 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
   }
 
   @Override
-  public String getScheme() {
-    return scheme;
-  }
-
-  @Override
   public String getServerName() {
     return serverName;
   }
 
   @Override
   public StringBuffer getRequestURL() {
+    String serverUrl;
+    final String scheme = super.getScheme();
+    if (scheme.equals("https")) {
+      serverUrl = secureServerUrl;
+    } else {
+      serverUrl = this.serverUrl;
+    }
     StringBuffer url = new StringBuffer(serverUrl);
     String contextPath = getContextPath();
     if (contextPath != null) {
