@@ -17,24 +17,24 @@ public class LazyHttpPostOutputStream extends OutputStream {
 
   private final String url;
 
-  public LazyHttpPostOutputStream(
-    final String url,
-    final String contentType) {
+  public LazyHttpPostOutputStream(final String url, final String contentType) {
     this.url = url;
     this.contentType = contentType;
   }
 
   @Override
-  public void close()
-    throws IOException {
+  public void close() throws IOException {
     out.flush();
     out.close();
     in = connection.getInputStream();
+    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+      throw new RuntimeException("Result data not accepted by server "
+        + connection.getResponseCode() + " " + connection.getResponseMessage());
+    }
     in.close();
   }
 
-  private void init()
-    throws IOException {
+  private void init() throws IOException {
     connection = (HttpURLConnection)new URL(url).openConnection();
     connection.setRequestMethod("POST");
     connection.setRequestProperty("Content-Type", contentType);
@@ -46,9 +46,7 @@ public class LazyHttpPostOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(
-    final byte[] b)
-    throws IOException {
+  public void write(final byte[] b) throws IOException {
     if (out == null) {
       init();
     }
@@ -56,10 +54,7 @@ public class LazyHttpPostOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(
-    final byte[] b,
-    final int off,
-    final int len)
+  public void write(final byte[] b, final int off, final int len)
     throws IOException {
     if (out == null) {
       init();
@@ -68,9 +63,7 @@ public class LazyHttpPostOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(
-    final int b)
-    throws IOException {
+  public void write(final int b) throws IOException {
     if (out == null) {
       init();
     }
