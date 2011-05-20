@@ -11,11 +11,11 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
 
   private String secureServerUrl;
 
-  private int serverPort;
-
   private String serverName;
 
   private String scheme;
+
+  private int serverPort;
 
   public ServerOverrideHttpServletRequest(final String serverUrl,
     HttpServletRequest request) {
@@ -25,9 +25,9 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
       URL url = new URL(serverUrl);
       scheme = url.getProtocol();
       serverName = url.getHost();
-      serverPort = url.getPort();
+       serverPort = url.getPort();
       if (serverPort == -1) {
-        serverPort = url.getDefaultPort();
+        this.serverPort = url.getDefaultPort();
         this.serverUrl = scheme + "://" + serverName;
         this.secureServerUrl = "https://" + serverName;
       } else {
@@ -41,8 +41,21 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
   }
 
   @Override
+  public String getScheme() {
+    if (super.getScheme().equals("https")) {
+      return super.getScheme();
+    } else {
+      return scheme;
+    }
+  }
+
+  @Override
   public int getServerPort() {
-    return serverPort;
+    if (super.getScheme().equals("https")) {
+      return super.getServerPort();
+    } else {
+      return serverPort;
+    }
   }
 
   @Override
