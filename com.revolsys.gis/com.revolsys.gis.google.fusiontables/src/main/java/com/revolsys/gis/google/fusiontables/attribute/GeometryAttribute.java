@@ -10,10 +10,7 @@ import com.revolsys.gis.kml.io.KmlWriterUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryAttribute extends FusionTablesAttribute {
-  private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-    "yyyy-MM-dd");
-
-  public GeometryAttribute(String name) {
+ public GeometryAttribute(String name) {
     super(name, DataTypes.GEOMETRY);
   }
 

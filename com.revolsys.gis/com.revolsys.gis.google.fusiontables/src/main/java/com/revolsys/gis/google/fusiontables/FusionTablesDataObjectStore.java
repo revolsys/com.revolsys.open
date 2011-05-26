@@ -46,7 +46,6 @@ import com.revolsys.gis.google.fusiontables.attribute.DateTimeAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.GeometryAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.NumberAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.StringAttribute;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapReader;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
