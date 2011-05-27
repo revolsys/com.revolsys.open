@@ -59,8 +59,7 @@ public class XmlWriter extends Writer {
      * 
      * @param element The QName of the current element.
      */
-    TagConfiguration(
-      final QName element) {
+    TagConfiguration(final QName element) {
       this.element = element;
     }
 
@@ -69,8 +68,7 @@ public class XmlWriter extends Writer {
      * 
      * @param namespaceUri The namespace URI to add.
      */
-    public void addDefinedNamespace(
-      final String namespaceUri) {
+    public void addDefinedNamespace(final String namespaceUri) {
       definedNamespaces.add(namespaceUri);
     }
 
@@ -116,7 +114,7 @@ public class XmlWriter extends Writer {
   private boolean elementHasContent = false;
 
   /** Flag indicating if an element has been started. */
-  private final boolean elementsStarted = false;
+  private boolean elementsStarted = false;
 
   /** The stack of open XML elements. */
   private final LinkedList<TagConfiguration> elementStack = new LinkedList<TagConfiguration>();
@@ -150,8 +148,7 @@ public class XmlWriter extends Writer {
    * 
    * @param out The output stream to write to.
    */
-  public XmlWriter(
-    final OutputStream out) {
+  public XmlWriter(final OutputStream out) {
     this(out, true);
   }
 
@@ -162,9 +159,7 @@ public class XmlWriter extends Writer {
    * @param useNamespaces True if namespaces should be written, false if they
    *          should be ignored.
    */
-  public XmlWriter(
-    final OutputStream out,
-    final boolean useNamespaces) {
+  public XmlWriter(final OutputStream out, final boolean useNamespaces) {
     this(new OutputStreamWriter(out), useNamespaces);
   }
 
@@ -175,9 +170,7 @@ public class XmlWriter extends Writer {
    * @param charsetName The character set to output using.
    * @throws UnsupportedEncodingException
    */
-  public XmlWriter(
-    final OutputStream out,
-    final String charsetName)
+  public XmlWriter(final OutputStream out, final String charsetName)
     throws UnsupportedEncodingException {
     this(out, charsetName, true);
   }
@@ -191,11 +184,8 @@ public class XmlWriter extends Writer {
    *          should be ignored.
    * @throws UnsupportedEncodingException
    */
-  public XmlWriter(
-    final OutputStream out,
-    final String charsetName,
-    final boolean useNamespaces)
-    throws UnsupportedEncodingException {
+  public XmlWriter(final OutputStream out, final String charsetName,
+    final boolean useNamespaces) throws UnsupportedEncodingException {
     this(new OutputStreamWriter(out, charsetName), useNamespaces);
   }
 
@@ -204,8 +194,7 @@ public class XmlWriter extends Writer {
    * 
    * @param out The writer to write to.
    */
-  public XmlWriter(
-    final Writer out) {
+  public XmlWriter(final Writer out) {
     this(out, true);
   }
 
@@ -216,9 +205,7 @@ public class XmlWriter extends Writer {
    * @param useNamespaces True if namespaces should be written, false if they
    *          should be ignored.
    */
-  public XmlWriter(
-    final Writer out,
-    final boolean useNamespaces) {
+  public XmlWriter(final Writer out, final boolean useNamespaces) {
     this.out = new PrintWriter(out);
     this.useNamespaces = useNamespaces;
   }
@@ -231,9 +218,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final boolean value) {
+  public void attribute(final QName attribute, final boolean value) {
     attribute(attribute, String.valueOf(value));
   }
 
@@ -245,9 +230,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final byte value) {
+  public void attribute(final QName attribute, final byte value) {
     attribute(attribute, String.valueOf(value));
   }
 
@@ -259,9 +242,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final double value) {
+  public void attribute(final QName attribute, final double value) {
     attribute(attribute, String.valueOf(value));
   }
 
@@ -273,9 +254,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final float value) {
+  public void attribute(final QName attribute, final float value) {
     attribute(attribute, String.valueOf(value));
   }
 
@@ -287,9 +266,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final int value) {
+  public void attribute(final QName attribute, final int value) {
     attribute(attribute, String.valueOf(value));
   }
 
@@ -301,9 +278,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final long value) {
+  public void attribute(final QName attribute, final long value) {
     attribute(attribute, String.valueOf(value));
   }
 
@@ -315,9 +290,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final Object value) {
+  public void attribute(final QName attribute, final Object value) {
     if (value != null) {
       attribute(attribute, value.toString());
     }
@@ -331,9 +304,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    * @throws IllegalStateException If a start tag is not open.
    */
-  public void attribute(
-    final QName attribute,
-    final String value) {
+  public void attribute(final QName attribute, final String value) {
     if (value != null) {
       checkWriteAttribute();
       out.write(' ');
@@ -351,8 +322,7 @@ public class XmlWriter extends Writer {
    * @param text The text to wrap in a CDATA section
    * @throws IOException If there was a problem writing the text
    */
-  public void cdata(
-    final String text) {
+  public void cdata(final String text) {
     closeStartTag();
     out.write("<![CDATA[");
     out.write(text);
@@ -454,8 +424,7 @@ public class XmlWriter extends Writer {
    * @param comment The comment to write
    * @throws IOException If there was a problem writing the comment
    */
-  public void comment(
-    final String comment) {
+  public void comment(final String comment) {
     closeStartTag();
     out.write("<!--");
     writeIndent();
@@ -473,8 +442,7 @@ public class XmlWriter extends Writer {
    * @param dtd The DTD to be written
    * @throws IOException If there was a problem writing the declaration
    */
-  public void docType(
-    final String dtd) {
+  public void docType(final String dtd) {
     checkWriteDocType();
     out.write(dtd);
     canWriteXmlDeclaration = false;
@@ -488,9 +456,7 @@ public class XmlWriter extends Writer {
    * @param systemId The system id
    * @throws IOException If there was a problem writing the declaration
    */
-  public void docType(
-    final String name,
-    final String systemId) {
+  public void docType(final String name, final String systemId) {
     checkWriteDocType();
     out.write("<!DOCTYPE ");
     out.write(name);
@@ -509,9 +475,7 @@ public class XmlWriter extends Writer {
    * @param systemId The system id.
    * @throws IOException If there was a problem writing the declaration.
    */
-  public void docType(
-    final String name,
-    final String publicId,
+  public void docType(final String name, final String publicId,
     final String systemId) {
     checkWriteDocType();
     out.write("<!DOCTYPE ");
@@ -532,31 +496,9 @@ public class XmlWriter extends Writer {
    * @param content The body context for the element.
    * @throws IOException If there was a problem writing the element.
    */
-  public void element(
-    final QName element,
-    final Object content) {
+  public void element(final QName element, final Object content) {
     startTag(element);
     if (content != null) {
-      text(content.toString());
-    }
-    endTag(element);
-  }
-
-  /**
-   * Write the element with the specified content, if null xsi:nil attribute
-   * will be set.
-   * 
-   * @param element The QName of the tag.
-   * @param content The body context for the element.
-   * @throws IOException If there was a problem writing the element.
-   */
-  public void nillableElement(
-    final QName element,
-    final Object content) {
-    startTag(element);
-    if (content == null) {
-attribute(XsiConstants.NIL  , "true");
-    } else {
       text(content.toString());
     }
     endTag(element);
@@ -568,8 +510,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param element The QName of the tag.
    * @throws IOException If there was a problem writing the tag.
    */
-  public void emptyTag(
-    final QName element) {
+  public void emptyTag(final QName element) {
     startTag(element);
     endTag(element);
   }
@@ -608,8 +549,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param element The QName of the tag.
    * @throws IOException If there was a problem writing the element.
    */
-  public void endTag(
-    final QName element) {
+  public void endTag(final QName element) {
     checkNotFinished();
     final TagConfiguration currentTag = getCurrentTag();
     final QName currentElement = currentTag.getElement();
@@ -637,8 +577,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param ch The character to write the entity for
    * @throws IOException If there was a problem writing the entity
    */
-  public void entityRef(
-    final char ch) {
+  public void entityRef(final char ch) {
     closeStartTag();
     out.write("&#");
     out.write(ch);
@@ -652,8 +591,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param name The name of the entity
    * @throws IOException If there was a problem writing the entity
    */
-  public void entityRef(
-    final String name) {
+  public void entityRef(final String name) {
     closeStartTag();
     out.write('&');
     out.write(name);
@@ -689,8 +627,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param namespaceUri The XML Namespace URI.
    * @return The prefix.
    */
-  public String getPrefix(
-    final String namespaceUri) {
+  public String getPrefix(final String namespaceUri) {
     if (namespaceUri == null || namespaceUri.equals("")) {
       return null;
 
@@ -705,8 +642,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param qName The QName without the prefix.
    * @return The QName with the prefix.
    */
-  private QName getQNameWithPrefix(
-    final QName qName) {
+  private QName getQNameWithPrefix(final QName qName) {
     final String namespaceUri = qName.getNamespaceURI();
     if (namespaceUri.equals("")) {
       return new QName(qName.getLocalPart());
@@ -747,15 +683,31 @@ attribute(XsiConstants.NIL  , "true");
   }
 
   /**
+   * Write the element with the specified content, if null xsi:nil attribute
+   * will be set.
+   * 
+   * @param element The QName of the tag.
+   * @param content The body context for the element.
+   * @throws IOException If there was a problem writing the element.
+   */
+  public void nillableElement(final QName element, final Object content) {
+    startTag(element);
+    if (content == null) {
+      attribute(XsiConstants.NIL, "true");
+    } else {
+      text(content.toString());
+    }
+    endTag(element);
+  }
+
+  /**
    * Write an XML processing instruction.
    * 
    * @param target The PI Target (must not be xml)
    * @param value The value of the processing instruction
    * @throws IOException If there was a problem writing the comment
    */
-  public void processingInstruction(
-    final String target,
-    final String value) {
+  public void processingInstruction(final String target, final String value) {
     closeStartTag();
     out.write("<?");
     out.write(target);
@@ -784,8 +736,7 @@ attribute(XsiConstants.NIL  , "true");
   /**
    * @param element
    */
-  private void setCurrentTag(
-    final QName element) {
+  private void setCurrentTag(final QName element) {
     elementStack.addFirst(new TagConfiguration(element));
   }
 
@@ -794,8 +745,7 @@ attribute(XsiConstants.NIL  , "true");
    * 
    * @param indent The flag indicating that the xml elements should be indented.
    */
-  public void setIndent(
-    final boolean indent) {
+  public void setIndent(final boolean indent) {
     this.indent = indent;
   }
 
@@ -805,9 +755,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param prefix The prefix.
    * @param namespaceUri The XML Namespace URI.
    */
-  public void setPrefix(
-    final String prefix,
-    final String namespaceUri) {
+  public void setPrefix(final String prefix, final String namespaceUri) {
     if (getPrefix(namespaceUri) == null) {
       namespaceMap.put(namespaceUri, prefix);
     }
@@ -829,8 +777,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param encoding The encoding for the document
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(
-    final String encoding) {
+  public void startDocument(final String encoding) {
     startDocument(encoding, null, null);
   }
 
@@ -842,9 +789,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(
-    final String encoding,
-    final boolean standalone) {
+  public void startDocument(final String encoding, final boolean standalone) {
     startDocument(encoding, Boolean.valueOf(standalone));
   }
 
@@ -856,9 +801,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(
-    final String encoding,
-    final Boolean standalone) {
+  public void startDocument(final String encoding, final Boolean standalone) {
   }
 
   /**
@@ -868,9 +811,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param version The XML version.
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(
-    final String encoding,
-    final String version) {
+  public void startDocument(final String encoding, final String version) {
     startDocument(encoding, version, null);
   }
 
@@ -883,9 +824,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(
-    final String encoding,
-    final String version,
+  public void startDocument(final String encoding, final String version,
     final Boolean standalone) {
     checkWriteXmlDeclaration();
     if (version == null) {
@@ -917,8 +856,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param element The QName of the tag.
    * @throws IOException If there was a problem writing the element.
    */
-  public void startTag(
-    final QName element) {
+  public void startTag(final QName element) {
     checkNotFinished();
     closeStartTag();
     writeIndent();
@@ -936,9 +874,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param localPart The local name.
    * @throws IOException If there was a problem writing the element.
    */
-  public void startTag(
-    final String namespaceUri,
-    final String localPart) {
+  public void startTag(final String namespaceUri, final String localPart) {
     startTag(new QName(namespaceUri, localPart));
   }
 
@@ -949,8 +885,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final boolean value) {
+  public void text(final boolean value) {
     text(String.valueOf(value));
   }
 
@@ -963,10 +898,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param length The number of characters to write.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final char[] buffer,
-    final int offset,
-    final int length) {
+  public void text(final char[] buffer, final int offset, final int length) {
     closeStartTag();
     writeElementContent(buffer, offset, length);
     elementHasContent = true;
@@ -979,8 +911,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final double value) {
+  public void text(final double value) {
     text(String.valueOf(value));
   }
 
@@ -991,8 +922,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final float value) {
+  public void text(final float value) {
     text(String.valueOf(value));
   }
 
@@ -1003,8 +933,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final int value) {
+  public void text(final int value) {
     text(String.valueOf(value));
   }
 
@@ -1015,8 +944,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final long value) {
+  public void text(final long value) {
     text(String.valueOf(value));
   }
 
@@ -1027,8 +955,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
-  public void text(
-    final Object value) {
+  public void text(final Object value) {
     if (value != null) {
       text(value.toString());
     }
@@ -1040,8 +967,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param text The text to write
    * @throws IOException If there was a problem writing the text
    */
-  public void text(
-    final String text) {
+  public void text(final String text) {
     if (text != null) {
       text(text.toCharArray(), 0, text.length());
     }
@@ -1054,8 +980,7 @@ attribute(XsiConstants.NIL  , "true");
    * @throws IOException If an I/O exception occurs.
    */
   @Override
-  public void write(
-    final char[] buffer) {
+  public void write(final char[] buffer) {
     write(buffer, 0, buffer.length);
   }
 
@@ -1068,10 +993,7 @@ attribute(XsiConstants.NIL  , "true");
    * @throws IOException If an I/O exception occurs.
    */
   @Override
-  public void write(
-    final char[] buffer,
-    final int offset,
-    final int length) {
+  public void write(final char[] buffer, final int offset, final int length) {
     closeStartTag();
     out.write(buffer, offset, length);
     elementHasContent = true;
@@ -1084,8 +1006,7 @@ attribute(XsiConstants.NIL  , "true");
    * @throws IOException If an I/O exception occurs.
    */
   @Override
-  public void write(
-    final int character) {
+  public void write(final int character) {
     closeStartTag();
     out.write(character);
     elementHasContent = true;
@@ -1098,8 +1019,7 @@ attribute(XsiConstants.NIL  , "true");
    * @throws IOException If an I/O exception occurs.
    */
   @Override
-  public void write(
-    final String string) {
+  public void write(final String string) {
     write(string.toCharArray(), 0, string.length());
   }
 
@@ -1112,10 +1032,7 @@ attribute(XsiConstants.NIL  , "true");
    * @throws IOException If an I/O exception occurs.
    */
   @Override
-  public void write(
-    final String string,
-    final int offset,
-    final int length) {
+  public void write(final String string, final int offset, final int length) {
     write(string.toCharArray(), 0, length);
   }
 
@@ -1131,9 +1048,7 @@ attribute(XsiConstants.NIL  , "true");
      * @param length The number of characters to write.
      * @throws IOException If an I/O exception occurs.
      */
-  protected void writeAttributeContent(
-    final char[] buffer,
-    final int offset,
+  protected void writeAttributeContent(final char[] buffer, final int offset,
     final int length) {
     final int lastIndex = offset + length;
     int index = offset;
@@ -1190,8 +1105,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param value The value to write.
    * @throws IOException If an I/O exception occurs.
    */
-  protected void writeAttributeValue(
-    final String value) {
+  protected void writeAttributeValue(final String value) {
     writeAttributeContent(value.toCharArray(), 0, value.length());
   }
 
@@ -1206,9 +1120,7 @@ attribute(XsiConstants.NIL  , "true");
      * @param length The number of characters to write.
      * @throws IOException If an I/O exception occurs.
      */
-  protected void writeElementContent(
-    final char[] buffer,
-    final int offest,
+  protected void writeElementContent(final char[] buffer, final int offest,
     final int length) {
     int index = offest;
     final int lastIndex = index + length;
@@ -1275,12 +1187,16 @@ attribute(XsiConstants.NIL  , "true");
    * @throws IOException If an I/O exception occurs.
    */
   private void writeIndent() {
-    out.write(newLine);
-    if (indent) {
-      final int depth = elementStack.size();
-      for (int i = 0; i < depth; i++) {
-        out.write("  ");
+    if (elementsStarted) {
+      out.write(newLine);
+      if (indent) {
+        final int depth = elementStack.size();
+        for (int i = 0; i < depth; i++) {
+          out.write("  ");
+        }
       }
+    } else {
+      elementsStarted = true;
     }
   }
 
@@ -1291,8 +1207,7 @@ attribute(XsiConstants.NIL  , "true");
    * @param qName The QName to write
    * @throws IOException If an I/O exception occurs.
    */
-  private void writeName(
-    final QName qName) {
+  private void writeName(final QName qName) {
     if (useNamespaces) {
       final QName prefixedQName = getQNameWithPrefix(qName);
       final String prefix = prefixedQName.getPrefix();
@@ -1305,8 +1220,7 @@ attribute(XsiConstants.NIL  , "true");
     out.write(name);
   }
 
-  public void writeNamespaceAttribute(
-    final String namespaceUri,
+  public void writeNamespaceAttribute(final String namespaceUri,
     final String prefix) {
     if (prefix.length() == 0) {
       out.write(" xmlns");

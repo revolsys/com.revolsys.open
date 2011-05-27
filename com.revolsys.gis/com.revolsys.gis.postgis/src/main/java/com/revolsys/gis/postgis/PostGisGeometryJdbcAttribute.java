@@ -22,7 +22,10 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -34,21 +37,16 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
 
   private final int srid;
 
-  public PostGisGeometryJdbcAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final int scale,
-    final boolean required,
-    final Map<QName, Object> properties,
-    final int srid) {
+  public PostGisGeometryJdbcAttribute(final String name, final DataType type,
+    final int length, final int scale, final boolean required,
+    final Map<QName, Object> properties, final int srid) {
     super(name, type, -1, length, scale, required, properties);
     this.srid = srid;
     final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
-    }
+  }
 
   @Override
   public JdbcAttribute clone() {
@@ -57,11 +55,8 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final DataObject object)
-    throws SQLException {
+  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final DataObject object) throws SQLException {
     final Object oracleValue = resultSet.getObject(columnIndex);
     final Object value = toJava(oracleValue);
     object.setValue(getIndex(), value);
@@ -69,19 +64,14 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final Object value)
-    throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
     final Object jdbcValue = toJdbc(value);
     statement.setObject(parameterIndex, jdbcValue);
     return parameterIndex + 1;
   }
 
-  public Object toJava(
-    final Object object)
-    throws SQLException {
+  public Object toJava(final Object object) throws SQLException {
     if (object instanceof PGgeometry) {
       final PGgeometry pgGeometry = (PGgeometry)object;
       final Geometry geometry = pgGeometry.getGeometry();
@@ -101,9 +91,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  public Object toJdbc(
-    final Object object)
-    throws SQLException {
+  public Object toJdbc(final Object object) throws SQLException {
     Geometry geometry = null;
     if (object instanceof com.vividsolutions.jts.geom.Point) {
       final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
@@ -124,18 +112,17 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.vividsolutions.jts.geom.LineString toJtsLineString(
-    final GeometryFactory factory,
-    final LineString lineString) {
+    final GeometryFactory factory, final LineString lineString) {
     final Point[] points = lineString.getPoints();
     final int dimension = lineString.getDimension();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
       points.length, dimension);
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
-      coordinates.setX(i,  point.x);
-      coordinates.setY(i,  point.y);
+      coordinates.setX(i, point.x);
+      coordinates.setY(i, point.y);
       if (dimension > 3) {
-        coordinates.setZ(i,  point.z);
+        coordinates.setZ(i, point.z);
         if (dimension > 4) {
           coordinates.setValue(i, 3, point.m);
         }
@@ -145,8 +132,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.vividsolutions.jts.geom.MultiLineString toJtsMultiLineString(
-    final GeometryFactory factory,
-    final MultiLineString multiLine) {
+    final GeometryFactory factory, final MultiLineString multiLine) {
     final LineString[] lines = multiLine.getLines();
     final com.vividsolutions.jts.geom.LineString[] lineStrings = new com.vividsolutions.jts.geom.LineString[lines.length];
     for (int i = 0; i < lines.length; i++) {
@@ -157,15 +143,25 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private com.vividsolutions.jts.geom.Point toJtsPoint(
-    final GeometryFactory factory,
-    final Point point) {
-    final Coordinate coordinate = new Coordinate(point.x, point.y, point.z);
+    final GeometryFactory factory, final Point point) {
+    final int dimension = point.getDimension();
+    final Coordinates coordinate;
+    switch (dimension) {
+      case 3:
+        coordinate = new DoubleCoordinates(point.x, point.y, point.z);
+      break;
+      case 4:
+        coordinate = new DoubleCoordinates(point.x, point.y, point.z, point.m);
+      break;
+      default:
+        coordinate = new DoubleCoordinates(point.x, point.y);
+      break;
+    }
     return factory.createPoint(coordinate);
   }
 
   private com.vividsolutions.jts.geom.Polygon toJtsPolygon(
-    final GeometryFactory factory,
-    final Polygon polygon) {
+    final GeometryFactory factory, final Polygon polygon) {
     final LinearRing ring = polygon.getRing(0);
     final Point[] points = ring.getPoints();
     final int dimension = polygon.getDimension();
@@ -214,25 +210,32 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     return pgMultiLineString;
   }
 
-  private Point toPgPoint(
-    final com.vividsolutions.jts.geom.Point point) {
-    final Coordinate coord = point.getCoordinate();
-    final Point pgPoint = toPgPoint(coord);
+  private Point toPgPoint(final com.vividsolutions.jts.geom.Point point) {
+    final Coordinates coordinates = CoordinatesUtil.get(point);
+    final Point pgPoint = toPgPoint(coordinates);
     pgPoint.setSrid(point.getSRID());
     return pgPoint;
   }
 
-  private Point toPgPoint(
-    final Coordinate coordinate) {
-    if (Double.isNaN(coordinate.z)) {
-      return new Point(coordinate.x, coordinate.y);
+  private Point toPgPoint(final Coordinates coordinates) {
+    int numAxis = coordinates.getNumAxis();
+
+    final double x = coordinates.getX();
+    final double y = coordinates.getY();
+    if (numAxis > 2) {
+      final double z = coordinates.getZ();
+      final Point point = new Point(x, y, z);
+      if (numAxis > 3) {
+        point.m = coordinates.getM();
+      }
+      return point;
+
     } else {
-      return new Point(coordinate.x, coordinate.y, coordinate.z);
+      return new Point(x, y);
     }
   }
 
-  private Point[] toPgPoints(
-    final CoordinateSequence coordinates) {
+  private Point[] toPgPoints(final CoordinateSequence coordinates) {
     final Point[] points = new Point[coordinates.size()];
     for (int i = 0; i < coordinates.size(); i++) {
       final double y = coordinates.getY(i);
@@ -251,8 +254,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     return points;
   }
 
-  private Polygon toPgPolygon(
-    final com.vividsolutions.jts.geom.Polygon polygon) {
+  private Polygon toPgPolygon(final com.vividsolutions.jts.geom.Polygon polygon) {
     final LinearRing[] rings = new LinearRing[1 + polygon.getNumInteriorRing()];
     final com.vividsolutions.jts.geom.LineString exteriorRing = polygon.getExteriorRing();
     rings[0] = toPgLinearRing(exteriorRing);

@@ -36,6 +36,10 @@ public interface Coordinates extends Comparable<Coordinates> {
 
   double getZ();
 
+  double getM();
+
+  long getTime();
+
   void setValue(
     final int index,
     final double value);
@@ -48,4 +52,10 @@ public interface Coordinates extends Comparable<Coordinates> {
 
   void setZ(
     double z);
+
+  void setM(
+    double m);
+
+  void setTime(
+    long time);
 }

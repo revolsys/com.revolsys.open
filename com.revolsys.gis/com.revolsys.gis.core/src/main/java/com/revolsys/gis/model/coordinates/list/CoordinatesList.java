@@ -49,11 +49,19 @@ public interface CoordinatesList extends CoordinateSequence,
 
   double getZ(int index);
 
+  double getM(int index);
+
+  long getTime(int index);
+
   void setX(int index, double x);
 
   void setY(int index, double y);
 
   void setZ(int index, double z);
+
+  void setTime(int index, long time);
+
+  void setM(int index, double m);
 
   Coordinates get(int i);
 

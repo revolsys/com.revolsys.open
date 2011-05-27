@@ -168,9 +168,17 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     return getNumAxis();
   }
 
+  public double getM(final int index) {
+    return getValue(index, 3);
+  }
+
   @Deprecated
   public double getOrdinate(final int index, final int axisIndex) {
     return getValue(index, axisIndex);
+  }
+
+  public long getTime(final int index) {
+    return (long)getM(index);
   }
 
   public double getX(final int index) {
@@ -219,6 +227,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
+  public void setM(final int index, final double m) {
+    setValue(index, 3, m);
+  }
+
   @Deprecated
   public void setOrdinate(final int index, final int axisIndex,
     final double value) {
@@ -231,6 +243,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     if (getNumAxis() > 2) {
       setZ(i, point.getZ());
     }
+  }
+
+  public void setTime(final int index, final long time) {
+    setM(index, time);
   }
 
   public void setX(final int index, final double x) {

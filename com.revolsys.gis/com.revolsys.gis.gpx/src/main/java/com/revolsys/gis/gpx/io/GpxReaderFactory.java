@@ -1,7 +1,6 @@
 package com.revolsys.gis.gpx.io;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import org.springframework.core.io.Resource;
 
@@ -11,7 +10,8 @@ import com.revolsys.gis.data.io.DataObjectIteratorReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
 
-public class GpxReaderFactory extends AbstractDataObjectAndGeometryReaderFactory {
+public class GpxReaderFactory extends
+  AbstractDataObjectAndGeometryReaderFactory {
   /** The factory instance. */
   public static final GpxReaderFactory INSTANCE = new GpxReaderFactory();
 
@@ -37,11 +37,11 @@ public class GpxReaderFactory extends AbstractDataObjectAndGeometryReaderFactory
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
-      DataObjectIterator iterator = new GpxIterator(new InputStreamReader(resource.getInputStream()), dataObjectFactory, null);
+      DataObjectIterator iterator = new GpxIterator(resource,
+        dataObjectFactory, null);
       return new DataObjectIteratorReader(iterator);
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to open resource " + resource,
