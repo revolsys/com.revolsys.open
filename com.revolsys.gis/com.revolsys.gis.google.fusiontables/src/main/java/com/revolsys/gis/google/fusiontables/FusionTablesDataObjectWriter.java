@@ -13,23 +13,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 
 public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
-  public static void appendString(final StringBuffer buffer, final String string) {
-    if (string == null) {
-    } else {
-
-      buffer.append('\'');
-      for (int i = 0; i < string.length(); i++) {
-        final char c = string.charAt(i);
-        if (c == '\'') {
-          buffer.append("\\'");
-        } else {
-          buffer.append(c);
-        }
-      }
-      buffer.append('\'');
-    }
-  }
-
+ 
   private final FusionTablesDataObjectStore dataStore;
 
   private Statistics deleteStatistics;
@@ -70,7 +54,7 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
     sqlBuffer.append(dataStore.getTableId(typeName));
     sqlBuffer.append(" WHERE rowid = ");
     final Object rowId = object.getValue("rowid");
-    appendString(sqlBuffer, rowId.toString());
+    FusionTablesDataObjectStore.appendString(sqlBuffer, rowId.toString());
     final String sql = sqlBuffer.toString();
 
     execute(typeName, sql, getDeleteStatistics());
@@ -94,7 +78,8 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   private DataObjectMetaData getDataObjectMetaData(final QName typeName) {
-    final DataObjectMetaData metaData = dataStore.getMetaData(typeName);
+    QName localTypeName = dataStore.getTypeName(typeName);
+    final DataObjectMetaData metaData = dataStore.getMetaData(localTypeName);
     return metaData;
   }
 
@@ -155,7 +140,7 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
         sql.append(", ");
       }
       final String attributeName = metaData.getAttributeName(i);
-      appendString(sql, attributeName);
+      FusionTablesDataObjectStore.appendString(sql, attributeName);
     }
     sql.append(") VALUES (");
     for (int i = 1; i < metaData.getAttributeCount(); i++) {
@@ -187,7 +172,7 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
       final FusionTablesAttribute attribute = (FusionTablesAttribute)metaData.getAttribute(i);
       final String attributeName = attribute.getName();
       Object value = object.getValue(attributeName);
-      appendString(sql, attributeName);
+      FusionTablesDataObjectStore.appendString(sql, attributeName);
       sql.append(" = ");
       attribute.appendValue(sql, value);
     }

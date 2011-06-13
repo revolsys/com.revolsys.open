@@ -39,8 +39,8 @@ public class MultiPointShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.MultiPointShapeBuffer_GetExtent(swigCPtr, this, SWIGTYPE_p_double.getCPtr(extent));
   }
 
-  public int GetNumPoints(SWIGTYPE_p_int numPoints) {
-    return EsriFileGdbJNI.MultiPointShapeBuffer_GetNumPoints(swigCPtr, this, SWIGTYPE_p_int.getCPtr(numPoints));
+  public int GetNumPoints(int[] numPoints) {
+    return EsriFileGdbJNI.MultiPointShapeBuffer_GetNumPoints(swigCPtr, this, numPoints);
   }
 
   public int GetPoints(Point points) {

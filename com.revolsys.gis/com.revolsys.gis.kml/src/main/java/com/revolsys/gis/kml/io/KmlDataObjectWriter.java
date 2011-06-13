@@ -31,8 +31,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private boolean opened;
 
-  public KmlDataObjectWriter(
-    final java.io.Writer out) {
+  public KmlDataObjectWriter(final java.io.Writer out) {
     this.writer = new KmlXmlWriter(out);
   }
 
@@ -80,8 +79,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     writer.flush();
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     if (!opened) {
       writeHeader();
     }
@@ -89,11 +87,20 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     final DataObjectMetaData metaData = object.getMetaData();
     int geometryIndex = metaData.getGeometryAttributeIndex();
     int idIndex = metaData.getIdAttributeIndex();
-    if (idIndex != -1) {
+
+    String nameAttribute = getProperty(PLACEMARK_NAME_ATTRIBUTE_PROPERTY);
+    String name = null;
+    if (nameAttribute != null) {
+      name = object.getValue(nameAttribute);
+    }
+    if (name == null && idIndex != -1) {
       final Object id = object.getValue(idIndex);
-      final QName name = metaData.getName();
-      final String localName = name.getLocalPart();
-      writer.element(NAME, localName + " " + id);
+      final QName qName = metaData.getName();
+      final String localName = qName.getLocalPart();
+      name = localName + " " + id;
+    }
+    if (name != null) {
+      writer.element(NAME, name);
     }
     String snippet = getProperty(SNIPPET_PROPERTY);
     if (snippet != null) {
@@ -117,7 +124,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     boolean hasValues = false;
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i != geometryIndex) {
-        final String name = metaData.getAttributeName(i);
+        final String attributeName = metaData.getAttributeName(i);
         Object value = object.getValue(i);
         if (value != null) {
           if (!hasValues) {
@@ -125,7 +132,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
             writer.startTag(EXTENDED_DATA);
           }
           writer.startTag(DATA);
-          writer.attribute(NAME, name);
+          writer.attribute(NAME, attributeName);
           writer.nillableElement(VALUE, value);
           writer.endTag(DATA);
         }

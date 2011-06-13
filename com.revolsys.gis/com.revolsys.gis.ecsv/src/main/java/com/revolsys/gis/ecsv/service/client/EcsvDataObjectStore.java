@@ -42,8 +42,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class EcsvDataObjectStore extends AbstractDataObjectStore {
-  public static final EcsvDataObjectStore create(
-    final URI uri) {
+  public static final EcsvDataObjectStore create(final URI uri) {
     return new EcsvDataObjectStore(uri, new ArrayDataObjectFactory());
   }
 
@@ -51,24 +50,19 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return null;
   }
 
-  public static final EcsvDataObjectStore create(
-    final URI uri,
+  public static final EcsvDataObjectStore create(final URI uri,
     final DataObjectFactory factory) {
     return new EcsvDataObjectStore(uri, factory);
   }
 
-  public static final EcsvDataObjectStore create(
-    final URI uri,
-    final String username,
-    final String password) {
+  public static final EcsvDataObjectStore create(final URI uri,
+    final String username, final String password) {
     final ArrayDataObjectFactory factory = new ArrayDataObjectFactory();
     return new EcsvDataObjectStore(uri, username, password, factory);
   }
 
-  public static final EcsvDataObjectStore create(
-    final URI uri,
-    final String username,
-    final String password,
+  public static final EcsvDataObjectStore create(final URI uri,
+    final String username, final String password,
     final DataObjectFactory factory) {
     return new EcsvDataObjectStore(uri, username, password, factory);
   }
@@ -83,32 +77,26 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
 
   private final String username;
 
-  public EcsvDataObjectStore(
-    final URI uri,
+  public EcsvDataObjectStore(final URI uri,
     final DataObjectFactory dataObjectFactory) {
     this(uri, null, null, dataObjectFactory);
   }
 
-  public EcsvDataObjectStore(
-    final URI uri,
-    final String username,
-    final String password,
-    final DataObjectFactory dataObjectFactory) {
+  public EcsvDataObjectStore(final URI uri, final String username,
+    final String password, final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
     this.uri = uri;
     this.username = username;
     this.password = password;
   }
 
-  protected DataObjectReader createReader(
-    final String path) {
+  protected DataObjectReader createReader(final String path) {
     final Map<String, String> params = Collections.emptyMap();
     return createReader(path, params);
 
   }
 
-  protected DataObjectReader createReader(
-    final String path,
+  protected DataObjectReader createReader(final String path,
     final Map<String, String> parameters) {
 
     final HttpClient client = new HttpClient();
@@ -160,8 +148,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private String getPath(
-    final String namespaceUri) {
+  private String getPath(final String namespaceUri) {
     String path = namespacePaths.get(namespaceUri);
     if (path == null) {
       getSchemas();
@@ -174,8 +161,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   // TODO move to load loadSchemaDataObjectMetaData
-  protected DataObjectMetaData loadMetaData(
-    final QName typeName) {
+  protected DataObjectMetaData loadMetaData(final QName typeName) {
     final String namespaceUri = typeName.getNamespaceURI();
     final String namespacePath = getPath(namespaceUri);
     final String name = typeName.getLocalPart();
@@ -195,8 +181,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  protected void loadSchemas(
-    Map<String, DataObjectStoreSchema> schemaMap) {
+  protected void loadSchemas(Map<String, DataObjectStoreSchema> schemaMap) {
     final Reader<DataObject> reader = createReader("");
     if (reader != null) {
       for (final DataObject object : reader) {
@@ -210,8 +195,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   // TODO move to load loadSchemaDataObjectMetaData
-  protected List<QName> loadTypeNames(
-    final String namespaceUri) {
+  protected List<QName> loadTypeNames(final String namespaceUri) {
     final List<QName> typeNames = new ArrayList<QName>();
     final String path = getPath(namespaceUri);
     final Reader<DataObject> reader = createReader(path);
@@ -224,16 +208,13 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return typeNames;
   }
 
-  public Reader query(
-    final QName typeName) {
+  public Reader<DataObject> query(final QName typeName) {
     final String path = getPath(typeName.getNamespaceURI()) + "/"
       + typeName.getLocalPart();
     return createReader(path);
   }
 
-  public Reader query(
-    final QName typeName,
-    final Envelope envelope) {
+  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
     final String path = getPath(typeName.getNamespaceURI()) + "/"
       + typeName.getLocalPart();
     final Map<String, String> parameters = new HashMap<String, String>();
@@ -245,17 +226,18 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return createReader(path, parameters);
   }
 
-  public Reader query(
-    final QName typeName,
-    final Geometry geometry) {
+  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
     final Envelope envelope = geometry.getEnvelopeInternal();
 
     return query(typeName, envelope);
   }
 
-  public DataObject query(
-    QName typeName,
-    String queryString,
+  public Reader<DataObject> query(QName typeName, String queryString,
+    Object... arguments) {
+    throw new UnsupportedOperationException();
+  }
+
+  public DataObject queryFirst(QName typeName, String queryString,
     Object... arguments) {
     throw new UnsupportedOperationException();
   }

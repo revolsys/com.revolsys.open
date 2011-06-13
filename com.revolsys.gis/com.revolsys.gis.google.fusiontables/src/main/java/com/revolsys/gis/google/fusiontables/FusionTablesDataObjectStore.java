@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +11,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
@@ -65,6 +66,23 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
 
   private static final String SERVICE_URL = "http://www.google.com/fusiontables/api/query";
 
+  public static void appendString(final StringBuffer buffer, final String string) {
+    if (string == null) {
+    } else {
+
+      buffer.append('\'');
+      for (int i = 0; i < string.length(); i++) {
+        final char c = string.charAt(i);
+        if (c == '\'') {
+          buffer.append("\\'");
+        } else {
+          buffer.append(c);
+        }
+      }
+      buffer.append('\'');
+    }
+  }
+
   public static void addColumnNames(final StringBuffer sql,
     final DataObjectMetaData metaData) {
     final List<String> attributeNames = metaData.getAttributeNames();
@@ -88,7 +106,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private String username = "api.user@revolsys.com";
+  private String username = "api.user2@revolsys.com";
 
   private String password = "Tdnmatm1";
 
@@ -136,7 +154,8 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
       if (i > 0) {
         sql.append(", ");
       }
-      sql.append(metaData.getAttributeName(i));
+      final String attributeName = metaData.getAttributeName(i);
+      appendString(sql, attributeName);
       sql.append(": ");
       final DataType dataType = metaData.getAttributeType(i);
       final Class<?> attributeClass = dataType.getJavaClass();
@@ -151,6 +170,27 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
       }
     }
     sql.append(" )");
+    executePostQuery(sql);
+    refreshMetaData("");
+  }
+
+  public static void appendString(final StringBuffer buffer, final Object value) {
+
+    if (value == null) {
+      buffer.append("''");
+    } else {
+      Class<?> valueClass = value.getClass();
+      if (Geometry.class.isAssignableFrom(valueClass)) {
+        GeometryAttribute.appendString(buffer, value);
+      } else if (Number.class.isAssignableFrom(valueClass)) {
+        NumberAttribute.appendString(buffer, value);
+      } else if (Date.class.isAssignableFrom(valueClass)) {
+        DateTimeAttribute.appendString(buffer, value);
+      } else {
+        StringAttribute.appendString(buffer, value);
+      }
+    }
+
   }
 
   public FusionTablesDataObjectWriter createWriter() {
@@ -167,14 +207,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  @Override
-  public void deleteAll(final Collection<DataObject> objects) {
-    for (final DataObject object : objects) {
-      delete(object);
-    }
-  }
-
-  private HttpResponse executeQuery(final String sql) {
+  private HttpResponse executeQuery(final CharSequence sql) {
     try {
       final HttpTransport transport = GoogleTransport.create();
       final GoogleHeaders headers = (GoogleHeaders)transport.defaultHeaders;
@@ -200,7 +233,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  protected HttpResponse executePostQuery(final String sql) {
+  protected HttpResponse executePostQuery(final CharSequence sql) {
     try {
       final HttpTransport transport = GoogleTransport.create();
       final GoogleHeaders headers = (GoogleHeaders)transport.defaultHeaders;
@@ -226,7 +259,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
       return response;
     } catch (final UnsupportedEncodingException e) {
       throw new RuntimeException("Unable to encode query " + sql, e);
-      } catch (final IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to invoke query " + sql, e);
     }
   }
@@ -295,6 +328,11 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return password;
   }
 
+  protected QName getTypeName(final QName typeName) {
+    QName localTypeName = new QName(typeName.getLocalPart());
+    return localTypeName;
+  }
+
   @SuppressWarnings("unchecked")
   private <T> T getSharedAttribute(final String name) {
     final Map<String, Object> sharedAttributes = getSharedAttributes();
@@ -312,12 +350,14 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   }
 
   public String getTableId(final QName typeName) {
-    return typeNameTableIdMap.get(typeName);
+    return typeNameTableIdMap.get(getTypeName(typeName));
   }
 
   public String getUsername() {
     return username;
   }
+
+  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
   public synchronized FusionTablesDataObjectWriter getWriter() {
     FusionTablesDataObjectWriter writer = getSharedAttribute("writer");
@@ -335,13 +375,6 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   @Override
   public void insert(final DataObject object) {
     getWriter().write(object);
-  }
-
-  @Override
-  public void insertAll(final Collection<DataObject> objects) {
-    for (final DataObject object : objects) {
-      insert(object);
-    }
   }
 
   @Override
@@ -416,7 +449,8 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return query(typeName, projectedGeometry.getEnvelopeInternal());
   }
 
-  private Reader<DataObject> query(final QName typeName, final String where) {
+  public Reader<DataObject> query(QName typeName, String where,
+    Object... arguments) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
@@ -424,18 +458,56 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     sql.append(" FROM ");
     final String tableId = getTableId(typeName);
     sql.append(tableId);
-    if (where != null) {
+    if (where == null) {
+      if (arguments.length > 0) {
+        throw new IllegalArgumentException(
+          "Arguments cannot be specified if there is no where clause");
+      }
+    } else {
       sql.append(" WHERE ");
-      sql.append(where);
+      if (arguments.length == 0) {
+        if (where.indexOf('?') > -1) {
+          throw new IllegalArgumentException(
+            "No arguments specified for a where clause with placeholders: "
+              + where);
+        } else {
+          sql.append(where);
+        }
+      } else {
+        Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+        int i = 0;
+        while (matcher.find()) {
+          if (i >= arguments.length) {
+            throw new IllegalArgumentException(
+              "Not enough arguments for where clause with placeholders: "
+                + where);
+          }
+          final Object argument = arguments[i];
+          matcher.appendReplacement(sql, "");
+          appendString(sql, argument);
+          i++;
+        }
+        matcher.appendTail(sql);
+      }
     }
     final String sqlString = sql.toString();
     return createDataObjectReader(metaData, sqlString);
   }
 
-  public DataObject query(final QName typeName, final String queryString,
-    final Object... arguments) {
-    // TODO Auto-generated method stub
-    return null;
+  public DataObject queryFirst(QName typeName, String queryString,
+    Object... arguments) {
+    final Reader<DataObject> reader = query(typeName, queryString, arguments);
+    final Iterator<DataObject> iterator = reader.iterator();
+    try {
+      if (iterator.hasNext()) {
+        final DataObject object = iterator.next();
+        return object;
+      } else {
+        return null;
+      }
+    } finally {
+      reader.close();
+    }
   }
 
   public void setPassword(final String password) {

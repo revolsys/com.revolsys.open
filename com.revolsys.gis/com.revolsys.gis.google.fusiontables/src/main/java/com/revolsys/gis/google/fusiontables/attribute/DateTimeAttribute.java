@@ -11,42 +11,53 @@ public class DateTimeAttribute extends FusionTablesAttribute {
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
     "yyyy-MM-dd");
 
-  public DateTimeAttribute(String name) {
-    super(name, DataTypes.DATE_TIME);
-  }
-
-  public void appendValue(StringBuffer sql, Object object) {
-    sql.append('\'');
-    if (object != null) {
+  public static void appendString(final StringBuffer sql, final Object object) {
+    if (object == null) {
+      sql.append('\'');
+      sql.append('\'');
+    } else {
+      String string;
       if (object instanceof Date) {
-        sql.append(DATE_FORMAT.format(object));
+        string = DATE_FORMAT.format(object);
       } else {
-        String string = object.toString();
+        string = object.toString();
         try {
-          Date date = DATE_FORMAT.parse(string);
-          sql.append(DATE_FORMAT.format(date));
-        } catch (ParseException e) {
+          final Date date = DATE_FORMAT.parse(string);
+          string = DATE_FORMAT.format(date);
+        } catch (final ParseException e) {
           throw new IllegalArgumentException("Expecting a YYYY-MM-DD date");
         }
       }
+      sql.append('\'');
+      sql.append(string);
+      sql.append('\'');
     }
-    sql.append('\'');
   }
 
-  public Object parseString(String string) {
-    if (string.trim().length() == 0) {
-      return null;
-    } else {
-      try {
-        return DATE_FORMAT.parse(string);
-      } catch (ParseException e) {
-        throw new IllegalArgumentException("Expecting a YYYY-MM-DD date");
-      }
-    }
+  public DateTimeAttribute(final String name) {
+    super(name, DataTypes.DATE_TIME);
+  }
+
+  @Override
+  public void appendValue(final StringBuffer sql, final Object object) {
+    appendString(sql, object);
   }
 
   @Override
   public DateTimeAttribute clone() {
     return new DateTimeAttribute(getName());
+  }
+
+  @Override
+  public Object parseString(final String string) {
+    if (string.trim().length() == 0) {
+      return null;
+    } else {
+      try {
+        return DATE_FORMAT.parse(string);
+      } catch (final ParseException e) {
+        throw new IllegalArgumentException("Expecting a YYYY-MM-DD date");
+      }
+    }
   }
 }

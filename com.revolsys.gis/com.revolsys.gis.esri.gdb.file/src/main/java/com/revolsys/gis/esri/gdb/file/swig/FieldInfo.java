@@ -47,12 +47,12 @@ public class FieldInfo {
     return EsriFileGdbJNI.FieldInfo_GetFieldType(swigCPtr, this, fieldNumber, SWIGTYPE_p_FileGDBAPI__FieldType.getCPtr(fieldType));
   }
 
-  public int GetFieldLength(int fieldNumber, SWIGTYPE_p_int fieldLength) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldLength(swigCPtr, this, fieldNumber, SWIGTYPE_p_int.getCPtr(fieldLength));
+  public int GetFieldLength(int fieldNumber, int[] fieldLength) {
+    return EsriFileGdbJNI.FieldInfo_GetFieldLength(swigCPtr, this, fieldNumber, fieldLength);
   }
 
-  public int GetFieldIsNullable(int fieldNumber, SWIGTYPE_p_bool isNullable) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldIsNullable(swigCPtr, this, fieldNumber, SWIGTYPE_p_bool.getCPtr(isNullable));
+  public int GetFieldIsNullable(int fieldNumber, boolean[] isNullable) {
+    return EsriFileGdbJNI.FieldInfo_GetFieldIsNullable(swigCPtr, this, fieldNumber, isNullable);
   }
 
   public FieldInfo() {

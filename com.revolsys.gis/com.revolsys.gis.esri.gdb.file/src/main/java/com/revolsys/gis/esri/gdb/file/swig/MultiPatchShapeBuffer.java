@@ -39,12 +39,12 @@ public class MultiPatchShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_GetExtent(swigCPtr, this, SWIGTYPE_p_double.getCPtr(extent));
   }
 
-  public int GetNumParts(SWIGTYPE_p_int numParts) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNumParts(swigCPtr, this, SWIGTYPE_p_int.getCPtr(numParts));
+  public int GetNumParts(int[] numParts) {
+    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNumParts(swigCPtr, this, numParts);
   }
 
-  public int GetNumPoints(SWIGTYPE_p_int numPoints) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNumPoints(swigCPtr, this, SWIGTYPE_p_int.getCPtr(numPoints));
+  public int GetNumPoints(int[] numPoints) {
+    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNumPoints(swigCPtr, this, numPoints);
   }
 
   public int GetParts(SWIGTYPE_p_int parts) {
@@ -83,12 +83,12 @@ public class MultiPatchShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNormals(swigCPtr, this, SWIGTYPE_p_float.getCPtr(normals));
   }
 
-  public int GetTextures(SWIGTYPE_p_int numTextures, SWIGTYPE_p_int textureDimension, SWIGTYPE_p_int textureParts, SWIGTYPE_p_float textureCoords) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetTextures(swigCPtr, this, SWIGTYPE_p_int.getCPtr(numTextures), SWIGTYPE_p_int.getCPtr(textureDimension), SWIGTYPE_p_int.getCPtr(textureParts), SWIGTYPE_p_float.getCPtr(textureCoords));
+  public int GetTextures(int[] numTextures, int[] textureDimension, SWIGTYPE_p_int textureParts, SWIGTYPE_p_float textureCoords) {
+    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetTextures(swigCPtr, this, numTextures, textureDimension, SWIGTYPE_p_int.getCPtr(textureParts), SWIGTYPE_p_float.getCPtr(textureCoords));
   }
 
-  public int GetMaterials(SWIGTYPE_p_int numMaterials, SWIGTYPE_p_int compressionType, SWIGTYPE_p_int materialParts, SWIGTYPE_p_unsigned_char materials) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetMaterials(swigCPtr, this, SWIGTYPE_p_int.getCPtr(numMaterials), SWIGTYPE_p_int.getCPtr(compressionType), SWIGTYPE_p_int.getCPtr(materialParts), SWIGTYPE_p_unsigned_char.getCPtr(materials));
+  public int GetMaterials(int[] numMaterials, int[] compressionType, SWIGTYPE_p_int materialParts, SWIGTYPE_p_unsigned_char materials) {
+    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetMaterials(swigCPtr, this, numMaterials, compressionType, SWIGTYPE_p_int.getCPtr(materialParts), SWIGTYPE_p_unsigned_char.getCPtr(materials));
   }
 
   public int Setup(ShapeType shapeType, int numParts, int numPoints, int numTextures, int textureDimension, int numMaterials) {

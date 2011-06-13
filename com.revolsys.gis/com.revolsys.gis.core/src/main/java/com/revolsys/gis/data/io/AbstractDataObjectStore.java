@@ -159,6 +159,13 @@ public abstract class AbstractDataObjectStore extends
     return query(typeName, envelope);
   }
 
+  protected void refreshMetaData(final String schemaName) {
+    final DataObjectStoreSchema schema = getSchema(schemaName);
+    if (schema != null) {
+      schema.refreshMetaData();
+    }
+  }
+
   public void setDataObjectFactory(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }

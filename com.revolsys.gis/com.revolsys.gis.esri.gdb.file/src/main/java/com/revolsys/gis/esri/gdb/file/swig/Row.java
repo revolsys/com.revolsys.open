@@ -35,16 +35,16 @@ public class Row {
     }
   }
 
-  public int IsNull(String field, SWIGTYPE_p_bool isNull) {
-    return EsriFileGdbJNI.Row_IsNull(swigCPtr, this, field, SWIGTYPE_p_bool.getCPtr(isNull));
+  public int IsNull(String field, boolean[] isNull) {
+    return EsriFileGdbJNI.Row_IsNull(swigCPtr, this, field, isNull);
   }
 
   public int SetNull(String field) {
     return EsriFileGdbJNI.Row_SetNull(swigCPtr, this, field);
   }
 
-  public int GetOID(SWIGTYPE_p_int objectID) {
-    return EsriFileGdbJNI.Row_GetOID(swigCPtr, this, SWIGTYPE_p_int.getCPtr(objectID));
+  public int GetOID(int[] objectID) {
+    return EsriFileGdbJNI.Row_GetOID(swigCPtr, this, objectID);
   }
 
   public int GetGlobalID(Guid globalID) {
@@ -59,32 +59,32 @@ public class Row {
     return EsriFileGdbJNI.Row_SetGeometry(swigCPtr, this, ShapeBuffer.getCPtr(shapeBuffer), shapeBuffer);
   }
 
-  public int GetShort(String field, SWIGTYPE_p_short value) {
-    return EsriFileGdbJNI.Row_GetShort(swigCPtr, this, field, SWIGTYPE_p_short.getCPtr(value));
+  public int GetShort(String field, short[] value) {
+    return EsriFileGdbJNI.Row_GetShort(swigCPtr, this, field, value);
   }
 
   public int SetShort(String field, short value) {
     return EsriFileGdbJNI.Row_SetShort(swigCPtr, this, field, value);
   }
 
-  public int GetInteger(String field, SWIGTYPE_p_int value) {
-    return EsriFileGdbJNI.Row_GetInteger(swigCPtr, this, field, SWIGTYPE_p_int.getCPtr(value));
+  public int GetInteger(String field, int[] value) {
+    return EsriFileGdbJNI.Row_GetInteger(swigCPtr, this, field, value);
   }
 
   public int SetInteger(String field, int value) {
     return EsriFileGdbJNI.Row_SetInteger(swigCPtr, this, field, value);
   }
 
-  public int GetFloat(String field, SWIGTYPE_p_float value) {
-    return EsriFileGdbJNI.Row_GetFloat(swigCPtr, this, field, SWIGTYPE_p_float.getCPtr(value));
+  public int GetFloat(String field, float[] value) {
+    return EsriFileGdbJNI.Row_GetFloat(swigCPtr, this, field, value);
   }
 
   public int SetFloat(String field, float value) {
     return EsriFileGdbJNI.Row_SetFloat(swigCPtr, this, field, value);
   }
 
-  public int GetDouble(String field, SWIGTYPE_p_double value) {
-    return EsriFileGdbJNI.Row_GetDouble(swigCPtr, this, field, SWIGTYPE_p_double.getCPtr(value));
+  public int GetDouble(String field, double[] value) {
+    return EsriFileGdbJNI.Row_GetDouble(swigCPtr, this, field, value);
   }
 
   public int SetDouble(String field, double value) {

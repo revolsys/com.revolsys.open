@@ -64,7 +64,8 @@ public final class GpxConstants {
 
     GPX_TYPE.addAttribute("location", DataTypes.GEOMETRY, true);
     GPX_TYPE.setGeometryAttributeIndex(0);
-    GPX_TYPE.addAttribute("file_name", DataTypes.STRING, false);
+    GPX_TYPE.addAttribute("dataset_name", DataTypes.STRING, false);
+    GPX_TYPE.addAttribute("index", DataTypes.DECIMAL, false);
     GPX_TYPE.addAttribute("feature_type", DataTypes.STRING, false);
     GPX_TYPE.addAttribute("time", DataTypes.DATE_TIME, false);
     GPX_TYPE.addAttribute("magvar", DataTypes.DECIMAL, false);

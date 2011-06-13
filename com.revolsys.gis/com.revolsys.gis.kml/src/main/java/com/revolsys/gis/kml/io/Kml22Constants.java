@@ -99,8 +99,10 @@ public interface Kml22Constants {
   String DOCUMENT_NAME_PROPERTY = "java:" + Kml22Constants.class.getName()
     + ".DocumentName";
 
-  String STYLE_PROPERTY = "java:" + Kml22Constants.class.getName()
-    + ".Style";
+  String STYLE_PROPERTY = "java:" + Kml22Constants.class.getName() + ".Style";
+
+  String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "java:"
+    + Kml22Constants.class.getName() + ".PlaceMarkNameAttribute";
 
   String SNIPPET_PROPERTY = "java:" + Kml22Constants.class.getName()
     + ".Snippet";

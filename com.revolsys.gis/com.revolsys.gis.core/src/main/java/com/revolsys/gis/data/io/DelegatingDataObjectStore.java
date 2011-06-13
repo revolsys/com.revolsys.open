@@ -154,12 +154,16 @@ public class DelegatingDataObjectStore implements DataObjectStore {
     return dataObjectStore.query(typeName, geometry);
   }
 
-  public DataObject query(final QName typeName, final String queryString,
+  public Reader<DataObject> query(final QName typeName, final String queryString,
     final Object... arguments) {
     final DataObjectStore dataObjectStore = getDataObjectStore();
     return dataObjectStore.query(typeName, queryString, arguments);
   }
-
+  public DataObject queryFirst(final QName typeName, final String queryString,
+    final Object... arguments) {
+    final DataObjectStore dataObjectStore = getDataObjectStore();
+    return dataObjectStore.queryFirst(typeName, queryString, arguments);
+  }
   protected void setDataObjectStore(final DataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
   }

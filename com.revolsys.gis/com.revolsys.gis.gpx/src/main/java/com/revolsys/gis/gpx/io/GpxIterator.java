@@ -26,8 +26,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -47,16 +49,19 @@ import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
+import com.revolsys.io.FileUtil;
 import com.revolsys.xml.io.StaxUtils;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 
-@SuppressWarnings("restriction")
 public class GpxIterator implements DataObjectIterator {
   private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
 
@@ -92,7 +97,11 @@ public class GpxIterator implements DataObjectIterator {
 
   private QName typeName;
 
-  private String fileName;
+  private String baseName;
+
+  private int index = 0;
+
+  private Queue<DataObject> objects = new LinkedList<DataObject>();
 
   public GpxIterator(final File file) throws IOException, XMLStreamException {
     this(new FileReader(file));
@@ -115,7 +124,7 @@ public class GpxIterator implements DataObjectIterator {
     this(createXmlReader(new InputStreamReader(resource.getInputStream())));
     this.dataObjectFactory = dataObjectFactory;
     this.typeName = typeName;
-    this.fileName = resource.getFilename();
+    this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
   public GpxIterator(final XMLStreamReader in) {
@@ -182,20 +191,27 @@ public class GpxIterator implements DataObjectIterator {
   }
 
   private DataObject parseDataObject() throws XMLStreamException {
-    if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
-      StaxUtils.skipToStartElement(in);
-    }
-    while (in.getEventType() == XMLStreamConstants.START_ELEMENT) {
-      if (in.getName().equals(GpxConstants.WAYPOINT_ELEMENT)) {
-        return parseWaypoint();
-      } else if (in.getName().equals(GpxConstants.TRACK_ELEMENT)) {
-        return parseTrack();
-      } else {
-        StaxUtils.skipSubTree(in);
-        in.nextTag();
+    if (!objects.isEmpty()) {
+      return objects.remove();
+    } else {
+      if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
+        StaxUtils.skipToStartElement(in);
       }
+      while (in.getEventType() == XMLStreamConstants.START_ELEMENT) {
+        final QName name = in.getName();
+        if (name.equals(GpxConstants.WAYPOINT_ELEMENT)) {
+          return parseWaypoint();
+        } else if (name.equals(GpxConstants.TRACK_ELEMENT)) {
+          return parseTrack();
+        } else if (name.equals(GpxConstants.ROUTE_ELEMENT)) {
+          return parseRoute();
+        } else {
+          StaxUtils.skipSubTree(in);
+          in.nextTag();
+        }
+      }
+      return null;
     }
-    return null;
   }
 
   //
@@ -232,8 +248,10 @@ public class GpxIterator implements DataObjectIterator {
   // }
 
   private DataObject parseTrack() throws XMLStreamException {
+    index++;
     final DataObject dataObject = dataObjectFactory.createDataObject(GpxConstants.GPX_TYPE);
-    dataObject.setValue("file_name", fileName);
+    dataObject.setValue("dataset_name", baseName);
+    dataObject.setValue("index", index);
     dataObject.setValue("feature_type", "trk");
     final List<CoordinatesList> segments = new ArrayList<CoordinatesList>();
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
@@ -252,6 +270,49 @@ public class GpxIterator implements DataObjectIterator {
     }
     final MultiLineString lines = geometryFactory.createMultiLineString(segments);
     dataObject.setGeometryValue(lines);
+    return dataObject;
+  }
+
+  private DataObject parseRoute() throws XMLStreamException {
+    index++;
+    final DataObject dataObject = dataObjectFactory.createDataObject(GpxConstants.GPX_TYPE);
+    dataObject.setValue("dataset_name", baseName);
+    dataObject.setValue("index", index);
+    dataObject.setValue("feature_type", "rte");
+    final List<DataObject> pointObjects = new ArrayList<DataObject>();
+    int numAxis = 2;
+    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+      if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
+        StaxUtils.skipSubTree(in);
+      } else if (in.getName().equals(GpxConstants.ROUTE_POINT_ELEMENT)) {
+        final double pointIndex = index + (pointObjects.size() + 1.0) / 10000;
+        final DataObject pointObject = parseRoutPoint(pointIndex);
+        pointObjects.add(pointObject);
+        Point point = pointObject.getGeometryValue();
+        Coordinates coordinates = CoordinatesUtil.get(point);
+        numAxis = Math.max(numAxis, coordinates.getNumAxis());
+      } else {
+        final String attributeName = in.getLocalName();
+        final String value = StaxUtils.getElementText(in);
+        if (value != null) {
+          dataObject.setValue(attributeName, value);
+        }
+      }
+    }
+    CoordinatesList points = new DoubleCoordinatesList(pointObjects.size(),
+      numAxis);
+    for (int i = 0; i < points.size(); i++) {
+      DataObject pointObject = pointObjects.get(i);
+      Point point = pointObject.getGeometryValue();
+      Coordinates coordinates = CoordinatesUtil.get(point);
+      for (int j = 0; j < numAxis; j++) {
+        double value = coordinates.getValue(j);
+        points.setValue(i, j, value);
+      }
+    }
+    final LineString line = geometryFactory.createLineString(points);
+    dataObject.setGeometryValue(line);
+    objects.addAll(pointObjects);
     return dataObject;
   }
 
@@ -308,10 +369,23 @@ public class GpxIterator implements DataObjectIterator {
     return new DoubleCoordinatesList(points, numAxis);
   }
 
+  private DataObject parseRoutPoint(double index) throws XMLStreamException {
+    final String featureType = "rtept";
+    return parsePoint(featureType, index);
+  }
+
   private DataObject parseWaypoint() throws XMLStreamException {
+    index++;
+    final String featureType = "wpt";
+    return parsePoint(featureType, index);
+  }
+
+  protected DataObject parsePoint(final String featureType, double index)
+    throws XMLStreamException {
     final DataObject dataObject = dataObjectFactory.createDataObject(GpxConstants.GPX_TYPE);
-    dataObject.setValue("file_name", fileName);
-    dataObject.setValue("feature_type", "wpt");
+    dataObject.setValue("dataset_name", baseName);
+    dataObject.setValue("index", index);
+    dataObject.setValue("feature_type", featureType);
     final double lat = Double.parseDouble(in.getAttributeValue("", "lat"));
     final double lon = Double.parseDouble(in.getAttributeValue("", "lon"));
     double elevation = Double.NaN;

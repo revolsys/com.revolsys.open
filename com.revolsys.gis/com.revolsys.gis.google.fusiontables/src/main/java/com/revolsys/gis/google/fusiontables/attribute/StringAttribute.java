@@ -3,34 +3,40 @@ package com.revolsys.gis.google.fusiontables.attribute;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class StringAttribute extends FusionTablesAttribute {
-  public StringAttribute(String name) {
-    super(name, DataTypes.STRING);
-  }
-
-  public void appendValue(StringBuffer sql, Object object) {
-    if (object == null) {
-      sql.append("''");
+  public static void appendString(final StringBuffer buffer, final Object value) {
+    if (value == null) {
+      buffer.append("''");
     } else {
-      String string = object.toString();
-      sql.append('\'');
+      final String string = value.toString();
+      buffer.append('\'');
       for (int i = 0; i < string.length(); i++) {
-        char c = string.charAt(i);
+        final char c = string.charAt(i);
         if (c == '\'') {
-          sql.append("\\'");
+          buffer.append("\\'");
         } else {
-          sql.append(c);
+          buffer.append(c);
         }
       }
-      sql.append('\'');
+      buffer.append('\'');
     }
   }
 
-  public Object parseString(String string) {
-    return string;
+  public StringAttribute(final String name) {
+    super(name, DataTypes.STRING);
+  }
+
+  @Override
+  public void appendValue(final StringBuffer sql, final Object object) {
+    appendString(sql, object);
   }
 
   @Override
   public StringAttribute clone() {
     return new StringAttribute(getName());
+  }
+
+  @Override
+  public Object parseString(final String string) {
+    return string;
   }
 }

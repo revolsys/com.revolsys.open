@@ -96,9 +96,14 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
     QName typeName,
     Geometry geometry);
 
-  DataObject query(
+  Reader<DataObject> query(
     QName typeName,
-    String queryString,
+    String where,
+    Object... arguments);
+
+  DataObject queryFirst(
+    QName typeName,
+    String where,
     Object... arguments);
 
   void update(

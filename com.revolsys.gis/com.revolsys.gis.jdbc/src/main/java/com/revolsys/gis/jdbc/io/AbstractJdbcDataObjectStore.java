@@ -666,7 +666,14 @@ public abstract class AbstractJdbcDataObjectStore extends
     return reader;
   }
 
-  public DataObject query(final QName typeName, final String queryString,
+  public Reader<DataObject> query(final QName typeName,
+    final String queryString, final Object... arguments) {
+    final JdbcQueryReader reader = createReader(typeName, queryString,
+      arguments);
+    return reader;
+  }
+
+  public DataObject queryFirst(final QName typeName, final String queryString,
     final Object... arguments) {
     final JdbcQueryReader reader = createReader(typeName, queryString,
       arguments);

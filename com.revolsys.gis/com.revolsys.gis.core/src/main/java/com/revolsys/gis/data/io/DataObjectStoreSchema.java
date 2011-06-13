@@ -47,13 +47,17 @@ public class DataObjectStoreSchema {
     final QName typeName) {
     if (typeName.getNamespaceURI().equals(name)) {
       if (metaDataCache.isEmpty()) {
-        dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+        refreshMetaData();
       }
       final DataObjectMetaData metaData = metaDataCache.get(typeName);
       return metaData;
     } else {
       return null;
     }
+  }
+
+  protected void refreshMetaData() {
+    dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
   }
 
   public String getName() {
@@ -71,14 +75,14 @@ public class DataObjectStoreSchema {
 
   public List<QName> getTypeNames() {
     if (metaDataCache.isEmpty()) {
-      dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+      refreshMetaData();
     }
     return new ArrayList<QName>(metaDataCache.keySet());
   }
 
   public List<DataObjectMetaData> getTypes() {
     if (metaDataCache.isEmpty()) {
-      dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
+      refreshMetaData();
     }
     return new ArrayList(metaDataCache.values());
   }
