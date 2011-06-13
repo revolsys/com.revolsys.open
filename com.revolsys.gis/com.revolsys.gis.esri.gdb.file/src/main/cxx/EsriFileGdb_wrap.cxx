@@ -221,6 +221,627 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <string>
 
 
+#if defined(SWIG_NOINCLUDE) || defined(SWIG_NOARRAYS)
+
+
+int SWIG_JavaArrayInBool (JNIEnv *jenv, jboolean **jarr, bool **carr, jbooleanArray input);
+void SWIG_JavaArrayArgoutBool (JNIEnv *jenv, jboolean *jarr, bool *carr, jbooleanArray input);
+jbooleanArray SWIG_JavaArrayOutBool (JNIEnv *jenv, bool *result, jsize sz);
+
+
+int SWIG_JavaArrayInSchar (JNIEnv *jenv, jbyte **jarr, signed char **carr, jbyteArray input);
+void SWIG_JavaArrayArgoutSchar (JNIEnv *jenv, jbyte *jarr, signed char *carr, jbyteArray input);
+jbyteArray SWIG_JavaArrayOutSchar (JNIEnv *jenv, signed char *result, jsize sz);
+
+
+int SWIG_JavaArrayInUchar (JNIEnv *jenv, jshort **jarr, unsigned char **carr, jshortArray input);
+void SWIG_JavaArrayArgoutUchar (JNIEnv *jenv, jshort *jarr, unsigned char *carr, jshortArray input);
+jshortArray SWIG_JavaArrayOutUchar (JNIEnv *jenv, unsigned char *result, jsize sz);
+
+
+int SWIG_JavaArrayInShort (JNIEnv *jenv, jshort **jarr, short **carr, jshortArray input);
+void SWIG_JavaArrayArgoutShort (JNIEnv *jenv, jshort *jarr, short *carr, jshortArray input);
+jshortArray SWIG_JavaArrayOutShort (JNIEnv *jenv, short *result, jsize sz);
+
+
+int SWIG_JavaArrayInUshort (JNIEnv *jenv, jint **jarr, unsigned short **carr, jintArray input);
+void SWIG_JavaArrayArgoutUshort (JNIEnv *jenv, jint *jarr, unsigned short *carr, jintArray input);
+jintArray SWIG_JavaArrayOutUshort (JNIEnv *jenv, unsigned short *result, jsize sz);
+
+
+int SWIG_JavaArrayInInt (JNIEnv *jenv, jint **jarr, int **carr, jintArray input);
+void SWIG_JavaArrayArgoutInt (JNIEnv *jenv, jint *jarr, int *carr, jintArray input);
+jintArray SWIG_JavaArrayOutInt (JNIEnv *jenv, int *result, jsize sz);
+
+
+int SWIG_JavaArrayInUint (JNIEnv *jenv, jlong **jarr, unsigned int **carr, jlongArray input);
+void SWIG_JavaArrayArgoutUint (JNIEnv *jenv, jlong *jarr, unsigned int *carr, jlongArray input);
+jlongArray SWIG_JavaArrayOutUint (JNIEnv *jenv, unsigned int *result, jsize sz);
+
+
+int SWIG_JavaArrayInLong (JNIEnv *jenv, jint **jarr, long **carr, jintArray input);
+void SWIG_JavaArrayArgoutLong (JNIEnv *jenv, jint *jarr, long *carr, jintArray input);
+jintArray SWIG_JavaArrayOutLong (JNIEnv *jenv, long *result, jsize sz);
+
+
+int SWIG_JavaArrayInUlong (JNIEnv *jenv, jlong **jarr, unsigned long **carr, jlongArray input);
+void SWIG_JavaArrayArgoutUlong (JNIEnv *jenv, jlong *jarr, unsigned long *carr, jlongArray input);
+jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, jsize sz);
+
+
+int SWIG_JavaArrayInLonglong (JNIEnv *jenv, jlong **jarr, jlong **carr, jlongArray input);
+void SWIG_JavaArrayArgoutLonglong (JNIEnv *jenv, jlong *jarr, jlong *carr, jlongArray input);
+jlongArray SWIG_JavaArrayOutLonglong (JNIEnv *jenv, jlong *result, jsize sz);
+
+
+int SWIG_JavaArrayInFloat (JNIEnv *jenv, jfloat **jarr, float **carr, jfloatArray input);
+void SWIG_JavaArrayArgoutFloat (JNIEnv *jenv, jfloat *jarr, float *carr, jfloatArray input);
+jfloatArray SWIG_JavaArrayOutFloat (JNIEnv *jenv, float *result, jsize sz);
+
+
+int SWIG_JavaArrayInDouble (JNIEnv *jenv, jdouble **jarr, double **carr, jdoubleArray input);
+void SWIG_JavaArrayArgoutDouble (JNIEnv *jenv, jdouble *jarr, double *carr, jdoubleArray input);
+jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz);
+
+
+#else
+
+
+/* bool[] support */
+int SWIG_JavaArrayInBool (JNIEnv *jenv, jboolean **jarr, bool **carr, jbooleanArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetBooleanArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new bool[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = ((*jarr)[i] != 0);
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutBool (JNIEnv *jenv, jboolean *jarr, bool *carr, jbooleanArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jboolean)carr[i];
+  jenv->ReleaseBooleanArrayElements(input, jarr, 0);
+}
+
+jbooleanArray SWIG_JavaArrayOutBool (JNIEnv *jenv, bool *result, jsize sz) {
+  jboolean *arr;
+  int i;
+  jbooleanArray jresult = jenv->NewBooleanArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetBooleanArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jboolean)result[i];
+  jenv->ReleaseBooleanArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* signed char[] support */
+int SWIG_JavaArrayInSchar (JNIEnv *jenv, jbyte **jarr, signed char **carr, jbyteArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetByteArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new signed char[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (signed char)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutSchar (JNIEnv *jenv, jbyte *jarr, signed char *carr, jbyteArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jbyte)carr[i];
+  jenv->ReleaseByteArrayElements(input, jarr, 0);
+}
+
+jbyteArray SWIG_JavaArrayOutSchar (JNIEnv *jenv, signed char *result, jsize sz) {
+  jbyte *arr;
+  int i;
+  jbyteArray jresult = jenv->NewByteArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetByteArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jbyte)result[i];
+  jenv->ReleaseByteArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* unsigned char[] support */
+int SWIG_JavaArrayInUchar (JNIEnv *jenv, jshort **jarr, unsigned char **carr, jshortArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetShortArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new unsigned char[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (unsigned char)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutUchar (JNIEnv *jenv, jshort *jarr, unsigned char *carr, jshortArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jshort)carr[i];
+  jenv->ReleaseShortArrayElements(input, jarr, 0);
+}
+
+jshortArray SWIG_JavaArrayOutUchar (JNIEnv *jenv, unsigned char *result, jsize sz) {
+  jshort *arr;
+  int i;
+  jshortArray jresult = jenv->NewShortArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetShortArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jshort)result[i];
+  jenv->ReleaseShortArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* short[] support */
+int SWIG_JavaArrayInShort (JNIEnv *jenv, jshort **jarr, short **carr, jshortArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetShortArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new short[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (short)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutShort (JNIEnv *jenv, jshort *jarr, short *carr, jshortArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jshort)carr[i];
+  jenv->ReleaseShortArrayElements(input, jarr, 0);
+}
+
+jshortArray SWIG_JavaArrayOutShort (JNIEnv *jenv, short *result, jsize sz) {
+  jshort *arr;
+  int i;
+  jshortArray jresult = jenv->NewShortArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetShortArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jshort)result[i];
+  jenv->ReleaseShortArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* unsigned short[] support */
+int SWIG_JavaArrayInUshort (JNIEnv *jenv, jint **jarr, unsigned short **carr, jintArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetIntArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new unsigned short[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (unsigned short)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutUshort (JNIEnv *jenv, jint *jarr, unsigned short *carr, jintArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jint)carr[i];
+  jenv->ReleaseIntArrayElements(input, jarr, 0);
+}
+
+jintArray SWIG_JavaArrayOutUshort (JNIEnv *jenv, unsigned short *result, jsize sz) {
+  jint *arr;
+  int i;
+  jintArray jresult = jenv->NewIntArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetIntArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jint)result[i];
+  jenv->ReleaseIntArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* int[] support */
+int SWIG_JavaArrayInInt (JNIEnv *jenv, jint **jarr, int **carr, jintArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetIntArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new int[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (int)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutInt (JNIEnv *jenv, jint *jarr, int *carr, jintArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jint)carr[i];
+  jenv->ReleaseIntArrayElements(input, jarr, 0);
+}
+
+jintArray SWIG_JavaArrayOutInt (JNIEnv *jenv, int *result, jsize sz) {
+  jint *arr;
+  int i;
+  jintArray jresult = jenv->NewIntArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetIntArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jint)result[i];
+  jenv->ReleaseIntArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* unsigned int[] support */
+int SWIG_JavaArrayInUint (JNIEnv *jenv, jlong **jarr, unsigned int **carr, jlongArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetLongArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new unsigned int[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (unsigned int)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutUint (JNIEnv *jenv, jlong *jarr, unsigned int *carr, jlongArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jlong)carr[i];
+  jenv->ReleaseLongArrayElements(input, jarr, 0);
+}
+
+jlongArray SWIG_JavaArrayOutUint (JNIEnv *jenv, unsigned int *result, jsize sz) {
+  jlong *arr;
+  int i;
+  jlongArray jresult = jenv->NewLongArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetLongArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jlong)result[i];
+  jenv->ReleaseLongArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* long[] support */
+int SWIG_JavaArrayInLong (JNIEnv *jenv, jint **jarr, long **carr, jintArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetIntArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new long[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (long)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutLong (JNIEnv *jenv, jint *jarr, long *carr, jintArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jint)carr[i];
+  jenv->ReleaseIntArrayElements(input, jarr, 0);
+}
+
+jintArray SWIG_JavaArrayOutLong (JNIEnv *jenv, long *result, jsize sz) {
+  jint *arr;
+  int i;
+  jintArray jresult = jenv->NewIntArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetIntArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jint)result[i];
+  jenv->ReleaseIntArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* unsigned long[] support */
+int SWIG_JavaArrayInUlong (JNIEnv *jenv, jlong **jarr, unsigned long **carr, jlongArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetLongArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new unsigned long[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (unsigned long)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutUlong (JNIEnv *jenv, jlong *jarr, unsigned long *carr, jlongArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jlong)carr[i];
+  jenv->ReleaseLongArrayElements(input, jarr, 0);
+}
+
+jlongArray SWIG_JavaArrayOutUlong (JNIEnv *jenv, unsigned long *result, jsize sz) {
+  jlong *arr;
+  int i;
+  jlongArray jresult = jenv->NewLongArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetLongArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jlong)result[i];
+  jenv->ReleaseLongArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* jlong[] support */
+int SWIG_JavaArrayInLonglong (JNIEnv *jenv, jlong **jarr, jlong **carr, jlongArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetLongArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new jlong[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (jlong)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutLonglong (JNIEnv *jenv, jlong *jarr, jlong *carr, jlongArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jlong)carr[i];
+  jenv->ReleaseLongArrayElements(input, jarr, 0);
+}
+
+jlongArray SWIG_JavaArrayOutLonglong (JNIEnv *jenv, jlong *result, jsize sz) {
+  jlong *arr;
+  int i;
+  jlongArray jresult = jenv->NewLongArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetLongArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jlong)result[i];
+  jenv->ReleaseLongArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* float[] support */
+int SWIG_JavaArrayInFloat (JNIEnv *jenv, jfloat **jarr, float **carr, jfloatArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetFloatArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new float[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (float)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutFloat (JNIEnv *jenv, jfloat *jarr, float *carr, jfloatArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jfloat)carr[i];
+  jenv->ReleaseFloatArrayElements(input, jarr, 0);
+}
+
+jfloatArray SWIG_JavaArrayOutFloat (JNIEnv *jenv, float *result, jsize sz) {
+  jfloat *arr;
+  int i;
+  jfloatArray jresult = jenv->NewFloatArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetFloatArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jfloat)result[i];
+  jenv->ReleaseFloatArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+/* double[] support */
+int SWIG_JavaArrayInDouble (JNIEnv *jenv, jdouble **jarr, double **carr, jdoubleArray input) {
+  int i;
+  jsize sz;
+  if (!input) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null array");
+    return 0;
+  }
+  sz = jenv->GetArrayLength(input);
+  *jarr = jenv->GetDoubleArrayElements(input, 0);
+  if (!*jarr)
+    return 0; 
+  *carr = new double[sz]; 
+  if (!*carr) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaOutOfMemoryError, "array memory allocation failed");
+    return 0;
+  }
+  for (i=0; i<sz; i++)
+    (*carr)[i] = (double)(*jarr)[i];
+  return 1;
+}
+
+void SWIG_JavaArrayArgoutDouble (JNIEnv *jenv, jdouble *jarr, double *carr, jdoubleArray input) {
+  int i;
+  jsize sz = jenv->GetArrayLength(input);
+  for (i=0; i<sz; i++)
+    jarr[i] = (jdouble)carr[i];
+  jenv->ReleaseDoubleArrayElements(input, jarr, 0);
+}
+
+jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz) {
+  jdouble *arr;
+  int i;
+  jdoubleArray jresult = jenv->NewDoubleArray(sz);
+  if (!jresult)
+    return NULL;
+  arr = jenv->GetDoubleArrayElements(jresult, 0);
+  if (!arr)
+    return NULL;
+  for (i=0; i<sz; i++)
+    arr[i] = (jdouble)result[i];
+  jenv->ReleaseDoubleArrayElements(jresult, arr, 0);
+  return jresult;
+}
+
+
+#endif
+
+
 #include "FileGDBAPI.h"
 
 
@@ -1848,23 +2469,35 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDefaultSubtypeCode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDefaultSubtypeCode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetDefaultSubtypeCode(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2118,44 +2751,68 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1IsEditable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1IsEditable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbooleanArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   bool *arg2 = 0 ;
+  bool temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(bool **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "bool & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->IsEditable(*arg2);
   jresult = (jint)result; 
+  {
+    jboolean jvalue = (jboolean)temp2;
+    jenv->SetBooleanArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetRowCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetRowCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetRowCount(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2251,11 +2908,12 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1IsNull(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1IsNull(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jbooleanArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   bool *arg3 = 0 ;
+  bool temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -2279,13 +2937,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(bool **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "bool & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->IsNull((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jboolean jvalue = (jboolean)temp3;
+    jenv->SetBooleanArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2323,23 +2992,35 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetOID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetOID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   int32 *arg2 = 0 ;
+  int32 temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Row **)&jarg1; 
-  arg2 = *(int32 **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32 & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetOID(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2410,11 +3091,12 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetShort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetShort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jshortArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   short *arg3 = 0 ;
+  short temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -2438,13 +3120,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(short **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "short & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->GetShort((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jshort jvalue = (jshort)temp3;
+    jenv->SetShortArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2484,11 +3177,12 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetInteger(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetInteger(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jintArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   int32 *arg3 = 0 ;
+  int32 temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -2512,13 +3206,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(int32 **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int32 & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->GetInteger((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp3;
+    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2558,11 +3263,12 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetFloat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetFloat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jfloatArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   float *arg3 = 0 ;
+  float temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -2586,13 +3292,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(float **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "float & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->GetFloat((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jfloat jvalue = (jfloat)temp3;
+    jenv->SetFloatArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -2632,11 +3349,12 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jdoubleArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   double *arg3 = 0 ;
+  double temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -2660,13 +3378,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(double **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "double & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->GetDouble((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jdouble jvalue = (jdouble)temp3;
+    jenv->SetDoubleArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -3396,11 +4125,12 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jintArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int arg2 ;
   int *arg3 = 0 ;
+  int temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -3408,22 +4138,34 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(int **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->GetFieldLength(arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp3;
+    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldIsNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldIsNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jbooleanArray jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int arg2 ;
   bool *arg3 = 0 ;
+  bool temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -3431,13 +4173,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(bool **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "bool & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   result = (fgdbError)(arg1)->GetFieldIsNullable(arg2,*arg3);
   jresult = (jint)result; 
+  {
+    jboolean jvalue = (jboolean)temp3;
+    jenv->SetBooleanArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -3916,23 +4669,35 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetNumPoints(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -4127,44 +4892,68 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetNumParts(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetNumPoints(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -4284,23 +5073,35 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumCurves(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumCurves(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetNumCurves(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -4458,44 +5259,68 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetNumParts(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
+  int temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
   result = (fgdbError)(arg1)->GetNumPoints(*arg2);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  
   return jresult;
 }
 
@@ -4672,13 +5497,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetTextures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetTextures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2, jintArray jarg3, jlong jarg4, jlong jarg5) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
   int *arg3 = 0 ;
   int **arg4 = 0 ;
   float **arg5 = 0 ;
+  int temp2 ;
+  int temp3 ;
   int *temp4 = 0 ;
   float *temp5 = 0 ;
   fgdbError result;
@@ -4687,33 +5514,57 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
-  arg3 = *(int **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   temp4 = *(int **)&jarg4;
   arg4 = &temp4; 
   temp5 = *(float **)&jarg5;
   arg5 = &temp5; 
   result = (fgdbError)(arg1)->GetTextures(*arg2,*arg3,*arg4,*arg5);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  {
+    jint jvalue = (jint)temp3;
+    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
+  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMaterials(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMaterials(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2, jintArray jarg3, jlong jarg4, jlong jarg5) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
   int *arg3 = 0 ;
   int **arg4 = 0 ;
   byte **arg5 = 0 ;
+  int temp2 ;
+  int temp3 ;
   int *temp4 = 0 ;
   byte *temp5 = 0 ;
   fgdbError result;
@@ -4722,22 +5573,44 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  arg2 = *(int **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
-  arg3 = *(int **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "int & reference is null");
-    return 0;
-  } 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg2 = &temp2; 
+  }
+  {
+    if (!jarg3) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if (jenv->GetArrayLength(jarg3) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    arg3 = &temp3; 
+  }
   temp4 = *(int **)&jarg4;
   arg4 = &temp4; 
   temp5 = *(byte **)&jarg5;
   arg5 = &temp5; 
   result = (fgdbError)(arg1)->GetMaterials(*arg2,*arg3,*arg4,*arg5);
   jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
+  }
+  {
+    jint jvalue = (jint)temp3;
+    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
+  }
+  
+  
   return jresult;
 }
 
@@ -5552,26 +6425,32 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Guid_1data4_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Guid_1data4_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshortArray jarg2) {
   FileGDBAPI::Guid *arg1 = (FileGDBAPI::Guid *) 0 ;
   byte *arg2 ;
+  jshort *jarr2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Guid **)&jarg1; 
-  arg2 = *(byte **)&jarg2; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 8) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUchar(jenv, &jarr2, &arg2, jarg2)) return ; 
   {
     size_t ii;
     byte *b = (byte *) arg1->data4;
     for (ii = 0; ii < (size_t)8; ii++) b[ii] = *((byte *) arg2 + ii);
   }
-  
+  SWIG_JavaArrayArgoutUchar(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Guid_1data4_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT jshortArray JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Guid_1data4_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshortArray jresult = 0 ;
   FileGDBAPI::Guid *arg1 = (FileGDBAPI::Guid *) 0 ;
   byte *result = 0 ;
   
@@ -5580,7 +6459,7 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Guid **)&jarg1; 
   result = (byte *)(byte *) ((arg1)->data4);
-  *(byte **)&jresult = result; 
+  jresult = SWIG_JavaArrayOutUchar(jenv, result, 8); 
   return jresult;
 }
 
