@@ -9,6 +9,26 @@
 package com.revolsys.gis.esri.gdb.file.swig;
 
 class EsriFileGdbJNI {
+  public final static native void FieldTypeValue_value_set(long jarg1, FieldTypeValue jarg1_, int jarg2);
+  public final static native int FieldTypeValue_value_get(long jarg1, FieldTypeValue jarg1_);
+  public final static native long new_FieldTypeValue();
+  public final static native void delete_FieldTypeValue(long jarg1);
+  public final static native void GeometryTypeValue_value_set(long jarg1, GeometryTypeValue jarg1_, int jarg2);
+  public final static native int GeometryTypeValue_value_get(long jarg1, GeometryTypeValue jarg1_);
+  public final static native long new_GeometryTypeValue();
+  public final static native void delete_GeometryTypeValue(long jarg1);
+  public final static native long new_IntArray(int jarg1);
+  public final static native void delete_IntArray(long jarg1);
+  public final static native int IntArray_getitem(long jarg1, IntArray jarg1_, int jarg2);
+  public final static native void IntArray_setitem(long jarg1, IntArray jarg1_, int jarg2, int jarg3);
+  public final static native long IntArray_cast(long jarg1, IntArray jarg1_);
+  public final static native long IntArray_frompointer(long jarg1);
+  public final static native long new_FloatArray(int jarg1);
+  public final static native void delete_FloatArray(long jarg1);
+  public final static native float FloatArray_getitem(long jarg1, FloatArray jarg1_, int jarg2);
+  public final static native void FloatArray_setitem(long jarg1, FloatArray jarg1_, int jarg2, float jarg3);
+  public final static native long FloatArray_cast(long jarg1, FloatArray jarg1_);
+  public final static native long FloatArray_frompointer(long jarg1);
   public final static native int CreateGeodatabase(String jarg1, long jarg2, Geodatabase jarg2_);
   public final static native int OpenGeodatabase(String jarg1, long jarg2, Geodatabase jarg2_);
   public final static native int CloseGeodatabase(long jarg1, Geodatabase jarg1_);
@@ -108,7 +128,7 @@ class EsriFileGdbJNI {
   public final static native void delete_EnumRows(long jarg1);
   public final static native int FieldInfo_GetFieldCount(long jarg1, FieldInfo jarg1_, int[] jarg2);
   public final static native int FieldInfo_GetFieldName(long jarg1, FieldInfo jarg1_, int jarg2, long jarg3);
-  public final static native int FieldInfo_GetFieldType(long jarg1, FieldInfo jarg1_, int jarg2, long jarg3);
+  public final static native int FieldInfo_GetFieldType(long jarg1, FieldInfo jarg1_, int jarg2, FieldTypeValue jarg3);
   public final static native int FieldInfo_GetFieldLength(long jarg1, FieldInfo jarg1_, int jarg2, int[] jarg3);
   public final static native int FieldInfo_GetFieldIsNullable(long jarg1, FieldInfo jarg1_, int jarg2, boolean[] jarg3);
   public final static native long new_FieldInfo();
@@ -126,7 +146,7 @@ class EsriFileGdbJNI {
   public final static native boolean ShapeBuffer_IsEmpty(long jarg1, ShapeBuffer jarg1_);
   public final static native void ShapeBuffer_SetEmpty(long jarg1, ShapeBuffer jarg1_);
   public final static native int ShapeBuffer_GetShapeType(long jarg1, ShapeBuffer jarg1_, long jarg2);
-  public final static native int ShapeBuffer_GetGeometryType__SWIG_0(long jarg1, ShapeBuffer jarg1_, long jarg2);
+  public final static native int ShapeBuffer_GetGeometryType__SWIG_0(long jarg1, ShapeBuffer jarg1_, GeometryTypeValue jarg2);
   public final static native boolean ShapeBuffer_HasZs(int jarg1);
   public final static native boolean ShapeBuffer_HasMs(int jarg1);
   public final static native boolean ShapeBuffer_HasIDs(int jarg1);
@@ -240,8 +260,8 @@ class EsriFileGdbJNI {
   public final static native int Guid_data2_get(long jarg1, Guid jarg1_);
   public final static native void Guid_data3_set(long jarg1, Guid jarg1_, int jarg2);
   public final static native int Guid_data3_get(long jarg1, Guid jarg1_);
-  public final static native void Guid_data4_set(long jarg1, Guid jarg1_, short[] jarg2);
-  public final static native short[] Guid_data4_get(long jarg1, Guid jarg1_);
+  public final static native void Guid_data4_set(long jarg1, Guid jarg1_, long jarg2);
+  public final static native long Guid_data4_get(long jarg1, Guid jarg1_);
   public final static native int GetErrorDescription(int jarg1, long jarg2);
   public final static native void GetErrorRecordCount(int[] jarg1);
   public final static native int GetErrorRecord(int jarg1, int[] jarg2, long jarg3);

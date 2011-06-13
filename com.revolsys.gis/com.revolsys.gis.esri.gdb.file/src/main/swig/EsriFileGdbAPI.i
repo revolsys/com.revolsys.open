@@ -1,12 +1,21 @@
 %module "EsriFileGdb"
 
+%{
+#include "FileGDBAPI.h"
+%}
+
 %include "std_vector.i"
 %include "std_string.i"
 %include "std_wstring.i"
 %include "typemaps.i"
 %include "enums.swg"
-%include "arrays_java.i"
+%include "FieldTypeValue.i"
+%include "GeometryTypeValue.i"
 %javaconst(1);
+
+%include "carrays.i"
+%array_class(int, IntArray);
+%array_class(float, FloatArray);
 
 %apply bool &OUTPUT { bool &isEditable };
 %apply bool &OUTPUT { bool &isNullable };
@@ -28,7 +37,6 @@
 %apply int &OUTPUT { int &numPoints };
 %apply int &OUTPUT { int &parts };
 %apply int &OUTPUT { int &numCurves };
-%apply int &OUTPUT { int &ids };
 %apply int &OUTPUT { int &parts };
 %apply int &OUTPUT { int &partDescriptorArray };
 %apply int &OUTPUT { int &numTextures };
@@ -42,15 +50,11 @@
 %apply int &OUTPUT { int &id };
 %apply int &OUTPUT { int &objectID };
 
-%apply int[] {int *};
-%apply float[] {float *};
+%apply FileGDBAPI::FieldType &OUTVALUE { FileGDBAPI::FieldType &fieldType };
+%apply FileGDBAPI::GeometryType &OUTVALUE { FileGDBAPI::GeometryType &geometryType };
 
 %define linux
 %enddef
-
-%{
-#include "FileGDBAPI.h"
-%}
 
 %include "FileGDBCore.h"
 %include "GeodatabaseManagement.h"

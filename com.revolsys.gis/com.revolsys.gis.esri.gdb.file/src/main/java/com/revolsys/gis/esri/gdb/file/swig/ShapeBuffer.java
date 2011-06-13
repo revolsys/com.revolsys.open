@@ -84,8 +84,8 @@ public class ShapeBuffer {
     return EsriFileGdbJNI.ShapeBuffer_GetShapeType(swigCPtr, this, SWIGTYPE_p_FileGDBAPI__ShapeType.getCPtr(shapeType));
   }
 
-  public int GetGeometryType(SWIGTYPE_p_FileGDBAPI__GeometryType geometryType) {
-    return EsriFileGdbJNI.ShapeBuffer_GetGeometryType__SWIG_0(swigCPtr, this, SWIGTYPE_p_FileGDBAPI__GeometryType.getCPtr(geometryType));
+  public int GetGeometryType(GeometryTypeValue geometryType) {
+    return EsriFileGdbJNI.ShapeBuffer_GetGeometryType__SWIG_0(swigCPtr, this, geometryType);
   }
 
   public static boolean HasZs(ShapeType shapeType) {
