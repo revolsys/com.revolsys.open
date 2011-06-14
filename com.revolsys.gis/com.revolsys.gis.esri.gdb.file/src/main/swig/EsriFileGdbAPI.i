@@ -11,11 +11,16 @@
 %include "enums.swg"
 %include "FieldTypeValue.i"
 %include "GeometryTypeValue.i"
+%include "ShapeTypeValue.i"
+%include "StringValue.i"
+%include "WstringValue.i"
 %javaconst(1);
 
 %include "carrays.i"
 %array_class(int, IntArray);
 %array_class(float, FloatArray);
+%array_class(double, DoubleArray);
+%array_class(unsigned char, UnsignedCharArray);
 
 %apply bool &OUTPUT { bool &isEditable };
 %apply bool &OUTPUT { bool &isNullable };
@@ -52,6 +57,19 @@
 
 %apply FileGDBAPI::FieldType &OUTVALUE { FileGDBAPI::FieldType &fieldType };
 %apply FileGDBAPI::GeometryType &OUTVALUE { FileGDBAPI::GeometryType &geometryType };
+%apply FileGDBAPI::ShapeType &OUTVALUE { FileGDBAPI::ShapeType &shapeType };
+
+%apply std::string &OUTVALUE { std::string &datasetDef };
+%apply std::string &OUTVALUE { std::string &documentation };
+%apply std::string &OUTVALUE { std::string &domainDef };
+%apply std::string &OUTVALUE { std::string &value };
+%apply std::string &OUTVALUE { std::string &tableDef };
+
+%apply std::wstring &OUTVALUE { std::wstring &fieldName };
+%apply std::wstring &OUTVALUE { std::wstring &guidString };
+%apply std::wstring &OUTVALUE { std::wstring &queryName };
+%apply std::wstring &OUTVALUE { std::wstring &errorDescription };
+%apply std::wstring &OUTVALUE { std::wstring &value };
 
 %define linux
 %enddef
@@ -75,21 +93,5 @@
     std::wstring errorDescription;
     FileGDBAPI::ErrorInfo::GetErrorDescription(hr, errorDescription);
     return errorDescription;
-  }
-
-  std::wstring getWstring(std::wstring& string) {
-    return string;
-  }
-  
-  std::vector<std::wstring> getVectorWstring(std::vector<std::wstring>& vector) {
-    return vector;
-  }
-
-  std::string getString(std::string& string) {
-    return string;
-  }
-  
-  std::vector<std::string> getVectorString(std::vector<std::string>& vector) {
-    return vector;
   }
 %}

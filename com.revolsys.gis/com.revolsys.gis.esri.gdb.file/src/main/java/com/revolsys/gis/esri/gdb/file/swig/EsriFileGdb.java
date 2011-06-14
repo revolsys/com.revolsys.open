@@ -25,16 +25,16 @@ public class EsriFileGdb {
     return EsriFileGdbJNI.DeleteGeodatabase(path);
   }
 
-  public static int GetErrorDescription(int fgdbError, SWIGTYPE_p_std__wstring errorDescription) {
-    return EsriFileGdbJNI.GetErrorDescription(fgdbError, SWIGTYPE_p_std__wstring.getCPtr(errorDescription));
+  public static int GetErrorDescription(int fgdbError, WstringValue errorDescription) {
+    return EsriFileGdbJNI.GetErrorDescription(fgdbError, errorDescription);
   }
 
   public static void GetErrorRecordCount(int[] recordCount) {
     EsriFileGdbJNI.GetErrorRecordCount(recordCount);
   }
 
-  public static int GetErrorRecord(int recordNum, int[] fgdbError, SWIGTYPE_p_std__wstring errorDescription) {
-    return EsriFileGdbJNI.GetErrorRecord(recordNum, fgdbError, SWIGTYPE_p_std__wstring.getCPtr(errorDescription));
+  public static int GetErrorRecord(int recordNum, int[] fgdbError, WstringValue errorDescription) {
+    return EsriFileGdbJNI.GetErrorRecord(recordNum, fgdbError, errorDescription);
   }
 
   public static void ClearErrors() {
@@ -53,16 +53,8 @@ public class EsriFileGdb {
     return EsriFileGdbJNI.getErrorDescription(hr);
   }
 
-  public static String getWstring(SWIGTYPE_p_std__wstring string) {
-    return EsriFileGdbJNI.getWstring(SWIGTYPE_p_std__wstring.getCPtr(string));
-  }
-
   public static SWIGTYPE_p_std__vectorT_std__wstring_t getVectorWstring(SWIGTYPE_p_std__vectorT_std__wstring_t vector) {
     return new SWIGTYPE_p_std__vectorT_std__wstring_t(EsriFileGdbJNI.getVectorWstring(SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(vector)), true);
-  }
-
-  public static String getString(SWIGTYPE_p_std__string string) {
-    return EsriFileGdbJNI.getString(SWIGTYPE_p_std__string.getCPtr(string));
   }
 
   public static SWIGTYPE_p_std__vectorT_std__string_t getVectorString(SWIGTYPE_p_std__vectorT_std__string_t vector) {

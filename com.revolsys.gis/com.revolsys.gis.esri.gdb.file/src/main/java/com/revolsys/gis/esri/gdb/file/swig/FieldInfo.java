@@ -39,8 +39,8 @@ public class FieldInfo {
     return EsriFileGdbJNI.FieldInfo_GetFieldCount(swigCPtr, this, fieldCount);
   }
 
-  public int GetFieldName(int fieldNumber, SWIGTYPE_p_std__wstring fieldName) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldName(swigCPtr, this, fieldNumber, SWIGTYPE_p_std__wstring.getCPtr(fieldName));
+  public int GetFieldName(int fieldNumber, WstringValue fieldName) {
+    return EsriFileGdbJNI.FieldInfo_GetFieldName(swigCPtr, this, fieldNumber, fieldName);
   }
 
   public int GetFieldType(int fieldNumber, FieldTypeValue fieldType) {

@@ -99,8 +99,8 @@ public class Row {
     return EsriFileGdbJNI.Row_SetDate(swigCPtr, this, field, SWIGTYPE_p_tm.getCPtr(value));
   }
 
-  public int GetString(String field, SWIGTYPE_p_std__wstring value) {
-    return EsriFileGdbJNI.Row_GetString(swigCPtr, this, field, SWIGTYPE_p_std__wstring.getCPtr(value));
+  public int GetString(String field, WstringValue value) {
+    return EsriFileGdbJNI.Row_GetString(swigCPtr, this, field, value);
   }
 
   public int SetString(String field, String value) {
@@ -115,8 +115,8 @@ public class Row {
     return EsriFileGdbJNI.Row_SetGUID(swigCPtr, this, field, Guid.getCPtr(value), value);
   }
 
-  public int GetXML(String field, SWIGTYPE_p_std__string value) {
-    return EsriFileGdbJNI.Row_GetXML(swigCPtr, this, field, SWIGTYPE_p_std__string.getCPtr(value));
+  public int GetXML(String field, StringValue value) {
+    return EsriFileGdbJNI.Row_GetXML(swigCPtr, this, field, value);
   }
 
   public int SetXML(String field, String value) {

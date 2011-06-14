@@ -35,12 +35,12 @@ public class Table {
     }
   }
 
-  public int GetDefinition(SWIGTYPE_p_std__string tableDef) {
-    return EsriFileGdbJNI.Table_GetDefinition(swigCPtr, this, SWIGTYPE_p_std__string.getCPtr(tableDef));
+  public int GetDefinition(StringValue tableDef) {
+    return EsriFileGdbJNI.Table_GetDefinition(swigCPtr, this, tableDef);
   }
 
-  public int GetDocumentation(SWIGTYPE_p_std__string documentation) {
-    return EsriFileGdbJNI.Table_GetDocumentation(swigCPtr, this, SWIGTYPE_p_std__string.getCPtr(documentation));
+  public int GetDocumentation(StringValue documentation) {
+    return EsriFileGdbJNI.Table_GetDocumentation(swigCPtr, this, documentation);
   }
 
   public int SetDocumentation(String documentation) {

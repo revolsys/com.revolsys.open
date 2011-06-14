@@ -51,8 +51,8 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path, relType, datasetType, SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(relatedDatasets));
   }
 
-  public int GetDatasetDefinition(String path, String datasetType, SWIGTYPE_p_std__string datasetDef) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetDefinition(swigCPtr, this, path, datasetType, SWIGTYPE_p_std__string.getCPtr(datasetDef));
+  public int GetDatasetDefinition(String path, String datasetType, StringValue datasetDef) {
+    return EsriFileGdbJNI.Geodatabase_GetDatasetDefinition(swigCPtr, this, path, datasetType, datasetDef);
   }
 
   public int GetChildDatasetDefinitions(String parentPath, String datasetType, SWIGTYPE_p_std__vectorT_std__string_t childDatasetDefs) {
@@ -63,8 +63,8 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr, this, path, relType, datasetType, SWIGTYPE_p_std__vectorT_std__string_t.getCPtr(relatedDatasetDefs));
   }
 
-  public int GetDatasetDocumentation(String path, String datasetType, SWIGTYPE_p_std__string documentation) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetDocumentation(swigCPtr, this, path, datasetType, SWIGTYPE_p_std__string.getCPtr(documentation));
+  public int GetDatasetDocumentation(String path, String datasetType, StringValue documentation) {
+    return EsriFileGdbJNI.Geodatabase_GetDatasetDocumentation(swigCPtr, this, path, datasetType, documentation);
   }
 
   public int CreateFeatureDataset(String featureDatasetDef) {
@@ -111,12 +111,12 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_DeleteDomain(swigCPtr, this, domainName);
   }
 
-  public int GetDomainDefinition(String domainName, SWIGTYPE_p_std__string domainDef) {
-    return EsriFileGdbJNI.Geodatabase_GetDomainDefinition(swigCPtr, this, domainName, SWIGTYPE_p_std__string.getCPtr(domainDef));
+  public int GetDomainDefinition(String domainName, StringValue domainDef) {
+    return EsriFileGdbJNI.Geodatabase_GetDomainDefinition(swigCPtr, this, domainName, domainDef);
   }
 
-  public int GetQueryName(String path, SWIGTYPE_p_std__wstring queryName) {
-    return EsriFileGdbJNI.Geodatabase_GetQueryName(swigCPtr, this, path, SWIGTYPE_p_std__wstring.getCPtr(queryName));
+  public int GetQueryName(String path, WstringValue queryName) {
+    return EsriFileGdbJNI.Geodatabase_GetQueryName(swigCPtr, this, path, queryName);
   }
 
   public int ExecuteSQL(String sqlStmt, boolean recycling, EnumRows rows) {

@@ -80,8 +80,8 @@ public class ShapeBuffer {
     EsriFileGdbJNI.ShapeBuffer_SetEmpty(swigCPtr, this);
   }
 
-  public int GetShapeType(SWIGTYPE_p_FileGDBAPI__ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_GetShapeType(swigCPtr, this, SWIGTYPE_p_FileGDBAPI__ShapeType.getCPtr(shapeType));
+  public int GetShapeType(ShapeTypeValue shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_GetShapeType(swigCPtr, this, shapeType);
   }
 
   public int GetGeometryType(GeometryTypeValue geometryType) {

@@ -51,8 +51,8 @@ public class Guid {
     return EsriFileGdbJNI.Guid_FromString(swigCPtr, this, guidString);
   }
 
-  public int ToString(SWIGTYPE_p_std__wstring guidString) {
-    return EsriFileGdbJNI.Guid_ToString(swigCPtr, this, SWIGTYPE_p_std__wstring.getCPtr(guidString));
+  public int ToString(WstringValue guidString) {
+    return EsriFileGdbJNI.Guid_ToString(swigCPtr, this, guidString);
   }
 
   public boolean equal(Guid other) {
