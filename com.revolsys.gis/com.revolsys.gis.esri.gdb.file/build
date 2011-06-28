@@ -8,4 +8,3 @@ mkdir -p target/lib
 g++ -fpic -lFileGDBAPI -lfgdblinuxrtl -Lsrc/main/lib/ -Isrc/main/include/ -I/usr/lib/jvm/java-6-openjdk/include/ -I$JAVA_HOME/include/ -c src/main/cxx/EsriFileGdb_wrap.cxx -o target/o/EsriFileGdb.o
 g++ -O2 -fpic -shared -Lsrc/main/lib/ -lFileGDBAPI -lfgdblinuxrtl target/o/EsriFileGdb.o -o target/lib/libEsriFileGdb.so
 
-
