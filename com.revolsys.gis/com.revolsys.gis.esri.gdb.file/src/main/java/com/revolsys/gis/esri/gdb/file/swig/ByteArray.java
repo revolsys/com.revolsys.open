@@ -47,15 +47,6 @@ public class ByteArray {
     this(EsriFileGdbJNI.new_ByteArray__SWIG_1(), true);
   }
 
-  public void setByteArray(SWIGTYPE_p_unsigned_char value) {
-    EsriFileGdbJNI.ByteArray_byteArray_set(swigCPtr, this, SWIGTYPE_p_unsigned_char.getCPtr(value));
-  }
-
-  public SWIGTYPE_p_unsigned_char getByteArray() {
-    long cPtr = EsriFileGdbJNI.ByteArray_byteArray_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
-  }
-
   public void setAllocatedLength(long value) {
     EsriFileGdbJNI.ByteArray_allocatedLength_set(swigCPtr, this, value);
   }
@@ -70,6 +61,14 @@ public class ByteArray {
 
   public long getInUseLength() {
     return EsriFileGdbJNI.ByteArray_inUseLength_get(swigCPtr, this);
+  }
+
+  public short get(int i) {
+    return EsriFileGdbJNI.ByteArray_get(swigCPtr, this, i);
+  }
+
+  public void set(int i, short c) {
+    EsriFileGdbJNI.ByteArray_set(swigCPtr, this, i, c);
   }
 
 }

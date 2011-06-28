@@ -35,7 +35,7 @@ public class Row {
     }
   }
 
-  public int IsNull(String field, boolean[] isNull) {
+  public int IsNull(String field, BoolValue isNull) {
     return EsriFileGdbJNI.Row_IsNull(swigCPtr, this, field, isNull);
   }
 
@@ -43,7 +43,7 @@ public class Row {
     return EsriFileGdbJNI.Row_SetNull(swigCPtr, this, field);
   }
 
-  public int GetOID(int[] objectID) {
+  public int GetOID(IntValue objectID) {
     return EsriFileGdbJNI.Row_GetOID(swigCPtr, this, objectID);
   }
 
@@ -59,7 +59,7 @@ public class Row {
     return EsriFileGdbJNI.Row_SetGeometry(swigCPtr, this, ShapeBuffer.getCPtr(shapeBuffer), shapeBuffer);
   }
 
-  public int GetShort(String field, short[] value) {
+  public int GetShort(String field, ShortValue value) {
     return EsriFileGdbJNI.Row_GetShort(swigCPtr, this, field, value);
   }
 
@@ -67,7 +67,7 @@ public class Row {
     return EsriFileGdbJNI.Row_SetShort(swigCPtr, this, field, value);
   }
 
-  public int GetInteger(String field, int[] value) {
+  public int GetInteger(String field, IntValue value) {
     return EsriFileGdbJNI.Row_GetInteger(swigCPtr, this, field, value);
   }
 
@@ -75,7 +75,7 @@ public class Row {
     return EsriFileGdbJNI.Row_SetInteger(swigCPtr, this, field, value);
   }
 
-  public int GetFloat(String field, float[] value) {
+  public int GetFloat(String field, FloatValue value) {
     return EsriFileGdbJNI.Row_GetFloat(swigCPtr, this, field, value);
   }
 
@@ -83,7 +83,7 @@ public class Row {
     return EsriFileGdbJNI.Row_SetFloat(swigCPtr, this, field, value);
   }
 
-  public int GetDouble(String field, double[] value) {
+  public int GetDouble(String field, DoubleValue value) {
     return EsriFileGdbJNI.Row_GetDouble(swigCPtr, this, field, value);
   }
 
@@ -99,7 +99,7 @@ public class Row {
     return EsriFileGdbJNI.Row_SetDate(swigCPtr, this, field, SWIGTYPE_p_tm.getCPtr(value));
   }
 
-  public int GetString(String field, WstringValue value) {
+  public int GetString(String field, WStringValue value) {
     return EsriFileGdbJNI.Row_GetString(swigCPtr, this, field, value);
   }
 

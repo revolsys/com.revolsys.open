@@ -35,32 +35,32 @@ public class Geodatabase {
     }
   }
 
-  public int GetDatasetTypes(SWIGTYPE_p_std__vectorT_std__wstring_t datasetTypes) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetTypes(swigCPtr, this, SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(datasetTypes));
+  public int GetDatasetTypes(VectorOfWString datasetTypes) {
+    return EsriFileGdbJNI.Geodatabase_GetDatasetTypes(swigCPtr, this, VectorOfWString.getCPtr(datasetTypes), datasetTypes);
   }
 
-  public int GetDatasetRelationshipTypes(SWIGTYPE_p_std__vectorT_std__wstring_t relationshipTypes) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetRelationshipTypes(swigCPtr, this, SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(relationshipTypes));
+  public int GetDatasetRelationshipTypes(VectorOfWString relationshipTypes) {
+    return EsriFileGdbJNI.Geodatabase_GetDatasetRelationshipTypes(swigCPtr, this, VectorOfWString.getCPtr(relationshipTypes), relationshipTypes);
   }
 
-  public int GetChildDatasets(String parentPath, String datasetType, SWIGTYPE_p_std__vectorT_std__wstring_t childDatasets) {
-    return EsriFileGdbJNI.Geodatabase_GetChildDatasets(swigCPtr, this, parentPath, datasetType, SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(childDatasets));
+  public int GetChildDatasets(String parentPath, String datasetType, VectorOfWString childDatasets) {
+    return EsriFileGdbJNI.Geodatabase_GetChildDatasets(swigCPtr, this, parentPath, datasetType, VectorOfWString.getCPtr(childDatasets), childDatasets);
   }
 
-  public int GetRelatedDatasets(String path, String relType, String datasetType, SWIGTYPE_p_std__vectorT_std__wstring_t relatedDatasets) {
-    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path, relType, datasetType, SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(relatedDatasets));
+  public int GetRelatedDatasets(String path, String relType, String datasetType, VectorOfWString relatedDatasets) {
+    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path, relType, datasetType, VectorOfWString.getCPtr(relatedDatasets), relatedDatasets);
   }
 
   public int GetDatasetDefinition(String path, String datasetType, StringValue datasetDef) {
     return EsriFileGdbJNI.Geodatabase_GetDatasetDefinition(swigCPtr, this, path, datasetType, datasetDef);
   }
 
-  public int GetChildDatasetDefinitions(String parentPath, String datasetType, SWIGTYPE_p_std__vectorT_std__string_t childDatasetDefs) {
-    return EsriFileGdbJNI.Geodatabase_GetChildDatasetDefinitions(swigCPtr, this, parentPath, datasetType, SWIGTYPE_p_std__vectorT_std__string_t.getCPtr(childDatasetDefs));
+  public int GetChildDatasetDefinitions(String parentPath, String datasetType, VectorOfString childDatasetDefs) {
+    return EsriFileGdbJNI.Geodatabase_GetChildDatasetDefinitions(swigCPtr, this, parentPath, datasetType, VectorOfString.getCPtr(childDatasetDefs), childDatasetDefs);
   }
 
-  public int GetRelatedDatasetDefinitions(String path, String relType, String datasetType, SWIGTYPE_p_std__vectorT_std__string_t relatedDatasetDefs) {
-    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr, this, path, relType, datasetType, SWIGTYPE_p_std__vectorT_std__string_t.getCPtr(relatedDatasetDefs));
+  public int GetRelatedDatasetDefinitions(String path, String relType, String datasetType, VectorOfString relatedDatasetDefs) {
+    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr, this, path, relType, datasetType, VectorOfString.getCPtr(relatedDatasetDefs), relatedDatasetDefs);
   }
 
   public int GetDatasetDocumentation(String path, String datasetType, StringValue documentation) {
@@ -95,8 +95,8 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_Delete(swigCPtr, this, path, datasetType);
   }
 
-  public int GetDomains(SWIGTYPE_p_std__vectorT_std__wstring_t domainNames) {
-    return EsriFileGdbJNI.Geodatabase_GetDomains(swigCPtr, this, SWIGTYPE_p_std__vectorT_std__wstring_t.getCPtr(domainNames));
+  public int GetDomains(VectorOfWString domainNames) {
+    return EsriFileGdbJNI.Geodatabase_GetDomains(swigCPtr, this, VectorOfWString.getCPtr(domainNames), domainNames);
   }
 
   public int CreateDomain(String domainDef) {
@@ -115,7 +115,7 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_GetDomainDefinition(swigCPtr, this, domainName, domainDef);
   }
 
-  public int GetQueryName(String path, WstringValue queryName) {
+  public int GetQueryName(String path, WStringValue queryName) {
     return EsriFileGdbJNI.Geodatabase_GetQueryName(swigCPtr, this, path, queryName);
   }
 

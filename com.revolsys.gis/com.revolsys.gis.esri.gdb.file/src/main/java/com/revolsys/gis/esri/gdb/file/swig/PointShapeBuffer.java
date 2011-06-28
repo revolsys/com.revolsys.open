@@ -39,16 +39,16 @@ public class PointShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.PointShapeBuffer_GetPoint(swigCPtr, this, Point.getCPtr(point), point);
   }
 
-  public int GetZ(SWIGTYPE_p_double z) {
-    return EsriFileGdbJNI.PointShapeBuffer_GetZ(swigCPtr, this, SWIGTYPE_p_double.getCPtr(z));
+  public int GetZ(DoubleArrayValue z) {
+    return EsriFileGdbJNI.PointShapeBuffer_GetZ(swigCPtr, this, z);
   }
 
-  public int GetM(SWIGTYPE_p_double m) {
-    return EsriFileGdbJNI.PointShapeBuffer_GetM(swigCPtr, this, SWIGTYPE_p_double.getCPtr(m));
+  public int GetM(DoubleArrayValue m) {
+    return EsriFileGdbJNI.PointShapeBuffer_GetM(swigCPtr, this, m);
   }
 
-  public int GetID(SWIGTYPE_p_int id) {
-    return EsriFileGdbJNI.PointShapeBuffer_GetID(swigCPtr, this, SWIGTYPE_p_int.getCPtr(id));
+  public int GetID(IntArrayValue id) {
+    return EsriFileGdbJNI.PointShapeBuffer_GetID(swigCPtr, this, id);
   }
 
   public int Setup(ShapeType shapeType) {

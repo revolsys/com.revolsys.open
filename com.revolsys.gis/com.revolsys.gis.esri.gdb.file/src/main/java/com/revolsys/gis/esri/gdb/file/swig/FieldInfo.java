@@ -35,11 +35,11 @@ public class FieldInfo {
     }
   }
 
-  public int GetFieldCount(int[] fieldCount) {
+  public int GetFieldCount(IntValue fieldCount) {
     return EsriFileGdbJNI.FieldInfo_GetFieldCount(swigCPtr, this, fieldCount);
   }
 
-  public int GetFieldName(int fieldNumber, WstringValue fieldName) {
+  public int GetFieldName(int fieldNumber, WStringValue fieldName) {
     return EsriFileGdbJNI.FieldInfo_GetFieldName(swigCPtr, this, fieldNumber, fieldName);
   }
 
@@ -47,11 +47,11 @@ public class FieldInfo {
     return EsriFileGdbJNI.FieldInfo_GetFieldType(swigCPtr, this, fieldNumber, fieldType);
   }
 
-  public int GetFieldLength(int fieldNumber, int[] fieldLength) {
+  public int GetFieldLength(int fieldNumber, IntValue fieldLength) {
     return EsriFileGdbJNI.FieldInfo_GetFieldLength(swigCPtr, this, fieldNumber, fieldLength);
   }
 
-  public int GetFieldIsNullable(int fieldNumber, boolean[] isNullable) {
+  public int GetFieldIsNullable(int fieldNumber, BoolValue isNullable) {
     return EsriFileGdbJNI.FieldInfo_GetFieldIsNullable(swigCPtr, this, fieldNumber, isNullable);
   }
 

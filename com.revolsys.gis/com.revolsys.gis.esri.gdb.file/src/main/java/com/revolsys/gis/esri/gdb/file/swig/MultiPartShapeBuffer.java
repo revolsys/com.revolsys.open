@@ -35,52 +35,52 @@ public class MultiPartShapeBuffer extends ShapeBuffer {
     super.delete();
   }
 
-  public int GetExtent(SWIGTYPE_p_double extent) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetExtent(swigCPtr, this, SWIGTYPE_p_double.getCPtr(extent));
+  public int GetExtent(DoubleArrayValue extent) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetExtent(swigCPtr, this, extent);
   }
 
-  public int GetNumParts(int[] numParts) {
+  public int GetNumParts(IntValue numParts) {
     return EsriFileGdbJNI.MultiPartShapeBuffer_GetNumParts(swigCPtr, this, numParts);
   }
 
-  public int GetNumPoints(int[] numPoints) {
+  public int GetNumPoints(IntValue numPoints) {
     return EsriFileGdbJNI.MultiPartShapeBuffer_GetNumPoints(swigCPtr, this, numPoints);
   }
 
-  public int GetParts(SWIGTYPE_p_int parts) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetParts(swigCPtr, this, SWIGTYPE_p_int.getCPtr(parts));
+  public int GetParts(IntArrayValue parts) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetParts(swigCPtr, this, parts);
   }
 
   public int GetPoints(Point points) {
     return EsriFileGdbJNI.MultiPartShapeBuffer_GetPoints(swigCPtr, this, Point.getCPtr(points), points);
   }
 
-  public int GetZExtent(SWIGTYPE_p_double zExtent) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetZExtent(swigCPtr, this, SWIGTYPE_p_double.getCPtr(zExtent));
+  public int GetZExtent(DoubleArrayValue zExtent) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetZExtent(swigCPtr, this, zExtent);
   }
 
-  public int GetZs(SWIGTYPE_p_double zArray) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetZs(swigCPtr, this, SWIGTYPE_p_double.getCPtr(zArray));
+  public int GetZs(DoubleArrayValue zArray) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetZs(swigCPtr, this, zArray);
   }
 
-  public int GetMExtent(SWIGTYPE_p_double mExtent) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetMExtent(swigCPtr, this, SWIGTYPE_p_double.getCPtr(mExtent));
+  public int GetMExtent(DoubleArrayValue mExtent) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetMExtent(swigCPtr, this, mExtent);
   }
 
-  public int GetMs(SWIGTYPE_p_double mArray) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetMs(swigCPtr, this, SWIGTYPE_p_double.getCPtr(mArray));
+  public int GetMs(DoubleArrayValue mArray) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetMs(swigCPtr, this, mArray);
   }
 
-  public int GetNumCurves(int[] numCurves) {
+  public int GetNumCurves(IntValue numCurves) {
     return EsriFileGdbJNI.MultiPartShapeBuffer_GetNumCurves(swigCPtr, this, numCurves);
   }
 
-  public int GetCurves(SWIGTYPE_p_unsigned_char curves) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetCurves(swigCPtr, this, SWIGTYPE_p_unsigned_char.getCPtr(curves));
+  public int GetCurves(UnsignedCharArrayValue curves) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetCurves(swigCPtr, this, curves);
   }
 
-  public int GetIDs(SWIGTYPE_p_int ids) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetIDs(swigCPtr, this, SWIGTYPE_p_int.getCPtr(ids));
+  public int GetIDs(IntArrayValue ids) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetIDs(swigCPtr, this, ids);
   }
 
   public int Setup(ShapeType shapeType, int numParts, int numPoints, int numCurves) {

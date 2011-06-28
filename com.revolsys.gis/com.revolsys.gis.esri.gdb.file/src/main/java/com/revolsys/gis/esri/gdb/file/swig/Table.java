@@ -63,8 +63,8 @@ public class Table {
     return EsriFileGdbJNI.Table_DeleteField(swigCPtr, this, fieldName);
   }
 
-  public int GetIndexes(SWIGTYPE_p_std__vectorT_std__string_t indexDefs) {
-    return EsriFileGdbJNI.Table_GetIndexes(swigCPtr, this, SWIGTYPE_p_std__vectorT_std__string_t.getCPtr(indexDefs));
+  public int GetIndexes(VectorOfString indexDefs) {
+    return EsriFileGdbJNI.Table_GetIndexes(swigCPtr, this, VectorOfString.getCPtr(indexDefs), indexDefs);
   }
 
   public int AddIndex(String indexDef) {
@@ -91,7 +91,7 @@ public class Table {
     return EsriFileGdbJNI.Table_EnableSubtypes(swigCPtr, this, subtypeFieldName, subtypeDef);
   }
 
-  public int GetDefaultSubtypeCode(int[] defaultCode) {
+  public int GetDefaultSubtypeCode(IntValue defaultCode) {
     return EsriFileGdbJNI.Table_GetDefaultSubtypeCode(swigCPtr, this, defaultCode);
   }
 
@@ -127,11 +127,11 @@ public class Table {
     return EsriFileGdbJNI.Table_Delete(swigCPtr, this, Row.getCPtr(row), row);
   }
 
-  public int IsEditable(boolean[] isEditable) {
+  public int IsEditable(BoolValue isEditable) {
     return EsriFileGdbJNI.Table_IsEditable(swigCPtr, this, isEditable);
   }
 
-  public int GetRowCount(int[] rowCount) {
+  public int GetRowCount(IntValue rowCount) {
     return EsriFileGdbJNI.Table_GetRowCount(swigCPtr, this, rowCount);
   }
 
