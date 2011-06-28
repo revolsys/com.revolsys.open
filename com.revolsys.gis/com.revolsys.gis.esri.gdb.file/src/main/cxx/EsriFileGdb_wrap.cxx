@@ -211,6 +211,9 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #define SWIG_contract_assert(nullreturn, expr, msg) if (!(expr)) {SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, msg); return nullreturn; } else
 
 
+#include "FileGDBAPI.h"
+
+
 #include <stdexcept>
 
 
@@ -220,6 +223,57 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 
 #include <string>
 
+
+template<class T> class OutParamValue {
+  public:
+    T value;
+};
+
+
+template<class T> class OutArrayParamValue {
+  private:
+    T* value;
+  public:
+    T get(int i) {
+      return this->value[i];
+    };
+    void set(int i, T value) {
+      this->value[i] = value;
+    };
+ 
+    T* getOutParamArrayValue() {
+      return this->value;
+    };
+};
+
+SWIGINTERN std::vector< std::string >::const_reference std_vector_Sl_std_string_Sg__get(std::vector< std::string > *self,int i){
+                int size = int(self->size());
+                if (i>=0 && i<size)
+                    return (*self)[i];
+                else
+                    throw std::out_of_range("vector index out of range");
+            }
+SWIGINTERN void std_vector_Sl_std_string_Sg__set(std::vector< std::string > *self,int i,std::vector< std::string >::value_type const &val){
+                int size = int(self->size());
+                if (i>=0 && i<size)
+                    (*self)[i] = val;
+                else
+                    throw std::out_of_range("vector index out of range");
+            }
+SWIGINTERN std::vector< std::wstring >::const_reference std_vector_Sl_std_wstring_Sg__get(std::vector< std::wstring > *self,int i){
+                int size = int(self->size());
+                if (i>=0 && i<size)
+                    return (*self)[i];
+                else
+                    throw std::out_of_range("vector index out of range");
+            }
+SWIGINTERN void std_vector_Sl_std_wstring_Sg__set(std::vector< std::wstring > *self,int i,std::vector< std::wstring >::value_type const &val){
+                int size = int(self->size());
+                if (i>=0 && i<size)
+                    (*self)[i] = val;
+                else
+                    throw std::out_of_range("vector index out of range");
+            }
 
 #if defined(SWIG_NOINCLUDE) || defined(SWIG_NOARRAYS)
 
@@ -841,9 +895,18 @@ jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz) {
 
 #endif
 
-
-#include "FileGDBAPI.h"
-
+SWIGINTERN unsigned char FileGDBAPI_ShapeBuffer_get(FileGDBAPI::ShapeBuffer *self,int i){
+    return self->shapeBuffer[i];
+  }
+SWIGINTERN void FileGDBAPI_ShapeBuffer_set(FileGDBAPI::ShapeBuffer *self,int i,unsigned char c){
+    self->shapeBuffer[i] = c;
+  }
+SWIGINTERN unsigned char FileGDBAPI_ByteArray_get(FileGDBAPI::ByteArray *self,int i){
+    return self->byteArray[i];
+  }
+SWIGINTERN void FileGDBAPI_ByteArray_set(FileGDBAPI::ByteArray *self,int i,unsigned char c){
+    self->byteArray[i] = c;
+  }
 
   std::wstring getErrorDescription(fgdbError hr) {
     std::wstring errorDescription;
@@ -851,26 +914,1138 @@ jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz) {
     return errorDescription;
   }
 
-  std::wstring getWstring(std::wstring& string) {
-    return string;
-  }
-  
-  std::vector<std::wstring> getVectorWstring(std::vector<std::wstring>& vector) {
-    return vector;
-  }
-
-  std::string getString(std::string& string) {
-    return string;
-  }
-  
-  std::vector<std::string> getVectorString(std::vector<std::string>& vector) {
-    return vector;
-  }
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1VectorOfString_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  std::vector< std::string > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (std::vector< std::string > *)new std::vector< std::string >();
+  *(std::vector< std::string > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1VectorOfString_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  std::vector< std::string >::size_type arg1 ;
+  std::vector< std::string > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (std::vector< std::string >::size_type)jarg1; 
+  result = (std::vector< std::string > *)new std::vector< std::string >(arg1);
+  *(std::vector< std::string > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  std::vector< std::string >::size_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  result = ((std::vector< std::string > const *)arg1)->size();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1capacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  std::vector< std::string >::size_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  result = ((std::vector< std::string > const *)arg1)->capacity();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  std::vector< std::string >::size_type arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  arg2 = (std::vector< std::string >::size_type)jarg2; 
+  (arg1)->reserve(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  result = (bool)((std::vector< std::string > const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  std::vector< std::string >::value_type *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return ;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  (arg1)->push_back((std::vector< std::string >::value_type const &)*arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jstring jresult = 0 ;
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  int arg2 ;
+  std::vector< std::string >::value_type *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = (std::vector< std::string >::value_type *) &std_vector_Sl_std_string_Sg__get(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  
+  jresult = jenv->NewStringUTF(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfString_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3) {
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  int arg2 ;
+  std::vector< std::string >::value_type *arg3 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if(!jarg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return ;
+  }
+  const char *arg3_pstr = (const char *)jenv->GetStringUTFChars(jarg3, 0); 
+  if (!arg3_pstr) return ;
+  std::string arg3_str(arg3_pstr);
+  arg3 = &arg3_str;
+  jenv->ReleaseStringUTFChars(jarg3, arg3_pstr); 
+  try {
+    std_vector_Sl_std_string_Sg__set(arg1,arg2,(std::string const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1VectorOfString(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  std::vector< std::string > *arg1 = (std::vector< std::string > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(std::vector< std::string > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1VectorOfWString_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  std::vector< std::wstring > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (std::vector< std::wstring > *)new std::vector< std::wstring >();
+  *(std::vector< std::wstring > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1VectorOfWString_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  std::vector< std::wstring >::size_type arg1 ;
+  std::vector< std::wstring > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (std::vector< std::wstring >::size_type)jarg1; 
+  result = (std::vector< std::wstring > *)new std::vector< std::wstring >(arg1);
+  *(std::vector< std::wstring > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  std::vector< std::wstring >::size_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  result = ((std::vector< std::wstring > const *)arg1)->size();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1capacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  std::vector< std::wstring >::size_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  result = ((std::vector< std::wstring > const *)arg1)->capacity();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  std::vector< std::wstring >::size_type arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  arg2 = (std::vector< std::wstring >::size_type)jarg2; 
+  (arg1)->reserve(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  result = (bool)((std::vector< std::wstring > const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  std::vector< std::wstring >::value_type *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
+    return ;
+  }
+  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
+  if (!arg2_pstr) return ;
+  jsize arg2_len = jenv->GetStringLength(jarg2);
+  std::wstring arg2_str;
+  if (arg2_len) {
+    arg2_str.reserve(arg2_len);
+    for (jsize i = 0; i < arg2_len; ++i) {
+      arg2_str.push_back((wchar_t)arg2_pstr[i]);
+    }
+  }
+  arg2 = &arg2_str;
+  jenv->ReleaseStringChars(jarg2, arg2_pstr);
+  
+  (arg1)->push_back((std::vector< std::wstring >::value_type const &)*arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jstring jresult = 0 ;
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  int arg2 ;
+  std::vector< std::wstring >::value_type *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  try {
+    result = (std::vector< std::wstring >::value_type *) &std_vector_Sl_std_wstring_Sg__get(arg1,arg2);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  
+  jsize result_len = result->length();
+  jchar *conv_buf = new jchar[result_len];
+  for (jsize i = 0; i < result_len; ++i) {
+    conv_buf[i] = (jchar)(*result)[i];
+  }
+  jresult = jenv->NewString(conv_buf, result_len);
+  delete [] conv_buf; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_VectorOfWString_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3) {
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  int arg2 ;
+  std::vector< std::wstring >::value_type *arg3 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if(!jarg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
+    return ;
+  }
+  const jchar *arg3_pstr = jenv->GetStringChars(jarg3, 0);
+  if (!arg3_pstr) return ;
+  jsize arg3_len = jenv->GetStringLength(jarg3);
+  std::wstring arg3_str;
+  if (arg3_len) {
+    arg3_str.reserve(arg3_len);
+    for (jsize i = 0; i < arg3_len; ++i) {
+      arg3_str.push_back((wchar_t)arg3_pstr[i]);
+    }
+  }
+  arg3 = &arg3_str;
+  jenv->ReleaseStringChars(jarg3, arg3_pstr);
+  
+  try {
+    std_vector_Sl_std_wstring_Sg__set(arg1,arg2,(std::wstring const &)*arg3);
+  }
+  catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return ;
+  }
+  
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1VectorOfWString(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  std::vector< std::wstring > *arg1 = (std::vector< std::wstring > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(std::vector< std::wstring > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_BoolValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  OutParamValue< bool > *arg1 = (OutParamValue< bool > *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< bool > **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_BoolValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  OutParamValue< bool > *arg1 = (OutParamValue< bool > *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< bool > **)&jarg1; 
+  result = (bool) ((arg1)->value);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1BoolValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< bool > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< bool > *)new OutParamValue< bool >();
+  *(OutParamValue< bool > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1BoolValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< bool > *arg1 = (OutParamValue< bool > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< bool > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_DoubleValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+  OutParamValue< double > *arg1 = (OutParamValue< double > *) 0 ;
+  double arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< double > **)&jarg1; 
+  arg2 = (double)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_DoubleValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jdouble jresult = 0 ;
+  OutParamValue< double > *arg1 = (OutParamValue< double > *) 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< double > **)&jarg1; 
+  result = (double) ((arg1)->value);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1DoubleValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< double > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< double > *)new OutParamValue< double >();
+  *(OutParamValue< double > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1DoubleValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< double > *arg1 = (OutParamValue< double > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< double > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FloatValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jfloat jarg2) {
+  OutParamValue< float > *arg1 = (OutParamValue< float > *) 0 ;
+  float arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< float > **)&jarg1; 
+  arg2 = (float)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jfloat JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FloatValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jfloat jresult = 0 ;
+  OutParamValue< float > *arg1 = (OutParamValue< float > *) 0 ;
+  float result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< float > **)&jarg1; 
+  result = (float) ((arg1)->value);
+  jresult = (jfloat)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1FloatValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< float > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< float > *)new OutParamValue< float >();
+  *(OutParamValue< float > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1FloatValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< float > *arg1 = (OutParamValue< float > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< float > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_IntValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  OutParamValue< int > *arg1 = (OutParamValue< int > *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< int > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_IntValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  OutParamValue< int > *arg1 = (OutParamValue< int > *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< int > **)&jarg1; 
+  result = (int) ((arg1)->value);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1IntValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< int > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< int > *)new OutParamValue< int >();
+  *(OutParamValue< int > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1IntValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< int > *arg1 = (OutParamValue< int > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< int > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShortValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  OutParamValue< short > *arg1 = (OutParamValue< short > *) 0 ;
+  short arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< short > **)&jarg1; 
+  arg2 = (short)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShortValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  OutParamValue< short > *arg1 = (OutParamValue< short > *) 0 ;
+  short result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< short > **)&jarg1; 
+  result = (short) ((arg1)->value);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1ShortValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< short > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< short > *)new OutParamValue< short >();
+  *(OutParamValue< short > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1ShortValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< short > *arg1 = (OutParamValue< short > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< short > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_StringValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  OutParamValue< std::string > *arg1 = (OutParamValue< std::string > *) 0 ;
+  std::string *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< std::string > **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::string");
+    return ;
+  }
+  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
+  if (!arg2_pstr) return ;
+  std::string arg2_str(arg2_pstr);
+  arg2 = &arg2_str;
+  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
+  if (arg1) (arg1)->value = *arg2;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_StringValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  OutParamValue< std::string > *arg1 = (OutParamValue< std::string > *) 0 ;
+  std::string *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< std::string > **)&jarg1; 
+  result = (std::string *) & ((arg1)->value);
+  jresult = jenv->NewStringUTF(result->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1StringValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< std::string > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< std::string > *)new OutParamValue< std::string >();
+  *(OutParamValue< std::string > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1StringValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< std::string > *arg1 = (OutParamValue< std::string > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< std::string > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_WStringValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  OutParamValue< std::wstring > *arg1 = (OutParamValue< std::wstring > *) 0 ;
+  std::wstring *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< std::wstring > **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
+    return ;
+  }
+  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
+  if (!arg2_pstr) return ;
+  jsize arg2_len = jenv->GetStringLength(jarg2);
+  std::wstring arg2_str;
+  if (arg2_len) {
+    arg2_str.reserve(arg2_len);
+    for (jsize i = 0; i < arg2_len; ++i) {
+      arg2_str.push_back((wchar_t)arg2_pstr[i]);
+    }
+  }
+  arg2 = &arg2_str;
+  jenv->ReleaseStringChars(jarg2, arg2_pstr);
+  
+  if (arg1) (arg1)->value = *arg2;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_WStringValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  OutParamValue< std::wstring > *arg1 = (OutParamValue< std::wstring > *) 0 ;
+  std::wstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< std::wstring > **)&jarg1; 
+  result = (std::wstring *) & ((arg1)->value);
+  jsize result_len = result->length();
+  jchar *conv_buf = new jchar[result_len];
+  for (jsize i = 0; i < result_len; ++i) {
+    conv_buf[i] = (jchar)(*result)[i];
+  }
+  jresult = jenv->NewString(conv_buf, result_len);
+  delete [] conv_buf; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1WStringValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< std::wstring > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< std::wstring > *)new OutParamValue< std::wstring >();
+  *(OutParamValue< std::wstring > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1WStringValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< std::wstring > *arg1 = (OutParamValue< std::wstring > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< std::wstring > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldTypeValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  OutParamValue< FileGDBAPI::FieldType > *arg1 = (OutParamValue< FileGDBAPI::FieldType > *) 0 ;
+  FileGDBAPI::FieldType arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< FileGDBAPI::FieldType > **)&jarg1; 
+  arg2 = (FileGDBAPI::FieldType)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldTypeValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  OutParamValue< FileGDBAPI::FieldType > *arg1 = (OutParamValue< FileGDBAPI::FieldType > *) 0 ;
+  FileGDBAPI::FieldType result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< FileGDBAPI::FieldType > **)&jarg1; 
+  result = (FileGDBAPI::FieldType) ((arg1)->value);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1FieldTypeValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< FileGDBAPI::FieldType > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< FileGDBAPI::FieldType > *)new OutParamValue< FileGDBAPI::FieldType >();
+  *(OutParamValue< FileGDBAPI::FieldType > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1FieldTypeValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< FileGDBAPI::FieldType > *arg1 = (OutParamValue< FileGDBAPI::FieldType > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< FileGDBAPI::FieldType > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GeometryTypeValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  OutParamValue< FileGDBAPI::GeometryType > *arg1 = (OutParamValue< FileGDBAPI::GeometryType > *) 0 ;
+  FileGDBAPI::GeometryType arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< FileGDBAPI::GeometryType > **)&jarg1; 
+  arg2 = (FileGDBAPI::GeometryType)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GeometryTypeValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  OutParamValue< FileGDBAPI::GeometryType > *arg1 = (OutParamValue< FileGDBAPI::GeometryType > *) 0 ;
+  FileGDBAPI::GeometryType result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< FileGDBAPI::GeometryType > **)&jarg1; 
+  result = (FileGDBAPI::GeometryType) ((arg1)->value);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1GeometryTypeValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< FileGDBAPI::GeometryType > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< FileGDBAPI::GeometryType > *)new OutParamValue< FileGDBAPI::GeometryType >();
+  *(OutParamValue< FileGDBAPI::GeometryType > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1GeometryTypeValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< FileGDBAPI::GeometryType > *arg1 = (OutParamValue< FileGDBAPI::GeometryType > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< FileGDBAPI::GeometryType > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeTypeValue_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  OutParamValue< FileGDBAPI::ShapeType > *arg1 = (OutParamValue< FileGDBAPI::ShapeType > *) 0 ;
+  FileGDBAPI::ShapeType arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< FileGDBAPI::ShapeType > **)&jarg1; 
+  arg2 = (FileGDBAPI::ShapeType)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeTypeValue_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  OutParamValue< FileGDBAPI::ShapeType > *arg1 = (OutParamValue< FileGDBAPI::ShapeType > *) 0 ;
+  FileGDBAPI::ShapeType result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutParamValue< FileGDBAPI::ShapeType > **)&jarg1; 
+  result = (FileGDBAPI::ShapeType) ((arg1)->value);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1ShapeTypeValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutParamValue< FileGDBAPI::ShapeType > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutParamValue< FileGDBAPI::ShapeType > *)new OutParamValue< FileGDBAPI::ShapeType >();
+  *(OutParamValue< FileGDBAPI::ShapeType > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1ShapeTypeValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutParamValue< FileGDBAPI::ShapeType > *arg1 = (OutParamValue< FileGDBAPI::ShapeType > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutParamValue< FileGDBAPI::ShapeType > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jfloat JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FloatArrayValue_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jfloat jresult = 0 ;
+  OutArrayParamValue< float > *arg1 = (OutArrayParamValue< float > *) 0 ;
+  int arg2 ;
+  float result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< float > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (float)(arg1)->get(arg2);
+  jresult = (jfloat)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FloatArrayValue_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jfloat jarg3) {
+  OutArrayParamValue< float > *arg1 = (OutArrayParamValue< float > *) 0 ;
+  int arg2 ;
+  float arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< float > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (float)jarg3; 
+  (arg1)->set(arg2,arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1FloatArrayValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutArrayParamValue< float > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutArrayParamValue< float > *)new OutArrayParamValue< float >();
+  *(OutArrayParamValue< float > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1FloatArrayValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutArrayParamValue< float > *arg1 = (OutArrayParamValue< float > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutArrayParamValue< float > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_DoubleArrayValue_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jdouble jresult = 0 ;
+  OutArrayParamValue< double > *arg1 = (OutArrayParamValue< double > *) 0 ;
+  int arg2 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< double > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (double)(arg1)->get(arg2);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_DoubleArrayValue_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jdouble jarg3) {
+  OutArrayParamValue< double > *arg1 = (OutArrayParamValue< double > *) 0 ;
+  int arg2 ;
+  double arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< double > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (double)jarg3; 
+  (arg1)->set(arg2,arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1DoubleArrayValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutArrayParamValue< double > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutArrayParamValue< double > *)new OutArrayParamValue< double >();
+  *(OutArrayParamValue< double > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1DoubleArrayValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutArrayParamValue< double > *arg1 = (OutArrayParamValue< double > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutArrayParamValue< double > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_IntArrayValue_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  OutArrayParamValue< int > *arg1 = (OutArrayParamValue< int > *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< int > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)(arg1)->get(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_IntArrayValue_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  OutArrayParamValue< int > *arg1 = (OutArrayParamValue< int > *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< int > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  (arg1)->set(arg2,arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1IntArrayValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutArrayParamValue< int > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutArrayParamValue< int > *)new OutArrayParamValue< int >();
+  *(OutArrayParamValue< int > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1IntArrayValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutArrayParamValue< int > *arg1 = (OutArrayParamValue< int > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutArrayParamValue< int > **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_UnsignedCharArrayValue_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jshort jresult = 0 ;
+  OutArrayParamValue< unsigned char > *arg1 = (OutArrayParamValue< unsigned char > *) 0 ;
+  int arg2 ;
+  unsigned char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< unsigned char > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (unsigned char)(arg1)->get(arg2);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_UnsignedCharArrayValue_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jshort jarg3) {
+  OutArrayParamValue< unsigned char > *arg1 = (OutArrayParamValue< unsigned char > *) 0 ;
+  int arg2 ;
+  unsigned char arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(OutArrayParamValue< unsigned char > **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (unsigned char)jarg3; 
+  (arg1)->set(arg2,arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1UnsignedCharArrayValue(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  OutArrayParamValue< unsigned char > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (OutArrayParamValue< unsigned char > *)new OutArrayParamValue< unsigned char >();
+  *(OutArrayParamValue< unsigned char > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_delete_1UnsignedCharArrayValue(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  OutArrayParamValue< unsigned char > *arg1 = (OutArrayParamValue< unsigned char > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(OutArrayParamValue< unsigned char > **)&jarg1; 
+  delete arg1;
+}
+
 
 SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_CreateGeodatabase(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
@@ -995,7 +2170,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetTypes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetTypes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::vector< std::wstring > *arg2 = 0 ;
@@ -1004,6 +2179,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg2_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   arg2 = *(std::vector< std::wstring > **)&jarg2;
   if (!arg2) {
@@ -1016,7 +2192,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetRelationshipTypes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetRelationshipTypes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::vector< std::wstring > *arg2 = 0 ;
@@ -1025,6 +2201,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg2_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   arg2 = *(std::vector< std::wstring > **)&jarg2;
   if (!arg2) {
@@ -1037,7 +2214,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetChildDatasets(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetChildDatasets(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4, jobject jarg4_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1048,6 +2225,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg4_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
@@ -1094,7 +2272,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetRelatedDatasets(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jlong jarg5) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetRelatedDatasets(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jlong jarg5, jobject jarg5_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1106,6 +2284,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg5_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
@@ -1169,7 +2348,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetDefinition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetDefinition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jobject jarg4) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1215,18 +2394,21 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg3 = &arg3_str;
   jenv->ReleaseStringChars(jarg3, arg3_pstr);
   
-  arg4 = *(std::string **)&jarg4;
-  if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg4);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg4, cPointerField);
+    OutParamValue<std::string> *wrapper = NULL;
+    *(OutParamValue<std::string> **)&wrapper = *(OutParamValue<std::string> **)&cPtr;
+    arg4 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetDatasetDefinition((std::wstring const &)*arg2,(std::wstring const &)*arg3,*arg4);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetChildDatasetDefinitions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetChildDatasetDefinitions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4, jobject jarg4_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1237,6 +2419,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg4_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
@@ -1283,7 +2466,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetRelatedDatasetDefinitions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jlong jarg5) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetRelatedDatasetDefinitions(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jlong jarg5, jobject jarg5_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1295,6 +2478,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg5_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   if(!jarg2) {
     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
@@ -1358,7 +2542,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetDocumentation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jlong jarg4) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDatasetDocumentation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jobject jarg4) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1404,11 +2588,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg3 = &arg3_str;
   jenv->ReleaseStringChars(jarg3, arg3_pstr);
   
-  arg4 = *(std::string **)&jarg4;
-  if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg4);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg4, cPointerField);
+    OutParamValue<std::string> *wrapper = NULL;
+    *(OutParamValue<std::string> **)&wrapper = *(OutParamValue<std::string> **)&cPtr;
+    arg4 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetDatasetDocumentation((std::wstring const &)*arg2,(std::wstring const &)*arg3,*arg4);
   jresult = (jint)result; 
   return jresult;
@@ -1723,7 +2910,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDomains(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDomains(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::vector< std::wstring > *arg2 = 0 ;
@@ -1732,6 +2919,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg2_;
   arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
   arg2 = *(std::vector< std::wstring > **)&jarg2;
   if (!arg2) {
@@ -1827,7 +3015,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDomainDefinition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetDomainDefinition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1855,18 +3043,21 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(std::string **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<std::string> *wrapper = NULL;
+    *(OutParamValue<std::string> **)&wrapper = *(OutParamValue<std::string> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetDomainDefinition((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetQueryName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Geodatabase_1GetQueryName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -1894,11 +3085,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(std::wstring **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<std::wstring> *wrapper = NULL;
+    *(OutParamValue<std::wstring> **)&wrapper = *(OutParamValue<std::wstring> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetQueryName((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
   return jresult;
@@ -2092,7 +3286,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDefinition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDefinition(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   std::string *arg2 = 0 ;
@@ -2102,18 +3296,21 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(std::string **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<std::string> *wrapper = NULL;
+    *(OutParamValue<std::string> **)&wrapper = *(OutParamValue<std::string> **)&cPtr;
+    arg2 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetDefinition(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDocumentation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDocumentation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   std::string *arg2 = 0 ;
@@ -2123,11 +3320,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(std::string **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<std::string> *wrapper = NULL;
+    *(OutParamValue<std::string> **)&wrapper = *(OutParamValue<std::string> **)&cPtr;
+    arg2 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetDocumentation(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -2264,7 +3464,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetIndexes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetIndexes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   std::vector< std::string > *arg2 = 0 ;
@@ -2273,6 +3473,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg2_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
   arg2 = *(std::vector< std::string > **)&jarg2;
   if (!arg2) {
@@ -2469,11 +3670,10 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDefaultSubtypeCode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetDefaultSubtypeCode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -2481,23 +3681,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetDefaultSubtypeCode(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -2751,11 +3943,10 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1IsEditable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jbooleanArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1IsEditable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   bool *arg2 = 0 ;
-  bool temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -2763,32 +3954,23 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<bool> *wrapper = NULL;
+    *(OutParamValue<bool> **)&wrapper = *(OutParamValue<bool> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->IsEditable(*arg2);
   jresult = (jint)result; 
-  {
-    jboolean jvalue = (jboolean)temp2;
-    jenv->SetBooleanArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetRowCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1GetRowCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -2796,23 +3978,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Table **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetRowCount(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -2908,12 +4082,11 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1IsNull(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jbooleanArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1IsNull(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   bool *arg3 = 0 ;
-  bool temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -2938,23 +4111,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<bool> *wrapper = NULL;
+    *(OutParamValue<bool> **)&wrapper = *(OutParamValue<bool> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->IsNull((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jboolean jvalue = (jboolean)temp3;
-    jenv->SetBooleanArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -2992,11 +4157,10 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetOID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetOID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   int32 *arg2 = 0 ;
-  int32 temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -3004,23 +4168,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Row **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetOID(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -3091,12 +4247,11 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetShort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jshortArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetShort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   short *arg3 = 0 ;
-  short temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -3121,23 +4276,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<short> *wrapper = NULL;
+    *(OutParamValue<short> **)&wrapper = *(OutParamValue<short> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetShort((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jshort jvalue = (jshort)temp3;
-    jenv->SetShortArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -3177,12 +4324,11 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetInteger(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jintArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetInteger(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   int32 *arg3 = 0 ;
-  int32 temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -3207,23 +4353,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetInteger((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp3;
-    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -3263,12 +4401,11 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetFloat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jfloatArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetFloat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   float *arg3 = 0 ;
-  float temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -3293,23 +4430,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<float> *wrapper = NULL;
+    *(OutParamValue<float> **)&wrapper = *(OutParamValue<float> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetFloat((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jfloat jvalue = (jfloat)temp3;
-    jenv->SetFloatArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -3349,12 +4478,11 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jdoubleArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
   double *arg3 = 0 ;
-  double temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -3379,23 +4507,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<double> *wrapper = NULL;
+    *(OutParamValue<double> **)&wrapper = *(OutParamValue<double> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetDouble((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jdouble jvalue = (jdouble)temp3;
-    jenv->SetDoubleArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -3513,7 +4633,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -3541,11 +4661,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(std::wstring **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<std::wstring> *wrapper = NULL;
+    *(OutParamValue<std::wstring> **)&wrapper = *(OutParamValue<std::wstring> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetString((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
   return jresult;
@@ -3683,7 +4806,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetXML(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetXML(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -3711,11 +4834,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg2 = &arg2_str;
   jenv->ReleaseStringChars(jarg2, arg2_pstr);
   
-  arg3 = *(std::string **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<std::string> *wrapper = NULL;
+    *(OutParamValue<std::string> **)&wrapper = *(OutParamValue<std::string> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetXML((std::wstring const &)*arg2,*arg3);
   jresult = (jint)result; 
   return jresult;
@@ -4046,11 +5172,10 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -4058,28 +5183,20 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetFieldCount(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int arg2 ;
@@ -4091,18 +5208,21 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(std::wstring **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<std::wstring> *wrapper = NULL;
+    *(OutParamValue<std::wstring> **)&wrapper = *(OutParamValue<std::wstring> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetFieldName(arg2,*arg3);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int arg2 ;
@@ -4114,23 +5234,25 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(FileGDBAPI::FieldType **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::FieldType & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<FileGDBAPI::FieldType> *wrapper = NULL;
+    *(OutParamValue<FileGDBAPI::FieldType> **)&wrapper = *(OutParamValue<FileGDBAPI::FieldType> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->GetFieldType(arg2,*arg3);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jintArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int arg2 ;
   int *arg3 = 0 ;
-  int temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -4139,33 +5261,24 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   arg2 = (int)jarg2; 
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetFieldLength(arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp3;
-    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldIsNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jbooleanArray jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_FieldInfo_1GetFieldIsNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jobject jarg3) {
   jint jresult = 0 ;
   FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
   int arg2 ;
   bool *arg3 = 0 ;
-  bool temp3 ;
   fgdbError result;
   
   (void)jenv;
@@ -4174,23 +5287,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
   arg2 = (int)jarg2; 
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<bool> *wrapper = NULL;
+    *(OutParamValue<bool> **)&wrapper = *(OutParamValue<bool> **)&cPtr;
+    arg3 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetFieldIsNullable(arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jboolean jvalue = (jboolean)temp3;
-    jenv->SetBooleanArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -4267,34 +5372,6 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
   delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1shapeBuffer_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  FileGDBAPI::ShapeBuffer *arg1 = (FileGDBAPI::ShapeBuffer *) 0 ;
-  byte *arg2 = (byte *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
-  arg2 = *(byte **)&jarg2; 
-  if (arg1) (arg1)->shapeBuffer = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1shapeBuffer_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  FileGDBAPI::ShapeBuffer *arg1 = (FileGDBAPI::ShapeBuffer *) 0 ;
-  byte *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
-  result = (byte *) ((arg1)->shapeBuffer);
-  *(byte **)&jresult = result; 
-  return jresult;
 }
 
 
@@ -4380,7 +5457,7 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1GetShapeType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1GetShapeType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::ShapeBuffer *arg1 = (FileGDBAPI::ShapeBuffer *) 0 ;
   FileGDBAPI::ShapeType *arg2 = 0 ;
@@ -4390,18 +5467,21 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
-  arg2 = *(FileGDBAPI::ShapeType **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::ShapeType & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<FileGDBAPI::ShapeType> *wrapper = NULL;
+    *(OutParamValue<FileGDBAPI::ShapeType> **)&wrapper = *(OutParamValue<FileGDBAPI::ShapeType> **)&cPtr;
+    arg2 = &wrapper->value;
+  }
   result = (fgdbError)((FileGDBAPI::ShapeBuffer const *)arg1)->GetShapeType(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1GetGeometryType_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1GetGeometryType_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::ShapeBuffer *arg1 = (FileGDBAPI::ShapeBuffer *) 0 ;
   FileGDBAPI::GeometryType *arg2 = 0 ;
@@ -4411,11 +5491,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
-  arg2 = *(FileGDBAPI::GeometryType **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::GeometryType & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<FileGDBAPI::GeometryType> *wrapper = NULL;
+    *(OutParamValue<FileGDBAPI::GeometryType> **)&wrapper = *(OutParamValue<FileGDBAPI::GeometryType> **)&cPtr;
+    arg2 = &wrapper->value;
+  }
   result = (fgdbError)((FileGDBAPI::ShapeBuffer const *)arg1)->GetGeometryType(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -4534,6 +5617,38 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
+SWIGEXPORT jshort JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jshort jresult = 0 ;
+  FileGDBAPI::ShapeBuffer *arg1 = (FileGDBAPI::ShapeBuffer *) 0 ;
+  int arg2 ;
+  unsigned char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (unsigned char)FileGDBAPI_ShapeBuffer_get(arg1,arg2);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ShapeBuffer_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jshort jarg3) {
+  FileGDBAPI::ShapeBuffer *arg1 = (FileGDBAPI::ShapeBuffer *) 0 ;
+  int arg2 ;
+  unsigned char arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::ShapeBuffer **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (unsigned char)jarg3; 
+  FileGDBAPI_ShapeBuffer_set(arg1,arg2,arg3);
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FileGDBAPI::PointShapeBuffer *arg1 = (FileGDBAPI::PointShapeBuffer *) 0 ;
@@ -4554,57 +5669,75 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetZ(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetZ(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::PointShapeBuffer *arg1 = (FileGDBAPI::PointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::PointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZ(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetM(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetM(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::PointShapeBuffer *arg1 = (FileGDBAPI::PointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::PointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetM(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_PointShapeBuffer_1GetID(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::PointShapeBuffer *arg1 = (FileGDBAPI::PointShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::PointShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetID(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -4650,30 +5783,35 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -4681,23 +5819,15 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetNumPoints(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -4722,95 +5852,125 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetZExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetZExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetZs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetZs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetMExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetMExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetMExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetMs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetMs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetMs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetIDs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPointShapeBuffer_1GetIDs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPointShapeBuffer *arg1 = (FileGDBAPI::MultiPointShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPointShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetIDs(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -4873,30 +6033,35 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -4904,32 +6069,23 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetNumParts(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -4937,40 +6093,38 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetNumPoints(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetParts(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -4997,87 +6151,110 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetZExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetZExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetZs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetZs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetMExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetMExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetMExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetMs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetMs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetMs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumCurves(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetNumCurves(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -5085,59 +6262,63 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetNumCurves(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetCurves(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetCurves(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   byte **arg2 = 0 ;
-  byte *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(byte **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<unsigned char> *wrapper = NULL;
+    *(OutArrayParamValue<unsigned char> **)&wrapper = *(OutArrayParamValue<unsigned char> **)&cPtr;
+    unsigned char* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetCurves(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetIDs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPartShapeBuffer_1GetIDs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPartShapeBuffer *arg1 = (FileGDBAPI::MultiPartShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPartShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetIDs(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -5240,30 +6421,35 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -5271,32 +6457,23 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetNumParts(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNumPoints(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
-  int temp2 ;
   fgdbError result;
   
   (void)jenv;
@@ -5304,59 +6481,63 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   result = (fgdbError)(arg1)->GetNumPoints(*arg2);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetParts(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetParts(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetPartDescriptors(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetPartDescriptors(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetPartDescriptors(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -5383,131 +6564,163 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetZExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetZExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetZs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetZs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetZs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMExtent(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetMExtent(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   double **arg2 = 0 ;
-  double *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(double **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<double> *wrapper = NULL;
+    *(OutArrayParamValue<double> **)&wrapper = *(OutArrayParamValue<double> **)&cPtr;
+    double* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetMs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetIDs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetIDs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int **arg2 = 0 ;
-  int *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(int **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetIDs(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNormals(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetNormals(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   float **arg2 = 0 ;
-  float *temp2 = 0 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
-  temp2 = *(float **)&jarg2;
-  arg2 = &temp2; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutArrayParamValue<float> *wrapper = NULL;
+    *(OutArrayParamValue<float> **)&wrapper = *(OutArrayParamValue<float> **)&cPtr;
+    float* value = wrapper->getOutParamArrayValue();
+    arg2 = &value;
+  }
   result = (fgdbError)(arg1)->GetNormals(*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetTextures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2, jintArray jarg3, jlong jarg4, jlong jarg5) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetTextures(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3, jobject jarg4, jobject jarg5) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
   int *arg3 = 0 ;
   int **arg4 = 0 ;
   float **arg5 = 0 ;
-  int temp2 ;
-  int temp3 ;
-  int *temp4 = 0 ;
-  float *temp5 = 0 ;
   fgdbError result;
   
   (void)jenv;
@@ -5515,58 +6728,52 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg3 = &wrapper->value;
   }
-  temp4 = *(int **)&jarg4;
-  arg4 = &temp4; 
-  temp5 = *(float **)&jarg5;
-  arg5 = &temp5; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg4);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg4, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg4 = &value;
+  }
+  {
+    jclass clazz = jenv->GetObjectClass(jarg5);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg5, cPointerField);
+    OutArrayParamValue<float> *wrapper = NULL;
+    *(OutArrayParamValue<float> **)&wrapper = *(OutArrayParamValue<float> **)&cPtr;
+    float* value = wrapper->getOutParamArrayValue();
+    arg5 = &value;
+  }
   result = (fgdbError)(arg1)->GetTextures(*arg2,*arg3,*arg4,*arg5);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  {
-    jint jvalue = (jint)temp3;
-    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
-  
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMaterials(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2, jintArray jarg3, jlong jarg4, jlong jarg5) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_MultiPatchShapeBuffer_1GetMaterials(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2, jobject jarg3, jobject jarg4, jobject jarg5) {
   jint jresult = 0 ;
   FileGDBAPI::MultiPatchShapeBuffer *arg1 = (FileGDBAPI::MultiPatchShapeBuffer *) 0 ;
   int *arg2 = 0 ;
   int *arg3 = 0 ;
   int **arg4 = 0 ;
   byte **arg5 = 0 ;
-  int temp2 ;
-  int temp3 ;
-  int *temp4 = 0 ;
-  byte *temp5 = 0 ;
   fgdbError result;
   
   (void)jenv;
@@ -5574,43 +6781,41 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jarg1_;
   arg1 = *(FileGDBAPI::MultiPatchShapeBuffer **)&jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
   {
-    if (!jarg3) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg3) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg3 = &temp3; 
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg3 = &wrapper->value;
   }
-  temp4 = *(int **)&jarg4;
-  arg4 = &temp4; 
-  temp5 = *(byte **)&jarg5;
-  arg5 = &temp5; 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg4);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg4, cPointerField);
+    OutArrayParamValue<int> *wrapper = NULL;
+    *(OutArrayParamValue<int> **)&wrapper = *(OutArrayParamValue<int> **)&cPtr;
+    int* value = wrapper->getOutParamArrayValue();
+    arg4 = &value;
+  }
+  {
+    jclass clazz = jenv->GetObjectClass(jarg5);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg5, cPointerField);
+    OutArrayParamValue<unsigned char> *wrapper = NULL;
+    *(OutArrayParamValue<unsigned char> **)&wrapper = *(OutArrayParamValue<unsigned char> **)&cPtr;
+    unsigned char* value = wrapper->getOutParamArrayValue();
+    arg5 = &value;
+  }
   result = (fgdbError)(arg1)->GetMaterials(*arg2,*arg3,*arg4,*arg5);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  {
-    jint jvalue = (jint)temp3;
-    jenv->SetIntArrayRegion(jarg3, 0, 1, &jvalue);
-  }
-  
-  
   return jresult;
 }
 
@@ -5801,34 +7006,6 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ByteArray_1byteArray_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  FileGDBAPI::ByteArray *arg1 = (FileGDBAPI::ByteArray *) 0 ;
-  byte *arg2 = (byte *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::ByteArray **)&jarg1; 
-  arg2 = *(byte **)&jarg2; 
-  if (arg1) (arg1)->byteArray = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ByteArray_1byteArray_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  FileGDBAPI::ByteArray *arg1 = (FileGDBAPI::ByteArray *) 0 ;
-  byte *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::ByteArray **)&jarg1; 
-  result = (byte *) ((arg1)->byteArray);
-  *(byte **)&jresult = result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ByteArray_1allocatedLength_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   FileGDBAPI::ByteArray *arg1 = (FileGDBAPI::ByteArray *) 0 ;
   size_t arg2 ;
@@ -5882,6 +7059,38 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI
   result =  ((arg1)->inUseLength);
   jresult = (jlong)result; 
   return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ByteArray_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jshort jresult = 0 ;
+  FileGDBAPI::ByteArray *arg1 = (FileGDBAPI::ByteArray *) 0 ;
+  int arg2 ;
+  unsigned char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::ByteArray **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (unsigned char)FileGDBAPI_ByteArray_get(arg1,arg2);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_ByteArray_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jshort jarg3) {
+  FileGDBAPI::ByteArray *arg1 = (FileGDBAPI::ByteArray *) 0 ;
+  int arg2 ;
+  unsigned char arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::ByteArray **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (unsigned char)jarg3; 
+  FileGDBAPI_ByteArray_set(arg1,arg2,arg3);
 }
 
 
@@ -6276,7 +7485,7 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Guid_1ToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Guid_1ToString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Guid *arg1 = (FileGDBAPI::Guid *) 0 ;
   std::wstring *arg2 = 0 ;
@@ -6286,11 +7495,14 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jcls;
   (void)jarg1_;
   arg1 = *(FileGDBAPI::Guid **)&jarg1; 
-  arg2 = *(std::wstring **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<std::wstring> *wrapper = NULL;
+    *(OutParamValue<std::wstring> **)&wrapper = *(OutParamValue<std::wstring> **)&cPtr;
+    arg2 = &wrapper->value;
+  }
   result = (fgdbError)(arg1)->ToString(*arg2);
   jresult = (jint)result; 
   return jresult;
@@ -6464,7 +7676,7 @@ SWIGEXPORT jshortArray JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFile
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GetErrorDescription(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GetErrorDescription(JNIEnv *jenv, jclass jcls, jint jarg1, jobject jarg2) {
   jint jresult = 0 ;
   fgdbError arg1 ;
   std::wstring *arg2 = 0 ;
@@ -6473,77 +7685,65 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
   (void)jenv;
   (void)jcls;
   arg1 = (fgdbError)jarg1; 
-  arg2 = *(std::wstring **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<std::wstring> *wrapper = NULL;
+    *(OutParamValue<std::wstring> **)&wrapper = *(OutParamValue<std::wstring> **)&cPtr;
+    arg2 = &wrapper->value;
+  }
   result = (fgdbError)FileGDBAPI::ErrorInfo::GetErrorDescription(arg1,*arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GetErrorRecordCount(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GetErrorRecordCount(JNIEnv *jenv, jclass jcls, jobject jarg1) {
   int *arg1 = 0 ;
-  int temp1 ;
   
   (void)jenv;
   (void)jcls;
   {
-    if (!jarg1) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return ;
-    }
-    if (jenv->GetArrayLength(jarg1) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return ;
-    }
-    arg1 = &temp1; 
+    jclass clazz = jenv->GetObjectClass(jarg1);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg1, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg1 = &wrapper->value;
   }
   FileGDBAPI::ErrorInfo::GetErrorRecordCount(*arg1);
-  {
-    jint jvalue = (jint)temp1;
-    jenv->SetIntArrayRegion(jarg1, 0, 1, &jvalue);
-  }
-  
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GetErrorRecord(JNIEnv *jenv, jclass jcls, jint jarg1, jintArray jarg2, jlong jarg3) {
+SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_GetErrorRecord(JNIEnv *jenv, jclass jcls, jint jarg1, jobject jarg2, jobject jarg3) {
   jint jresult = 0 ;
   int arg1 ;
   fgdbError *arg2 = 0 ;
   std::wstring *arg3 = 0 ;
-  fgdbError temp2 ;
   fgdbError result;
   
   (void)jenv;
   (void)jcls;
   arg1 = (int)jarg1; 
   {
-    if (!jarg2) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
-      return 0;
-    }
-    if (jenv->GetArrayLength(jarg2) == 0) {
-      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
-      return 0;
-    }
-    arg2 = &temp2; 
+    jclass clazz = jenv->GetObjectClass(jarg2);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg2, cPointerField);
+    OutParamValue<int> *wrapper = NULL;
+    *(OutParamValue<int> **)&wrapper = *(OutParamValue<int> **)&cPtr;
+    arg2 = &wrapper->value;
   }
-  arg3 = *(std::wstring **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
+  {
+    jclass clazz = jenv->GetObjectClass(jarg3);
+    jfieldID cPointerField = jenv->GetFieldID(clazz, "swigCPtr", "J");
+    jlong cPtr = jenv->GetLongField(jarg3, cPointerField);
+    OutParamValue<std::wstring> *wrapper = NULL;
+    *(OutParamValue<std::wstring> **)&wrapper = *(OutParamValue<std::wstring> **)&cPtr;
+    arg3 = &wrapper->value;
+  }
   result = (fgdbError)FileGDBAPI::ErrorInfo::GetErrorRecord(arg1,*arg2,*arg3);
   jresult = (jint)result; 
-  {
-    jint jvalue = (jint)temp2;
-    jenv->SetIntArrayRegion(jarg2, 0, 1, &jvalue);
-  }
-  
   return jresult;
 }
 
@@ -6928,84 +8128,6 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJ
   }
   jresult = jenv->NewString(conv_buf, result_len);
   delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_getWstring(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jstring jresult = 0 ;
-  std::wstring *arg1 = 0 ;
-  std::wstring result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(std::wstring **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::wstring & reference is null");
-    return 0;
-  } 
-  result = getWstring(*arg1);
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_getVectorWstring(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  std::vector< std::wstring > *arg1 = 0 ;
-  SwigValueWrapper< std::vector< std::wstring > > result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(std::vector< std::wstring > **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::wstring > & reference is null");
-    return 0;
-  } 
-  result = getVectorWstring(*arg1);
-  *(std::vector< std::wstring > **)&jresult = new std::vector< std::wstring >((const std::vector< std::wstring > &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_getString(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jstring jresult = 0 ;
-  std::string *arg1 = 0 ;
-  std::string result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(std::string **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::string & reference is null");
-    return 0;
-  } 
-  result = getString(*arg1);
-  jresult = jenv->NewStringUTF((&result)->c_str()); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_getVectorString(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  std::vector< std::string > *arg1 = 0 ;
-  SwigValueWrapper< std::vector< std::string > > result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(std::vector< std::string > **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::string > & reference is null");
-    return 0;
-  } 
-  result = getVectorString(*arg1);
-  *(std::vector< std::string > **)&jresult = new std::vector< std::string >((const std::vector< std::string > &)result); 
   return jresult;
 }
 

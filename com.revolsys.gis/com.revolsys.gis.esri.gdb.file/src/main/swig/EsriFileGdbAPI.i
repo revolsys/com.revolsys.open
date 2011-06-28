@@ -9,83 +9,79 @@
 %include "std_wstring.i"
 %include "typemaps.i"
 %include "enums.swg"
-%include "FieldTypeValue.i"
-%include "GeometryTypeValue.i"
-%include "ShapeTypeValue.i"
-%include "StringValue.i"
-%include "WstringValue.i"
+%include "OutParam.i"
+%include "OutArrayParam.i"
 %javaconst(1);
 
-%include "carrays.i"
-%array_class(int, IntArray);
-%array_class(float, FloatArray);
-%array_class(double, DoubleArray);
-%array_class(unsigned char, UnsignedCharArray);
+%template(VectorOfString) std::vector<std::string>;
+%template(VectorOfWString) std::vector<std::wstring>;
 
-%apply bool &OUTPUT { bool &isEditable };
-%apply bool &OUTPUT { bool &isNullable };
-%apply bool &OUTPUT { bool &isNull };
+%include "arrays_java.i"
+%apply int[] {int []};
+%apply int[] {int *};
+%apply float[] {float *};
+%apply double[] {double *};
 
+OUT_PARAM(bool, BoolValue)
+OUT_PARAM(double, DoubleValue)
+OUT_PARAM(float, FloatValue)
+OUT_PARAM(int, IntValue)
+OUT_PARAM(short, ShortValue)
+OUT_PARAM(std::string, StringValue)
+OUT_PARAM(std::wstring, WStringValue)
+OUT_PARAM(FileGDBAPI::FieldType, FieldTypeValue)
+OUT_PARAM(FileGDBAPI::GeometryType, GeometryTypeValue)
+OUT_PARAM(FileGDBAPI::ShapeType, ShapeTypeValue)
 
-%apply int &OUTPUT { int &fieldCount };
-%apply int &OUTPUT { int &recordCount };
-%apply int &OUTPUT { int &fgdbError };
-%apply int &OUTPUT { int &fieldLength };
-%apply int &OUTPUT { int &defaultCode };
-%apply int &OUTPUT { int &rowCount };
-%apply short &OUTPUT { short &value };
-%apply float &OUTPUT { float &value };
-%apply double &OUTPUT { double &value };
-%apply int &OUTPUT { int &value };
+OUT_ARRAY_PARAM(float, FloatArrayValue)
+OUT_ARRAY_PARAM(double, DoubleArrayValue)
+OUT_ARRAY_PARAM(int, IntArrayValue)
+OUT_ARRAY_PARAM(unsigned char, UnsignedCharArrayValue)
 
-%apply int &OUTPUT { int &numParts };
-%apply int &OUTPUT { int &numPoints };
-%apply int &OUTPUT { int &parts };
-%apply int &OUTPUT { int &numCurves };
-%apply int &OUTPUT { int &parts };
-%apply int &OUTPUT { int &partDescriptorArray };
-%apply int &OUTPUT { int &numTextures };
-%apply int &OUTPUT { int &textureDimension };
-%apply int &OUTPUT { int &textureParts };
-%apply float &OUTPUT { float &textureCoords };
-%apply int &OUTPUT { int &numMaterials };
-%apply int &OUTPUT { int &compressionType };
-%apply int &OUTPUT { int &materialParts };
-%apply unsigned char &OUTPUT { unsigned char &materials };
-%apply int &OUTPUT { int &id };
-%apply int &OUTPUT { int &objectID };
-
-%apply FileGDBAPI::FieldType &OUTVALUE { FileGDBAPI::FieldType &fieldType };
-%apply FileGDBAPI::GeometryType &OUTVALUE { FileGDBAPI::GeometryType &geometryType };
-%apply FileGDBAPI::ShapeType &OUTVALUE { FileGDBAPI::ShapeType &shapeType };
-
-%apply std::string &OUTVALUE { std::string &datasetDef };
-%apply std::string &OUTVALUE { std::string &documentation };
-%apply std::string &OUTVALUE { std::string &domainDef };
-%apply std::string &OUTVALUE { std::string &value };
-%apply std::string &OUTVALUE { std::string &tableDef };
-
-%apply std::wstring &OUTVALUE { std::wstring &fieldName };
-%apply std::wstring &OUTVALUE { std::wstring &guidString };
-%apply std::wstring &OUTVALUE { std::wstring &queryName };
-%apply std::wstring &OUTVALUE { std::wstring &errorDescription };
-%apply std::wstring &OUTVALUE { std::wstring &value };
 
 %define linux
 %enddef
 
 %include "FileGDBCore.h"
 %include "GeodatabaseManagement.h"
+
 %rename(createGeodatabase) FileGDBAPI::CreateGeodatabase;
 %rename(openGeodatabase) FileGDBAPI::OpenGeodatabase;
 %rename(closeGeodatabase) FileGDBAPI::CloseGeodatabase;
 %rename(deleteGeodatabase) FileGDBAPI::DeleteGeodatabase;
 %include "Geodatabase.h"
+
 %include "Table.h"
+
 %include "Row.h"
+
 %rename(equal) FileGDBAPI::Guid::operator==;
 %rename(notEqual) FileGDBAPI::Guid::operator!=;
+
+%ignore FileGDBAPI::ByteArray::byteArray;
+%extend FileGDBAPI::ByteArray {
+  unsigned char get(int i) {
+    return $self->byteArray[i];
+  }
+
+  void set(int i, unsigned char c) {
+    $self->byteArray[i] = c;
+  }
+}
+
+%ignore FileGDBAPI::ShapeBuffer::shapeBuffer;
+%extend FileGDBAPI::ShapeBuffer {
+  unsigned char get(int i) {
+    return $self->shapeBuffer[i];
+  }
+
+  void set(int i, unsigned char c) {
+    $self->shapeBuffer[i] = c;
+  }
+}
+
 %include "Util.h"
+
 %include "Raster.h"
 
 %inline %{
@@ -95,3 +91,5 @@
     return errorDescription;
   }
 %}
+
+
