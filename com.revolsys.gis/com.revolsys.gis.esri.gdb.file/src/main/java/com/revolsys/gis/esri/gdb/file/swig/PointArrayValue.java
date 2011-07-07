@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class WStringValue {
+public class PointArrayValue {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected WStringValue(long cPtr, boolean cMemoryOwn) {
+  protected PointArrayValue(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(WStringValue obj) {
+  protected static long getCPtr(PointArrayValue obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,22 @@ public class WStringValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_WStringValue(swigCPtr);
+        EsriFileGdbJNI.delete_PointArrayValue(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void setValue(String value) {
-    EsriFileGdbJNI.WStringValue_value_set(swigCPtr, this, value);
+  public PointArrayValue() {
+    this(EsriFileGdbJNI.new_PointArrayValue(), true);
   }
 
-  public String getValue() {
-    return EsriFileGdbJNI.WStringValue_value_get(swigCPtr, this);
+  public Point get(int i) {
+    return new Point(EsriFileGdbJNI.PointArrayValue_get(swigCPtr, this, i), false);
   }
 
-  public WStringValue() {
-    this(EsriFileGdbJNI.new_WStringValue(), true);
+  public void set(int i, Point value) {
+    EsriFileGdbJNI.PointArrayValue_set(swigCPtr, this, i, Point.getCPtr(value), value);
   }
 
 }

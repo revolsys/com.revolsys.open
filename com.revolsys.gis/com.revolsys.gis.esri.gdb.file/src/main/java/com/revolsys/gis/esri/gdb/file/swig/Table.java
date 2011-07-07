@@ -35,14 +35,6 @@ public class Table {
     }
   }
 
-  public int GetDefinition(StringValue tableDef) {
-    return EsriFileGdbJNI.Table_GetDefinition(swigCPtr, this, tableDef);
-  }
-
-  public int GetDocumentation(StringValue documentation) {
-    return EsriFileGdbJNI.Table_GetDocumentation(swigCPtr, this, documentation);
-  }
-
   public int SetDocumentation(String documentation) {
     return EsriFileGdbJNI.Table_SetDocumentation(swigCPtr, this, documentation);
   }
@@ -127,10 +119,6 @@ public class Table {
     return EsriFileGdbJNI.Table_Delete(swigCPtr, this, Row.getCPtr(row), row);
   }
 
-  public int IsEditable(BoolValue isEditable) {
-    return EsriFileGdbJNI.Table_IsEditable(swigCPtr, this, isEditable);
-  }
-
   public int GetRowCount(IntValue rowCount) {
     return EsriFileGdbJNI.Table_GetRowCount(swigCPtr, this, rowCount);
   }
@@ -153,6 +141,18 @@ public class Table {
 
   public Table() {
     this(EsriFileGdbJNI.new_Table(), true);
+  }
+
+  public boolean isEditable() {
+    return EsriFileGdbJNI.Table_isEditable(swigCPtr, this);
+  }
+
+  public String getDefinition() {
+    return EsriFileGdbJNI.Table_getDefinition(swigCPtr, this);
+  }
+
+  public String getDocumentation() {
+    return EsriFileGdbJNI.Table_getDocumentation(swigCPtr, this);
   }
 
 }

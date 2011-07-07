@@ -51,20 +51,12 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path, relType, datasetType, VectorOfWString.getCPtr(relatedDatasets), relatedDatasets);
   }
 
-  public int GetDatasetDefinition(String path, String datasetType, StringValue datasetDef) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetDefinition(swigCPtr, this, path, datasetType, datasetDef);
-  }
-
   public int GetChildDatasetDefinitions(String parentPath, String datasetType, VectorOfString childDatasetDefs) {
     return EsriFileGdbJNI.Geodatabase_GetChildDatasetDefinitions(swigCPtr, this, parentPath, datasetType, VectorOfString.getCPtr(childDatasetDefs), childDatasetDefs);
   }
 
   public int GetRelatedDatasetDefinitions(String path, String relType, String datasetType, VectorOfString relatedDatasetDefs) {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr, this, path, relType, datasetType, VectorOfString.getCPtr(relatedDatasetDefs), relatedDatasetDefs);
-  }
-
-  public int GetDatasetDocumentation(String path, String datasetType, StringValue documentation) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetDocumentation(swigCPtr, this, path, datasetType, documentation);
   }
 
   public int CreateFeatureDataset(String featureDatasetDef) {
@@ -111,20 +103,24 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_DeleteDomain(swigCPtr, this, domainName);
   }
 
-  public int GetDomainDefinition(String domainName, StringValue domainDef) {
-    return EsriFileGdbJNI.Geodatabase_GetDomainDefinition(swigCPtr, this, domainName, domainDef);
-  }
-
-  public int GetQueryName(String path, WStringValue queryName) {
-    return EsriFileGdbJNI.Geodatabase_GetQueryName(swigCPtr, this, path, queryName);
-  }
-
   public int ExecuteSQL(String sqlStmt, boolean recycling, EnumRows rows) {
     return EsriFileGdbJNI.Geodatabase_ExecuteSQL(swigCPtr, this, sqlStmt, recycling, EnumRows.getCPtr(rows), rows);
   }
 
   public Geodatabase() {
     this(EsriFileGdbJNI.new_Geodatabase(), true);
+  }
+
+  public String getDatasetDefinition(String path, String datasetType) {
+    return EsriFileGdbJNI.Geodatabase_getDatasetDefinition(swigCPtr, this, path, datasetType);
+  }
+
+  public String getDatasetDocumentation(String path, String datasetType) {
+    return EsriFileGdbJNI.Geodatabase_getDatasetDocumentation(swigCPtr, this, path, datasetType);
+  }
+
+  public String getQueryName(String path) {
+    return EsriFileGdbJNI.Geodatabase_getQueryName(swigCPtr, this, path);
   }
 
 }

@@ -35,16 +35,16 @@ public class DoubleArrayValue {
     }
   }
 
+  public DoubleArrayValue() {
+    this(EsriFileGdbJNI.new_DoubleArrayValue(), true);
+  }
+
   public double get(int i) {
     return EsriFileGdbJNI.DoubleArrayValue_get(swigCPtr, this, i);
   }
 
   public void set(int i, double value) {
     EsriFileGdbJNI.DoubleArrayValue_set(swigCPtr, this, i, value);
-  }
-
-  public DoubleArrayValue() {
-    this(EsriFileGdbJNI.new_DoubleArrayValue(), true);
   }
 
 }

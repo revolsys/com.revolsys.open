@@ -35,8 +35,8 @@ public class PointShapeBuffer extends ShapeBuffer {
     super.delete();
   }
 
-  public int GetPoint(Point point) {
-    return EsriFileGdbJNI.PointShapeBuffer_GetPoint(swigCPtr, this, Point.getCPtr(point), point);
+  public int GetPoint(PointArrayValue point) {
+    return EsriFileGdbJNI.PointShapeBuffer_GetPoint(swigCPtr, this, point);
   }
 
   public int GetZ(DoubleArrayValue z) {

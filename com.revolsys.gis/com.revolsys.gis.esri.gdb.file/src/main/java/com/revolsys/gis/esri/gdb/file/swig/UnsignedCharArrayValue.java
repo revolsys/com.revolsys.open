@@ -35,16 +35,16 @@ public class UnsignedCharArrayValue {
     }
   }
 
+  public UnsignedCharArrayValue() {
+    this(EsriFileGdbJNI.new_UnsignedCharArrayValue(), true);
+  }
+
   public short get(int i) {
     return EsriFileGdbJNI.UnsignedCharArrayValue_get(swigCPtr, this, i);
   }
 
   public void set(int i, short value) {
     EsriFileGdbJNI.UnsignedCharArrayValue_set(swigCPtr, this, i, value);
-  }
-
-  public UnsignedCharArrayValue() {
-    this(EsriFileGdbJNI.new_UnsignedCharArrayValue(), true);
   }
 
 }

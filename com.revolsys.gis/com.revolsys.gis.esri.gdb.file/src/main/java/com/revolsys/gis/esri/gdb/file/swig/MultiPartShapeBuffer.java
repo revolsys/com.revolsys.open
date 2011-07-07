@@ -51,8 +51,8 @@ public class MultiPartShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.MultiPartShapeBuffer_GetParts(swigCPtr, this, parts);
   }
 
-  public int GetPoints(Point points) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetPoints(swigCPtr, this, Point.getCPtr(points), points);
+  public int GetPoints(PointArrayValue points) {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_GetPoints(swigCPtr, this, points);
   }
 
   public int GetZExtent(DoubleArrayValue zExtent) {

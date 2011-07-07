@@ -35,20 +35,8 @@ public class Row {
     }
   }
 
-  public int IsNull(String field, BoolValue isNull) {
-    return EsriFileGdbJNI.Row_IsNull(swigCPtr, this, field, isNull);
-  }
-
   public int SetNull(String field) {
     return EsriFileGdbJNI.Row_SetNull(swigCPtr, this, field);
-  }
-
-  public int GetOID(IntValue objectID) {
-    return EsriFileGdbJNI.Row_GetOID(swigCPtr, this, objectID);
-  }
-
-  public int GetGlobalID(Guid globalID) {
-    return EsriFileGdbJNI.Row_GetGlobalID(swigCPtr, this, Guid.getCPtr(globalID), globalID);
   }
 
   public int GetGeometry(ShapeBuffer shapeBuffer) {
@@ -59,72 +47,36 @@ public class Row {
     return EsriFileGdbJNI.Row_SetGeometry(swigCPtr, this, ShapeBuffer.getCPtr(shapeBuffer), shapeBuffer);
   }
 
-  public int GetShort(String field, ShortValue value) {
-    return EsriFileGdbJNI.Row_GetShort(swigCPtr, this, field, value);
-  }
-
   public int SetShort(String field, short value) {
     return EsriFileGdbJNI.Row_SetShort(swigCPtr, this, field, value);
-  }
-
-  public int GetInteger(String field, IntValue value) {
-    return EsriFileGdbJNI.Row_GetInteger(swigCPtr, this, field, value);
   }
 
   public int SetInteger(String field, int value) {
     return EsriFileGdbJNI.Row_SetInteger(swigCPtr, this, field, value);
   }
 
-  public int GetFloat(String field, FloatValue value) {
-    return EsriFileGdbJNI.Row_GetFloat(swigCPtr, this, field, value);
-  }
-
   public int SetFloat(String field, float value) {
     return EsriFileGdbJNI.Row_SetFloat(swigCPtr, this, field, value);
-  }
-
-  public int GetDouble(String field, DoubleValue value) {
-    return EsriFileGdbJNI.Row_GetDouble(swigCPtr, this, field, value);
   }
 
   public int SetDouble(String field, double value) {
     return EsriFileGdbJNI.Row_SetDouble(swigCPtr, this, field, value);
   }
 
-  public int GetDate(String field, SWIGTYPE_p_tm value) {
-    return EsriFileGdbJNI.Row_GetDate(swigCPtr, this, field, SWIGTYPE_p_tm.getCPtr(value));
-  }
-
   public int SetDate(String field, SWIGTYPE_p_tm value) {
     return EsriFileGdbJNI.Row_SetDate(swigCPtr, this, field, SWIGTYPE_p_tm.getCPtr(value));
-  }
-
-  public int GetString(String field, WStringValue value) {
-    return EsriFileGdbJNI.Row_GetString(swigCPtr, this, field, value);
   }
 
   public int SetString(String field, String value) {
     return EsriFileGdbJNI.Row_SetString(swigCPtr, this, field, value);
   }
 
-  public int GetGUID(String field, Guid value) {
-    return EsriFileGdbJNI.Row_GetGUID(swigCPtr, this, field, Guid.getCPtr(value), value);
-  }
-
   public int SetGUID(String field, Guid value) {
     return EsriFileGdbJNI.Row_SetGUID(swigCPtr, this, field, Guid.getCPtr(value), value);
   }
 
-  public int GetXML(String field, StringValue value) {
-    return EsriFileGdbJNI.Row_GetXML(swigCPtr, this, field, value);
-  }
-
   public int SetXML(String field, String value) {
     return EsriFileGdbJNI.Row_SetXML(swigCPtr, this, field, value);
-  }
-
-  public int GetRaster(String field, Raster raster) {
-    return EsriFileGdbJNI.Row_GetRaster(swigCPtr, this, field, Raster.getCPtr(raster), raster);
   }
 
   public int SetRaster(String field, Raster raster) {
@@ -145,6 +97,38 @@ public class Row {
 
   public Row() {
     this(EsriFileGdbJNI.new_Row(), true);
+  }
+
+  public boolean isNull(String name) {
+    return EsriFileGdbJNI.Row_isNull(swigCPtr, this, name);
+  }
+
+  public SWIGTYPE_p_tm getDate(String name) {
+    return new SWIGTYPE_p_tm(EsriFileGdbJNI.Row_getDate(swigCPtr, this, name), true);
+  }
+
+  public double getDouble(String name) {
+    return EsriFileGdbJNI.Row_getDouble(swigCPtr, this, name);
+  }
+
+  public float getFloat(String name) {
+    return EsriFileGdbJNI.Row_getFloat(swigCPtr, this, name);
+  }
+
+  public Guid getGuid(String name) {
+    return new Guid(EsriFileGdbJNI.Row_getGuid(swigCPtr, this, name), true);
+  }
+
+  public int getOid() {
+    return EsriFileGdbJNI.Row_getOid(swigCPtr, this);
+  }
+
+  public short getShort(String name) {
+    return EsriFileGdbJNI.Row_getShort(swigCPtr, this, name);
+  }
+
+  public int getInteger(String name) {
+    return EsriFileGdbJNI.Row_getInteger(swigCPtr, this, name);
   }
 
 }

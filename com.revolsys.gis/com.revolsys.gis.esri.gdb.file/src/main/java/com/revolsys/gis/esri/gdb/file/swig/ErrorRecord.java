@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class DoubleValue {
+public class ErrorRecord {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected DoubleValue(long cPtr, boolean cMemoryOwn) {
+  protected ErrorRecord(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(DoubleValue obj) {
+  protected static long getCPtr(ErrorRecord obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,30 @@ public class DoubleValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_DoubleValue(swigCPtr);
+        EsriFileGdbJNI.delete_ErrorRecord(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void setValue(double value) {
-    EsriFileGdbJNI.DoubleValue_value_set(swigCPtr, this, value);
+  public void setErrorNumber(int value) {
+    EsriFileGdbJNI.ErrorRecord_errorNumber_set(swigCPtr, this, value);
   }
 
-  public double getValue() {
-    return EsriFileGdbJNI.DoubleValue_value_get(swigCPtr, this);
+  public int getErrorNumber() {
+    return EsriFileGdbJNI.ErrorRecord_errorNumber_get(swigCPtr, this);
   }
 
-  public DoubleValue() {
-    this(EsriFileGdbJNI.new_DoubleValue(), true);
+  public void setErrorDescription(String value) {
+    EsriFileGdbJNI.ErrorRecord_errorDescription_set(swigCPtr, this, value);
+  }
+
+  public String getErrorDescription() {
+    return EsriFileGdbJNI.ErrorRecord_errorDescription_get(swigCPtr, this);
+  }
+
+  public ErrorRecord() {
+    this(EsriFileGdbJNI.new_ErrorRecord(), true);
   }
 
 }

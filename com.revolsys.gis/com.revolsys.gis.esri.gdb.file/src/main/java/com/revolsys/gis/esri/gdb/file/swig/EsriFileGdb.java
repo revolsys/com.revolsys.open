@@ -9,6 +9,14 @@
 package com.revolsys.gis.esri.gdb.file.swig;
 
 public class EsriFileGdb {
+  public static String getErrorDescription(int hr) {
+    return EsriFileGdbJNI.getErrorDescription(hr);
+  }
+
+  public static ErrorRecord getErrorRecord(int num) {
+    return new ErrorRecord(EsriFileGdbJNI.getErrorRecord(num), true);
+  }
+
   public static int CreateGeodatabase(String path, Geodatabase geodatabase) {
     return EsriFileGdbJNI.CreateGeodatabase(path, Geodatabase.getCPtr(geodatabase), geodatabase);
   }
@@ -25,16 +33,8 @@ public class EsriFileGdb {
     return EsriFileGdbJNI.DeleteGeodatabase(path);
   }
 
-  public static int GetErrorDescription(int fgdbError, WStringValue errorDescription) {
-    return EsriFileGdbJNI.GetErrorDescription(fgdbError, errorDescription);
-  }
-
   public static void GetErrorRecordCount(IntValue recordCount) {
     EsriFileGdbJNI.GetErrorRecordCount(recordCount);
-  }
-
-  public static int GetErrorRecord(int recordNum, IntValue fgdbError, WStringValue errorDescription) {
-    return EsriFileGdbJNI.GetErrorRecord(recordNum, fgdbError, errorDescription);
   }
 
   public static void ClearErrors() {
@@ -47,10 +47,6 @@ public class EsriFileGdb {
 
   public static boolean FindSpatialReferenceByName(String srname, SpatialReferenceInfo spatialRef) {
     return EsriFileGdbJNI.FindSpatialReferenceByName(srname, SpatialReferenceInfo.getCPtr(spatialRef), spatialRef);
-  }
-
-  public static String getErrorDescription(int hr) {
-    return EsriFileGdbJNI.getErrorDescription(hr);
   }
 
 }

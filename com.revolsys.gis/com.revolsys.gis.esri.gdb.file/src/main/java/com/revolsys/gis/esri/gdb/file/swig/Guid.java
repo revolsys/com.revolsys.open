@@ -51,10 +51,6 @@ public class Guid {
     return EsriFileGdbJNI.Guid_FromString(swigCPtr, this, guidString);
   }
 
-  public int ToString(WStringValue guidString) {
-    return EsriFileGdbJNI.Guid_ToString(swigCPtr, this, guidString);
-  }
-
   public boolean equal(Guid other) {
     return EsriFileGdbJNI.Guid_equal(swigCPtr, this, Guid.getCPtr(other), other);
   }
@@ -93,6 +89,10 @@ public class Guid {
 
   public short[] getData4() {
     return EsriFileGdbJNI.Guid_data4_get(swigCPtr, this);
+  }
+
+  public String toString() {
+    return EsriFileGdbJNI.Guid_toString(swigCPtr, this);
   }
 
 }

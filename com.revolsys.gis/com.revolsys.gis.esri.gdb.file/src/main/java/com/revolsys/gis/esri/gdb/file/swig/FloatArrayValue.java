@@ -35,16 +35,16 @@ public class FloatArrayValue {
     }
   }
 
+  public FloatArrayValue() {
+    this(EsriFileGdbJNI.new_FloatArrayValue(), true);
+  }
+
   public float get(int i) {
     return EsriFileGdbJNI.FloatArrayValue_get(swigCPtr, this, i);
   }
 
   public void set(int i, float value) {
     EsriFileGdbJNI.FloatArrayValue_set(swigCPtr, this, i, value);
-  }
-
-  public FloatArrayValue() {
-    this(EsriFileGdbJNI.new_FloatArrayValue(), true);
   }
 
 }

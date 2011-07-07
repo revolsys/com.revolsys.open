@@ -35,28 +35,28 @@ public class FieldInfo {
     }
   }
 
-  public int GetFieldCount(IntValue fieldCount) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldCount(swigCPtr, this, fieldCount);
-  }
-
-  public int GetFieldName(int fieldNumber, WStringValue fieldName) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldName(swigCPtr, this, fieldNumber, fieldName);
-  }
-
-  public int GetFieldType(int fieldNumber, FieldTypeValue fieldType) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldType(swigCPtr, this, fieldNumber, fieldType);
-  }
-
-  public int GetFieldLength(int fieldNumber, IntValue fieldLength) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldLength(swigCPtr, this, fieldNumber, fieldLength);
-  }
-
-  public int GetFieldIsNullable(int fieldNumber, BoolValue isNullable) {
-    return EsriFileGdbJNI.FieldInfo_GetFieldIsNullable(swigCPtr, this, fieldNumber, isNullable);
-  }
-
   public FieldInfo() {
     this(EsriFileGdbJNI.new_FieldInfo(), true);
+  }
+
+  public int getFieldCount() {
+    return EsriFileGdbJNI.FieldInfo_getFieldCount(swigCPtr, this);
+  }
+
+  public String getFieldName(int i) {
+    return EsriFileGdbJNI.FieldInfo_getFieldName(swigCPtr, this, i);
+  }
+
+  public int getFieldLength(int i) {
+    return EsriFileGdbJNI.FieldInfo_getFieldLength(swigCPtr, this, i);
+  }
+
+  public boolean isNullable(int i) {
+    return EsriFileGdbJNI.FieldInfo_isNullable(swigCPtr, this, i);
+  }
+
+  public FieldType getFieldType(int i) {
+    return FieldType.swigToEnum(EsriFileGdbJNI.FieldInfo_getFieldType(swigCPtr, this, i));
   }
 
 }
