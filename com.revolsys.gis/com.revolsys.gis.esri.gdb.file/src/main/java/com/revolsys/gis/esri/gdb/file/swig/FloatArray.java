@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class GeometryTypeValue {
+public class FloatArray {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected GeometryTypeValue(long cPtr, boolean cMemoryOwn) {
+  protected FloatArray(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(GeometryTypeValue obj) {
+  protected static long getCPtr(FloatArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,22 @@ public class GeometryTypeValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_GeometryTypeValue(swigCPtr);
+        EsriFileGdbJNI.delete_FloatArray(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void setValue(GeometryType value) {
-    EsriFileGdbJNI.GeometryTypeValue_value_set(swigCPtr, this, value.swigValue());
+  public FloatArray() {
+    this(EsriFileGdbJNI.new_FloatArray(), true);
   }
 
-  public GeometryType getValue() {
-    return GeometryType.swigToEnum(EsriFileGdbJNI.GeometryTypeValue_value_get(swigCPtr, this));
+  public float get(int i) {
+    return EsriFileGdbJNI.FloatArray_get(swigCPtr, this, i);
   }
 
-  public GeometryTypeValue() {
-    this(EsriFileGdbJNI.new_GeometryTypeValue(), true);
+  public void set(int i, float value) {
+    EsriFileGdbJNI.FloatArray_set(swigCPtr, this, i, value);
   }
 
 }

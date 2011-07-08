@@ -83,10 +83,6 @@ public class Table {
     return EsriFileGdbJNI.Table_EnableSubtypes(swigCPtr, this, subtypeFieldName, subtypeDef);
   }
 
-  public int GetDefaultSubtypeCode(IntValue defaultCode) {
-    return EsriFileGdbJNI.Table_GetDefaultSubtypeCode(swigCPtr, this, defaultCode);
-  }
-
   public int SetDefaultSubtypeCode(int defaultCode) {
     return EsriFileGdbJNI.Table_SetDefaultSubtypeCode(swigCPtr, this, defaultCode);
   }
@@ -119,10 +115,6 @@ public class Table {
     return EsriFileGdbJNI.Table_Delete(swigCPtr, this, Row.getCPtr(row), row);
   }
 
-  public int GetRowCount(IntValue rowCount) {
-    return EsriFileGdbJNI.Table_GetRowCount(swigCPtr, this, rowCount);
-  }
-
   public int GetExtent(Envelope extent) {
     return EsriFileGdbJNI.Table_GetExtent(swigCPtr, this, Envelope.getCPtr(extent), extent);
   }
@@ -153,6 +145,14 @@ public class Table {
 
   public String getDocumentation() {
     return EsriFileGdbJNI.Table_getDocumentation(swigCPtr, this);
+  }
+
+  public int getRowCount() {
+    return EsriFileGdbJNI.Table_getRowCount(swigCPtr, this);
+  }
+
+  public int getDefaultSubtypeCode() {
+    return EsriFileGdbJNI.Table_getDefaultSubtypeCode(swigCPtr, this);
   }
 
 }

@@ -79,14 +79,6 @@ public class MultiPatchShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_GetIDs(swigCPtr, this, ids);
   }
 
-  public int GetNormals(FloatArrayValue normals) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNormals(swigCPtr, this, normals);
-  }
-
-  public int GetTextures(IntValue numTextures, IntValue textureDimension, IntArrayValue textureParts, FloatArrayValue textureCoords) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetTextures(swigCPtr, this, numTextures, textureDimension, textureParts, textureCoords);
-  }
-
   public int GetMaterials(IntValue numMaterials, IntValue compressionType, IntArrayValue materialParts, UnsignedCharArrayValue materials) {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_GetMaterials(swigCPtr, this, numMaterials, compressionType, materialParts, materials);
   }
@@ -110,6 +102,10 @@ public class MultiPatchShapeBuffer extends ShapeBuffer {
   public int CalculateExtent() {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_CalculateExtent(swigCPtr, this);
   }
+
+  public FloatArray getNormals() {
+  return new FloatArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getNormals(swigCPtr, this), false);
+}
 
   public MultiPatchShapeBuffer() {
     this(EsriFileGdbJNI.new_MultiPatchShapeBuffer(), true);

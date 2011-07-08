@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class ShapeTypeValue {
+public class IntArray {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected ShapeTypeValue(long cPtr, boolean cMemoryOwn) {
+  protected IntArray(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(ShapeTypeValue obj) {
+  protected static long getCPtr(IntArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,22 @@ public class ShapeTypeValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_ShapeTypeValue(swigCPtr);
+        EsriFileGdbJNI.delete_IntArray(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void setValue(ShapeType value) {
-    EsriFileGdbJNI.ShapeTypeValue_value_set(swigCPtr, this, value.swigValue());
+  public IntArray() {
+    this(EsriFileGdbJNI.new_IntArray(), true);
   }
 
-  public ShapeType getValue() {
-    return ShapeType.swigToEnum(EsriFileGdbJNI.ShapeTypeValue_value_get(swigCPtr, this));
+  public int get(int i) {
+    return EsriFileGdbJNI.IntArray_get(swigCPtr, this, i);
   }
 
-  public ShapeTypeValue() {
-    this(EsriFileGdbJNI.new_ShapeTypeValue(), true);
+  public void set(int i, int value) {
+    EsriFileGdbJNI.IntArray_set(swigCPtr, this, i, value);
   }
 
 }

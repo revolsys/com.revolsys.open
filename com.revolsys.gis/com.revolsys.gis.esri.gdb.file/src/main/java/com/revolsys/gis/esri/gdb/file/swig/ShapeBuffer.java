@@ -71,14 +71,6 @@ public class ShapeBuffer {
     EsriFileGdbJNI.ShapeBuffer_SetEmpty(swigCPtr, this);
   }
 
-  public int GetShapeType(ShapeTypeValue shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_GetShapeType(swigCPtr, this, shapeType);
-  }
-
-  public int GetGeometryType(GeometryTypeValue geometryType) {
-    return EsriFileGdbJNI.ShapeBuffer_GetGeometryType__SWIG_0(swigCPtr, this, geometryType);
-  }
-
   public static boolean HasZs(ShapeType shapeType) {
     return EsriFileGdbJNI.ShapeBuffer_HasZs(shapeType.swigValue());
   }
@@ -107,16 +99,20 @@ public class ShapeBuffer {
     return EsriFileGdbJNI.ShapeBuffer_HasMaterials(shapeType.swigValue());
   }
 
-  public static GeometryType GetGeometryType(ShapeType shapeType) {
-    return GeometryType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_GetGeometryType__SWIG_1(shapeType.swigValue()));
-  }
-
   public short get(int i) {
     return EsriFileGdbJNI.ShapeBuffer_get(swigCPtr, this, i);
   }
 
   public void set(int i, short c) {
     EsriFileGdbJNI.ShapeBuffer_set(swigCPtr, this, i, c);
+  }
+
+  public ShapeType getShapeType() {
+    return ShapeType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getShapeType(swigCPtr, this));
+  }
+
+  public GeometryType getGeometryType() {
+    return GeometryType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getGeometryType(swigCPtr, this));
   }
 
 }

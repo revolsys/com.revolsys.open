@@ -17,6 +17,10 @@ public class EsriFileGdb {
     return new ErrorRecord(EsriFileGdbJNI.getErrorRecord(num), true);
   }
 
+  public static int getErrorRecordCount(int num) {
+    return EsriFileGdbJNI.getErrorRecordCount(num);
+  }
+
   public static int CreateGeodatabase(String path, Geodatabase geodatabase) {
     return EsriFileGdbJNI.CreateGeodatabase(path, Geodatabase.getCPtr(geodatabase), geodatabase);
   }
@@ -31,10 +35,6 @@ public class EsriFileGdb {
 
   public static int DeleteGeodatabase(String path) {
     return EsriFileGdbJNI.DeleteGeodatabase(path);
-  }
-
-  public static void GetErrorRecordCount(IntValue recordCount) {
-    EsriFileGdbJNI.GetErrorRecordCount(recordCount);
   }
 
   public static void ClearErrors() {
