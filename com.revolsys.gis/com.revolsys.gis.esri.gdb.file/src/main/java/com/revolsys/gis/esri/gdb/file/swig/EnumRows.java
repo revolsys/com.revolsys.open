@@ -35,10 +35,6 @@ public class EnumRows {
     }
   }
 
-  public int Next(Row row) {
-    return EsriFileGdbJNI.EnumRows_Next(swigCPtr, this, Row.getCPtr(row), row);
-  }
-
   public void Close() {
     EsriFileGdbJNI.EnumRows_Close(swigCPtr, this);
   }
@@ -49,6 +45,11 @@ public class EnumRows {
 
   public EnumRows() {
     this(EsriFileGdbJNI.new_EnumRows(), true);
+  }
+
+  public Row next() {
+    long cPtr = EsriFileGdbJNI.EnumRows_next(swigCPtr, this);
+    return (cPtr == 0) ? null : new Row(cPtr, false);
   }
 
 }

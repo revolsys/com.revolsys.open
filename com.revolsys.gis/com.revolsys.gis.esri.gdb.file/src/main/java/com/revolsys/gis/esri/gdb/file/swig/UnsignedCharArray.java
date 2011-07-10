@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class IntArrayValue {
+public class UnsignedCharArray {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected IntArrayValue(long cPtr, boolean cMemoryOwn) {
+  protected UnsignedCharArray(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(IntArrayValue obj) {
+  protected static long getCPtr(UnsignedCharArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,22 @@ public class IntArrayValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_IntArrayValue(swigCPtr);
+        EsriFileGdbJNI.delete_UnsignedCharArray(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public IntArrayValue() {
-    this(EsriFileGdbJNI.new_IntArrayValue(), true);
+  public UnsignedCharArray() {
+    this(EsriFileGdbJNI.new_UnsignedCharArray(), true);
   }
 
-  public int get(int i) {
-    return EsriFileGdbJNI.IntArrayValue_get(swigCPtr, this, i);
+  public short get(int i) {
+    return EsriFileGdbJNI.UnsignedCharArray_get(swigCPtr, this, i);
   }
 
-  public void set(int i, int value) {
-    EsriFileGdbJNI.IntArrayValue_set(swigCPtr, this, i, value);
+  public void set(int i, short value) {
+    EsriFileGdbJNI.UnsignedCharArray_set(swigCPtr, this, i, value);
   }
 
 }

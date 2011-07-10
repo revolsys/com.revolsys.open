@@ -35,54 +35,6 @@ public class MultiPartShapeBuffer extends ShapeBuffer {
     super.delete();
   }
 
-  public int GetExtent(DoubleArrayValue extent) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetExtent(swigCPtr, this, extent);
-  }
-
-  public int GetNumParts(IntValue numParts) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetNumParts(swigCPtr, this, numParts);
-  }
-
-  public int GetNumPoints(IntValue numPoints) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetNumPoints(swigCPtr, this, numPoints);
-  }
-
-  public int GetParts(IntArrayValue parts) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetParts(swigCPtr, this, parts);
-  }
-
-  public int GetPoints(PointArrayValue points) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetPoints(swigCPtr, this, points);
-  }
-
-  public int GetZExtent(DoubleArrayValue zExtent) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetZExtent(swigCPtr, this, zExtent);
-  }
-
-  public int GetZs(DoubleArrayValue zArray) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetZs(swigCPtr, this, zArray);
-  }
-
-  public int GetMExtent(DoubleArrayValue mExtent) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetMExtent(swigCPtr, this, mExtent);
-  }
-
-  public int GetMs(DoubleArrayValue mArray) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetMs(swigCPtr, this, mArray);
-  }
-
-  public int GetNumCurves(IntValue numCurves) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetNumCurves(swigCPtr, this, numCurves);
-  }
-
-  public int GetCurves(UnsignedCharArrayValue curves) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetCurves(swigCPtr, this, curves);
-  }
-
-  public int GetIDs(IntArrayValue ids) {
-    return EsriFileGdbJNI.MultiPartShapeBuffer_GetIDs(swigCPtr, this, ids);
-  }
-
   public int Setup(ShapeType shapeType, int numParts, int numPoints, int numCurves) {
     return EsriFileGdbJNI.MultiPartShapeBuffer_Setup__SWIG_0(swigCPtr, this, shapeType.swigValue(), numParts, numPoints, numCurves);
   }
@@ -97,6 +49,54 @@ public class MultiPartShapeBuffer extends ShapeBuffer {
 
   public int PackCurves() {
     return EsriFileGdbJNI.MultiPartShapeBuffer_PackCurves(swigCPtr, this);
+  }
+
+  public PointArray getPoints() {
+  return new PointArray(EsriFileGdbJNI.MultiPartShapeBuffer_getPoints(swigCPtr, this), false);
+}
+
+  public UnsignedCharArray getCurves() {
+  return new UnsignedCharArray(EsriFileGdbJNI.MultiPartShapeBuffer_getCurves(swigCPtr, this), false);
+}
+
+  public DoubleArray getExtent() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPartShapeBuffer_getExtent(swigCPtr, this), false);
+}
+
+  public DoubleArray getMExtent() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPartShapeBuffer_getMExtent(swigCPtr, this), false);
+}
+
+  public DoubleArray getZExtent() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPartShapeBuffer_getZExtent(swigCPtr, this), false);
+}
+
+  public DoubleArray getZs() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPartShapeBuffer_getZs(swigCPtr, this), false);
+}
+
+  public DoubleArray getMs() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPartShapeBuffer_getMs(swigCPtr, this), false);
+}
+
+  public IntArray getIDs() {
+  return new IntArray(EsriFileGdbJNI.MultiPartShapeBuffer_getIDs(swigCPtr, this), false);
+}
+
+  public IntArray getParts() {
+  return new IntArray(EsriFileGdbJNI.MultiPartShapeBuffer_getParts(swigCPtr, this), false);
+}
+
+  public int getNumPoints() {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_getNumPoints(swigCPtr, this);
+  }
+
+  public int getNumParts() {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_getNumParts(swigCPtr, this);
+  }
+
+  public int getNumCurves() {
+    return EsriFileGdbJNI.MultiPartShapeBuffer_getNumCurves(swigCPtr, this);
   }
 
   public MultiPartShapeBuffer() {

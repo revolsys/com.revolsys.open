@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class PointArrayValue {
+public class PointArray {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected PointArrayValue(long cPtr, boolean cMemoryOwn) {
+  protected PointArray(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(PointArrayValue obj) {
+  protected static long getCPtr(PointArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,22 @@ public class PointArrayValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_PointArrayValue(swigCPtr);
+        EsriFileGdbJNI.delete_PointArray(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public PointArrayValue() {
-    this(EsriFileGdbJNI.new_PointArrayValue(), true);
+  public PointArray() {
+    this(EsriFileGdbJNI.new_PointArray(), true);
   }
 
   public Point get(int i) {
-    return new Point(EsriFileGdbJNI.PointArrayValue_get(swigCPtr, this, i), false);
+    return new Point(EsriFileGdbJNI.PointArray_get(swigCPtr, this, i), false);
   }
 
   public void set(int i, Point value) {
-    EsriFileGdbJNI.PointArrayValue_set(swigCPtr, this, i, Point.getCPtr(value), value);
+    EsriFileGdbJNI.PointArray_set(swigCPtr, this, i, Point.getCPtr(value), value);
   }
 
 }

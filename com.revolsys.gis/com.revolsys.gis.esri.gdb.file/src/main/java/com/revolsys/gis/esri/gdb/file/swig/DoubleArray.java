@@ -8,16 +8,16 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
-public class IntValue {
+public class DoubleArray {
   private long swigCPtr;
   protected boolean swigCMemOwn;
 
-  protected IntValue(long cPtr, boolean cMemoryOwn) {
+  protected DoubleArray(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(IntValue obj) {
+  protected static long getCPtr(DoubleArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,22 +29,22 @@ public class IntValue {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        EsriFileGdbJNI.delete_IntValue(swigCPtr);
+        EsriFileGdbJNI.delete_DoubleArray(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public void setValue(int value) {
-    EsriFileGdbJNI.IntValue_value_set(swigCPtr, this, value);
+  public DoubleArray() {
+    this(EsriFileGdbJNI.new_DoubleArray(), true);
   }
 
-  public int getValue() {
-    return EsriFileGdbJNI.IntValue_value_get(swigCPtr, this);
+  public double get(int i) {
+    return EsriFileGdbJNI.DoubleArray_get(swigCPtr, this, i);
   }
 
-  public IntValue() {
-    this(EsriFileGdbJNI.new_IntValue(), true);
+  public void set(int i, double value) {
+    EsriFileGdbJNI.DoubleArray_set(swigCPtr, this, i, value);
   }
 
 }

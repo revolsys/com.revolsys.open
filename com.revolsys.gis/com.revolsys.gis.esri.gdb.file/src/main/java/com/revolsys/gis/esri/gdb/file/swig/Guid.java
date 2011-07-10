@@ -59,38 +59,6 @@ public class Guid {
     return EsriFileGdbJNI.Guid_notEqual(swigCPtr, this, Guid.getCPtr(other), other);
   }
 
-  public void setData1(long value) {
-    EsriFileGdbJNI.Guid_data1_set(swigCPtr, this, value);
-  }
-
-  public long getData1() {
-    return EsriFileGdbJNI.Guid_data1_get(swigCPtr, this);
-  }
-
-  public void setData2(int value) {
-    EsriFileGdbJNI.Guid_data2_set(swigCPtr, this, value);
-  }
-
-  public int getData2() {
-    return EsriFileGdbJNI.Guid_data2_get(swigCPtr, this);
-  }
-
-  public void setData3(int value) {
-    EsriFileGdbJNI.Guid_data3_set(swigCPtr, this, value);
-  }
-
-  public int getData3() {
-    return EsriFileGdbJNI.Guid_data3_get(swigCPtr, this);
-  }
-
-  public void setData4(short[] value) {
-    EsriFileGdbJNI.Guid_data4_set(swigCPtr, this, value);
-  }
-
-  public short[] getData4() {
-    return EsriFileGdbJNI.Guid_data4_get(swigCPtr, this);
-  }
-
   public String toString() {
     return EsriFileGdbJNI.Guid_toString(swigCPtr, this);
   }

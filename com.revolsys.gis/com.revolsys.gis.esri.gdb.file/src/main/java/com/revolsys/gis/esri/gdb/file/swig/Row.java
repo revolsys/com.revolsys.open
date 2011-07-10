@@ -131,4 +131,17 @@ public class Row {
     return EsriFileGdbJNI.Row_getInteger(swigCPtr, this, name);
   }
 
+  public String getString(String name) {
+    return EsriFileGdbJNI.Row_getString(swigCPtr, this, name);
+  }
+
+  public String getXML(String name) {
+    return EsriFileGdbJNI.Row_getXML(swigCPtr, this, name);
+  }
+
+  public ShapeBuffer getGeometry() {
+    long cPtr = EsriFileGdbJNI.Row_getGeometry(swigCPtr, this);
+    return (cPtr == 0) ? null : new ShapeBuffer(cPtr, false);
+  }
+
 }

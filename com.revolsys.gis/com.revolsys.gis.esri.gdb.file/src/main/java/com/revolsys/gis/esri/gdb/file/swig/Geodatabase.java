@@ -67,10 +67,6 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_CreateTable(swigCPtr, this, tableDef, parent, Table.getCPtr(table), table);
   }
 
-  public int OpenTable(String path, Table table) {
-    return EsriFileGdbJNI.Geodatabase_OpenTable(swigCPtr, this, path, Table.getCPtr(table), table);
-  }
-
   public int CloseTable(Table table) {
     return EsriFileGdbJNI.Geodatabase_CloseTable(swigCPtr, this, Table.getCPtr(table), table);
   }
@@ -121,6 +117,11 @@ public class Geodatabase {
 
   public String getQueryName(String path) {
     return EsriFileGdbJNI.Geodatabase_getQueryName(swigCPtr, this, path);
+  }
+
+  public Table openTable(String path) {
+    long cPtr = EsriFileGdbJNI.Geodatabase_openTable(swigCPtr, this, path);
+    return (cPtr == 0) ? null : new Table(cPtr, false);
   }
 
 }

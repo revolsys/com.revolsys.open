@@ -35,54 +35,6 @@ public class MultiPatchShapeBuffer extends ShapeBuffer {
     super.delete();
   }
 
-  public int GetExtent(DoubleArrayValue extent) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetExtent(swigCPtr, this, extent);
-  }
-
-  public int GetNumParts(IntValue numParts) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNumParts(swigCPtr, this, numParts);
-  }
-
-  public int GetNumPoints(IntValue numPoints) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetNumPoints(swigCPtr, this, numPoints);
-  }
-
-  public int GetParts(IntArrayValue parts) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetParts(swigCPtr, this, parts);
-  }
-
-  public int GetPartDescriptors(IntArrayValue partDescriptorArray) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetPartDescriptors(swigCPtr, this, partDescriptorArray);
-  }
-
-  public int GetPoints(PointArrayValue points) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetPoints(swigCPtr, this, points);
-  }
-
-  public int GetZExtent(DoubleArrayValue zExtent) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetZExtent(swigCPtr, this, zExtent);
-  }
-
-  public int GetZs(DoubleArrayValue zArray) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetZs(swigCPtr, this, zArray);
-  }
-
-  public int GetMExtent(DoubleArrayValue mExtent) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetMExtent(swigCPtr, this, mExtent);
-  }
-
-  public int GetMs(DoubleArrayValue mArray) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetMs(swigCPtr, this, mArray);
-  }
-
-  public int GetIDs(IntArrayValue ids) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetIDs(swigCPtr, this, ids);
-  }
-
-  public int GetMaterials(IntValue numMaterials, IntValue compressionType, IntArrayValue materialParts, UnsignedCharArrayValue materials) {
-    return EsriFileGdbJNI.MultiPatchShapeBuffer_GetMaterials(swigCPtr, this, numMaterials, compressionType, materialParts, materials);
-  }
-
   public int Setup(ShapeType shapeType, int numParts, int numPoints, int numTextures, int textureDimension, int numMaterials) {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_Setup__SWIG_0(swigCPtr, this, shapeType.swigValue(), numParts, numPoints, numTextures, textureDimension, numMaterials);
   }
@@ -103,9 +55,53 @@ public class MultiPatchShapeBuffer extends ShapeBuffer {
     return EsriFileGdbJNI.MultiPatchShapeBuffer_CalculateExtent(swigCPtr, this);
   }
 
+  public PointArray getPoints() {
+  return new PointArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getPoints(swigCPtr, this), false);
+}
+
   public FloatArray getNormals() {
   return new FloatArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getNormals(swigCPtr, this), false);
 }
+
+  public DoubleArray getExtent() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getExtent(swigCPtr, this), false);
+}
+
+  public DoubleArray getMExtent() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getMExtent(swigCPtr, this), false);
+}
+
+  public DoubleArray getZExtent() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getZExtent(swigCPtr, this), false);
+}
+
+  public DoubleArray getZs() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getZs(swigCPtr, this), false);
+}
+
+  public DoubleArray getMs() {
+  return new DoubleArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getMs(swigCPtr, this), false);
+}
+
+  public IntArray getIDs() {
+  return new IntArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getIDs(swigCPtr, this), false);
+}
+
+  public IntArray getParts() {
+  return new IntArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getParts(swigCPtr, this), false);
+}
+
+  public IntArray getPartDescriptors() {
+  return new IntArray(EsriFileGdbJNI.MultiPatchShapeBuffer_getPartDescriptors(swigCPtr, this), false);
+}
+
+  public int getNumPoints() {
+    return EsriFileGdbJNI.MultiPatchShapeBuffer_getNumPoints(swigCPtr, this);
+  }
+
+  public int getNumParts() {
+    return EsriFileGdbJNI.MultiPatchShapeBuffer_getNumParts(swigCPtr, this);
+  }
 
   public MultiPatchShapeBuffer() {
     this(EsriFileGdbJNI.new_MultiPatchShapeBuffer(), true);

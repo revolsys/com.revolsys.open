@@ -35,14 +35,6 @@ public class PointShapeBuffer extends ShapeBuffer {
     super.delete();
   }
 
-  public int GetZ(DoubleArrayValue z) {
-    return EsriFileGdbJNI.PointShapeBuffer_GetZ(swigCPtr, this, z);
-  }
-
-  public int GetID(IntArrayValue id) {
-    return EsriFileGdbJNI.PointShapeBuffer_GetID(swigCPtr, this, id);
-  }
-
   public int Setup(ShapeType shapeType) {
     return EsriFileGdbJNI.PointShapeBuffer_Setup(swigCPtr, this, shapeType.swigValue());
   }
@@ -57,6 +49,10 @@ public class PointShapeBuffer extends ShapeBuffer {
 
   public Point getPoint() {
     return new Point(EsriFileGdbJNI.PointShapeBuffer_getPoint(swigCPtr, this), true);
+  }
+
+  public int getID() {
+    return EsriFileGdbJNI.PointShapeBuffer_getID(swigCPtr, this);
   }
 
   public PointShapeBuffer() {
