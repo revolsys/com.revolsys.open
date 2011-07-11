@@ -107,6 +107,10 @@ public class ShapeBuffer {
     EsriFileGdbJNI.ShapeBuffer_set(swigCPtr, this, i, c);
   }
 
+  public UnsignedCharArray getShapeBuffer() {
+  return new UnsignedCharArray(EsriFileGdbJNI.ShapeBuffer_getShapeBuffer(swigCPtr, this), false);
+}
+
   public ShapeType getShapeType() {
     return ShapeType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getShapeType(swigCPtr, this));
   }

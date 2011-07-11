@@ -9,10 +9,14 @@ public class ShortAttribute extends AbstractEsriFileGeodatabaseAttribute {
   }
 
   @Override
-  public Object getValue(Row row, int index) {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  public Object getValue(Row row) {
+    final String name = getName();
+    if (row.isNull(name)) {
+      return null;
+    } else {
+      return row.getShort(name);
+    }
+}
 
   public void setValue(Row row, Object object) {
   }

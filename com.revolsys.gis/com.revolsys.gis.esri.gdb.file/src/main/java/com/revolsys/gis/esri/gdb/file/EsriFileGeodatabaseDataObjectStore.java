@@ -33,6 +33,8 @@ import com.revolsys.gis.esri.gdb.file.type.OidAttribute;
 import com.revolsys.gis.esri.gdb.file.type.ShortAttribute;
 import com.revolsys.gis.esri.gdb.file.type.StringAttribute;
 import com.revolsys.gis.esri.gdb.file.type.XmlAttribute;
+import com.revolsys.gis.esri.gdb.xml.parser.DataElement;
+import com.revolsys.gis.esri.gdb.xml.parser.EsriGdbXmlParser;
 import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -93,9 +95,13 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
         final QName typeName = new QName(schemaName, tableName);
         final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
           typeName);
-        Table table = new Table();
-        try {
-          EsriFileGeodatabaseUtil.check(geodatabase.OpenTable(childPath, table));
+        Table table = geodatabase.openTable(childPath);
+         try {
+           final EsriGdbXmlParser parser = new EsriGdbXmlParser();
+          final String tableDefinition = table.getDefinition();
+          System.out.println(tableDefinition);
+           final DataElement dataElement = parser.process(tableDefinition);
+           System.out.println(dataElement.getSpatialReference().getGeometryFactory());
           FieldInfo fieldInfo = new FieldInfo();
           table.GetFieldInformation(fieldInfo);
           for (int j = 0; j < fieldInfo.getFieldCount(); j++) {
@@ -147,7 +153,6 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
           }
         } finally {
           geodatabase.CloseTable(table);
-          table.delete();
         }
         metaDataMap.put(typeName, metaData);
       }
@@ -182,22 +187,26 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
   }
 
   private Table getTable(QName typeName) {
-    return null;
+    String path = "\\\\" + typeName.getNamespaceURI() + "\\"
+      + typeName.getLocalPart();
+    return geodatabase.openTable(path);
   }
 
   public Reader<DataObject> query(final QName typeName) {
     Table table = getTable(typeName);
+    DataObjectMetaData metaData = getMetaData(typeName);
     final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
-      table);
+      metaData, geodatabase, table);
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
   }
 
   public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
+    DataObjectMetaData metaData = getMetaData(typeName);
     Table table = getTable(typeName);
     final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
-      table, envelope);
+      metaData, geodatabase, table, envelope);
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
@@ -212,6 +221,7 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
 
   public Reader<DataObject> query(final QName typeName, final String where,
     final Object... arguments) {
+    DataObjectMetaData metaData = getMetaData(typeName);
     Table table = getTable(typeName);
     StringBuffer whereClause = new StringBuffer();
     if (arguments.length == 0) {
@@ -239,7 +249,7 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
     }
 
     final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
-      table, whereClause.toString());
+      metaData, geodatabase, table, whereClause.toString());
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;

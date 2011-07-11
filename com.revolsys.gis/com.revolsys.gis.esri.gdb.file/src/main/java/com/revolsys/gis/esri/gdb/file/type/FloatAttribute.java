@@ -8,10 +8,14 @@ public class FloatAttribute extends AbstractEsriFileGeodatabaseAttribute {
     super(name,DataTypes.FLOAT,length,required);
    }
  @Override
-  public Object getValue(Row row, int index) {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  public Object getValue(Row row) {
+   final String name = getName();
+   if (row.isNull(name)) {
+     return null;
+   } else {
+     return row.getFloat(name);
+   }
+}
 
   public void setValue(Row row, Object object) {
   }

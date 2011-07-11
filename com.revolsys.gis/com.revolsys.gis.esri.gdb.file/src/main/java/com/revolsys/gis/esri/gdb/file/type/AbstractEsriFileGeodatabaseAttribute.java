@@ -13,6 +13,6 @@ public abstract class AbstractEsriFileGeodatabaseAttribute extends Attribute {
 
   public abstract void setValue(Row row, Object object);
 
-  public abstract Object getValue(Row row, int index);
+  public abstract Object getValue(Row row);
 
 }

@@ -9,7 +9,7 @@ public class BinaryAttribute extends AbstractEsriFileGeodatabaseAttribute {
   }
 
   @Override
-  public Object getValue(Row row, int index) {
+  public Object getValue(Row row) {
     // TODO Auto-generated method stub
     return null;
   }

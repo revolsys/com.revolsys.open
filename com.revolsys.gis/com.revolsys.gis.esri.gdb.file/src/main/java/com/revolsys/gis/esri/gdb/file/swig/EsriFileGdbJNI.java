@@ -197,6 +197,7 @@ class EsriFileGdbJNI {
   public final static native boolean ShapeBuffer_HasMaterials(int jarg1);
   public final static native short ShapeBuffer_get(long jarg1, ShapeBuffer jarg1_, int jarg2);
   public final static native void ShapeBuffer_set(long jarg1, ShapeBuffer jarg1_, int jarg2, short jarg3);
+  public final static native long ShapeBuffer_getShapeBuffer(long jarg1, ShapeBuffer jarg1_);
   public final static native int ShapeBuffer_getShapeType(long jarg1, ShapeBuffer jarg1_);
   public final static native int ShapeBuffer_getGeometryType(long jarg1, ShapeBuffer jarg1_);
   public final static native int PointShapeBuffer_Setup(long jarg1, PointShapeBuffer jarg1_, int jarg2);

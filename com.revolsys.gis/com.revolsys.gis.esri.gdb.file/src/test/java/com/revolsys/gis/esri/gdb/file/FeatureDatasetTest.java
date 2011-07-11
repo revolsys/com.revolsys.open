@@ -9,6 +9,9 @@ import java.io.Writer;
 
 import org.junit.Test;
 
+import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.esri.gdb.file.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.swig.EsriFileGdb;
 import com.revolsys.gis.esri.gdb.file.swig.Geodatabase;
@@ -17,6 +20,7 @@ import com.revolsys.gis.esri.gdb.file.swig.PointShapeBuffer;
 import com.revolsys.gis.esri.gdb.file.swig.Row;
 import com.revolsys.gis.esri.gdb.file.swig.ShapeType;
 import com.revolsys.gis.esri.gdb.file.swig.Table;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class FeatureDatasetTest {
   static {
@@ -48,10 +52,35 @@ public class FeatureDatasetTest {
   }
 
   @Test
+  public void testSchemas() throws Exception {
+    String datasetName = "data/Topo.gdb";
+    final EsriFileGeodatabaseDataObjectStore dataStore = new EsriFileGeodatabaseDataObjectStore(
+      datasetName);
+    dataStore.initialize();
+    for (DataObjectStoreSchema schema : dataStore.getSchemas()) {
+      System.out.println(schema.getName());
+      for (DataObjectMetaData metaData : schema.getTypes()) {
+        System.out.println(metaData.getName());
+        final com.revolsys.gis.data.io.Reader<DataObject> reader = dataStore.query(metaData.getName());
+        try {
+          for (DataObject dataObject : reader) {
+            final Geometry geometry = dataObject.getGeometryValue();
+            if (geometry==null || geometry.isEmpty()) {
+              System.out.println(dataObject);
+            }
+          }
+        } finally {
+          reader.close();
+        }
+      }
+    }
+
+  }
+
+  @Test
   public void testFeatureDatasets() throws Exception {
     String datasetName = "target/FeatureDatasetDemo.gdb";
     int hr;
-    String errorText;
     Geodatabase geodatabase = new Geodatabase();
     hr = EsriFileGdb.DeleteGeodatabase(datasetName);
     if (hr == 0) {
@@ -104,13 +133,14 @@ public class FeatureDatasetTest {
 
   }
 
-  public void x() {
+  @Test
+  public void testShapes() {
     int hr;
     String errorText;
 
     // Open the geodatabase.
     Geodatabase geodatabase = new Geodatabase();
-    if ((hr = EsriFileGdb.OpenGeodatabase("../data/Shapes.gdb", geodatabase)) != 0) {
+    if ((hr = EsriFileGdb.OpenGeodatabase("data/Shapes.gdb", geodatabase)) != 0) {
       throw new RuntimeException(
         "An error occurred while opening the geodatabase."
           + EsriFileGdb.getErrorDescription(hr));
@@ -120,42 +150,32 @@ public class FeatureDatasetTest {
     System.out.println('\n' + "Testing Point Shapes, Read" + '\n' + '\n');
 
     // Open the point test table, cities.
-    Table citiesTable = new Table();
-    if ((hr = geodatabase.OpenTable("\\cities", citiesTable)) != 0) {
-      System.out.println("An error occurred while opening the table, cities." + '\n');
-      errorText = EsriFileGdb.getErrorDescription(hr);
-      throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
-    }
+    Table citiesTable = geodatabase.openTable("\\cities");
 
     // Return all rows.
     EnumRows enumRows = new EnumRows();
-    if ((hr = citiesTable.Search("", "CITY_NAME = 'Woodinville'", true,
-      enumRows)) != 0) {
+    hr = citiesTable.Search("*", "CITY_NAME = 'Woodinville'", true, enumRows);
+    if (hr != 0) {
       System.out.println("An error occurred while performing the attribute query." + '\n');
       errorText = EsriFileGdb.getErrorDescription(hr);
       throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
     }
 
     // Get the first returned row.
-    Row row = new Row();
-    if ((hr = enumRows.Next(row)) != 0) {
-      System.out.println("An error occurred returning the first row." + '\n');
-      errorText = EsriFileGdb.getErrorDescription(hr);
-      throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
-    }
+    Row row = enumRows.next();
 
     PointShapeBuffer pointGeometry = new PointShapeBuffer();
     row.GetGeometry(pointGeometry);
 
-    Point point = new Point();
-    pointGeometry.GetPoint(point);
+    Point point = pointGeometry.getPoint();
     System.out.println("Point test:" + '\n');
     System.out.println("x: " + point.getX() + " y: " + point.getY() + '\n');
 
     enumRows.Close();
 
     // Close the cities table
-    if ((hr = geodatabase.CloseTable(citiesTable)) != 0) {
+    hr = geodatabase.CloseTable(citiesTable);
+    if (hr != 0) {
       System.out.println("An error occurred while closing the cities table." + '\n');
       errorText = EsriFileGdb.getErrorDescription(hr);
       throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
@@ -164,8 +184,8 @@ public class FeatureDatasetTest {
     System.out.println('\n' + "Testing Point Shapes, Write" + '\n' + '\n');
 
     // Open the point test table, cities2.
-    Table cities2Table = new Table();
-    if ((hr = geodatabase.OpenTable("\\cities2", cities2Table)) != 0) {
+    Table cities2Table = geodatabase.openTable("\\cities2");
+    if (hr != 0) {
       System.out.println("An error occurred while opening the table, cities2." + '\n');
       errorText = EsriFileGdb.getErrorDescription(hr);
       throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
@@ -180,14 +200,15 @@ public class FeatureDatasetTest {
 
     PointShapeBuffer point2Geometry = new PointShapeBuffer();
     point2Geometry.Setup(ShapeType.shapePoint);
-    Point point2 = new Point();
-    point2Geometry.GetPoint(point2);
+
+    Point point2 = point2Geometry.getPoint();
     point2.setX(point.getX());
     point2.setY(point.getY());
 
     hr = cities2Row.SetGeometry(point2Geometry);
 
-    if ((hr = cities2Table.Insert(cities2Row)) != 0) {
+    hr = cities2Table.Insert(cities2Row);
+    if (hr != 0) {
       System.out.println("An error occurred while inserting a row." + '\n');
       errorText = EsriFileGdb.getErrorDescription(hr);
       throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
@@ -202,14 +223,16 @@ public class FeatureDatasetTest {
     cities2Table.LoadOnlyMode(false);
 
     // Close the cities table.
-    if ((hr = geodatabase.CloseTable(cities2Table)) != 0) {
+    hr = geodatabase.CloseTable(cities2Table);
+    if (hr != 0) {
       System.out.println("An error occurred while closing the cities2 table." + '\n');
       errorText = EsriFileGdb.getErrorDescription(hr);
       throw new RuntimeException(errorText + "(" + hr + ")." + '\n');
     }
 
     // Close the geodatabase
-    if ((hr = EsriFileGdb.CloseGeodatabase(geodatabase)) != 0) {
+    hr = EsriFileGdb.CloseGeodatabase(geodatabase);
+    if (hr != 0) {
       throw new RuntimeException(
         "An error occurred while closing the geodatabase."
           + EsriFileGdb.getErrorDescription(hr));

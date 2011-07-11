@@ -10,7 +10,7 @@ public class GuidAttribute extends AbstractEsriFileGeodatabaseAttribute {
   }
 
   @Override
-  public Object getValue(Row row, int index) {
+  public Object getValue(Row row) {
     final String name = getName();
     if (row.isNull(name)) {
       return null;
