@@ -494,22 +494,6 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return createDataObjectReader(metaData, sqlString);
   }
 
-  public DataObject queryFirst(QName typeName, String queryString,
-    Object... arguments) {
-    final Reader<DataObject> reader = query(typeName, queryString, arguments);
-    final Iterator<DataObject> iterator = reader.iterator();
-    try {
-      if (iterator.hasNext()) {
-        final DataObject object = iterator.next();
-        return object;
-      } else {
-        return null;
-      }
-    } finally {
-      reader.close();
-    }
-  }
-
   public void setPassword(final String password) {
     this.password = password;
   }

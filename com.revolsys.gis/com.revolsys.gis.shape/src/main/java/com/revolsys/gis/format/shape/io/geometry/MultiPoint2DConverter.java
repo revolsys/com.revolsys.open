@@ -9,7 +9,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class MultiPoint2DConverter implements ShapefileGeometryConverter {
@@ -19,12 +19,11 @@ public class MultiPoint2DConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public MultiPoint2DConverter(
-    final GeometryFactory geometryFactory) {
+  public MultiPoint2DConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
-      this.geometryFactory = new GeometryFactory(new PrecisionModel());
+      this.geometryFactory = new GeometryFactory();
     }
   }
 
@@ -32,21 +31,12 @@ public class MultiPoint2DConverter implements ShapefileGeometryConverter {
     return ShapefileConstants.MULTI_POINT_SHAPE;
   }
 
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
-    in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
-    final int numPoints = in.readLEInt();
-    final CoordinatesList coordinates = new DoubleCoordinatesList(numPoints,
-      2);
-    ShapefileGeometryUtil.readCoordinates(in, coordinates);
-    return geometryFactory.createMultiPoint(coordinates);
+    return ShapefileGeometryUtil.readMultiPoint(geometryFactory, in);
   }
 
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
 
   }

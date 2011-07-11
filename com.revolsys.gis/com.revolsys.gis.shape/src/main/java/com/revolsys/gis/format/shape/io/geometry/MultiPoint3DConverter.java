@@ -9,7 +9,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class MultiPoint3DConverter implements ShapefileGeometryConverter {
@@ -24,7 +24,7 @@ public class MultiPoint3DConverter implements ShapefileGeometryConverter {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
-      this.geometryFactory = new GeometryFactory(new PrecisionModel());
+      this.geometryFactory = new GeometryFactory();
     }
   }
 

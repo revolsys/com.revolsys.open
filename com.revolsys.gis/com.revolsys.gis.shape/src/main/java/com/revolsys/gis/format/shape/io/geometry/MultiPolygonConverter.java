@@ -23,8 +23,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public MultiPolygonConverter(
-    final GeometryFactory geometryFactory) {
+  public MultiPolygonConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
@@ -36,9 +35,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     return ShapefileConstants.MULTI_PATCH_SHAPE;
   }
 
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     List<Polygon> polygons = new ArrayList<Polygon>();
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -54,7 +51,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
       numPoints);
     final int[] partTypes = ShapefileGeometryUtil.readIntArray(in, numParts);
 
-    final CoordinatesList[] parts = ShapefileGeometryUtil.createCoordinatesLists(
+    final List<CoordinatesList> parts = ShapefileGeometryUtil.createCoordinatesLists(
       partIndex, dimension);
     ShapefileGeometryUtil.readPoints(in, partIndex, parts);
     if (dimension > 2) {
@@ -63,7 +60,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int i = 0; i < numParts; i++) {
       int partType = partTypes[i];
-      CoordinatesList points = parts[i];
+      CoordinatesList points = parts.get(i);
       switch (partType) {
         case 2:
           if (!rings.isEmpty()) {
@@ -94,9 +91,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     return geometryFactory.createMultiPolygon(polygons);
   }
 
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof MultiPolygon) {
       final MultiPolygon multiPolygon = (MultiPolygon)geometry;
@@ -112,8 +107,8 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
         if (exteriorRing.getDimension() > 2) {
           hasZ = true;
         }
-        numPoints += addPart(ShapefileConstants.OUTER_RING, numPoints, partIndexes,
-          partTypes, partPoints, exteriorRing);
+        numPoints += addPart(ShapefileConstants.OUTER_RING, numPoints,
+          partIndexes, partTypes, partPoints, exteriorRing);
         for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
           LineString innerRing = polygon.getInteriorRingN(j);
           numPoints += addPart(ShapefileConstants.INNER_RING, numPoints,
@@ -152,13 +147,8 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private int addPart(
-    int partType,
-    int index,
-    List<Integer> partIndexes,
-    List<Integer> partTypes,
-    List<CoordinatesList> partPoints,
-    LineString ring) {
+  private int addPart(int partType, int index, List<Integer> partIndexes,
+    List<Integer> partTypes, List<CoordinatesList> partPoints, LineString ring) {
     partIndexes.add(index);
     partTypes.add(partType);
     CoordinatesList points = CoordinatesListUtil.get(ring);

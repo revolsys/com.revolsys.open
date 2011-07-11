@@ -54,6 +54,11 @@ public class JtsGeometryConverter {
     final int x =in.readInt();
     final int recordLength = in.readInt();
     final int shapeType = in.readLEInt();
+    return readGeometry(in, shapeType, recordLength);
+  }
+
+  public Geometry readGeometry(final EndianInput in, final int shapeType,
+    final int recordLength) throws IOException {
     switch (shapeType) {
       case ShapefileConstants.NULL_SHAPE:
         return null;

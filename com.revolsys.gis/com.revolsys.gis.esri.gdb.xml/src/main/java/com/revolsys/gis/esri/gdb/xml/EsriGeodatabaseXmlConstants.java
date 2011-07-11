@@ -181,6 +181,8 @@ public interface EsriGeodatabaseXmlConstants {
 
   String NAMESPACE_URI_93 = "http://www.esri.com/schemas/ArcGIS/9.3";
 
+  String NAMESPACE_URI_10_1 = "http://www.esri.com/schemas/ArcGIS/10.1";
+
   QName OBJECT_ID_FIELD_NAME = new QName("OIDFieldName");
 
   QName PATH_ARRAY = new QName("PathArray");

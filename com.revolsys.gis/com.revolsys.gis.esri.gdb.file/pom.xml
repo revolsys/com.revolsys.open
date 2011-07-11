@@ -60,6 +60,18 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.revolsys.gis</groupId>
+      <artifactId>com.revolsys.gis.shape</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.revolsys.gis</groupId>
+      <artifactId>com.revolsys.gis.esri.gdb.xml</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.5</version>

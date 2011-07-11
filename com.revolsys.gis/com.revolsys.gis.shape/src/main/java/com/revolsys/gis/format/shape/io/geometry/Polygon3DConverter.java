@@ -12,7 +12,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.EndianInput;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
@@ -25,12 +25,11 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public Polygon3DConverter(
-    final GeometryFactory geometryFactory) {
+  public Polygon3DConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
-      this.geometryFactory = new GeometryFactory(new PrecisionModel());
+      this.geometryFactory = new GeometryFactory();
     }
   }
 
@@ -38,9 +37,7 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
     return ShapefileConstants.POLYGON_Z_SHAPE;
   }
 
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
@@ -53,7 +50,7 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
       dimension = 4;
     }
 
-    final CoordinatesList[] parts = ShapefileGeometryUtil.createCoordinatesLists(
+    final List<CoordinatesList> parts = ShapefileGeometryUtil.createCoordinatesLists(
       partIndex, dimension);
 
     ShapefileGeometryUtil.readPoints(in, partIndex, parts);
@@ -61,18 +58,10 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
     if (dimension == 4) {
       ShapefileGeometryUtil.readCoordinates(in, partIndex, parts, 3);
     }
-    final CoordinatesList exteriorCoords = parts[0];
-    final LinearRing shell = geometryFactory.createLinearRing(exteriorCoords);
-    final LinearRing[] holes = new LinearRing[parts.length - 1];
-    for (int j = 0; j < holes.length; j++) {
-      holes[j] = geometryFactory.createLinearRing(parts[j]);
-    }
-    return geometryFactory.createPolygon(shell, holes);
+    return geometryFactory.createPolygon(parts);
   }
 
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
