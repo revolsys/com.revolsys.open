@@ -2,6 +2,7 @@ package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -157,6 +158,22 @@ public abstract class AbstractDataObjectStore extends
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
     final Envelope envelope = boundingBox.convert(geometryFactory);
     return query(typeName, envelope);
+  }
+
+  public DataObject queryFirst(QName typeName, String where,
+    Object... arguments) {
+    final Reader<DataObject> reader = query(typeName, where, arguments);
+    final Iterator<DataObject> iterator = reader.iterator();
+    try {
+      if (iterator.hasNext()) {
+        final DataObject object = iterator.next();
+        return object;
+      } else {
+        return null;
+      }
+    } finally {
+      reader.close();
+    }
   }
 
   protected void refreshMetaData(final String schemaName) {

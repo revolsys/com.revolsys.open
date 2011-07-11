@@ -16,6 +16,7 @@
 package com.revolsys.xml.io;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -56,8 +57,7 @@ import javax.xml.stream.XMLStreamReader;
  * </p>
  * 
  * <pre>
- * public BankAccount processBankAccount(
- *   XMLStreamReader parser);
+ * public BankAccount processBankAccount(XMLStreamReader parser);
  * </pre>
  * <p>
  * For example the process method for the XML element firstName would have the
@@ -66,8 +66,7 @@ import javax.xml.stream.XMLStreamReader;
  * </p>
  * 
  * <pre>
- * public String processfirstName(
- *   XMLStreamReader parser);
+ * public String processfirstName(XMLStreamReader parser);
  * </pre>
  * <p>
  * The process methods read the attributes from the element and can either
@@ -87,10 +86,8 @@ import javax.xml.stream.XMLStreamReader;
  * </p>
  * 
  * <pre>
- * public Person processPerson(
- *   final XMLStreamReader parser)
- *   throws XMLStreamException,
- *   IOException {
+ * public Person processPerson(final XMLStreamReader parser)
+ *   throws XMLStreamException, IOException {
  *   String firstName = parser.getAttributeValue(null, &quot;firstName&quot;);
  *   String lastName = parser.getAttributeValue(null, &quot;lastName&quot;);
  *   Person person = new Person(firstName, lastName);
@@ -105,10 +102,8 @@ import javax.xml.stream.XMLStreamReader;
  * </p>
  * 
  * <pre>
- * public Family processFamily(
- *   final XMLStreamReader parser)
- *   throws XMLStreamException,
- *   IOException {
+ * public Family processFamily(final XMLStreamReader parser)
+ *   throws XMLStreamException, IOException {
  *   Family family = new Family();
  *   while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
  *     Object object = process(parser);
@@ -129,12 +124,12 @@ import javax.xml.stream.XMLStreamReader;
  */
 public abstract class XmlProcessor {
   /** The arguments a processor method must have. */
-  private static final Class[] PROCESS_METHOD_ARGS = new Class[] {
+  private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
     XMLStreamReader.class
   };
 
   /** The cache of processor classes to method caches. */
-  private static final Map processorMethodCache = new HashMap();
+  private static final Map<Class<?>,Map<String,Method>> processorMethodCache = new HashMap<Class<?>, Map<String,Method>>();
 
   /**
    * Create the cache of process methods from the specified class.
@@ -142,11 +137,10 @@ public abstract class XmlProcessor {
    * @param processorClass The XmlPorcessor class.
    * @return The map of method names to process methods.
    */
-  private static Map getMethodCache(
-    final Class processorClass) {
-    Map methodCache = (Map)processorMethodCache.get(processorClass);
+  private static Map<String,Method> getMethodCache(final Class<?> processorClass) {
+    Map<String,Method> methodCache = processorMethodCache.get(processorClass);
     if (methodCache == null) {
-      methodCache = new HashMap();
+      methodCache = new HashMap<String,Method>();
       processorMethodCache.put(processorClass, methodCache);
       final Method[] methods = processorClass.getMethods();
       for (int i = 0; i < methods.length; i++) {
@@ -154,7 +148,8 @@ public abstract class XmlProcessor {
         final String methodName = method.getName();
         if (methodName.startsWith("process")) {
           if (Arrays.equals(method.getParameterTypes(), PROCESS_METHOD_ARGS)) {
-            methodCache.put(methodName.substring(7), method);
+            final String name = methodName.substring(7);
+            methodCache.put(name, method);
           }
         }
       }
@@ -166,7 +161,7 @@ public abstract class XmlProcessor {
   private XmlProcessorContext context = new SimpleXmlProcessorContext();
 
   /** The cache of XML element names to processor methods. */
-  private final Map methodCache;
+  private final Map<String,Method> methodCache;
 
   /** The XML namespace URI processed by this processor. */
   private final String namespaceUri;
@@ -176,8 +171,7 @@ public abstract class XmlProcessor {
    * 
    * @param namespaceUri The XML Namespace URI.
    */
-  protected XmlProcessor(
-    final String namespaceUri) {
+  protected XmlProcessor(final String namespaceUri) {
     this.namespaceUri = namespaceUri;
     methodCache = getMethodCache(getClass());
   }
@@ -197,8 +191,7 @@ public abstract class XmlProcessor {
    * @param element The element to process.
    * @return The method to process the XML element.
    */
-  private Method getProcessMethod(
-    final QName element) {
+  private Method getProcessMethod(final QName element) {
     final String elementName = element.getLocalPart();
     final Method method = (Method)methodCache.get(elementName);
     if (method == null) {
@@ -206,6 +199,21 @@ public abstract class XmlProcessor {
         + elementName);
     }
     return method;
+  }
+
+  public <T> T process(String xml) {
+    try {
+      StringReader reader = new StringReader(xml);
+      XMLStreamReader xmlReader = StaxUtils.createXmlReader(reader);
+      StaxUtils.skipToStartElement(xmlReader);
+       return (T)process(xmlReader);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Error e) {
+      throw e;
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to parse: " + xml, e);
+    }
   }
 
   /**
@@ -223,8 +231,7 @@ public abstract class XmlProcessor {
    * </p>
    * 
    * <pre>
-   * public BankAccount processBankAccount(
-   *   XMLStreamReader parser);
+   * public BankAccount processBankAccount(XMLStreamReader parser);
    * </pre>
    * <p>
    * For example the process method for the XML element firstName would have the
@@ -233,8 +240,7 @@ public abstract class XmlProcessor {
    * </p>
    * 
    * <pre>
-   * public String processfirstName(
-   *   XMLStreamReader parser);
+   * public String processfirstName(XMLStreamReader parser);
    * </pre>
    * 
    * @param parser The STAX XML parser.
@@ -242,10 +248,8 @@ public abstract class XmlProcessor {
    * @throws IOException If an I/O exception occurs.
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
-  public Object process(
-    final XMLStreamReader parser)
-    throws XMLStreamException,
-    IOException {
+  public Object process(final XMLStreamReader parser)
+    throws XMLStreamException, IOException {
     final QName element = parser.getName();
     try {
       final Method method = getProcessMethod(element);
@@ -278,8 +282,7 @@ public abstract class XmlProcessor {
    * 
    * @param context The context for processing the XML Document.
    */
-  public final void setContext(
-    final XmlProcessorContext context) {
+  public final void setContext(final XmlProcessorContext context) {
     this.context = context;
   }
 }

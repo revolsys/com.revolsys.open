@@ -3,6 +3,7 @@ package com.revolsys.gis.data.io;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.io.ObjectWithProperties;
 
 public class IteratorReader<T> extends AbstractReader<T> {
@@ -20,6 +21,10 @@ public class IteratorReader<T> extends AbstractReader<T> {
   }
 
   public void close() {
+    if (iterator instanceof AbstractIterator) {
+      AbstractIterator i = (AbstractIterator)iterator;
+      i.close();
+    }
     iterator = null;
   }
 

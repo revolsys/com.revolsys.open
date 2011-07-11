@@ -10,19 +10,17 @@ import java.util.regex.Pattern;
 public final class CaseConverter {
   public static final String LOWER_CAMEL_CASE_RE = "";
 
-  public static String captialize(
-    final String text) {
+  public static String captialize(final String text) {
     return Character.toUpperCase(text.charAt(0))
       + text.substring(1).toLowerCase();
   }
 
-  public static List<String> splitWords(
-    final String text) {
+  public static List<String> splitWords(final String text) {
     if (text == null) {
       return Collections.emptyList();
     } else {
-      final Pattern p = Pattern.compile("([\\p{Lu}\\d']+)$" + "|" + "([\\p{Lu}\\d']+)[ _]"
-        + "|" + "([\\p{L}\\d'][^\\p{Lu} _]*)");
+      final Pattern p = Pattern.compile("([\\p{Lu}\\d']+)$" + "|"
+        + "([\\p{Lu}\\d']+)[ _]" + "|" + "([\\p{L}\\d'][^\\p{Lu} _]*)");
       final Matcher m = p.matcher(text);
       final List<String> words = new ArrayList<String>();
       while (m.find()) {
@@ -37,8 +35,7 @@ public final class CaseConverter {
     }
   }
 
-  public static String toCapitalizedWords(
-    final String text) {
+  public static String toCapitalizedWords(final String text) {
     final List<String> words = splitWords(text);
     final StringBuffer result = new StringBuffer();
     for (final Iterator<String> iter = words.iterator(); iter.hasNext();) {
@@ -51,8 +48,7 @@ public final class CaseConverter {
     return result.toString();
   }
 
-  public static String toLowerCamelCase(
-    final String text) {
+  public static String toLowerCamelCase(final String text) {
     final List<String> words = splitWords(text);
     if (words.size() == 0) {
       return "";
@@ -70,8 +66,7 @@ public final class CaseConverter {
     }
   }
 
-  public static String toLowerUnderscore(
-    final String text) {
+  public static String toLowerUnderscore(final String text) {
     final List<String> words = splitWords(text);
     final StringBuffer result = new StringBuffer();
     for (final Iterator<String> iter = words.iterator(); iter.hasNext();) {
@@ -84,8 +79,7 @@ public final class CaseConverter {
     return result.toString();
   }
 
-  public static String toSentence(
-    final String text) {
+  public static String toSentence(final String text) {
     final List<String> words = splitWords(text);
     if (words.size() == 0) {
       return "";
@@ -106,8 +100,7 @@ public final class CaseConverter {
     }
   }
 
-  public static String toUpperCamelCase(
-    final String text) {
+  public static String toUpperCamelCase(final String text) {
     final List<String> words = splitWords(text);
     final StringBuffer result = new StringBuffer();
     for (final Iterator<String> iter = words.iterator(); iter.hasNext();) {
@@ -117,8 +110,7 @@ public final class CaseConverter {
     return result.toString();
   }
 
-  public static String toUpperUnderscore(
-    final String text) {
+  public static String toUpperUnderscore(final String text) {
     final List<String> words = splitWords(text);
     final StringBuffer result = new StringBuffer();
     for (final Iterator<String> iter = words.iterator(); iter.hasNext();) {
@@ -132,5 +124,14 @@ public final class CaseConverter {
   }
 
   private CaseConverter() {
+  }
+
+  public static String toLowerFirstChar(String text) {
+    if (text.length() > 0) {
+      char c = text.charAt(0);
+      return Character.toLowerCase(c) + text.substring(1);
+    } else {
+      return text;
+    }
   }
 }

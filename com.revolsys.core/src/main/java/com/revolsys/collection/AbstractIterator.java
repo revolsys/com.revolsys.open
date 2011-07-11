@@ -3,6 +3,8 @@ package com.revolsys.collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.PreDestroy;
+
 import com.revolsys.io.AbstractObjectWithProperties;
 
 public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
@@ -16,6 +18,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
 
   private T object;
 
+  @PreDestroy
   public final void close() {
     hasNext = false;
     object = null;
@@ -45,6 +48,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
           object = getNext();
           loadNext = false;
         } catch (final NoSuchElementException e) {
+          close();
           hasNext = false;
         }
       }

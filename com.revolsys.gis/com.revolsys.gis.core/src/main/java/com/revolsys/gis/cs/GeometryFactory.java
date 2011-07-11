@@ -335,12 +335,16 @@ public class GeometryFactory extends
   }
 
   public Polygon createPolygon(final List<?> rings) {
-    final LinearRing exteriorRing = getLinearRing(rings, 0);
-    final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
-    for (int i = 1; i < rings.size(); i++) {
-      interiorRings[i - 1] = getLinearRing(rings, i);
+    if (rings.size() == 0) {
+      return createPolygon(null,null);
+    } else {
+      final LinearRing exteriorRing = getLinearRing(rings, 0);
+      final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
+      for (int i = 1; i < rings.size(); i++) {
+        interiorRings[i - 1] = getLinearRing(rings, i);
+      }
+      return createPolygon(exteriorRing, interiorRings);
     }
-    return createPolygon(exteriorRing, interiorRings);
   }
 
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
