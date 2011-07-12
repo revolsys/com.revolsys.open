@@ -37,13 +37,19 @@ public class SpatialReference {
 
   private int latestWKID;
 
+  public SpatialReference() {
+  }
+
   private CoordinateSystem coordinateSystem;
 
   private GeometryFactory geometryFactory;
 
   public CoordinateSystem getCoordinateSystem() {
     if (coordinateSystem == null) {
-      coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(wKID);
+      coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(latestWKID);
+      if (coordinateSystem == null) {
+        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(wKID);
+      }
     }
     return coordinateSystem;
   }
@@ -52,8 +58,12 @@ public class SpatialReference {
     if (geometryFactory == null) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
-          xYScale, zScale);
+        final CoordinatesPrecisionModel precisionModel;
+        if (xYScale == 1.1258999068426238E13) {
+          precisionModel = new SimpleCoordinatesPrecisionModel(0, zScale);
+        } else {
+          precisionModel = new SimpleCoordinatesPrecisionModel(xYScale, zScale);
+        }
         geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
       }
     }

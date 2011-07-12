@@ -25,6 +25,8 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName CONTROLLER_MEMBERSHIPS = new QName("ControllerMemberships");
 
+  QName CONTROLLER_MEMBERSHIP = new QName("ControllerMembership");
+
   String CONTROLLER_MEMBERSHIPS_TYPE = "esri:ArrayOfControllerMembership";
 
   QName Data = new QName("Data");
@@ -40,6 +42,12 @@ public interface EsriGeodatabaseXmlConstants {
   String DATA_RECORD_SET = "esri:RecordSet";
 
   QName DATASET_DATA = new QName("DatasetData");
+
+  QName INDEX = new QName("Index");
+
+  QName INDEXES = new QName("Indexes");
+
+  QName INDEX_ARRAY = new QName("IndexArray");
 
   String DATASET_DATA_TABLE_DATA = "esri:TableData";
 
@@ -220,6 +228,8 @@ public interface EsriGeodatabaseXmlConstants {
   String PROPERTY_ARRAY_TYPE = "esri:ArrayOfPropertySetProperty";
 
   String PROPERTY_SET_TYPE = "esri:PropertySet";
+
+  QName PROPERTY_SET = new QName("PropertySet");
 
   QName RASTER_FIELD_NAME = new QName("RasterFieldName");
 
