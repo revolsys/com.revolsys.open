@@ -1,4 +1,4 @@
-package com.revolsys.gis.esri.gdb.xml.parser;
+package com.revolsys.gis.esri.gdb.xml.model;
 
 import java.io.IOException;
 import java.util.ArrayList;

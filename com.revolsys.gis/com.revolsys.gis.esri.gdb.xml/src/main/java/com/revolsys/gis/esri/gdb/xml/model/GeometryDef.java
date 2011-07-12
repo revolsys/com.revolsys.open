@@ -1,4 +1,4 @@
-package com.revolsys.gis.esri.gdb.xml.parser;
+package com.revolsys.gis.esri.gdb.xml.model;
 
 public class GeometryDef {
   private int avgNumPoints;
