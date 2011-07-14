@@ -3,6 +3,8 @@ package com.revolsys.gis.esri.gdb.xml.model;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 
@@ -33,11 +35,37 @@ public class SpatialReference {
 
   private double leftLongitude;
 
-  private int wKID;
+  private int wkid;
 
   private int latestWKID;
 
   public SpatialReference() {
+  }
+
+  public SpatialReference(GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+    if (geometryFactory != null) {
+      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem != null) {
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        if (esriCoordinateSystem != null) {
+
+          wkt = EsriCsWktWriter.toWkt(esriCoordinateSystem);
+          xOrigin = 0;
+          yOrigin = 0;
+          xYScale = geometryFactory.getScaleXY();
+          zOrigin = 0;
+          zScale = geometryFactory.getScaleZ();
+          mOrigin = 0;
+          mScale = 1;
+          xYTolerance = 1.0 / xYScale * 2.0;
+          zTolerance = 1.0 / zScale * 2.0;
+          mTolerance = 1.0 / mScale * 2.0;
+          highPrecision = true;
+          wkid = coordinateSystem.getId();
+        }
+      }
+    }
   }
 
   private CoordinateSystem coordinateSystem;
@@ -48,7 +76,7 @@ public class SpatialReference {
     if (coordinateSystem == null) {
       coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(latestWKID);
       if (coordinateSystem == null) {
-        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(wKID);
+        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(wkid);
       }
     }
     return coordinateSystem;
@@ -91,7 +119,7 @@ public class SpatialReference {
   }
 
   public int getWKID() {
-    return wKID;
+    return wkid;
   }
 
   public String getWKT() {
@@ -155,7 +183,7 @@ public class SpatialReference {
   }
 
   public void setWKID(final int wkid) {
-    this.wKID = wkid;
+    this.wkid = wkid;
   }
 
   public void setWKT(final String wkt) {

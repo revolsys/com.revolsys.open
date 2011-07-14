@@ -45,25 +45,28 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
       DataTypes.GEOMETRY));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY, DataTypes.POINT));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
+      DataTypes.MULTI_POINT));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
       DataTypes.LINE_STRING));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
+      DataTypes.MULTI_LINE_STRING));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
       DataTypes.POLYGON));
+    addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
+      DataTypes.MULTI_POLYGON));
   }
 
-  public void addFieldType(
-    final EsriGeodatabaseXmlFieldType fieldType) {
+  public void addFieldType(final EsriGeodatabaseXmlFieldType fieldType) {
     final DataType dataType = fieldType.getDataType();
     addFieldType(dataType, fieldType);
   }
 
-  public void addFieldType(
-    final DataType dataType,
+  public void addFieldType(final DataType dataType,
     final EsriGeodatabaseXmlFieldType fieldType) {
     typeMapping.put(dataType, fieldType);
   }
 
-  public EsriGeodatabaseXmlFieldType getFieldType(
-    DataType dataType) {
+  public EsriGeodatabaseXmlFieldType getFieldType(DataType dataType) {
     return typeMapping.get(dataType);
   }
 }

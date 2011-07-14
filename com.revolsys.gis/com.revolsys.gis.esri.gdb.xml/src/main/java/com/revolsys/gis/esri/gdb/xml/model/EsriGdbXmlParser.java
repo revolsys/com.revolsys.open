@@ -21,46 +21,46 @@ public class EsriGdbXmlParser extends XmlProcessor implements
   private static final Map<String, Class<?>> TAG_NAME_CLASS_MAP = new HashMap<String, Class<?>>();
 
   static {
+    TAG_NAME_CLASS_MAP.put(CHILDREN.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(SUBTYPE.getLocalPart(), Subtype.class);
+    TAG_NAME_CLASS_MAP.put(FIELD_INFOS.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(SUBTYPE_FIELD_INFO.getLocalPart(),
+      SubtypeFieldInfo.class);
+    TAG_NAME_CLASS_MAP.put(RELATIONSHIP_CLASS_NAMES.getLocalPart(),
+      ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(DATA_ELEMENT.getLocalPart(), DataElement.class);
-    TAG_NAME_CLASS_MAP.put(SPATIAL_REFERENCE.getLocalPart(),
+    TAG_NAME_CLASS_MAP.put(DE_DATASET.getLocalPart(), DEDataset.class);
+    TAG_NAME_CLASS_MAP.put(DE_FEATURE_CLASS.getLocalPart(),
+      DEFeatureClass.class);
+    TAG_NAME_CLASS_MAP.put(DE_TABLE.getLocalPart(), DETable.class);
+    TAG_NAME_CLASS_MAP.put(ENVELOPE.getLocalPart(), Envelope.class);
+    TAG_NAME_CLASS_MAP.put(ENVELOPE_N.getLocalPart(), EnvelopeN.class);
+      TAG_NAME_CLASS_MAP.put(SPATIAL_REFERENCE.getLocalPart(),
       SpatialReference.class);
+    TAG_NAME_CLASS_MAP.put(FIELD_ARRAY.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(FIELDS.getLocalPart(), null);
     TAG_NAME_CLASS_MAP.put(FIELD.getLocalPart(), Field.class);
+    TAG_NAME_CLASS_MAP.put(INDEX_ARRAY.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(INDEXES.getLocalPart(), null);
+    TAG_NAME_CLASS_MAP.put(METADATA.getLocalPart(), null);
     TAG_NAME_CLASS_MAP.put(INDEX.getLocalPart(), Index.class);
     TAG_NAME_CLASS_MAP.put(GEOMETRY_DEF.getLocalPart(), GeometryDef.class);
     TAG_NAME_CLASS_MAP.put(CONTROLLER_MEMBERSHIP.getLocalPart(),
       GeometryDef.class);
-    TAG_NAME_CLASS_MAP.put(PROPERTY_SET.getLocalPart(), PropertySet.class);
-    TAG_NAME_CLASS_MAP.put(EXTENT.getLocalPart(), Extent.class);
+    TAG_NAME_CLASS_MAP.put(PROPERTY_ARRAY.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(PROPERTY_SET.getLocalPart(), null);
+    TAG_NAME_CLASS_MAP.put(PROPERTY_SET_PROPERTY.getLocalPart(),
+      PropertySetProperty.class);
+    TAG_NAME_CLASS_MAP.put(EXTENT.getLocalPart(), EnvelopeN.class);
+    TAG_NAME_CLASS_MAP.put(GEOGRAPHIC_COORDINATE_SYSTEM.getLocalPart(),
+      GeographicCoordinateSystem.class);
+    TAG_NAME_CLASS_MAP.put(PROJECTED_COORDINATE_SYSTEM.getLocalPart(),
+      ProjectedCoordinateSystem.class);
   }
 
   public EsriGdbXmlParser() {
     super("http://www.esri.com/schemas/ArcGIS/10.1", TAG_NAME_CLASS_MAP);
-  }
-
-  public List<Field> processFields(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    List<Field> fields = null;
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      QName tagName = parser.getName();
-      Object value = process(parser);
-      if (tagName.equals(FIELD_ARRAY)) {
-        fields = (List<Field>)value;
-      }
-    }
-    return fields;
-  }
-
-  public List<Field> processFieldArray(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    List<Field> fields = new ArrayList<Field>();
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      Object value = process(parser);
-      if (value instanceof Field) {
-        Field field = (Field)value;
-        fields.add(field);
-      }
-    }
-    return fields;
   }
 
   public List<ControllerMembership> processControllerMemberships(
@@ -76,55 +76,4 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     return controllerMemberships;
   }
 
-  public List<Index> processIndexes(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    List<Index> indexes = null;
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      QName tagName = parser.getName();
-      Object value = process(parser);
-      if (tagName.equals(INDEX_ARRAY)) {
-        indexes = (List<Index>)value;
-      }
-    }
-    return indexes;
-  }
-
-  public List<Index> processIndexArray(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    List<Index> indexes = new ArrayList<Index>();
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      Object value = process(parser);
-      if (value instanceof Index) {
-        Index field = (Index)value;
-        indexes.add(field);
-      }
-    }
-    return indexes;
-  }
-
-  public Set<PropertySet> processExtensionProperties(
-    final XMLStreamReader parser) throws XMLStreamException, IOException {
-    Set<PropertySet> properties = null;
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      QName tagName = parser.getName();
-      Object value = process(parser);
-      if (tagName.equals(PROPERTY_ARRAY)) {
-        properties = (Set<PropertySet>)value;
-      }
-    }
-    return properties;
-  }
-
-  public Set<PropertySet> processPropertyArray(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    Set<PropertySet> properties = new LinkedHashSet<PropertySet>();
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      Object value = process(parser);
-      if (value instanceof PropertySet) {
-        PropertySet propertySet = (PropertySet)value;
-        properties.add(propertySet);
-      }
-    }
-    return properties;
-  }
 }

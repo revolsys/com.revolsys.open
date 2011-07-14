@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
+import com.revolsys.gis.cs.GeometryFactory;
+
 public class GeometryDef {
   private int avgNumPoints;
 
@@ -16,6 +18,16 @@ public class GeometryDef {
   private double gridSize1;
 
   private double gridSize2;
+
+  public GeometryDef() {
+  }
+
+  public GeometryDef(String geometryType, GeometryFactory geometryFactory) {
+    this.geometryType = geometryType;
+    this.spatialReference = new SpatialReference(geometryFactory);
+    this.hasZ = geometryFactory.hasZ();
+    this.hasM = geometryFactory.hasM();
+  }
 
   public int getAvgNumPoints() {
     return avgNumPoints;

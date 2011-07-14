@@ -20,15 +20,15 @@ public class Index {
     return name;
   }
 
-  public boolean isAscending() {
+  public boolean isIsAscending() {
     return isAscending;
   }
 
-  public boolean isUnique() {
+  public boolean isIsUnique() {
     return isUnique;
   }
 
-  public void setAscending(final boolean isAscending) {
+  public void setIsAscending(final boolean isAscending) {
     this.isAscending = isAscending;
   }
 
@@ -40,7 +40,7 @@ public class Index {
     this.name = name;
   }
 
-  public void setUnique(final boolean isUnique) {
+  public void setIsUnique(final boolean isUnique) {
     this.isUnique = isUnique;
   }
 }
