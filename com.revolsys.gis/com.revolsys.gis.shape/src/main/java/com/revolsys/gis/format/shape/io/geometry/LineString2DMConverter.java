@@ -2,6 +2,7 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.io.EndianInput;
@@ -10,9 +11,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class LineString2DMConverter implements ShapefileGeometryConverter {
   private GeometryFactory geometryFactory;
@@ -21,8 +20,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public LineString2DMConverter(
-    final GeometryFactory geometryFactory) {
+  public LineString2DMConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
@@ -40,9 +38,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
    * com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryConverter#read
    * (int, com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile)
    */
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     // skip bounding box;
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -83,9 +79,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
    * (com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile,
    * com.vividsolutions.jts.geom.Geometry)
    */
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;

@@ -2,6 +2,7 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.io.EndianInput;
@@ -9,10 +10,8 @@ import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class LineString3DConverter implements ShapefileGeometryConverter {
   private GeometryFactory geometryFactory;
@@ -30,7 +29,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapefileConstants.POLYLINE_Z_SHAPE;
+    return ShapefileConstants.POLYLINE_ZM_SHAPE;
   }
 
   /*
@@ -96,14 +95,14 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
       final LineString line = (LineString)geometry;
       writePolyLineZHeader(out, geometry);
       out.writeLEInt(0);
-      ShapefileGeometryUtil.write2DCoordinates(out, line);
-      ShapefileGeometryUtil.writeCoordinateZValues(out, line);
+      ShapefileGeometryUtil.writeXYCoordinates(out, line);
+      ShapefileGeometryUtil.writeZCoordinates(out, line);
     } else if (geometry instanceof MultiLineString) {
       final MultiLineString multiLine = (MultiLineString)geometry;
       writePolyLineZHeader(out, multiLine);
-      ShapefileGeometryUtil.writePartIndexes(out, multiLine);
-      ShapefileGeometryUtil.write2DCoordinates(out, multiLine);
-      ShapefileGeometryUtil.writeCoordinateZValues(out, multiLine);
+      ShapefileGeometryUtil.writePolylinePartIndexes(out, multiLine);
+      ShapefileGeometryUtil.writeXYCoordinates(out, multiLine);
+      ShapefileGeometryUtil.writeZCoordinates(out, multiLine);
     } else {
       throw new IllegalArgumentException("Expecting " + LineString.class
         + " geometry got " + geometry.getClass());
@@ -117,7 +116,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     final int recordLength = ((3 + numGeometries) * MathUtil.BYTES_IN_INT + (6 + 3 * numCoordinates)
       * MathUtil.BYTES_IN_DOUBLE) / 2;
     out.writeInt(recordLength);
-    out.writeLEInt(ShapefileConstants.POLYLINE_Z_SHAPE);
+    out.writeLEInt(ShapefileConstants.POLYLINE_ZM_SHAPE);
     final Envelope envelope = geometry.getEnvelopeInternal();
     ShapefileGeometryUtil.writeEnvelope(out, envelope);
     out.writeLEInt(numGeometries);

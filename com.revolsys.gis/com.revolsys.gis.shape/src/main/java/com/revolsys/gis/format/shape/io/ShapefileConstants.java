@@ -45,7 +45,9 @@ public class ShapefileConstants {
 
   public static final int MULTI_POINT_SHAPE = 8;
 
-  public static final int MULTI_POINT_Z_SHAPE = 18;
+  public static final int MULTI_POINT_Z_SHAPE = 20;
+
+  public static final int MULTI_POINT_ZM_SHAPE = 18;
 
   public static final int NULL_SHAPE = 0;
 
@@ -55,19 +57,25 @@ public class ShapefileConstants {
 
   public static final int POINT_SHAPE = 1;
 
-  public static final int POINT_Z_SHAPE = 11;
+  public static final int POINT_Z_SHAPE = 9;
+
+  public static final int POINT_ZM_SHAPE = 11;
 
   public static final int POLYGON_M_SHAPE = 25;
 
   public static final int POLYGON_SHAPE = 5;
 
-  public static final int POLYGON_Z_SHAPE = 15;
+  public static final int POLYGON_Z_SHAPE = 19;
+
+  public static final int POLYGON_ZM_SHAPE = 15;
 
   public static final int POLYLINE_M_SHAPE = 23;
 
   public static final int POLYLINE_SHAPE = 3;
 
-  public static final int POLYLINE_Z_SHAPE = 13;
+  public static final int POLYLINE_Z_SHAPE = 10;
+
+  public static final int POLYLINE_ZM_SHAPE = 13;
 
   public static final int UNKNOWN_SHAPE = -1;
 
@@ -78,13 +86,13 @@ public class ShapefileConstants {
     DATA_TYPE_MAP.put(POINT_Z_SHAPE, DataTypes.POINT);
     DATA_TYPE_MAP.put(POINT_SHAPE, DataTypes.POINT);
     DATA_TYPE_MAP.put(POLYLINE_M_SHAPE, DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put(POLYLINE_Z_SHAPE, DataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put(POLYLINE_ZM_SHAPE, DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put(POLYLINE_SHAPE, DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put(POLYGON_M_SHAPE, DataTypes.POLYGON);
-    DATA_TYPE_MAP.put(POLYGON_Z_SHAPE, DataTypes.POLYGON);
+    DATA_TYPE_MAP.put(POLYGON_ZM_SHAPE, DataTypes.POLYGON);
     DATA_TYPE_MAP.put(POLYGON_SHAPE, DataTypes.POLYGON);
     DATA_TYPE_MAP.put(MULTI_POINT_M_SHAPE, DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put(MULTI_POINT_Z_SHAPE, DataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put(MULTI_POINT_ZM_SHAPE, DataTypes.MULTI_POINT);
     DATA_TYPE_MAP.put(MULTI_POINT_SHAPE, DataTypes.MULTI_POINT);
   }
 

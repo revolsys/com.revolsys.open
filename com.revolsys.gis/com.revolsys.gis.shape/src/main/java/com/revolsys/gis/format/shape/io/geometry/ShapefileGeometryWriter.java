@@ -9,9 +9,6 @@ public interface ShapefileGeometryWriter {
 
   int getShapeType();
 
-  void write(
-    EndianOutput out,
-    Geometry geometry)
-    throws IOException;
+  void write(EndianOutput out, Geometry geometry) throws IOException;
 
 }

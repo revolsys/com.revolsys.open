@@ -43,7 +43,7 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
     final int numPoints = in.readLEInt();
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = new DoubleCoordinatesList(numPoints,2);
+      final CoordinatesList points = new DoubleCoordinatesList(numPoints, 2);
       for (int i = 0; i < numPoints; i++) {
         final double x = in.readLEDouble();
         points.setX(i, x);
@@ -59,14 +59,14 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
         partIndex[i] = in.readLEInt();
 
       }
-      List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
       for (int i = 0; i < partIndex.length - 1; i++) {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
         final CoordinatesList points = new DoubleCoordinatesList(2, numCoords);
 
-        for (int j = 0; j < numCoords; i++) {
+        for (final int j = 0; j < numCoords; i++) {
           final double x = in.readLEDouble();
           points.setX(j, x);
           final double y = in.readLEDouble();
@@ -83,12 +83,12 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
       writePolyLineHeader(out, geometry);
       final LineString line = (LineString)geometry;
       out.writeLEInt(0);
-      ShapefileGeometryUtil.write2DCoordinates(out, line);
+      ShapefileGeometryUtil.writeXYCoordinates(out, line);
     } else if (geometry instanceof MultiLineString) {
       final MultiLineString multiLine = (MultiLineString)geometry;
       writePolyLineHeader(out, multiLine);
-      ShapefileGeometryUtil.writePartIndexes(out, multiLine);
-      ShapefileGeometryUtil.write2DCoordinates(out, multiLine);
+      ShapefileGeometryUtil.writePolylinePartIndexes(out, multiLine);
+      ShapefileGeometryUtil.writeXYCoordinates(out, multiLine);
     } else {
       throw new IllegalArgumentException("Expecting " + LineString.class
         + " geometry got " + geometry.getClass());

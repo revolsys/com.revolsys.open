@@ -4,19 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.EndianInput;
-import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Polygon2DMConverter implements ShapefileGeometryConverter {
   private GeometryFactory geometryFactory;
@@ -34,7 +31,7 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapefileConstants.POLYGON_Z_SHAPE;
+    return ShapefileConstants.POLYGON_ZM_SHAPE;
   }
 
   public Geometry read(final EndianInput in, final long recordLength)
@@ -84,7 +81,7 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
       }
 
       for (final CoordinatesList ring : rings) {
-        ShapefileGeometryUtil.write2DCoordinates(out, ring);
+        ShapefileGeometryUtil.writeXYCoordinates(out, ring);
       }
       double minZ = Double.MAX_VALUE;
       double maxZ = Double.MIN_VALUE;

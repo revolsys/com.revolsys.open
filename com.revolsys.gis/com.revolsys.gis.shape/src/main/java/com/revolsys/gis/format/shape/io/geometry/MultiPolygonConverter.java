@@ -31,13 +31,24 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     }
   }
 
+  private int addPart(final int partType, final int index,
+    final List<Integer> partIndexes, final List<Integer> partTypes,
+    final List<CoordinatesList> partPoints, final LineString ring) {
+    partIndexes.add(index);
+    partTypes.add(partType);
+    final CoordinatesList points = CoordinatesListUtil.get(ring);
+    partPoints.add(points);
+
+    return points.size();
+  }
+
   public int getShapeType() {
     return ShapefileConstants.MULTI_PATCH_SHAPE;
   }
 
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
-    List<Polygon> polygons = new ArrayList<Polygon>();
+    final List<Polygon> polygons = new ArrayList<Polygon>();
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
@@ -59,12 +70,12 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     }
     List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int i = 0; i < numParts; i++) {
-      int partType = partTypes[i];
-      CoordinatesList points = parts.get(i);
+      final int partType = partTypes[i];
+      final CoordinatesList points = parts.get(i);
       switch (partType) {
         case 2:
           if (!rings.isEmpty()) {
-            Polygon polygon = geometryFactory.createPolygon(rings);
+            final Polygon polygon = geometryFactory.createPolygon(rings);
             polygons.add(polygon);
             rings = new ArrayList<CoordinatesList>();
           }
@@ -85,7 +96,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
       }
     }
     if (!rings.isEmpty()) {
-      Polygon polygon = geometryFactory.createPolygon(rings);
+      final Polygon polygon = geometryFactory.createPolygon(rings);
       polygons.add(polygon);
     }
     return geometryFactory.createMultiPolygon(polygons);
@@ -97,12 +108,12 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
       final MultiPolygon multiPolygon = (MultiPolygon)geometry;
 
       int numPoints = 0;
-      List<Integer> partIndexes = new ArrayList<Integer>();
-      List<Integer> partTypes = new ArrayList<Integer>();
-      List<CoordinatesList> partPoints = new ArrayList<CoordinatesList>();
+      final List<Integer> partIndexes = new ArrayList<Integer>();
+      final List<Integer> partTypes = new ArrayList<Integer>();
+      final List<CoordinatesList> partPoints = new ArrayList<CoordinatesList>();
       boolean hasZ = false;
       for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-        Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
+        final Polygon polygon = (Polygon)multiPolygon.getGeometryN(i);
         final LineString exteriorRing = polygon.getExteriorRing();
         if (exteriorRing.getDimension() > 2) {
           hasZ = true;
@@ -110,7 +121,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
         numPoints += addPart(ShapefileConstants.OUTER_RING, numPoints,
           partIndexes, partTypes, partPoints, exteriorRing);
         for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-          LineString innerRing = polygon.getInteriorRingN(j);
+          final LineString innerRing = polygon.getInteriorRingN(j);
           numPoints += addPart(ShapefileConstants.INNER_RING, numPoints,
             partIndexes, partTypes, partPoints, innerRing);
         }
@@ -128,32 +139,22 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
         multiPolygon.getEnvelopeInternal());
       out.writeLEInt(numParts);
       out.writeLEInt(numPoints);
-      for (Integer partIndex : partIndexes) {
+      for (final Integer partIndex : partIndexes) {
         out.writeLEInt(partIndex);
       }
-      for (Integer partType : partTypes) {
+      for (final Integer partType : partTypes) {
         out.writeLEInt(partType);
       }
 
-      for (CoordinatesList points : partPoints) {
-        ShapefileGeometryUtil.write2DCoordinates(out, points);
+      for (final CoordinatesList points : partPoints) {
+        ShapefileGeometryUtil.writeXYCoordinates(out, points);
       }
       if (hasZ) {
-        ShapefileGeometryUtil.writeCoordinateZValues(out, partPoints);
+        ShapefileGeometryUtil.writeZCoordinates(out, partPoints);
       }
     } else {
       throw new IllegalArgumentException("Expecting " + MultiPolygon.class
         + " geometry got " + geometry.getClass());
     }
-  }
-
-  private int addPart(int partType, int index, List<Integer> partIndexes,
-    List<Integer> partTypes, List<CoordinatesList> partPoints, LineString ring) {
-    partIndexes.add(index);
-    partTypes.add(partType);
-    CoordinatesList points = CoordinatesListUtil.get(ring);
-    partPoints.add(points);
-
-    return points.size();
   }
 }

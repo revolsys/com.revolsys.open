@@ -43,15 +43,12 @@ public class JtsGeometryConverter {
     this(new GeometryFactory());
   }
 
-  public JtsGeometryConverter(
-    final GeometryFactory geometryFactory) {
+  public JtsGeometryConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public Geometry readGeometry(
-    final EndianInput in)
-    throws IOException {
-    final int x =in.readInt();
+  public Geometry readGeometry(final EndianInput in) throws IOException {
+    final int x = in.readInt();
     final int recordLength = in.readInt();
     final int shapeType = in.readLEInt();
     return readGeometry(in, shapeType, recordLength);
@@ -66,26 +63,26 @@ public class JtsGeometryConverter {
         return new Point2DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.POINT_M_SHAPE:
         return new Point2DMConverter(geometryFactory).read(in, recordLength);
-      case ShapefileConstants.POINT_Z_SHAPE:
+      case ShapefileConstants.POINT_ZM_SHAPE:
         return new Point3DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.MULTI_POINT_SHAPE:
         return new Point2DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.MULTI_POINT_M_SHAPE:
         return new Point2DMConverter(geometryFactory).read(in, recordLength);
-      case ShapefileConstants.MULTI_POINT_Z_SHAPE:
+      case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
         return new Point3DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.POLYLINE_SHAPE:
         return new LineString2DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.POLYLINE_M_SHAPE:
         return new LineString2DMConverter(geometryFactory).read(in,
           recordLength);
-      case ShapefileConstants.POLYLINE_Z_SHAPE:
+      case ShapefileConstants.POLYLINE_ZM_SHAPE:
         return new LineString3DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.POLYGON_SHAPE:
         return new Polygon2DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.POLYGON_M_SHAPE:
         return new Polygon2DMConverter(geometryFactory).read(in, recordLength);
-      case ShapefileConstants.POLYGON_Z_SHAPE:
+      case ShapefileConstants.POLYGON_ZM_SHAPE:
         return new Polygon3DConverter(geometryFactory).read(in, recordLength);
       case ShapefileConstants.MULTI_PATCH_SHAPE:
         return new MultiPolygonConverter(geometryFactory).read(in, recordLength);
@@ -95,10 +92,8 @@ public class JtsGeometryConverter {
     return null;
   }
 
-  private void write2DCoordinates(
-    final EndianInputOutput out,
-    final Coordinate[] coordinates)
-    throws IOException {
+  private void write2DCoordinates(final EndianInputOutput out,
+    final Coordinate[] coordinates) throws IOException {
     for (int i = 0; i < coordinates.length; i++) {
       final Coordinate coordinate = coordinates[i];
       out.writeLEDouble(coordinate.x);
@@ -106,23 +101,17 @@ public class JtsGeometryConverter {
     }
   }
 
-  private void writeEnvelope(
-    final EndianInputOutput out,
-    final Envelope envelope)
-    throws IOException {
+  private void writeEnvelope(final EndianInputOutput out,
+    final Envelope envelope) throws IOException {
     out.writeLEDouble(envelope.getMinX());
     out.writeLEDouble(envelope.getMinY());
     out.writeLEDouble(envelope.getMaxX());
     out.writeLEDouble(envelope.getMaxY());
   }
 
-  public int writeGeometry(
-    final LittleEndianRandomAccessFile out,
-    final int recordNumber,
-    final Object geometry,
-    final Envelope envelope,
-    final int shapeType)
-    throws IOException {
+  public int writeGeometry(final LittleEndianRandomAccessFile out,
+    final int recordNumber, final Object geometry, final Envelope envelope,
+    final int shapeType) throws IOException {
     out.writeInt(recordNumber);
     if (geometry == null) {
       return writeNull(out);
@@ -147,11 +136,8 @@ public class JtsGeometryConverter {
     }
   }
 
-  private int writeLineString(
-    final LittleEndianRandomAccessFile out,
-    final LineString line,
-    final int shapeType)
-    throws IOException {
+  private int writeLineString(final LittleEndianRandomAccessFile out,
+    final LineString line, final int shapeType) throws IOException {
     final Envelope envelope = line.getEnvelopeInternal();
     final Coordinate[] coordinates = line.getCoordinates();
     if (coordinates.length > 0) {
@@ -176,7 +162,7 @@ public class JtsGeometryConverter {
         final int recordLength = (4 * MathUtil.BYTES_IN_INT + (8 + 2 * coordinates.length)
           * MathUtil.BYTES_IN_DOUBLE) / 2;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapefileConstants.POLYLINE_Z_SHAPE);
+        out.writeLEInt(ShapefileConstants.POLYLINE_ZM_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(1);
         out.writeLEInt(coordinates.length);
@@ -205,18 +191,15 @@ public class JtsGeometryConverter {
         out.writeLEDouble(minZ);
         out.writeLEDouble(maxZ);
         out.seek(endIndex);
-        return ShapefileConstants.POLYLINE_Z_SHAPE;
+        return ShapefileConstants.POLYLINE_ZM_SHAPE;
       }
     } else {
       return writeNull(out);
     }
   }
 
-  private int writeMultiPoint(
-    final LittleEndianRandomAccessFile out,
-    final MultiPoint point,
-    final int shapeType)
-    throws IOException {
+  private int writeMultiPoint(final LittleEndianRandomAccessFile out,
+    final MultiPoint point, final int shapeType) throws IOException {
     final com.vividsolutions.jts.geom.Envelope envelope = point.getEnvelopeInternal();
     final Coordinate[] coordinates = point.getCoordinates();
     if (coordinates.length > 0) {
@@ -237,7 +220,7 @@ public class JtsGeometryConverter {
       } else {
         final int recordLength = 28 + coordinates.length * 12;
         out.writeInt(recordLength);
-        out.writeLEInt(ShapefileConstants.MULTI_POINT_Z_SHAPE);
+        out.writeLEInt(ShapefileConstants.MULTI_POINT_ZM_SHAPE);
         writeEnvelope(out, envelope);
         out.writeLEInt(coordinates.length);
 
@@ -264,15 +247,14 @@ public class JtsGeometryConverter {
         out.writeLEDouble(minZ);
         out.writeLEDouble(maxZ);
         out.seek(endIndex);
-        return ShapefileConstants.MULTI_POINT_Z_SHAPE;
+        return ShapefileConstants.MULTI_POINT_ZM_SHAPE;
       }
     } else {
       return writeNull(out);
     }
   }
 
-  private int writeNull(
-    final LittleEndianRandomAccessFile out)
+  private int writeNull(final LittleEndianRandomAccessFile out)
     throws IOException {
     final int recordLength = MathUtil.BYTES_IN_INT;
     out.writeInt(recordLength);
@@ -280,13 +262,11 @@ public class JtsGeometryConverter {
     return ShapefileConstants.NULL_SHAPE;
   }
 
-  private int writePoint(
-    final LittleEndianRandomAccessFile out,
-    final Point point,
-    final int shapeType)
-    throws IOException {
+  private int writePoint(final LittleEndianRandomAccessFile out,
+    final Point point, final int shapeType) throws IOException {
     final Coordinate coordinate = point.getCoordinate();
-    if (shapeType == ShapefileConstants.POINT_SHAPE || Double.isNaN(coordinate.z)) {
+    if (shapeType == ShapefileConstants.POINT_SHAPE
+      || Double.isNaN(coordinate.z)) {
       final int recordLength = 10; // (BYTES_IN_INT + 2 * BYTES_IN_DOUBLE) /
       // BYTES_IN_SHORT;
       out.writeInt(recordLength);
@@ -298,20 +278,17 @@ public class JtsGeometryConverter {
       final int recordLength = 18; // (BYTES_IN_INT + 2 * BYTES_IN_DOUBLE) /
       // BYTES_IN_SHORT;
       out.writeInt(recordLength);
-      out.writeLEInt(ShapefileConstants.POINT_Z_SHAPE);
+      out.writeLEInt(ShapefileConstants.POINT_ZM_SHAPE);
       out.writeLEDouble(coordinate.x);
       out.writeLEDouble(coordinate.y);
       out.writeLEDouble(coordinate.z);
       out.writeLEDouble(0);
-      return ShapefileConstants.POINT_Z_SHAPE;
+      return ShapefileConstants.POINT_ZM_SHAPE;
     }
   }
 
-  private int writePolygon(
-    final LittleEndianRandomAccessFile out,
-    final Polygon polygon,
-    final int type)
-    throws IOException {
+  private int writePolygon(final LittleEndianRandomAccessFile out,
+    final Polygon polygon, final int type) throws IOException {
     int shapeType = type;
     if (!polygon.isEmpty()) {
       final Coordinate[] coordinates = polygon.getCoordinates();
@@ -328,7 +305,7 @@ public class JtsGeometryConverter {
           shapeType = ShapefileConstants.POLYGON_SHAPE;
         } else {
           dimension = 3;
-          shapeType = ShapefileConstants.POLYGON_Z_SHAPE;
+          shapeType = ShapefileConstants.POLYGON_ZM_SHAPE;
           recordLength += 2 * MathUtil.BYTES_IN_DOUBLE; // For minZ + maxZ
         }
       }
@@ -351,7 +328,7 @@ public class JtsGeometryConverter {
 
       write2DCoordinates(out, coordinates);
 
-      if (shapeType == ShapefileConstants.POLYGON_Z_SHAPE) {
+      if (shapeType == ShapefileConstants.POLYGON_ZM_SHAPE) {
         final long zRangePos = out.getFilePointer();
         out.writeLEDouble(0);
         out.writeLEDouble(0);

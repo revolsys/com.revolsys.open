@@ -234,10 +234,10 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     out.writeLEDouble(envelope.getMaxX());
     out.writeLEDouble(envelope.getMaxY());
     switch (shapeType) {
-      case ShapefileConstants.POINT_Z_SHAPE:
-      case ShapefileConstants.MULTI_POINT_Z_SHAPE:
-      case ShapefileConstants.POLYLINE_Z_SHAPE:
-      case ShapefileConstants.POLYGON_Z_SHAPE:
+      case ShapefileConstants.POINT_ZM_SHAPE:
+      case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
+      case ShapefileConstants.POLYLINE_ZM_SHAPE:
+      case ShapefileConstants.POLYGON_ZM_SHAPE:
         out.writeLEDouble(zMin);
         out.writeLEDouble(zMax);
       break;

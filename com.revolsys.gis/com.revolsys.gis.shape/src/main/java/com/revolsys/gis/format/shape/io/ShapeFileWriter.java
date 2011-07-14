@@ -307,10 +307,10 @@ public class ShapeFileWriter extends XbaseFileWriter {
     inOut.writeLEDouble(envelope.getMaxX());
     inOut.writeLEDouble(envelope.getMaxY());
     switch (shapeType) {
-      case ShapefileConstants.POINT_Z_SHAPE:
-      case ShapefileConstants.MULTI_POINT_Z_SHAPE:
-      case ShapefileConstants.POLYLINE_Z_SHAPE:
-      case ShapefileConstants.POLYGON_Z_SHAPE:
+      case ShapefileConstants.POINT_ZM_SHAPE:
+      case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
+      case ShapefileConstants.POLYLINE_ZM_SHAPE:
+      case ShapefileConstants.POLYGON_ZM_SHAPE:
         inOut.writeLEDouble(zMin);
         inOut.writeLEDouble(zMax);
       break;

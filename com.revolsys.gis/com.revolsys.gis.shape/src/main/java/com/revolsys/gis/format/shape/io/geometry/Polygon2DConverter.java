@@ -4,19 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.EndianInput;
-import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Geometry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Polygon2DConverter implements ShapefileGeometryConverter {
   private GeometryFactory geometryFactory;
@@ -25,8 +22,7 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public Polygon2DConverter(
-    final GeometryFactory geometryFactory) {
+  public Polygon2DConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
@@ -38,16 +34,12 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
     return ShapefileConstants.POLYGON_SHAPE;
   }
 
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     return ShapefileGeometryUtil.readPolygon(geometryFactory, in);
   }
 
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
@@ -89,7 +81,7 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
       }
 
       for (final CoordinatesList ring : rings) {
-        ShapefileGeometryUtil.write2DCoordinates(out, ring);
+        ShapefileGeometryUtil.writeXYCoordinates(out, ring);
       }
     } else {
       throw new IllegalArgumentException("Expecting " + Polygon.class

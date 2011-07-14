@@ -19,7 +19,6 @@ import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
@@ -177,7 +176,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public void delete(final DataObject object) {
-    if (object.getState() == DataObjectState.Persisted) {
+    if (object.getState() == DataObjectState.Persisted
+      || object.getState() == DataObjectState.Modified) {
       object.setState(DataObjectState.Deleted);
       getWriter().write(object);
     }
@@ -375,21 +375,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       sequenceTypeSqlMap.put(typeName, sql);
     }
     return sql;
-  }
-
-  private <T> T getSharedAttribute(final String name) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    final T value = (T)sharedAttributes.get(name);
-    return value;
-  }
-
-  private synchronized Map<String, Object> getSharedAttributes() {
-    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
-    if (sharedAttributes == null) {
-      sharedAttributes = new HashMap<String, Object>();
-      ThreadSharedAttributes.setAttribute(this, sharedAttributes);
-    }
-    return sharedAttributes;
   }
 
   public String getSqlPrefix() {
@@ -746,11 +731,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     if (properties != null) {
       metaData.setProperties(properties);
     }
-  }
-
-  private void setSharedAttribute(final String name, final Object value) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    sharedAttributes.put(name, value);
   }
 
   public void setSqlPrefix(final String sqlPrefix) {

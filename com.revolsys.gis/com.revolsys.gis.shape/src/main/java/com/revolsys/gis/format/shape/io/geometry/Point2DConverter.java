@@ -2,6 +2,7 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -9,9 +10,7 @@ import com.revolsys.io.EndianInput;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Point2DConverter implements ShapefileGeometryConverter {
   private GeometryFactory geometryFactory;
@@ -20,8 +19,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public Point2DConverter(
-    final GeometryFactory geometryFactory) {
+  public Point2DConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
@@ -39,9 +37,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
    * com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryConverter#read
    * (int, com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile)
    */
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -60,9 +56,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
    * (com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile,
    * com.vividsolutions.jts.geom.Geometry)
    */
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;

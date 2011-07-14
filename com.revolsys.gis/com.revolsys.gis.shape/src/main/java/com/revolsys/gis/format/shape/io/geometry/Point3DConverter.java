@@ -2,6 +2,7 @@ package com.revolsys.gis.format.shape.io.geometry;
 
 import java.io.IOException;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.format.shape.io.ShapefileConstants;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -9,9 +10,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Point3DConverter implements ShapefileGeometryConverter {
   private GeometryFactory geometryFactory;
@@ -20,8 +19,7 @@ public class Point3DConverter implements ShapefileGeometryConverter {
     this(null);
   }
 
-  public Point3DConverter(
-    final GeometryFactory geometryFactory) {
+  public Point3DConverter(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
@@ -30,12 +28,10 @@ public class Point3DConverter implements ShapefileGeometryConverter {
   }
 
   public int getShapeType() {
-    return ShapefileConstants.POINT_Z_SHAPE;
+    return ShapefileConstants.POINT_ZM_SHAPE;
   }
 
-  public Geometry read(
-    final EndianInput in,
-    final long recordLength)
+  public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     byte numAxis = 3;
     if (recordLength == 18) {
@@ -50,9 +46,7 @@ public class Point3DConverter implements ShapefileGeometryConverter {
     return geometryFactory.createPoint(points);
   }
 
-  public void write(
-    final EndianOutput out,
-    final Geometry geometry)
+  public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
