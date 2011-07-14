@@ -201,7 +201,8 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
 
   @Override
   public void delete(final DataObject object) {
-    if (object.getState() == DataObjectState.Persisted) {
+    if (object.getState() == DataObjectState.Persisted
+      || object.getState() == DataObjectState.Modified) {
       object.setState(DataObjectState.Deleted);
       getWriter().write(object);
     }
@@ -331,22 +332,6 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   protected QName getTypeName(final QName typeName) {
     QName localTypeName = new QName(typeName.getLocalPart());
     return localTypeName;
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> T getSharedAttribute(final String name) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    final T value = (T)sharedAttributes.get(name);
-    return value;
-  }
-
-  private synchronized Map<String, Object> getSharedAttributes() {
-    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
-    if (sharedAttributes == null) {
-      sharedAttributes = new HashMap<String, Object>();
-      ThreadSharedAttributes.setAttribute(this, sharedAttributes);
-    }
-    return sharedAttributes;
   }
 
   public String getTableId(final QName typeName) {
@@ -496,11 +481,6 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
 
   public void setPassword(final String password) {
     this.password = password;
-  }
-
-  private void setSharedAttribute(final String name, final Object value) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    sharedAttributes.put(name, value);
   }
 
   public void setUsername(final String username) {
