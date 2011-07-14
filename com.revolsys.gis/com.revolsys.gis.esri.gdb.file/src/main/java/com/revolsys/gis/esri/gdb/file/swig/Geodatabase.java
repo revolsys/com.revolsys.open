@@ -63,10 +63,6 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_CreateFeatureDataset(swigCPtr, this, featureDatasetDef);
   }
 
-  public int CreateTable(String tableDef, String parent, Table table) {
-    return EsriFileGdbJNI.Geodatabase_CreateTable(swigCPtr, this, tableDef, parent, Table.getCPtr(table), table);
-  }
-
   public int CloseTable(Table table) {
     return EsriFileGdbJNI.Geodatabase_CloseTable(swigCPtr, this, Table.getCPtr(table), table);
   }
@@ -115,12 +111,21 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_getDatasetDocumentation(swigCPtr, this, path, datasetType);
   }
 
+  public String getDomainDefinition(String domainName) {
+    return EsriFileGdbJNI.Geodatabase_getDomainDefinition(swigCPtr, this, domainName);
+  }
+
   public String getQueryName(String path) {
     return EsriFileGdbJNI.Geodatabase_getQueryName(swigCPtr, this, path);
   }
 
   public Table openTable(String path) {
     long cPtr = EsriFileGdbJNI.Geodatabase_openTable(swigCPtr, this, path);
+    return (cPtr == 0) ? null : new Table(cPtr, false);
+  }
+
+  public Table createTable(String tableDefinition, String parent) {
+    long cPtr = EsriFileGdbJNI.Geodatabase_createTable(swigCPtr, this, tableDefinition, parent);
     return (cPtr == 0) ? null : new Table(cPtr, false);
   }
 

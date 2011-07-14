@@ -3,30 +3,38 @@ package com.revolsys.gis.esri.gdb.file.type;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.swig.Row;
+import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class GuidAttribute extends AbstractEsriFileGeodatabaseAttribute {
-  public GuidAttribute(String name, int length, boolean required) {
+  public GuidAttribute(final Field field) {
+    this(field.getName(), field.getLength(), field.isRequired());
+  }
+
+  public GuidAttribute(final String name, final int length,
+    final boolean required) {
     super(name, DataTypes.STRING, length, required);
   }
 
   @Override
-  public Object getValue(Row row) {
+  public Object getValue(final Row row) {
     final String name = getName();
     if (row.isNull(name)) {
       return null;
     } else {
-      Guid guid = row.getGuid(name);
+      final Guid guid = row.getGuid(name);
       return guid.toString();
     }
   }
 
-  public void setValue(Row row, Object object) {
+  @Override
+  public void setValue(final Row row, final Object value) {
     final String name = getName();
-    if (object == null) {
+    if (value == null) {
       row.SetNull(name);
     } else {
-      Guid guid = new Guid();
-      guid.FromString(object.toString());
+      final Guid guid = new Guid();
+      final String string = value.toString();
+      guid.FromString(string);
       row.SetGUID(name, guid);
     }
   }

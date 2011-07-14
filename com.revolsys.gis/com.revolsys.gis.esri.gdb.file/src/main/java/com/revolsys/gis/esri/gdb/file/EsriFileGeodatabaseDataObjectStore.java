@@ -1,5 +1,8 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,6 +10,9 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -16,9 +22,8 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.esri.gdb.file.swig.EsriFileGdb;
-import com.revolsys.gis.esri.gdb.file.swig.FieldInfo;
-import com.revolsys.gis.esri.gdb.file.swig.FieldType;
 import com.revolsys.gis.esri.gdb.file.swig.Geodatabase;
 import com.revolsys.gis.esri.gdb.file.swig.Table;
 import com.revolsys.gis.esri.gdb.file.swig.VectorOfWString;
@@ -33,139 +38,83 @@ import com.revolsys.gis.esri.gdb.file.type.OidAttribute;
 import com.revolsys.gis.esri.gdb.file.type.ShortAttribute;
 import com.revolsys.gis.esri.gdb.file.type.StringAttribute;
 import com.revolsys.gis.esri.gdb.file.type.XmlAttribute;
-import com.revolsys.gis.esri.gdb.xml.parser.DataElement;
-import com.revolsys.gis.esri.gdb.xml.parser.EsriGdbXmlParser;
+import com.revolsys.gis.esri.gdb.xml.model.DEFeatureClass;
+import com.revolsys.gis.esri.gdb.xml.model.DETable;
+import com.revolsys.gis.esri.gdb.xml.model.EsriGdbXmlParser;
+import com.revolsys.gis.esri.gdb.xml.model.EsriXmlDataObjectMetaDataUtil;
+import com.revolsys.gis.esri.gdb.xml.model.Field;
+import com.revolsys.gis.esri.gdb.xml.model.Serializer;
 import com.revolsys.io.Writer;
+import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.xml.io.XmlProcessor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore {
 
+  private static final Logger LOG = LoggerFactory.getLogger(EsriFileGeodatabaseDataObjectStore.class);
+
   private Geodatabase geodatabase;
 
   private String fileName;
 
+  private boolean createMissingGeodatabase = false;
+
+  private boolean createMissingTables;
+
+  public boolean isCreateMissingGeodatabase() {
+    return createMissingGeodatabase;
+  }
+
+  public void setCreateMissingGeodatabase(boolean createMissingGeodatabase) {
+    this.createMissingGeodatabase = createMissingGeodatabase;
+  }
+
+  private static final Map<String, Constructor<? extends Attribute>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<String, Constructor<? extends Attribute>>();
+
+  static {
+    addFieldTypeAttributeConstructor("esriFieldTypeInteger",
+      IntegerAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeSmallInteger",
+      ShortAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeDouble",
+      DoubleAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeSingle",
+      FloatAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeString",
+      StringAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeDate", DateAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeGeometry",
+      GeometryAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeOID", OidAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeBlob", BinaryAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeGlobalID",
+      GuidAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeGUID", GuidAttribute.class);
+    addFieldTypeAttributeConstructor("esriFieldTypeXML", XmlAttribute.class);
+
+  }
+
+  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
+
+  private static void addFieldTypeAttributeConstructor(
+    final String esriTypeName, final Class<? extends Attribute> attributeClass) {
+    try {
+      final Constructor<? extends Attribute> constructor = attributeClass.getConstructor(Field.class);
+      ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(esriTypeName, constructor);
+    } catch (final SecurityException e) {
+      LOG.error("No public constructor for ESRI type " + esriTypeName, e);
+    } catch (final NoSuchMethodException e) {
+      LOG.error("No public constructor for ESRI type " + esriTypeName, e);
+    }
+
+  }
+
+  public EsriFileGeodatabaseDataObjectStore() {
+  }
+
   public EsriFileGeodatabaseDataObjectStore(final String fileName) {
     this.fileName = fileName;
-  }
-
-  public Writer<DataObject> createWriter() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @PreDestroy
-  public void destory() {
-    EsriFileGeodatabaseUtil.check(EsriFileGdb.CloseGeodatabase(geodatabase));
-    geodatabase.delete();
-    geodatabase = null;
-  }
-
-  public String getFileName() {
-    return fileName;
-  }
-
-  @PostConstruct
-  public void initialize() {
-    System.loadLibrary("EsriFileGdb");
-    geodatabase = new Geodatabase();
-    EsriFileGeodatabaseUtil.check(EsriFileGdb.OpenGeodatabase(fileName,
-      geodatabase));
-  }
-
-  @Override
-  protected void loadSchemaDataObjectMetaData(
-    final DataObjectStoreSchema schema,
-    final Map<QName, DataObjectMetaData> metaDataMap) {
-    final String schemaName = schema.getName();
-    String path = "\\" + schemaName;
-    loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Feature Class");
-    loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Table");
-  }
-
-  public void loadSchemaDataObjectMetaData(
-    final Map<QName, DataObjectMetaData> metaDataMap, final String schemaName,
-    String path, final String datasetType) {
-    final VectorOfWString childFeatureClasses = new VectorOfWString();
-    try {
-      geodatabase.GetChildDatasets(path, datasetType, childFeatureClasses);
-      for (int i = 0; i < childFeatureClasses.size(); i++) {
-        final String childPath = childFeatureClasses.get(i);
-        final String tableName = childPath.substring(schemaName.length() + 2);
-        final QName typeName = new QName(schemaName, tableName);
-        final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
-          typeName);
-        Table table = geodatabase.openTable(childPath);
-         try {
-           final EsriGdbXmlParser parser = new EsriGdbXmlParser();
-          final String tableDefinition = table.getDefinition();
-          System.out.println(tableDefinition);
-           final DataElement dataElement = parser.process(tableDefinition);
-           System.out.println(dataElement.getSpatialReference().getGeometryFactory());
-          FieldInfo fieldInfo = new FieldInfo();
-          table.GetFieldInformation(fieldInfo);
-          for (int j = 0; j < fieldInfo.getFieldCount(); j++) {
-            String fieldName = fieldInfo.getFieldName(j);
-            FieldType fieldType = fieldInfo.getFieldType(j);
-            int length = fieldInfo.getFieldLength(j);
-            boolean required = !fieldInfo.isNullable(j);
-            Attribute attribute = null;
-            switch (fieldType) {
-              case fieldTypeBlob:
-                attribute = new BinaryAttribute(fieldName, length, required);
-              break;
-              case fieldTypeDate:
-                attribute = new DateAttribute(fieldName, length, required);
-              break;
-              case fieldTypeSingle:
-                attribute = new FloatAttribute(fieldName, length, required);
-              break;
-              case fieldTypeDouble:
-                attribute = new DoubleAttribute(fieldName, length, required);
-              break;
-              case fieldTypeGeometry:
-                attribute = new GeometryAttribute(fieldName, length, required);
-              break;
-              case fieldTypeInteger:
-                attribute = new IntegerAttribute(fieldName, length, required);
-              break;
-              case fieldTypeSmallInteger:
-                attribute = new ShortAttribute(fieldName, length, required);
-              break;
-              case fieldTypeString:
-                attribute = new StringAttribute(fieldName, length, required);
-              break;
-              case fieldTypeXML:
-                attribute = new XmlAttribute(fieldName, length, required);
-              break;
-              case fieldTypeOID:
-                attribute = new OidAttribute(fieldName, length, required);
-              break;
-              case fieldTypeGUID:
-                attribute = new GuidAttribute(fieldName, length, required);
-              break;
-
-              default:
-                System.err.println(fieldName + ":" + fieldType);
-              break;
-            }
-            metaData.addAttribute(attribute);
-          }
-        } finally {
-          geodatabase.CloseTable(table);
-        }
-        metaDataMap.put(typeName, metaData);
-      }
-    } finally {
-      childFeatureClasses.delete();
-    }
-  }
-
-  @Override
-  protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
-    schemaMap.put("", new DataObjectStoreSchema(this, ""));
-
-    addChildSchema(schemaMap, "\\");
   }
 
   public void addChildSchema(
@@ -186,27 +135,207 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
     }
   }
 
-  private Table getTable(QName typeName) {
-    String path = "\\\\" + typeName.getNamespaceURI() + "\\"
+  protected Geodatabase getGeodatabase() {
+    return geodatabase;
+  }
+
+  protected void closeTable(Table table) {
+    try {
+      geodatabase.CloseTable(table);
+    } catch (Throwable e) {
+      LOG.error("Unable to close table", e);
+    }
+  }
+
+  public Writer<DataObject> createWriter() {
+    return new EsriFileGeodatabaseWriter(this);
+  }
+
+  @Override
+  public void delete(final DataObject object) {
+    if (object.getState() == DataObjectState.Persisted
+      || object.getState() == DataObjectState.Modified) {
+      object.setState(DataObjectState.Deleted);
+      final Writer<DataObject> writer = getWriter();
+      writer.write(object);
+    }
+  }
+
+  @PreDestroy
+  public void close() {
+    try {
+      if (geodatabase != null) {
+        EsriFileGdb.CloseGeodatabase(geodatabase);
+      }
+    } finally {
+      geodatabase = null;
+    }
+  }
+
+  public String getFileName() {
+    return fileName;
+  }
+
+  protected Table getTable(final QName typeName) {
+    final String path = "\\\\" + typeName.getNamespaceURI() + "\\"
       + typeName.getLocalPart();
     return geodatabase.openTable(path);
   }
 
+  public synchronized Writer<DataObject> getWriter() {
+    Writer<DataObject> writer = getSharedAttribute("writer");
+    if (writer == null) {
+      writer = createWriter();
+      setSharedAttribute("writer", writer);
+    }
+    return writer;
+  }
+
+  @PostConstruct
+  public void initialize() {
+    System.loadLibrary("EsriFileGdb");
+    final File file = new File(fileName);
+    if (file.exists()) {
+      if (file.isDirectory()) {
+        geodatabase = EsriFileGdb.openGeodatabase(fileName);
+      } else {
+        throw new IllegalArgumentException(
+          "ESRI File Geodatabase must be a directory");
+      }
+    } else if (createMissingGeodatabase) {
+      geodatabase = EsriFileGdb.createGeodatabase(fileName);
+    } else {
+      throw new IllegalArgumentException("ESRI file geodatbase not found "
+        + fileName);
+    }
+  }
+
+  @Override
+  public void insert(final DataObject object) {
+    getWriter().write(object);
+  }
+
+  public void deleteGeodatabase() {
+    close();
+    if (new File(fileName).exists()) {
+      EsriFileGdb.DeleteGeodatabase(fileName);
+    }
+  }
+
+  @Override
+  public DataObject load(final QName typeName, final Object id) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    if (metaData == null) {
+      throw new IllegalArgumentException("Unknown type " + typeName);
+    } else {
+      final Table table = getTable(typeName);
+      final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
+        metaData, this, table, metaData.getIdAttributeName() + " = " + id);
+      try {
+        if (iterator.hasNext()) {
+          return iterator.next();
+        } else {
+          return null;
+        }
+      } finally {
+        iterator.close();
+      }
+    }
+  }
+
+  @Override
+  protected void loadSchemaDataObjectMetaData(
+    final DataObjectStoreSchema schema,
+    final Map<QName, DataObjectMetaData> metaDataMap) {
+    final String schemaName = schema.getName();
+    final String path = "\\" + schemaName;
+    loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Feature Class");
+    loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Table");
+  }
+
+  public void loadSchemaDataObjectMetaData(
+    final Map<QName, DataObjectMetaData> metaDataMap, final String schemaName,
+    final String path, final String datasetType) {
+    final VectorOfWString childFeatureClasses = new VectorOfWString();
+    try {
+      geodatabase.GetChildDatasets(path, datasetType, childFeatureClasses);
+      for (int i = 0; i < childFeatureClasses.size(); i++) {
+        final String childPath = childFeatureClasses.get(i);
+        final Table table = geodatabase.openTable(childPath);
+        DataObjectMetaData metaData = getMetaData(table);
+        metaDataMap.put(metaData.getName(), metaData);
+      }
+    } finally {
+      childFeatureClasses.delete();
+    }
+  }
+
+  private DataObjectMetaData getMetaData(final Table table) {
+    try {
+      final XmlProcessor parser = new EsriGdbXmlParser();
+      final String tableDefinition = table.getDefinition();
+      final DETable deTable = parser.process(tableDefinition);
+      final QName typeName = deTable.getTypeName();
+      final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+        typeName);
+      for (final Field field : deTable.getFields()) {
+        final String fieldName = field.getName();
+        final String type = field.getType();
+        final Constructor<? extends Attribute> attributeConstructor = ESRI_FIELD_TYPE_ATTRIBUTE_MAP.get(type);
+        if (attributeConstructor != null) {
+          try {
+            final Attribute attribute = JavaBeanUtil.invokeConstructor(
+              attributeConstructor, field);
+            metaData.addAttribute(attribute);
+            if (type.equals("esriFieldTypeOID")) {
+              metaData.setIdAttributeName(fieldName);
+            }
+          } catch (final Throwable e) {
+            LOG.error(tableDefinition);
+            throw new RuntimeException("Error creating attribute for "
+              + typeName + "." + field.getName() + " : " + field.getType(), e);
+          }
+        } else {
+          LOG.error("Unsupported field type " + fieldName + ":" + type);
+        }
+      }
+      if (metaData.getIdAttributeIndex() == -1) {
+        final String oidFieldName = deTable.getOIDFieldName();
+        metaData.setIdAttributeName(oidFieldName);
+      }
+      if (deTable instanceof DEFeatureClass) {
+        DEFeatureClass featureClass = (DEFeatureClass)deTable;
+        final String shapeFieldName = featureClass.getShapeFieldName();
+        metaData.setGeometryAttributeName(shapeFieldName);
+      }
+      return metaData;
+    } finally {
+      geodatabase.CloseTable(table);
+    }
+  }
+
+  @Override
+  protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
+    schemaMap.put("", new DataObjectStoreSchema(this, ""));
+
+    addChildSchema(schemaMap, "\\");
+  }
+
   public Reader<DataObject> query(final QName typeName) {
-    Table table = getTable(typeName);
-    DataObjectMetaData metaData = getMetaData(typeName);
+    final Table table = getTable(typeName);
+    final DataObjectMetaData metaData = getMetaData(typeName);
     final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
-      metaData, geodatabase, table);
+      metaData, this, table);
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
   }
 
   public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
-    DataObjectMetaData metaData = getMetaData(typeName);
-    Table table = getTable(typeName);
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    final Table table = getTable(typeName);
     final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
-      metaData, geodatabase, table, envelope);
+      metaData, this, table, envelope);
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
@@ -217,13 +346,11 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
     return query(typeName, envelope);
   }
 
-  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
-
   public Reader<DataObject> query(final QName typeName, final String where,
     final Object... arguments) {
-    DataObjectMetaData metaData = getMetaData(typeName);
-    Table table = getTable(typeName);
-    StringBuffer whereClause = new StringBuffer();
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    final Table table = getTable(typeName);
+    final StringBuffer whereClause = new StringBuffer();
     if (arguments.length == 0) {
       if (where.indexOf('?') > -1) {
         throw new IllegalArgumentException(
@@ -233,7 +360,7 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
         whereClause.append(where);
       }
     } else {
-      Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
       int i = 0;
       while (matcher.find()) {
         if (i >= arguments.length) {
@@ -249,7 +376,7 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
     }
 
     final EsriFileGeodatabaseQueryIterator iterator = new EsriFileGeodatabaseQueryIterator(
-      metaData, geodatabase, table, whereClause.toString());
+      metaData, this, table, whereClause.toString());
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
@@ -259,4 +386,32 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
     this.fileName = fileName;
   }
 
+  @Override
+  public void update(final DataObject object) {
+    getWriter().write(object);
+  }
+
+  public boolean isCreateMissingTables() {
+    return createMissingTables;
+  }
+
+  public void setCreateMissingTables(boolean createMissingTables) {
+    this.createMissingTables = createMissingTables;
+  }
+
+  public DataObjectMetaData getMetaData(DataObjectMetaData objectMetaData) {
+    QName typeName = objectMetaData.getName();
+    synchronized (geodatabase) {
+      DataObjectMetaData metaData = getMetaData(typeName);
+      if (createMissingTables && metaData == null) {
+        final DETable deTable = EsriXmlDataObjectMetaDataUtil.getDETable(objectMetaData);
+        String tableDefinition = Serializer.toString(deTable);
+        Table table = geodatabase.createTable(tableDefinition,
+          "\\" + typeName.getNamespaceURI());
+        metaData = getMetaData(table);
+        addMetaData(metaData);
+      }
+      return metaData;
+    }
+  }
 }

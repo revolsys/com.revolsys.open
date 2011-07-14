@@ -17,16 +17,18 @@ public class EsriFileGdb {
     return new ErrorRecord(EsriFileGdbJNI.getErrorRecord(num), true);
   }
 
-  public static int getErrorRecordCount(int num) {
-    return EsriFileGdbJNI.getErrorRecordCount(num);
+  public static int getErrorRecordCount() {
+    return EsriFileGdbJNI.getErrorRecordCount();
   }
 
-  public static int CreateGeodatabase(String path, Geodatabase geodatabase) {
-    return EsriFileGdbJNI.CreateGeodatabase(path, Geodatabase.getCPtr(geodatabase), geodatabase);
+  public static Geodatabase createGeodatabase(String path) {
+    long cPtr = EsriFileGdbJNI.createGeodatabase(path);
+    return (cPtr == 0) ? null : new Geodatabase(cPtr, false);
   }
 
-  public static int OpenGeodatabase(String path, Geodatabase geodatabase) {
-    return EsriFileGdbJNI.OpenGeodatabase(path, Geodatabase.getCPtr(geodatabase), geodatabase);
+  public static Geodatabase openGeodatabase(String path) {
+    long cPtr = EsriFileGdbJNI.openGeodatabase(path);
+    return (cPtr == 0) ? null : new Geodatabase(cPtr, false);
   }
 
   public static int CloseGeodatabase(Geodatabase geodatabase) {

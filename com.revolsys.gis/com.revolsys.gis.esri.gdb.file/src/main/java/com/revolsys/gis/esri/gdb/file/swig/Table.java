@@ -91,18 +91,6 @@ public class Table {
     return EsriFileGdbJNI.Table_DisableSubtypes(swigCPtr, this);
   }
 
-  public int Search(String subfields, String whereClause, Envelope envelope, boolean recycling, EnumRows rows) {
-    return EsriFileGdbJNI.Table_Search__SWIG_0(swigCPtr, this, subfields, whereClause, Envelope.getCPtr(envelope), envelope, recycling, EnumRows.getCPtr(rows), rows);
-  }
-
-  public int Search(String subfields, String whereClause, boolean recycling, EnumRows rows) {
-    return EsriFileGdbJNI.Table_Search__SWIG_1(swigCPtr, this, subfields, whereClause, recycling, EnumRows.getCPtr(rows), rows);
-  }
-
-  public int CreateRowObject(Row row) {
-    return EsriFileGdbJNI.Table_CreateRowObject(swigCPtr, this, Row.getCPtr(row), row);
-  }
-
   public int Insert(Row row) {
     return EsriFileGdbJNI.Table_Insert(swigCPtr, this, Row.getCPtr(row), row);
   }
@@ -153,6 +141,21 @@ public class Table {
 
   public int getDefaultSubtypeCode() {
     return EsriFileGdbJNI.Table_getDefaultSubtypeCode(swigCPtr, this);
+  }
+
+  public Row createRowObject() {
+    long cPtr = EsriFileGdbJNI.Table_createRowObject(swigCPtr, this);
+    return (cPtr == 0) ? null : new Row(cPtr, false);
+  }
+
+  public EnumRows search(String subfields, String whereClause, Envelope envelope, boolean recycling) {
+    long cPtr = EsriFileGdbJNI.Table_search__SWIG_0(swigCPtr, this, subfields, whereClause, Envelope.getCPtr(envelope), envelope, recycling);
+    return (cPtr == 0) ? null : new EnumRows(cPtr, false);
+  }
+
+  public EnumRows search(String subfields, String whereClause, boolean recycling) {
+    long cPtr = EsriFileGdbJNI.Table_search__SWIG_1(swigCPtr, this, subfields, whereClause, recycling);
+    return (cPtr == 0) ? null : new EnumRows(cPtr, false);
   }
 
 }

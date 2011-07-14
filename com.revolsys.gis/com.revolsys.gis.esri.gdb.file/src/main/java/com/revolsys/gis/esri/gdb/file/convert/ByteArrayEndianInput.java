@@ -11,21 +11,100 @@ public class ByteArrayEndianInput implements EndianInput {
 
   private UnsignedCharArray array;
 
-  public ByteArrayEndianInput(UnsignedCharArray array) {
+  private final byte readBuffer[] = new byte[8];
+
+  public ByteArrayEndianInput(final UnsignedCharArray array) {
     this.array = array;
+  }
+
+  public void close() throws IOException {
+    array = null;
+  }
+
+  public int read() throws IOException {
+    final int b = array.get(index);
+    index++;
+    return b;
+  }
+
+  public final int read(final byte b[]) throws IOException {
+    return read(b, 0, b.length);
+  }
+
+  public int read(final byte b[], final int off, final int len)
+    throws IOException {
+    if (b == null) {
+      throw new NullPointerException();
+    } else if ((off < 0) || (off > b.length) || (len < 0)
+      || ((off + len) > b.length) || ((off + len) < 0)) {
+      throw new IndexOutOfBoundsException();
+    } else if (len == 0) {
+      return 0;
+    }
+
+    int c = read();
+    if (c == -1) {
+      return -1;
+    }
+    b[off] = (byte)c;
+
+    int i = 1;
+    try {
+      for (; i < len; i++) {
+        c = read();
+        if (c == -1) {
+          break;
+        }
+        if (b != null) {
+          b[off + i] = (byte)c;
+        }
+      }
+    } catch (final IOException ee) {
+    }
+    return i;
+  }
+
+  public final double readDouble() throws IOException {
+    return Double.longBitsToDouble(readLong());
+  }
+
+  public final float readFloat() throws IOException {
+    return Float.intBitsToFloat(readInt());
+  }
+
+  public final void readFully(final byte b[]) throws IOException {
+    readFully(b, 0, b.length);
+  }
+
+  public final void readFully(final byte b[], final int off, final int len)
+    throws IOException {
+    if (len < 0) {
+      throw new IndexOutOfBoundsException();
+    }
+    int n = 0;
+    while (n < len) {
+      final int count = read(b, off + n, len - n);
+      if (count < 0) {
+        throw new EOFException();
+      }
+      n += count;
+    }
+  }
+
+  public final int readInt() throws IOException {
+    final int ch1 = read();
+    final int ch2 = read();
+    final int ch3 = read();
+    final int ch4 = read();
+    if ((ch1 | ch2 | ch3 | ch4) < 0) {
+      throw new EOFException();
+    }
+    return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
   }
 
   public double readLEDouble() throws IOException {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
-  }
-
-  public final short readShort() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
-    if ((ch1 | ch2) < 0)
-      throw new EOFException();
-    return (short)((ch1 << 8) + (ch2 << 0));
   }
 
   public int readLEInt() throws IOException {
@@ -59,64 +138,6 @@ public class ByteArrayEndianInput implements EndianInput {
     return (short)value;
   }
 
-  public void close() throws IOException {
-    array = null;
-  }
-
-  public int read(byte b[], int off, int len) throws IOException {
-    if (b == null) {
-      throw new NullPointerException();
-    } else if ((off < 0) || (off > b.length) || (len < 0)
-      || ((off + len) > b.length) || ((off + len) < 0)) {
-      throw new IndexOutOfBoundsException();
-    } else if (len == 0) {
-      return 0;
-    }
-
-    int c = read();
-    if (c == -1) {
-      return -1;
-    }
-    b[off] = (byte)c;
-
-    int i = 1;
-    try {
-      for (; i < len; i++) {
-        c = read();
-        if (c == -1) {
-          break;
-        }
-        if (b != null) {
-          b[off + i] = (byte)c;
-        }
-      }
-    } catch (IOException ee) {
-    }
-    return i;
-  }
-
-  public int read() throws IOException {
-    int b = array.get(index);
-    index++;
-    return b;
-  }
-
-  public final int read(byte b[]) throws IOException {
-    return read(b, 0, b.length);
-  }
-
-  public final int readInt() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
-    if ((ch1 | ch2 | ch3 | ch4) < 0)
-      throw new EOFException();
-    return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
-  }
-
-  private byte readBuffer[] = new byte[8];
-
   public final long readLong() throws IOException {
     readFully(readBuffer, 0, 8);
     return (((long)readBuffer[0] << 56) + ((long)(readBuffer[1] & 255) << 48)
@@ -126,31 +147,16 @@ public class ByteArrayEndianInput implements EndianInput {
       + ((readBuffer[6] & 255) << 8) + ((readBuffer[7] & 255) << 0));
   }
 
-  public final void readFully(byte b[]) throws IOException {
-    readFully(b, 0, b.length);
-  }
-
-  public final void readFully(byte b[], int off, int len) throws IOException {
-    if (len < 0)
-      throw new IndexOutOfBoundsException();
-    int n = 0;
-    while (n < len) {
-      int count = read(b, off + n, len - n);
-      if (count < 0)
-        throw new EOFException();
-      n += count;
+  public final short readShort() throws IOException {
+    final int ch1 = read();
+    final int ch2 = read();
+    if ((ch1 | ch2) < 0) {
+      throw new EOFException();
     }
+    return (short)((ch1 << 8) + (ch2 << 0));
   }
 
-  public final float readFloat() throws IOException {
-    return Float.intBitsToFloat(readInt());
-  }
-
-  public final double readDouble() throws IOException {
-    return Double.longBitsToDouble(readLong());
-  }
-
-  public int skipBytes(int i) throws IOException {
+  public int skipBytes(final int i) throws IOException {
     this.index += i;
     return i;
   }
