@@ -7,12 +7,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.vividsolutions.jts.geom.Geometry;
 
 public class FeatureDatasetTest {
   static {

@@ -250,6 +250,7 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
     out.endTag();
   }
 
+  @SuppressWarnings("rawtypes")
   private void serializeObjectProperties(final QName tagName, Object object) {
     if (object != null) {
       final Class<? extends Object> objectClass = object.getClass();

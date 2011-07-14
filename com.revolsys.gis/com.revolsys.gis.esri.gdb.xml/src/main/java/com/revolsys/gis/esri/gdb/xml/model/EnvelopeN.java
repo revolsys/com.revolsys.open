@@ -3,7 +3,6 @@ package com.revolsys.gis.esri.gdb.xml.model;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.xml.XsiConstants;
 
 public class EnvelopeN extends Envelope {
   private double xMin;
