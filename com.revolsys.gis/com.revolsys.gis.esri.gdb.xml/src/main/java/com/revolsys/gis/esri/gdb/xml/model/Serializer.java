@@ -16,7 +16,6 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
 
 public class Serializer implements EsriGeodatabaseXmlConstants {
@@ -46,6 +45,8 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
   private XmlWriter out;
 
   private boolean writeNamespaces;
+
+  private boolean writeFirstNamespace;
 
   private boolean writeNull;
 
@@ -113,6 +114,12 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
     addClassProperties(DEDataset.class, DATA_ELEMENT, DE_DATASET, DATASET_TYPE,
       DSID, VERSIONED, CAN_VERSION, CONFIGURATION_KEYWORD);
 
+    addClassProperties(DEGeoDataset.class, DATA_ELEMENT, DE_GEO_DATASET,
+      EXTENT, SPATIAL_REFERENCE);
+
+    addClassProperties(DEFeatureDataset.class, DATA_ELEMENT,
+      DE_FEATURE_DATASET, EXTENT, SPATIAL_REFERENCE);
+
     addClassProperties(DETable.class, DATA_ELEMENT, DE_TABLE, HAS_OID,
       OBJECT_ID_FIELD_NAME, FIELDS, INDEXES, CLSID, EXTCLSID,
       RELATIONSHIP_CLASS_NAMES, ALIAS_NAME, MODEL_NAME, HAS_GLOBAL_ID,
@@ -130,8 +137,9 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
     this();
     this.out = new XmlWriter(out);
     this.out.setIndent(true);
-    this.out.startDocument("utf-8");
+    this.out.startDocument("UTF-8");
     writeNamespaces = false;
+    writeFirstNamespace = true;
   }
 
   public Serializer(final XmlWriter out) {
@@ -170,7 +178,9 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
 
   private void addClassXsiTagName(final Class<?> objectClass,
     final QName tagName) {
-    classXsiTagNameMap.put(objectClass, tagName);
+    if (tagName != null) {
+      classXsiTagNameMap.put(objectClass, tagName);
+    }
   }
 
   private void addSuperclassPropertyNames(final Set<QName> allPropertyNames,
@@ -237,11 +247,7 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
       endTag(childTagName);
     }
 
-    if (writeNamespaces) {
-      out.endTag(tagName);
-    } else {
-      out.endTag(new QName(tagName.getLocalPart()));
-    }
+    out.endTag();
   }
 
   private void serializeObjectProperties(final QName tagName, Object object) {
@@ -296,15 +302,16 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
   }
 
   private boolean startTag(final QName tagName) {
-    if (writeNamespaces) {
+    if (writeNamespaces || writeFirstNamespace) {
       out.startTag(tagName);
+      writeFirstNamespace = false;
     } else {
       out.startTag(null, tagName.getLocalPart());
     }
     final QName xsiTagName = tagNameXsiTagNameMap.get(tagName);
     boolean hasXsi = false;
     if (xsiTagName != null) {
-      writeXsiAttribute(xsiTagName);
+      out.xsiTypeAttribute(xsiTagName);
       hasXsi = true;
     }
     final QName childTagName = tagNameChildTagNameMap.get(tagName);
@@ -317,17 +324,7 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
   private void writeXsiTypeAttribute(final Class<? extends Object> objectClass) {
     final QName xsiTagName = classXsiTagNameMap.get(objectClass);
     if (xsiTagName != null) {
-      writeXsiAttribute(xsiTagName);
-    }
-  }
-
-  private void writeXsiAttribute(final QName xsiTagName) {
-    final String prefix = xsiTagName.getPrefix();
-    final String xsiName = xsiTagName.getLocalPart();
-    if (prefix.equals("")) {
-      out.attribute(XsiConstants.TYPE, xsiName);
-    } else {
-      out.attribute(XsiConstants.TYPE, prefix + ":" + xsiName);
+      out.xsiTypeAttribute(xsiTagName);
     }
   }
 

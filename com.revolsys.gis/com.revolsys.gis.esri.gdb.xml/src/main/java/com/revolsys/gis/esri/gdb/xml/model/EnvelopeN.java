@@ -37,8 +37,8 @@ public class EnvelopeN extends Envelope {
         xMax = boundingBox.getMaxX();
         yMax = boundingBox.getMaxY();
         zMin = boundingBox.getMinZ();
-        xMax = boundingBox.getMaxZ();
-        spatialReference = new SpatialReference(geometryFactory);
+        zMax = boundingBox.getMaxZ();
+        spatialReference = SpatialReference.get(geometryFactory);
       }
     }
   }

@@ -272,7 +272,11 @@ public class BoundingBox extends Envelope {
   }
 
   public double getMaxZ() {
-    return maxZ;
+    if (Double.isNaN(maxZ)) {
+      return 0;
+    } else {
+      return maxZ;
+    }
   }
 
   public <Q extends Quantity> Measurable<Q> getMinimumX() {
@@ -286,7 +290,11 @@ public class BoundingBox extends Envelope {
   }
 
   public double getMinZ() {
-    return minZ;
+    if (Double.isNaN(minZ)) {
+      return 0;
+    } else {
+      return minZ;
+    }
   }
 
   public Measurable<Length> getWidthLength() {

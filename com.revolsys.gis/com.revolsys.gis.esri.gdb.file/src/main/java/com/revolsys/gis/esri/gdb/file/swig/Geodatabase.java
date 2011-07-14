@@ -43,10 +43,6 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_GetDatasetRelationshipTypes(swigCPtr, this, VectorOfWString.getCPtr(relationshipTypes), relationshipTypes);
   }
 
-  public int GetChildDatasets(String parentPath, String datasetType, VectorOfWString childDatasets) {
-    return EsriFileGdbJNI.Geodatabase_GetChildDatasets(swigCPtr, this, parentPath, datasetType, VectorOfWString.getCPtr(childDatasets), childDatasets);
-  }
-
   public int GetRelatedDatasets(String path, String relType, String datasetType, VectorOfWString relatedDatasets) {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path, relType, datasetType, VectorOfWString.getCPtr(relatedDatasets), relatedDatasets);
   }
@@ -57,10 +53,6 @@ public class Geodatabase {
 
   public int GetRelatedDatasetDefinitions(String path, String relType, String datasetType, VectorOfString relatedDatasetDefs) {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr, this, path, relType, datasetType, VectorOfString.getCPtr(relatedDatasetDefs), relatedDatasetDefs);
-  }
-
-  public int CreateFeatureDataset(String featureDatasetDef) {
-    return EsriFileGdbJNI.Geodatabase_CreateFeatureDataset(swigCPtr, this, featureDatasetDef);
   }
 
   public int CloseTable(Table table) {
@@ -101,6 +93,14 @@ public class Geodatabase {
 
   public Geodatabase() {
     this(EsriFileGdbJNI.new_Geodatabase(), true);
+  }
+
+  public void createFeatureDataset(String featureDatasetDef) {
+    EsriFileGdbJNI.Geodatabase_createFeatureDataset(swigCPtr, this, featureDatasetDef);
+  }
+
+  public VectorOfWString getChildDatasets(String parentPath, String datasetType) {
+    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getChildDatasets(swigCPtr, this, parentPath, datasetType), true);
   }
 
   public String getDatasetDefinition(String path, String datasetType) {

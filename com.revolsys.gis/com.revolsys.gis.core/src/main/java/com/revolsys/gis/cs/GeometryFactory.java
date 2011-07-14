@@ -234,6 +234,15 @@ public class GeometryFactory extends
     this.coordinatesPrecisionModel = precisionModel;
   }
 
+  public GeometryFactory(int crsId) {
+    this(EpsgCoordinateSystems.getCoordinateSystem(crsId));
+  }
+
+  public GeometryFactory(int crsId, double scaleXY, double scaleZ) {
+    this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
+      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
+  }
+
   @SuppressWarnings("unchecked")
   public Geometry createGeometry(final List<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
@@ -336,7 +345,7 @@ public class GeometryFactory extends
 
   public Polygon createPolygon(final List<?> rings) {
     if (rings.size() == 0) {
-      return createPolygon(null,null);
+      return createPolygon(null, null);
     } else {
       final LinearRing exteriorRing = getLinearRing(rings, 0);
       final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
@@ -396,6 +405,7 @@ public class GeometryFactory extends
   public boolean hasM() {
     return numAxis > 3;
   }
+
   public void makePrecise(final Coordinates point) {
     coordinatesPrecisionModel.makePrecise(point);
   }

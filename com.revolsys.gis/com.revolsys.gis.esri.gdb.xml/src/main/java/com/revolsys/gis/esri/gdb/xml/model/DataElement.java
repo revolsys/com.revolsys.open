@@ -37,9 +37,15 @@ public class DataElement {
 
   public QName getTypeName() {
     final int slashIndex = catalogPath.lastIndexOf('\\');
-    final String namespaceUri = catalogPath.substring(0, slashIndex);
-    final String localPart = catalogPath.substring(slashIndex + 1);
-    return new QName(namespaceUri, localPart);
+    if (slashIndex == -1) {
+      return new QName(catalogPath);
+    } else if (slashIndex == 0) {
+      return new QName(catalogPath.substring(1));
+    } else {
+      final String namespaceUri = catalogPath.substring(1, slashIndex);
+      final String localPart = catalogPath.substring(slashIndex + 1);
+      return new QName(namespaceUri, localPart);
+    }
   }
 
   public boolean isChildrenExpanded() {
@@ -85,7 +91,11 @@ public class DataElement {
   public void setTypeName(final QName catalogPath) {
     final String namespaceUri = catalogPath.getNamespaceURI();
     this.name = catalogPath.getLocalPart();
-    this.catalogPath = "\\" + namespaceUri + "\\" + name;
+    if (namespaceUri.length() == 0) {
+      this.catalogPath = "\\" + name;
+    } else {
+      this.catalogPath = "\\" + namespaceUri + "\\" + name;
+    }
   }
 
 }

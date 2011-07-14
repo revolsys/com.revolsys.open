@@ -53,6 +53,10 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName DATA_ELEMENT = new QName(_NAMESPACE_URI, "DataElement", "esri");
 
+  QName DE_FEATURE_DATASET = new QName(_NAMESPACE_URI, "DEFeatureDataset", "esri");
+
+  QName DE_GEO_DATASET = new QName(_NAMESPACE_URI, "DEGeoDataset", "esri");
+
   String DATA_ELEMENT_FEATURE_CLASS = "esri:DEFeatureClass";
 
   String DATA_ELEMENT_TABLE = "esri:DETable";

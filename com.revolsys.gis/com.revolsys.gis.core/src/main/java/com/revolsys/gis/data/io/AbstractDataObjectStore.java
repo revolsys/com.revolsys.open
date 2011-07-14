@@ -59,6 +59,21 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  public DataObjectMetaData getMetaData(DataObjectMetaData objectMetaData) {
+    QName typeName = objectMetaData.getName();
+    DataObjectMetaData metaData = getMetaData(typeName);
+    return metaData;
+  }
+
+  public DataObject create(final DataObjectMetaData objectMetaData) {
+    final DataObjectMetaData metaData = getMetaData(objectMetaData);
+    if (metaData == null) {
+      return null;
+    } else {
+      return dataObjectFactory.createDataObject(metaData);
+    }
+  }
+
   public void delete(final DataObject object) {
     throw new UnsupportedOperationException("Delete not supported");
   }
@@ -159,6 +174,10 @@ public abstract class AbstractDataObjectStore extends
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
+
+  protected void addSchema(final DataObjectStoreSchema schema) {
+    schemaMap.put(schema.getName(), schema);
+  }
 
   public Reader<DataObject> query(final QName typeName,
     final BoundingBox boundingBox) {

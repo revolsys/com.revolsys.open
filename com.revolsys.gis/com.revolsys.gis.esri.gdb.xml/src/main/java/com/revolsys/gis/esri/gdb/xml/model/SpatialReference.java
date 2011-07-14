@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
@@ -9,6 +10,18 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 
 public class SpatialReference {
+  public static SpatialReference get(GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
+      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem instanceof com.revolsys.gis.cs.GeographicCoordinateSystem) {
+        return new GeographicCoordinateSystem(geometryFactory);
+      } else if (coordinateSystem instanceof com.revolsys.gis.cs.ProjectedCoordinateSystem) {
+        return new ProjectedCoordinateSystem(geometryFactory);
+      }
+    }
+    return null;
+  }
+
   private String wkt;
 
   private double xOrigin;
@@ -42,22 +55,28 @@ public class SpatialReference {
   public SpatialReference() {
   }
 
-  public SpatialReference(GeometryFactory geometryFactory) {
+  protected SpatialReference(GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     if (geometryFactory != null) {
       CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem.getId());
         if (esriCoordinateSystem != null) {
-
+          final BoundingBox areaBoundingBox = esriCoordinateSystem.getAreaBoundingBox();
           wkt = EsriCsWktWriter.toWkt(esriCoordinateSystem);
-          xOrigin = 0;
-          yOrigin = 0;
+          xOrigin = areaBoundingBox.getMinX();
+          yOrigin = areaBoundingBox.getMinY();
           xYScale = geometryFactory.getScaleXY();
-          zOrigin = 0;
+          if (xYScale == 0) {
+            xYScale = 1.1258999068426238E13;
+          }
+          zOrigin = -100000;
           zScale = geometryFactory.getScaleZ();
-          mOrigin = 0;
-          mScale = 1;
+          if (zScale == 0) {
+            zScale = 1000;
+          }
+          mOrigin = -100000;
+          mScale = 1000;
           xYTolerance = 1.0 / xYScale * 2.0;
           zTolerance = 1.0 / zScale * 2.0;
           mTolerance = 1.0 / mScale * 2.0;

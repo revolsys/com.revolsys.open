@@ -1,15 +1,9 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
-import com.revolsys.xml.XsiConstants;
 
 public class DEFeatureClass extends DETable {
-  private String featureType = "FEATURE_TYPE_SIMPLE";
+  private String featureType = EsriGeodatabaseXmlConstants.FEATURE_TYPE_SIMPLE;
 
   private String shapeType;
 

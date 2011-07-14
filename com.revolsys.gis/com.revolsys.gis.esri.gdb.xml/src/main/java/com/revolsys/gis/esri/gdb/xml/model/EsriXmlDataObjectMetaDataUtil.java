@@ -1,5 +1,8 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.GeometryFactory;
@@ -20,7 +23,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
   public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
   public static DETable getDETable(DataObjectMetaData metaData) {
-     DETable table = metaData.getProperty(DE_TABLE_PROPERTY);
+    DETable table = metaData.getProperty(DE_TABLE_PROPERTY);
     if (table == null) {
       Attribute geometryAttribute = metaData.getGeometryAttribute();
       boolean hasGeometry = false;
@@ -58,13 +61,14 @@ public class EsriXmlDataObjectMetaDataUtil implements
         featureClass.setShapeFieldName(geometryAttribute.getName());
 
         GeometryFactory geometryFactory = metaData.getGeometryFactory();
-        final SpatialReference spatialReference = new SpatialReference(
-          geometryFactory);
-        featureClass.setSpatialReference(spatialReference);
-        featureClass.setHasZ(geometryFactory.hasM());
-        featureClass.setHasZ(geometryFactory.hasZ());
-        final EnvelopeN envelope = new EnvelopeN(geometryFactory);
-        featureClass.setExtent(envelope);
+        if (geometryFactory != null) {
+          final SpatialReference spatialReference = SpatialReference.get(geometryFactory);
+          featureClass.setSpatialReference(spatialReference);
+          featureClass.setHasZ(geometryFactory.hasM());
+          featureClass.setHasZ(geometryFactory.hasZ());
+          final EnvelopeN envelope = new EnvelopeN(geometryFactory);
+          featureClass.setExtent(envelope);
+        }
       } else {
         table = new DETable();
       }
@@ -131,5 +135,48 @@ public class EsriXmlDataObjectMetaDataUtil implements
         table.addField(field);
       }
     }
+  }
+
+  public static DEFeatureDataset getDEFeatureDataset(DataObjectMetaData metaData) {
+    final QName typeName = metaData.getName();
+    final String path = typeName.getNamespaceURI();
+    return getDEFeatureDataset("\\" + path, metaData);
+  }
+
+  public static List<DEFeatureDataset> getDEFeatureDatasets(
+    DataObjectMetaData metaData) {
+    List<DEFeatureDataset> datasets = new ArrayList<DEFeatureDataset>();
+    final QName typeName = metaData.getName();
+    final String fullPath = typeName.getNamespaceURI();
+    String path = "";
+    for (String name : fullPath.split("\\\\")) {
+      path += "\\" + name;
+      final DEFeatureDataset dataset = getDEFeatureDataset(path, metaData);
+      datasets.add(dataset);
+    }
+    return datasets;
+  }
+
+  public static DEFeatureDataset getDEFeatureDataset(final String path,
+    DataObjectMetaData metaData) {
+    DEFeatureDataset dataset = new DEFeatureDataset();
+    String name;
+    int slashIndex = path.lastIndexOf('\\');
+    if (slashIndex == -1) {
+      name = path;
+    } else {
+      name = path.substring(slashIndex + 1);
+    }
+    dataset.setCatalogPath(path);
+    dataset.setName(name);
+
+    GeometryFactory geometryFactory = metaData.getGeometryFactory();
+    if (geometryFactory != null) {
+      final SpatialReference spatialReference = SpatialReference.get(geometryFactory);
+      dataset.setSpatialReference(spatialReference);
+      final EnvelopeN envelope = new EnvelopeN(geometryFactory);
+      dataset.setExtent(envelope);
+    }
+    return dataset;
   }
 }

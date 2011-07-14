@@ -31,9 +31,9 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
       8));
     addFieldType(new SimpleFieldType(FIELD_TYPE_SINGLE, DataTypes.FLOAT,
       "xs:double", true, 4));
-    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INT, true, 8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INT, true, 4));
     addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INTEGER,
-      "xs:int", true, 8));
+      "xs:int", true, 4));
     addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.LONG,
       "xs:int", true, 8));
     addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.QNAME,

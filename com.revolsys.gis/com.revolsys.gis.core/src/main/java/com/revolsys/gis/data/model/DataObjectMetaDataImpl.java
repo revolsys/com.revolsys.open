@@ -69,6 +69,14 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
+  public void setGeometryFactory(GeometryFactory geometryFactory) {
+    Attribute geometryAttribute = getGeometryAttribute();
+    if (geometryAttribute != null) {
+      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        geometryFactory);
+    }
+  }
+
   private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
   private final List<String> geometryAttributeNames = new ArrayList<String>();

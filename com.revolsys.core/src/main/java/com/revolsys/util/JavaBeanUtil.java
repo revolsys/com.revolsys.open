@@ -15,7 +15,9 @@
  */
 package com.revolsys.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -34,10 +36,8 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @param value The property value.
    */
-  public static void setProperty(
-    final Object object,
-    final String propertyName,
-    final Object value) {
+  public static void setProperty(final Object object,
+    final String propertyName, final Object value) {
     try {
       PropertyUtils.setProperty(object, propertyName, value);
     } catch (final IllegalAccessException e) {
@@ -65,9 +65,8 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @return The property value.
    */
-  public static <T> T getProperty(
-    final Object object,
-    final String propertyName) {
+  @SuppressWarnings("unchecked")
+  public static <T> T getProperty(final Object object, final String propertyName) {
     try {
       return (T)PropertyUtils.getProperty(object, propertyName);
     } catch (final IllegalAccessException e) {
@@ -84,6 +83,62 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException("Property " + propertyName
         + " does not exist");
+    }
+  }
+
+  public static <T> T invokeConstructor(Constructor<? extends T> constructor,
+    Object... args) {
+    try {
+      T object = constructor.newInstance(args);
+      return object;
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Error e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException(t.getMessage(), t);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  public static <T> T invokeMethod(Method method, Object object,
+    Object... args) {
+    try {
+      @SuppressWarnings("unchecked")
+      T result = (T)method.invoke(object, args);
+      return result;
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Error e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException(t.getMessage(), t);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static Method getMethod(Class<?> clazz, String name,
+    Class<?>... parameterTypes) {
+    try {
+      Method method = clazz.getMethod(name, parameterTypes);
+      return method;
+    } catch (NoSuchMethodException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 

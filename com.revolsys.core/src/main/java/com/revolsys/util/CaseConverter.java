@@ -66,6 +66,15 @@ public final class CaseConverter {
     }
   }
 
+  public static String toLowerFirstChar(final String text) {
+    if (text.length() > 0) {
+      final char c = text.charAt(0);
+      return Character.toLowerCase(c) + text.substring(1);
+    } else {
+      return text;
+    }
+  }
+
   public static String toLowerUnderscore(final String text) {
     final List<String> words = splitWords(text);
     final StringBuffer result = new StringBuffer();
@@ -110,6 +119,15 @@ public final class CaseConverter {
     return result.toString();
   }
 
+  public static String toUpperFirstChar(final String text) {
+    if (text.length() > 0) {
+      final char c = text.charAt(0);
+      return Character.toUpperCase(c) + text.substring(1);
+    } else {
+      return text;
+    }
+  }
+
   public static String toUpperUnderscore(final String text) {
     final List<String> words = splitWords(text);
     final StringBuffer result = new StringBuffer();
@@ -124,14 +142,5 @@ public final class CaseConverter {
   }
 
   private CaseConverter() {
-  }
-
-  public static String toLowerFirstChar(String text) {
-    if (text.length() > 0) {
-      char c = text.charAt(0);
-      return Character.toLowerCase(c) + text.substring(1);
-    } else {
-      return text;
-    }
   }
 }

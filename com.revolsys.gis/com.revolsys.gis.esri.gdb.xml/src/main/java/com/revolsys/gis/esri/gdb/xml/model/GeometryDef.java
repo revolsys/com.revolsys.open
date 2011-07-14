@@ -24,7 +24,7 @@ public class GeometryDef {
 
   public GeometryDef(String geometryType, GeometryFactory geometryFactory) {
     this.geometryType = geometryType;
-    this.spatialReference = new SpatialReference(geometryFactory);
+    this.spatialReference = SpatialReference.get(geometryFactory);
     this.hasZ = geometryFactory.hasZ();
     this.hasM = geometryFactory.hasM();
   }

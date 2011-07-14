@@ -3,12 +3,9 @@ package com.revolsys.gis.esri.gdb.xml.model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -31,12 +28,15 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(DATA_ELEMENT.getLocalPart(), DataElement.class);
     TAG_NAME_CLASS_MAP.put(DE_DATASET.getLocalPart(), DEDataset.class);
+    TAG_NAME_CLASS_MAP.put(DE_GEO_DATASET.getLocalPart(), DEGeoDataset.class);
+    TAG_NAME_CLASS_MAP.put(DE_FEATURE_DATASET.getLocalPart(),
+      DEFeatureDataset.class);
     TAG_NAME_CLASS_MAP.put(DE_FEATURE_CLASS.getLocalPart(),
       DEFeatureClass.class);
     TAG_NAME_CLASS_MAP.put(DE_TABLE.getLocalPart(), DETable.class);
     TAG_NAME_CLASS_MAP.put(ENVELOPE.getLocalPart(), Envelope.class);
     TAG_NAME_CLASS_MAP.put(ENVELOPE_N.getLocalPart(), EnvelopeN.class);
-      TAG_NAME_CLASS_MAP.put(SPATIAL_REFERENCE.getLocalPart(),
+    TAG_NAME_CLASS_MAP.put(SPATIAL_REFERENCE.getLocalPart(),
       SpatialReference.class);
     TAG_NAME_CLASS_MAP.put(FIELD_ARRAY.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(FIELDS.getLocalPart(), null);

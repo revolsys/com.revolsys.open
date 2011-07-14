@@ -23,7 +23,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
   @Override
   public int getFixedLength() {
-    return 4;
+    return 0;
   }
 
   @Override

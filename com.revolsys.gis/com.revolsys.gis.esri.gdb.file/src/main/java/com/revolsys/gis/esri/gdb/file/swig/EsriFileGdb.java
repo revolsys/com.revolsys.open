@@ -9,18 +9,6 @@
 package com.revolsys.gis.esri.gdb.file.swig;
 
 public class EsriFileGdb {
-  public static String getErrorDescription(int hr) {
-    return EsriFileGdbJNI.getErrorDescription(hr);
-  }
-
-  public static ErrorRecord getErrorRecord(int num) {
-    return new ErrorRecord(EsriFileGdbJNI.getErrorRecord(num), true);
-  }
-
-  public static int getErrorRecordCount() {
-    return EsriFileGdbJNI.getErrorRecordCount();
-  }
-
   public static Geodatabase createGeodatabase(String path) {
     long cPtr = EsriFileGdbJNI.createGeodatabase(path);
     return (cPtr == 0) ? null : new Geodatabase(cPtr, false);
@@ -37,18 +25,6 @@ public class EsriFileGdb {
 
   public static int DeleteGeodatabase(String path) {
     return EsriFileGdbJNI.DeleteGeodatabase(path);
-  }
-
-  public static void ClearErrors() {
-    EsriFileGdbJNI.ClearErrors();
-  }
-
-  public static boolean FindSpatialReferenceBySRID(int auth_srid, SpatialReferenceInfo spatialRef) {
-    return EsriFileGdbJNI.FindSpatialReferenceBySRID(auth_srid, SpatialReferenceInfo.getCPtr(spatialRef), spatialRef);
-  }
-
-  public static boolean FindSpatialReferenceByName(String srname, SpatialReferenceInfo spatialRef) {
-    return EsriFileGdbJNI.FindSpatialReferenceByName(srname, SpatialReferenceInfo.getCPtr(spatialRef), spatialRef);
   }
 
 }

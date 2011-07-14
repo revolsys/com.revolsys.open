@@ -1,21 +1,21 @@
 %inline %{
 template<class T> class OutArrayParamValue {
-  private:
-    T* value;
   public:
-    T get(int i) {
-      return this->value[i];
+    T* outArrayParamValue;
+
+    OutArrayParamValue() {
     };
-    void set(int i, T value) {
-      this->value[i] = value;
+    
+    const T& get(int i) {
+      return this->outArrayParamValue[i];
     };
- 
-    T* getOutParamArrayValue() {
-      return this->value;
+    
+    void set(int i, const T& value) {
+      this->outArrayParamValue[i] = value;
     };
 };
 %}
-%ignore *::getOutParamArrayValue;
+%ignore *::outArrayParamValue;
 
 %define OUT_ARRAY_PARAM(C_TYPE, WRAPPER_TYPE)
 
@@ -27,8 +27,7 @@ template<class T> class OutArrayParamValue {
     jlong cPtr = jenv->GetLongField($input, cPointerField);
     OutArrayParamValue<C_TYPE> *wrapper = NULL;
     *(OutArrayParamValue<C_TYPE> **)&wrapper = *(OutArrayParamValue<C_TYPE> **)&cPtr;
-    C_TYPE* value = wrapper->getOutParamArrayValue();
-    $1 = &value;
+    $1 = &wrapper->outArrayParamValue;
 }
 
 %typemap(jtype) C_TYPE* &OUTVALUE "WRAPPER_TYPE"

@@ -143,6 +143,8 @@ public class XmlWriter extends Writer {
   /** Flag indicating that an XML declaration has been written. */
   private boolean xmlDeclarationWritten = false;
 
+  private int prefixNum;
+
   /**
    * Construct a new XmlWriter.
    * 
@@ -307,11 +309,43 @@ public class XmlWriter extends Writer {
   public void attribute(final QName attribute, final String value) {
     if (value != null) {
       checkWriteAttribute();
+
+      final String namespaceUri = attribute.getNamespaceURI();
+      if (namespaceUri.length() > 0) {
+        String prefix = namespaceMap.get(namespaceUri);
+        if (prefix == null) {
+          prefix = attribute.getPrefix();
+          if (prefix == null || namespaceMap.containsValue(prefix)) {
+            prefix = "p" + ++prefixNum;
+          }
+          namespaceMap.put(namespaceUri, prefix);
+          writeNamespaceAttribute(namespaceUri, prefix);
+        }
+      }
       out.write(' ');
       writeName(attribute);
       out.write("=\"");
       writeAttributeValue(value);
       out.write('"');
+    }
+  }
+
+  public void xsiTypeAttribute(final QName xsiTagName) {
+    final String namespaceUri = xsiTagName.getNamespaceURI();
+    final String xsiName = xsiTagName.getLocalPart();
+    if (namespaceUri.length() > 0) {
+      String prefix = namespaceMap.get(namespaceUri);
+      if (prefix == null) {
+        prefix = xsiTagName.getPrefix();
+        if (prefix == null || namespaceMap.containsValue(prefix)) {
+          prefix = "p" + ++prefixNum;
+        }
+        namespaceMap.put(namespaceUri, prefix);
+        writeNamespaceAttribute(namespaceUri, prefix);
+      }
+      attribute(XsiConstants.TYPE, prefix + ":" + xsiName);
+    } else {
+      attribute(XsiConstants.TYPE, xsiName);
     }
   }
 
@@ -630,9 +664,9 @@ public class XmlWriter extends Writer {
   public String getPrefix(final String namespaceUri) {
     if (namespaceUri == null || namespaceUri.equals("")) {
       return null;
-
+    } else {
+      return namespaceMap.get(namespaceUri);
     }
-    return namespaceMap.get(namespaceUri);
   }
 
   /**
@@ -759,7 +793,14 @@ public class XmlWriter extends Writer {
     if (getPrefix(namespaceUri) == null) {
       namespaceMap.put(namespaceUri, prefix);
     }
-    getCurrentTag().addDefinedNamespace(namespaceUri);
+    final TagConfiguration currentTag = getCurrentTag();
+    if (currentTag != null) {
+      currentTag.addDefinedNamespace(namespaceUri);
+    }
+  }
+
+  public void setPrefix(final QName typeName) {
+    setPrefix(typeName.getPrefix(), typeName.getNamespaceURI());
   }
 
   /**
@@ -845,7 +886,7 @@ public class XmlWriter extends Writer {
         out.write(" standalone=\"no\"");
       }
     }
-    out.write("?>");
+    out.write("?>\n");
     xmlDeclarationWritten = true;
     canWriteXmlDeclaration = false;
   }
