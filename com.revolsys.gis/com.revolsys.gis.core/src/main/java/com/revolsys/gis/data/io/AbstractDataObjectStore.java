@@ -2,6 +2,7 @@ package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.TreeMap;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -39,6 +41,13 @@ public abstract class AbstractDataObjectStore extends
 
   @PreDestroy
   public void close() {
+  }
+
+  protected void addMetaData(final DataObjectMetaData metaData) {
+    QName typeName = metaData.getName();
+    String schemaName = typeName.getNamespaceURI();
+    final DataObjectStoreSchema schema = getSchema(schemaName);
+    schema.addMetaData(metaData);
   }
 
   public DataObject create(final QName typeName) {
@@ -199,5 +208,26 @@ public abstract class AbstractDataObjectStore extends
     for (final DataObject object : objects) {
       update(object);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T> T getSharedAttribute(final String name) {
+    final Map<String, Object> sharedAttributes = getSharedAttributes();
+    final T value = (T)sharedAttributes.get(name);
+    return value;
+  }
+
+  protected synchronized Map<String, Object> getSharedAttributes() {
+    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
+    if (sharedAttributes == null) {
+      sharedAttributes = new HashMap<String, Object>();
+      ThreadSharedAttributes.setAttribute(this, sharedAttributes);
+    }
+    return sharedAttributes;
+  }
+
+  protected void setSharedAttribute(final String name, final Object value) {
+    final Map<String, Object> sharedAttributes = getSharedAttributes();
+    sharedAttributes.put(name, value);
   }
 }

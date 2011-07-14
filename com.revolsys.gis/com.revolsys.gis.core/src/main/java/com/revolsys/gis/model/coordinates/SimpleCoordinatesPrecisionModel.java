@@ -4,9 +4,7 @@ public class SimpleCoordinatesPrecisionModel implements
   CoordinatesPrecisionModel {
   public static SimpleCoordinatesPrecisionModel FLOATING = new SimpleCoordinatesPrecisionModel();
 
-  public static double makePrecise(
-    final double value,
-    final double scale) {
+  public static double makePrecise(final double value, final double scale) {
     if (scale <= 0) {
       return value;
     } else if (Double.isNaN(value)) {
@@ -23,21 +21,18 @@ public class SimpleCoordinatesPrecisionModel implements
   public SimpleCoordinatesPrecisionModel() {
   }
 
-  public SimpleCoordinatesPrecisionModel(
-    final double scale) {
+  public SimpleCoordinatesPrecisionModel(final double scale) {
     this.scaleXY = scale;
     this.scaleZ = scale;
   }
 
-  public SimpleCoordinatesPrecisionModel(
-    final double scaleXY,
+  public SimpleCoordinatesPrecisionModel(final double scaleXY,
     final double scaleZ) {
     this.scaleXY = scaleXY;
     this.scaleZ = scaleZ;
   }
 
-  public Coordinates getPreciseCoordinates(
-    final Coordinates coordinates) {
+  public Coordinates getPreciseCoordinates(final Coordinates coordinates) {
     final Coordinates newCoordinates = new DoubleCoordinates(coordinates);
     makePrecise(newCoordinates);
     return newCoordinates;
@@ -51,9 +46,8 @@ public class SimpleCoordinatesPrecisionModel implements
     return scaleZ;
   }
 
-  public void makePrecise(
-    final Coordinates coordinates) {
-    if (scaleXY >0) {
+  public void makePrecise(final Coordinates coordinates) {
+    if (scaleXY > 0) {
       final double x = coordinates.getX();
       final double newX = makePrecise(x, scaleXY);
       coordinates.setX(newX);
@@ -71,27 +65,28 @@ public class SimpleCoordinatesPrecisionModel implements
     }
   }
 
-  public void setScaleXY(
-    final double scaleXY) {
+  public void setScaleXY(final double scaleXY) {
     this.scaleXY = scaleXY;
   }
 
-  public void setScaleZ(
-    final double scaleZ) {
+  public void setScaleZ(final double scaleZ) {
     this.scaleZ = scaleZ;
   }
+
   @Override
   public String toString() {
     if (isFloating()) {
-      return "floating";
-    } else if (scaleZ > 0) {
-      return "fixed(" + scaleXY + ")";
+      return "scale(xyz=floating)";
+    } else if (scaleZ <= 0) {
+      return "scale(xy=" + scaleXY + ",z=floating)";
+    } else if (scaleXY <= 0) {
+      return "scale(xy=floating,z=" + scaleZ + ")";
     } else {
-      return "fixed[" + scaleXY + "," + scaleZ + "]";
+      return "scale(xy=" + scaleXY + ",z=" + scaleZ + "]";
     }
   }
 
   public boolean isFloating() {
-    return scaleXY <=0;
+    return scaleXY <= 0 && scaleZ <= 0;
   }
 }

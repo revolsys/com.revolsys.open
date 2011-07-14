@@ -261,11 +261,15 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public int getAttributeIndex(final CharSequence name) {
-    final Integer attributeId = attributeIdMap.get(name.toString());
-    if (attributeId == null) {
+    if (name == null) {
       return -1;
     } else {
-      return attributeId;
+      final Integer attributeId = attributeIdMap.get(name.toString());
+      if (attributeId == null) {
+        return -1;
+      } else {
+        return attributeId;
+      }
     }
   }
 

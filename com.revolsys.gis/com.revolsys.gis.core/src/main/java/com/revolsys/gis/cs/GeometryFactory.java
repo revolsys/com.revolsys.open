@@ -393,6 +393,9 @@ public class GeometryFactory extends
     return numAxis > 2;
   }
 
+  public boolean hasM() {
+    return numAxis > 3;
+  }
   public void makePrecise(final Coordinates point) {
     coordinatesPrecisionModel.makePrecise(point);
   }

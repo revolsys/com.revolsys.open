@@ -14,37 +14,37 @@ import com.revolsys.xml.QNameComparator;
 public class DataObjectStoreSchema {
   private final AbstractDataObjectStore dataObjectStore;
 
-  private Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(new QNameComparator());
+  private Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(
+    new QNameComparator());
 
   private final String name;
 
   private Map<QName, Object> properties = new HashMap<QName, Object>();
 
-  public DataObjectStoreSchema(
-    final AbstractDataObjectStore dataObjectStore,
+  public DataObjectStoreSchema(final AbstractDataObjectStore dataObjectStore,
     final String name) {
     this.dataObjectStore = dataObjectStore;
     this.name = name;
   }
 
-  public synchronized DataObjectMetaData findMetaData(
-    final QName typeName) {
-       final DataObjectMetaData metaData = metaDataCache.get(typeName);
-      return metaData;
+  public synchronized DataObjectMetaData findMetaData(final QName typeName) {
+    final DataObjectMetaData metaData = metaDataCache.get(typeName);
+    return metaData;
   }
 
-  protected void addMetaData(
-    QName typeName,
-    DataObjectMetaData metaData) {
+  protected void addMetaData(QName typeName, DataObjectMetaData metaData) {
     metaDataCache.put(typeName, metaData);
+  }
+
+  protected void addMetaData(DataObjectMetaData metaData) {
+    addMetaData(metaData.getName(), metaData);
   }
 
   public DataObjectStore getDataObjectStore() {
     return dataObjectStore;
   }
 
-  public synchronized DataObjectMetaData getMetaData(
-    final QName typeName) {
+  public synchronized DataObjectMetaData getMetaData(final QName typeName) {
     if (typeName.getNamespaceURI().equals(name)) {
       if (metaDataCache.isEmpty()) {
         refreshMetaData();
@@ -60,6 +60,10 @@ public class DataObjectStoreSchema {
     dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
   }
 
+  protected Map<QName, DataObjectMetaData> getMetaDataCache() {
+    return metaDataCache;
+  }
+
   public String getName() {
     return name;
   }
@@ -68,8 +72,8 @@ public class DataObjectStoreSchema {
     return properties;
   }
 
-  public <V extends Object> V getProperty(
-    final QName name) {
+  @SuppressWarnings("unchecked")
+  public <V extends Object> V getProperty(final QName name) {
     return (V)properties.get(name);
   }
 
@@ -84,17 +88,14 @@ public class DataObjectStoreSchema {
     if (metaDataCache.isEmpty()) {
       refreshMetaData();
     }
-    return new ArrayList(metaDataCache.values());
+    return new ArrayList<DataObjectMetaData>(metaDataCache.values());
   }
 
-  public void setProperties(
-    final Map<QName, Object> properties) {
+  public void setProperties(final Map<QName, Object> properties) {
     this.properties = properties;
   }
 
-  public void setProperty(
-    final QName name,
-    final Object value) {
+  public void setProperty(final QName name, final Object value) {
     properties.put(name, value);
   }
 
