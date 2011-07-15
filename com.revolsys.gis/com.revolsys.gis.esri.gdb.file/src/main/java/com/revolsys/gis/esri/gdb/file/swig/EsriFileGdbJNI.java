@@ -8,7 +8,14 @@
 
 package com.revolsys.gis.esri.gdb.file.swig;
 
+import com.revolsys.jar.ClasspathNativeLibraryUtil;
+
 class EsriFileGdbJNI {
+
+  static {
+    ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
+  }
+
   public final static native long new_VectorOfString__SWIG_0();
   public final static native long new_VectorOfString__SWIG_1(long jarg1);
   public final static native long VectorOfString_size(long jarg1, VectorOfString jarg1_);

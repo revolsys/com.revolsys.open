@@ -39,6 +39,16 @@ void handleRuntimeError(JNIEnv *jenv, const std::runtime_error e) {
   
 %}
 
+%pragma(java) jniclassimports=%{
+import com.revolsys.jar.ClasspathNativeLibraryUtil;
+%}
+
+%pragma(java) jniclasscode=%{
+  static {
+    ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
+  }
+%}
+
 %include "std_vector.i"
 %include "std_string.i"
 %include "std_wstring.i"

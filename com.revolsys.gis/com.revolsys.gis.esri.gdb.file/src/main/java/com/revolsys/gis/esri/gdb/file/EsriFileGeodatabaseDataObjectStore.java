@@ -194,7 +194,6 @@ public class EsriFileGeodatabaseDataObjectStore extends AbstractDataObjectStore 
 
   @PostConstruct
   public void initialize() {
-    System.loadLibrary("EsriFileGdb");
     final File file = new File(fileName);
     if (file.exists()) {
       if (file.isDirectory()) {
