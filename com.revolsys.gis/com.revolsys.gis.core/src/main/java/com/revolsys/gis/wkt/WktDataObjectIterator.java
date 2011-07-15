@@ -29,7 +29,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
 
   private final BufferedReader in;
 
-  private WKTReader wktReader;
+  private WktParser wktParser;
 
   private DataObjectMetaData metaData;
 
@@ -59,7 +59,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         geometryFactory);
     }
-    wktReader = new WKTReader(geometryFactory);
+    wktParser = new WktParser(geometryFactory);
   }
 
   public DataObjectMetaData getMetaData() {
@@ -69,7 +69,8 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
   @Override
   protected DataObject getNext() {
     try {
-      final Geometry geometry = wktReader.read(in);
+      String wkt = in.readLine();
+      final Geometry geometry = wktParser.parseGeometry(wkt);
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {
@@ -77,7 +78,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
         object.setGeometryValue(geometry);
         return object;
       }
-    } catch (final ParseException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Error reading geometry ", e);
     }
 

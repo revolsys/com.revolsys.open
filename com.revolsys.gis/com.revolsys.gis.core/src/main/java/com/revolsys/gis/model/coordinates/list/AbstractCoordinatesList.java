@@ -308,7 +308,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
   @Override
   public String toString() {
     final byte numAxis = getNumAxis();
-    if (numAxis > 0) {
+    if (numAxis > 0 && size() > 0) {
       final StringBuffer s = new StringBuffer("LINESTRING(");
       append(s, 0, numAxis);
       for (int i = 1; i < size(); i++) {

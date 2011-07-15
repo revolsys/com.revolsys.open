@@ -47,7 +47,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
             shapeType = GEOMETRY_TYPE_MULTI_PATCH;
           } else {
             throw new IllegalArgumentException(
-              "Unable to detectn geometry type");
+              "Unable to detect geometry type");
           }
         }
       }

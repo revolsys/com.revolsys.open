@@ -10,35 +10,27 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   private final byte numAxis;
 
-  public DoubleCoordinatesList(
-    final CoordinatesList coordinatesList) {
+  public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
     this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
   }
 
-  public DoubleCoordinatesList(
-    final CoordinatesList coordinatesList,
+  public DoubleCoordinatesList(final CoordinatesList coordinatesList,
     final int numAxis) {
     this(coordinatesList.size(), numAxis);
     coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
   }
 
-  public DoubleCoordinatesList(
-    final int numAxis,
-    final double... coordinates) {
+  public DoubleCoordinatesList(final int numAxis, final double... coordinates) {
     this.numAxis = (byte)numAxis;
     this.coordinates = coordinates;
   }
 
-  public DoubleCoordinatesList(
-    final int size,
-    final int numAxis) {
+  public DoubleCoordinatesList(final int size, final int numAxis) {
     this.coordinates = new double[size * numAxis];
     this.numAxis = (byte)numAxis;
   }
 
-  public DoubleCoordinatesList(
-    final int numAxis,
-    final List<Number> coordinates) {
+  public DoubleCoordinatesList(final int numAxis, final List<? extends Number> coordinates) {
     this(numAxis, MathUtil.toDoubleArray(coordinates));
   }
 
@@ -58,9 +50,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     return numAxis;
   }
 
-  public double getValue(
-    final int index,
-    final int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     final byte numAxis = getNumAxis();
     if (axisIndex < numAxis) {
       return coordinates[index * numAxis + axisIndex];
@@ -69,10 +59,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
-  public void setValue(
-    final int index,
-    final int axisIndex,
-    final double value) {
+  public void setValue(final int index, final int axisIndex, final double value) {
     final byte numAxis = getNumAxis();
     if (axisIndex < numAxis) {
       coordinates[index * numAxis + axisIndex] = value;

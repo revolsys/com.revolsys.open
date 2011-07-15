@@ -35,10 +35,66 @@ import com.revolsys.jdbc.JdbcUtils;
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   private final DataSource dataSource;
 
+  private static final Map<Integer, String> ID_TO_GEOMETRY_TYPE = new HashMap<Integer, String>();
+
+  private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
+
+  static {
+    addGeometryType("GEOMETRY", 0);
+    addGeometryType("POINT", 1);
+    addGeometryType("LINESTRING", 2);
+    addGeometryType("POLYGON", 3);
+    addGeometryType("MULTIPOINT", 4);
+    addGeometryType("MULTILINESTRING", 5);
+    addGeometryType("MULTIPOLYGON", 6);
+    addGeometryType("GEOMCOLLECTION", 7);
+    addGeometryType("CURVE", 13);
+    addGeometryType("SURFACE", 14);
+    addGeometryType("POLYHEDRALSURFACE", 15);
+    addGeometryType("GEOMETRYZ", 1000);
+    addGeometryType("POINTZ", 1001);
+    addGeometryType("LINESTRINGZ", 1002);
+    addGeometryType("POLYGONZ", 1003);
+    addGeometryType("MULTIPOINTZ", 1004);
+    addGeometryType("MULTILINESTRINGZ", 1005);
+    addGeometryType("MULTIPOLYGONZ", 1006);
+    addGeometryType("GEOMCOLLECTIONZ", 1007);
+    addGeometryType("CURVEZ", 1013);
+    addGeometryType("SURFACEZ", 1014);
+    addGeometryType("POLYHEDRALSURFACEZ", 1015);
+    addGeometryType("GEOMETRY", 2000);
+    addGeometryType("POINTM", 2001);
+    addGeometryType("LINESTRINGM", 2002);
+    addGeometryType("POLYGONM", 2003);
+    addGeometryType("MULTIPOINTM", 2004);
+    addGeometryType("MULTILINESTRINGM", 2005);
+    addGeometryType("MULTIPOLYGONM", 2006);
+    addGeometryType("GEOMCOLLECTIONM", 2007);
+    addGeometryType("CURVEM", 2013);
+    addGeometryType("SURFACEM", 2014);
+    addGeometryType("POLYHEDRALSURFACEM", 2015);
+    addGeometryType("GEOMETRYZM", 3000);
+    addGeometryType("POINTZM", 3001);
+    addGeometryType("LINESTRINGZM", 3002);
+    addGeometryType("POLYGONZM", 3003);
+    addGeometryType("MULTIPOINTZM", 3004);
+    addGeometryType("MULTILINESTRINGZM", 3005);
+    addGeometryType("MULTIPOLYGONZM", 3006);
+    addGeometryType("GEOMCOLLECTIONZM", 3007);
+    addGeometryType("CURVEZM", 3013);
+    addGeometryType("SURFACEZM", 3014);
+    addGeometryType("POLYHEDRALSURFACEZM", 3015);
+  }
+
   private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
 
   public OracleSdoGeometryAttributeAdder(final DataSource dataSource) {
     this.dataSource = dataSource;
+  }
+
+  private static void addGeometryType(String name, int id) {
+    ID_TO_GEOMETRY_TYPE.put(id, name);
+    GEOMETRY_TYPE_TO_ID.put(name, id);
   }
 
   @Override

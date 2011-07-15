@@ -9,8 +9,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
 
-import com.revolsys.jdbc.JdbcUtils;
-
 public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private Map<String, Object> config = new HashMap<String, Object>();
@@ -39,7 +37,6 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
       dataSourceReference = new WeakReference<DataSource>(dataSource); 
     }
     return dataSourceReference.get();
-    
   }
 
   public void close() {

@@ -33,9 +33,12 @@
 package com.revolsys.gis.wkt;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -48,10 +51,18 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class WktWriter {
-  private static final NumberFormat FORMAT = new DecimalFormat("#.#########################");
-  public static void write(
-    PrintWriter out,
-    Geometry geometry) {
+  private static final NumberFormat FORMAT = new DecimalFormat(
+    "#.#########################");
+
+  public static String toString(Geometry geometry) {
+    StringWriter out = new StringWriter();
+    PrintWriter writer = new PrintWriter(out);
+    write(writer, geometry);
+    writer.flush();
+    return out.toString();
+  }
+
+  public static void write(PrintWriter out, Geometry geometry) {
     if (geometry != null) {
       if (geometry instanceof Point) {
         Point point = (Point)geometry;
@@ -81,32 +92,29 @@ public class WktWriter {
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    Geometry geometry,
-    int dimension) {
+  public static void write(PrintWriter out, Geometry geometry, int numAxis) {
     if (geometry != null) {
       if (geometry instanceof Point) {
         Point point = (Point)geometry;
-        write(out, point, dimension);
+        write(out, point, numAxis);
       } else if (geometry instanceof MultiPoint) {
         MultiPoint multiPoint = (MultiPoint)geometry;
-        write(out, multiPoint, dimension);
+        write(out, multiPoint, numAxis);
       } else if (geometry instanceof LineString) {
         LineString line = (LineString)geometry;
-        write(out, line, dimension);
+        write(out, line, numAxis);
       } else if (geometry instanceof MultiLineString) {
         MultiLineString multiLine = (MultiLineString)geometry;
-        write(out, multiLine, dimension);
+        write(out, multiLine, numAxis);
       } else if (geometry instanceof Polygon) {
         Polygon polygon = (Polygon)geometry;
-        write(out, polygon, dimension);
+        write(out, polygon, numAxis);
       } else if (geometry instanceof MultiPolygon) {
         MultiPolygon multiPolygon = (MultiPolygon)geometry;
-        write(out, multiPolygon, dimension);
+        write(out, multiPolygon, numAxis);
       } else if (geometry instanceof GeometryCollection) {
         GeometryCollection geometryCollection = (GeometryCollection)geometry;
-        write(out, geometryCollection, dimension);
+        write(out, geometryCollection, numAxis);
       } else {
         throw new IllegalArgumentException("Unknown geometry type"
           + geometry.getClass());
@@ -114,262 +122,209 @@ public class WktWriter {
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    Point point) {
-    int dimension = Math.min(getDimension(point), 3);
-    write(out, point, dimension);
+  public static void write(PrintWriter out, Point point) {
+    int numAxis = Math.min(getDimension(point), 4);
+    write(out, point, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    Point point,
-    int dimension) {
+  private static void write(PrintWriter out, Point point, int numAxis) {
+    writeGeometryType(out, "POINT", numAxis);
     if (point.isEmpty()) {
-      out.print("POINT EMPTY");
+      out.print(" EMPTY");
     } else {
-      if (dimension > 2) {
-        out.print("POINT Z(");
-      } else {
-        out.print("POINT(");
-      }
+      out.print("(");
       final CoordinateSequence coordinates = point.getCoordinateSequence();
-      write(out, coordinates, 0, dimension);
+      write(out, coordinates, 0, numAxis);
       out.print(')');
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    LineString line) {
-    int dimension = Math.min(getDimension(line), 3);
-    write(out, line, dimension);
+  private static void writeGeometryType(PrintWriter out,
+    final String geometryType, int numAxis) {
+    out.print(geometryType);
+    writeAxis(out, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    LineString line,
-    int dimension) {
+  private static void writeAxis(PrintWriter out, int numAxis) {
+    if (numAxis > 3) {
+      out.print(" ZM");
+    } else if (numAxis > 2) {
+      out.print(" Z");
+    }
+  }
+
+  public static void write(PrintWriter out, LineString line) {
+    int numAxis = Math.min(getDimension(line), 4);
+    write(out, line, numAxis);
+  }
+
+  private static void write(PrintWriter out, LineString line, int numAxis) {
+    writeGeometryType(out, "LINESTRING", numAxis);
     if (line.isEmpty()) {
-      out.print("LINE_STRING EMPTY");
+      out.print(" EMPTY");
     } else {
-      if (dimension > 2) {
-        out.print("LINE_STRING Z");
-      } else {
-        out.print("LINE_STRING");
-      }
       final CoordinateSequence coordinates = line.getCoordinateSequence();
-      write(out, coordinates, dimension);
+      write(out, coordinates, numAxis);
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    Polygon polygon) {
-    int dimension = Math.min(getDimension(polygon), 3);
-    write(out, polygon, dimension);
+  public static void write(PrintWriter out, Polygon polygon) {
+    int numAxis = Math.min(getDimension(polygon), 4);
+    write(out, polygon, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    Polygon polygon,
-    int dimension) {
+  private static void write(PrintWriter out, Polygon polygon, int numAxis) {
+    writeGeometryType(out, "POLYGON", numAxis);
     if (polygon.isEmpty()) {
-      out.print("POLYGON EMPTY");
+      out.print(" EMPTY");
     } else {
-      if (dimension > 2) {
-        out.print("POLYGON Z");
-      } else {
-        out.print("POLYGON");
-      }
-      writePolygon(out, polygon, dimension);
+      writePolygon(out, polygon, numAxis);
     }
   }
 
-  private static void writePolygon(
-    PrintWriter out,
-    Polygon polygon,
-    int dimension) {
+  private static void writePolygon(PrintWriter out, Polygon polygon, int numAxis) {
     out.print('(');
     final LineString shell = polygon.getExteriorRing();
     final CoordinateSequence coordinates = shell.getCoordinateSequence();
-    write(out, coordinates, dimension);
+    write(out, coordinates, numAxis);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+      out.print(',');
       final LineString hole = polygon.getInteriorRingN(i);
       final CoordinateSequence holeCoordinates = hole.getCoordinateSequence();
-      write(out, holeCoordinates, dimension);
+      write(out, holeCoordinates, numAxis);
     }
     out.print(')');
   }
 
-  public static void write(
-    PrintWriter out,
-    MultiPoint multiPoint) {
-    int dimension = Math.min(getDimension(multiPoint), 3);
-    write(out, multiPoint, dimension);
+  public static void write(PrintWriter out, MultiPoint multiPoint) {
+    int numAxis = Math.min(getDimension(multiPoint), 4);
+    write(out, multiPoint, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    MultiPoint multiPoint,
-    int dimension) {
+  private static void write(PrintWriter out, MultiPoint multiPoint, int numAxis) {
+    writeGeometryType(out, "MULTIPOINT", numAxis);
     if (multiPoint.isEmpty()) {
-      out.print("MULTIPOINT EMPTY");
+      out.print(" EMPTY");
     } else {
       Point point = (Point)multiPoint.getGeometryN(0);
       CoordinateSequence coordinates = point.getCoordinateSequence();
-      if (dimension > 2) {
-        out.print("MUTLIPOINT Z(");
-      } else {
-        out.print("MUTLIPOINT(");
-      }
-      write(out, coordinates, 0, dimension);
+      out.print("((");
+      write(out, coordinates, 0, numAxis);
       for (int i = 1; i < multiPoint.getNumGeometries(); i++) {
-        out.print(',');
+        out.print("),(");
         point = (Point)multiPoint.getGeometryN(i);
         coordinates = point.getCoordinateSequence();
-        write(out, coordinates, 0, dimension);
+        write(out, coordinates, 0, numAxis);
       }
-      out.print(')');
+      out.print("))");
     }
   }
 
-  private static int getDimension(
-    Geometry geometry) {
-    int dimension = 0;
+  private static int getDimension(Geometry geometry) {
+    int numAxis = GeometryFactory.getFactory(geometry).getNumAxis();
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry subGeometry = geometry.getGeometryN(i);
-      final int geometryDimension = CoordinatesListUtil.get(subGeometry).getNumAxis();
-      dimension = Math.max(dimension, geometryDimension);
+      final int geometryDimension = CoordinatesListUtil.get(subGeometry)
+        .getNumAxis();
+      numAxis = Math.max(numAxis, geometryDimension);
     }
-    return dimension;
+    return numAxis;
   }
 
-  public static void write(
-    PrintWriter out,
-    MultiLineString multiLineString) {
-    int dimension = Math.min(getDimension(multiLineString), 3);
-    write(out, multiLineString, dimension);
+  public static void write(PrintWriter out, MultiLineString multiLineString) {
+    int numAxis = Math.min(getDimension(multiLineString), 4);
+    write(out, multiLineString, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    MultiLineString multiLineString,
-    int dimension) {
+  private static void write(PrintWriter out, MultiLineString multiLineString,
+    int numAxis) {
+    writeGeometryType(out, "MULTILINESTRING", numAxis);
     if (multiLineString.isEmpty()) {
-      out.print("MULTILINESTRING EMPTY");
+      out.print(" EMPTY");
     } else {
-      if (dimension > 2) {
-        out.print("MULTILINESTRING Z(");
-      } else {
-        out.print("MULTILINESTRING(");
-      }
-
+      out.print("(");
       LineString line = (LineString)multiLineString.getGeometryN(0);
-      CoordinateSequence coordinates = line.getCoordinateSequence();
-      write(out, coordinates, 0, dimension);
+      CoordinatesList points = CoordinatesListUtil.get(line);
+      write(out, points, numAxis);
       for (int i = 1; i < multiLineString.getNumGeometries(); i++) {
-        out.print(',');
+        out.print(",");
         line = (LineString)multiLineString.getGeometryN(i);
-        coordinates = line.getCoordinateSequence();
-        write(out, coordinates, 0, dimension);
+        points = CoordinatesListUtil.get(line);
+        write(out, points, numAxis);
       }
-      out.print(')');
+      out.print(")");
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    MultiPolygon multiPolygon) {
-    int dimension = Math.min(getDimension(multiPolygon), 3);
-    write(out, multiPolygon, dimension);
+  public static void write(PrintWriter out, MultiPolygon multiPolygon) {
+    int numAxis = Math.min(getDimension(multiPolygon), 4);
+    write(out, multiPolygon, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    MultiPolygon multiPolygon,
-    int dimension) {
+  private static void write(PrintWriter out, MultiPolygon multiPolygon,
+    int numAxis) {
+    writeGeometryType(out, "MULTIPOLYGON", numAxis);
     if (multiPolygon.isEmpty()) {
-      out.print("MULTIPOLYGON EMPTY");
+      out.print(" EMPTY");
     } else {
-      if (dimension > 2) {
-        out.print("MULTIPOLYGON Z(");
-      } else {
-        out.print("MULTIPOLYGON(");
-      }
+      out.print("(");
 
       Polygon polygon = (Polygon)multiPolygon.getGeometryN(0);
-      writePolygon(out, polygon, dimension);
+      writePolygon(out, polygon, numAxis);
       for (int i = 1; i < multiPolygon.getNumGeometries(); i++) {
-        out.print(',');
+        out.print(",");
         polygon = (Polygon)multiPolygon.getGeometryN(i);
-        writePolygon(out, polygon, dimension);
+        writePolygon(out, polygon, numAxis);
       }
-      out.print(')');
+      out.print(")");
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    GeometryCollection multiGeometry) {
-    int dimension = Math.min(getDimension(multiGeometry), 3);
-    write(out, multiGeometry, dimension);
+  public static void write(PrintWriter out, GeometryCollection multiGeometry) {
+    int numAxis = Math.min(getDimension(multiGeometry), 4);
+    write(out, multiGeometry, numAxis);
   }
 
-  private static void write(
-    PrintWriter out,
-    GeometryCollection multiGeometry,
-    int dimension) {
+  private static void write(PrintWriter out, GeometryCollection multiGeometry,
+    int numAxis) {
+    writeGeometryType(out, "MULTIGEOMETRY", numAxis);
     if (multiGeometry.isEmpty()) {
-      out.print("MULTIGEOMETRY EMPTY");
+      out.print(" EMPTY");
     } else {
-      if (dimension > 2) {
-        out.print("MULTIGEOMETRY Z(");
-      } else {
-        out.print("MULTIGEOMETRY(");
-      }
-
+      out.print("(");
       Geometry geometry = multiGeometry.getGeometryN(0);
-      write(out, geometry, dimension);
+      write(out, geometry, numAxis);
       for (int i = 1; i < multiGeometry.getNumGeometries(); i++) {
         out.print(',');
         geometry = multiGeometry.getGeometryN(i);
-        write(out, geometry, dimension);
+        write(out, geometry, numAxis);
       }
       out.print(')');
     }
   }
 
-  public static void write(
-    PrintWriter out,
-    CoordinateSequence coordinates,
-    int dimension) {
+  public static void write(PrintWriter out, CoordinateSequence coordinates,
+    int numAxis) {
     out.print('(');
-    write(out, coordinates, 0, dimension);
+    write(out, coordinates, 0, numAxis);
     for (int i = 1; i < coordinates.size(); i++) {
       out.print(',');
-      write(out, coordinates, i, dimension);
+      write(out, coordinates, i, numAxis);
     }
     out.print(')');
   }
 
-  private static void write(
-    PrintWriter out,
-    CoordinateSequence coordinates,
-    int index,
-    int dimension) {
+  private static void write(PrintWriter out, CoordinateSequence coordinates,
+    int index, int numAxis) {
     writeOrdinate(out, coordinates, index, 0);
-    for (int j = 1; j < dimension; j++) {
+    for (int j = 1; j < numAxis; j++) {
       out.print(' ');
       writeOrdinate(out, coordinates, index, j);
     }
   }
 
-  private static void writeOrdinate(
-    PrintWriter out,
-    CoordinateSequence coordinates,
-    int index,
-    int ordinateIndex) {
+  private static void writeOrdinate(PrintWriter out,
+    CoordinateSequence coordinates, int index, int ordinateIndex) {
     if (ordinateIndex > coordinates.getDimension()) {
       out.print(0);
     } else {

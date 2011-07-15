@@ -3,6 +3,7 @@ package com.revolsys.gis.jdbc.io;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.sql.DataSource;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.jdbc.JdbcUtils;
@@ -80,6 +82,36 @@ public class JdbcFactory {
     }
   }
 
+  public static DataSource createDataSource(final String url,
+    final String username, final String password, Map<String, Object> config) {
+    Map<String, Object> newConfig = new HashMap<String, Object>(config);
+    newConfig.put("url", url);
+    newConfig.put("username", username);
+    newConfig.put("password", password);
+    return createDataSource(newConfig);
+  }
+
+  public static DataSource createDataSource(final String url,
+    final String username, final String password) {
+    final Map<String, Object> config = Collections.emptyMap();
+    return createDataSource(url, username, password, config);
+  }
+
+  public static DataObjectStore createDataObjectStore(final String url,
+    final String username, final String password, Map<String, Object> config) {
+    Map<String, Object> newConfig = new HashMap<String, Object>(config);
+    newConfig.put("url", url);
+    newConfig.put("username", username);
+    newConfig.put("password", password);
+    return createDataObjectStore(newConfig);
+  }
+
+  public static DataObjectStore createDataObjectStore(final String url,
+    final String username, final String password) {
+    final Map<String, Object> config = Collections.emptyMap();
+    return createDataObjectStore(url, username, password, config);
+  }
+
   public static DataSource createDataSource(final String productName,
     final Map<String, Object> config) {
     try {
@@ -121,6 +153,7 @@ public class JdbcFactory {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static Class<?> register(final String productName,
     final String dataStoreClassName) {
     try {
