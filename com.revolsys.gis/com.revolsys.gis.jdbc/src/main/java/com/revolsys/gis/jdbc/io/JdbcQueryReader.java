@@ -125,7 +125,11 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
    */
   public void setTableNames(final List<QName> tableNames) {
     for (final QName tableName : tableNames) {
-      addQuery(tableName, "SELECT * FROM " + JdbcQuery.getTableName(tableName));
+      final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
+      final StringBuffer sql = new StringBuffer();
+      JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
+      final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
+      addQuery(query);
     }
   }
 }

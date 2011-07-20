@@ -13,17 +13,18 @@ public class DEFeatureClass extends DETable {
 
   private boolean hasZ;
 
-  private boolean hasSpatialIndex;
+  private boolean hasSpatialIndex = true;
 
-  private String areaFieldName;
+  private String areaFieldName = "";
 
-  private String lengthFieldName;
+  private String lengthFieldName = "";
 
   private Envelope extent;
 
   private SpatialReference spatialReference;
 
   public DEFeatureClass() {
+    super("{52353152-891A-11D0-BEC6-00805F7C4268}");
     setDatasetType(EsriGeodatabaseXmlConstants.DATASET_TYPE_FEATURE_CLASS);
   }
 

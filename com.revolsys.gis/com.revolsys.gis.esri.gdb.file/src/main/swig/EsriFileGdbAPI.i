@@ -3,6 +3,7 @@
 %{
 
 #include <stdexcept>
+#include <sstream>
 #include "FileGDBAPI.h"
 
 std::string wstring2string(std::wstring wstr) {
@@ -14,27 +15,30 @@ std::string wstring2string(std::wstring wstr) {
   
 fgdbError checkResult(fgdbError error) {
   if (error) {
-     std::wstring message;
-     FileGDBAPI::ErrorInfo::GetErrorDescription(error, message);
-     throw std::runtime_error(wstring2string(message));
+     std::wstring errorString;
+     FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString);
+     std::stringstream message;
+     message << error << "\t" << wstring2string(errorString);
+     throw std::runtime_error(message.str());
   }
   return error;
 }
 
 void handleRuntimeError(JNIEnv *jenv, const std::runtime_error e) {
-  std::string message(e.what());
+  std::stringstream message;
+  message << e.what();
   int count;
   FileGDBAPI::ErrorInfo::GetErrorRecordCount(count);
   for (int i = 0; i < count; i++) {
     int num;
     std::wstring description;
     FileGDBAPI::ErrorInfo::GetErrorRecord(i, num, description);
-    message += "\n" + wstring2string(description);
+    message << "\n" << num << "\t" << wstring2string(description);
     FileGDBAPI::ErrorInfo::ClearErrors();
     
   }
   jclass clazz = jenv->FindClass("java/lang/RuntimeException");
-  jenv->ThrowNew(clazz, message.c_str());
+  jenv->ThrowNew(clazz, message.str().c_str());
 }
   
 %}
@@ -48,6 +52,8 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
     ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
   }
 %}
+%define EXT_FILEGDB_API
+%enddef
 
 %include "std_vector.i"
 %include "std_string.i"
@@ -94,6 +100,12 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     FileGDBAPI::Geodatabase* value = new FileGDBAPI::Geodatabase();
     checkResult(FileGDBAPI::OpenGeodatabase(path, *value));
     return value;
+  }
+  
+  std::wstring getSpatialReferenceWkt(int srid) {
+    FileGDBAPI::SpatialReferenceInfo value;
+    FileGDBAPI::SpatialReferences::FindSpatialReferenceBySRID(srid, value);
+    return value.srtext;
   }
 }
 

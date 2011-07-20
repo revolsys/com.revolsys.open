@@ -15,7 +15,7 @@ public class Field {
 
   private boolean required;
 
-  private boolean editable;
+  private boolean editable = true;
 
   private String aliasName;
 
@@ -29,6 +29,12 @@ public class Field {
 
   public void setName(String name) {
     this.name = name;
+    if (aliasName == null) {
+      this.aliasName = name;
+    }
+    if (modelName == null) {
+      this.modelName = name;
+    }
   }
 
   public String getType() {

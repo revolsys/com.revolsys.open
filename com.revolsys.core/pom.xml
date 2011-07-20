@@ -5,16 +5,13 @@
 		<version>TRUNK-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-  <groupId>com.revolsys</groupId>
   <artifactId>com.revolsys.core</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
   <name>RS Utilities</name>
   
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-5</version>
         <executions>
           <execution>
             <id>make-assembly</id>
@@ -157,4 +154,6 @@
     	<scope>provided</scope>
     </dependency>
   </dependencies>
+  <groupId>com.revolsys</groupId>
+  <version>TRUNK-SNAPSHOT</version>
 </project>

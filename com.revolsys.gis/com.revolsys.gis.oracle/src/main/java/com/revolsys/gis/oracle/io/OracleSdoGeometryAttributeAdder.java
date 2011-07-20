@@ -24,6 +24,7 @@ import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.JdbcConstants;
@@ -37,53 +38,55 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private static final Map<Integer, String> ID_TO_GEOMETRY_TYPE = new HashMap<Integer, String>();
 
+  private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<Integer, DataType>();
+
   private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
 
   static {
-    addGeometryType("GEOMETRY", 0);
-    addGeometryType("POINT", 1);
-    addGeometryType("LINESTRING", 2);
-    addGeometryType("POLYGON", 3);
-    addGeometryType("MULTIPOINT", 4);
-    addGeometryType("MULTILINESTRING", 5);
-    addGeometryType("MULTIPOLYGON", 6);
-    addGeometryType("GEOMCOLLECTION", 7);
-    addGeometryType("CURVE", 13);
-    addGeometryType("SURFACE", 14);
-    addGeometryType("POLYHEDRALSURFACE", 15);
-    addGeometryType("GEOMETRYZ", 1000);
-    addGeometryType("POINTZ", 1001);
-    addGeometryType("LINESTRINGZ", 1002);
-    addGeometryType("POLYGONZ", 1003);
-    addGeometryType("MULTIPOINTZ", 1004);
-    addGeometryType("MULTILINESTRINGZ", 1005);
-    addGeometryType("MULTIPOLYGONZ", 1006);
-    addGeometryType("GEOMCOLLECTIONZ", 1007);
-    addGeometryType("CURVEZ", 1013);
-    addGeometryType("SURFACEZ", 1014);
-    addGeometryType("POLYHEDRALSURFACEZ", 1015);
-    addGeometryType("GEOMETRY", 2000);
-    addGeometryType("POINTM", 2001);
-    addGeometryType("LINESTRINGM", 2002);
-    addGeometryType("POLYGONM", 2003);
-    addGeometryType("MULTIPOINTM", 2004);
-    addGeometryType("MULTILINESTRINGM", 2005);
-    addGeometryType("MULTIPOLYGONM", 2006);
-    addGeometryType("GEOMCOLLECTIONM", 2007);
-    addGeometryType("CURVEM", 2013);
-    addGeometryType("SURFACEM", 2014);
-    addGeometryType("POLYHEDRALSURFACEM", 2015);
-    addGeometryType("GEOMETRYZM", 3000);
-    addGeometryType("POINTZM", 3001);
-    addGeometryType("LINESTRINGZM", 3002);
-    addGeometryType("POLYGONZM", 3003);
-    addGeometryType("MULTIPOINTZM", 3004);
-    addGeometryType("MULTILINESTRINGZM", 3005);
-    addGeometryType("MULTIPOLYGONZM", 3006);
-    addGeometryType("GEOMCOLLECTIONZM", 3007);
-    addGeometryType("CURVEZM", 3013);
-    addGeometryType("SURFACEZM", 3014);
-    addGeometryType("POLYHEDRALSURFACEZM", 3015);
+    addGeometryType(DataTypes.GEOMETRY, "GEOMETRY", 0);
+    addGeometryType(DataTypes.POINT, "POINT", 1);
+    addGeometryType(DataTypes.LINE_STRING, "LINESTRING", 2);
+    addGeometryType(DataTypes.POLYGON, "POLYGON", 3);
+    addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINT", 4);
+    addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRING", 5);
+    addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGON", 6);
+    addGeometryType(null, "GEOMCOLLECTION", 7);
+    addGeometryType(null, "CURVE", 13);
+    addGeometryType(null, "SURFACE", 14);
+    addGeometryType(null, "POLYHEDRALSURFACE", 15);
+    addGeometryType(DataTypes.GEOMETRY, "GEOMETRYZ", 1000);
+    addGeometryType(DataTypes.POINT, "POINTZ", 1001);
+    addGeometryType(DataTypes.LINE_STRING, "LINESTRINGZ", 1002);
+    addGeometryType(DataTypes.POLYGON, "POLYGONZ", 1003);
+    addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINTZ", 1004);
+    addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRINGZ", 1005);
+    addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGONZ", 1006);
+    addGeometryType(null, "GEOMCOLLECTIONZ", 1007);
+    addGeometryType(null, "CURVEZ", 1013);
+    addGeometryType(null, "SURFACEZ", 1014);
+    addGeometryType(null, "POLYHEDRALSURFACEZ", 1015);
+    addGeometryType(DataTypes.GEOMETRY, "GEOMETRYM", 2000);
+    addGeometryType(DataTypes.POINT, "POINTM", 2001);
+    addGeometryType(DataTypes.LINE_STRING, "LINESTRINGM", 2002);
+    addGeometryType(DataTypes.POLYGON, "POLYGONM", 2003);
+    addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINTM", 2004);
+    addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRINGM", 2005);
+    addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGONM", 2006);
+    addGeometryType(null, "GEOMCOLLECTIONM", 2007);
+    addGeometryType(null, "CURVEM", 2013);
+    addGeometryType(null, "SURFACEM", 2014);
+    addGeometryType(null, "POLYHEDRALSURFACEM", 2015);
+    addGeometryType(DataTypes.GEOMETRY, "GEOMETRYZM", 3000);
+    addGeometryType(DataTypes.POINT, "POINTZM", 3001);
+    addGeometryType(DataTypes.LINE_STRING, "LINESTRINGZM", 3002);
+    addGeometryType(DataTypes.POLYGON, "POLYGONZM", 3003);
+    addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINTZM", 3004);
+    addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRINGZM", 3005);
+    addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGONZM", 3006);
+    addGeometryType(null, "GEOMCOLLECTIONZM", 3007);
+    addGeometryType(null, "CURVEZM", 3013);
+    addGeometryType(null, "SURFACEZM", 3014);
+    addGeometryType(null, "POLYHEDRALSURFACEZM", 3015);
   }
 
   private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
@@ -92,9 +95,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     this.dataSource = dataSource;
   }
 
-  private static void addGeometryType(String name, int id) {
+  private static void addGeometryType(DataType dataType, String name, Integer id) {
     ID_TO_GEOMETRY_TYPE.put(id, name);
     GEOMETRY_TYPE_TO_ID.put(name, id);
+    ID_TO_DATA_TYPE.put(id, dataType);
   }
 
   @Override
@@ -128,9 +132,26 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       geometryFactory = new GeometryFactory(coordinateSystem, precisionModel,
         dimension);
     }
+    DataType dataType = DataTypes.GEOMETRY;
+      final String schemaName = typeName.getNamespaceURI();
+      final String tableName = typeName.getLocalPart();
+      String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+      try {
+          int geometryType = JdbcUtils.selectInt(
+        dataSource,
+        sql,
+        schemaName, tableName, columnName);
+      dataType = ID_TO_DATA_TYPE.get(geometryType);
+    } catch (SQLException e) {
+      LOG.error("Unable to get geometry type for " + typeName + "."
+        + columnName,e);
+    } catch (IllegalArgumentException e) {
+      LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typeName + "."
+        + columnName);
+    }
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
-      DataTypes.GEOMETRY, sqlType, length, scale, required, null,
-      geometryFactory, dimension);
+      dataType, sqlType, length, scale, required, null, geometryFactory,
+      dimension);
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));

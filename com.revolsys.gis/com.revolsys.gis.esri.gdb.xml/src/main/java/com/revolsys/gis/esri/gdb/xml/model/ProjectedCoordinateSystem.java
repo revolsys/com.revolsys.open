@@ -10,4 +10,8 @@ public class ProjectedCoordinateSystem extends SpatialReference {
     super(geometryFactory);
   }
 
+public ProjectedCoordinateSystem(GeometryFactory geometryFactory, String wkt) {
+	super(geometryFactory, wkt);
+}
+
 }

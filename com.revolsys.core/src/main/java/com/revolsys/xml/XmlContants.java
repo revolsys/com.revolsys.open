@@ -44,4 +44,7 @@ public final class XmlContants {
 
   public static final QName XML_LANG = new QName(XML_NS_URI, "lang",
     XML_NS_PREFIX);
+
+  public static final QName XML_SCHEMA = new QName(XML_SCHEMA_NAMESPACE_URI, "schema",
+    XML_SCHEMA_NAMESPACE_PREFIX);
 }

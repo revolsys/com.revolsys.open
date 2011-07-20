@@ -58,8 +58,7 @@ public final class FileUtil {
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
 
-  public static void closeSilent(
-    final EndianInput in) {
+  public static void closeSilent(final EndianInput in) {
     try {
       in.close();
     } catch (final IOException e) {
@@ -73,8 +72,7 @@ public final class FileUtil {
    * 
    * @param in The input stream to close.
    */
-  public static void closeSilent(
-    final InputStream in) {
+  public static void closeSilent(final InputStream in) {
     if (in != null) {
       try {
         in.close();
@@ -90,8 +88,7 @@ public final class FileUtil {
    * 
    * @param out The output stream to close.
    */
-  public static void closeSilent(
-    final OutputStream out) {
+  public static void closeSilent(final OutputStream out) {
     if (out != null) {
       try {
         out.close();
@@ -107,8 +104,7 @@ public final class FileUtil {
    * 
    * @param in The reader to close.
    */
-  public static void closeSilent(
-    final Reader in) {
+  public static void closeSilent(final Reader in) {
     if (in != null) {
       try {
         in.close();
@@ -124,8 +120,7 @@ public final class FileUtil {
    * 
    * @param out The writer to close.
    */
-  public static void closeSilent(
-    final Writer out) {
+  public static void closeSilent(final Writer out) {
     if (out != null) {
       try {
         out.close();
@@ -142,8 +137,7 @@ public final class FileUtil {
    * @param path The path to convert.
    * @return The converted path.
    */
-  public static String convertPath(
-    final String path) {
+  public static String convertPath(final String path) {
     final char separator = File.separatorChar;
     if (separator == WINDOWS_FILE_SEPARATOR) {
       return path.replace(UNIX_FILE_SEPARATOR, separator);
@@ -163,9 +157,7 @@ public final class FileUtil {
    * @param out The output stream to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(
-    final File file,
-    final OutputStream out)
+  public static long copy(final File file, final OutputStream out)
     throws IOException {
     final FileInputStream in = new FileInputStream(file);
     try {
@@ -183,10 +175,7 @@ public final class FileUtil {
    * @param out The writer to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(
-    final File file,
-    final Writer out)
-    throws IOException {
+  public static long copy(final File file, final Writer out) throws IOException {
     final FileReader in = new FileReader(file);
     try {
       return copy(in, out);
@@ -203,9 +192,7 @@ public final class FileUtil {
    * @param file The file to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(
-    final InputStream in,
-    final File file)
+  public static long copy(final InputStream in, final File file)
     throws IOException {
     final FileOutputStream out = new FileOutputStream(file);
     try {
@@ -223,10 +210,7 @@ public final class FileUtil {
    * @param sz file size
    * @throws IOException if an i/o error
    */
-  public static void copy(
-    final InputStream zin,
-    final File file,
-    final long sz)
+  public static void copy(final InputStream zin, final File file, final long sz)
     throws IOException {
 
     ReadableByteChannel rc = null;
@@ -272,9 +256,7 @@ public final class FileUtil {
    * @param out The output stream to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(
-    final InputStream in,
-    final OutputStream out)
+  public static long copy(final InputStream in, final OutputStream out)
     throws IOException {
     final byte[] buffer = new byte[4906];
     long numBytes = 0;
@@ -294,10 +276,7 @@ public final class FileUtil {
    * @param file The file to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static void copy(
-    final Reader in,
-    final File file)
-    throws IOException {
+  public static void copy(final Reader in, final File file) throws IOException {
     final FileWriter out = new FileWriter(file);
     try {
       copy(in, out);
@@ -314,10 +293,7 @@ public final class FileUtil {
    * @param out The writer to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(
-    final Reader in,
-    final Writer out)
-    throws IOException {
+  public static long copy(final Reader in, final Writer out) throws IOException {
     final char[] buffer = new char[4906];
     long numBytes = 0;
     int count;
@@ -336,10 +312,8 @@ public final class FileUtil {
    * @return The temportary directory.
    * @throws IOException If there was an exception creating the directory.
    */
-  public static File createTempDirectory(
-    final String prefix,
-    final String suffix)
-    throws IOException {
+  public static File createTempDirectory(final String prefix,
+    final String suffix) throws IOException {
     final File file = File.createTempFile(prefix, suffix);
     if (!file.delete()) {
       throw new IOException("Cannot delete temporary file");
@@ -358,8 +332,7 @@ public final class FileUtil {
    * @param directory The directory to delete.
    * @throws IOException If a file or directory could not be deleted.
    */
-  public static void deleteDirectory(
-    final File directory) {
+  public static void deleteDirectory(final File directory) {
     deleteDirectory(directory, true);
   }
 
@@ -371,8 +344,7 @@ public final class FileUtil {
    * @param deleteRoot Flag indicating if the directory should also be deleted.
    * @throws IOException If a file or directory could not be deleted.
    */
-  public static void deleteDirectory(
-    final File directory,
+  public static void deleteDirectory(final File directory,
     final boolean deleteRoot) {
     final File[] files = directory.listFiles();
     if (files != null) {
@@ -402,8 +374,7 @@ public final class FileUtil {
    * 
    * @param file The file or directory to delete.
    */
-  public static void deleteFileOnExit(
-    final File file) {
+  public static void deleteFileOnExit(final File file) {
     synchronized (deleteFilesOnExit) {
       if (deleteFilesOnExitThread == null) {
         deleteFilesOnExitThread = new Thread(new Runnable() {
@@ -435,9 +406,7 @@ public final class FileUtil {
    * @param directory The directory.
    * @param pattern The regular expression to match
    */
-  public static void deleteFiles(
-    final File directory,
-    final String pattern) {
+  public static void deleteFiles(final File directory, final String pattern) {
     final File[] files = directory.listFiles(new PatternFilenameFilter(pattern));
     for (int i = 0; i < files.length; i++) {
       final File file = files[i];
@@ -445,14 +414,12 @@ public final class FileUtil {
     }
   }
 
-  public static String getBaseName(
-    final File file) {
+  public static String getBaseName(final File file) {
     final String fileName = file.getName();
     return getBaseName(fileName);
   }
 
-  public static String getBaseName(
-    final String name) {
+  public static String getBaseName(final String name) {
     final String fileName = getFileName(name);
     final int dotIndex = fileName.lastIndexOf('.');
     if (dotIndex != -1) {
@@ -462,8 +429,7 @@ public final class FileUtil {
     }
   }
 
-  private static String getCanonicalPath(
-    final File file) {
+  private static String getCanonicalPath(final File file) {
     try {
       return file.getCanonicalPath();
     } catch (final IOException e) {
@@ -471,8 +437,7 @@ public final class FileUtil {
     }
   }
 
-  public static String getFileName(
-    final String fileName) {
+  public static String getFileName(final String fileName) {
     int slashIndex = fileName.lastIndexOf('/');
     if (slashIndex != -1) {
       return fileName.substring(slashIndex + 1);
@@ -486,14 +451,12 @@ public final class FileUtil {
     }
   }
 
-  public static String getFileNameExtension(
-    final File file) {
+  public static String getFileNameExtension(final File file) {
     final String fileName = file.getName();
     return getFileNameExtension(fileName);
   }
 
-  public static String getFileNameExtension(
-    final String fileName) {
+  public static String getFileNameExtension(final String fileName) {
     final int dotIndex = fileName.lastIndexOf('.');
     if (dotIndex != -1) {
       return fileName.substring(dotIndex + 1);
@@ -502,14 +465,12 @@ public final class FileUtil {
     }
   }
 
-  public static String getFileNamePrefix(
-    final File file) {
+  public static String getFileNamePrefix(final File file) {
     final String fileName = file.getName();
     return getBaseName(fileName);
   }
 
-  public static File getFileWithExtension(
-    final File file,
+  public static File getFileWithExtension(final File file,
     final String extension) {
     final File parentFile = file.getParentFile();
     final String baseName = FileUtil.getFileNamePrefix(file);
@@ -531,10 +492,8 @@ public final class FileUtil {
    * @return The relative path.
    * @throws IOException If an I/O error occurs.
    */
-  public static String getRelativePath(
-    final File parentDirectory,
-    final File file)
-    throws IOException {
+  public static String getRelativePath(final File parentDirectory,
+    final File file) throws IOException {
     final String parentPath = getCanonicalPath(parentDirectory);
     final String filePath = getCanonicalPath(file);
     if (filePath.startsWith(parentPath)) {
@@ -547,5 +506,29 @@ public final class FileUtil {
    * Construct a new FileUtil.
    */
   private FileUtil() {
+  }
+
+  public static void copy(File src, File dest) throws IOException {
+    if (src.isDirectory()) {
+      dest.mkdirs();
+      File[] files = src.listFiles();
+      if (files != null) {
+        for (File file : files) {
+          String name = file.getName();
+          File destFile = new File(dest, name);
+          copy(file, destFile);
+        }
+      }
+    } else {
+      FileInputStream in = new FileInputStream(src);
+      File destFile;
+      if (dest.isDirectory()) {
+        String name = src.getName();
+        destFile = new File(dest, name);
+      } else {
+        destFile = dest;
+      }
+      copy(in, destFile);
+    }
   }
 }

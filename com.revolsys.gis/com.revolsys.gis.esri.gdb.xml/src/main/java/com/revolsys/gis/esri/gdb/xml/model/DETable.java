@@ -2,7 +2,6 @@ package com.revolsys.gis.esri.gdb.xml.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 
@@ -16,27 +15,27 @@ public class DETable extends DEDataset {
 
   private List<Index> indexes = new ArrayList<Index>();
 
-  private String clsid = "{" + UUID.randomUUID().toString() + "}";
+  private String clsid = "{7A566981-C114-11D2-8A28-006097AFF44E}";
 
-  private String extclsid;
+  private String extclsid = "";
 
   private List<String> relationshipClassNames = new ArrayList<String>();
 
   private String aliasName;
 
-  private String modelName;
+  private String modelName = "";
 
   private boolean hasGlobalID;
 
-  private String globalIDFieldName;
+  private String globalIDFieldName = "";
 
-  private String rasterFieldName;
+  private String rasterFieldName = "";
 
   private List<PropertySetProperty> extensionProperties = new ArrayList<PropertySetProperty>();
 
   private String subtypeFieldName;
 
-  private String DefaultSubtypeCode;
+  private String defaultSubtypeCode;
 
   private List<Subtype> subtypes = new ArrayList<Subtype>();
 
@@ -46,146 +45,172 @@ public class DETable extends DEDataset {
     setDatasetType(EsriGeodatabaseXmlConstants.DATASET_TYPE_TABLE);
   }
 
-  public boolean isHasOID() {
-    return hasOID;
-  }
-
-  public void setHasOID(boolean hasOID) {
-    this.hasOID = hasOID;
-  }
-
-  public String getOIDFieldName() {
-    return oidFieldName;
-  }
-
-  public void setOIDFieldName(String oidFieldName) {
-    this.oidFieldName = oidFieldName;
-  }
-
-  public List<Field> getFields() {
-    return fields;
-  }
-
-  public void setFields(List<Field> fields) {
-    this.fields = fields;
-  }
-
-  public List<Index> getIndexes() {
-    return indexes;
-  }
-
-  public void setIndexes(List<Index> indexes) {
-    this.indexes = indexes;
-  }
-
-  public String getCLSID() {
-    return clsid;
-  }
-
-  public void setCLSID(String clsid) {
+  public DETable(final String clsid) {
     this.clsid = clsid;
   }
 
-  public String getEXTCLSID() {
-    return extclsid;
+  public void addField(final Field field) {
+    fields.add(field);
   }
 
-  public void setEXTCLSID(String extclsid) {
-    this.extclsid = extclsid;
+  public void addIndex(final Field field) {
+    final Index index = new Index();
+    final String indexName = getName() + "_" + field.getName();
+    index.setName(indexName);
+    index.addField(field);
+    addIndex(index);
   }
 
-  public List<String> getRelationshipClassNames() {
-    return relationshipClassNames;
+  public void addIndex(final Field field, final boolean unique) {
+    final Index index = new Index();
+    final String indexName = getName() + "_" + field.getName();
+    index.setName(indexName);
+    index.setIsUnique(unique);
+    index.addField(field);
+    addIndex(index);
   }
 
-  public void setRelationshipClassNames(List<String> relationshipClassNames) {
-    this.relationshipClassNames = relationshipClassNames;
+  public void addIndex(final Index index) {
+    this.indexes.add(index);
   }
 
   public String getAliasName() {
     return aliasName;
   }
 
-  public void setAliasName(String aliasName) {
-    this.aliasName = aliasName;
-  }
-
-  public String getModelName() {
-    return modelName;
-  }
-
-  public void setModelName(String modelName) {
-    this.modelName = modelName;
-  }
-
-  public boolean isHasGlobalID() {
-    return hasGlobalID;
-  }
-
-  public void setHasGlobalID(boolean hasGlobalID) {
-    this.hasGlobalID = hasGlobalID;
-  }
-
-  public String getGlobalIDFieldName() {
-    return globalIDFieldName;
-  }
-
-  public void setGlobalIDFieldName(String globalIDFieldName) {
-    this.globalIDFieldName = globalIDFieldName;
-  }
-
-  public String getRasterFieldName() {
-    return rasterFieldName;
-  }
-
-  public void setRasterFieldName(String rasterFieldName) {
-    this.rasterFieldName = rasterFieldName;
-  }
-
-  public List<PropertySetProperty> getExtensionProperties() {
-    return extensionProperties;
-  }
-
-  public void setExtensionProperties(
-    List<PropertySetProperty> extensionProperties) {
-    this.extensionProperties = extensionProperties;
-  }
-
-  public String getSubtypeFieldName() {
-    return subtypeFieldName;
-  }
-
-  public void setSubtypeFieldName(String subtypeFieldName) {
-    this.subtypeFieldName = subtypeFieldName;
-  }
-
-  public String getDefaultSubtypeCode() {
-    return DefaultSubtypeCode;
-  }
-
-  public void setDefaultSubtypeCode(String defaultSubtypeCode) {
-    DefaultSubtypeCode = defaultSubtypeCode;
-  }
-
-  public List<Subtype> getSubtypes() {
-    return subtypes;
-  }
-
-  public void setSubtypes(List<Subtype> subtypes) {
-    this.subtypes = subtypes;
+  public String getCLSID() {
+    return clsid;
   }
 
   public List<ControllerMembership> getControllerMemberships() {
     return controllerMemberships;
   }
 
+  public String getDefaultSubtypeCode() {
+    return defaultSubtypeCode;
+  }
+
+  public String getEXTCLSID() {
+    return extclsid;
+  }
+
+  public List<PropertySetProperty> getExtensionProperties() {
+    return extensionProperties;
+  }
+
+  public List<Field> getFields() {
+    return fields;
+  }
+
+  public String getGlobalIDFieldName() {
+    return globalIDFieldName;
+  }
+
+  public List<Index> getIndexes() {
+    return indexes;
+  }
+
+  public String getModelName() {
+    return modelName;
+  }
+
+  public String getOIDFieldName() {
+    return oidFieldName;
+  }
+
+  public String getRasterFieldName() {
+    return rasterFieldName;
+  }
+
+  public List<String> getRelationshipClassNames() {
+    return relationshipClassNames;
+  }
+
+  public String getSubtypeFieldName() {
+    return subtypeFieldName;
+  }
+
+  public List<Subtype> getSubtypes() {
+    return subtypes;
+  }
+
+  public boolean isHasGlobalID() {
+    return hasGlobalID;
+  }
+
+  public boolean isHasOID() {
+    return hasOID;
+  }
+
+  public void setAliasName(final String aliasName) {
+    this.aliasName = aliasName;
+  }
+
+  public void setCLSID(final String clsid) {
+    this.clsid = clsid;
+  }
+
   public void setControllerMemberships(
-    List<ControllerMembership> controllerMemberships) {
+    final List<ControllerMembership> controllerMemberships) {
     this.controllerMemberships = controllerMemberships;
   }
 
-  public void addField(Field field) {
-    fields.add(field);
+  public void setDefaultSubtypeCode(final String defaultSubtypeCode) {
+    this.defaultSubtypeCode = defaultSubtypeCode;
+  }
+
+  public void setEXTCLSID(final String extclsid) {
+    this.extclsid = extclsid;
+  }
+
+  public void setExtensionProperties(
+    final List<PropertySetProperty> extensionProperties) {
+    this.extensionProperties = extensionProperties;
+  }
+
+  public void setFields(final List<Field> fields) {
+    this.fields = fields;
+  }
+
+  public void setGlobalIDFieldName(final String globalIDFieldName) {
+    this.globalIDFieldName = globalIDFieldName;
+  }
+
+  public void setHasGlobalID(final boolean hasGlobalID) {
+    this.hasGlobalID = hasGlobalID;
+  }
+
+  public void setHasOID(final boolean hasOID) {
+    this.hasOID = hasOID;
+  }
+
+  public void setIndexes(final List<Index> indexes) {
+    this.indexes = indexes;
+  }
+
+  public void setModelName(final String modelName) {
+    this.modelName = modelName;
+  }
+
+  public void setOIDFieldName(final String oidFieldName) {
+    this.oidFieldName = oidFieldName;
+  }
+
+  public void setRasterFieldName(final String rasterFieldName) {
+    this.rasterFieldName = rasterFieldName;
+  }
+
+  public void setRelationshipClassNames(
+    final List<String> relationshipClassNames) {
+    this.relationshipClassNames = relationshipClassNames;
+  }
+
+  public void setSubtypeFieldName(final String subtypeFieldName) {
+    this.subtypeFieldName = subtypeFieldName;
+  }
+
+  public void setSubtypes(final List<Subtype> subtypes) {
+    this.subtypes = subtypes;
   }
 
 }

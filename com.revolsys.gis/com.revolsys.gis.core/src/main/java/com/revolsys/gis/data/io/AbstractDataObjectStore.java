@@ -29,6 +29,8 @@ public abstract class AbstractDataObjectStore extends
 
   private DataObjectFactory dataObjectFactory;
 
+  private String label;
+
   private Map<String, DataObjectStoreSchema> schemaMap = new TreeMap<String, DataObjectStoreSchema>();
 
   public AbstractDataObjectStore() {
@@ -39,19 +41,23 @@ public abstract class AbstractDataObjectStore extends
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  @PreDestroy
-  public void close() {
-  }
-
   protected void addMetaData(final DataObjectMetaData metaData) {
-    QName typeName = metaData.getName();
-    String schemaName = typeName.getNamespaceURI();
+    final QName typeName = metaData.getName();
+    final String schemaName = typeName.getNamespaceURI();
     final DataObjectStoreSchema schema = getSchema(schemaName);
     schema.addMetaData(metaData);
   }
 
-  public DataObject create(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  protected void addSchema(final DataObjectStoreSchema schema) {
+    schemaMap.put(schema.getName(), schema);
+  }
+
+  @PreDestroy
+  public void close() {
+  }
+
+  public DataObject create(final DataObjectMetaData objectMetaData) {
+    final DataObjectMetaData metaData = getMetaData(objectMetaData);
     if (metaData == null) {
       return null;
     } else {
@@ -59,14 +65,8 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public DataObjectMetaData getMetaData(DataObjectMetaData objectMetaData) {
-    QName typeName = objectMetaData.getName();
-    DataObjectMetaData metaData = getMetaData(typeName);
-    return metaData;
-  }
-
-  public DataObject create(final DataObjectMetaData objectMetaData) {
-    final DataObjectMetaData metaData = getMetaData(objectMetaData);
+  public DataObject create(final QName typeName) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
     if (metaData == null) {
       return null;
     } else {
@@ -106,6 +106,16 @@ public abstract class AbstractDataObjectStore extends
     return this.dataObjectFactory;
   }
 
+  public String getLabel() {
+    return label;
+  }
+
+  public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
+    final QName typeName = objectMetaData.getName();
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    return metaData;
+  }
+
   public DataObjectMetaData getMetaData(final QName typeName) {
     final String schemaName = typeName.getNamespaceURI();
     final DataObjectStoreSchema schema = getSchema(schemaName);
@@ -136,6 +146,22 @@ public abstract class AbstractDataObjectStore extends
       }
       return new ArrayList<DataObjectStoreSchema>(schemaMap.values());
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T> T getSharedAttribute(final String name) {
+    final Map<String, Object> sharedAttributes = getSharedAttributes();
+    final T value = (T)sharedAttributes.get(name);
+    return value;
+  }
+
+  protected synchronized Map<String, Object> getSharedAttributes() {
+    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
+    if (sharedAttributes == null) {
+      sharedAttributes = new HashMap<String, Object>();
+      ThreadSharedAttributes.setAttribute(this, sharedAttributes);
+    }
+    return sharedAttributes;
   }
 
   public List<QName> getTypeNames(final String schemaName) {
@@ -175,10 +201,6 @@ public abstract class AbstractDataObjectStore extends
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
 
-  protected void addSchema(final DataObjectStoreSchema schema) {
-    schemaMap.put(schema.getName(), schema);
-  }
-
   public Reader<DataObject> query(final QName typeName,
     final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typeName);
@@ -188,8 +210,8 @@ public abstract class AbstractDataObjectStore extends
     return query(typeName, envelope);
   }
 
-  public DataObject queryFirst(QName typeName, String where,
-    Object... arguments) {
+  public DataObject queryFirst(final QName typeName, final String where,
+    final Object... arguments) {
     final Reader<DataObject> reader = query(typeName, where, arguments);
     final Iterator<DataObject> iterator = reader.iterator();
     try {
@@ -215,8 +237,17 @@ public abstract class AbstractDataObjectStore extends
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  public void setLabel(final String label) {
+    this.label = label;
+  }
+
   public void setSchemaMap(final Map<String, DataObjectStoreSchema> schemaMap) {
     this.schemaMap = new DataObjectStoreSchemaMapProxy(this, schemaMap);
+  }
+
+  protected void setSharedAttribute(final String name, final Object value) {
+    final Map<String, Object> sharedAttributes = getSharedAttributes();
+    sharedAttributes.put(name, value);
   }
 
   public void update(final DataObject object) {
@@ -227,26 +258,5 @@ public abstract class AbstractDataObjectStore extends
     for (final DataObject object : objects) {
       update(object);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected <T> T getSharedAttribute(final String name) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    final T value = (T)sharedAttributes.get(name);
-    return value;
-  }
-
-  protected synchronized Map<String, Object> getSharedAttributes() {
-    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
-    if (sharedAttributes == null) {
-      sharedAttributes = new HashMap<String, Object>();
-      ThreadSharedAttributes.setAttribute(this, sharedAttributes);
-    }
-    return sharedAttributes;
-  }
-
-  protected void setSharedAttribute(final String name, final Object value) {
-    final Map<String, Object> sharedAttributes = getSharedAttributes();
-    sharedAttributes.put(name, value);
   }
 }

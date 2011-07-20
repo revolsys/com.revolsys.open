@@ -10,6 +10,7 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -25,24 +26,25 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
 
   private Map<QName, Table> tables = new HashMap<QName, Table>();
 
-  private Geodatabase geodatabase;
+  private final Geodatabase geodatabase;
 
   private EsriFileGeodatabaseDataObjectStore dataObjectStore;
 
-  public EsriFileGeodatabaseWriter(
-    EsriFileGeodatabaseDataObjectStore dataObjectStore) {
+  EsriFileGeodatabaseWriter(
+    final EsriFileGeodatabaseDataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
     this.geodatabase = dataObjectStore.getGeodatabase();
   }
 
+  @Override
   @PreDestroy
   public void close() {
-    for (Entry<QName, Table> entry : tables.entrySet()) {
-      QName name = entry.getKey();
-      Table table = entry.getValue();
+    for (final Entry<QName, Table> entry : tables.entrySet()) {
+      final QName name = entry.getKey();
+      final Table table = entry.getValue();
       try {
         geodatabase.CloseTable(table);
-      } catch (Throwable e) {
+      } catch (final Throwable e) {
         LOG.error("Unable to close table " + name);
       }
     }
@@ -52,32 +54,17 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
 
   private void delete(final DataObject object) {
     final DataObjectMetaData objectMetaData = object.getMetaData();
-    QName typeName = objectMetaData.getName();
-    Table table = getTable(typeName);
-    DataObjectMetaData metaData = dataObjectStore.getMetaData(objectMetaData);
+    final QName typeName = objectMetaData.getName();
+    final Table table = getTable(typeName);
+    final DataObjectMetaData metaData = dataObjectStore.getMetaData(objectMetaData);
     final String idAttributeName = metaData.getIdAttributeName();
-    EnumRows rows = table.search(idAttributeName, idAttributeName + "="
+    final EnumRows rows = table.search(idAttributeName, idAttributeName + "="
       + object.getValue(idAttributeName), false);
-    Row row = rows.next();
+    final Row row = rows.next();
     table.Delete(row);
   }
 
-  private void insert(final DataObject object) {
-    QName typeName = object.getMetaData().getName();
-    Table table = getTable(typeName);
-    DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
-
-    Row row = table.createRowObject();
-    for (Attribute attribute : metaData.getAttributes()) {
-      String name = attribute.getName();
-      Object value = object.getValue(name);
-      AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
-      esriAttribute.setInsertValue(row, value);
-    }
-    table.Insert(row);
-  }
-
-  private Table getTable(QName typeName) {
+  private Table getTable(final QName typeName) {
     Table table = tables.get(typeName);
     if (table == null) {
       table = dataObjectStore.getTable(typeName);
@@ -86,19 +73,34 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
     return table;
   }
 
-  private void update(final DataObject object) {
-    QName typeName = object.getMetaData().getName();
-    Table table = getTable(typeName);
-    DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
-    final String idAttributeName = metaData.getIdAttributeName();
-    EnumRows rows = table.search(idAttributeName, idAttributeName + "="
-      + object.getValue(idAttributeName), false);
-    Row row = rows.next();
+  private void insert(final DataObject object) {
+    final QName typeName = object.getMetaData().getName();
+    final Table table = getTable(typeName);
+    final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
 
-    for (Attribute attribute : metaData.getAttributes()) {
-      String name = attribute.getName();
-      Object value = object.getValue(name);
-      AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
+    final Row row = table.createRowObject();
+    for (final Attribute attribute : metaData.getAttributes()) {
+      final String name = attribute.getName();
+      final Object value = object.getValue(name);
+      final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
+      esriAttribute.setInsertValue(row, value);
+    }
+    table.Insert(row);
+  }
+
+  private void update(final DataObject object) {
+    final QName typeName = object.getMetaData().getName();
+    final Table table = getTable(typeName);
+    final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
+    final String idAttributeName = metaData.getIdAttributeName();
+    final EnumRows rows = table.search(idAttributeName, idAttributeName + "="
+      + object.getValue(idAttributeName), false);
+    final Row row = rows.next();
+
+    for (final Attribute attribute : metaData.getAttributes()) {
+      final String name = attribute.getName();
+      final Object value = object.getValue(name);
+      final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
       esriAttribute.setUpdateValue(row, value);
     }
     table.Update(row);
@@ -106,21 +108,27 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
 
   public synchronized void write(final DataObject object) {
     try {
-      switch (object.getState()) {
-        case New:
-          insert(object);
-        break;
-        case Modified:
-          update(object);
-        break;
-        case Persisted:
+      final DataObjectMetaData metaData = object.getMetaData();
+      final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
+      if (dataObjectStore == this.dataObjectStore) {
+        switch (object.getState()) {
+          case New:
+            insert(object);
+          break;
+          case Modified:
+            update(object);
+          break;
+          case Persisted:
           // No action required
-        break;
-        case Deleted:
-          delete(object);
-        break;
-        default:
-          throw new IllegalStateException("State not known");
+          break;
+          case Deleted:
+            delete(object);
+          break;
+          default:
+            throw new IllegalStateException("State not known");
+        }
+      } else {
+        insert(object);
       }
     } catch (final RuntimeException e) {
       throw e;

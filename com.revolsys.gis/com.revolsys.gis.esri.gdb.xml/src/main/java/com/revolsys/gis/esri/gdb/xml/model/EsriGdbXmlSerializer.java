@@ -16,13 +16,16 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.xml.XmlContants;
+import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
 
-public class Serializer implements EsriGeodatabaseXmlConstants {
+public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   public static String toString(final Object object) {
     final StringWriter writer = new StringWriter();
-    final Serializer serializer = new Serializer(writer);
+    final EsriGdbXmlSerializer serializer = new EsriGdbXmlSerializer(null,
+      writer);
     serializer.serialize(object);
     writer.flush();
     return writer.toString();
@@ -50,7 +53,7 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
 
   private boolean writeNull;
 
-  private Serializer() {
+  private EsriGdbXmlSerializer() {
     addTagNameXsiTagName(METADATA, XML_PROPERTY_SET);
     addTagNameChildTagName(METADATA, XML_DOC);
 
@@ -106,6 +109,7 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
 
     addClassProperties(EnvelopeN.class, ENVELOPE, ENVELOPE_N, X_MIN, Y_MIN,
       X_MAX, Y_MAX, Z_MIN, Z_MAX, M_MIN, M_MAX, SPATIAL_REFERENCE);
+    addTagNameXsiTagName(CONTROLLER_MEMBERSHIPS, ARRAY_OF_CONTROLLER_MEMBERSHIP);
 
     addClassProperties(DataElement.class, DATA_ELEMENT, DATA_ELEMENT,
       CATALOG_PATH, NAME, CHILDREN_EXPANDED, FULL_PROPS_RETRIEVED,
@@ -131,20 +135,38 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
       FEATURE_TYPE, SHAPE_TYPE, SHAPE_FIELD_NAME, HAS_M, HAS_Z,
       HAS_SPATIAL_INDEX, AREA_FIELD_NAME, LENGTH_FIELD_NAME, EXTENT,
       SPATIAL_REFERENCE);
+
+    addTagNameXsiTagName(DATASET_DEFINITIONS, ARRAY_OF_DATA_ELEMENT);
+    addTagNameXsiTagName(DOMAINS, ARRAY_OF_DOMAIN);
+
+    addClassProperties(WorkspaceDefinition.class, WORKSPACE_DEFINITION,
+      WORKSPACE_DEFINITION, WORKSPACE_TYPE, VERSION, DOMAINS,
+      DATASET_DEFINITIONS, METADATA);
+
+    addTagNameListElementTagName(WORKSPACE_DATA, DATASET_DATA);
+    addTagNameXsiTagName(WORKSPACE_DATA, WORKSPACE_DATA);
+
+    addClassProperties(Workspace.class, WORKSPACE, null, WORKSPACE_DEFINITION,
+      WORKSPACE_DATA);
+
   }
 
-  public Serializer(final Writer out) {
+  public EsriGdbXmlSerializer(String esriNamespaceUri, final Writer out) {
+    this(out);
+    if (esriNamespaceUri != null) {
+      this.out.setNamespaceAlias(_NAMESPACE_URI, esriNamespaceUri);
+    }
+  }
+
+  public EsriGdbXmlSerializer(final Writer out) {
     this();
     this.out = new XmlWriter(out);
     this.out.setIndent(true);
     this.out.startDocument("UTF-8");
+    this.out.setPrefix(XmlContants.XML_SCHEMA);
+    this.out.setPrefix(XsiConstants.TYPE);
     writeNamespaces = false;
     writeFirstNamespace = true;
-  }
-
-  public Serializer(final XmlWriter out) {
-    this();
-    this.out = out;
   }
 
   private void addClassProperties(final Class<?> objectClass,
@@ -171,8 +193,8 @@ public class Serializer implements EsriGeodatabaseXmlConstants {
       classMethods = new HashMap<QName, Method>();
       classPropertyMethodMap.put(objectClass, classMethods);
     }
-    final Method method = JavaBeanUtil.getMethod(Serializer.class, methodName,
-      Object.class);
+    final Method method = JavaBeanUtil.getMethod(EsriGdbXmlSerializer.class,
+      methodName, Object.class);
     classMethods.put(propertyName, method);
   }
 

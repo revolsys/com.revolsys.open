@@ -1,9 +1,13 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class DEDataset extends DataElement {
+  private AtomicInteger DSID = new AtomicInteger(0);
+
   private String datasetType;
 
-  private int dsid;
+  private int dsid = DSID.incrementAndGet();
 
   private boolean versioned;
 

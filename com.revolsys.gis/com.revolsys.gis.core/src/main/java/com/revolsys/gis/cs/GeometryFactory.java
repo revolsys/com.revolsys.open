@@ -267,6 +267,10 @@ public class GeometryFactory extends
       new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
   }
 
+  public GeometryFactory(CoordinateSystem coordinateSystem, double scaleXY, double scaleZ) {
+    this(coordinateSystem,
+      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
+  }
   public Geometry createGeometry(Geometry geometry) {
     if (geometry == null) {
       return null;

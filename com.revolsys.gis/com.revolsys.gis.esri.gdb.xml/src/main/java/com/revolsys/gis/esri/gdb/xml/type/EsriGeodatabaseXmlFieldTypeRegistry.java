@@ -21,25 +21,25 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
     addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.BOOLEAN,
       false));
     addFieldType(new SimpleFieldType(FIELD_TYPE_SMALL_INTEGER, DataTypes.BYTE,
-      "xs:short", true, 2));
+      "xs:short", false, 2));
     addFieldType(new SimpleFieldType(FIELD_TYPE_DATE, DataTypes.DATE, false, 36));
     addFieldType(new SimpleFieldType(FIELD_TYPE_DATE, DataTypes.DATE_TIME,
-      true, 36));
+      false, 36));
     addFieldType(new SimpleFieldType(FIELD_TYPE_DOUBLE, DataTypes.DECIMAL,
-      "xs:double", true, 8));
-    addFieldType(new SimpleFieldType(FIELD_TYPE_DOUBLE, DataTypes.DOUBLE, true,
+      "xs:double", false, 8));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_DOUBLE, DataTypes.DOUBLE, false,
       8));
     addFieldType(new SimpleFieldType(FIELD_TYPE_SINGLE, DataTypes.FLOAT,
-      "xs:double", true, 4));
-    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INT, true, 4));
+      "xs:double", false, 4));
+    addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INT, false, 4));
     addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.INTEGER,
-      "xs:int", true, 4));
+      "xs:int", false, 4));
     addFieldType(new SimpleFieldType(FIELD_TYPE_INTEGER, DataTypes.LONG,
-      "xs:int", true, 8));
+      "xs:int", false, 8));
     addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.QNAME,
       "xs:string", true, -1));
     addFieldType(new SimpleFieldType(FIELD_TYPE_SMALL_INTEGER, DataTypes.SHORT,
-      true, 2));
+      false, 2));
     addFieldType(new SimpleFieldType(FIELD_TYPE_STRING, DataTypes.STRING, false));
     addFieldType(new XmlGeometryFieldType(FIELD_TYPE_GEOMETRY,
       DataTypes.GEOMETRY));

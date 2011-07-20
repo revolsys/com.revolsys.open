@@ -1,23 +1,53 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
-public class DataElement {
+public class DataElement implements Cloneable {
   private String catalogPath;
 
   private String name;
 
-  private boolean childrenExpanded;
+  private Boolean childrenExpanded;
 
-  private boolean fullPropsRetrieved;
+  private Boolean fullPropsRetrieved;
 
-  private boolean metadataRetrieved;
+  private Boolean metadataRetrieved;
 
   private String metadata;
 
   private List<DataElement> children;
+
+  @Override
+  public DataElement clone() {
+    try {
+      final DataElement clone = (DataElement)super.clone();
+      if (children != null) {
+        clone.children = new ArrayList<DataElement>();
+        for (DataElement child : children) {
+          clone.children.add(child.clone());
+        }
+      }
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  public String getParentCatalogPath() {
+    String path = getCatalogPath();
+    if (path == null) {
+      return null;
+    } else {
+      int index = path.lastIndexOf('\\');
+      if (index == -1 || index == 0) {
+        return "\\";
+      } else {
+        return path.substring(0, index);
+      }
+    }
+  }
 
   public String getCatalogPath() {
     return catalogPath;
@@ -48,15 +78,15 @@ public class DataElement {
     }
   }
 
-  public boolean isChildrenExpanded() {
+  public Boolean getChildrenExpanded() {
     return childrenExpanded;
   }
 
-  public boolean isFullPropsRetrieved() {
+  public Boolean getFullPropsRetrieved() {
     return fullPropsRetrieved;
   }
 
-  public boolean isMetadataRetrieved() {
+  public Boolean getMetadataRetrieved() {
     return metadataRetrieved;
   }
 
@@ -68,11 +98,11 @@ public class DataElement {
     this.children = children;
   }
 
-  public void setChildrenExpanded(final boolean childrenExpanded) {
+  public void setChildrenExpanded(final Boolean childrenExpanded) {
     this.childrenExpanded = childrenExpanded;
   }
 
-  public void setFullPropsRetrieved(final boolean fullPropsRetrieved) {
+  public void setFullPropsRetrieved(final Boolean fullPropsRetrieved) {
     this.fullPropsRetrieved = fullPropsRetrieved;
   }
 
@@ -80,7 +110,7 @@ public class DataElement {
     this.metadata = metadata;
   }
 
-  public void setMetadataRetrieved(final boolean metadataRetrieved) {
+  public void setMetadataRetrieved(final Boolean metadataRetrieved) {
     this.metadataRetrieved = metadataRetrieved;
   }
 

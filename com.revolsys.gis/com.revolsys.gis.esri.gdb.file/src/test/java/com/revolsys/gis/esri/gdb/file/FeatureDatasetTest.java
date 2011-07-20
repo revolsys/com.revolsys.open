@@ -7,15 +7,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class FeatureDatasetTest {
-  static {
-    System.loadLibrary("EsriFileGdb");
-  }
 
   @Test
   public void testCreateGeodatabase() throws Exception {
@@ -25,16 +23,17 @@ public class FeatureDatasetTest {
     newMetaData.addAttribute("name", DataTypes.STRING, 255, false);
     newMetaData.addAttribute("geometry", DataTypes.POINT, true);
     newMetaData.setIdAttributeName("id");
-    final GeometryFactory geometryFactory = new GeometryFactory(4326, 1000, 1000);
+    final GeometryFactory geometryFactory = new GeometryFactory(4326);
     newMetaData.setGeometryFactory(geometryFactory);
 
     final String datasetName = "target/Create.gdb";
-    final EsriFileGeodatabaseDataObjectStore dataStore = new EsriFileGeodatabaseDataObjectStore(
+     EsriFileGeodatabaseDataObjectStore dataStore = new EsriFileGeodatabaseDataObjectStore(
       datasetName);
     try {
       dataStore.setCreateMissingTables(true);
       dataStore.setCreateMissingGeodatabase(true);
       dataStore.initialize();
+      dataStore.setDefaultSchema("test");
       Assert.assertEquals("Initial Schema Size", 1, dataStore.getSchemas()
         .size());
       final DataObjectMetaData metaData = dataStore.getMetaData(newMetaData);
@@ -47,6 +46,16 @@ public class FeatureDatasetTest {
       dataStore.insert(object);
       for (DataObject object2 : dataStore.query(typeName)) {
         System.out.println(object2);
+      }
+      dataStore.close();
+      
+      dataStore = new EsriFileGeodatabaseDataObjectStore(
+        datasetName);
+      dataStore.initialize();
+      dataStore.setDefaultSchema("test");
+      DataObjectStoreSchema schema = dataStore.getSchema("test");
+      for(DataObjectMetaData metaData2 : schema.getTypes()) {
+        System.out.println(metaData2);
       }
     } finally {
       dataStore.deleteGeodatabase();

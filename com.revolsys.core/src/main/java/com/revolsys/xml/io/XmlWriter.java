@@ -22,8 +22,9 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +127,9 @@ public class XmlWriter extends Writer {
   private boolean indent;
 
   /** The map of XML Namespace URIs to prefixes. */
-  private final Map<String, String> namespaceMap = new HashMap<String, String>();
+  private final Map<String, String> namespacePrefixMap = new LinkedHashMap<String, String>();
+
+  private final Map<String, String> namespaceAliasMap = new LinkedHashMap<String, String>();
 
   /** The string of characters to use for a new line. */
   private final String newLine = "\n";
@@ -312,13 +315,13 @@ public class XmlWriter extends Writer {
 
       final String namespaceUri = attribute.getNamespaceURI();
       if (namespaceUri.length() > 0) {
-        String prefix = namespaceMap.get(namespaceUri);
+        String prefix = namespacePrefixMap.get(namespaceUri);
         if (prefix == null) {
           prefix = attribute.getPrefix();
-          if (prefix == null || namespaceMap.containsValue(prefix)) {
+          if (prefix == null || namespacePrefixMap.containsValue(prefix)) {
             prefix = "p" + ++prefixNum;
           }
-          namespaceMap.put(namespaceUri, prefix);
+          namespacePrefixMap.put(namespaceUri, prefix);
           writeNamespaceAttribute(namespaceUri, prefix);
         }
       }
@@ -327,25 +330,6 @@ public class XmlWriter extends Writer {
       out.write("=\"");
       writeAttributeValue(value);
       out.write('"');
-    }
-  }
-
-  public void xsiTypeAttribute(final QName xsiTagName) {
-    final String namespaceUri = xsiTagName.getNamespaceURI();
-    final String xsiName = xsiTagName.getLocalPart();
-    if (namespaceUri.length() > 0) {
-      String prefix = namespaceMap.get(namespaceUri);
-      if (prefix == null) {
-        prefix = xsiTagName.getPrefix();
-        if (prefix == null || namespaceMap.containsValue(prefix)) {
-          prefix = "p" + ++prefixNum;
-        }
-        namespaceMap.put(namespaceUri, prefix);
-        writeNamespaceAttribute(namespaceUri, prefix);
-      }
-      attribute(XsiConstants.TYPE, prefix + ":" + xsiName);
-    } else {
-      attribute(XsiConstants.TYPE, xsiName);
     }
   }
 
@@ -652,7 +636,11 @@ public class XmlWriter extends Writer {
    * @return The TagConfiguration of the current open tag.
    */
   private TagConfiguration getCurrentTag() {
-    return elementStack.getFirst();
+    if (elementStack.isEmpty()) {
+      return null;
+    } else {
+      return elementStack.getFirst();
+    }
   }
 
   /**
@@ -665,7 +653,7 @@ public class XmlWriter extends Writer {
     if (namespaceUri == null || namespaceUri.equals("")) {
       return null;
     } else {
-      return namespaceMap.get(namespaceUri);
+      return namespacePrefixMap.get(namespaceUri);
     }
   }
 
@@ -682,11 +670,11 @@ public class XmlWriter extends Writer {
       return new QName(qName.getLocalPart());
 
     }
-    String prefix = namespaceMap.get(namespaceUri);
+    String prefix = namespacePrefixMap.get(namespaceUri);
     if (prefix == null) {
       prefix = qName.getPrefix();
       getCurrentTag().addDefinedNamespace(namespaceUri);
-      namespaceMap.put(namespaceUri, prefix);
+      namespacePrefixMap.put(namespaceUri, prefix);
       return new QName(namespaceUri, qName.getLocalPart(), prefix);
     }
     if (prefix == qName.getPrefix()) {
@@ -762,7 +750,7 @@ public class XmlWriter extends Writer {
         .iterator();
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
-        namespaceMap.remove(namespaceUri);
+        namespacePrefixMap.remove(namespaceUri);
       }
     }
   }
@@ -783,6 +771,14 @@ public class XmlWriter extends Writer {
     this.indent = indent;
   }
 
+  public void setNamespaceAlias(final String namespaceUri, final String alias) {
+    this.namespaceAliasMap.put(namespaceUri, alias);
+  }
+
+  public void setPrefix(final QName typeName) {
+    setPrefix(typeName.getPrefix(), typeName.getNamespaceURI());
+  }
+
   /**
    * Set the prefix for the XML Namespace URI.
    * 
@@ -791,16 +787,12 @@ public class XmlWriter extends Writer {
    */
   public void setPrefix(final String prefix, final String namespaceUri) {
     if (getPrefix(namespaceUri) == null) {
-      namespaceMap.put(namespaceUri, prefix);
+      namespacePrefixMap.put(namespaceUri, prefix);
     }
     final TagConfiguration currentTag = getCurrentTag();
     if (currentTag != null) {
       currentTag.addDefinedNamespace(namespaceUri);
     }
-  }
-
-  public void setPrefix(final QName typeName) {
-    setPrefix(typeName.getPrefix(), typeName.getNamespaceURI());
   }
 
   /**
@@ -940,9 +932,11 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final char[] buffer, final int offset, final int length) {
-    closeStartTag();
-    writeElementContent(buffer, offset, length);
-    elementHasContent = true;
+    if (length > 0) {
+      closeStartTag();
+      writeElementContent(buffer, offset, length);
+      elementHasContent = true;
+    }
   }
 
   /**
@@ -1009,7 +1003,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text
    */
   public void text(final String text) {
-    if (text != null) {
+    if (text != null && text.length() > 0) {
       text(text.toCharArray(), 0, text.length());
     }
   }
@@ -1078,17 +1072,17 @@ public class XmlWriter extends Writer {
   }
 
 /**
-     * Write content for an attribute value to the output, escaping the characters
-     * that are used within markup. This method will escape characters ' <', '>',
-     * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
-     * unless it is part of "]]>" for simplicity it is allways escaped in this
-     * implementation.
-     * 
-     * @param buffer The character buffer to write
-     * @param offset The offset in the character data to write
-     * @param length The number of characters to write.
-     * @throws IOException If an I/O exception occurs.
-     */
+       * Write content for an attribute value to the output, escaping the characters
+       * that are used within markup. This method will escape characters ' <', '>',
+       * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
+       * unless it is part of "]]>" for simplicity it is allways escaped in this
+       * implementation.
+       * 
+       * @param buffer The character buffer to write
+       * @param offset The offset in the character data to write
+       * @param length The number of characters to write.
+       * @throws IOException If an I/O exception occurs.
+       */
   protected void writeAttributeContent(final char[] buffer, final int offset,
     final int length) {
     final int lastIndex = offset + length;
@@ -1151,16 +1145,16 @@ public class XmlWriter extends Writer {
   }
 
 /**
-     * Write content for an element to the output, escaping the characters that
-     * are used within markup. This method will escape characters ' <', '>' and
-     * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
-     * of "]]>" for simplicity it is allways escaped in this implementation.
-     * 
-     * @param buffer The character buffer to write
-     * @param offest The offset in the character data to write
-     * @param length The number of characters to write.
-     * @throws IOException If an I/O exception occurs.
-     */
+       * Write content for an element to the output, escaping the characters that
+       * are used within markup. This method will escape characters ' <', '>' and
+       * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
+       * of "]]>" for simplicity it is allways escaped in this implementation.
+       * 
+       * @param buffer The character buffer to write
+       * @param offest The offset in the character data to write
+       * @param length The number of characters to write.
+       * @throws IOException If an I/O exception occurs.
+       */
   protected void writeElementContent(final char[] buffer, final int offest,
     final int length) {
     int index = offest;
@@ -1181,7 +1175,7 @@ public class XmlWriter extends Writer {
         case 9:
         case 10:
         case 13:
-          // Accept these control characters
+        // Accept these control characters
         break;
         default:
           // Reject all other control characters
@@ -1283,13 +1277,41 @@ public class XmlWriter extends Writer {
   private void writeNamespaces() {
     if (useNamespaces) {
       final TagConfiguration tag = getCurrentTag();
-      final Iterator<String> namespaceUris = tag.getDefinedNamespaces()
-        .iterator();
-      while (namespaceUris.hasNext()) {
-        final String namespaceUri = namespaceUris.next();
-        final String prefix = namespaceMap.get(namespaceUri);
+
+      final Collection<String> namespaceUris;
+      if (elementStack.size() == 1) {
+        namespaceUris = namespacePrefixMap.keySet();
+      } else {
+        namespaceUris = tag.getDefinedNamespaces();
+      }
+      for (final String namespaceUri : namespaceUris) {
+        final String prefix = namespacePrefixMap.get(namespaceUri);
+        final String alias = namespaceAliasMap.get(namespaceUri);
+        if (alias == null) {
+          writeNamespaceAttribute(namespaceUri, prefix);
+        } else {
+          writeNamespaceAttribute(alias, prefix);
+        }
+      }
+    }
+  }
+
+  public void xsiTypeAttribute(final QName xsiTagName) {
+    final String namespaceUri = xsiTagName.getNamespaceURI();
+    final String xsiName = xsiTagName.getLocalPart();
+    if (namespaceUri.length() > 0) {
+      String prefix = namespacePrefixMap.get(namespaceUri);
+      if (prefix == null) {
+        prefix = xsiTagName.getPrefix();
+        if (prefix == null || namespacePrefixMap.containsValue(prefix)) {
+          prefix = "p" + ++prefixNum;
+        }
+        namespacePrefixMap.put(namespaceUri, prefix);
         writeNamespaceAttribute(namespaceUri, prefix);
       }
+      attribute(XsiConstants.TYPE, prefix + ":" + xsiName);
+    } else {
+      attribute(XsiConstants.TYPE, xsiName);
     }
   }
 }

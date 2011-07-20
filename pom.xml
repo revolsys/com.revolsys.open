@@ -15,6 +15,7 @@
     <tag>trunk</tag>
     <url>https://secure.revolsys.com/websvn/listing.php?repname=open.revolsys.com&amp;path=%2Fcom.revolsys%2F&amp;rev=0&amp;sc=0</url>
   </scm>
+  
   <modules>
     <module>com.revolsys.core</module>
     <module>com.revolsys.orm</module>

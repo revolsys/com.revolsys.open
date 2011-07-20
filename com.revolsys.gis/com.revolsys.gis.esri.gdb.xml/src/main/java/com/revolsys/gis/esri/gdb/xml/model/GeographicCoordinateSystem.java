@@ -11,4 +11,8 @@ public class GeographicCoordinateSystem extends SpatialReference {
     super(geometryFactory);
   }
 
+public GeographicCoordinateSystem(GeometryFactory geometryFactory, String wkt) {
+	super(geometryFactory, wkt);
+}
+
 }

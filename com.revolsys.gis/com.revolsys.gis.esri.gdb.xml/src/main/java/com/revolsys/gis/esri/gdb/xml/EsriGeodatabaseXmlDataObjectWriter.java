@@ -68,7 +68,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     Geometry geometry) {
     opened = true;
     out.startDocument();
-    out.startTag(new QName(namespaceUri, WORKSPACE, "esri"));
+    out.startTag(WORKSPACE);
     out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
     out.setPrefix(XmlContants.XML_SCHEMA_NAMESPACE_PREFIX,
       XmlContants.XML_SCHEMA_NAMESPACE_URI);

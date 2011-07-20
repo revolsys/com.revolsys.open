@@ -6,8 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.xml.io.XmlProcessor;
@@ -63,13 +66,18 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     super("http://www.esri.com/schemas/ArcGIS/10.1", TAG_NAME_CLASS_MAP);
   }
 
+  public <T> T parse(final Resource resource) {
+    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
+    return (T)parser.process(resource);
+  }
+
   public List<ControllerMembership> processControllerMemberships(
     final XMLStreamReader parser) throws XMLStreamException, IOException {
-    List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
-    while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-      Object value = process(parser);
+    final List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
+    while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
+      final Object value = process(parser);
       if (value instanceof ControllerMembership) {
-        ControllerMembership controllerMembership = (ControllerMembership)value;
+        final ControllerMembership controllerMembership = (ControllerMembership)value;
         controllerMemberships.add(controllerMembership);
       }
     }

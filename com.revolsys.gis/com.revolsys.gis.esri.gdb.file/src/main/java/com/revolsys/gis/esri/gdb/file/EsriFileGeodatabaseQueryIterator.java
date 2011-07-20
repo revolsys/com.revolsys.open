@@ -34,36 +34,36 @@ public class EsriFileGeodatabaseQueryIterator extends
 
   private EnumRows rows;
 
-  public EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
+   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
     final EsriFileGeodatabaseDataObjectStore dataStore, final Table table) {
     this(metaData, dataStore, table, "*", "", null);
   }
 
-  public EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
+   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
     final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
     final Envelope envelope) {
     this(metaData, dataStore, table, "*", "", envelope);
   }
 
-  public EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
+   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
     final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
     final String whereClause) {
     this(metaData, dataStore, table, "*", whereClause, null);
   }
 
-  public EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
+   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
     final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
     final String whereClause, final Envelope envelope) {
     this(metaData, dataStore, table, "*", whereClause, envelope);
   }
 
-  public EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
+   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
     final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
     final String fields, final String whereClause) {
     this(metaData, dataStore, table, fields, whereClause, null);
   }
 
-  public EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
+  EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
     final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
     final String fields, final String whereClause, final Envelope envelope) {
     this.metaData = metaData;

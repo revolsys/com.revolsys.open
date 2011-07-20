@@ -1,10 +1,10 @@
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:src/main/lib:target/lib
-rm -f src/main/java/com/revolsys/gis/esri/gdb/file/swig/*.java
-
-swig -c++ -o src/main/cxx/EsriFileGdb_wrap.cxx -java -package com.revolsys.gis.esri.gdb.file.swig -outdir src/main/java/com/revolsys/gis/esri/gdb/file/swig  -Isrc/main/swig -Isrc/main/include/ src/main/swig/EsriFileGdbAPI.i
+# requires the following libraries to be installed
+# /usr/lib/libfgdblinuxrtl.so
+#/usr/lib/libFileGDBAPI.so
 
 mkdir -p target/o
 mkdir -p target/lib
-g++ -fpic -lFileGDBAPI -lfgdblinuxrtl -Lsrc/main/lib/ -Isrc/main/include/ -I/usr/lib/jvm/java-6-openjdk/include/ -I$JAVA_HOME/include/ -c src/main/cxx/EsriFileGdb_wrap.cxx -o target/o/EsriFileGdb.o
-g++ -O2 -fpic -shared -Lsrc/main/lib/ -lFileGDBAPI -lfgdblinuxrtl target/o/EsriFileGdb.o -o target/lib/libEsriFileGdb.so
+g++ -fpic -lFileGDBAPI -lfgdblinuxrtl -Isrc/main/include/ -I/usr/lib/jvm/java-6-openjdk/include/ -I$JAVA_HOME/include/ -c src/main/cxx/EsriFileGdb_wrap.cxx -o target/o/EsriFileGdb.o
+g++ -O2 -fpic -shared -lFileGDBAPI -lfgdblinuxrtl target/o/EsriFileGdb.o -o target/lib/libEsriFileGdbJni.so
+cp target/lib/libEsriFileGdbJni.so src/main/lib/native/libEsriFileGdbJni-x86-linux.so
 

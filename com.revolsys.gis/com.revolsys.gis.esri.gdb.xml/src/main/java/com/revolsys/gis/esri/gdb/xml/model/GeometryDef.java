@@ -15,16 +15,17 @@ public class GeometryDef {
 
   private double gridSize0;
 
-  private double gridSize1;
+  private Double gridSize1;
 
-  private double gridSize2;
+  private Double gridSize2;
 
   public GeometryDef() {
   }
 
-  public GeometryDef(String geometryType, GeometryFactory geometryFactory) {
+  public GeometryDef(String geometryType, SpatialReference spatialReference) {
     this.geometryType = geometryType;
-    this.spatialReference = SpatialReference.get(geometryFactory);
+    this.spatialReference = spatialReference;
+    GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
     this.hasZ = geometryFactory.hasZ();
     this.hasM = geometryFactory.hasM();
   }
@@ -77,19 +78,19 @@ public class GeometryDef {
     this.gridSize0 = gridSize0;
   }
 
-  public double getGridSize1() {
+  public Double getGridSize1() {
     return gridSize1;
   }
 
-  public void setGridSize1(double gridSize1) {
+  public void setGridSize1(Double gridSize1) {
     this.gridSize1 = gridSize1;
   }
 
-  public double getGridSize2() {
+  public Double getGridSize2() {
     return gridSize2;
   }
 
-  public void setGridSize2(double gridSize2) {
+  public void setGridSize2(Double gridSize2) {
     this.gridSize2 = gridSize2;
   }
 

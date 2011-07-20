@@ -8,7 +8,7 @@ public class Index {
 
   private boolean isUnique;
 
-  private boolean isAscending;
+  private boolean isAscending = true;
 
   private List<Field> fields = new ArrayList<Field>();
 
@@ -42,5 +42,9 @@ public class Index {
 
   public void setIsUnique(final boolean isUnique) {
     this.isUnique = isUnique;
+  }
+
+  public void addField(Field field) {
+    fields.add(field);
   }
 }

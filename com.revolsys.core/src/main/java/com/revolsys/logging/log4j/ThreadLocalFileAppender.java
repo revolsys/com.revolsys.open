@@ -16,8 +16,7 @@ public class ThreadLocalFileAppender extends FileAppender {
     return getAppender("ThreadLocalLog");
   }
 
-  public static ThreadLocalFileAppender getAppender(
-    final String name) {
+  public static ThreadLocalFileAppender getAppender(final String name) {
     final Logger rootLogger = Logger.getRootLogger();
     final ThreadLocalFileAppender appender = (ThreadLocalFileAppender)rootLogger.getAppender(name);
     return appender;
@@ -33,27 +32,21 @@ public class ThreadLocalFileAppender extends FileAppender {
     super();
   }
 
-  public ThreadLocalFileAppender(
-    final Layout layout,
-    final String filename)
+  public ThreadLocalFileAppender(final Layout layout, final String filename)
     throws IOException {
-    super(layout, filename);
+    setLayout(layout);
+    setFile(filename);
   }
 
-  public ThreadLocalFileAppender(
-    final Layout layout,
-    final String filename,
-    final boolean append)
-    throws IOException {
-    super(layout, filename, append);
+  public ThreadLocalFileAppender(final Layout layout, final String filename,
+    final boolean append) throws IOException {
+    setLayout(layout);
+    setFile(filename);
+    setAppend(append);
   }
 
-  public ThreadLocalFileAppender(
-    final Layout layout,
-    final String filename,
-    final boolean append,
-    final boolean bufferedIO,
-    final int bufferSize)
+  public ThreadLocalFileAppender(final Layout layout, final String filename,
+    final boolean append, final boolean bufferedIO, final int bufferSize)
     throws IOException {
     super(layout, filename, append, bufferedIO, bufferSize);
   }
@@ -63,11 +56,10 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void append(
-    final LoggingEvent event) {
+  public void append(final LoggingEvent event) {
     if (hasLocalAppender()) {
-      final FileAppender localAppender = getLocalAppender();
-      localAppender.append(event);
+      final FileAppender appender = getLocalAppender();
+      appender.append(event);
     }
   }
 
@@ -141,8 +133,7 @@ public class ThreadLocalFileAppender extends FileAppender {
     }
   }
 
-  private synchronized FileAppender getFileAppender(
-    final String file) {
+  private synchronized FileAppender getFileAppender(final String file) {
     FileAppender appender = appenders.get(file);
     if (appender == null) {
       appender = new FileAppender();
@@ -224,8 +215,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setAppend(
-    final boolean append) {
+  public void setAppend(final boolean append) {
     if (hasLocalAppender()) {
       getLocalAppender().setAppend(append);
     } else {
@@ -234,8 +224,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setBufferedIO(
-    final boolean bufferedIO) {
+  public void setBufferedIO(final boolean bufferedIO) {
     if (hasLocalAppender()) {
       getLocalAppender().setBufferedIO(bufferedIO);
     } else {
@@ -244,8 +233,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setBufferSize(
-    final int bufferSize) {
+  public void setBufferSize(final int bufferSize) {
     if (hasLocalAppender()) {
       getLocalAppender().setBufferSize(bufferSize);
     } else {
@@ -254,8 +242,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setEncoding(
-    final String encoding) {
+  public void setEncoding(final String encoding) {
     if (hasLocalAppender()) {
       getLocalAppender().setEncoding(encoding);
     } else {
@@ -264,8 +251,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setErrorHandler(
-    final ErrorHandler errorHandler) {
+  public void setErrorHandler(final ErrorHandler errorHandler) {
     if (hasLocalAppender()) {
       getLocalAppender().setErrorHandler(errorHandler);
     } else {
@@ -274,8 +260,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setFile(
-    final String file) {
+  public void setFile(final String file) {
     if (hasLocalAppender()) {
       getLocalAppender().setFile(file);
     } else {
@@ -284,8 +269,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setImmediateFlush(
-    final boolean immediateFlush) {
+  public void setImmediateFlush(final boolean immediateFlush) {
     if (hasLocalAppender()) {
       getLocalAppender().setImmediateFlush(immediateFlush);
     } else {
@@ -294,8 +278,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setLayout(
-    final Layout layout) {
+  public void setLayout(final Layout layout) {
     if (hasLocalAppender()) {
       getLocalAppender().setLayout(layout);
     } else {
@@ -303,8 +286,7 @@ public class ThreadLocalFileAppender extends FileAppender {
     }
   }
 
-  public void setLocalFile(
-    final String file) {
+  public void setLocalFile(final String file) {
     localFile.set(file);
     if (file != null) {
       createLocalAppender();
@@ -312,8 +294,7 @@ public class ThreadLocalFileAppender extends FileAppender {
   }
 
   @Override
-  public void setThreshold(
-    final Priority threshold) {
+  public void setThreshold(final Priority threshold) {
     if (hasLocalAppender()) {
       getLocalAppender().setThreshold(threshold);
     } else {
