@@ -21,17 +21,17 @@ import com.revolsys.gis.esri.gdb.file.swig.Table;
 import com.revolsys.gis.esri.gdb.file.type.AbstractEsriFileGeodatabaseAttribute;
 import com.revolsys.io.AbstractWriter;
 
-public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
-  private static final Logger LOG = LoggerFactory.getLogger(EsriFileGeodatabaseWriter.class);
+public class FileGdbWriter extends AbstractWriter<DataObject> {
+  private static final Logger LOG = LoggerFactory.getLogger(FileGdbWriter.class);
 
   private Map<QName, Table> tables = new HashMap<QName, Table>();
 
   private final Geodatabase geodatabase;
 
-  private EsriFileGeodatabaseDataObjectStore dataObjectStore;
+  private FileGdbDataObjectStore dataObjectStore;
 
-  EsriFileGeodatabaseWriter(
-    final EsriFileGeodatabaseDataObjectStore dataObjectStore) {
+  FileGdbWriter(
+    final FileGdbDataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
     this.geodatabase = dataObjectStore.getGeodatabase();
   }
@@ -43,6 +43,7 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
       final QName name = entry.getKey();
       final Table table = entry.getValue();
       try {
+        table.FreeWriteLock();
         geodatabase.CloseTable(table);
       } catch (final Throwable e) {
         LOG.error("Unable to close table " + name);
@@ -56,12 +57,15 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
     final DataObjectMetaData objectMetaData = object.getMetaData();
     final QName typeName = objectMetaData.getName();
     final Table table = getTable(typeName);
-    final DataObjectMetaData metaData = dataObjectStore.getMetaData(objectMetaData);
-    final String idAttributeName = metaData.getIdAttributeName();
-    final EnumRows rows = table.search(idAttributeName, idAttributeName + "="
-      + object.getValue(idAttributeName), false);
+    final Row row = getRow(table, object);
+    table.deleteRow(row);
+  }
+
+  public Row getRow(final Table table, final DataObject object) {
+    final EnumRows rows = table.search("OBJECTID",
+      "OBJECTID=" + object.getValue("OBJECTID"), false);
     final Row row = rows.next();
-    table.Delete(row);
+    return row;
   }
 
   private Table getTable(final QName typeName) {
@@ -69,6 +73,7 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
     if (table == null) {
       table = dataObjectStore.getTable(typeName);
       tables.put(typeName, table);
+      table.SetWriteLock();
     }
     return table;
   }
@@ -85,25 +90,22 @@ public class EsriFileGeodatabaseWriter extends AbstractWriter<DataObject> {
       final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
       esriAttribute.setInsertValue(row, value);
     }
-    table.Insert(row);
+    table.insertRow(row);
   }
 
   private void update(final DataObject object) {
     final QName typeName = object.getMetaData().getName();
     final Table table = getTable(typeName);
-    final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
-    final String idAttributeName = metaData.getIdAttributeName();
-    final EnumRows rows = table.search(idAttributeName, idAttributeName + "="
-      + object.getValue(idAttributeName), false);
-    final Row row = rows.next();
+    final Row row = getRow(table, object);
 
+    final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
     for (final Attribute attribute : metaData.getAttributes()) {
       final String name = attribute.getName();
       final Object value = object.getValue(name);
       final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
       esriAttribute.setUpdateValue(row, value);
     }
-    table.Update(row);
+    table.updateRow(row);
   }
 
   public synchronized void write(final DataObject object) {

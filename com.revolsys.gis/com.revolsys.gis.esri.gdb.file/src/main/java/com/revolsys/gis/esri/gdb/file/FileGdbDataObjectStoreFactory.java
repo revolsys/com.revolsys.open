@@ -11,11 +11,11 @@ import java.util.Map;
 import com.revolsys.gis.data.io.DataObjectStoreFactory;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 
-public class EsriFileGeodatabaseDataObjectStoreFactory implements DataObjectStoreFactory{
+public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory{
 
   private static final List<String> URL_PATTERNS = Arrays.asList("file:///.*.gdb");
 
-  public EsriFileGeodatabaseDataObjectStore createDataObjectStore(
+  public FileGdbDataObjectStore createDataObjectStore(
     Map<String, Object> connectionProperties) {
     Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
     String url = (String)properties.remove("url");
@@ -23,7 +23,7 @@ public class EsriFileGeodatabaseDataObjectStoreFactory implements DataObjectStor
       URI uri = new URI(url);
       File file = new File(uri);
       
-      EsriFileGeodatabaseDataObjectStore dataObjectStore = new EsriFileGeodatabaseDataObjectStore(file);
+      FileGdbDataObjectStore dataObjectStore = new FileGdbDataObjectStore(file);
       DataObjectStoreFactoryRegistry.setConnectionProperties(dataObjectStore, properties);
       return dataObjectStore;
     } catch (URISyntaxException e) {

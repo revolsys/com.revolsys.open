@@ -15,7 +15,7 @@ import com.revolsys.gis.esri.gdb.file.swig.Table;
 import com.revolsys.gis.esri.gdb.file.type.AbstractEsriFileGeodatabaseAttribute;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class EsriFileGeodatabaseQueryIterator extends
+public class FileGdbQueryIterator extends
   AbstractIterator<DataObject> {
 
   private final DataObjectFactory dataObjectFactory;
@@ -30,41 +30,41 @@ public class EsriFileGeodatabaseQueryIterator extends
 
   private DataObjectMetaData metaData;
 
-  private EsriFileGeodatabaseDataObjectStore dataStore;
+  private FileGdbDataObjectStore dataStore;
 
   private EnumRows rows;
 
-   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
-    final EsriFileGeodatabaseDataObjectStore dataStore, final Table table) {
+   FileGdbQueryIterator(final DataObjectMetaData metaData,
+    final FileGdbDataObjectStore dataStore, final Table table) {
     this(metaData, dataStore, table, "*", "", null);
   }
 
-   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
-    final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
+   FileGdbQueryIterator(final DataObjectMetaData metaData,
+    final FileGdbDataObjectStore dataStore, final Table table,
     final Envelope envelope) {
     this(metaData, dataStore, table, "*", "", envelope);
   }
 
-   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
-    final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
+   FileGdbQueryIterator(final DataObjectMetaData metaData,
+    final FileGdbDataObjectStore dataStore, final Table table,
     final String whereClause) {
     this(metaData, dataStore, table, "*", whereClause, null);
   }
 
-   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
-    final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
+   FileGdbQueryIterator(final DataObjectMetaData metaData,
+    final FileGdbDataObjectStore dataStore, final Table table,
     final String whereClause, final Envelope envelope) {
     this(metaData, dataStore, table, "*", whereClause, envelope);
   }
 
-   EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
-    final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
+   FileGdbQueryIterator(final DataObjectMetaData metaData,
+    final FileGdbDataObjectStore dataStore, final Table table,
     final String fields, final String whereClause) {
     this(metaData, dataStore, table, fields, whereClause, null);
   }
 
-  EsriFileGeodatabaseQueryIterator(final DataObjectMetaData metaData,
-    final EsriFileGeodatabaseDataObjectStore dataStore, final Table table,
+  FileGdbQueryIterator(final DataObjectMetaData metaData,
+    final FileGdbDataObjectStore dataStore, final Table table,
     final String fields, final String whereClause, final Envelope envelope) {
     this.metaData = metaData;
     this.dataStore = dataStore;

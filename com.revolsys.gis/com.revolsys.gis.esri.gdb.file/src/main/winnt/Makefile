@@ -1,9 +1,9 @@
-INTERFACE     = ..\main\swig\EsriFileGdbAPI.i
-WRAPFILE      = ..\main\cxx\EsriFileGdb_wrap.cxx
+INTERFACE     = ..\swig\EsriFileGdbAPI.i
+WRAPFILE      = ..\cxx\EsriFileGdb_wrap.cxx
 
 TOOLS         = C:\Program Files\Microsoft Visual Studio 10.0\VC
 WIN_SDK				= C:\Program Files\Microsoft SDKs\Windows\v7.0a
-TARGET        = ..\main\lib\native\EsriFileGdbJni-x86-winnt.dll
+TARGET        = ..\lib\native\EsriFileGdbJni-x86-winnt.dll
 CC            = "$(TOOLS)\bin\cl.exe"
 LINK          = "$(TOOLS)\bin\link.exe"
 INCLUDE32     = -I$(TOOLS)\include
@@ -27,7 +27,7 @@ LOPT      = /NODEFAULTLIB /RELEASE /NOLOGO \
 
 CFLAGS        = /O2 /c /nologo /EHsc
 JAVA_INCLUDE    = "-I$(JAVA_HOME)\include" "-I$(JAVA_HOME)\include\win32"
-ESRI_INCLUDE    = -I..\main\include
+ESRI_INCLUDE    = -I..\include
 
 java::
 	$(CC) $(CFLAGS) $(JAVA_INCLUDE) $(ESRI_INCLUDE) $(WRAPFILE)

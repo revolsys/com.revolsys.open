@@ -53,10 +53,6 @@ public class Table {
     return EsriFileGdbJNI.Table_DeleteField(swigCPtr, this, fieldName);
   }
 
-  public int GetIndexes(VectorOfString indexDefs) {
-    return EsriFileGdbJNI.Table_GetIndexes(swigCPtr, this, VectorOfString.getCPtr(indexDefs), indexDefs);
-  }
-
   public int AddIndex(String indexDef) {
     return EsriFileGdbJNI.Table_AddIndex(swigCPtr, this, indexDef);
   }
@@ -87,18 +83,6 @@ public class Table {
 
   public int DisableSubtypes() {
     return EsriFileGdbJNI.Table_DisableSubtypes(swigCPtr, this);
-  }
-
-  public int Insert(Row row) {
-    return EsriFileGdbJNI.Table_Insert(swigCPtr, this, Row.getCPtr(row), row);
-  }
-
-  public int Update(Row row) {
-    return EsriFileGdbJNI.Table_Update(swigCPtr, this, Row.getCPtr(row), row);
-  }
-
-  public int Delete(Row row) {
-    return EsriFileGdbJNI.Table_Delete(swigCPtr, this, Row.getCPtr(row), row);
   }
 
   public int GetExtent(Envelope extent) {
@@ -141,9 +125,25 @@ public class Table {
     return EsriFileGdbJNI.Table_getDefaultSubtypeCode(swigCPtr, this);
   }
 
+  public VectorOfString getIndexes() {
+    return new VectorOfString(EsriFileGdbJNI.Table_getIndexes(swigCPtr, this), true);
+  }
+
   public Row createRowObject() {
     long cPtr = EsriFileGdbJNI.Table_createRowObject(swigCPtr, this);
     return (cPtr == 0) ? null : new Row(cPtr, false);
+  }
+
+  public void insertRow(Row row) {
+    EsriFileGdbJNI.Table_insertRow(swigCPtr, this, Row.getCPtr(row), row);
+  }
+
+  public void updateRow(Row row) {
+    EsriFileGdbJNI.Table_updateRow(swigCPtr, this, Row.getCPtr(row), row);
+  }
+
+  public void deleteRow(Row row) {
+    EsriFileGdbJNI.Table_deleteRow(swigCPtr, this, Row.getCPtr(row), row);
   }
 
   public EnumRows search(String subfields, String whereClause, Envelope envelope, boolean recycling) {

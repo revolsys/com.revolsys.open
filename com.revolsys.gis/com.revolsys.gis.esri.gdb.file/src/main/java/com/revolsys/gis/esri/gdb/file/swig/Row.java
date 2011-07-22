@@ -61,10 +61,6 @@ public class Row {
     return EsriFileGdbJNI.Row_SetDouble(swigCPtr, this, field, value);
   }
 
-  public int SetDate(String field, SWIGTYPE_p_tm value) {
-    return EsriFileGdbJNI.Row_SetDate(swigCPtr, this, field, SWIGTYPE_p_tm.getCPtr(value));
-  }
-
   public int SetString(String field, String value) {
     return EsriFileGdbJNI.Row_SetString(swigCPtr, this, field, value);
   }
@@ -101,8 +97,12 @@ public class Row {
     return EsriFileGdbJNI.Row_isNull(swigCPtr, this, name);
   }
 
-  public SWIGTYPE_p_tm getDate(String name) {
-    return new SWIGTYPE_p_tm(EsriFileGdbJNI.Row_getDate(swigCPtr, this, name), true);
+  public int getDate(String name) {
+    return EsriFileGdbJNI.Row_getDate(swigCPtr, this, name);
+  }
+
+  public void setDate(String name, int date) {
+    EsriFileGdbJNI.Row_setDate(swigCPtr, this, name, date);
   }
 
   public double getDouble(String name) {

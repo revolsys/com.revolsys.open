@@ -27,7 +27,7 @@ public class FeatureDatasetTest {
     newMetaData.setGeometryFactory(geometryFactory);
 
     final String datasetName = "target/Create.gdb";
-     EsriFileGeodatabaseDataObjectStore dataStore = new EsriFileGeodatabaseDataObjectStore(
+     FileGdbDataObjectStore dataStore = new FileGdbDataObjectStore(
       datasetName);
     try {
       dataStore.setCreateMissingTables(true);
@@ -49,7 +49,7 @@ public class FeatureDatasetTest {
       }
       dataStore.close();
       
-      dataStore = new EsriFileGeodatabaseDataObjectStore(
+      dataStore = new FileGdbDataObjectStore(
         datasetName);
       dataStore.initialize();
       dataStore.setDefaultSchema("test");

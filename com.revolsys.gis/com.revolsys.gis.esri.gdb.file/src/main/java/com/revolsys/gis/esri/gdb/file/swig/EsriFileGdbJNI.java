@@ -68,10 +68,6 @@ class EsriFileGdbJNI {
   public final static native int Geodatabase_Rename(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3, String jarg4);
   public final static native int Geodatabase_Move(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3);
   public final static native int Geodatabase_Delete(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3);
-  public final static native int Geodatabase_GetDomains(long jarg1, Geodatabase jarg1_, long jarg2, VectorOfWString jarg2_);
-  public final static native int Geodatabase_CreateDomain(long jarg1, Geodatabase jarg1_, String jarg2);
-  public final static native int Geodatabase_AlterDomain(long jarg1, Geodatabase jarg1_, String jarg2);
-  public final static native int Geodatabase_DeleteDomain(long jarg1, Geodatabase jarg1_, String jarg2);
   public final static native int Geodatabase_ExecuteSQL(long jarg1, Geodatabase jarg1_, String jarg2, boolean jarg3, long jarg4, EnumRows jarg4_);
   public final static native long new_Geodatabase();
   public final static native void delete_Geodatabase(long jarg1);
@@ -83,7 +79,11 @@ class EsriFileGdbJNI {
   public final static native long Geodatabase_getChildDatasets(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3);
   public final static native String Geodatabase_getDatasetDefinition(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3);
   public final static native String Geodatabase_getDatasetDocumentation(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3);
+  public final static native long Geodatabase_getDomains(long jarg1, Geodatabase jarg1_);
   public final static native String Geodatabase_getDomainDefinition(long jarg1, Geodatabase jarg1_, String jarg2);
+  public final static native void Geodatabase_createDomain(long jarg1, Geodatabase jarg1_, String jarg2);
+  public final static native void Geodatabase_alterDomain(long jarg1, Geodatabase jarg1_, String jarg2);
+  public final static native void Geodatabase_deleteDomain(long jarg1, Geodatabase jarg1_, String jarg2);
   public final static native String Geodatabase_getQueryName(long jarg1, Geodatabase jarg1_, String jarg2);
   public final static native long Geodatabase_openTable(long jarg1, Geodatabase jarg1_, String jarg2);
   public final static native long Geodatabase_createTable(long jarg1, Geodatabase jarg1_, String jarg2, String jarg3);
@@ -92,7 +92,6 @@ class EsriFileGdbJNI {
   public final static native int Table_AddField(long jarg1, Table jarg1_, String jarg2);
   public final static native int Table_AlterField(long jarg1, Table jarg1_, String jarg2);
   public final static native int Table_DeleteField(long jarg1, Table jarg1_, String jarg2);
-  public final static native int Table_GetIndexes(long jarg1, Table jarg1_, long jarg2, VectorOfString jarg2_);
   public final static native int Table_AddIndex(long jarg1, Table jarg1_, String jarg2);
   public final static native int Table_DeleteIndex(long jarg1, Table jarg1_, String jarg2);
   public final static native int Table_CreateSubtype(long jarg1, Table jarg1_, String jarg2);
@@ -101,9 +100,6 @@ class EsriFileGdbJNI {
   public final static native int Table_EnableSubtypes(long jarg1, Table jarg1_, String jarg2, String jarg3);
   public final static native int Table_SetDefaultSubtypeCode(long jarg1, Table jarg1_, int jarg2);
   public final static native int Table_DisableSubtypes(long jarg1, Table jarg1_);
-  public final static native int Table_Insert(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
-  public final static native int Table_Update(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
-  public final static native int Table_Delete(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
   public final static native int Table_GetExtent(long jarg1, Table jarg1_, long jarg2, Envelope jarg2_);
   public final static native int Table_SetWriteLock(long jarg1, Table jarg1_);
   public final static native int Table_FreeWriteLock(long jarg1, Table jarg1_);
@@ -115,7 +111,11 @@ class EsriFileGdbJNI {
   public final static native String Table_getDocumentation(long jarg1, Table jarg1_);
   public final static native int Table_getRowCount(long jarg1, Table jarg1_);
   public final static native int Table_getDefaultSubtypeCode(long jarg1, Table jarg1_);
+  public final static native long Table_getIndexes(long jarg1, Table jarg1_);
   public final static native long Table_createRowObject(long jarg1, Table jarg1_);
+  public final static native void Table_insertRow(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
+  public final static native void Table_updateRow(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
+  public final static native void Table_deleteRow(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
   public final static native long Table_search__SWIG_0(long jarg1, Table jarg1_, String jarg2, String jarg3, long jarg4, Envelope jarg4_, boolean jarg5);
   public final static native long Table_search__SWIG_1(long jarg1, Table jarg1_, String jarg2, String jarg3, boolean jarg4);
   public final static native int Row_SetNull(long jarg1, Row jarg1_, String jarg2);
@@ -125,7 +125,6 @@ class EsriFileGdbJNI {
   public final static native int Row_SetInteger(long jarg1, Row jarg1_, String jarg2, int jarg3);
   public final static native int Row_SetFloat(long jarg1, Row jarg1_, String jarg2, float jarg3);
   public final static native int Row_SetDouble(long jarg1, Row jarg1_, String jarg2, double jarg3);
-  public final static native int Row_SetDate(long jarg1, Row jarg1_, String jarg2, long jarg3);
   public final static native int Row_SetString(long jarg1, Row jarg1_, String jarg2, String jarg3);
   public final static native int Row_SetGUID(long jarg1, Row jarg1_, String jarg2, long jarg3, Guid jarg3_);
   public final static native int Row_SetXML(long jarg1, Row jarg1_, String jarg2, String jarg3);
@@ -136,7 +135,8 @@ class EsriFileGdbJNI {
   public final static native long new_Row();
   public final static native void delete_Row(long jarg1);
   public final static native boolean Row_isNull(long jarg1, Row jarg1_, String jarg2);
-  public final static native long Row_getDate(long jarg1, Row jarg1_, String jarg2);
+  public final static native int Row_getDate(long jarg1, Row jarg1_, String jarg2);
+  public final static native void Row_setDate(long jarg1, Row jarg1_, String jarg2, int jarg3);
   public final static native double Row_getDouble(long jarg1, Row jarg1_, String jarg2);
   public final static native float Row_getFloat(long jarg1, Row jarg1_, String jarg2);
   public final static native long Row_getGuid(long jarg1, Row jarg1_, String jarg2);

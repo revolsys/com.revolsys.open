@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <sstream>
+#include "time.h"
 #include "FileGDBAPI.h"
 
 std::string wstring2string(std::wstring wstr) {
@@ -120,10 +121,14 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %rename(deleteGeodatabase2) FileGDBAPI::DeleteGeodatabase;
 %ignore FileGDBAPI::Geodatabase::GetDatasetDefinition;
 %ignore FileGDBAPI::Geodatabase::GetDatasetDocumentation;
-%ignore FileGDBAPI::Geodatabase::GetDomainDefinition;
 %ignore FileGDBAPI::Geodatabase::GetQueryName;
 %ignore FileGDBAPI::Geodatabase::OpenTable;
 %ignore FileGDBAPI::Geodatabase::CreateTable;
+%ignore FileGDBAPI::Geodatabase::CreateDomain;
+%ignore FileGDBAPI::Geodatabase::AlterDomain;
+%ignore FileGDBAPI::Geodatabase::DeleteDomain;
+%ignore FileGDBAPI::Geodatabase::GetDomainDefinition;
+%ignore FileGDBAPI::Geodatabase::GetDomains;
 %ignore FileGDBAPI::Geodatabase::GetChildDatasets;
 %ignore FileGDBAPI::Geodatabase::CreateFeatureDataset;
 %extend FileGDBAPI::Geodatabase {
@@ -149,10 +154,25 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     return value;
   }
   
+  std::vector<std::wstring> getDomains() {
+    std::vector<std::wstring> value;
+    checkResult(self->GetDomains(value));
+    return value;
+  }
+  
   std::string getDomainDefinition(std::wstring domainName) {
     std::string value;
     checkResult(self->GetDomainDefinition(domainName, value));
     return value;
+  }
+  void createDomain(const std::string& domainDefinition) {
+    checkResult(self->CreateDomain(domainDefinition));
+  }
+  void alterDomain(const std::string& domainDefinition) {
+    checkResult(self->AlterDomain(domainDefinition));
+  }
+  void deleteDomain(const std::wstring& domainName) {
+    checkResult(self->DeleteDomain(domainName));
   }
   
   std::wstring getQueryName(std::wstring path) {
@@ -179,7 +199,11 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Table::GetRowCount;
 %ignore FileGDBAPI::Table::GetDefaultSubtypeCode;
 %ignore FileGDBAPI::Table::CreateRowObject;
+%ignore FileGDBAPI::Table::GetIndexes;
 %ignore FileGDBAPI::Table::Search;
+%ignore FileGDBAPI::Table::Insert;
+%ignore FileGDBAPI::Table::Update;
+%ignore FileGDBAPI::Table::Delete;
 %extend FileGDBAPI::Table {
   bool isEditable() {
     bool value;
@@ -206,10 +230,24 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     checkResult(self->GetDefaultSubtypeCode(value));
     return value;
   }
+  std::vector<std::string> getIndexes() {
+    std::vector<std::string> value;
+    checkResult(self->GetIndexes(value));
+    return value;
+  }
   FileGDBAPI::Row* createRowObject() {
     FileGDBAPI::Row* value = new FileGDBAPI::Row();
     checkResult(self->CreateRowObject(*value));
     return value;
+  }
+  void insertRow(FileGDBAPI::Row& row) {
+    checkResult(self->Insert(row));
+  }
+  void updateRow(FileGDBAPI::Row& row) {
+    checkResult(self->Update(row));
+  }
+  void deleteRow(FileGDBAPI::Row& row) {
+    checkResult(self->Delete(row));
   }
 
   FileGDBAPI::EnumRows* search(const std::wstring& subfields, const std::wstring& whereClause, Envelope envelope, bool recycling) {
@@ -229,6 +267,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 
 %ignore FileGDBAPI::Row::IsNull;
 %ignore FileGDBAPI::Row::GetDate;
+%ignore FileGDBAPI::Row::SetDate;
 %ignore FileGDBAPI::Row::GetDouble;
 %ignore FileGDBAPI::Row::GetFloat;
 %ignore FileGDBAPI::Row::GetGUID;
@@ -246,10 +285,16 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     return value;
   }
  
-  struct tm getDate(const std::wstring& name) {
+  int getDate(const std::wstring& name) {
     struct tm value;
     checkResult(self->GetDate(name,value));
-    return value;
+    return mktime(&value);
+  }
+  void setDate(const std::wstring& name, int date) {
+    struct tm value;
+    const time_t time = (time_t)date;
+    value = *localtime(&time);
+    checkResult(self->SetDate(name, value));
   }
 
   double getDouble(const std::wstring& name) {

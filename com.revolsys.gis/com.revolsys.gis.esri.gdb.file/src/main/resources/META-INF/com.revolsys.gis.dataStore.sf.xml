@@ -15,7 +15,7 @@
   >
     <constructor-arg>
       <bean
-        class="com.revolsys.gis.esri.gdb.file.EsriFileGeodatabaseDataObjectStoreFactory" />
+        class="com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory" />
     </constructor-arg>
   </bean>
 </beans>

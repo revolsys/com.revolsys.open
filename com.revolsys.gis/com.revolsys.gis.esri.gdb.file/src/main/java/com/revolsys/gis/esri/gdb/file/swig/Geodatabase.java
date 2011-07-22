@@ -69,22 +69,6 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_Delete(swigCPtr, this, path, datasetType);
   }
 
-  public int GetDomains(VectorOfWString domainNames) {
-    return EsriFileGdbJNI.Geodatabase_GetDomains(swigCPtr, this, VectorOfWString.getCPtr(domainNames), domainNames);
-  }
-
-  public int CreateDomain(String domainDef) {
-    return EsriFileGdbJNI.Geodatabase_CreateDomain(swigCPtr, this, domainDef);
-  }
-
-  public int AlterDomain(String domainDef) {
-    return EsriFileGdbJNI.Geodatabase_AlterDomain(swigCPtr, this, domainDef);
-  }
-
-  public int DeleteDomain(String domainName) {
-    return EsriFileGdbJNI.Geodatabase_DeleteDomain(swigCPtr, this, domainName);
-  }
-
   public int ExecuteSQL(String sqlStmt, boolean recycling, EnumRows rows) {
     return EsriFileGdbJNI.Geodatabase_ExecuteSQL(swigCPtr, this, sqlStmt, recycling, EnumRows.getCPtr(rows), rows);
   }
@@ -109,8 +93,24 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_getDatasetDocumentation(swigCPtr, this, path, datasetType);
   }
 
+  public VectorOfWString getDomains() {
+    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getDomains(swigCPtr, this), true);
+  }
+
   public String getDomainDefinition(String domainName) {
     return EsriFileGdbJNI.Geodatabase_getDomainDefinition(swigCPtr, this, domainName);
+  }
+
+  public void createDomain(String domainDefinition) {
+    EsriFileGdbJNI.Geodatabase_createDomain(swigCPtr, this, domainDefinition);
+  }
+
+  public void alterDomain(String domainDefinition) {
+    EsriFileGdbJNI.Geodatabase_alterDomain(swigCPtr, this, domainDefinition);
+  }
+
+  public void deleteDomain(String domainName) {
+    EsriFileGdbJNI.Geodatabase_deleteDomain(swigCPtr, this, domainName);
   }
 
   public String getQueryName(String path) {
