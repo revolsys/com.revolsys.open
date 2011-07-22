@@ -411,7 +411,7 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
   @PostConstruct
   public void initialize() {
     final File file = new File(fileName);
-    if (file.exists()) {
+    if (file.exists() && new File(fileName, "gdb").exists()) {
       if (file.isDirectory()) {
         geodatabase = EsriFileGdb.openGeodatabase(fileName);
       } else {
