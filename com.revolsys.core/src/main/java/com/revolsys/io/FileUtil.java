@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -531,4 +532,23 @@ public final class FileUtil {
       copy(in, destFile);
     }
   }
+
+  public static void deleteDirectory(File directory,
+    FilenameFilter filter) {
+    final File[] files = directory.listFiles();
+    if (files != null) {
+      for (int i = 0; i < files.length; i++) {
+        final File file = files[i];
+        if (file.exists() && filter.accept(directory, file.getName())) {
+          if (file.isDirectory()) {
+            deleteDirectory(file, true);
+          } else {
+            if (!file.delete() && file.exists()) {
+              LOG.error("Cannot delete file: " + getCanonicalPath(file));
+            }
+          }
+        }
+      }
+    }
+ }
 }
