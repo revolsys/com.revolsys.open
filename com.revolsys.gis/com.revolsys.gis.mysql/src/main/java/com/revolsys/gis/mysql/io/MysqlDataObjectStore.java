@@ -7,7 +7,6 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -19,6 +18,7 @@ import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.gis.jdbc.io.JdbcQueryReader;
+import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Envelope;
 

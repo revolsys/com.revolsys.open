@@ -8,11 +8,11 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.AbstractReader;
 
 public class MoepBinaryReader extends AbstractReader<DataObject> implements
   DataObjectReader {

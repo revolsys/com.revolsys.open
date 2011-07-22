@@ -12,11 +12,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.io.DataObjectDirectoryReader;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
+import com.revolsys.io.Reader;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
 public class MoepDirectoryReader extends DataObjectDirectoryReader implements
