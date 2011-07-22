@@ -50,6 +50,7 @@ public class PatternFilenameFilter implements FilenameFilter {
   public boolean accept(
     final File directory,
     final String fileName) {
-    return pattern.matcher(fileName).matches();
+    boolean matches = pattern.matcher(fileName).matches();
+    return matches;
   }
 }
