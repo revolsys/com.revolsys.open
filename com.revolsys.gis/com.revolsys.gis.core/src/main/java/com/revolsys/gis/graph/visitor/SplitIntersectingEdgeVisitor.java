@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.filter.LineFilter;

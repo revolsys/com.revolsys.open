@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;

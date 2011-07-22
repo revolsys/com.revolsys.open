@@ -7,10 +7,13 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
+
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapReader;
 
-public class CsvMapReader implements MapReader {
+public class CsvMapReader extends AbstractReader<Map<String,Object>> implements MapReader {
 
   private final Reader in;
 
@@ -19,6 +22,11 @@ public class CsvMapReader implements MapReader {
   public CsvMapReader(
     final InputStream in) {
     this.in = new InputStreamReader(in, CsvConstants.CHARACTER_SET);
+  }
+
+  public CsvMapReader(
+    final Resource in) throws IOException {
+    this(in.getInputStream());
   }
 
   public CsvMapReader(
@@ -40,5 +48,8 @@ public class CsvMapReader implements MapReader {
       }
     }
     return iterator;
+  }
+
+  public void open() {
   }
 }

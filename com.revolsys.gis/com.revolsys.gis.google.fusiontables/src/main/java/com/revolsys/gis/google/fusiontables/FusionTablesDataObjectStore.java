@@ -33,7 +33,6 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -48,6 +47,7 @@ import com.revolsys.gis.google.fusiontables.attribute.GeometryAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.NumberAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.StringAttribute;
 import com.revolsys.io.MapReader;
+import com.revolsys.io.Reader;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 

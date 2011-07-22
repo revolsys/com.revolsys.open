@@ -7,11 +7,11 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.DelegatingDataObjectStore;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty;
+import com.revolsys.gis.data.model.codes.AbstractCodeTable;
+import com.revolsys.io.Reader;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class JdbcDelegatingDataObjectStore extends DelegatingDataObjectStore
@@ -24,7 +24,7 @@ public class JdbcDelegatingDataObjectStore extends DelegatingDataObjectStore
     super(dataObjectStore);
   }
 
-  public void addCodeTable(final JdbcCodeTableProperty jdbcCodeTableProperty) {
+  public void addCodeTable(final AbstractCodeTable jdbcCodeTableProperty) {
     final JdbcDataObjectStore dataObjectStore = getDataObjectStore();
     dataObjectStore.addCodeTable(jdbcCodeTableProperty);
   }

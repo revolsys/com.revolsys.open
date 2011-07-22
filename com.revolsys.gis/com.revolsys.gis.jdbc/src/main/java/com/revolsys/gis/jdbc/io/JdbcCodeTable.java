@@ -183,7 +183,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     return dataStore;
   }
 
-  public String getIdColumn() {
+  public String getIdAttributeName() {
     return idColumn;
   }
 

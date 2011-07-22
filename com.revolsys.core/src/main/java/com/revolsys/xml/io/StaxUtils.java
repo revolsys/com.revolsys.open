@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -36,7 +37,6 @@ import org.springframework.core.io.Resource;
  * 
  * @author Paul Austin
  */
-@SuppressWarnings("restriction")
 public final class StaxUtils {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
@@ -45,6 +45,27 @@ public final class StaxUtils {
       in.close();
     } catch (final XMLStreamException e) {
     }
+  }
+  public static QName getXmlQName(NamespaceContext context, String value) {
+    if (value == null) {
+      return null;
+    } else {
+      int colonIndex = value.indexOf(':');
+      if (colonIndex == -1) {
+        return new QName(value);
+      } else {
+        String prefix = value.substring(0, colonIndex);
+        String name = value.substring(colonIndex + 1);
+        String namespaceUri = context.getNamespaceURI(prefix);
+        return new QName(namespaceUri, name, prefix);
+      }
+    }
+  }
+  public static QName getQNameAttribute(XMLStreamReader in, QName attributeName) {
+    String value = StaxUtils.getAttribute(in, attributeName);
+    NamespaceContext namespaceContext = in.getNamespaceContext();
+    QName qName = getXmlQName(namespaceContext, value);
+    return qName;
   }
 
   public static XMLStreamReader createXmlReader(final Resource resource)

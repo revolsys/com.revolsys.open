@@ -1,6 +1,7 @@
 package com.revolsys.gis.esri.gdb.xml.type;
 
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.xml.io.XmlWriter;
 
 public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
@@ -10,32 +11,32 @@ public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   private int fixedLength = -1;
 
   public SimpleFieldType(
-    String esriFieldTypeName,
+    FieldType esriFieldType,
     DataType dataType,
     boolean usePrecision,
     int fixedLength) {
     super(dataType, "xs:" + dataType.getName().getLocalPart(),
-      esriFieldTypeName);
+      esriFieldType);
     this.usePrecision = usePrecision;
     this.fixedLength = fixedLength;
   }
 
   public SimpleFieldType(
-    String esriFieldTypeName,
+    FieldType esriFieldType,
     DataType dataType,
     String xmlSchemaTypeName,
     boolean usePrecision,
     int fixedLength) {
-    super(dataType, xmlSchemaTypeName, esriFieldTypeName);
+    super(dataType, xmlSchemaTypeName, esriFieldType);
     this.usePrecision = usePrecision;
     this.fixedLength = fixedLength;
   }
 
   public SimpleFieldType(
-    String esriFieldTypeName,
+    FieldType esriFieldType,
     DataType dataType,
     boolean usePrecision) {
-    this(esriFieldTypeName, dataType, usePrecision, -1);
+    this(esriFieldType, dataType, usePrecision, -1);
   }
 
   protected void writeValueText(

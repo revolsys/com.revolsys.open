@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.ItemVisitor;

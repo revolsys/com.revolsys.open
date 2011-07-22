@@ -1,6 +1,7 @@
 package com.revolsys.gis.esri.gdb.xml.type;
 
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -15,10 +16,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   public XmlGeometryFieldType(
-    final String esriFieldTypeName,
+    final FieldType esriFieldType,
     final DataType dataType) {
     super(dataType, "xs:" + dataType.getName().getLocalPart(),
-      esriFieldTypeName);
+      esriFieldType);
   }
 
   @Override

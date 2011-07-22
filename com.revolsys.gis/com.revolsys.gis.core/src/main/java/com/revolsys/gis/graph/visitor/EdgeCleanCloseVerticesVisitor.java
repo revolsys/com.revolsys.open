@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.event.CoordinateEventListenerList;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;

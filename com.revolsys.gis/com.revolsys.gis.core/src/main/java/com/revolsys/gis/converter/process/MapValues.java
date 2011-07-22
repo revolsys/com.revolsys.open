@@ -63,11 +63,11 @@ public class MapValues implements SourceToTargetProcess<DataObject, DataObject> 
       if (targetValue != null) {
         final DataObjectMetaData targetMetaData = target.getMetaData();
         final DataObjectStore targetDataObjectStore = targetMetaData.getDataObjectStore();
-        final CodeTable codeTable = targetDataObjectStore.getCodeTableByColumn(targetAttributeName);
+        final CodeTable<?> codeTable = targetDataObjectStore.getCodeTableByColumn(targetAttributeName);
         if (codeTable == null) {
           target.setValue(targetAttributeName, targetValue);
         } else {
-          final Number codeId = codeTable.getId(targetValue);
+          final Object codeId = codeTable.getId(targetValue);
           target.setValue(targetAttributeName, codeId);
         }
       }

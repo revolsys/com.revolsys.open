@@ -11,12 +11,17 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory {
   void close();
+
+  Number createPrimaryId(QName typeName);
+  
+  void addCodeTable(CodeTable<?> codeTable);
 
   DataObject create(
     QName typeName);
@@ -29,10 +34,10 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   void deleteAll(
     Collection<DataObject> objects);
 
-  CodeTable getCodeTable(
+  <T> CodeTable<T> getCodeTable(
     QName typeName);
 
-  CodeTable getCodeTableByColumn(
+  <T> CodeTable<T> getCodeTableByColumn(
     String columnName);
 
   DataObjectFactory getDataObjectFactory();

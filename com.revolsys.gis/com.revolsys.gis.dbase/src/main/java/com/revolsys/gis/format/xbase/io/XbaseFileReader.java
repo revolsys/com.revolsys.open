@@ -38,11 +38,11 @@ import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.io.DataObjectReader;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 

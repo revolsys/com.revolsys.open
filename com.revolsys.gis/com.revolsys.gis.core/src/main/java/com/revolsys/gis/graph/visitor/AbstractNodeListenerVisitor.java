@@ -2,7 +2,7 @@ package com.revolsys.gis.graph.visitor;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.EdgeEventListener;

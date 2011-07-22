@@ -12,6 +12,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.Reader;
 
 public class DataObjectDirectoryReader extends
   AbstractDirectoryReader<DataObject> implements DataObjectMetaDataFactory {

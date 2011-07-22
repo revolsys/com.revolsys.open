@@ -25,7 +25,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.io.AbstractWriter;
-import com.revolsys.xml.XmlContants;
+import com.revolsys.xml.XmlConstants;
 import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
 import com.vividsolutions.jts.geom.Geometry;
@@ -70,8 +70,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.startDocument();
     out.startTag(WORKSPACE);
     out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
-    out.setPrefix(XmlContants.XML_SCHEMA_NAMESPACE_PREFIX,
-      XmlContants.XML_SCHEMA_NAMESPACE_URI);
+    out.setPrefix(XmlConstants.XML_SCHEMA_NAMESPACE_PREFIX,
+      XmlConstants.XML_SCHEMA_NAMESPACE_URI);
 
     out.startTag(WORKSPACE_DEFINITION);
     out.attribute(XsiConstants.TYPE, WORKSPACE_DEFINITION_TYPE);
@@ -302,7 +302,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
         out.startTag(FIELD);
         out.attribute(XsiConstants.TYPE, FIELD_TYPE);
         out.element(NAME, fieldName);
-        out.element(TYPE, fieldType.getEsriFieldTypeName());
+        out.element(TYPE, fieldType.getEsriFieldType());
         out.element(IS_NULLABLE, !attribute.isRequired());
         int length = fieldType.getFixedLength();
         if (length < 0) {

@@ -53,11 +53,11 @@ public class CopyValues implements
       if (value != null) {
         final DataObjectMetaData targetMetaData = target.getMetaData();
         final DataObjectStore targetDataObjectStore = targetMetaData.getDataObjectStore();
-        final CodeTable codeTable = targetDataObjectStore.getCodeTableByColumn(targetName);
+        final CodeTable<?> codeTable = targetDataObjectStore.getCodeTableByColumn(targetName);
         if (codeTable == null) {
           target.setValue(targetName, value);
         } else {
-          final Number codeId = codeTable.getId(value);
+          final Object codeId = codeTable.getId(value);
           target.setValue(targetName, codeId);
         }
       }

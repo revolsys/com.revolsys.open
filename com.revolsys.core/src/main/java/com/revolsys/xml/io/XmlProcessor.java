@@ -25,13 +25,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConvertUtilsBean;
+import org.apache.commons.beanutils.Converter;
+import org.apache.commons.beanutils.converters.IntegerConverter;
+import org.apache.commons.beanutils.converters.ShortConverter;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.beans.EnumConverter;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.xml.XmlConstants;
 import com.revolsys.xml.XsiConstants;
 
 /**
@@ -130,13 +138,17 @@ import com.revolsys.xml.XsiConstants;
  * @author Paul Austin
  */
 public abstract class XmlProcessor {
+  static {
+    registerEnumConverter(Enum.class);
+  }
+
   /** The arguments a processor method must have. */
   private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
     XMLStreamReader.class
   };
 
   /** The cache of processor classes to method caches. */
-  private static final Map<Class<?>, Map<String, Method>> processorMethodCache = new HashMap<Class<?>, Map<String, Method>>();
+  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
 
   /**
    * Create the cache of process methods from the specified class.
@@ -146,10 +158,10 @@ public abstract class XmlProcessor {
    */
   private static Map<String, Method> getMethodCache(
     final Class<?> processorClass) {
-    Map<String, Method> methodCache = processorMethodCache.get(processorClass);
+    Map<String, Method> methodCache = PROCESSOR_METHOD_CACHE.get(processorClass);
     if (methodCache == null) {
       methodCache = new HashMap<String, Method>();
-      processorMethodCache.put(processorClass, methodCache);
+      PROCESSOR_METHOD_CACHE.put(processorClass, methodCache);
       final Method[] methods = processorClass.getMethods();
       for (int i = 0; i < methods.length; i++) {
         final Method method = methods[i];
@@ -165,6 +177,13 @@ public abstract class XmlProcessor {
     return methodCache;
   }
 
+  public static void registerEnumConverter(final Class<? extends Enum> enumClass) {
+    final BeanUtilsBean beanUtilsBean = BeanUtilsBean.getInstance();
+    final ConvertUtilsBean convertUtils = beanUtilsBean.getConvertUtils();
+    final EnumConverter enumConverter = new EnumConverter();
+    convertUtils.register(enumConverter, enumClass);
+  }
+
   /** The context for processing of the XML Document. */
   private XmlProcessorContext context = new SimpleXmlProcessorContext();
 
@@ -174,7 +193,9 @@ public abstract class XmlProcessor {
   /** The XML namespace URI processed by this processor. */
   private final String namespaceUri;
 
-  private Map<String, Class<?>> tagNameClassMap;
+  private Map<String, Class<?>> tagNameClassMap = new HashMap<String, Class<?>>();
+
+  private final Map<QName, Converter> typeNameConverterMap = new HashMap<QName, Converter>();
 
   /**
    * Construct a new XmlProcessor for the XML Namespace URI.
@@ -183,14 +204,13 @@ public abstract class XmlProcessor {
    */
   protected XmlProcessor(final String namespaceUri) {
     this.namespaceUri = namespaceUri;
+    typeNameConverterMap.put(XmlConstants.XS_SHORT, new ShortConverter());
+    typeNameConverterMap.put(XmlConstants.XS_INT, new IntegerConverter());
     methodCache = getMethodCache(getClass());
   }
 
-  public String getNamespaceUri() {
-    return namespaceUri;
-  }
-
-  public XmlProcessor(String namespaceUri, Map<String, Class<?>> tagNameClassMap) {
+  public XmlProcessor(final String namespaceUri,
+    final Map<String, Class<?>> tagNameClassMap) {
     this(namespaceUri);
     this.tagNameClassMap = tagNameClassMap;
   }
@@ -204,6 +224,10 @@ public abstract class XmlProcessor {
     return context;
   }
 
+  public String getNamespaceUri() {
+    return namespaceUri;
+  }
+
   /**
    * Get the method to process the XML element.
    * 
@@ -212,37 +236,88 @@ public abstract class XmlProcessor {
    */
   private Method getProcessMethod(final QName element) {
     final String elementName = element.getLocalPart();
-    final Method method = (Method)methodCache.get(elementName);
+    final Method method = methodCache.get(elementName);
     return method;
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T process(String xml) {
+  public <T> T parseObject(final XMLStreamReader parser,
+    final Class<? extends T> objectClass) throws XMLStreamException,
+    IOException {
     try {
-      StringReader reader = new StringReader(xml);
-      XMLStreamReader xmlReader = StaxUtils.createXmlReader(reader);
-      StaxUtils.skipToStartElement(xmlReader);
-      return (T)process(xmlReader);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Error e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException("Unable to parse: " + xml, e);
+      if (objectClass == null) {
+        Object object = null;
+        while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
+          if (object != null) {
+            throw new IllegalArgumentException(
+              "Expecting a single child element " + parser.getLocation());
+          }
+          object = process(parser);
+        }
+        return (T)object;
+      } else {
+        final T object = objectClass.newInstance();
+        if (object instanceof Collection) {
+          final Collection<Object> collection = (Collection<Object>)object;
+          while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
+            final Object value = process(parser);
+            collection.add(value);
+          }
+        } else {
+          while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
+            final String tagName = parser.getName().getLocalPart();
+            final Object value = process(parser);
+            try {
+              String propertyName;
+              if (tagName.length() > 1
+                && Character.isLowerCase(tagName.charAt(1))) {
+                propertyName = CaseConverter.toLowerFirstChar(tagName);
+              } else {
+                propertyName = tagName;
+              }
+              BeanUtils.setProperty(object, propertyName, value);
+            } catch (final Throwable e) {
+              e.printStackTrace();
+            }
+          }
+        }
+        return object;
+      }
+    } catch (final InstantiationException e) {
+      throw new IllegalArgumentException(e);
+    } catch (final IllegalAccessException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 
-  public <T> T process(Resource resource) {
+  @SuppressWarnings("unchecked")
+  public <T> T process(final Resource resource) {
     try {
-      XMLStreamReader xmlReader = StaxUtils.createXmlReader(resource);
+      final XMLStreamReader xmlReader = StaxUtils.createXmlReader(resource);
       StaxUtils.skipToStartElement(xmlReader);
       return (T)process(xmlReader);
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       throw e;
-    } catch (Error e) {
+    } catch (final Error e) {
       throw e;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException("Unable to parse: " + resource, e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T process(final String xml) {
+    try {
+      final StringReader reader = new StringReader(xml);
+      final XMLStreamReader xmlReader = StaxUtils.createXmlReader(reader);
+      StaxUtils.skipToStartElement(xmlReader);
+      return (T)process(xmlReader);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException("Unable to parse: " + xml, e);
     }
   }
 
@@ -284,7 +359,7 @@ public abstract class XmlProcessor {
     final QName element = parser.getName();
 
     final String tagName = element.getLocalPart();
-    String xsiName = StaxUtils.getAttribute(parser, XsiConstants.TYPE);
+    QName xsiName = StaxUtils.getQNameAttribute(parser, XsiConstants.TYPE);
     boolean hasMapping = false;
     Class<?> objectClass = null;
     if (xsiName == null) {
@@ -294,12 +369,13 @@ public abstract class XmlProcessor {
         hasMapping = true;
       }
     } else {
-      int colonIndex = xsiName.indexOf(':');
-      if (colonIndex > -1) {
-        xsiName = xsiName.substring(colonIndex + 1);
-      }
-      if (tagNameClassMap.containsKey(xsiName)) {
-        objectClass = tagNameClassMap.get(xsiName);
+      String xsiLocalName = xsiName.getLocalPart();
+      Converter converter = typeNameConverterMap.get(xsiName);
+      if (converter != null) {
+        String text = StaxUtils.getChildText(parser);
+        return (T)converter.convert(null, text);
+      } else if (tagNameClassMap.containsKey(xsiLocalName)) {
+        objectClass = tagNameClassMap.get(xsiLocalName);
         hasMapping = true;
       } else if (tagNameClassMap.containsKey(tagName)) {
         objectClass = tagNameClassMap.get(tagName);
@@ -344,54 +420,5 @@ public abstract class XmlProcessor {
    */
   public final void setContext(final XmlProcessorContext context) {
     this.context = context;
-  }
-
-  public <T> T parseObject(final XMLStreamReader parser,
-    final Class<? extends T> objectClass) throws XMLStreamException,
-    IOException {
-    try {
-      if (objectClass == null) {
-        Object object = null;
-        while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-          if (object != null) {
-            throw new IllegalArgumentException(
-              "Expecting a single child element " + parser.getLocation());
-          }
-          object = process(parser);
-        }
-        return (T)object;
-      } else {
-        T object = objectClass.newInstance();
-        if (object instanceof Collection) {
-          Collection<Object> collection = (Collection<Object>)object;
-          while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-            Object value = process(parser);
-            collection.add(value);
-          }
-        } else {
-          while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
-            String tagName = parser.getName().getLocalPart();
-            Object value = process(parser);
-            try {
-              String propertyName;
-              if (tagName.length() > 1
-                && Character.isLowerCase(tagName.charAt(1))) {
-                propertyName = CaseConverter.toLowerFirstChar(tagName);
-              } else {
-                propertyName = tagName;
-              }
-              BeanUtils.setProperty(object, propertyName, value);
-            } catch (Throwable e) {
-              e.printStackTrace();
-            }
-          }
-        }
-        return object;
-      }
-    } catch (InstantiationException e) {
-      throw new IllegalArgumentException(e);
-    } catch (IllegalAccessException e) {
-      throw new IllegalArgumentException(e);
-    }
   }
 }

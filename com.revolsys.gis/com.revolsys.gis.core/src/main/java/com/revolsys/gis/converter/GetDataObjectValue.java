@@ -34,4 +34,9 @@ public class GetDataObjectValue implements Converter<DataObject, Object> {
     }
     return value;
   }
+  
+  @Override
+  public String toString() {
+    return attributePath;
+  }
 }

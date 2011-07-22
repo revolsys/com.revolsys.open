@@ -8,22 +8,22 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapReader;
 
-public class JsonMapReader implements MapReader {
+public class JsonMapReader extends AbstractReader<Map<String, Object>>
+  implements MapReader {
 
   private final Reader in;
 
   private Iterator<Map<String, Object>> iterator;
 
-  public JsonMapReader(
-    final InputStream in) {
+  public JsonMapReader(final InputStream in) {
     this.in = new InputStreamReader(in, Charset.forName("UTF-8"));
   }
 
-  public JsonMapReader(
-    final Reader in) {
+  public JsonMapReader(final Reader in) {
     this.in = in;
   }
 
@@ -41,5 +41,8 @@ public class JsonMapReader implements MapReader {
       }
     }
     return iterator;
+  }
+
+  public void open() {
   }
 }

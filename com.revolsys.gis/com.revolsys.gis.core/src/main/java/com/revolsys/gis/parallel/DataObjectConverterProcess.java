@@ -37,13 +37,12 @@ public class DataObjectConverterProcess extends BaseInOutProcess<DataObject,Data
     final Channel<DataObject> in,
     final Channel<DataObject> out,
     final DataObject sourceObject) {
-    if (sourceObject != null) {
-      final DataObjectMetaData sourceMetaData = sourceObject.getMetaData();
+      int matchCount = 0;
+       final DataObjectMetaData sourceMetaData = sourceObject.getMetaData();
       final QName sourceTypeName = sourceMetaData.getName();
       final Collection<FilterDataObjectConverter> converters = typeConverterMap.get(sourceTypeName);
       if (converters != null && !converters.isEmpty()) {
         DataObject targetObject = null;
-        int matchCount = 0;
         for (final FilterDataObjectConverter filterConverter : converters) {
           final Filter<DataObject> filter = filterConverter.getFilter();
           if (filter.accept(sourceObject)) {
@@ -54,29 +53,29 @@ public class DataObjectConverterProcess extends BaseInOutProcess<DataObject,Data
         }
         if (matchCount == 1) {
           out.write(targetObject);
-        } else if (matchCount == 0) {
-          if (defaultConverter == null) {
-            LOG.error("No converter found for: " + sourceObject);
-          } else {
-            targetObject = defaultConverter.convert(sourceObject);
-            out.write(targetObject);
-          }
+          return;
+        }  
+      }
+      if (matchCount == 0) {
+        if (defaultConverter == null) {
+          LOG.error("No converter found for: " + sourceObject);
         } else {
-          final StringBuffer sb = new StringBuffer(
-            "Multiple converers found: \n  ");
-          for (final FilterDataObjectConverter filterConverter : converters) {
-            final Filter<DataObject> filter = filterConverter.getFilter();
-            if (filter.accept(sourceObject)) {
-              sb.append(filter.toString());
-              sb.append("\n  ");
-            }
-          }
-          sb.append(sourceObject);
+          DataObject targetObject = defaultConverter.convert(sourceObject);
+          out.write(targetObject);
         }
       } else {
-        // LOG.error("No converter found for: " + sourceObject);
+        final StringBuffer sb = new StringBuffer(
+          "Multiple converers found: \n  ");
+        for (final FilterDataObjectConverter filterConverter : converters) {
+          final Filter<DataObject> filter = filterConverter.getFilter();
+          if (filter.accept(sourceObject)) {
+            sb.append(filter.toString());
+            sb.append("\n  ");
+          }
+        }
+        sb.append(sourceObject);
+        LOG.error(sb.toString());
       }
-    }
   }
 
   public void setDefaultConverter(

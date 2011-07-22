@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
@@ -20,25 +22,65 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.Reader;
 import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
 
+  private AtomicInteger idGenerator = new AtomicInteger();
+
   private DataObjectFactory dataObjectFactory;
+
+  private final Map<String, CodeTable<?>> columnToTableMap = new HashMap<String, CodeTable<?>>();
 
   private String label;
 
   private Map<String, DataObjectStoreSchema> schemaMap = new TreeMap<String, DataObjectStoreSchema>();
 
+  private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
+
+  private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
+
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
 
+  public Number createPrimaryId(QName typeName) {
+    return idGenerator.incrementAndGet();
+  }
+
+  protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
+    QName typeName = metaData.getName();
+    for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
+      final DataObjectMetaDataProperty clonedProperty = property.clone();
+      clonedProperty.setMetaData(metaData);
+    }
+    final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
+    metaData.setProperties(properties);
+  }
+
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void addCodeTable(final CodeTable<?> codeTable) {
+    final String idColumn = codeTable.getIdAttributeName();
+    this.columnToTableMap.put(idColumn, codeTable);
+    List<String> attributeAliases = codeTable.getAttributeAliases();
+    for (final String alias : attributeAliases) {
+      this.columnToTableMap.put(alias, codeTable);
+    }
+  }
+
+  public void setCommonMetaDataProperties(
+    final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
+    this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
   protected void addMetaData(final DataObjectMetaData metaData) {
@@ -94,12 +136,20 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public CodeTable getCodeTable(final QName typeName) {
-    return null;
+  public <T> CodeTable<T> getCodeTable(final QName typeName) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    if (metaData == null) {
+      return null;
+    } else {
+      final CodeTableProperty codeTable = CodeTableProperty.getProperty(metaData);
+      return (CodeTable<T>)codeTable;
+    }
   }
 
-  public CodeTable getCodeTableByColumn(final String columnName) {
-    return null;
+  public <T> CodeTable<T> getCodeTableByColumn(final String columnName) {
+    final CodeTable<?> codeTable = columnToTableMap.get(columnName);
+    return (CodeTable<T>)codeTable;
+
   }
 
   public DataObjectFactory getDataObjectFactory() {
@@ -257,6 +307,31 @@ public abstract class AbstractDataObjectStore extends
   public void updateAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       update(object);
+    }
+  }
+
+  public QName getQName(final Object name) {
+    if (name instanceof QName) {
+      return (QName)name;
+    } else {
+      return QName.valueOf(name.toString());
+    }
+  }
+
+  public void setTypeMetaDataProperties(
+    final Map<Object, List<DataObjectMetaDataProperty>> typeMetaProperties) {
+    for (final Entry<Object, List<DataObjectMetaDataProperty>> typeProperties : typeMetaProperties.entrySet()) {
+      final QName typeName = getQName(typeProperties.getKey());
+      Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typeName);
+      if (currentProperties == null) {
+        currentProperties = new HashMap<String, Object>();
+        this.typeMetaDataProperties.put(typeName, currentProperties);
+      }
+      final List<DataObjectMetaDataProperty> properties = typeProperties.getValue();
+      for (final DataObjectMetaDataProperty property : properties) {
+        final String name = property.getPropertyName();
+        currentProperties.put(name, property);
+      }
     }
   }
 }

@@ -2,8 +2,8 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.NodeQuadTree;

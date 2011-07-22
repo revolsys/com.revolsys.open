@@ -9,6 +9,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.Reader;
 
 public interface DataObjectReaderFactory extends IoFactory {
 

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.revolsys.csv.CsvMapReader;
-import com.revolsys.gis.data.io.AbstractReader;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
@@ -14,6 +13,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.google.fusiontables.attribute.FusionTablesAttribute;
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.MapReader;
 
 public class FusionTablesDataObjectReader extends AbstractReader<DataObject>

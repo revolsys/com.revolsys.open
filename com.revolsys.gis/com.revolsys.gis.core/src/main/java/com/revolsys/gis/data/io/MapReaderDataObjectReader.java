@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.MapReader;
 
 public class MapReaderDataObjectReader extends AbstractReader<DataObject>

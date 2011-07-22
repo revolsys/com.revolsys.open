@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,6 +25,14 @@ public class DelegatingDataObjectStore implements DataObjectStore {
 
   public DelegatingDataObjectStore(final DataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
+  }
+
+  public Number createPrimaryId(QName typeName) {
+    return dataObjectStore.createPrimaryId(typeName);
+  }
+
+  public void addCodeTable(final CodeTable codeTable) {
+    dataObjectStore.addCodeTable(codeTable);
   }
 
   public void close() {
@@ -154,16 +163,18 @@ public class DelegatingDataObjectStore implements DataObjectStore {
     return dataObjectStore.query(typeName, geometry);
   }
 
-  public Reader<DataObject> query(final QName typeName, final String queryString,
-    final Object... arguments) {
+  public Reader<DataObject> query(final QName typeName,
+    final String queryString, final Object... arguments) {
     final DataObjectStore dataObjectStore = getDataObjectStore();
     return dataObjectStore.query(typeName, queryString, arguments);
   }
+
   public DataObject queryFirst(final QName typeName, final String queryString,
     final Object... arguments) {
     final DataObjectStore dataObjectStore = getDataObjectStore();
     return dataObjectStore.queryFirst(typeName, queryString, arguments);
   }
+
   protected void setDataObjectStore(final DataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
   }

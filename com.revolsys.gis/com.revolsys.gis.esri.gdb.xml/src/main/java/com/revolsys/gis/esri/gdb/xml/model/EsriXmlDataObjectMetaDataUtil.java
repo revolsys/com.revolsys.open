@@ -12,6 +12,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
+import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 
@@ -31,7 +32,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     } else {
       final Field field = new Field();
       field.setName(fieldName);
-      field.setType(fieldType.getEsriFieldTypeName());
+      field.setType(fieldType.getEsriFieldType());
       field.setIsNullable(!attribute.isRequired());
       field.setRequired(attribute.isRequired());
       int length = fieldType.getFixedLength();
@@ -61,20 +62,20 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final GeometryDef geometryDef = new GeometryDef(shapeType, spatialReference);
     field.setGeometryDef(geometryDef);
 
-    table.addIndex(field);
+    table.addIndex(field, false, "FDO_GEOMETRY");
   }
 
   private static void addObjectIdField(final DETable table) {
     final Field field = new Field();
     field.setName("OBJECTID");
-    field.setType(FIELD_TYPE_OBJECT_ID);
+    field.setType(FieldType.esriFieldTypeOID);
     field.setIsNullable(false);
     field.setLength(4);
     field.setRequired(true);
     field.setEditable(false);
     table.addField(field);
 
-    table.addIndex(field, true);
+    table.addIndex(field, true, "FDO_OBJECTID");
   }
 
   public static DEFeatureDataset createDEFeatureDataset(
@@ -192,13 +193,17 @@ public class EsriXmlDataObjectMetaDataUtil implements
     table.setOIDFieldName("OBJECTID");
 
     addObjectIdField(table);
-    for (final Attribute attribute : metaData.getAttributes()) {
+    Attribute idAttribute = metaData.getIdAttribute();
+     for (final Attribute attribute : metaData.getAttributes()) {
       if (attribute == geometryAttribute) {
         addGeometryField(shapeType, table, attribute);
       } else {
         final String attributeName = attribute.getName();
         if (!attributeName.equals("OBJECTID")) {
-          addField(table, attribute);
+          Field field = addField(table, attribute);
+          if (idAttribute == attribute) {
+            table.addIndex(field, true, attributeName +"_PK");
+          }
         }
       }
     }

@@ -53,17 +53,8 @@ public class DETable extends DEDataset {
     fields.add(field);
   }
 
-  public void addIndex(final Field field) {
+  public void addIndex(final Field field, final boolean unique, final String indexName) {
     final Index index = new Index();
-    final String indexName = getName() + "_" + field.getName();
-    index.setName(indexName);
-    index.addField(field);
-    addIndex(index);
-  }
-
-  public void addIndex(final Field field, final boolean unique) {
-    final Index index = new Index();
-    final String indexName = getName() + "_" + field.getName();
     index.setName(indexName);
     index.setIsUnique(unique);
     index.addField(field);

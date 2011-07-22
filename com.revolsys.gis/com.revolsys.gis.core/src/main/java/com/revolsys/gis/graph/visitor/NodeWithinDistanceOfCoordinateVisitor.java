@@ -1,6 +1,6 @@
 package com.revolsys.gis.graph.visitor;
 
-import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectEqualsFilter;
@@ -13,7 +14,6 @@ import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.FilterVisitor;
 import com.revolsys.gis.data.visitor.SingleObjectVisitor;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.index.quadtree.Quadtree;

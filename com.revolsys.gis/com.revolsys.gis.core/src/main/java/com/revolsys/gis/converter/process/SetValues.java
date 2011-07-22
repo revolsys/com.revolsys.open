@@ -30,13 +30,13 @@ public class SetValues implements SourceToTargetProcess<DataObject, DataObject> 
         if (targetDataObjectStore == null) {
           target.setValue(name, value);
         } else {
-          final CodeTable codeTable = targetDataObjectStore.getCodeTableByColumn(name);
+          final CodeTable<?> codeTable = targetDataObjectStore.getCodeTableByColumn(name);
           if (codeTable == null) {
             target.setValue(name, value);
           } else if (value instanceof Number) {
             target.setValue(name, value);
           } else {
-            final Number codeId = codeTable.getId(value);
+            final Object codeId = codeTable.getId(value);
             target.setValue(name, codeId);
           }
         }

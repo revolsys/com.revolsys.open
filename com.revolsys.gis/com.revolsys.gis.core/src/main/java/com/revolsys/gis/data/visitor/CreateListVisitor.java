@@ -3,6 +3,8 @@ package com.revolsys.gis.data.visitor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
+
 /**
  * A visitor implementation which adds all the visited items to a List.
  * 

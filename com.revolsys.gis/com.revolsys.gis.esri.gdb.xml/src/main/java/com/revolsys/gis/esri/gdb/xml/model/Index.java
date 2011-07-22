@@ -12,6 +12,10 @@ public class Index {
 
   private List<Field> fields = new ArrayList<Field>();
 
+  public void addField(final Field field) {
+    fields.add(field);
+  }
+
   public List<Field> getFields() {
     return fields;
   }
@@ -28,23 +32,24 @@ public class Index {
     return isUnique;
   }
 
-  public void setIsAscending(final boolean isAscending) {
-    this.isAscending = isAscending;
-  }
-
   public void setFields(final List<Field> fields) {
     this.fields = fields;
   }
 
-  public void setName(final String name) {
-    this.name = name;
+  public void setIsAscending(final boolean isAscending) {
+    this.isAscending = isAscending;
   }
 
   public void setIsUnique(final boolean isUnique) {
     this.isUnique = isUnique;
   }
 
-  public void addField(Field field) {
-    fields.add(field);
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return getName();
   }
 }

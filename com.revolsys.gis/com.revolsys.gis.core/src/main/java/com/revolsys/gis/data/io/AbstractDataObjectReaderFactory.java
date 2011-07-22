@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.Reader;
 
 public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
   implements DataObjectReaderFactory {

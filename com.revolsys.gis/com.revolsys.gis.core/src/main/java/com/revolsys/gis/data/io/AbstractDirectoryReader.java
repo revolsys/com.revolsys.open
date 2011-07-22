@@ -39,7 +39,9 @@ import org.apache.log4j.Logger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.Reader;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
 public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>

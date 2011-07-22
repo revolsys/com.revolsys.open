@@ -2,6 +2,7 @@ package com.revolsys.gis.data.visitor;
 
 import java.util.Comparator;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;

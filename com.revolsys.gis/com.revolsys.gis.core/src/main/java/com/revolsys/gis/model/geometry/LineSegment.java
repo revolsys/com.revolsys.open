@@ -2,8 +2,8 @@ package com.revolsys.gis.model.geometry;
 
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;

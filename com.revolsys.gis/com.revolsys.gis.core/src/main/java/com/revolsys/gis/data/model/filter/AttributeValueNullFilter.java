@@ -11,10 +11,12 @@ import com.revolsys.gis.data.model.DataObject;
 public class AttributeValueNullFilter implements Filter<DataObject> {
 
   /** The property name, or path to match. */
-  private final String attributeName;
+  private String attributeName;
 
-  public AttributeValueNullFilter(
-    final String attributeName) {
+  public AttributeValueNullFilter() {
+  }
+
+  public AttributeValueNullFilter(final String attributeName) {
     this.attributeName = attributeName;
   }
 
@@ -24,10 +26,17 @@ public class AttributeValueNullFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Object propertyValue = object.getValue(attributeName);
     return propertyValue == null;
+  }
+
+  public String getAttributeName() {
+    return attributeName;
+  }
+
+  public void setAttributeName(final String attributeName) {
+    this.attributeName = attributeName;
   }
 
   /**

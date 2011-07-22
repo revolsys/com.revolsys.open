@@ -3,6 +3,7 @@ package com.revolsys.gis.data.visitor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 
 public class FilterListVisitor<T> implements Visitor<T> {

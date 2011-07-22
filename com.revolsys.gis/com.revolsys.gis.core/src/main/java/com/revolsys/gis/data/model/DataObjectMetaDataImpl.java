@@ -480,11 +480,15 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   public void setProperties(final Map<String, Object> properties) {
     if (properties != null) {
-      this.properties.putAll(properties);
-      for (final Entry<String, Object> propertyIter : properties.entrySet()) {
-        if (propertyIter.getValue() instanceof DataObjectMetaDataProperty) {
-          final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)propertyIter.getValue();
-          property.setMetaData(this);
+      for (final Entry<String, Object> entry : properties.entrySet()) {
+        final String key = entry.getKey();
+        final Object value = entry.getValue();
+        if (value instanceof DataObjectMetaDataProperty) {
+          final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
+          final DataObjectMetaDataProperty clonedProperty = property.clone();
+          clonedProperty.setMetaData(this);
+        } else {
+          setProperty(key, value);
         }
       }
     }

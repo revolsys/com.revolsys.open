@@ -2,13 +2,14 @@ package com.revolsys.gis.esri.gdb.xml.type;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
+import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
 
 public abstract class AbstractEsriGeodatabaseXmlFieldType implements
   EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
 
-  private String esriFieldTypeName;
+  private FieldType esriFieldType;
 
   private String xmlSchemaTypeName;
 
@@ -25,10 +26,10 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
   public AbstractEsriGeodatabaseXmlFieldType(
     DataType dataType,
     String xmlSchemaTypeName,
-    String esriFieldTypeName) {
+    FieldType esriFieldType) {
     this.dataType = dataType;
     this.xmlSchemaTypeName = xmlSchemaTypeName;
-    this.esriFieldTypeName = esriFieldTypeName;
+    this.esriFieldType = esriFieldType;
   }
 
   public void writeValue(
@@ -53,8 +54,8 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
     XmlWriter out,
     Object value);
 
-  public String getEsriFieldTypeName() {
-    return esriFieldTypeName;
+  public FieldType getEsriFieldType() {
+    return esriFieldType;
   }
 
   public String getXmlSchemaTypeName() {

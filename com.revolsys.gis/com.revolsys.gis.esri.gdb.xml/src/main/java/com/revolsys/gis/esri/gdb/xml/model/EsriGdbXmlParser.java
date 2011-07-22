@@ -10,9 +10,19 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
+import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.MergePolicyType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.RelCardinality;
+import com.revolsys.gis.esri.gdb.xml.model.enums.RelClassKey;
+import com.revolsys.gis.esri.gdb.xml.model.enums.RelKeyRole;
+import com.revolsys.gis.esri.gdb.xml.model.enums.RelKeyType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.RelNotification;
+import com.revolsys.gis.esri.gdb.xml.model.enums.SplitPolicyType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.WorkspaceType;
 import com.revolsys.xml.io.XmlProcessor;
 
 public class EsriGdbXmlParser extends XmlProcessor implements
@@ -21,6 +31,15 @@ public class EsriGdbXmlParser extends XmlProcessor implements
   private static final Map<String, Class<?>> TAG_NAME_CLASS_MAP = new HashMap<String, Class<?>>();
 
   static {
+    registerEnumConverter(FieldType.class);
+    registerEnumConverter(MergePolicyType.class);
+    registerEnumConverter(RelCardinality.class);
+    registerEnumConverter(RelClassKey.class);
+    registerEnumConverter(RelKeyRole.class);
+    registerEnumConverter(RelKeyType.class);
+    registerEnumConverter(RelNotification.class);
+    registerEnumConverter(SplitPolicyType.class);
+    registerEnumConverter(WorkspaceType.class);
     TAG_NAME_CLASS_MAP.put(CHILDREN.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(SUBTYPE.getLocalPart(), Subtype.class);
     TAG_NAME_CLASS_MAP.put(FIELD_INFOS.getLocalPart(), ArrayList.class);
@@ -28,7 +47,10 @@ public class EsriGdbXmlParser extends XmlProcessor implements
       SubtypeFieldInfo.class);
     TAG_NAME_CLASS_MAP.put(RELATIONSHIP_CLASS_NAMES.getLocalPart(),
       ArrayList.class);
-    TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
+    
+    TAG_NAME_CLASS_MAP.put(CODED_VALUE.getLocalPart(), CodedValue.class);
+    TAG_NAME_CLASS_MAP.put(CODED_VALUE_DOMAIN.getLocalPart(), CodedValueDomain.class);
+    TAG_NAME_CLASS_MAP.put(CODED_VALUES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(DATA_ELEMENT.getLocalPart(), DataElement.class);
     TAG_NAME_CLASS_MAP.put(DE_DATASET.getLocalPart(), DEDataset.class);
     TAG_NAME_CLASS_MAP.put(DE_GEO_DATASET.getLocalPart(), DEGeoDataset.class);
@@ -37,6 +59,7 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     TAG_NAME_CLASS_MAP.put(DE_FEATURE_CLASS.getLocalPart(),
       DEFeatureClass.class);
     TAG_NAME_CLASS_MAP.put(DE_TABLE.getLocalPart(), DETable.class);
+    TAG_NAME_CLASS_MAP.put(DOMAIN.getLocalPart(), Domain.class);
     TAG_NAME_CLASS_MAP.put(ENVELOPE.getLocalPart(), Envelope.class);
     TAG_NAME_CLASS_MAP.put(ENVELOPE_N.getLocalPart(), EnvelopeN.class);
     TAG_NAME_CLASS_MAP.put(SPATIAL_REFERENCE.getLocalPart(),
@@ -60,15 +83,24 @@ public class EsriGdbXmlParser extends XmlProcessor implements
       GeographicCoordinateSystem.class);
     TAG_NAME_CLASS_MAP.put(PROJECTED_COORDINATE_SYSTEM.getLocalPart(),
       ProjectedCoordinateSystem.class);
+    TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T parse(final Resource resource) {
+    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
+    return (T)parser.process(resource);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T parse(final String text) {
+    final byte[] bytes = text.getBytes();
+    final ByteArrayResource resource = new ByteArrayResource(bytes);
+    return (T)parse(resource);
   }
 
   public EsriGdbXmlParser() {
     super("http://www.esri.com/schemas/ArcGIS/10.1", TAG_NAME_CLASS_MAP);
-  }
-
-  public <T> T parse(final Resource resource) {
-    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
-    return (T)parser.process(resource);
   }
 
   public List<ControllerMembership> processControllerMemberships(

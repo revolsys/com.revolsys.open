@@ -1,5 +1,7 @@
 package com.revolsys.gis.data.visitor;
 
+import com.revolsys.collection.Visitor;
+
 public class SingleObjectVisitor<T> implements Visitor<T> {
   private T object;
 

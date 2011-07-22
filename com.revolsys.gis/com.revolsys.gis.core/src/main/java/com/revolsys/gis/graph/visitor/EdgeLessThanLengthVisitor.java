@@ -1,7 +1,7 @@
 package com.revolsys.gis.graph.visitor;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.util.ObjectProcessor;

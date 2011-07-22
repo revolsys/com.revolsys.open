@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.data.visitor.Visitor;
+import com.revolsys.collection.Visitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.xml.XmlConstants;
 import com.revolsys.xml.XsiConstants;
 
 /**
@@ -147,7 +148,7 @@ public class XmlWriter extends Writer {
   private boolean xmlDeclarationWritten = false;
 
   private int prefixNum;
-
+  
   /**
    * Construct a new XmlWriter.
    * 

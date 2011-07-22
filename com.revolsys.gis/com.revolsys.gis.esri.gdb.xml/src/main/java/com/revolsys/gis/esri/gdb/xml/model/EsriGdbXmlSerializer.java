@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +15,13 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.xml.XmlContants;
+import com.revolsys.xml.XmlConstants;
 import com.revolsys.xml.XsiConstants;
 import com.revolsys.xml.io.XmlWriter;
 
@@ -53,6 +58,10 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   private boolean writeNull;
 
+  private final Map<Class<?>, QName> classTypeNameMap = new LinkedHashMap<Class<?>, QName>();
+
+  private final Set<QName> xsiTypeTypeNames = new HashSet<QName>();
+
   private EsriGdbXmlSerializer() {
     addTagNameXsiTagName(METADATA, XML_PROPERTY_SET);
     addTagNameChildTagName(METADATA, XML_DOC);
@@ -71,9 +80,17 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
       AVG_NUM_POINTS, GEOMETRY_TYPE, HAS_M, HAS_Z, SPATIAL_REFERENCE,
       GRID_SIZE_0, GRID_SIZE_1, GRID_SIZE_2);
 
+    addClassProperties(Domain.class, DOMAIN, null, DOMAIN_NAME, FIELD_TYPE,
+      MERGE_POLICY, SPLIT_POLICY, DESCRIPTION, OWNER, CODED_VALUES);
+
+    addClassProperties(CodedValueDomain.class, DOMAIN, CODED_VALUE_DOMAIN);
+    addTagNameXsiTagName(CODED_VALUES, ARRAY_OF_CODED_VALUE);
+
+    addClassProperties(CodedValue.class, CODED_VALUE, CODED_VALUE, NAME, CODE);
+
     addClassProperties(Field.class, FIELD, FIELD, NAME, TYPE, IS_NULLABLE,
-      LENGTH, PRECISION, SCALE, REQUIRED, EDIATBLE, GEOMETRY_DEF, ALIAS_NAME,
-      MODEL_NAME);
+      LENGTH, PRECISION, SCALE, REQUIRED, EDIATBLE, DOMAIN_FIXED, GEOMETRY_DEF,
+      ALIAS_NAME, MODEL_NAME, DEFAULT_VALUE, DOMAIN);
 
     addTagNameXsiTagName(FIELD_ARRAY, ARRAY_OF_FIELD);
 
@@ -149,9 +166,17 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     addClassProperties(Workspace.class, WORKSPACE, null, WORKSPACE_DEFINITION,
       WORKSPACE_DATA);
 
+    classTypeNameMap.put(Byte.class, XmlConstants.XS_BYTE);
+    classTypeNameMap.put(Short.class, XmlConstants.XS_SHORT);
+    classTypeNameMap.put(Integer.class, XmlConstants.XS_INT);
+    classTypeNameMap.put(Float.class, XmlConstants.XS_FLOAT);
+    classTypeNameMap.put(Double.class, XmlConstants.XS_DOUBLE);
+    classTypeNameMap.put(Double.class, XmlConstants.XS_STRING);
+
+    xsiTypeTypeNames.add(CODE);
   }
 
-  public EsriGdbXmlSerializer(String esriNamespaceUri, final Writer out) {
+  public EsriGdbXmlSerializer(final String esriNamespaceUri, final Writer out) {
     this(out);
     if (esriNamespaceUri != null) {
       this.out.setNamespaceAlias(_NAMESPACE_URI, esriNamespaceUri);
@@ -163,7 +188,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     this.out = new XmlWriter(out);
     this.out.setIndent(true);
     this.out.startDocument("UTF-8");
-    this.out.setPrefix(XmlContants.XML_SCHEMA);
+    this.out.setPrefix(XmlConstants.XML_SCHEMA);
     this.out.setPrefix(XsiConstants.TYPE);
     writeNamespaces = false;
     writeFirstNamespace = true;
@@ -217,10 +242,6 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   }
 
-  private void addTagNameXsiTagName(final QName tagName, final QName xsiTagName) {
-    tagNameXsiTagNameMap.put(tagName, xsiTagName);
-  }
-
   private void addTagNameChildTagName(final QName tagName,
     final QName xsiTagName) {
     tagNameChildTagNameMap.put(tagName, xsiTagName);
@@ -231,9 +252,22 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     tagNameListElementTagNameMap.put(tagName, xsiTagName);
   }
 
+  private void addTagNameXsiTagName(final QName tagName, final QName xsiTagName) {
+    tagNameXsiTagNameMap.put(tagName, xsiTagName);
+  }
+
   public void close() {
     out.flush();
     out.close();
+  }
+
+  private void endTag(final QName tagName) {
+    final QName childTagName = tagNameChildTagNameMap.get(tagName);
+    if (childTagName != null) {
+      endTag(childTagName);
+    }
+
+    out.endTag();
   }
 
   private Method getClassPropertyMethod(final Class<?> objectClass,
@@ -257,30 +291,22 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
       tagName = new QName(packageName, className);
     }
     if (!startTag(tagName)) {
-      writeXsiTypeAttribute(objectClass);
+      writeXsiTypeAttribute(tagName, objectClass);
     }
     serializeObjectProperties(tagName, object);
     endTag(tagName);
   }
 
-  private void endTag(QName tagName) {
-    final QName childTagName = tagNameChildTagNameMap.get(tagName);
-    if (childTagName != null) {
-      endTag(childTagName);
-    }
-
-    out.endTag();
-  }
-
   @SuppressWarnings("rawtypes")
-  private void serializeObjectProperties(final QName tagName, Object object) {
+  private void serializeObjectProperties(final QName tagName,
+    final Object object) {
     if (object != null) {
       final Class<? extends Object> objectClass = object.getClass();
       final Collection<QName> propertyTagNames = classPropertyTagNamesMap.get(objectClass);
       if (propertyTagNames == null) {
         if (object instanceof List) {
           final Collection list = (Collection)object;
-          QName listElementTagName = tagNameListElementTagNameMap.get(tagName);
+          final QName listElementTagName = tagNameListElementTagNameMap.get(tagName);
           if (listElementTagName == null) {
             for (final Object value : list) {
               serialize(value);
@@ -289,7 +315,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
           } else {
             for (final Object value : list) {
               if (!startTag(listElementTagName)) {
-                writeXsiTypeAttribute(value);
+                writeXsiTypeAttribute(listElementTagName, value);
               }
               serializeObjectProperties(listElementTagName, value);
               endTag(listElementTagName);
@@ -311,7 +337,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
               propertyTagName);
             if (method == null) {
               if (!startTag(propertyTagName)) {
-                writeXsiTypeAttribute(value);
+                writeXsiTypeAttribute(propertyTagName,value);
               }
               serializeObjectProperties(propertyTagName, value);
               endTag(propertyTagName);
@@ -344,17 +370,27 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     return hasXsi;
   }
 
-  private void writeXsiTypeAttribute(final Class<? extends Object> objectClass) {
-    final QName xsiTagName = classXsiTagNameMap.get(objectClass);
-    if (xsiTagName != null) {
-      out.xsiTypeAttribute(xsiTagName);
+  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
+  private void writeXsiTypeAttribute(final QName tagName,
+    final Class<? extends Object> objectClass) {
+     QName xsiTagName = classXsiTagNameMap.get(objectClass);
+    if (xsiTagName == null) {
+      if (xsiTypeTypeNames.contains(tagName)) {
+        xsiTagName = classTypeNameMap.get(objectClass);
+        if (xsiTagName == null) {
+          LOG.error("No xsi:type configuration for class " + objectClass);
+        }
+      }
     }
+if (xsiTagName != null){
+      out.xsiTypeAttribute(xsiTagName);
+    } 
   }
 
-  private void writeXsiTypeAttribute(final Object value) {
+  private void writeXsiTypeAttribute(final QName tagName, final Object value) {
     if (value != null) {
       final Class<?> valueClass = value.getClass();
-      writeXsiTypeAttribute(valueClass);
+      writeXsiTypeAttribute(tagName, valueClass);
     }
   }
 }

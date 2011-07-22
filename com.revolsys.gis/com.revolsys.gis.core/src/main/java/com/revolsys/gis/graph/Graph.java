@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
@@ -21,7 +22,6 @@ import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.FilterListVisitor;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListener;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;

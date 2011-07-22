@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm.index;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.visitor.Visitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.ItemVisitor;
 

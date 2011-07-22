@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.Reader;
 
 public abstract class AbstractDataObjectAndGeometryReaderFactory extends
   AbstractGeometryReaderFactory implements DataObjectReaderFactory {

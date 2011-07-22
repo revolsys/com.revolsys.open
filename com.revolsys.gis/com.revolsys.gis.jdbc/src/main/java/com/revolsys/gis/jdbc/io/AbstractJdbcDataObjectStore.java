@@ -12,18 +12,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -31,13 +31,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty;
+import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -47,10 +47,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   private final Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
 
   private int batchSize;
-
-  private final Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
-
-  private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
 
   private Connection connection;
 
@@ -72,9 +68,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
-  private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
-
-  private List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
+  private final List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -109,14 +103,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   public void addAttributeAdder(final String sqlTypeName,
     final JdbcAttributeAdder adder) {
     attributeAdders.put(sqlTypeName, adder);
-  }
-
-  public void addCodeTable(final JdbcCodeTableProperty codeTable) {
-    final String idColumn = codeTable.getIdColumn();
-    this.columnToTableMap.put(idColumn, codeTable);
-    for (final String alias : codeTable.getColumnAliases()) {
-      this.columnToTableMap.put(alias, codeTable);
-    }
   }
 
   @Override
@@ -206,24 +192,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     return batchSize;
   }
 
-  @Override
-  public CodeTable getCodeTable(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    if (metaData == null) {
-      return null;
-    } else {
-      final JdbcCodeTableProperty codeTable = JdbcCodeTableProperty.getProperty(metaData);
-      return codeTable;
-    }
-  }
-
-  @Override
-  public CodeTable getCodeTableByColumn(final String columnName) {
-    final CodeTable codeTable = columnToTableMap.get(columnName);
-    return codeTable;
-
-  }
-
   public List<String> getColumnNames(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     return metaData.getAttributeNames();
@@ -254,6 +222,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return hints;
   }
 
+  @Override
   public String getLabel() {
     return label;
   }
@@ -303,37 +272,12 @@ public abstract class AbstractJdbcDataObjectStore extends
         addAttribute(resultSetMetaData, metaData, name, i);
       }
 
-      for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-        final DataObjectMetaDataProperty clonedProperty = property.clone();
-        clonedProperty.setMetaData(metaData);
-      }
-      final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
-      if (properties != null) {
-        for (final Entry<String, Object> entry : properties.entrySet()) {
-          final String key = entry.getKey();
-          final Object value = entry.getValue();
-          if (value instanceof DataObjectMetaDataProperty) {
-            final DataObjectMetaDataProperty property = (DataObjectMetaDataProperty)value;
-            final DataObjectMetaDataProperty clonedProperty = property.clone();
-            clonedProperty.setMetaData(metaData);
-          } else {
-            metaData.setProperty(key, value);
-          }
-        }
-      }
+      addMetaDataProperties(metaData);
 
       return metaData;
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for "
         + typeName);
-    }
-  }
-
-  private QName getQName(final Object name) {
-    if (name instanceof QName) {
-      return (QName)name;
-    } else {
-      return QName.valueOf(name.toString());
     }
   }
 
@@ -542,7 +486,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
 
     for (final DataObjectMetaData metaData : metaDataMap.values()) {
-      setMetaDataProperties((DataObjectMetaDataImpl)metaData);
+      addMetaDataProperties((DataObjectMetaDataImpl)metaData);
 
       postCreateDataObjectMetaData((DataObjectMetaDataImpl)metaData);
     }
@@ -559,8 +503,8 @@ public abstract class AbstractJdbcDataObjectStore extends
         try {
           while (schemaRs.next()) {
             final String schemaName = schemaRs.getString("TABLE_SCHEM");
-            DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
-              schemaName);
+            final DataObjectStoreSchema schema = new DataObjectStoreSchema(
+              this, schemaName);
             schemaMap.put(schemaName, schema);
           }
         } finally {
@@ -652,12 +596,20 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public Reader<DataObject> query(final QName typeName,
-    final String queryString, final Object... arguments) {
-    final JdbcQueryReader reader = createReader(typeName, queryString,
-      arguments);
+    final String whereClause, final Object... arguments) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    final StringBuffer sql = new StringBuffer();
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
+    if (StringUtils.hasText(whereClause)) {
+      sql.append(" WHERE ");
+      sql.append(whereClause);
+    }
+    final JdbcQuery query = new JdbcQuery(metaData, sql.toString(), arguments);
+    final JdbcQueryReader reader = createReader(query);
     return reader;
   }
 
+  @Override
   public DataObject queryFirst(final QName typeName, final String queryString,
     final Object... arguments) {
     final JdbcQueryReader reader = createReader(typeName, queryString,
@@ -687,14 +639,9 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public void setCodeTables(final List<JdbcCodeTableProperty> codeTables) {
-    for (final JdbcCodeTableProperty codeTable : codeTables) {
+    for (final AbstractCodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
     }
-  }
-
-  public void setCommonMetaDataProperties(
-    final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
-    this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
   public void setConnection(final Connection connection) {
@@ -717,20 +664,9 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.hints = hints;
   }
 
+  @Override
   public void setLabel(final String label) {
     this.label = label;
-  }
-
-  private void setMetaDataProperties(final DataObjectMetaDataImpl metaData) {
-    final QName typeName = metaData.getName();
-    for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-      final DataObjectMetaDataProperty clonedProperty = property.clone();
-      clonedProperty.setMetaData(metaData);
-    }
-    final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
-    if (properties != null) {
-      metaData.setProperties(properties);
-    }
   }
 
   public void setSqlPrefix(final String sqlPrefix) {
@@ -741,28 +677,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.sqlSuffix = sqlSuffix;
   }
 
-  public void setTypeMetaDataProperties(
-    final Map<Object, List<DataObjectMetaDataProperty>> typeMetaProperties) {
-    for (final Entry<Object, List<DataObjectMetaDataProperty>> typeProperties : typeMetaProperties.entrySet()) {
-      final QName typeName = getQName(typeProperties.getKey());
-      Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typeName);
-      if (currentProperties == null) {
-        currentProperties = new HashMap<String, Object>();
-        this.typeMetaDataProperties.put(typeName, currentProperties);
-      }
-      final List<DataObjectMetaDataProperty> properties = typeProperties.getValue();
-      for (final DataObjectMetaDataProperty property : properties) {
-        final String name = property.getPropertyName();
-        currentProperties.put(name, property);
-      }
-    }
-  }
-
-  @Override
-  public void update(final DataObject object) {
-    getWriter().write(object);
-  }
-
   @Override
   public String toString() {
     if (label == null) {
@@ -770,5 +684,10 @@ public abstract class AbstractJdbcDataObjectStore extends
     } else {
       return label;
     }
+  }
+
+  @Override
+  public void update(final DataObject object) {
+    getWriter().write(object);
   }
 }

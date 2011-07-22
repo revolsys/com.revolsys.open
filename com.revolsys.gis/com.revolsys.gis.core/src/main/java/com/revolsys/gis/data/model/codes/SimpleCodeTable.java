@@ -6,32 +6,28 @@ public class SimpleCodeTable extends AbstractCodeTable {
   private int index = 0;
 
   @Override
-  public void addValue(
-    final Number id,
-    final Object... values) {
+  public void addValue(final Number id, final Object... values) {
     super.addValue(id, values);
   }
 
-  public void addValue(
-    final Object... values) {
+  public void addValue(final Object... values) {
     index++;
     addValue(index, values);
   }
 
   @Override
-  public CodeTable clone() {
-    return new SimpleCodeTable();
+  public SimpleCodeTable clone() {
+    return (SimpleCodeTable)super.clone();
   }
 
-  public String getIdColumn() {
+  public String getIdAttributeName() {
     return null;
   }
 
   @Override
-  protected Number loadId(
-    final List<Object> values,
-    final boolean createId) {
+  protected Number loadId(final List<Object> values, final boolean createId) {
     index++;
     return index;
   }
+
 }
