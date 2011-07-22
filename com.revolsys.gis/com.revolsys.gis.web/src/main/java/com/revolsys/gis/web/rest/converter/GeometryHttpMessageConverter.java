@@ -18,11 +18,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.io.Reader;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
