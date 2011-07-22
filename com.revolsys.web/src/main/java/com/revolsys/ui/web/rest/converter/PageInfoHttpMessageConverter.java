@@ -35,7 +35,7 @@ import com.revolsys.ui.model.ParameterInfo;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.xml.XmlContants;
+import com.revolsys.xml.XmlConstants;
 import com.revolsys.xml.io.XmlWriter;
 import com.revolsys.xml.wadl.WadlConstants;
 
@@ -374,7 +374,7 @@ public class PageInfoHttpMessageConverter extends
         writer.startTag(DOC);
         final Locale locale = documentation.getLocale();
         if (locale != null) {
-          writer.attribute(XmlContants.XML_LANG, locale);
+          writer.attribute(XmlConstants.XML_LANG, locale);
         }
         writer.attribute(TITLE, title);
         writer.text(description);
