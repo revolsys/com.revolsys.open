@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreRegistry;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.io.Reader;
+import com.revolsys.io.Reader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 

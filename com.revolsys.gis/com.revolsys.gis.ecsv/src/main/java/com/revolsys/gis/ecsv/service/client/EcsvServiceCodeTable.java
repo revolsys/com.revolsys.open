@@ -1,6 +1,7 @@
 package com.revolsys.gis.ecsv.service.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -16,7 +17,17 @@ public class EcsvServiceCodeTable extends AbstractCodeTable {
 
   private QName typeName;
 
+  private List<String> valueNames;
+
   public EcsvServiceCodeTable() {
+  }
+
+  public EcsvServiceCodeTable(final EcsvDataObjectStore client,
+    final QName typeName, final String idColumnName, final String... valueNames) {
+    this.client = client;
+    this.typeName = typeName;
+    this.idColumn = idColumnName;
+    this.valueNames = Arrays.asList(valueNames);
   }
 
   @Override
@@ -27,6 +38,11 @@ public class EcsvServiceCodeTable extends AbstractCodeTable {
 
   public String getIdAttributeName() {
     return idColumn;
+  }
+
+  @Override
+  public List<String> getValueAttributeNames() {
+    return valueNames;
   }
 
   @Override
