@@ -27,9 +27,9 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
   }
 
   protected synchronized Number getNextId() {
-    return ++maxId;  
+    return ++maxId;
   }
-  
+
   protected synchronized void addValue(final Number id,
     final List<Object> values) {
     final long longValue = id.longValue();
@@ -87,6 +87,17 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
   }
 
   public Number getId(final Object... values) {
+    if (values.length == 1) {
+      Object firstValue = values[0];
+      if (firstValue instanceof Number) {
+        Number id = (Number)firstValue;
+        List<Object> foundValues = getValues(id);
+        if (foundValues != null) {
+          return id;
+        }
+      }
+    }
+
     final List<Object> valueList = Arrays.asList(values);
     processValues(valueList);
     Number id = getIdByValue(valueList);

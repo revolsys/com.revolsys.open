@@ -52,6 +52,7 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     TAG_NAME_CLASS_MAP.put(CODED_VALUE_DOMAIN.getLocalPart(), CodedValueDomain.class);
     TAG_NAME_CLASS_MAP.put(CODED_VALUES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(DATA_ELEMENT.getLocalPart(), DataElement.class);
+    TAG_NAME_CLASS_MAP.put(DATASET_DEFINITIONS.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(DE_DATASET.getLocalPart(), DEDataset.class);
     TAG_NAME_CLASS_MAP.put(DE_GEO_DATASET.getLocalPart(), DEGeoDataset.class);
     TAG_NAME_CLASS_MAP.put(DE_FEATURE_DATASET.getLocalPart(),
@@ -60,6 +61,7 @@ public class EsriGdbXmlParser extends XmlProcessor implements
       DEFeatureClass.class);
     TAG_NAME_CLASS_MAP.put(DE_TABLE.getLocalPart(), DETable.class);
     TAG_NAME_CLASS_MAP.put(DOMAIN.getLocalPart(), Domain.class);
+    TAG_NAME_CLASS_MAP.put(DOMAINS.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(ENVELOPE.getLocalPart(), Envelope.class);
     TAG_NAME_CLASS_MAP.put(ENVELOPE_N.getLocalPart(), EnvelopeN.class);
     TAG_NAME_CLASS_MAP.put(SPATIAL_REFERENCE.getLocalPart(),
@@ -84,6 +86,10 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     TAG_NAME_CLASS_MAP.put(PROJECTED_COORDINATE_SYSTEM.getLocalPart(),
       ProjectedCoordinateSystem.class);
     TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(WORKSPACE_DATA.getLocalPart(), ArrayList.class);
+    TAG_NAME_CLASS_MAP.put(WORKSPACE_DEFINITION.getLocalPart(), WorkspaceDefinition.class);
+    TAG_NAME_CLASS_MAP.put(WORKSPACE.getLocalPart(), Workspace.class);
   }
 
   @SuppressWarnings("unchecked")

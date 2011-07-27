@@ -16,9 +16,9 @@ public class Field {
 
   private int scale;
 
-  private boolean required;
+  private Boolean required;
 
-  private boolean editable = true;
+  private Boolean editable;
 
   private String aliasName;
 
@@ -78,7 +78,7 @@ public class Field {
     return type;
   }
 
-  public boolean isEditable() {
+  public Boolean getEditable() {
     return editable;
   }
 
@@ -86,7 +86,7 @@ public class Field {
     return isNullable;
   }
 
-  public boolean isRequired() {
+  public Boolean getRequired() {
     return required;
   }
 
@@ -106,7 +106,7 @@ public class Field {
     this.domainFixed = domainFixed;
   }
 
-  public void setEditable(final boolean editable) {
+  public void setEditable(final Boolean editable) {
     this.editable = editable;
   }
 
@@ -140,7 +140,7 @@ public class Field {
     this.precision = precision;
   }
 
-  public void setRequired(final boolean required) {
+  public void setRequired(final Boolean required) {
     this.required = required;
   }
 

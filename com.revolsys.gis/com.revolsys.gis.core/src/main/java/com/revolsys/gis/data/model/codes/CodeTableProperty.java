@@ -65,11 +65,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
   protected synchronized Number createId(final List<Object> values) {
     // TODO prevent duplicates from other threads/processes
     final DataObject code = dataStore.create(typeName);
-    final Number id ;
+    final Number id;
     if (loadAll) {
       id = getNextId();
     } else {
-     id = dataStore.createPrimaryId(typeName);
+      id = dataStore.createPrimaryId(typeName);
     }
     code.setIdValue(id);
     for (int i = 0; i < valueAttributeNames.size(); i++) {
@@ -88,17 +88,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   public DataObjectStore getDataStore() {
     return dataStore;
-  }
-
-  @Override
-  public Number getId(final Map<String, ? extends Object> valueMap) {
-    final Object[] values = new Object[valueAttributeNames.size()];
-    for (int i = 0; i < values.length; i++) {
-      final String name = valueAttributeNames.get(i);
-      final Object value = valueMap.get(name);
-      values[i] = value;
-    }
-    return getId(values);
   }
 
   public String getIdAttributeName() {

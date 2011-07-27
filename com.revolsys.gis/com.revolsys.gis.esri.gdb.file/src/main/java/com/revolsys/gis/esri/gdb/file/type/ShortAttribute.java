@@ -6,7 +6,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class ShortAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public ShortAttribute(final Field field) {
-    super(field.getName(), DataTypes.SHORT, field.isRequired());
+    super(field.getName(), DataTypes.SHORT, field.getRequired() == Boolean.TRUE);
   }
 
   @Override

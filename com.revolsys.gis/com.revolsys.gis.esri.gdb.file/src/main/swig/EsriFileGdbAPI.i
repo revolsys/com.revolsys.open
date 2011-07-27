@@ -91,6 +91,8 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::ErrorInfo::GetErrorDescription;
 %ignore FileGDBAPI::ErrorInfo::GetErrorRecord;
 %ignore FileGDBAPI::ErrorInfo::ClearErrors;
+%newobject createGeodatabase;
+%newobject openGeodatabase;
 %inline {
   FileGDBAPI::Geodatabase* createGeodatabase(const std::wstring& path) {
     FileGDBAPI::Geodatabase* value = new FileGDBAPI::Geodatabase();
@@ -131,6 +133,8 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Geodatabase::GetDomains;
 %ignore FileGDBAPI::Geodatabase::GetChildDatasets;
 %ignore FileGDBAPI::Geodatabase::CreateFeatureDataset;
+%newobject FileGDBAPI::Geodatabase::createTable;
+%newobject FileGDBAPI::Geodatabase::openTable;
 %extend FileGDBAPI::Geodatabase {
   void createFeatureDataset(std::string featureDatasetDef) {
     checkResult(self->CreateFeatureDataset(featureDatasetDef));
@@ -204,6 +208,8 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Table::Insert;
 %ignore FileGDBAPI::Table::Update;
 %ignore FileGDBAPI::Table::Delete;
+%newobject FileGDBAPI::Table::createRowObject;
+%newobject FileGDBAPI::Table::search;
 %extend FileGDBAPI::Table {
   bool isEditable() {
     bool value;
@@ -270,6 +276,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Row::SetDate;
 %ignore FileGDBAPI::Row::GetDouble;
 %ignore FileGDBAPI::Row::GetFloat;
+%ignore FileGDBAPI::Row::GetGeometry;
 %ignore FileGDBAPI::Row::GetGUID;
 %ignore FileGDBAPI::Row::GetGlobalID;
 %ignore FileGDBAPI::Row::GetInteger;
@@ -278,6 +285,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Row::GetShort;
 %ignore FileGDBAPI::Row::GetString;
 %ignore FileGDBAPI::Row::GetXML;
+%newobject FileGDBAPI::Row::getGeometry;
 %extend FileGDBAPI::Row {
   bool isNull(std::wstring name) {
     bool value;
@@ -459,6 +467,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::MultiPatchShapeBuffer;
 
 %ignore FileGDBAPI::EnumRows::Next;
+%newobject FileGDBAPI::EnumRows::next;
 %extend FileGDBAPI::EnumRows {
   FileGDBAPI::Row* next() {
     FileGDBAPI::Row* value = new FileGDBAPI::Row();

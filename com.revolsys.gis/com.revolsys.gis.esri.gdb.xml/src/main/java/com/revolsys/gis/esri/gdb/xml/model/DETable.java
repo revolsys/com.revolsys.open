@@ -37,7 +37,7 @@ public class DETable extends DEDataset {
 
   private String defaultSubtypeCode;
 
-  private List<Subtype> subtypes = new ArrayList<Subtype>();
+  private List<Subtype> subtypes = null;
 
   private List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
 

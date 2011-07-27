@@ -38,7 +38,7 @@ public class FileGdbDomainCodeTable implements CodeTable<Object> {
     final Object id = domain.addCodedValue(name);
     final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
     geodatabase.alterDomain(domainDefinition);
-    LOG.info("Created code " + id + "=" + name);
+    LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
     return id;
   }
 
@@ -78,8 +78,9 @@ public class FileGdbDomainCodeTable implements CodeTable<Object> {
     return domain.getMap(id);
   }
 
+  @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
-    return domain.getValue(id);
+    return (V)domain.getValue(id);
   }
 
   public List<String> getValueAttributeNames() {
@@ -90,4 +91,8 @@ public class FileGdbDomainCodeTable implements CodeTable<Object> {
     return domain.getValues(id);
   }
 
+  @Override
+  public String toString() {
+    return domain.toString();
+  }
 }

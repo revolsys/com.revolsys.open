@@ -37,10 +37,6 @@ public class Row {
     return EsriFileGdbJNI.Row_SetNull(swigCPtr, this, field);
   }
 
-  public int GetGeometry(ShapeBuffer shapeBuffer) {
-    return EsriFileGdbJNI.Row_GetGeometry(swigCPtr, this, ShapeBuffer.getCPtr(shapeBuffer), shapeBuffer);
-  }
-
   public int SetGeometry(ShapeBuffer shapeBuffer) {
     return EsriFileGdbJNI.Row_SetGeometry(swigCPtr, this, ShapeBuffer.getCPtr(shapeBuffer), shapeBuffer);
   }
@@ -139,7 +135,7 @@ public class Row {
 
   public ShapeBuffer getGeometry() {
     long cPtr = EsriFileGdbJNI.Row_getGeometry(swigCPtr, this);
-    return (cPtr == 0) ? null : new ShapeBuffer(cPtr, false);
+    return (cPtr == 0) ? null : new ShapeBuffer(cPtr, true);
   }
 
 }

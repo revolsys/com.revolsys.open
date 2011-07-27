@@ -19,6 +19,10 @@ public class Domain implements Cloneable {
   private String owner;
 
   @Override
+  public String toString() {
+    return domainName;
+  }
+  @Override
   public Domain clone() {
     try {
       final Domain clone = (Domain)super.clone();

@@ -13,7 +13,7 @@ public class DEDataset extends DataElement {
 
   private boolean canVersion;
 
-  private String configurationKeyword;
+  private String configurationKeyword = "";
 
   public String getConfigurationKeyword() {
     return configurationKeyword;

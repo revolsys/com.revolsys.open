@@ -78,4 +78,8 @@ public class WorkspaceDefinition implements Cloneable {
     this.workspaceType = workspaceType;
   }
 
+  public void addDomain(Domain domain) {
+    domains.add(domain);
+  }
+
 }

@@ -8,10 +8,13 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
+  public static final UtmRectangularMapGrid INSTANCE = new UtmRectangularMapGrid();
+  
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
@@ -111,7 +114,10 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return getMapTileName(lon, lat);
   }
 
-  public int getNad83Srid(final double lon, final double lat) {
+  public int getNad83Srid(final Geometry geometry) {
+    return getNad83Srid(getMapTileName(geometry));
+  }
+ public int getNad83Srid(final double lon, final double lat) {
     return getNad83Srid(getMapTileName(lon, lat));
   }
 
@@ -120,6 +126,23 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     final int verticalZone = getVerticalZone(sheet);
     if (horizontalZone < 24 && verticalZone >= 'n') {
       return 26900 + horizontalZone;
+    } else {
+      throw new IllegalArgumentException("UTM Zone " + sheet
+        + " is not in North America");
+    }
+  }
+  public int getNad27Srid(final Geometry geometry) {
+    return getNad27Srid(getMapTileName(geometry));
+  }
+ public int getNad27Srid(final double lon, final double lat) {
+    return getNad27Srid(getMapTileName(lon, lat));
+  }
+
+  public int getNad27Srid(final String sheet) {
+    final int horizontalZone = getHorizontalZone(sheet);
+    final int verticalZone = getVerticalZone(sheet);
+    if (horizontalZone < 24 && verticalZone >= 'n') {
+      return 26700 + horizontalZone;
     } else {
       throw new IllegalArgumentException("UTM Zone " + sheet
         + " is not in North America");

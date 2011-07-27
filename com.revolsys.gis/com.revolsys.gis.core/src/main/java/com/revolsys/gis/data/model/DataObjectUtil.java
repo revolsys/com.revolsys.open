@@ -100,6 +100,21 @@ public final class DataObjectUtil {
     return (T)propertyValue;
   }
 
+  public static void setAttributeValue(final DataObject object,
+    final String name, final Object value) {
+    DataObjectMetaData metaData = object.getMetaData();
+    DataObjectStore dataObjectStore = metaData.getDataObjectStore();
+    if (dataObjectStore != null) {
+      CodeTable<?> codeTable = dataObjectStore.getCodeTableByColumn(name);
+      if (codeTable != null && codeTable.getValueAttributeNames().size() == 1) {
+        Object id = codeTable.getId(value);
+        object.setValue(name, id);
+        return;
+      }
+    }
+    object.setValue(name, value);
+  }
+
   private DataObjectUtil() {
   }
 }

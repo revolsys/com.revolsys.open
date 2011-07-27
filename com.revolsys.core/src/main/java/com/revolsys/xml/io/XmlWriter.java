@@ -346,6 +346,10 @@ public class XmlWriter extends Writer {
     out.write("<![CDATA[");
     out.write(text);
     out.write("]]>");
+    setElementHasContent();
+  }
+
+  public void setElementHasContent() {
     elementHasContent = true;
   }
 
@@ -428,7 +432,7 @@ public class XmlWriter extends Writer {
    * 
    * @throws IOException If there was an error writing.
    */
-  private void closeStartTag() {
+  public void closeStartTag() {
     if (writingStartTag) {
       checkNotFinished();
       writeNamespaces();
@@ -451,7 +455,7 @@ public class XmlWriter extends Writer {
     writeEndIndent();
     out.write("-->");
     canWriteXmlDeclaration = false;
-    elementHasContent = true;
+    setElementHasContent();
   }
 
   /**
@@ -601,7 +605,7 @@ public class XmlWriter extends Writer {
     out.write("&#");
     out.write(ch);
     out.write(';');
-    elementHasContent = true;
+    setElementHasContent();
   }
 
   /**
@@ -615,7 +619,7 @@ public class XmlWriter extends Writer {
     out.write('&');
     out.write(name);
     out.write(';');
-    elementHasContent = true;
+    setElementHasContent();
   }
 
   /**
@@ -933,11 +937,9 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final char[] buffer, final int offset, final int length) {
-    if (length > 0) {
       closeStartTag();
       writeElementContent(buffer, offset, length);
-      elementHasContent = true;
-    }
+      setElementHasContent();
   }
 
   /**
@@ -1004,7 +1006,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text
    */
   public void text(final String text) {
-    if (text != null && text.length() > 0) {
+    if (text != null ) {
       text(text.toCharArray(), 0, text.length());
     }
   }
@@ -1032,7 +1034,7 @@ public class XmlWriter extends Writer {
   public void write(final char[] buffer, final int offset, final int length) {
     closeStartTag();
     out.write(buffer, offset, length);
-    elementHasContent = true;
+    setElementHasContent();
   }
 
   /**
@@ -1045,7 +1047,7 @@ public class XmlWriter extends Writer {
   public void write(final int character) {
     closeStartTag();
     out.write(character);
-    elementHasContent = true;
+    setElementHasContent();
   }
 
   /**

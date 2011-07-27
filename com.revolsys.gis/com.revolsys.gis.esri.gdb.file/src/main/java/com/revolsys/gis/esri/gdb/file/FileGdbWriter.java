@@ -30,8 +30,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
 
   private FileGdbDataObjectStore dataObjectStore;
 
-  FileGdbWriter(
-    final FileGdbDataObjectStore dataObjectStore) {
+  FileGdbWriter(final FileGdbDataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
     this.geodatabase = dataObjectStore.getGeodatabase();
   }
@@ -58,7 +57,11 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final QName typeName = objectMetaData.getName();
     final Table table = getTable(typeName);
     final Row row = getRow(table, object);
-    table.deleteRow(row);
+    try {
+      table.deleteRow(row);
+    } finally {
+      row.delete();
+    }
   }
 
   public Row getRow(final Table table, final DataObject object) {
@@ -84,28 +87,36 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
 
     final Row row = table.createRowObject();
-    for (final Attribute attribute : metaData.getAttributes()) {
-      final String name = attribute.getName();
-      final Object value = object.getValue(name);
-      final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
-      esriAttribute.setInsertValue(row, value);
+    try {
+      for (final Attribute attribute : metaData.getAttributes()) {
+        final String name = attribute.getName();
+        final Object value = object.getValue(name);
+        final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
+        esriAttribute.setInsertValue(row, value);
+      }
+      table.insertRow(row);
+    } finally {
+      row.delete();
     }
-    table.insertRow(row);
   }
 
   private void update(final DataObject object) {
     final QName typeName = object.getMetaData().getName();
     final Table table = getTable(typeName);
     final Row row = getRow(table, object);
+    try {
 
-    final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
-    for (final Attribute attribute : metaData.getAttributes()) {
-      final String name = attribute.getName();
-      final Object value = object.getValue(name);
-      final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
-      esriAttribute.setUpdateValue(row, value);
+      final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
+      for (final Attribute attribute : metaData.getAttributes()) {
+        final String name = attribute.getName();
+        final Object value = object.getValue(name);
+        final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
+        esriAttribute.setUpdateValue(row, value);
+      }
+      table.updateRow(row);
+    } finally {
+      row.delete();
     }
-    table.updateRow(row);
   }
 
   public synchronized void write(final DataObject object) {

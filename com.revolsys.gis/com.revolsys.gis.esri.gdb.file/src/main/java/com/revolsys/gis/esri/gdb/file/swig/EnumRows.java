@@ -47,7 +47,7 @@ public class EnumRows {
 
   public Row next() {
     long cPtr = EsriFileGdbJNI.EnumRows_next(swigCPtr, this);
-    return (cPtr == 0) ? null : new Row(cPtr, false);
+    return (cPtr == 0) ? null : new Row(cPtr, true);
   }
 
 }

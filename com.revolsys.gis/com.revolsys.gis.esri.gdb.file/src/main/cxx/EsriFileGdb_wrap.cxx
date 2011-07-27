@@ -3608,34 +3608,6 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1GetGeometry(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
-  FileGDBAPI::ShapeBuffer *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(FileGDBAPI::Row **)&jarg1; 
-  arg2 = *(FileGDBAPI::ShapeBuffer **)&jarg2;
-  if(!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::ShapeBuffer & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)(arg1)->GetGeometry(*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleRuntimeError(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Row_1SetGeometry(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jint jresult = 0 ;
   FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;

@@ -8,7 +8,7 @@ public class XmlAttribute extends AbstractEsriFileGeodatabaseAttribute {
 
   public XmlAttribute(final Field field) {
     super(field.getName(), DataTypes.STRING, field.getLength(),
-      field.isRequired());
+      field.getRequired() == Boolean.TRUE);
   }
 
   @Override

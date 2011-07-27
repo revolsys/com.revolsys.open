@@ -24,26 +24,27 @@ public class SimpleDataObjectConveter implements
   public SimpleDataObjectConveter() {
   }
 
-  public SimpleDataObjectConveter(
-    final DataObjectMetaData dataObjectMetaData) {
+  public SimpleDataObjectConveter(final DataObjectMetaData dataObjectMetaData) {
     setDataObjectMetaData(dataObjectMetaData);
   }
 
-  public SimpleDataObjectConveter(
-    final DataObjectMetaData dataObjectMetaData,
+  public SimpleDataObjectConveter(final DataObjectMetaData dataObjectMetaData,
     final List<SourceToTargetProcess<DataObject, DataObject>> processors) {
     setDataObjectMetaData(dataObjectMetaData);
     this.processors = processors;
   }
 
-  public SimpleDataObjectConveter(
-    final DataObjectMetaData dataObjectMetaData,
+  public SimpleDataObjectConveter(final DataObjectMetaData dataObjectMetaData,
     final SourceToTargetProcess<DataObject, DataObject>... processors) {
     this(dataObjectMetaData, Arrays.asList(processors));
   }
 
-  public DataObject convert(
-    final DataObject sourceObject) {
+  public void addProcessor(
+    final SourceToTargetProcess<DataObject, DataObject> processor) {
+    processors.add(processor);
+  }
+
+  public DataObject convert(final DataObject sourceObject) {
     final DataObject targetObject = factory.createDataObject(dataObjectMetaData);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
     final Geometry targetGeometry = (Geometry)sourceGeometry.clone();
@@ -62,8 +63,7 @@ public class SimpleDataObjectConveter implements
     return processors;
   }
 
-  public void setDataObjectMetaData(
-    final DataObjectMetaData dataObjectMetaData) {
+  public void setDataObjectMetaData(final DataObjectMetaData dataObjectMetaData) {
     this.dataObjectMetaData = dataObjectMetaData;
     this.factory = dataObjectMetaData.getDataObjectFactory();
   }

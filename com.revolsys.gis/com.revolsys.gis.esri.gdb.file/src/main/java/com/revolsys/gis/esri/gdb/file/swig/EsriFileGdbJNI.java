@@ -119,7 +119,6 @@ class EsriFileGdbJNI {
   public final static native long Table_search__SWIG_0(long jarg1, Table jarg1_, String jarg2, String jarg3, long jarg4, Envelope jarg4_, boolean jarg5);
   public final static native long Table_search__SWIG_1(long jarg1, Table jarg1_, String jarg2, String jarg3, boolean jarg4);
   public final static native int Row_SetNull(long jarg1, Row jarg1_, String jarg2);
-  public final static native int Row_GetGeometry(long jarg1, Row jarg1_, long jarg2, ShapeBuffer jarg2_);
   public final static native int Row_SetGeometry(long jarg1, Row jarg1_, long jarg2, ShapeBuffer jarg2_);
   public final static native int Row_SetShort(long jarg1, Row jarg1_, String jarg2, short jarg3);
   public final static native int Row_SetInteger(long jarg1, Row jarg1_, String jarg2, int jarg3);

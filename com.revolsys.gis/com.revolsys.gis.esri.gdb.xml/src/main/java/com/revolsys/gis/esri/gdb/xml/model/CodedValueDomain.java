@@ -18,6 +18,7 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
 
   private int maxId = 0;
 
+
   public synchronized void addCodedValue(final Object code, final String name) {
     final CodedValue value = new CodedValue(code, name);
     codedValues.add(value);
@@ -63,9 +64,16 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
 
   public Object getId(final Object... values) {
     if (values.length == 1) {
-      final String value = ((String)values[0]);
-      final Object id = valueIdMap.get(value.toLowerCase());
-      return id;
+      final Object value = values[0];
+      if (value == null) {
+        return null;
+      } else if (idValueMap.containsKey(value)) {
+        return value;
+      } else {
+        String lowerValue = ((String)value).toLowerCase();
+        final Object id = valueIdMap.get(lowerValue);
+        return id;
+      }
     } else {
       throw new IllegalArgumentException("Expecting only a single value "
         + values);
@@ -116,13 +124,14 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
     switch (getFieldType()) {
       case esriFieldTypeInteger:
         id = (int)++maxId;
-       break;
+      break;
       case esriFieldTypeSmallInteger:
         id = (short)++maxId;
-       break;
+      break;
 
       default:
-      throw new RuntimeException("Cannot generate code for field type " + getFieldType());
+        throw new RuntimeException("Cannot generate code for field type "
+          + getFieldType());
     }
     addCodedValue(id, name);
     return id;

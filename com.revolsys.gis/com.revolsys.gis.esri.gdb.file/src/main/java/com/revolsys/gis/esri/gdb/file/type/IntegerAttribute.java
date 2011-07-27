@@ -6,7 +6,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class IntegerAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public IntegerAttribute(final Field field) {
-    super(field.getName(), DataTypes.INT, field.isRequired());
+    super(field.getName(), DataTypes.INT, field.getRequired() == Boolean.TRUE);
   }
 
   @Override

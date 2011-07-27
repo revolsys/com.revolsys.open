@@ -8,7 +8,7 @@ public class BinaryAttribute extends AbstractEsriFileGeodatabaseAttribute {
 
   public BinaryAttribute(final Field field) {
     super(field.getName(), DataTypes.BASE64_BINARY, field.getLength(),
-      field.isRequired());
+      field.getRequired() == Boolean.TRUE);
   }
 
   @Override

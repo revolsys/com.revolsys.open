@@ -119,12 +119,12 @@ public class Geodatabase {
 
   public Table openTable(String path) {
     long cPtr = EsriFileGdbJNI.Geodatabase_openTable(swigCPtr, this, path);
-    return (cPtr == 0) ? null : new Table(cPtr, false);
+    return (cPtr == 0) ? null : new Table(cPtr, true);
   }
 
   public Table createTable(String tableDefinition, String parent) {
     long cPtr = EsriFileGdbJNI.Geodatabase_createTable(swigCPtr, this, tableDefinition, parent);
-    return (cPtr == 0) ? null : new Table(cPtr, false);
+    return (cPtr == 0) ? null : new Table(cPtr, true);
   }
 
 }

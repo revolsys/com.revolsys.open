@@ -7,7 +7,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class GuidAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public GuidAttribute(final Field field) {
-    this(field.getName(), field.getLength(), field.isRequired());
+    this(field.getName(), field.getLength(),field.getRequired() == Boolean.TRUE);
   }
 
   public GuidAttribute(final String name, final int length,

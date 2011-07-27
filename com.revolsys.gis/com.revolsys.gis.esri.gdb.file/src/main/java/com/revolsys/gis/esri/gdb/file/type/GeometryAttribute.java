@@ -79,7 +79,7 @@ public class GeometryAttribute extends AbstractEsriFileGeodatabaseAttribute {
   private Method writeMethod;
 
   public GeometryAttribute(final Field field) {
-    super(field.getName(), DataTypes.GEOMETRY, field.isRequired());
+    super(field.getName(), DataTypes.GEOMETRY, field.getRequired() == Boolean.TRUE);
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException(

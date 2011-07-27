@@ -6,7 +6,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class DoubleAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public DoubleAttribute(final Field field) {
-    super(field.getName(), DataTypes.DOUBLE, field.isRequired());
+    super(field.getName(), DataTypes.DOUBLE, field.getRequired() == Boolean.TRUE);
   }
 
   @Override

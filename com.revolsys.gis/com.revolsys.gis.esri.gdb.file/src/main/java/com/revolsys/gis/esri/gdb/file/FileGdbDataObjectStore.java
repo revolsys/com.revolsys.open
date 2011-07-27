@@ -15,6 +15,8 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
@@ -46,6 +48,7 @@ import com.revolsys.gis.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.gis.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.gis.esri.gdb.xml.model.DEFeatureDataset;
 import com.revolsys.gis.esri.gdb.xml.model.DETable;
+import com.revolsys.gis.esri.gdb.xml.model.DataElement;
 import com.revolsys.gis.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.xml.model.EsriGdbXmlParser;
 import com.revolsys.gis.esri.gdb.xml.model.EsriGdbXmlSerializer;
@@ -53,6 +56,8 @@ import com.revolsys.gis.esri.gdb.xml.model.EsriXmlDataObjectMetaDataUtil;
 import com.revolsys.gis.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.xml.model.Index;
 import com.revolsys.gis.esri.gdb.xml.model.SpatialReference;
+import com.revolsys.gis.esri.gdb.xml.model.Workspace;
+import com.revolsys.gis.esri.gdb.xml.model.WorkspaceDefinition;
 import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
@@ -103,15 +108,20 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
       FloatAttribute.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeString,
       StringAttribute.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDate, DateAttribute.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDate,
+      DateAttribute.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGeometry,
       GeometryAttribute.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeOID, OidAttribute.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeBlob, BinaryAttribute.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeOID,
+      OidAttribute.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeBlob,
+      BinaryAttribute.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGlobalID,
       GuidAttribute.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGUID, GuidAttribute.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeXML, XmlAttribute.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGUID,
+      GuidAttribute.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeXML,
+      XmlAttribute.class);
 
   }
 
@@ -130,7 +140,7 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
 
   }
 
-  private File template;
+  private Resource template;
 
   public FileGdbDataObjectStore() {
   }
@@ -256,19 +266,18 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     } else if (schemaName.equals("")) {
       schemaName = defaultSchema;
     }
-//    for (Field field: deTable.getFields()) {
-//      String fieldName = field.getName();
-//      CodeTable<?> codeTable= getCodeTableByColumn(fieldName);
-//      if (codeTable instanceof FileGdbDomainCodeTable) {
-//        FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
-//        field.setDomain(domainCodeTable.getDomain());
-//        field.setDomainFixed(true);
-//      }
-//    }
+    for (Field field : deTable.getFields()) {
+      String fieldName = field.getName();
+      CodeTable<?> codeTable = getCodeTableByColumn(fieldName);
+      if (codeTable instanceof FileGdbDomainCodeTable) {
+        FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
+        field.setDomain(domainCodeTable.getDomain());
+      }
+    }
     final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
     final Table table;
     try {
-     table = geodatabase.createTable(tableDefinition, schemaPath);
+      table = geodatabase.createTable(tableDefinition, schemaPath);
     } catch (final Throwable t) {
       if (LOG.isDebugEnabled()) {
         LOG.debug(tableDefinition);
@@ -395,7 +404,7 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     return geodatabase.openTable(path);
   }
 
-  public File getTemplate() {
+  public Resource getTemplate() {
     return template;
   }
 
@@ -421,21 +430,44 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     } else if (createMissingGeodatabase) {
       if (template == null) {
         geodatabase = EsriFileGdb.createGeodatabase(fileName);
-      } else {
-        try {
-          FileUtil.copy(template, file);
-        } catch (final IOException e) {
-          throw new IllegalArgumentException(
-            "Unable to copy template ESRI geodatabase " + template, e);
+      } else if (template.exists()) {
+        if (template instanceof FileSystemResource) {
+          FileSystemResource fileResource = (FileSystemResource)template;
+          File templateFile = fileResource.getFile();
+          if (templateFile.isDirectory()) {
+            try {
+              FileUtil.copy(templateFile, file);
+            } catch (final IOException e) {
+              throw new IllegalArgumentException(
+                "Unable to copy template ESRI geodatabase " + template, e);
+            }
+            geodatabase = EsriFileGdb.openGeodatabase(fileName);
+          }
         }
-        geodatabase = EsriFileGdb.openGeodatabase(fileName);
+        if (geodatabase == null) {
+          geodatabase = EsriFileGdb.createGeodatabase(fileName);
+          Workspace workspace = EsriGdbXmlParser.parse(template);
+          WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
+          for (Domain domain : workspaceDefinition.getDomains()) {
+            createDomain(domain);
+          }
+          for (DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
+            if (dataElement instanceof DETable) {
+              DETable table = (DETable)dataElement;
+              createTable(table);
+            }
+          }
+        }
+      } else {
+        throw new IllegalArgumentException("Template does not exist "
+          + template);
       }
     } else {
       throw new IllegalArgumentException("ESRI file geodatbase not found "
         + fileName);
     }
     VectorOfWString domainNames = geodatabase.getDomains();
-    for (int i = 0 ;i < domainNames.size();i++) {
+    for (int i = 0; i < domainNames.size(); i++) {
       String domainName = domainNames.get(i);
       loadDomain(domainName);
     }
@@ -446,7 +478,8 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     Domain domain = EsriGdbXmlParser.parse(domainDef);
     if (domain instanceof CodedValueDomain) {
       CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
-      FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(geodatabase, codedValueDomain); 
+      FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
+        geodatabase, codedValueDomain);
       addCodeTable(codeTable);
     }
   }
@@ -471,8 +504,8 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
       throw new IllegalArgumentException("Unknown type " + typeName);
     } else {
       final Table table = getTable(typeName);
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(
-        metaData, this, table, metaData.getIdAttributeName() + " = " + id);
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(metaData,
+        this, table, metaData.getIdAttributeName() + " = " + id);
       try {
         if (iterator.hasNext()) {
           return iterator.next();
@@ -535,8 +568,8 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     if (metaData == null) {
       throw new IllegalArgumentException("Type name does not exist " + typeName);
     } else {
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(
-        metaData, this, table);
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(metaData,
+        this, table);
       final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
         iterator);
       return reader;
@@ -549,8 +582,8 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
       throw new IllegalArgumentException("Type name does not exist " + typeName);
     } else {
       final Table table = getTable(typeName);
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(
-        metaData, this, table, envelope);
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(metaData,
+        this, table, envelope);
       final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
         iterator);
       return reader;
@@ -590,19 +623,19 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
           final Object argument = arguments[i];
           matcher.appendReplacement(whereClause, "");
           if (argument instanceof Number) {
-          whereClause.append(argument);
+            whereClause.append(argument);
           } else {
             whereClause.append("'");
             whereClause.append(argument);
             whereClause.append("'");
-             }
+          }
           i++;
         }
         matcher.appendTail(whereClause);
       }
 
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(
-        metaData, this, table, whereClause.toString());
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(metaData,
+        this, table, whereClause.toString());
       final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
         iterator);
       return reader;
@@ -625,7 +658,7 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     this.fileName = fileName;
   }
 
-  public void setTemplate(final File template) {
+  public void setTemplate(final Resource template) {
     this.template = template;
   }
 
@@ -636,7 +669,12 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
 
   public void createDomain(Domain domain) {
     String domainDef = EsriGdbXmlSerializer.toString(domain);
-    geodatabase.createDomain(domainDef);
+    try {
+      geodatabase.createDomain(domainDef);
+    } catch (Exception e) {
+      LOG.debug(domainDef);
+      LOG.error("Unable to create domain", e);
+    }
     loadDomain(domain.getDomainName());
   }
 }

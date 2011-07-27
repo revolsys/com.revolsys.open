@@ -7,7 +7,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 public class StringAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public StringAttribute(final Field field) {
     super(field.getName(), DataTypes.STRING, field.getLength(),
-      field.isRequired());
+      field.getRequired() == Boolean.TRUE);
   }
 
   @Override

@@ -306,19 +306,23 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
       if (propertyTagNames == null) {
         if (object instanceof List) {
           final Collection list = (Collection)object;
-          final QName listElementTagName = tagNameListElementTagNameMap.get(tagName);
-          if (listElementTagName == null) {
-            for (final Object value : list) {
-              serialize(value);
-            }
-
+          if (list.isEmpty()) {
+            out.closeStartTag();
+            out.setElementHasContent();
           } else {
-            for (final Object value : list) {
-              if (!startTag(listElementTagName)) {
-                writeXsiTypeAttribute(listElementTagName, value);
+            final QName listElementTagName = tagNameListElementTagNameMap.get(tagName);
+            if (listElementTagName == null) {
+              for (final Object value : list) {
+                serialize(value);
               }
-              serializeObjectProperties(listElementTagName, value);
-              endTag(listElementTagName);
+            } else {
+              for (final Object value : list) {
+                if (!startTag(listElementTagName)) {
+                  writeXsiTypeAttribute(listElementTagName, value);
+                }
+                serializeObjectProperties(listElementTagName, value);
+                endTag(listElementTagName);
+              }
             }
           }
         } else {
@@ -337,7 +341,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
               propertyTagName);
             if (method == null) {
               if (!startTag(propertyTagName)) {
-                writeXsiTypeAttribute(propertyTagName,value);
+                writeXsiTypeAttribute(propertyTagName, value);
               }
               serializeObjectProperties(propertyTagName, value);
               endTag(propertyTagName);
@@ -371,9 +375,10 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
   }
 
   private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
+
   private void writeXsiTypeAttribute(final QName tagName,
     final Class<? extends Object> objectClass) {
-     QName xsiTagName = classXsiTagNameMap.get(objectClass);
+    QName xsiTagName = classXsiTagNameMap.get(objectClass);
     if (xsiTagName == null) {
       if (xsiTypeTypeNames.contains(tagName)) {
         xsiTagName = classTypeNameMap.get(objectClass);
@@ -382,9 +387,9 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
         }
       }
     }
-if (xsiTagName != null){
+    if (xsiTagName != null) {
       out.xsiTypeAttribute(xsiTagName);
-    } 
+    }
   }
 
   private void writeXsiTypeAttribute(final QName tagName, final Object value) {

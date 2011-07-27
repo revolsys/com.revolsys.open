@@ -11,12 +11,12 @@ package com.revolsys.gis.esri.gdb.file.swig;
 public class EsriFileGdb {
   public static Geodatabase createGeodatabase(String path) {
     long cPtr = EsriFileGdbJNI.createGeodatabase(path);
-    return (cPtr == 0) ? null : new Geodatabase(cPtr, false);
+    return (cPtr == 0) ? null : new Geodatabase(cPtr, true);
   }
 
   public static Geodatabase openGeodatabase(String path) {
     long cPtr = EsriFileGdbJNI.openGeodatabase(path);
-    return (cPtr == 0) ? null : new Geodatabase(cPtr, false);
+    return (cPtr == 0) ? null : new Geodatabase(cPtr, true);
   }
 
   public static String getSpatialReferenceWkt(int srid) {

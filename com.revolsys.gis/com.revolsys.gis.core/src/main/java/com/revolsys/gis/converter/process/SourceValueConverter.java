@@ -3,6 +3,7 @@ package com.revolsys.gis.converter.process;
 import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectUtil;
 
 public class SourceValueConverter implements
   SourceToTargetProcess<DataObject, DataObject> {
@@ -22,7 +23,7 @@ public class SourceValueConverter implements
   public void process(final DataObject source, final DataObject target) {
     final Object value = sourceValueConverter.convert(source);
     if (value != null && (!(value instanceof String) || !("".equals(value)))) {
-      target.setValue(targetAttributeName, value);
+      DataObjectUtil.setAttributeValue(target,targetAttributeName, value);
     }
   }
 

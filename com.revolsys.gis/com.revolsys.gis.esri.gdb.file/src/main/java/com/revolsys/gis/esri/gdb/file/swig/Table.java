@@ -131,7 +131,7 @@ public class Table {
 
   public Row createRowObject() {
     long cPtr = EsriFileGdbJNI.Table_createRowObject(swigCPtr, this);
-    return (cPtr == 0) ? null : new Row(cPtr, false);
+    return (cPtr == 0) ? null : new Row(cPtr, true);
   }
 
   public void insertRow(Row row) {
@@ -148,12 +148,12 @@ public class Table {
 
   public EnumRows search(String subfields, String whereClause, Envelope envelope, boolean recycling) {
     long cPtr = EsriFileGdbJNI.Table_search__SWIG_0(swigCPtr, this, subfields, whereClause, Envelope.getCPtr(envelope), envelope, recycling);
-    return (cPtr == 0) ? null : new EnumRows(cPtr, false);
+    return (cPtr == 0) ? null : new EnumRows(cPtr, true);
   }
 
   public EnumRows search(String subfields, String whereClause, boolean recycling) {
     long cPtr = EsriFileGdbJNI.Table_search__SWIG_1(swigCPtr, this, subfields, whereClause, recycling);
-    return (cPtr == 0) ? null : new EnumRows(cPtr, false);
+    return (cPtr == 0) ? null : new EnumRows(cPtr, true);
   }
 
 }

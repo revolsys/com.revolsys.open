@@ -6,7 +6,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class FloatAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public FloatAttribute(final Field field) {
-    super(field.getName(), DataTypes.FLOAT, field.isRequired());
+    super(field.getName(), DataTypes.FLOAT, field.getRequired() == Boolean.TRUE);
   }
 
   @Override

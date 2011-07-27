@@ -35,6 +35,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -66,14 +68,12 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @param object The object to clone.
    */
-  public ArrayDataObject(
-    final DataObject object) {
+  public ArrayDataObject(final DataObject object) {
     this(object.getMetaData(), object);
   }
 
   @Override
-  public boolean equals(
-    Object o) {
+  public boolean equals(Object o) {
     return this == o;
   }
 
@@ -87,14 +87,12 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @param metaData The metaData defining the object type.
    */
-  public ArrayDataObject(
-    final DataObjectMetaData metaData) {
+  public ArrayDataObject(final DataObjectMetaData metaData) {
     this.metaData = metaData;
     attributes = new Object[metaData.getAttributeCount()];
   }
 
-  protected ArrayDataObject(
-    final DataObjectMetaData metaData,
+  protected ArrayDataObject(final DataObjectMetaData metaData,
     final DataObject object) {
     this.metaData = metaData;
     attributes = new Object[metaData.getAttributeCount()];
@@ -124,8 +122,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param value The value to clone.
    * @return The cloned value.
    */
-  private Object clone(
-    final Object value) {
+  private Object clone(final Object value) {
     if (value instanceof Cloneable) {
       try {
         final Class<? extends Object> valueClass = value.getClass();
@@ -208,8 +205,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @return The attribute value.
    */
   @SuppressWarnings("unchecked")
-  public <T extends Object> T getValue(
-    final CharSequence name) {
+  public <T extends Object> T getValue(final CharSequence name) {
     try {
       final int index = metaData.getAttributeIndex(name);
       return (T)getValue(index);
@@ -227,8 +223,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @return The attribute value.
    */
   @SuppressWarnings("unchecked")
-  public <T extends Object> T getValue(
-    final int index) {
+  public <T extends Object> T getValue(final int index) {
     if (index < 0) {
       return null;
     } else {
@@ -264,8 +259,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param name The name of the attribute.
    * @return True if the DataObject has an attribute with the specified name.
    */
-  public boolean hasAttribute(
-    final CharSequence name) {
+  public boolean hasAttribute(final CharSequence name) {
     return metaData.hasAttribute(name);
   }
 
@@ -274,8 +268,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @param geometry The primary geometry.
    */
-  public void setGeometryValue(
-    final Geometry geometry) {
+  public void setGeometryValue(final Geometry geometry) {
     final int index = metaData.getGeometryAttributeIndex();
     setValue(index, geometry);
   }
@@ -286,8 +279,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @param id The unique identifier.
    */
-  public void setIdValue(
-    final Object id) {
+  public void setIdValue(final Object id) {
     if (state != DataObjectState.New) {
       throw new IllegalStateException(
         "Cannot change the ID on a persisted object");
@@ -296,8 +288,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     setValue(index, id);
   }
 
-  public void setState(
-    final DataObjectState state) {
+  public void setState(final DataObjectState state) {
     // TODO make this more secure
     this.state = state;
   }
@@ -308,9 +299,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param name The name of the attribute.
    * @param value The new value.
    */
-  public void setValue(
-    final CharSequence name,
-    final Object value) {
+  public void setValue(final CharSequence name, final Object value) {
     final int index = metaData.getAttributeIndex(name);
     if (index >= 0) {
       setValue(index, value);
@@ -358,17 +347,14 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value.
    */
-  public void setValue(
-    final int index,
-    final Object value) {
+  public void setValue(final int index, Object value) {
     if (index >= 0) {
       updateState();
       attributes[index] = value;
     }
   }
 
-  public void setValues(
-    final Map<String, ? extends Object> values) {
+  public void setValues(final Map<String, ? extends Object> values) {
     for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
       final String name = defaultValue.getKey();
       final Object value = defaultValue.getValue();

@@ -8,7 +8,7 @@ import com.revolsys.gis.esri.gdb.xml.model.Field;
 
 public class DateAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public DateAttribute(final Field field) {
-    super(field.getName(), DataTypes.DATE, field.isRequired());
+    super(field.getName(), DataTypes.DATE, field.getRequired() == Boolean.TRUE);
   }
 
   @Override
