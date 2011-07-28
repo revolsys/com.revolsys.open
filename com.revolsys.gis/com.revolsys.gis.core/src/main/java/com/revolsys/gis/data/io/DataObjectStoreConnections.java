@@ -1,4 +1,4 @@
-package com.revolsys.gis.jdbc.io;
+package com.revolsys.gis.data.io;
 
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -16,48 +16,48 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.util.CollectionUtil;
 
-public class JdbcDataObjectStoreConnections implements
+public class DataObjectStoreConnections implements
   PropertyChangeSupportProxy {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JdbcDataObjectStoreConnections.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataObjectStoreConnections.class);
 
-  private static JdbcDataObjectStoreConnections INSTANCE = new JdbcDataObjectStoreConnections();
+  private static DataObjectStoreConnections INSTANCE = new DataObjectStoreConnections();
 
-  private Map<String, JdbcDataObjectStore> dataStores = new HashMap<String, JdbcDataObjectStore>();
+  private Map<String, DataObjectStore> dataStores = new HashMap<String, DataObjectStore>();
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
-  public static JdbcDataObjectStoreConnections get() {
+  public static DataObjectStoreConnections get() {
     return INSTANCE;
   }
 
-  private final Preferences jdbcDataStoresPrefereneces;
+  private final Preferences dataStoresPrefereneces;
 
-  public JdbcDataObjectStoreConnections() {
-    this(Preferences.userRoot(), "com/revolsys/jdbc/dataSource");
+  public DataObjectStoreConnections() {
+    this(Preferences.userRoot(), "com/revolsys/data/store");
   }
 
-  public JdbcDataObjectStoreConnections(final Preferences root,
+  public DataObjectStoreConnections(final Preferences root,
     final String preferencesPath) {
-    jdbcDataStoresPrefereneces = root.node("com/revolsys/jdbc/dataSource");
+    dataStoresPrefereneces = root.node("com/revolsys/data/store");
   }
 
-  public JdbcDataObjectStoreConnections(final String preferencesPath) {
+  public DataObjectStoreConnections(final String preferencesPath) {
     this(Preferences.userRoot(), preferencesPath);
   }
 
   public List<String> getConnectionNames() {
     try {
-      final String[] names = jdbcDataStoresPrefereneces.childrenNames();
+      final String[] names = dataStoresPrefereneces.childrenNames();
       return Arrays.asList(names);
     } catch (final BackingStoreException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public JdbcDataObjectStore getDataObjectStore(final String connectionName) {
-    JdbcDataObjectStore dataStore = dataStores.get(connectionName);
+  public DataObjectStore getDataObjectStore(final String connectionName) {
+    DataObjectStore dataStore = dataStores.get(connectionName);
     if (dataStore == null) {
       final Preferences preferences = getPreferences(connectionName);
       Map<String, Object> config = CollectionUtil.toMap(preferences);
@@ -67,7 +67,7 @@ public class JdbcDataObjectStoreConnections implements
           LOG.error("No JDBC URL set for " + connectionName);
           preferences.removeNode();
         } else {
-          dataStore = new LazyJdbcDataObjectStore(connectionName, config);
+          dataStore = DelegatingDataObjectStore.create(connectionName, config);
           dataStores.put(connectionName, dataStore);
         }
       } catch (Throwable t) {
@@ -77,11 +77,11 @@ public class JdbcDataObjectStoreConnections implements
     return dataStore;
   }
 
-  public List<JdbcDataObjectStore> getDataObjectStores() {
-    final List<JdbcDataObjectStore> dataObjectStores = new ArrayList<JdbcDataObjectStore>();
+  public List<DataObjectStore> getDataObjectStores() {
+    final List<DataObjectStore> dataObjectStores = new ArrayList<DataObjectStore>();
     final List<String> connectionNames = getConnectionNames();
     for (final String connectionName : connectionNames) {
-      final JdbcDataObjectStore dataObjectStore = getDataObjectStore(connectionName);
+      final DataObjectStore dataObjectStore = getDataObjectStore(connectionName);
       if (dataObjectStore != null) {
         dataObjectStores.add(dataObjectStore);
       }
@@ -90,12 +90,12 @@ public class JdbcDataObjectStoreConnections implements
   }
 
   private Preferences getPreferences(final String connectionName) {
-    return jdbcDataStoresPrefereneces.node(connectionName);
+    return dataStoresPrefereneces.node(connectionName);
   }
 
   @Override
   public String toString() {
-    return "JDBC Connections";
+    return "Data Store Connections";
   }
 
   public void createConnection(String connectionName, Map<String, String> config) {

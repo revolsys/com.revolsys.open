@@ -128,4 +128,8 @@ public class DataElement implements Cloneable {
     }
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
 }

@@ -20,17 +20,32 @@ WINLIB        = FileGDBAPI.lib kernel32.lib advapi32.lib user32.lib gdi32.lib co
 LIBS          = $(DLLIBC) $(WINLIB) 
 
 # Linker options
-LOPT      = /NODEFAULTLIB /RELEASE /NOLOGO \
+LINKFLAGS      = /NODEFAULTLIB /NOLOGO \
              /MACHINE:$(MACHINE) -entry:_DllMainCRTStartup@12 /DLL
 
-# C compiler flags
+CFLAGS        = /c /nologo /EHsc
+!IF "$(DEBUG)" == "1"
+CLFLAGS   = /D_DEBUG $(CLFLAGS) /Od /Zi /f
+LINKFLAGS = $(LINKFLAGS) /DEBUG
+LIBS      = $(DLLIBC) $(WINLIB)
+!ELSE
+CLFLAGS   = $(CLFLAGS) /O2 
+LINKFLAGS = $(LINKFLAGS) /RELEASE 
+LIBS      = $(DLLIBC) $(WINLIB)
+!ENDIF
 
-CFLAGS        = /O2 /c /nologo /EHsc
 JAVA_INCLUDE    = "-I$(JAVA_HOME)\include" "-I$(JAVA_HOME)\include\win32"
 ESRI_INCLUDE    = -I..\include
 
-java::
-	$(CC) $(CFLAGS) $(JAVA_INCLUDE) $(ESRI_INCLUDE) $(WRAPFILE)
+all: EsriFileGdbJni-x86-winnt.dll
+
+EsriFileGdbJni-x86-winnt.dll: EsriFileGdb_wrap.obj
 	set LIB=$(TOOLS)\lib;$(WIN_SDK)\lib
-	$(LINK) $(LOPT) -out:EsriFileGdbJni-x86-winnt.dll $(LIBS) EsriFileGdb_wrap.obj
+	$(LINK) $(LINKFLAGS) -out:EsriFileGdbJni-x86-winnt.dll $(LIBS) EsriFileGdb_wrap.obj
 	copy EsriFileGdbJni-x86-winnt.dll $(TARGET)
+
+EsriFileGdb_wrap.obj: ..\cxx\EsriFileGdb_wrap.cxx
+  $(CC) $(CFLAGS) $(JAVA_INCLUDE) $(ESRI_INCLUDE) $(WRAPFILE)
+
+clean:
+  del EsriFileGdb* 

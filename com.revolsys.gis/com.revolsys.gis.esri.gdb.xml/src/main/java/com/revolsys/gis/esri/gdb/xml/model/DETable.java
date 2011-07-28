@@ -1,9 +1,13 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
+import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 
 public class DETable extends DEDataset {
 
@@ -51,9 +55,14 @@ public class DETable extends DEDataset {
 
   public void addField(final Field field) {
     fields.add(field);
+    if (field.getType() == FieldType.esriFieldTypeGlobalID) {
+      hasGlobalID = true;
+      globalIDFieldName = field.getName();
+    }
   }
 
-  public void addIndex(final Field field, final boolean unique, final String indexName) {
+  public void addIndex(final Field field, final boolean unique,
+    final String indexName) {
     final Index index = new Index();
     index.setName(indexName);
     index.setIsUnique(unique);
@@ -94,6 +103,14 @@ public class DETable extends DEDataset {
   }
 
   public String getGlobalIDFieldName() {
+    if (!StringUtils.hasText(globalIDFieldName)) {
+      for (Field field : getFields()) {
+        if (field.getType() == FieldType.esriFieldTypeGlobalID) {
+          hasGlobalID = true;
+          globalIDFieldName = field.getName();
+        }
+      }
+    }
     return globalIDFieldName;
   }
 
@@ -126,7 +143,7 @@ public class DETable extends DEDataset {
   }
 
   public boolean isHasGlobalID() {
-    return hasGlobalID;
+    return StringUtils.hasText(getGlobalIDFieldName());
   }
 
   public boolean isHasOID() {
@@ -161,6 +178,12 @@ public class DETable extends DEDataset {
 
   public void setFields(final List<Field> fields) {
     this.fields = fields;
+    for (Field field : fields) {
+      if (field.getType() == FieldType.esriFieldTypeGlobalID) {
+        hasGlobalID = true;
+        globalIDFieldName = field.getName();
+      }
+    }
   }
 
   public void setGlobalIDFieldName(final String globalIDFieldName) {

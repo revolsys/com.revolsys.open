@@ -12,7 +12,7 @@ import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.gis.esri.gdb.file.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.swig.Row;
 import com.revolsys.gis.esri.gdb.file.swig.Table;
-import com.revolsys.gis.esri.gdb.file.type.AbstractEsriFileGeodatabaseAttribute;
+import com.revolsys.gis.esri.gdb.file.type.AbstractFileGdbAttribute;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class FileGdbQueryIterator extends
@@ -126,7 +126,7 @@ public class FileGdbQueryIterator extends
         final DataObject object = dataObjectFactory.createDataObject(metaData);
         for (final Attribute attribute : metaData.getAttributes()) {
           final String name = attribute.getName();
-          final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
+          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
           final Object value = esriAttribute.getValue(row);
           object.setValue(name, value);
         }

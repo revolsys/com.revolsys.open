@@ -18,7 +18,8 @@ import com.revolsys.gis.esri.gdb.file.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.swig.Geodatabase;
 import com.revolsys.gis.esri.gdb.file.swig.Row;
 import com.revolsys.gis.esri.gdb.file.swig.Table;
-import com.revolsys.gis.esri.gdb.file.type.AbstractEsriFileGeodatabaseAttribute;
+import com.revolsys.gis.esri.gdb.file.type.AbstractFileGdbAttribute;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 
 public class FileGdbWriter extends AbstractWriter<DataObject> {
@@ -29,6 +30,12 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   private final Geodatabase geodatabase;
 
   private FileGdbDataObjectStore dataObjectStore;
+
+  private Statistics insertStatistics;
+
+  private Statistics deleteStatistics;
+
+  private Statistics updateStatistics;
 
   FileGdbWriter(final FileGdbDataObjectStore dataObjectStore) {
     this.dataObjectStore = dataObjectStore;
@@ -50,6 +57,18 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     }
     tables = null;
     dataObjectStore = null;
+    if (insertStatistics != null) {
+      insertStatistics.disconnect();
+      insertStatistics = null;
+    }
+    if (updateStatistics != null) {
+      updateStatistics.disconnect();
+      updateStatistics = null;
+    }
+    if (deleteStatistics != null) {
+      deleteStatistics.disconnect();
+      deleteStatistics = null;
+    }
   }
 
   private void delete(final DataObject object) {
@@ -61,7 +80,34 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       table.deleteRow(row);
     } finally {
       row.delete();
+      getDeleteStatistics().add(object);
     }
+  }
+
+  public Statistics getDeleteStatistics() {
+    if (deleteStatistics == null) {
+      final String label = dataObjectStore.getLabel();
+      if (label == null) {
+        deleteStatistics = new Statistics("Delete");
+      } else {
+        deleteStatistics = new Statistics(label + " Delete");
+      }
+      deleteStatistics.connect();
+    }
+    return deleteStatistics;
+  }
+
+  public Statistics getInsertStatistics() {
+    if (insertStatistics == null) {
+      final String label = dataObjectStore.getLabel();
+      if (label == null) {
+        insertStatistics = new Statistics("Insert");
+      } else {
+        insertStatistics = new Statistics(label + " Insert");
+      }
+      insertStatistics.connect();
+    }
+    return insertStatistics;
   }
 
   public Row getRow(final Table table, final DataObject object) {
@@ -81,22 +127,49 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     return table;
   }
 
+  public Statistics getUpdateStatistics() {
+    if (updateStatistics == null) {
+      final String label = dataObjectStore.getLabel();
+      if (label == null) {
+        updateStatistics = new Statistics("Update");
+      } else {
+        updateStatistics = new Statistics(label + " Update");
+      }
+      updateStatistics.connect();
+    }
+    return updateStatistics;
+  }
+
   private void insert(final DataObject object) {
     final QName typeName = object.getMetaData().getName();
     final Table table = getTable(typeName);
     final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
-
-    final Row row = table.createRowObject();
     try {
-      for (final Attribute attribute : metaData.getAttributes()) {
-        final String name = attribute.getName();
-        final Object value = object.getValue(name);
-        final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
-        esriAttribute.setInsertValue(row, value);
+      final Row row = table.createRowObject();
+      try {
+        for (final Attribute attribute : metaData.getAttributes()) {
+          final String name = attribute.getName();
+          final Object value = object.getValue(name);
+          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+          esriAttribute.setInsertValue(row, value);
+        }
+        table.insertRow(row);
+        for (final Attribute attribute : metaData.getAttributes()) {
+          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+          esriAttribute.setPostInsertValue(object, row);
+        }
+      } finally {
+        row.delete();
+        getInsertStatistics().add(object);
       }
-      table.insertRow(row);
-    } finally {
-      row.delete();
+    } catch (final IllegalArgumentException e) {
+      LOG.error(
+        "Unable to insert row " + e.getMessage() + "\n" + object.toString(), e);
+    } catch (final RuntimeException e) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Unable to insert row \n:" + object.toString());
+      }
+      throw new RuntimeException("Unable to insert row", e);
     }
   }
 
@@ -105,17 +178,27 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final Table table = getTable(typeName);
     final Row row = getRow(table, object);
     try {
-
-      final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
-      for (final Attribute attribute : metaData.getAttributes()) {
-        final String name = attribute.getName();
-        final Object value = object.getValue(name);
-        final AbstractEsriFileGeodatabaseAttribute esriAttribute = (AbstractEsriFileGeodatabaseAttribute)attribute;
-        esriAttribute.setUpdateValue(row, value);
+      try {
+        final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
+        for (final Attribute attribute : metaData.getAttributes()) {
+          final String name = attribute.getName();
+          final Object value = object.getValue(name);
+          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+          esriAttribute.setUpdateValue(row, value);
+        }
+        table.updateRow(row);
+      } finally {
+        row.delete();
+        getUpdateStatistics().add(object);
       }
-      table.updateRow(row);
-    } finally {
-      row.delete();
+    } catch (final IllegalArgumentException e) {
+      LOG.error(
+        "Unable to insert row " + e.getMessage() + "\n" + object.toString(), e);
+    } catch (final RuntimeException e) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Unable to insert row \n:" + object.toString());
+      }
+      throw new RuntimeException("Unable to insert row", e);
     }
   }
 

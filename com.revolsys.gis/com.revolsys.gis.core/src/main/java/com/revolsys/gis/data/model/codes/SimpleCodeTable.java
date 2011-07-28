@@ -2,7 +2,7 @@ package com.revolsys.gis.data.model.codes;
 
 import java.util.List;
 
-public class SimpleCodeTable extends AbstractCodeTable {
+public class SimpleCodeTable extends AbstractCodeTable<Number> {
   private int index = 0;
 
   @Override

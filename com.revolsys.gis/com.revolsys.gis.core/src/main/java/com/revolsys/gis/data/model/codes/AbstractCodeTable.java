@@ -10,12 +10,14 @@ import java.util.Map.Entry;
 
 import com.revolsys.util.CaseConverter;
 
-public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable {
+public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
   private boolean capitalizeWords = false;
 
-  private Map<Number, List<Object>> idValueCache = new LinkedHashMap<Number, List<Object>>();
+  private Map<T, List<Object>> idValueCache = new LinkedHashMap<T, List<Object>>();
 
-  private Map<List<Object>, Number> valueIdCache = new LinkedHashMap<List<Object>, Number>();
+  private Map<List<Object>, T> valueIdCache = new LinkedHashMap<List<Object>, T>();
+
+  private Map<String, T> stringIdMap = new HashMap<String, T>();
 
   private long maxId;
 
@@ -26,41 +28,46 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized Number getNextId() {
+  protected synchronized long getNextId() {
     return ++maxId;
   }
 
-  protected synchronized void addValue(final Number id,
-    final List<Object> values) {
-    final long longValue = id.longValue();
-    if (longValue > maxId) {
-      maxId = longValue;
+  protected synchronized void addValue(final T id, final List<Object> values) {
+    if (id instanceof Number) {
+      Number number = (Number)id;
+      final long longValue = number.longValue();
+      if (longValue > maxId) {
+        maxId = longValue;
+      }
+      Object newId = longValue;
+      idValueCache.put((T)newId, values);
+    } else {
     }
-    idValueCache.put(id.longValue(), values);
-    valueIdCache.put(values, id.longValue());
+    valueIdCache.put(values, id);
+    stringIdMap.put(id.toString().toLowerCase(), id);
   }
 
-  protected void addValue(final Number id, final Object... values) {
+  protected void addValue(final T id, final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     addValue(id, valueList);
 
   }
 
-  protected synchronized void addValues(final Map<Number, List<Object>> valueMap) {
+  protected synchronized void addValues(final Map<T, List<Object>> valueMap) {
 
-    for (final Entry<Number, List<Object>> entry : valueMap.entrySet()) {
-      final Long id = entry.getKey().longValue();
+    for (final Entry<T, List<Object>> entry : valueMap.entrySet()) {
+      final T id = entry.getKey();
       final List<Object> values = entry.getValue();
       addValue(id, values);
     }
   }
 
   @Override
-  public AbstractCodeTable clone() {
+  public AbstractCodeTable<T> clone() {
     try {
-      final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
-      clone.idValueCache = new LinkedHashMap<Number, List<Object>>(idValueCache);
-      clone.valueIdCache = new LinkedHashMap<List<Object>, Number>(valueIdCache);
+      final AbstractCodeTable<T> clone = (AbstractCodeTable<T>)super.clone();
+      clone.idValueCache = new LinkedHashMap<T, List<Object>>(idValueCache);
+      clone.valueIdCache = new LinkedHashMap<List<Object>, T>(valueIdCache);
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
@@ -71,11 +78,11 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
     return Collections.emptyList();
   }
 
-  public Map<Number, List<Object>> getCodes() {
+  public Map<T, List<Object>> getCodes() {
     return Collections.unmodifiableMap(idValueCache);
   }
 
-  public Number getId(final Map<String, ? extends Object> valueMap) {
+  public T getId(final Map<String, ? extends Object> valueMap) {
     final List<String> valueAttributeNames = getValueAttributeNames();
     final Object[] values = new Object[valueAttributeNames.size()];
     for (int i = 0; i < values.length; i++) {
@@ -86,21 +93,24 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
     return getId(values);
   }
 
-  public Number getId(final Object... values) {
+  public T getId(final Object... values) {
     if (values.length == 1) {
-      Object firstValue = values[0];
-      if (firstValue instanceof Number) {
-        Number id = (Number)firstValue;
-        List<Object> foundValues = getValues(id);
-        if (foundValues != null) {
-          return id;
+      final Object id = values[0];
+      if (id == null) {
+        return null;
+      } else if (idValueCache.containsKey(id)) {
+        return (T)id;
+      } else {
+        String lowerId = id.toString().toLowerCase();
+        if (stringIdMap.containsKey(lowerId)) {
+          return stringIdMap.get(lowerId);
         }
       }
     }
 
     final List<Object> valueList = Arrays.asList(values);
     processValues(valueList);
-    Number id = getIdByValue(valueList);
+    T id = getIdByValue(valueList);
     if (id == null) {
       synchronized (this) {
         id = loadId(valueList, true);
@@ -112,12 +122,12 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
     return id;
   }
 
-  protected Number getIdByValue(final List<Object> valueList) {
+  protected T getIdByValue(final List<Object> valueList) {
     processValues(valueList);
     return valueIdCache.get(valueList);
   }
 
-  public Map<String, ? extends Object> getMap(final Number id) {
+  public Map<String, ? extends Object> getMap(final T id) {
     final List<Object> values = getValues(id);
     if (values == null) {
       return Collections.emptyMap();
@@ -133,7 +143,7 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final Number id) {
+  public <V> V getValue(final T id) {
     final List<Object> values = getValues(id);
     if (values != null) {
       return (V)values.get(0);
@@ -146,11 +156,19 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
     return Arrays.asList("VALUE");
   }
 
-  protected List<Object> getValueById(final Number id) {
-    return idValueCache.get(id.longValue());
+  protected List<Object> getValueById( T id) {
+    List<Object> values = idValueCache.get(id);
+    if (values == null) {
+      String lowerId = id.toString().toLowerCase();
+      if (stringIdMap.containsKey(lowerId)) {
+        id= stringIdMap.get(lowerId);
+        values = idValueCache.get(id);
+      }
+    }
+    return values;
   }
 
-  public List<Object> getValues(final Number id) {
+  public List<Object> getValues(final T id) {
     if (id != null) {
       List<Object> values = getValueById(id);
       if (values == null) {
@@ -172,11 +190,11 @@ public abstract class AbstractCodeTable implements CodeTable<Number>, Cloneable 
     return capitalizeWords;
   }
 
-  protected Number loadId(final List<Object> values, final boolean createId) {
+  protected T loadId(final List<Object> values, final boolean createId) {
     return null;
   }
 
-  protected List<Object> loadValues(final Number id) {
+  protected List<Object> loadValues(final T id) {
     return null;
   }
 

@@ -17,30 +17,27 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory {
-  void close();
-
-  Number createPrimaryId(QName typeName);
-  
   void addCodeTable(CodeTable<?> codeTable);
 
-  DataObject create(
-    QName typeName);
+  void close();
+
+  DataObject create(QName typeName);
+
+  Number createPrimaryId(QName typeName);
 
   Writer<DataObject> createWriter();
 
-  void delete(
-    DataObject object);
+  void delete(DataObject object);
 
-  void deleteAll(
-    Collection<DataObject> objects);
+  void deleteAll(Collection<DataObject> objects);
 
-  <T> CodeTable<T> getCodeTable(
-    QName typeName);
+  <T> CodeTable<T> getCodeTable(QName typeName);
 
-  <T> CodeTable<T> getCodeTableByColumn(
-    String columnName);
+  <T> CodeTable<T> getCodeTableByColumn(String columnName);
 
   DataObjectFactory getDataObjectFactory();
+
+  String getLabel();
 
   /**
    * Get the meta data for the specified type.
@@ -48,11 +45,9 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
    * @param typeName The type name.
    * @return The meta data.
    */
-  DataObjectMetaData getMetaData(
-    QName typeName);
+  DataObjectMetaData getMetaData(QName typeName);
 
-  DataObjectStoreSchema getSchema(
-    final String schemaName);
+  DataObjectStoreSchema getSchema(final String schemaName);
 
   /**
    * Get the list of name space names provided by the data store.
@@ -67,53 +62,33 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
    * @param namespace The name space.
    * @return The type names.
    */
-  List<QName> getTypeNames(
-    String namespace);
+  List<QName> getTypeNames(String namespace);
 
-  List<DataObjectMetaData> getTypes(
-    String namespace);
+  List<DataObjectMetaData> getTypes(String namespace);
 
-  void insert(
-    DataObject object);
+  void insert(DataObject object);
 
-  void insertAll(
-    Collection<DataObject> objects);
+  void insertAll(Collection<DataObject> objects);
 
-  boolean isEditable(
-    QName typeName);
+  boolean isEditable(QName typeName);
 
-  DataObject load(
-    QName typeName,
-    Object id);
+  DataObject load(QName typeName, Object id);
 
-  Reader<DataObject> query(
-    QName typeName);
+  Reader<DataObject> query(QName typeName);
 
-  Reader<DataObject> query(
-    QName typeName,
-    BoundingBox boundingBox);
+  Reader<DataObject> query(QName typeName, BoundingBox boundingBox);
 
-  Reader<DataObject> query(
-    QName typeName,
-    Envelope envelope);
+  Reader<DataObject> query(QName typeName, Envelope envelope);
 
-  Reader<DataObject> query(
-    QName typeName,
-    Geometry geometry);
+  Reader<DataObject> query(QName typeName, Geometry geometry);
 
-  Reader<DataObject> query(
-    QName typeName,
-    String where,
-    Object... arguments);
+  Reader<DataObject> query(QName typeName, String where, Object... arguments);
 
-  DataObject queryFirst(
-    QName typeName,
-    String where,
-    Object... arguments);
+  DataObject queryFirst(QName typeName, String where, Object... arguments);
 
-  void update(
-    DataObject object);
+  void setLabel(String label);
 
-  void updateAll(
-    Collection<DataObject> objects);
+  void update(DataObject object);
+
+  void updateAll(Collection<DataObject> objects);
 }

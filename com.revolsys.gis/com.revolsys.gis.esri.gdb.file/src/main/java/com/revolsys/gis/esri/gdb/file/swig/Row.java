@@ -33,46 +33,6 @@ public class Row {
     swigCPtr = 0;
   }
 
-  public int SetNull(String field) {
-    return EsriFileGdbJNI.Row_SetNull(swigCPtr, this, field);
-  }
-
-  public int SetGeometry(ShapeBuffer shapeBuffer) {
-    return EsriFileGdbJNI.Row_SetGeometry(swigCPtr, this, ShapeBuffer.getCPtr(shapeBuffer), shapeBuffer);
-  }
-
-  public int SetShort(String field, short value) {
-    return EsriFileGdbJNI.Row_SetShort(swigCPtr, this, field, value);
-  }
-
-  public int SetInteger(String field, int value) {
-    return EsriFileGdbJNI.Row_SetInteger(swigCPtr, this, field, value);
-  }
-
-  public int SetFloat(String field, float value) {
-    return EsriFileGdbJNI.Row_SetFloat(swigCPtr, this, field, value);
-  }
-
-  public int SetDouble(String field, double value) {
-    return EsriFileGdbJNI.Row_SetDouble(swigCPtr, this, field, value);
-  }
-
-  public int SetString(String field, String value) {
-    return EsriFileGdbJNI.Row_SetString(swigCPtr, this, field, value);
-  }
-
-  public int SetGUID(String field, Guid value) {
-    return EsriFileGdbJNI.Row_SetGUID(swigCPtr, this, field, Guid.getCPtr(value), value);
-  }
-
-  public int SetXML(String field, String value) {
-    return EsriFileGdbJNI.Row_SetXML(swigCPtr, this, field, value);
-  }
-
-  public int SetRaster(String field, Raster raster) {
-    return EsriFileGdbJNI.Row_SetRaster(swigCPtr, this, field, Raster.getCPtr(raster), raster);
-  }
-
   public int GetBinary(String field, ByteArray binaryBuf) {
     return EsriFileGdbJNI.Row_GetBinary(swigCPtr, this, field, ByteArray.getCPtr(binaryBuf), binaryBuf);
   }
@@ -93,11 +53,15 @@ public class Row {
     return EsriFileGdbJNI.Row_isNull(swigCPtr, this, name);
   }
 
-  public int getDate(String name) {
+  public void setNull(String name) {
+    EsriFileGdbJNI.Row_setNull(swigCPtr, this, name);
+  }
+
+  public long getDate(String name) {
     return EsriFileGdbJNI.Row_getDate(swigCPtr, this, name);
   }
 
-  public void setDate(String name, int date) {
+  public void setDate(String name, long date) {
     EsriFileGdbJNI.Row_setDate(swigCPtr, this, name, date);
   }
 
@@ -105,12 +69,28 @@ public class Row {
     return EsriFileGdbJNI.Row_getDouble(swigCPtr, this, name);
   }
 
+  public void setDouble(String name, double value) {
+    EsriFileGdbJNI.Row_setDouble(swigCPtr, this, name, value);
+  }
+
   public float getFloat(String name) {
     return EsriFileGdbJNI.Row_getFloat(swigCPtr, this, name);
   }
 
+  public void setFloat(String name, double value) {
+    EsriFileGdbJNI.Row_setFloat(swigCPtr, this, name, value);
+  }
+
   public Guid getGuid(String name) {
     return new Guid(EsriFileGdbJNI.Row_getGuid(swigCPtr, this, name), true);
+  }
+
+  public Guid getGlobalId() {
+    return new Guid(EsriFileGdbJNI.Row_getGlobalId(swigCPtr, this), true);
+  }
+
+  public void setGuid(String name, Guid value) {
+    EsriFileGdbJNI.Row_setGuid(swigCPtr, this, name, Guid.getCPtr(value), value);
   }
 
   public int getOid() {
@@ -121,21 +101,41 @@ public class Row {
     return EsriFileGdbJNI.Row_getShort(swigCPtr, this, name);
   }
 
+  public void setShort(String name, short value) {
+    EsriFileGdbJNI.Row_setShort(swigCPtr, this, name, value);
+  }
+
   public int getInteger(String name) {
     return EsriFileGdbJNI.Row_getInteger(swigCPtr, this, name);
+  }
+
+  public void setInteger(String name, int value) {
+    EsriFileGdbJNI.Row_setInteger(swigCPtr, this, name, value);
   }
 
   public String getString(String name) {
     return EsriFileGdbJNI.Row_getString(swigCPtr, this, name);
   }
 
+  public void setString(String name, String value) {
+    EsriFileGdbJNI.Row_setString(swigCPtr, this, name, value);
+  }
+
   public String getXML(String name) {
     return EsriFileGdbJNI.Row_getXML(swigCPtr, this, name);
+  }
+
+  public void setXML(String name, String value) {
+    EsriFileGdbJNI.Row_setXML(swigCPtr, this, name, value);
   }
 
   public ShapeBuffer getGeometry() {
     long cPtr = EsriFileGdbJNI.Row_getGeometry(swigCPtr, this);
     return (cPtr == 0) ? null : new ShapeBuffer(cPtr, true);
+  }
+
+  public void setGeometry(ShapeBuffer value) {
+    EsriFileGdbJNI.Row_setGeometry(swigCPtr, this, ShapeBuffer.getCPtr(value), value);
   }
 
 }

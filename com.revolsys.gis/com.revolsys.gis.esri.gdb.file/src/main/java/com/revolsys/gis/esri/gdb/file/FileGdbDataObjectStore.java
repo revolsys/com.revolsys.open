@@ -37,6 +37,7 @@ import com.revolsys.gis.esri.gdb.file.type.DateAttribute;
 import com.revolsys.gis.esri.gdb.file.type.DoubleAttribute;
 import com.revolsys.gis.esri.gdb.file.type.FloatAttribute;
 import com.revolsys.gis.esri.gdb.file.type.GeometryAttribute;
+import com.revolsys.gis.esri.gdb.file.type.GlobalIdAttribute;
 import com.revolsys.gis.esri.gdb.file.type.GuidAttribute;
 import com.revolsys.gis.esri.gdb.file.type.IntegerAttribute;
 import com.revolsys.gis.esri.gdb.file.type.OidAttribute;
@@ -71,6 +72,19 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
   private static final String CATALOG_PATH_PROPERTY = FileGdbDataObjectStore.class
     + ".CatalogPath";
 
+  private static void addFieldTypeAttributeConstructor(
+    final FieldType fieldType, final Class<? extends Attribute> attributeClass) {
+    try {
+      final Constructor<? extends Attribute> constructor = attributeClass.getConstructor(Field.class);
+      ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
+    } catch (final SecurityException e) {
+      LOG.error("No public constructor for ESRI type " + fieldType, e);
+    } catch (final NoSuchMethodException e) {
+      LOG.error("No public constructor for ESRI type " + fieldType, e);
+    }
+
+  }
+
   public static SpatialReference getSpatialReference(
     final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
@@ -82,6 +96,8 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
       return spatialReference;
     }
   }
+
+  private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
   private String defaultSchema;
 
@@ -117,7 +133,7 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeBlob,
       BinaryAttribute.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGlobalID,
-      GuidAttribute.class);
+      GlobalIdAttribute.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGUID,
       GuidAttribute.class);
     addFieldTypeAttributeConstructor(FieldType.esriFieldTypeXML,
@@ -126,19 +142,6 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
   }
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
-
-  private static void addFieldTypeAttributeConstructor(
-    final FieldType fieldType, final Class<? extends Attribute> attributeClass) {
-    try {
-      final Constructor<? extends Attribute> constructor = attributeClass.getConstructor(Field.class);
-      ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
-    } catch (final SecurityException e) {
-      LOG.error("No public constructor for ESRI type " + fieldType, e);
-    } catch (final NoSuchMethodException e) {
-      LOG.error("No public constructor for ESRI type " + fieldType, e);
-    }
-
-  }
 
   private Resource template;
 
@@ -198,6 +201,17 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     } catch (final Throwable e) {
       LOG.error("Unable to close table", e);
     }
+  }
+
+  public void createDomain(final Domain domain) {
+    final String domainDef = EsriGdbXmlSerializer.toString(domain);
+    try {
+      geodatabase.createDomain(domainDef);
+    } catch (final Exception e) {
+      LOG.debug(domainDef);
+      LOG.error("Unable to create domain", e);
+    }
+    loadDomain(domain.getDomainName());
   }
 
   private void createSchema(final DETable table) {
@@ -266,11 +280,11 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     } else if (schemaName.equals("")) {
       schemaName = defaultSchema;
     }
-    for (Field field : deTable.getFields()) {
-      String fieldName = field.getName();
-      CodeTable<?> codeTable = getCodeTableByColumn(fieldName);
+    for (final Field field : deTable.getFields()) {
+      final String fieldName = field.getName();
+      final CodeTable<?> codeTable = getCodeTableByColumn(fieldName);
       if (codeTable instanceof FileGdbDomainCodeTable) {
-        FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
+        final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
         field.setDomain(domainCodeTable.getDomain());
       }
     }
@@ -320,6 +334,10 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     return defaultSchema;
   }
 
+  public Map<String, List<String>> getDomainColumNames() {
+    return domainColumNames;
+  }
+
   public String getFileName() {
     return fileName;
   }
@@ -359,6 +377,9 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
             final Attribute attribute = JavaBeanUtil.invokeConstructor(
               attributeConstructor, field);
             metaData.addAttribute(attribute);
+            if (attribute instanceof GlobalIdAttribute) {
+              metaData.setIdAttributeName(fieldName);
+            }
           } catch (final Throwable e) {
             LOG.error(tableDefinition);
             throw new RuntimeException("Error creating attribute for "
@@ -432,8 +453,8 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
         geodatabase = EsriFileGdb.createGeodatabase(fileName);
       } else if (template.exists()) {
         if (template instanceof FileSystemResource) {
-          FileSystemResource fileResource = (FileSystemResource)template;
-          File templateFile = fileResource.getFile();
+          final FileSystemResource fileResource = (FileSystemResource)template;
+          final File templateFile = fileResource.getFile();
           if (templateFile.isDirectory()) {
             try {
               FileUtil.copy(templateFile, file);
@@ -446,14 +467,14 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
         }
         if (geodatabase == null) {
           geodatabase = EsriFileGdb.createGeodatabase(fileName);
-          Workspace workspace = EsriGdbXmlParser.parse(template);
-          WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
-          for (Domain domain : workspaceDefinition.getDomains()) {
+          final Workspace workspace = EsriGdbXmlParser.parse(template);
+          final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
+          for (final Domain domain : workspaceDefinition.getDomains()) {
             createDomain(domain);
           }
-          for (DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
+          for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
             if (dataElement instanceof DETable) {
-              DETable table = (DETable)dataElement;
+              final DETable table = (DETable)dataElement;
               createTable(table);
             }
           }
@@ -466,21 +487,10 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
       throw new IllegalArgumentException("ESRI file geodatbase not found "
         + fileName);
     }
-    VectorOfWString domainNames = geodatabase.getDomains();
+    final VectorOfWString domainNames = geodatabase.getDomains();
     for (int i = 0; i < domainNames.size(); i++) {
-      String domainName = domainNames.get(i);
+      final String domainName = domainNames.get(i);
       loadDomain(domainName);
-    }
-  }
-
-  protected void loadDomain(String domainName) {
-    String domainDef = geodatabase.getDomainDefinition(domainName);
-    Domain domain = EsriGdbXmlParser.parse(domainDef);
-    if (domain instanceof CodedValueDomain) {
-      CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
-      FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
-        geodatabase, codedValueDomain);
-      addCodeTable(codeTable);
     }
   }
 
@@ -514,6 +524,23 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
         }
       } finally {
         iterator.close();
+      }
+    }
+  }
+
+  protected void loadDomain(final String domainName) {
+    final String domainDef = geodatabase.getDomainDefinition(domainName);
+    final Domain domain = EsriGdbXmlParser.parse(domainDef);
+    if (domain instanceof CodedValueDomain) {
+      final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
+      final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
+        geodatabase, codedValueDomain);
+      addCodeTable(codeTable);
+      List<String> columnNames = domainColumNames.get(domainName);
+      if (columnNames != null) {
+        for (String columnName : columnNames) {
+          addCodeTable(columnName, codeTable);
+        }
       }
     }
   }
@@ -654,6 +681,11 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
     this.defaultSchema = defaultSchema;
   }
 
+  public void setDomainColumNames(
+    final Map<String, List<String>> domainColumNames) {
+    this.domainColumNames = domainColumNames;
+  }
+
   public void setFileName(final String fileName) {
     this.fileName = fileName;
   }
@@ -665,16 +697,5 @@ public class FileGdbDataObjectStore extends AbstractDataObjectStore {
   @Override
   public void update(final DataObject object) {
     getWriter().write(object);
-  }
-
-  public void createDomain(Domain domain) {
-    String domainDef = EsriGdbXmlSerializer.toString(domain);
-    try {
-      geodatabase.createDomain(domainDef);
-    } catch (Exception e) {
-      LOG.debug(domainDef);
-      LOG.error("Unable to create domain", e);
-    }
-    loadDomain(domain.getDomainName());
   }
 }

@@ -31,12 +31,14 @@ public class SetCodeTableId implements
       final String codeTableAttributeName = entry.getKey();
       final Converter<DataObject, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
-      DataObjectStore dataObjectStore = target.getMetaData()
-        .getDataObjectStore();
-      if (dataObjectStore != null) {
-        CodeTable<?> targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
-        if (targetCodeTable != null) {
-          sourceValue = targetCodeTable.getId(sourceValue);
+      if (sourceValue != null) {
+        DataObjectStore dataObjectStore = target.getMetaData()
+          .getDataObjectStore();
+        if (dataObjectStore != null) {
+          CodeTable<?> targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
+          if (targetCodeTable != null) {
+            sourceValue = targetCodeTable.getId(sourceValue);
+          }
         }
       }
       codeTableValues.put(codeTableAttributeName, sourceValue);

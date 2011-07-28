@@ -20,7 +20,7 @@ import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.jdbc.JdbcUtils;
 
 @Deprecated
-public class JdbcCodeTable extends AbstractCodeTable {
+public class JdbcCodeTable extends AbstractCodeTable<Number> {
   private static final Logger LOG = Logger.getLogger(JdbcCodeTable.class);
 
   private String allSql;

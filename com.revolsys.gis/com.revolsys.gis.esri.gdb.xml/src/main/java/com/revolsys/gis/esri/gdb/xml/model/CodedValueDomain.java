@@ -14,16 +14,18 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
 
   private Map<Object, List<Object>> idValueMap = new HashMap<Object, List<Object>>();
 
+  private Map<String, Object> stringIdMap = new HashMap<String, Object>();
+
   private Map<String, Object> valueIdMap = new HashMap<String, Object>();
 
   private int maxId = 0;
-
 
   public synchronized void addCodedValue(final Object code, final String name) {
     final CodedValue value = new CodedValue(code, name);
     codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
     idValueMap.put(code, values);
+    stringIdMap.put(code.toString(), code);
     valueIdMap.put(name.toLowerCase(), code);
     if (code instanceof Number) {
       final int id = ((Number)code).intValue();
@@ -37,6 +39,7 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
   public CodedValueDomain clone() {
     final CodedValueDomain clone = (CodedValueDomain)super.clone();
     clone.idValueMap = new HashMap<Object, List<Object>>();
+    clone.stringIdMap = new HashMap<String, Object>();
     clone.valueIdMap = new HashMap<String, Object>();
     clone.codedValues = new ArrayList<CodedValue>();
     for (final CodedValue codedValue : codedValues) {
@@ -69,6 +72,8 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
         return null;
       } else if (idValueMap.containsKey(value)) {
         return value;
+      } else if (stringIdMap.containsKey(value.toString())) {
+        return stringIdMap.get(value.toString());
       } else {
         String lowerValue = ((String)value).toLowerCase();
         final Object id = valueIdMap.get(lowerValue);
@@ -96,8 +101,12 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     final List<Object> values = getValues(id);
-    final Object value = values.get(0);
-    return (V)value;
+    if (values == null) {
+      return null;
+    } else {
+      final Object value = values.get(0);
+      return (V)value;
+    }
   }
 
   public List<String> getValueAttributeNames() {
@@ -105,8 +114,20 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
   }
 
   public List<Object> getValues(final Object id) {
-    final List<Object> values = idValueMap.get(id);
-    return Collections.unmodifiableList(values);
+    if (id == null) {
+      return null;
+    } else {
+      List<Object> values = idValueMap.get(id);
+      if (values == null) {
+        Object objectId = stringIdMap.get(id.toString());
+        if (objectId == null) {
+          return null;
+        } else {
+          values = idValueMap.get(objectId);
+        }
+      }
+      return Collections.unmodifiableList(values);
+    }
   }
 
   public synchronized void setCodedValues(final List<CodedValue> codedValues) {

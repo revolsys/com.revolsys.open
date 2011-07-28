@@ -5,6 +5,8 @@ import java.util.Map;
 
 public interface DataObjectStoreFactory {
   DataObjectStore createDataObjectStore(Map<String, Object> connectionProperties);
+  
+  Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(Map<String, Object> connectionProperties);
 
   List<String> getUrlPatterns();
 }

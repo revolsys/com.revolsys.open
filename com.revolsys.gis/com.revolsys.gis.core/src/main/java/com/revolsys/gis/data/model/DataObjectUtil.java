@@ -62,6 +62,7 @@ public final class DataObjectUtil {
   @SuppressWarnings("unchecked")
   public static <T> T getAttributeByPath(final DataObject object,
     final String path) {
+
     final String[] propertyPath = path.split("\\.");
     Object propertyValue = object;
     for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {

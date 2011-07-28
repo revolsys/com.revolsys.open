@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactory;
 
 public class JdbcDataObjectStoreFactory implements DataObjectStoreFactory {
@@ -13,6 +14,11 @@ public class JdbcDataObjectStoreFactory implements DataObjectStoreFactory {
   public JdbcDataObjectStore createDataObjectStore(
     final Map<String, Object> connectionProperties) {
     return JdbcFactory.createDataObjectStore(connectionProperties);
+  }
+
+  public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
+    Map<String, Object> connectionProperties) {
+    return JdbcDataObjectStore.class;
   }
 
   public List<String> getUrlPatterns() {

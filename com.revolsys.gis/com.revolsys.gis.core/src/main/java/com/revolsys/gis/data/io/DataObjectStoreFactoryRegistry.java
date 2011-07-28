@@ -70,4 +70,10 @@ public class DataObjectStoreFactoryRegistry {
     }
   }
 
+  public static Class<?> getDataObjectStoreInterfaceClass(Map<String, Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final DataObjectStoreFactory factory = getDataSourceFactory(url);
+    return factory.getDataObjectStoreInterfaceClass(connectionProperties);
+  }
+
 }

@@ -10,7 +10,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.io.Reader;
 
-public class EcsvServiceCodeTable extends AbstractCodeTable {
+public class EcsvServiceCodeTable extends AbstractCodeTable<Number> {
   private EcsvDataObjectStore client;
 
   private String idColumn;

@@ -71,10 +71,16 @@ public abstract class AbstractDataObjectStore extends
 
   public void addCodeTable(final CodeTable<?> codeTable) {
     final String idColumn = codeTable.getIdAttributeName();
-    this.columnToTableMap.put(idColumn, codeTable);
+    addCodeTable(idColumn, codeTable);
     List<String> attributeAliases = codeTable.getAttributeAliases();
     for (final String alias : attributeAliases) {
-      this.columnToTableMap.put(alias, codeTable);
+      addCodeTable(alias, codeTable);
+    }
+  }
+
+  public void addCodeTable(final String columnName, final CodeTable<?> codeTable) {
+    if (!columnName.equalsIgnoreCase("ID")) {
+      this.columnToTableMap.put(columnName, codeTable);
     }
   }
 
@@ -333,5 +339,10 @@ public abstract class AbstractDataObjectStore extends
         currentProperties.put(name, property);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return label;
   }
 }

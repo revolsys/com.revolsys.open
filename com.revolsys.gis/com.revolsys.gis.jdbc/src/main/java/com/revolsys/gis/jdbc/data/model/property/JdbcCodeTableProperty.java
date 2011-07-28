@@ -21,8 +21,7 @@ import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.jdbc.JdbcUtils;
 
-public class JdbcCodeTableProperty extends CodeTableProperty implements
-  DataObjectMetaDataProperty {
+public class JdbcCodeTableProperty extends CodeTableProperty<Number> {
   private static final Logger LOG = Logger.getLogger(JdbcCodeTableProperty.class);
 
   private Map<String, String> auditColumns = Collections.emptyMap();

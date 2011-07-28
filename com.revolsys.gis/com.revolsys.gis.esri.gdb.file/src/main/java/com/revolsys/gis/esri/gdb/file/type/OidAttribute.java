@@ -1,12 +1,13 @@
 package com.revolsys.gis.esri.gdb.file.type;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.swig.Row;
 import com.revolsys.gis.esri.gdb.xml.model.Field;
 
-public class OidAttribute extends AbstractEsriFileGeodatabaseAttribute {
+public class OidAttribute extends AbstractFileGdbAttribute {
   public OidAttribute(final Field field) {
-    super(field.getName(), DataTypes.INT, field.getRequired() == Boolean.TRUE);
+    super(field.getName(), DataTypes.INT, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
   }
 
   @Override
@@ -21,19 +22,17 @@ public class OidAttribute extends AbstractEsriFileGeodatabaseAttribute {
 
   @Override
   public void setValue(final Row row, final Object value) {
-    final String name = getName();
-    if (value == null) {
-      row.SetNull(name);
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      row.SetInteger(name, number.intValue());
-    } else {
-      final String string = value.toString();
-      row.SetInteger(name, Integer.parseInt(string));
-    }
   }
 
   @Override
   public void setUpdateValue(Row row, Object value) {
   }
+  
+
+  public void setPostInsertValue(DataObject object, Row row) {
+    int oid = row.getOid();
+    String name = getName();
+    object.setValue(name, oid);
+  }
+
 }

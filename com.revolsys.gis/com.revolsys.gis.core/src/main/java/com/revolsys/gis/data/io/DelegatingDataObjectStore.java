@@ -1,82 +1,62 @@
 package com.revolsys.gis.data.io;
 
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
+public class DelegatingDataObjectStore implements InvocationHandler {
+  public static <T extends DataObjectStore> T create(String label,
+    Map<String, Object> config) {
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Class<?>[] interfaces = new Class<?>[] {
+      DataObjectStoreFactoryRegistry.getDataObjectStoreInterfaceClass(config)
+    };
+    DelegatingDataObjectStore handler = new DelegatingDataObjectStore(label,config);
+    T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
+    return proxyStore;
+  }
 
-import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.io.Reader;
-import com.revolsys.io.Writer;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+  public static <T extends DataObjectStore> T create(String label,
+    Class<T> interfaceClass, T dataObjectStore) {
+    ClassLoader classLoader = dataObjectStore.getClass().getClassLoader();
+    Class<?>[] interfaces = new Class<?>[] {
+      interfaceClass
+    };
+    DelegatingDataObjectStore handler = new DelegatingDataObjectStore(label,
+      dataObjectStore);
+    T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
+    return proxyStore;
 
-public class DelegatingDataObjectStore implements DataObjectStore {
+  }
+
+  private Map<String, Object> config;
 
   private DataObjectStore dataObjectStore;
+
+  private String label;
 
   public DelegatingDataObjectStore() {
   }
 
-  public DelegatingDataObjectStore(final DataObjectStore dataObjectStore) {
+  public DelegatingDataObjectStore(final String label,
+    final DataObjectStore dataObjectStore) {
+    this.label = label;
     this.dataObjectStore = dataObjectStore;
   }
 
-  public Number createPrimaryId(QName typeName) {
-    return dataObjectStore.createPrimaryId(typeName);
-  }
-
-  public void addCodeTable(final CodeTable codeTable) {
-    dataObjectStore.addCodeTable(codeTable);
-  }
-
-  public void close() {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.close();
-  }
-
-  public DataObject create(final QName typeName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.create(typeName);
+  public DelegatingDataObjectStore(final String label,
+    final Map<String, Object> config) {
+    this.label = label;
+    this.config = config;
   }
 
   protected DataObjectStore createDataObjectStore() {
-    throw new UnsupportedOperationException("Data store must be set manually");
-  }
-
-  public Writer<DataObject> createWriter() {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.createWriter();
-  }
-
-  public void delete(final DataObject object) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.delete(object);
-  }
-
-  public void deleteAll(final Collection<DataObject> objects) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.deleteAll(objects);
-  }
-
-  public CodeTable getCodeTable(final QName typeName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getCodeTable(typeName);
-  }
-
-  public CodeTable getCodeTableByColumn(final String columnName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getCodeTableByColumn(columnName);
-  }
-
-  public DataObjectFactory getDataObjectFactory() {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getDataObjectFactory();
+    if (config != null) {
+      return DataObjectStoreFactoryRegistry.createDataObjectStore(config);
+    } else {
+      throw new UnsupportedOperationException("Data store must be set manually");
+    }
   }
 
   public DataObjectStore getDataObjectStore() {
@@ -86,112 +66,18 @@ public class DelegatingDataObjectStore implements DataObjectStore {
     return dataObjectStore;
   }
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getMetaData(typeName);
+  public Object invoke(final Object proxy, final Method method,
+    final Object[] args) throws Throwable {
+    if (method.getName().equals("toString")) {
+      return label;
+    } else  if (method.getName().equals("hashCode")) {
+      return label.hashCode();
+    } else  if (method.getName().equals("equals")) {
+      boolean equal = args[0] == proxy;
+      return equal;
+    } else {
+      final DataObjectStore dataObjectStore = getDataObjectStore();
+      return method.invoke(dataObjectStore, args);
+    }
   }
-
-  public Map<String, Object> getProperties() {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getProperties();
-  }
-
-  @SuppressWarnings("unchecked")
-  public <C> C getProperty(final String name) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return (C)dataObjectStore.getProperty(name);
-  }
-
-  public DataObjectStoreSchema getSchema(final String schemaName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getSchema(schemaName);
-  }
-
-  public List<DataObjectStoreSchema> getSchemas() {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getSchemas();
-  }
-
-  public List<QName> getTypeNames(final String namespace) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getTypeNames(namespace);
-  }
-
-  public List<DataObjectMetaData> getTypes(final String namespace) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.getTypes(namespace);
-  }
-
-  public void insert(final DataObject object) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.insert(object);
-  }
-
-  public void insertAll(final Collection<DataObject> objects) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.insertAll(objects);
-  }
-
-  public boolean isEditable(final QName typeName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.isEditable(typeName);
-  }
-
-  public DataObject load(final QName typeName, final Object id) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.load(typeName, id);
-  }
-
-  public Reader<DataObject> query(final QName typeName) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.query(typeName);
-  }
-
-  public Reader<DataObject> query(final QName typeName,
-    final BoundingBox boundingBox) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.query(typeName, boundingBox);
-  }
-
-  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.query(typeName, envelope);
-  }
-
-  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.query(typeName, geometry);
-  }
-
-  public Reader<DataObject> query(final QName typeName,
-    final String queryString, final Object... arguments) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.query(typeName, queryString, arguments);
-  }
-
-  public DataObject queryFirst(final QName typeName, final String queryString,
-    final Object... arguments) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    return dataObjectStore.queryFirst(typeName, queryString, arguments);
-  }
-
-  protected void setDataObjectStore(final DataObjectStore dataObjectStore) {
-    this.dataObjectStore = dataObjectStore;
-  }
-
-  public void setProperty(final String name, final Object value) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.setProperty(name, value);
-  }
-
-  public void update(final DataObject object) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.update(object);
-  }
-
-  public void updateAll(final Collection<DataObject> objects) {
-    final DataObjectStore dataObjectStore = getDataObjectStore();
-    dataObjectStore.updateAll(objects);
-  }
-
 }

@@ -23,7 +23,7 @@ import com.revolsys.io.EndianInput;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryAttribute extends AbstractEsriFileGeodatabaseAttribute {
+public class GeometryAttribute extends AbstractFileGdbAttribute {
   private static Map<String, Method> geometryTypeReadMethodMap = new LinkedHashMap<String, Method>();
 
   private static Map<String, Method> geometryTypeWriteMethodMap = new LinkedHashMap<String, Method>();
@@ -79,7 +79,7 @@ public class GeometryAttribute extends AbstractEsriFileGeodatabaseAttribute {
   private Method writeMethod;
 
   public GeometryAttribute(final Field field) {
-    super(field.getName(), DataTypes.GEOMETRY, field.getRequired() == Boolean.TRUE);
+    super(field.getName(), DataTypes.GEOMETRY, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException(
@@ -145,7 +145,12 @@ public class GeometryAttribute extends AbstractEsriFileGeodatabaseAttribute {
   public void setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
-      row.SetNull(name);
+      if (isRequired()) {
+        throw new IllegalArgumentException(name
+          + " is required and cannot be null");
+      } else {
+        row.setNull(name);
+      }
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       final Geometry projectedGeometry = ProjectionFactory.convert(geometry,
@@ -162,7 +167,7 @@ public class GeometryAttribute extends AbstractEsriFileGeodatabaseAttribute {
         final byte b = bytes[i];
         shape.set(i, b);
       }
-      row.SetGeometry(shape);
+      row.setGeometry(shape);
     } else {
       throw new IllegalArgumentException("Expecting a " + Geometry.class
         + " not a " + value.getClass() + "=" + value);

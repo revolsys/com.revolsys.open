@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreFactory;
 import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 
@@ -31,6 +32,11 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory{
     }
   }
 
+  public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
+    Map<String, Object> connectionProperties) {
+    return DataObjectStore.class;
+  }
+  
   public List<String> getUrlPatterns() {
     return URL_PATTERNS;
   }

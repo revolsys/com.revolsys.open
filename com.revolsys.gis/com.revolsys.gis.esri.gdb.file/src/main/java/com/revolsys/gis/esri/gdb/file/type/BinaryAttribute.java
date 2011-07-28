@@ -4,11 +4,11 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.swig.Row;
 import com.revolsys.gis.esri.gdb.xml.model.Field;
 
-public class BinaryAttribute extends AbstractEsriFileGeodatabaseAttribute {
+public class BinaryAttribute extends AbstractFileGdbAttribute {
 
   public BinaryAttribute(final Field field) {
     super(field.getName(), DataTypes.BASE64_BINARY, field.getLength(),
-      field.getRequired() == Boolean.TRUE);
+      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
   }
 
   @Override
