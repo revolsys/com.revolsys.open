@@ -45,7 +45,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
 
   protected void addValues(final Reader<DataObject> allCodes) {
     for (final DataObject code : allCodes) {
-      final T id = code.getValue(getIdAttributeName());
+      final T id = (T)code.getValue(getIdAttributeName());
       final List<Object> values = new ArrayList<Object>();
       for (final String attributeName : this.valueAttributeNames) {
         final Object value = code.getValue(attributeName);
