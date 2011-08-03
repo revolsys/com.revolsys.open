@@ -101,9 +101,6 @@ class EsriFileGdbJNI {
   public final static native int Table_SetDefaultSubtypeCode(long jarg1, Table jarg1_, int jarg2);
   public final static native int Table_DisableSubtypes(long jarg1, Table jarg1_);
   public final static native int Table_GetExtent(long jarg1, Table jarg1_, long jarg2, Envelope jarg2_);
-  public final static native int Table_SetWriteLock(long jarg1, Table jarg1_);
-  public final static native int Table_FreeWriteLock(long jarg1, Table jarg1_);
-  public final static native int Table_LoadOnlyMode(long jarg1, Table jarg1_, boolean jarg2);
   public final static native long new_Table();
   public final static native void delete_Table(long jarg1);
   public final static native boolean Table_isEditable(long jarg1, Table jarg1_);
@@ -118,6 +115,9 @@ class EsriFileGdbJNI {
   public final static native void Table_deleteRow(long jarg1, Table jarg1_, long jarg2, Row jarg2_);
   public final static native long Table_search__SWIG_0(long jarg1, Table jarg1_, String jarg2, String jarg3, long jarg4, Envelope jarg4_, boolean jarg5);
   public final static native long Table_search__SWIG_1(long jarg1, Table jarg1_, String jarg2, String jarg3, boolean jarg4);
+  public final static native void Table_setLoadOnlyMode(long jarg1, Table jarg1_, boolean jarg2);
+  public final static native void Table_setWriteLock(long jarg1, Table jarg1_);
+  public final static native void Table_freeWriteLock(long jarg1, Table jarg1_);
   public final static native int Row_GetBinary(long jarg1, Row jarg1_, String jarg2, long jarg3, ByteArray jarg3_);
   public final static native int Row_SetBinary(long jarg1, Row jarg1_, String jarg2, long jarg3, ByteArray jarg3_);
   public final static native int Row_GetFieldInformation(long jarg1, Row jarg1_, long jarg2, FieldInfo jarg2_);

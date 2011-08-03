@@ -433,6 +433,15 @@ SWIGINTERN FileGDBAPI::EnumRows *FileGDBAPI_Table_search__SWIG_1(FileGDBAPI::Tab
     checkResult(self->Search(subfields, whereClause, recycling, *rows));
     return rows;
   }
+SWIGINTERN void FileGDBAPI_Table_setLoadOnlyMode(FileGDBAPI::Table *self,bool loadOnly){
+    checkResult(self->LoadOnlyMode(loadOnly));
+  }
+SWIGINTERN void FileGDBAPI_Table_setWriteLock(FileGDBAPI::Table *self){
+    checkResult(self->SetWriteLock());
+  }
+SWIGINTERN void FileGDBAPI_Table_freeWriteLock(FileGDBAPI::Table *self){
+    checkResult(self->FreeWriteLock());
+  }
 SWIGINTERN bool FileGDBAPI_Row_isNull(FileGDBAPI::Row *self,std::wstring name){
     bool value;
     checkResult(self->IsNull(name,value));
@@ -3150,71 +3159,6 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1SetWriteLock(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  {
-    try {
-      result = (fgdbError)(arg1)->SetWriteLock();;
-    } catch (const std::runtime_error& e) {
-      handleRuntimeError(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1FreeWriteLock(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  {
-    try {
-      result = (fgdbError)(arg1)->FreeWriteLock();;
-    } catch (const std::runtime_error& e) {
-      handleRuntimeError(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1LoadOnlyMode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  bool arg2 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = jarg2 ? true : false; 
-  {
-    try {
-      result = (fgdbError)(arg1)->LoadOnlyMode(arg2);;
-    } catch (const std::runtime_error& e) {
-      handleRuntimeError(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_new_1Table(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   FileGDBAPI::Table *result = 0 ;
@@ -3601,6 +3545,59 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI
   }
   *(FileGDBAPI::EnumRows **)&jresult = result; 
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1setLoadOnlyMode(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::Table **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  {
+    try {
+      FileGDBAPI_Table_setLoadOnlyMode(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleRuntimeError(jenv, e);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1setWriteLock(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::Table **)&jarg1; 
+  {
+    try {
+      FileGDBAPI_Table_setWriteLock(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleRuntimeError(jenv, e);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_swig_EsriFileGdbJNI_Table_1freeWriteLock(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::Table **)&jarg1; 
+  {
+    try {
+      FileGDBAPI_Table_freeWriteLock(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleRuntimeError(jenv, e);
+    }
+  }
 }
 
 

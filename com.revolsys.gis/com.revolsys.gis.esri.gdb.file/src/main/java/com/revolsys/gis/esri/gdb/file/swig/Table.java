@@ -89,18 +89,6 @@ public class Table {
     return EsriFileGdbJNI.Table_GetExtent(swigCPtr, this, Envelope.getCPtr(extent), extent);
   }
 
-  public int SetWriteLock() {
-    return EsriFileGdbJNI.Table_SetWriteLock(swigCPtr, this);
-  }
-
-  public int FreeWriteLock() {
-    return EsriFileGdbJNI.Table_FreeWriteLock(swigCPtr, this);
-  }
-
-  public int LoadOnlyMode(boolean loadOnlyMode) {
-    return EsriFileGdbJNI.Table_LoadOnlyMode(swigCPtr, this, loadOnlyMode);
-  }
-
   public Table() {
     this(EsriFileGdbJNI.new_Table(), true);
   }
@@ -154,6 +142,18 @@ public class Table {
   public EnumRows search(String subfields, String whereClause, boolean recycling) {
     long cPtr = EsriFileGdbJNI.Table_search__SWIG_1(swigCPtr, this, subfields, whereClause, recycling);
     return (cPtr == 0) ? null : new EnumRows(cPtr, true);
+  }
+
+  public void setLoadOnlyMode(boolean loadOnly) {
+    EsriFileGdbJNI.Table_setLoadOnlyMode(swigCPtr, this, loadOnly);
+  }
+
+  public void setWriteLock() {
+    EsriFileGdbJNI.Table_setWriteLock(swigCPtr, this);
+  }
+
+  public void freeWriteLock() {
+    EsriFileGdbJNI.Table_freeWriteLock(swigCPtr, this);
   }
 
 }

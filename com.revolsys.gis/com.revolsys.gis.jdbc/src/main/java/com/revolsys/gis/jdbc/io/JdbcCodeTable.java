@@ -246,17 +246,15 @@ public class JdbcCodeTable extends AbstractCodeTable<Number> {
         try {
           final ResultSet rs = statement.executeQuery();
           try {
-            final Map<Number, List<Object>> valueMap = new LinkedHashMap<Number, List<Object>>();
             while (rs.next()) {
               final Number id = rs.getLong(1);
               final List<Object> values = new ArrayList<Object>();
               for (int i = 0; i < valueColumns.size(); i++) {
                 values.add(rs.getObject(2 + i));
               }
-              valueMap.put(id, values);
+              addValue(id,values);
             }
-            addValues(valueMap);
-          } finally {
+           } finally {
             rs.close();
           }
         } finally {

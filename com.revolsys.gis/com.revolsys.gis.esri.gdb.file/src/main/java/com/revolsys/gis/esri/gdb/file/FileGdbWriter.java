@@ -49,7 +49,8 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       final QName name = entry.getKey();
       final Table table = entry.getValue();
       try {
-        table.FreeWriteLock();
+        table.freeWriteLock();
+        table.setLoadOnlyMode(false);
         geodatabase.CloseTable(table);
       } catch (final Throwable e) {
         LOG.error("Unable to close table " + name);
@@ -122,7 +123,8 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     if (table == null) {
       table = dataObjectStore.getTable(typeName);
       tables.put(typeName, table);
-      table.SetWriteLock();
+      table.setWriteLock();
+      table.setLoadOnlyMode(true);
     }
     return table;
   }

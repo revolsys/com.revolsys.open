@@ -39,10 +39,8 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
       if (longValue > maxId) {
         maxId = longValue;
       }
-      Object newId = longValue;
-      idValueCache.put((T)newId, values);
-    } else {
     }
+    idValueCache.put(id, values);
     valueIdCache.put(values, id);
     stringIdMap.put(id.toString().toLowerCase(), id);
   }

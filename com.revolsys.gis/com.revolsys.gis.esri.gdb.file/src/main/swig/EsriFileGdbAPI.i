@@ -208,6 +208,10 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Table::Insert;
 %ignore FileGDBAPI::Table::Update;
 %ignore FileGDBAPI::Table::Delete;
+%ignore FileGDBAPI::Table::SetWriteLock;
+%ignore FileGDBAPI::Table::FreeWriteLock;
+%ignore FileGDBAPI::Table::LoadOnlyMode;
+%ignore FileGDBAPI::Table::Delete;
 %newobject FileGDBAPI::Table::createRowObject;
 %newobject FileGDBAPI::Table::search;
 %extend FileGDBAPI::Table {
@@ -266,6 +270,15 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     FileGDBAPI::EnumRows* rows = new FileGDBAPI::EnumRows();
     checkResult(self->Search(subfields, whereClause, recycling, *rows));
     return rows;
+  }
+  void setLoadOnlyMode(bool loadOnly) {
+    checkResult(self->LoadOnlyMode(loadOnly));
+  }
+  void setWriteLock() {
+    checkResult(self->SetWriteLock());
+  }
+  void freeWriteLock() {
+    checkResult(self->FreeWriteLock());
   }
 
 }
