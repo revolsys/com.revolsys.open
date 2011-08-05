@@ -5,16 +5,16 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Reader;
 import com.revolsys.parallel.process.AbstractProcess;
-import com.vividsolutions.jts.geom.Envelope;
 
 public class DataStoreQueryTask extends AbstractProcess {
 
   private final DataObjectStore dataStore;
 
-  private final Envelope envelope;
+  private final BoundingBox boundingBox;
 
   private List<DataObject> objects;
 
@@ -23,10 +23,10 @@ public class DataStoreQueryTask extends AbstractProcess {
   public DataStoreQueryTask(
     final DataObjectStore dataStore,
     final QName typeName,
-    final Envelope envelope) {
+    final BoundingBox boundingBox) {
     this.dataStore = dataStore;
     this.typeName = typeName;
-    this.envelope = envelope;
+    this.boundingBox = boundingBox;
   }
 
   public void cancel() {
@@ -39,7 +39,7 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   public void run() {
     objects = new ArrayList();
-    final Reader<DataObject> reader = dataStore.query(typeName, envelope);
+    final Reader<DataObject> reader = dataStore.query(typeName, boundingBox);
     try {
       for (final DataObject object : reader) {
         try {

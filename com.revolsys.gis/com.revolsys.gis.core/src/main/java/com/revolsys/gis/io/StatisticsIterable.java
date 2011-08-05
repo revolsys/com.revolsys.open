@@ -18,8 +18,7 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
   public StatisticsIterable() {
   }
 
-  public StatisticsIterable(
-    final Iterable<DataObject> iterable) {
+  public StatisticsIterable(final Iterable<DataObject> iterable) {
     setIterable(iterable);
   }
 
@@ -50,22 +49,24 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     return new StatisticsIterator(iterable.iterator(), statistics);
   }
 
-  public void setBeanName(
-    final String beanName) {
+  public void setBeanName(final String beanName) {
     this.beanName = beanName.replaceAll("Stats", "");
   }
 
-  public void setIterable(
-    final Iterable<DataObject> iterable) {
+  public void setIterable(final Iterable<DataObject> iterable) {
     this.iterable = iterable;
   }
 
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(
-    final Statistics statistics) {
+  public void setStatistics(final Statistics statistics) {
     this.statistics = statistics;
+  }
+
+  @Override
+  public String toString() {
+    return iterable.toString();
   }
 
 }

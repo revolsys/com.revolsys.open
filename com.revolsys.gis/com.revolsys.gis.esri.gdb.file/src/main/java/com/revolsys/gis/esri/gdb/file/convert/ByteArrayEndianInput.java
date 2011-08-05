@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.file.convert;
 import java.io.EOFException;
 import java.io.IOException;
 
-import com.revolsys.gis.esri.gdb.file.swig.UnsignedCharArray;
+import com.revolsys.gis.esri.gdb.file.capi.swig.UnsignedCharArray;
 import com.revolsys.io.EndianInput;
 
 public class ByteArrayEndianInput implements EndianInput {

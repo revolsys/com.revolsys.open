@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -17,6 +16,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
+import com.revolsys.spring.TargetBeanFactoryBean;
+import com.revolsys.spring.TargetBeanProcess;
 
 public class ProcessNetwork implements BeanPostProcessor,
   ApplicationListener<ContextRefreshedEvent> {
@@ -39,14 +40,9 @@ public class ProcessNetwork implements BeanPostProcessor,
   public void addProcess(final Process process) {
     synchronized (processes) {
       if (!processes.containsKey(process)) {
-        final Runnable runnable = new ProcessRunnable(this, process);
-        final String name = process.toString();
-        final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
-          runnable);
-        final Thread thread = new Thread(threadGroup, appenderRunnable, name);
-        processes.put(process, thread);
+         processes.put(process, null);
         if (running) {
-          startProcess(thread);
+          start(process);
         }
       }
     }
@@ -86,6 +82,23 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   public Object postProcessAfterInitialization(final Object bean,
     final String beanName) throws BeansException {
+    if (beanName.equals("sourceReaderProcess")) {
+      System.out.println();
+    }
+    if (bean instanceof TargetBeanFactoryBean) {
+      final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
+      final Class<?> targetClass = targetBean.getObjectType();
+      if (Process.class.isAssignableFrom(targetClass)) {
+        try {
+          final Process process = new TargetBeanProcess(targetBean);
+          addProcess(process);
+        } catch (final Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+
+      }
+    }
     if (bean instanceof Process) {
       final Process process = (Process)bean;
       addProcess(process);
@@ -127,26 +140,41 @@ public class ProcessNetwork implements BeanPostProcessor,
   public void start() {
     synchronized (processes) {
       running = true;
-      for (final Entry<Process, Thread> entry : processes.entrySet()) {
-        final Process process = entry.getKey();
+      for (Process process : new ArrayList<Process>(processes.keySet())) {
         process.setProcessNetwork(this);
-        final Thread thread = entry.getValue();
-        startProcess(thread);
+        start(process);
       }
     }
+  }
+
+  private void start(final Process process) {
+    Thread thread = processes.get(process);
+    if (thread == null) {
+      final Process runProcess;
+      if (process instanceof TargetBeanProcess) {
+        TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
+        runProcess = targetBeanProcess.getProcess();
+        processes.remove(process);
+      } else {
+        runProcess = process;
+      }
+      final Runnable runnable = new ProcessRunnable(this, runProcess);
+      final String name = runProcess.toString();
+      final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
+        runnable);
+      thread = new Thread(threadGroup, appenderRunnable, name);
+      processes.put(runProcess, thread);
+      if (!thread.isAlive()) {
+        thread.start();
+        count++;
+      }
+   }
   }
 
   public void startAndWait() {
     synchronized (processes) {
       start();
       waitTillFinished();
-    }
-  }
-
-  private void startProcess(final Thread thread) {
-    if (!thread.isAlive()) {
-      thread.start();
-      count++;
     }
   }
 
@@ -169,6 +197,11 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
+
   public void waitTillFinished() {
     synchronized (processes) {
       while (count > 0) {
@@ -179,10 +212,5 @@ public class ProcessNetwork implements BeanPostProcessor,
       }
       finishRunning();
     }
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 }

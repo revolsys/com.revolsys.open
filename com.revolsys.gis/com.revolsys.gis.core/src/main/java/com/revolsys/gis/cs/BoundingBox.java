@@ -51,6 +51,19 @@ public class BoundingBox extends Envelope {
 
   private GeometryFactory geometryFactory;
 
+  public BoundingBox() {
+    this(4326);
+  }
+
+  /**
+   * Construct a new Bounding Box.
+   * 
+   * @param geometryFactory The geometry factory.
+   */
+  public BoundingBox(final int srid) {
+    this.geometryFactory = GeometryFactory.getFactory(srid);
+  }
+
   /**
    * Construct a new Bounding Box.
    * 
@@ -61,10 +74,6 @@ public class BoundingBox extends Envelope {
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.minZ = boundingBox.getMinZ();
     this.maxZ = boundingBox.getMaxZ();
-  }
-
-  public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
   }
 
   public BoundingBox(final Coordinates point) {
@@ -185,6 +194,10 @@ public class BoundingBox extends Envelope {
     this.maxZ = Double.NaN;
   }
 
+  public BoundingBox(Geometry geometry) {
+    this(GeometryFactory.getFactory(geometry), geometry.getEnvelopeInternal());
+  }
+
   public BoundingBox convert(final GeometryFactory geometryFactory) {
     if (this.geometryFactory == null || geometryFactory == null
       || this.geometryFactory.equals(geometryFactory)) {
@@ -256,6 +269,10 @@ public class BoundingBox extends Envelope {
     return geometryFactory.getCoordinateSystem();
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
   public Measurable<Length> getHeightLength() {
     final double height = getHeight();
     return Measure.valueOf(height, getCoordinateSystem().getLengthUnit());
@@ -277,6 +294,36 @@ public class BoundingBox extends Envelope {
     } else {
       return maxZ;
     }
+  }
+
+  public void setMaxZ(double maxZ) {
+    if (isNull()) {
+      this.minZ = maxZ;
+      this.maxZ = maxZ;
+    }
+    if (maxZ < this.minZ) {
+      this.minZ = maxZ;
+    }
+    if (maxZ > this.maxZ) {
+      this.maxZ = maxZ;
+    }
+  }
+
+  public void setMinZ(double minZ) {
+    if (isNull()) {
+      this.minZ = minZ;
+      this.maxZ = minZ;
+    }
+    if (minZ < this.minZ) {
+      this.minZ = minZ;
+    }
+    if (minZ > this.maxZ) {
+      this.maxZ = minZ;
+    }
+  }
+
+  public void setGeometryFactory(GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   public <Q extends Quantity> Measurable<Q> getMinimumX() {
@@ -320,6 +367,22 @@ public class BoundingBox extends Envelope {
   public boolean intersects(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     return intersects((Envelope)convertedBoundingBox);
+  }
+
+  public void setMaxX(final double maxX) {
+    expandToInclude(maxX, getMaxY());
+  }
+
+  public void setMaxY(final double maxY) {
+    expandToInclude(getMaxX(), maxY);
+  }
+
+  public void setMinX(final double minX) {
+    expandToInclude(minX, getMinY());
+  }
+
+  public void setMinY(final double minY) {
+    expandToInclude(getMinX(), minY);
   }
 
   public Geometry toGeometry() {

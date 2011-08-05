@@ -257,15 +257,6 @@ public abstract class AbstractDataObjectStore extends
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
 
-  public Reader<DataObject> query(final QName typeName,
-    final BoundingBox boundingBox) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
-    final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-    final Envelope envelope = boundingBox.convert(geometryFactory);
-    return query(typeName, envelope);
-  }
-
   public DataObject queryFirst(final QName typeName, final String where,
     final Object... arguments) {
     final Reader<DataObject> reader = query(typeName, where, arguments);

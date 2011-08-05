@@ -8,10 +8,12 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractReader;
+import com.vividsolutions.jts.geom.Envelope;
 
 public class JdbcQueryReader extends AbstractReader<DataObject> implements
   DataObjectReader {
@@ -34,6 +36,10 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   private final List<JdbcQuery> queries = new ArrayList<JdbcQuery>();
 
   private JdbcMultipleQueryIterator iterator;
+
+  private BoundingBox boundingBox;
+
+  private List<QName> typeNames;
 
   public JdbcQueryReader() {
   }
@@ -80,6 +86,21 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   }
 
   protected void initialize() {
+    if (typeNames != null) {
+      for (final QName tableName : typeNames) {
+        final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
+        final StringBuffer sql = new StringBuffer();
+        JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
+        final JdbcQuery query;
+        if (boundingBox == null) {
+          query = new JdbcQuery(metaData, sql.toString());
+        } else {
+          QName typeName = metaData.getName();
+          query = dataStore.createQuery(typeName, boundingBox);
+        }
+        addQuery(query);
+      }
+    }
   }
 
   public boolean isAutoCommit() {
@@ -96,7 +117,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   }
 
   public void open() {
-    iterator.hasNext();
+    iterator().hasNext();
   }
 
   public void setAutoCommit(final boolean autoCommit) {
@@ -121,15 +142,14 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   }
 
   /**
-   * @param tableNames the tableNames to set
+   * @param typeNames the typeNames to set
    */
-  public void setTableNames(final List<QName> tableNames) {
-    for (final QName tableName : tableNames) {
-      final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
-      final StringBuffer sql = new StringBuffer();
-      JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-      final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
-      addQuery(query);
-    }
+  public void setTypeNames(final List<QName> typeNames) {
+    this.typeNames = typeNames;
+
+  }
+
+  public void setBoundingBox(BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
   }
 }

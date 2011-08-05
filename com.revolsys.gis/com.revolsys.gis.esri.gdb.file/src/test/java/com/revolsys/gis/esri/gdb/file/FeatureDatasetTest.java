@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 
 import junit.framework.Assert;
@@ -27,8 +29,8 @@ public class FeatureDatasetTest {
     newMetaData.setGeometryFactory(geometryFactory);
 
     final String datasetName = "target/Create.gdb";
-     FileGdbDataObjectStore dataStore = new FileGdbDataObjectStore(
-      datasetName);
+    FileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(new File(
+      datasetName));
     try {
       dataStore.setCreateMissingTables(true);
       dataStore.setCreateMissingGeodatabase(true);
@@ -48,13 +50,13 @@ public class FeatureDatasetTest {
         System.out.println(object2);
       }
       dataStore.close();
-      
-      dataStore = new FileGdbDataObjectStore(
-        datasetName);
+
+      dataStore = FileGdbDataObjectStoreFactory.create(new File(
+        datasetName));
       dataStore.initialize();
       dataStore.setDefaultSchema("test");
       DataObjectStoreSchema schema = dataStore.getSchema("test");
-      for(DataObjectMetaData metaData2 : schema.getTypes()) {
+      for (DataObjectMetaData metaData2 : schema.getTypes()) {
         System.out.println(metaData2);
       }
     } finally {

@@ -8,6 +8,9 @@ import java.util.List;
 public class AndFilter<T> implements Filter<T> {
   private final List<Filter<T>> filters = new ArrayList<Filter<T>>();
 
+  public AndFilter() {
+  }
+
   public AndFilter(final Collection<Filter<T>> filters) {
     this.filters.addAll(filters);
   }

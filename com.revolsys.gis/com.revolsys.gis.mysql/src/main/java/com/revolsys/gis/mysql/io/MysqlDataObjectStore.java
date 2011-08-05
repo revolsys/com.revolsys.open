@@ -117,33 +117,5 @@ public class MysqlDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  @Override
-  public Reader query(final QName typeName, final Envelope envelope) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
-    final String geometryColumnName = geometryAttribute.getName();
-    GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-
-    final double x1 = envelope.getMinX();
-    final double y1 = envelope.getMinY();
-    final double x2 = envelope.getMaxX();
-    final double y2 = envelope.getMaxY();
-
-    final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-    sql.append(" WHERE ");
-    sql.append(" SDO_RELATE("
-      + geometryColumnName
-      + ","
-      +
-
-      "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))"
-      + ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-    final JdbcQueryReader reader = createReader();
-    JdbcQuery query = new JdbcQuery(metaData, sql.toString(),
-      geometryFactory.getSRID(), x1, y1, x2, y2);
-    reader.addQuery(query);
-    return reader;
-  }
 
 }

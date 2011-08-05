@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
@@ -26,7 +27,6 @@ import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
-import com.vividsolutions.jts.geom.Envelope;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
@@ -129,17 +129,19 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  @Override
-  public Reader query(final QName typeName, final Envelope envelope) {
+  public JdbcQuery createQuery(final QName typeName,
+    final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     final String geometryColumnName = geometryAttribute.getName();
     GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
 
-    final double x1 = envelope.getMinX();
-    final double y1 = envelope.getMinY();
-    final double x2 = envelope.getMaxX();
-    final double y2 = envelope.getMaxY();
+    final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
+
+    final double x1 = projectedBoundingBox.getMinX();
+    final double y1 = projectedBoundingBox.getMinY();
+    final double x2 = projectedBoundingBox.getMaxX();
+    final double y2 = projectedBoundingBox.getMaxY();
 
     final StringBuffer sql = new StringBuffer();
     JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
@@ -151,11 +153,9 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
       "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))"
       + ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-    final JdbcQueryReader reader = createReader();
     JdbcQuery query = new JdbcQuery(metaData, sql.toString(),
       geometryFactory.getSRID(), x1, y1, x2, y2);
-    reader.addQuery(query);
-    return reader;
+    return query;
   }
 
 }

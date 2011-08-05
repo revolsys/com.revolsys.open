@@ -58,4 +58,8 @@ public class IterableProcess<T> extends AbstractOutProcess<T> {
     this.iterable = iterable;
   }
 
+  @Override
+  public String toString() {
+    return iterable.toString();
+  }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.vividsolutions.jts.geom.Envelope;
+import com.revolsys.gis.cs.BoundingBox;
 
 public class DataObjectStoreCache {
   public static DataObjectStoreCache getCache(
@@ -16,11 +16,11 @@ public class DataObjectStoreCache {
     return new DataObjectStoreCache(dataStore);
   }
 
-  private final Map<Envelope, List> cachedObejcts = Collections.synchronizedMap(new HashMap<Envelope, List>());
+  private final Map<BoundingBox, List> cachedObejcts = Collections.synchronizedMap(new HashMap<BoundingBox, List>());
 
   private final DataObjectStore dataStore;
 
-  private final Map<Envelope, DataStoreQueryTask> loadTasks = new LinkedHashMap<Envelope, DataStoreQueryTask>();
+  private final Map<BoundingBox, DataStoreQueryTask> loadTasks = new LinkedHashMap<BoundingBox, DataStoreQueryTask>();
 
   private QName typeName;
 
@@ -29,35 +29,35 @@ public class DataObjectStoreCache {
     this.dataStore = dataStore;
   }
 
-  private void addEnvelope(
-    final Envelope envelope) {
+  private void addBoundingBox(
+    final BoundingBox boundingBox) {
     synchronized (loadTasks) {
-      if (!loadTasks.containsKey(envelope)) {
-        loadTasks.put(envelope, new DataStoreQueryTask(dataStore, typeName,
-          envelope));
+      if (!loadTasks.containsKey(boundingBox)) {
+        loadTasks.put(boundingBox, new DataStoreQueryTask(dataStore, typeName,
+          boundingBox));
       }
     }
   }
 
   public List getObjects(
-    final Envelope envelope) {
-    final List objects = cachedObejcts.get(envelope);
+    final BoundingBox boundingBox) {
+    final List objects = cachedObejcts.get(boundingBox);
     if (objects == null) {
-      addEnvelope(envelope);
+      addBoundingBox(boundingBox);
     }
     return objects;
   }
 
   public void removeObjects(
-    final Envelope envelope) {
+    final BoundingBox boundingBox) {
     synchronized (loadTasks) {
-      final DataStoreQueryTask task = loadTasks.get(envelope);
+      final DataStoreQueryTask task = loadTasks.get(boundingBox);
       if (task != null) {
         task.cancel();
         loadTasks.remove(task);
       }
     }
-    cachedObejcts.remove(envelope);
+    cachedObejcts.remove(boundingBox);
   }
 
 }

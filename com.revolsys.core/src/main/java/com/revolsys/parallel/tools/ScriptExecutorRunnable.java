@@ -1,6 +1,7 @@
 package com.revolsys.parallel.tools;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,9 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.PropertyBatchUpdateException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -18,12 +21,12 @@ import com.revolsys.beans.ResourceEditorRegistrar;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
+import com.revolsys.spring.factory.Parameter;
 
 public class ScriptExecutorRunnable implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorRunnable.class);
 
-  private static Throwable getBeanExceptionCause(
-    BeanCreationException e) {
+  private static Throwable getBeanExceptionCause(BeanCreationException e) {
     Throwable cause = e.getCause();
     while (cause instanceof BeanCreationException
       || cause instanceof MethodInvocationException
@@ -46,15 +49,34 @@ public class ScriptExecutorRunnable implements Runnable {
     return cause;
   }
 
-  private Map<String, Object> attributes;
+  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+
+  private Map<String, Object> beans = new LinkedHashMap<String, Object>();
 
   private String script;
 
-  public ScriptExecutorRunnable(
-    String script,
-    Map<String, Object> attributes) {
+  public ScriptExecutorRunnable(String script) {
+    this.script = script;
+  }
+
+  public ScriptExecutorRunnable(String script, Map<String, Object> attributes) {
     this.script = script;
     this.attributes = attributes;
+  }
+
+  public Map<String, Object> getBeans() {
+    return beans;
+  }
+
+  public void setBeans(Map<String, Object> beans) {
+    this.beans = beans;
+  }
+
+  public void addBean(String name, Object value) {
+    beans.put(name, value);
+  }
+  public void addBeans(Map<String,Object> beans) {
+    this.beans.putAll(beans);
   }
 
   public void run() {
@@ -84,23 +106,37 @@ public class ScriptExecutorRunnable implements Runnable {
       LOG.info(message.toString());
       ThreadSharedAttributes.setAttributes(attributes);
 
-      GenericApplicationContext beans = new GenericApplicationContext();
-      beans.getBeanFactory().addPropertyEditorRegistrar(
+      GenericApplicationContext applicationContext = new GenericApplicationContext();
+      applicationContext.getBeanFactory().addPropertyEditorRegistrar(
         new ResourceEditorRegistrar());
 
-      if (new File(script).exists()) {
-        new XmlBeanDefinitionReader(beans).loadBeanDefinitions("file:" + script);
-      } else {
-        new XmlBeanDefinitionReader(beans).loadBeanDefinitions("classpath:"
-          + script);
+      for (Entry<String, Object> entry : beans.entrySet()) {
+        String key = entry.getKey();
+        if (key.indexOf('.') == -1 && key.indexOf('[') == -1) {
+          Object value = entry.getValue();
+          GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+          beanDefinition.setBeanClass(Parameter.class);
+          MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+          propertyValues.add("type", value.getClass());
+          propertyValues.add("value", value);
+          applicationContext.registerBeanDefinition(key, beanDefinition);
+        }
       }
-      beans.refresh();
+
+      XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
+        applicationContext);
+      if (new File(script).exists()) {
+        beanReader.loadBeanDefinitions("file:" + script);
+      } else {
+        beanReader.loadBeanDefinitions("classpath:" + script);
+      }
+      applicationContext.refresh();
       try {
-        Object bean = beans.getBean("com.revolsys.parallel.process.ProcessNetwork");
+        Object bean = applicationContext.getBean("com.revolsys.parallel.process.ProcessNetwork");
         ProcessNetwork pipeline = (ProcessNetwork)bean;
         pipeline.startAndWait();
       } finally {
-        beans.close();
+        applicationContext.close();
       }
     } catch (BeanCreationException e) {
       Throwable cause = getBeanExceptionCause(e);

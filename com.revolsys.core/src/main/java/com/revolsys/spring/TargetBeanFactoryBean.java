@@ -12,6 +12,11 @@ public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
 
   private BeanDefinition targetBeanDefinition;
 
+  private Class<?> targetBeanClass;
+
+  public TargetBeanFactoryBean() {
+  }
+
   @Override
   protected Object createInstance() {
     return this.targetBeanFactory.getBean(this.targetBeanName);
@@ -19,7 +24,19 @@ public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
 
   @Override
   public Class<?> getObjectType() {
-    return Object.class;
+    if (targetBeanClass == null) {
+      return Object.class;
+    } else {
+      return targetBeanClass;
+    }
+  }
+
+  public Class<?> getTargetBeanClass() {
+    return targetBeanClass;
+  }
+
+  public BeanDefinition getTargetBeanDefinition() {
+    return targetBeanDefinition;
   }
 
   public BeanFactory getTargetBeanFactory() {
@@ -30,11 +47,11 @@ public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
     return targetBeanName;
   }
 
-  public BeanDefinition getTargetBeanDefinition() {
-    return targetBeanDefinition;
+  public void setTargetBeanClass(final Class<?> targetBeanClass) {
+    this.targetBeanClass = targetBeanClass;
   }
 
-  public void setTargetBeanDefinition(BeanDefinition targetBeanDefinition) {
+  public void setTargetBeanDefinition(final BeanDefinition targetBeanDefinition) {
     this.targetBeanDefinition = targetBeanDefinition;
   }
 
@@ -45,4 +62,5 @@ public class TargetBeanFactoryBean extends AbstractFactoryBean<Object> {
   public void setTargetBeanName(final String targetBeanName) {
     this.targetBeanName = targetBeanName;
   }
+
 }

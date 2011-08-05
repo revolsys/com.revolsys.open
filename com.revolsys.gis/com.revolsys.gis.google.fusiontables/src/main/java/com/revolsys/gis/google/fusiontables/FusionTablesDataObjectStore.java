@@ -26,8 +26,8 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
-import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.csv.CsvMapIoFactory;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
@@ -420,7 +420,8 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return query(typeName, where);
   }
 
-  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
+  public Reader<DataObject> query(final QName typeName, final BoundingBox boundingBox) {
+    BoundingBox envelope = boundingBox.convert(GeometryFactory.getFactory(4326));
     final DataObjectMetaData metaData = getMetaData(typeName);
     final String where = "ST_INTERSECTS(" + metaData.getGeometryAttributeName()
       + ", RECTANGLE(LATLNG(" + envelope.getMinY() + "," + envelope.getMinX()
@@ -431,7 +432,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
     final Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
       4326);
-    return query(typeName, projectedGeometry.getEnvelopeInternal());
+    return query(typeName, new BoundingBox(projectedGeometry));
   }
 
   public Reader<DataObject> query(QName typeName, String where,

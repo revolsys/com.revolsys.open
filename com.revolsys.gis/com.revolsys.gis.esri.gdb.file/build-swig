@@ -1,4 +1,4 @@
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:src/main/lib:target/lib
-rm -f src/main/java/com/revolsys/gis/esri/gdb/file/swig/*.java
+rm -f src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig/*.java
 
-swig -c++ -o src/main/cxx/EsriFileGdb_wrap.cxx -java -package com.revolsys.gis.esri.gdb.file.swig -outdir src/main/java/com/revolsys/gis/esri/gdb/file/swig  -Isrc/main/swig -Isrc/main/include/ src/main/swig/EsriFileGdbAPI.i
+swig -c++ -o src/main/cxx/EsriFileGdb_wrap.cxx -java -package com.revolsys.gis.esri.gdb.file.capi.swig -outdir src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig  -Isrc/main/swig -Isrc/main/include/ src/main/swig/EsriFileGdbAPI.i

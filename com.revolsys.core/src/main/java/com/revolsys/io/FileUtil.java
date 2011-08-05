@@ -34,6 +34,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.io.filter.PatternFilenameFilter;
 
@@ -63,6 +65,21 @@ public final class FileUtil {
     try {
       in.close();
     } catch (final IOException e) {
+    }
+
+  }
+
+  public static File getFile(Resource resource) throws IOException {
+    if (resource instanceof FileSystemResource) {
+      FileSystemResource fileResource = (FileSystemResource)resource;
+      return fileResource.getFile();
+    } else {
+      String fileName = resource.getFilename();
+      String ext = getFileNameExtension(fileName);
+      File file = File.createTempFile(fileName, "." + ext);
+      copy(resource.getInputStream(), file);
+      file.deleteOnExit();
+      return file;
     }
 
   }
@@ -533,8 +550,7 @@ public final class FileUtil {
     }
   }
 
-  public static void deleteDirectory(File directory,
-    FilenameFilter filter) {
+  public static void deleteDirectory(File directory, FilenameFilter filter) {
     final File[] files = directory.listFiles();
     if (files != null) {
       for (int i = 0; i < files.length; i++) {
@@ -550,5 +566,5 @@ public final class FileUtil {
         }
       }
     }
- }
+  }
 }

@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
@@ -39,7 +40,6 @@ import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
@@ -113,6 +113,11 @@ public abstract class AbstractJdbcDataObjectStore extends
       setSharedAttribute("writer", null);
       writer.close();
     }
+  }
+
+  public JdbcQuery createQuery(final QName typeName,
+    final BoundingBox boundingBox) {
+    throw new UnsupportedOperationException();
   }
 
   public JdbcQueryReader createReader() {
@@ -563,8 +568,12 @@ public abstract class AbstractJdbcDataObjectStore extends
     return reader;
   }
 
-  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
-    return null;
+  public JdbcQueryReader query(final QName typeName,
+    final BoundingBox boundingBox) {
+    final JdbcQuery query = createQuery(typeName, boundingBox);
+    final JdbcQueryReader reader = createReader();
+    reader.addQuery(query);
+    return reader;
   }
 
   public Reader<DataObject> query(final QName typeName, final Geometry geometry) {

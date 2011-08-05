@@ -21,8 +21,10 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import com.revolsys.beans.ResourceEditorRegistrar;
 import com.revolsys.collection.AttributeMap;
@@ -34,6 +36,8 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
   private GenericApplicationContext applicationContext;
 
   private Map<String, String> exportBeanAliases = Collections.emptyMap();
+
+  private Map<String, String> importBeanAliases = Collections.emptyMap();
 
   private List<String> exportBeanNames = Collections.emptyList();
 
@@ -51,11 +55,7 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
 
   private String beanName;
 
-  private Set<String> beanNamesNotToExport = new HashSet<String>();
-
-  public void setBeanName(String beanName) {
-    this.beanName = beanName;
-  }
+  private final Set<String> beanNamesNotToExport = new HashSet<String>();
 
   public ModuleImport() {
     beanNamesNotToExport.add("com.revolsys.spring.config.AttributesBeanConfigurer");
@@ -69,16 +69,46 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
     final BeanDefinitionRegistry registry) throws BeansException {
   }
 
+  protected GenericBeanDefinition createTargetBeanDefinition(
+    final BeanDefinitionRegistry beanFactory, final String beanName) {
+    final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+    if (beanDefinition == null) {
+      return null;
+    } else {
+      final boolean singleton = beanDefinition.isSingleton();
+      final GenericBeanDefinition proxyBeanDefinition = new GenericBeanDefinition();
+      proxyBeanDefinition.setBeanClass(TargetBeanFactoryBean.class);
+      final MutablePropertyValues values = new MutablePropertyValues();
+      final String beanClassName = beanDefinition.getBeanClassName();
+      final PropertyValue beanDefinitionProperty = new PropertyValue(
+        "targetBeanDefinition", beanDefinition);
+      beanDefinitionProperty.setConvertedValue(beanDefinition);
+      values.addPropertyValue(beanDefinitionProperty);
+      values.addPropertyValue("targetBeanName", beanName);
+      values.addPropertyValue("targetBeanClass", beanClassName);
+      values.addPropertyValue("targetBeanFactory", beanFactory);
+      values.addPropertyValue("singleton", singleton);
+      proxyBeanDefinition.setPropertyValues(values);
+      return proxyBeanDefinition;
+    }
+  }
+
   protected GenericApplicationContext getApplicationContext(
-    BeanDefinitionRegistry parentRegistry) {
+    final BeanDefinitionRegistry parentRegistry) {
     if (applicationContext == null) {
       applicationContext = new GenericApplicationContext();
-      final DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
+      if (parentRegistry instanceof ResourceLoader) {
+        ResourceLoader resourceLoader = (ResourceLoader)parentRegistry;
+        ClassLoader classLoader = resourceLoader.getClassLoader();
+        applicationContext.setClassLoader(classLoader);
+      }
+      AnnotationConfigUtils.registerAnnotationConfigProcessors(applicationContext,null);
+        final DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
 
       final BeanFactory parentBeanFactory = (BeanFactory)parentRegistry;
-      for (String beanName : parentRegistry.getBeanDefinitionNames()) {
-        BeanDefinition beanDefinition = parentRegistry.getBeanDefinition(beanName);
-        String beanClassName = beanDefinition.getBeanClassName();
+      for (final String beanName : parentRegistry.getBeanDefinitionNames()) {
+        final BeanDefinition beanDefinition = parentRegistry.getBeanDefinition(beanName);
+        final String beanClassName = beanDefinition.getBeanClassName();
         if (beanClassName.equals(AttributeMap.class.getName())) {
           registerTargetBeanDefinition(applicationContext, parentBeanFactory,
             beanName, beanName);
@@ -105,6 +135,13 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
           beanName, beanName);
         beanNamesNotToExport.add(beanName);
       }
+      for (final Entry<String, String> entry : importBeanAliases.entrySet()) {
+        final String beanName = entry.getKey();
+        final String aliasName = entry.getValue();
+        registerTargetBeanDefinition(applicationContext, parentBeanFactory,
+          beanName, aliasName);
+        beanNamesNotToExport.add(aliasName);
+      }
       final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
         applicationContext);
       beanReader.loadBeanDefinitions(resource);
@@ -113,20 +150,20 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
     return applicationContext;
   }
 
-  public List<String> getImportBeanNames() {
-    return importBeanNames;
-  }
-
-  public void setImportBeanNames(List<String> importBeanNames) {
-    this.importBeanNames = importBeanNames;
-  }
-
   public Map<String, String> getExportBeanAliases() {
     return exportBeanAliases;
   }
 
   public List<String> getExportBeanNames() {
     return exportBeanNames;
+  }
+
+  public Map<String, String> getImportBeanAliases() {
+    return importBeanAliases;
+  }
+
+  public List<String> getImportBeanNames() {
+    return importBeanNames;
   }
 
   public Map<String, Object> getParameters() {
@@ -151,7 +188,7 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
 
   public void postProcessBeanDefinitionRegistry(
     final BeanDefinitionRegistry registry) throws BeansException {
-    beforePostProcessBeanDefinitionRegistry(registry);
+     beforePostProcessBeanDefinitionRegistry(registry);
     if (enabled) {
       final GenericApplicationContext beanFactory = getApplicationContext(registry);
       if (exportAllBeans) {
@@ -201,27 +238,8 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
     }
   }
 
-  protected GenericBeanDefinition createTargetBeanDefinition(
-    final BeanDefinitionRegistry beanFactory, final String beanName) {
-    final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-    if (beanDefinition == null) {
-      return null;
-    } else {
-      final boolean singleton = beanDefinition.isSingleton();
-      final GenericBeanDefinition proxyBeanDefinition = new GenericBeanDefinition();
-      proxyBeanDefinition.setBeanClass(TargetBeanFactoryBean.class);
-      final MutablePropertyValues values = new MutablePropertyValues();
-      final String beanClassName = beanDefinition.getBeanClassName();
-      final PropertyValue beanDefinitionProperty = new PropertyValue(
-        "targetBeanDefinition", beanDefinition);
-      beanDefinitionProperty.setConvertedValue(beanDefinition);
-      values.addPropertyValue(beanDefinitionProperty);
-      values.addPropertyValue("targetBeanName", beanName);
-      values.addPropertyValue("targetBeanFactory", beanFactory);
-      values.addPropertyValue("singleton", singleton);
-      proxyBeanDefinition.setPropertyValues(values);
-      return proxyBeanDefinition;
-    }
+  public void setBeanName(final String beanName) {
+    this.beanName = beanName;
   }
 
   public void setEnabled(final boolean enabled) {
@@ -238,6 +256,14 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
 
   public void setExportBeanNames(final List<String> exportBeanNames) {
     this.exportBeanNames = exportBeanNames;
+  }
+
+  public void setImportBeanAliases(final Map<String, String> importBeanAliases) {
+    this.importBeanAliases = importBeanAliases;
+  }
+
+  public void setImportBeanNames(final List<String> importBeanNames) {
+    this.importBeanNames = importBeanNames;
   }
 
   public void setParameters(final Map<String, Object> parameters) {

@@ -13,7 +13,6 @@ import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory {
@@ -22,6 +21,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   void close();
 
   DataObject create(QName typeName);
+
+  DataObject create(DataObjectMetaData metaData);
 
   Number createPrimaryId(QName typeName);
 
@@ -77,8 +78,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   Reader<DataObject> query(QName typeName);
 
   Reader<DataObject> query(QName typeName, BoundingBox boundingBox);
-
-  Reader<DataObject> query(QName typeName, Envelope envelope);
 
   Reader<DataObject> query(QName typeName, Geometry geometry);
 

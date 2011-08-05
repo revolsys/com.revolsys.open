@@ -66,6 +66,7 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, Spheroid> spheroids = new HashMap<Integer, Spheroid>();
 
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<String, CoordinateSystem>();
   static {
     loadUnits();
     loadAreas();
@@ -106,15 +107,17 @@ public final class EpsgCoordinateSystems {
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(
-    final Geometry geometry) {
+  public static CoordinateSystem getCoordinateSystem(final Geometry geometry) {
     return getCoordinateSystem(geometry.getSRID());
   }
 
-  public static CoordinateSystem getCoordinateSystem(
-    final int crsId) {
+  public static CoordinateSystem getCoordinateSystem(final int crsId) {
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return coordinateSystem;
+  }
+
+  public static CoordinateSystem getCoordinateSystem(final String name) {
+    return coordinateSystemsByName.get(name);
   }
 
   public static Set<CoordinateSystem> getCoordinateSystems() {
@@ -147,8 +150,7 @@ public final class EpsgCoordinateSystems {
     return Collections.unmodifiableMap(coordinateSystemsById);
   }
 
-  public static int getCrsId(
-    final CoordinateSystem coordinateSystem) {
+  public static int getCrsId(final CoordinateSystem coordinateSystem) {
     final Authority authority = coordinateSystem.getAuthority();
     if (authority != null) {
       final String name = authority.getName();
@@ -160,8 +162,7 @@ public final class EpsgCoordinateSystems {
     return 0;
   }
 
-  public static String getCrsName(
-    final CoordinateSystem coordinateSystem) {
+  public static String getCrsName(final CoordinateSystem coordinateSystem) {
     final Authority authority = coordinateSystem.getAuthority();
     final String name = authority.getName();
     final String code = authority.getCode();
@@ -176,8 +177,7 @@ public final class EpsgCoordinateSystems {
     return Collections.unmodifiableMap(datums);
   }
 
-  private static double getDouble(
-    final String value) {
+  private static double getDouble(final String value) {
     if (value.equals("")) {
       return Double.NaN;
     } else {
@@ -185,8 +185,7 @@ public final class EpsgCoordinateSystems {
     }
   }
 
-  private static Integer getInteger(
-    final String value) {
+  private static Integer getInteger(final String value) {
     if (value.equals("")) {
       return null;
     } else {
@@ -206,8 +205,7 @@ public final class EpsgCoordinateSystems {
     return Collections.unmodifiableMap(spheroids);
   }
 
-  private static String getString(
-    final String string) {
+  private static String getString(final String string) {
     return new String(string);
   }
 
@@ -461,6 +459,7 @@ public final class EpsgCoordinateSystems {
               authority, deprecated);
             coordinateSystemsById.put(code, cs);
             coordinateSystemsByCoordinateSystem.put(cs, cs);
+            coordinateSystemsByName.put(name, cs);
           }
         }
       } catch (final IOException e) {
@@ -538,6 +537,7 @@ public final class EpsgCoordinateSystems {
                 linearUnit, axis, authority, deprecated);
               coordinateSystemsById.put(code, cs);
               coordinateSystemsByCoordinateSystem.put(cs, cs);
+              coordinateSystemsByName.put(name, cs);
             }
           }
         }

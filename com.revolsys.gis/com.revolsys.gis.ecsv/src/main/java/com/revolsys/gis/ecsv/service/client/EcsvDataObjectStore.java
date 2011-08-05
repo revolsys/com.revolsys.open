@@ -23,6 +23,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -214,7 +215,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     return createReader(path);
   }
 
-  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
+  public Reader<DataObject> query(final QName typeName, final BoundingBox envelope) {
     final String path = getPath(typeName.getNamespaceURI()) + "/"
       + typeName.getLocalPart();
     final Map<String, String> parameters = new HashMap<String, String>();
@@ -227,9 +228,8 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
-    final Envelope envelope = geometry.getEnvelopeInternal();
-
-    return query(typeName, envelope);
+    final BoundingBox boundingBox = new BoundingBox(geometry);
+    return query(typeName, boundingBox);
   }
 
   public Reader<DataObject> query(QName typeName, String queryString,

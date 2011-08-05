@@ -467,6 +467,12 @@ public class GeometryFactory extends
     }
     return super.createPoint(points);
   }
+  public MultiPoint createMultiPoint(final CoordinatesList points) {
+    if (points != null) {
+      points.makePrecise(coordinatesPrecisionModel);
+    }
+    return super.createMultiPoint(points);
+  }
 
   public Polygon createPolygon(final CoordinatesList... rings) {
     final List<CoordinatesList> ringList = Arrays.asList(rings);

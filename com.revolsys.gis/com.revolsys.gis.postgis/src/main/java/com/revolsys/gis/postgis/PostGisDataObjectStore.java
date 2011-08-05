@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 
 import org.postgresql.geometric.PGbox;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -16,9 +17,10 @@ import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.gis.jdbc.io.JdbcQuery;
+import com.revolsys.gis.jdbc.io.JdbcQueryReader;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
-import com.vividsolutions.jts.geom.Envelope;
 
 public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
 
@@ -108,16 +110,16 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
     addAttributeAdder("geometry", geometryAttributeAdder);
   }
 
-  @Override
-  public Reader<DataObject> query(final QName typeName, final Envelope envelope) {
-    final double x1 = envelope.getMinX();
-    final double y1 = envelope.getMinY();
-    final double x2 = envelope.getMaxX();
-    final double y2 = envelope.getMaxY();
+  public JdbcQuery createQuery(final QName typeName,
+    final BoundingBox boundingBox) {
+    final double x1 = boundingBox.getMinX();
+    final double y1 = boundingBox.getMinY();
+    final double x2 = boundingBox.getMaxX();
+    final double y2 = boundingBox.getMaxY();
     final String sql = "SELECT * FROM " + typeName.getNamespaceURI() + "."
       + typeName.getLocalPart() + " WHERE GEOMETRY && ?";
-    final Reader reader = createReader(typeName, sql, new PGbox(x1, y1, x2, y2));
-    return reader;
+    JdbcQuery query = new JdbcQuery(typeName, sql, new PGbox(x1, y1, x2, y2));
+    return query;
   }
 
 }

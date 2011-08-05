@@ -3,6 +3,8 @@ package com.revolsys.spring.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,9 @@ import org.springframework.beans.factory.config.BeanDefinitionVisitor;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.MapFactoryBean;
+import org.springframework.beans.factory.config.TypedStringValue;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
@@ -49,8 +54,6 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   private String beanName;
 
-  private String beanNameSeparator = DEFAULT_BEAN_NAME_SEPARATOR;
-
   private boolean ignoreInvalidKeys = true;
 
   private boolean ignoreUnresolvablePlaceholders = true;
@@ -63,12 +66,39 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   private String placeholderSuffix = DEFAULT_PLACEHOLDER_SUFFIX;
 
+  public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
+
   public AttributesBeanConfigurer() {
   }
 
   public AttributesBeanConfigurer(final Map<String, Object> attributes) {
     if (attributes != null) {
       this.attributes.putAll(attributes);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void addAttributes(final Map<String, Object> attributes,
+    final ConfigurableListableBeanFactory beanFactory,
+    final BeanDefinition beanDefinition, final String beanName,
+    final String beanClassName) {
+    if (beanClassName != null) {
+      if (beanClassName.equals(AttributeMap.class.getName())) {
+        processPlaceholderAttributes(beanFactory, beanName, attributes);
+        final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+        attributes.putAll(otherAttributes);
+      } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
+        final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        final PropertyValue targetMapClass = propertyValues.getPropertyValue("targetMapClass");
+        if (targetMapClass != null) {
+          final Object mapClass = targetMapClass.getValue();
+          if (AttributeMap.class.getName().equals(mapClass)) {
+            processPlaceholderAttributes(beanFactory, beanName, attributes);
+            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
+            attributes.putAll(otherAttributes);
+          }
+        }
+      }
     }
   }
 
@@ -82,10 +112,6 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   public String getBeanName() {
     return beanName;
-  }
-
-  public String getBeanNameSeparator() {
-    return beanNameSeparator;
   }
 
   public String getNullValue() {
@@ -114,9 +140,15 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
-    final Map<String, Object> attributes = new LinkedHashMap<String, Object>(
-      getAttributes());
+    final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
     attributes.putAll(ThreadSharedAttributes.getAttributes());
+    for (Entry<String, Object> entry : getAttributes().entrySet()) {
+      String key = entry.getKey();
+      if (!attributes.containsKey(key)) {
+        Object value = entry.getValue();
+        attributes.put(key, value);
+      }
+    }
 
     final String[] beanNames = beanFactory.getBeanDefinitionNames();
     for (int i = 0; i < beanNames.length; i++) {
@@ -132,10 +164,10 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
           addAttributes(attributes, beanFactory, bd, beanName, beanClassName);
           if (beanClassName.equals(TargetBeanFactoryBean.class.getName())) {
             final MutablePropertyValues propertyValues = bd.getPropertyValues();
-            BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues.getPropertyValue(
+            final BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues.getPropertyValue(
               "targetBeanDefinition")
               .getValue();
-            String targetBeanClassName = targetBeanDefinition.getBeanClassName();
+            final String targetBeanClassName = targetBeanDefinition.getBeanClassName();
             addAttributes(attributes, beanFactory, targetBeanDefinition,
               beanName, targetBeanClassName);
           }
@@ -146,73 +178,108 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     processPlaceholderAttributes(beanFactory, attributes);
   }
 
-  protected void addAttributes(final Map<String, Object> attributes,
-    final ConfigurableListableBeanFactory beanFactory,
-    final BeanDefinition beanDefinition, final String beanName,
-    final String beanClassName) {
-    if (beanClassName != null) {
-      if (beanClassName.equals(AttributeMap.class.getName())) {
-        processPlaceholderAttributes(beanFactory, beanName, attributes);
-        final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
-        attributes.putAll(otherAttributes);
-      } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
-        final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-        final PropertyValue targetMapClass = propertyValues.getPropertyValue("targetMapClass");
-        if (targetMapClass != null) {
-          final Object mapClass = targetMapClass.getValue();
-          if (AttributeMap.class.getName().equals(mapClass)) {
-            processPlaceholderAttributes(beanFactory, beanName, attributes);
-            final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
-            attributes.putAll(otherAttributes);
+  /**
+   * Process the given key as 'beanName.property' entry.
+   */
+  @SuppressWarnings("unchecked")
+  protected void processOverride(final ConfigurableListableBeanFactory factory,
+    final String key, final Object value) throws BeansException {
+    final Matcher matcher = KEY_PATTERN.matcher(key);
+    if (matcher.matches()) {
+      final String beanName = matcher.group(1);
+      final String mapKey = matcher.group(2);
+      final String propertyName = matcher.group(3);
+
+      if (mapKey == null) {
+        if (propertyName == null) {
+          if (factory.containsBean(beanName)) {
+            BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
+            try {
+              final Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
+              if (Parameter.class.isAssignableFrom(beanClass)) {
+                while (beanDefinition.getOriginatingBeanDefinition() != null) {
+                  beanDefinition = beanDefinition.getOriginatingBeanDefinition();
+                }
+                final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+                PropertyValue propertyValue = new PropertyValue("value", value);
+                final PropertyValue typeValue = propertyValues.getPropertyValue("type");
+                if (typeValue != null) {
+                  final String typeClassName = typeValue.getValue().toString();
+                  try {
+                    final Class<?> typeClass = Class.forName(typeClassName);
+
+                    final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
+                      value, typeClass);
+                    propertyValue = new PropertyValue("value", convertedValue);
+                  } catch (final Throwable e) {
+                    LOG.error("Unable to set " + beanName + ".value=" + value,
+                      e);
+                  }
+                }
+                propertyValues.addPropertyValue(propertyValue);
+              }
+            } catch (final ClassNotFoundException e) {
+              LOG.error("Unable to set " + beanName + ".value=" + value, e);
+            }
+          } else if (value != null) {
+            createParameterBeanDefinition(factory,beanName, value);
+          }
+        } else {
+          setAttributeValue(factory, beanName, propertyName, value);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Property '" + key + "' set to value [" + value + "]");
           }
         }
+      } else if (propertyName == null) {
+        setMapValue(factory, key, beanName, mapKey, value);
+      } else {
+        LOG.error("Invalid syntax unable to set " + key + "=" + value);
       }
     }
   }
 
-  /**
-   * Process the given key as 'beanName.property' entry.
-   */
-  protected void processOverride(final ConfigurableListableBeanFactory factory,
-    final String key, final Object value) throws BeansException {
+  public void createParameterBeanDefinition(ConfigurableListableBeanFactory factory, final String beanName,
+    final Object value) {
+    GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+    beanDefinition.setBeanClass(Parameter.class);
+    MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+    propertyValues.add("type", value.getClass());
+    propertyValues.add("value", value);
+    ((DefaultListableBeanFactory)factory).registerBeanDefinition(beanName,
+      beanDefinition);
+  }
 
-    final int separatorIndex = key.indexOf(this.beanNameSeparator);
-    if (separatorIndex == -1) {
-      final String beanName = key;
-      BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
-      try {
-        final Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
-        if (Parameter.class.isAssignableFrom(beanClass)) {
-          while (beanDefinition.getOriginatingBeanDefinition() != null) {
-            beanDefinition = beanDefinition.getOriginatingBeanDefinition();
-          }
-          final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-          PropertyValue propertyValue = new PropertyValue("value", value);
-          final PropertyValue typeValue = propertyValues.getPropertyValue("type");
-          if (typeValue != null) {
-            final String typeClassName = typeValue.getValue().toString();
-            try {
-              final Class<?> typeClass = Class.forName(typeClassName);
-
-              final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
-                value, typeClass);
-              propertyValue = new PropertyValue("value", convertedValue);
-            } catch (final Throwable e) {
-              LOG.error("Unable to set " + beanName + ".value=" + value, e);
+  public void setMapValue(final ConfigurableListableBeanFactory factory,
+    final String key, final String beanName, final String mapKey,
+    final Object value) {
+    final BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
+    final String beanClassName = beanDefinition.getBeanClassName();
+    try {
+      final Class<?> beanClass = Class.forName(beanClassName);
+      if (MapFactoryBean.class.isAssignableFrom(beanClass)) {
+        final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+        final PropertyValue sourceMapProperty = propertyValues.getPropertyValue("sourceMap");
+        final Map<Object, Object> sourceMap = (Map<Object, Object>)sourceMapProperty.getValue();
+        boolean found = false;
+        for (final Entry<Object, Object> entry : sourceMap.entrySet()) {
+          final Object mapEntryKey = entry.getKey();
+          if (mapEntryKey instanceof TypedStringValue) {
+            final TypedStringValue typedKey = (TypedStringValue)mapEntryKey;
+            if (typedKey.getValue().equals(mapKey)) {
+              entry.setValue(value);
+              found = true;
             }
           }
-          propertyValues.addPropertyValue(propertyValue);
         }
-      } catch (final ClassNotFoundException e) {
-        LOG.error("Unable to set " + beanName + ".value=" + value, e);
+        if (!found) {
+          sourceMap.put(new TypedStringValue(mapKey), value);
+        }
+      } else {
+        LOG.error("Bean class must be a MapFactoryBean, unable to set " + key
+          + "=" + value);
       }
-    } else {
-      final String beanName = key.substring(0, separatorIndex);
-      final String beanProperty = key.substring(separatorIndex + 1);
-      setAttributeValue(factory, beanName, beanProperty, value);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Property '" + key + "' set to value [" + value + "]");
-      }
+    } catch (final ClassNotFoundException e) {
+      LOG.error("Unable to set " + key + "=" + value, e);
     }
   }
 
@@ -345,14 +412,6 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   public void setBeanName(final String beanName) {
     this.beanName = beanName;
-  }
-
-  /**
-   * Set the separator to expect between bean name and property path. Default is
-   * a dot (".").
-   */
-  public void setBeanNameSeparator(final String beanNameSeparator) {
-    this.beanNameSeparator = beanNameSeparator;
   }
 
   /**
