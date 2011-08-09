@@ -12,17 +12,24 @@ import com.revolsys.gis.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.gis.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.xml.model.EsriGdbXmlSerializer;
 
-public class FileGdbDomainCodeTable implements CodeTable<Object> {
+public class FileGdbDomainCodeTable implements CodeTable {
   private final CodedValueDomain domain;
 
   private final Geodatabase geodatabase;
 
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
 
+  private String name;
+
   public FileGdbDomainCodeTable(final Geodatabase geodatabase,
     final CodedValueDomain domain) {
     this.geodatabase = geodatabase;
     this.domain = domain;
+    this.name = domain.getDomainName();
+  }
+
+  public String getName() {
+    return name;
   }
 
   @Override
@@ -54,20 +61,20 @@ public class FileGdbDomainCodeTable implements CodeTable<Object> {
     return domain;
   }
 
-  public Object getId(final Map<String, ? extends Object> values) {
+  public <T> T getId(final Map<String, ? extends Object> values) {
     final Object id = domain.getId(values);
     if (id == null) {
-      return createValue(domain.getName(values));
+      return (T)createValue(domain.getName(values));
     }
-    return id;
+    return (T)id;
   }
 
-  public Object getId(final Object... values) {
+  public <T> T getId(final Object... values) {
     final Object id = domain.getId(values);
     if (id == null) {
-      return createValue((String)values[0]);
+      return (T)createValue((String)values[0]);
     }
-    return id;
+    return (T)id;
   }
 
   public String getIdAttributeName() {

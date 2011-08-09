@@ -6,18 +6,16 @@ import com.revolsys.xml.io.XmlWriter;
 
 public interface EsriGeodatabaseXmlFieldType {
 
-  void writeValue(
-    XmlWriter out,
-    Object value);
+  DataType getDataType();
 
   FieldType getEsriFieldType();
 
-  String getXmlSchemaTypeName();
+  int getFixedLength();
 
-  DataType getDataType();
+  String getXmlSchemaTypeName();
 
   boolean isUsePrecision();
 
-  int getFixedLength();
+  void writeValue(XmlWriter out, Object value);
 
 }

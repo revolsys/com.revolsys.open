@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.xml.model;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DEDataset extends DataElement {
-  private AtomicInteger DSID = new AtomicInteger(0);
+  private final AtomicInteger DSID = new AtomicInteger(0);
 
   private String datasetType;
 

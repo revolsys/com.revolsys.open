@@ -45,57 +45,71 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
   private final XmlWriter out;
 
-  private String namespaceUri = EsriGeodatabaseXmlConstants.NAMESPACE_URI_93;
-
   private boolean opened;
 
-  private DataObjectMetaData metaData;
+  private final DataObjectMetaData metaData;
 
   private String datasetType;
 
-  private EsriGeodatabaseXmlFieldTypeRegistry fieldTypes = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
+  private final EsriGeodatabaseXmlFieldTypeRegistry fieldTypes = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
   private String geometryType;
 
-  public EsriGeodatabaseXmlDataObjectWriter(
-    DataObjectMetaData metaData,
+  public EsriGeodatabaseXmlDataObjectWriter(final DataObjectMetaData metaData,
     final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
   }
 
-  private void writeHeader(
-    Geometry geometry) {
-    opened = true;
-    out.startDocument();
-    out.startTag(WORKSPACE);
-    out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
-    out.setPrefix(XmlConstants.XML_SCHEMA_NAMESPACE_PREFIX,
-      XmlConstants.XML_SCHEMA_NAMESPACE_URI);
+  @Override
+  public void close() {
+    if (!opened) {
+      writeHeader(null);
+    }
 
-    out.startTag(WORKSPACE_DEFINITION);
-    out.attribute(XsiConstants.TYPE, WORKSPACE_DEFINITION_TYPE);
-
-    out.element(WORKSPACE_TYPE, "esriLocalDatabaseWorkspace");
-    out.element(VERSION, "");
-
-    out.startTag(DOMAINS);
-    out.attribute(XsiConstants.TYPE, DOMAINS_TYPE);
-    out.endTag(DOMAINS);
-
-    out.startTag(DATASET_DEFINITIONS);
-    out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
-    writeDataElement(metaData, geometry);
-    out.endTag(DATASET_DEFINITIONS);
-
-    out.endTag(WORKSPACE_DEFINITION);
+    writeFooter();
+    out.close();
   }
 
-  private void writeDataElement(
-    DataObjectMetaData metaData,
-    Geometry geometry) {
+  @Override
+  public void flush() {
+    out.flush();
+  }
+
+  public void write(final DataObject object) {
+    if (!opened) {
+      writeHeader(object.getGeometryValue());
+      writeWorkspaceDataHeader();
+    }
+    out.startTag(RECORD);
+    out.attribute(XsiConstants.TYPE, RECORD_TYPE);
+
+    out.startTag(VALUES);
+    out.attribute(XsiConstants.TYPE, VALUES_TYPE);
+
+    for (final Attribute attribute : metaData.getAttributes()) {
+      final String attributeName = attribute.getName();
+      final Object value = object.getValue(attributeName);
+      final DataType type = attribute.getType();
+      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(type);
+      if (fieldType != null) {
+        fieldType.writeValue(out, value);
+      }
+    }
+    if (metaData.getAttribute("OBJECTID") == null) {
+      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(DataTypes.INTEGER);
+      fieldType.writeValue(out, objectId++);
+    }
+
+    out.endTag(VALUES);
+
+    out.endTag(RECORD);
+  }
+
+  private void writeDataElement(final DataObjectMetaData metaData,
+    final Geometry geometry) {
     final String dataElementType;
-    Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
     boolean hasGeometry = false;
     DataType geometryDataType = null;
     if (geometryAttribute != null) {
@@ -158,7 +172,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.text(UUID.randomUUID().toString().toUpperCase());
     out.text("}</MetaID>");
     out.text("<CreaDate>");
-    Timestamp date = new Timestamp(System.currentTimeMillis());
+    final Timestamp date = new Timestamp(System.currentTimeMillis());
     out.text(new SimpleDateFormat("yyyyMMdd").format(date));
     out.text("</CreaDate>");
     out.text("<CreaTime>");
@@ -201,7 +215,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
       out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
       out.element(SHAPE_TYPE, geometryType);
       out.element(SHAPE_FIELD_NAME, geometryAttribute.getName());
-      GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       out.element(HAS_M, false);
       out.element(HAS_Z, geometryFactory.hasZ());
       out.element(HAS_SPATIAL_INDEX, false);
@@ -215,12 +229,11 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(DATA_ELEMENT);
   }
 
-  public void writeExtent(
-    GeometryFactory geometryFactory) {
+  public void writeExtent(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+        final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
         out.startTag(EXTENT);
         out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);
         out.element(X_MIN, boundingBox.getMinX());
@@ -235,61 +248,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     }
   }
 
-  public void writeSpatialReference(
-    GeometryFactory geometryFactory) {
-    if (geometryFactory != null) {
-      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
-        if (esriCoordinateSystem != null) {
-          out.startTag(SPATIAL_REFERENCE);
-          if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {
-            out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
-          } else {
-            out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
-          }
-          out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
-          out.element(X_ORIGIN, 0);
-          out.element(Y_ORIGIN, 0);
-          final double scaleXy = geometryFactory.getScaleXY();
-          out.element(XY_SCALE, (int)scaleXy);
-          out.element(Z_ORIGIN, 0);
-          final double scaleZ = geometryFactory.getScaleZ();
-          out.element(Z_SCALE, (int)scaleZ);
-          out.element(M_ORIGIN, 0);
-          out.element(M_SCALE, 1);
-          out.element(XY_TOLERANCE, 1.0 / scaleXy * 2.0);
-          out.element(Z_TOLERANCE, 1.0 / scaleZ * 2.0);
-          out.element(M_TOLERANCE, 1);
-          out.element(HIGH_PRECISION, true);
-          out.element(WKID, coordinateSystem.getId());
-          out.endTag(SPATIAL_REFERENCE);
-        }
-      }
-    }
-  }
-
-  private void writeFields(
-    DataObjectMetaData metaData) {
-    out.startTag(FIELDS);
-    out.attribute(XsiConstants.TYPE, FIELDS_TYPE);
-
-    out.startTag(FIELD_ARRAY);
-    out.attribute(XsiConstants.TYPE, FIELD_ARRAY_TYPE);
-
-    for (Attribute attribute : metaData.getAttributes()) {
-      writeField(attribute);
-    }
-    if (metaData.getAttribute("OBJECTID") == null) {
-      writeOidField();
-    }
-    out.endTag(FIELD_ARRAY);
-
-    out.endTag(FIELDS);
-  }
-
-  private void writeField(
-    Attribute attribute) {
+  private void writeField(final Attribute attribute) {
     final String fieldName = attribute.getName();
     if (fieldName.equals("OBJECTID")) {
       writeOidField();
@@ -318,7 +277,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
         out.element(PRECISION, precision);
         out.element(SCALE, attribute.getScale());
 
-        GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+        final GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
         if (geometryFactory != null) {
           out.startTag(GEOMETRY_DEF);
           out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);
@@ -338,6 +297,54 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     }
   }
 
+  private void writeFields(final DataObjectMetaData metaData) {
+    out.startTag(FIELDS);
+    out.attribute(XsiConstants.TYPE, FIELDS_TYPE);
+
+    out.startTag(FIELD_ARRAY);
+    out.attribute(XsiConstants.TYPE, FIELD_ARRAY_TYPE);
+
+    for (final Attribute attribute : metaData.getAttributes()) {
+      writeField(attribute);
+    }
+    if (metaData.getAttribute("OBJECTID") == null) {
+      writeOidField();
+    }
+    out.endTag(FIELD_ARRAY);
+
+    out.endTag(FIELDS);
+  }
+
+  public void writeFooter() {
+    out.endDocument();
+  }
+
+  private void writeHeader(final Geometry geometry) {
+    opened = true;
+    out.startDocument();
+    out.startTag(WORKSPACE);
+    out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
+    out.setPrefix(XmlConstants.XML_SCHEMA_NAMESPACE_PREFIX,
+      XmlConstants.XML_SCHEMA_NAMESPACE_URI);
+
+    out.startTag(WORKSPACE_DEFINITION);
+    out.attribute(XsiConstants.TYPE, WORKSPACE_DEFINITION_TYPE);
+
+    out.element(WORKSPACE_TYPE, "esriLocalDatabaseWorkspace");
+    out.element(VERSION, "");
+
+    out.startTag(DOMAINS);
+    out.attribute(XsiConstants.TYPE, DOMAINS_TYPE);
+    out.endTag(DOMAINS);
+
+    out.startTag(DATASET_DEFINITIONS);
+    out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
+    writeDataElement(metaData, geometry);
+    out.endTag(DATASET_DEFINITIONS);
+
+    out.endTag(WORKSPACE_DEFINITION);
+  }
+
   private void writeOidField() {
     out.startTag(FIELD);
     out.attribute(XsiConstants.TYPE, FIELD_TYPE);
@@ -353,52 +360,37 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(FIELD);
   }
 
-  public void close() {
-    if (!opened) {
-      writeHeader(null);
-    }
-
-    writeFooter();
-    out.close();
-  }
-
-  public void writeFooter() {
-    out.endDocument();
-  }
-
-  public void flush() {
-    out.flush();
-  }
-
-  public void write(
-    final DataObject object) {
-    if (!opened) {
-      writeHeader(object.getGeometryValue());
-      writeWorkspaceDataHeader();
-    }
-    out.startTag(RECORD);
-    out.attribute(XsiConstants.TYPE, RECORD_TYPE);
-
-    out.startTag(VALUES);
-    out.attribute(XsiConstants.TYPE, VALUES_TYPE);
-
-    for (Attribute attribute : metaData.getAttributes()) {
-      final String attributeName = attribute.getName();
-      final Object value = object.getValue(attributeName);
-      final DataType type = attribute.getType();
-      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(type);
-      if (fieldType != null) {
-        fieldType.writeValue(out, value);
+  public void writeSpatialReference(final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem != null) {
+        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        if (esriCoordinateSystem != null) {
+          out.startTag(SPATIAL_REFERENCE);
+          if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {
+            out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
+          } else {
+            out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
+          }
+          out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
+          out.element(X_ORIGIN, 0);
+          out.element(Y_ORIGIN, 0);
+          final double scaleXy = geometryFactory.getScaleXY();
+          out.element(XY_SCALE, (int)scaleXy);
+          out.element(Z_ORIGIN, 0);
+          final double scaleZ = geometryFactory.getScaleZ();
+          out.element(Z_SCALE, (int)scaleZ);
+          out.element(M_ORIGIN, 0);
+          out.element(M_SCALE, 1);
+          out.element(XY_TOLERANCE, 1.0 / scaleXy * 2.0);
+          out.element(Z_TOLERANCE, 1.0 / scaleZ * 2.0);
+          out.element(M_TOLERANCE, 1);
+          out.element(HIGH_PRECISION, true);
+          out.element(WKID, coordinateSystem.getId());
+          out.endTag(SPATIAL_REFERENCE);
+        }
       }
     }
-    if (metaData.getAttribute("OBJECTID") == null) {
-      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(DataTypes.INTEGER);
-      fieldType.writeValue(out, objectId++);
-    }
-
-    out.endTag(VALUES);
-
-    out.endTag(RECORD);
   }
 
   public void writeWorkspaceDataHeader() {

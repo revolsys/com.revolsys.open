@@ -13,9 +13,17 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry INSTANCE = new EsriGeodatabaseXmlFieldTypeRegistry();
 
-  private Map<DataType, EsriGeodatabaseXmlFieldType> typeMapping = new HashMap<DataType, EsriGeodatabaseXmlFieldType>();
+  private final Map<DataType, EsriGeodatabaseXmlFieldType> typeMapping = new HashMap<DataType, EsriGeodatabaseXmlFieldType>();
+
+  private final Map<FieldType, DataType> esriToDataType = new HashMap<FieldType, DataType>();
 
   public EsriGeodatabaseXmlFieldTypeRegistry() {
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeOID, DataTypes.INT,
+      false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeGlobalID,
+      DataTypes.STRING, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeGUID,
+      DataTypes.STRING, false));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString,
       DataTypes.ANY_URI, false));
     addFieldType(new SimpleFieldType(null, DataTypes.BASE64_BINARY, false));
@@ -34,19 +42,17 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeSingle,
       DataTypes.FLOAT, "xs:double", false, 4));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger,
-      DataTypes.INT, false, 4));
-    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger,
       DataTypes.INTEGER, "xs:int", false, 4));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger,
       DataTypes.LONG, "xs:int", false, 8));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger,
+      DataTypes.INT, false, 4));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString,
       DataTypes.QNAME, "xs:string", true, -1));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeSmallInteger,
       DataTypes.SHORT, false, 2));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString,
       DataTypes.STRING, false));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
-      DataTypes.GEOMETRY));
     addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
       DataTypes.POINT));
     addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
@@ -59,6 +65,14 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
       DataTypes.POLYGON));
     addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
       DataTypes.MULTI_POLYGON));
+    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
+      DataTypes.GEOMETRY));
+  }
+
+  public void addFieldType(final DataType dataType,
+    final EsriGeodatabaseXmlFieldType fieldType) {
+    typeMapping.put(dataType, fieldType);
+    esriToDataType.put(fieldType.getEsriFieldType(), dataType);
   }
 
   public void addFieldType(final EsriGeodatabaseXmlFieldType fieldType) {
@@ -66,12 +80,11 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
     addFieldType(dataType, fieldType);
   }
 
-  public void addFieldType(final DataType dataType,
-    final EsriGeodatabaseXmlFieldType fieldType) {
-    typeMapping.put(dataType, fieldType);
+  public DataType getDataType(final FieldType fieldType) {
+    return esriToDataType.get(fieldType);
   }
 
-  public EsriGeodatabaseXmlFieldType getFieldType(DataType dataType) {
+  public EsriGeodatabaseXmlFieldType getFieldType(final DataType dataType) {
     return typeMapping.get(dataType);
   }
 }

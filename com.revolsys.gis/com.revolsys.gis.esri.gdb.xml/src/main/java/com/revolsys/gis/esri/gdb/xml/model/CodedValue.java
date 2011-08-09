@@ -33,7 +33,7 @@ public class CodedValue implements Cloneable {
   public void setName(final String name) {
     this.name = name;
   }
-  
+
   @Override
   public String toString() {
     return code + "=" + name;

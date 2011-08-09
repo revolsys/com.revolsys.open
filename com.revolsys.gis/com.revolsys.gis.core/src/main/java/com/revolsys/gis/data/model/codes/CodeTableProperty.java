@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
@@ -16,7 +17,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.io.Reader;
 
-public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
+public class CodeTableProperty extends AbstractCodeTable implements
   DataObjectMetaDataProperty {
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
@@ -45,7 +46,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
 
   protected void addValues(final Reader<DataObject> allCodes) {
     for (final DataObject code : allCodes) {
-      final T id = (T)code.getValue(getIdAttributeName());
+      final Object id = code.getValue(getIdAttributeName());
       final List<Object> values = new ArrayList<Object>();
       for (final String attributeName : this.valueAttributeNames) {
         final Object value = code.getValue(attributeName);
@@ -55,6 +56,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
     }
   }
 
+  
   @Override
   public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
@@ -63,18 +65,19 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
     return clone;
   }
 
-  protected synchronized T createId(final List<Object> values) {
+  protected synchronized Object createId(final List<Object> values) {
     // TODO prevent duplicates from other threads/processes
-    Object id = null;
     final DataObject code = dataStore.create(typeName);
     DataObjectMetaData metaData = code.getMetaData();
-    Attribute idAttribute = metaData.getIdAttribute();
-    if (idAttribute != null && Number.class.isAssignableFrom(idAttribute.getType().getJavaClass())) {
-      if (loadAll) {
-        id = getNextId();
-      } else {
-        id = dataStore.createPrimaryId(typeName);
-      }
+    Object id = dataStore.createPrimaryIdValue(typeName);
+    if (id == null) {
+      Attribute idAttribute = metaData.getIdAttribute();
+      if (idAttribute != null)
+        if (Number.class.isAssignableFrom(idAttribute.getType().getJavaClass())) {
+          id = getNextId();
+        } else {
+          id = UUID.randomUUID().toString();
+        }
     }
     code.setIdValue(id);
     for (int i = 0; i < valueAttributeNames.size(); i++) {
@@ -84,7 +87,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
     }
     dataStore.insert(code);
     id = code.getIdValue();
-    return (T)id;
+    return id;
   }
 
   @Override
@@ -105,7 +108,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final T id) {
+  public Map<String, ? extends Object> getMap(final Object id) {
     final List<Object> values = getValues(id);
     if (values == null) {
       return Collections.emptyMap();
@@ -137,18 +140,18 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
     return loadAll;
   }
 
-  protected void loadAll() {
+  protected synchronized void loadAll() {
     final Reader<DataObject> allCodes = dataStore.query(typeName);
     addValues(allCodes);
   }
 
   @Override
-  protected synchronized T loadId(final List<Object> values,
+  protected synchronized Object loadId(final List<Object> values,
     final boolean createId) {
-    T id = null;
+    Object id = null;
     if (createId && loadAll) {
       loadAll();
-      id = getIdByValue(values);
+      id = getId(values, false);
     } else {
       final StringBuffer where = new StringBuffer();
       if (!values.isEmpty()) {
@@ -172,7 +175,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
   }
 
   @Override
-  protected List<Object> loadValues(final T id) {
+  protected List<Object> loadValues(final Object id) {
     List<Object> values = null;
     if (loadAll) {
       loadAll();
@@ -205,6 +208,7 @@ public class CodeTableProperty<T> extends AbstractCodeTable<T> implements
         this.typeName = null;
       } else {
         this.typeName = metaData.getName();
+        setName(typeName.getLocalPart());
         this.dataStore = this.metaData.getDataObjectStore();
         metaData.setProperty(getPropertyName(), this);
         dataStore.addCodeTable(this);

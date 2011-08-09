@@ -19,13 +19,11 @@ public class EsriGeodatabaseXmlDataObjectWriterFactory extends
     setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    String baseName,
-    DataObjectMetaData metaData,
-    OutputStream outputStream,
-    Charset charset) {
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
-    return new EsriGeodatabaseXmlDataObjectWriter(metaData,writer);
+    return new EsriGeodatabaseXmlDataObjectWriter(metaData, writer);
   }
 }

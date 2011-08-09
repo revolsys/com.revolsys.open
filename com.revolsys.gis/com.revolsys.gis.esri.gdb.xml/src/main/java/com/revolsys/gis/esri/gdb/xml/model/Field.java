@@ -1,7 +1,6 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
 import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
-import com.revolsys.gis.util.NoOp;
 
 public class Field {
   private String name;
@@ -50,6 +49,10 @@ public class Field {
     return domainFixed;
   }
 
+  public Boolean getEditable() {
+    return editable;
+  }
+
   public GeometryDef getGeometryDef() {
     return geometryDef;
   }
@@ -70,6 +73,10 @@ public class Field {
     return precision;
   }
 
+  public Boolean getRequired() {
+    return required;
+  }
+
   public int getScale() {
     return scale;
   }
@@ -78,16 +85,8 @@ public class Field {
     return type;
   }
 
-  public Boolean getEditable() {
-    return editable;
-  }
-
   public boolean isIsNullable() {
     return isNullable;
-  }
-
-  public Boolean getRequired() {
-    return required;
   }
 
   public void setAliasName(final String aliasName) {

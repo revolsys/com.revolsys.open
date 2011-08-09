@@ -1,5 +1,8 @@
 package com.revolsys.gis.data.model.codes;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,16 +13,18 @@ import java.util.Map.Entry;
 
 import com.revolsys.util.CaseConverter;
 
-public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
+public abstract class AbstractCodeTable implements CodeTable, Cloneable {
   private boolean capitalizeWords = false;
 
-  private Map<T, List<Object>> idValueCache = new LinkedHashMap<T, List<Object>>();
+  private Map<Object, List<Object>> idValueCache = new LinkedHashMap<Object, List<Object>>();
 
-  private Map<List<Object>, T> valueIdCache = new LinkedHashMap<List<Object>, T>();
+  private Map<List<Object>, Object> valueIdCache = new LinkedHashMap<List<Object>, Object>();
 
-  private Map<String, T> stringIdMap = new HashMap<String, T>();
+  private final Map<String, Object> stringIdMap = new HashMap<String, Object>();
 
   private long maxId;
+
+  private String name;
 
   public AbstractCodeTable() {
   }
@@ -28,13 +33,9 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized long getNextId() {
-    return ++maxId;
-  }
-
-  protected synchronized void addValue(final T id, final List<Object> values) {
+  protected synchronized void addValue(final Object id, final List<Object> values) {
     if (id instanceof Number) {
-      Number number = (Number)id;
+      final Number number = (Number)id;
       final long longValue = number.longValue();
       if (longValue > maxId) {
         maxId = longValue;
@@ -42,30 +43,31 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
     }
     idValueCache.put(id, values);
     valueIdCache.put(values, id);
+    valueIdCache.put(getNormalizedValues(values), id);
     stringIdMap.put(id.toString().toLowerCase(), id);
   }
 
-  protected void addValue(final T id, final Object... values) {
+  protected void addValue(final Object id, final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     addValue(id, valueList);
 
   }
 
-  protected synchronized void addValues(final Map<T, List<Object>> valueMap) {
+  protected synchronized void addValues(final Map<Object, List<Object>> valueMap) {
 
-    for (final Entry<T, List<Object>> entry : valueMap.entrySet()) {
-      final T id = entry.getKey();
+    for (final Entry<Object, List<Object>> entry : valueMap.entrySet()) {
+      final Object id = entry.getKey();
       final List<Object> values = entry.getValue();
       addValue(id, values);
     }
   }
 
   @Override
-  public AbstractCodeTable<T> clone() {
+  public AbstractCodeTable clone() {
     try {
-      final AbstractCodeTable<T> clone = (AbstractCodeTable<T>)super.clone();
-      clone.idValueCache = new LinkedHashMap<T, List<Object>>(idValueCache);
-      clone.valueIdCache = new LinkedHashMap<List<Object>, T>(valueIdCache);
+      final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
+      clone.idValueCache = new LinkedHashMap<Object, List<Object>>(idValueCache);
+      clone.valueIdCache = new LinkedHashMap<List<Object>, Object>(valueIdCache);
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
@@ -76,11 +78,11 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
     return Collections.emptyList();
   }
 
-  public Map<T, List<Object>> getCodes() {
+  public Map<Object, List<Object>> getCodes() {
     return Collections.unmodifiableMap(idValueCache);
   }
 
-  public T getId(final Map<String, ? extends Object> valueMap) {
+  public <T> T getId(final Map<String, ? extends Object> valueMap) {
     final List<String> valueAttributeNames = getValueAttributeNames();
     final Object[] values = new Object[valueAttributeNames.size()];
     for (int i = 0; i < values.length; i++) {
@@ -88,44 +90,73 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
       final Object value = valueMap.get(name);
       values[i] = value;
     }
-    return getId(values);
+    return (T)getId(values);
   }
 
-  public T getId(final Object... values) {
-    if (values.length == 1) {
-      final Object id = values[0];
+  public <T> T getId(final List<Object> values) {
+    return (T)getId(values, true);
+  }
+  private static final NumberFormat FORMAT = new DecimalFormat(
+      "#.#########################");
+
+  public <T> T getId(final List<Object> values, boolean loadValues) {
+    if (values.size() == 1) {
+      final Object id = values.get(0);
       if (id == null) {
         return null;
       } else if (idValueCache.containsKey(id)) {
         return (T)id;
       } else {
-        String lowerId = id.toString().toLowerCase();
+        final String lowerId = id.toString().toLowerCase();
         if (stringIdMap.containsKey(lowerId)) {
-          return stringIdMap.get(lowerId);
+          return (T)stringIdMap.get(lowerId);
         }
       }
     }
 
-    final List<Object> valueList = Arrays.asList(values);
-    processValues(valueList);
-    T id = getIdByValue(valueList);
-    if (id == null) {
+    processValues(values);
+    Object id = getIdByValue(values);
+    if (id == null && loadValues) {
       synchronized (this) {
-        id = loadId(valueList, true);
-        if (id != null) {
-          addValue(id, valueList);
+        id = loadId(values, true);
+        if (id != null && !idValueCache.containsKey(id)) {
+          addValue(id, values);
         }
       }
+    }
+    return (T)id;
+  }
+
+  public <T> T getId(final Object... values) {
+    final List<Object> valueList = Arrays.asList(values);
+    return getId(valueList);
+  }
+
+  List<Object> getNormalizedValues(final List<Object> values) {
+    List<Object> normalizedValues = new ArrayList<Object>();
+    for (Object value : values) {
+      if (value == null) {
+        normalizedValues.add(null);
+      } else if (value instanceof Number) {
+        Number number = (Number)value;
+        normalizedValues.add(FORMAT.format(number));
+      } else {
+        normalizedValues.add(value.toString().toLowerCase());
+      }
+    }
+    return normalizedValues;
+  }
+  protected Object getIdByValue(final List<Object> valueList) {
+    processValues(valueList);
+     Object id = valueIdCache.get(valueList);
+    if (id == null) {
+      List<Object> normalizedValues = getNormalizedValues(valueList);
+      id = valueIdCache.get(normalizedValues);
     }
     return id;
   }
 
-  protected T getIdByValue(final List<Object> valueList) {
-    processValues(valueList);
-    return valueIdCache.get(valueList);
-  }
-
-  public Map<String, ? extends Object> getMap(final T id) {
+  public Map<String, ? extends Object> getMap(final Object id) {
     final List<Object> values = getValues(id);
     if (values == null) {
       return Collections.emptyMap();
@@ -140,8 +171,16 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
     }
   }
 
+  public String getName() {
+    return name;
+  }
+
+  protected synchronized long getNextId() {
+    return ++maxId;
+  }
+
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final T id) {
+  public <V> V getValue(final Object id) {
     final List<Object> values = getValues(id);
     if (values != null) {
       return (V)values.get(0);
@@ -154,19 +193,19 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
     return Arrays.asList("VALUE");
   }
 
-  protected List<Object> getValueById( T id) {
+  protected List<Object> getValueById(Object id) {
     List<Object> values = idValueCache.get(id);
     if (values == null) {
-      String lowerId = id.toString().toLowerCase();
+      final String lowerId = id.toString().toLowerCase();
       if (stringIdMap.containsKey(lowerId)) {
-        id= stringIdMap.get(lowerId);
+        id = stringIdMap.get(lowerId);
         values = idValueCache.get(id);
       }
     }
     return values;
   }
 
-  public List<Object> getValues(final T id) {
+  public List<Object> getValues(final Object id) {
     if (id != null) {
       List<Object> values = getValueById(id);
       if (values == null) {
@@ -188,11 +227,11 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
     return capitalizeWords;
   }
 
-  protected T loadId(final List<Object> values, final boolean createId) {
+  protected Object loadId(final List<Object> values, final boolean createId) {
     return null;
   }
 
-  protected List<Object> loadValues(final T id) {
+  protected List<Object> loadValues(final Object id) {
     return null;
   }
 
@@ -210,5 +249,9 @@ public abstract class AbstractCodeTable<T> implements CodeTable<T>, Cloneable {
 
   public void setCapitalizeWords(final boolean capitalizedWords) {
     this.capitalizeWords = capitalizedWords;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
   }
 }

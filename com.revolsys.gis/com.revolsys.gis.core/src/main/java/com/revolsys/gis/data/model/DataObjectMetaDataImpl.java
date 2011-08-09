@@ -156,10 +156,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void addAttribute(final Attribute attribute) {
     final int index = attributeNames.size();
     final String name = attribute.getName();
+    String lowerName = name.toLowerCase();
     attributeNames.add(name);
     attributes.add(attribute);
-    attributeMap.put(name, attribute);
-    attributeIdMap.put(name, attributeIdMap.size());
+    attributeMap.put(lowerName, attribute);
+    attributeIdMap.put(lowerName, attributeIdMap.size());
     final DataType dataType = attribute.getType();
     if (dataType == null) {
       LoggerFactory.getLogger(getClass()).debug(attribute.toString());
@@ -257,7 +258,8 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public Attribute getAttribute(final CharSequence name) {
-    return attributeMap.get(name.toString());
+    String lowerName = name.toString().toLowerCase();
+    return attributeMap.get(lowerName);
   }
 
   public Attribute getAttribute(final int i) {
@@ -272,7 +274,8 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     if (name == null) {
       return -1;
     } else {
-      final Integer attributeId = attributeIdMap.get(name.toString());
+      String lowerName = name.toString().toLowerCase();
+      final Integer attributeId = attributeIdMap.get(lowerName);
       if (attributeId == null) {
         return -1;
       } else {
@@ -403,7 +406,8 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public boolean hasAttribute(final CharSequence name) {
-    return attributeMap.containsKey(name.toString());
+    String lowerName = name.toString().toLowerCase();
+    return attributeMap.containsKey(lowerName);
   }
 
   @Override
@@ -434,11 +438,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void replaceAttribute(final Attribute attribute,
     final Attribute newAttribute) {
     final String name = attribute.getName();
+    String lowerName = name.toLowerCase();
     final String newName = newAttribute.getName();
     if (attributes.contains(attribute) && name.equals(newName)) {
       final int index = attribute.getIndex();
       attributes.set(index, newAttribute);
-      attributeMap.put(name, newAttribute);
+      attributeMap.put(lowerName, newAttribute);
       newAttribute.setIndex(index);
     } else {
       addAttribute(newAttribute);

@@ -7,12 +7,17 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 
@@ -54,7 +59,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     }
   }
 
-  private static void addGeometryField(final String shapeType,
+  private static void addGeometryField(final GeometryType shapeType,
     final DETable table, final Attribute attribute) {
     final Field field = addField(table, attribute);
     final DEFeatureClass featureClass = (DEFeatureClass)table;
@@ -146,23 +151,24 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     boolean hasGeometry = false;
     DataType geometryDataType = null;
-    String shapeType = null;
+    GeometryType shapeType = null;
     if (geometryAttribute != null) {
       geometryDataType = geometryAttribute.getType();
       if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
+        // TODO Z,m
         if (geometryDataType.equals(DataTypes.POINT)) {
-          shapeType = GEOMETRY_TYPE_POINT;
+          shapeType = GeometryType.esriGeometryPoint;
         } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
-          shapeType = GEOMETRY_TYPE_MULTI_POINT;
+          shapeType = GeometryType.esriGeometryMultipoint;
         } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
-          shapeType = GEOMETRY_TYPE_POLYLINE;
+          shapeType = GeometryType.esriGeometryPolyline;
         } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
-          shapeType = GEOMETRY_TYPE_POLYLINE;
+          shapeType = GeometryType.esriGeometryPolyline;
         } else if (geometryDataType.equals(DataTypes.POLYGON)) {
-          shapeType = GEOMETRY_TYPE_POLYGON;
+          shapeType = GeometryType.esriGeometryPolygon;
         } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
-          shapeType = GEOMETRY_TYPE_MULTI_PATCH;
+          shapeType = GeometryType.esriGeometryMultiPatch;
         } else {
           throw new IllegalArgumentException("Unable to detect geometry type");
         }
@@ -193,16 +199,16 @@ public class EsriXmlDataObjectMetaDataUtil implements
     table.setOIDFieldName("OBJECTID");
 
     addObjectIdField(table);
-    Attribute idAttribute = metaData.getIdAttribute();
-     for (final Attribute attribute : metaData.getAttributes()) {
+    final Attribute idAttribute = metaData.getIdAttribute();
+    for (final Attribute attribute : metaData.getAttributes()) {
       if (attribute == geometryAttribute) {
         addGeometryField(shapeType, table, attribute);
       } else {
         final String attributeName = attribute.getName();
         if (!attributeName.equals("OBJECTID")) {
-          Field field = addField(table, attribute);
+          final Field field = addField(table, attribute);
           if (idAttribute == attribute) {
-            table.addIndex(field, true, attributeName +"_PK");
+            table.addIndex(field, true, attributeName + "_PK");
           }
         }
       }
@@ -218,5 +224,121 @@ public class EsriXmlDataObjectMetaDataUtil implements
       table = createDETable(metaData, spatialReference);
     }
     return table;
+  }
+
+  public static DataObjectMetaData getMetaData(final String schemaName,
+    final CodedValueDomain domain) {
+    final String tableName = domain.getName();
+    final QName typeName = new QName(schemaName, tableName);
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
+    final FieldType fieldType = domain.getFieldType();
+    final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
+    metaData.addAttribute(tableName + "_ID", dataType, true);
+    metaData.addAttribute("VALUE", DataTypes.STRING, 255,true);
+    metaData.setIdAttributeIndex(0);
+    return metaData;
+  }
+
+  /**
+   * Get a metaData instance for the table definition excluding any ESRI
+   * specific fields.
+   * 
+   * @param schemaName
+   * @param deTable
+   * @return
+   */
+  public static DataObjectMetaData getMetaData(final String schemaName,
+    final DETable deTable) {
+    return getMetaData(schemaName, deTable, true);
+  }
+
+  public static DataObjectMetaData getMetaData(final String schemaName,
+    final DETable deTable, final boolean ignoreEsriFields) {
+    final String tableName = deTable.getName();
+    final QName typeName = new QName(schemaName, tableName);
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
+    final List<String> ignoreFieldNames = new ArrayList<String>();
+    if (ignoreEsriFields) {
+      ignoreFieldNames.add(deTable.getOIDFieldName());
+
+      if (deTable instanceof DEFeatureClass) {
+        final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+        ignoreFieldNames.add(featureClass.getLengthFieldName());
+        ignoreFieldNames.add(featureClass.getAreaFieldName());
+      }
+    }
+    for (final Field field : deTable.getFields()) {
+      final String fieldName = field.getName();
+      if (!ignoreFieldNames.contains(fieldName)) {
+        final FieldType fieldType = field.getType();
+        final DataType dataType;
+        if (fieldType == FieldType.esriFieldTypeGeometry && deTable instanceof DEFeatureClass) {
+          final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+          final GeometryType shapeType = featureClass.getShapeType();
+          switch (shapeType) {
+            case esriGeometryPoint:
+             dataType = DataTypes.POINT;
+            break;
+            case esriGeometryMultipoint:
+             dataType = DataTypes.MULTI_POINT;
+            break;
+            case esriGeometryPolyline:
+             dataType = DataTypes.MULTI_LINE_STRING;
+            break;
+            case esriGeometryPolygon:
+             dataType = DataTypes.POLYGON;
+            break;
+
+            default:
+           throw new RuntimeException("Unknown geometry type");
+          }
+          
+        } else {
+        dataType= EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
+        }
+        final int scale = field.getScale();
+        int length = field.getLength();
+        if (length == 0) {
+          length = field.getPrecision();
+        }
+        final Boolean required = !field.isIsNullable()
+          || field.getRequired() == Boolean.TRUE;
+        final Attribute attribute = new Attribute(fieldName, dataType, length,
+          scale, required);
+
+        metaData.addAttribute(attribute);
+        if (fieldName.equals(tableName + "_ID")) {
+          metaData.setIdAttributeName(fieldName);
+        }
+      }
+    }
+    if (deTable instanceof DEFeatureClass) {
+      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+      final String shapeFieldName = featureClass.getShapeFieldName();
+      metaData.setGeometryAttributeName(shapeFieldName);
+      final SpatialReference spatialReference = featureClass.getSpatialReference();
+       GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      if (featureClass.isHasM()) {
+        geometryFactory = new GeometryFactory(geometryFactory, 4);
+      } else if (featureClass.isHasZ()) {
+        geometryFactory = new GeometryFactory(geometryFactory, 3);
+      }
+      final Attribute geometryAttribute = metaData.getGeometryAttribute();
+      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        geometryFactory);
+    }
+
+    return metaData;
+  }
+  
+  public static List<DataObject> getValues(DataObjectMetaData metaData, CodedValueDomain domain) {
+    List<DataObject> values= new ArrayList<DataObject>();
+    for (CodedValue codedValue : domain.getCodedValues()) {
+      DataObject value = new ArrayDataObject(metaData);
+      value.setIdValue(codedValue.getCode());
+      value.setValue("VALUE", codedValue.getName());
+      values.add(value);
+    }
+    return values;
   }
 }

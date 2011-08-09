@@ -11,7 +11,7 @@ public class Fields {
     return fields;
   }
 
-  public void setFields(List<Field> fields) {
+  public void setFields(final List<Field> fields) {
     this.fields = fields;
   }
 

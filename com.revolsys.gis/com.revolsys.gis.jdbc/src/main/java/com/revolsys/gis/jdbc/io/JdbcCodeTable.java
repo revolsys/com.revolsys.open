@@ -20,7 +20,7 @@ import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.jdbc.JdbcUtils;
 
 @Deprecated
-public class JdbcCodeTable extends AbstractCodeTable<Number> {
+public class JdbcCodeTable extends AbstractCodeTable {
   private static final Logger LOG = Logger.getLogger(JdbcCodeTable.class);
 
   private String allSql;
@@ -122,14 +122,14 @@ public class JdbcCodeTable extends AbstractCodeTable<Number> {
     return codeTable;
   }
 
-  protected Number createId(
+  protected Object createId(
     final List<Object> values) {
     try {
       init();
       final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
         JdbcUtils.lockTable(connection, tableName);
-        Number id = loadId(values, false);
+        Object id = loadId(values, false);
         if (id == null) {
           final PreparedStatement statement = connection.prepareStatement(insertSql);
           try {
@@ -270,11 +270,11 @@ public class JdbcCodeTable extends AbstractCodeTable<Number> {
   }
 
   @Override
-  protected Number loadId(
+  protected Object loadId(
     final List<Object> values,
     final boolean createId) {
     init();
-    Number id = null;
+    Object id = null;
     if (createId && loadAll) {
       loadAll();
       id = getIdByValue(values);
@@ -315,7 +315,7 @@ public class JdbcCodeTable extends AbstractCodeTable<Number> {
 
   @Override
   protected List<Object> loadValues(
-    final Number id) {
+    final Object id) {
     init();
     List<Object> values = null;
     if (loadAll) {
@@ -327,7 +327,7 @@ public class JdbcCodeTable extends AbstractCodeTable<Number> {
         try {
           final PreparedStatement statement = connection.prepareStatement(valueByIdSql);
           try {
-            statement.setLong(1, id.longValue());
+            statement.setObject(1, id);
             final ResultSet rs = statement.executeQuery();
             try {
               if (rs.next()) {

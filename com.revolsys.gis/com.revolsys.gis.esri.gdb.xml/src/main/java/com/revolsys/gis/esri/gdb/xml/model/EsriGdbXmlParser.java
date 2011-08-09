@@ -21,6 +21,7 @@ import com.revolsys.gis.esri.gdb.xml.model.enums.RelClassKey;
 import com.revolsys.gis.esri.gdb.xml.model.enums.RelKeyRole;
 import com.revolsys.gis.esri.gdb.xml.model.enums.RelKeyType;
 import com.revolsys.gis.esri.gdb.xml.model.enums.RelNotification;
+import com.revolsys.gis.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.gis.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.gis.esri.gdb.xml.model.enums.WorkspaceType;
 import com.revolsys.xml.io.XmlProcessor;
@@ -40,6 +41,7 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     registerEnumConverter(RelNotification.class);
     registerEnumConverter(SplitPolicyType.class);
     registerEnumConverter(WorkspaceType.class);
+    registerEnumConverter(GeometryType.class);
     TAG_NAME_CLASS_MAP.put(CHILDREN.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(SUBTYPE.getLocalPart(), Subtype.class);
     TAG_NAME_CLASS_MAP.put(FIELD_INFOS.getLocalPart(), ArrayList.class);
@@ -47,9 +49,10 @@ public class EsriGdbXmlParser extends XmlProcessor implements
       SubtypeFieldInfo.class);
     TAG_NAME_CLASS_MAP.put(RELATIONSHIP_CLASS_NAMES.getLocalPart(),
       ArrayList.class);
-    
+
     TAG_NAME_CLASS_MAP.put(CODED_VALUE.getLocalPart(), CodedValue.class);
-    TAG_NAME_CLASS_MAP.put(CODED_VALUE_DOMAIN.getLocalPart(), CodedValueDomain.class);
+    TAG_NAME_CLASS_MAP.put(CODED_VALUE_DOMAIN.getLocalPart(),
+      CodedValueDomain.class);
     TAG_NAME_CLASS_MAP.put(CODED_VALUES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(DATA_ELEMENT.getLocalPart(), DataElement.class);
     TAG_NAME_CLASS_MAP.put(DATASET_DEFINITIONS.getLocalPart(), ArrayList.class);
@@ -88,7 +91,8 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(WORKSPACE_DATA.getLocalPart(), ArrayList.class);
-    TAG_NAME_CLASS_MAP.put(WORKSPACE_DEFINITION.getLocalPart(), WorkspaceDefinition.class);
+    TAG_NAME_CLASS_MAP.put(WORKSPACE_DEFINITION.getLocalPart(),
+      WorkspaceDefinition.class);
     TAG_NAME_CLASS_MAP.put(WORKSPACE.getLocalPart(), Workspace.class);
   }
 

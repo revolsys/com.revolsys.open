@@ -16,6 +16,8 @@ import com.revolsys.gis.esri.gdb.file.convert.ByteArrayEndianInput;
 import com.revolsys.gis.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.gis.esri.gdb.xml.model.SpatialReference;
+import com.revolsys.gis.esri.gdb.xml.model.enums.GeometryType;
+import com.revolsys.gis.esri.gdb.xml.model.enums.ShapeType;
 import com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryUtil;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.EndianOutputStream;
@@ -24,9 +26,9 @@ import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryAttribute extends AbstractFileGdbAttribute {
-  private static Map<String, Method> geometryTypeReadMethodMap = new LinkedHashMap<String, Method>();
+  private static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<String, Method>();
 
-  private static Map<String, Method> geometryTypeWriteMethodMap = new LinkedHashMap<String, Method>();
+  private static final Map<String, Method> GEOMETRY_TYPE_WRITE_METHOD_MAP = new LinkedHashMap<String, Method>();
 
   static {
     addReadWriteMethods("Point");
@@ -53,22 +55,22 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   private static void addReadWriteMethods(final String geometryType) {
-    addMethod("read", geometryTypeReadMethodMap, geometryType, false, false,
+    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false, false,
       GeometryFactory.class, EndianInput.class);
-    addMethod("read", geometryTypeReadMethodMap, geometryType, true, false,
+    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, true, false,
       GeometryFactory.class, EndianInput.class);
-    addMethod("read", geometryTypeReadMethodMap, geometryType, false, true,
+    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false, true,
       GeometryFactory.class, EndianInput.class);
-    addMethod("read", geometryTypeReadMethodMap, geometryType, true, true,
+    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, true, true,
       GeometryFactory.class, EndianInput.class);
 
-    addMethod("write", geometryTypeWriteMethodMap, geometryType, false, false,
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false, false,
       EndianOutput.class, Geometry.class);
-    addMethod("write", geometryTypeWriteMethodMap, geometryType, true, false,
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true, false,
       EndianOutput.class, Geometry.class);
-    addMethod("write", geometryTypeWriteMethodMap, geometryType, false, true,
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false, true,
       EndianOutput.class, Geometry.class);
-    addMethod("write", geometryTypeWriteMethodMap, geometryType, true, true,
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true, true,
       EndianOutput.class, Geometry.class);
   }
 
@@ -79,7 +81,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   private Method writeMethod;
 
   public GeometryAttribute(final Field field) {
-    super(field.getName(), DataTypes.GEOMETRY, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+    super(field.getName(), DataTypes.GEOMETRY,
+      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException(
@@ -100,16 +103,16 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
 
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
       }
-      final String geometryType = geometryDef.getGeometryType();
+      final GeometryType geometryType = geometryDef.getGeometryType();
       final boolean hasZ = geometryDef.isHasZ();
       final boolean hasM = geometryDef.isHasM();
-      final String geometryTypeKey = geometryType + hasZ + hasM;
-      readMethod = geometryTypeReadMethodMap.get(geometryTypeKey);
+      final String geometryTypeKey = geometryType.toString() + hasZ + hasM;
+      readMethod = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey);
       if (readMethod == null) {
         throw new IllegalArgumentException("No read method for geometry type "
           + geometryTypeKey);
       }
-      writeMethod = geometryTypeWriteMethodMap.get(geometryTypeKey);
+      writeMethod = GEOMETRY_TYPE_WRITE_METHOD_MAP.get(geometryTypeKey);
       if (writeMethod == null) {
         throw new IllegalArgumentException("No write method for geometry type "
           + geometryTypeKey);

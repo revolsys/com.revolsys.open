@@ -10,7 +10,6 @@ import org.postgresql.geometric.PGbox;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
@@ -18,8 +17,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.gis.jdbc.io.JdbcQuery;
-import com.revolsys.gis.jdbc.io.JdbcQueryReader;
-import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
@@ -40,21 +37,32 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
 
   @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String schema = typeName.getNamespaceURI();
-    final String tableName = typeName.getLocalPart();
-    final String idAttributeName = metaData.getIdAttributeName();
-    return "nextval('" + schema + "." + tableName + "_" + idAttributeName
-      + "_seq')";
+    final String sequenceName = getSequenceName(metaData);
+    return "nextval('" + sequenceName + "')";
   }
 
-  public long getNextPrimaryKey(final DataObjectMetaData metaData) {
+  public String getSequenceName(final DataObjectMetaData metaData) {
+    final QName typeName = metaData.getName();
+    final String schema = getDatabaseSchemaName(typeName.getNamespaceURI());
+    final String tableName = getDatabaseTableName(typeName);
+    final String idAttributeName = metaData.getIdAttributeName().toLowerCase();
+    final String sequenceName = schema + "." + tableName + "_"
+      + idAttributeName + "_seq";
+    return sequenceName;
+  }
+
+  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
     final String shortName = ShortNameProperty.getShortName(metaData);
-    final String sequenceName = shortName + "_SEQ";
+    String sequenceName;
+    if (shortName == null) {
+      sequenceName = getSequenceName(metaData);
+    } else {
+      sequenceName = shortName + "_SEQ";
+    }
     return getNextPrimaryKey(sequenceName);
   }
 
-  public long getNextPrimaryKey(final String sequenceName) {
+  public Object getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
     try {
       return JdbcUtils.selectLong(getDataSource(), getConnection(), sql,
@@ -106,7 +114,7 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
     addAttributeAdder("bool", new JdbcAttributeAdder(DataTypes.BOOLEAN));
 
     final JdbcAttributeAdder geometryAttributeAdder = new PostGisGeometryAttributeAdder(
-      getDataSource());
+      this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
   }
 

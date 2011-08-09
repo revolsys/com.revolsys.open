@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.esri.arcgis.geodatabase.CodedValueDomain;
 import com.esri.arcgis.geodatabase.Workspace;
-import com.esri.arcgis.geodatabase.esriFieldType;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 
-public class FileGdbDomainCodeTable extends AbstractCodeTable<Object> {
+public class FileGdbDomainCodeTable extends AbstractCodeTable {
   private final CodedValueDomain domain;
 
   private final Workspace workspace;
@@ -21,7 +20,7 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable<Object> {
 
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
 
-  public FileGdbDomainCodeTable(final Workspace workspace,
+  FileGdbDomainCodeTable(final Workspace workspace,
     final CodedValueDomain domain) {
     this.workspace = workspace;
     this.domain = domain;
@@ -43,40 +42,29 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable<Object> {
   }
 
   private Object createValue(final String value) {
-    try {
-      Object id = getNextId();
-      if (domain.getFieldType() == esriFieldType.esriFieldTypeInteger) {
-        id = ((Number)id).intValue();
-      } else if (domain.getFieldType() == esriFieldType.esriFieldTypeSmallInteger) {
-        id = ((Number)id).shortValue();
-      }
-      addValue(id, value);
-      domain.addCode(id, value);
-      workspace.alterDomain(domain);
-      LOG.info(this.name + " created code " + id + "=" + value);
-      return id;
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to create value " + this.name + " "
-        + value, e);
+    Object id = getNextId();
+    id = ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+      "createDomainValue", workspace, domain, id, value);
+    addValue(id, value);
+    LOG.info(this.name + " created code " + id + "=" + value);
+    return id;
+  }
+  @Override
+  public <T> T getId(final Map<String, ? extends Object> values) {
+    final Object id = super.getId(values);
+    if (id == null) {
+      return (T)createValue((String)values.get("NAME"));
     }
+    return (T)id;
   }
 
   @Override
-  public Object getId(final Map<String, ? extends Object> values) {
+  public <T> T getId(final Object... values) {
     final Object id = super.getId(values);
     if (id == null) {
-      return createValue((String)values.get("NAME"));
+      return (T)createValue((String)values[0]);
     }
-    return id;
-  }
-
-  @Override
-  public Object getId(final Object... values) {
-    final Object id = super.getId(values);
-    if (id == null) {
-      return createValue((String)values[0]);
-    }
-    return id;
+    return (T)id;
   }
 
   public String getIdAttributeName() {

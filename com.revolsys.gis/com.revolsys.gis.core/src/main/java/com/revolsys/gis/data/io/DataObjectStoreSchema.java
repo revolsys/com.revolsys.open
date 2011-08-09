@@ -36,7 +36,7 @@ public class DataObjectStoreSchema {
     metaDataCache.put(typeName, metaData);
   }
 
-  protected void addMetaData(DataObjectMetaData metaData) {
+  public void addMetaData(DataObjectMetaData metaData) {
     addMetaData(metaData.getName(), metaData);
   }
 

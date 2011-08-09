@@ -39,7 +39,10 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  public PostGisGeometryAttributeAdder(final DataSource dataSource) {
+  private PostGisDataObjectStore dataStore;
+
+  public PostGisGeometryAttributeAdder(PostGisDataObjectStore dataStore, final DataSource dataSource) {
+    this.dataStore = dataStore;
     this.dataSource = dataSource;
   }
 
@@ -48,21 +51,22 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
     final String name, final int sqlType, final int length, final int scale,
     final boolean required) {
     final QName typeName = metaData.getName();
-    String owner = typeName.getNamespaceURI().toLowerCase();
+    String owner = dataStore.getDatabaseSchemaName(typeName.getNamespaceURI());
     if (owner.equals("")) {
       owner = "public";
     }
-    final String tableName = typeName.getLocalPart().toLowerCase();
+    final String tableName = dataStore.getDatabaseTableName(typeName);
     final String columnName = name.toLowerCase();
     try {
-      final String sql = "select SRID, TYPE from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+      final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
       final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
         owner, tableName, columnName);
       int srid = (Integer)values.get("srid");
       String type = (String)values.get("type");
-      final DataType dataType = DATA_TYPE_MAP.get(type);
+      int numAxis = (Integer)values.get("coord_dimension");
+       final DataType dataType = DATA_TYPE_MAP.get(type);
       final Attribute attribute = new PostGisGeometryJdbcAttribute(name,
-        dataType, length, scale, required, null, srid);
+        dataType, length, scale, required, null, srid,numAxis);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));

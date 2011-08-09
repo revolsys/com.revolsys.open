@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
 
-public class CodedValueDomain extends Domain implements CodeTable<Object> {
+public class CodedValueDomain extends Domain implements CodeTable {
   private List<CodedValue> codedValues = new ArrayList<CodedValue>();
 
   private Map<Object, List<Object>> idValueMap = new HashMap<Object, List<Object>>();
@@ -33,6 +33,24 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
         maxId = id;
       }
     }
+  }
+
+  public synchronized Object addCodedValue(final String name) {
+    Object id;
+    switch (getFieldType()) {
+      case esriFieldTypeInteger:
+        id = (int)++maxId;
+      break;
+      case esriFieldTypeSmallInteger:
+        id = (short)++maxId;
+      break;
+
+      default:
+        throw new RuntimeException("Cannot generate code for field type "
+          + getFieldType());
+    }
+    addCodedValue(id, name);
+    return id;
   }
 
   @Override
@@ -60,24 +78,24 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
     return Collections.unmodifiableMap(idValueMap);
   }
 
-  public Object getId(final Map<String, ? extends Object> values) {
+  public <T> T getId(final Map<String, ? extends Object> values) {
     final Object name = getName(values);
-    return getId(name);
+    return (T)getId(name);
   }
 
-  public Object getId(final Object... values) {
+  public <T> T getId(final Object... values) {
     if (values.length == 1) {
       final Object value = values[0];
       if (value == null) {
         return null;
       } else if (idValueMap.containsKey(value)) {
-        return value;
+        return (T)value;
       } else if (stringIdMap.containsKey(value.toString())) {
-        return stringIdMap.get(value.toString());
+        return (T)stringIdMap.get(value.toString());
       } else {
-        String lowerValue = ((String)value).toLowerCase();
+        final String lowerValue = ((String)value).toLowerCase();
         final Object id = valueIdMap.get(lowerValue);
-        return id;
+        return (T)id;
       }
     } else {
       throw new IllegalArgumentException("Expecting only a single value "
@@ -92,6 +110,10 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
   public Map<String, ? extends Object> getMap(final Object id) {
     final Object value = getValue(id);
     return Collections.singletonMap("NAME", value);
+  }
+
+  public String getName() {
+    return super.getDomainName();
   }
 
   public String getName(final Map<String, ? extends Object> values) {
@@ -119,7 +141,7 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
     } else {
       List<Object> values = idValueMap.get(id);
       if (values == null) {
-        Object objectId = stringIdMap.get(id.toString());
+        final Object objectId = stringIdMap.get(id.toString());
         if (objectId == null) {
           return null;
         } else {
@@ -138,23 +160,5 @@ public class CodedValueDomain extends Domain implements CodeTable<Object> {
       addCodedValue(code, name);
 
     }
-  }
-
-  public synchronized Object addCodedValue(String name) {
-    Object id;
-    switch (getFieldType()) {
-      case esriFieldTypeInteger:
-        id = (int)++maxId;
-      break;
-      case esriFieldTypeSmallInteger:
-        id = (short)++maxId;
-      break;
-
-      default:
-        throw new RuntimeException("Cannot generate code for field type "
-          + getFieldType());
-    }
-    addCodedValue(id, name);
-    return id;
   }
 }

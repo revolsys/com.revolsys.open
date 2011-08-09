@@ -1,11 +1,12 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
 import com.revolsys.gis.esri.gdb.xml.EsriGeodatabaseXmlConstants;
+import com.revolsys.gis.esri.gdb.xml.model.enums.GeometryType;
 
 public class DEFeatureClass extends DETable {
   private String featureType = EsriGeodatabaseXmlConstants.FEATURE_TYPE_SIMPLE;
 
-  private String shapeType;
+  private GeometryType shapeType;
 
   private String shapeFieldName;
 
@@ -28,83 +29,83 @@ public class DEFeatureClass extends DETable {
     setDatasetType(EsriGeodatabaseXmlConstants.DATASET_TYPE_FEATURE_CLASS);
   }
 
-  public String getFeatureType() {
-    return featureType;
-  }
-
-  public void setFeatureType(String featureType) {
-    this.featureType = featureType;
-  }
-
-  public String getShapeType() {
-    return shapeType;
-  }
-
-  public void setShapeType(String shapeType) {
-    this.shapeType = shapeType;
-  }
-
-  public String getShapeFieldName() {
-    return shapeFieldName;
-  }
-
-  public void setShapeFieldName(String shapeFieldName) {
-    this.shapeFieldName = shapeFieldName;
-  }
-
-  public boolean isHasM() {
-    return hasM;
-  }
-
-  public void setHasM(boolean hasM) {
-    this.hasM = hasM;
-  }
-
-  public boolean isHasZ() {
-    return hasZ;
-  }
-
-  public void setHasZ(boolean hasZ) {
-    this.hasZ = hasZ;
-  }
-
-  public boolean isHasSpatialIndex() {
-    return hasSpatialIndex;
-  }
-
-  public void setHasSpatialIndex(boolean hasSpatialIndex) {
-    this.hasSpatialIndex = hasSpatialIndex;
-  }
-
   public String getAreaFieldName() {
     return areaFieldName;
-  }
-
-  public void setAreaFieldName(String areaFieldName) {
-    this.areaFieldName = areaFieldName;
-  }
-
-  public String getLengthFieldName() {
-    return lengthFieldName;
-  }
-
-  public void setLengthFieldName(String lengthFieldName) {
-    this.lengthFieldName = lengthFieldName;
   }
 
   public Envelope getExtent() {
     return extent;
   }
 
-  public void setExtent(Envelope extent) {
-    this.extent = extent;
+  public String getFeatureType() {
+    return featureType;
+  }
+
+  public String getLengthFieldName() {
+    return lengthFieldName;
+  }
+
+  public String getShapeFieldName() {
+    return shapeFieldName;
+  }
+
+  public GeometryType getShapeType() {
+    return shapeType;
   }
 
   public SpatialReference getSpatialReference() {
     return spatialReference;
   }
 
-  public void setSpatialReference(SpatialReference spatialReference) {
+  public boolean isHasM() {
+    return hasM;
+  }
+
+  public boolean isHasSpatialIndex() {
+    return hasSpatialIndex;
+  }
+
+  public boolean isHasZ() {
+    return hasZ;
+  }
+
+  public void setAreaFieldName(final String areaFieldName) {
+    this.areaFieldName = areaFieldName;
+  }
+
+  public void setExtent(final Envelope extent) {
+    this.extent = extent;
+  }
+
+  public void setFeatureType(final String featureType) {
+    this.featureType = featureType;
+  }
+
+  public void setHasM(final boolean hasM) {
+    this.hasM = hasM;
+  }
+
+  public void setHasSpatialIndex(final boolean hasSpatialIndex) {
+    this.hasSpatialIndex = hasSpatialIndex;
+  }
+
+  public void setHasZ(final boolean hasZ) {
+    this.hasZ = hasZ;
+  }
+
+  public void setLengthFieldName(final String lengthFieldName) {
+    this.lengthFieldName = lengthFieldName;
+  }
+
+  public void setShapeFieldName(final String shapeFieldName) {
+    this.shapeFieldName = shapeFieldName;
+  }
+
+  public void setShapeType(final GeometryType shapeType) {
+    this.shapeType = shapeType;
+  }
+
+  public void setSpatialReference(final SpatialReference spatialReference) {
     this.spatialReference = spatialReference;
   }
 }

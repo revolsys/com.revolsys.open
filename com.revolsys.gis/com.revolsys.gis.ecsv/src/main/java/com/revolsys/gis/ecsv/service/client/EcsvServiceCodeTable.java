@@ -10,7 +10,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.io.Reader;
 
-public class EcsvServiceCodeTable extends AbstractCodeTable<Number> {
+public class EcsvServiceCodeTable extends AbstractCodeTable {
   private EcsvDataObjectStore client;
 
   private String idColumn;
@@ -46,7 +46,7 @@ public class EcsvServiceCodeTable extends AbstractCodeTable<Number> {
   }
 
   @Override
-  protected Number loadId(final List<Object> values, final boolean createId) {
+  protected Object loadId(final List<Object> values, final boolean createId) {
     loadValues();
     return getIdByValue(values);
   }
@@ -64,7 +64,7 @@ public class EcsvServiceCodeTable extends AbstractCodeTable<Number> {
   }
 
   @Override
-  protected List<Object> loadValues(final Number id) {
+  protected List<Object> loadValues(final Object id) {
     loadValues();
     return getValueById(id);
   }

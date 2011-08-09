@@ -14,11 +14,7 @@ import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import com.revolsys.collection.ThreadSharedAttributes;
-import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -28,16 +24,15 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.Reader;
-import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
 
-  private AtomicInteger idGenerator = new AtomicInteger();
+  private Map<String, List<String>> codeTableColumNames = new HashMap<String, List<String>>();
 
   private DataObjectFactory dataObjectFactory;
 
-  private final Map<String, CodeTable<?>> columnToTableMap = new HashMap<String, CodeTable<?>>();
+  private final Map<String, CodeTable> columnToTableMap = new HashMap<String, CodeTable>();
 
   private String label;
 
@@ -51,42 +46,31 @@ public abstract class AbstractDataObjectStore extends
     this(new ArrayDataObjectFactory());
   }
 
-  public Number createPrimaryId(QName typeName) {
-    return idGenerator.incrementAndGet();
-  }
-
-  protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
-    QName typeName = metaData.getName();
-    for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-      final DataObjectMetaDataProperty clonedProperty = property.clone();
-      clonedProperty.setMetaData(metaData);
-    }
-    final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
-    metaData.setProperties(properties);
-  }
-
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
+  
 
-  public void addCodeTable(final CodeTable<?> codeTable) {
+  public void addCodeTable(final CodeTable codeTable) {
     final String idColumn = codeTable.getIdAttributeName();
     addCodeTable(idColumn, codeTable);
-    List<String> attributeAliases = codeTable.getAttributeAliases();
+    final List<String> attributeAliases = codeTable.getAttributeAliases();
     for (final String alias : attributeAliases) {
       addCodeTable(alias, codeTable);
     }
-  }
-
-  public void addCodeTable(final String columnName, final CodeTable<?> codeTable) {
-    if (!columnName.equalsIgnoreCase("ID")) {
-      this.columnToTableMap.put(columnName, codeTable);
+    final String codeTableName = codeTable.getName();
+    final List<String> columnNames = codeTableColumNames.get(codeTableName);
+    if (columnNames != null) {
+      for (final String columnName : columnNames) {
+        addCodeTable(columnName, codeTable);
+      }
     }
   }
 
-  public void setCommonMetaDataProperties(
-    final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
-    this.commonMetaDataProperties = commonMetaDataProperties;
+  public void addCodeTable(final String columnName, final CodeTable codeTable) {
+    if (columnName != null && !columnName.equalsIgnoreCase("ID")) {
+      this.columnToTableMap.put(columnName, codeTable);
+    }
   }
 
   protected void addMetaData(final DataObjectMetaData metaData) {
@@ -94,6 +78,16 @@ public abstract class AbstractDataObjectStore extends
     final String schemaName = typeName.getNamespaceURI();
     final DataObjectStoreSchema schema = getSchema(schemaName);
     schema.addMetaData(metaData);
+  }
+
+  protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
+    final QName typeName = metaData.getName();
+    for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
+      final DataObjectMetaDataProperty clonedProperty = property.clone();
+      clonedProperty.setMetaData(metaData);
+    }
+    final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
+    metaData.setProperties(properties);
   }
 
   protected void addSchema(final DataObjectStoreSchema schema) {
@@ -122,6 +116,10 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  public Object createPrimaryIdValue(final QName typeName) {
+    return null;
+  }
+
   public void delete(final DataObject object) {
     throw new UnsupportedOperationException("Delete not supported");
   }
@@ -142,20 +140,24 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public <T> CodeTable<T> getCodeTable(final QName typeName) {
+  public  CodeTable getCodeTable(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     if (metaData == null) {
       return null;
     } else {
       final CodeTableProperty codeTable = CodeTableProperty.getProperty(metaData);
-      return (CodeTable<T>)codeTable;
+      return codeTable;
     }
   }
 
-  public <T> CodeTable<T> getCodeTableByColumn(final String columnName) {
-    final CodeTable<?> codeTable = columnToTableMap.get(columnName);
-    return (CodeTable<T>)codeTable;
+  public CodeTable getCodeTableByColumn(final String columnName) {
+    final CodeTable codeTable = columnToTableMap.get(columnName);
+    return (CodeTable)codeTable;
 
+  }
+
+  public Map<String, List<String>> getCodeTableColumNames() {
+    return codeTableColumNames;
   }
 
   public DataObjectFactory getDataObjectFactory() {
@@ -179,6 +181,14 @@ public abstract class AbstractDataObjectStore extends
       return null;
     } else {
       return schema.getMetaData(typeName);
+    }
+  }
+
+  public QName getQName(final Object name) {
+    if (name instanceof QName) {
+      return (QName)name;
+    } else {
+      return QName.valueOf(name.toString());
     }
   }
 
@@ -280,6 +290,16 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  public void setCodeTableColumNames(
+    final Map<String, List<String>> domainColumNames) {
+    this.codeTableColumNames = domainColumNames;
+  }
+
+  public void setCommonMetaDataProperties(
+    final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
+    this.commonMetaDataProperties = commonMetaDataProperties;
+  }
+
   public void setDataObjectFactory(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -295,24 +315,6 @@ public abstract class AbstractDataObjectStore extends
   protected void setSharedAttribute(final String name, final Object value) {
     final Map<String, Object> sharedAttributes = getSharedAttributes();
     sharedAttributes.put(name, value);
-  }
-
-  public void update(final DataObject object) {
-    throw new UnsupportedOperationException("Update not supported");
-  }
-
-  public void updateAll(final Collection<DataObject> objects) {
-    for (final DataObject object : objects) {
-      update(object);
-    }
-  }
-
-  public QName getQName(final Object name) {
-    if (name instanceof QName) {
-      return (QName)name;
-    } else {
-      return QName.valueOf(name.toString());
-    }
   }
 
   public void setTypeMetaDataProperties(
@@ -335,5 +337,15 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public String toString() {
     return label;
+  }
+
+  public void update(final DataObject object) {
+    throw new UnsupportedOperationException("Update not supported");
+  }
+
+  public void updateAll(final Collection<DataObject> objects) {
+    for (final DataObject object : objects) {
+      update(object);
+    }
   }
 }

@@ -15,11 +15,9 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
-  public XmlGeometryFieldType(
-    final FieldType esriFieldType,
+  public XmlGeometryFieldType(final FieldType esriFieldType,
     final DataType dataType) {
-    super(dataType, "xs:" + dataType.getName().getLocalPart(),
-      esriFieldType);
+    super(dataType, "xs:" + dataType.getName().getLocalPart(), esriFieldType);
   }
 
   @Override
@@ -28,8 +26,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   }
 
   @Override
-  protected String getType(
-    final Object value) {
+  protected String getType(final Object value) {
     if (value instanceof Point) {
       return POINT_N_TYPE;
     } else if (value instanceof LineString || value instanceof MultiLineString) {
@@ -40,9 +37,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     return null;
   }
 
-  private void writeLineString(
-    final XmlWriter out,
-    final LineString line) {
+  private void writeLineString(final XmlWriter out, final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final boolean hasZ = points.getNumAxis() > 2;
     out.element(HAS_ID, false);
@@ -57,8 +52,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH_ARRAY);
   }
 
-  private void writeMultiLineString(
-    final XmlWriter out,
+  private void writeMultiLineString(final XmlWriter out,
     final MultiLineString multiLine) {
     final boolean hasZ;
     if (multiLine.isEmpty()) {
@@ -81,9 +75,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH_ARRAY);
   }
 
-  public void writePath(
-    final XmlWriter out,
-    final CoordinatesList points,
+  public void writePath(final XmlWriter out, final CoordinatesList points,
     final boolean hasZ) {
     out.startTag(PATH);
     out.attribute(XsiConstants.TYPE, PATH_TYPE);
@@ -93,9 +85,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH);
   }
 
-  public void writePoint(
-    final XmlWriter out,
-    final Coordinates coordinates,
+  public void writePoint(final XmlWriter out, final Coordinates coordinates,
     final boolean hasZ) {
     out.element(X, coordinates.getX());
     out.element(Y, coordinates.getY());
@@ -104,17 +94,28 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     }
   }
 
-  private void writePoint(
-    final XmlWriter out,
-    final Point point) {
+  private void writePoint(final XmlWriter out, final Point point) {
     final Coordinates coordinates = CoordinatesUtil.get(point);
     final boolean hasZ = coordinates.getNumAxis() > 2;
     writePoint(out, coordinates, hasZ);
   }
 
-  private void writePolygon(
-    final XmlWriter out,
-    final Polygon polygon) {
+  public void writePointArray(final XmlWriter out,
+    final CoordinatesList points, final boolean hasZ) {
+    out.startTag(POINT_ARRAY);
+    out.attribute(XsiConstants.TYPE, POINT_ARRAY_TYPE);
+
+    for (final Coordinates point : new InPlaceIterator(points)) {
+      out.startTag(POINT);
+      out.attribute(XsiConstants.TYPE, POINT_N_TYPE);
+      writePoint(out, point, hasZ);
+      out.endTag(POINT);
+    }
+
+    out.endTag(POINT_ARRAY);
+  }
+
+  private void writePolygon(final XmlWriter out, final Polygon polygon) {
     final boolean hasZ;
     final LineString exteriorRing = polygon.getExteriorRing();
     final CoordinatesList points = CoordinatesListUtil.get(exteriorRing);
@@ -136,10 +137,8 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(RING_ARRAY);
   }
 
-  private void writeRing(
-    XmlWriter out,
-    LineString line,
-    boolean hasZ) {
+  private void writeRing(final XmlWriter out, final LineString line,
+    final boolean hasZ) {
     out.startTag(RING);
     out.attribute(XsiConstants.TYPE, RING_TYPE);
     final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -149,27 +148,8 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(RING);
   }
 
-  public void writePointArray(
-    XmlWriter out,
-    final CoordinatesList points,
-    boolean hasZ) {
-    out.startTag(POINT_ARRAY);
-    out.attribute(XsiConstants.TYPE, POINT_ARRAY_TYPE);
-
-    for (final Coordinates point : new InPlaceIterator(points)) {
-      out.startTag(POINT);
-      out.attribute(XsiConstants.TYPE, POINT_N_TYPE);
-      writePoint(out, point, hasZ);
-      out.endTag(POINT);
-    }
-
-    out.endTag(POINT_ARRAY);
-  }
-
   @Override
-  protected void writeValueText(
-    final XmlWriter out,
-    final Object value) {
+  protected void writeValueText(final XmlWriter out, final Object value) {
     if (value instanceof Point) {
       final Point point = (Point)value;
       writePoint(out, point);

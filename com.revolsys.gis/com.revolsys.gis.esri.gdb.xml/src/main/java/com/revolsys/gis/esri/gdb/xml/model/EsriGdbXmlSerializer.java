@@ -27,6 +27,8 @@ import com.revolsys.xml.io.XmlWriter;
 
 public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
+  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
+
   public static String toString(final Object object) {
     final StringWriter writer = new StringWriter();
     final EsriGdbXmlSerializer serializer = new EsriGdbXmlSerializer(null,
@@ -373,8 +375,6 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     }
     return hasXsi;
   }
-
-  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
 
   private void writeXsiTypeAttribute(final QName tagName,
     final Class<? extends Object> objectClass) {

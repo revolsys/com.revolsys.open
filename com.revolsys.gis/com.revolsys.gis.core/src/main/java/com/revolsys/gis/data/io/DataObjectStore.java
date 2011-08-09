@@ -16,15 +16,14 @@ import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory {
-  void addCodeTable(CodeTable<?> codeTable);
+  void addCodeTable(CodeTable codeTable);
 
   void close();
-
   DataObject create(QName typeName);
 
   DataObject create(DataObjectMetaData metaData);
 
-  Number createPrimaryId(QName typeName);
+  Object createPrimaryIdValue(QName typeName);
 
   Writer<DataObject> createWriter();
 
@@ -32,9 +31,9 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   void deleteAll(Collection<DataObject> objects);
 
-  <T> CodeTable<T> getCodeTable(QName typeName);
+   CodeTable getCodeTable(QName typeName);
 
-  <T> CodeTable<T> getCodeTableByColumn(String columnName);
+   CodeTable getCodeTableByColumn(String columnName);
 
   DataObjectFactory getDataObjectFactory();
 

@@ -89,16 +89,18 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     if (typeNames != null) {
       for (final QName tableName : typeNames) {
         final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
-        final StringBuffer sql = new StringBuffer();
-        JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-        final JdbcQuery query;
-        if (boundingBox == null) {
-          query = new JdbcQuery(metaData, sql.toString());
-        } else {
-          QName typeName = metaData.getName();
-          query = dataStore.createQuery(typeName, boundingBox);
+        if (metaData != null) {
+          final StringBuffer sql = new StringBuffer();
+          JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
+          final JdbcQuery query;
+          if (boundingBox == null) {
+            query = new JdbcQuery(metaData, sql.toString());
+          } else {
+            QName typeName = metaData.getName();
+            query = dataStore.createQuery(typeName, boundingBox);
+          }
+          addQuery(query);
         }
-        addQuery(query);
       }
     }
   }

@@ -3,24 +3,26 @@ package com.revolsys.gis.data.model.codes;
 import java.util.List;
 import java.util.Map;
 
-public interface CodeTable<I> extends Cloneable {
-  CodeTable<I> clone();
+public interface CodeTable extends Cloneable {
+  CodeTable clone();
 
   List<String> getAttributeAliases();
 
-  List<String> getValueAttributeNames();
+  Map<Object, List<Object>> getCodes();
 
-  Map<I, List<Object>> getCodes();
+  <T> T getId(final Map<String, ? extends Object> values);
 
-  I getId(final Map<String, ? extends Object> values);
-
-  I getId(final Object... values);
+  <T> T getId(final Object... values);
 
   String getIdAttributeName();
 
-  Map<String, ? extends Object> getMap(final I id);
+  Map<String, ? extends Object> getMap(final Object id);
 
-  <V> V getValue(final I id);
+  String getName();
 
-  List<Object> getValues(final I id);
+  <V> V getValue(final Object id);
+
+  List<String> getValueAttributeNames();
+
+  List<Object> getValues(final Object id);
 }

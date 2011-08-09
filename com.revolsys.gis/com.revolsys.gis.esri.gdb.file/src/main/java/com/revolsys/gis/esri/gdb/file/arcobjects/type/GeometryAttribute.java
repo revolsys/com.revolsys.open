@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.esri.arcgis.geodatabase.IFeature;
+import com.esri.arcgis.geodatabase.IFeatureBuffer;
 import com.esri.arcgis.geodatabase.IField;
 import com.esri.arcgis.geodatabase.IGeometryDef;
 import com.esri.arcgis.geodatabase.IRow;
@@ -15,6 +17,7 @@ import com.esri.arcgis.geometry.GeometryEnvironment;
 import com.esri.arcgis.geometry.IGeometry;
 import com.esri.arcgis.geometry.IPoint;
 import com.esri.arcgis.geometry.IPointCollection;
+import com.esri.arcgis.geometry.IPointCollection4;
 import com.esri.arcgis.geometry.ISpatialReference;
 import com.esri.arcgis.geometry.Multipoint;
 import com.esri.arcgis.geometry.Point;
@@ -25,17 +28,21 @@ import com.esri.arcgis.geometry.Ring;
 import com.esri.arcgis.geometry.esriGeometryType;
 import com.esri.arcgis.interop.AutomationException;
 import com.esri.arcgis.system.Cleaner;
+import com.esri.arcgis.system._WKSPoint;
+import com.esri.arcgis.system._WKSPointZ;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.wkt.WktWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -43,14 +50,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class GeometryAttribute extends AbstractFileGdbAttribute {
-  private static final GeometryEnvironment GEOMETRY_ENVIRONMENT;
-  static {
-    try {
-      GEOMETRY_ENVIRONMENT = new GeometryEnvironment();
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to get geometry environment", e);
-    }
-  }
 
   public static GeometryFactory getGeometryFactory(
     final ISpatialReference spatialReference) {
@@ -91,21 +90,27 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     }
   }
 
+  private final GeometryEnvironment geometryEnvironment;
+
   private GeometryFactory geometryFactory = new GeometryFactory();
 
   private int geometryType;
 
-  private boolean hasZ;
-
   private boolean hasM;
 
+  private boolean hasZ;
+
   private int numAxis;
+
+  private Polyline polyline;
 
   public GeometryAttribute(final IField field) throws AutomationException,
     IOException {
     super(field.getName(), DataTypes.GEOMETRY,
       field.isRequired() == Boolean.TRUE || !field.isNullable(),
       field.isEditable());
+    this.geometryEnvironment = new GeometryEnvironment();
+
     final IGeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException(
@@ -136,8 +141,12 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       } else {
         numAxis = 2;
       }
-
     }
+    this.polyline = new Polyline();
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   @Override
@@ -183,17 +192,32 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     coordinates.setM(index, point.getM());
   }
 
+  public void setCoordinates(final Geometry geometry,
+    final IPointCollection4 polyline) throws IOException, AutomationException {
+    final CoordinatesList coordinates = CoordinatesListUtil.get(geometry);
+    if (numAxis == 2) {
+      final _WKSPoint[] points = toWKSPointArray(coordinates);
+      geometryEnvironment.setWKSPoints(polyline, points);
+    } else if (numAxis == 3) {
+      final _WKSPointZ[] points = toWKSPointZArray(coordinates);
+      geometryEnvironment.setWKSPointZs(polyline, points);
+    } else {
+
+    }
+  }
+
   @Override
   public void setValue(final IRowBuffer row, final Object value) {
-    if (value == null) {
-      super.setValue(row, value);
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      final Geometry projectedGeometry = ProjectionFactory.convert(geometry,
-        geometryFactory);
+    Geometry geometry = null;
+    IGeometry iGeometry;
+    try {
+      if (value == null) {
+        iGeometry = null;
+      } else if (value instanceof Geometry) {
+        geometry = (Geometry)value;
+        final Geometry projectedGeometry = ProjectionFactory.convert(geometry,
+          geometryFactory);
 
-      try {
-        IGeometry iGeometry;
         if (value instanceof com.vividsolutions.jts.geom.Point) {
           iGeometry = toIPoint((com.vividsolutions.jts.geom.Point)projectedGeometry);
         } else if (value instanceof MultiPoint) {
@@ -210,14 +234,22 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           throw new IllegalArgumentException("Unsupported geometry type "
             + value.getClass() + "=" + value);
         }
-        super.setValue(row, iGeometry);
-      } catch (final Exception e) {
-        throw new RuntimeException("Unable to convert geometry "
-          + projectedGeometry, e);
+      } else {
+        throw new IllegalArgumentException("Expecting a " + Geometry.class
+          + " not a " + value.getClass() + "=" + value);
       }
-    } else {
-      throw new IllegalArgumentException("Expecting a " + Geometry.class
-        + " not a " + value.getClass() + "=" + value);
+      if (row instanceof IFeatureBuffer) {
+        final IFeatureBuffer feature = (IFeatureBuffer)row;
+        feature.setShapeByRef(iGeometry);
+      } else if (row instanceof IFeature) {
+        final IFeature feature = (IFeature)row;
+        feature.setShapeByRef(iGeometry);
+      } else {
+        throw new RuntimeException("Unknown row type " + row.getClass());
+      }
+    } catch (final Exception e) {
+      throw new RuntimeException("Unable to set geometry "
+        + WktWriter.toString(geometry), e);
     }
 
   }
@@ -236,75 +268,38 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
 
   private IGeometry toIMultiPatch(final MultiPolygon multiPolygon)
     throws UnknownHostException, IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  private IGeometry toIMultiPoint(final MultiPoint multiPoint)
+  private Multipoint toIMultiPoint(final MultiPoint multiPoint)
     throws UnknownHostException, IOException {
-    // TODO Auto-generated method stub
-    return null;
+    final Multipoint multipoint = new Multipoint();
+    multipoint.setZAware(hasZ);
+    multipoint.setMAware(hasM);
+    setCoordinates(multiPoint, multipoint);
+    return multipoint;
   }
 
   private IGeometry toIPoint(final com.vividsolutions.jts.geom.Point point)
     throws UnknownHostException, IOException {
-    // TODO Auto-generated method stub
     return null;
-  }
-
-  private IPoint[] toIPointArray(final CoordinatesList coordinates)
-    throws UnknownHostException, IOException {
-    final int numPoints = coordinates.size();
-    final IPoint[] points = new IPoint[numPoints];
-    for (int i = 0; i < numPoints; i++) {
-      final Point point = new Point();
-      point.setZAware(hasZ);
-      point.setMAware(hasM);
-      points[i] = point;
-      final double x = coordinates.getX(i);
-      point.setX(x);
-      final double y = coordinates.getY(i);
-      point.setY(y);
-      if (numAxis > 2) {
-        double z = coordinates.getZ(i);
-        if (Double.isNaN(z)) {
-          z = 0;
-        }
-        point.setZ(z);
-        if (numAxis > 3) {
-          double m = coordinates.getM(i);
-          if (Double.isNaN(m)) {
-            m = 0;
-          }
-          point.setM(m);
-        }
-      }
-    }
-    return points;
   }
 
   private IGeometry toIPolygon(final com.vividsolutions.jts.geom.Polygon polygon)
     throws UnknownHostException, IOException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   private IGeometry toIPolyline(final LineString line)
     throws UnknownHostException, IOException {
-    final Polyline polyline = new Polyline();
+
     polyline.setZAware(hasZ);
     polyline.setMAware(hasM);
-    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
-    final IPoint[] points = toIPointArray(coordinates);
-    GEOMETRY_ENVIRONMENT.setPoints(polyline, points);
-    for (IPoint iPoint : points) {
-      Cleaner.release(iPoint);
-    }
+    setCoordinates(line, polyline);
     return polyline;
   }
 
   private IGeometry toIPolyline(final MultiLineString projectedGeometry) {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -368,7 +363,34 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     }
   }
 
-  public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+  private _WKSPoint[] toWKSPointArray(final CoordinatesList coordinates) {
+    final int numPoints = coordinates.size();
+    final _WKSPoint[] points = new _WKSPoint[numPoints];
+    for (int i = 0; i < numPoints; i++) {
+      final _WKSPoint point = new _WKSPoint();
+
+      points[i] = point;
+      point.x = coordinates.getX(i);
+      point.y = coordinates.getY(i);
+    }
+    return points;
+  }
+
+  private _WKSPointZ[] toWKSPointZArray(final CoordinatesList coordinates) {
+    final int numPoints = coordinates.size();
+    final _WKSPointZ[] points = new _WKSPointZ[numPoints];
+    for (int i = 0; i < numPoints; i++) {
+      final _WKSPointZ point = new _WKSPointZ();
+
+      points[i] = point;
+      point.x = coordinates.getX(i);
+      point.y = coordinates.getY(i);
+      double z = coordinates.getZ(i);
+      if (Double.isNaN(z)) {
+        z = 0;
+      }
+      point.z = z;
+    }
+    return points;
   }
 }

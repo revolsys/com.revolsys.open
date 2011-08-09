@@ -12,13 +12,13 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 
 public class SetCodeTableId implements
   SourceToTargetProcess<DataObject, DataObject> {
-  private final CodeTable<?> codeTable;
+  private final CodeTable codeTable;
 
   private final Map<String, Converter<DataObject, Object>> codeTableValueConverters = new HashMap<String, Converter<DataObject, Object>>();
 
   private final String targetAttributeName;
 
-  public SetCodeTableId(final CodeTable<?> codeTable,
+  public SetCodeTableId(final CodeTable codeTable,
     final String targetAttributeName) {
     this.codeTable = codeTable;
     this.targetAttributeName = targetAttributeName;
@@ -35,7 +35,7 @@ public class SetCodeTableId implements
         DataObjectStore dataObjectStore = target.getMetaData()
           .getDataObjectStore();
         if (dataObjectStore != null) {
-          CodeTable<?> targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
+          CodeTable targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
           if (targetCodeTable != null) {
             sourceValue = targetCodeTable.getId(sourceValue);
           }

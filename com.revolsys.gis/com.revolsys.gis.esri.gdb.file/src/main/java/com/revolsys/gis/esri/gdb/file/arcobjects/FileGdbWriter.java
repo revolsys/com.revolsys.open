@@ -1,9 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.arcobjects;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,34 +10,20 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esri.arcgis.geodatabase.FeatureClass;
-import com.esri.arcgis.geodatabase.ICursor;
-import com.esri.arcgis.geodatabase.IFeatureClass;
-import com.esri.arcgis.geodatabase.IQueryFilter;
-import com.esri.arcgis.geodatabase.IRow;
-import com.esri.arcgis.geodatabase.IRowBuffer;
-import com.esri.arcgis.geodatabase.ITable;
-import com.esri.arcgis.geodatabase.QueryFilter;
-import com.esri.arcgis.geometry.IGeometry;
-import com.esri.arcgis.interop.AutomationException;
+import com.esri.arcgis.geometry.IEnvelope;
 import com.esri.arcgis.system.Cleaner;
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.esri.gdb.file.arcobjects.type.AbstractFileGdbAttribute;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.io.AbstractWriter;
 
 public class FileGdbWriter extends AbstractWriter<DataObject> {
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbWriter.class);
 
-  private Map<QName, ICursor> cursors = new HashMap<QName, ICursor>();
+  private Map<DataObjectMetaData, Object> cursors = new HashMap<DataObjectMetaData, Object>();
 
-  private Map<QName, IRowBuffer> rowBuffers = new HashMap<QName, IRowBuffer>();
-
-  private List<FeatureClass> featureClasses = new ArrayList<FeatureClass>();
+  private Map<DataObjectMetaData, Object> rowBuffers = new HashMap<DataObjectMetaData, Object>();
 
   private ArcObjectsFileGdbDataObjectStore dataObjectStore;
 
@@ -59,33 +42,20 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   @Override
   @PreDestroy
   public void close() {
-    for (final Entry<QName, ICursor> entry : cursors.entrySet()) {
-      final QName name = entry.getKey();
-      final ICursor cursor = entry.getValue();
-      try {
-        cursor.flush();
-        Cleaner.release(cursor);
-      } catch (final Throwable e) {
-        LOG.error("Unable to close " + name);
-      }
+    for (final Entry<DataObjectMetaData, Object> entry : cursors.entrySet()) {
+      DataObjectMetaData metaData = entry.getKey();
+      Object cursor = entry.getValue();
+      flush(cursor);
+      ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+        "setLoadOnlyMode", metaData, false);
+      ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class, "release",
+        cursor);
     }
-    for (FeatureClass featureClass : featureClasses) {
-      try {
-        featureClass.setLoadOnlyMode(false);
-      } catch (final Throwable e) {
-        LOG.error("Unable to close " + featureClass);
-      }
-    }
-    for (IRowBuffer rowBuffer : rowBuffers.values()) {
-      try {
-        Cleaner.release(rowBuffer);
-      } catch (final Throwable e) {
-        LOG.error("Unable to close " + rowBuffer);
-      }
+    for (final Object rowBuffer : rowBuffers.values()) {
+      ArcObjectsFileGdbDataObjectStore.release(rowBuffer);
     }
     rowBuffers = null;
     cursors = null;
-    featureClasses = null;
     dataObjectStore = null;
     if (insertStatistics != null) {
       insertStatistics.disconnect();
@@ -102,51 +72,60 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   }
 
   private void delete(final DataObject object) {
-    final DataObjectMetaData objectMetaData = object.getMetaData();
-    final QName typeName = objectMetaData.getName();
-    final Object objectId = object.getValue("OBJECTID");
-    try {
-      final ITable table = dataObjectStore.getITable(typeName);
-      if (table instanceof IFeatureClass) {
-        IFeatureClass iFeatureClass = (IFeatureClass)table;
-        FeatureClass featureClass = new FeatureClass(iFeatureClass);
-        featureClasses.add(featureClass);
-        featureClass.setLoadOnlyMode(true);
+    // final DataObjectMetaData objectMetaData = object.getMetaData();
+    // final QName typeName = objectMetaData.getName();
+    // final Object objectId = object.getValue("OBJECTID");
+    // try {
+    // final ITable table = getITable(typeName);
+    // if (table instanceof IFeatureClass) {
+    // IFeatureClass iFeatureClass = (IFeatureClass)table;
+    // FeatureClass featureClass = new FeatureClass(iFeatureClass);
+    // featureClasses.add(featureClass);
+    // featureClass.setLoadOnlyMode(true);
+    // }
+    // final IQueryFilter query = new QueryFilter();
+    // query.setWhereClause("OBJECTID=" + objectId);
+    // table.deleteSearchedRows(query);
+    // getDeleteStatistics().add(object);
+    // } catch (final Exception e) {
+    // throw new RuntimeException("Unable to delete record " + typeName
+    // + ".OBJECTID=" + objectId);
+    // }
+  }
+
+  public void flush(final Object cursor) {
+    ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class, "flush",
+      cursor);
+  }
+
+  private boolean editing;
+
+  private Object getCursor(final DataObjectMetaData metaData) {
+    synchronized (cursors) {
+
+      Object cursor = cursors.get(metaData);
+      if (cursor == null) {
+        if (!editing) {
+          startEditing();
+        }
+        cursor = ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+          "createInsertCursor", metaData);
+        cursors.put(metaData, cursor);
       }
-      final IQueryFilter query = new QueryFilter();
-      query.setWhereClause("OBJECTID=" + objectId);
-      table.deleteSearchedRows(query);
-      getDeleteStatistics().add(object);
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to delete record " + typeName
-        + ".OBJECTID=" + objectId);
+      return cursor;
     }
   }
 
-  private ICursor getCursor(final QName typeName) throws AutomationException,
-    IOException {
-    ICursor cursor = cursors.get(typeName);
-    if (cursor == null) {
-      final ITable table = dataObjectStore.getITable(typeName);
-
-      cursor = table.insert(true);
-
-      cursors.put(typeName, cursor);
-    }
-    return cursor;
+  private void startEditing() {
+    ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+      "startEditing", dataObjectStore.getWorkspace());
+    this.editing = true;
   }
 
-  private IRowBuffer getRowBuffer(final QName typeName)
-    throws AutomationException, IOException {
-    IRowBuffer rowBuffer = rowBuffers.get(typeName);
-    if (rowBuffer == null) {
-      final ITable table = dataObjectStore.getITable(typeName);
-
-      rowBuffer = table.createRowBuffer();
-
-      rowBuffers.put(typeName, rowBuffer);
-    }
-    return rowBuffer;
+  private void stopEditing() {
+    ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+      "stopEditing", dataObjectStore.getWorkspace());
+    this.editing = false;
   }
 
   public Statistics getDeleteStatistics() {
@@ -175,6 +154,16 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     return insertStatistics;
   }
 
+  private Object getRowBuffer(final DataObjectMetaData metaData) {
+    Object rowBuffer = rowBuffers.get(metaData);
+    if (rowBuffer == null) {
+      rowBuffer = ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+        "createRowBuffer", metaData);
+      rowBuffers.put(metaData, rowBuffer);
+    }
+    return rowBuffer;
+  }
+
   public Statistics getUpdateStatistics() {
     if (updateStatistics == null) {
       final String label = dataObjectStore.getLabel();
@@ -192,69 +181,60 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final QName typeName = object.getMetaData().getName();
     final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
     try {
-      final ICursor cursor = getCursor(typeName);
-      final IRowBuffer row = getRowBuffer(typeName);
-      for (final Attribute attribute : metaData.getAttributes()) {
-        final String name = attribute.getName();
-        final Object value = object.getValue(name);
-        final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-        esriAttribute.setInsertValue(row, value);
-      }
-      final Object id = cursor.insertRow(row);
-
-      object.setValue("OBJECTID", id);
-      for (final Attribute attribute : metaData.getAttributes()) {
-        final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-        esriAttribute.setPostInsertValue(object, row);
-      }
-      int geometryAttributeIndex = metaData.getGeometryAttributeIndex();
-      if (geometryAttributeIndex != -1) {
-        IGeometry iGeometry = (IGeometry)row.getValue(geometryAttributeIndex);
-        Cleaner.release(iGeometry);
-      }
+      final Object cursor = getCursor(metaData);
+      ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class, "insert",
+        cursor, metaData, object);
       getInsertStatistics().add(object);
       i++;
       if (i % 1000 == 0) {
-        cursor.flush();
-        System.out.println(com.esri.arcgis.interop.Cleaner.getActiveObjectCount());
+        flush(cursor);
+        stopEditing();
+        startEditing();
       }
+      if (i % 10000 == 0) {
+        System.out.println(i);
+      }
+    } catch (final IllegalArgumentException e) {
+      LOG.error("Unable to insert row \n:" + object.toString(),e);
     } catch (final Exception e) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Unable to insert row \n:" + object.toString());
+        LOG.debug("Unable to insert row \n:" + object.toString(),e);
       }
       throw new RuntimeException("Unable to insert row", e);
     }
   }
 
   private void update(final DataObject object) {
-    final DataObjectMetaData objectMetaData = object.getMetaData();
-    final DataObjectMetaData metaData = dataObjectStore.getMetaData(objectMetaData);
-    final QName typeName = metaData.getName();
-    final Object objectId = object.getValue("OBJECTID");
-    try {
-      final ITable table = dataObjectStore.getITable(typeName);
-      final IQueryFilter query = new QueryFilter();
-      query.setWhereClause("OBJECTID=" + objectId);
-      final ICursor updateCursor = table.update(query, true);
-      final IRow row = updateCursor.nextRow();
-      if (row == null) {
-        LOG.error("Unable to update row as it does not exist" + typeName
-          + ".OBJECTID=" + objectId);
-        for (final Attribute attribute : metaData.getAttributes()) {
-          final String name = attribute.getName();
-          final Object value = object.getValue(name);
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          esriAttribute.setUpdateValue(row, value);
-        }
-        updateCursor.updateRow(row);
-        updateCursor.flush();
-      } else {
-        getUpdateStatistics().add(object);
-      }
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to update record " + typeName
-        + ".OBJECTID=" + objectId);
-    }
+    // final DataObjectMetaData objectMetaData = object.getMetaData();
+    // final DataObjectMetaData metaData =
+    // dataObjectStore.getMetaData(objectMetaData);
+    // final QName typeName = metaData.getName();
+    // final Object objectId = object.getValue("OBJECTID");
+    // try {
+    // final ITable table = getITable(typeName);
+    // final IQueryFilter query = new QueryFilter();
+    // query.setWhereClause("OBJECTID=" + objectId);
+    // final ICursor updateCursor = table.update(query, true);
+    // final IRow row = updateCursor.nextRow();
+    // if (row == null) {
+    // LOG.error("Unable to update row as it does not exist" + typeName
+    // + ".OBJECTID=" + objectId);
+    // for (final Attribute attribute : metaData.getAttributes()) {
+    // final String name = attribute.getName();
+    // final Object value = object.getValue(name);
+    // final AbstractFileGdbAttribute esriAttribute =
+    // (AbstractFileGdbAttribute)attribute;
+    // esriAttribute.setUpdateValue(row, value);
+    // }
+    // updateCursor.updateRow(row);
+    // updateCursor.flush();
+    // } else {
+    // getUpdateStatistics().add(object);
+    // }
+    // } catch (final Exception e) {
+    // throw new RuntimeException("Unable to update record " + typeName
+    // + ".OBJECTID=" + objectId);
+    // }
   }
 
   public synchronized void write(final DataObject object) {

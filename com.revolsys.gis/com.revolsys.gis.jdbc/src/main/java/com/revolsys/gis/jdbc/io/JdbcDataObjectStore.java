@@ -33,9 +33,9 @@ public interface JdbcDataObjectStore extends DataObjectStore {
   DataObjectMetaData getMetaData(QName tableName,
     ResultSetMetaData resultSetMetaData);
 
-  long getNextPrimaryKey(DataObjectMetaData metaData);
+  Object getNextPrimaryKey(DataObjectMetaData metaData);
 
-  long getNextPrimaryKey(String typeName);
+  Object getNextPrimaryKey(String typeName);
 
   void initialize();
 

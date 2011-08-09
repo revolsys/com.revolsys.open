@@ -1,7 +1,6 @@
 package com.revolsys.gis.esri.gdb.xml.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.util.StringUtils;
@@ -104,7 +103,7 @@ public class DETable extends DEDataset {
 
   public String getGlobalIDFieldName() {
     if (!StringUtils.hasText(globalIDFieldName)) {
-      for (Field field : getFields()) {
+      for (final Field field : getFields()) {
         if (field.getType() == FieldType.esriFieldTypeGlobalID) {
           hasGlobalID = true;
           globalIDFieldName = field.getName();
@@ -178,7 +177,7 @@ public class DETable extends DEDataset {
 
   public void setFields(final List<Field> fields) {
     this.fields = fields;
-    for (Field field : fields) {
+    for (final Field field : fields) {
       if (field.getType() == FieldType.esriFieldTypeGlobalID) {
         hasGlobalID = true;
         globalIDFieldName = field.getName();

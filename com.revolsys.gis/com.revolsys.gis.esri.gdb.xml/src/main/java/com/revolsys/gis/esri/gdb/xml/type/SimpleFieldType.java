@@ -6,43 +6,28 @@ import com.revolsys.xml.io.XmlWriter;
 
 public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
-  private boolean usePrecision;
+  private final boolean usePrecision;
 
   private int fixedLength = -1;
 
-  public SimpleFieldType(
-    FieldType esriFieldType,
-    DataType dataType,
-    boolean usePrecision,
-    int fixedLength) {
-    super(dataType, "xs:" + dataType.getName().getLocalPart(),
-      esriFieldType);
-    this.usePrecision = usePrecision;
-    this.fixedLength = fixedLength;
-  }
-
-  public SimpleFieldType(
-    FieldType esriFieldType,
-    DataType dataType,
-    String xmlSchemaTypeName,
-    boolean usePrecision,
-    int fixedLength) {
-    super(dataType, xmlSchemaTypeName, esriFieldType);
-    this.usePrecision = usePrecision;
-    this.fixedLength = fixedLength;
-  }
-
-  public SimpleFieldType(
-    FieldType esriFieldType,
-    DataType dataType,
-    boolean usePrecision) {
+  public SimpleFieldType(final FieldType esriFieldType,
+    final DataType dataType, final boolean usePrecision) {
     this(esriFieldType, dataType, usePrecision, -1);
   }
 
-  protected void writeValueText(
-    XmlWriter out,
-    Object value) {
-    out.text(value);
+  public SimpleFieldType(final FieldType esriFieldType,
+    final DataType dataType, final boolean usePrecision, final int fixedLength) {
+    super(dataType, "xs:" + dataType.getName().getLocalPart(), esriFieldType);
+    this.usePrecision = usePrecision;
+    this.fixedLength = fixedLength;
+  }
+
+  public SimpleFieldType(final FieldType esriFieldType,
+    final DataType dataType, final String xmlSchemaTypeName,
+    final boolean usePrecision, final int fixedLength) {
+    super(dataType, xmlSchemaTypeName, esriFieldType);
+    this.usePrecision = usePrecision;
+    this.fixedLength = fixedLength;
   }
 
   @Override
@@ -53,6 +38,11 @@ public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   @Override
   public boolean isUsePrecision() {
     return usePrecision;
+  }
+
+  @Override
+  protected void writeValueText(final XmlWriter out, final Object value) {
+    out.text(value);
   }
 
 }

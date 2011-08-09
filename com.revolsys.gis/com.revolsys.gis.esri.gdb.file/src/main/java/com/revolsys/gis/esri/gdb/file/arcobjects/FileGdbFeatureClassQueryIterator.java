@@ -4,11 +4,7 @@ import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
 
-import com.esri.arcgis.geodatabase.IFeatureClass;
 import com.esri.arcgis.geodatabase.IFeatureCursor;
-import com.esri.arcgis.geodatabase.IRow;
-import com.esri.arcgis.geodatabase.SpatialFilter;
-import com.esri.arcgis.geometry.Envelope;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -17,15 +13,11 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.esri.gdb.file.arcobjects.type.AbstractFileGdbAttribute;
 
 public class FileGdbFeatureClassQueryIterator extends
   AbstractIterator<DataObject> {
 
   private final DataObjectFactory dataObjectFactory;
-
-  private IFeatureClass featureClass;
 
   private String fields;
 
@@ -53,7 +45,6 @@ public class FileGdbFeatureClassQueryIterator extends
     if (metaData == null) {
       throw new IllegalArgumentException("Unknown type " + typeName);
     }
-    this.featureClass = (IFeatureClass)dataStore.getITable(typeName);
     this.fields = fields;
     this.whereClause = whereClause;
     setBoundingBox(boundingBox);
@@ -63,7 +54,6 @@ public class FileGdbFeatureClassQueryIterator extends
   @Override
   protected void doClose() {
     rows = null;
-    featureClass = null;
     metaData = null;
     fields = null;
     whereClause = null;
@@ -72,25 +62,8 @@ public class FileGdbFeatureClassQueryIterator extends
 
   @Override
   protected void doInit() {
-    try {
-      final Envelope envelope = new Envelope();
-
-      final double x1 = boundingBox.getMinX();
-      final double y1 = boundingBox.getMinY();
-      final double x2 = boundingBox.getMaxX();
-      final double y2 = boundingBox.getMaxY();
-      envelope.setXMin(x1);
-      envelope.setYMin(y1);
-      envelope.setXMax(x2);
-      envelope.setYMax(y2);
-      final SpatialFilter query = new SpatialFilter();
-      query.setGeometryByRef(envelope);
-      query.setSubFields(fields);
-      query.setWhereClause(whereClause);
-      rows = featureClass.search(query, true);
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to perform search", e);
-    }
+    rows = ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+      "search", metaData, fields, whereClause, boundingBox);
   }
 
   protected DataObjectMetaData getMetaData() {
@@ -102,26 +75,8 @@ public class FileGdbFeatureClassQueryIterator extends
 
   @Override
   protected DataObject getNext() throws NoSuchElementException {
-    try {
-      final IRow row = rows.nextFeature();
-      if (row == null) {
-        throw new NoSuchElementException();
-      } else {
-        final DataObject object = dataObjectFactory.createDataObject(metaData);
-        for (final Attribute attribute : metaData.getAttributes()) {
-          final String name = attribute.getName();
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          final Object value = esriAttribute.getValue(row);
-          object.setValue(name, value);
-        }
-        object.setState(DataObjectState.Persisted);
-        return object;
-      }
-    } catch (final NoSuchElementException e) {
-      throw e;
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to get next row", e);
-    }
+    return ArcObjectsFileGdbDataObjectStore.invoke(ArcObjectsUtil.class,
+      "getNext", rows, metaData, dataObjectFactory);
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {

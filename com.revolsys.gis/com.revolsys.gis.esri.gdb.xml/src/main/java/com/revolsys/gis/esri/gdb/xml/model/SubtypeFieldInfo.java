@@ -7,28 +7,28 @@ public class SubtypeFieldInfo {
 
   private Object defaultValue;
 
-  public String getFieldName() {
-    return fieldName;
-  }
-
-  public void setFieldName(String fieldName) {
-    this.fieldName = fieldName;
+  public Object getDefaultValue() {
+    return defaultValue;
   }
 
   public String getDomainName() {
     return domainName;
   }
 
-  public void setDomainName(String domainName) {
+  public String getFieldName() {
+    return fieldName;
+  }
+
+  public void setDefaultValue(final Object defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public void setDomainName(final String domainName) {
     this.domainName = domainName;
   }
 
-  public Object getDefaultValue() {
-    return defaultValue;
-  }
-
-  public void setDefaultValue(Object defaultValue) {
-    this.defaultValue = defaultValue;
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
 }

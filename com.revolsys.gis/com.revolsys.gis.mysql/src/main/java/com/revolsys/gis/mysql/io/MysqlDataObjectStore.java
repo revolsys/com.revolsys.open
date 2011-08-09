@@ -50,13 +50,13 @@ public class MysqlDataObjectStore extends AbstractJdbcDataObjectStore {
     return shortName + "_SEQ.NEXTVAL";
   }
 
-  public long getNextPrimaryKey(final DataObjectMetaData metaData) {
+  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
     final String shortName = ShortNameProperty.getShortName(metaData);
     final String sequenceName = shortName + "_SEQ";
     return getNextPrimaryKey(sequenceName);
   }
 
-  public long getNextPrimaryKey(final String sequenceName) {
+  public Object getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
     try {
       return JdbcUtils.selectLong(getDataSource(), getConnection(), sql);

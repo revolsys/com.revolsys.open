@@ -9,29 +9,28 @@ public class RelationshipClassKey {
 
   private RelKeyRole keyRole;
 
-  public String getObjectKeyName() {
-    return objectKeyName;
-  }
-
-  public void setObjectKeyName(String objectKeyName) {
-    this.objectKeyName = objectKeyName;
-  }
-
   public String getClassKeyName() {
     return classKeyName;
-  }
-
-  public void setClassKeyName(String classKeyName) {
-    this.classKeyName = classKeyName;
   }
 
   public RelKeyRole getKeyRole() {
     return keyRole;
   }
 
-  public void setKeyRole(RelKeyRole keyRole) {
+  public String getObjectKeyName() {
+    return objectKeyName;
+  }
+
+  public void setClassKeyName(final String classKeyName) {
+    this.classKeyName = classKeyName;
+  }
+
+  public void setKeyRole(final RelKeyRole keyRole) {
     this.keyRole = keyRole;
   }
-  
-  
+
+  public void setObjectKeyName(final String objectKeyName) {
+    this.objectKeyName = objectKeyName;
+  }
+
 }

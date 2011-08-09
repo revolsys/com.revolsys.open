@@ -41,117 +41,119 @@ public class DERelationshipClass extends DETable {
     super("");
   }
 
+  public String getBackwardPathLabel() {
+    return backwardPathLabel;
+  }
+
   public RelCardinality getCardinality() {
     return cardinality;
-  }
-
-  public void setCardinality(RelCardinality cardinality) {
-    this.cardinality = cardinality;
-  }
-
-  public RelNotification getNotification() {
-    return notification;
-  }
-
-  public void setNotification(RelNotification notification) {
-    this.notification = notification;
-  }
-
-  public boolean isAttributed() {
-    return isAttributed;
-  }
-
-  public void setAttributed(boolean isAttributed) {
-    this.isAttributed = isAttributed;
-  }
-
-  public boolean isComposite() {
-    return isComposite;
-  }
-
-  public void setComposite(boolean isComposite) {
-    this.isComposite = isComposite;
-  }
-
-  public List<String> getOriginClassNames() {
-    return originClassNames;
-  }
-
-  public void setOriginClassNames(List<String> originClassNames) {
-    this.originClassNames = originClassNames;
-  }
-
-  public List<String> getDestinationClassNames() {
-    return destinationClassNames;
-  }
-
-  public void setDestinationClassNames(List<String> destinationClassNames) {
-    this.destinationClassNames = destinationClassNames;
-  }
-
-  public RelKeyType getReyType() {
-    return reyType;
-  }
-
-  public void setReyType(RelKeyType reyType) {
-    this.reyType = reyType;
   }
 
   public RelClassKey getClassKey() {
     return classKey;
   }
 
-  public void setClassKey(RelClassKey classKey) {
-    this.classKey = classKey;
+  public List<RelationshipClassKey> getDestinationClassKeys() {
+    return destinationClassKeys;
+  }
+
+  public List<String> getDestinationClassNames() {
+    return destinationClassNames;
   }
 
   public String getForwardPathLabel() {
     return forwardPathLabel;
   }
 
-  public void setForwardPathLabel(String forwardPathLabel) {
-    this.forwardPathLabel = forwardPathLabel;
-  }
-
-  public String getBackwardPathLabel() {
-    return backwardPathLabel;
-  }
-
-  public void setBackwardPathLabel(String backwardPathLabel) {
-    this.backwardPathLabel = backwardPathLabel;
-  }
-
-  public boolean isReflexive() {
-    return isReflexive;
-  }
-
-  public void setReflexive(boolean isReflexive) {
-    this.isReflexive = isReflexive;
+  public RelNotification getNotification() {
+    return notification;
   }
 
   public List<RelationshipClassKey> getOriginClassKeys() {
     return originClassKeys;
   }
 
-  public void setOriginClassKeys(List<RelationshipClassKey> originClassKeys) {
-    this.originClassKeys = originClassKeys;
-  }
-
-  public List<RelationshipClassKey> getDestinationClassKeys() {
-    return destinationClassKeys;
-  }
-
-  public void setDestinationClassKeys(
-    List<RelationshipClassKey> destinationClassKeys) {
-    this.destinationClassKeys = destinationClassKeys;
+  public List<String> getOriginClassNames() {
+    return originClassNames;
   }
 
   public List<RelationshipRule> getRelationshipRules() {
     return relationshipRules;
   }
 
-  public void setRelationshipRules(List<RelationshipRule> relationshipRules) {
+  public RelKeyType getReyType() {
+    return reyType;
+  }
+
+  public boolean isAttributed() {
+    return isAttributed;
+  }
+
+  public boolean isComposite() {
+    return isComposite;
+  }
+
+  public boolean isReflexive() {
+    return isReflexive;
+  }
+
+  public void setAttributed(final boolean isAttributed) {
+    this.isAttributed = isAttributed;
+  }
+
+  public void setBackwardPathLabel(final String backwardPathLabel) {
+    this.backwardPathLabel = backwardPathLabel;
+  }
+
+  public void setCardinality(final RelCardinality cardinality) {
+    this.cardinality = cardinality;
+  }
+
+  public void setClassKey(final RelClassKey classKey) {
+    this.classKey = classKey;
+  }
+
+  public void setComposite(final boolean isComposite) {
+    this.isComposite = isComposite;
+  }
+
+  public void setDestinationClassKeys(
+    final List<RelationshipClassKey> destinationClassKeys) {
+    this.destinationClassKeys = destinationClassKeys;
+  }
+
+  public void setDestinationClassNames(final List<String> destinationClassNames) {
+    this.destinationClassNames = destinationClassNames;
+  }
+
+  public void setForwardPathLabel(final String forwardPathLabel) {
+    this.forwardPathLabel = forwardPathLabel;
+  }
+
+  public void setNotification(final RelNotification notification) {
+    this.notification = notification;
+  }
+
+  public void setOriginClassKeys(
+    final List<RelationshipClassKey> originClassKeys) {
+    this.originClassKeys = originClassKeys;
+  }
+
+  public void setOriginClassNames(final List<String> originClassNames) {
+    this.originClassNames = originClassNames;
+  }
+
+  public void setReflexive(final boolean isReflexive) {
+    this.isReflexive = isReflexive;
+  }
+
+  public void setRelationshipRules(
+    final List<RelationshipRule> relationshipRules) {
     this.relationshipRules = relationshipRules;
+  }
+
+  public void setReyType(final RelKeyType reyType) {
+    this.reyType = reyType;
   }
 
 }

@@ -8,7 +8,7 @@ import com.revolsys.gis.esri.gdb.xml.model.enums.WorkspaceType;
 public class WorkspaceDefinition implements Cloneable {
   private WorkspaceType workspaceType = WorkspaceType.esriLocalDatabaseWorkspace;
 
-  private String version="";
+  private String version = "";
 
   private List<Domain> domains = new ArrayList<Domain>();
 
@@ -18,6 +18,10 @@ public class WorkspaceDefinition implements Cloneable {
 
   public void addDatasetDefinition(final DataElement datasetDefinition) {
     this.datasetDefinitions.add(datasetDefinition);
+  }
+
+  public void addDomain(final Domain domain) {
+    domains.add(domain);
   }
 
   @Override
@@ -76,10 +80,6 @@ public class WorkspaceDefinition implements Cloneable {
 
   public void setWorkspaceType(final WorkspaceType workspaceType) {
     this.workspaceType = workspaceType;
-  }
-
-  public void addDomain(Domain domain) {
-    domains.add(domain);
   }
 
 }

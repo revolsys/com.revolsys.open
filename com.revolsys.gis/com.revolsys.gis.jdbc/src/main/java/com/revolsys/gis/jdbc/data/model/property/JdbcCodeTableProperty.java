@@ -21,7 +21,7 @@ import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.jdbc.JdbcUtils;
 
-public class JdbcCodeTableProperty extends CodeTableProperty<Number> {
+public class JdbcCodeTableProperty extends CodeTableProperty {
   private static final Logger LOG = Logger.getLogger(JdbcCodeTableProperty.class);
 
   private Map<String, String> auditColumns = Collections.emptyMap();
@@ -42,13 +42,13 @@ public class JdbcCodeTableProperty extends CodeTableProperty<Number> {
     return this;
   }
 
-  protected synchronized Number createId(final List<Object> values) {
+  protected synchronized Object createId(final List<Object> values) {
     try {
       init();
       final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
         JdbcUtils.lockTable(connection, tableName);
-        Number id = loadId(values, false);
+        Object id = loadId(values, false);
         if (id == null) {
           final PreparedStatement statement = connection.prepareStatement(insertSql);
           try {

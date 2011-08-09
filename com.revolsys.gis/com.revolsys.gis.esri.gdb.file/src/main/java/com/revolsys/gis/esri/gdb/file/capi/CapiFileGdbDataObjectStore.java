@@ -287,7 +287,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
     }
     for (final Field field : deTable.getFields()) {
       final String fieldName = field.getName();
-      final CodeTable<?> codeTable = getCodeTableByColumn(fieldName);
+      final CodeTable codeTable = getCodeTableByColumn(fieldName);
       if (codeTable instanceof FileGdbDomainCodeTable) {
         final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
         field.setDomain(domainCodeTable.getDomain());

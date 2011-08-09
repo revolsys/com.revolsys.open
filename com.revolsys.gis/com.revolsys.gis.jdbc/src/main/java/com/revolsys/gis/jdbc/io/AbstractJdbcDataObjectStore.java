@@ -5,13 +5,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -33,6 +33,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
@@ -69,6 +70,10 @@ public abstract class AbstractJdbcDataObjectStore extends
   private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
   private final List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
+
+  private final Map<String, String> schemaNameMap = new HashMap<String, String>();
+
+  private final Map<QName, String> tableNameMap = new HashMap<QName, String>();
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -112,6 +117,16 @@ public abstract class AbstractJdbcDataObjectStore extends
     if (writer != null) {
       setSharedAttribute("writer", null);
       writer.close();
+    }
+  }
+
+  public Object createPrimaryIdValue(final QName typeName) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(metaData);
+    if (globalIdProperty != null) {
+      return UUID.randomUUID().toString();
+    } else {
+      return getNextPrimaryKey(metaData);
     }
   }
 
@@ -162,6 +177,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     writer.setHints(hints);
     writer.setLabel(label);
     writer.setFlushBetweenTypes(flushBetweenTypes);
+    writer.setQuoteColumnNames(false);
     return writer;
   }
 
@@ -204,6 +220,14 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public Connection getConnection() {
     return connection;
+  }
+
+  public String getDatabaseSchemaName(final String schemaName) {
+    return schemaNameMap.get(schemaName);
+  }
+
+  public String getDatabaseTableName(final QName typeName) {
+    return tableNameMap.get(typeName);
   }
 
   public DataSource getDataSource() {
@@ -422,6 +446,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectStoreSchema schema,
     final Map<QName, DataObjectMetaData> metaDataMap) {
     final String schemaName = schema.getName();
+    final String dbSchemaName = getDatabaseSchemaName(schemaName);
     for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
       attributeAdder.initialize(schema);
     }
@@ -429,25 +454,28 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-      final ResultSet tablesRs = databaseMetaData.getTables(null, schemaName,
+      final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
         "%", null);
       final Map<QName, String> idColumnNames = new HashMap<QName, String>();
       try {
         while (tablesRs.next()) {
-          final String tableName = tablesRs.getString("TABLE_NAME");
+          final String dbTableName = tablesRs.getString("TABLE_NAME");
+          final String tableName = dbTableName.toUpperCase();
           final String tableType = tablesRs.getString("TABLE_TYPE");
           boolean excluded = !tableTypes.contains(tableType);
           for (final String pattern : excludeTablePatterns) {
-            if (tableName.matches(pattern)) {
+            if (dbTableName.matches(pattern) || tableName.matches(pattern)) {
               excluded = true;
             }
           }
           if (!excluded) {
             final QName typeName = new QName(schemaName, tableName);
+            tableNameMap.put(typeName, dbTableName);
             final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
               this, schema, typeName);
             metaDataMap.put(typeName, metaData);
-            final String idColumnName = loadIdColumnName(schemaName, tableName);
+            final String idColumnName = loadIdColumnName(dbSchemaName,
+              dbTableName);
             idColumnNames.put(typeName, idColumnName);
 
           }
@@ -456,22 +484,24 @@ public abstract class AbstractJdbcDataObjectStore extends
         JdbcUtils.close(tablesRs);
       }
 
-      final ResultSet columnsRs = databaseMetaData.getColumns(null, schemaName,
-        "%", "%");
+      final ResultSet columnsRs = databaseMetaData.getColumns(null,
+        dbSchemaName, "%", "%");
       try {
         while (columnsRs.next()) {
-          final String tableName = columnsRs.getString("TABLE_NAME");
+          final String tableName = columnsRs.getString("TABLE_NAME")
+            .toUpperCase();
           final QName typeName = new QName(schemaName, tableName);
           final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)metaDataMap.get(typeName);
           if (metaData != null) {
-            final String name = columnsRs.getString("COLUMN_NAME");
+            final String name = columnsRs.getString("COLUMN_NAME")
+              .toUpperCase();
             final int sqlType = columnsRs.getInt("DATA_TYPE");
             final String dataType = columnsRs.getString("TYPE_NAME");
             final int length = columnsRs.getInt("COLUMN_SIZE");
             final int scale = columnsRs.getInt("DECIMAL_DIGITS");
             final boolean required = !columnsRs.getString("IS_NULLABLE")
               .equals("YES");
-            if (name.equals(idColumnNames.get(typeName))) {
+            if (name.equalsIgnoreCase(idColumnNames.get(typeName))) {
               metaData.setIdAttributeIndex(metaData.getAttributeCount());
             }
             addAttribute(metaData, name, dataType, sqlType, length, scale,
@@ -507,7 +537,9 @@ public abstract class AbstractJdbcDataObjectStore extends
 
         try {
           while (schemaRs.next()) {
-            final String schemaName = schemaRs.getString("TABLE_SCHEM");
+            final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
+            final String schemaName = dbSchemaName.toUpperCase();
+            schemaNameMap.put(schemaName, dbSchemaName);
             final DataObjectStoreSchema schema = new DataObjectStoreSchema(
               this, schemaName);
             schemaMap.put(schemaName, schema);
@@ -520,38 +552,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to get list of namespaces", e);
-    }
-  }
-
-  protected List<QName> loadTypeNames(final String namespace) {
-    try {
-      final Connection connection = getDbConnection();
-      try {
-        final DatabaseMetaData databaseMetaData = connection.getMetaData();
-        final ResultSet tablesRs = databaseMetaData.getTables(null, namespace,
-          "%", null);
-        final List<QName> typeNames = new ArrayList<QName>();
-        while (tablesRs.next()) {
-          final String tableName = tablesRs.getString("TABLE_NAME");
-          boolean excluded = false;
-          for (final String pattern : excludeTablePatterns) {
-            if (tableName.matches(pattern)) {
-              excluded = true;
-            }
-          }
-          if (!excluded) {
-            final QName typeName = new QName(namespace, tableName);
-            typeNames.add(typeName);
-          }
-        }
-        return typeNames;
-
-      } finally {
-        releaseConnection(connection);
-      }
-    } catch (final SQLException e) {
-      throw new RuntimeException(
-        "Unable to get list of type names for schema: " + namespace, e);
     }
   }
 

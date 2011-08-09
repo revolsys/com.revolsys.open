@@ -9,32 +9,44 @@ import com.revolsys.xml.io.XmlWriter;
 public abstract class AbstractEsriGeodatabaseXmlFieldType implements
   EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
 
-  private FieldType esriFieldType;
+  private final FieldType esriFieldType;
 
-  private String xmlSchemaTypeName;
+  private final String xmlSchemaTypeName;
 
-  private DataType dataType;
+  private final DataType dataType;
 
-  public boolean isUsePrecision() {
-    return false;
+  public AbstractEsriGeodatabaseXmlFieldType(final DataType dataType,
+    final String xmlSchemaTypeName, final FieldType esriFieldType) {
+    this.dataType = dataType;
+    this.xmlSchemaTypeName = xmlSchemaTypeName;
+    this.esriFieldType = esriFieldType;
+  }
+
+  public DataType getDataType() {
+    return dataType;
+  }
+
+  public FieldType getEsriFieldType() {
+    return esriFieldType;
   }
 
   public int getFixedLength() {
     return -1;
   }
 
-  public AbstractEsriGeodatabaseXmlFieldType(
-    DataType dataType,
-    String xmlSchemaTypeName,
-    FieldType esriFieldType) {
-    this.dataType = dataType;
-    this.xmlSchemaTypeName = xmlSchemaTypeName;
-    this.esriFieldType = esriFieldType;
+  protected String getType(final Object value) {
+    return xmlSchemaTypeName;
   }
 
-  public void writeValue(
-    XmlWriter out,
-    Object value) {
+  public String getXmlSchemaTypeName() {
+    return xmlSchemaTypeName;
+  }
+
+  public boolean isUsePrecision() {
+    return false;
+  }
+
+  public void writeValue(final XmlWriter out, final Object value) {
     out.startTag(EsriGeodatabaseXmlConstants.VALUE);
     if (value == null) {
       out.attribute(XsiConstants.NIL, true);
@@ -45,25 +57,6 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
     out.endTag(EsriGeodatabaseXmlConstants.VALUE);
   }
 
-  protected String getType(
-    Object value) {
-    return xmlSchemaTypeName;
-  }
-
-  protected abstract void writeValueText(
-    XmlWriter out,
-    Object value);
-
-  public FieldType getEsriFieldType() {
-    return esriFieldType;
-  }
-
-  public String getXmlSchemaTypeName() {
-    return xmlSchemaTypeName;
-  }
-
-  public DataType getDataType() {
-    return dataType;
-  }
+  protected abstract void writeValueText(XmlWriter out, Object value);
 
 }

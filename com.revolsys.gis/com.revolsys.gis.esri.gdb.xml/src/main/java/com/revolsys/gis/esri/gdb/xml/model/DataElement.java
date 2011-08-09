@@ -26,26 +26,13 @@ public class DataElement implements Cloneable {
       final DataElement clone = (DataElement)super.clone();
       if (children != null) {
         clone.children = new ArrayList<DataElement>();
-        for (DataElement child : children) {
+        for (final DataElement child : children) {
           clone.children.add(child.clone());
         }
       }
       return clone;
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
-    }
-  }
-  public String getParentCatalogPath() {
-    String path = getCatalogPath();
-    if (path == null) {
-      return null;
-    } else {
-      int index = path.lastIndexOf('\\');
-      if (index == -1 || index == 0) {
-        return "\\";
-      } else {
-        return path.substring(0, index);
-      }
     }
   }
 
@@ -57,12 +44,38 @@ public class DataElement implements Cloneable {
     return children;
   }
 
+  public Boolean getChildrenExpanded() {
+    return childrenExpanded;
+  }
+
+  public Boolean getFullPropsRetrieved() {
+    return fullPropsRetrieved;
+  }
+
   public String getMetadata() {
     return metadata;
   }
 
+  public Boolean getMetadataRetrieved() {
+    return metadataRetrieved;
+  }
+
   public String getName() {
     return name;
+  }
+
+  public String getParentCatalogPath() {
+    final String path = getCatalogPath();
+    if (path == null) {
+      return null;
+    } else {
+      final int index = path.lastIndexOf('\\');
+      if (index == -1 || index == 0) {
+        return "\\";
+      } else {
+        return path.substring(0, index);
+      }
+    }
   }
 
   public QName getTypeName() {
@@ -76,18 +89,6 @@ public class DataElement implements Cloneable {
       final String localPart = catalogPath.substring(slashIndex + 1);
       return new QName(namespaceUri, localPart);
     }
-  }
-
-  public Boolean getChildrenExpanded() {
-    return childrenExpanded;
-  }
-
-  public Boolean getFullPropsRetrieved() {
-    return fullPropsRetrieved;
-  }
-
-  public Boolean getMetadataRetrieved() {
-    return metadataRetrieved;
   }
 
   public void setCatalogPath(final String catalogPath) {

@@ -9,15 +9,15 @@ public class PropertySetProperty {
     return key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
-
   public Object getValue() {
     return value;
   }
 
-  public void setValue(Object value) {
+  public void setKey(final String key) {
+    this.key = key;
+  }
+
+  public void setValue(final Object value) {
     this.value = value;
   }
 
