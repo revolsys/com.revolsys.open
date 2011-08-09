@@ -21,6 +21,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +33,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.xml.XmlConstants;
 import com.revolsys.xml.XsiConstants;
 
 /**
@@ -103,6 +104,9 @@ public class XmlWriter extends Writer {
     }
   }
 
+  private static final NumberFormat FORMAT = new DecimalFormat(
+    "#.#########################");
+
   /** True if an XML declaration can be written. */
   private boolean canWriteXmlDeclaration = true;
 
@@ -148,7 +152,7 @@ public class XmlWriter extends Writer {
   private boolean xmlDeclarationWritten = false;
 
   private int prefixNum;
-  
+
   /**
    * Construct a new XmlWriter.
    * 
@@ -347,10 +351,6 @@ public class XmlWriter extends Writer {
     out.write(text);
     out.write("]]>");
     setElementHasContent();
-  }
-
-  public void setElementHasContent() {
-    elementHasContent = true;
   }
 
   /**
@@ -767,6 +767,10 @@ public class XmlWriter extends Writer {
     elementStack.addFirst(new TagConfiguration(element));
   }
 
+  public void setElementHasContent() {
+    elementHasContent = true;
+  }
+
   /**
    * Set the flag indicating that the xml elements should be indented.
    * 
@@ -937,9 +941,9 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final char[] buffer, final int offset, final int length) {
-      closeStartTag();
-      writeElementContent(buffer, offset, length);
-      setElementHasContent();
+    closeStartTag();
+    writeElementContent(buffer, offset, length);
+    setElementHasContent();
   }
 
   /**
@@ -950,7 +954,8 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final double value) {
-    text(String.valueOf(value));
+    final String text = FORMAT.format(value);
+    text(text);
   }
 
   /**
@@ -961,7 +966,8 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final float value) {
-    text(String.valueOf(value));
+    final String text = FORMAT.format(value);
+    text(text);
   }
 
   /**
@@ -995,7 +1001,13 @@ public class XmlWriter extends Writer {
    */
   public void text(final Object value) {
     if (value != null) {
-      text(value.toString());
+      if (value instanceof Number) {
+        final Number number = (Number)value;
+        final String text = FORMAT.format(number);
+        text(text);
+      } else {
+        text(value.toString());
+      }
     }
   }
 
@@ -1006,7 +1018,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text
    */
   public void text(final String text) {
-    if (text != null ) {
+    if (text != null) {
       text(text.toCharArray(), 0, text.length());
     }
   }
