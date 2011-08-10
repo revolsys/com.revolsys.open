@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import org.postgresql.geometric.PGbox;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -118,15 +119,23 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
     addAttributeAdder("geometry", geometryAttributeAdder);
   }
 
-  public JdbcQuery createQuery(final QName typeName,
+  public JdbcQuery createQuery(final QName typeName, String whereClause,
     final BoundingBox boundingBox) {
     final double x1 = boundingBox.getMinX();
     final double y1 = boundingBox.getMinY();
     final double x2 = boundingBox.getMaxX();
     final double y2 = boundingBox.getMaxY();
-    final String sql = "SELECT * FROM " + typeName.getNamespaceURI() + "."
-      + typeName.getLocalPart() + " WHERE GEOMETRY && ?";
-    JdbcQuery query = new JdbcQuery(typeName, sql, new PGbox(x1, y1, x2, y2));
+    final StringBuffer sql = new StringBuffer();
+    DataObjectMetaData metaData = getMetaData(typeName);
+    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
+    sql.append( "WHERE ");
+    if (StringUtils.hasText(whereClause)) {
+      sql.append(whereClause);
+      sql.append(" AND ");
+    }
+    sql.append("GEOMETRY && ?");
+    JdbcQuery query = new JdbcQuery(metaData, sql.toString(), new PGbox(x1, y1,
+      x2, y2));
     return query;
   }
 

@@ -16,7 +16,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public interface JdbcDataObjectStore extends DataObjectStore {
 
-  JdbcQuery createQuery(final QName typeName, final BoundingBox boundingBox);
+  JdbcQuery createQuery(final QName typeName, String whereClause, final BoundingBox boundingBox);
 
   JdbcQueryReader createReader();
 

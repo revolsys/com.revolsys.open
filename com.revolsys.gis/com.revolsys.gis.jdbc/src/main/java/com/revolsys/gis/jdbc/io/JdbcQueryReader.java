@@ -8,12 +8,13 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractReader;
-import com.vividsolutions.jts.geom.Envelope;
 
 public class JdbcQueryReader extends AbstractReader<DataObject> implements
   DataObjectReader {
@@ -40,6 +41,8 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   private BoundingBox boundingBox;
 
   private List<QName> typeNames;
+
+  private String whereClause;
 
   public JdbcQueryReader() {
   }
@@ -90,19 +93,31 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
       for (final QName tableName : typeNames) {
         final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
         if (metaData != null) {
-          final StringBuffer sql = new StringBuffer();
-          JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
           final JdbcQuery query;
           if (boundingBox == null) {
+            final StringBuffer sql = new StringBuffer();
+            JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
+            if (StringUtils.hasText(whereClause)) {
+              sql.append(" WHERE ");
+              sql.append(whereClause);
+            }
             query = new JdbcQuery(metaData, sql.toString());
           } else {
             QName typeName = metaData.getName();
-            query = dataStore.createQuery(typeName, boundingBox);
+            query = dataStore.createQuery(typeName, null, boundingBox);
           }
           addQuery(query);
         }
       }
     }
+  }
+
+  public String getWhereClause() {
+    return whereClause;
+  }
+
+  public void setWhereClause(String whereClause) {
+    this.whereClause = whereClause;
   }
 
   public boolean isAutoCommit() {

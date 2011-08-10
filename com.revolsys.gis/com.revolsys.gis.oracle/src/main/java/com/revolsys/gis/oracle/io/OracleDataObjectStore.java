@@ -7,6 +7,8 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -21,11 +23,9 @@ import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.gis.jdbc.io.JdbcQuery;
-import com.revolsys.gis.jdbc.io.JdbcQueryReader;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
-import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
@@ -129,7 +129,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  public JdbcQuery createQuery(final QName typeName,
+  public JdbcQuery createQuery(final QName typeName, String whereClause,
     final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
@@ -146,13 +146,15 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     final StringBuffer sql = new StringBuffer();
     JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
     sql.append(" WHERE ");
-    sql.append(" SDO_RELATE("
-      + geometryColumnName
-      + ","
-      +
-
-      "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))"
-      + ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
+    if (StringUtils.hasText(whereClause)) {
+      sql.append(whereClause);
+      sql.append(" AND ");
+    }
+    sql.append(" SDO_RELATE(");
+    sql.append(geometryColumnName);
+    sql.append(",");
+    sql.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
+    sql.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
     JdbcQuery query = new JdbcQuery(metaData, sql.toString(),
       geometryFactory.getSRID(), x1, y1, x2, y2);
     return query;

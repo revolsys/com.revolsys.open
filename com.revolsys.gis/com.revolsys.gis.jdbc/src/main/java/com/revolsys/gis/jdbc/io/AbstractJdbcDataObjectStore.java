@@ -131,7 +131,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public JdbcQuery createQuery(final QName typeName,
-    final BoundingBox boundingBox) {
+    String whereClause, final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
@@ -570,7 +570,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public JdbcQueryReader query(final QName typeName,
     final BoundingBox boundingBox) {
-    final JdbcQuery query = createQuery(typeName, boundingBox);
+    final JdbcQuery query = createQuery(typeName, null, boundingBox);
     final JdbcQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
