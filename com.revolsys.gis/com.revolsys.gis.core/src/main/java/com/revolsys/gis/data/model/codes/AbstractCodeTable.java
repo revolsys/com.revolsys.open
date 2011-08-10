@@ -26,6 +26,9 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
 
   private String name;
 
+  private static final NumberFormat FORMAT = new DecimalFormat(
+    "#.#########################");
+
   public AbstractCodeTable() {
   }
 
@@ -33,7 +36,8 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(final Object id, final List<Object> values) {
+  protected synchronized void addValue(final Object id,
+    final List<Object> values) {
     if (id instanceof Number) {
       final Number number = (Number)id;
       final long longValue = number.longValue();
@@ -82,24 +86,13 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return Collections.unmodifiableMap(idValueCache);
   }
 
-  public <T> T getId(final Map<String, ? extends Object> valueMap) {
-    final List<String> valueAttributeNames = getValueAttributeNames();
-    final Object[] values = new Object[valueAttributeNames.size()];
-    for (int i = 0; i < values.length; i++) {
-      final String name = valueAttributeNames.get(i);
-      final Object value = valueMap.get(name);
-      values[i] = value;
-    }
-    return (T)getId(values);
-  }
-
+  @SuppressWarnings("unchecked")
   public <T> T getId(final List<Object> values) {
     return (T)getId(values, true);
   }
-  private static final NumberFormat FORMAT = new DecimalFormat(
-      "#.#########################");
 
-  public <T> T getId(final List<Object> values, boolean loadValues) {
+  @SuppressWarnings("unchecked")
+  public <T> T getId(final List<Object> values, final boolean loadValues) {
     if (values.size() == 1) {
       final Object id = values.get(0);
       if (id == null) {
@@ -127,30 +120,29 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return (T)id;
   }
 
-  public <T> T getId(final Object... values) {
-    final List<Object> valueList = Arrays.asList(values);
-    return getId(valueList);
+  @SuppressWarnings("unchecked")
+  public <T> T getId(final Map<String, ? extends Object> valueMap) {
+    final List<String> valueAttributeNames = getValueAttributeNames();
+    final Object[] values = new Object[valueAttributeNames.size()];
+    for (int i = 0; i < values.length; i++) {
+      final String name = valueAttributeNames.get(i);
+      final Object value = valueMap.get(name);
+      values[i] = value;
+    }
+    return (T)getId(values);
   }
 
-  List<Object> getNormalizedValues(final List<Object> values) {
-    List<Object> normalizedValues = new ArrayList<Object>();
-    for (Object value : values) {
-      if (value == null) {
-        normalizedValues.add(null);
-      } else if (value instanceof Number) {
-        Number number = (Number)value;
-        normalizedValues.add(FORMAT.format(number));
-      } else {
-        normalizedValues.add(value.toString().toLowerCase());
-      }
-    }
-    return normalizedValues;
+  @SuppressWarnings("unchecked")
+  public <T> T getId(final Object... values) {
+    final List<Object> valueList = Arrays.asList(values);
+    return (T)getId(valueList);
   }
+
   protected Object getIdByValue(final List<Object> valueList) {
     processValues(valueList);
-     Object id = valueIdCache.get(valueList);
+    Object id = valueIdCache.get(valueList);
     if (id == null) {
-      List<Object> normalizedValues = getNormalizedValues(valueList);
+      final List<Object> normalizedValues = getNormalizedValues(valueList);
       id = valueIdCache.get(normalizedValues);
     }
     return id;
@@ -177,6 +169,21 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
 
   protected synchronized long getNextId() {
     return ++maxId;
+  }
+
+  List<Object> getNormalizedValues(final List<Object> values) {
+    final List<Object> normalizedValues = new ArrayList<Object>();
+    for (final Object value : values) {
+      if (value == null) {
+        normalizedValues.add(null);
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        normalizedValues.add(FORMAT.format(number));
+      } else {
+        normalizedValues.add(value.toString().toLowerCase());
+      }
+    }
+    return normalizedValues;
   }
 
   @SuppressWarnings("unchecked")
