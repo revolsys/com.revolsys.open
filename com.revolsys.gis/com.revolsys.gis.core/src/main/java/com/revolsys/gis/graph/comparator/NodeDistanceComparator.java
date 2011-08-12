@@ -10,28 +10,28 @@ import com.revolsys.gis.model.coordinates.Coordinates;
  * 
  * @author paustin
  */
-public class NodeDistanceComparator implements Comparator<Node<?>> {
+public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
 
   private final boolean invert;
 
-  private final Node<?> node;
+  private final Node<T> node;
 
   public NodeDistanceComparator(
-    final Node<?> node) {
+    final Node<T> node) {
     this.node = node;
     this.invert = false;
   }
 
   public NodeDistanceComparator(
-    final Node<?> node,
+    final Node<T> node,
     final boolean invert) {
     this.node = node;
     this.invert = invert;
   }
 
   public int compare(
-    final Node<?> node1,
-    final Node<?> node2) {
+    final Node<T> node1,
+    final Node<T> node2) {
     int compare;
     final double distance1 = node1.distance(node);
     final double distance2 = node2.distance(node);

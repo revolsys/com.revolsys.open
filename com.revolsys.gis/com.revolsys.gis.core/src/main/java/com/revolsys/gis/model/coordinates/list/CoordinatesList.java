@@ -10,38 +10,27 @@ public interface CoordinatesList extends CoordinateSequence,
   void copy(int sourceIndex, CoordinatesList target, int targetIndex,
     int numAxis, int count);
 
-  double[] getCoordinates();
+  double distance(int index, CoordinatesList other, int otherIndex);
 
-  byte getNumAxis();
-
-  double getValue(int index, int axisIndex);
-
-  void makePrecise(CoordinatesPrecisionModel precisionModel);
-
-  boolean equals(CoordinatesList coordinatesList);
-
-  CoordinatesList reverse();
-
-  void setCoordinate(int i, Coordinate coordinate);
-
-  boolean startsWith(CoordinatesList coordinatesList, int numAxis);
-
-  void setPoint(int i, Coordinates point);
-
-  void setValue(int index, int axisIndex, double value);
-
-  CoordinatesList subList(int index, int count);
-
-  CoordinatesList subList(int length, int index, int count);
-
-  CoordinatesList subList(int length, int sourceIndex, int targetIndex,
-    int count);
+  boolean equal2d(int index, Coordinates point);
 
   boolean equal(int index, CoordinatesList other, int otherIndex);
 
   boolean equal(int index, CoordinatesList other, int otherIndex, int numAxis);
 
-  double distance(int index, CoordinatesList other, int otherIndex);
+  boolean equals(CoordinatesList coordinatesList);
+
+  Coordinates get(int i);
+
+  double[] getCoordinates();
+  
+  double getM(int index);
+
+  byte getNumAxis();
+
+  long getTime(int index);
+
+  double getValue(int index, int axisIndex);
 
   double getX(int index);
 
@@ -49,9 +38,19 @@ public interface CoordinatesList extends CoordinateSequence,
 
   double getZ(int index);
 
-  double getM(int index);
+  void makePrecise(CoordinatesPrecisionModel precisionModel);
 
-  long getTime(int index);
+  CoordinatesList reverse();
+
+  void setCoordinate(int i, Coordinate coordinate);
+
+  void setM(int index, double m);
+
+  void setPoint(int i, Coordinates point);
+
+  void setTime(int index, long time);
+
+  void setValue(int index, int axisIndex, double value);
 
   void setX(int index, double x);
 
@@ -59,11 +58,14 @@ public interface CoordinatesList extends CoordinateSequence,
 
   void setZ(int index, double z);
 
-  void setTime(int index, long time);
-
-  void setM(int index, double m);
-
-  Coordinates get(int i);
-
   int size();
+
+  boolean startsWith(CoordinatesList coordinatesList, int numAxis);
+
+  CoordinatesList subList(int index, int count);
+
+  CoordinatesList subList(int length, int index, int count);
+
+  CoordinatesList subList(int length, int sourceIndex, int targetIndex,
+    int count);
 }

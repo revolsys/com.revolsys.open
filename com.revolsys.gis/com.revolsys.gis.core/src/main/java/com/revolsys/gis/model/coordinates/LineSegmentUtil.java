@@ -16,21 +16,19 @@ public class LineSegmentUtil {
    * 
    * @return The angle in radians.
    */
-  public static double orientedAngleBetween2d(
-    Coordinates start,
-    Coordinates line1End,
-    Coordinates line2End) {
+  public static double orientedAngleBetween2d(Coordinates start,
+    Coordinates line1End, Coordinates line2End) {
     double angle1 = start.angle2d(line1End);
     double angle2 = start.angle2d(line2End);
     return MathUtil.orientedAngleBetween(angle1, angle2);
   }
 
-  public static double getElevation(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
-    final double fraction = point.distance(lineStart) / lineStart.distance(lineEnd);
-    final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ()) * (fraction);
+  public static double getElevation(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
+    final double fraction = point.distance(lineStart)
+      / lineStart.distance(lineEnd);
+    final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ())
+      * (fraction);
     return z;
   }
 
@@ -44,10 +42,8 @@ public class LineSegmentUtil {
    * @param point The coordinates of the point location.
    * @return The distance.
    */
-  public static double distance(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static double distance(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double x2 = lineEnd.getX();
@@ -69,13 +65,8 @@ public class LineSegmentUtil {
    * @param y The y coordinate of the point.
    * @return The distance.
    */
-  public static double distance(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
+  public static double distance(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y) {
     if (x1 == x2 && y1 == y2) {
       return MathUtil.distance(x, y, x1, y1);
     } else {
@@ -111,10 +102,8 @@ public class LineSegmentUtil {
    * @param point The point.
    * @return True if the point intersects the line's envelope.
    */
-  public static boolean envelopeIntersects(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static boolean envelopeIntersects(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
 
@@ -139,13 +128,8 @@ public class LineSegmentUtil {
    * @param y The y coordinate of the point.
    * @return True if the point intersects the line's envelope.
    */
-  public static boolean envelopeIntersects(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
+  public static boolean envelopeIntersects(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y) {
     final double minX = Math.min(x1, x2);
     if (x >= minX) {
       final double maxX = Math.max(x1, x2);
@@ -172,10 +156,8 @@ public class LineSegmentUtil {
    * @param line2End The point at the end of the second line.
    * @return True if the envelope of line intersects the envelope of line 2.
    */
-  public static boolean envelopeIntersects(
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
+  public static boolean envelopeIntersects(final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
     final Coordinates line2End) {
     final double line1X1 = line1Start.getX();
     final double line1X2 = line1End.getX();
@@ -225,10 +207,8 @@ public class LineSegmentUtil {
    */
   public static List<Coordinates> intersection(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
-    final Coordinates line2End) {
+    final Coordinates line1Start, final Coordinates line1End,
+    final Coordinates line2Start, final Coordinates line2End) {
     if (envelopeIntersects(line1Start, line1End, line2Start, line2End)) {
       final PointLineProjection line1StartProjection = getPointLineProjection(
         precisionModel, line2Start, line2End, line1Start);
@@ -311,11 +291,8 @@ public class LineSegmentUtil {
     return Collections.emptyList();
   }
 
-  public static Coordinates intersection(
-    Coordinates line1Start,
-    Coordinates line1End,
-    Coordinates line2Start,
-    Coordinates line2End) {
+  public static Coordinates intersection(Coordinates line1Start,
+    Coordinates line1End, Coordinates line2Start, Coordinates line2End) {
     final double line1x1 = line1Start.getX();
     final double line1y1 = line1Start.getY();
     final double line1y2 = line1End.getY();
@@ -330,14 +307,9 @@ public class LineSegmentUtil {
       line2x2, line2y2);
   }
 
-  public static Coordinates intersection(
-    final double line1x1,
-    final double line1y1,
-    final double line1x2,
-    final double line1y2,
-    final double line2x1,
-    final double line2y1,
-    final double line2x2,
+  public static Coordinates intersection(final double line1x1,
+    final double line1y1, final double line1x2, final double line1y2,
+    final double line2x1, final double line2y1, final double line2x2,
     final double line2y2) {
     double x = det(det(line1x1, line1y1, line1x2, line1y2), line1x1 - line1x2,
       det(line2x1, line2y1, line2x2, line2y2), line2x1 - line2x2)
@@ -350,17 +322,12 @@ public class LineSegmentUtil {
     return new DoubleCoordinates(x, y);
   }
 
-  static double det(
-    double a,
-    double b,
-    double c,
-    double d) {
+  static double det(double a, double b, double c, double d) {
     return a * d - b * c;
   }
 
   private static List<Coordinates> getUniqueCoordinates(
-    final Coordinates point1,
-    final Coordinates point2) {
+    final Coordinates point1, final Coordinates point2) {
     if (point1.equals2d(point2)) {
       return ListUtil.create(point1);
     } else {
@@ -368,10 +335,8 @@ public class LineSegmentUtil {
     }
   }
 
-  public static int orientationIndex(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static int orientationIndex(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double lineDx = lineEnd.getX() - lineStart.getX();
     final double lineDy = lineEnd.getY() - lineStart.getY();
     final double dx2 = point.getX() - lineEnd.getX();
@@ -379,10 +344,8 @@ public class LineSegmentUtil {
     return RobustDeterminant.signOfDet2x2(lineDx, lineDy, dx2, dy2);
   }
 
-  public static Coordinates project(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final double r) {
+  public static Coordinates project(final Coordinates lineStart,
+    final Coordinates lineEnd, final double r) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double z1 = lineStart.getZ();
@@ -404,9 +367,7 @@ public class LineSegmentUtil {
 
   public static Coordinates project(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final double r) {
+    final Coordinates lineStart, final Coordinates lineEnd, final double r) {
     Coordinates point = project(lineStart, lineEnd, r);
     precisionModel.makePrecise(point);
     return point;
@@ -414,15 +375,13 @@ public class LineSegmentUtil {
 
   public static Coordinates midPoint(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd) {
+    final Coordinates lineStart, final Coordinates lineEnd) {
     return project(precisionModel, lineStart, lineEnd, 0.5);
   }
 
   public static Coordinates pointAlong(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     double projectionFactor = projectionFactor(lineStart, lineEnd, point);
     if (projectionFactor < 0.0) {
@@ -436,8 +395,7 @@ public class LineSegmentUtil {
 
   public static Coordinates project(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart) || point.equals2d(lineEnd)) {
       return point.clone();
@@ -457,8 +415,7 @@ public class LineSegmentUtil {
 
   public static boolean isPointOnLineMiddle(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart)) {
       return false;
@@ -491,8 +448,7 @@ public class LineSegmentUtil {
    */
   public static boolean isPointOnLine(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     double projectionFactor = projectionFactor(lineStart, lineEnd, point);
     if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
@@ -506,24 +462,22 @@ public class LineSegmentUtil {
     return false;
   }
 
-  /**
-   * Check to see if the point in relation to the line between lineStart and
-   * lineEnd is between the line end points and is within the maxDistance from
-   * the line.
-   * 
-   * @param precisionModel The precision model.
-   * @param lineStart The point at the start of the line.
-   * @param lineEnd The point at the end of the line.
-   * @param maxDistance The distance the point must be less than from the line.
-   * @param point The point.
-   * @return True if the point is on the line.
-   */
-  public static boolean isPointOnLine(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point,
+  public static boolean isPointOnLine(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y,
     double maxDistance) {
-    double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
+    double distance = distance(x1, y1, x2, y2, x, y);
+    if (distance < maxDistance) {
+      double projectionFactor = projectionFactor(x1, y1, x2, y2, x, y);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean isPointOnLine(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point, double maxDistance) {
+    double distance = distance(lineStart, lineEnd, point);
     if (distance < maxDistance) {
       double projectionFactor = projectionFactor(lineStart, lineEnd, point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
@@ -533,11 +487,8 @@ public class LineSegmentUtil {
     return false;
   }
 
-  public static boolean isPointOnLineMiddle(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point,
-    double maxDistance) {
+  public static boolean isPointOnLineMiddle(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point, double maxDistance) {
     if (point.equals2d(lineStart)) {
       return false;
     } else if (point.equals2d(lineEnd)) {
@@ -556,8 +507,7 @@ public class LineSegmentUtil {
 
   public static PointLineProjection getPointLineProjection(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates pointCoordinates) {
     return new PointLineProjection(precisionModel, lineStart, lineEnd,
       pointCoordinates);
@@ -573,10 +523,8 @@ public class LineSegmentUtil {
    * @param point The point coordinates.
    * @return The projection factor from (-inf -> +inf).
    */
-  public static double projectionFactor(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static double projectionFactor(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
 
@@ -602,13 +550,8 @@ public class LineSegmentUtil {
    * @param y The y coordinate for the point.
    * @return The projection factor from (-inf -> +inf).
    */
-  public static double projectionFactor(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
+  public static double projectionFactor(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     final double length = dx * dx + dy * dy;
@@ -616,10 +559,8 @@ public class LineSegmentUtil {
     return r;
   }
 
-  public double segmentFraction(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    Coordinates point) {
+  public double segmentFraction(final Coordinates lineStart,
+    final Coordinates lineEnd, Coordinates point) {
     double segFrac = projectionFactor(lineStart, lineEnd, point);
     if (segFrac < 0.0) {
       return 0.0;
@@ -630,11 +571,8 @@ public class LineSegmentUtil {
     }
   }
 
-  public static void addElevation(
-    CoordinatesPrecisionModel precisionModel,
-    Coordinates lineStart,
-    Coordinates lineEnd,
-    Coordinates point) {
+  public static void addElevation(CoordinatesPrecisionModel precisionModel,
+    Coordinates lineStart, Coordinates lineEnd, Coordinates point) {
     double z = getElevation(lineStart, lineEnd, point);
     point.setZ(z);
     precisionModel.makePrecise(point);

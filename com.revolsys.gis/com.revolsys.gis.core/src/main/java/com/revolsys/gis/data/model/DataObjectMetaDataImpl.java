@@ -156,7 +156,13 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void addAttribute(final Attribute attribute) {
     final int index = attributeNames.size();
     final String name = attribute.getName();
-    String lowerName = name.toLowerCase();
+    String lowerName;
+    if (name == null) {
+      lowerName =null;
+    } else {
+      lowerName = name.toLowerCase();
+
+    }
     attributeNames.add(name);
     attributes.add(attribute);
     attributeMap.put(lowerName, attribute);

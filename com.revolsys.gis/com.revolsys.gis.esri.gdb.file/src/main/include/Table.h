@@ -62,12 +62,12 @@ public:
   /// Gets the table's definition as an XML document.
   /// @param[out]   tableDef An XML document than defines the table's schema.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDefinition(std::string& tableDef);
+  fgdbError GetDefinition(std::string& tableDef) const;
 
   /// Gets the table's metadata as XML.
   /// @param[out]   documentation The table's metadata as XML.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDocumentation(std::string& documentation);
+  fgdbError GetDocumentation(std::string& documentation) const;
 
   /// Assigns metadata to the table.
   /// @param[in]    documentation An XML document that will be the table's metadata.
@@ -77,7 +77,7 @@ public:
   /// Return information about the fields in the row.
   /// @param[out]   fieldInfo The field information.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldInformation(FieldInfo& fieldInfo);
+  fgdbError GetFieldInformation(FieldInfo& fieldInfo) const;
 
   /// Adds a field to the table.
   /// If the XML is not UTF-8 encoded, create will fail with an error code of -2147024809 (Invalid function arguments).<br/>
@@ -108,7 +108,7 @@ public:
   /// Returns an XML definition of the table's index collection.
   /// @param[out]   indexDefs An XML document containing a collection of index definitions.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetIndexes(std::vector<std::string>& indexDefs);
+  fgdbError GetIndexes(std::vector<std::string>& indexDefs) const;
 
   /// Adds an index to the table.
   /// If the XML is not UTF-8 encoded, create will fail with an error code of -2147024809 (Invalid function arguments).<br/>
@@ -152,7 +152,7 @@ public:
   /// Returns the default subtype code.
   /// @param[out]   defaultCode The table's default subtype code.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDefaultSubtypeCode(int& defaultCode);
+  fgdbError GetDefaultSubtypeCode(int& defaultCode) const;
 
   /// Sets the default subtype code.
   /// @param[out]   defaultCode The code to assign as the default subtype code.
@@ -174,7 +174,7 @@ public:
   /// @param[in]    recycling Indicates whether row memory should be recycled.
   /// @param[out]   rows The results of the query.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError Search(const std::wstring& subfields, const std::wstring& whereClause, Envelope envelope, bool recycling, EnumRows& rows);
+  fgdbError Search(const std::wstring& subfields, const std::wstring& whereClause, const Envelope& envelope, bool recycling, EnumRows& rows);
 
   /// Performs an attribute query on the table.
   /// @param[in]    subfields (Optional) The fields that should be fetched by the query's returned rows. Must
@@ -213,13 +213,13 @@ public:
   /// Returns the number of rows in the table.
   /// @param[out]   rowCount The number of rows in the table.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetRowCount(int& rowCount);
+  fgdbError GetRowCount(int& rowCount) const;
 
   /// Returns the extent of the feature class.
   /// If the table is not a feature class an error of 1 will be returned.
   /// @param[out]   extent The extent of the feature class.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetExtent(Envelope& extent);
+  fgdbError GetExtent(Envelope& extent) const;
 
   /// Sets a write lock on a table.
   /// This should be used when performing bulk updates and inserts. Otherwise a
@@ -251,7 +251,7 @@ private:
 
   /// @cond PRIVATE
   fgdbError SetupTable(const std::wstring& path, Geodatabase* pGeodatabase, Datafile* pDatafile);
-  bool      IsSetup();
+  bool      IsSetup() const;
 
 #pragma warning(push)
 #pragma warning(disable : 4251)

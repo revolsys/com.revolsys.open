@@ -591,7 +591,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
             if (!matchEdges.isEmpty()) {
               boolean allowSplit = edge.getLength() >= 2 * tolerance;
               Set<Node<LineSegmentMatch>> splitNodes = new TreeSet<Node<LineSegmentMatch>>(
-                new NodeDistanceComparator(edge.getFromNode()));
+                new NodeDistanceComparator<LineSegmentMatch>(edge.getFromNode()));
               final Node<LineSegmentMatch> lineStart = edge.getFromNode();
               final Node<LineSegmentMatch> lineEnd = edge.getToNode();
 
@@ -604,7 +604,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
                   final Node<LineSegmentMatch> line2Start = matchEdge.getFromNode();
                   final Node<LineSegmentMatch> line2End = matchEdge.getToNode();
                   Set<Node<LineSegmentMatch>> matchSplitNodes = new TreeSet<Node<LineSegmentMatch>>(
-                    new NodeDistanceComparator(line2Start));
+                    new NodeDistanceComparator<LineSegmentMatch>(line2Start));
                   if (matchEdge.getLength() >= 2 * tolerance) {
                     if (LineSegmentUtil.isPointOnLineMiddle(line2Start,
                       line2End, lineStart, tolerance)) {

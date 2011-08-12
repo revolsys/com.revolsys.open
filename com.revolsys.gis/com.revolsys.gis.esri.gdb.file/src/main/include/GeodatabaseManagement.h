@@ -69,7 +69,7 @@ EXT_FILEGDB_API fgdbError OpenGeodatabase(const std::wstring& path, Geodatabase&
 EXT_FILEGDB_API fgdbError CloseGeodatabase(Geodatabase& geodatabase);
 
 /// Deletes a file geodatabase.
-/// If the path is incorrect a -2147024894 (The system cannot find the file specified) error will be returned. 
+/// If the path is incorrect a -2147024894 (The system cannot find the file specified) error will be returned.
 /// If another process has a lock on the geodatabase, a -2147220947 (Cannot acquire a lock) error will be returned.
 /// If access is denied an E_FAIL is returned.
 /// @param[in]    path The path of the geodatabase.

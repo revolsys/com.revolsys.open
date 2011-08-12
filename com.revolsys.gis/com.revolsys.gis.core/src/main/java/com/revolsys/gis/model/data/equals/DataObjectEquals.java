@@ -12,11 +12,16 @@ public class DataObjectEquals implements Equals<DataObject> {
   public static final String EXCLUDE_ID = DataObjectEquals.class.getName()
     + ".excludeId";
 
+  public static boolean equals(final DataObject object1,
+    final DataObject object2, final String attributeName) {
+    final Object value1 = object1.getValue(attributeName);
+    final Object value2 = object2.getValue(attributeName);
+    return EqualsRegistry.INSTANCE.equals(value1, value2);
+  }
+
   private EqualsRegistry equalsRegistry;
 
-  public boolean equals(
-    final DataObject object1,
-    final DataObject object2,
+  public boolean equals(final DataObject object1, final DataObject object2,
     final Collection<String> excludedAttributes) {
     if (object1 != null && object2 != null) {
       final DataObjectMetaData metaData1 = object1.getMetaData();
@@ -49,8 +54,7 @@ public class DataObjectEquals implements Equals<DataObject> {
     return false;
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }
 }

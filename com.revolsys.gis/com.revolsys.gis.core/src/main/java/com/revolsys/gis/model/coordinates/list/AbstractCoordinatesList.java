@@ -35,6 +35,17 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
+  public boolean equal2d(int index, Coordinates point) {
+    for (int j = 0; j < 2; j++) {
+      final double value1 = getValue(index, j);
+      final double value2 = point.getValue(j);
+      if (Double.compare(value1, value2) != 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public CoordinatesList create(final int length, final int numAxis) {
     return new DoubleCoordinatesList(length, numAxis);
   }

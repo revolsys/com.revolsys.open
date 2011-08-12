@@ -24,10 +24,8 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
-  public static <T> void addEdgeToEdgesByLine(
-    final Node<T> node,
-    final Map<LineString, Set<Edge<T>>> lineEdgeMap,
-    final Edge<T> edge) {
+  public static <T> void addEdgeToEdgesByLine(final Node<T> node,
+    final Map<LineString, Set<Edge<T>>> lineEdgeMap, final Edge<T> edge) {
     LineString line = edge.getLine();
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
@@ -45,8 +43,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     lineEdgeMap.put(line, edges);
   }
 
-  public static <T> Set<Edge<T>> getEdges(
-    final Collection<Edge<T>> edges,
+  public static <T> Set<Edge<T>> getEdges(final Collection<Edge<T>> edges,
     final LineString line) {
     final Set<Edge<T>> newEdges = new LinkedHashSet<Edge<T>>();
     for (final Edge<T> edge : edges) {
@@ -57,8 +54,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return newEdges;
   }
 
-  public static <T> List<Edge<T>> getEdges(
-    final List<Edge<T>> edges,
+  public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges,
     final Filter<Edge<T>> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
@@ -69,24 +65,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return filteredEdges;
   }
 
-  public List<Edge<T>> replace(
-    final LineString... lines) {
-    return replace(Arrays.asList(lines));
-  }
-
-  public List<Edge<T>> replace(
-    final List<LineString> lines) {
-    if (isRemoved()) {
-      return Collections.emptyList();
-    } else {
-      final Graph<T> graph = getGraph();
-      return graph.replaceEdge(this, lines);
-    }
-  }
-
   public static <T> Set<Edge<T>> getEdges(
-    final Map<LineString, Set<Edge<T>>> lineEdgeMap,
-    final LineString line) {
+    final Map<LineString, Set<Edge<T>>> lineEdgeMap, final LineString line) {
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
       if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -98,8 +78,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(
-    final Node<T> node,
-    final List<Edge<T>> edges) {
+    final Node<T> node, final List<Edge<T>> edges) {
     final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<LineString, Set<Edge<T>>>();
     for (final Edge<T> edge : edges) {
       addEdgeToEdgesByLine(node, edgesByLine, edge);
@@ -108,8 +87,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public static <T> List<Edge<T>> getEdgesMatchingObjectFilter(
-    final List<Edge<T>> edges,
-    final Filter<T> filter) {
+    final List<Edge<T>> edges, final Filter<T> filter) {
     final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : edges) {
       if (!edge.isRemoved()) {
@@ -129,8 +107,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * @param edges The collection of edges.
    * @return The collection of edges.
    */
-  public static <T> List<T> getObjects(
-    final Collection<Edge<T>> edges) {
+  public static <T> List<T> getObjects(final Collection<Edge<T>> edges) {
     final List<T> objects = new ArrayList<T>();
     for (final Edge<T> edge : edges) {
       final T object = edge.getObject();
@@ -162,8 +139,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public static <T> boolean hasEdgeMatchingObjectFilter(
-    final List<Edge<T>> edges,
-    final Filter<T> filter) {
+    final List<Edge<T>> edges, final Filter<T> filter) {
     for (final Edge<T> edge : edges) {
       final T object = edge.getObject();
       if (filter.accept(object)) {
@@ -173,10 +149,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return false;
   }
 
-  public static <T> void setEdgesAttribute(
-    final List<Edge<T>> edges,
-    final String attributeName,
-    final Object value) {
+  public static <T> void setEdgesAttribute(final List<Edge<T>> edges,
+    final String attributeName, final Object value) {
     for (final Edge<T> edge : edges) {
       edge.setAttribute(attributeName, value);
     }
@@ -189,7 +163,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   private final double fromAngle;
 
   /** The node the edge goes from. */
-  private Node<T> fromNode;
+  private final Node<T> fromNode;
 
   /** The graph the edge is part of. */
   private final Graph<T> graph;
@@ -200,21 +174,16 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   private LineString line;
 
   /** The object representing the edge. */
-  private T object;
+  private final T object;
 
   /** The angle of the line at the toNode. */
   private final double toAngle;
 
   /** The node the edge goes to. */
-  private Node<T> toNode;
+  private final Node<T> toNode;
 
-  public Edge(
-    final Graph<T> graph,
-    final T object,
-    final LineString line,
-    final Node<T> fromNode,
-    final double fromAngle,
-    final Node<T> toNode,
+  public Edge(final Graph<T> graph, final T object, final LineString line,
+    final Node<T> fromNode, final double fromAngle, final Node<T> toNode,
     final double toAngle) {
     this.graph = graph;
     this.fromNode = fromNode;
@@ -229,8 +198,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     toNode.addInEdge(this);
   }
 
-  public int compareTo(
-    final Edge<T> edge) {
+  public int compareTo(final Edge<T> edge) {
     if (this == edge) {
       return 0;
     } else {
@@ -242,12 +210,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
         final Node<T> toNode = getToNode();
         final int toCompare = toNode.compareTo(otherToNode);
         if (toCompare == 0) {
-          double otherLength = edge.getLength();
-          double length = getLength();
+          final double otherLength = edge.getLength();
+          final double length = getLength();
           final int lengthCompare = Double.compare(length, otherLength);
           if (lengthCompare == 0) {
-            String name = toSuperString();
-            String otherName = edge.toSuperString();
+            final String name = toSuperString();
+            final String otherName = edge.toSuperString();
             final int nameCompare = name.compareTo(otherName);
             return nameCompare;
           }
@@ -261,24 +229,20 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     }
   }
 
-  public double distance(
-    final Coordinates point) {
+  public double distance(final Coordinates point) {
     return LineStringUtil.distance(point, line);
   }
 
-  public double distance(
-    final Edge<LineSegmentMatch> edge) {
+  public double distance(final Edge<LineSegmentMatch> edge) {
     return getLine().distance(edge.getLine());
   }
 
-  public double distance(
-    final Node<T> node) {
+  public double distance(final Node<T> node) {
     final Coordinates point = node;
     return distance(point);
   }
 
-  public double getAngle(
-    final Node<T> node) {
+  public double getAngle(final Node<T> node) {
     if (node == fromNode) {
       return fromAngle;
     } else {
@@ -291,8 +255,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * @see com.revolsys.gis.graph.AttributedObject#getAttribute(java.lang.String)
    */
   @SuppressWarnings("unchecked")
-  public <A> A getAttribute(
-    final String name) {
+  public <A> A getAttribute(final String name) {
     return (A)attributes.get(name);
   }
 
@@ -304,16 +267,14 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return Collections.unmodifiableMap(attributes);
   }
 
-  public Collection<Node<T>> getCommonNodes(
-    final Edge<DataObject> edge) {
+  public Collection<Node<T>> getCommonNodes(final Edge<DataObject> edge) {
     final Collection<Node<T>> nodes1 = getNodes();
     final Collection<Node<DataObject>> nodes2 = edge.getNodes();
     nodes1.retainAll(nodes2);
     return nodes1;
   }
 
-  public List<Edge<T>> getEdgesToNextJunctionNode(
-    final Node<T> node) {
+  public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
     final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     edges.add(this);
     Edge<T> currentEdge = this;
@@ -355,8 +316,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return line;
   }
 
-  public Node<T> getNextJunctionNode(
-    final Node<T> node) {
+  public Node<T> getNextJunctionNode(final Node<T> node) {
     Edge<T> currentEdge = this;
     Node<T> currentNode = getOppositeNode(node);
     while (currentNode.getDegree() == 2) {
@@ -382,8 +342,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return object;
   }
 
-  public Node<T> getOppositeNode(
-    final Node<T> node) {
+  public Node<T> getOppositeNode(final Node<T> node) {
     if (fromNode == node) {
       return toNode;
     } else if (toNode == node) {
@@ -405,8 +364,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return graph.getTypeName(this);
   }
 
-  public boolean hasNode(
-    final Node<T> node) {
+  public boolean hasNode(final Node<T> node) {
     if (fromNode == node) {
       return true;
     } else if (toNode == node) {
@@ -424,8 +382,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * @param node The node to test the direction from.
    * @return True if the node is at the start of the edge.
    */
-  public boolean isForwards(
-    final Node<T> node) {
+  public boolean isForwards(final Node<T> node) {
     if (fromNode == node) {
       return true;
     } else if (toNode == node) {
@@ -436,15 +393,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     }
   }
 
-  public boolean isLessThanDistance(
-    final Coordinates point,
+  public boolean isLessThanDistance(final Coordinates point,
     final double distance) {
     return LineStringUtil.distance(point, line, distance) < distance;
   }
 
-  public boolean isLessThanDistance(
-    final Node<T> node,
-    final double distance) {
+  public boolean isLessThanDistance(final Node<T> node, final double distance) {
     final Coordinates point = node;
     return isLessThanDistance(point, distance);
   }
@@ -453,15 +407,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return line == null;
   }
 
-  public boolean isWithinDistance(
-    final Coordinates point,
-    final double distance) {
+  public boolean isWithinDistance(final Coordinates point, final double distance) {
     return LineStringUtil.distance(point, line, distance) <= distance;
   }
 
-  public boolean isWithinDistance(
-    final Node<T> node,
-    final double distance) {
+  public boolean isWithinDistance(final Node<T> node, final double distance) {
     final Coordinates point = node;
     return isWithinDistance(point, distance);
   }
@@ -470,8 +420,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     graph.remove(this);
   }
 
-  void remove(
-    Graph<T> graph) {
+  void remove(final Graph<T> graph) {
     if (fromNode != null) {
       fromNode.remove(this);
     }
@@ -482,22 +431,29 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     length = 0;
   }
 
+  public List<Edge<T>> replace(final LineString... lines) {
+    return replace(Arrays.asList(lines));
+  }
+
+  public List<Edge<T>> replace(final List<LineString> lines) {
+    if (isRemoved()) {
+      return Collections.emptyList();
+    } else {
+      final Graph<T> graph = getGraph();
+      return graph.replaceEdge(this, lines);
+    }
+  }
+
   /*
    * (non-Javadoc)
    * @see com.revolsys.gis.graph.AttributedObject#setAttribute(java.lang.String,
    * java.lang.Object)
    */
-  public void setAttribute(
-    final String name,
-    final Object value) {
+  public void setAttribute(final String name, final Object value) {
     if (attributes.isEmpty()) {
       attributes = new HashMap<String, Object>();
     }
     attributes.put(name, value);
-  }
-
-  private String toSuperString() {
-    return super.toString();
   }
 
   @Override
@@ -516,8 +472,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return sb.toString();
   }
 
-  public boolean touches(
-    final Edge<DataObject> edge) {
+  private String toSuperString() {
+    return super.toString();
+  }
+
+  public boolean touches(final Edge<DataObject> edge) {
     final Collection<Node<T>> nodes1 = getCommonNodes(edge);
     return !nodes1.isEmpty();
   }

@@ -104,7 +104,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
             query = new JdbcQuery(metaData, sql.toString());
           } else {
             QName typeName = metaData.getName();
-            query = dataStore.createQuery(typeName, null, boundingBox);
+            query = dataStore.createQuery(typeName, whereClause, boundingBox);
           }
           addQuery(query);
         }

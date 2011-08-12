@@ -29,39 +29,24 @@ typedef unsigned short uint16;
 
 typedef int            fgdbError;
 
-#if defined (S_OK)
-  #undef S_OK
-  #define S_OK ((fgdbError)0x00000000)
-#else
-  #define S_OK ((fgdbError)0x00000000)
+#if !defined (S_OK)
+  #define S_OK    ((fgdbError)0x00000000)
 #endif
 
-#if defined (S_FALSE)
-  #undef S_FALSE
-  #define S_FALSE ((fgdbError)0x00000001)
-#else
+#if !defined (S_FALSE)
   #define S_FALSE ((fgdbError)0x00000001)
 #endif
 
-#if defined (E_FAIL)
-  #undef E_FAIL
-  #define E_FAIL ((fgdbError)0x80004005)
-#else
-  #define E_FAIL ((fgdbError)0x80004005)
+#if !defined (E_FAIL)
+  #define E_FAIL  ((fgdbError)0x80004005)
 #endif
 
-#if defined (SUCCEEDED)
-  #undef SUCCEEDED
-  #define SUCCEEDED(result) ((fgdbError)(result) >= 0)
-#else
+#if !defined (SUCCEEDED)
   #define SUCCEEDED(result) ((fgdbError)(result) >= 0)
 #endif
 
-#if defined (FAILED)
-  #undef FAILED
-  #define FAILED(result) ((fgdbError)(result) < 0)
-#else
-  #define FAILED(result) ((fgdbError)(result) < 0)
+#if !defined (FAILED)
+  #define FAILED(result)    ((fgdbError)(result) < 0)
 #endif
 
 namespace FileGDBAPI
@@ -69,16 +54,16 @@ namespace FileGDBAPI
 
 enum FieldType
 {
-  fieldTypeSmallInteger = 0,
-  fieldTypeInteger      = 1,
-  fieldTypeSingle       = 2,
-  fieldTypeDouble       = 3,
-  fieldTypeString       = 4,
-  fieldTypeDate         = 5,
-  fieldTypeOID          = 6,
-  fieldTypeGeometry     = 7,
-  fieldTypeBlob         = 8,
-  fieldTypeRaster       = 9,
+  fieldTypeSmallInteger =  0,
+  fieldTypeInteger      =  1,
+  fieldTypeSingle       =  2,
+  fieldTypeDouble       =  3,
+  fieldTypeString       =  4,
+  fieldTypeDate         =  5,
+  fieldTypeOID          =  6,
+  fieldTypeGeometry     =  7,
+  fieldTypeBlob         =  8,
+  fieldTypeRaster       =  9,
   fieldTypeGUID         = 10,
   fieldTypeGlobalID     = 11,
   fieldTypeXML          = 12,
@@ -86,20 +71,20 @@ enum FieldType
 
 enum ShapeType
 {
-  shapeNull               = 0,
-  shapePoint              = 1,
+  shapeNull               =  0,
+  shapePoint              =  1,
   shapePointM             = 21,
   shapePointZM            = 11,
-  shapePointZ             = 9,
-  shapeMultipoint         = 8,
+  shapePointZ             =  9,
+  shapeMultipoint         =  8,
   shapeMultipointM        = 28,
   shapeMultipointZM       = 18,
   shapeMultipointZ        = 20,
-  shapePolyline           = 3,
+  shapePolyline           =  3,
   shapePolylineM          = 23,
   shapePolylineZM         = 13,
   shapePolylineZ          = 10,
-  shapePolygon            = 5,
+  shapePolygon            =  5,
   shapePolygonM           = 25,
   shapePolygonZM          = 15,
   shapePolygonZ           = 19,

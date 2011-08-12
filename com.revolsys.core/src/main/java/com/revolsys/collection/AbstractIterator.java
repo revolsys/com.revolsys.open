@@ -25,18 +25,18 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
     doClose();
   }
 
-  protected abstract void doClose();
+  protected void doClose() {
+  }
 
-  protected abstract void doInit();
+  protected void doInit() {
+  }
 
   @Override
-  protected void finalize()
-    throws Throwable {
+  protected void finalize() throws Throwable {
     close();
   }
 
-  protected abstract T getNext()
-    throws NoSuchElementException;
+  protected abstract T getNext() throws NoSuchElementException;
 
   public final boolean hasNext() {
     if (hasNext) {

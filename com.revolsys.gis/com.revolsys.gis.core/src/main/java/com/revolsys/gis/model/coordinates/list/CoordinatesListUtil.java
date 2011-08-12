@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.coordinates.list;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -119,6 +120,11 @@ public class CoordinatesListUtil {
       previousY = y;
     }
     return coordIndex;
+  }
+
+  public static CoordinatesList create(int numAxis,
+    final Coordinates... coordinateArray) {
+    return create(Arrays.asList(coordinateArray), numAxis);
   }
 
   public static CoordinatesList create(final List<Coordinates> coordinateArray,
@@ -488,6 +494,32 @@ public class CoordinatesListUtil {
     if (!endEqual && endPoint != null) {
       newPoints.setPoint(lastIndex, endPoint);
     }
+
+    return newPoints;
+  }
+
+  public static CoordinatesList subList(final CoordinatesList points,
+    final Coordinates startPoint, final int start) {
+    final int dimension = points.getNumAxis();
+    final int length = points.size() - start;
+    int size = length;
+    int startIndex = 0;
+    boolean startEqual = false;
+    if (startPoint != null) {
+      startEqual = startPoint.equals2d(points.get(start));
+      if (!startEqual) {
+        size++;
+        startIndex++;
+      }
+    }
+
+    final CoordinatesList newPoints = new DoubleCoordinatesList(size, dimension);
+
+    if (!startEqual && startPoint != null) {
+      newPoints.setPoint(0, startPoint);
+    }
+
+    points.copy(start, newPoints, startIndex, dimension, length);
 
     return newPoints;
   }

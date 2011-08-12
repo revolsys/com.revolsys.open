@@ -3,10 +3,12 @@ package com.revolsys.io;
 import java.util.Map;
 
 public class DelegatingWriter<T> extends AbstractWriter<T> {
-  private final Writer<T> writer;
+  private Writer<T> writer;
 
-  public DelegatingWriter(
-    final Writer<T> writer) {
+  public DelegatingWriter() {
+  }
+
+  public DelegatingWriter(final Writer<T> writer) {
     this.writer = writer;
   }
 
@@ -26,20 +28,24 @@ public class DelegatingWriter<T> extends AbstractWriter<T> {
   }
 
   @Override
-  public <C> C getProperty(
-    final String name) {
+  public <C> C getProperty(final String name) {
     return (C)writer.getProperty(name);
   }
 
+  public Writer<T> getWriter() {
+    return writer;
+  }
+
   @Override
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     writer.setProperty(name, value);
   }
 
-  public void write(
-    final T object) {
+  public void setWriter(final Writer<T> writer) {
+    this.writer = writer;
+  }
+
+  public void write(final T object) {
     writer.write(object);
   }
 }

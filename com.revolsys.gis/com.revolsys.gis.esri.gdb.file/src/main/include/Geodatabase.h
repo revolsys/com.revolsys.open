@@ -61,31 +61,31 @@ public:
   /// Gets a list of the dataset types in the geodatabase.
   /// @param[out]   datasetTypes The dataset types in the geodatabase.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDatasetTypes(std::vector<std::wstring>& datasetTypes);
+  fgdbError GetDatasetTypes(std::vector<std::wstring>& datasetTypes) const;
 
   /// Gets a list of relationship types in the geodatabase.
   /// @param[out]   relationshipTypes The relationship types in the geodatabase.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDatasetRelationshipTypes(std::vector<std::wstring>& relationshipTypes);
+  fgdbError GetDatasetRelationshipTypes(std::vector<std::wstring>& relationshipTypes) const;
 
   /// Gets the child datasets for a particular dataset, if any.
   /// If a non-existent path is provided, a -2147211775 (The item was not found) error will be returned.
   /// @param[in]    parentPath The dataset to find the children of, e.g. "\usa".
-  /// @param[in]    datasetType The child dataset type as a wstring, e.g. "Feature Class". Passing in 
+  /// @param[in]    datasetType The child dataset type as a wstring, e.g. "Feature Class". Passing in
   /// an empty string will return all child datasets. <a href="ItemTypes.txt">DatasetType</a>
   /// @param[out]   childDatasets The children of the parent dataset, if any.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetChildDatasets(const std::wstring& parentPath, const std::wstring& datasetType, std::vector<std::wstring>& childDatasets);
+  fgdbError GetChildDatasets(const std::wstring& parentPath, const std::wstring& datasetType, std::vector<std::wstring>& childDatasets) const;
 
   /// Gets the related datasets for a particular dataset, if any.
   /// If a non-existent path is provided, a -2147211775 (The item was not found) error will be returned.
   /// @param[in]    path The path of the dataset to find related datasets for, e.g. "\usa\streets_topology".
-  /// @param[in]    relType The relationship type to filter return values with, e.g. "DatasetInFeatureDataset". Passing in 
+  /// @param[in]    relType The relationship type to filter return values with, e.g. "DatasetInFeatureDataset". Passing in
   /// an empty string will return all related datasets. <a href="RelationshipTypes.txt">RelationshipType</a>
   /// @param[in]    datasetType The type of the dataset to find related datasets for. <a href="ItemTypes.txt">DatasetType</a>
   /// @param[out]   relatedDatasets The origin dataset's related datasets, if any.
   /// @result       Error code indicating whether the method finished successfully.
-  fgdbError GetRelatedDatasets(const std::wstring& path, const std::wstring& relType, const std::wstring& datasetType, std::vector<std::wstring>& relatedDatasets);
+  fgdbError GetRelatedDatasets(const std::wstring& path, const std::wstring& relType, const std::wstring& datasetType, std::vector<std::wstring>& relatedDatasets) const;
   //@}
 
   /// @name Schema definition
@@ -97,26 +97,26 @@ public:
   /// @param[in]    datasetType The requested dataset's type as a string, e.g. "Table".  <a href="ItemTypes.txt">DatasetType</a>
   /// @param[out]   datasetDef The dataset's definition as an XML document.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDatasetDefinition(const std::wstring& path, const std::wstring& datasetType, std::string& datasetDef);
+  fgdbError GetDatasetDefinition(const std::wstring& path, const std::wstring& datasetType, std::string& datasetDef) const;
 
   /// Gets the definitions of child datasets as a collection of XML documents.
   /// If a non-existent path is provided, a -2147211775 (The item was not found) error will be returned.
   /// @param[in]    parentPath The parent dataset's path, e.g. "\usa".
-  /// @param[in]    datasetType The parent dataset's type as a string, e.g. "Feature Dataset". Passing in 
+  /// @param[in]    datasetType The parent dataset's type as a string, e.g. "Feature Dataset". Passing in
   /// an empty string will return all child datasets. <a href="ItemTypes.txt">DatasetType</a>
   /// @param[out]   childDatasetDefs A collection of child dataset definitions, if any.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetChildDatasetDefinitions(const std::wstring& parentPath, const std::wstring& datasetType, std::vector<std::string>& childDatasetDefs);
+  fgdbError GetChildDatasetDefinitions(const std::wstring& parentPath, const std::wstring& datasetType, std::vector<std::string>& childDatasetDefs) const;
 
   /// Gets the definitions of related datasets as a collection of XML documents.
   /// If a non-existent path is provided, a -2147211775 (The item was not found) error will be returned.
   /// @param[in]    path The origin dataset's path, e.g. "\usa\streets_topology"
   /// @param[in]    relType The relationship type to filter return values with, e.g. "DatasetInFeatureDataset". <a href="RelationshipTypes.txt">RelationshipType</a>
-  /// @param[in]    datasetType The origin dataset's type as a string, e.g. "Relationship Class". Passing in 
+  /// @param[in]    datasetType The origin dataset's type as a string, e.g. "Relationship Class". Passing in
   /// an empty string will return all related datasets. <a href="ItemTypes.txt">DatasetType</a>
   /// @param[out]   relatedDatasetDefs A collection of related dataset definitions, if any.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetRelatedDatasetDefinitions(const std::wstring& path, const std::wstring& relType, const std::wstring& datasetType, std::vector<std::string>& relatedDatasetDefs);
+  fgdbError GetRelatedDatasetDefinitions(const std::wstring& path, const std::wstring& relType, const std::wstring& datasetType, std::vector<std::string>& relatedDatasetDefs) const;
 
   /// Gets the metadata of a dataset as XML.
   /// If a non-existent path is provided, a -2147211775 (The item was not found) error will be returned.
@@ -124,12 +124,12 @@ public:
   /// @param[in]    datasetType The requested dataset's type as a string, e.g. "Table". <a href="ItemTypes.txt">DatasetType</a>
   /// @param[out]   documentation The dataset's metadata as XML.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDatasetDocumentation(const std::wstring& path, const std::wstring& datasetType, std::string& documentation);
+  fgdbError GetDatasetDocumentation(const std::wstring& path, const std::wstring& datasetType, std::string& documentation) const;
   //@}
 
   /// @name Datasets
   //@{
-  /// Creates a new feature dataset. 
+  /// Creates a new feature dataset.
   /// If the feature dataset already exists, a -2147220733 (The dataset already exists) error will be returned.<br/>
   /// If the feature dataset name is missing from the XML, a -2147220645 (INVALID_NAME) error will be returned.<br/>
   /// If the XML is not UTF-8 encoded, create will fail with an error code of -2147024809 (Invalid function arguments).<br/>
@@ -139,7 +139,11 @@ public:
   /// @return       Error code indicating whether the method finished successfully.
   fgdbError CreateFeatureDataset(const std::string& featureDatasetDef);
 
-  /// Creates a new table. This can either be a table or a feature class.<br/>
+  /// Creates a new table. This can either be a table or a feature class. If a geometry is to support Zs or Ms (measures), HasZ
+  /// and or HasM must be set to true in the GeometryDef in the XML. The ZOrigin, MOrigin, ZScale and MScale
+  /// must also be set in the SpatialReferences in the XML. These do not default.
+  /// See the samlples\XMLsamples\FC_GCS_LineMin.xml for an example. Domain definitions in the table XML definition 
+  /// will be ignored. Use Table.AlterField to assign a domain. <br/>
   /// If the table already exists, a -2147220653 (The table already exists) error will be returned.<br/>
   /// If the table name is missing from the XML, a -2147220654 (The table name is invalid) error will be returned.<br/>
   /// If the XML is not UTF-8 encoded, create will fail with an error code of -2147024809 (Invalid function arguments).<br/>
@@ -147,8 +151,8 @@ public:
   /// <br><a href="FC_GCS_LineMin.xml">XML-Feature Class with the minimum spatial reference definition</a>
   /// <br><a href="FeatureClassInAFeatureDataset.xml">XML-Feature Class to be created in a feature dataset</a>
   /// @param[in]    tableDef The XML definition of the table to be created.
-  /// @param[in]    parent The location where the table will be created. Pass an empty string if you want to 
-  /// create a table or feature class at the root. If you want to create a feature class in an existing feature 
+  /// @param[in]    parent The location where the table will be created. Pass an empty string if you want to
+  /// create a table or feature class at the root. If you want to create a feature class in an existing feature
   /// dataset use the path "\USA".
   /// @param[out]   table An Table instance for the newly created table.
   /// @return       Error code indicating whether the method finished successfully.
@@ -156,10 +160,10 @@ public:
 
   /// Opens a table. This can also be used to open attributed and M:N relationship class tables.
   /// If the table does not exist, a -2147220655 (The table was not found) error will be returned.
-  /// Attempting to open a compressed file is not supported and a -2147220109 (FileGDB compression is 
+  /// Attempting to open a compressed file is not supported and a -2147220109 (FileGDB compression is
   /// not installed.) error will be returned.
-  /// @param[in]    path The path of the table to open. Opening a table or feature class at 
-  /// the root make sure to include "\". If opening a feature class in a feature dataset include 
+  /// @param[in]    path The path of the table to open. Opening a table or feature class at
+  /// the root make sure to include "\". If opening a feature class in a feature dataset include
   /// the feature dataset name in the path "\USA\counties".
   /// @param[out]   table An Table instance for the opened table.
   /// @return       Error code indicating whether the method finished successfully.
@@ -198,7 +202,7 @@ public:
   /// Gets the names of all domains, if any.
   /// @param[out]   domainNames The domains.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDomains(std::vector<std::wstring>& domainNames);
+  fgdbError GetDomains(std::vector<std::wstring>& domainNames) const;
 
   /// Creates a domain.
   /// If the XML is not UTF-8, create will fail with an error code of -2147024809 (Invalid function arguments).<br/>
@@ -222,9 +226,9 @@ public:
 
   /// Gets the definition of the specified domain.
   /// @param[in]    domainName The name of the domain.
-  /// @param[out]    domainDef The XML definition of the domain. 
+  /// @param[out]   domainDef The XML definition of the domain.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetDomainDefinition(const std::wstring& domainName, std::string& domainDef);
+  fgdbError GetDomainDefinition(const std::wstring& domainName, std::string& domainDef) const;
   //@}
 
   /// @name SQL
@@ -233,7 +237,7 @@ public:
   /// @param[in]    path The path of the dataset that will be queried.
   /// @param[out]   queryName The name that should be used for the table in SQL statements.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetQueryName(const std::wstring& path, std::wstring& queryName);
+  fgdbError GetQueryName(const std::wstring& path, std::wstring& queryName) const;
 
   /// Executes a SQL statement on the geodatabase. This may or may not return a result set.
   /// If the SQL statement is invalid, an -2147220985 (An invalid SQL statement was used) error will be returned.<br/>
@@ -241,7 +245,7 @@ public:
   /// @param[in]    recycling Indicates whether the row enumerator should recycle memory.
   /// @param[out]   rows An enumerator of rows or a null value.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError ExecuteSQL(const std::wstring& sqlStmt, bool recycling, EnumRows& rows);
+  fgdbError ExecuteSQL(const std::wstring& sqlStmt, bool recycling, EnumRows& rows) const;
   //@}
 
   /// @name Constructors and Destructors
@@ -261,7 +265,7 @@ private:
   fgdbError CloseGeodatabase();
   fgdbError DeleteGeodatabase();
 
-  bool IsSetup();
+  bool IsSetup() const;
 
   Catalog* m_pCatalog;
 

@@ -30,7 +30,6 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
   private JdbcDataObjectStore dataStore;
 
- 
   private boolean initialized;
 
   private String insertSql;
@@ -40,6 +39,13 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   @Override
   public JdbcCodeTableProperty clone() {
     return this;
+  }
+
+  @Override
+  public void setMetaData(DataObjectMetaData metaData) {
+    super.setMetaData(metaData);
+    dataStore = (JdbcDataObjectStore)metaData.getDataObjectStore();
+    dataSource = dataStore.getDataSource();
   }
 
   protected synchronized Object createId(final List<Object> values) {
@@ -108,27 +114,27 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       DataObjectMetaData metaData = getMetaData();
       if (metaData != null) {
         this.tableName = JdbcQuery.getTableName(metaData.getName());
-      }
-      List<String> valueAttributeNames = getValueAttributeNames();
-      final String idColumn = metaData.getIdAttributeName();
-      this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
-      for (int i = 0; i < valueAttributeNames.size(); i++) {
-        final String columnName = valueAttributeNames.get(i);
-        this.insertSql += ", " + columnName;
-      }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getKey();
-      }
-      insertSql += ") VALUES (?";
-      for (int i = 0; i < valueAttributeNames.size(); i++) {
-        insertSql += ", ?";
-      }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getValue();
-      }
-      insertSql += ")";
-    }
 
+        List<String> valueAttributeNames = getValueAttributeNames();
+        final String idColumn = metaData.getIdAttributeName();
+        this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
+        for (int i = 0; i < valueAttributeNames.size(); i++) {
+          final String columnName = valueAttributeNames.get(i);
+          this.insertSql += ", " + columnName;
+        }
+        for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
+          insertSql += ", " + auditColumn.getKey();
+        }
+        insertSql += ") VALUES (?";
+        for (int i = 0; i < valueAttributeNames.size(); i++) {
+          insertSql += ", ?";
+        }
+        for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
+          insertSql += ", " + auditColumn.getValue();
+        }
+        insertSql += ")";
+      }
+    }
     initialized = true;
   }
 

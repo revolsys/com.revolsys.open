@@ -10,13 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public class Node<T> extends AbstractCoordinates {
@@ -33,6 +39,18 @@ public class Node<T> extends AbstractCoordinates {
   public static <V> int getEdgeIndex(final List<Edge<V>> edges,
     final Edge<V> edge) {
     return edges.indexOf(edge);
+  }
+
+  public static <T> Collection<Edge<T>> getEdgesBetween(final QName typeName,
+    final Node<T> node0, final Node<T> node1) {
+    final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
+    for (Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
+      Edge<T> edge = (Edge<T>)edgeIter.next();
+      if (!edge.getTypeName().equals(typeName)) {
+        edgeIter.remove();
+      }
+    }
+    return edges;
   }
 
   public static <T> Collection<Edge<T>> getEdgesBetween(final Node<T> node0,
@@ -54,6 +72,69 @@ public class Node<T> extends AbstractCoordinates {
       commonEdges.retainAll(edges1);
     }
     return commonEdges;
+  }
+
+  public static <T> boolean hasEdgesBetween(final QName typeName,
+    final Node<T> node0, final Node<T> node1) {
+    if (node1 == null) {
+      return false;
+    }
+    if (node0 == node1) {
+      for (final Edge<T> edge : node0.getEdges()) {
+        if (edge.getTypeName().equals(typeName)) {
+          if (edge.getFromNode() == edge.getToNode()) {
+            return true;
+          }
+        }
+      }
+    } else {
+      for (Edge<T> edge : node0.getEdges()) {
+        if (edge.getTypeName().equals(typeName)) {
+          if (edge.hasNode(node1)) {
+            return true;
+          }
+        }
+      }
+      for (Edge<T> edge : node1.getEdges()) {
+        if (edge.getTypeName().equals(typeName)) {
+          if (edge.hasNode(node0)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  public Coordinates get3dCoordinates(QName typeName) {
+    if (!isRemoved()) {
+
+      final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typeName);
+      if (!edges.isEmpty()) {
+        Coordinates coordinates = null;
+        for (Edge<T> edge : edges) {
+          LineString line = edge.getLine();
+          CoordinatesList points = CoordinatesListUtil.get(line);
+          Coordinates point = null;
+          if (edge.getFromNode() == this) {
+            point = points.get(0);
+          } else if (edge.getToNode() == this) {
+            point = points.get(points.size() - 1);
+          }
+          if (point != null) {
+            double z = point.getZ();
+            if (z == 0 || Double.isNaN(z)) {
+              coordinates = point;
+            } else {
+              return point;
+            }
+          }
+        }
+        return coordinates;
+      }
+    }
+    return null;
+
   }
 
   public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,

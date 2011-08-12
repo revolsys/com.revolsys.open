@@ -85,7 +85,7 @@ public class DataObjectConverterProcess extends
         targetObject = typeConveter.convert(sourceObject);
         out.write(targetObject);
       } else if (defaultConverter == null) {
-        LOG.error("No converter found for: " + sourceObject);
+        processObjectWithNoConverter(out,sourceObject);
       } else {
         targetObject = defaultConverter.convert(sourceObject);
         out.write(targetObject);
@@ -102,6 +102,10 @@ public class DataObjectConverterProcess extends
       sb.append(sourceObject);
       LOG.error(sb.toString());
     }
+  }
+
+  protected void processObjectWithNoConverter(Channel<DataObject> out, final DataObject sourceObject) {
+    LOG.error("No converter found for: " + sourceObject);
   }
 
   public void setDefaultConverter(

@@ -75,7 +75,7 @@ public class ScriptExecutorRunnable implements Runnable {
   public void addBean(String name, Object value) {
     beans.put(name, value);
   }
-  public void addBeans(Map<String,Object> beans) {
+  public void addBeans(Map<String,?> beans) {
     this.beans.putAll(beans);
   }
 

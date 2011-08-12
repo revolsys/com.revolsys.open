@@ -40,7 +40,7 @@ public class ProcessNetwork implements BeanPostProcessor,
   public void addProcess(final Process process) {
     synchronized (processes) {
       if (!processes.containsKey(process)) {
-         processes.put(process, null);
+        processes.put(process, null);
         if (running) {
           start(process);
         }
@@ -82,9 +82,6 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   public Object postProcessAfterInitialization(final Object bean,
     final String beanName) throws BeansException {
-    if (beanName.equals("sourceReaderProcess")) {
-      System.out.println();
-    }
     if (bean instanceof TargetBeanFactoryBean) {
       final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
       final Class<?> targetClass = targetBean.getObjectType();
@@ -168,7 +165,7 @@ public class ProcessNetwork implements BeanPostProcessor,
         thread.start();
         count++;
       }
-   }
+    }
   }
 
   public void startAndWait() {

@@ -40,7 +40,7 @@
 #include "FileGDBCore.h"
 
 struct IFields;
-class SqlSelectCommand;
+class  SqlSelectCommand;
 
 namespace FileGDBAPI
 {
@@ -66,7 +66,7 @@ public:
   /// Return information about the fields in the row.
   /// @param[out]   fieldInfo The field information.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldInformation(FieldInfo& fieldInfo);
+  fgdbError GetFieldInformation(FieldInfo& fieldInfo) const;
 
   /// @name Constructors and destructors
   //@{
@@ -81,7 +81,7 @@ private:
 
   /// @cond PRIVATE
   fgdbError SetupRows(SqlSelectCommand* pSqlSelectCommand);
-  bool      IsSetup();
+  bool      IsSetup() const;
 
   SqlSelectCommand* m_pSqlSelectCommand;
 
@@ -101,31 +101,31 @@ public:
   /// The number of fields.
   /// @param[out]   fieldCount The number of fields.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldCount(int& fieldCount);
+  fgdbError GetFieldCount(int& fieldCount) const;
 
   /// The name of the field.
   /// @param[in]    fieldNumber The number of field.
   /// @param[out]   fieldName The name of the field.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldName(int fieldNumber, std::wstring& fieldName);
+  fgdbError GetFieldName(int fieldNumber, std::wstring& fieldName) const;
 
   /// The data type of the field.
   /// @param[in]    fieldNumber The number of field.
   /// @param[out]   fieldType The data type of the field.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldType(int fieldNumber, FieldType& fieldType);
+  fgdbError GetFieldType(int fieldNumber, FieldType& fieldType) const;
 
   /// The length of the field.
   /// @param[in]    fieldNumber The number of field.
   /// @param[out]   fieldLength The length of the field.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldLength(int fieldNumber, int& fieldLength);
+  fgdbError GetFieldLength(int fieldNumber, int& fieldLength) const;
 
   /// The nullability of the field.
   /// @param[in]    fieldNumber The number of field.
   /// @param[out]   isNullable The nullability of the field.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetFieldIsNullable(int fieldNumber, bool& isNullable);
+  fgdbError GetFieldIsNullable(int fieldNumber, bool& isNullable) const;
 
   /// @name Constructors and destructors
   //@{
@@ -139,7 +139,7 @@ public:
 private:
 
   fgdbError SetupFieldInfo(IFields* pFields);
-  bool      IsSetup();
+  bool      IsSetup() const;
 
   IFields*            m_pFields;
 
@@ -257,22 +257,22 @@ public:
   /// Get a pointer to the points coordinates.
   /// @param[out]   point A pointer to the coordinate.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetPoint(Point*& point);
+  fgdbError GetPoint(Point*& point) const;
 
   /// Get a pointer to the points z coordinate.
   /// @param[out]   z A pointer to the z value.
   /// @return       Error code indicating whether the method finished successfully..
-  fgdbError GetZ(double*& z);
+  fgdbError GetZ(double*& z) const;
 
   /// Get a pointer to the points measure.
   /// @param[out]   m A pointer to the m value.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetM(double*& m);
+  fgdbError GetM(double*& m) const;
 
   /// Get a pointer to the points ID value.
   /// @param[out]   id A pointer to the id.
   /// @return       Error code indicating whether the method finished successfully..
-  fgdbError GetID(int*& id);
+  fgdbError GetID(int*& id) const;
 
   /// Setup a shape buffer for insert. Allocates the correct length buffer for the selected shape type.
   /// @param[in]    shapeType The shape type of the buffer. <a href="ShapeTypes.txt">Shape Type</a>
@@ -298,42 +298,42 @@ public:
   /// Get a pointer to the geomtries extent.
   /// @param[out]   extent A pointer to the geometries extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetExtent(double*& extent);
+  fgdbError GetExtent(double*& extent) const;
 
   /// Get the number of coordinates in the geometry.
   /// @param[out]   numPoints The number of points.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNumPoints(int& numPoints);
+  fgdbError GetNumPoints(int& numPoints) const;
 
   /// Get a pointer to the point array.
   /// @param[out]   points A pointer to the coordinate array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetPoints(Point*& points);
+  fgdbError GetPoints(Point*& points) const;
 
   /// Get a pointer to the z extent.
   /// @param[out]   zExtent A pointer to the z extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetZExtent(double*& zExtent);
+  fgdbError GetZExtent(double*& zExtent) const;
 
   /// Get a pointer to the z array.
   /// @param[out]   zArray A pointer to the z array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetZs(double*& zArray);
+  fgdbError GetZs(double*& zArray) const;
 
   /// Get a pointer to the m extent.
   /// @param[out]   mExtent A pointer to the m extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMExtent(double*& mExtent);
+  fgdbError GetMExtent(double*& mExtent) const;
 
   /// Get a pointer to the m array.
   /// @param[out]   mArray A pointer to the m array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMs(double*& mArray);
+  fgdbError GetMs(double*& mArray) const;
 
   /// Get a pointer to the id array.
   /// @param[out]   ids A pointer to the id array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetIDs(int*& ids);
+  fgdbError GetIDs(int*& ids) const;
 
   /// Setup a shape buffer for insert. Allocates the correct length buffer for the selected shape type.
   /// @param[in]    shapeType The shape type of the buffer. <a href="ShapeTypes.txt">Shape Type</a>
@@ -367,62 +367,62 @@ public:
   /// Get a pointer to the geomtries extent.
   /// @param[out]   extent A pointer to the geometries extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetExtent(double*& extent);
+  fgdbError GetExtent(double*& extent) const;
 
   /// Get the number of parts.
   /// @param[out]   numParts The number of parts in the geometry.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNumParts(int& numParts);
+  fgdbError GetNumParts(int& numParts) const;
 
   /// Get the number of coordinates in the geometry.
   /// @param[out]   numPoints The number of points.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNumPoints(int& numPoints);
+  fgdbError GetNumPoints(int& numPoints) const;
 
   /// Get a pointer to the parts array.
   /// @param[out]   parts A pointer to the parts array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetParts(int*& parts);
+  fgdbError GetParts(int*& parts) const;
 
   /// Get a pointer to the point array.
   /// @param[out]   points A pointer to the point array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetPoints(Point*& points);
+  fgdbError GetPoints(Point*& points) const;
 
   /// Get a pointer to the z extent.
   /// @param[out]   zExtent A pointer to the z extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetZExtent(double*& zExtent);
+  fgdbError GetZExtent(double*& zExtent) const;
 
   /// Get a pointer to the z array.
   /// @param[out]   zArray A pointer to the z array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetZs(double*& zArray);
+  fgdbError GetZs(double*& zArray) const;
 
   /// Get a pointer to the m extent.
   /// @param[out]   mExtent A pointer to the m extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMExtent(double*& mExtent);
+  fgdbError GetMExtent(double*& mExtent) const;
 
   /// Get a pointer to the m array.
   /// @param[out]   mArray A pointer to the m array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMs(double*& mArray);
+  fgdbError GetMs(double*& mArray) const;
 
   /// Get the number of curves in the geometry.
   /// @param[out]   numCurves The number of curves.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNumCurves(int& numCurves);
+  fgdbError GetNumCurves(int& numCurves) const;
 
   /// Get a pointer to the curve array.
   /// @param[out]   curves A pointer to the curve array.
   /// @return       Error code indicating whether the method finished successfully.s.
-  fgdbError GetCurves(byte*& curves);
+  fgdbError GetCurves(byte*& curves) const;
 
   /// Get a pointer to the id array.
-  /// @param[out]    ids A pointer to the id array.
+  /// @param[out]   ids A pointer to the id array.
   /// @return       Error code indicating whether the method finished successfully..
-  fgdbError GetIDs(int*& ids);
+  fgdbError GetIDs(int*& ids) const;
 
   /// Setup a shape buffer for insert. Allocates the correct length buffer for the selected shape type.
   /// @param[in]    shapeType The shape type of the buffer. <a href="ShapeTypes.txt">Shape Type</a>
@@ -452,78 +452,78 @@ public:
   /// Get a pointer to the geomtries extent.
   /// @param[out]   extent A pointer to the geometries extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetExtent(double*& extent);
+  fgdbError GetExtent(double*& extent) const;
 
   /// Get the number of parts.
   /// @param[out]   numParts The number of parts in the geometry.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNumParts(int& numParts);
+  fgdbError GetNumParts(int& numParts) const;
 
   /// Get the number of coordinates in the geometry.
   /// @param[out]   numPoints The number of points.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNumPoints(int& numPoints);
+  fgdbError GetNumPoints(int& numPoints) const;
 
   /// Get a pointer to the parts array.
   /// @param[out]   parts A pointer to the parts array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetParts(int*& parts);
+  fgdbError GetParts(int*& parts) const;
 
   /// Get a pointer to the part descriptor array.
   /// @param[out]   partDescriptorArray A pointer to the part descriptor array.
   /// @return       Error code indicating whether the method finished successfully
-  fgdbError GetPartDescriptors(int*& partDescriptorArray);
+  fgdbError GetPartDescriptors(int*& partDescriptorArray) const;
 
   /// Get a pointer to the point array.
   /// @param[out]   points A pointer to the point array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetPoints(Point*& points);
+  fgdbError GetPoints(Point*& points) const;
 
   /// Get a pointer to the z extent.
   /// @param[out]   zExtent A pointer to the z extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetZExtent(double*& zExtent);
+  fgdbError GetZExtent(double*& zExtent) const;
 
   /// Get a pointer to the z array.
   /// @param[out]   zArray A pointer to the z array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetZs(double*& zArray);
+  fgdbError GetZs(double*& zArray) const;
 
   /// Get a pointer to the m extent.
   /// @param[out]   mExtent A pointer to the m extent.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMExtent(double*& mExtent);
+  fgdbError GetMExtent(double*& mExtent) const;
 
   /// Get a pointer to the m array.
   /// @param[out]   mArray A pointer to the m array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMs(double*& mArray);
+  fgdbError GetMs(double*& mArray) const;
 
   /// Get a pointer to the id array.
   /// @param[out]   ids A pointer to the id array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetIDs(int*& ids);
+  fgdbError GetIDs(int*& ids) const;
 
   /// Get a pointer to the normals array.
   /// @param[out]   normals A pointer to the normals array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetNormals(float*& normals);
+  fgdbError GetNormals(float*& normals) const;
 
   /// Returns textures.
   /// @param[out]   numTextures The number of textures
   /// @param[out]   textureDimension The texture dimension.
-  /// @param[out]   textureParts A pointer to the texture parts. 
-  /// @param[out]   textureCoords A pointer to the texture coordinates. 
+  /// @param[out]   textureParts A pointer to the texture parts.
+  /// @param[out]   textureCoords A pointer to the texture coordinates.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetTextures(int& numTextures, int& textureDimension, int*& textureParts, float*& textureCoords);
+  fgdbError GetTextures(int& numTextures, int& textureDimension, int*& textureParts, float*& textureCoords) const;
 
   /// Returns materials.
   /// @param[out]   numMaterials The number of materials
   /// @param[out]   compressionType The compression type.
-  /// @param[out]   materialParts A pointer to the number of material parts. 
-  /// @param[out]   materials A pointer to the materials array. 
+  /// @param[out]   materialParts A pointer to the number of material parts.
+  /// @param[out]   materials A pointer to the materials array.
   /// @return       Error code indicating whether the method finished successfully.
-  fgdbError GetMaterials(int& numMaterials, int& compressionType, int*& materialParts, byte*& materials);
+  fgdbError GetMaterials(int& numMaterials, int& compressionType, int*& materialParts, byte*& materials) const;
 
   /// Setup a shape buffer for insert. Allocates the correct length buffer for the selected shape type.
   /// @param[in]    shapeType The shape type of the buffer. <a href="ShapeTypes.txt">Shape Type</a>
@@ -582,7 +582,7 @@ public:
 
   /// Indicates whether the envelope's attributes have been set.
   /// @return       True if one or more attributes are NaN, false otherwise.
-  bool IsEmpty();
+  bool IsEmpty() const;
 
   /// Sets the envelope's attributes to NaN.
   /// @return       Void.

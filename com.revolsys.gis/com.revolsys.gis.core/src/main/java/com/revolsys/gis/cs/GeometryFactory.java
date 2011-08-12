@@ -262,15 +262,21 @@ public class GeometryFactory extends
     this(EpsgCoordinateSystems.getCoordinateSystem(crsId), numAxis);
   }
 
-  public GeometryFactory(int crsId, double scaleXY, double scaleZ) {
+  public GeometryFactory(int crsId, double scaleXY) {
     this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
-      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
+      new SimpleCoordinatesPrecisionModel(scaleXY), 2);
   }
 
-  public GeometryFactory(CoordinateSystem coordinateSystem, double scaleXY, double scaleZ) {
-    this(coordinateSystem,
-      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
+  public GeometryFactory(int crsId, double scaleXY, double scaleZ) {
+    this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
+      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ), 3);
   }
+
+  public GeometryFactory(CoordinateSystem coordinateSystem, double scaleXY,
+    double scaleZ) {
+    this(coordinateSystem, new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
+  }
+
   public Geometry createGeometry(Geometry geometry) {
     if (geometry == null) {
       return null;
@@ -467,6 +473,7 @@ public class GeometryFactory extends
     }
     return super.createPoint(points);
   }
+
   public MultiPoint createMultiPoint(final CoordinatesList points) {
     if (points != null) {
       points.makePrecise(coordinatesPrecisionModel);
@@ -481,7 +488,8 @@ public class GeometryFactory extends
 
   public Polygon createPolygon(final List<?> rings) {
     if (rings.size() == 0) {
-      final DoubleCoordinatesList nullPoints = new DoubleCoordinatesList(0, numAxis);
+      final DoubleCoordinatesList nullPoints = new DoubleCoordinatesList(0,
+        numAxis);
       LinearRing ring = createLinearRing(nullPoints);
       return createPolygon(ring, null);
     } else {

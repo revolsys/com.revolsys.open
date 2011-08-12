@@ -45,6 +45,14 @@ public class BoundingBox extends Envelope {
     }
   }
 
+  private double maxX = -1;
+
+  private double minX = 0;
+
+  private double maxY = -1;
+
+  private double minY = 0;
+
   private double maxZ;
 
   private double minZ;
@@ -370,19 +378,29 @@ public class BoundingBox extends Envelope {
   }
 
   public void setMaxX(final double maxX) {
-    expandToInclude(maxX, getMaxY());
+    this.maxX = maxX;
+    initIfNotNull();
   }
 
   public void setMaxY(final double maxY) {
-    expandToInclude(getMaxX(), maxY);
+    this.maxY = maxY;
+    initIfNotNull();
   }
 
   public void setMinX(final double minX) {
-    expandToInclude(minX, getMinY());
+    this.minX = minX;
+    initIfNotNull();
+  }
+
+  private void initIfNotNull() {
+    if (maxX != -1 && minX  != 0 && maxY !=-1 && minY != 0) {
+      init(minX, maxX, minY, maxY);
+    }
   }
 
   public void setMinY(final double minY) {
-    expandToInclude(getMinX(), minY);
+    this.minY = minY;
+    initIfNotNull();
   }
 
   public Geometry toGeometry() {

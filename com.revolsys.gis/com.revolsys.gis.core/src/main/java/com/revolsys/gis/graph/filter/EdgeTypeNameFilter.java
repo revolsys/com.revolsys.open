@@ -1,5 +1,6 @@
 package com.revolsys.gis.graph.filter;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
@@ -26,6 +27,15 @@ public class EdgeTypeNameFilter<T> implements Filter<Edge<T>> {
   public EdgeTypeNameFilter(
     final Collection<QName> typeNames) {
     this.typeNames = typeNames;
+  }
+  /**
+   * Construct a new EdgeTypeNameFilter.
+   * 
+   * @param typeNames The list of type names to accept.
+   */
+  public EdgeTypeNameFilter(
+    final QName... typeNames) {
+    this(Arrays.asList(typeNames));
   }
 
   /**

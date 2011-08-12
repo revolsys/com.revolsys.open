@@ -4,6 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.data.io.OutsideBoundaryWriter;
+import com.revolsys.parallel.channel.ChannelInput;
+import com.revolsys.parallel.channel.ChannelOutput;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 
 public class ScriptExecutorBoundingBoxTaskSplitter extends
@@ -15,12 +18,29 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   private Map<String, Object> beans = new LinkedHashMap<String, Object>();
 
+  private Map<String, ChannelInput<?>> inChannels = new LinkedHashMap<String, ChannelInput<?>>();
+
+  private Map<String, ChannelOutput<?>> outChannels = new LinkedHashMap<String, ChannelOutput<?>>();
+
+  private OutsideBoundaryWriter outsideBoundaryWriter;
+  
+  public OutsideBoundaryWriter getOutsideBoundaryWriter() {
+    return outsideBoundaryWriter;
+  }
+
+  public void setOutsideBoundaryWriter(OutsideBoundaryWriter outsideBoundaryWriter) {
+    this.outsideBoundaryWriter = outsideBoundaryWriter;
+  }
+
   @Override
   public void execute(final BoundingBox boundingBox) {
+    outsideBoundaryWriter.expandBoundary(boundingBox.toGeometry());
     final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(
       scriptName, attributes);
     executor.addBean("boundingBox", boundingBox);
     executor.addBeans(beans);
+    executor.addBeans(inChannels);
+    executor.addBeans(outChannels);
     executor.run();
   }
 
@@ -28,24 +48,60 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     return attributes;
   }
 
-  public String getScriptName() {
-    return scriptName;
-  }
-
-  public void setAttributes(Map<String, Object> attributes) {
-    this.attributes = attributes;
-  }
-
-  public void setScriptName(final String scriptName) {
-    this.scriptName = scriptName;
-  }
-
   public Map<String, Object> getBeans() {
     return beans;
   }
 
-  public void setBeans(Map<String, Object> beans) {
+  public Map<String, ChannelInput<?>> getInChannels() {
+    return inChannels;
+  }
+
+  public Map<String, ChannelOutput<?>> getOutChannels() {
+    return outChannels;
+  }
+
+  public String getScriptName() {
+    return scriptName;
+  }
+
+  @Override
+  protected void postRun() {
+    for (final ChannelInput<?> in : inChannels.values()) {
+      in.readDisconnect();
+    }
+    for (final ChannelOutput<?> out : outChannels.values()) {
+      out.writeDisconnect();
+    }
+  }
+
+  @Override
+  protected void preRun() {
+    for (final ChannelInput<?> in : inChannels.values()) {
+      in.readConnect();
+    }
+    for (final ChannelOutput<?> out : outChannels.values()) {
+      out.writeConnect();
+    }
+  }
+
+  public void setAttributes(final Map<String, Object> attributes) {
+    this.attributes = attributes;
+  }
+
+  public void setBeans(final Map<String, Object> beans) {
     this.beans = beans;
+  }
+
+  public void setInChannels(final Map<String, ChannelInput<?>> inChannels) {
+    this.inChannels = inChannels;
+  }
+
+  public void setOutChannels(final Map<String, ChannelOutput<?>> outChannels) {
+    this.outChannels = outChannels;
+  }
+
+  public void setScriptName(final String scriptName) {
+    this.scriptName = scriptName;
   }
 
 }

@@ -25,21 +25,32 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   }
 
   public void run() {
-    if (boundingBox != null) {
-      final double xInc = boundingBox.getWidth() / numX;
-      final double yInc = boundingBox.getHeight() / numY;
-      double x = boundingBox.getMinX();
-      for (int i = 0; i < numX; i++) {
-        double y = boundingBox.getMinY();
-        for (int j = 0; j < numX; j++) {
-          final BoundingBox cellBoundingBox = new BoundingBox(
-            boundingBox.getGeometryFactory(), x, y, x + xInc, y + yInc);
-          execute(cellBoundingBox);
+    preRun();
+    try {
+      if (boundingBox != null) {
+        final double xInc = boundingBox.getWidth() / numX;
+        final double yInc = boundingBox.getHeight() / numY;
+        double x = boundingBox.getMinX();
+        for (int i = 0; i < numX; i++) {
+          double y = boundingBox.getMinY();
+          for (int j = 0; j < numX; j++) {
+            final BoundingBox cellBoundingBox = new BoundingBox(
+              boundingBox.getGeometryFactory(), x, y, x + xInc, y + yInc);
+            execute(cellBoundingBox);
+            y += yInc;
+          }
+          x += xInc;
         }
-        y += yInc;
       }
-      x += xInc;
+    } finally {
+      postRun();
     }
+  }
+
+  protected void preRun() {
+  }
+
+  protected void postRun() {
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {

@@ -77,6 +77,16 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     return parameterIndex + 1;
   }
 
+  @Override
+  public int setInsertPreparedStatementValue(PreparedStatement statement,
+    int parameterIndex, DataObject object) throws SQLException {
+    final String name = getName();
+    final Object value = object.getValue(name);
+    final Object jdbcValue = getInsertUpdateValue(value);
+    statement.setObject(parameterIndex, jdbcValue);
+    return parameterIndex + 1;
+  }
+  
   public Object toJava(final Object object) throws SQLException {
     if (object instanceof PGgeometry) {
       final PGgeometry pgGeometry = (PGgeometry)object;
@@ -97,7 +107,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  public Object toJdbc(final Object object) throws SQLException {
+  public Object getInsertUpdateValue(final Object object) throws SQLException {
     Geometry geometry = null;
     if (getType() == DataTypes.POINT) {
       geometry = toPgPoint(object);
@@ -129,19 +139,37 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     return new PGgeometry(geometry);
   }
 
+  public Object toJdbc(final Object object) throws SQLException {
+    Geometry geometry = null;
+     if (object instanceof com.vividsolutions.jts.geom.Point) {
+      final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
+      geometry = toPgPoint(point);
+    } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
+      final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
+      geometry = toPgLineString(lineString);
+    } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
+      final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
+      geometry = toPgMultiLineString(lineString);
+    } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
+      final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
+      geometry = toPgPolygon(polygon);
+    } else {
+      return object;
+    }
+    return new PGgeometry(geometry);
+  }
   private com.vividsolutions.jts.geom.LineString toJtsLineString(
     final GeometryFactory factory, final LineString lineString) {
     final Point[] points = lineString.getPoints();
-    final int dimension = lineString.getDimension();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
-      points.length, dimension);
+      points.length, numAxis);
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
       coordinates.setX(i, point.x);
       coordinates.setY(i, point.y);
-      if (dimension > 3) {
+      if (numAxis > 2) {
         coordinates.setZ(i, point.z);
-        if (dimension > 4) {
+        if (numAxis > 3) {
           coordinates.setValue(i, 3, point.m);
         }
       }
@@ -162,9 +190,8 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
 
   private com.vividsolutions.jts.geom.Point toJtsPoint(
     final GeometryFactory factory, final Point point) {
-    final int dimension = point.getDimension();
     final Coordinates coordinate;
-    switch (dimension) {
+    switch (numAxis) {
       case 3:
         coordinate = new DoubleCoordinates(point.x, point.y, point.z);
       break;
@@ -182,16 +209,15 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     final GeometryFactory factory, final Polygon polygon) {
     final LinearRing ring = polygon.getRing(0);
     final Point[] points = ring.getPoints();
-    final int dimension = polygon.getDimension();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
-      points.length, dimension);
+      points.length, numAxis);
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
       coordinates.setValue(i, 0, point.x);
       coordinates.setValue(i, 1, point.y);
-      if (dimension > 3) {
+      if (numAxis > 2) {
         coordinates.setOrdinate(i, 2, point.z);
-        if (dimension > 4) {
+        if (numAxis > 3) {
           coordinates.setOrdinate(i, 3, point.m);
         }
       }
@@ -380,13 +406,13 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
       final double x = coordinates.getX(i);
 
       if (numAxis > 2) {
-        double z = coordinates.getZ(0);
+        double z = coordinates.getZ(i);
         if (Double.isNaN(z)) {
           z = 0;
         }
         pgPoint = new Point(x, y, z);
         if (numAxis > 3) {
-          double m = coordinates.getM(0);
+          double m = coordinates.getM(i);
           if (Double.isNaN(m)) {
             m = 0;
           }

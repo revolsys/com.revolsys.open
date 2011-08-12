@@ -102,26 +102,29 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
         ClassLoader classLoader = resourceLoader.getClassLoader();
         applicationContext.setClassLoader(classLoader);
       }
-      AnnotationConfigUtils.registerAnnotationConfigProcessors(applicationContext,null);
-        final DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
+      AnnotationConfigUtils.registerAnnotationConfigProcessors(
+        applicationContext, null);
+      final DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
 
       final BeanFactory parentBeanFactory = (BeanFactory)parentRegistry;
       for (final String beanName : parentRegistry.getBeanDefinitionNames()) {
         final BeanDefinition beanDefinition = parentRegistry.getBeanDefinition(beanName);
         final String beanClassName = beanDefinition.getBeanClassName();
-        if (beanClassName.equals(AttributeMap.class.getName())) {
-          registerTargetBeanDefinition(applicationContext, parentBeanFactory,
-            beanName, beanName);
-          beanNamesNotToExport.add(beanName);
-        } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
-          final PropertyValue targetMapClass = beanDefinition.getPropertyValues()
-            .getPropertyValue("targetMapClass");
-          if (targetMapClass != null) {
-            final Object mapClass = targetMapClass.getValue();
-            if (AttributeMap.class.getName().equals(mapClass)) {
-              registerTargetBeanDefinition(applicationContext,
-                parentBeanFactory, beanName, beanName);
-              beanNamesNotToExport.add(beanName);
+        if (beanClassName != null) {
+          if (beanClassName.equals(AttributeMap.class.getName())) {
+            registerTargetBeanDefinition(applicationContext, parentBeanFactory,
+              beanName, beanName);
+            beanNamesNotToExport.add(beanName);
+          } else if (beanClassName.equals(MapFactoryBean.class.getName())) {
+            final PropertyValue targetMapClass = beanDefinition.getPropertyValues()
+              .getPropertyValue("targetMapClass");
+            if (targetMapClass != null) {
+              final Object mapClass = targetMapClass.getValue();
+              if (AttributeMap.class.getName().equals(mapClass)) {
+                registerTargetBeanDefinition(applicationContext,
+                  parentBeanFactory, beanName, beanName);
+                beanNamesNotToExport.add(beanName);
+              }
             }
           }
         }
@@ -188,7 +191,7 @@ public class ModuleImport implements BeanDefinitionRegistryPostProcessor,
 
   public void postProcessBeanDefinitionRegistry(
     final BeanDefinitionRegistry registry) throws BeansException {
-     beforePostProcessBeanDefinitionRegistry(registry);
+    beforePostProcessBeanDefinitionRegistry(registry);
     if (enabled) {
       final GenericApplicationContext beanFactory = getApplicationContext(registry);
       if (exportAllBeans) {

@@ -162,7 +162,7 @@ public final class JdbcUtils {
       throw new RuntimeException(
         "SQL error getting connection from data source", e);
     } catch (final Throwable e) {
-      throw new RuntimeException("Unknown getting connection from data source",
+      throw new RuntimeException("Unknown error getting connection from data source",
         e);
     }
   }

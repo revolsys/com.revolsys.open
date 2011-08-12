@@ -80,7 +80,7 @@ public final class DataObjectUtil {
             if (dataStore != null) {
               final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
               if (codeTable != null) {
-                propertyValue = codeTable.getMap((Number)propertyValue);
+                propertyValue = codeTable.getMap(propertyValue);
               }
             }
           }

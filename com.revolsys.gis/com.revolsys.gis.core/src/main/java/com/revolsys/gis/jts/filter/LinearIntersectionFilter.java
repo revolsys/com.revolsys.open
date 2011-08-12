@@ -1,6 +1,8 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.util.NoOp;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.IntersectionMatrix;
 import com.vividsolutions.jts.geom.LineString;
@@ -13,18 +15,18 @@ public class LinearIntersectionFilter implements Filter<LineString> {
 
   private final PreparedGeometry preparedLine;
 
-  public LinearIntersectionFilter(
-    final LineString line) {
+  private Envelope envelope;
+
+  public LinearIntersectionFilter(final LineString line) {
     this.line = line;
     this.preparedLine = PreparedGeometryFactory.prepare(line);
+    this.envelope = line.getEnvelopeInternal();
   }
 
-  public boolean accept(
-    final LineString line) {
-    if (preparedLine.intersects(line)) {
-      final Geometry edgeEnvelope = line.getEnvelope();
-      final Geometry envelope = this.line.getEnvelope();
-      if (edgeEnvelope.intersects(envelope)) {
+  public boolean accept(final LineString line) {
+    final Envelope envelope = line.getEnvelopeInternal();
+    if (envelope.intersects(this.envelope)) {
+      if (preparedLine.intersects(line)) {
         final IntersectionMatrix relate = this.line.relate(line);
         if (relate.isOverlaps(1, 1) || relate.isContains() || relate.isWithin()) {
           return true;
