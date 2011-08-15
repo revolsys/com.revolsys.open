@@ -618,9 +618,9 @@ public class Graph<T> {
     final Node<DataObject> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typeName, node1, newNode)
       && !Node.hasEdgesBetween(typeName, node2, newNode)) {
-      if (node1.equals2d(midPoint)) {
+      if (node1.equals2d(newNode)) {
         moveNode(typeName, node2, node1, newPoint);
-      } else if (node2.equals2d(midPoint)) {
+      } else if (node2.equals2d(newNode)) {
         moveNode(typeName, node1, node2, newPoint);
       } else {
         moveNode(typeName, node1, newNode, newPoint);

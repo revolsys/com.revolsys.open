@@ -27,6 +27,8 @@ import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.ObjectProcessor;
@@ -86,15 +88,15 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
         }
       }
       final LineString line2 = edge2.getLine();
-      final boolean equalExact = LineStringUtil.equalsExact(line1, line2, 3);
+
+      final boolean equalZ = fixMissingZValues(line1, line2);
       if (equalExcludedAttributes || getComparator() != null) {
-        if (equalExact) {
-          edge1.remove();
+        if (equalZ) {
+          edge2.remove();
           if (duplicateStatistics != null) {
-            duplicateStatistics.add(object1);
+            duplicateStatistics.add(object2);
           }
         } else {
-          // TODO check for 0 z and not null z-s
           LOG.error("Equal geometry with different coordinates or Z-values: "
             + line1);
         }
@@ -103,6 +105,73 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
       }
     } else {
       LOG.error("Equal geometry with different attributes: " + line1);
+    }
+  }
+
+  public boolean fixMissingZValues(final LineString line1,
+    final LineString line2) {
+    CoordinatesList points1 = CoordinatesListUtil.get(line1);
+    CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    if (points1.getNumAxis() > 2) {
+      final int numPoints = points1.size();
+      boolean reverse = isReverse(points1, points2);
+      if (reverse) {
+        int j = numPoints - 1;
+        for (int i = 0; i < numPoints; i++) {
+          if (!fixZValues(points1, j, points2, i)) {
+            return false;
+          }
+          j--;
+        }
+      } else {
+        for (int i = 0; i < numPoints; i++) {
+          if (!fixZValues(points1, i, points2, i)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    } else {
+      return true;
+    }
+  }
+
+  public boolean fixZValues(CoordinatesList points1, int index1,
+    CoordinatesList points2, int index2) {
+    double z1 = points1.getZ(index2);
+    double z2 = points2.getZ(index1);
+    if (Double.isNaN(z1) || z1 == 0) {
+      if (!Double.isNaN(z2)) {
+        points1.setZ(index2, z2);
+      }
+      return true;
+    } else if (Double.isNaN(z2) || z2 == 0) {
+      if (!Double.isNaN(z1)) {
+        points2.setZ(index1, z1);
+      }
+      return true;
+    } else {
+      return z1 == z2;
+    }
+  }
+
+  public boolean isReverse(CoordinatesList points1, CoordinatesList points2) {
+    final int numPoints = points1.size();
+    if (points1.equal(0, points2, numPoints - 1, 2)) {
+      if (points1.equal(0, points1, numPoints - 1, 2)) {
+        int j = numPoints - 1;
+        for (int i = 1; i < numPoints; i++) {
+          if (!points1.equal(i, points2, j, 2)) {
+            return false;
+          }
+          j++;
+        }
+        return true;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
     }
   }
 

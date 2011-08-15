@@ -132,7 +132,6 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
               final Node<DataObject> fromNode2 = edge2.getFromNode();
               if (fromNode1.distance(fromNode2) < 2) {
                 graph.moveNodesToMidpoint(typeName, fromNode1, fromNode2);
-                System.out.println("Movinging " + fromNode1);
                 return true;
               }
             }
@@ -142,7 +141,6 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
               final Node<DataObject> toNode1 = edge.getToNode();
               final Node<DataObject> toNode2 = edge2.getToNode();
               if (toNode1.distance(toNode2) < 2) {
-                System.out.println("Movinging " + toNode1);
                 graph.moveNodesToMidpoint(typeName, toNode1, toNode2);
                 return true;
               }
