@@ -48,6 +48,7 @@
       <groupId>com.revolsys.com.esri</groupId>
       <artifactId>com.esri.arcobjects</artifactId>
       <version>10.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
