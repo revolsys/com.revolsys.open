@@ -294,7 +294,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       final String tableName = typeName.getLocalPart();
       final String idColumnName = loadIdColumnName(schemaName, tableName);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
-        final String name = resultSetMetaData.getColumnName(i);
+        final String name = resultSetMetaData.getColumnName(i).toUpperCase();
         if (name.equals(idColumnName)) {
           metaData.setIdAttributeIndex(i - 1);
         }
@@ -373,7 +373,9 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public void insert(final DataObject object) {
-    getWriter().write(object);
+    final JdbcWriter writer = createWriter();
+    writer.write(object);
+    writer.close();
   }
 
   @Override

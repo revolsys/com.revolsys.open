@@ -62,6 +62,8 @@ public final class DataObjectUtil {
   @SuppressWarnings("unchecked")
   public static <T> T getAttributeByPath(final DataObject object,
     final String path) {
+    final DataObjectMetaData metaData = object.getMetaData();
+    final DataObjectStore dataStore = metaData.getDataObjectStore();
 
     final String[] propertyPath = path.split("\\.");
     Object propertyValue = object;
@@ -75,8 +77,6 @@ public final class DataObjectUtil {
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final DataObjectMetaData metaData = dataObject.getMetaData();
-            final DataObjectStore dataStore = metaData.getDataObjectStore();
             if (dataStore != null) {
               final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
               if (codeTable != null) {
@@ -94,8 +94,22 @@ public final class DataObjectUtil {
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
+        if (propertyValue == null) {
+          return null;
+        } else if (i + 1 < propertyPath.length) {
+          if (dataStore != null) {
+            final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
+            if (codeTable != null) {
+              propertyValue = codeTable.getMap(propertyValue);
+            }
+          }
+        }
       } else {
-        propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
+        try {
+          propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
+        } catch (IllegalArgumentException e) {
+          throw new IllegalArgumentException("Path does not exist " + path, e);
+        }
       }
     }
     return (T)propertyValue;

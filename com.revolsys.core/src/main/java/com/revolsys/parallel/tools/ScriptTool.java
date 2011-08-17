@@ -61,8 +61,7 @@ public class ScriptTool {
 
   private static final String VERSION_OPTION = "v";
 
-  private static Throwable getBeanExceptionCause(
-    BeanCreationException e) {
+  private static Throwable getBeanExceptionCause(BeanCreationException e) {
     Throwable cause = e.getCause();
     if (cause == null) {
       return e;
@@ -91,8 +90,7 @@ public class ScriptTool {
   /**
    * @param args
    */
-  public static void main(
-    String[] args) {
+  public static void main(String[] args) {
     ScriptTool app = new ScriptTool();
     app.start(args);
   }
@@ -162,9 +160,7 @@ public class ScriptTool {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public boolean processArguments(
-    String[] args) {
+  public boolean processArguments(String[] args) {
     try {
       loadProperties("script.properties");
       CommandLineParser parser = new PosixParser();
@@ -274,8 +270,7 @@ public class ScriptTool {
     }
   }
 
-  private boolean setScriptFileName(
-    final String scriptFileName) {
+  private boolean setScriptFileName(final String scriptFileName) {
     if (new File(scriptFileName).exists()) {
       this.scriptFileName = scriptFileName;
       scriptFile = new File(scriptFileName);
@@ -289,17 +284,14 @@ public class ScriptTool {
     }
   }
 
-  private boolean loadProperties(
-    String name) {
+  private boolean loadProperties(String name) {
     Class<? extends ScriptTool> clazz = getClass();
     ClassLoader classLoader = clazz.getClassLoader();
     InputStream scriptIn = classLoader.getResourceAsStream(name);
     return loadProperties(name, scriptIn);
   }
 
-  private boolean loadProperties(
-    final String name,
-    final InputStream in) {
+  private boolean loadProperties(final String name, final InputStream in) {
     if (in != null) {
       try {
         Properties props = new Properties();
@@ -363,6 +355,10 @@ public class ScriptTool {
     }
     System.out.println(message);
 
+    if (System.getProperty("applicationHome") == null) {
+      ThreadSharedAttributes.setAttribute("applicationHome", ".");
+      System.setProperty("applicationHome", ".");
+    }
     try {
       GenericApplicationContext beans = new GenericApplicationContext();
       beans.getBeanFactory().addPropertyEditorRegistrar(
@@ -400,8 +396,7 @@ public class ScriptTool {
 
   }
 
-  public void start(
-    String[] args) {
+  public void start(String[] args) {
     if (processArguments(args)) {
       run();
     } else {

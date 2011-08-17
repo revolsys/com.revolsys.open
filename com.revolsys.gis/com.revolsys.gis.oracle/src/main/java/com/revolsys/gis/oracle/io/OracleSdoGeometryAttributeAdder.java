@@ -40,6 +40,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<Integer, DataType>();
 
+  private static final Map<DataType, Integer> DATA_TYPE_TO_2D_ID = new HashMap<DataType, Integer>();
+
   private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
 
   static {
@@ -99,6 +101,20 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     ID_TO_GEOMETRY_TYPE.put(id, name);
     GEOMETRY_TYPE_TO_ID.put(name, id);
     ID_TO_DATA_TYPE.put(id, dataType);
+    if (!DATA_TYPE_TO_2D_ID.containsKey(dataType)) {
+      DATA_TYPE_TO_2D_ID.put(dataType, id);
+    }
+  }
+
+  public static int getGeometryTypeId(DataType dataType, int numAxis) {
+    int id = DATA_TYPE_TO_2D_ID.get(dataType);
+    if (numAxis > 3) {
+      return 3000 + id;
+    } else if (numAxis > 2) {
+      return 1000 + id;
+    } else {
+      return id;
+    }
   }
 
   @Override
@@ -133,18 +149,16 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
         dimension);
     }
     DataType dataType = DataTypes.GEOMETRY;
-      final String schemaName = typeName.getNamespaceURI();
-      final String tableName = typeName.getLocalPart();
-      String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
-      try {
-          int geometryType = JdbcUtils.selectInt(
-        dataSource,
-        sql,
-        schemaName, tableName, columnName);
+    final String schemaName = typeName.getNamespaceURI();
+    final String tableName = typeName.getLocalPart();
+    String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+    try {
+      int geometryType = JdbcUtils.selectInt(dataSource, sql, schemaName,
+        tableName, columnName);
       dataType = ID_TO_DATA_TYPE.get(geometryType);
     } catch (SQLException e) {
       LOG.error("Unable to get geometry type for " + typeName + "."
-        + columnName,e);
+        + columnName, e);
     } catch (IllegalArgumentException e) {
       LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typeName + "."
         + columnName);

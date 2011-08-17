@@ -56,7 +56,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
-  
   @Override
   public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
@@ -154,18 +153,32 @@ public class CodeTableProperty extends AbstractCodeTable implements
       id = getId(values, false);
     } else {
       final StringBuffer where = new StringBuffer();
+      List<Object> queryValues = new ArrayList<Object>();
       if (!values.isEmpty()) {
+        int i = 0;
         for (final String attributeName : valueAttributeNames) {
-          if (where.length() > 0) {
+          if (i > 0) {
             where.append(" AND ");
           }
-          where.append(attributeName + " = ?");
+          where.append(attributeName);
+          Object value = values.get(i);
+          if (value == null) {
+            where.append(" IS NULL");
+          } else {
+            queryValues.add(value);
+            where.append(" = ?");
+          }
+          i++;
         }
       }
       final Reader<DataObject> reader = dataStore.query(typeName,
-        where.toString(), values.toArray());
-      addValues(reader);
-      id = getIdByValue(values);
+        where.toString(), queryValues.toArray());
+      try {
+        addValues(reader);
+        id = getIdByValue(values);
+      } finally {
+        reader.close();
+      }
     }
     if (createId && id == null) {
       return createId(values);
