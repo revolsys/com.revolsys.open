@@ -88,8 +88,6 @@ public class ShapeFileWriter extends XbaseFileWriter {
 
   private double zMin = 0; // Double.MAX_VALUE;
 
-  private CoordinateSystem coordinateSystem;
-
   private GeometryFactory geometryFactory;
 
   public ShapeFileWriter(
@@ -149,6 +147,7 @@ public class ShapeFileWriter extends XbaseFileWriter {
     }
     final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)getMetaData();
     if (metaData != null) {
+      geometryPropertyName = metaData.getGeometryAttributeName();
       if (!metaData.hasAttribute(geometryPropertyName)) {
         metaData.addAttribute(geometryPropertyName, DataTypes.GEOMETRY, true);
         addField(new FieldDefinition(geometryPropertyName,
@@ -330,10 +329,10 @@ public class ShapeFileWriter extends XbaseFileWriter {
     final DataObject object,
     final FieldDefinition field)
     throws IOException {
-    if (field.getName() == geometryPropertyName) {
+    if (field.getName().equals(geometryPropertyName)) {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
-      geometry = GeometryProjectionUtil.perform(geometry, coordinateSystem);
+      geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);
       envelope.expandToInclude(geometry.getEnvelopeInternal());
       if (geometry.isEmpty()) {
         writeNull(out);
