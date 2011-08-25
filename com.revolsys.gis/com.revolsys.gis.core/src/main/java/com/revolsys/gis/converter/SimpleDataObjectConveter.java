@@ -1,5 +1,6 @@
 package com.revolsys.gis.converter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ public class SimpleDataObjectConveter implements
 
   private DataObjectFactory factory;
 
-  private List<SourceToTargetProcess<DataObject, DataObject>> processors = Collections.emptyList();
+  private List<SourceToTargetProcess<DataObject, DataObject>> processors = new ArrayList<SourceToTargetProcess<DataObject,DataObject>>();
 
   public SimpleDataObjectConveter() {
   }

@@ -224,8 +224,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
   }
 
   public DataObjectMetaData getMetaData() {
-    // TODO Auto-generated method stub
-    return null;
+    return metaData;
   }
 
   private BigDecimal getNumber(

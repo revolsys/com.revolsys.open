@@ -22,9 +22,7 @@ public abstract class AbstractDataObjectIoFactory extends
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractDataObjectIoFactory(
-    final String name,
-    final boolean binary) {
+  public AbstractDataObjectIoFactory(final String name, final boolean binary) {
     super(name, binary);
   }
 
@@ -36,23 +34,15 @@ public abstract class AbstractDataObjectIoFactory extends
    * @return The writer.
    */
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource) {
-    try {
-      final OutputStream out = SpringUtil.getOutputStream(resource);
-      final String fileName = resource.getFilename();
-      final String baseName = FileUtil.getBaseName(fileName);
-      return createDataObjectWriter(baseName, metaData, out);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Error opening resource " + resource,
-        e);
-    }
+    final DataObjectMetaData metaData, final Resource resource) {
+    final OutputStream out = SpringUtil.getOutputStream(resource);
+    final String fileName = resource.getFilename();
+    final String baseName = FileUtil.getBaseName(fileName);
+    return createDataObjectWriter(baseName, metaData, out);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream) {
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
   }

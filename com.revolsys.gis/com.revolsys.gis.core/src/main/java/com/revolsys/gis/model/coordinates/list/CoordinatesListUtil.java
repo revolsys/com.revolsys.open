@@ -577,4 +577,13 @@ public class CoordinatesListUtil {
     }
     return points;
   }
+
+  public static double angle(CoordinatesList points, int i1, int i2) {
+    double x1 = points.getX(i1);
+    double y1 = points.getY(i1);
+    double x2 = points.getX(i2);
+    double y2 = points.getY(i2);
+    final double angle = MathUtil.angle(x1, y1, x2, y2);
+    return angle;
+  }
 }

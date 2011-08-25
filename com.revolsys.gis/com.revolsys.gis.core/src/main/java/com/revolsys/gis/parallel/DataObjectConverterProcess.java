@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -14,8 +15,11 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.converter.FilterDataObjectConverter;
+import com.revolsys.gis.converter.SimpleDataObjectConveter;
+import com.revolsys.gis.converter.process.CopyValues;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
@@ -28,6 +32,10 @@ public class DataObjectConverterProcess extends
   private Map<QName, Collection<FilterDataObjectConverter>> typeFilterConverterMap = new LinkedHashMap<QName, Collection<FilterDataObjectConverter>>();
 
   private Map<QName, Converter<DataObject, DataObject>> typeConverterMap = new HashMap<QName, Converter<DataObject, DataObject>>();
+
+  private DataObjectMetaDataFactory targetMetaDataFactory;
+
+  private Map<Object, Map<String, Object>> simpleMapping;
 
   public void addTypeConverter(final QName typeName,
     final Converter<DataObject, DataObject> converter) {
@@ -51,6 +59,10 @@ public class DataObjectConverterProcess extends
 
   public Map<QName, Collection<FilterDataObjectConverter>> getFilterTypeConverterMap() {
     return typeFilterConverterMap;
+  }
+
+  public DataObjectMetaDataFactory getTargetMetaDataFactory() {
+    return targetMetaDataFactory;
   }
 
   public Map<QName, Converter<DataObject, DataObject>> getTypeConverterMap() {
@@ -85,7 +97,7 @@ public class DataObjectConverterProcess extends
         targetObject = typeConveter.convert(sourceObject);
         out.write(targetObject);
       } else if (defaultConverter == null) {
-        processObjectWithNoConverter(out,sourceObject);
+        processObjectWithNoConverter(out, sourceObject);
       } else {
         targetObject = defaultConverter.convert(sourceObject);
         out.write(targetObject);
@@ -104,13 +116,53 @@ public class DataObjectConverterProcess extends
     }
   }
 
-  protected void processObjectWithNoConverter(Channel<DataObject> out, final DataObject sourceObject) {
+  protected void processObjectWithNoConverter(final Channel<DataObject> out,
+    final DataObject sourceObject) {
     LOG.error("No converter found for: " + sourceObject);
   }
 
   public void setDefaultConverter(
     final Converter<DataObject, DataObject> defaultConverter) {
     this.defaultConverter = defaultConverter;
+  }
+
+  protected void preRun(final Channel<DataObject> in, final Channel<DataObject> out) {
+    if (simpleMapping != null) {
+      for (final Entry<Object, Map<String, Object>> entry : simpleMapping.entrySet()) {
+        final Object key = entry.getKey();
+        QName sourceTypeName;
+        if (key instanceof QName) {
+          sourceTypeName = (QName)key;
+        } else {
+          sourceTypeName = QName.valueOf(key.toString());
+        }
+        final Map<String, Object> map = entry.getValue();
+        final Object targetName = map.get("typeName");
+        QName targetTypeName;
+        if (key instanceof QName) {
+          targetTypeName = (QName)targetName;
+        } else {
+          targetTypeName = QName.valueOf(targetName.toString());
+        }
+        Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
+
+        final DataObjectMetaData targetMetaData = targetMetaDataFactory.getMetaData(targetTypeName);
+        final SimpleDataObjectConveter converter = new SimpleDataObjectConveter(
+          targetMetaData);
+        converter.addProcessor(new CopyValues(attributeMapping));
+        addTypeConverter(sourceTypeName, converter);
+      }
+    }
+  }
+
+  public void setSimpleMapping(
+    final Map<Object, Map<String, Object>> simpleMapping) {
+    this.simpleMapping = simpleMapping;
+  }
+
+  public void setTargetMetaDataFactory(
+    final DataObjectMetaDataFactory targetMetaDataFactory) {
+    this.targetMetaDataFactory = targetMetaDataFactory;
   }
 
   public void setTypeConverterMap(

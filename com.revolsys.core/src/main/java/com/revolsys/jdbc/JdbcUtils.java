@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,7 +394,7 @@ public final class JdbcUtils {
         if (resultSet.next()) {
           return readMap(resultSet);
         } else {
-          throw new IllegalArgumentException("Value not found");
+          throw new IllegalArgumentException("Value not found for " + sql +" " + Arrays.asList(parameters));
         }
       } finally {
         close(resultSet);

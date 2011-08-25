@@ -1,5 +1,6 @@
 package com.revolsys.gis.converter.process;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,16 +29,27 @@ public class SetCodeTableId implements
     final Map<String, Object> codeTableValues = new HashMap<String, Object>();
 
     for (final Entry<String, Converter<DataObject, Object>> entry : codeTableValueConverters.entrySet()) {
-      final String codeTableAttributeName = entry.getKey();
+      String codeTableAttributeName = entry.getKey();
       final Converter<DataObject, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
         DataObjectStore dataObjectStore = target.getMetaData()
           .getDataObjectStore();
         if (dataObjectStore != null) {
+          String codeTableValueName = null;
+          final int dotIndex = codeTableAttributeName.indexOf(".");
+          if (dotIndex != -1) {
+            codeTableValueName = codeTableAttributeName.substring(dotIndex + 1);
+            codeTableAttributeName = codeTableAttributeName.substring(0,
+              dotIndex);
+          }
           CodeTable targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
           if (targetCodeTable != null) {
-            sourceValue = targetCodeTable.getId(sourceValue);
+            if (codeTableValueName == null) {
+              sourceValue = targetCodeTable.getId(sourceValue);
+            } else {
+              sourceValue = targetCodeTable.getId(Collections.singletonMap(codeTableValueName, sourceValue));
+            }
           }
         }
       }

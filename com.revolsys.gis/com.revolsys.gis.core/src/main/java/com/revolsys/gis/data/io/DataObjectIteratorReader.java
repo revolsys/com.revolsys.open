@@ -10,6 +10,8 @@ public class DataObjectIteratorReader extends IteratorReader<DataObject>
   }
 
   public DataObjectMetaData getMetaData() {
-    return ((DataObjectIterator)iterator()).getMetaData();
+    final DataObjectIterator iterator = (DataObjectIterator)iterator();
+    iterator.hasNext();
+    return iterator.getMetaData();
   }
 }

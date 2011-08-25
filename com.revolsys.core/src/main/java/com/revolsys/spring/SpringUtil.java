@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -15,29 +17,35 @@ import com.revolsys.io.FileUtil;
 
 public class SpringUtil {
 
-  public static OutputStream getOutputStream(
-    Resource resource)
-    throws IOException {
-    if (resource instanceof OutputStreamResource) {
-      OutputStreamResource outputStreamResource = (OutputStreamResource)resource;
-      return outputStreamResource.getOutputStream();
-    } else if (resource instanceof FileSystemResource) {
-      return getFileOutputStream(resource);
-    } else {
-      final URL url = resource.getURL();
-      final String protocol = url.getProtocol();
-      if (protocol.equals("file")) {
+  public static OutputStream getOutputStream(Resource resource) {
+    try {
+      if (resource instanceof OutputStreamResource) {
+        OutputStreamResource outputStreamResource = (OutputStreamResource)resource;
+        return outputStreamResource.getOutputStream();
+      } else if (resource instanceof FileSystemResource) {
         return getFileOutputStream(resource);
       } else {
-        final URLConnection connection = url.openConnection();
-        connection.setDoOutput(true);
-        return connection.getOutputStream();
+        final URL url = resource.getURL();
+        final String protocol = url.getProtocol();
+        if (protocol.equals("file")) {
+          return getFileOutputStream(resource);
+        } else {
+          final URLConnection connection = url.openConnection();
+          connection.setDoOutput(true);
+          return connection.getOutputStream();
+        }
       }
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to open stream for " + resource, e);
     }
   }
 
-  public static File getFileOrCreateTempFile(
-    Resource resource)
+  public static Writer getWriter(Resource resource) {
+    OutputStream stream = getOutputStream(resource);
+    return new OutputStreamWriter(stream);
+  }
+
+  public static File getFileOrCreateTempFile(Resource resource)
     throws IOException {
     if (resource instanceof FileSystemResource) {
       return resource.getFile();
@@ -49,19 +57,15 @@ public class SpringUtil {
     }
   }
 
-  public static Resource getResourceWithExtension(
-    Resource resource,
-    String extension)
-    throws IOException {
+  public static Resource getResourceWithExtension(Resource resource,
+    String extension) throws IOException {
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     final String newFileName = baseName + "." + extension;
     return resource.createRelative(newFileName);
   }
 
-  private static OutputStream getFileOutputStream(
-    Resource resource)
-    throws IOException,
-    FileNotFoundException {
+  private static OutputStream getFileOutputStream(Resource resource)
+    throws IOException, FileNotFoundException {
     final File file = resource.getFile();
     return new FileOutputStream(file);
   }

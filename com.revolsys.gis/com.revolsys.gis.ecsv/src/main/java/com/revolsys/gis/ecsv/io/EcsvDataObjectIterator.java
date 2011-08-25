@@ -19,6 +19,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectIterator;
+import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -54,22 +55,23 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private final Resource resource;
 
+  public EcsvDataObjectIterator(final Resource resource) {
+    this(resource, new ArrayDataObjectFactory());
+  }
+
   /**
    * Constructs CSVReader with supplied separator and quote char.
    * 
    * @param reader
    * @throws IOException
    */
-  public EcsvDataObjectIterator(
-    final Resource resource,
-    final DataObjectFactory dataObjectFactory)
-    throws IOException {
+  public EcsvDataObjectIterator(final Resource resource,
+    final DataObjectFactory dataObjectFactory) {
     this.resource = resource;
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  private void addMetaData(
-    final Map<String, Object> map) {
+  private void addMetaData(final Map<String, Object> map) {
     final QName typeName = (QName)map.get(NAME);
     final List<Attribute> attributes = new ArrayList<Attribute>();
     final Map<String, List<?>> attributeProperties = (Map<String, List<?>>)map.get(ATTRIBUTE_PROPERTIES);
@@ -115,21 +117,22 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
 
   @Override
   protected void doInit() {
-    try {
-      this.in = new BufferedReader(new InputStreamReader(
-        resource.getInputStream()));
-      readFileProperties();
-      readRecordHeader();
-      final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-      fieldTypeRegistry = new EcsvFieldTypeRegistry(geometryFactory);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to read file " + resource, e);
+    if (in == null) {
+      try {
+        this.in = new BufferedReader(new InputStreamReader(
+          resource.getInputStream()));
+        readFileProperties();
+        readRecordHeader();
+        final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        fieldTypeRegistry = new EcsvFieldTypeRegistry(geometryFactory);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to read file " + resource, e);
+      }
     }
   }
 
   private <V> V getAttributeHeader(
-    final Map<String, List<?>> attributeProperties,
-    final String attributeType,
+    final Map<String, List<?>> attributeProperties, final String attributeType,
     final int i) {
     final List<?> values = attributeProperties.get(attributeType);
     if (values == null) {
@@ -164,23 +167,19 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
    * @return the next line from the file without trailing newline
    * @throws IOException if bad things happen during the read
    */
-  private String getNextLine()
-    throws IOException {
+  private String getNextLine() throws IOException {
     final String nextLine = in.readLine();
     return nextLine;
   }
 
-  private QName getTypeNameParameter(
-    String type) {
+  private QName getTypeNameParameter(String type) {
     type = type.substring(type.indexOf(TYPE_PARAMETER_START) + 1,
       type.indexOf(TYPE_PARAMETER_END));
     final QName typeName = QName.valueOf(type);
     return typeName;
   }
 
-  private boolean isBlockEnd(
-    final String[] record,
-    final String endCharacter) {
+  private boolean isBlockEnd(final String[] record, final String endCharacter) {
     if (record != null) {
       if (record.length > 1) {
         return false;
@@ -193,9 +192,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     return true;
   }
 
-  private Object parseCommaList(
-    final DataType dataType,
-    String[] record)
+  private Object parseCommaList(final DataType dataType, String[] record)
     throws IOException {
     final List<Object> values = new ArrayList<Object>();
     int offset = 3;
@@ -222,8 +219,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
    * @param record The record.
    * @return The DataObject.
    */
-  private DataObject parseDataObject(
-    final String[] record) {
+  private DataObject parseDataObject(final String[] record) {
     recordCount++;
     final DataObject object = dataObjectFactory.createDataObject(metaData);
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
@@ -253,9 +249,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
    * @return the comma-tokenized list of elements, or null if nextLine is null
    * @throws IOException if bad things happen during the read
    */
-  private String[] parseLine(
-    final String nextLine,
-    final boolean readLine)
+  private String[] parseLine(final String nextLine, final boolean readLine)
     throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
@@ -315,11 +309,8 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   @SuppressWarnings("unchecked")
-  private Object parseValue(
-    final DataType type,
-    final String text,
-    final String[] record)
-    throws IOException {
+  private Object parseValue(final DataType type, final String text,
+    final String[] record) throws IOException {
     if (type.equals(DataTypes.MAP)) {
       return readMap();
     } else {
@@ -328,9 +319,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     }
   }
 
-  private Object parseValue(
-    final String[] record)
-    throws IOException {
+  private Object parseValue(final String[] record) throws IOException {
     final String type = record[1];
     final String text = record[2];
     if (type.startsWith("List<")) {
@@ -350,8 +339,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     }
   }
 
-  private void readFileProperties()
-    throws IOException {
+  private void readFileProperties() throws IOException {
     String[] record = readNextRecord();
     while (record != null) {
       if (record.length >= 3) {
@@ -380,8 +368,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     }
   }
 
-  private Object readMap()
-    throws IOException {
+  private Object readMap() throws IOException {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
     String[] record = readNextRecord();
     while (!isBlockEnd(record, MAP_END)) {
@@ -402,8 +389,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
    *         entry.
    * @throws IOException if bad things happen during the read
    */
-  private String[] readNextRecord()
-    throws IOException {
+  private String[] readNextRecord() throws IOException {
     final String nextLine = getNextLine();
     if (nextLine == null) {
       return null;
@@ -417,8 +403,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
    * 
    * @throws IOException If there was an error reading the header.
    */
-  private void readRecordHeader()
-    throws IOException {
+  private void readRecordHeader() throws IOException {
     // if (hasNext) {
     // int headerIndex = 0;
     // for (String[] line = readNextRecord(); line != null && line.length > 0;

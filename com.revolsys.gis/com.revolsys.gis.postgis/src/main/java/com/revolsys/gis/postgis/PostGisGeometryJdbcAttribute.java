@@ -86,7 +86,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     statement.setObject(parameterIndex, jdbcValue);
     return parameterIndex + 1;
   }
-  
+
   public Object toJava(final Object object) throws SQLException {
     if (object instanceof PGgeometry) {
       final PGgeometry pgGeometry = (PGgeometry)object;
@@ -141,7 +141,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
 
   public Object toJdbc(final Object object) throws SQLException {
     Geometry geometry = null;
-     if (object instanceof com.vividsolutions.jts.geom.Point) {
+    if (object instanceof com.vividsolutions.jts.geom.Point) {
       final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
       geometry = toPgPoint(point);
     } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
@@ -158,6 +158,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     }
     return new PGgeometry(geometry);
   }
+
   private com.vividsolutions.jts.geom.LineString toJtsLineString(
     final GeometryFactory factory, final LineString lineString) {
     final Point[] points = lineString.getPoints();
@@ -177,15 +178,19 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
     return factory.createLineString(coordinates);
   }
 
-  private com.vividsolutions.jts.geom.MultiLineString toJtsMultiLineString(
+  private com.vividsolutions.jts.geom.Geometry toJtsMultiLineString(
     final GeometryFactory factory, final MultiLineString multiLine) {
     final LineString[] lines = multiLine.getLines();
-    final com.vividsolutions.jts.geom.LineString[] lineStrings = new com.vividsolutions.jts.geom.LineString[lines.length];
-    for (int i = 0; i < lines.length; i++) {
-      final LineString line = lines[i];
-      lineStrings[i] = toJtsLineString(factory, line);
+    if (lines.length == 1) {
+      return toJtsLineString(factory, lines[0]);
+    } else {
+      final com.vividsolutions.jts.geom.LineString[] lineStrings = new com.vividsolutions.jts.geom.LineString[lines.length];
+      for (int i = 0; i < lines.length; i++) {
+        final LineString line = lines[i];
+        lineStrings[i] = toJtsLineString(factory, line);
+      }
+      return factory.createMultiLineString(lineStrings);
     }
-    return factory.createMultiLineString(lineStrings);
   }
 
   private com.vividsolutions.jts.geom.Point toJtsPoint(

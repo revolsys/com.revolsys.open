@@ -18,8 +18,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
   implements GeometryWriterFactory {
 
-  public static Writer<Geometry> createWriter(
-    Resource resource) {
+  public static Writer<Geometry> createWriter(Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
     final GeometryWriterFactory writerFactory = ioFactoryRegistry.getFactoryByResource(
       GeometryWriterFactory.class, resource);
@@ -31,8 +30,7 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
     }
   }
 
-  public AbstractGeometryWriterFactory(
-    final String name) {
+  public AbstractGeometryWriterFactory(final String name) {
     super(name);
   }
 
@@ -42,17 +40,11 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
    * @param resource The resource to write to.
    * @return The writer.
    */
-  public Writer<Geometry> createGeometryWriter(
-    final Resource resource) {
-    try {
-      final OutputStream out = SpringUtil.getOutputStream(resource);
-      final String fileName = resource.getFilename();
-      final String baseName = FileUtil.getBaseName(fileName);
-      return createGeometryWriter(baseName, out);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Error opening resource " + resource,
-        e);
-    }
+  public Writer<Geometry> createGeometryWriter(final Resource resource) {
+    final OutputStream out = SpringUtil.getOutputStream(resource);
+    final String fileName = resource.getFilename();
+    final String baseName = FileUtil.getBaseName(fileName);
+    return createGeometryWriter(baseName, out);
   }
 
   /**
@@ -62,8 +54,7 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
    * @param out The output stream to write to.
    * @return The writer.
    */
-  public Writer<Geometry> createGeometryWriter(
-    String baseName,
+  public Writer<Geometry> createGeometryWriter(String baseName,
     final OutputStream out) {
     return createGeometryWriter(baseName, out, Charset.forName("UTF-8"));
 

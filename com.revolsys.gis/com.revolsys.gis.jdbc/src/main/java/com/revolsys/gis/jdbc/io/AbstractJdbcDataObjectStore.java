@@ -18,6 +18,7 @@ import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -130,8 +131,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  public JdbcQuery createQuery(final QName typeName,
-    String whereClause, final BoundingBox boundingBox) {
+  public JdbcQuery createQuery(final QName typeName, String whereClause,
+    final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
@@ -373,9 +374,14 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public void insert(final DataObject object) {
-    final JdbcWriter writer = createWriter();
-    writer.write(object);
-    writer.close();
+    try {
+      final JdbcWriter writer = createWriter();
+      writer.write(object);
+      writer.close();
+    } catch (RuntimeException e) {
+      LoggerFactory.getLogger(getClass()).error("Unable to insert " + object);
+      throw e;
+    }
   }
 
   @Override

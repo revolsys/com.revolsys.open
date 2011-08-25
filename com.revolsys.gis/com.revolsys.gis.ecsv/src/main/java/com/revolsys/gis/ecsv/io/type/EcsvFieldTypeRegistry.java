@@ -21,8 +21,7 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
     this(null);
   }
 
-  public EcsvFieldTypeRegistry(
-    final GeometryFactory geometryFactory) {
+  public EcsvFieldTypeRegistry(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       this.geometryFactory = new GeometryFactory();
     } else {
@@ -54,22 +53,26 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
       this.geometryFactory));
     addFieldType(new EcsvGeometryFieldType(DataTypes.POLYGON,
       this.geometryFactory));
+    addFieldType(new EcsvGeometryFieldType(DataTypes.MULTI_POINT,
+      this.geometryFactory));
+    addFieldType(new EcsvGeometryFieldType(DataTypes.MULTI_LINE_STRING,
+      this.geometryFactory));
+    addFieldType(new EcsvGeometryFieldType(DataTypes.MULTI_POLYGON,
+      this.geometryFactory));
+    addFieldType(new GeometryFactoryFieldType());
   }
 
-  public void addFieldType(
-    final DataType dataType,
+  public void addFieldType(final DataType dataType,
     final EcsvFieldType fieldType) {
     typeMapping.put(dataType, fieldType);
   }
 
-  public void addFieldType(
-    final EcsvFieldType fieldType) {
+  public void addFieldType(final EcsvFieldType fieldType) {
     final DataType dataType = fieldType.getDataType();
     addFieldType(dataType, fieldType);
   }
 
-  public EcsvFieldType getFieldType(
-    final DataType dataType) {
+  public EcsvFieldType getFieldType(final DataType dataType) {
     final EcsvFieldType fieldType = typeMapping.get(dataType);
     if (fieldType == null) {
       return new StringFieldType();

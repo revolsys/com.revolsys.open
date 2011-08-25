@@ -156,7 +156,7 @@ public final class DataTypes {
     }
   }
 
-  private static void register(
+  public static void register(
     final DataType type) {
     final QName typeName = type.getName();
     NAME_TYPE_MAP.put(typeName, type);

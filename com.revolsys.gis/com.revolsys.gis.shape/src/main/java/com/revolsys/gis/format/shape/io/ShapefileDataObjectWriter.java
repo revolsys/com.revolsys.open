@@ -1,5 +1,5 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/shape/io/ShapeFileWriter.java $
+ * $URL $
  * $Author:paul.austin@revolsys.com $
  * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
  * $Revision:265 $
@@ -87,8 +87,6 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private double zMin = 0; // Double.MAX_VALUE;
 
-  private CoordinateSystem coordinateSystem;
-
   private GeometryFactory geometryFactory;
 
   public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
@@ -116,6 +114,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
     final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)getMetaData();
     if (metaData != null) {
+      geometryPropertyName = metaData.getGeometryAttributeName();
       if (!metaData.hasAttribute(geometryPropertyName)) {
         metaData.addAttribute(geometryPropertyName, DataTypes.GEOMETRY, true);
       }
@@ -143,17 +142,12 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       Resource prjResource = SpringUtil.getResourceWithExtension(resource,
         "prj");
       if (!(prjResource instanceof NonExistingResource)) {
-        try {
-          OutputStream out = SpringUtil.getOutputStream(prjResource);
-          final PrintWriter writer = new PrintWriter(
-            new OutputStreamWriter(out));
-          CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-            "ESRI", String.valueOf(srid)));
-          EsriCsWktWriter.write(writer, esriCoordinateSystem);
-          writer.close();
-        } catch (final IOException e) {
-          LOG.error("Unable to create .prj file: " + prjResource, e);
-        }
+        OutputStream out = SpringUtil.getOutputStream(prjResource);
+        final PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
+        CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
+          "ESRI", String.valueOf(srid)));
+        EsriCsWktWriter.write(writer, esriCoordinateSystem);
+        writer.close();
       }
     }
   }
@@ -186,8 +180,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   private void createGeometryWriter(final Geometry geometry) {
-    final CoordinatesList points = CoordinatesListUtil.get(geometry);
-    final byte numAxis = points.getNumAxis();
+    final int numAxis = geometryFactory.getNumAxis();
     if (geometry instanceof Point) {
       if (numAxis == 2) {
         geometryConverter = new Point2DConverter();
@@ -258,7 +251,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     if (field.getName() == geometryPropertyName) {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
-      geometry = GeometryProjectionUtil.perform(geometry, coordinateSystem);
+      geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);
       envelope.expandToInclude(geometry.getEnvelopeInternal());
       if (geometry.isEmpty()) {
         writeNull(out);

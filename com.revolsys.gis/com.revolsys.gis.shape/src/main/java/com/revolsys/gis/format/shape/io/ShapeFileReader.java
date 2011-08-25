@@ -150,8 +150,16 @@ public class ShapeFileReader extends XbaseFileReader {
     final EndianInput in)
     throws IOException {
     final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)super.loadSchema(in);
+    try {
+      final FileInputStream fileIn = new FileInputStream(shapeFile);
+      final BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+      this.in = new EndianInputStream(bufferedIn);
+      loadHeader();
+    } catch (final IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
     type.setGeometryAttributeIndex(type.getAttributeCount());
-    final Attribute attribute = type.addAttribute("geometry", dataType, true);
+    final Attribute attribute = type.addAttribute("GEOMETRY", dataType, true);
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return type;
   }
@@ -179,14 +187,7 @@ public class ShapeFileReader extends XbaseFileReader {
 
     geometryReader = new JtsGeometryConverter(geometryFactory);
     super.open();
-    try {
-      final FileInputStream fileIn = new FileInputStream(shapeFile);
-      final BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
-      in = new EndianInputStream(bufferedIn);
-      loadHeader();
-    } catch (final IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+    
   }
 
   @Override

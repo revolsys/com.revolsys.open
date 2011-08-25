@@ -558,11 +558,16 @@ public class GeometryFactory extends
 
   @Override
   public String toString() {
-    if (coordinatesPrecisionModel.isFloating()) {
-      return coordinateSystem.getName() + " (" + coordinateSystem.getId() + ")";
+    if (coordinateSystem == null) {
+      return "Unknown coordinate system";
     } else {
-      return coordinateSystem.getName() + " (" + coordinateSystem.getId()
-        + ") " + coordinatesPrecisionModel;
+      if (coordinatesPrecisionModel.isFloating()) {
+        return coordinateSystem.getName() + " (" + coordinateSystem.getId()
+          + ")";
+      } else {
+        return coordinateSystem.getName() + " (" + coordinateSystem.getId()
+          + ") " + coordinatesPrecisionModel;
+      }
     }
   }
 

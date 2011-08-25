@@ -25,8 +25,7 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
   implements DataObjectWriterFactory {
 
   public static Writer<DataObject> dataObjectWriter(
-    DataObjectMetaData metaData,
-    final Resource resource) {
+    DataObjectMetaData metaData, final Resource resource) {
     final DataObjectWriterFactory writerFactory = getDataObjectWriterFactory(resource);
     if (writerFactory == null) {
       return null;
@@ -47,8 +46,7 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractDataObjectWriterFactory(
-    String name) {
+  public AbstractDataObjectWriterFactory(String name) {
     super(name);
   }
 
@@ -56,13 +54,11 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
     return coordinateSystems;
   }
 
-  protected void setCoordinateSystems(
-    Set<CoordinateSystem> coordinateSystems) {
+  protected void setCoordinateSystems(Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
   }
 
-  public boolean isCoordinateSystemSupported(
-    CoordinateSystem coordinateSystem) {
+  public boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem) {
     return coordinateSystems.contains(coordinateSystem);
   }
 
@@ -73,30 +69,21 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
    * @param resource The resource to write to.
    * @return The writer.
    */
-  public Writer<DataObject> createDataObjectWriter(
-    DataObjectMetaData metaData,
+  public Writer<DataObject> createDataObjectWriter(DataObjectMetaData metaData,
     final Resource resource) {
-    try {
-      final OutputStream out = SpringUtil.getOutputStream(resource);
-      final String fileName = resource.getFilename();
-      final String baseName = FileUtil.getBaseName(fileName);
-      return createDataObjectWriter(baseName, metaData, out);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Error opening resource " + resource,
-        e);
-    }
+    final OutputStream out = SpringUtil.getOutputStream(resource);
+    final String fileName = resource.getFilename();
+    final String baseName = FileUtil.getBaseName(fileName);
+    return createDataObjectWriter(baseName, metaData, out);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    String baseName,
-    DataObjectMetaData metaData,
-    OutputStream outputStream) {
+  public Writer<DataObject> createDataObjectWriter(String baseName,
+    DataObjectMetaData metaData, OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
   }
 
-  protected void setCoordinateSystems(
-    CoordinateSystem... coordinateSystems) {
+  protected void setCoordinateSystems(CoordinateSystem... coordinateSystems) {
     setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
       Arrays.asList(coordinateSystems)));
   }
