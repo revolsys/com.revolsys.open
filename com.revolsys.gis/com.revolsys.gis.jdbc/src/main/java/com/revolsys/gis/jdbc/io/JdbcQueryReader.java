@@ -8,10 +8,9 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractReader;
@@ -34,9 +33,9 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
 
   private int fetchSize = 10;
 
-  private final List<JdbcQuery> queries = new ArrayList<JdbcQuery>();
+  private final List<Query> queries = new ArrayList<Query>();
 
-  private JdbcMultipleQueryIterator iterator;
+  private JdbcQueryIterator iterator;
 
   private BoundingBox boundingBox;
 
@@ -51,17 +50,17 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
     this.dataStore = dataStore;
   }
 
-  public void addQuery(final JdbcQuery query) {
+  public void addQuery(final Query query) {
     queries.add(query);
   }
 
   public void addQuery(final QName typeName, final String query) {
-    addQuery(new JdbcQuery(typeName, query));
+    addQuery(new Query(typeName, query));
   }
 
   public void addQuery(final QName typeName, final String query,
     final List<Object> parameters) {
-    addQuery(new JdbcQuery(typeName, query, parameters));
+    addQuery(new Query(typeName, query, parameters));
   }
 
   public void addQuery(final QName typeName, final String query,
@@ -85,7 +84,7 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   }
 
   public DataObjectMetaData getMetaData() {
-    return ((JdbcMultipleQueryIterator)iterator()).getMetaData();
+    return ((JdbcQueryIterator)iterator()).getMetaData();
   }
 
   protected void initialize() {
@@ -93,15 +92,10 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
       for (final QName tableName : typeNames) {
         final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
         if (metaData != null) {
-          final JdbcQuery query;
+          final Query query;
           if (boundingBox == null) {
-            final StringBuffer sql = new StringBuffer();
-            JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-            if (StringUtils.hasText(whereClause)) {
-              sql.append(" WHERE ");
-              sql.append(whereClause);
-            }
-            query = new JdbcQuery(metaData, sql.toString());
+            query = new Query(metaData);
+            query.setWhereClause(whereClause);
           } else {
             QName typeName = metaData.getName();
             query = dataStore.createQuery(typeName, whereClause, boundingBox);
@@ -127,8 +121,8 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   public Iterator<DataObject> iterator() {
     initialize();
     if (iterator == null) {
-      iterator = new JdbcMultipleQueryIterator(dataStore, queries, autoCommit,
-        fetchSize);
+//      iterator = new JdbcQueryIterator(dataStore, queries, autoCommit,
+//        fetchSize);
     }
     return iterator;
   }
@@ -152,8 +146,8 @@ public class JdbcQueryReader extends AbstractReader<DataObject> implements
   /**
    * @param queries the queries to set
    */
-  public void setQueries(final List<JdbcQuery> queries) {
-    for (final JdbcQuery query : queries) {
+  public void setQueries(final List<Query> queries) {
+    for (final Query query : queries) {
       addQuery(query);
     }
   }
