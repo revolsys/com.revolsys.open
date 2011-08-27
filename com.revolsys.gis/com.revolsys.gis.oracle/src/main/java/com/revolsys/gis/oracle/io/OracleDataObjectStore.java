@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -22,7 +23,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
-import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
@@ -129,7 +129,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  public JdbcQuery createQuery(final QName typeName, String whereClause,
+  public Query createQuery(final QName typeName, String whereClause,
     final BoundingBox boundingBox) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
@@ -143,20 +143,19 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     final double x2 = projectedBoundingBox.getMaxX();
     final double y2 = projectedBoundingBox.getMaxY();
 
-    final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-    sql.append(" WHERE ");
+    final StringBuffer where = new StringBuffer();
     if (StringUtils.hasText(whereClause)) {
-      sql.append(whereClause);
-      sql.append(" AND ");
+      where.append(whereClause);
+      where.append(" AND ");
     }
-    sql.append(" SDO_RELATE(");
-    sql.append(geometryColumnName);
-    sql.append(",");
-    sql.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
-    sql.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-    JdbcQuery query = new JdbcQuery(metaData, sql.toString(),
-      geometryFactory.getSRID(), x1, y1, x2, y2);
+    where.append(" SDO_RELATE(");
+    where.append(geometryColumnName);
+    where.append(",");
+    where.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
+    where.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
+    Query query = new Query(metaData);
+    query.setWhereClause(where.toString());
+    query.setParameters(geometryFactory.getSRID(), x1, y1, x2, y2);
     return query;
   }
 

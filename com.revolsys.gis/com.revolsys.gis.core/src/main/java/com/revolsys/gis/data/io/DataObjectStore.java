@@ -18,7 +18,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DataObjectStore extends DataObjectMetaDataFactory {
   void addCodeTable(CodeTable codeTable);
 
+  Query createQuery(final QName typeName, String whereClause, final BoundingBox boundingBox);
+
+  DataObjectReader createReader(QName typeName, String query,
+    List<Object> parameters);
+
   void close();
+
   DataObject create(QName typeName);
 
   DataObject create(DataObjectMetaData metaData);
@@ -31,9 +37,9 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   void deleteAll(Collection<DataObject> objects);
 
-   CodeTable getCodeTable(QName typeName);
+  CodeTable getCodeTable(QName typeName);
 
-   CodeTable getCodeTableByColumn(String columnName);
+  CodeTable getCodeTableByColumn(String columnName);
 
   DataObjectFactory getDataObjectFactory();
 
@@ -73,6 +79,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   boolean isEditable(QName typeName);
 
   DataObject load(QName typeName, Object id);
+
+  Reader<DataObject> query(Query query);
 
   Reader<DataObject> query(QName typeName);
 

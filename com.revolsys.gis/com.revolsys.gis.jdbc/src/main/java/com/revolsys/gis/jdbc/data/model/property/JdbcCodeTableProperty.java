@@ -15,10 +15,8 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class JdbcCodeTableProperty extends CodeTableProperty {
@@ -113,7 +111,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     if (!initialized) {
       DataObjectMetaData metaData = getMetaData();
       if (metaData != null) {
-        this.tableName = JdbcQuery.getTableName(metaData.getName());
+        this.tableName = JdbcUtils.getTableName(metaData.getName());
 
         List<String> valueAttributeNames = getValueAttributeNames();
         final String idColumn = metaData.getIdAttributeName();

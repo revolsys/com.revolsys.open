@@ -312,7 +312,6 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
         sqlBuffer.append("SELECT ");
         addColumnNames(sqlBuffer, metaData);
         sqlBuffer.append(" FROM " + tableId);
-        // JdbcQuery.addColumnsAndTableName(sqlBuffer, metaData, "T");
         sqlBuffer.append(" WHERE ");
 
         sqlBuffer.append(idAttributeName);

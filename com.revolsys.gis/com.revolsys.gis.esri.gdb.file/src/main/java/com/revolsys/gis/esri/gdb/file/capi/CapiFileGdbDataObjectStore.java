@@ -215,9 +215,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
     loadDomain(domain.getDomainName());
   }
 
-  public FileGdbReader createReader() {
-    return new FileGdbReader(this);
-  }
+
+//  @Override
+//  protected AbstractIterator<DataObject> createIterator(final Query query,
+//    final Map<String, Object> properties) {
+//    return new JdbcQueryIterator(this, query, properties);
+//  }
+//
+//  
+//  public FileGdbReader createReader() {
+//    return new FileGdbReader(this);
+//  }
 
   private void createSchema(final DETable table) {
     final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);

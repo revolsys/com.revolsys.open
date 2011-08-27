@@ -9,12 +9,20 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   private AbstractIterator<T> iterator;
 
+  private boolean open;
+
   public void close() {
-    iterator = null;
-    iterator.close();
+    if (iterator != null) {
+      iterator.close();
+      iterator = null;
+    }
   }
 
   public void open() {
+    if (!open) {
+      open = true;
+      hasNext();
+    }
   }
 
   public Iterator<T> iterator() {

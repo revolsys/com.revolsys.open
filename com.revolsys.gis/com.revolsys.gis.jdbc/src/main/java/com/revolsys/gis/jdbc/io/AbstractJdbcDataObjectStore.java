@@ -21,11 +21,15 @@ import javax.xml.namespace.QName;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
+import com.revolsys.gis.data.io.DataObjectReader;
+import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -67,8 +71,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   private String sqlPrefix;
 
   private String sqlSuffix;
-
-  private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
   private final List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
 
@@ -121,9 +123,16 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Override
+  protected AbstractIterator<DataObject> createIterator(final Query query,
+    final Map<String, Object> properties) {
+    return new JdbcQueryIterator(this, query, properties);
+  }
+
+  @Override
   public Object createPrimaryIdValue(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
-    GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(metaData);
+    final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(metaData);
     if (globalIdProperty != null) {
       return UUID.randomUUID().toString();
     } else {
@@ -131,43 +140,41 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  public JdbcQuery createQuery(final QName typeName, String whereClause,
+  public Query createQuery(final QName typeName, final String whereClause,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
-  public JdbcQueryReader createReader() {
-    final JdbcQueryReader reader = new JdbcQueryReader(this);
-    return reader;
-  }
-
-  protected JdbcQueryReader createReader(final DataObjectMetaData metaData,
+  protected DataObjectStoreQueryReader createReader(final DataObjectMetaData metaData,
     final String sql, final List<Object> parameters) {
-    final JdbcQuery query = new JdbcQuery(metaData, sql, parameters);
+    final Query query = new Query(metaData);
+    query.setSql(sql);
+    query.setParameters(parameters);
     return createReader(query);
   }
 
-  protected JdbcQueryReader createReader(final DataObjectMetaData metaData,
+  protected DataObjectStoreQueryReader createReader(final DataObjectMetaData metaData,
     final String query, final Object... parameters) {
     return createReader(metaData, query, Arrays.asList(parameters));
   }
 
-  protected JdbcQueryReader createReader(final JdbcQuery query) {
-    final JdbcQueryReader reader = createReader();
-    reader.addQuery(query);
-    return reader;
-  }
-
-  protected JdbcQueryReader createReader(final QName typeName,
+  @Override
+  public DataObjectReader createReader(final QName typeName,
     final String query, final List<Object> parameters) {
-    final JdbcQueryReader reader = createReader();
+    final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(typeName, query, parameters);
     return reader;
   }
 
-  protected JdbcQueryReader createReader(final QName typeName,
-    final String query, final Object... parameters) {
-    return createReader(typeName, query, Arrays.asList(parameters));
+  protected DataObjectReader createReader(final QName typeName,
+    final String whereClause, final Object... parameters) {
+    return createReader(typeName, whereClause, Arrays.asList(parameters));
+  }
+
+  protected DataObjectStoreQueryReader createReader(final Query query) {
+    final DataObjectStoreQueryReader reader = createReader();
+    reader.addQuery(query);
+    return reader;
   }
 
   public JdbcWriter createWriter() {
@@ -255,34 +262,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   public String getLabel() {
     return label;
-  }
-
-  protected String getLoadSql(final QName typeName) {
-    String sql = typeLoadSql.get(typeName);
-    if (sql == null) {
-      final DataObjectMetaData metaData = getMetaData(typeName);
-      if (metaData == null) {
-        return null;
-      } else {
-        if (metaData.getIdAttributeIndex() == -1) {
-          throw new IllegalArgumentException(typeName
-            + " does not have a primary key");
-        }
-
-        final String idAttributeName = metaData.getIdAttributeName();
-
-        final StringBuffer sqlBuffer = new StringBuffer();
-        JdbcQuery.addColumnsAndTableName(sqlBuffer, metaData, "T", null);
-        sqlBuffer.append(" WHERE ");
-
-        sqlBuffer.append(idAttributeName);
-        sqlBuffer.append(" = ?");
-
-        sql = sqlBuffer.toString();
-        typeLoadSql.put(typeName, sql);
-      }
-    }
-    return sql;
   }
 
   public DataObjectMetaData getMetaData(final QName typeName,
@@ -378,7 +357,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       final JdbcWriter writer = createWriter();
       writer.write(object);
       writer.close();
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       LoggerFactory.getLogger(getClass()).error("Unable to insert " + object);
       throw e;
     }
@@ -403,23 +382,23 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public DataObject load(final QName typeName, final Object id) {
-    final String sql = getLoadSql(typeName);
-    if (sql == null) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    if (metaData == null) {
       return null;
     } else {
-      final DataObjectMetaData metaData = getMetaData(typeName);
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (idAttributeName == null) {
 
-      final JdbcQueryReader reader = createReader(metaData, sql, id);
-      try {
-        final Iterator<DataObject> iterator = reader.iterator();
-        if (iterator.hasNext()) {
-          final DataObject object = iterator.next();
-          return object;
-        } else {
-          return null;
-        }
-      } finally {
-        reader.close();
+        throw new IllegalArgumentException(typeName
+          + " does not have a primary key");
+      } else {
+
+        final StringBuffer where = new StringBuffer();
+
+        where.append(idAttributeName);
+        where.append(" = ?");
+
+        return queryFirst(typeName, where.toString(), id);
       }
     }
   }
@@ -569,17 +548,15 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public Reader<DataObject> query(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
-    final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-    final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
-    final JdbcQueryReader reader = createReader(query);
+    final Query query = new Query(metaData);
+    final DataObjectStoreQueryReader reader = createReader(query);
     return reader;
   }
 
-  public JdbcQueryReader query(final QName typeName,
+  public DataObjectStoreQueryReader query(final QName typeName,
     final BoundingBox boundingBox) {
-    final JdbcQuery query = createQuery(typeName, null, boundingBox);
-    final JdbcQueryReader reader = createReader();
+    final Query query = createQuery(typeName, null, boundingBox);
+    final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
   }
@@ -594,43 +571,44 @@ public abstract class AbstractJdbcDataObjectStore extends
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
     geometry = ProjectionFactory.convert(geometry, geometryFactory);
-    final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-    final JdbcQueryReader reader = createReader();
+
+    final StringBuffer where = new StringBuffer();
+    if (StringUtils.hasText(whereClause)) {
+      where.append(whereClause);
+      where.append(" AND ");
+    }
     final SqlFunction intersectsFunction = geometryAttribute.getProperty(JdbcConstants.FUNCTION_INTERSECTS);
-    sql.append(" WHERE ");
     final StringBuffer qArg = new StringBuffer();
     geometryAttribute.addSelectStatementPlaceHolder(qArg);
-    sql.append(intersectsFunction.toSql(geometryAttribute.getName(), qArg));
-    if (whereClause != null) {
-      sql.append(" AND ");
-      sql.append(whereClause);
-    }
-    final JdbcQuery query = new JdbcQuery(metaData, sql.toString());
+    where.append(intersectsFunction.toSql(geometryAttribute.getName(), qArg));
+
+    final Query query = new Query(metaData);
+    query.setWhereClause(where.toString());
     query.addParameter(geometry, geometryAttribute);
+    final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
   }
 
   public Reader<DataObject> query(final QName typeName,
-    final String whereClause, final Object... arguments) {
+    final String whereClause, final List<Object> parameters) {
     final DataObjectMetaData metaData = getMetaData(typeName);
-    final StringBuffer sql = new StringBuffer();
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-    if (StringUtils.hasText(whereClause)) {
-      sql.append(" WHERE ");
-      sql.append(whereClause);
-    }
-    final JdbcQuery query = new JdbcQuery(metaData, sql.toString(), arguments);
-    final JdbcQueryReader reader = createReader(query);
+    final Query query = new Query(metaData);
+    query.setWhereClause(whereClause);
+    query.setParameters(parameters);
+    final DataObjectStoreQueryReader reader = createReader(query);
     return reader;
   }
 
+  public Reader<DataObject> query(final QName typeName,
+    final String whereClause, final Object... parameters) {
+    return query(typeName, whereClause, Arrays.asList(parameters));
+  }
+
   @Override
-  public DataObject queryFirst(final QName typeName, final String queryString,
+  public DataObject queryFirst(final QName typeName, final String whereClause,
     final Object... arguments) {
-    final JdbcQueryReader reader = createReader(typeName, queryString,
-      arguments);
+    final Reader<DataObject> reader = query(typeName, whereClause, arguments);
     final Iterator<DataObject> iterator = reader.iterator();
     try {
       if (iterator.hasNext()) {

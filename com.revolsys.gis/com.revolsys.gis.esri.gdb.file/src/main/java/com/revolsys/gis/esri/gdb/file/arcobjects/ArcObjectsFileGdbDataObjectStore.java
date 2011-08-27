@@ -161,9 +161,9 @@ public class ArcObjectsFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public FileGdbReader createReader() {
-    return new FileGdbReader(this);
-  }
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
 
   private DataObjectMetaData createTable(final DataObjectMetaData objectMetaData) {
     // TODO final GeometryFactory geometryFactory =

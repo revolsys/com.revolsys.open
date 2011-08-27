@@ -6,8 +6,8 @@ import java.sql.ResultSetMetaData;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -16,9 +16,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public interface JdbcDataObjectStore extends DataObjectStore {
 
-  JdbcQuery createQuery(final QName typeName, String whereClause, final BoundingBox boundingBox);
-
-  JdbcQueryReader createReader();
+  DataObjectStoreQueryReader createReader();
 
   JdbcWriter createWriter();
 

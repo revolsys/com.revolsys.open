@@ -10,6 +10,7 @@ import org.postgresql.geometric.PGbox;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -17,7 +18,6 @@ import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
-import com.revolsys.gis.jdbc.io.JdbcQuery;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
@@ -119,24 +119,26 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
     addAttributeAdder("geometry", geometryAttributeAdder);
   }
 
-  public JdbcQuery createQuery(final QName typeName, String whereClause,
+  public Query createQuery(final QName typeName, String whereClause,
     final BoundingBox boundingBox) {
-    final double x1 = boundingBox.getMinX();
-    final double y1 = boundingBox.getMinY();
-    final double x2 = boundingBox.getMaxX();
-    final double y2 = boundingBox.getMaxY();
-    final StringBuffer sql = new StringBuffer();
     DataObjectMetaData metaData = getMetaData(typeName);
-    JdbcQuery.addColumnsAndTableName(sql, metaData, "T", null);
-    sql.append( "WHERE ");
-    if (StringUtils.hasText(whereClause)) {
-      sql.append(whereClause);
-      sql.append(" AND ");
+    if (metaData == null) {
+      throw new IllegalArgumentException("Unable to  find table " + typeName);
+    } else {
+      final double x1 = boundingBox.getMinX();
+      final double y1 = boundingBox.getMinY();
+      final double x2 = boundingBox.getMaxX();
+      final double y2 = boundingBox.getMaxY();
+      if (StringUtils.hasText(whereClause)) {
+        whereClause += " AND GEOMETRY && ?";
+      } else {
+        whereClause = "GEOMETRY && ?";
+      }
+      Query query = new Query(metaData);
+      query.setWhereClause(whereClause);
+      final PGbox box = new PGbox(x1, y1, x2, y2);
+      query.addParameter(box);
+      return query;
     }
-    sql.append("GEOMETRY && ?");
-    JdbcQuery query = new JdbcQuery(metaData, sql.toString(), new PGbox(x1, y1,
-      x2, y2));
-    return query;
   }
-
 }

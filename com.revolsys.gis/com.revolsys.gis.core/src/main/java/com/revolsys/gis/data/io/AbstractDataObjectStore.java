@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -49,7 +50,6 @@ public abstract class AbstractDataObjectStore extends
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
-  
 
   public void addCodeTable(final CodeTable codeTable) {
     final String idColumn = codeTable.getIdAttributeName();
@@ -116,8 +116,29 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  protected AbstractIterator<DataObject> createIterator(final Query query,
+    final Map<String, Object> properties) {
+    throw new UnsupportedOperationException();
+  }
+
   public Object createPrimaryIdValue(final QName typeName) {
     return null;
+  }
+
+  public Query createQuery(final QName typeName, final String whereClause,
+    final BoundingBox boundingBox) {
+    throw new UnsupportedOperationException();
+  }
+
+  public DataObjectStoreQueryReader createReader() {
+    final DataObjectStoreQueryReader reader = new DataObjectStoreQueryReader(
+      this);
+    return reader;
+  }
+
+  public DataObjectReader createReader(final QName typeName,
+    final String query, final List<Object> parameters) {
+    throw new UnsupportedOperationException();
   }
 
   public void delete(final DataObject object) {
@@ -140,7 +161,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public  CodeTable getCodeTable(final QName typeName) {
+  public CodeTable getCodeTable(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     if (metaData == null) {
       return null;
@@ -152,7 +173,7 @@ public abstract class AbstractDataObjectStore extends
 
   public CodeTable getCodeTableByColumn(final String columnName) {
     final CodeTable codeTable = columnToTableMap.get(columnName);
-    return (CodeTable)codeTable;
+    return codeTable;
 
   }
 
@@ -266,6 +287,12 @@ public abstract class AbstractDataObjectStore extends
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
+
+  public Reader<DataObject> query(final Query query) {
+    final DataObjectStoreQueryReader reader = createReader();
+    reader.addQuery(query);
+    return reader;
+  }
 
   public DataObject queryFirst(final QName typeName, final String where,
     final Object... arguments) {
