@@ -13,11 +13,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcBigIntegerAttribute extends JdbcAttribute {
-  public JdbcBigIntegerAttribute(
-    final String name,
-    final int sqlType,
-    final int length,
-    final boolean required,
+  public JdbcBigIntegerAttribute(final String name, final int sqlType,
+    final int length, final boolean required,
     final Map<QName, Object> properties) {
     super(name, DataTypes.INTEGER, sqlType, length, 0, required, properties);
   }
@@ -29,37 +26,31 @@ public class JdbcBigIntegerAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final DataObject object)
-    throws SQLException {
-    final BigDecimal number = resultSet.getBigDecimal(columnIndex);
-    if (number != null) {
-      Object value = number;
-      final int precision = number.precision();
-      if (precision <= 2) {
-        value = Byte.valueOf(number.byteValue());
-      } else if (precision <= 4) {
-        value = Short.valueOf(number.shortValue());
-      } else if (precision <= 9) {
-        value = Integer.valueOf(number.intValue());
-      } else if (precision <= 18) {
-        value = Long.valueOf(number.longValue());
-      } else {
-        value = number.toBigInteger();
-      }
+  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final DataObject object) throws SQLException {
+    Object value;
+    final int length = getLength();
+    if (length <= 2) {
+      value = resultSet.getByte(columnIndex);
+    } else if (length <= 4) {
+      value = resultSet.getShort(columnIndex);
+    } else if (length <= 9) {
+      value = resultSet.getInt(columnIndex);
+    } else if (length <= 18) {
+      value = resultSet.getLong(columnIndex);
+    } else {
+      final BigDecimal number = resultSet.getBigDecimal(columnIndex);
+      value = number.toBigInteger();
+    }
+    if (!resultSet.wasNull()) {
       object.setValue(getIndex(), value);
     }
     return columnIndex + 1;
   }
 
   @Override
-  public int setPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final Object value)
-    throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {

@@ -51,7 +51,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -190,6 +189,17 @@ public class Graph<T> {
 
   public Iterable<Edge<T>> edges() {
     return edges;
+  }
+
+  public List<T> getObjects() {
+    List<T> objects = new ArrayList<T>();
+    for (Edge<T> edge : edges) {
+      if (!edge.isRemoved()) {
+        final T object = edge.getObject();
+        objects.add(object);
+      }
+    }
+    return objects;
   }
 
   public List<Edge<T>> findEdges(final EdgeVisitor<T> visitor) {

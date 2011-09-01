@@ -38,6 +38,7 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.LineString2DConverter;
 import com.revolsys.gis.format.shape.io.geometry.LineString3DConverter;
@@ -51,13 +52,10 @@ import com.revolsys.gis.format.xbase.io.FieldDefinition;
 import com.revolsys.gis.format.xbase.io.XbaseDataObjectWriter;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -153,13 +151,13 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected int addDbaseField(final String name, final Class<?> typeJavaClass,
-    final int length, final int scale) {
+  protected int addDbaseField(final String name, final DataType dataType,
+    final Class<?> typeJavaClass, final int length, final int scale) {
     if (Geometry.class.isAssignableFrom(typeJavaClass)) {
       addField(new FieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0));
       return 0;
     } else {
-      return super.addDbaseField(name, typeJavaClass, length, scale);
+      return super.addDbaseField(name, dataType, typeJavaClass, length, scale);
     }
   }
 

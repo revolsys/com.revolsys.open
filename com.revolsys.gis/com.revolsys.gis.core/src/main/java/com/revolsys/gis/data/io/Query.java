@@ -7,9 +7,12 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.util.CollectionUtil;
 
 public class Query {
   private final List<Attribute> parameterAttributes = new ArrayList<Attribute>();
@@ -22,9 +25,9 @@ public class Query {
 
   private String sql;
 
-  private QName tableName;
-
   private QName typeName;
+
+  private QName typeNameAlias;
 
   private String whereClause;
 
@@ -61,17 +64,17 @@ public class Query {
     this(dataStore.getMetaData(typeName));
   }
 
-  public Query(final QName tableName) {
-    this(tableName, null, Collections.emptyList());
+  public Query(final QName typeName) {
+    this(typeName, null, Collections.emptyList());
   }
 
-  public Query(final QName tableName, final String query) {
-    this(tableName, query, Collections.emptyList());
+  public Query(final QName typeName, final String query) {
+    this(typeName, query, Collections.emptyList());
   }
 
-  public Query(final QName tableName, final String query,
+  public Query(final QName typeName, final String query,
     final List<Object> parameters) {
-    this.tableName = tableName;
+    this.typeName = typeName;
     this.sql = query;
     if (parameters != null) {
       this.parameters.addAll(parameters);
@@ -81,52 +84,6 @@ public class Query {
   public Query(final QName typeName, final String query,
     final Object... parameters) {
     this(typeName, query, Arrays.asList(parameters));
-  }
-
-  protected void addAttributeName(final StringBuffer sql,
-    final String tablePrefix, final Attribute attribute) {
-    sql.append(attribute.getName());
-  }
-
-  private void addColumnNames(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix) {
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
-      if (i > 0) {
-        sql.append(", ");
-      }
-      final Attribute attribute = metaData.getAttribute(i);
-      addAttributeName(sql, tablePrefix, attribute);
-    }
-  }
-
-  protected void addColumnNames(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix,
-    final List<String> attributeNames) {
-    for (int i = 0; i < attributeNames.size(); i++) {
-      if (i > 0) {
-        sql.append(", ");
-      }
-      final String attributeName = attributeNames.get(i);
-      final Attribute attribute = metaData.getAttribute(attributeName);
-      addAttributeName(sql, tablePrefix, attribute);
-    }
-  }
-
-  public void addColumnsAndTableName(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix,
-    final String where) {
-    final QName typeName = metaData.getName();
-    sql.append("SELECT ");
-    addColumnNames(sql, metaData, tablePrefix);
-    sql.append(" FROM ");
-    final String tableName = JdbcUtils.getTableName(typeName);
-    sql.append(tableName);
-    sql.append(" ");
-    sql.append(tablePrefix);
-    if (where != null) {
-      sql.append(" WHERE ");
-      sql.append(where);
-    }
   }
 
   public void addParameter(final Object value) {
@@ -176,12 +133,12 @@ public class Query {
     return sql;
   }
 
-  public QName getTableName() {
-    return tableName;
-  }
-
   public QName getTypeName() {
     return typeName;
+  }
+
+  public QName getTypeNameAlias() {
+    return typeNameAlias;
   }
 
   public String getWhereClause() {
@@ -224,12 +181,12 @@ public class Query {
     this.sql = sql;
   }
 
-  public void setTableName(final QName tableName) {
-    this.tableName = tableName;
-  }
-
   public void setTypeName(final QName typeName) {
     this.typeName = typeName;
+  }
+
+  public void setTypeNameAlias(final QName typeNameAlias) {
+    this.typeNameAlias = typeNameAlias;
   }
 
   public void setWhereClause(final String whereClause) {
@@ -238,6 +195,39 @@ public class Query {
 
   @Override
   public String toString() {
-    return getSql() + "\n" + getParameters();
+    StringBuffer string = new StringBuffer();
+    if (sql == null) {
+      string.append("SELECT ");
+      if (attributeNames.isEmpty()) {
+        string.append("*");
+      } else {
+        CollectionUtil.append(string, attributeNames, ", ");
+      }
+      string.append(" FROM ");
+      if (fromClause == null) {
+        if (typeName != null) {
+          string.append(JdbcUtils.getTableName(typeName));
+        } else if (metaData != null) {
+          string.append(JdbcUtils.getTableName(metaData.getName()));
+        }
+      } else {
+        string.append(fromClause);
+      }
+      if (StringUtils.hasText(whereClause)) {
+        string.append(" WHERE ");
+        string.append(whereClause);
+      }
+      if (!orderBy.isEmpty()) {
+        string.append(" ORDER BY ");
+        CollectionUtil.append(string, orderBy, ", ");
+      }
+    } else {
+      string.append(sql);
+    }
+    if (!parameters.isEmpty()) {
+      string.append(" ");
+      string.append(parameters);
+    }
+    return string.toString();
   }
 }

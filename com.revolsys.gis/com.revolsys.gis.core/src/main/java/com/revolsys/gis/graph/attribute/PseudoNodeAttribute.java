@@ -2,79 +2,48 @@ package com.revolsys.gis.graph.attribute;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.property.Merge;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class PseudoNodeAttribute {
-  public static final String AUTO_FIX_LENGTH = PseudoNodeAttribute.class.getName()
-    + ".autoFixLength";
+  private final Set<String> equalExcludeAttributes = new HashSet<String>();
 
-  private static double autoFixEdgesLessThanLength = 3;
+  private final List<EdgePair<DataObject>> edgePairs = new ArrayList<EdgePair<DataObject>>();
 
-  public static PseudoNodeAttribute create(final Node<DataObject> node,
+  private final List<EdgePair<DataObject>> reversedEdgePairs = new ArrayList<EdgePair<DataObject>>();
+
+  private final QName typeName;
+
+  public PseudoNodeAttribute(final Node<DataObject> node, final QName typeName,
     final Collection<String> equalExcludeAttributes) {
-    return new PseudoNodeAttribute(node, equalExcludeAttributes);
-  }
-
-  public static PseudoNodeAttribute getAttribute(final Node<DataObject> node,
-    final Collection<String> equalExcludeAttributes) {
-    final String attributeName = PseudoNodeAttribute.class.getName();
-    if (!node.hasAttribute(attributeName)) {
-      final ObjectAttributeProxy<PseudoNodeAttribute, Node<DataObject>> proxy = new InvokeMethodObjectAttributeProxy<PseudoNodeAttribute, Node<DataObject>>(
-        PseudoNodeAttribute.class, "create", Node.class, equalExcludeAttributes);
-      node.setAttribute(attributeName, proxy);
-    }
-    final PseudoNodeAttribute value = node.getAttribute(attributeName);
-    return value;
-  }
-
-  public static double getAutoFixEdgesLessThanLength() {
-    return autoFixEdgesLessThanLength;
-  }
-
-  public static void setAutoFixEdgesLessThanLength(
-    final double autoFixEdgesLessThanLength) {
-    PseudoNodeAttribute.autoFixEdgesLessThanLength = autoFixEdgesLessThanLength;
-  }
-
-  private Collection<String> equalExcludeAttributes = Collections.emptySet();
-
-  private final Map<QName, List<EdgePair<DataObject>>> typeEdgePairs = new HashMap<QName, List<EdgePair<DataObject>>>();
-
-  private final Map<QName, List<EdgePair<DataObject>>> typeReversedEdgePairs = new HashMap<QName, List<EdgePair<DataObject>>>();
-
-  public PseudoNodeAttribute(final Node<DataObject> node,
-    final Collection<String> equalExcludeAttributes) {
-    this.equalExcludeAttributes = equalExcludeAttributes;
+    this.typeName = typeName;
+    this.equalExcludeAttributes.addAll(equalExcludeAttributes);
     final Map<QName, Map<LineString, Set<Edge<DataObject>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
-    for (final Entry<QName, Map<LineString, Set<Edge<DataObject>>>> entry : edgesByTypeNameAndLine.entrySet()) {
-      final QName typeName = entry.getKey();
-      final Map<LineString, Set<Edge<DataObject>>> edgesByLine = entry.getValue();
-      init(node, typeName, edgesByLine);
-    }
+    final Map<LineString, Set<Edge<DataObject>>> edgesByLine = edgesByTypeNameAndLine.get(typeName);
+    init(node, edgesByLine);
   }
 
   private boolean attributesEqual(final Edge<DataObject> edge1,
     final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
+
     final DataObject object2 = edge2.getObject();
-    return EqualsRegistry.INSTANCE.equals(object1, object2,
-      equalExcludeAttributes);
+
+    final Merge merge = Merge.getProperty(object1);
+    return merge.canMerge(object1, object2, equalExcludeAttributes);
   }
 
   private EdgePair<DataObject> createEdgePair(final Edge<DataObject> edge1,
@@ -82,49 +51,30 @@ public class PseudoNodeAttribute {
     if (attributesEqual(edge1, edge2)) {
       return new EdgePair<DataObject>(edge1, edge2);
     } else {
-      final double length1 = edge1.getLength();
-      final double length2 = edge2.getLength();
-      if (length1 < autoFixEdgesLessThanLength) {
-        final EdgePair<DataObject> edgePair = new EdgePair<DataObject>(edge1,
-          edge2);
-        if (length2 < autoFixEdgesLessThanLength) {
-          if (length1 <= length2) {
-            edgePair.setProperty1(AUTO_FIX_LENGTH, Boolean.TRUE);
-          } else {
-            edgePair.setProperty2(AUTO_FIX_LENGTH, Boolean.TRUE);
-          }
-        } else {
-          edgePair.setProperty1(AUTO_FIX_LENGTH, Boolean.TRUE);
-        }
-        return edgePair;
-      } else if (length2 < autoFixEdgesLessThanLength) {
-        final EdgePair<DataObject> edgePair = new EdgePair<DataObject>(edge1,
-          edge2);
-        edgePair.setProperty2(AUTO_FIX_LENGTH, Boolean.TRUE);
-        return edgePair;
-      } else {
-        return null;
-      }
+      return null;
     }
   }
 
-  public Map<QName, List<EdgePair<DataObject>>> getTypeEdgePairs() {
-    return typeEdgePairs;
+  public List<EdgePair<DataObject>> getEdgePairs() {
+    return edgePairs;
   }
 
-  public Map<QName, List<EdgePair<DataObject>>> getTypeReversedEdgePairs() {
-    return typeReversedEdgePairs;
+  public List<EdgePair<DataObject>> getReversedEdgePairs() {
+    return reversedEdgePairs;
   }
 
-  private void init(final Node<DataObject> node, final QName typeName,
+  public QName getTypeName() {
+    return typeName;
+  }
+
+  private void init(final Node<DataObject> node,
     final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
-    if (isPseudoNode(node, typeName, edgesByLine)) {
+    if (isPseudoNode(node, edgesByLine)) {
 
     }
   }
 
   private boolean isPseudoNode(final Node<DataObject> node,
-    final QName typeName,
     final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
     final Set<LineString> lines = edgesByLine.keySet();
     if (!LineStringUtil.hasLoop(lines)) {
@@ -141,33 +91,26 @@ public class PseudoNodeAttribute {
             final Edge<DataObject> edge2 = edges2.iterator().next();
             final EdgePair<DataObject> edgePair = createEdgePair(edge1, edge2);
             if (edgePair != null) {
-
-              final List<EdgePair<DataObject>> pairedEdges = Collections.singletonList(edgePair);
               if (edge1.isForwards(node) == edge2.isForwards(node)) {
-                typeReversedEdgePairs.put(typeName, pairedEdges);
+                reversedEdgePairs.add(edgePair);
               } else {
-                typeEdgePairs.put(typeName, pairedEdges);
+                edgePairs.add(edgePair);
               }
               return true;
             }
           } else {
-            final List<EdgePair<DataObject>> pairedEdges = new ArrayList<EdgePair<DataObject>>();
-            typeEdgePairs.put(typeName, pairedEdges);
             final List<Edge<DataObject>> unmatchedEdges1 = new ArrayList<Edge<DataObject>>(
               edges1);
             final List<Edge<DataObject>> unmatchedEdges2 = new ArrayList<Edge<DataObject>>(
               edges2);
             // Find non-reversed matches
-            matchEdges(node, unmatchedEdges1, unmatchedEdges2, pairedEdges,
-              false);
+            matchEdges(node, unmatchedEdges1, unmatchedEdges2, edgePairs, false);
             if (unmatchedEdges2.isEmpty()) {
               return true;
             } else {
               // Find reversed matches
-              final List<EdgePair<DataObject>> reversedPairedEdges = new ArrayList<EdgePair<DataObject>>();
               matchEdges(node, unmatchedEdges1, unmatchedEdges2,
-                reversedPairedEdges, true);
-              typeReversedEdgePairs.put(typeName, reversedPairedEdges);
+                reversedEdgePairs, true);
               if (unmatchedEdges2.isEmpty()) {
                 return true;
               }

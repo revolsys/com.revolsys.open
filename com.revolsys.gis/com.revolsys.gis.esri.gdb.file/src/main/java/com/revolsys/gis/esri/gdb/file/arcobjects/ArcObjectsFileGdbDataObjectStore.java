@@ -28,11 +28,13 @@ import com.esri.arcgis.geodatabase.IFeatureClass;
 import com.esri.arcgis.geodatabase.ITable;
 import com.esri.arcgis.geodatabase.Workspace;
 import com.esri.arcgis.interop.AutomationException;
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.IteratorReader;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -383,50 +385,57 @@ public class ArcObjectsFileGdbDataObjectStore extends AbstractDataObjectStore
     return query(typeName, boundingBox);
   }
 
-  public Reader<DataObject> query(final QName typeName, final String where,
-    final Object... arguments) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  @Override
+  protected AbstractIterator<DataObject> createIterator(Query query,
+    Map<String, Object> properties) {
+    QName typeName = query.getTypeName();
+    DataObjectMetaData metaData = query.getMetaData();
     if (metaData == null) {
-      throw new IllegalArgumentException("Type name does not exist " + typeName);
-    } else {
-      final StringBuffer whereClause = new StringBuffer();
-      if (arguments.length == 0) {
-        if (where.indexOf('?') > -1) {
-          throw new IllegalArgumentException(
-            "No arguments specified for a where clause with placeholders: "
-              + where);
-        } else {
-          whereClause.append(where);
-        }
-      } else {
-        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-        int i = 0;
-        while (matcher.find()) {
-          if (i >= arguments.length) {
-            throw new IllegalArgumentException(
-              "Not enough arguments for where clause with placeholders: "
-                + where);
-          }
-          final Object argument = arguments[i];
-          matcher.appendReplacement(whereClause, "");
-          if (argument instanceof Number) {
-            whereClause.append(argument);
-          } else {
-            whereClause.append("'");
-            whereClause.append(argument);
-            whereClause.append("'");
-          }
-          i++;
-        }
-        matcher.appendTail(whereClause);
+      typeName = query.getTypeName();
+      metaData = getMetaData(typeName);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Type name does not exist "
+          + typeName);
       }
-
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-        typeName, whereClause.toString());
-      final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-        iterator);
-      return reader;
+    } else {
+      typeName = metaData.getName();
     }
+    final String where = query.getWhereClause();
+    final List<Object> parameters = query.getParameters();
+    final StringBuffer whereClause = new StringBuffer();
+    if (parameters.isEmpty()) {
+      if (where.indexOf('?') > -1) {
+        throw new IllegalArgumentException(
+          "No arguments specified for a where clause with placeholders: "
+            + where);
+      } else {
+        whereClause.append(where);
+      }
+    } else {
+      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+      int i = 0;
+      while (matcher.find()) {
+        if (i >= parameters.size()) {
+          throw new IllegalArgumentException(
+            "Not enough arguments for where clause with placeholders: " + where);
+        }
+        final Object argument = parameters.get(i);
+        matcher.appendReplacement(whereClause, "");
+        if (argument instanceof Number) {
+          whereClause.append(argument);
+        } else {
+          whereClause.append("'");
+          whereClause.append(argument);
+          whereClause.append("'");
+        }
+        i++;
+      }
+      matcher.appendTail(whereClause);
+    }
+
+    final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+      typeName, whereClause.toString());
+    return iterator;
   }
 
   public void setCreateMissingGeodatabase(final boolean createMissingGeodatabase) {

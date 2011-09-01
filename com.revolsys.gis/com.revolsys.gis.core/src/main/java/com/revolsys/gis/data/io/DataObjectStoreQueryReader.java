@@ -108,6 +108,7 @@ public class DataObjectStoreQueryReader extends
    * @param queries the queries to set
    */
   public void setQueries(final List<Query> queries) {
+    this.queries.clear();
     for (final Query query : queries) {
       addQuery(query);
     }

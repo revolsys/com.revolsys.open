@@ -11,6 +11,24 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public final class CollectionUtil {
+  public static void append(final StringBuffer string,
+    final Collection<? extends Object> values) {
+    append(string, values, ",");
+  }
+
+  public static void append(final StringBuffer string,
+    final Collection<? extends Object> values, final String separator) {
+    for (final Iterator<? extends Object> iterator = values.iterator(); iterator.hasNext();) {
+      final Object value = iterator.next();
+      if (value != null) {
+        string.append(value);
+      }
+      if (iterator.hasNext()) {
+        string.append(separator);
+      }
+    }
+  }
+
   public static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues,
     final List<T2> targetValues) {
     final Map<T1, T2> map = new HashMap<T1, T2>();
@@ -92,15 +110,7 @@ public final class CollectionUtil {
       return null;
     } else {
       final StringBuffer string = new StringBuffer();
-      for (final Iterator<? extends Object> iterator = values.iterator(); iterator.hasNext();) {
-        final Object value = iterator.next();
-        if (value != null) {
-          string.append(value);
-        }
-        if (iterator.hasNext()) {
-          string.append(separator);
-        }
-      }
+      append(string, values, separator);
       return string.toString();
     }
   }

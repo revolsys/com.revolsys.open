@@ -69,11 +69,16 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     out.flush();
   }
 
-  protected int addDbaseField(final String name, final Class<?> typeJavaClass,
-    int length, final int scale) {
+  protected int addDbaseField(final String name, DataType dataType,
+    final Class<?> typeJavaClass, int length, final int scale) {
 
     FieldDefinition field = null;
-    if (typeJavaClass == String.class) {
+    if (dataType == DataTypes.DECIMAL) {
+      if (length  > 18) {
+        throw new IllegalArgumentException("Length  must be less < 18 for " + name);
+      }
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length, scale);
+    } else if (typeJavaClass == String.class) {
       if (length > 254 || length == 0) {
         field = new FieldDefinition(name, FieldDefinition.CHARACTER_TYPE, 254);
       } else {
@@ -86,7 +91,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (typeJavaClass == Date.class) {
       field = new FieldDefinition(name, FieldDefinition.DATE_TYPE, 8);
     } else if (typeJavaClass == BigDecimal.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18, scale);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length, scale);
     } else if (typeJavaClass == BigInteger.class) {
       field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Float.class) {
@@ -290,8 +295,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
         final int scale = metaData.getAttributeScale(index);
         final DataType attributeType = metaData.getAttributeType(index);
         final Class<?> typeJavaClass = attributeType.getJavaClass();
-        final int fieldLength = addDbaseField(name, typeJavaClass, length,
-          scale);
+        final int fieldLength = addDbaseField(name, attributeType,
+          typeJavaClass, length, scale);
         if (fieldLength > 0) {
           recordLength += fieldLength;
           numFields++;

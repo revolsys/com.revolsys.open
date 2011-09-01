@@ -18,7 +18,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DataObjectStore extends DataObjectMetaDataFactory {
   void addCodeTable(CodeTable codeTable);
 
-  Query createQuery(final QName typeName, String whereClause, final BoundingBox boundingBox);
+  Query createQuery(final QName typeName, String whereClause,
+    final BoundingBox boundingBox);
 
   DataObjectReader createReader(QName typeName, String query,
     List<Object> parameters);
@@ -80,17 +81,17 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   DataObject load(QName typeName, Object id);
 
-  Reader<DataObject> query(Query query);
+  Reader<DataObject> query(Query... queries);
+
+  DataObject queryFirst(Query query);
+
+  Reader<DataObject> query(List<Query> queries);
 
   Reader<DataObject> query(QName typeName);
 
   Reader<DataObject> query(QName typeName, BoundingBox boundingBox);
 
   Reader<DataObject> query(QName typeName, Geometry geometry);
-
-  Reader<DataObject> query(QName typeName, String where, Object... arguments);
-
-  DataObject queryFirst(QName typeName, String where, Object... arguments);
 
   void setLabel(String label);
 

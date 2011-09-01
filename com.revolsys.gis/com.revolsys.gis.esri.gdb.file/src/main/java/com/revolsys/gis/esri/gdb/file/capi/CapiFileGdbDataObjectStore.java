@@ -18,11 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.io.IteratorReader;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -69,7 +71,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.xml.io.XmlProcessor;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implements FileGdbDataObjectStore{
+public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
+  implements FileGdbDataObjectStore {
   private static final String CATALOG_PATH_PROPERTY = CapiFileGdbDataObjectStore.class
     + ".CatalogPath";
 
@@ -215,17 +218,69 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
     loadDomain(domain.getDomainName());
   }
 
+  // @Override
+  // protected AbstractIterator<DataObject> createIterator(final Query query,
+  // final Map<String, Object> properties) {
+  // return new JdbcQueryIterator(this, query, properties);
+  // }
+  //
+  //
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
 
-//  @Override
-//  protected AbstractIterator<DataObject> createIterator(final Query query,
-//    final Map<String, Object> properties) {
-//    return new JdbcQueryIterator(this, query, properties);
-//  }
-//
-//  
-//  public FileGdbReader createReader() {
-//    return new FileGdbReader(this);
-//  }
+  @Override
+  protected AbstractIterator<DataObject> createIterator(final Query query,
+    final Map<String, Object> properties) {
+    QName typeName = query.getTypeName();
+    DataObjectMetaData metaData = query.getMetaData();
+    if (metaData == null) {
+      typeName = query.getTypeName();
+      metaData = getMetaData(typeName);
+      if (metaData == null) {
+        throw new IllegalArgumentException("Type name does not exist "
+          + typeName);
+      }
+    } else {
+      typeName = metaData.getName();
+    }
+    final String where = query.getWhereClause();
+    final List<Object> parameters = query.getParameters();
+    final StringBuffer whereClause = new StringBuffer();
+    if (parameters.isEmpty()) {
+      if (where.indexOf('?') > -1) {
+        throw new IllegalArgumentException(
+          "No arguments specified for a where clause with placeholders: "
+            + where);
+      } else {
+        whereClause.append(where);
+      }
+    } else {
+      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+      int i = 0;
+      while (matcher.find()) {
+        if (i >= parameters.size()) {
+          throw new IllegalArgumentException(
+            "Not enough arguments for where clause with placeholders: " + where);
+        }
+        final Object argument = parameters.get(i);
+        matcher.appendReplacement(whereClause, "");
+        if (argument instanceof Number) {
+          whereClause.append(argument);
+        } else {
+          whereClause.append("'");
+          whereClause.append(argument);
+          whereClause.append("'");
+        }
+        i++;
+      }
+      matcher.appendTail(whereClause);
+    }
+
+    final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+      typeName, whereClause.toString());
+    return iterator;
+  }
 
   private void createSchema(final DETable table) {
     final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
@@ -370,15 +425,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
     }
   }
 
-  private DataObjectMetaData getMetaData(final String schemaName,
-    final String path, final Table table) {
-    final String tableDefinition;
-    synchronized (Table.class) {
-      tableDefinition = table.getDefinition();
-    }
-    return getMetaData(schemaName, path, tableDefinition);
-  }
-
   public DataObjectMetaData getMetaData(final String schemaName,
     final String path, final String tableDefinition) {
     try {
@@ -440,12 +486,21 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
     }
   }
 
+  private DataObjectMetaData getMetaData(final String schemaName,
+    final String path, final Table table) {
+    final String tableDefinition;
+    synchronized (Table.class) {
+      tableDefinition = table.getDefinition();
+    }
+    return getMetaData(schemaName, path, tableDefinition);
+  }
+
   protected Table getTable(final QName typeName) {
     final String schemaName = typeName.getNamespaceURI();
     final String path = "\\\\" + schemaName + "\\" + typeName.getLocalPart();
     try {
       return geodatabase.openTable(path);
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       throw new RuntimeException("Unable to open table " + typeName, e);
     }
   }
@@ -613,6 +668,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
     addChildSchema("\\");
   }
 
+  @Override
   public Reader<DataObject> query(final QName typeName) {
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
       typeName);
@@ -633,52 +689,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore implemen
   public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
     final BoundingBox boundingBox = new BoundingBox(geometry);
     return query(typeName, boundingBox);
-  }
-
-  public Reader<DataObject> query(final QName typeName, final String where,
-    final Object... arguments) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Type name does not exist " + typeName);
-    } else {
-      final StringBuffer whereClause = new StringBuffer();
-      if (arguments.length == 0) {
-        if (where.indexOf('?') > -1) {
-          throw new IllegalArgumentException(
-            "No arguments specified for a where clause with placeholders: "
-              + where);
-        } else {
-          whereClause.append(where);
-        }
-      } else {
-        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-        int i = 0;
-        while (matcher.find()) {
-          if (i >= arguments.length) {
-            throw new IllegalArgumentException(
-              "Not enough arguments for where clause with placeholders: "
-                + where);
-          }
-          final Object argument = arguments[i];
-          matcher.appendReplacement(whereClause, "");
-          if (argument instanceof Number) {
-            whereClause.append(argument);
-          } else {
-            whereClause.append("'");
-            whereClause.append(argument);
-            whereClause.append("'");
-          }
-          i++;
-        }
-        matcher.appendTail(whereClause);
-      }
-
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-        typeName, whereClause.toString());
-      final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-        iterator);
-      return reader;
-    }
   }
 
   public void setCreateMissingGeodatabase(final boolean createMissingGeodatabase) {

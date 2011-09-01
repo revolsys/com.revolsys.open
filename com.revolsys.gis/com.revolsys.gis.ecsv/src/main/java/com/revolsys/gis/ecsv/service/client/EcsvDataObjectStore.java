@@ -231,14 +231,4 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
     final BoundingBox boundingBox = new BoundingBox(geometry);
     return query(typeName, boundingBox);
   }
-
-  public Reader<DataObject> query(QName typeName, String queryString,
-    Object... arguments) {
-    throw new UnsupportedOperationException();
-  }
-
-  public DataObject queryFirst(QName typeName, String queryString,
-    Object... arguments) {
-    throw new UnsupportedOperationException();
-  }
 }

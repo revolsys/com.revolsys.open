@@ -14,6 +14,8 @@ import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.io.Query;
@@ -123,15 +125,15 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       addColumnNames(sql, metaData, tablePrefix, attributeNames);
     }
     sql.append(" FROM ");
-    if (fromClause == null) {
+    if (StringUtils.hasText(fromClause)) {
+      sql.append(fromClause);
+    } else {
       final String tableName = JdbcUtils.getTableName(typeName);
       sql.append(tableName);
       sql.append(" ");
       sql.append(tablePrefix);
-    } else {
-      sql.append(fromClause);
     }
-    if (where != null) {
+    if (StringUtils.hasText(where)) {
       sql.append(" WHERE ");
       sql.append(where);
     }
@@ -219,7 +221,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   }
 
   protected ResultSet getResultSet(final Query query) {
-    final QName tableName = query.getTableName();
+    final QName tableName = query.getTypeName();
     final String dbTableName = JdbcUtils.getTableName(tableName);
     metaData = query.getMetaData();
     String sql = query.getSql();
@@ -267,7 +269,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         }
       }
 
-      final QName typeName = query.getTypeName();
+      final QName typeName = query.getTypeNameAlias();
       if (typeName != null) {
         final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).clone();
         newMetaData.setName(typeName);

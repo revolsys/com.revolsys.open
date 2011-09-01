@@ -1,5 +1,7 @@
 package com.revolsys.gis.graph;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -8,6 +10,17 @@ import com.revolsys.gis.data.model.DataObjectUtil;
 import com.vividsolutions.jts.geom.LineString;
 
 public class DataObjectGraph extends Graph<DataObject> {
+  public void add(final DataObject object) {
+    final LineString line = object.getGeometryValue();
+    add(object, line);
+  }
+
+  public void add(final List<DataObject> objects) {
+    for (final DataObject object : objects) {
+      add(object);
+    }
+  }
+
   /**
    * Clone the object, setting the line property to the new value.
    * 
@@ -16,9 +29,7 @@ public class DataObjectGraph extends Graph<DataObject> {
    * @return The new object.
    */
   @Override
-  protected DataObject clone(
-    final DataObject object,
-    final LineString line) {
+  protected DataObject clone(final DataObject object, final LineString line) {
     if (object == null) {
       return null;
     } else {
@@ -33,8 +44,7 @@ public class DataObjectGraph extends Graph<DataObject> {
    * @return The type name.
    */
   @Override
-  public QName getTypeName(
-    final Edge<DataObject> edge) {
+  public QName getTypeName(final Edge<DataObject> edge) {
     final DataObject object = edge.getObject();
     if (object == null) {
       return null;

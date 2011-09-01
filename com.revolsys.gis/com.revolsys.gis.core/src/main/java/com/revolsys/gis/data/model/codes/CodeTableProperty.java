@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -46,14 +47,18 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   protected void addValues(final Reader<DataObject> allCodes) {
     for (final DataObject code : allCodes) {
-      final Object id = code.getValue(getIdAttributeName());
-      final List<Object> values = new ArrayList<Object>();
-      for (final String attributeName : this.valueAttributeNames) {
-        final Object value = code.getValue(attributeName);
-        values.add(value);
-      }
-      addValue(id, values);
+      addValue(code);
     }
+  }
+
+  public void addValue(final DataObject code) {
+    final Object id = code.getValue(getIdAttributeName());
+    final List<Object> values = new ArrayList<Object>();
+    for (final String attributeName : this.valueAttributeNames) {
+      final Object value = code.getValue(attributeName);
+      values.add(value);
+    }
+    addValue(id, values);
   }
 
   @Override
@@ -171,8 +176,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
           i++;
         }
       }
-      final Reader<DataObject> reader = dataStore.query(typeName,
-        where.toString(), queryValues.toArray());
+      Query query = new Query(typeName);
+      query.setWhereClause(where.toString());
+      query.setParameters(queryValues);
+      final Reader<DataObject> reader = dataStore.query(query);
       try {
         addValues(reader);
         id = getIdByValue(values);
@@ -194,10 +201,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
       loadAll();
       values = getValueById(id);
     } else {
-      final Reader<DataObject> reader = dataStore.query(typeName,
-        getIdAttributeName() + " = ?", id);
-      addValues(reader);
-      values = getValueById(id);
+      final DataObject code = dataStore.load(typeName, id);
+      if (code != null) {
+        addValue(code);
+        values = getValueById(id);
+      }
     }
     return values;
   }

@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -279,7 +280,25 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public DataObject load(final QName typeName, final Object id) {
-    throw new UnsupportedOperationException("Load not supported");
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    if (metaData == null) {
+      return null;
+    } else {
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (idAttributeName == null) {
+        throw new IllegalArgumentException(typeName
+          + " does not have a primary key");
+      } else {
+        final StringBuffer where = new StringBuffer();
+        where.append(idAttributeName);
+        where.append(" = ?");
+        
+        final Query query = new Query(typeName);
+        query.setWhereClause(where.toString());
+        query.addParameter(id);
+        return queryFirst(query);
+      }
+    }
   }
 
   protected abstract void loadSchemaDataObjectMetaData(
@@ -288,15 +307,22 @@ public abstract class AbstractDataObjectStore extends
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
 
-  public Reader<DataObject> query(final Query query) {
+  public Reader<DataObject> query(QName typeName) {
+   Query query = new Query(typeName);
+    return query(query);
+  }
+  public Reader<DataObject> query(final List<Query> queries) {
     final DataObjectStoreQueryReader reader = createReader();
-    reader.addQuery(query);
+    reader.setQueries(queries);
     return reader;
   }
 
-  public DataObject queryFirst(final QName typeName, final String where,
-    final Object... arguments) {
-    final Reader<DataObject> reader = query(typeName, where, arguments);
+  public Reader<DataObject> query(final Query... queries) {
+    return query(Arrays.asList(queries));
+  }
+
+  public DataObject queryFirst(final Query query) {
+    final Reader<DataObject> reader = query(query);
     final Iterator<DataObject> iterator = reader.iterator();
     try {
       if (iterator.hasNext()) {

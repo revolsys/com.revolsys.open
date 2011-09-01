@@ -2,8 +2,6 @@ package com.revolsys.gis.esri.gdb.file;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.esri.gdb.xml.model.DETable;
-import com.revolsys.gis.esri.gdb.xml.model.Domain;
 
 public interface FileGdbDataObjectStore extends DataObjectStore{
 

@@ -103,7 +103,7 @@ public class DataObjectConverterProcess extends
         out.write(targetObject);
       }
     } else {
-      final StringBuffer sb = new StringBuffer("Multiple converers found: \n  ");
+      final StringBuffer sb = new StringBuffer("Multiple conveters found: \n  ");
       for (final FilterDataObjectConverter filterConverter : converters) {
         final Filter<DataObject> filter = filterConverter.getFilter();
         if (filter.accept(sourceObject)) {

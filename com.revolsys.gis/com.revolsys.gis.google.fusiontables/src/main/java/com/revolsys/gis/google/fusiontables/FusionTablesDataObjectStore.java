@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
@@ -26,6 +25,7 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
+import com.revolsys.collection.AbstractIterator;
 import com.revolsys.csv.CsvMapIoFactory;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -33,6 +33,7 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -48,7 +49,6 @@ import com.revolsys.gis.google.fusiontables.attribute.NumberAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.StringAttribute;
 import com.revolsys.io.MapReader;
 import com.revolsys.io.Reader;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
@@ -414,18 +414,16 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     schemaMap.put("", new DataObjectStoreSchema(this, ""));
   }
 
-  public Reader<DataObject> query(final QName typeName) {
-    final String where = null;
-    return query(typeName, where);
-  }
-
-  public Reader<DataObject> query(final QName typeName, final BoundingBox boundingBox) {
+  public Reader<DataObject> query(final QName typeName,
+    final BoundingBox boundingBox) {
     BoundingBox envelope = boundingBox.convert(GeometryFactory.getFactory(4326));
     final DataObjectMetaData metaData = getMetaData(typeName);
     final String where = "ST_INTERSECTS(" + metaData.getGeometryAttributeName()
       + ", RECTANGLE(LATLNG(" + envelope.getMinY() + "," + envelope.getMinX()
       + "), LATLNG(" + envelope.getMaxY() + "," + envelope.getMaxX() + ")))";
-    return query(typeName, where);
+    Query query = new Query(typeName);
+    query.setWhereClause(where);
+    return query(query);
   }
 
   public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
@@ -434,50 +432,57 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return query(typeName, new BoundingBox(projectedGeometry));
   }
 
-  public Reader<DataObject> query(QName typeName, String where,
-    Object... arguments) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    final StringBuffer sql = new StringBuffer();
-    sql.append("SELECT ");
-    addColumnNames(sql, metaData);
-    sql.append(" FROM ");
-    final String tableId = getTableId(typeName);
-    sql.append(tableId);
-    if (where == null) {
-      if (arguments.length > 0) {
-        throw new IllegalArgumentException(
-          "Arguments cannot be specified if there is no where clause");
-      }
-    } else {
-      sql.append(" WHERE ");
-      if (arguments.length == 0) {
-        if (where.indexOf('?') > -1) {
-          throw new IllegalArgumentException(
-            "No arguments specified for a where clause with placeholders: "
-              + where);
-        } else {
-          sql.append(where);
-        }
-      } else {
-        Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-        int i = 0;
-        while (matcher.find()) {
-          if (i >= arguments.length) {
-            throw new IllegalArgumentException(
-              "Not enough arguments for where clause with placeholders: "
-                + where);
-          }
-          final Object argument = arguments[i];
-          matcher.appendReplacement(sql, "");
-          appendString(sql, argument);
-          i++;
-        }
-        matcher.appendTail(sql);
-      }
-    }
-    final String sqlString = sql.toString();
-    return createDataObjectReader(metaData, sqlString);
+  @Override
+  protected AbstractIterator<DataObject> createIterator(Query query,
+    Map<String, Object> properties) {
+    // TODO Auto-generated method stub
+    return super.createIterator(query, properties);
   }
+
+  // public Reader<DataObject> query(QName typeName, String where,
+  // Object... arguments) {
+  // final DataObjectMetaData metaData = getMetaData(typeName);
+  // final StringBuffer sql = new StringBuffer();
+  // sql.append("SELECT ");
+  // addColumnNames(sql, metaData);
+  // sql.append(" FROM ");
+  // final String tableId = getTableId(typeName);
+  // sql.append(tableId);
+  // if (where == null) {
+  // if (arguments.length > 0) {
+  // throw new IllegalArgumentException(
+  // "Arguments cannot be specified if there is no where clause");
+  // }
+  // } else {
+  // sql.append(" WHERE ");
+  // if (arguments.length == 0) {
+  // if (where.indexOf('?') > -1) {
+  // throw new IllegalArgumentException(
+  // "No arguments specified for a where clause with placeholders: "
+  // + where);
+  // } else {
+  // sql.append(where);
+  // }
+  // } else {
+  // Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+  // int i = 0;
+  // while (matcher.find()) {
+  // if (i >= arguments.length) {
+  // throw new IllegalArgumentException(
+  // "Not enough arguments for where clause with placeholders: "
+  // + where);
+  // }
+  // final Object argument = arguments[i];
+  // matcher.appendReplacement(sql, "");
+  // appendString(sql, argument);
+  // i++;
+  // }
+  // matcher.appendTail(sql);
+  // }
+  // }
+  // final String sqlString = sql.toString();
+  // return createDataObjectReader(metaData, sqlString);
+  // }
 
   public void setPassword(final String password) {
     this.password = password;

@@ -366,6 +366,11 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
       }
       record = readNextRecord();
     }
+    if (metaData == null) {
+      if (metaDataMap.size() == 1) {
+        metaData = metaDataMap.values().iterator().next();
+      }
+    }
   }
 
   private Object readMap() throws IOException {

@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -145,16 +144,18 @@ public abstract class AbstractJdbcDataObjectStore extends
     throw new UnsupportedOperationException();
   }
 
-  protected DataObjectStoreQueryReader createReader(final DataObjectMetaData metaData,
-    final String sql, final List<Object> parameters) {
+  protected DataObjectStoreQueryReader createReader(
+    final DataObjectMetaData metaData, final String sql,
+    final List<Object> parameters) {
     final Query query = new Query(metaData);
     query.setSql(sql);
     query.setParameters(parameters);
     return createReader(query);
   }
 
-  protected DataObjectStoreQueryReader createReader(final DataObjectMetaData metaData,
-    final String query, final Object... parameters) {
+  protected DataObjectStoreQueryReader createReader(
+    final DataObjectMetaData metaData, final String query,
+    final Object... parameters) {
     return createReader(metaData, query, Arrays.asList(parameters));
   }
 
@@ -380,28 +381,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     return flushBetweenTypes;
   }
 
-  @Override
-  public DataObject load(final QName typeName, final Object id) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    if (metaData == null) {
-      return null;
-    } else {
-      final String idAttributeName = metaData.getIdAttributeName();
-      if (idAttributeName == null) {
-
-        throw new IllegalArgumentException(typeName
-          + " does not have a primary key");
-      } else {
-
-        final StringBuffer where = new StringBuffer();
-
-        where.append(idAttributeName);
-        where.append(" = ?");
-
-        return queryFirst(typeName, where.toString(), id);
-      }
-    }
-  }
 
   private synchronized String loadIdColumnName(final String schemaName,
     final String tableName) {
@@ -588,38 +567,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
-  }
-
-  public Reader<DataObject> query(final QName typeName,
-    final String whereClause, final List<Object> parameters) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    final Query query = new Query(metaData);
-    query.setWhereClause(whereClause);
-    query.setParameters(parameters);
-    final DataObjectStoreQueryReader reader = createReader(query);
-    return reader;
-  }
-
-  public Reader<DataObject> query(final QName typeName,
-    final String whereClause, final Object... parameters) {
-    return query(typeName, whereClause, Arrays.asList(parameters));
-  }
-
-  @Override
-  public DataObject queryFirst(final QName typeName, final String whereClause,
-    final Object... arguments) {
-    final Reader<DataObject> reader = query(typeName, whereClause, arguments);
-    final Iterator<DataObject> iterator = reader.iterator();
-    try {
-      if (iterator.hasNext()) {
-        final DataObject object = iterator.next();
-        return object;
-      } else {
-        return null;
-      }
-    } finally {
-      reader.close();
-    }
   }
 
   protected void releaseConnection(final Connection connection) {
