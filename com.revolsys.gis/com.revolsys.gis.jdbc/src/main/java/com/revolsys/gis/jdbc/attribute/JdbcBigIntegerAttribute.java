@@ -40,7 +40,11 @@ public class JdbcBigIntegerAttribute extends JdbcAttribute {
       value = resultSet.getLong(columnIndex);
     } else {
       final BigDecimal number = resultSet.getBigDecimal(columnIndex);
-      value = number.toBigInteger();
+      if (number == null) {
+        value = null;
+      } else {
+        value = number.toBigInteger();
+      }
     }
     if (!resultSet.wasNull()) {
       object.setValue(getIndex(), value);
