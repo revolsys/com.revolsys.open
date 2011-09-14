@@ -44,13 +44,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private JdbcDataObjectStore dataStore;
 
-  private Statistics deleteStatistics;
-
   private boolean flushBetweenTypes = false;
 
   private String hints = null;
-
-  private Statistics insertStatistics;
 
   private String label;
 
@@ -88,8 +84,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private Map<QName, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<QName, PreparedStatement>();
 
-  private Statistics updateStatistics;
-
   public JdbcWriter(final Connection connection,
     final JdbcDataObjectStore dataStore) {
     this.dataStore = dataStore;
@@ -125,13 +119,13 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       try {
 
         close(typeInsertSqlMap, typeInsertStatementMap,
-          typeInsertBatchCountMap, getInsertStatistics());
+          typeInsertBatchCountMap, dataStore.getInsertStatistics());
         close(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
-          typeInsertSequenceBatchCountMap, getInsertStatistics());
+          typeInsertSequenceBatchCountMap, dataStore.getInsertStatistics());
         close(typeUpdateSqlMap, typeUpdateStatementMap,
-          typeUpdateBatchCountMap, getUpdateStatistics());
+          typeUpdateBatchCountMap, dataStore.getUpdateStatistics());
         close(typeDeleteSqlMap, typeDeleteStatementMap,
-          typeDeleteBatchCountMap, getDeleteStatistics());
+          typeDeleteBatchCountMap, dataStore.getDeleteStatistics());
       } finally {
         if (dataSource != null) {
           try {
@@ -143,12 +137,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
           }
         }
       }
-      insertStatistics.disconnect();
-      insertStatistics = null;
-      updateStatistics.disconnect();
-      updateStatistics = null;
-      deleteStatistics.disconnect();
-      deleteStatistics = null;
       typeInsertSqlMap = null;
       typeInsertStatementMap = null;
       typeInsertBatchCountMap = null;
@@ -222,13 +210,13 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   @Override
   public void flush() {
     flush(typeInsertSqlMap, typeInsertStatementMap, typeInsertBatchCountMap,
-      getInsertStatistics());
+      dataStore.getInsertStatistics());
     flush(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
-      typeInsertSequenceBatchCountMap, getInsertStatistics());
+      typeInsertSequenceBatchCountMap, dataStore.getInsertStatistics());
     flush(typeUpdateSqlMap, typeUpdateStatementMap, typeUpdateBatchCountMap,
-      getUpdateStatistics());
+      dataStore.getUpdateStatistics());
     flush(typeDeleteSqlMap, typeDeleteStatementMap, typeDeleteBatchCountMap,
-      getDeleteStatistics());
+      dataStore.getDeleteStatistics());
   }
 
   private void flush(final Map<QName, String> sqlMap,
@@ -294,18 +282,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       typeDeleteSqlMap.put(typeName, sql);
     }
     return sql;
-  }
-
-  public Statistics getDeleteStatistics() {
-    if (deleteStatistics == null) {
-      if (label == null) {
-        deleteStatistics = new Statistics("Delete");
-      } else {
-        deleteStatistics = new Statistics(label + " Delete");
-      }
-      deleteStatistics.connect();
-    }
-    return deleteStatistics;
   }
 
   private String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
@@ -391,18 +367,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return sql;
   }
 
-  public Statistics getInsertStatistics() {
-    if (insertStatistics == null) {
-      if (label == null) {
-        insertStatistics = new Statistics("Insert");
-      } else {
-        insertStatistics = new Statistics(label + " Insert");
-      }
-      insertStatistics.connect();
-    }
-    return insertStatistics;
-  }
-
   public String getLabel() {
     return label;
   }
@@ -452,18 +416,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       typeUpdateSqlMap.put(typeName, sql);
     }
     return sql;
-  }
-
-  public Statistics getUpdateStatistics() {
-    if (updateStatistics == null) {
-      if (label == null) {
-        updateStatistics = new Statistics("Update");
-      } else {
-        updateStatistics = new Statistics(label + " Update");
-      }
-      updateStatistics.connect();
-    }
-    return updateStatistics;
   }
 
   private void insert(final DataObject object) throws SQLException {
@@ -522,7 +474,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     if (batchCount >= batchSize) {
       final String sql = getInsertSql(metaData, false);
       processCurrentBatch(typeName, sql, statement, typeInsertBatchCountMap,
-        getInsertStatistics());
+        dataStore.getInsertStatistics());
     }
   }
 
@@ -559,7 +511,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     if (batchCount >= batchSize) {
       final String sql = getInsertSql(metaData, true);
       processCurrentBatch(typeName, sql, statement,
-        typeInsertSequenceBatchCountMap, getInsertStatistics());
+        typeInsertSequenceBatchCountMap, dataStore.getInsertStatistics());
     }
   }
 
@@ -690,7 +642,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     if (batchCount >= batchSize) {
       final String sql = getUpdateSql(metaData);
       processCurrentBatch(typeName, sql, statement, typeUpdateBatchCountMap,
-        getUpdateStatistics());
+        dataStore.getUpdateStatistics());
     }
   }
 
@@ -716,11 +668,11 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       throw e;
     } catch (final Error e) {
       throw e;
-    } catch (BatchUpdateException e) {
-     for (SQLException e1 = e.getNextException(); e1 != null; e1 = e1.getNextException()) {
-       LOG.error("Unable to write", e1);
-     }
-     throw new RuntimeException("Unable to write", e);
+    } catch (final BatchUpdateException e) {
+      for (SQLException e1 = e.getNextException(); e1 != null; e1 = e1.getNextException()) {
+        LOG.error("Unable to write", e1);
+      }
+      throw new RuntimeException("Unable to write", e);
     } catch (final Exception e) {
       throw new RuntimeException("Unable to write", e);
     }

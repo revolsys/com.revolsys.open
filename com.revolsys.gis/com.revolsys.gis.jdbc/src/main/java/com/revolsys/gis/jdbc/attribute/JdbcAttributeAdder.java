@@ -35,10 +35,19 @@ public class JdbcAttributeAdder {
           required, null);
       break;
       case Types.BIGINT:
+        attribute = new JdbcLongAttribute(name, sqlType, length,
+          required, null);
+      break;
       case Types.INTEGER:
+        attribute = new JdbcIntegerAttribute(name, sqlType, length,
+          required, null);
+      break;
       case Types.SMALLINT:
+        attribute = new JdbcShortAttribute(name, sqlType, length,
+          required, null);
+      break;
       case Types.TINYINT:
-        attribute = new JdbcBigIntegerAttribute(name, sqlType, length,
+        attribute = new JdbcByteAttribute(name, sqlType, length,
           required, null);
       break;
       case Types.DECIMAL:

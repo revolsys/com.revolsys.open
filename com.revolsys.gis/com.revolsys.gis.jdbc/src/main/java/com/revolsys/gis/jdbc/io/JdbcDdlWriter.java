@@ -114,13 +114,18 @@ public abstract class JdbcDdlWriter {
   }
 
   public String writeCreateSequence(final DataObjectMetaData metaData) {
+    final String sequenceName = getSequenceName(metaData);
+    writeCreateSequence(sequenceName);
+    return sequenceName;
+  }
+
+  public String getSequenceName(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String schema = typeName.getNamespaceURI().toLowerCase();
     final String tableName = typeName.getLocalPart().toLowerCase();
     final String idAttributeName = metaData.getIdAttributeName().toLowerCase();
     final String sequenceName = schema + "." + tableName + "_"
       + idAttributeName + "_seq";
-    writeCreateSequence(sequenceName);
     return sequenceName;
   }
 
@@ -221,5 +226,10 @@ public abstract class JdbcDdlWriter {
       out.print('.');
     }
     out.print(tableName);
+  }
+
+  public void writeResetSequence(DataObjectMetaData metaData,
+    List<DataObject> values) {
+    throw new UnsupportedOperationException();
   }
 }

@@ -12,18 +12,22 @@ public interface CoordinatesList extends CoordinateSequence,
 
   double distance(int index, CoordinatesList other, int otherIndex);
 
-  boolean equal2d(int index, Coordinates point);
+  boolean equal(int i, Coordinates point);
+
+  boolean equal(int i, Coordinates point, int numAxis);
 
   boolean equal(int index, CoordinatesList other, int otherIndex);
 
   boolean equal(int index, CoordinatesList other, int otherIndex, int numAxis);
+
+  boolean equal2d(int index, Coordinates point);
 
   boolean equals(CoordinatesList coordinatesList);
 
   Coordinates get(int i);
 
   double[] getCoordinates();
-  
+
   double getM(int index);
 
   byte getNumAxis();

@@ -1,6 +1,7 @@
 package com.revolsys.gis.oracle.io;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -8,6 +9,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -54,12 +56,62 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
+  public void writeResetSequence(DataObjectMetaData metaData,
+    List<DataObject> values) {
+    PrintWriter out = getOut();
+    Long nextValue = 0L;
+    for (DataObject object : values) {
+      Object id = object.getIdValue();
+      if (id instanceof Number) {
+        Number number = (Number)id;
+        final long longValue = number.longValue();
+        if (longValue > nextValue) {
+          nextValue = longValue;
+        }
+      }
+    }
+    nextValue++;
+    String sequeneName = getSequenceName(metaData);
+    out.println("DECLARE");
+    out.println("  cur_val NUMBER;");
+    out.println("BEGIN");
+
+    out.print("  SELECT ");
+    out.print(sequeneName);
+    out.println(".NEXTVAL INTO cur_val FROM DUAL;");
+ 
+    out.print("  IF cur_val + 1 <> ");
+    out.print(nextValue);
+    out.println(" THEN");
+ 
+    out.print("    EXECUTE IMMEDIATE 'ALTER SEQUENCE ");
+    out.print(sequeneName);
+    out.print(" INCREMENT BY ' || (");
+    out.print(nextValue);
+    out.println(" -  cur_val -1) || ' MINVALUE 1';");
+
+    out.print("    SELECT ");
+    out.print(sequeneName);
+    out.println(".NEXTVAL INTO cur_val FROM DUAL;");
+
+    out.print("    EXECUTE IMMEDIATE 'ALTER SEQUENCE ");
+    out.print(sequeneName);
+    out.println(" INCREMENT BY 1';");
+    out.println("  END IF;");
+    out.println("END;");
+  }
+
   public String writeCreateSequence(final DataObjectMetaData metaData) {
+    final String sequenceName = getSequenceName(metaData);
+    writeCreateSequence(sequenceName);
+    return sequenceName;
+  }
+
+  public String getSequenceName(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String schemaName = typeName.getNamespaceURI().toUpperCase();
     final String tableName = typeName.getLocalPart().toUpperCase();
     final String sequenceName = schemaName + "." + tableName + "_SEQ";
-    writeCreateSequence(sequenceName);
     return sequenceName;
   }
 

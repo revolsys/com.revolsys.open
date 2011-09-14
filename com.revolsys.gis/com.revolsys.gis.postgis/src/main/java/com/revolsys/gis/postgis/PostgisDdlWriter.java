@@ -1,6 +1,7 @@
 package com.revolsys.gis.postgis;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -8,6 +9,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -59,6 +61,29 @@ public class PostgisDdlWriter extends JdbcDdlWriter {
     } else {
       throw new IllegalArgumentException("Unknown data type" + dataType);
     }
+  }
+
+  public void writeResetSequence(DataObjectMetaData metaData,
+    List<DataObject> values) {
+    PrintWriter out = getOut();
+    Long nextValue = 0L;
+    for (DataObject object : values) {
+      Object id = object.getIdValue();
+      if (id instanceof Number) {
+        Number number = (Number)id;
+        final long longValue = number.longValue();
+        if (longValue > nextValue) {
+          nextValue = longValue;
+        }
+      }
+    }
+    nextValue++;
+    String sequeneName = getSequenceName(metaData);
+    out.print("ALTER SEQUENCE ");
+    out.print(sequeneName);
+    out.print(" RESTART WITH ");
+    out.print(nextValue);
+    out.println(";");
   }
 
   public void writeGeometryMetaData(final DataObjectMetaData metaData) {

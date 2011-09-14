@@ -86,7 +86,7 @@ public class Statistics {
     }
   }
 
-  public Long get(final String name) {
+  public synchronized Long get(final String name) {
     if (name != null) {
       final Long count = counts.get(name);
       return count;
@@ -95,11 +95,11 @@ public class Statistics {
     }
   }
 
-  public Set<String> getNames() {
+  public synchronized Set<String> getNames() {
     return counts.keySet();
   }
 
-  public void logCounts() {
+  public synchronized void logCounts() {
     int totalCount = 0;
     final StringBuffer sb = new StringBuffer();
     if (message != null) {

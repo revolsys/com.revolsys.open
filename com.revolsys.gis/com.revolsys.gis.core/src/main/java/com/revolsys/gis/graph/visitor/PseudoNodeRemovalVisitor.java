@@ -12,7 +12,7 @@ import javax.xml.namespace.QName;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.property.Merge;
+import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
@@ -21,6 +21,7 @@ import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
+import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.ObjectProcessor;
 
 /**
@@ -68,22 +69,30 @@ public class PseudoNodeRemovalVisitor extends
     if (edgePairs != null) {
       for (final EdgePair<DataObject> edgePair : edgePairs) {
         final Edge<DataObject> edge1 = edgePair.getEdge1();
-        final DataObject object1 = edge1.getObject();
-
         final Edge<DataObject> edge2 = edgePair.getEdge2();
-        final DataObject object2 = edge2.getObject();
-
-        final Merge merge = Merge.getProperty(object1);
-        DataObject newObject = merge.getMergedObject(object1, object2);
-        newObject.setIdValue(null);
-
-        final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
-        graph.add(newObject);
-        graph.remove(edge1);
-        graph.remove(edge2);
-        mergedStatistics.add(object1);
+        final DataObject object = edge1.getObject();
+        if (mergeEdges(node, edge1, edge2)) {
+          mergedStatistics.add(object);
+        }
       }
     }
+  }
+
+  protected boolean mergeEdges(Node<DataObject> node,
+    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
+    final DataObject object1 = edge1.getObject();
+
+    final DataObject object2 = edge2.getObject();
+
+    DataObject newObject = DirectionalAttributes.mergeLongest(node, object1,
+      object2);
+    newObject.setIdValue(null);
+
+    final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
+    graph.add(newObject);
+    graph.remove(edge1);
+    graph.remove(edge2);
+    return true;
   }
 
   public void process(final DataObjectGraph graph) {
@@ -91,7 +100,6 @@ public class PseudoNodeRemovalVisitor extends
   }
 
   private void processPseudoNodes(final Node<DataObject> node) {
-
     for (final QName typeName : NodeAttributes.getEdgeTypeNames(node)) {
       final PseudoNodeAttribute pseudoNodeAttribute = new PseudoNodeAttribute(
         node, typeName, equalExcludeAttributes);

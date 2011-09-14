@@ -130,6 +130,12 @@ public final class DataObjectUtil {
     object.setValue(name, value);
   }
 
+  public static void copyValue(final DataObject source,
+    String sourceAttributeName, DataObject target, String targetAttributeName) {
+    Object value = source.get(sourceAttributeName);
+    target.setValue(targetAttributeName, value);
+  }
+
   private DataObjectUtil() {
   }
 }

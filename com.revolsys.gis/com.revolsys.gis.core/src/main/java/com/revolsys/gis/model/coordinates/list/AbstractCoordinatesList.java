@@ -35,17 +35,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
-  public boolean equal2d(int index, Coordinates point) {
-    for (int j = 0; j < 2; j++) {
-      final double value1 = getValue(index, j);
-      final double value2 = point.getValue(j);
-      if (Double.compare(value1, value2) != 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   public CoordinatesList create(final int length, final int numAxis) {
     return new DoubleCoordinatesList(length, numAxis);
   }
@@ -63,10 +52,37 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
+  public boolean equal(final int index, final Coordinates point) {
+    final int numAxis = Math.max(getNumAxis(), point.getNumAxis());
+    return equal(index, point, numAxis);
+  }
+
+  public boolean equal(final int index, final Coordinates point,
+    final int numAxis) {
+    if (getNumAxis() < numAxis) {
+      return false;
+    } else if (point.getNumAxis() < numAxis) {
+      return false;
+    }
+    if (index < size()) {
+      for (int j = 0; j < numAxis; j++) {
+        final double value1 = getValue(index, j);
+        final double value2 = point.getValue(j);
+        if (Double.compare(value1, value2) != 0) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public boolean equal(final int index, final CoordinatesList other,
     final int otherIndex) {
+    final int numAxis = Math.max(getNumAxis(), other.getNumAxis());
     if (index < size() || otherIndex < other.size()) {
-      for (int j = 0; j < Math.max(getNumAxis(), other.getNumAxis()); j++) {
+      for (int j = 0; j < numAxis; j++) {
         final double value1 = getValue(index, j);
         final double value2 = other.getValue(otherIndex, j);
         if (Double.compare(value1, value2) != 0) {
@@ -81,8 +97,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
 
   public boolean equal(final int index, final CoordinatesList other,
     final int otherIndex, int numAxis) {
+    numAxis = Math.min(numAxis, Math.max(getNumAxis(), other.getNumAxis()));
     if (index < size() || otherIndex < other.size()) {
-      numAxis = Math.min(numAxis, Math.max(getNumAxis(), other.getNumAxis()));
       for (int j = 0; j < numAxis; j++) {
         final double value1 = getValue(index, j);
         final double value2 = other.getValue(otherIndex, j);
@@ -94,6 +110,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     } else {
       return false;
     }
+  }
+
+  public boolean equal2d(final int index, final Coordinates point) {
+    return equal(index, point, 2);
   }
 
   public boolean equals(final CoordinatesList coordinatesList) {

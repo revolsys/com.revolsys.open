@@ -40,6 +40,7 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty;
@@ -60,6 +61,12 @@ public abstract class AbstractJdbcDataObjectStore extends
   private String[] excludeTablePatterns = new String[0];
 
   private boolean flushBetweenTypes;
+
+  private Statistics deleteStatistics;
+
+  private Statistics insertStatistics;
+
+  private Statistics updateStatistics;
 
   private String hints;
 
@@ -120,6 +127,18 @@ public abstract class AbstractJdbcDataObjectStore extends
       setSharedAttribute("writer", null);
       writer.close();
     }
+    if (insertStatistics != null) {
+      insertStatistics.disconnect();
+      insertStatistics = null;
+    }
+    if (updateStatistics != null) {
+      updateStatistics.disconnect();
+      updateStatistics = null;
+    }
+    if (deleteStatistics != null) {
+      deleteStatistics.disconnect();
+      deleteStatistics = null;
+    }
   }
 
   @Override
@@ -139,6 +158,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Override
   public Query createQuery(final QName typeName, final String whereClause,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
@@ -251,6 +271,18 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  public Statistics getDeleteStatistics() {
+    if (deleteStatistics == null) {
+      if (label == null) {
+        deleteStatistics = new Statistics("Delete");
+      } else {
+        deleteStatistics = new Statistics(label + " Delete");
+      }
+      deleteStatistics.connect();
+    }
+    return deleteStatistics;
+  }
+
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     throw new UnsupportedOperationException(
       "Cannot create SQL to generate Primary Key for " + metaData);
@@ -258,6 +290,18 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public String getHints() {
     return hints;
+  }
+
+  public Statistics getInsertStatistics() {
+    if (insertStatistics == null) {
+      if (label == null) {
+        insertStatistics = new Statistics("Insert");
+      } else {
+        insertStatistics = new Statistics(label + " Insert");
+      }
+      insertStatistics.connect();
+    }
+    return insertStatistics;
   }
 
   @Override
@@ -339,6 +383,18 @@ public abstract class AbstractJdbcDataObjectStore extends
     return sqlSuffix;
   }
 
+  public Statistics getUpdateStatistics() {
+    if (updateStatistics == null) {
+      if (label == null) {
+        updateStatistics = new Statistics("Update");
+      } else {
+        updateStatistics = new Statistics(label + " Update");
+      }
+      updateStatistics.connect();
+    }
+    return updateStatistics;
+  }
+
   public synchronized JdbcWriter getWriter() {
     JdbcWriter writer = getSharedAttribute("writer");
     if (writer == null) {
@@ -380,7 +436,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   public boolean isFlushBetweenTypes() {
     return flushBetweenTypes;
   }
-
 
   private synchronized String loadIdColumnName(final String schemaName,
     final String tableName) {
@@ -525,6 +580,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectMetaDataImpl metaData) {
   }
 
+  @Override
   public Reader<DataObject> query(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
     final Query query = new Query(metaData);
