@@ -9,7 +9,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
-public class SetValues implements SourceToTargetProcess<DataObject, DataObject> {
+public class SetValues extends
+  AbstractSourceToTargetProcess<DataObject, DataObject> {
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
   public SetValues(final Map<String, ? extends Object> values) {

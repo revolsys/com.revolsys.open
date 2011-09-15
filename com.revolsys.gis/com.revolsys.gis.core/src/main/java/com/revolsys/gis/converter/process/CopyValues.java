@@ -10,8 +10,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
-public class CopyValues implements
-  SourceToTargetProcess<DataObject, DataObject> {
+public class CopyValues extends
+  AbstractSourceToTargetProcess<DataObject, DataObject> {
   private Map<String, String> attributeNames = new LinkedHashMap<String, String>();
 
   public CopyValues() {

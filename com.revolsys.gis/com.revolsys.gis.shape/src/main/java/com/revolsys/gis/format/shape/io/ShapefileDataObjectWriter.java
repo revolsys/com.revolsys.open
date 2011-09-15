@@ -95,41 +95,42 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   @Override
   protected void preFirstWrite(DataObject object) throws IOException {
-    if (geometryFactory == null) {
-      final Geometry geometry = object.getGeometryValue();
-      if (geometry != null) {
-        geometryFactory = GeometryFactory.getFactory(geometry);
+    if (geometryPropertyName != null) {
+      if (geometryFactory == null) {
+        final Geometry geometry = object.getGeometryValue();
+        if (geometry != null) {
+          geometryFactory = GeometryFactory.getFactory(geometry);
+        }
       }
+      createPrjFile(geometryFactory);
     }
-    createPrjFile(geometryFactory);
   }
 
   protected void init() throws IOException {
     super.init();
-
-    this.out = new ResourceEndianOutput(resource);
-    writeHeader(this.out);
-
     final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)getMetaData();
     if (metaData != null) {
       geometryPropertyName = metaData.getGeometryAttributeName();
-      if (!metaData.hasAttribute(geometryPropertyName)) {
-        metaData.addAttribute(geometryPropertyName, DataTypes.GEOMETRY, true);
-      }
-      if (!hasField(geometryPropertyName)) {
-        addField(new FieldDefinition(geometryPropertyName,
-          FieldDefinition.OBJECT_TYPE, 0));
+      if (geometryPropertyName != null) {
+
+        this.out = new ResourceEndianOutput(resource);
+        writeHeader(this.out);
+
+        if (!hasField(geometryPropertyName)) {
+          addField(new FieldDefinition(geometryPropertyName,
+            FieldDefinition.OBJECT_TYPE, 0));
+        }
+
+        Resource indexResource = SpringUtil.getResourceWithExtension(resource,
+          "shx");
+        if (!(indexResource instanceof NonExistingResource)) {
+          indexOut = new ResourceEndianOutput(indexResource);
+          writeHeader(indexOut);
+        }
+
+        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
       }
     }
-
-    Resource indexResource = SpringUtil.getResourceWithExtension(resource,
-      "shx");
-    if (!(indexResource instanceof NonExistingResource)) {
-      indexOut = new ResourceEndianOutput(indexResource);
-      writeHeader(indexOut);
-    }
-
-    geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
   }
 
   private void createPrjFile(GeometryFactory geometryFactory)
@@ -211,36 +212,37 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   private void updateHeader(final ResourceEndianOutput out) throws IOException {
+    if (out != null) {
+      int shapeType = ShapefileConstants.NULL_SHAPE;
+      if (geometryConverter != null) {
+        shapeType = geometryConverter.getShapeType();
+      }
+      out.seek(24);
+      out.writeInt((int)(out.length() / 2));
+      out.seek(32);
+      out.writeLEInt(shapeType);
+      out.writeLEDouble(envelope.getMinX());
+      out.writeLEDouble(envelope.getMinY());
+      out.writeLEDouble(envelope.getMaxX());
+      out.writeLEDouble(envelope.getMaxY());
+      switch (shapeType) {
+        case ShapefileConstants.POINT_ZM_SHAPE:
+        case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
+        case ShapefileConstants.POLYLINE_ZM_SHAPE:
+        case ShapefileConstants.POLYGON_ZM_SHAPE:
+          out.writeLEDouble(zMin);
+          out.writeLEDouble(zMax);
+        break;
 
-    int shapeType = ShapefileConstants.NULL_SHAPE;
-    if (geometryConverter != null) {
-      shapeType = geometryConverter.getShapeType();
+        default:
+          out.writeLEDouble(0.0);
+          out.writeLEDouble(0.0);
+        break;
+      }
+      out.writeLEDouble(0.0);
+      out.writeLEDouble(0.0);
+      out.close();
     }
-    out.seek(24);
-    out.writeInt((int)(out.length() / 2));
-    out.seek(32);
-    out.writeLEInt(shapeType);
-    out.writeLEDouble(envelope.getMinX());
-    out.writeLEDouble(envelope.getMinY());
-    out.writeLEDouble(envelope.getMaxX());
-    out.writeLEDouble(envelope.getMaxY());
-    switch (shapeType) {
-      case ShapefileConstants.POINT_ZM_SHAPE:
-      case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
-      case ShapefileConstants.POLYLINE_ZM_SHAPE:
-      case ShapefileConstants.POLYGON_ZM_SHAPE:
-        out.writeLEDouble(zMin);
-        out.writeLEDouble(zMax);
-      break;
-
-      default:
-        out.writeLEDouble(0.0);
-        out.writeLEDouble(0.0);
-      break;
-    }
-    out.writeLEDouble(0.0);
-    out.writeLEDouble(0.0);
-    out.close();
   }
 
   @Override

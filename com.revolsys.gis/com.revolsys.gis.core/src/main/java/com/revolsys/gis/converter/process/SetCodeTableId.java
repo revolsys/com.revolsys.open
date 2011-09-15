@@ -11,8 +11,8 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
-public class SetCodeTableId implements
-  SourceToTargetProcess<DataObject, DataObject> {
+public class SetCodeTableId extends
+  AbstractSourceToTargetProcess<DataObject, DataObject> {
   private final CodeTable codeTable;
 
   private final Map<String, Converter<DataObject, Object>> codeTableValueConverters = new HashMap<String, Converter<DataObject, Object>>();
@@ -48,7 +48,8 @@ public class SetCodeTableId implements
             if (codeTableValueName == null) {
               sourceValue = targetCodeTable.getId(sourceValue);
             } else {
-              sourceValue = targetCodeTable.getId(Collections.singletonMap(codeTableValueName, sourceValue));
+              sourceValue = targetCodeTable.getId(Collections.singletonMap(
+                codeTableValueName, sourceValue));
             }
           }
         }

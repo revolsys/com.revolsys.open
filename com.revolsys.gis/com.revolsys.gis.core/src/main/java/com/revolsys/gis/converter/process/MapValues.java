@@ -9,7 +9,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
-public class MapValues implements SourceToTargetProcess<DataObject, DataObject> {
+public class MapValues extends
+  AbstractSourceToTargetProcess<DataObject, DataObject> {
   private String sourceAttributeName;
 
   private String targetAttributeName;
@@ -19,25 +20,20 @@ public class MapValues implements SourceToTargetProcess<DataObject, DataObject> 
   public MapValues() {
   }
 
-  public MapValues(
-    final String sourceAttributeName,
+  public MapValues(final String sourceAttributeName,
     final String targetAttributeName) {
     this.sourceAttributeName = sourceAttributeName;
     this.targetAttributeName = targetAttributeName;
   }
 
-  public MapValues(
-    final String sourceAttributeName,
-    final String targetAttributeName,
-    final Map<Object, Object> valueMap) {
+  public MapValues(final String sourceAttributeName,
+    final String targetAttributeName, final Map<Object, Object> valueMap) {
     this.sourceAttributeName = sourceAttributeName;
     this.targetAttributeName = targetAttributeName;
     this.valueMap = valueMap;
   }
 
-  public void addValueMap(
-    final Object sourceValue,
-    final Object targetValue) {
+  public void addValueMap(final Object sourceValue, final Object targetValue) {
     valueMap.put(sourceValue, targetValue);
   }
 
@@ -53,9 +49,7 @@ public class MapValues implements SourceToTargetProcess<DataObject, DataObject> 
     return valueMap;
   }
 
-  public void process(
-    final DataObject source,
-    final DataObject target) {
+  public void process(final DataObject source, final DataObject target) {
     final Object sourceValue = DataObjectUtil.getAttributeByPath(source,
       sourceAttributeName);
     if (sourceValue != null) {
@@ -74,18 +68,15 @@ public class MapValues implements SourceToTargetProcess<DataObject, DataObject> 
     }
   }
 
-  public void setSourceAttributeName(
-    final String sourceAttributeName) {
+  public void setSourceAttributeName(final String sourceAttributeName) {
     this.sourceAttributeName = sourceAttributeName;
   }
 
-  public void setTargetAttributeName(
-    final String targetAttributeName) {
+  public void setTargetAttributeName(final String targetAttributeName) {
     this.targetAttributeName = targetAttributeName;
   }
 
-  public void setValueMap(
-    final Map<Object, Object> attributeNames) {
+  public void setValueMap(final Map<Object, Object> attributeNames) {
     this.valueMap = attributeNames;
   }
 

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.revolsys.gis.data.model.DataObject;
 
-public class SourceToTargetAttributeMapping implements
-  SourceToTargetProcess<DataObject, DataObject> {
+public class SourceToTargetAttributeMapping extends
+  AbstractSourceToTargetProcess<DataObject, DataObject> {
   private Map<String, SourceToTargetProcess<DataObject, DataObject>> targetAttributeMappings = new HashMap<String, SourceToTargetProcess<DataObject, DataObject>>();
 
   public SourceToTargetAttributeMapping() {
@@ -17,11 +17,23 @@ public class SourceToTargetAttributeMapping implements
     this.targetAttributeMappings = targetAttributeMappings;
   }
 
-  public void process(
-    final DataObject source,
-    final DataObject target) {
+  public void process(final DataObject source, final DataObject target) {
     for (final SourceToTargetProcess<DataObject, DataObject> mapping : targetAttributeMappings.values()) {
       mapping.process(source, target);
+    }
+  }
+
+  @Override
+  public void init() {
+    for (SourceToTargetProcess<DataObject, DataObject> process : targetAttributeMappings.values()) {
+      process.init();
+    }
+  }
+
+  @Override
+  public void close() {
+    for (SourceToTargetProcess<DataObject, DataObject> process : targetAttributeMappings.values()) {
+      process.close();
     }
   }
 
