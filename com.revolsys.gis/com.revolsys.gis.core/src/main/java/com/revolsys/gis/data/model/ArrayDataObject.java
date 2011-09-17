@@ -35,8 +35,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.JavaBeanUtil;

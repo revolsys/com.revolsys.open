@@ -2,40 +2,26 @@ package com.revolsys.parallel.process;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.ChannelOutput;
 
-public final class Delta<T> extends BaseInOutProcess<T, T> {
+public final class Delta<T> extends AbstractInProcess<T> {
 
-  /** The second output Channel<T> */
-  private Channel<T> out2;
+  private List<ChannelOutput<T>> out = new ArrayList<ChannelOutput<T>>();
+
+  private boolean running;
+
+  private boolean clone = true;
 
   public Delta() {
   }
 
-  /**
-   * Construct a new Delta process with the input Channel<T> in and the output
-   * Channel<T>s out1 and out2. The ordering of the Channel<T>s out1 and out2
-   * make no difference to the functionality of this process.
-   * 
-   * @param in The input channel
-   * @param out1 The first output Channel<T>
-   * @param out2 The second output Channel<T>
-   */
-  public Delta(Channel<T> in, Channel<T> out, Channel<T> out2) {
-    setIn(in);
-    setOut(out);
-    this.out2 = out2;
-  }
-
-  protected void process(Channel<T> in, Channel<T> out, T object) {
-    T object2 = clone(object);
-    out.write(object);
-    out2.write(object2);
-  }
-
+  @SuppressWarnings("unchecked")
   private T clone(final T value) {
-    if (value instanceof Cloneable) {
+    if (clone && (value instanceof Cloneable)) {
       try {
         final Class<? extends Object> valueClass = value.getClass();
         final Method method = valueClass.getMethod("clone", new Class[0]);
@@ -69,35 +55,49 @@ public final class Delta<T> extends BaseInOutProcess<T, T> {
   @Override
   protected void destroy() {
     super.destroy();
-    if (out2 != null) {
-      out2.writeDisconnect();
+    if (out != null) {
+      for (final ChannelOutput<T> out : this.out) {
+        out.writeDisconnect();
+      }
     }
   }
 
-  /**
-   * @return the out
-   */
-  public Channel<T> getOut2() {
-    if (out2 == null) {
-      setOut2(new Channel<T>());
+  public List<ChannelOutput<T>> getOut() {
+    return out;
+  }
+
+  public boolean isClone() {
+    return clone;
+  }
+
+  @Override
+  protected void run(final Channel<T> in) {
+    running = true;
+    try {
+      while (running) {
+        final T object = in.read();
+        if (object != null) {
+          for (final ChannelOutput<T> out : this.out) {
+            final T clonedObject = clone(object);
+            out.write(clonedObject);
+          }
+        }
+      }
+    } finally {
+      try {
+      } finally {
+        running = false;
+      }
     }
-    return out2;
-  }
-
-  /**
-   * @param out the out to set
-   */
-  public void setOut2(Channel<T> out2) {
-    this.out2 = out2;
-    out2.writeConnect();
 
   }
 
-  public void setOut2Process(final InProcess<T> out2) {
-    setOut2(out2.getIn());
+  public void setClone(final boolean clone) {
+    this.clone = clone;
   }
 
-  public InProcess<T> getOut2Process() {
-    return null;
+  public void setOut(final List<ChannelOutput<T>> out) {
+    this.out = out;
   }
+
 }

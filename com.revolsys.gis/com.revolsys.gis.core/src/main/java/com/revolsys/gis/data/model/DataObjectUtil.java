@@ -132,7 +132,7 @@ public final class DataObjectUtil {
 
   public static void copyValue(final DataObject source,
     String sourceAttributeName, DataObject target, String targetAttributeName) {
-    Object value = source.get(sourceAttributeName);
+    Object value = getAttributeByPath(source, sourceAttributeName);
     target.setValue(targetAttributeName, value);
   }
 

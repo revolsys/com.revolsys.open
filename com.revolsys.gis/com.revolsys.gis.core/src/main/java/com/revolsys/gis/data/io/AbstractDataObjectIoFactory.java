@@ -1,6 +1,5 @@
 package com.revolsys.gis.data.io;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -14,12 +13,32 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractDataObjectIoFactory extends
   AbstractDataObjectReaderFactory implements DataObjectWriterFactory {
 
+
+  protected static DataObjectWriterFactory getDataObjectWriterFactory(
+    final Resource resource) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final DataObjectWriterFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      DataObjectWriterFactory.class, resource);
+    return readerFactory;
+  }
+
+  public static Writer<DataObject> dataObjectWriter(final DataObjectMetaData metaData,
+    final Resource resource) {
+    final DataObjectWriterFactory writerFactory = getDataObjectWriterFactory(resource);
+    if (writerFactory == null) {
+      return null;
+    } else {
+      final Writer<DataObject> writer = writerFactory.createDataObjectWriter(metaData,resource);
+      return writer;
+    }
+  }
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
   public AbstractDataObjectIoFactory(final String name, final boolean binary) {
