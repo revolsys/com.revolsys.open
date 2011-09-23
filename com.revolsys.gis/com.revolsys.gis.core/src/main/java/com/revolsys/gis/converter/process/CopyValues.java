@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
 public class CopyValues extends
@@ -17,20 +16,15 @@ public class CopyValues extends
   public CopyValues() {
   }
 
-  public CopyValues(
-    final Map<String, String> attributeNames) {
+  public CopyValues(final Map<String, String> attributeNames) {
     this.attributeNames = attributeNames;
   }
 
-  public CopyValues(
-    final String sourceName,
-    final String targetName) {
+  public CopyValues(final String sourceName, final String targetName) {
     addAttributeName(sourceName, targetName);
   }
 
-  public void addAttributeName(
-    final String sourceName,
-    final String targetName) {
+  public void addAttributeName(final String sourceName, final String targetName) {
     attributeNames.put(sourceName, targetName);
   }
 
@@ -38,9 +32,7 @@ public class CopyValues extends
     return attributeNames;
   }
 
-  public void process(
-    final DataObject source,
-    final DataObject target) {
+  public void process(final DataObject source, final DataObject target) {
     for (final Entry<String, String> entry : attributeNames.entrySet()) {
       final String sourceName = entry.getKey();
       final String targetName = entry.getValue();
@@ -48,7 +40,7 @@ public class CopyValues extends
       if (sourceName.startsWith("~")) {
         value = sourceName.substring(1);
       } else {
-        value = DataObjectUtil.getAttributeByPath(source, sourceName);
+        value = source.getValueByPath(sourceName);
       }
       if (value != null) {
         final DataObjectMetaData targetMetaData = target.getMetaData();
@@ -64,8 +56,7 @@ public class CopyValues extends
     }
   }
 
-  public void setAttributeNames(
-    final Map<String, String> attributeNames) {
+  public void setAttributeNames(final Map<String, String> attributeNames) {
     this.attributeNames = attributeNames;
   }
 

@@ -10,28 +10,30 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
-public class JdbcLongAttribute extends JdbcAttribute {
-  public JdbcLongAttribute(
+public class JdbcDoubleAttribute extends JdbcAttribute {
+  public JdbcDoubleAttribute(
     final String name,
     final int sqlType,
     final int length,
     final boolean required,
     final Map<QName, Object> properties) {
-    super(name, DataTypes.LONG, sqlType, length, 0, required, properties);
+    super(name, DataTypes.DOUBLE, sqlType, length, 0, required, properties);
   }
+
   @Override
-  public JdbcLongAttribute clone() {
-    return new JdbcLongAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
-  } 
+  public JdbcDoubleAttribute clone() {
+    return new JdbcDoubleAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
+  }
+  
   @Override
   public int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
     final DataObject object)
     throws SQLException {
-    final long longValue = resultSet.getLong(columnIndex);
+    final double longValue = resultSet.getDouble(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Long.valueOf(longValue));
+      object.setValue(getIndex(), Double.valueOf(longValue));
     }
     return columnIndex + 1;
   }
@@ -45,14 +47,14 @@ public class JdbcLongAttribute extends JdbcAttribute {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {
-      long numberValue;
+      double numberValue;
       if (value instanceof Number) {
         final Number number = (Number)value;
-        numberValue = number.longValue();
+        numberValue = number.doubleValue();
       } else {
-        numberValue = Long.parseLong(value.toString());
+        numberValue = Double.parseDouble(value.toString());
       }
-      statement.setLong(parameterIndex, numberValue);
+      statement.setDouble(parameterIndex, numberValue);
 
     }
     return parameterIndex + 1;

@@ -234,7 +234,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
     metaData.addAttribute(tableName + "_ID", dataType, true);
-    metaData.addAttribute("VALUE", DataTypes.STRING, 255,true);
+    metaData.addAttribute("VALUE", DataTypes.STRING, 255, true);
     metaData.setIdAttributeIndex(0);
     return metaData;
   }
@@ -270,46 +270,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     for (final Field field : deTable.getFields()) {
       final String fieldName = field.getName();
       if (!ignoreFieldNames.contains(fieldName)) {
-        final FieldType fieldType = field.getType();
-        final DataType dataType;
-        if (fieldType == FieldType.esriFieldTypeGeometry && deTable instanceof DEFeatureClass) {
-          final DEFeatureClass featureClass = (DEFeatureClass)deTable;
-          final GeometryType shapeType = featureClass.getShapeType();
-          switch (shapeType) {
-            case esriGeometryPoint:
-             dataType = DataTypes.POINT;
-            break;
-            case esriGeometryMultipoint:
-             dataType = DataTypes.MULTI_POINT;
-            break;
-            case esriGeometryPolyline:
-             dataType = DataTypes.MULTI_LINE_STRING;
-            break;
-            case esriGeometryPolygon:
-             dataType = DataTypes.POLYGON;
-            break;
-
-            default:
-           throw new RuntimeException("Unknown geometry type");
-          }
-          
-        } else {
-        dataType= EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
-        }
-        final int scale = field.getScale();
-        int length = field.getLength();
-        if (length == 0) {
-          length = field.getPrecision();
-        }
-        final Boolean required = !field.isIsNullable()
-          || field.getRequired() == Boolean.TRUE;
-        final Attribute attribute = new Attribute(fieldName, dataType, length,
-          scale, required);
-
-        metaData.addAttribute(attribute);
-        if (fieldName.equals(tableName + "_ID")) {
-          metaData.setIdAttributeName(fieldName);
-        }
+        addField(metaData, deTable, tableName, field, fieldName);
       }
     }
     if (deTable instanceof DEFeatureClass) {
@@ -317,7 +278,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       final String shapeFieldName = featureClass.getShapeFieldName();
       metaData.setGeometryAttributeName(shapeFieldName);
       final SpatialReference spatialReference = featureClass.getSpatialReference();
-       GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
         geometryFactory = new GeometryFactory(geometryFactory, 4);
       } else if (featureClass.isHasZ()) {
@@ -330,9 +291,60 @@ public class EsriXmlDataObjectMetaDataUtil implements
 
     return metaData;
   }
-  
-  public static List<DataObject> getValues(DataObjectMetaData metaData, CodedValueDomain domain) {
-    List<DataObject> values= new ArrayList<DataObject>();
+
+  private static void addField(final DataObjectMetaDataImpl metaData,
+    final DETable deTable, final String tableName, final Field field,
+    final String fieldName) {
+    final FieldType fieldType = field.getType();
+    int precision = field.getPrecision();
+    final DataType dataType;
+    if (fieldType == FieldType.esriFieldTypeGeometry
+      && deTable instanceof DEFeatureClass) {
+      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+      final GeometryType shapeType = featureClass.getShapeType();
+      switch (shapeType) {
+        case esriGeometryPoint:
+          dataType = DataTypes.POINT;
+        break;
+        case esriGeometryMultipoint:
+          dataType = DataTypes.MULTI_POINT;
+        break;
+        case esriGeometryPolyline:
+          dataType = DataTypes.MULTI_LINE_STRING;
+        break;
+        case esriGeometryPolygon:
+          dataType = DataTypes.POLYGON;
+        break;
+
+        default:
+          throw new RuntimeException("Unknown geometry type");
+      }
+
+    } else if (precision > 0
+      && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
+      dataType = DataTypes.DECIMAL;
+    } else {
+      dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
+    }
+    final int scale = field.getScale();
+    int length = field.getLength();
+    if (precision != 0) {
+      length = precision;
+    }
+    final Boolean required = !field.isIsNullable()
+      || field.getRequired() == Boolean.TRUE;
+    final Attribute attribute = new Attribute(fieldName, dataType, length,
+      scale, required);
+
+    metaData.addAttribute(attribute);
+    if (fieldName.equals(tableName + "_ID")) {
+      metaData.setIdAttributeName(fieldName);
+    }
+  }
+
+  public static List<DataObject> getValues(DataObjectMetaData metaData,
+    CodedValueDomain domain) {
+    List<DataObject> values = new ArrayList<DataObject>();
     for (CodedValue codedValue : domain.getCodedValues()) {
       DataObject value = new ArrayDataObject(metaData);
       value.setIdValue(codedValue.getCode());

@@ -13,17 +13,12 @@ public class JdbcAttributeAdder {
   public JdbcAttributeAdder() {
   }
 
-  public JdbcAttributeAdder(
-    final DataType dataType) {
+  public JdbcAttributeAdder(final DataType dataType) {
     this.dataType = dataType;
   }
 
-  public Attribute addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final int sqlType,
-    final int length,
-    final int scale,
+  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, final int sqlType, int length, int scale,
     final boolean required) {
     JdbcAttribute attribute;
     switch (sqlType) {
@@ -31,32 +26,39 @@ public class JdbcAttributeAdder {
       case Types.CLOB:
       case Types.LONGVARCHAR:
       case Types.VARCHAR:
-        attribute = new JdbcStringAttribute(name, sqlType, length, 
-          required, null);
+        attribute = new JdbcStringAttribute(name, sqlType, length, required,
+          null);
       break;
       case Types.BIGINT:
-        attribute = new JdbcLongAttribute(name, sqlType, length,
-          required, null);
+        attribute = new JdbcLongAttribute(name, sqlType, length, required, null);
       break;
       case Types.INTEGER:
-        attribute = new JdbcIntegerAttribute(name, sqlType, length,
-          required, null);
+        attribute = new JdbcIntegerAttribute(name, sqlType, length, required,
+          null);
       break;
       case Types.SMALLINT:
-        attribute = new JdbcShortAttribute(name, sqlType, length,
-          required, null);
+        attribute = new JdbcShortAttribute(name, sqlType, length, required,
+          null);
       break;
       case Types.TINYINT:
-        attribute = new JdbcByteAttribute(name, sqlType, length,
-          required, null);
+        attribute = new JdbcByteAttribute(name, sqlType, length, required, null);
+      break;
+      case Types.DOUBLE:
+        attribute = new JdbcDoubleAttribute(name, sqlType, length, required,
+          null);
+      break;
+      case Types.REAL:
+        attribute = new JdbcFloatAttribute(name, sqlType, length, required,
+          null);
       break;
       case Types.DECIMAL:
-      case Types.DOUBLE:
-      case Types.FLOAT:
       case Types.NUMERIC:
-      case Types.REAL:
+      case Types.FLOAT:
         if (scale > 0) {
-          attribute = new JdbcBigDecimalAttribute(name, sqlType, length,scale,
+          attribute = new JdbcBigDecimalAttribute(name, sqlType, length, scale,
+            required, null);
+        } else if (length == 131089 || length ==0) {
+          attribute = new JdbcBigDecimalAttribute(name, sqlType, -1, -1,
             required, null);
         } else {
           if (length <= 2) {
@@ -92,7 +94,6 @@ public class JdbcAttributeAdder {
     return attribute;
   }
 
-  public void initialize(
-    final DataObjectStoreSchema schema) {
+  public void initialize(final DataObjectStoreSchema schema) {
   }
 }

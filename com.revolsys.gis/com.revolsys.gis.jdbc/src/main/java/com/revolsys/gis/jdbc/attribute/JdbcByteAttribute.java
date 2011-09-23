@@ -1,7 +1,5 @@
 package com.revolsys.gis.jdbc.attribute;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,19 +47,14 @@ public class JdbcByteAttribute extends JdbcAttribute {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {
-      if (value instanceof BigDecimal) {
-        final BigDecimal number = (BigDecimal)value;
-        statement.setBigDecimal(parameterIndex, number);
-      } else if (value instanceof BigInteger) {
-        final BigInteger number = (BigInteger)value;
-        statement.setBigDecimal(parameterIndex, new BigDecimal(number));
-      } else if (value instanceof Number) {
+      byte numberValue;
+      if (value instanceof Number) {
         final Number number = (Number)value;
-        statement.setLong(parameterIndex, number.longValue());
+        numberValue = number.byteValue();
       } else {
-        final BigDecimal number = new BigDecimal(value.toString());
-        statement.setBigDecimal(parameterIndex, number);
+        numberValue = Byte.parseByte(value.toString());
       }
+      statement.setByte(parameterIndex, numberValue);
     }
     return parameterIndex + 1;
   }

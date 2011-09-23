@@ -26,7 +26,7 @@ import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public interface DataObject extends Map<String,Object>{
+public interface DataObject extends Map<String, Object> {
   /**
    * Create a clone of the data object.
    * 
@@ -70,8 +70,7 @@ public interface DataObject extends Map<String,Object>{
    * @param name The name of the attribute.
    * @return The attribute value.
    */
-  <T extends Object> T getValue(
-    CharSequence name);
+  <T extends Object> T getValue(CharSequence name);
 
   /**
    * Get the value of the attribute with the specified index.
@@ -79,8 +78,9 @@ public interface DataObject extends Map<String,Object>{
    * @param index The index of the attribute.
    * @return The attribute value.
    */
-  <T extends Object> T getValue(
-    int index);
+  <T extends Object> T getValue(int index);
+
+  <T> T getValueByPath(CharSequence attributePath);
 
   Map<String, Object> getValueMap(
     final Collection<? extends CharSequence> attributeNames);
@@ -99,27 +99,23 @@ public interface DataObject extends Map<String,Object>{
    * @param name The name of the attribute.
    * @return True if the DataObject has an attribute with the specified name.
    */
-  boolean hasAttribute(
-    CharSequence name);
+  boolean hasAttribute(CharSequence name);
 
   /**
    * Set the value of the primary geometry attribute.
    * 
    * @param geometry The primary geometry.
    */
-  void setGeometryValue(
-    Geometry geometry);
+  void setGeometryValue(Geometry geometry);
 
   /**
    * Set the value of the unique identifier attribute.
    * 
    * @param id The unique identifier.
    */
-  void setIdValue(
-    Object id);
+  void setIdValue(Object id);
 
-  void setState(
-    final DataObjectState state);
+  void setState(final DataObjectState state);
 
   /**
    * Set the value of the attribute with the specified name.
@@ -127,9 +123,7 @@ public interface DataObject extends Map<String,Object>{
    * @param name The name of the attribute. param value The attribute value.
    * @param value The new value;
    */
-  void setValue(
-    CharSequence name,
-    Object value);
+  void setValue(CharSequence name, Object value);
 
   /**
    * Set the value of the attribute with the specified name.
@@ -137,15 +131,19 @@ public interface DataObject extends Map<String,Object>{
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value;
    */
-  void setValue(
-    int index,
-    Object value);
+  void setValue(int index, Object value);
+
+  <T> T setValueByPath(CharSequence attributePath, DataObject source,
+    String sourceAttributePath);
+
+  void setValueByPath(CharSequence attributePath, Object value);
+
+  void setValues(final DataObject object);
 
   /**
    * Set the values on the object based on the values in the map.
    * 
    * @param values The values to set.
    */
-  void setValues(
-    Map<String, ? extends Object> values);
+  void setValues(Map<String, ? extends Object> values);
 }

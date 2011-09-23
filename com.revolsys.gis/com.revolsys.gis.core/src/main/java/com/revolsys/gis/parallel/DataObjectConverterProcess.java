@@ -72,53 +72,60 @@ public class DataObjectConverterProcess extends
   @Override
   protected void process(final Channel<DataObject> in,
     final Channel<DataObject> out, final DataObject sourceObject) {
+    DataObject targetObject = convert(sourceObject);
+    if (targetObject != null) {
+      out.write(targetObject);
+    }
+  }
+
+  protected DataObject convert(final DataObject source) {
     int matchCount = 0;
-    final DataObjectMetaData sourceMetaData = sourceObject.getMetaData();
+    final DataObjectMetaData sourceMetaData = source.getMetaData();
     final QName sourceTypeName = sourceMetaData.getName();
     final Collection<FilterDataObjectConverter> converters = typeFilterConverterMap.get(sourceTypeName);
-    DataObject targetObject = null;
+    DataObject target = null;
     if (converters != null && !converters.isEmpty()) {
       for (final FilterDataObjectConverter filterConverter : converters) {
         final Filter<DataObject> filter = filterConverter.getFilter();
-        if (filter.accept(sourceObject)) {
+        if (filter.accept(source)) {
           final Converter<DataObject, DataObject> converter = filterConverter.getConverter();
-          targetObject = converter.convert(sourceObject);
+          target = converter.convert(source);
           matchCount++;
         }
       }
       if (matchCount == 1) {
-        out.write(targetObject);
-        return;
+        return target;
       }
     }
     if (matchCount == 0) {
       final Converter<DataObject, DataObject> typeConveter = typeConverterMap.get(sourceTypeName);
       if (typeConveter != null) {
-        targetObject = typeConveter.convert(sourceObject);
-        out.write(targetObject);
+        target = typeConveter.convert(source);
+        return target;
       } else if (defaultConverter == null) {
-        processObjectWithNoConverter(out, sourceObject);
+        return convertObjectWithNoConverter(source);
       } else {
-        targetObject = defaultConverter.convert(sourceObject);
-        out.write(targetObject);
+        return defaultConverter.convert(source);
+
       }
     } else {
       final StringBuffer sb = new StringBuffer("Multiple conveters found: \n  ");
       for (final FilterDataObjectConverter filterConverter : converters) {
         final Filter<DataObject> filter = filterConverter.getFilter();
-        if (filter.accept(sourceObject)) {
+        if (filter.accept(source)) {
           sb.append(filter.toString());
           sb.append("\n  ");
         }
       }
-      sb.append(sourceObject);
+      sb.append(source);
       LOG.error(sb.toString());
+      return null;
     }
   }
 
-  protected void processObjectWithNoConverter(final Channel<DataObject> out,
-    final DataObject sourceObject) {
-    LOG.error("No converter found for: " + sourceObject);
+  protected DataObject convertObjectWithNoConverter(final DataObject source) {
+    LOG.error("No converter found for: " + source);
+    return null;
   }
 
   public void setDefaultConverter(
@@ -126,7 +133,8 @@ public class DataObjectConverterProcess extends
     this.defaultConverter = defaultConverter;
   }
 
-  protected void preRun(final Channel<DataObject> in, final Channel<DataObject> out) {
+  protected void preRun(final Channel<DataObject> in,
+    final Channel<DataObject> out) {
     if (simpleMapping != null) {
       for (final Entry<Object, Map<String, Object>> entry : simpleMapping.entrySet()) {
         final Object key = entry.getKey();
@@ -144,6 +152,7 @@ public class DataObjectConverterProcess extends
         } else {
           targetTypeName = QName.valueOf(targetName.toString());
         }
+        @SuppressWarnings("unchecked")
         Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
 
         final DataObjectMetaData targetMetaData = targetMetaDataFactory.getMetaData(targetTypeName);

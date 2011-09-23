@@ -6,7 +6,6 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.util.NoOp;
 
 public class GetDataObjectValue implements Converter<DataObject, Object> {
   private String attributePath;

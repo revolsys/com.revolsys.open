@@ -71,7 +71,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   }
 
   @Override
-  protected void doInit() {
+  protected synchronized void doInit() {
     try {
       final Resource xbaseResource = this.resource.createRelative(name.getLocalPart()
         + ".dbf");

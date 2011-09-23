@@ -1,5 +1,7 @@
 package com.revolsys.spring;
 
+import org.springframework.beans.factory.BeanFactory;
+
 import com.revolsys.parallel.process.Process;
 import com.revolsys.parallel.process.ProcessNetwork;
 
@@ -26,8 +28,16 @@ public class TargetBeanProcess implements Process {
     }
   }
 
+  public boolean isInstanceCreated() {
+    return bean.isInstanceCreated();
+  }
+
   public ProcessNetwork getProcessNetwork() {
     return processNetwork;
+  }
+
+  public BeanFactory getTargetBeanFactory() {
+    return bean.getTargetBeanFactory();
   }
 
   public void run() {
@@ -41,4 +51,12 @@ public class TargetBeanProcess implements Process {
     this.processNetwork = processNetwork;
   }
 
+  @Override
+  public String toString() {
+    if (bean == null) {
+      return "Target=" + beanName;
+    } else {
+      return bean.toString();
+    }
+  }
 }

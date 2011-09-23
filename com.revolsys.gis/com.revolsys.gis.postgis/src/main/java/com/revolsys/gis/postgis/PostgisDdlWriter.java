@@ -52,6 +52,15 @@ public class PostgisDdlWriter extends JdbcDdlWriter {
       out.print("date");
     } else if (dataType == DataTypes.DATE_TIME) {
       out.print("timestamp");
+    } else if (dataType == DataTypes.DECIMAL) {
+      out.print("NUMERIC(");
+      out.print(attribute.getLength());
+      int scale = attribute.getScale();
+      if (scale >= 0) {
+        out.print(',');
+        out.print(scale);
+      }
+      out.print(')');
     } else if (dataType == DataTypes.STRING) {
       out.print("varchar(");
       out.print(attribute.getLength());
@@ -59,7 +68,7 @@ public class PostgisDdlWriter extends JdbcDdlWriter {
     } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
       out.print("geometry");
     } else {
-      throw new IllegalArgumentException("Unknown data type" + dataType);
+      throw new IllegalArgumentException("Unknown data type " + dataType);
     }
   }
 

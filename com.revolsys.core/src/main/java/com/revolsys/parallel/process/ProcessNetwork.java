@@ -3,13 +3,17 @@ package com.revolsys.parallel.process;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -95,9 +99,27 @@ public class ProcessNetwork implements BeanPostProcessor,
         }
 
       }
-    }
-    if (bean instanceof Process) {
+    } else if (bean instanceof Process) {
       final Process process = (Process)bean;
+      // Check to see if this was a target bean, if so make sure duplicate
+      // threads aren't created
+      for (Entry<Process, Thread> entry : processes.entrySet()) {
+        Process otherProcess = entry.getKey();
+        if (otherProcess instanceof TargetBeanProcess) {
+          TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
+          if (targetProcessBean.isInstanceCreated()) {
+            Process targetProcess = targetProcessBean.getProcess();
+            if (targetProcess == process) {
+              synchronized (processes) {
+                Thread thread = entry.getValue();
+                processes.put(targetProcess, thread);
+                processes.remove(otherProcess);
+                return bean;
+              }
+            }
+          }
+        }
+      }
       addProcess(process);
     }
     return bean;
@@ -144,7 +166,7 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
-  private void start(final Process process) {
+  private synchronized void start(final Process process) {
     Thread thread = processes.get(process);
     if (thread == null) {
       final Process runProcess;
@@ -210,4 +232,5 @@ public class ProcessNetwork implements BeanPostProcessor,
       finishRunning();
     }
   }
+
 }

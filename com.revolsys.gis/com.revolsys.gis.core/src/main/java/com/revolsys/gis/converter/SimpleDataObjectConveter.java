@@ -11,8 +11,10 @@ import com.revolsys.gis.converter.process.SourceToTargetProcess;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class SimpleDataObjectConveter implements
   Converter<DataObject, DataObject> {
@@ -48,7 +50,9 @@ public class SimpleDataObjectConveter implements
   public DataObject convert(final DataObject sourceObject) {
     final DataObject targetObject = factory.createDataObject(dataObjectMetaData);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
-    final Geometry targetGeometry = (Geometry)sourceGeometry.clone();
+    final GeometryFactory geometryFactory = sourceGeometry.getFactory();
+    final Geometry targetGeometry = geometryFactory.createGeometry(sourceGeometry);
+    JtsGeometryUtil.copyUserData(sourceGeometry, targetGeometry);
     targetObject.setGeometryValue(targetGeometry);
     for (final SourceToTargetProcess<DataObject, DataObject> processor : processors) {
       processor.process(sourceObject, targetObject);

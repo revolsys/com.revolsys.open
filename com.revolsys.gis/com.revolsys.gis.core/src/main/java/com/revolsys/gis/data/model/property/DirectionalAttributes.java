@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +45,14 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final Set<String> equalExcludeAttributes) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.canMerge(point, object1, object2, equalExcludeAttributes);
+  }
+
+  public static Set<String> getCantMergeAttributesObjects(
+    final Coordinates point, final DataObject object1,
+    final DataObject object2, final Set<String> equalExcludeAttributes) {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
+    return property.getCantMergeAttributes(point, object1, object2,
+      equalExcludeAttributes);
   }
 
   public static boolean equalsObjects(final DataObject object1,
@@ -100,6 +109,12 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
+  public static DataObject getReverseObject(final DataObject object) {
+    final DirectionalAttributes property = getProperty(object);
+    final DataObject reverse = property.getReverse(object);
+    return reverse;
+  }
+
   private final Map<String, String> endAttributeNamePairs = new HashMap<String, String>();
 
   private final Map<String, String> sideAttributeNamePairs = new HashMap<String, String>();
@@ -115,6 +130,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   private final Map<String, Map<Object, Object>> directionalAttributeValues = new HashMap<String, Map<Object, Object>>();
 
   private final List<List<String>> endAndSideAttributeNamePairs = new ArrayList<List<String>>();
+
+  private final List<List<String>> endTurnAttributeNamePairs = new ArrayList<List<String>>();
 
   public DirectionalAttributes() {
   }
@@ -166,6 +183,19 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       endRightAttributeName);
     addAttributeNamePair(reverseAttributeNameMap, endLeftAttributeName,
       startRightAttributeName);
+  }
+
+  public void addEndTurnAttributePairs(final String startLeftAttributeName,
+    final String startRightAttributeName, final String endLeftAttributeName,
+    final String endRightAttributeName) {
+    endTurnAttributeNamePairs.add(Arrays.asList(startLeftAttributeName,
+      startRightAttributeName, endLeftAttributeName, endRightAttributeName));
+    addEndAttributePairInternal(startLeftAttributeName, endLeftAttributeName);
+    addEndAttributePairInternal(startRightAttributeName, endRightAttributeName);
+    addAttributeNamePair(reverseAttributeNameMap, startLeftAttributeName,
+      endLeftAttributeName);
+    addAttributeNamePair(reverseAttributeNameMap, startRightAttributeName,
+      endRightAttributeName);
   }
 
   public void addEndAttributePair(final String startAttributeName,
@@ -221,6 +251,29 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       return true;
     } else {
       return false;
+    }
+  }
+
+  public Set<String> getCantMergeAttributes(final Coordinates point,
+    final DataObject object1, final DataObject object2,
+    final Collection<String> equalExcludeAttributes) {
+    final DataObjectMetaData metaData = getMetaData();
+    if (canMergeCoordinates(point, object1, object2)) {
+      Set<String> attributeNames = new LinkedHashSet<String>();
+      final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(metaData);
+      for (final String attributeName : metaData.getAttributeNames()) {
+        if (!equalExcludeAttributes.contains(attributeName)
+          && !equalIgnore.isAttributeIgnored(attributeName)) {
+          if (!canMerge(attributeName, point, object1, object2,
+            equalExcludeAttributes)) {
+            attributeNames.add(attributeName);
+          }
+        }
+      }
+      return attributeNames;
+    } else {
+      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      return Collections.singleton(geometryAttributeName);
     }
   }
 
@@ -461,7 +514,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     } else {
       final String reverseAttributeName = reverseAttributeNameMap.get(attributeName);
       if (reverseAttributeName == null) {
-        return equals(attributeName, object1, object2, equalExcludeAttributes);
+        return equals(object1, attributeName, object2, attributeName,
+          equalExcludeAttributes);
       } else {
         return equals(object1, attributeName, object2, reverseAttributeName,
           equalExcludeAttributes);
@@ -489,6 +543,10 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
 
   public List<List<String>> getEndAndSideAttributeNamePairs() {
     return endAndSideAttributeNamePairs;
+  }
+
+  public List<List<String>> getEndTurnAttributeNamePairs() {
+    return endTurnAttributeNamePairs;
   }
 
   public Map<String, String> getEndAttributeNamePairs() {
@@ -527,24 +585,24 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(line1, line2);
+      newLine = LineStringUtil.merge(point, line1, line2);
     } else if (points1.equal(lastPoint1, points2, lastPoint2)
       && points1.equal2d(lastPoint1, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(line1, line2);
+      newLine = LineStringUtil.merge(point, line1, line2);
     } else if (points1.equal(lastPoint1, points2, 0)
       && points1.equal2d(lastPoint1, point)) {
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(line1, line2);
+      newLine = LineStringUtil.merge(point, line1, line2);
     } else if (points1.equal(0, points2, lastPoint2)
       && points1.equal2d(0, point)) {
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(line2, line1);
+      newLine = LineStringUtil.merge(point, line2, line1);
     } else {
       throw new IllegalArgumentException("Lines for objects don't touch");
     }
@@ -655,8 +713,10 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final DataObject reverse = object.clone();
 
     final LineString line = object.getGeometryValue();
-    final LineString reverseLine = LineStringUtil.reverse(line);
-    reverse.setGeometryValue(reverseLine);
+    if (line != null) {
+      final LineString reverseLine = LineStringUtil.reverse(line);
+      reverse.setGeometryValue(reverseLine);
+    }
 
     for (final Entry<String, String> pair : reverseAttributeNameMap.entrySet()) {
       final String fromAttributeName = pair.getKey();
@@ -732,6 +792,18 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       final String endRightAttributeName = endAndSideAttributePair.get(3);
       addEndAndSideAttributePairs(startLeftAttributeName,
         startRightAttributeName, endLeftAttributeName, endRightAttributeName);
+    }
+  }
+
+  public void setEndTurnAttributeNamePairs(
+    final List<List<String>> endAndSideAttributePairs) {
+    for (final List<String> endAndSideAttributePair : endAndSideAttributePairs) {
+      final String startLeftAttributeName = endAndSideAttributePair.get(0);
+      final String startRightAttributeName = endAndSideAttributePair.get(1);
+      final String endLeftAttributeName = endAndSideAttributePair.get(2);
+      final String endRightAttributeName = endAndSideAttributePair.get(3);
+      addEndTurnAttributePairs(startLeftAttributeName, startRightAttributeName,
+        endLeftAttributeName, endRightAttributeName);
     }
   }
 

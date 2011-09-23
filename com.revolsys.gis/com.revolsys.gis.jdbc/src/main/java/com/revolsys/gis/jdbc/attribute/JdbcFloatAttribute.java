@@ -10,25 +10,25 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
-public class JdbcShortAttribute extends JdbcAttribute {
-  public JdbcShortAttribute(final String name, final int sqlType,
+public class JdbcFloatAttribute extends JdbcAttribute {
+  public JdbcFloatAttribute(final String name, final int sqlType,
     final int length, final boolean required,
     final Map<QName, Object> properties) {
-    super(name, DataTypes.SHORT, sqlType, length, 0, required, properties);
+    super(name, DataTypes.FLOAT, sqlType, length, 0, required, properties);
   }
 
   @Override
-  public JdbcShortAttribute clone() {
-    return new JdbcShortAttribute(getName(), getSqlType(), getLength(),
+  public JdbcFloatAttribute clone() {
+    return new JdbcFloatAttribute(getName(), getSqlType(), getLength(),
       isRequired(), getProperties());
   }
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
-    final short value = resultSet.getShort(columnIndex);
+    final float longValue = resultSet.getFloat(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Short.valueOf(value));
+      object.setValue(getIndex(), Float.valueOf(longValue));
     }
     return columnIndex + 1;
   }
@@ -39,14 +39,14 @@ public class JdbcShortAttribute extends JdbcAttribute {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {
-      short numberValue;
+      float numberValue;
       if (value instanceof Number) {
         final Number number = (Number)value;
-        numberValue = number.shortValue();
+        numberValue = number.floatValue();
       } else {
-        numberValue = Short.parseShort(value.toString());
+        numberValue = Float.parseFloat(value.toString());
       }
-      statement.setShort(parameterIndex, numberValue);
+      statement.setFloat(parameterIndex, numberValue);
     }
     return parameterIndex + 1;
   }

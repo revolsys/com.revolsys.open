@@ -230,4 +230,8 @@ public class Query {
     }
     return string.toString();
   }
+
+  public void setAttributeNames(String... attributeNames) {
+    setAttributeNames(Arrays.asList(attributeNames));
+  }
 }

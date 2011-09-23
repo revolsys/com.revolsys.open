@@ -14,4 +14,9 @@ public class DataObjectIteratorReader extends IteratorReader<DataObject>
     iterator.hasNext();
     return iterator.getMetaData();
   }
+
+  @Override
+  public String toString() {
+    return "Reader=" + iterator().toString();
+  }
 }

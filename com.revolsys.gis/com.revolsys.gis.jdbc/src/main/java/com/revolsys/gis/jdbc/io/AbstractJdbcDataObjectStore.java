@@ -519,7 +519,10 @@ public abstract class AbstractJdbcDataObjectStore extends
             final int sqlType = columnsRs.getInt("DATA_TYPE");
             final String dataType = columnsRs.getString("TYPE_NAME");
             final int length = columnsRs.getInt("COLUMN_SIZE");
-            final int scale = columnsRs.getInt("DECIMAL_DIGITS");
+            int scale = columnsRs.getInt("DECIMAL_DIGITS");
+            if (columnsRs.wasNull()) {
+              scale = -1;
+            }
             final boolean required = !columnsRs.getString("IS_NULLABLE")
               .equals("YES");
             if (name.equalsIgnoreCase(idColumnNames.get(typeName))) {
@@ -583,9 +586,13 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   public Reader<DataObject> query(final QName typeName) {
     final DataObjectMetaData metaData = getMetaData(typeName);
-    final Query query = new Query(metaData);
-    final DataObjectStoreQueryReader reader = createReader(query);
-    return reader;
+    if (metaData == null) {
+      throw new IllegalArgumentException("Unknown type " + typeName);
+    } else {
+      final Query query = new Query(metaData);
+      final DataObjectStoreQueryReader reader = createReader(query);
+      return reader;
+    }
   }
 
   public DataObjectStoreQueryReader query(final QName typeName,

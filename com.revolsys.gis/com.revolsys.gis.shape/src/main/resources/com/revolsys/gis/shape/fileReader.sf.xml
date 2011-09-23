@@ -13,9 +13,8 @@
 >
   <bean
     id="shapeFileReader"
-    class="com.revolsys.gis.format.shape.io.ShapeFileReader"
-    p:file="objects.shp"
-    p:srid="3005"
+    class="com.revolsys.gis.data.io.FileDataObjectReaderFactory"
+    p:resource="objects.shp"
   />
 
   <bean

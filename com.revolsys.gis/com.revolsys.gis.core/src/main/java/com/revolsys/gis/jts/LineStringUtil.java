@@ -770,7 +770,16 @@ public final class LineStringUtil {
     line.setUserData(line1.getUserData());
     return line;
   }
-
+  public static LineString merge(final Coordinates point,final LineString line1, final LineString line2) {
+    final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
+    final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
+    final CoordinatesList coordinates = CoordinatesListUtil.merge(point,coordinates1,
+      coordinates2);
+    final GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final LineString line = factory.createLineString(coordinates);
+    line.setUserData(line1.getUserData());
+    return line;
+  }
   public static LineString reverse(final LineString line) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);

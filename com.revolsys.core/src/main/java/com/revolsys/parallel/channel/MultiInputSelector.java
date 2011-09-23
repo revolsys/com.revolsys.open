@@ -7,12 +7,20 @@ import java.util.List;
 public class MultiInputSelector {
   private int enabledChannels = 0;
 
+  private int guardEnabledChannels = 0;
+
   private long maxWait;
 
-  synchronized void closeChannel() {
-    enabledChannels--;
-    if (enabledChannels <= 0) {
-      notify();
+  private boolean scheduled;
+
+  private Object monitor = new Object();
+
+   void closeChannel() {
+    synchronized (monitor) {
+      enabledChannels--;
+      if (enabledChannels <= 0) {
+        monitor.notifyAll();
+      }
     }
   }
 
@@ -56,6 +64,7 @@ public class MultiInputSelector {
 
   private boolean enableChannels(final List<? extends SelectableInput> channels) {
     enabledChannels = 0;
+    scheduled = false;
     maxWait = Long.MAX_VALUE;
     int closedCount = 0;
     for (final SelectableInput channel : channels) {
@@ -77,6 +86,7 @@ public class MultiInputSelector {
   private boolean enableChannels(
     final List<? extends SelectableInput> channels, final List<Boolean> guard) {
     enabledChannels = 0;
+    scheduled = false;
     maxWait = Long.MAX_VALUE;
     int closedCount = 0;
     int activeChannelCount = 0;
@@ -97,11 +107,15 @@ public class MultiInputSelector {
         }
       }
     }
+    guardEnabledChannels = activeChannelCount - closedCount;
     return closedCount == activeChannelCount;
   }
 
-  synchronized void schedule() {
-    notify();
+  void schedule() {
+    synchronized (monitor) {
+      scheduled = true;
+      monitor.notifyAll();
+    }
   }
 
   public synchronized int select(final List<? extends SelectableInput> channels) {
@@ -143,10 +157,14 @@ public class MultiInputSelector {
   public synchronized int select(
     final List<? extends SelectableInput> channels, final List<Boolean> guard,
     final long msecs, final int nsecs) {
-    if (!enableChannels(channels, guard)) {
-      try {
-        wait(Math.min(msecs, maxWait), nsecs);
-      } catch (final InterruptedException e) {
+    if (!enableChannels(channels, guard) && guardEnabledChannels > 0) {
+      synchronized (monitor) {
+        if (!scheduled) {
+          try {
+            monitor.wait(Math.min(msecs, maxWait), nsecs);
+          } catch (final InterruptedException e) {
+          }
+        }
       }
     }
     return disableChannels(channels, guard);
@@ -155,11 +173,15 @@ public class MultiInputSelector {
   public synchronized int select(final long msecs, final int nsecs,
     final List<? extends SelectableInput> channels) {
     if (!enableChannels(channels)) {
-      try {
-        if (msecs + nsecs >= 0) {
-          wait(Math.min(msecs, maxWait), nsecs);
+      if (msecs + nsecs >= 0) {
+        synchronized (monitor) {
+          try {
+            if (!scheduled) {
+              monitor.wait(Math.min(msecs, maxWait), nsecs);
+            }
+          } catch (final InterruptedException e) {
+          }
         }
-      } catch (final InterruptedException e) {
       }
     }
     return disableChannels(channels);

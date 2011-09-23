@@ -41,7 +41,8 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private PostGisDataObjectStore dataStore;
 
-  public PostGisGeometryAttributeAdder(PostGisDataObjectStore dataStore, final DataSource dataSource) {
+  public PostGisGeometryAttributeAdder(PostGisDataObjectStore dataStore,
+    final DataSource dataSource) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;
   }
@@ -58,15 +59,24 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
     final String tableName = dataStore.getDatabaseTableName(typeName);
     final String columnName = name.toLowerCase();
     try {
-      final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
-      final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
-        owner, tableName, columnName);
-      int srid = (Integer)values.get("srid");
-      String type = (String)values.get("type");
-      int numAxis = (Integer)values.get("coord_dimension");
-       final DataType dataType = DATA_TYPE_MAP.get(type);
+      int srid = 0;
+      String type = "GEOMETRY";
+      int numAxis = 3;
+      try {
+        final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+        final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
+          owner, tableName, columnName);
+        srid = (Integer)values.get("srid");
+        type = (String)values.get("type");
+        numAxis = (Integer)values.get("coord_dimension");
+      } catch (IllegalArgumentException e) {
+        LOG.warn("Cannot get geometry column metadata for " + typeName + "."
+          + columnName);
+      }
+
+      final DataType dataType = DATA_TYPE_MAP.get(type);
       final Attribute attribute = new PostGisGeometryJdbcAttribute(name,
-        dataType, length, scale, required, null, srid,numAxis);
+        dataType, length, scale, required, null, srid, numAxis);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));

@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,6 +36,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -70,16 +73,6 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     this(object.getMetaData(), object);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    return this == o;
-  }
-
-  @Override
-  public int hashCode() {
-    return attributes.hashCode();
-  }
-
   /**
    * Construct a new empty ArrayDataObject using the metaData.
    * 
@@ -90,14 +83,12 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     attributes = new Object[metaData.getAttributeCount()];
   }
 
-  protected ArrayDataObject(final DataObjectMetaData metaData,
+  public ArrayDataObject(final DataObjectMetaData metaData,
     final DataObject object) {
     this.metaData = metaData;
-    attributes = new Object[metaData.getAttributeCount()];
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
-      final Object value = object.getValue(i);
-      attributes[i] = clone(value);
-    }
+    final int attributeCount = metaData.getAttributeCount();
+    attributes = new Object[attributeCount];
+    setValues(object);
   }
 
   /**
@@ -150,6 +141,20 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
     }
     return value;
+  }
+
+  @Override
+  public Set<Entry<String, Object>> entrySet() {
+    final Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
+    for (int i = 0; i < attributes.length; i++) {
+      entries.add(new DataObjectEntry(this, i));
+    }
+    return entries;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    return this == o;
   }
 
   /**
@@ -229,6 +234,59 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public <T> T getValueByPath(final CharSequence path) {
+    final DataObjectStore dataStore = metaData.getDataObjectStore();
+    final String[] propertyPath = path.toString().split("\\.");
+    Object propertyValue = this;
+    for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
+      final String propertyName = propertyPath[i];
+      if (propertyValue instanceof DataObject) {
+        final DataObject dataObject = (DataObject)propertyValue;
+
+        if (dataObject.hasAttribute(propertyName)) {
+          propertyValue = dataObject.getValue(propertyName);
+          if (propertyValue == null) {
+            return null;
+          } else if (i + 1 < propertyPath.length) {
+            if (dataStore != null) {
+              final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
+              if (codeTable != null) {
+                propertyValue = codeTable.getMap(propertyValue);
+              }
+            }
+          }
+        } else {
+          return null;
+        }
+      } else if (propertyValue instanceof Geometry) {
+        final Geometry geometry = (Geometry)propertyValue;
+        propertyValue = JtsGeometryUtil.getGeometryProperty(geometry,
+          propertyName);
+      } else if (propertyValue instanceof Map) {
+        final Map<String, Object> map = (Map<String, Object>)propertyValue;
+        propertyValue = map.get(propertyName);
+        if (propertyValue == null) {
+          return null;
+        } else if (i + 1 < propertyPath.length) {
+          if (dataStore != null) {
+            final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
+            if (codeTable != null) {
+              propertyValue = codeTable.getMap(propertyValue);
+            }
+          }
+        }
+      } else {
+        try {
+          propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
+        } catch (final IllegalArgumentException e) {
+          throw new IllegalArgumentException("Path does not exist " + path, e);
+        }
+      }
+    }
+    return (T)propertyValue;
+  }
+
   public Map<String, Object> getValueMap(
     final Collection<? extends CharSequence> attributeNames) {
     final Map<String, Object> values = new HashMap<String, Object>();
@@ -259,6 +317,11 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    */
   public boolean hasAttribute(final CharSequence name) {
     return metaData.hasAttribute(name);
+  }
+
+  @Override
+  public int hashCode() {
+    return attributes.hashCode();
   }
 
   /**
@@ -310,7 +373,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
         final CharSequence key = name.subSequence(0, dotIndex);
         final CharSequence subKey = name.subSequence(dotIndex + 1,
           name.length());
-        Object objectValue = getValue(key);
+        final Object objectValue = getValue(key);
         if (objectValue == null) {
           final DataType attributeType = metaData.getAttributeType(key);
           if (attributeType != null) {
@@ -326,10 +389,10 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
           }
         } else {
           if (objectValue instanceof Geometry) {
-            Geometry geometry = (Geometry)objectValue;
+            final Geometry geometry = (Geometry)objectValue;
             JtsGeometryUtil.setGeometryProperty(geometry, subKey, value);
           } else if (objectValue instanceof DataObject) {
-            DataObject object = (DataObject)objectValue;
+            final DataObject object = (DataObject)objectValue;
             object.setValue(subKey, value);
           } else {
             JavaBeanUtil.setProperty(objectValue, subKey.toString(), value);
@@ -345,10 +408,69 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value.
    */
-  public void setValue(final int index, Object value) {
+  public void setValue(final int index, final Object value) {
     if (index >= 0) {
       updateState();
       attributes[index] = value;
+    }
+  }
+
+  public <T> T setValueByPath(final CharSequence attributePath,
+    final DataObject source, final String sourceAttributePath) {
+    final T value = source.getValueByPath(sourceAttributePath);
+    setValueByPath(attributePath, value);
+    return value;
+  }
+
+  public void setValueByPath(final CharSequence path, final Object value) {
+    final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
+
+    final String name = path.toString();
+    final int dotIndex = name.indexOf(".");
+    if (dataObjectStore == null) {
+      if (dotIndex != -1) {
+        throw new IllegalArgumentException("Cannot get code table for "
+          + metaData.getName() + "." + name);
+      }
+      setValue(name, value);
+    } else {
+      String codeTableAttributeName;
+      String codeTableValueName = null;
+      if (dotIndex == -1) {
+        codeTableAttributeName = name;
+      } else {
+        codeTableAttributeName = name.substring(0, dotIndex);
+        codeTableValueName = name.substring(dotIndex + 1);
+      }
+      final CodeTable codeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
+      if (codeTable == null) {
+        if (dotIndex != -1) {
+          throw new IllegalArgumentException("Cannot get code table for "
+            + metaData.getName() + "." + name);
+        }
+        setValue(name, value);
+      } else {
+        Object targetValue;
+        if (codeTableValueName == null) {
+          targetValue = codeTable.getId(value);
+        } else {
+          targetValue = codeTable.getId(Collections.singletonMap(
+            codeTableValueName, value));
+        }
+        if (targetValue == null) {
+          throw new IllegalArgumentException("Cannot get code table for "
+            + metaData.getName() + "." + name + "=" + value);
+        } else {
+          setValue(codeTableAttributeName, targetValue);
+        }
+      }
+    }
+  }
+
+  public void setValues(final DataObject object) {
+    for (final String name : this.metaData.getAttributeNames()) {
+      final Object value = clone(object.getValue(name));
+      setValue(name, value);
     }
   }
 
@@ -392,14 +514,5 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
         throw new IllegalStateException(
           "Cannot modify an object which has been deleted");
     }
-  }
-
-  @Override
-  public Set<Entry<String, Object>> entrySet() {
-    Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
-    for (int i = 0; i < attributes.length; i++) {
-      entries.add(new DataObjectEntry(this, i));
-    }
-    return entries;
   }
 }

@@ -49,6 +49,15 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("VARCHAR2(");
       out.print(attribute.getLength());
       out.print(")");
+    } else if (dataType == DataTypes.DECIMAL) {
+      out.print("NUMBER(");
+      out.print(attribute.getLength());
+      int scale = attribute.getScale();
+      if (scale >= 0) {
+        out.print(',');
+        out.print(scale);
+      }
+      out.print(')');
     } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
       out.print("MDSYS.SDO_GEOMETRY");
     } else {
@@ -79,11 +88,11 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     out.print("  SELECT ");
     out.print(sequeneName);
     out.println(".NEXTVAL INTO cur_val FROM DUAL;");
- 
+
     out.print("  IF cur_val + 1 <> ");
     out.print(nextValue);
     out.println(" THEN");
- 
+
     out.print("    EXECUTE IMMEDIATE 'ALTER SEQUENCE ");
     out.print(sequeneName);
     out.print(" INCREMENT BY ' || (");

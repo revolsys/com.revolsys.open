@@ -405,6 +405,43 @@ public class CoordinatesListUtil {
     return trim(coordinates, numCoords);
   }
 
+  public static CoordinatesList merge(final Coordinates point,
+    final CoordinatesList coordinates1, final CoordinatesList coordinates2) {
+    final int dimension = Math.max(coordinates1.getDimension(),
+      coordinates2.getDimension());
+    final int maxSize = coordinates1.size() + coordinates2.size();
+    final CoordinatesList coordinates = new DoubleCoordinatesList(maxSize,
+      dimension);
+
+    int numCoords = 0;
+    final Coordinates coordinates1Start = coordinates1.get(0);
+    final Coordinates coordinates1End = coordinates1.get(coordinates1.size() - 1);
+    final Coordinates coordinates2Start = coordinates2.get(0);
+    final Coordinates coordinates2End = coordinates2.get(coordinates2.size() - 1);
+    if (coordinates1Start.equals2d(coordinates2End)
+      && coordinates1Start.equals2d(point)) {
+      numCoords = append(coordinates2, coordinates, numCoords);
+      numCoords = append(coordinates1, coordinates, numCoords);
+    } else if (coordinates2Start.equals2d(coordinates1End)
+      && coordinates2Start.equals2d(point)) {
+      numCoords = append(coordinates1, coordinates, numCoords);
+      numCoords = append(coordinates2, coordinates, numCoords);
+    } else if (coordinates1Start.equals2d(coordinates2Start)
+      && coordinates1Start.equals2d(point)) {
+      numCoords = appendReversed(coordinates2, coordinates, numCoords);
+      numCoords = append(coordinates1, coordinates, numCoords);
+    } else if (coordinates1End.equals2d(coordinates2End)
+      && coordinates1End.equals2d(point)) {
+      numCoords = append(coordinates1, coordinates, numCoords);
+      numCoords = appendReversed(coordinates2, coordinates, numCoords);
+    } else {
+      throw new IllegalArgumentException("lines don't touch\n" + coordinates1
+        + "\n" + coordinates2);
+
+    }
+    return trim(coordinates, numCoords);
+  }
+
   public static CoordinatesList merge(
     final List<CoordinatesList> coordinatesList) {
     final Iterator<CoordinatesList> iterator = coordinatesList.iterator();

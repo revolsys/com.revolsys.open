@@ -2,7 +2,6 @@ package com.revolsys.gis.data.io;
 
 import java.io.File;
 
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -18,7 +17,7 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
   private static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
 
   public static DataObjectReader dataObjectReader(
-    final FileSystemResource resource,
+    final Resource resource,
     final DataObjectFactory factory) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
@@ -61,7 +60,8 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractIoFactory
   public boolean isBinary() {
    return binary;
   }
-
+  
+  
   /**
    * Create a reader for the resource using the ({@link ArrayDataObjectFactory}
    * ).

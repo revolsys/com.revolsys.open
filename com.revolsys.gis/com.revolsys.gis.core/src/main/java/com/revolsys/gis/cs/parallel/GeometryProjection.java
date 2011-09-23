@@ -7,7 +7,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryProjectionProcess extends BaseInOutProcess<DataObject,DataObject> {
+public class GeometryProjection extends BaseInOutProcess<DataObject,DataObject> {
   private GeometryFactory geometryFactory;
 
   public GeometryFactory getGeometryFactory() {

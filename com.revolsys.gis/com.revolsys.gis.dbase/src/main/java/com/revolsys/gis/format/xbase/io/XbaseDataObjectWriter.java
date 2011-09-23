@@ -23,7 +23,9 @@ package com.revolsys.gis.format.xbase.io;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +41,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.spring.NonExistingResource;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   private static final Logger log = Logger.getLogger(XbaseDataObjectWriter.class);
@@ -74,10 +77,12 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
     FieldDefinition field = null;
     if (dataType == DataTypes.DECIMAL) {
-      if (length  > 18) {
-        throw new IllegalArgumentException("Length  must be less < 18 for " + name);
+      if (length > 18) {
+        throw new IllegalArgumentException("Length  must be less < 18 for "
+          + name);
       }
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length, scale);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length,
+        scale);
     } else if (typeJavaClass == String.class) {
       if (length > 254 || length == 0) {
         field = new FieldDefinition(name, FieldDefinition.CHARACTER_TYPE, 254);
@@ -91,7 +96,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     } else if (typeJavaClass == Date.class) {
       field = new FieldDefinition(name, FieldDefinition.DATE_TYPE, 8);
     } else if (typeJavaClass == BigDecimal.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length, scale);
+      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length,
+        scale);
     } else if (typeJavaClass == BigInteger.class) {
       field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Float.class) {
@@ -199,17 +205,35 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
       return true;
     } else {
       final Object value = object.getValue(field.getName());
-
       final int fieldLength = field.getLength();
       switch (field.getType()) {
         case FieldDefinition.NUMBER_TYPE:
           String numString = "";
+          final DecimalFormat numberFormat = field.getNumberFormat();
           if (value == null) {
             if (useZeroForNull) {
-              numString = field.getNumberFormat().format(0);
+              numString = numberFormat.format(0);
             }
+          } else if (value instanceof Number) {
+           
+            Number number = (Number)value;
+            int decimalPlaces = field.getDecimalPlaces();
+            if (decimalPlaces >= 0) {
+              if (number instanceof BigDecimal) {
+                BigDecimal bigDecimal = (BigDecimal)number;
+                number = bigDecimal.setScale(decimalPlaces,
+                  RoundingMode.HALF_UP);
+              } else if ((number instanceof Double)
+                || (number instanceof Float)) {
+                double doubleValue = number.doubleValue();
+                PrecisionModel precisionModel = field.getPrecisionModel();
+                number = precisionModel.makePrecise(doubleValue);
+              }
+            }
+            numString = numberFormat.format(number);
           } else {
-            numString = field.getNumberFormat().format(value);
+            throw new IllegalArgumentException("Not a number "
+              + field.getName() + "=" + value);
           }
           if (numString.length() > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
@@ -219,8 +243,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             for (int i = numString.length(); i < fieldLength; i++) {
               out.write(' ');
             }
+            out.writeBytes(numString);
           }
-          out.writeBytes(numString);
           return true;
         case FieldDefinition.FLOAT_TYPE:
           String floatString = "";

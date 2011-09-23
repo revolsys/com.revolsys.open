@@ -44,6 +44,14 @@ public class DirectionalAttributesTest {
 
   private static final String END_RIGHT = "END_RIGHT";
 
+  private static final String START_LEFT_TURN = "START_LEFT_TURN";
+
+  private static final String START_RIGHT_TURN = "START_RIGHT_TURN";
+
+  private static final String END_LEFT_TURN = "END_LEFT_TURN";
+
+  private static final String END_RIGHT_TURN = "END_RIGHT_TURN";
+
   private static final String START = "START";
 
   private static final String END = "END";
@@ -99,6 +107,10 @@ public class DirectionalAttributesTest {
     TABLE.addAttribute(START_RIGHT, DataTypes.STRING, false);
     TABLE.addAttribute(END_LEFT, DataTypes.STRING, false);
     TABLE.addAttribute(END_RIGHT, DataTypes.STRING, false);
+    TABLE.addAttribute(START_LEFT_TURN, DataTypes.STRING, false);
+    TABLE.addAttribute(START_RIGHT_TURN, DataTypes.STRING, false);
+    TABLE.addAttribute(END_LEFT_TURN, DataTypes.STRING, false);
+    TABLE.addAttribute(END_RIGHT_TURN, DataTypes.STRING, false);
     TABLE.addAttribute("LINE", DataTypes.LINE_STRING, true);
 
     DIRECTIONAL_ATTRIBUTES = DirectionalAttributes.getProperty(TABLE);
@@ -108,6 +120,8 @@ public class DirectionalAttributesTest {
     DIRECTIONAL_ATTRIBUTES.addEndAttributePair(START, END);
     DIRECTIONAL_ATTRIBUTES.addEndAndSideAttributePairs(START_LEFT, START_RIGHT,
       END_LEFT, END_RIGHT);
+    DIRECTIONAL_ATTRIBUTES.addEndTurnAttributePairs(START_LEFT_TURN, START_RIGHT_TURN,
+      END_LEFT_TURN, END_RIGHT_TURN);
   }
 
   private void assertAttributeEquals(final String message,
@@ -171,6 +185,116 @@ public class DirectionalAttributesTest {
 
     assertAttributeEquals("Directional reverse attribute", reverse,
       DIRECTIONAL, expectedReverseValue);
+  }
+
+  private void assertEndAndSideAttributesEqual(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final String endLeftValue1, final String endRightValue1,
+    final LineString line2, final String startLeftValue2,
+    final String startRightValue2, final String endLeftValue2,
+    final String endRightValue2) {
+    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
+      endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
+      endRightValue2);
+    final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
+    if (!equals) {
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+    }
+    Assert.assertTrue("End and side attribute equal", equals);
+  }
+
+  private void assertEndAndSideAttributesMerge(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final Object endLeftValue1, final Object endRightValue1,
+    final LineString line2, final Object startLeftValue2,
+    final Object startRightValue2, final String endLeftValue2,
+    final String endRightValue2, final LineString expectedMergedLine,
+    final String expectedStartLeftValue, final String expectedStartRightValue,
+    final String expectedEndLeftValue, final String expectedEndRightValue) {
+    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
+      endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
+      endRightValue2);
+    DataObject mergedObject = null;
+    try {
+      final boolean canMerge = DirectionalAttributes.canMergeObjects(
+        MERGE_COORDINATES, object1, object2);
+      Assert.assertTrue("End & Side attribute can't merge", canMerge);
+
+      mergedObject = DirectionalAttributes.mergeLongest(object1, object2);
+
+      assertAttributeEquals("End & Side attribute merge start left",
+        mergedObject, START_LEFT, expectedStartLeftValue);
+      assertAttributeEquals("End & Side attribute merge start right",
+        mergedObject, START_RIGHT, expectedStartRightValue);
+      assertAttributeEquals("End & Side attribute merge end left",
+        mergedObject, END_LEFT, expectedEndLeftValue);
+      assertAttributeEquals("End & Side attribute merge end right",
+        mergedObject, END_RIGHT, expectedEndRightValue);
+
+      final LineString mergedLine = mergedObject.getGeometryValue();
+      Assert.assertTrue("End attribute merge line",
+        LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+    } catch (final AssertionFailedError e) {
+      LOG.error(e.getMessage());
+      LOG.error(expectedMergedLine.toString());
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+      if (mergedObject != null) {
+        LOG.error(mergedObject.toString());
+      }
+      throw e;
+    }
+  }
+
+  private void assertEndAndSideAttributesNotCanMerge(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final Object endLeftValue1, final Object endRightValue1,
+    final LineString line2, final Object startLeftValue2,
+    final Object startRightValue2, final String endLeftValue2,
+    final String endRightValue2) {
+    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
+      endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
+      endRightValue2);
+    final boolean canMerge = DirectionalAttributes.canMergeObjects(
+      MERGE_COORDINATES, object1, object2);
+    try {
+      Assert.assertFalse("Side attribute not can't merge", canMerge);
+    } catch (final AssertionFailedError e) {
+      LOG.error(e.getMessage());
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+      throw e;
+    }
+  }
+
+  private void assertEndAndSideAttributesNotEqual(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final String endLeftValue1, final String endRightValue1,
+    final LineString line2, final String startLeftValue2,
+    final String startRightValue2, final String endLeftValue2,
+    final String endRightValue2) {
+    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
+      endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
+      endRightValue2);
+    final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
+    if (equals) {
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+    }
+    Assert.assertFalse("End and side attribute not equal", equals);
   }
 
   private void assertEndAndSideAttributesReverse(final String startLeftValue,
@@ -271,6 +395,140 @@ public class DirectionalAttributesTest {
       START, endValue);
   }
 
+  private void assertEndTurnAttributesEqual(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final String endLeftValue1, final String endRightValue1,
+    final LineString line2, final String startLeftValue2,
+    final String startRightValue2, final String endLeftValue2,
+    final String endRightValue2) {
+    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+      startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
+      endLeftValue1, END_RIGHT_TURN, endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT_TURN, startLeftValue2,
+      START_RIGHT_TURN, startRightValue2, END_LEFT_TURN, endLeftValue2,
+      END_RIGHT_TURN, endRightValue2);
+    final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
+    if (!equals) {
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+    }
+    Assert.assertTrue("End turn attribute equal", equals);
+  }
+
+  private void assertEndTurnAttributesMerge(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final Object endLeftValue1, final Object endRightValue1,
+    final LineString line2, final Object startLeftValue2,
+    final Object startRightValue2, final String endLeftValue2,
+    final String endRightValue2, final LineString expectedMergedLine,
+    final String expectedStartLeftValue, final String expectedStartRightValue,
+    final String expectedEndLeftValue, final String expectedEndRightValue) {
+    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+      startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
+      endLeftValue1, END_RIGHT_TURN, endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT_TURN,
+      startLeftValue2, START_RIGHT_TURN, startRightValue2, END_LEFT_TURN,
+      endLeftValue2, END_RIGHT_TURN, endRightValue2);
+    DataObject mergedObject = null;
+    try {
+      final boolean canMerge = DirectionalAttributes.canMergeObjects(
+        MERGE_COORDINATES, object1, object2);
+      Assert.assertTrue("End & Side attribute can't merge", canMerge);
+
+      mergedObject = DirectionalAttributes.mergeLongest(object1, object2);
+
+      assertAttributeEquals("End turn attribute merge start left",
+        mergedObject, START_LEFT_TURN, expectedStartLeftValue);
+      assertAttributeEquals("End turn attribute merge start right",
+        mergedObject, START_RIGHT_TURN, expectedStartRightValue);
+      assertAttributeEquals("End turn attribute merge end left", mergedObject,
+        END_LEFT_TURN, expectedEndLeftValue);
+      assertAttributeEquals("End turn attribute merge end right", mergedObject,
+        END_RIGHT_TURN, expectedEndRightValue);
+
+      final LineString mergedLine = mergedObject.getGeometryValue();
+      Assert.assertTrue("End turn attribute merge line",
+        LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+    } catch (final AssertionFailedError e) {
+      LOG.error(e.getMessage());
+      LOG.error(expectedMergedLine.toString());
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+      if (mergedObject != null) {
+        LOG.error(mergedObject.toString());
+      }
+      throw e;
+    }
+  }
+
+  private void assertEndTurnAttributesNotCanMerge(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final Object endLeftValue1, final Object endRightValue1,
+    final LineString line2, final Object startLeftValue2,
+    final Object startRightValue2, final String endLeftValue2,
+    final String endRightValue2) {
+    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+      startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
+      endLeftValue1, END_RIGHT_TURN, endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT_TURN,
+      startLeftValue2, START_RIGHT_TURN, startRightValue2, END_LEFT_TURN,
+      endLeftValue2, END_RIGHT_TURN, endRightValue2);
+    final boolean canMerge = DirectionalAttributes.canMergeObjects(
+      MERGE_COORDINATES, object1, object2);
+    try {
+      Assert.assertFalse("End turn attribute not can't merge", canMerge);
+    } catch (final AssertionFailedError e) {
+      LOG.error(e.getMessage());
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+      throw e;
+    }
+  }
+
+  private void assertEndTurnAttributesNotEqual(final LineString line1,
+    final String startLeftValue1, final String startRightValue1,
+    final String endLeftValue1, final String endRightValue1,
+    final LineString line2, final String startLeftValue2,
+    final String startRightValue2, final String endLeftValue2,
+    final String endRightValue2) {
+    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+      startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
+      endLeftValue1, END_RIGHT_TURN, endRightValue1);
+    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+      START_RIGHT_TURN, startRightValue2, END_LEFT_TURN, endLeftValue2,
+      END_RIGHT_TURN, endRightValue2);
+    final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
+    if (equals) {
+      LOG.error(object1.toString());
+      LOG.error(object2.toString());
+    }
+    Assert.assertFalse("End turn attribute not equal", equals);
+  }
+
+  private void assertEndTurnAttributesReverse(final String startLeftValue,
+    final String startRightValue, final String endLeftValue,
+    final String endRightValue) {
+    final DataObject object = createObject(LINE1, START_LEFT_TURN,
+      startLeftValue, START_RIGHT_TURN, startRightValue, END_LEFT_TURN,
+      endLeftValue, END_RIGHT_TURN, endRightValue);
+    final DataObject reverse = reverse(object);
+    final LineString reverseLine = reverse.getGeometryValue();
+    Assert.assertTrue("Reverse line", REVERSE_LINE1.equals(reverseLine));
+
+    assertAttributeEquals(
+      "End turn reverse attribute (endRight->startRightValue)", reverse,
+      END_RIGHT_TURN, startRightValue);
+    assertAttributeEquals(
+      "End turn reverse attribute (endLeft->startLeftValue)", reverse,
+      END_LEFT_TURN, startLeftValue);
+    assertAttributeEquals(
+      "End turn reverse attribute (startRightValue->endRight)", reverse,
+      START_RIGHT_TURN, endRightValue);
+    assertAttributeEquals(
+      "End turn reverse attribute (startLeftValue->endLeft)", reverse,
+      START_LEFT_TURN, endLeftValue);
+  }
+
   private void assertSideAttributesEqual(final LineString line1,
     final Boolean startValue1, final Boolean endValue1, final LineString line2,
     final Boolean startValue2, final Boolean endValue2) {
@@ -316,7 +574,7 @@ public class DirectionalAttributesTest {
       MERGE_COORDINATES, object1, object2);
     try {
       Assert.assertFalse("Side attribute not can't merge", canMerge);
-    } catch (AssertionFailedError e) {
+    } catch (final AssertionFailedError e) {
       LOG.error(e.getMessage());
       LOG.error(object1.toString());
       LOG.error(object2.toString());
@@ -458,6 +716,46 @@ public class DirectionalAttributesTest {
   }
 
   @Test
+  public void testEndAndSideAttributesEqual() {
+    for (final String startLeftValue : Arrays.asList("A", "B", "C", "D", null)) {
+      for (final String startRightValue : Arrays.asList("B", "C", "D", null,
+        "A")) {
+        for (final String endLeftValue : Arrays.asList("C", "D", null, "A", "B")) {
+          for (final String endRightValue : Arrays.asList("D", null, "A", "B",
+            "C")) {
+            assertEndAndSideAttributesEqual(LINE1, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, LINE1,
+              startLeftValue, startRightValue, endLeftValue, endRightValue);
+            assertEndAndSideAttributesEqual(LINE1, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, REVERSE_LINE1,
+              endRightValue, endLeftValue, startRightValue, startLeftValue);
+            assertEndAndSideAttributesEqual(LINE2, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, LINE2,
+              startLeftValue, startRightValue, endLeftValue, endRightValue);
+            assertEndAndSideAttributesEqual(LINE2, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, REVERSE_LINE2,
+              endRightValue, endLeftValue, startRightValue, startLeftValue);
+          }
+        }
+      }
+    }
+
+    for (final String startLeftValue : Arrays.asList("A", null)) {
+      for (final String startRightValue : Arrays.asList("B", null)) {
+        for (final String endLeftValue : Arrays.asList("C", null)) {
+          for (final String endRightValue : Arrays.asList("D")) {
+            assertEndAndSideAttributesNotEqual(LINE1, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, REVERSE_LINE1,
+              startLeftValue, startRightValue, endLeftValue, endRightValue);
+          }
+        }
+      }
+    }
+    assertEndAndSideAttributesNotEqual(LINE1, null, null, null, null, LINE2,
+      null, null, null, null);
+  }
+
+  @Test
   public void testEndAndSideAttributesMerge() {
     for (final String startLeftValue : Arrays.asList("A", "B", "C", "D", null)) {
       for (final String startRightValue : Arrays.asList("B", "C", "D", null,
@@ -485,10 +783,10 @@ public class DirectionalAttributesTest {
         }
       }
     }
-    String startLeftValue = "A";
-    String startRightValue = "B";
-    String endLeftValue = "C";
-    String endRightValue = "D";
+    final String startLeftValue = "A";
+    final String startRightValue = "B";
+    final String endLeftValue = "C";
+    final String endRightValue = "D";
 
     assertEndAndSideAttributesNotCanMerge(LINE1, startLeftValue,
       startRightValue, null, null, LINE2, startLeftValue, null, endLeftValue,
@@ -543,149 +841,6 @@ public class DirectionalAttributesTest {
       null, null, null, null);
     assertEndAndSideAttributesNotCanMerge(LINE1, null, null, null, null, LINE3,
       null, null, null, null);
-  }
-
-  private void assertEndAndSideAttributesNotCanMerge(LineString line1,
-    String startLeftValue1, String startRightValue1, Object endLeftValue1,
-    Object endRightValue1, LineString line2, Object startLeftValue2,
-    Object startRightValue2, String endLeftValue2, String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
-      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
-      endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
-      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
-      endRightValue2);
-    final boolean canMerge = DirectionalAttributes.canMergeObjects(
-      MERGE_COORDINATES, object1, object2);
-    try {
-      Assert.assertFalse("Side attribute not can't merge", canMerge);
-    } catch (AssertionFailedError e) {
-      LOG.error(e.getMessage());
-      LOG.error(object1.toString());
-      LOG.error(object2.toString());
-      throw e;
-    }
-  }
-
-  private void assertEndAndSideAttributesMerge(LineString line1,
-    String startLeftValue1, String startRightValue1, Object endLeftValue1,
-    Object endRightValue1, LineString line2, Object startLeftValue2,
-    Object startRightValue2, String endLeftValue2, String endRightValue2,
-    LineString expectedMergedLine, String expectedStartLeftValue,
-    String expectedStartRightValue, String expectedEndLeftValue,
-    String expectedEndRightValue) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
-      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
-      endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
-      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
-      endRightValue2);
-    DataObject mergedObject = null;
-    try {
-      final boolean canMerge = DirectionalAttributes.canMergeObjects(
-        MERGE_COORDINATES, object1, object2);
-      Assert.assertTrue("End & Side attribute can't merge", canMerge);
-
-      mergedObject = DirectionalAttributes.mergeLongest(object1, object2);
-
-      assertAttributeEquals("End & Side attribute merge start left",
-        mergedObject, START_LEFT, expectedStartLeftValue);
-      assertAttributeEquals("End & Side attribute merge start right",
-        mergedObject, START_RIGHT, expectedStartRightValue);
-      assertAttributeEquals("End & Side attribute merge end left",
-        mergedObject, END_LEFT, expectedEndLeftValue);
-      assertAttributeEquals("End & Side attribute merge end right",
-        mergedObject, END_RIGHT, expectedEndRightValue);
-
-      final LineString mergedLine = mergedObject.getGeometryValue();
-      Assert.assertTrue("End attribute merge line",
-        LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
-    } catch (AssertionFailedError e) {
-      LOG.error(e.getMessage());
-      LOG.error(expectedMergedLine.toString());
-      LOG.error(object1.toString());
-      LOG.error(object2.toString());
-      if (mergedObject != null) {
-        LOG.error(mergedObject.toString());
-      }
-      throw e;
-    }
-  }
-
-  @Test
-  public void testEndAndSideAttributesEqual() {
-    for (final String startLeftValue : Arrays.asList("A", "B", "C", "D", null)) {
-      for (final String startRightValue : Arrays.asList("B", "C", "D", null,
-        "A")) {
-        for (final String endLeftValue : Arrays.asList("C", "D", null, "A", "B")) {
-          for (final String endRightValue : Arrays.asList("D", null, "A", "B",
-            "C")) {
-            assertEndAndSideAttributesEqual(LINE1, startLeftValue,
-              startRightValue, endLeftValue, endRightValue, LINE1,
-              startLeftValue, startRightValue, endLeftValue, endRightValue);
-            assertEndAndSideAttributesEqual(LINE1, startLeftValue,
-              startRightValue, endLeftValue, endRightValue, REVERSE_LINE1,
-              endRightValue, endLeftValue, startRightValue, startLeftValue);
-            assertEndAndSideAttributesEqual(LINE2, startLeftValue,
-              startRightValue, endLeftValue, endRightValue, LINE2,
-              startLeftValue, startRightValue, endLeftValue, endRightValue);
-            assertEndAndSideAttributesEqual(LINE2, startLeftValue,
-              startRightValue, endLeftValue, endRightValue, REVERSE_LINE2,
-              endRightValue, endLeftValue, startRightValue, startLeftValue);
-          }
-        }
-      }
-    }
-
-    for (final String startLeftValue : Arrays.asList("A", null)) {
-      for (final String startRightValue : Arrays.asList("B", null)) {
-        for (final String endLeftValue : Arrays.asList("C", null)) {
-          for (final String endRightValue : Arrays.asList("D")) {
-            assertEndAndSideAttributesNotEqual(LINE1, startLeftValue,
-              startRightValue, endLeftValue, endRightValue, REVERSE_LINE1,
-              startLeftValue, startRightValue, endLeftValue, endRightValue);
-          }
-        }
-      }
-    }
-    assertEndAndSideAttributesNotEqual(LINE1, null, null, null, null, LINE2,
-      null, null, null, null);
-  }
-
-  private void assertEndAndSideAttributesEqual(LineString line1,
-    String startLeftValue1, String startRightValue1, String endLeftValue1,
-    String endRightValue1, LineString line2, String startLeftValue2,
-    String startRightValue2, String endLeftValue2, String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
-      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
-      endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
-      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
-      endRightValue2);
-    final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
-    if (!equals) {
-      LOG.error(object1.toString());
-      LOG.error(object2.toString());
-    }
-    Assert.assertTrue("End and side attribute equal", equals);
-  }
-
-  private void assertEndAndSideAttributesNotEqual(LineString line1,
-    String startLeftValue1, String startRightValue1, String endLeftValue1,
-    String endRightValue1, LineString line2, String startLeftValue2,
-    String startRightValue2, String endLeftValue2, String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
-      START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
-      endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
-      START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
-      endRightValue2);
-    final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
-    if (equals) {
-      LOG.error(object1.toString());
-      LOG.error(object2.toString());
-    }
-    Assert.assertFalse("End and side attribute not equal", equals);
   }
 
   @Test
@@ -771,6 +926,146 @@ public class DirectionalAttributesTest {
     for (final Boolean startValue : Arrays.asList(null, false, true)) {
       for (final Boolean endValue : Arrays.asList(null, false, true)) {
         assertEndAttributesReverse(startValue, endValue);
+      }
+    }
+  }
+
+  @Test
+  public void testEndTurnAttributesEqual() {
+    for (final String startLeftValue : Arrays.asList("A", "B", "C", "D", null)) {
+      for (final String startRightValue : Arrays.asList("B", "C", "D", null,
+        "A")) {
+        for (final String endLeftValue : Arrays.asList("C", "D", null, "A", "B")) {
+          for (final String endRightValue : Arrays.asList("D", null, "A", "B",
+            "C")) {
+            assertEndTurnAttributesEqual(LINE1, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, LINE1,
+              startLeftValue, startRightValue, endLeftValue, endRightValue);
+            assertEndTurnAttributesEqual(LINE1, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, REVERSE_LINE1,
+              endLeftValue,endRightValue, startLeftValue,  startRightValue);
+            assertEndTurnAttributesEqual(LINE2, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, LINE2,
+              startLeftValue, startRightValue, endLeftValue, endRightValue);
+            assertEndTurnAttributesEqual(LINE2, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, REVERSE_LINE2,
+              endLeftValue,endRightValue, startLeftValue,  startRightValue);
+          }
+        }
+      }
+    }
+
+    for (final String startLeftValue : Arrays.asList("A", null)) {
+      for (final String startRightValue : Arrays.asList("B", null)) {
+        for (final String endLeftValue : Arrays.asList("C", null)) {
+          for (final String endRightValue : Arrays.asList("D")) {
+            assertEndTurnAttributesNotEqual(LINE1, startLeftValue,
+              startRightValue, endLeftValue, endRightValue, REVERSE_LINE1,
+              startLeftValue, startRightValue, endLeftValue, endRightValue);
+          }
+        }
+      }
+    }
+    assertEndTurnAttributesNotEqual(LINE1, null, null, null, null, LINE2, null,
+      null, null, null);
+  }
+
+  @Test
+  public void testEndTurnAttributesMerge() {
+    for (final String startLeftValue : Arrays.asList("A", "B", "C", "D", null)) {
+      for (final String startRightValue : Arrays.asList("B", "C", "D", null,
+        "A")) {
+        for (final String endLeftValue : Arrays.asList("C", "D", null, "A", "B")) {
+          for (final String endRightValue : Arrays.asList("D", null, "A", "B",
+            "C")) {
+            assertEndTurnAttributesMerge(LINE1, startLeftValue,
+              startRightValue, null, null, LINE2, null, null, endLeftValue,
+              endRightValue, MERGED_LINE, startLeftValue, startRightValue,
+              endLeftValue, endRightValue);
+            assertEndTurnAttributesMerge(LINE1, startLeftValue,
+              startRightValue, null, null, REVERSE_LINE2, endLeftValue,
+              endRightValue, null, null, MERGED_LINE, startLeftValue,
+              startRightValue, endLeftValue, endRightValue);
+            assertEndTurnAttributesMerge(REVERSE_LINE1, null, null,
+              startLeftValue, startRightValue, LINE2, null, null,
+              endLeftValue, endRightValue, REVERSE_MERGED_LINE, endLeftValue,
+              endRightValue, startLeftValue, startRightValue);
+            assertEndTurnAttributesMerge(REVERSE_LINE1, null, null,
+              startLeftValue, startRightValue, REVERSE_LINE2, endLeftValue,
+              endRightValue, null, null, REVERSE_MERGED_LINE, endLeftValue,
+              endRightValue, startLeftValue, startRightValue);
+          }
+        }
+      }
+    }
+    final String startLeftValue = "A";
+    final String startRightValue = "B";
+    final String endLeftValue = "C";
+    final String endRightValue = "D";
+
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      null, null, LINE2, startLeftValue, null, endLeftValue, endRightValue);
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      null, null, LINE2, null, startRightValue, endLeftValue, endRightValue);
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      null, null, REVERSE_LINE2, endLeftValue, null, startLeftValue,
+      startRightValue);
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      null, null, REVERSE_LINE2, null, endRightValue, startLeftValue,
+      startRightValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, null, null,
+      startLeftValue, startRightValue, LINE2, startLeftValue, null,
+      endLeftValue, endRightValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, null, null,
+      startLeftValue, startRightValue, LINE2, null, startRightValue,
+      endLeftValue, endRightValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, null, null,
+      startLeftValue, startRightValue, REVERSE_LINE2, endLeftValue,
+      endRightValue, startLeftValue, startRightValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, null, null,
+      startLeftValue, startRightValue, REVERSE_LINE2, endLeftValue,
+      endRightValue, null, startRightValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, null, null,
+      startLeftValue, startRightValue, REVERSE_LINE2, endLeftValue,
+      endRightValue, startLeftValue, null);
+
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      endLeftValue, null, LINE2, null, null, endLeftValue, endRightValue);
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      null, endRightValue, LINE2, null, null, endLeftValue, endRightValue);
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      endLeftValue, null, REVERSE_LINE2, endLeftValue, endRightValue, null,
+      null);
+    assertEndTurnAttributesNotCanMerge(LINE1, startLeftValue, startRightValue,
+      null, endRightValue, REVERSE_LINE2, endLeftValue, endRightValue, null,
+      null);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, endLeftValue,
+      endRightValue, startLeftValue, startRightValue, LINE2, null, null, null,
+      endLeftValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, endLeftValue, null,
+      startLeftValue, startRightValue, LINE2, null, null, null, endLeftValue);
+    assertEndTurnAttributesNotCanMerge(REVERSE_LINE1, endLeftValue, null,
+      startLeftValue, startRightValue, REVERSE_LINE2, endLeftValue, null, null,
+      null);
+
+    assertEndTurnAttributesNotCanMerge(LINE1, null, null, null, null, LINE1,
+      null, null, null, null);
+    assertEndTurnAttributesNotCanMerge(LINE1, null, null, null, null, LINE3,
+      null, null, null, null);
+  }
+
+  @Test
+  public void testEndTurnAttributesReverse() {
+    for (final String startLeftValue : Arrays.asList(null, "A", "B", "C", "D")) {
+      for (final String startRightValue : Arrays.asList(null, "A", "B", "C",
+        "D")) {
+        for (final String endLeftValue : Arrays.asList(null, "A", "B", "C", "D")) {
+          for (final String endRightValue : Arrays.asList(null, "A", "B", "C",
+            "D")) {
+            assertEndTurnAttributesReverse(startLeftValue, startRightValue,
+              endLeftValue, endRightValue);
+          }
+        }
       }
     }
   }

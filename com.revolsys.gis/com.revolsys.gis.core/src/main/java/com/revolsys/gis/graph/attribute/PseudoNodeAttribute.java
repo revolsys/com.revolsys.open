@@ -16,7 +16,6 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.LineString;
 
 public class PseudoNodeAttribute {
@@ -37,9 +36,8 @@ public class PseudoNodeAttribute {
     init(node, edgesByLine);
   }
 
-  // TODO add node to can merge for loops!
-  private EdgePair<DataObject> createEdgePair(Node<DataObject> node, final Edge<DataObject> edge1,
-    final Edge<DataObject> edge2) {
+  private EdgePair<DataObject> createEdgePair(Node<DataObject> node,
+    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
     final DataObject object2 = edge2.getObject();
     if (DirectionalAttributes.canMergeObjects(node, object1, object2,
@@ -84,7 +82,8 @@ public class PseudoNodeAttribute {
           if (size1 == 1) {
             final Edge<DataObject> edge1 = edges1.iterator().next();
             final Edge<DataObject> edge2 = edges2.iterator().next();
-            final EdgePair<DataObject> edgePair = createEdgePair(node, edge1, edge2);
+            final EdgePair<DataObject> edgePair = createEdgePair(node, edge1,
+              edge2);
             if (edgePair != null) {
               if (edge1.isForwards(node) == edge2.isForwards(node)) {
                 reversedEdgePairs.add(edgePair);
@@ -134,7 +133,8 @@ public class PseudoNodeAttribute {
           match = !reversed;
         }
         if (match) {
-          final EdgePair<DataObject> edgePair = createEdgePair(node,edge1, edge2);
+          final EdgePair<DataObject> edgePair = createEdgePair(node, edge1,
+            edge2);
           if (edgePair != null) {
             matched = true;
             edgeIter1.remove();

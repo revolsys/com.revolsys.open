@@ -74,9 +74,7 @@ public final class MathUtil {
    * @param y The y coordinate.
    * @return The distance.
    */
-  public static double angle(
-    final double x,
-    final double y) {
+  public static double angle(final double x, final double y) {
     final double angle = Math.atan2(y, x);
     return angle;
   }
@@ -90,10 +88,7 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double angle(
-    final double x1,
-    final double y1,
-    final double x2,
+  public static double angle(final double x1, final double y1, final double x2,
     final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
@@ -113,33 +108,22 @@ public final class MathUtil {
    * @param y3 The third y coordinate.
    * @return The distance.
    */
-  public static double angle(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x3,
-    final double y3) {
+  public static double angle(final double x1, final double y1, final double x2,
+    final double y2, final double x3, final double y3) {
     final double angle1 = angle(x2, y2, x1, y1);
     final double angle2 = angle(x2, y2, x3, y3);
     return angleDiff(angle1, angle2);
   }
 
-  public static double angle2d(
-    final double x1,
-    final double x2,
-    final double y1,
-    final double y2) {
+  public static double angle2d(final double x1, final double x2,
+    final double y1, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     return Math.atan2(dy, dx);
   }
 
-  public static double angleDegrees(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2) {
+  public static double angleDegrees(final double x1, final double y1,
+    final double x2, final double y2) {
     final double width = x2 - x1;
     final double height = y2 - y1;
     if (width == 0) {
@@ -165,9 +149,7 @@ public final class MathUtil {
     return degrees;
   }
 
-  public static double angleDiff(
-    final double ang1,
-    final double ang2) {
+  public static double angleDiff(final double ang1, final double ang2) {
     double delAngle;
 
     if (ang1 < ang2) {
@@ -183,9 +165,7 @@ public final class MathUtil {
     return delAngle;
   }
 
-  public static double angleDiff(
-    final double angle1,
-    final double angle2,
+  public static double angleDiff(final double angle1, final double angle2,
     final boolean clockwise) {
     if (clockwise) {
       if (angle2 < angle1) {
@@ -206,9 +186,7 @@ public final class MathUtil {
     }
   }
 
-  public static double angleDiffDegrees(
-    final double a,
-    final double b) {
+  public static double angleDiffDegrees(final double a, final double b) {
     final double largest = Math.max(a, b);
     final double smallest = Math.min(a, b);
     double diff = largest - smallest;
@@ -218,14 +196,19 @@ public final class MathUtil {
     return diff;
   }
 
+  public static double angleNorthDegrees(final double x1, final double y1,
+    final double x2, final double y2) {
+    final double angle = angleDegrees(x1, y1, x2, y2);
+    return getNorthClockwiseAngle(angle);
+  }
+
   /**
    * Convert a BigDecimal amount to a currency string prefixed by the "$" sign.
    * 
    * @param amount The BigDecimal amount.
    * @return The currency String
    */
-  public static String currencyToString(
-    final BigDecimal amount) {
+  public static String currencyToString(final BigDecimal amount) {
     if (amount != null) {
       return "$" + getCurrency(amount);
     } else {
@@ -242,11 +225,8 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double distance(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2) {
+  public static double distance(final double x1, final double y1,
+    final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
 
@@ -262,8 +242,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal divideCurrency(
-    final BigDecimal left,
+  public static BigDecimal divideCurrency(final BigDecimal left,
     final BigDecimal right) {
     return left.divide(right, CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
   }
@@ -276,8 +255,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(
-    final BigDecimal left,
+  public static BigDecimal dividePercent(final BigDecimal left,
     final BigDecimal right) {
     return left.divide(right, PERCENT_SCALE, BigDecimal.ROUND_HALF_UP);
   }
@@ -290,9 +268,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(
-    final double left,
-    final double right) {
+  public static BigDecimal dividePercent(final double left, final double right) {
     return dividePercent(new BigDecimal(left), new BigDecimal(right));
   }
 
@@ -304,9 +280,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(
-    final double left,
-    final int right) {
+  public static BigDecimal dividePercent(final double left, final int right) {
     return dividePercent(new BigDecimal(left), new BigDecimal(right));
   }
 
@@ -316,8 +290,7 @@ public final class MathUtil {
    * @param amount The ammount.
    * @return The currency.
    */
-  public static BigDecimal getCurrency(
-    final BigDecimal amount) {
+  public static BigDecimal getCurrency(final BigDecimal amount) {
     if (amount != null) {
       return amount.setScale(CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
     } else {
@@ -331,8 +304,7 @@ public final class MathUtil {
    * @param amount The ammount.
    * @return The currency.
    */
-  public static BigDecimal getCurrency(
-    final double amount) {
+  public static BigDecimal getCurrency(final double amount) {
     return getCurrency(new BigDecimal(amount));
   }
 
@@ -342,8 +314,7 @@ public final class MathUtil {
    * @param value The BigDecimal value.
    * @return The ineteger BigDecimal.
    */
-  public static BigDecimal getInteger(
-    final BigDecimal value) {
+  public static BigDecimal getInteger(final BigDecimal value) {
     if (value != null) {
       return value.setScale(INTEGER_SCALE, BigDecimal.ROUND_DOWN);
     } else {
@@ -357,9 +328,13 @@ public final class MathUtil {
    * @param value The int value.
    * @return The ineteger BigDecimal.
    */
-  public static BigDecimal getInteger(
-    final int value) {
+  public static BigDecimal getInteger(final int value) {
     return getInteger(new BigDecimal((double)value));
+  }
+
+  public static double getNorthClockwiseAngle(final double angle) {
+    final double northAngle = (450 - angle) % 360;
+    return northAngle;
   }
 
   /**
@@ -369,8 +344,7 @@ public final class MathUtil {
    * @param decimalPercent The decimal percent value.
    * @return The currency.
    */
-  public static BigDecimal getPercent(
-    final BigDecimal decimalPercent) {
+  public static BigDecimal getPercent(final BigDecimal decimalPercent) {
     if (decimalPercent != null) {
       return decimalPercent.setScale(PERCENT_SCALE, BigDecimal.ROUND_HALF_UP);
     } else {
@@ -385,8 +359,7 @@ public final class MathUtil {
    * @param decimalPercent The decimal percent value.
    * @return The currency.
    */
-  public static BigDecimal getPercent(
-    final double decimalPercent) {
+  public static BigDecimal getPercent(final double decimalPercent) {
     return getPercent(new BigDecimal(decimalPercent));
   }
 
@@ -397,8 +370,7 @@ public final class MathUtil {
    * @param decimalPercent The decimal percent value.
    * @return The currency.
    */
-  public static BigDecimal getPercent(
-    final String decimalPercent) {
+  public static BigDecimal getPercent(final String decimalPercent) {
     return getPercent(new BigDecimal(decimalPercent));
   }
 
@@ -408,18 +380,12 @@ public final class MathUtil {
    * @param integer The BigDecimal integer.
    * @return The integer String
    */
-  public static String integerToString(
-    final BigDecimal integer) {
+  public static String integerToString(final BigDecimal integer) {
     return getInteger(integer).toString();
   }
 
-  public static boolean isAcute(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x3,
-    final double y3) {
+  public static boolean isAcute(final double x1, final double y1,
+    final double x2, final double y2, final double x3, final double y3) {
     final double dx0 = x1 - x2;
     final double dy0 = y1 - y2;
     final double dx1 = x3 - x2;
@@ -428,15 +394,11 @@ public final class MathUtil {
     return dotprod > 0;
   }
 
-  public static double midpoint(
-    final double d1,
-    final double d2) {
+  public static double midpoint(final double d1, final double d2) {
     return d1 + (d2 - d1) / 2;
   }
 
-  public static double orientedAngleBetween(
-    double angle1,
-    double angle2) {
+  public static double orientedAngleBetween(double angle1, double angle2) {
     if (angle1 < 0) {
       angle1 = PI_TIMES_2 + angle1;
     }
@@ -457,8 +419,7 @@ public final class MathUtil {
    * @param decimalPercent The BigDecimal percent.
    * @return The percent String
    */
-  public static String percentToString(
-    final BigDecimal decimalPercent) {
+  public static String percentToString(final BigDecimal decimalPercent) {
     return percentToString(decimalPercent, PERCENT_SCALE);
   }
 
@@ -470,8 +431,7 @@ public final class MathUtil {
    * @param scale The number of decimal places to show.
    * @return The percent String
    */
-  public static String percentToString(
-    final BigDecimal decimalPercent,
+  public static String percentToString(final BigDecimal decimalPercent,
     final int scale) {
     if (decimalPercent != null) {
       final DecimalFormat format = new DecimalFormat();
@@ -487,13 +447,8 @@ public final class MathUtil {
     }
   }
 
-  public static double pointLineDistance(
-    final double x,
-    final double y,
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2) {
+  public static double pointLineDistance(final double x, final double y,
+    final double x1, final double y1, final double x2, final double y2) {
     // if start==end, then use pt distance
     if (x1 == x2 && y1 == y2) {
       return distance(x, y, x1, y1);
@@ -528,8 +483,7 @@ public final class MathUtil {
       * Math.sqrt(((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
   }
 
-  public static double[] toDoubleArray(
-    final List<? extends Number> numbers) {
+  public static double[] toDoubleArray(final List<? extends Number> numbers) {
     final double[] doubles = new double[numbers.size()];
     for (int i = 0; i < doubles.length; i++) {
       final Number number = numbers.get(i);
@@ -538,8 +492,7 @@ public final class MathUtil {
     return doubles;
   }
 
-  public static double[] toDoubleArray(
-    final String[] values) {
+  public static double[] toDoubleArray(final String[] values) {
     final double[] doubles = new double[values.length];
     for (int i = 0; i < doubles.length; i++) {
       doubles[i] = Double.valueOf(values[i]);

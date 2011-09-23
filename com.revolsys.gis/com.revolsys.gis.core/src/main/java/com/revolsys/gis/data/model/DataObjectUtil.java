@@ -107,33 +107,12 @@ public final class DataObjectUtil {
       } else {
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
           throw new IllegalArgumentException("Path does not exist " + path, e);
         }
       }
     }
     return (T)propertyValue;
-  }
-
-  public static void setAttributeValue(final DataObject object,
-    final String name, final Object value) {
-    DataObjectMetaData metaData = object.getMetaData();
-    DataObjectStore dataObjectStore = metaData.getDataObjectStore();
-    if (dataObjectStore != null) {
-      CodeTable codeTable = dataObjectStore.getCodeTableByColumn(name);
-      if (codeTable != null && codeTable.getValueAttributeNames().size() == 1) {
-        Object id = codeTable.getId(value);
-        object.setValue(name, id);
-        return;
-      }
-    }
-    object.setValue(name, value);
-  }
-
-  public static void copyValue(final DataObject source,
-    String sourceAttributeName, DataObject target, String targetAttributeName) {
-    Object value = getAttributeByPath(source, sourceAttributeName);
-    target.setValue(targetAttributeName, value);
   }
 
   private DataObjectUtil() {

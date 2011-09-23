@@ -108,7 +108,12 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       }
       final String attributeName = attributeNames.get(i);
       final Attribute attribute = metaData.getAttribute(attributeName);
-      addAttributeName(sql, tablePrefix, attribute);
+      if (attribute == null) {
+        throw new IllegalArgumentException("Attribute does not exist "
+          + metaData.getName() + "." + attributeName);
+      } else {
+        addAttributeName(sql, tablePrefix, attribute);
+      }
     }
   }
 
@@ -202,7 +207,6 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
           }
         }
         object.setState(DataObjectState.Persisted);
-
         return object;
       } else {
         close();

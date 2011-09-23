@@ -68,12 +68,14 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     return (data.getState() != ChannelDataStore.EMPTY);
   }
 
-  public synchronized boolean enable(final MultiInputSelector alt) {
-    if (data.getState() == ChannelDataStore.EMPTY) {
-      this.alt = alt;
-      return false;
-    } else {
-      return true;
+  public boolean enable(final MultiInputSelector alt) {
+    synchronized (monitor) {
+      if (data.getState() == ChannelDataStore.EMPTY) {
+        this.alt = alt;
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 

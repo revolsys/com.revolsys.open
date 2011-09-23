@@ -38,7 +38,11 @@ public class GeometryProjectionUtil {
       } else {
         final GeometryOperation operation = getGeometryOperation(geometrySrid,
           geometryFactory);
-        return perform(operation, geometry);
+        T newGeometry = perform(operation, geometry);
+        if (geometry == newGeometry) {
+          newGeometry = (T)geometryFactory.createGeometry(geometry);
+        }
+        return newGeometry;
       }
     }
   }

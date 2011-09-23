@@ -56,7 +56,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
     return hasNext;
   }
 
-  public void init() {
+  public synchronized void init() {
     if (!initialized) {
       initialized = true;
          doInit();

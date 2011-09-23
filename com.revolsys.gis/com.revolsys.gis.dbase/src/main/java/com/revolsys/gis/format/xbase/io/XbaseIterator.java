@@ -247,7 +247,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      metaData.addAttribute(fieldName.toString(), dataType, length, true);
+      metaData.addAttribute(fieldName.toString(), dataType, length, -1, true);
     }
   }
 
