@@ -1,6 +1,6 @@
 package com.revolsys.gis.graph;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -15,7 +15,7 @@ public class DataObjectGraph extends Graph<DataObject> {
     add(object, line);
   }
 
-  public void add(final List<DataObject> objects) {
+  public void add(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       add(object);
     }
