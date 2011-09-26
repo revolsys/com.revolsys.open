@@ -417,7 +417,8 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   public <T> T setValueByPath(final CharSequence attributePath,
     final DataObject source, final String sourceAttributePath) {
-    final T value = source.getValueByPath(sourceAttributePath);
+    @SuppressWarnings("unchecked")
+    final T value = (T)source.getValueByPath(sourceAttributePath);
     setValueByPath(attributePath, value);
     return value;
   }
