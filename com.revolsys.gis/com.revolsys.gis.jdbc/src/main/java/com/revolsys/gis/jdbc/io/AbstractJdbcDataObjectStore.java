@@ -122,6 +122,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   @PreDestroy
   public synchronized void close() {
+    super.close();
     final JdbcWriter writer = getSharedAttribute("writer");
     if (writer != null) {
       setSharedAttribute("writer", null);
@@ -394,6 +395,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
     return updateStatistics;
   }
+
 
   public synchronized JdbcWriter getWriter() {
     JdbcWriter writer = getSharedAttribute("writer");

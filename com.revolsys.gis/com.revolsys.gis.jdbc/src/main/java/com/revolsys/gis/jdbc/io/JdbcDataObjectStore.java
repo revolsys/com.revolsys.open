@@ -45,8 +45,10 @@ public interface JdbcDataObjectStore extends DataObjectStore {
   void setDataSource(DataSource dataSource);
 
   void setLabel(String label);
-  
+
   Statistics getUpdateStatistics();
+
   Statistics getInsertStatistics();
+
   Statistics getDeleteStatistics();
 }

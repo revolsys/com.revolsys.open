@@ -24,6 +24,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.Reader;
 
@@ -43,6 +44,8 @@ public abstract class AbstractDataObjectStore extends
   private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
 
   private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
+
+  private Statistics queryStatistics;
 
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -97,6 +100,9 @@ public abstract class AbstractDataObjectStore extends
 
   @PreDestroy
   public void close() {
+    if (queryStatistics != null) {
+      queryStatistics.disconnect();
+    }
   }
 
   public DataObject create(final DataObjectMetaData objectMetaData) {
@@ -214,6 +220,18 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  public Statistics getQueryStatistics() {
+    if (queryStatistics == null) {
+      if (label == null) {
+        queryStatistics = new Statistics("Query");
+      } else {
+        queryStatistics = new Statistics(label + " Query");
+      }
+      queryStatistics.connect();
+    }
+    return queryStatistics;
+  }
+
   public DataObjectStoreSchema getSchema(final String schemaName) {
     synchronized (schemaMap) {
       if (schemaMap.isEmpty()) {
@@ -292,7 +310,7 @@ public abstract class AbstractDataObjectStore extends
         final StringBuffer where = new StringBuffer();
         where.append(idAttributeName);
         where.append(" = ?");
-        
+
         final Query query = new Query(typeName);
         query.setWhereClause(where.toString());
         query.addParameter(id);
@@ -307,14 +325,15 @@ public abstract class AbstractDataObjectStore extends
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
 
-  public Reader<DataObject> query(QName typeName) {
-   Query query = new Query(typeName);
-    return query(query);
-  }
   public Reader<DataObject> query(final List<Query> queries) {
     final DataObjectStoreQueryReader reader = createReader();
     reader.setQueries(queries);
     return reader;
+  }
+
+  public Reader<DataObject> query(final QName typeName) {
+    final Query query = new Query(typeName);
+    return query(query);
   }
 
   public Reader<DataObject> query(final Query... queries) {

@@ -50,7 +50,12 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   protected abstract AbstractIterator<T> getNextIterator();
 
   public T next() {
-    return iterator.next();
+    final T object = iterator.next();
+    process(object);
+    return object;
+  }
+
+  protected void process(T object) {
   }
 
   public void remove() {
