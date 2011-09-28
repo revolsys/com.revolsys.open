@@ -74,6 +74,8 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private Runnable initCallback;
 
+  private int numRecords;
+
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
@@ -214,11 +216,15 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     final int m = in.read();
     final int d = in.read();
     // properties.put(new QName("date"), new Date(y, m - 1, d));
-    in.readLEInt();
+    numRecords = in.readLEInt();
     in.readLEShort();
 
     this.recordSize = (short)(in.readLEShort() - 1);
     in.skipBytes(20);
+  }
+
+  public int getNumRecords() {
+    return numRecords;
   }
 
   private void readMetaData() throws IOException {

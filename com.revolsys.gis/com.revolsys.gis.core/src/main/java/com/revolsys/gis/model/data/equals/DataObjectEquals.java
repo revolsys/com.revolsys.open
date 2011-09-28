@@ -12,6 +12,16 @@ public class DataObjectEquals implements Equals<DataObject> {
   public static final String EXCLUDE_ID = DataObjectEquals.class.getName()
     + ".excludeId";
 
+  public static boolean equalAttributes(final DataObject object1,
+    final DataObject object2, final Collection<String> attributeNames) {
+    for (final String attributeName : attributeNames) {
+      if (!equals(object1, object2, attributeName)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static boolean equals(final DataObject object1,
     final DataObject object2, final String attributeName) {
     final Object value1 = object1.getValue(attributeName);

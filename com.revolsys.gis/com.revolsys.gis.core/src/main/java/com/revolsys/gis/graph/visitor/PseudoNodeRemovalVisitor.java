@@ -21,7 +21,6 @@ import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.ObjectProcessor;
 
 /**
@@ -43,6 +42,9 @@ public class PseudoNodeRemovalVisitor extends
 
   private Statistics mergedStatistics;
 
+  public PseudoNodeRemovalVisitor() {
+  }
+
   @PreDestroy
   public void destroy() {
     if (mergedStatistics != null) {
@@ -51,17 +53,14 @@ public class PseudoNodeRemovalVisitor extends
     mergedStatistics = null;
   }
 
+  public Filter<Node<DataObject>> getFilter() {
+    return filter;
+  }
+
   @PostConstruct
   public void init() {
     mergedStatistics = new Statistics("Merged at psuedo node");
     mergedStatistics.connect();
-  }
-
-  public PseudoNodeRemovalVisitor() {
-  }
-
-  public Filter<Node<DataObject>> getFilter() {
-    return filter;
   }
 
   private void mergeEdgePairs(final Node<DataObject> node,
@@ -78,14 +77,13 @@ public class PseudoNodeRemovalVisitor extends
     }
   }
 
-  protected boolean mergeEdges(Node<DataObject> node,
+  protected boolean mergeEdges(final Node<DataObject> node,
     final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
 
     final DataObject object2 = edge2.getObject();
 
-    DataObject newObject = DirectionalAttributes.mergeLongest(node, object1,
-      object2);
+    final DataObject newObject = mergeObjects(node, object1, object2);
     newObject.setIdValue(null);
 
     final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
@@ -93,6 +91,11 @@ public class PseudoNodeRemovalVisitor extends
     graph.remove(edge1);
     graph.remove(edge2);
     return true;
+  }
+
+  protected DataObject mergeObjects(final Node<DataObject> node,
+    final DataObject object1, final DataObject object2) {
+    return DirectionalAttributes.mergeLongest(node, object1, object2);
   }
 
   public void process(final DataObjectGraph graph) {

@@ -94,6 +94,12 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return property.getMergedObjectReverseLongest(point, object1, object2);
   }
 
+  public static DataObject merge(final Coordinates point,
+    final DataObject object1, final DataObject object2) {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
+    return property.getMergedObject(point, object1, object2);
+  }
+
   public static DataObject mergeLongest(final DataObject object1,
     final DataObject object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
