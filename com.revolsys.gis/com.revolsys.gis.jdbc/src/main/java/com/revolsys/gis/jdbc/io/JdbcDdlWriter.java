@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -16,6 +17,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
+import com.revolsys.util.CollectionUtil;
 
 public abstract class JdbcDdlWriter implements Cloneable {
   private static final NumberFormat FORMAT = new DecimalFormat(
@@ -35,6 +37,30 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.close();
   }
 
+  public void writeGrant(QName typeName, String username, boolean select, boolean insert, boolean update, boolean delete) {
+    
+    out.print("GRANT ");
+    List<String> perms = new ArrayList<String>();
+    if  (select) {
+      perms.add("SELECT");
+    }
+    if  (insert) {
+      perms.add("INSERT");
+    }
+    if  (update) {
+      perms.add("UPDATE");
+    }
+    if  (delete) {
+      perms.add("DELETE");
+    }
+    out.print(CollectionUtil.toString(perms, ", "));
+    out.print(" ON ");
+    writeTableName(typeName);
+    out.print(" TO ");
+    out.print(username);
+    out.println(";");
+    
+  }
   @Override
   public JdbcDdlWriter clone() {
     try {
