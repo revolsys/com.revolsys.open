@@ -1,5 +1,8 @@
 package com.revolsys.gis.jdbc.io;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -14,7 +17,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 
-public abstract class JdbcDdlWriter {
+public abstract class JdbcDdlWriter implements Cloneable {
   private static final NumberFormat FORMAT = new DecimalFormat(
     "#.#########################");
 
@@ -25,6 +28,26 @@ public abstract class JdbcDdlWriter {
 
   public JdbcDdlWriter(final PrintWriter out) {
     this.out = out;
+  }
+
+  public void close() {
+    out.flush();
+    out.close();
+  }
+
+  @Override
+  public JdbcDdlWriter clone() {
+    try {
+      return (JdbcDdlWriter)super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public JdbcDdlWriter clone(File file) {
+    final JdbcDdlWriter clone = clone();
+    clone.setOut(file);
+    return clone;
   }
 
   public PrintWriter getOut() {
@@ -47,6 +70,15 @@ public abstract class JdbcDdlWriter {
 
   public void setOut(final PrintWriter out) {
     this.out = out;
+  }
+
+  public void setOut(final File file) {
+    try {
+      final FileWriter writer = new FileWriter(file);
+      out = new PrintWriter(writer);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public void writeAddForeignKeyConstraint(final DataObjectMetaData metaData,
