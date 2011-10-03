@@ -283,6 +283,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
       if (MapFactoryBean.class.isAssignableFrom(beanClass)) {
         final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
         final PropertyValue sourceMapProperty = propertyValues.getPropertyValue("sourceMap");
+        @SuppressWarnings("unchecked")
         final Map<Object, Object> sourceMap = (Map<Object, Object>)sourceMapProperty.getValue();
         boolean found = false;
         for (final Entry<Object, Object> entry : sourceMap.entrySet()) {
