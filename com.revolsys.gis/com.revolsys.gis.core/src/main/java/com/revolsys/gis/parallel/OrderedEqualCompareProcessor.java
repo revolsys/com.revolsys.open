@@ -179,9 +179,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
 
   private void logNoMatch(final DataObject object, final boolean other) {
     if (other) {
-      dataObjectLog.log(otherName + " has no match in " + sourceName, object);
+      log(otherName + " has no match in " + sourceName, object);
     } else {
-      dataObjectLog.log(sourceName + " has no match in " + otherName, object);
+      log(sourceName + " has no match in " + otherName, object);
     }
   }
 
@@ -242,8 +242,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
           } else {
             final Object value = readObject.getValue(attributeName);
             if (value == null) {
-              dataObjectLog.log("Missing key value for " + attributeName,
-                readObject);
+              log("Missing key value for " + attributeName, readObject);
             } else {
               Comparable<Object> comparator;
               if (index == 0) {
@@ -256,10 +255,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
                 if (!geometryEquals(sourceObject, otherObject)) {
                   final String geometryAttributeName = sourceObject.getMetaData()
                     .getGeometryAttributeName();
-                  dataObjectLog.log(sourceName + " " + geometryAttributeName,
-                    sourceObject);
-                  dataObjectLog.log(otherName + " " + geometryAttributeName,
-                    otherObject);
+                  log(sourceName + " " + geometryAttributeName, sourceObject);
+                  log(otherName + " " + geometryAttributeName, otherObject);
                 } else {
                   final Set<String> notEqualAttributeNames = getNotEqualAttributeNames(
                     sourceObject, otherObject);
@@ -267,10 +264,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
                   if (!notEqualAttributeNames.isEmpty()) {
                     final String attributeNames = CollectionUtil.toString(
                       notEqualAttributeNames, ",");
-                    dataObjectLog.log(sourceName + " " + attributeNames,
-                      sourceObject);
-                    dataObjectLog.log(otherName + " " + attributeNames,
-                      otherObject);
+                    log(sourceName + " " + attributeNames, sourceObject);
+                    log(otherName + " " + attributeNames, otherObject);
                   }
                 }
                 objects[0] = null;
@@ -297,6 +292,10 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         }
       }
     }
+  }
+
+  private void log(final String message, final DataObject readObject) {
+    dataObjectLog.log(message, readObject);
   }
 
   public void setAttributeName(final String attributeName) {
