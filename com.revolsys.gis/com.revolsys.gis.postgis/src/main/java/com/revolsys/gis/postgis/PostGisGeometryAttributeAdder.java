@@ -31,7 +31,7 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
     DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
     DATA_TYPE_MAP.put("POINT", DataTypes.POINT);
     DATA_TYPE_MAP.put("LINESTRING", DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put("POLYGON", DataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put("POLYGON", DataTypes.POLYGON);
     DATA_TYPE_MAP.put("MULTIPOINT", DataTypes.MULTI_POINT);
     DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put("MULTIPOLYGON", DataTypes.MULTI_POLYGON);

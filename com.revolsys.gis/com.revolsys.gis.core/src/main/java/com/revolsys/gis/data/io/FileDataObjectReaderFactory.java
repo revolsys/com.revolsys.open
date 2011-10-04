@@ -1,7 +1,10 @@
 package com.revolsys.gis.data.io;
 
+import java.io.File;
+
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -31,6 +34,11 @@ public class FileDataObjectReaderFactory implements
       final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
       return reader;
     }
+  }
+
+  public static DataObjectReader dataObjectReader(final File file) {
+    Resource resource = new FileSystemResource(file);
+    return dataObjectReader(resource);
   }
 
   protected static DataObjectReaderFactory getDataObjectReaderFactory(
