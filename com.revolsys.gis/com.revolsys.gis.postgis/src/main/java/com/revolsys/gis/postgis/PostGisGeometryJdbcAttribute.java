@@ -108,35 +108,40 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   public Object getInsertUpdateValue(final Object object) throws SQLException {
-    Geometry geometry = null;
-    if (getType() == DataTypes.POINT) {
-      geometry = toPgPoint(object);
-    } else if (getType() == DataTypes.LINE_STRING) {
-      geometry = toPgLineString(object);
-    } else if (getType() == DataTypes.POLYGON) {
-      geometry = toPgPolygon(object);
-    } else if (getType() == DataTypes.MULTI_POINT) {
-      geometry = toPgMultiPoint((com.vividsolutions.jts.geom.Geometry)object);
-    } else if (getType() == DataTypes.MULTI_LINE_STRING) {
-      geometry = toPgMultiLineString((com.vividsolutions.jts.geom.Geometry)object);
-    } else if (getType() == DataTypes.MULTI_POLYGON) {
-      geometry = toPgMultiPolygon((com.vividsolutions.jts.geom.Geometry)object);
-    } else if (object instanceof com.vividsolutions.jts.geom.Point) {
-      final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
-      geometry = toPgPoint(point);
-    } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
-      final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
-      geometry = toPgLineString(lineString);
-    } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
-      final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
-      geometry = toPgMultiLineString(lineString);
-    } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
-      final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
-      geometry = toPgPolygon(polygon);
+    if (object == null) {
+      return null;
     } else {
-      return object;
+      Geometry geometry = null;
+
+      if (getType() == DataTypes.POINT) {
+        geometry = toPgPoint(object);
+      } else if (getType() == DataTypes.LINE_STRING) {
+        geometry = toPgLineString(object);
+      } else if (getType() == DataTypes.POLYGON) {
+        geometry = toPgPolygon(object);
+      } else if (getType() == DataTypes.MULTI_POINT) {
+        geometry = toPgMultiPoint((com.vividsolutions.jts.geom.Geometry)object);
+      } else if (getType() == DataTypes.MULTI_LINE_STRING) {
+        geometry = toPgMultiLineString((com.vividsolutions.jts.geom.Geometry)object);
+      } else if (getType() == DataTypes.MULTI_POLYGON) {
+        geometry = toPgMultiPolygon((com.vividsolutions.jts.geom.Geometry)object);
+      } else if (object instanceof com.vividsolutions.jts.geom.Point) {
+        final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
+        geometry = toPgPoint(point);
+      } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
+        final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
+        geometry = toPgLineString(lineString);
+      } else if (object instanceof com.vividsolutions.jts.geom.MultiLineString) {
+        final com.vividsolutions.jts.geom.MultiLineString lineString = (com.vividsolutions.jts.geom.MultiLineString)object;
+        geometry = toPgMultiLineString(lineString);
+      } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
+        final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
+        geometry = toPgPolygon(polygon);
+      } else {
+        return object;
+      }
+      return new PGgeometry(geometry);
     }
-    return new PGgeometry(geometry);
   }
 
   public Object toJdbc(final Object object) throws SQLException {
@@ -465,8 +470,10 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
         throw new RuntimeException(
           "GeometryCollection has more than one geometry");
       }
+    } else if (object == null) {
+      return null;
     } else {
-      throw new RuntimeException("Expecting a point");
+      throw new RuntimeException("Expecting a polygon");
     }
   }
 }
