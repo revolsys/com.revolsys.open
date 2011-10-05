@@ -20,6 +20,7 @@ import com.revolsys.gis.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.gis.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.gis.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
+import com.revolsys.util.CollectionUtil;
 
 public class EsriXmlDataObjectMetaDataUtil implements
   EsriGeodatabaseXmlConstants {
@@ -271,6 +272,15 @@ public class EsriXmlDataObjectMetaDataUtil implements
       final String fieldName = field.getName();
       if (!ignoreFieldNames.contains(fieldName)) {
         addField(metaData, deTable, tableName, field, fieldName);
+      }
+    }
+    for (Index index : deTable.getIndexes()) {
+      String indexName = index.getName();
+      if (indexName.endsWith("_PK")) {
+        final List<Field> indexFields = index.getFields();
+        final Field indexField = CollectionUtil.get(indexFields,0);
+        final String idName = indexField.getName();
+        metaData.setIdAttributeName(idName);
       }
     }
     if (deTable instanceof DEFeatureClass) {

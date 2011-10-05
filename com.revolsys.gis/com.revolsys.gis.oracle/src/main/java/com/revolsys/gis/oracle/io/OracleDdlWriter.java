@@ -108,6 +108,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     out.println(" INCREMENT BY 1';");
     out.println("  END IF;");
     out.println("END;");
+    out.println("/");
   }
 
   public String writeCreateSequence(final DataObjectMetaData metaData) {
