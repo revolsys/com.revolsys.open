@@ -232,7 +232,11 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     if (sql == null) {
       if (metaData == null) {
         metaData = dataStore.getMetaData(tableName);
+        if (metaData == null) {
+          throw new IllegalArgumentException("Unknown table name " + tableName);
+        }
       }
+
       final List<String> attributeNames = query.getAttributeNames();
       final String fromClause = query.getFromClause();
       final String where = query.getWhereClause();

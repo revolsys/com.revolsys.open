@@ -362,7 +362,7 @@ public class GeometryFactory extends
     final int size = points.size();
     final byte numAxis2 = points.getNumAxis();
     final int numAxis = Math.min(this.numAxis, numAxis2);
-    CoordinatesList newPoints = new DoubleCoordinatesList(size, this.numAxis);
+    CoordinatesList newPoints = new DoubleCoordinatesList(size, numAxis);
     points.copy(0, newPoints, 0, numAxis, size);
     return newPoints;
   }
