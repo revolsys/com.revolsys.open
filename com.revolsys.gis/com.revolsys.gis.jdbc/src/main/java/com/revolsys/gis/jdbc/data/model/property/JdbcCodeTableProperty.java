@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
@@ -28,8 +27,6 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
   private JdbcDataObjectStore dataStore;
 
-  private boolean initialized;
-
   private String insertSql;
 
   private String tableName;
@@ -44,11 +41,32 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     super.setMetaData(metaData);
     dataStore = (JdbcDataObjectStore)metaData.getDataObjectStore();
     dataSource = dataStore.getDataSource();
+    if (metaData != null) {
+      this.tableName = JdbcUtils.getTableName(metaData.getName());
+
+      List<String> valueAttributeNames = getValueAttributeNames();
+      final String idColumn = metaData.getIdAttributeName();
+      this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
+      for (int i = 0; i < valueAttributeNames.size(); i++) {
+        final String columnName = valueAttributeNames.get(i);
+        this.insertSql += ", " + columnName;
+      }
+      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
+        insertSql += ", " + auditColumn.getKey();
+      }
+      insertSql += ") VALUES (?";
+      for (int i = 0; i < valueAttributeNames.size(); i++) {
+        insertSql += ", ?";
+      }
+      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
+        insertSql += ", " + auditColumn.getValue();
+      }
+      insertSql += ")";
+    }
   }
 
   protected synchronized Object createId(final List<Object> values) {
     try {
-      init();
       final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
         JdbcUtils.lockTable(connection, tableName);
@@ -100,40 +118,6 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
   public JdbcDataObjectStore getDataStore() {
     return dataStore;
-  }
-
-  public String getTableName() {
-    return tableName;
-  }
-
-  @PostConstruct
-  protected synchronized void init() {
-    if (!initialized) {
-      DataObjectMetaData metaData = getMetaData();
-      if (metaData != null) {
-        this.tableName = JdbcUtils.getTableName(metaData.getName());
-
-        List<String> valueAttributeNames = getValueAttributeNames();
-        final String idColumn = metaData.getIdAttributeName();
-        this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
-        for (int i = 0; i < valueAttributeNames.size(); i++) {
-          final String columnName = valueAttributeNames.get(i);
-          this.insertSql += ", " + columnName;
-        }
-        for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-          insertSql += ", " + auditColumn.getKey();
-        }
-        insertSql += ") VALUES (?";
-        for (int i = 0; i < valueAttributeNames.size(); i++) {
-          insertSql += ", ?";
-        }
-        for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-          insertSql += ", " + auditColumn.getValue();
-        }
-        insertSql += ")";
-      }
-    }
-    initialized = true;
   }
 
   public void setAuditColumns(final boolean useAuditColumns) {

@@ -141,4 +141,29 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
       return query;
     }
   }
+
+  public Query createBoundingBoxQuery(final Query query,
+    final BoundingBox boundingBox) {
+    Query boundingBoxQuery = query.clone();
+    final QName typeName = boundingBoxQuery.getTypeName();
+    DataObjectMetaData metaData = getMetaData(typeName);
+    if (metaData == null) {
+      throw new IllegalArgumentException("Unable to  find table " + typeName);
+    } else {
+      final double x1 = boundingBox.getMinX();
+      final double y1 = boundingBox.getMinY();
+      final double x2 = boundingBox.getMaxX();
+      final double y2 = boundingBox.getMaxY();
+      String whereClause = boundingBoxQuery.getWhereClause();
+      if (StringUtils.hasText(whereClause)) {
+        whereClause = "(" + whereClause + ") AND GEOMETRY && ?";
+      } else {
+        whereClause = "GEOMETRY && ?";
+      }
+      boundingBoxQuery.setWhereClause(whereClause);
+      final PGbox box = new PGbox(x1, y1, x2, y2);
+      boundingBoxQuery.addParameter(box);
+      return boundingBoxQuery;
+    }
+  }
 }

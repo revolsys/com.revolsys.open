@@ -20,6 +20,7 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
@@ -50,7 +51,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Paul Austin
  */
 public class ArrayDataObject extends AbstractMap<String, Object> implements
-  DataObject, Cloneable {
+  DataObject, Cloneable, Serializable {
+  /** Seialization version */
+  private static final long serialVersionUID = 2704226494490082708L;
+
   /** The log instance. */
   private static final Logger LOG = Logger.getLogger(ArrayDataObject.class);
 
@@ -58,7 +62,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   private final Object[] attributes;
 
   /** The metaData defining the object type. */
-  private final DataObjectMetaData metaData;
+  private final transient DataObjectMetaData metaData;
 
   protected DataObjectState state = DataObjectState.New;
 

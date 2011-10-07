@@ -1,11 +1,13 @@
 package com.revolsys.parallel.channel;
 
+import java.util.Iterator;
+
 public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
   /** Flag indicating if the channel has been closed. */
   private boolean closed = false;
 
   /** The monitor reads must synchronize on */
-  private Object monitor = new Object();
+  private final Object monitor = new Object();
 
   /** The name of the channel. */
   private String name;
@@ -14,14 +16,13 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
   private int numReaders = 0;
 
   /** The monitor reads must synchronize on */
-  private Object readMonitor = new Object();
+  private final Object readMonitor = new Object();
 
   public AbstractChannelInput() {
 
   }
 
-  public AbstractChannelInput(
-    final String name) {
+  public AbstractChannelInput(final String name) {
     this.name = name;
   }
 
@@ -29,12 +30,20 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
     closed = true;
   }
 
+  protected abstract T doRead();
+
+  protected abstract T doRead(long timeout);
+
   public String getName() {
     return name;
   }
 
   public boolean isClosed() {
     return closed;
+  }
+
+  public Iterator<T> iterator() {
+    return new ChannelInputIterator<T>(this);
   }
 
   /**
@@ -64,8 +73,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
-  public T read(
-    final long timeout) {
+  public T read(final long timeout) {
     synchronized (readMonitor) {
       synchronized (monitor) {
         if (isClosed()) {
@@ -75,11 +83,6 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
       }
     }
   }
-
-  protected abstract T doRead();
-
-  protected abstract T doRead(
-    long timeout);
 
   public void readConnect() {
     synchronized (monitor) {

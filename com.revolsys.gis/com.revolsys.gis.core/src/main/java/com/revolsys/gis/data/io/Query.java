@@ -9,19 +9,21 @@ import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.util.CollectionUtil;
+import com.vividsolutions.jts.geom.Geometry;
 
-public class Query {
-  private final List<Attribute> parameterAttributes = new ArrayList<Attribute>();
+public class Query implements Cloneable {
+  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
 
   private List<String> attributeNames = Collections.emptyList();
 
   private DataObjectMetaData metaData;
 
-  private final List<Object> parameters = new ArrayList<Object>();
+  private List<Object> parameters = new ArrayList<Object>();
 
   private String sql;
 
@@ -32,6 +34,10 @@ public class Query {
   private String whereClause;
 
   private String fromClause;
+
+  private BoundingBox boundingBox;
+
+  private Geometry geometry;
 
   private List<String> orderBy = new ArrayList<String>();
 
@@ -101,12 +107,44 @@ public class Query {
     addParameter(value, attribute);
   }
 
+  public void addParameters(final List<Object> parameters) {
+    for (final Object parameter : parameters) {
+      addParameter(parameter);
+    }
+  }
+
+  public void addParameters(final Object... parameters) {
+    addParameters(Arrays.asList(parameters));
+  }
+
+  @Override
+  public Query clone() {
+    try {
+      final Query clone = (Query)super.clone();
+      clone.parameterAttributes = new ArrayList<Attribute>(parameterAttributes);
+      clone.attributeNames = new ArrayList<String>(clone.attributeNames);
+      clone.parameters = new ArrayList<Object>(parameters);
+      clone.orderBy = new ArrayList<String>(orderBy);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
   public List<String> getAttributeNames() {
     return attributeNames;
   }
 
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
+  }
+
   public String getFromClause() {
     return fromClause;
+  }
+
+  public Geometry getGeometry() {
+    return geometry;
   }
 
   public DataObjectMetaData getMetaData() {
@@ -149,8 +187,20 @@ public class Query {
     this.attributeNames = attributeNames;
   }
 
+  public void setAttributeNames(final String... attributeNames) {
+    setAttributeNames(Arrays.asList(attributeNames));
+  }
+
+  public void setBoundingBox(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
   public void setFromClause(final String fromClause) {
     this.fromClause = fromClause;
+  }
+
+  public void setGeometry(final Geometry geometry) {
+    this.geometry = geometry;
   }
 
   public void setMetaData(final DataObjectMetaData metaData) {
@@ -161,20 +211,18 @@ public class Query {
     this.orderBy = orderBy;
   }
 
+  public void setOrderBy(final String... orderBy) {
+    setOrderBy(Arrays.asList(orderBy));
+  }
+
   public void setParameters(final List<Object> parameters) {
     this.parameters.clear();
     this.parameterAttributes.clear();
-    for (final Object parameter : parameters) {
-      addParameter(parameter);
-    }
+    addParameters(parameters);
   }
 
   public void setParameters(final Object... parameters) {
     setParameters(Arrays.asList(parameters));
-  }
-
-  public void setOrderBy(final String... orderBy) {
-    setOrderBy(Arrays.asList(orderBy));
   }
 
   public void setSql(final String sql) {
@@ -195,7 +243,7 @@ public class Query {
 
   @Override
   public String toString() {
-    StringBuffer string = new StringBuffer();
+    final StringBuffer string = new StringBuffer();
     if (sql == null) {
       string.append("SELECT ");
       if (attributeNames.isEmpty()) {
@@ -229,9 +277,5 @@ public class Query {
       string.append(parameters);
     }
     return string.toString();
-  }
-
-  public void setAttributeNames(String... attributeNames) {
-    setAttributeNames(Arrays.asList(attributeNames));
   }
 }

@@ -137,6 +137,11 @@ public abstract class AbstractDataObjectStore extends
     throw new UnsupportedOperationException();
   }
 
+  public Query createBoundingBoxQuery(final Query query,
+    final BoundingBox boundingBox) {
+    throw new UnsupportedOperationException();
+  }
+
   public DataObjectStoreQueryReader createReader() {
     final DataObjectStoreQueryReader reader = new DataObjectStoreQueryReader(
       this);

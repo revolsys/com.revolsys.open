@@ -10,9 +10,9 @@ import com.revolsys.gis.data.model.DataObjectUtil;
 import com.vividsolutions.jts.geom.LineString;
 
 public class DataObjectGraph extends Graph<DataObject> {
-  public void add(final DataObject object) {
+  public Edge<DataObject> add(final DataObject object) {
     final LineString line = object.getGeometryValue();
-    add(object, line);
+    return add(object, line);
   }
 
   public void add(final Collection<DataObject> objects) {

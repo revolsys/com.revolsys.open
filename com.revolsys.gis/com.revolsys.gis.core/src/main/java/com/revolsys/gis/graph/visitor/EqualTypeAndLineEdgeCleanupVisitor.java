@@ -2,6 +2,7 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,6 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -57,64 +57,13 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     duplicateStatistics = null;
   }
 
-  public Set<String> getEqualExcludeAttributes() {
-    return equalExcludeAttributes;
-  }
-
-  @PostConstruct
-  public void init() {
-    duplicateStatistics = new Statistics("Duplicate equal lines");
-    duplicateStatistics.connect();
-  }
-
-  public void process(final DataObjectGraph graph) {
-    graph.visitEdges(this);
-  }
-
-  private void processEqualEdge(final Edge<DataObject> edge1,
-    final Edge<DataObject> edge2) {
-    final DataObject object1 = edge1.getObject();
-    final DataObject object2 = edge2.getObject();
-
-    final boolean equalAttributes = EqualsRegistry.INSTANCE.equals(object1,
-      object2, equalExcludeAttributes);
-
-    final LineString line1 = edge1.getLine();
-    if (equalAttributes) {
-      boolean equalExcludedAttributes = true;
-      for (final String name : equalExcludeAttributes) {
-        if (!DataObjectEquals.equals(object1, object2, name)) {
-          equalExcludedAttributes = false;
-        }
-      }
-      final LineString line2 = edge2.getLine();
-
-      final boolean equalZ = fixMissingZValues(line1, line2);
-      if (equalExcludedAttributes || getComparator() != null) {
-        if (equalZ) {
-          edge2.remove();
-          if (duplicateStatistics != null) {
-            duplicateStatistics.add(object2);
-          }
-        } else {
-          LOG.error("Equal geometry with different coordinates or Z-values: "
-            + line1);
-        }
-      } else {
-        LOG.error("Equal geometry with different attributes: " + line1);
-      }
-    } else {
-      LOG.error("Equal geometry with different attributes: " + line1);
-    }
-  }
-
   public boolean fixMissingZValues(final LineString line1,
     final LineString line2) {
-    CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
+    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
     if (points1.getNumAxis() > 2) {
       final int numPoints = points1.size();
-      boolean reverse = isReverse(points1, points2);
+      final boolean reverse = isReverse(points1, points2);
       if (reverse) {
         int j = numPoints - 1;
         for (int i = 0; i < numPoints; i++) {
@@ -136,10 +85,10 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  public boolean fixZValues(CoordinatesList points1, int index1,
-    CoordinatesList points2, int index2) {
-    double z1 = points1.getZ(index2);
-    double z2 = points2.getZ(index1);
+  public boolean fixZValues(final CoordinatesList points1, final int index1,
+    final CoordinatesList points2, final int index2) {
+    final double z1 = points1.getZ(index2);
+    final double z2 = points2.getZ(index1);
     if (Double.isNaN(z1) || z1 == 0) {
       if (!Double.isNaN(z2)) {
         points1.setZ(index2, z2);
@@ -155,7 +104,18 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  public boolean isReverse(CoordinatesList points1, CoordinatesList points2) {
+  public Set<String> getEqualExcludeAttributes() {
+    return equalExcludeAttributes;
+  }
+
+  @PostConstruct
+  public void init() {
+    duplicateStatistics = new Statistics("Duplicate equal lines");
+    duplicateStatistics.connect();
+  }
+
+  public boolean isReverse(final CoordinatesList points1,
+    final CoordinatesList points2) {
     final int numPoints = points1.size();
     if (points1.equal(0, points2, numPoints - 1, 2)) {
       if (points1.equal(0, points1, numPoints - 1, 2)) {
@@ -175,6 +135,53 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
+  public void process(final DataObjectGraph graph) {
+    graph.visitEdges(this);
+  }
+
+  private void processEqualEdge(final Edge<DataObject> edge1,
+    final Edge<DataObject> edge2) {
+    final DataObject object1 = edge1.getObject();
+    final DataObject object2 = edge2.getObject();
+
+    final boolean equalAttributes = EqualsRegistry.INSTANCE.equals(object1,
+      object2, equalExcludeAttributes);
+
+    final LineString line1 = edge1.getLine();
+    int compare = 0;
+    final Comparator<Edge<DataObject>> comparator = getComparator();
+    if (comparator != null) {
+      compare = comparator.compare(edge1, edge2);
+    }
+    if (compare == 0) {
+      if (equalAttributes) {
+        boolean equalExcludedAttributes = true;
+        for (final String name : equalExcludeAttributes) {
+          if (!DataObjectEquals.equals(object1, object2, name)) {
+            equalExcludedAttributes = false;
+          }
+        }
+        final LineString line2 = edge2.getLine();
+
+        final boolean equalZ = fixMissingZValues(line1, line2);
+        if (equalExcludedAttributes) {
+          if (equalZ) {
+            removeDuplicate(edge2);
+          } else {
+            LOG.error("Equal geometry with different coordinates or Z-values: "
+              + line1);
+          }
+        } else {
+          LOG.error("Equal geometry with different attributes: " + line1);
+        }
+      } else {
+        LOG.error("Equal geometry with different attributes: " + line1);
+      }
+    } else {
+      removeDuplicate(edge2);
+    }
+  }
+
   private void processEqualEdges(final List<Edge<DataObject>> equalEdges) {
     final Iterator<Edge<DataObject>> edgeIter = equalEdges.iterator();
     final Edge<DataObject> edge1 = edgeIter.next();
@@ -188,6 +195,13 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
       if (edge1.isRemoved()) {
         return;
       }
+    }
+  }
+
+  protected void removeDuplicate(final Edge<DataObject> edge) {
+    edge.remove();
+    if (duplicateStatistics != null) {
+      duplicateStatistics.add(edge.getObject());
     }
   }
 

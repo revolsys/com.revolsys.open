@@ -52,6 +52,10 @@ public class PostgisDdlWriter extends JdbcDdlWriter {
       out.print("date");
     } else if (dataType == DataTypes.DATE_TIME) {
       out.print("timestamp");
+    } else if (dataType == DataTypes.INTEGER) {
+      out.print("NUMERIC(");
+      out.print(attribute.getLength());
+      out.print(')');
     } else if (dataType == DataTypes.DECIMAL) {
       out.print("NUMERIC(");
       out.print(attribute.getLength());

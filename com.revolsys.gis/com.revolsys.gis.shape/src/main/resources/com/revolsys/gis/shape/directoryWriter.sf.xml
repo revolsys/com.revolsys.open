@@ -16,7 +16,7 @@
     lazy-init="true"
     p:directory="."
     p:useZeroForNull="false"
-    
+    p:useNamespaceAsSubDirectory="false"
   />
   
   <bean

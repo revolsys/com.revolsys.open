@@ -70,14 +70,14 @@ public class PseudoNodeRemovalVisitor extends
         final Edge<DataObject> edge1 = edgePair.getEdge1();
         final Edge<DataObject> edge2 = edgePair.getEdge2();
         final DataObject object = edge1.getObject();
-        if (mergeEdges(node, edge1, edge2)) {
+        if (mergeEdges(node, edge1, edge2) != null) {
           mergedStatistics.add(object);
         }
       }
     }
   }
 
-  protected boolean mergeEdges(final Node<DataObject> node,
+  protected Edge<DataObject> mergeEdges(final Node<DataObject> node,
     final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
 
@@ -87,10 +87,10 @@ public class PseudoNodeRemovalVisitor extends
     newObject.setIdValue(null);
 
     final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
-    graph.add(newObject);
+    Edge<DataObject> newEdge = graph.add(newObject);
     graph.remove(edge1);
     graph.remove(edge2);
-    return true;
+    return newEdge;
   }
 
   protected DataObject mergeObjects(final Node<DataObject> node,

@@ -49,6 +49,10 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("VARCHAR2(");
       out.print(attribute.getLength());
       out.print(")");
+    } else if (dataType == DataTypes.INTEGER) {
+      out.print("NUMBER(");
+      out.print(attribute.getLength());
+      out.print(')');
     } else if (dataType == DataTypes.DECIMAL) {
       out.print("NUMBER(");
       out.print(attribute.getLength());

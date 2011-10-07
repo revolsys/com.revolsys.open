@@ -43,7 +43,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.gis.jdbc.data.model.property.JdbcCodeTableProperty;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -143,8 +142,12 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  protected AbstractIterator<DataObject> createIterator(final Query query,
+  protected AbstractIterator<DataObject> createIterator(Query query,
     final Map<String, Object> properties) {
+    final BoundingBox boundingBox = query.getBoundingBox();
+    if (boundingBox != null) {
+      query = createBoundingBoxQuery(query, boundingBox);
+    }
     return new JdbcQueryIterator(this, query, properties);
   }
 
@@ -396,7 +399,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     return updateStatistics;
   }
 
-
   public synchronized JdbcWriter getWriter() {
     JdbcWriter writer = getSharedAttribute("writer");
     if (writer == null) {
@@ -645,7 +647,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.batchSize = batchSize;
   }
 
-  public void setCodeTables(final List<JdbcCodeTableProperty> codeTables) {
+  public void setCodeTables(final List<AbstractCodeTable> codeTables) {
     for (final AbstractCodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
     }

@@ -42,6 +42,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private QName typeName;
 
+  public QName getTypeName() {
+    return typeName;
+  }
+
   public CodeTableProperty() {
   }
 

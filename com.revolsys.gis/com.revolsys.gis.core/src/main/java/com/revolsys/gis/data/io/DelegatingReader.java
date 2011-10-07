@@ -65,10 +65,14 @@ public class DelegatingReader<T> extends AbstractReader<T> {
     if (iterator == null) {
       iterator = reader.iterator();
       if (objects != null && !objects.isEmpty()) {
-        iterator = new DelegatingIterator<T>(iterator, objects);
+        iterator = createIterator(iterator, objects);
       }
     }
     return iterator;
+  }
+
+  protected Iterator<T> createIterator(Iterator<T> iterator, Collection<T> objects) {
+    return new DelegatingIterator<T>(iterator, objects);
   }
 
   public void open() {

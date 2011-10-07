@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
@@ -67,6 +69,10 @@ public class DataObjectStoreQueryReader extends
   protected AbstractIterator<DataObject> getNextIterator() {
     if (queryIndex < queries.size()) {
       final Query query = queries.get(queryIndex);
+      if (StringUtils.hasText(whereClause)) {
+        query.setWhereClause(whereClause);
+      }
+      query.setBoundingBox(boundingBox);
       final AbstractIterator<DataObject> iterator = dataStore.createIterator(
         query, getProperties());
       queryIndex++;

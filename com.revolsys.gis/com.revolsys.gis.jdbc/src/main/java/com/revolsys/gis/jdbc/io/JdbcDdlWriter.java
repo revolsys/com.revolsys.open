@@ -37,20 +37,21 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.close();
   }
 
-  public void writeGrant(QName typeName, String username, boolean select, boolean insert, boolean update, boolean delete) {
-    
+  public void writeGrant(QName typeName, String username, boolean select,
+    boolean insert, boolean update, boolean delete) {
+
     out.print("GRANT ");
     List<String> perms = new ArrayList<String>();
-    if  (select) {
+    if (select) {
       perms.add("SELECT");
     }
-    if  (insert) {
+    if (insert) {
       perms.add("INSERT");
     }
-    if  (update) {
+    if (update) {
       perms.add("UPDATE");
     }
-    if  (delete) {
+    if (delete) {
       perms.add("DELETE");
     }
     out.print(CollectionUtil.toString(perms, ", "));
@@ -59,8 +60,9 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.print(" TO ");
     out.print(username);
     out.println(";");
-    
+
   }
+
   @Override
   public JdbcDdlWriter clone() {
     try {
@@ -191,6 +193,21 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.print("CREATE SEQUENCE ");
     out.print(sequenceName);
     out.println(";");
+  }
+
+  public void writeCreateView(final QName typeName, QName queryTypeName,
+    List<String> columnNames) {
+    out.println();
+    out.print("CREATE VIEW ");
+    writeTableName(typeName);
+    out.println(" AS ( ");
+    out.println("  SELECT ");
+    out.print("  ");
+    out.println(CollectionUtil.toString(columnNames, ",\n  "));
+    out.print("  FROM ");
+    writeTableName(queryTypeName);
+    out.println();
+    out.println(");");
   }
 
   public void writeCreateTable(final DataObjectMetaData metaData) {

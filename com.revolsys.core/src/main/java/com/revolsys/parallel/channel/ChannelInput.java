@@ -1,6 +1,6 @@
 package com.revolsys.parallel.channel;
 
-public interface ChannelInput<T> {
+public interface ChannelInput<T> extends Iterable<T> {
   /**
    * Reads an Object from the Channel. This method also ensures only one of the
    * readers can actually be reading at any time. All other readers are blocked

@@ -229,6 +229,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // return new FileGdbReader(this);
   // }
 
+  // TODO add bounding box
   @Override
   protected AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {

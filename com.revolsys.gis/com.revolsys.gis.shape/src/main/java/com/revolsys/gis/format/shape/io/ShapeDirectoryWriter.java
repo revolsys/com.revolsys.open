@@ -1,11 +1,13 @@
 package com.revolsys.gis.format.shape.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
@@ -23,14 +25,16 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private final Map<DataObjectMetaData, Writer<DataObject>> writers = new HashMap<DataObjectMetaData, Writer<DataObject>>();
 
+  private boolean useNamespaceAsSubDirectory;
+
   public ShapeDirectoryWriter() {
   }
 
-  public ShapeDirectoryWriter(
-    final File baseDirectory) {
+  public ShapeDirectoryWriter(final File baseDirectory) {
     setDirectory(baseDirectory);
   }
 
+  @Override
   public void close() {
     for (final Writer<DataObject> writer : writers.values()) {
       try {
@@ -41,26 +45,41 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public File getDirectory() {
-    return directory;
-  }
-
+  @Override
   public void flush() {
     // TODO Auto-generated method stub
 
   }
 
-  public String toString() {
-    return directory.getAbsolutePath();
+  public File getDirectory() {
+    return directory;
   }
 
-  private Writer<DataObject> getWriter(
-    final DataObject object) {
+  private File getDirectory(final DataObjectMetaData metaData) {
+    if (useNamespaceAsSubDirectory) {
+      final QName typeName = metaData.getName();
+      final String schemaName = typeName.getNamespaceURI();
+      if (StringUtils.hasText(schemaName)) {
+        final File childDirectory = new File(directory, schemaName);
+        if (!childDirectory.mkdirs()) {
+          throw new IllegalArgumentException("Unable to create directory " + childDirectory);
+        }
+        return childDirectory;
+      }
+    }
+    return directory;
+  }
+
+  private String getFileName(final DataObjectMetaData metaData) {
+    return metaData.getName().getLocalPart();
+  }
+
+  private Writer<DataObject> getWriter(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     Writer<DataObject> writer = writers.get(metaData);
     if (writer == null) {
-      File file = new File(directory, getFileName(metaData)
-        + ".shp");
+      final File directory = getDirectory(metaData);
+      final File file = new File(directory, getFileName(metaData) + ".shp");
       writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
         new FileSystemResource(file));
       final Geometry geometry = object.getGeometryValue();
@@ -73,27 +92,34 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     return writer;
   }
 
-  protected String getFileName(final DataObjectMetaData metaData) {
-    return metaData.getName().getLocalPart();
+  public boolean isUseNamespaceAsSubDirectory() {
+    return useNamespaceAsSubDirectory;
   }
 
   public boolean isUseZeroForNull() {
     return useZeroForNull;
   }
 
-  public void setDirectory(
-    final File baseDirectory) {
+  public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
   }
 
-  public void setUseZeroForNull(
-    final boolean useZeroForNull) {
+  public void setUseNamespaceAsSubDirectory(
+    final boolean useNamespaceAsSubDirectory) {
+    this.useNamespaceAsSubDirectory = useNamespaceAsSubDirectory;
+  }
+
+  public void setUseZeroForNull(final boolean useZeroForNull) {
     this.useZeroForNull = useZeroForNull;
   }
 
-  public void write(
-    final DataObject object) {
+  @Override
+  public String toString() {
+    return directory.getAbsolutePath();
+  }
+
+  public void write(final DataObject object) {
 
     final Writer<DataObject> writer = getWriter(object);
     writer.write(object);

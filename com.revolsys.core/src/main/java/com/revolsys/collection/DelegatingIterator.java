@@ -38,14 +38,23 @@ public class DelegatingIterator<T> extends AbstractIterator<T> {
   @Override
   protected T getNext() throws NoSuchElementException {
     if (objects.isEmpty()) {
-      if (iterator.hasNext()) {
-        return iterator.next();
-      } else {
-        throw new NoSuchElementException();
-      }
+      final Iterator<T> i = iterator;
+      return getNextIteratorObject(i);
     } else {
-      return objects.removeFirst();
+      return getNextSavedObject();
     }
+  }
+
+  protected T getNextIteratorObject(final Iterator<T> iterator) {
+    if (iterator.hasNext()) {
+      return iterator.next();
+    } else {
+      throw new NoSuchElementException();
+    }
+  }
+
+  protected T getNextSavedObject() {
+    return objects.removeFirst();
   }
 
   @Override

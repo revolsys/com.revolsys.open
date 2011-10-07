@@ -158,7 +158,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     final String name = attribute.getName();
     String lowerName;
     if (name == null) {
-      lowerName =null;
+      lowerName = null;
     } else {
       lowerName = name.toLowerCase();
 
@@ -379,7 +379,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public Attribute getIdAttribute() {
-    return attributes.get(idAttributeIndex);
+    if (idAttributeIndex >= 0) {
+      return attributes.get(idAttributeIndex);
+    } else {
+      return null;
+    }
   }
 
   public int getIdAttributeIndex() {
