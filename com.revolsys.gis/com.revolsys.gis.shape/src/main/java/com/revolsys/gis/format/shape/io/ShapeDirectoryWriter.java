@@ -62,7 +62,9 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       if (StringUtils.hasText(schemaName)) {
         final File childDirectory = new File(directory, schemaName);
         if (!childDirectory.mkdirs()) {
+          if (!childDirectory.isDirectory() ) {
           throw new IllegalArgumentException("Unable to create directory " + childDirectory);
+          }
         }
         return childDirectory;
       }

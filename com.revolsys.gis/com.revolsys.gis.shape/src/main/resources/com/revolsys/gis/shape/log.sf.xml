@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:util="http://www.springframework.org/schema/util"
   xmlns:p="http://www.springframework.org/schema/p"
@@ -11,33 +12,17 @@
   "
 >
   <bean
-    id="shapeDirectoryWriter"
+    id="shapeLogWriter"
     class="com.revolsys.gis.format.shape.io.ShapeDirectoryWriter"
     lazy-init="true"
     p:directory="."
     p:useZeroForNull="false"
     p:useNamespaceAsSubDirectory="false"
   />
-  
-  <bean
-    id="shapeDirectoryStatisticsWriter"
-    class="com.revolsys.gis.io.StatisticsWriter"
-    lazy-init="true"
-  >
-    <constructor-arg ref="shapeDirectoryWriter" />
-  </bean>
 
   <bean
-    id="shapeDirectoryWriterProcess"
-    class="com.revolsys.gis.parallel.WriterProcess"
-    lazy-init="true"
-    p:writer-ref="shapeDirectoryStatisticsWriter"
-  />
- 
-  <bean
-    id="shapeDirectoryStatisticsWriterStats"
-    factory-bean="shapeDirectoryStatisticsWriter"
-    factory-method="getStatistics"
-    lazy-init="true"
-  />
+    id="shapeLog"
+    class="com.revolsys.gis.data.model.DataObjectLog"
+    factory-method="dataObjectLog"
+    p:writer-ref="shapeLogWriter" />
 </beans>

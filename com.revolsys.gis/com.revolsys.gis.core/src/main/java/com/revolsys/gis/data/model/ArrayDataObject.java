@@ -20,6 +20,9 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,11 +35,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.collection.WeakUuidObjectMap;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
@@ -62,9 +67,21 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   private final Object[] attributes;
 
   /** The metaData defining the object type. */
-  private final transient DataObjectMetaData metaData;
+  private transient DataObjectMetaData metaData;
 
   protected DataObjectState state = DataObjectState.New;
+
+  private void writeObject(ObjectOutputStream oos) throws IOException {
+    oos.writeObject(metaData.getUuid());
+    oos.defaultWriteObject();
+  }
+
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
+    IOException {
+    UUID metaDataUuid = (UUID)ois.readObject();
+    metaData = WeakUuidObjectMap.getObject(metaDataUuid);
+    ois.defaultReadObject();
+  }
 
   /**
    * Construct a new ArrayDataObject as a deep clone of the attribute values.

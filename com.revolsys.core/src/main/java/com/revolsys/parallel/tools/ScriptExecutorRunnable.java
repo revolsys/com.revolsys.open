@@ -26,7 +26,7 @@ import com.revolsys.spring.factory.Parameter;
 public class ScriptExecutorRunnable implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorRunnable.class);
 
-  private static Throwable getBeanExceptionCause(BeanCreationException e) {
+  private static Throwable getBeanExceptionCause(final BeanCreationException e) {
     Throwable cause = e.getCause();
     while (cause instanceof BeanCreationException
       || cause instanceof MethodInvocationException
@@ -35,7 +35,7 @@ public class ScriptExecutorRunnable implements Runnable {
       || cause instanceof InvalidPropertyException) {
       Throwable newCause;
       if (cause instanceof PropertyBatchUpdateException) {
-        PropertyBatchUpdateException batchEx = (PropertyBatchUpdateException)cause;
+        final PropertyBatchUpdateException batchEx = (PropertyBatchUpdateException)cause;
         newCause = batchEx.getPropertyAccessExceptions()[0];
       } else {
         newCause = cause.getCause();
@@ -53,77 +53,87 @@ public class ScriptExecutorRunnable implements Runnable {
 
   private Map<String, Object> beans = new LinkedHashMap<String, Object>();
 
-  private String script;
+  private final String script;
 
-  public ScriptExecutorRunnable(String script) {
+  private boolean logScriptInfo = true;
+
+  public ScriptExecutorRunnable(final String script) {
     this.script = script;
   }
 
-  public ScriptExecutorRunnable(String script, Map<String, Object> attributes) {
+  public ScriptExecutorRunnable(final String script,
+    final Map<String, Object> attributes) {
     this.script = script;
     this.attributes = attributes;
+  }
+
+  public void addBean(final String name, final Object value) {
+    beans.put(name, value);
+  }
+
+  public void addBeans(final Map<String, ?> beans) {
+    this.beans.putAll(beans);
   }
 
   public Map<String, Object> getBeans() {
     return beans;
   }
 
-  public void setBeans(Map<String, Object> beans) {
-    this.beans = beans;
-  }
-
-  public void addBean(String name, Object value) {
-    beans.put(name, value);
-  }
-  public void addBeans(Map<String,?> beans) {
-    this.beans.putAll(beans);
+  public boolean isLogScriptInfo() {
+    return logScriptInfo;
   }
 
   public void run() {
-    long startTime = System.currentTimeMillis();
+    final long startTime = System.currentTimeMillis();
     try {
-      StringBuffer message = new StringBuffer("Processing ");
-      message.append(" -s ");
-      message.append(script);
-      String logFileName = (String)attributes.get("logFile");
+      String logPath = null;
+      final String logFileName = (String)attributes.get("logFile");
       if (logFileName != null && logFileName.trim().length() > 0) {
-        File logFile = new File(logFileName);
-        File parentFile = logFile.getParentFile();
+        final File logFile = new File(logFileName);
+        final File parentFile = logFile.getParentFile();
         if (parentFile != null) {
           parentFile.mkdirs();
         }
-        ThreadLocalFileAppender.getAppender().setLocalFile(
-          logFile.getAbsolutePath());
-        message.append(" -l ");
-        message.append(logFile.getAbsolutePath());
+        logPath = logFile.getAbsolutePath();
+        ThreadLocalFileAppender.getAppender().setLocalFile(logPath);
       }
-      for (Entry<String, Object> parameter : attributes.entrySet()) {
-        message.append(" ");
-        message.append(parameter.getKey());
-        message.append("=");
-        message.append(parameter.getValue());
+      if (logScriptInfo) {
+        final StringBuffer message = new StringBuffer("Processing ");
+        message.append(" -s ");
+        message.append(script);
+        if (logPath != null) {
+          message.append(" -l ");
+          message.append(logPath);
+
+        }
+        for (final Entry<String, Object> parameter : attributes.entrySet()) {
+          message.append(" ");
+          message.append(parameter.getKey());
+          message.append("=");
+          message.append(parameter.getValue());
+        }
+        LOG.info(message.toString());
       }
-      LOG.info(message.toString());
       ThreadSharedAttributes.setAttributes(attributes);
 
-      GenericApplicationContext applicationContext = new GenericApplicationContext();
+      final GenericApplicationContext applicationContext = new GenericApplicationContext();
       applicationContext.getBeanFactory().addPropertyEditorRegistrar(
         new ResourceEditorRegistrar());
 
-      for (Entry<String, Object> entry : beans.entrySet()) {
-        String key = entry.getKey();
+      for (final Entry<String, Object> entry : beans.entrySet()) {
+        final String key = entry.getKey();
         if (key.indexOf('.') == -1 && key.indexOf('[') == -1) {
-          Object value = entry.getValue();
-          GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+          final Object value = entry.getValue();
+          final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
           beanDefinition.setBeanClass(Parameter.class);
-          MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
+          final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
           propertyValues.add("type", value.getClass());
           propertyValues.add("value", value);
           applicationContext.registerBeanDefinition(key, beanDefinition);
         }
       }
 
-      XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
+      final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
         applicationContext);
       if (new File(script).exists()) {
         beanReader.loadBeanDefinitions("file:" + script);
@@ -132,25 +142,35 @@ public class ScriptExecutorRunnable implements Runnable {
       }
       applicationContext.refresh();
       try {
-        Object bean = applicationContext.getBean("com.revolsys.parallel.process.ProcessNetwork");
-        ProcessNetwork pipeline = (ProcessNetwork)bean;
+        final Object bean = applicationContext.getBean("com.revolsys.parallel.process.ProcessNetwork");
+        final ProcessNetwork pipeline = (ProcessNetwork)bean;
         pipeline.startAndWait();
       } finally {
         applicationContext.close();
       }
-    } catch (BeanCreationException e) {
-      Throwable cause = getBeanExceptionCause(e);
+    } catch (final BeanCreationException e) {
+      final Throwable cause = getBeanExceptionCause(e);
       LOG.error(cause.getMessage(), cause);
       System.err.println(cause.getMessage());
       System.err.flush();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       LOG.error(t.getMessage(), t);
     }
-    long endTime = System.currentTimeMillis();
-    long time = endTime - startTime;
-    long seconds = time / 1000;
-    long minutes = seconds / 60;
-    seconds = seconds % 60;
-    LOG.info(minutes + " minutes " + seconds + " seconds");
+    if (logScriptInfo) {
+      final long endTime = System.currentTimeMillis();
+      final long time = endTime - startTime;
+      long seconds = time / 1000;
+      final long minutes = seconds / 60;
+      seconds = seconds % 60;
+      LOG.info(minutes + " minutes " + seconds + " seconds");
+    }
+  }
+
+  public void setBeans(final Map<String, Object> beans) {
+    this.beans = beans;
+  }
+
+  public void setLogScriptInfo(final boolean logScriptInfo) {
+    this.logScriptInfo = logScriptInfo;
   }
 }

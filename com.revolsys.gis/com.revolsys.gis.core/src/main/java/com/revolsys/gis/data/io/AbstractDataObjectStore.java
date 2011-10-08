@@ -13,6 +13,8 @@ import java.util.TreeMap;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.cs.BoundingBox;
@@ -230,7 +232,7 @@ public abstract class AbstractDataObjectStore extends
       if (label == null) {
         queryStatistics = new Statistics("Query");
       } else {
-        queryStatistics = new Statistics(label + " Query");
+        queryStatistics = new Statistics(label + " query");
       }
       queryStatistics.connect();
     }
@@ -413,7 +415,11 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public String toString() {
-    return label;
+    if (StringUtils.hasText(label)) {
+      return label;
+    } else {
+      return super.toString();
+    }
   }
 
   public void update(final DataObject object) {

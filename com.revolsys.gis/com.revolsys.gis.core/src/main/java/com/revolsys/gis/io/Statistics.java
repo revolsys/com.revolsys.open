@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
@@ -17,9 +19,13 @@ public class Statistics {
 
   private final Logger log;
 
-  private final String message;
+  private String message;
 
   private int providerCount = 0;
+
+  public Statistics() {
+    this(null);
+  }
 
   public Statistics(final String message) {
     this(Statistics.class.getName(), message);
@@ -75,10 +81,12 @@ public class Statistics {
     }
   }
 
+  @PostConstruct
   public synchronized void connect() {
     providerCount++;
   }
 
+  @PreDestroy
   public synchronized void disconnect() {
     providerCount--;
     if (providerCount <= 0) {
@@ -93,6 +101,10 @@ public class Statistics {
     } else {
       return null;
     }
+  }
+
+  public String getMessage() {
+    return message;
   }
 
   public synchronized Set<String> getNames() {
@@ -121,6 +133,10 @@ public class Statistics {
     if (totalCount > 0) {
       log.info(sb.toString());
     }
+  }
+
+  public void setMessage(final String message) {
+    this.message = message;
   }
 
   @Override

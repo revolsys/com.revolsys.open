@@ -1,7 +1,9 @@
 package com.revolsys.gis.model.coordinates;
 
+import java.io.Serializable;
+
 public class SimpleCoordinatesPrecisionModel implements
-  CoordinatesPrecisionModel {
+  CoordinatesPrecisionModel,Serializable {
   public static SimpleCoordinatesPrecisionModel FLOATING = new SimpleCoordinatesPrecisionModel();
 
   public static double makePrecise(final double value, final double scale) {

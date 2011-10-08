@@ -1,6 +1,8 @@
 package com.revolsys.gis.cs;
 
-public class PrimeMeridian {
+import java.io.Serializable;
+
+public class PrimeMeridian implements Serializable {
   private final Authority authority;
 
   private boolean deprecated;

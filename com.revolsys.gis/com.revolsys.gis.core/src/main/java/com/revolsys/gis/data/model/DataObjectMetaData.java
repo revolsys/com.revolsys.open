@@ -22,6 +22,7 @@ package com.revolsys.gis.data.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
@@ -35,19 +36,17 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   /** The namespaceUri for standard properties. */
   String NS_URI = "http://revolsys.com/gis";
 
-  void addDefaultValue(
-    String attributeName,
-    Object defaultValue);
+  void addDefaultValue(String attributeName, Object defaultValue);
 
   DataObjectMetaData clone();
 
   DataObject createDataObject();
 
-  Attribute getAttribute(
-    CharSequence name);
+  Attribute getAttribute(CharSequence name);
 
-  Attribute getAttribute(
-    int index);
+  Attribute getAttribute(int index);
+
+  UUID getUuid();
 
   /**
    * Get the number of attributes supported by the type.
@@ -63,8 +62,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param name The attribute name.
    * @return The index.
    */
-  int getAttributeIndex(
-    CharSequence name);
+  int getAttributeIndex(CharSequence name);
 
   /**
    * Get the maximum length of the attribute.
@@ -72,8 +70,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param index The attribute index.
    * @return The maximum length.
    */
-  int getAttributeLength(
-    int index);
+  int getAttributeLength(int index);
 
   /**
    * Get the name of the attribute at the specified index.
@@ -81,8 +78,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param index The attribute index.
    * @return The attribute name.
    */
-  String getAttributeName(
-    int index);
+  String getAttributeName(int index);
 
   /**
    * Get the names of all the attributes supported by the type.
@@ -99,8 +95,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param index The attribute index.
    * @return The maximum number of decimal places.
    */
-  int getAttributeScale(
-    int index);
+  int getAttributeScale(int index);
 
   /**
    * Get the type name of the attribute at the specified index.
@@ -108,11 +103,9 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param index The attribute index.
    * @return The attribute type name.
    */
-  DataType getAttributeType(
-    int index);
+  DataType getAttributeType(int index);
 
-  DataType getAttributeType(
-    CharSequence name);
+  DataType getAttributeType(CharSequence name);
 
   DataObjectFactory getDataObjectFactory();
 
@@ -120,8 +113,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
 
   DataObjectStore getDataObjectStore();
 
-  Object getDefaultValue(
-    String attributeName);
+  Object getDefaultValue(String attributeName);
 
   Map<String, Object> getDefaultValues();
 
@@ -187,8 +179,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param name The name of the attribute.
    * @return True id the type has the attribute, false otherwise.
    */
-  boolean hasAttribute(
-    CharSequence name);
+  boolean hasAttribute(CharSequence name);
 
   /**
    * Return true if a value for the attribute is required.
@@ -196,11 +187,9 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param index The attribute index.
    * @return True if the attribute is required, false otherwise.
    */
-  boolean isAttributeRequired(
-    int index);
+  boolean isAttributeRequired(int index);
 
-  boolean isInstanceOf(
-    DataObjectMetaData classDefinition);
+  boolean isInstanceOf(DataObjectMetaData classDefinition);
 
   /**
    * Set the name of the object type. Names are described using a {@link QName}
@@ -208,6 +197,5 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * 
    * @param name The name.
    */
-  void setName(
-    QName name);
+  void setName(QName name);
 }

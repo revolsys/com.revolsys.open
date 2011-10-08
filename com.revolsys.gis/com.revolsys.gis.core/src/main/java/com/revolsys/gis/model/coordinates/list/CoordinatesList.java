@@ -1,12 +1,14 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.io.Serializable;
+
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 
 public interface CoordinatesList extends CoordinateSequence,
-  Iterable<Coordinates> {
+  Iterable<Coordinates>, Serializable {
   void copy(int sourceIndex, CoordinatesList target, int targetIndex,
     int numAxis, int count);
 

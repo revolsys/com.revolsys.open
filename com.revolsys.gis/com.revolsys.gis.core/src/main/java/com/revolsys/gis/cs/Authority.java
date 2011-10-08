@@ -1,6 +1,8 @@
 package com.revolsys.gis.cs;
 
-public class Authority {
+import java.io.Serializable;
+
+public class Authority implements Serializable {
   private final String code;
 
   private final String name;

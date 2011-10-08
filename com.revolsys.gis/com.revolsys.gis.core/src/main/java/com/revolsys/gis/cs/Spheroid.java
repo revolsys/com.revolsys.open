@@ -1,8 +1,10 @@
 package com.revolsys.gis.cs;
 
+import java.io.Serializable;
+
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class Spheroid {
+public class Spheroid implements Serializable {
   private final Authority authority;
 
   private boolean deprecated;

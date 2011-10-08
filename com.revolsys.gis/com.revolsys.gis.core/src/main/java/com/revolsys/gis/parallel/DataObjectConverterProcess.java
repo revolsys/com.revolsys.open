@@ -20,6 +20,7 @@ import com.revolsys.gis.converter.process.CopyValues;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
@@ -37,6 +38,8 @@ public class DataObjectConverterProcess extends
 
   private Map<Object, Map<String, Object>> simpleMapping;
 
+  private Statistics statistics = new Statistics("Converted");
+
   public void addTypeConverter(final QName typeName,
     final Converter<DataObject, DataObject> converter) {
     typeConverterMap.put(typeName, converter);
@@ -51,31 +54,6 @@ public class DataObjectConverterProcess extends
       typeFilterConverterMap.put(typeName, converters);
     }
     converters.add(filterConverter);
-  }
-
-  public Converter<DataObject, DataObject> getDefaultConverter() {
-    return defaultConverter;
-  }
-
-  public Map<QName, Collection<FilterDataObjectConverter>> getFilterTypeConverterMap() {
-    return typeFilterConverterMap;
-  }
-
-  public DataObjectMetaDataFactory getTargetMetaDataFactory() {
-    return targetMetaDataFactory;
-  }
-
-  public Map<QName, Converter<DataObject, DataObject>> getTypeConverterMap() {
-    return typeConverterMap;
-  }
-
-  @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject sourceObject) {
-    DataObject targetObject = convert(sourceObject);
-    if (targetObject != null) {
-      out.write(targetObject);
-    }
   }
 
   protected DataObject convert(final DataObject source) {
@@ -128,13 +106,37 @@ public class DataObjectConverterProcess extends
     return null;
   }
 
-  public void setDefaultConverter(
-    final Converter<DataObject, DataObject> defaultConverter) {
-    this.defaultConverter = defaultConverter;
+  public Converter<DataObject, DataObject> getDefaultConverter() {
+    return defaultConverter;
   }
 
+  public Map<QName, Collection<FilterDataObjectConverter>> getFilterTypeConverterMap() {
+    return typeFilterConverterMap;
+  }
+
+  public Statistics getStatistics() {
+    return statistics;
+  }
+
+  public DataObjectMetaDataFactory getTargetMetaDataFactory() {
+    return targetMetaDataFactory;
+  }
+
+  public Map<QName, Converter<DataObject, DataObject>> getTypeConverterMap() {
+    return typeConverterMap;
+  }
+
+  @Override
+  protected void postRun(final Channel<DataObject> in,
+    final Channel<DataObject> out) {
+    super.postRun(in, out);
+    statistics.disconnect();
+  }
+
+  @Override
   protected void preRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
+    statistics.connect();
     if (simpleMapping != null) {
       for (final Entry<Object, Map<String, Object>> entry : simpleMapping.entrySet()) {
         final Object key = entry.getKey();
@@ -153,7 +155,7 @@ public class DataObjectConverterProcess extends
           targetTypeName = QName.valueOf(targetName.toString());
         }
         @SuppressWarnings("unchecked")
-        Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
+        final Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
 
         final DataObjectMetaData targetMetaData = targetMetaDataFactory.getMetaData(targetTypeName);
         final SimpleDataObjectConveter converter = new SimpleDataObjectConveter(
@@ -164,9 +166,30 @@ public class DataObjectConverterProcess extends
     }
   }
 
+  @Override
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject source) {
+    final DataObject target = convert(source);
+    if (target != null) {
+      out.write(target);
+      if (source != target) {
+        statistics.add(target);
+      }
+    }
+  }
+
+  public void setDefaultConverter(
+    final Converter<DataObject, DataObject> defaultConverter) {
+    this.defaultConverter = defaultConverter;
+  }
+
   public void setSimpleMapping(
     final Map<Object, Map<String, Object>> simpleMapping) {
     this.simpleMapping = simpleMapping;
+  }
+
+  public void setStatistics(final Statistics statistics) {
+    this.statistics = statistics;
   }
 
   public void setTargetMetaDataFactory(

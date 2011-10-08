@@ -20,6 +20,8 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,11 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.WeakUuidObjectMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -59,23 +63,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
 
-  public GeometryFactory getGeometryFactory() {
-    Attribute geometryAttribute = getGeometryAttribute();
-    if (geometryAttribute == null) {
-      return null;
-    } else {
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-      return geometryFactory;
-    }
-  }
-
-  public void setGeometryFactory(GeometryFactory geometryFactory) {
-    Attribute geometryAttribute = getGeometryAttribute();
-    if (geometryAttribute != null) {
-      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
-        geometryFactory);
-    }
-  }
+  private final UUID uuid = UUID.randomUUID();
 
   private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
@@ -99,15 +87,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
     this(metaData.getName(), metaData.getProperties(), metaData.getAttributes());
     setIdAttributeIndex(metaData.getIdAttributeIndex());
-  }
-
-  public DataType getAttributeType(CharSequence name) {
-    final int index = getAttributeIndex(name);
-    if (index == -1) {
-      return null;
-    } else {
-      return getAttributeType(index);
-    }
+    WeakUuidObjectMap.putObject(uuid, this);
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
@@ -116,6 +96,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
+    WeakUuidObjectMap.putObject(uuid, this);
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
@@ -124,10 +105,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
+    WeakUuidObjectMap.putObject(uuid, this);
   }
 
   public DataObjectMetaDataImpl(final QName name) {
     this.name = name;
+    WeakUuidObjectMap.putObject(uuid, this);
   }
 
   public DataObjectMetaDataImpl(final QName name, final Attribute... attributes) {
@@ -151,6 +134,13 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
       addAttribute(attribute.clone());
     }
     cloneProperties(properties);
+    WeakUuidObjectMap.putObject(uuid, this);
+  }
+
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
+    IOException {
+    ois.defaultReadObject();
+    WeakUuidObjectMap.putObject(uuid, this);
   }
 
   public void addAttribute(final Attribute attribute) {
@@ -223,11 +213,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   @Override
   public DataObjectMetaDataImpl clone() {
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name,
+    final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(name,
       properties, attributes);
-    metaData.setIdAttributeIndex(idAttributeIndex);
-    metaData.setProperties(getProperties());
-    return metaData;
+    clone.setIdAttributeIndex(idAttributeIndex);
+    clone.setProperties(getProperties());
+    return clone;
   }
 
   public void cloneProperties(final Map<String, Object> properties) {
@@ -264,7 +254,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public Attribute getAttribute(final CharSequence name) {
-    String lowerName = name.toString().toLowerCase();
+    final String lowerName = name.toString().toLowerCase();
     return attributeMap.get(lowerName);
   }
 
@@ -280,7 +270,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     if (name == null) {
       return -1;
     } else {
-      String lowerName = name.toString().toLowerCase();
+      final String lowerName = name.toString().toLowerCase();
       final Integer attributeId = attributeIdMap.get(lowerName);
       if (attributeId == null) {
         return -1;
@@ -323,6 +313,15 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public int getAttributeScale(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getScale();
+  }
+
+  public DataType getAttributeType(final CharSequence name) {
+    final int index = getAttributeIndex(name);
+    if (index == -1) {
+      return null;
+    } else {
+      return getAttributeType(index);
+    }
   }
 
   public DataType getAttributeType(final int i) {
@@ -378,6 +377,16 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return geometryAttributeNames;
   }
 
+  public GeometryFactory getGeometryFactory() {
+    final Attribute geometryAttribute = getGeometryAttribute();
+    if (geometryAttribute == null) {
+      return null;
+    } else {
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      return geometryFactory;
+    }
+  }
+
   public Attribute getIdAttribute() {
     if (idAttributeIndex >= 0) {
       return attributes.get(idAttributeIndex);
@@ -415,8 +424,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return schema;
   }
 
+  public UUID getUuid() {
+    return uuid;
+  }
+
   public boolean hasAttribute(final CharSequence name) {
-    String lowerName = name.toString().toLowerCase();
+    final String lowerName = name.toString().toLowerCase();
     return attributeMap.containsKey(lowerName);
   }
 
@@ -448,7 +461,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void replaceAttribute(final Attribute attribute,
     final Attribute newAttribute) {
     final String name = attribute.getName();
-    String lowerName = name.toLowerCase();
+    final String lowerName = name.toLowerCase();
     final String newName = newAttribute.getName();
     if (attributes.contains(attribute) && name.equals(newName)) {
       final int index = attribute.getIndex();
@@ -475,6 +488,14 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public void setGeometryAttributeName(final String name) {
     final int id = getAttributeIndex(name);
     setGeometryAttributeIndex(id);
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    final Attribute geometryAttribute = getGeometryAttribute();
+    if (geometryAttribute != null) {
+      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        geometryFactory);
+    }
   }
 
   /**

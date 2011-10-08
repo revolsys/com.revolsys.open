@@ -1,11 +1,13 @@
 package com.revolsys.gis.cs;
 
+import java.io.Serializable;
+
 import javax.measure.quantity.Angle;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-public class AngularUnit {
+public class AngularUnit implements Serializable {
   /**
    * Get the angular unit representing the conversion factor from
    * {@link SI#RADIAN}.

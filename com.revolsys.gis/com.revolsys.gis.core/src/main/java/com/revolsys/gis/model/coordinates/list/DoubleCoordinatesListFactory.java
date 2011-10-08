@@ -1,16 +1,20 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 
-public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory {
+public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
+  Serializable {
+
+  private static final long serialVersionUID = 948765434610427191L;
+
   public static final DoubleCoordinatesListFactory INSTANCE = new DoubleCoordinatesListFactory();
 
-  public static CoordinatesList create(
-    final List<Coordinate> coordinates) {
+  public static CoordinatesList create(final List<Coordinate> coordinates) {
     final CoordinatesList coordinatesList = INSTANCE.create(coordinates.size(),
       3);
     for (int i = 0; i < coordinates.size(); i++) {
@@ -20,8 +24,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory {
     return coordinatesList;
   }
 
-  public CoordinatesList create(
-    final Coordinate[] coordinates) {
+  public CoordinatesList create(final Coordinate[] coordinates) {
     final CoordinatesList coordinatesList = create(coordinates.length, 3);
     for (int i = 0; i < coordinates.length; i++) {
       final Coordinate coordinate = coordinates[i];
@@ -30,8 +33,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory {
     return coordinatesList;
   }
 
-  public CoordinatesList create(
-    final CoordinateSequence coordinateSequence) {
+  public CoordinatesList create(final CoordinateSequence coordinateSequence) {
     final int size = coordinateSequence.size();
     final int numAxis = coordinateSequence.getDimension();
     final CoordinatesList coordinatesList = create(size, numAxis);
@@ -44,9 +46,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory {
     return coordinatesList;
   }
 
-  public CoordinatesList create(
-    final int size,
-    final int dimension) {
+  public CoordinatesList create(final int size, final int dimension) {
     return new DoubleCoordinatesList(size, dimension);
   }
 

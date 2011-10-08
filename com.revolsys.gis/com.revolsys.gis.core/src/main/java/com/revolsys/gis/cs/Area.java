@@ -1,8 +1,10 @@
 package com.revolsys.gis.cs;
 
+import java.io.Serializable;
+
 import com.vividsolutions.jts.geom.Envelope;
 
-public class Area {
+public class Area implements Serializable {
   private final Authority authority;
 
   private final boolean deprecated;
@@ -11,11 +13,8 @@ public class Area {
 
   private final String name;
 
-  public Area(
-    final String name,
-    final Envelope latLonBounds,
-    final Authority authority,
-    final boolean deprecated) {
+  public Area(final String name, final Envelope latLonBounds,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     this.latLonBounds = latLonBounds;
     this.authority = authority;

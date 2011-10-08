@@ -12,12 +12,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.filter.GeometryFilter;
 import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.DataObjectGraph;
@@ -40,8 +38,6 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
   /** Flag indicating that the edge has been processed. */
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
     + ".processed";
-
-  private static final Logger LOG = LoggerFactory.getLogger(EqualTypeAndLineEdgeCleanupVisitor.class);
 
   private Statistics duplicateStatistics;
 
@@ -166,19 +162,21 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
         final boolean equalZ = fixMissingZValues(line1, line2);
         if (equalExcludedAttributes) {
           if (equalZ) {
-            removeDuplicate(edge2);
+            removeDuplicate(edge2, edge1);
           } else {
-            LOG.error("Equal geometry with different coordinates or Z-values: "
-              + line1);
+            DataObjectLog.error(getClass(),
+              "Equal geometry with different coordinates or Z-values", object1);
           }
         } else {
-          LOG.error("Equal geometry with different attributes: " + line1);
+          DataObjectLog.error(getClass(),
+            "Equal geometry with different attributes: ", object1);
         }
       } else {
-        LOG.error("Equal geometry with different attributes: " + line1);
+        DataObjectLog.error(getClass(),
+          "Equal geometry with different attributes: ", object1);
       }
     } else {
-      removeDuplicate(edge2);
+      removeDuplicate(edge2, edge1);
     }
   }
 
@@ -198,10 +196,11 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  protected void removeDuplicate(final Edge<DataObject> edge) {
-    edge.remove();
+  protected void removeDuplicate(final Edge<DataObject> removeEdge,
+    Edge<DataObject> keepEdge) {
+    removeEdge.remove();
     if (duplicateStatistics != null) {
-      duplicateStatistics.add(edge.getObject());
+      duplicateStatistics.add(removeEdge.getObject());
     }
   }
 

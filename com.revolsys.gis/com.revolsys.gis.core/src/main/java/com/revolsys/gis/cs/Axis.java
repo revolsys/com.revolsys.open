@@ -1,6 +1,8 @@
 package com.revolsys.gis.cs;
 
-public class Axis {
+import java.io.Serializable;
+
+public class Axis implements Serializable {
   private final String direction;
 
   private final String name;

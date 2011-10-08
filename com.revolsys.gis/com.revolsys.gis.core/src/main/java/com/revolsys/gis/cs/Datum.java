@@ -1,6 +1,8 @@
 package com.revolsys.gis.cs;
 
-public class Datum {
+import java.io.Serializable;
+
+public class Datum implements Serializable {
   private final Authority authority;
 
   private boolean deprecated;

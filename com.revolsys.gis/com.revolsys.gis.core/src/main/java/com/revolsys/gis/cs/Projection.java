@@ -1,6 +1,8 @@
 package com.revolsys.gis.cs;
 
-public class Projection {
+import java.io.Serializable;
+
+public class Projection implements Serializable {
   private Authority authority;
 
   private final String name;

@@ -51,6 +51,10 @@ public class OutsideBoundaryWriter extends DelegatingWriter<DataObject> {
     this.outsideBoundaryObjects = outsideBoundaryObjects;
   }
 
+  public void clearOutsideBoundaryObjects() {
+    outsideBoundaryObjects = new LinkedHashSet<DataObject>();
+  }
+
   @Override
   public void write(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
@@ -61,5 +65,11 @@ public class OutsideBoundaryWriter extends DelegatingWriter<DataObject> {
     } else {
       outsideBoundaryObjects.add(object);
     }
+  }
+
+  public Set<DataObject> getAndClearOutsideBoundaryObjects() {
+    Set<DataObject> objects = outsideBoundaryObjects;
+    clearOutsideBoundaryObjects();
+    return objects;
   }
 }

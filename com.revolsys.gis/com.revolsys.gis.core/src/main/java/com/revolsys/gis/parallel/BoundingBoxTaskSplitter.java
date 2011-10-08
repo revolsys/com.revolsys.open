@@ -15,6 +15,8 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
 
   private int numY = 10;
 
+  private boolean logScriptInfo;
+
   public abstract void execute(BoundingBox cellBoundingBox);
 
   public BoundingBox getBoundingBox() {
@@ -41,7 +43,9 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
           for (int i = 0; i < numX; i++) {
             final BoundingBox cellBoundingBox = new BoundingBox(
               boundingBox.getGeometryFactory(), x, y, x + xInc, y + yInc);
-            log.info("Processing bounding box " + boundingBox);
+            if (logScriptInfo) {
+              log.info("Processing bounding box " + boundingBox);
+            }
             execute(cellBoundingBox);
             x += xInc;
           }
@@ -69,6 +73,14 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
 
   public void setNumY(final int numY) {
     this.numY = numY;
+  }
+
+  public boolean isLogScriptInfo() {
+    return logScriptInfo;
+  }
+
+  public void setLogScriptInfo(final boolean logScriptInfo) {
+    this.logScriptInfo = logScriptInfo;
   }
 
 }

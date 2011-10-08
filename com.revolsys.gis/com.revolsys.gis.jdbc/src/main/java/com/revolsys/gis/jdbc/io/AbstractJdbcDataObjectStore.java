@@ -69,8 +69,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String hints;
 
-  private String label;
-
   private final Map<QName, String> sequenceTypeSqlMap = new HashMap<QName, String>();
 
   private String sqlPrefix;
@@ -208,7 +206,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     writer.setSqlSuffix(sqlSuffix);
     writer.setBatchSize(batchSize);
     writer.setHints(hints);
-    writer.setLabel(label);
+    writer.setLabel(getLabel());
     writer.setFlushBetweenTypes(flushBetweenTypes);
     writer.setQuoteColumnNames(false);
     return writer;
@@ -277,10 +275,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public Statistics getDeleteStatistics() {
     if (deleteStatistics == null) {
-      if (label == null) {
+      if (getLabel() == null) {
         deleteStatistics = new Statistics("Delete");
       } else {
-        deleteStatistics = new Statistics(label + " Delete");
+        deleteStatistics = new Statistics(getLabel() + " Delete");
       }
       deleteStatistics.connect();
     }
@@ -298,19 +296,14 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public Statistics getInsertStatistics() {
     if (insertStatistics == null) {
-      if (label == null) {
+      if (getLabel() == null) {
         insertStatistics = new Statistics("Insert");
       } else {
-        insertStatistics = new Statistics(label + " Insert");
+        insertStatistics = new Statistics(getLabel() + " Insert");
       }
       insertStatistics.connect();
     }
     return insertStatistics;
-  }
-
-  @Override
-  public String getLabel() {
-    return label;
   }
 
   public DataObjectMetaData getMetaData(final QName typeName,
@@ -389,10 +382,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public Statistics getUpdateStatistics() {
     if (updateStatistics == null) {
-      if (label == null) {
+      if (getLabel() == null) {
         updateStatistics = new Statistics("Update");
       } else {
-        updateStatistics = new Statistics(label + " Update");
+        updateStatistics = new Statistics(getLabel() + " Update");
       }
       updateStatistics.connect();
     }
@@ -673,26 +666,12 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.hints = hints;
   }
 
-  @Override
-  public void setLabel(final String label) {
-    this.label = label;
-  }
-
   public void setSqlPrefix(final String sqlPrefix) {
     this.sqlPrefix = sqlPrefix;
   }
 
   public void setSqlSuffix(final String sqlSuffix) {
     this.sqlSuffix = sqlSuffix;
-  }
-
-  @Override
-  public String toString() {
-    if (label == null) {
-      return super.toString();
-    } else {
-      return label;
-    }
   }
 
   @Override
