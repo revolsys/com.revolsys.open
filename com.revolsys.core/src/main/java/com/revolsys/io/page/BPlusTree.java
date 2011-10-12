@@ -126,7 +126,7 @@ public class BPlusTree {
     skipHeader(page);
     if (pageType == INTERIOR) {
       // skip pointer
-      pageIndexSerializer.readFromPage(page);
+      readPageIndex(page);
       Object firstKey = keySerializer.readFromPage(page);
       return firstKey;
     } else if (pageType == LEAF) {
@@ -210,7 +210,7 @@ public class BPlusTree {
   }
 
   public int readPageIndex(Page page) {
-    int pageIndex = pageIndexSerializer.readFromPage(page);
+    int pageIndex = ((Number)pageIndexSerializer.readFromPage(page)).intValue();
     return pageIndex;
   }
 
