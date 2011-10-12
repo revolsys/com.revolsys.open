@@ -39,7 +39,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.format.shape.io.geometry.LineString2DConverter;
 import com.revolsys.gis.format.shape.io.geometry.LineString3DConverter;
 import com.revolsys.gis.format.shape.io.geometry.MultiPolygonConverter;

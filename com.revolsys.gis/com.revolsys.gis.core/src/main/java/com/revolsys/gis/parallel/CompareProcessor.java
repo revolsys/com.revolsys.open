@@ -5,8 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Factory;
 import com.revolsys.filter.Filter;
@@ -14,52 +12,22 @@ import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.algorithm.index.PointDataObjectMap;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
-import com.revolsys.gis.data.model.ArrayDataObject;
-import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.filter.GeometryFilter;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.jts.filter.LineIntersectsFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.parallel.channel.Channel;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
 public class CompareProcessor extends AbstractMergeProcess {
-
-  private static final DataObjectMetaData LINE_LOG_METADATA;
-
-  private static final DataObjectMetaData POINT_LOG_METADATA;
-  static {
-    final DataObjectMetaDataImpl pointLogMetaData = new DataObjectMetaDataImpl(
-      new QName("CompareLogPoint"));
-    pointLogMetaData.addAttribute(new Attribute("type", DataTypes.STRING, 50,
-      true));
-    pointLogMetaData.addAttribute(new Attribute("message", DataTypes.STRING,
-      254, true));
-    pointLogMetaData.addAttribute(new Attribute("geometry",
-      DataTypes.MULTI_POINT, true));
-    POINT_LOG_METADATA = pointLogMetaData;
-
-    final DataObjectMetaDataImpl lineLogMetaData = new DataObjectMetaDataImpl(
-      new QName("CompareLogLine"));
-    lineLogMetaData.addAttribute(new Attribute("type", DataTypes.STRING, 50,
-      true));
-    lineLogMetaData.addAttribute(new Attribute("message", DataTypes.STRING,
-      254, true));
-    lineLogMetaData.addAttribute(new Attribute("geometry",
-      DataTypes.LINE_STRING, true));
-    LINE_LOG_METADATA = lineLogMetaData;
-  }
 
   private final boolean cleanDuplicatePoints = true;
 
@@ -83,8 +51,6 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private String label;
 
-  private Channel<DataObject> logOut;
-
   private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
 
   private Statistics notEqualSourceStatistics = new Statistics(
@@ -97,6 +63,16 @@ public class CompareProcessor extends AbstractMergeProcess {
   private Set<DataObject> sourceObjects = new LinkedHashSet<DataObject>();
 
   private final PointDataObjectMap sourcePointMap = new PointDataObjectMap();
+
+  private boolean logNotEqualSource = true;
+
+  public boolean isLogNotEqualSource() {
+    return logNotEqualSource;
+  }
+
+  public void setLogNotEqualSource(boolean logNotEqualSource) {
+    this.logNotEqualSource = logNotEqualSource;
+  }
 
   @Override
   protected void addOtherObject(final DataObject object) {
@@ -174,13 +150,6 @@ public class CompareProcessor extends AbstractMergeProcess {
     return label;
   }
 
-  /**
-   * @return the logOut
-   */
-  public Channel<DataObject> getLogOut() {
-    return logOut;
-  }
-
   public Statistics getNotEqualOtherStatistics() {
     return notEqualOtherStatistics;
   }
@@ -197,24 +166,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       } else {
         notEqualOtherStatistics.add(object);
       }
-      final Geometry geometry = object.getGeometryValue();
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry subGeometry = geometry.getGeometryN(i);
-        DataObject logObject;
-        if (subGeometry instanceof LineString) {
-          logObject = new ArrayDataObject(LINE_LOG_METADATA);
-        } else if (subGeometry instanceof Point) {
-          logObject = new ArrayDataObject(POINT_LOG_METADATA);
-        } else if (subGeometry instanceof MultiPoint) {
-          logObject = new ArrayDataObject(POINT_LOG_METADATA);
-        } else {
-          return;
-        }
-        logObject.setValue("type", object.getMetaData().getName());
-        logObject.setValue("message", message);
-        logObject.setGeometryValue(subGeometry);
-        logOut.write(logObject);
-      }
+      DataObjectLog.error(getClass(), message, object);
     } else {
       if (source) {
         excludeNotEqualSourceStatistics.add(object);
@@ -278,8 +230,10 @@ public class CompareProcessor extends AbstractMergeProcess {
   protected void processObjects(final DataObjectMetaData metaData,
     final Channel<DataObject> out) {
     if (otherIndex.size() + otherPointMap.size() == 0) {
-      for (final DataObject object : sourceObjects) {
-        logError(object, "Source missing in Other", true);
+      if (logNotEqualSource) {
+        for (final DataObject object : sourceObjects) {
+          logError(object, "Source missing in Other", true);
+        }
       }
     } else {
       processExactPointMatches();
@@ -292,8 +246,10 @@ public class CompareProcessor extends AbstractMergeProcess {
     for (final DataObject object : otherPointMap.getAll()) {
       logError(object, "Other missing in Source", false);
     }
-    for (final DataObject object : sourceObjects) {
-      logError(object, "Source missing in Other", true);
+    if (logNotEqualSource) {
+      for (final DataObject object : sourceObjects) {
+        logError(object, "Source missing in Other", true);
+      }
     }
     sourceObjects.clear();
     otherIndex = new DataObjectQuadTree();
@@ -386,14 +342,6 @@ public class CompareProcessor extends AbstractMergeProcess {
     this.label = label;
   }
 
-  /**
-   * @param logOut the logOut to set
-   */
-  public void setLogOut(final Channel<DataObject> logOut) {
-    this.logOut = logOut;
-    logOut.writeConnect();
-  }
-
   @Override
   protected void setUp() {
     equalStatistics.connect();
@@ -407,9 +355,6 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   @Override
   protected void tearDown() {
-    if (logOut != null) {
-      logOut.writeDisconnect();
-    }
     sourceObjects = null;
     sourcePointMap.clear();
     otherPointMap = null;

@@ -129,36 +129,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  public Query createQuery(final QName typeName, String whereClause,
-    final BoundingBox boundingBox) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
-    final String geometryColumnName = geometryAttribute.getName();
-    GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-
-    final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
-
-    final double x1 = projectedBoundingBox.getMinX();
-    final double y1 = projectedBoundingBox.getMinY();
-    final double x2 = projectedBoundingBox.getMaxX();
-    final double y2 = projectedBoundingBox.getMaxY();
-
-    final StringBuffer where = new StringBuffer();
-    if (StringUtils.hasText(whereClause)) {
-      where.append(whereClause);
-      where.append(" AND ");
-    }
-    where.append(" SDO_RELATE(");
-    where.append(geometryColumnName);
-    where.append(",");
-    where.append("MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?))");
-    where.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-    Query query = new Query(metaData);
-    query.setWhereClause(where.toString());
-    query.setParameters(geometryFactory.getSRID(), x1, y1, x2, y2);
-    return query;
-  }
-
   @Override
   public Query createBoundingBoxQuery(final Query query,
     final BoundingBox boundingBox) {

@@ -104,6 +104,7 @@ public abstract class AbstractDataObjectStore extends
   public void close() {
     if (queryStatistics != null) {
       queryStatistics.disconnect();
+      queryStatistics = null;
     }
   }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import org.springframework.core.io.FileSystemResource;
@@ -35,6 +36,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
+  @PreDestroy
   public void close() {
     for (final Writer<DataObject> writer : writers.values()) {
       try {
@@ -47,8 +49,13 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   @Override
   public void flush() {
-    // TODO Auto-generated method stub
-
+    for (final Writer<DataObject> writer : writers.values()) {
+      try {
+        writer.flush();
+      } catch (final RuntimeException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public File getDirectory() {
@@ -62,8 +69,9 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       if (StringUtils.hasText(schemaName)) {
         final File childDirectory = new File(directory, schemaName);
         if (!childDirectory.mkdirs()) {
-          if (!childDirectory.isDirectory() ) {
-          throw new IllegalArgumentException("Unable to create directory " + childDirectory);
+          if (!childDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Unable to create directory "
+              + childDirectory);
           }
         }
         return childDirectory;

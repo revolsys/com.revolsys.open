@@ -141,7 +141,11 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           out.write(now.getDate());
           out.writeLEInt(numRecords);
         } finally {
-          out.close();
+          try {
+            out.close();
+          } finally {
+            out = null;
+          }
         }
       }
     } catch (final IOException e) {
@@ -215,7 +219,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
               numString = numberFormat.format(0);
             }
           } else if (value instanceof Number) {
-           
+
             Number number = (Number)value;
             int decimalPlaces = field.getDecimalPlaces();
             if (decimalPlaces >= 0) {

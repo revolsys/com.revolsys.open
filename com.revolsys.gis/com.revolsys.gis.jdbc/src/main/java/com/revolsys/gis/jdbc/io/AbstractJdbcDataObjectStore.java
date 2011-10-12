@@ -160,12 +160,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  @Override
-  public Query createQuery(final QName typeName, final String whereClause,
-    final BoundingBox boundingBox) {
-    throw new UnsupportedOperationException();
-  }
-
   protected DataObjectStoreQueryReader createReader(
     final DataObjectMetaData metaData, final String sql,
     final List<Object> parameters) {
@@ -594,7 +588,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public DataObjectStoreQueryReader query(final QName typeName,
     final BoundingBox boundingBox) {
-    final Query query = createQuery(typeName, null, boundingBox);
+
+    final Query query = createBoundingBoxQuery(new Query(typeName), boundingBox);
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;

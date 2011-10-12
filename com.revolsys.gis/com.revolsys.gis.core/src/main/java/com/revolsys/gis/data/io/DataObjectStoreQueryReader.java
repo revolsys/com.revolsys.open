@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
@@ -20,7 +21,7 @@ public class DataObjectStoreQueryReader extends
 
   private AbstractDataObjectStore dataStore;
 
-  private final List<Query> queries = new ArrayList<Query>();
+  private List<Query> queries = new ArrayList<Query>();
 
   private BoundingBox boundingBox;
 
@@ -91,13 +92,13 @@ public class DataObjectStoreQueryReader extends
       for (final QName tableName : typeNames) {
         final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
         if (metaData != null) {
-          final Query query;
+          Query query;
           if (boundingBox == null) {
             query = new Query(metaData);
             query.setWhereClause(whereClause);
           } else {
-            final QName typeName = metaData.getName();
-            query = dataStore.createQuery(typeName, whereClause, boundingBox);
+            query = new Query(metaData);
+            query = dataStore.createBoundingBoxQuery(query, boundingBox);
           }
           addQuery(query);
         }
@@ -119,6 +120,7 @@ public class DataObjectStoreQueryReader extends
   public void setDataStore(final AbstractDataObjectStore dataStore) {
     this.dataStore = dataStore;
     statistics = dataStore.getQueryStatistics();
+    statistics.connect();
   }
 
   /**
@@ -129,6 +131,21 @@ public class DataObjectStoreQueryReader extends
     for (final Query query : queries) {
       addQuery(query);
     }
+  }
+
+  @Override
+  @PreDestroy
+  public void close() {
+    super.close();
+    if (statistics != null) {
+      statistics.disconnect();
+      statistics = null;
+    }
+    boundingBox = null;
+    dataStore = null;
+    queries = null;
+    typeNames = null;
+    whereClause = null;
   }
 
   /**

@@ -33,6 +33,7 @@ import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.PropertyBatchUpdateException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.ResourceEditorRegistrar;
@@ -361,6 +362,7 @@ public class ScriptTool {
     }
     try {
       GenericApplicationContext beans = new GenericApplicationContext();
+      AnnotationConfigUtils.registerAnnotationConfigProcessors(beans, null);
       beans.getBeanFactory().addPropertyEditorRegistrar(
         new ResourceEditorRegistrar());
 

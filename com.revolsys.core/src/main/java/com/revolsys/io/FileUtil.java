@@ -567,4 +567,12 @@ public final class FileUtil {
       }
     }
   }
+
+  public static File createTempFile(String prefix, String suffix) {
+    try {
+      return File.createTempFile(prefix, suffix);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

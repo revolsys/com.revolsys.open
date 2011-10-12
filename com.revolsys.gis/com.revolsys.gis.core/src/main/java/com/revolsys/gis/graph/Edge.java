@@ -162,8 +162,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   /** The angle of the line at the fromNode. */
   private final double fromAngle;
 
-  /** The node the edge goes from. */
-  private final Node<T> fromNode;
+  private final int fromNodeId;
 
   /** The graph the edge is part of. */
   private final Graph<T> graph;
@@ -179,16 +178,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   /** The angle of the line at the toNode. */
   private final double toAngle;
 
-  /** The node the edge goes to. */
-  private final Node<T> toNode;
+  private final int toNodeId;
 
   public Edge(final Graph<T> graph, final T object, final LineString line,
     final Node<T> fromNode, final double fromAngle, final Node<T> toNode,
     final double toAngle) {
     this.graph = graph;
-    this.fromNode = fromNode;
+    this.fromNodeId = fromNode.getNodeId();
     this.fromAngle = fromAngle;
-    this.toNode = toNode;
+    this.toNodeId = toNode.getNodeId();
     this.toAngle = toAngle;
     this.object = object;
     this.line = line;
@@ -243,11 +241,16 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public double getAngle(final Node<T> node) {
-    if (node == fromNode) {
-      return fromAngle;
-    } else {
-      return toAngle;
+    if (node.getGraph() == graph) {
+      final int nodeId = node.getNodeId();
+      if (nodeId == fromNodeId) {
+        return fromAngle;
+      } else if (nodeId == toNodeId) {
+        return toAngle;
+
+      }
     }
+    return Double.NaN;
   }
 
   /*
@@ -301,7 +304,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public Node<T> getFromNode() {
-    return fromNode;
+    return graph.getNode(fromNodeId);
   }
 
   public Graph<T> getGraph() {
@@ -333,8 +336,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public Collection<Node<T>> getNodes() {
     final LinkedHashSet<Node<T>> nodes = new LinkedHashSet<Node<T>>();
-    nodes.add(fromNode);
-    nodes.add(toNode);
+    nodes.add(getFromNode());
+    nodes.add(getToNode());
     return nodes;
   }
 
@@ -343,13 +346,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public Node<T> getOppositeNode(final Node<T> node) {
-    if (fromNode == node) {
-      return toNode;
-    } else if (toNode == node) {
-      return fromNode;
-    } else {
-      return null;
+    if (node.getGraph() == node.getGraph()) {
+      final int nodeId = node.getNodeId();
+      if (fromNodeId == nodeId) {
+        return getToNode();
+      } else if (toNodeId == nodeId) {
+        return getFromNode();
+      }
     }
+    return null;
   }
 
   public double getToAngle() {
@@ -357,7 +362,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public Node<T> getToNode() {
-    return toNode;
+    return graph.getNode(toNodeId);
   }
 
   public QName getTypeName() {
@@ -365,13 +370,16 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public boolean hasNode(final Node<T> node) {
-    if (fromNode == node) {
-      return true;
-    } else if (toNode == node) {
-      return true;
-    } else {
-      return false;
+    if (node.getGraph() == graph) {
+      final int nodeId = node.getNodeId();
+      if (fromNodeId == nodeId) {
+        return true;
+      } else if (toNodeId == nodeId) {
+        return true;
+      }
     }
+    return false;
+
   }
 
   /**
@@ -383,14 +391,16 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * @return True if the node is at the start of the edge.
    */
   public boolean isForwards(final Node<T> node) {
-    if (fromNode == node) {
-      return true;
-    } else if (toNode == node) {
-      return false;
-    } else {
-      throw new IllegalArgumentException("Node " + node
-        + " is not part of the edge.");
+    if (node.getGraph() == graph) {
+      final int nodeId = node.getNodeId();
+      if (fromNodeId == nodeId) {
+        return true;
+      } else if (toNodeId == nodeId) {
+        return false;
+      }
     }
+    throw new IllegalArgumentException("Node " + node
+      + " is not part of the edge.");
   }
 
   public boolean isLessThanDistance(final Coordinates point,
@@ -421,9 +431,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   void remove(final Graph<T> graph) {
+    final Node<T> fromNode = graph.getNode(fromNodeId);
     if (fromNode != null) {
       fromNode.remove(this);
     }
+    final Node<T> toNode = graph.getNode(toNodeId);
     if (toNode != null) {
       toNode.remove(this);
     }

@@ -154,10 +154,17 @@ public class Node<T> extends AbstractCoordinates {
 
   private List<Edge<T>> outEdges = new ArrayList<Edge<T>>();
 
-  public Node(final Graph<T> graph, final Coordinates point) {
+  private final int nodeId;
+
+  protected Node(int nodeId, final Graph<T> graph, final Coordinates point) {
+    this.nodeId = nodeId;
     this.graph = graph;
     this.x = point.getX();
     this.y = point.getY();
+  }
+
+  public int getNodeId() {
+    return nodeId;
   }
 
   protected void addInEdge(final Edge<T> edge) {

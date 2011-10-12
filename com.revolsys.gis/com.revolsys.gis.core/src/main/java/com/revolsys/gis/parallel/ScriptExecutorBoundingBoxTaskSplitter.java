@@ -28,13 +28,18 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   @Override
   public void execute(final BoundingBox boundingBox) {
-    outsideBoundaryWriter.expandBoundary(boundingBox.toGeometry());
+    if (outsideBoundaryWriter != null) {
+      outsideBoundaryWriter.expandBoundary(boundingBox.toGeometry());
+    }
+
     final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(
       scriptName, attributes);
     executor.setLogScriptInfo(isLogScriptInfo());
     executor.addBean("boundingBox", boundingBox);
-    final Set<DataObject> outsideBoundaryObjects = outsideBoundaryWriter.getAndClearOutsideBoundaryObjects();
-    executor.addBean("outsideBoundaryObjects", outsideBoundaryObjects);
+    if (outsideBoundaryWriter != null) {
+      final Set<DataObject> outsideBoundaryObjects = outsideBoundaryWriter.getAndClearOutsideBoundaryObjects();
+      executor.addBean("outsideBoundaryObjects", outsideBoundaryObjects);
+    }
     executor.addBeans(beans);
     executor.addBeans(inChannels);
     executor.addBeans(outChannels);
@@ -73,7 +78,7 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     for (final ChannelOutput<?> out : outChannels.values()) {
       out.writeDisconnect();
     }
-    
+
   }
 
   @Override

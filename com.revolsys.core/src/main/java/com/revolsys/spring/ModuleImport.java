@@ -13,6 +13,7 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -30,7 +31,8 @@ import com.revolsys.beans.ResourceEditorRegistrar;
 import com.revolsys.collection.AttributeMap;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
 
-public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware {
+public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
+  DisposableBean {
 
   private GenericApplicationContext applicationContext;
 
@@ -58,6 +60,12 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware {
 
   public ModuleImport() {
     beanNamesNotToExport.add("com.revolsys.spring.config.AttributesBeanConfigurer");
+  }
+
+  public void destroy() throws Exception {
+    if (applicationContext != null) {
+      applicationContext.close();
+    }
   }
 
   protected void afterPostProcessBeanDefinitionRegistry(

@@ -56,7 +56,7 @@ public class DataObjectLog {
     this.writer = out;
   }
 
-  public void error(final Object message, final DataObject object) {
+  public synchronized void error(final Object message, final DataObject object) {
     if (writer != null) {
       final DataObjectMetaData logMetaData = getLogMetaData(object);
       final DataObject logObject = new ArrayDataObject(logMetaData, object);
@@ -65,13 +65,13 @@ public class DataObjectLog {
     }
   }
 
-  public DataObjectMetaData getLogMetaData(final DataObject object) {
+  private DataObjectMetaData getLogMetaData(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     final DataObjectMetaData logMetaData = getLogMetaData(metaData);
     return logMetaData;
   }
 
-  public DataObjectMetaData getLogMetaData(final DataObjectMetaData metaData) {
+  private DataObjectMetaData getLogMetaData(final DataObjectMetaData metaData) {
     DataObjectMetaDataImpl logMetaData = logMetaDataMap.get(metaData);
     if (logMetaData == null) {
       final QName typeName = metaData.getName();
@@ -91,6 +91,7 @@ public class DataObjectLog {
         logMetaData.addAttribute(logAttribute);
 
       }
+      logMetaDataMap.put(metaData, logMetaData);
     }
     return logMetaData;
   }

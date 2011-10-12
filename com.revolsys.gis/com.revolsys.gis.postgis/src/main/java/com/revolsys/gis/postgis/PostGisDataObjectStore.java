@@ -3,6 +3,7 @@ package com.revolsys.gis.postgis;
 import java.sql.SQLException;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
@@ -34,6 +35,12 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
+  }
+
+  @Override
+  @PreDestroy
+  public synchronized void close() {
+    super.close();
   }
 
   @Override
@@ -117,29 +124,6 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttributeAdder geometryAttributeAdder = new PostGisGeometryAttributeAdder(
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
-  }
-
-  public Query createQuery(final QName typeName, String whereClause,
-    final BoundingBox boundingBox) {
-    DataObjectMetaData metaData = getMetaData(typeName);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Unable to  find table " + typeName);
-    } else {
-      final double x1 = boundingBox.getMinX();
-      final double y1 = boundingBox.getMinY();
-      final double x2 = boundingBox.getMaxX();
-      final double y2 = boundingBox.getMaxY();
-      if (StringUtils.hasText(whereClause)) {
-        whereClause += " AND GEOMETRY && ?";
-      } else {
-        whereClause = "GEOMETRY && ?";
-      }
-      Query query = new Query(metaData);
-      query.setWhereClause(whereClause);
-      final PGbox box = new PGbox(x1, y1, x2, y2);
-      query.addParameter(box);
-      return query;
-    }
   }
 
   public Query createBoundingBoxQuery(final Query query,

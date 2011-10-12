@@ -299,7 +299,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
         if (!found) {
           sourceMap.put(new TypedStringValue(mapKey), value);
         }
-      } else {
+      } else if (!TargetBeanFactoryBean.class.isAssignableFrom(beanClass)) {
         LOG.error("Bean class must be a MapFactoryBean, unable to set " + key
           + "=" + value);
       }

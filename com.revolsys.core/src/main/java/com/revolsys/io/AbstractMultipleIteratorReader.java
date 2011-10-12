@@ -2,6 +2,8 @@ package com.revolsys.io;
 
 import java.util.Iterator;
 
+import javax.annotation.PreDestroy;
+
 import com.revolsys.collection.AbstractIterator;
 
 public abstract class AbstractMultipleIteratorReader<T> extends
@@ -11,6 +13,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   private boolean open;
 
+  @PreDestroy
   public void close() {
     if (iterator != null) {
       iterator.close();
@@ -34,6 +37,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
     if (iterator == null) {
       iterator = getNextIterator();
       if (iterator == null) {
+        close();
         return false;
       }
     }

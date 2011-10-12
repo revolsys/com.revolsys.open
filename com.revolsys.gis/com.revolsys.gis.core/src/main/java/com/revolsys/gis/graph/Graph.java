@@ -69,7 +69,11 @@ public class Graph<T> {
 
   private final Map<Coordinates, Node<T>> nodes = new TreeMap<Coordinates, Node<T>>();
 
+  private final Map<Integer, Node<T>> nodesById = new TreeMap<Integer, Node<T>>();
+
   private CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
+
+  private int nodeId;
 
   protected void add(final Edge<T> edge) {
     edges.add(edge);
@@ -77,14 +81,6 @@ public class Graph<T> {
       edgeIndex.add(edge);
     }
     edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_ADDED, null);
-  }
-
-  protected void add(final Node<T> node) {
-    nodes.put(node, node);
-    if (nodeIndex != null) {
-      nodeIndex.add(node);
-    }
-    nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
   }
 
   public void add(final NodeEventListener<T> listener) {
@@ -189,17 +185,6 @@ public class Graph<T> {
 
   public Iterable<Edge<T>> edges() {
     return edges;
-  }
-
-  public List<T> getObjects() {
-    List<T> objects = new ArrayList<T>();
-    for (Edge<T> edge : edges) {
-      if (!edge.isRemoved()) {
-        final T object = edge.getObject();
-        objects.add(object);
-      }
-    }
-    return objects;
   }
 
   public List<Edge<T>> findEdges(final EdgeVisitor<T> visitor) {
@@ -416,10 +401,19 @@ public class Graph<T> {
   public Node<T> getNode(final Coordinates point) {
     Node<T> node = findNode(point);
     if (node == null) {
-      node = new Node<T>(this, point);
-      add(node);
+      node = new Node<T>(++nodeId, this, point);
+      nodes.put(node, node);
+      nodesById.put(node.getNodeId(), node);
+      if (nodeIndex != null) {
+        nodeIndex.add(node);
+      }
+      nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
     }
     return node;
+  }
+
+  public Node<T> getNode(final int nodeId) {
+    return nodesById.get(nodeId);
   }
 
   public NodeQuadTree<T> getNodeIndex() {
@@ -482,6 +476,17 @@ public class Graph<T> {
     final Envelope envelope) {
     return getNodes(filter, null, envelope);
 
+  }
+
+  public List<T> getObjects() {
+    final List<T> objects = new ArrayList<T>();
+    for (final Edge<T> edge : edges) {
+      if (!edge.isRemoved()) {
+        final T object = edge.getObject();
+        objects.add(object);
+      }
+    }
+    return objects;
   }
 
   public CoordinatesPrecisionModel getPrecisionModel() {
@@ -582,7 +587,7 @@ public class Graph<T> {
   }
 
   public void moveNode(final QName typeName, final Node<DataObject> fromNode,
-    final Node<DataObject> toNode, Coordinates newPoint) {
+    final Node<DataObject> toNode, final Coordinates newPoint) {
     if (!fromNode.isRemoved() && !toNode.isRemoved()) {
       if (!fromNode.equals(toNode)) {
         final List<Edge<DataObject>> edges = NodeAttributes.getEdgesByType(
@@ -609,13 +614,13 @@ public class Graph<T> {
 
   public boolean moveNodesToMidpoint(final QName typeName,
     final Node<DataObject> node1, final Node<DataObject> node2) {
-    Coordinates point1 = node1.get3dCoordinates(typeName);
-    Coordinates point2 = node2.get3dCoordinates(typeName);
+    final Coordinates point1 = node1.get3dCoordinates(typeName);
+    final Coordinates point2 = node2.get3dCoordinates(typeName);
 
     final Graph<DataObject> graph = node1.getGraph();
     final Coordinates midPoint = LineSegmentUtil.midPoint(
       new SimpleCoordinatesPrecisionModel(1000, 1), node2, node1);
-    Coordinates newPoint = new DoubleCoordinates(3);
+    final Coordinates newPoint = new DoubleCoordinates(3);
     newPoint.setX(midPoint.getX());
     newPoint.setY(midPoint.getY());
     final double z1 = point1.getZ();
