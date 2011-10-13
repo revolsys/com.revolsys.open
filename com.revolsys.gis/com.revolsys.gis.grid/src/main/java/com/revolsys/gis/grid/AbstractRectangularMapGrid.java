@@ -15,6 +15,13 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
     return getPolygon(mapTileName, new GeometryFactory(coordinateSystem));
   }
 
+  public BoundingBox getBoundingBox(String mapTileName, int srid) {
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid);
+    final RectangularMapTile mapTile = getTileByName(mapTileName);
+    final BoundingBox boundingBox = mapTile.getBoundingBox();
+    return boundingBox.convert(geometryFactory);
+  }
+
   public Polygon getPolygon(String mapTileName, GeometryFactory geometryFactory) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();

@@ -7,24 +7,29 @@ import com.revolsys.util.MathUtil;
 public class DoubleCoordinates extends AbstractCoordinates {
   private final double[] coordinates;
 
-  public DoubleCoordinates(
-    final Coordinates coordinates) {
+  public DoubleCoordinates(final Coordinates coordinates) {
     this.coordinates = coordinates.getCoordinates();
   }
 
-  public DoubleCoordinates(
-    final double... coordinates) {
+  public DoubleCoordinates(final double... coordinates) {
     this.coordinates = coordinates;
   }
 
-  public DoubleCoordinates(
-    final int dimension) {
+  public DoubleCoordinates(final int dimension) {
     this.coordinates = new double[dimension];
   }
 
-  public DoubleCoordinates(
-    final List<Number> coordinates) {
+  public DoubleCoordinates(final List<Number> coordinates) {
     this(MathUtil.toDoubleArray(coordinates));
+  }
+
+  public DoubleCoordinates(Coordinates point, int numAxis) {
+    this(numAxis);
+    final int count = Math.min(numAxis, point.getNumAxis());
+    for (int i = 0; i < count; i++) {
+      final double value = point.getValue(i);
+      setValue(i, value);
+    }
   }
 
   @Override
@@ -45,8 +50,7 @@ public class DoubleCoordinates extends AbstractCoordinates {
     return (byte)coordinates.length;
   }
 
-  public double getValue(
-    final int index) {
+  public double getValue(final int index) {
     if (index >= 0 && index < getNumAxis()) {
       return coordinates[index];
     } else {
@@ -54,9 +58,7 @@ public class DoubleCoordinates extends AbstractCoordinates {
     }
   }
 
-  public void setValue(
-    final int index,
-    final double value) {
+  public void setValue(final int index, final double value) {
     if (index >= 0 && index < getNumAxis()) {
       coordinates[index] = value;
     }

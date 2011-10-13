@@ -6,11 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
@@ -50,6 +53,61 @@ public class CoordinatesListUtil {
       previousCoordinate.next();
     }
 
+  }
+
+  public static boolean isPointOnLine(final Coordinates coordinate,
+    final CoordinatesList points, double tolerance) {
+    final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
+      points, 0);
+    final CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
+      points, 0);
+    for (int i = 1; i < points.size(); i++) {
+      currentCoordinate.next();
+
+      if (LineSegmentUtil.isPointOnLine(previousCoordinate, currentCoordinate,
+        coordinate, tolerance)) {
+        return true;
+      }
+      previousCoordinate.next();
+    }
+    return false;
+  }
+
+  public static boolean equalWithinTolerance(CoordinatesList points1,
+    CoordinatesList points2, double tolerance) {
+    if (points1.equal(0, points2, 0, 2)) {
+      if (points1.equal(points1.size() - 1, points2, points2.size() - 1, 2)) {
+        Set<Coordinates> pointSet1 = getCoordinatesSet2d(points1);
+        Set<Coordinates> pointSet2 = new TreeSet<Coordinates>();
+        for (Coordinates point : new InPlaceIterator(points2)) {
+          if (pointSet1.contains(point)) {
+            pointSet1.remove(point);
+          } else {
+            pointSet2.add(new DoubleCoordinates(point, 2));
+          }
+        }
+        for (Coordinates point : pointSet1) {
+          if (!isPointOnLine(point, points2, tolerance)) {
+            return false;
+          }
+        }
+        for (Coordinates point : pointSet2) {
+          if (!isPointOnLine(point, points1, tolerance)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static Set<Coordinates> getCoordinatesSet2d(CoordinatesList points) {
+    Set<Coordinates> pointSet = new TreeSet<Coordinates>();
+    for (Coordinates point : new InPlaceIterator(points)) {
+      pointSet.add(new DoubleCoordinates(point, 2));
+    }
+    return pointSet;
   }
 
   public static int append(final CoordinatesList src,

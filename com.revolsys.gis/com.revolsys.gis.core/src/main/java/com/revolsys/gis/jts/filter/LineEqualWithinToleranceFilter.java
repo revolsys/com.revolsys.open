@@ -25,29 +25,25 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.LineString;
 
-public class LineEqualExactFilter implements Filter<LineString> {
+public class LineEqualWithinToleranceFilter implements Filter<LineString> {
   private final CoordinatesList points;
 
-  int numAxis = -1;
+  private double tolerance;
 
-  public LineEqualExactFilter(final LineString line) {
+  public LineEqualWithinToleranceFilter(final LineString line) {
     this.points = CoordinatesListUtil.get(line);
   }
 
-  public LineEqualExactFilter(final LineString line, int numAxis) {
+  public LineEqualWithinToleranceFilter(final LineString line, double tolerance) {
     this.points = CoordinatesListUtil.get(line);
-    this.numAxis = numAxis;
+    this.tolerance = tolerance;
   }
 
   public boolean accept(final LineString line) {
     CoordinatesList points = CoordinatesListUtil.get(line);
 
-    final boolean equal;
-    if (numAxis >= 2) {
-      equal = this.points.equals(points, numAxis);
-    } else {
-      equal = this.points.equals(points);
-    }
+    final boolean equal = CoordinatesListUtil.equalWithinTolerance(this.points,
+      points, tolerance);
     if (equal) {
       return true;
     } else {

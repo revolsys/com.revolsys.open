@@ -24,6 +24,9 @@ public interface RectangularMapGrid {
 
   double getTileWidth();
 
+  BoundingBox getBoundingBox(final String mapTileName,
+    final int srid);
+
   Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem);
 

@@ -26,6 +26,8 @@ public interface CoordinatesList extends CoordinateSequence,
 
   boolean equals(CoordinatesList coordinatesList);
 
+  boolean equals(CoordinatesList coordinatesList, int numAxis);
+
   Coordinates get(int i);
 
   double[] getCoordinates();

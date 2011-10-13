@@ -137,6 +137,27 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     }
   }
 
+  public boolean equals(final CoordinatesList coordinatesList, int numAxis) {
+    if (numAxis <= getNumAxis() && numAxis <= coordinatesList.getNumAxis()) {
+      if (size() == coordinatesList.size()) {
+        for (int i = 0; i < size(); i++) {
+          for (int j = 0; j < numAxis; j++) {
+            final double value1 = getValue(i, j);
+            final double value2 = coordinatesList.getValue(i, j);
+            if (Double.compare(value1, value2) != 0) {
+              return false;
+            }
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   @Override
   public boolean equals(final Object object) {
     if (object instanceof CoordinatesList) {
