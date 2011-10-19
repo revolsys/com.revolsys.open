@@ -38,12 +38,6 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  @PreDestroy
-  public synchronized void close() {
-    super.close();
-  }
-
-  @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     final String sequenceName = getSequenceName(metaData);
     return "nextval('" + sequenceName + "')";

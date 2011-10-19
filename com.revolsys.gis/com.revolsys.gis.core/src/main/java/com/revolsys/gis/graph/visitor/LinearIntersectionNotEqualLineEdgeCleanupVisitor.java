@@ -19,7 +19,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.filter.NotFilter;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.filter.GeometryFilter;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
@@ -106,9 +106,9 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     }
 
     final Filter<DataObject> notEqualLineFilter = new NotFilter<DataObject>(
-      new GeometryFilter<LineString>(new EqualFilter<LineString>(line)));
+      new DataObjectGeometryFilter<LineString>(new EqualFilter<LineString>(line)));
 
-    final GeometryFilter<LineString> linearIntersectionFilter = new GeometryFilter<LineString>(
+    final DataObjectGeometryFilter<LineString> linearIntersectionFilter = new DataObjectGeometryFilter<LineString>(
       new LinearIntersectionFilter(line));
 
     attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<DataObject>(

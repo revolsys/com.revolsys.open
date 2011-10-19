@@ -1,5 +1,6 @@
 package com.revolsys.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,10 +23,11 @@ public final class CollectionUtil {
       final Object value = iterator.next();
       if (value != null) {
         string.append(value);
+        if (iterator.hasNext()) {
+          string.append(separator);
+        }
       }
-      if (iterator.hasNext()) {
-        string.append(separator);
-      }
+
     }
   }
 
@@ -113,6 +115,10 @@ public final class CollectionUtil {
       append(string, values, separator);
       return string.toString();
     }
+  }
+
+  public static String toString(final String separator, final Object... values) {
+    return toString(Arrays.asList(values), separator);
   }
 
   private CollectionUtil() {

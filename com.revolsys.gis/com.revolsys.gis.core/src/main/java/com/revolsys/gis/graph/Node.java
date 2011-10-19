@@ -460,4 +460,14 @@ public class Node<T> extends AbstractCoordinates {
     return new DoubleCoordinates(x, y);
   }
 
+  public boolean move(Coordinates newCoordinates) {
+    Node<T> newNode = graph.getNode(newCoordinates);
+    if (equals(newNode)) {
+      return false;
+    } else {
+      graph.moveNode(this, newNode);
+      return true;
+    }
+  }
+
 }

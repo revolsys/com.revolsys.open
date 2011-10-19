@@ -1,8 +1,10 @@
 package com.revolsys.spring;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,7 +50,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
 
   private Map<String, Object> parameters = new HashMap<String, Object>();
 
-  private Resource resource;
+  private Collection<Resource> resources = new LinkedHashSet<Resource>();
 
   private boolean enabled = true;
 
@@ -60,12 +62,6 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
 
   public ModuleImport() {
     beanNamesNotToExport.add("com.revolsys.spring.config.AttributesBeanConfigurer");
-  }
-
-  public void destroy() throws Exception {
-    if (applicationContext != null) {
-      applicationContext.close();
-    }
   }
 
   protected void afterPostProcessBeanDefinitionRegistry(
@@ -100,13 +96,19 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     }
   }
 
+  public void destroy() throws Exception {
+    if (applicationContext != null) {
+      applicationContext.close();
+    }
+  }
+
   protected GenericApplicationContext getApplicationContext(
     final BeanDefinitionRegistry parentRegistry) {
     if (applicationContext == null) {
       applicationContext = new GenericApplicationContext();
       if (parentRegistry instanceof ResourceLoader) {
-        ResourceLoader resourceLoader = (ResourceLoader)parentRegistry;
-        ClassLoader classLoader = resourceLoader.getClassLoader();
+        final ResourceLoader resourceLoader = (ResourceLoader)parentRegistry;
+        final ClassLoader classLoader = resourceLoader.getClassLoader();
         applicationContext.setClassLoader(classLoader);
       }
       AnnotationConfigUtils.registerAnnotationConfigProcessors(
@@ -154,7 +156,9 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
       }
       final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
         applicationContext);
-      beanReader.loadBeanDefinitions(resource);
+      for (final Resource resource : resources) {
+        beanReader.loadBeanDefinitions(resource);
+      }
       applicationContext.refresh();
     }
     return applicationContext;
@@ -180,12 +184,12 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     return parameters;
   }
 
-  public Resource getResource() {
-    return resource;
-  }
-
   public ResourceEditorRegistrar getResourceEditorRegistrar() {
     return resourceEditorRegistrar;
+  }
+
+  public Collection<Resource> getResources() {
+    return resources;
   }
 
   public boolean isEnabled() {
@@ -237,7 +241,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     if (beanFactory instanceof BeanDefinitionRegistry) {
-      BeanDefinitionRegistry registry = (BeanDefinitionRegistry)beanFactory;
+      final BeanDefinitionRegistry registry = (BeanDefinitionRegistry)beanFactory;
       postProcessBeanDefinitionRegistry(registry);
     }
   }
@@ -285,12 +289,16 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   }
 
   public void setResource(final Resource resource) {
-    this.resource = resource;
+    this.resources.add(resource);
   }
 
   public void setResourceEditorRegistrar(
     final ResourceEditorRegistrar resourceEditorRegistrar) {
     this.resourceEditorRegistrar = resourceEditorRegistrar;
+  }
+
+  public void setResources(final Collection<Resource> resources) {
+    this.resources = resources;
   }
 
   @Override

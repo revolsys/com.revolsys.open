@@ -49,6 +49,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
   public CodeTableProperty() {
   }
 
+  public void addAttributeAlias(String columnName) {
+    attributeAliases.add(columnName);
+  }
+  
   protected void addValues(final Reader<DataObject> allCodes) {
     for (final DataObject code : allCodes) {
       addValue(code);

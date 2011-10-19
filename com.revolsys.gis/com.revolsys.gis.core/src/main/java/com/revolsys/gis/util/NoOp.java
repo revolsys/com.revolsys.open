@@ -15,9 +15,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class NoOp {
 
-  public static void equals(
-    final Coordinate point,
-    final double x,
+  public static void equals(final Coordinate point, final double x,
     final double y) {
     final Coordinate coordinate2 = new Coordinate(x, y);
     if (point.equals2D(coordinate2)) {
@@ -25,80 +23,60 @@ public class NoOp {
     }
   }
 
-  public static void equals(
-    final Coordinates coordinates1End,
+  public static void equals(final Coordinates coordinates1End,
     final double... coordinates) {
     if (coordinates1End.equals(coordinates)) {
       noOp();
     }
   }
 
-  public static void equals(
-    final DataObject object,
-    final Double x,
+  public static void equals(final DataObject object, final Double x,
     final Double y) {
     equals(object.getGeometryValue(), x, y);
   }
 
-  public static void equals(
-    final DataObject object,
-    final double x,
+  public static void equals(final DataObject object, final double x,
     final double y) {
     equals(object.getGeometryValue(), x, y);
   }
 
-  public static void equals(
-    final Geometry geometry,
-    final double x,
+  public static void equals(final Geometry geometry, final double x,
     final double y) {
     final Coordinate coordinate1 = geometry.getCoordinate();
     equals(coordinate1, x, y);
   }
 
-  public static void equals(
-    final Node<?> node,
-    final double... coordinates) {
-    equals((Coordinates)node, coordinates);
-  }
-
-  public static void equals(
-    final Object object1,
-    final Object object2) {
+  public static void equals(final Object object1, final Object object2) {
     if (object1.equals(object2)) {
       noOp();
     }
   }
 
-  public static void idNull(
-    final DataObject object) {
+  public static void idNull(final DataObject object) {
     if (object.getIdValue() == null) {
       noOp();
     }
   }
 
-  public static void infinite(
-    final double value) {
+  public static void infinite(final double value) {
     if (Double.isInfinite(value)) {
       noOp();
     }
   }
 
-  public static void invalidGeometry(
-    final Geometry geometry) {
+  public static void invalidGeometry(final Geometry geometry) {
     if (!geometry.isValid()) {
       noOp();
     }
   }
 
-  public static void isNull(
-    final Object value) {
+  public static void isNull(final Object value) {
     if (value == null) {
       noOp();
     }
   }
 
-  public static void modified(
-    final DataObject object) {
+  public static void modified(final DataObject object) {
     if (object.getState() == DataObjectState.Modified) {
       noOp();
     }
@@ -107,35 +85,27 @@ public class NoOp {
   public static void noOp() {
   }
 
-  public static void typeName(
-    final DataObject object,
-    final QName typeName) {
+  public static void typeName(final DataObject object, final QName typeName) {
     final QName typeName2 = object.getMetaData().getName();
     equals(typeName2, typeName);
   }
 
-  public static void typeName(
-    final Edge<?> edge,
-    final QName typeName) {
+  public static void typeName(final Edge<?> edge, final QName typeName) {
     final QName typeName2 = edge.getTypeName();
     equals(typeName2, typeName);
   }
 
-  public static void zeroLegthLine(
-    final LineString line) {
+  public static void zeroLegthLine(final LineString line) {
     if (line.getLength() == 0) {
       noOp();
     }
   }
 
-  public static boolean equals(
-    LineString line,
-    double x1,
-    double y1,
-    double x2,
-    double y2) {
+  public static boolean equals(LineString line, double x1, double y1,
+    double x2, double y2) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    if (points.get(0).equals(x1,y1) && points.get(points.size()-1).equals(x2,y2)) {
+    if (points.get(0).equals(x1, y1)
+      && points.get(points.size() - 1).equals(x2, y2)) {
       noOp();
       return true;
     } else {
@@ -143,8 +113,7 @@ public class NoOp {
     }
   }
 
-  public static void nan(
-    double value) {
+  public static void nan(double value) {
     if (Double.isNaN(value)) {
       noOp();
     }

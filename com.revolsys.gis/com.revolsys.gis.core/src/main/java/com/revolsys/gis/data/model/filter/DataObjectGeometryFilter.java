@@ -24,10 +24,10 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryFilter<G extends Geometry> implements Filter<DataObject> {
+public class DataObjectGeometryFilter<G extends Geometry> implements Filter<DataObject> {
   private Filter<G> filter;
 
-  public GeometryFilter() {
+  public DataObjectGeometryFilter() {
   }
 
   public Filter<G> getFilter() {
@@ -39,7 +39,7 @@ public class GeometryFilter<G extends Geometry> implements Filter<DataObject> {
     this.filter = filter;
   }
 
-  public GeometryFilter(
+  public DataObjectGeometryFilter(
     final Filter<G> filter) {
     this.filter = filter;
   }

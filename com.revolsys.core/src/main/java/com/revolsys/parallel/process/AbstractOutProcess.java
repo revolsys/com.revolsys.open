@@ -16,14 +16,15 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
   public AbstractOutProcess() {
   }
 
-  public AbstractOutProcess(
-    final Channel<T> out) {
+  public AbstractOutProcess(final Channel<T> out) {
     this.out = out;
   }
 
-  public AbstractOutProcess(
-    int outBufferSize) {
+  public AbstractOutProcess(final int outBufferSize) {
     this.outBufferSize = outBufferSize;
+  }
+
+  protected void destroy() {
   }
 
   /**
@@ -44,27 +45,24 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
     return out;
   }
 
-  /**
-   * @param out the out to set
-   */
-  public void setOut(
-    final Channel<T> out) {
-    this.out = out;
-    out.writeConnect();
+  public int getOutBufferSize() {
+    return outBufferSize;
+  }
 
+  protected void init() {
   }
 
   public final void run() {
-    Logger log = Logger.getLogger(getClass());
+    final Logger log = Logger.getLogger(getClass());
     try {
       log.debug("Start");
       init();
       run(getOut());
-    } catch (ClosedException e) {
+    } catch (final ClosedException e) {
       log.debug("Shutdown");
-    } catch (ThreadDeath e) {
+    } catch (final ThreadDeath e) {
       log.debug("Shutdown");
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       log.error(e.getMessage(), e);
       getProcessNetwork().stop();
     } finally {
@@ -75,13 +73,19 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
     }
   }
 
-  protected abstract void run(
-    final Channel<T> out);
+  protected abstract void run(final Channel<T> out);
 
-  protected void init() {
+  /**
+   * @param out the out to set
+   */
+  public void setOut(final Channel<T> out) {
+    this.out = out;
+    out.writeConnect();
+
   }
 
-  protected void destroy() {
+  public void setOutBufferSize(final int outBufferSize) {
+    this.outBufferSize = outBufferSize;
   }
 
 }

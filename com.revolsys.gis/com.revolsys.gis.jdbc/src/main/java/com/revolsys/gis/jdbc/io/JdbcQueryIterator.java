@@ -207,6 +207,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
           }
         }
         object.setState(DataObjectState.Persisted);
+        dataStore.addStatistic("query", object);
         return object;
       } else {
         close();

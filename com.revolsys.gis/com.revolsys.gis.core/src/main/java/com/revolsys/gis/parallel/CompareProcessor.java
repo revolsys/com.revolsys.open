@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.data.model.filter.GeometryFilter;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.jts.filter.LineIntersectsFilter;
@@ -180,7 +180,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     final LineString sourceLine = sourceObject.getGeometryValue();
     final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
       sourceLine, 3);
-    final Filter<DataObject> geometryFilter = new GeometryFilter<LineString>(
+    final Filter<DataObject> geometryFilter = new DataObjectGeometryFilter<LineString>(
       lineEqualFilter);
     final Filter<DataObject> equalFilter = equalFilterFactory.create(sourceObject);
     final Filter<DataObject> filter = new AndFilter<DataObject>(equalFilter,
@@ -263,7 +263,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
       final LineIntersectsFilter intersectsFilter = new LineIntersectsFilter(
         sourceLine);
-      final Filter<DataObject> geometryFilter = new GeometryFilter<LineString>(
+      final Filter<DataObject> geometryFilter = new DataObjectGeometryFilter<LineString>(
         intersectsFilter);
       final Filter<DataObject> equalFilter = equalFilterFactory.create(sourceObject);
       final Filter<DataObject> filter = new AndFilter<DataObject>(equalFilter,

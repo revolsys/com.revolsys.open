@@ -13,7 +13,6 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractMultipleIteratorReader;
 
 public class DataObjectStoreQueryReader extends
@@ -30,8 +29,6 @@ public class DataObjectStoreQueryReader extends
   private String whereClause;
 
   private int queryIndex = 0;
-
-  private Statistics statistics;
 
   public DataObjectStoreQueryReader() {
   }
@@ -106,21 +103,12 @@ public class DataObjectStoreQueryReader extends
     }
   }
 
-  @Override
-  protected void process(DataObject object) {
-    if (statistics != null) {
-      statistics.add(object);
-    }
-  }
-
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
 
   public void setDataStore(final AbstractDataObjectStore dataStore) {
     this.dataStore = dataStore;
-    statistics = dataStore.getQueryStatistics();
-    statistics.connect();
   }
 
   /**
@@ -137,10 +125,6 @@ public class DataObjectStoreQueryReader extends
   @PreDestroy
   public void close() {
     super.close();
-    if (statistics != null) {
-      statistics.disconnect();
-      statistics = null;
-    }
     boundingBox = null;
     dataStore = null;
     queries = null;

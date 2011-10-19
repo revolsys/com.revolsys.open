@@ -26,7 +26,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
-import com.revolsys.gis.io.Statistics;
+import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.Reader;
 
@@ -47,7 +47,7 @@ public abstract class AbstractDataObjectStore extends
 
   private final Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
 
-  private Statistics queryStatistics;
+  private StatisticsMap statistics = new StatisticsMap();
 
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -100,11 +100,16 @@ public abstract class AbstractDataObjectStore extends
     schemaMap.put(schema.getName(), schema);
   }
 
+  public void addStatistic(final String statisticName, final DataObject object) {
+    statistics.add(statisticName, object);
+
+  }
+
   @PreDestroy
   public void close() {
-    if (queryStatistics != null) {
-      queryStatistics.disconnect();
-      queryStatistics = null;
+    if (statistics != null) {
+      statistics.disconnect();
+      statistics = null;
     }
   }
 
@@ -126,6 +131,11 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  public Query createBoundingBoxQuery(final Query query,
+    final BoundingBox boundingBox) {
+    throw new UnsupportedOperationException();
+  }
+
   protected AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
     throw new UnsupportedOperationException();
@@ -136,11 +146,6 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public Query createQuery(final QName typeName, final String whereClause,
-    final BoundingBox boundingBox) {
-    throw new UnsupportedOperationException();
-  }
-
-  public Query createBoundingBoxQuery(final Query query,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
@@ -226,18 +231,6 @@ public abstract class AbstractDataObjectStore extends
     } else {
       return QName.valueOf(name.toString());
     }
-  }
-
-  public Statistics getQueryStatistics() {
-    if (queryStatistics == null) {
-      if (label == null) {
-        queryStatistics = new Statistics("Query");
-      } else {
-        queryStatistics = new Statistics(label + " query");
-      }
-      queryStatistics.connect();
-    }
-    return queryStatistics;
   }
 
   public DataObjectStoreSchema getSchema(final String schemaName) {
@@ -386,6 +379,7 @@ public abstract class AbstractDataObjectStore extends
 
   public void setLabel(final String label) {
     this.label = label;
+    statistics.setPrefix(label);
   }
 
   public void setSchemaMap(final Map<String, DataObjectStoreSchema> schemaMap) {

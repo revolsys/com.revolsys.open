@@ -63,6 +63,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
    */
   List<DataObjectStoreSchema> getSchemas();
 
+  void addStatistic(String name, DataObject object);
+
   /**
    * Get the list of type names (including name space) in the name space.
    * 

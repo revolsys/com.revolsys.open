@@ -16,7 +16,7 @@ import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
-import com.revolsys.gis.data.model.filter.GeometryFilter;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
@@ -231,7 +231,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
         attributeAndGeometryFilter.addFilter(filter);
       }
 
-      final Filter<DataObject> equalLineFilter = new GeometryFilter<LineString>(
+      final Filter<DataObject> equalLineFilter = new DataObjectGeometryFilter<LineString>(
         new LineEqualIgnoreDirectionFilter(line, 2));
       final EdgeObjectFilter<DataObject> edgeFilter = new EdgeObjectFilter<DataObject>(
         equalLineFilter);

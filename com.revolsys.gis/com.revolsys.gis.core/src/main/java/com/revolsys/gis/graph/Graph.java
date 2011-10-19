@@ -140,6 +140,20 @@ public class Graph<T> {
     }
   }
 
+  public boolean hasEdgeBetween(Coordinates fromPoint, Coordinates toPoint) {
+    Node<T> fromNode = findNode(fromPoint);
+    if (fromNode == null) {
+      return false;
+    } else {
+      Node<T> toNode = findNode(toPoint);
+      if (toNode == null) {
+        return false;
+      } else {
+        return fromNode.hasEdgeTo(toNode);
+      }
+    }
+  }
+
   public boolean contains(final Edge<T> e) {
     return edges.contains(e);
   }
@@ -815,8 +829,8 @@ public class Graph<T> {
         Set<Node<T>> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
           final Coordinates point = points.get(index);
-          splitNodes = new TreeSet<Node<T>>(
-            new CoordinatesDistanceComparator<T>(point));
+          splitNodes = new TreeSet<Node<T>>(new CoordinatesDistanceComparator(
+            point));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }
