@@ -13,8 +13,6 @@ import java.util.Map;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -24,6 +22,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -32,7 +31,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
@@ -448,6 +446,7 @@ public final class LineStringUtil {
     final SpatialIndex index) {
     final Envelope envelope = new BoundingBox(point);
     envelope.expandBy(2);
+    @SuppressWarnings("unchecked")
     final List<LineSegment> segments = index.query(envelope);
     for (final LineSegment lineSegment : segments) {
       if (lineSegment.getEnvelope().intersects(envelope)) {
@@ -972,77 +971,6 @@ public final class LineStringUtil {
     }
   }
 
-  private List<LineString> split(final LineSegmentIndex index,
-    final LineString line) {
-    final PrecisionModel precisionModel = line.getFactory().getPrecisionModel();
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
-    final Coordinate firstCoordinate = coordinates.getCoordinate(0);
-    final int lastIndex = coordinates.size() - 1;
-    final Coordinate lastCoordinate = coordinates.getCoordinate(lastIndex);
-    int startIndex = 0;
-    final List<LineString> newLines = new ArrayList<LineString>();
-    Coordinate startCoordinate = null;
-
-    Coordinate c0 = coordinates.getCoordinate(0);
-    for (int i = 1; i < coordinates.size(); i++) {
-      final Coordinate c1 = coordinates.getCoordinate(i);
-
-      final List<Coordinate> intersections = index.queryIntersections(c0, c1);
-      if (!intersections.isEmpty()) {
-        if (intersections.size() > 1) {
-          Collections.sort(intersections, new CoordinateDistanceComparator(c0));
-        }
-        int j = 0;
-        for (final Coordinate intersection : intersections) {
-          if (i == 1 && intersection.distance(firstCoordinate) < 1) {
-          } else if (i == lastIndex
-            && intersection.distance(lastCoordinate) < 1) {
-          } else {
-            final double d0 = intersection.distance(c0);
-            final double d1 = intersection.distance(c1);
-            if (d0 <= 1) {
-              if (d1 > 1) {
-                createLineString(line, coordinates, startCoordinate,
-                  startIndex, i - 1, null, newLines);
-                startIndex = i - 1;
-                startCoordinate = null;
-              } else {
-                precisionModel.makePrecise(intersection);
-                createLineString(line, coordinates, startCoordinate,
-                  startIndex, i - 1, intersection, newLines);
-                startIndex = i + 1;
-                startCoordinate = intersection;
-                c0 = intersection;
-              }
-            } else if (d1 <= 1) {
-              createLineString(line, coordinates, startCoordinate, startIndex,
-                i, null, newLines);
-              startIndex = i;
-              startCoordinate = null;
-            } else {
-              precisionModel.makePrecise(intersection);
-              createLineString(line, coordinates, startCoordinate, startIndex,
-                i - 1, intersection, newLines);
-              startIndex = i;
-              startCoordinate = intersection;
-              c0 = intersection;
-            }
-          }
-          j++;
-        }
-
-      }
-      c0 = c1;
-    }
-    if (newLines.isEmpty()) {
-      return Collections.singletonList(line);
-    } else {
-      createLineString(line, coordinates, startCoordinate, startIndex,
-        lastIndex, null, newLines);
-    }
-    return newLines;
-  }
-
   public static Coordinates getFromPoint(LineString line) {
     final int i = 0;
     return getPoint(line, i);
@@ -1058,9 +986,38 @@ public final class LineStringUtil {
     return points.get(points.size() - 1);
   }
 
-  public static boolean isWithinDistance(LineString updateLine,
-    Node<DataObject> archiveToNode) {
-    // TODO Auto-generated method stub
-    return false;
+  public static LineString cleanShortSegments(LineString line) {
+    GeometryFactory factory = GeometryFactory.getFactory(line);
+    if (line.getLength() > 2) {
+      CoordinatesList points = CoordinatesListUtil.get(line);
+      DoubleListCoordinatesList newPoints = null;
+      int numRemoved = 0;
+      for (int i = 1; i < points.size(); i++) {
+        final double distance = points.distance(i - 1, points, i);
+        if (distance < 2) {
+          if (newPoints == null) {
+            newPoints = new DoubleListCoordinatesList(points);
+          }
+          if (i == 0) {
+            newPoints.remove(1);
+          } else if (i == points.size() - 1) {
+            newPoints.remove(points.size() - 2 - numRemoved);
+          } else {
+            Coordinates midPoint = LineSegmentUtil.midPoint(factory,
+              points.get(i - 1), points.get(i));
+            newPoints.setPoint(i - 1 - numRemoved, midPoint);
+            newPoints.remove(i - numRemoved);
+          }
+          numRemoved++;
+        }
+      }
+      if (newPoints == null) {
+        return line;
+      } else {
+        return factory.createLineString(newPoints);
+      }
+    } else {
+      return line;
+    }
   }
 }

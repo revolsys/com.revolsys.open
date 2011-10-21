@@ -9,7 +9,8 @@ import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
-public abstract class AbstractCoordinatesList implements CoordinatesList {
+public abstract class AbstractCoordinatesList implements CoordinatesList,
+  Cloneable {
 
   private void append(final StringBuffer s, final int i, final byte numAxis) {
     s.append(getX(i));
@@ -23,7 +24,13 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
   }
 
   @Override
-  public abstract CoordinatesList clone();
+  public AbstractCoordinatesList clone() {
+    try {
+      return (AbstractCoordinatesList)super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public void copy(final int sourceIndex, final CoordinatesList target,
     final int targetIndex, final int numAxis, final int count) {
@@ -205,11 +212,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList {
     final int size = size();
     final byte numAxis = getNumAxis();
     final double[] coordinates = new double[size * numAxis];
-    final int k = 0;
+     int k = 0;
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < numAxis; j++) {
         final double coordinate = getValue(i, j);
         coordinates[k] = coordinate;
+        k++;
       }
     }
     return coordinates;

@@ -43,6 +43,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.vividsolutions.jts.geom.Geometry;
@@ -80,6 +81,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   private final Map<String, String> schemaNameMap = new HashMap<String, String>();
 
   private final Map<QName, String> tableNameMap = new HashMap<QName, String>();
+
+  private CoordinatesPrecisionModel precisionModel;
 
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -324,6 +327,10 @@ public abstract class AbstractJdbcDataObjectStore extends
       throw new IllegalArgumentException("Unable to load metadata for "
         + typeName);
     }
+  }
+
+  public CoordinatesPrecisionModel getPrecisionModel() {
+    return precisionModel;
   }
 
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
@@ -659,6 +666,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public void setHints(final String hints) {
     this.hints = hints;
+  }
+
+  public void setPrecisionModel(final CoordinatesPrecisionModel precisionModel) {
+    this.precisionModel = precisionModel;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {

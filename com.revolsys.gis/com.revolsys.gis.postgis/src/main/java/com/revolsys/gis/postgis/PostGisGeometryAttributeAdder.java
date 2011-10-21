@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -19,6 +20,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.gis.jdbc.io.JdbcConstants;
 import com.revolsys.gis.jdbc.io.SqlFunction;
+import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
@@ -75,13 +77,22 @@ public class PostGisGeometryAttributeAdder extends JdbcAttributeAdder {
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
+      CoordinatesPrecisionModel precisionModel = dataStore.getPrecisionModel();
+      final GeometryFactory geometryFactory;
+      if (precisionModel == null) {
+        geometryFactory = new GeometryFactory(srid, numAxis);
+      } else {
+        geometryFactory = new GeometryFactory(
+          EpsgCoordinateSystems.getCoordinateSystem(srid), precisionModel,
+          numAxis);
+      }
       final Attribute attribute = new PostGisGeometryJdbcAttribute(name,
-        dataType, length, scale, required, null, srid, numAxis);
+        dataType, length, scale, required, null, srid, numAxis, geometryFactory);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));
       attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
-        GeometryFactory.getFactory(srid));
+        geometryFactory);
       return attribute;
     } catch (final SQLException e) {
       LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner

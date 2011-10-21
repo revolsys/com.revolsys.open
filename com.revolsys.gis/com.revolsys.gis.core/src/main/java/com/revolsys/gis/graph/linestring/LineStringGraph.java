@@ -17,6 +17,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.filter.NodeCoordinatesFilter;
+import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -26,94 +27,46 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineStringGraph extends Graph<LineSegment> {
   private GeometryFactory geometryFactory;
 
-  private CoordinatesPrecisionModel precisionModel;
-
   private CoordinatesList points;
 
-  public LineStringGraph(final LineString lineString) {
-    this.points = CoordinatesListUtil.get(lineString);
-    geometryFactory = GeometryFactory.getFactory(lineString);
-    precisionModel = geometryFactory.getCoordinatesPrecisionModel();
-    CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
-      geometryFactory, points);
-    for (LineSegment lineSegment : iterator) {
-      add(lineSegment, lineSegment.getLine());
-    }
-  }
-
   public LineStringGraph(final CoordinatesList points) {
-    this.points = points;
-    CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
-      points);
-    for (LineSegment lineSegment : iterator) {
-      add(lineSegment, lineSegment.getLine());
-    }
+    setPoints(points);
   }
 
-  public Geometry getSelfIntersections() {
-    Set<Coordinates> intersectionPoints = new HashSet<Coordinates>();
-    for (Coordinates point : points) {
-      Node<LineSegment> node = getNode(point);
-      if (node.getDegree() > 2 || hasTouchingEdges(node)) {
-        intersectionPoints.add(point);
-      }
-    }
-    for (Edge<LineSegment> edge1 : getEdges()) {
-      LineSegment lineSegment1 = edge1.getObject();
-      List<Edge<LineSegment>> edges = getEdges(edge1);
-      for (Edge<LineSegment> edge2 : edges) {
-        if (edge1 != edge2) {
-          LineSegment lineSegment2 = edge2.getObject();
-          List<Coordinates> intersections = lineSegment1.intersection(
-            precisionModel, lineSegment2);
-          for (Coordinates intersection : intersections) {
-            if (!lineSegment1.contains(intersection)
-              && !lineSegment2.contains(intersection)) {
-              intersectionPoints.add(intersection);
-            }
-          }
-        }
-      }
-    }
-    return geometryFactory.createMultiPoint(intersectionPoints);
+  public LineStringGraph(final GeometryFactory geometryFactory,
+    final LineString line) {
+    setGeometryFactory(geometryFactory);
+    setLineString(LineStringUtil.cleanShortSegments(line));
   }
 
-  public boolean hasTouchingEdges(Node<LineSegment> node) {
-    List<Edge<LineSegment>> edges = findEdges(node, precisionModel.getScaleXY());
-    for (Edge<LineSegment> edge : edges) {
-      Coordinates lineStart = edge.getFromNode();
-      Coordinates lineEnd = edge.getToNode();
-      if (LineSegmentUtil.isPointOnLineMiddle(precisionModel, lineStart,
-        lineEnd, node)) {
-        return true;
-      }
-    }
-    return false;
+  public LineStringGraph(final LineString lineString) {
+    setGeometryFactory(GeometryFactory.getFactory(lineString));
+    setLineString(lineString);
   }
 
   public Map<Edge<LineSegment>, List<Node<LineSegment>>> getPointsOnEdges(
-    LineStringGraph graph1, double tolerance) {
-    Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = new HashMap<Edge<LineSegment>, List<Node<LineSegment>>>();
-    for (Edge<LineSegment> edge : getEdges()) {
-      Node<LineSegment> fromNode = edge.getFromNode();
-      Node<LineSegment> toNode = edge.getToNode();
-      LineSegment lineSegment = edge.getObject();
+    final Graph<LineSegment> graph1, final double tolerance) {
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = new HashMap<Edge<LineSegment>, List<Node<LineSegment>>>();
+    for (final Edge<LineSegment> edge : getEdges()) {
+      final Node<LineSegment> fromNode = edge.getFromNode();
+      final Node<LineSegment> toNode = edge.getToNode();
+      final LineSegment lineSegment = edge.getObject();
       final PointOnLineSegment coordinatesFilter = new PointOnLineSegment(
         lineSegment, tolerance);
       final NodeCoordinatesFilter<LineSegment> nodeFilter = new NodeCoordinatesFilter<LineSegment>(
         coordinatesFilter);
       final NodeDistanceComparator<LineSegment> comparator = new NodeDistanceComparator<LineSegment>(
         fromNode);
-      List<Node<LineSegment>> nodes = graph1.getNodes(nodeFilter, comparator);
-      for (Iterator<Node<LineSegment>> iterator = nodes.iterator(); iterator.hasNext();) {
-        Node<LineSegment> node = iterator.next();
+      final List<Node<LineSegment>> nodes = graph1.getNodes(nodeFilter,
+        comparator);
+      for (final Iterator<Node<LineSegment>> iterator = nodes.iterator(); iterator.hasNext();) {
+        final Node<LineSegment> node = iterator.next();
         if (node.equals2d(fromNode)) {
           iterator.remove();
         } else if (node.equals2d(toNode)) {
@@ -125,33 +78,89 @@ public class LineStringGraph extends Graph<LineSegment> {
     return pointsOnEdge1;
   }
 
-  public void splitEdges(
-    Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1) {
-    for (Entry<Edge<LineSegment>, List<Node<LineSegment>>> entry : pointsOnEdge1.entrySet()) {
-      Edge<LineSegment> edge = entry.getKey();
-      List<Node<LineSegment>> nodes = entry.getValue();
-      splitEdge(edge, nodes);
+  public Geometry getSelfIntersections() {
+    final CoordinatesPrecisionModel precisionModel = getPrecisionModel();
+    final Set<Coordinates> intersectionPoints = new HashSet<Coordinates>();
+    for (final Coordinates point : points) {
+      final Node<LineSegment> node = getNode(point);
+      if (node.getDegree() > 2 || hasTouchingEdges(node)) {
+        intersectionPoints.add(point);
+      }
+    }
+    for (final Edge<LineSegment> edge1 : getEdges()) {
+      final LineSegment lineSegment1 = edge1.getObject();
+      final List<Edge<LineSegment>> edges = getEdges(edge1);
+      for (final Edge<LineSegment> edge2 : edges) {
+        if (edge1 != edge2) {
+          final LineSegment lineSegment2 = edge2.getObject();
+          final List<Coordinates> intersections = lineSegment1.intersection(
+            precisionModel, lineSegment2);
+          for (final Coordinates intersection : intersections) {
+            if (!lineSegment1.contains(intersection)
+              && !lineSegment2.contains(intersection)) {
+              intersectionPoints.add(intersection);
+            }
+          }
+        }
+      }
+    }
+    return geometryFactory.createMultiPoint(intersectionPoints);
+  }
+
+  public boolean hasTouchingEdges(final Node<LineSegment> node) {
+    final CoordinatesPrecisionModel precisionModel = getPrecisionModel();
+    final List<Edge<LineSegment>> edges = findEdges(node,
+      precisionModel.getScaleXY());
+    for (final Edge<LineSegment> edge : edges) {
+      final Coordinates lineStart = edge.getFromNode();
+      final Coordinates lineEnd = edge.getToNode();
+      if (LineSegmentUtil.isPointOnLineMiddle(precisionModel, lineStart,
+        lineEnd, node)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+    setPrecisionModel(geometryFactory);
+  }
+
+  private void setLineString(final LineString lineString) {
+    final CoordinatesList points = CoordinatesListUtil.get(lineString);
+    setPoints(points);
+  }
+
+  private void setPoints(final CoordinatesList points) {
+    this.points = points;
+    final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
+      geometryFactory, points);
+    for (final LineSegment lineSegment : iterator) {
+      add(lineSegment, lineSegment.getLine());
     }
   }
 
-  public List<Edge<LineSegment>> splitEdge(final Edge<LineSegment> edge,
-    final Collection<Node<LineSegment>> nodes) {
+  @Override
+  public <V extends Coordinates> List<Edge<LineSegment>> splitEdge(
+    final Edge<LineSegment> edge, final Collection<V> nodes) {
     final List<Edge<LineSegment>> newEdges = new ArrayList<Edge<LineSegment>>();
     if (!edge.isRemoved()) {
-      Node<LineSegment> fromNode = edge.getFromNode();
-      Node<LineSegment> toNode = edge.getToNode();
+      final Node<LineSegment> fromNode = edge.getFromNode();
+      final Node<LineSegment> toNode = edge.getToNode();
       final CoordinatesDistanceComparator comparator = new CoordinatesDistanceComparator(
         fromNode);
-      Set<Coordinates> newPoints = new TreeSet<Coordinates>(comparator);
-      for (Coordinates point : nodes) {
+      final Set<Coordinates> newPoints = new TreeSet<Coordinates>(comparator);
+      for (final Coordinates point : nodes) {
         newPoints.add(point);
       }
       newPoints.add(toNode);
 
       Coordinates previousPoint = fromNode;
-      for (Coordinates point : newPoints) {
-        LineSegment lineSegment = new LineSegment(previousPoint, point);
-        Edge<LineSegment> newEdge = add(lineSegment, lineSegment.getLine());
+      for (final Coordinates point : newPoints) {
+        final LineSegment lineSegment = new LineSegment(previousPoint, point);
+        final Edge<LineSegment> newEdge = add(lineSegment,
+          lineSegment.getLine());
         newEdges.add(newEdge);
         previousPoint = point;
       }
@@ -159,6 +168,15 @@ public class LineStringGraph extends Graph<LineSegment> {
       remove(edge);
     }
     return newEdges;
+  }
+
+  public <V extends Coordinates> void splitEdges(
+    final Map<Edge<LineSegment>, List<V>> pointsOnEdge1) {
+    for (final Entry<Edge<LineSegment>, List<V>> entry : pointsOnEdge1.entrySet()) {
+      final Edge<LineSegment> edge = entry.getKey();
+      final List<V> nodes = entry.getValue();
+      splitEdge(edge, nodes);
+    }
   }
 
 }

@@ -504,4 +504,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     final Collection<Node<T>> nodes1 = getCommonNodes(edge);
     return !nodes1.isEmpty();
   }
+
+  public List<Edge<T>> split(List<Coordinates> points) {
+   return getGraph().splitEdge(this, points);
+    
+  }
 }

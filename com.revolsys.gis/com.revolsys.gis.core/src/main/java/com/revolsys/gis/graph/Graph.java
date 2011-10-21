@@ -511,6 +511,12 @@ public class Graph<T> {
     }
   }
 
+  public boolean hasEdge(final Edge<T> edge) {
+    final Node<T> fromNode = edge.getFromNode();
+    final Node<T> toNode = edge.getToNode();
+    return hasEdgeBetween(fromNode, toNode);
+  }
+
   public boolean hasEdgeBetween(final Coordinates fromPoint,
     final Coordinates toPoint) {
     final Node<T> fromNode = findNode(fromPoint);
@@ -763,8 +769,8 @@ public class Graph<T> {
     this.precisionModel = precisionModel;
   }
 
-  public List<Edge<T>> splitEdge(final Edge<T> edge,
-    final Collection<Node<T>> nodes) {
+  public <V extends Coordinates> List<Edge<T>> splitEdge(final Edge<T> edge,
+    final Collection<V> nodes) {
     final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
     if (edge.isRemoved()) {
       return Collections.emptyList();
@@ -774,18 +780,18 @@ public class Graph<T> {
       final Set<Integer> splitVertices = new TreeSet<Integer>();
       final Set<Integer> splitIndexes = new TreeSet<Integer>();
 
-      for (final Iterator<Node<T>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
-        final Node<T> node = nodeIter.next();
+      for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
+        final Coordinates node = nodeIter.next();
         if (points.equal2d(0, node)) {
           nodeIter.remove();
         }
       }
-      final Map<Node<T>, Double> nodeDistance = new HashMap<Node<T>, Double>();
-      final Map<Node<T>, Integer> nodeSegment = new HashMap<Node<T>, Integer>();
+      final Map<Coordinates, Double> nodeDistance = new HashMap<Coordinates, Double>();
+      final Map<Coordinates, Integer> nodeSegment = new HashMap<Coordinates, Integer>();
 
       for (int i = 1; i < points.size() && !nodes.isEmpty(); i++) {
-        for (final Iterator<Node<T>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
-          final Node<T> node = nodeIter.next();
+        for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
+          final Coordinates node = nodeIter.next();
           if (points.equal2d(i, node)) {
             if (i < points.size() - 1) {
               splitVertices.add(i);
@@ -825,15 +831,15 @@ public class Graph<T> {
       }
       final T object = edge.getObject();
       final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-      final Map<Integer, Set<Node<T>>> segmentSplitNodes = new TreeMap<Integer, Set<Node<T>>>();
-      for (final Entry<Node<T>, Integer> entry : nodeSegment.entrySet()) {
-        final Node<T> node = entry.getKey();
+      final Map<Integer, Set<Coordinates>> segmentSplitNodes = new TreeMap<Integer, Set<Coordinates>>();
+      for (final Entry<Coordinates, Integer> entry : nodeSegment.entrySet()) {
+        final Coordinates node = entry.getKey();
         final Integer index = entry.getValue();
-        Set<Node<T>> splitNodes = segmentSplitNodes.get(index);
+        Set<Coordinates> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
           final Coordinates point = points.get(index);
-          splitNodes = new TreeSet<Node<T>>(new CoordinatesDistanceComparator(
-            point));
+          splitNodes = new TreeSet<Coordinates>(
+            new CoordinatesDistanceComparator(point));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }
@@ -853,9 +859,10 @@ public class Graph<T> {
             startPoint = null;
             startIndex = index;
           }
-          final Set<Node<T>> splitNodes = segmentSplitNodes.get(index);
+          final Set<Coordinates> splitNodes = segmentSplitNodes.get(index);
           if (splitNodes != null) {
-            for (final Node<T> node : splitNodes) {
+            for (final Coordinates splitPoint : splitNodes) {
+              Node<T> node = getNode(splitPoint);
               final QName typeName = edge.getTypeName();
               final Coordinates point = node.get3dCoordinates(typeName);
               final CoordinatesList newPoints;
@@ -886,7 +893,7 @@ public class Graph<T> {
     }
   }
 
-  public List<Edge<T>> splitEdge(final Edge<T> edge, final Node<T>... nodes) {
+  public List<Edge<T>> splitEdge(final Edge<T> edge, final Coordinates... nodes) {
     return splitEdge(edge, Arrays.asList(nodes));
   }
 
@@ -1083,5 +1090,9 @@ public class Graph<T> {
   public void visitNodes(final Visitor<Node<T>> visitor,
     final Comparator<Node<T>> comparator) {
     visitNodes(null, comparator, visitor);
+  }
+
+  public int getEdgeCount() {
+    return edges.size();
   }
 }

@@ -3,9 +3,12 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.util.MathUtil;
 
 public class DoubleListCoordinatesList extends AbstractCoordinatesList {
+
+  private static final long serialVersionUID = 4917034011117842840L;
 
   private List<Double> coordinates = new ArrayList<Double>();
 
@@ -40,7 +43,33 @@ public class DoubleListCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public DoubleListCoordinatesList clone() {
-    return new DoubleListCoordinatesList(this);
+    final DoubleListCoordinatesList clone = (DoubleListCoordinatesList)super.clone();
+    clone.coordinates = new ArrayList<Double>(coordinates);
+    return clone;
+  }
+
+  public void add(Coordinates point) {
+    for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+      double value;
+      if (axisIndex < point.getNumAxis()) {
+        value = point.getValue(axisIndex);
+      } else {
+        value = Double.NaN;
+      }
+      coordinates.add(value);
+    }
+  }
+
+  public void add(CoordinatesList points, int index) {
+    for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+      double value;
+      if (axisIndex < points.getNumAxis()) {
+        value = points.getValue(index, axisIndex);
+      } else {
+        value = Double.NaN;
+      }
+      coordinates.add(value);
+    }
   }
 
   @Override
@@ -81,5 +110,15 @@ public class DoubleListCoordinatesList extends AbstractCoordinatesList {
 
   public int size() {
     return coordinates.size() / numAxis;
+  }
+
+  public void remove(int index) {
+    for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+      coordinates.remove(index * numAxis);
+    }
+  }
+
+  public void clear() {
+    coordinates.clear();
   }
 }

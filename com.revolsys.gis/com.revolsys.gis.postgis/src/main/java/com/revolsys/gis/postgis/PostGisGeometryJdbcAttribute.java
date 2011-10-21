@@ -44,12 +44,10 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
 
   public PostGisGeometryJdbcAttribute(final String name, final DataType type,
     final int length, final int scale, final boolean required,
-    final Map<QName, Object> properties, final int srid, final int numAxis) {
+    final Map<QName, Object> properties, final int srid, final int numAxis, final GeometryFactory geometryFactory) {
     super(name, type, -1, length, scale, required, properties);
     this.srid = srid;
-    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
-    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-    geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
+     this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     this.numAxis = numAxis;
   }
@@ -57,7 +55,7 @@ public class PostGisGeometryJdbcAttribute extends JdbcAttribute {
   @Override
   public JdbcAttribute clone() {
     return new PostGisGeometryJdbcAttribute(getName(), getType(), getLength(),
-      getScale(), isRequired(), getProperties(), srid, numAxis);
+      getScale(), isRequired(), getProperties(), srid, numAxis,geometryFactory);
   }
 
   @Override

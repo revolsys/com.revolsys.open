@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.revolsys.collection.InvokeMethodVisitor;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -21,7 +22,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -168,9 +168,11 @@ public class CoordinatesListUtil {
     final LineStringGraph graph1 = new LineStringGraph(points1);
     final LineStringGraph graph2 = new LineStringGraph(points2);
     graph1.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
-      CoordinatesListUtil.class, "movePointsWithinTolerance", graph2, tolerance));
+      CoordinatesListUtil.class, "movePointsWithinTolerance", null, graph2,
+      tolerance));
     graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
-      CoordinatesListUtil.class, "movePointsWithinTolerance", graph1, tolerance));
+      CoordinatesListUtil.class, "movePointsWithinTolerance", null, graph1,
+      tolerance));
 
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1.getPointsOnEdges(
       graph2, tolerance);
@@ -183,33 +185,6 @@ public class CoordinatesListUtil {
       final Node<LineSegment> toNode = edge.getToNode();
       if (!graph1.hasEdgeBetween(fromNode, toNode)) {
         return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Only move the node if there is one of them
-   * @param graph2
-   * @param maxDistance
-   * @param node1
-   * @return
-   */
-  public static <T> boolean movePointsWithinTolerance(Graph<T> graph2,
-    double maxDistance, Node<T> node1) {
-    Graph<T> graph1 = node1.getGraph();
-    final List<Node<T>> nodes2 = graph2.findNodes(node1, maxDistance);
-    if (nodes2.size() == 1) {
-      for (Node<T> node2 : nodes2) {
-        if (graph1.findNode(node2) == null) {
-          final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
-          final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
-            node1, node2);
-          node1.move(midPoint);
-          node2.move(midPoint);
-        } else {
-          return true;
-        }
       }
     }
     return true;
@@ -255,7 +230,7 @@ public class CoordinatesListUtil {
     final Set<Coordinates> pointSet1 = getCoordinatesSet2d(points1);
     final Set<Coordinates> pointSet2 = new TreeSet<Coordinates>();
     for (int i = 0; i < points2.size() - 1; i++) {
-      Coordinates point2 = points2.get(i);
+      final Coordinates point2 = points2.get(i);
       if (pointSet1.contains(point2)) {
         pointSet1.remove(point2);
       } else if (isWithinDistanceOfPoints(point2, points1, tolerance)) {
@@ -264,23 +239,23 @@ public class CoordinatesListUtil {
         pointSet2.add(new DoubleCoordinates(point2, 2));
       }
     }
-    for (Iterator<Coordinates> iterator1 = pointSet1.iterator(); iterator1.hasNext();) {
-      Coordinates point1 = iterator1.next();
+    for (final Iterator<Coordinates> iterator1 = pointSet1.iterator(); iterator1.hasNext();) {
+      final Coordinates point1 = iterator1.next();
       if (isWithinDistanceOfPoints(point1, points2, tolerance)) {
         iterator1.remove();
         pointSet2.remove(point1);
       }
     }
-    for (Iterator<Coordinates> iterator1 = pointSet1.iterator(); iterator1.hasNext();) {
-      Coordinates point1 = iterator1.next();
+    for (final Iterator<Coordinates> iterator1 = pointSet1.iterator(); iterator1.hasNext();) {
+      final Coordinates point1 = iterator1.next();
       if (isPointOnLine(point1, points2, tolerance)) {
         iterator1.remove();
       } else {
         return false;
       }
     }
-    for (Iterator<Coordinates> iterator2 = pointSet2.iterator(); iterator2.hasNext();) {
-      Coordinates point2 = iterator2.next();
+    for (final Iterator<Coordinates> iterator2 = pointSet2.iterator(); iterator2.hasNext();) {
+      final Coordinates point2 = iterator2.next();
       if (isPointOnLine(point2, points1, tolerance)) {
         iterator2.remove();
       } else {
@@ -288,16 +263,6 @@ public class CoordinatesListUtil {
       }
     }
     return true;
-  }
-
-  public static boolean isWithinDistanceOfPoints(Coordinates point,
-    CoordinatesList points, double maxDistance) {
-    for (Coordinates point2 : new InPlaceIterator(points)) {
-      if (point.distance(point2) < maxDistance) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public static Map<String, Number> findClosestSegmentAndCoordinate(
@@ -398,6 +363,11 @@ public class CoordinatesListUtil {
     return get(line.getCoordinateSequence());
   }
 
+  public static Coordinates get(final LineString line, final int i) {
+    final CoordinatesList points = get(line);
+    return points.get(i);
+  }
+
   public static CoordinatesList get(final Point point) {
     return get(point.getCoordinateSequence());
   }
@@ -440,6 +410,76 @@ public class CoordinatesListUtil {
       pointSet.add(new DoubleCoordinates(point, 2));
     }
     return pointSet;
+  }
+
+  public static List<CoordinatesList> intersection(
+    GeometryFactory geometryFactory, final CoordinatesList points1,
+    final CoordinatesList points2, final double maxDistance) {
+
+    final LineStringGraph graph1 = new LineStringGraph(points1);
+    graph1.setPrecisionModel(geometryFactory);
+    final LineStringGraph graph2 = new LineStringGraph(points2);
+    graph2.setPrecisionModel(geometryFactory);
+    final Map<Coordinates, Coordinates> movedNodes = new HashMap<Coordinates, Coordinates>();
+    graph1.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
+      CoordinatesListUtil.class, "movePointsWithinTolerance", movedNodes,
+      graph2, maxDistance));
+    graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
+      CoordinatesListUtil.class, "movePointsWithinTolerance", movedNodes,
+      graph1, maxDistance));
+
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1.getPointsOnEdges(
+      graph2, maxDistance);
+    final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge2 = graph2.getPointsOnEdges(
+      graph1, maxDistance);
+    graph1.splitEdges(pointsOnEdge1);
+    graph2.splitEdges(pointsOnEdge2);
+    Coordinates startPoint = points1.get(0);
+    if (movedNodes.containsKey(startPoint)) {
+      startPoint = movedNodes.get(startPoint);
+    }
+    Coordinates endPoint = points1.get(points1.size() - 1);
+    if (movedNodes.containsKey(endPoint)) {
+      endPoint = movedNodes.get(endPoint);
+    }
+    final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>();
+    final PointArrayCoordinatesList currentCoordinates = new PointArrayCoordinatesList(
+      points1.getNumAxis());
+    Node<LineSegment> previousNode = graph1.getNode(startPoint);
+    do {
+      final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
+      if (outEdges.isEmpty()) {
+        previousNode = null;
+      } else if (outEdges.size() > 1) {
+        throw new IllegalArgumentException("Cannot handle overlaps\n" + points1
+          + "\n " + points2);
+      } else {
+        final Edge<LineSegment> edge = outEdges.get(0);
+        final LineSegment line = edge.getObject();
+        final Node<LineSegment> nextNode = edge.getToNode();
+        if (graph2.hasEdgeBetween(previousNode, nextNode)) {
+          if (currentCoordinates.size() == 0) {
+            currentCoordinates.add(line.get(0));
+          }
+          currentCoordinates.add(line.get(1));
+        } else {
+          if (currentCoordinates.size() > 0) {
+            final CoordinatesList points = new DoubleCoordinatesList(
+              currentCoordinates);
+            intersections.add(points);
+            currentCoordinates.clear();
+          }
+        }
+        previousNode = nextNode;
+      }
+
+    } while (previousNode != null && !endPoint.equals2d(startPoint));
+    if (currentCoordinates.size() > 0) {
+      final CoordinatesList points = new DoubleCoordinatesList(
+        currentCoordinates);
+      intersections.add(points);
+    }
+    return intersections;
   }
 
   public static boolean isCCW(final CoordinatesList ring) {
@@ -521,6 +561,16 @@ public class CoordinatesListUtil {
         return true;
       }
       previousCoordinate.next();
+    }
+    return false;
+  }
+
+  public static boolean isWithinDistanceOfPoints(final Coordinates point,
+    final CoordinatesList points, final double maxDistance) {
+    for (final Coordinates point2 : new InPlaceIterator(points)) {
+      if (point.distance(point2) < maxDistance) {
+        return true;
+      }
     }
     return false;
   }
@@ -625,6 +675,38 @@ public class CoordinatesListUtil {
       }
       return coordinates;
     }
+  }
+
+  /**
+   * Only move the node if there is one of them
+   * @param graph2
+   * @param maxDistance
+   * @param node1
+   * @return
+   */
+  public static <T> boolean movePointsWithinTolerance(
+    final Map<Coordinates, Coordinates> movedNodes, final Graph<T> graph2,
+    final double maxDistance, final Node<T> node1) {
+    final Graph<T> graph1 = node1.getGraph();
+    final List<Node<T>> nodes2 = graph2.findNodes(node1, maxDistance);
+    if (nodes2.size() == 1) {
+      final Node<T> node2 = nodes2.get(0);
+      if (graph1.findNode(node2) == null) {
+        final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
+        final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
+          node1, node2);
+        if (movedNodes != null) {
+          movedNodes.put(node1.clone(), midPoint);
+        }
+        node1.move(midPoint);
+
+        if (movedNodes != null) {
+          movedNodes.put(node2.clone(), midPoint);
+        }
+        node2.move(midPoint);
+      }
+    }
+    return true;
   }
 
   public static int orientationIndex(final CoordinatesList ring,
