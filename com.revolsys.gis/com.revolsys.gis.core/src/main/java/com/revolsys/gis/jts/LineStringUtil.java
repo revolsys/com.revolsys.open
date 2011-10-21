@@ -13,6 +13,8 @@ import java.util.Map;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -68,6 +70,14 @@ public final class LineStringUtil {
     final double x = point.getX();
     final double y = point.getY();
     return distance(x, y, line, tolerance);
+  }
+
+  public static boolean equalWithinDistance(final LineString line1,
+    final LineString line2, final double maxDistance) {
+    CoordinatesList points1 = CoordinatesListUtil.get(line1);
+    CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    return CoordinatesListUtil.equalWithinTolerance(points1, points2,
+      maxDistance);
   }
 
   public static double distance(final double aX1, final double aY1,
@@ -153,7 +163,7 @@ public final class LineStringUtil {
       final double distance = LineSegmentUtil.distance(x1, y1, x2, y2, x, y);
       if (distance < minDistance) {
         if (distance <= tolerance) {
-          return tolerance;
+          return distance;
         } else {
           minDistance = distance;
         }
@@ -1046,5 +1056,11 @@ public final class LineStringUtil {
   public static Coordinates getToPoint(LineString line) {
     CoordinatesList points = CoordinatesListUtil.get(line);
     return points.get(points.size() - 1);
+  }
+
+  public static boolean isWithinDistance(LineString updateLine,
+    Node<DataObject> archiveToNode) {
+    // TODO Auto-generated method stub
+    return false;
   }
 }

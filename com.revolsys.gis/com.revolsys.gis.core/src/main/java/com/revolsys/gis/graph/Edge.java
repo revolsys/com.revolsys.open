@@ -164,6 +164,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   private final int fromNodeId;
 
+  private final int id;
+
   /** The graph the edge is part of. */
   private final Graph<T> graph;
 
@@ -180,13 +182,14 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   private final int toNodeId;
 
-  public Edge(final Graph<T> graph, final T object, final LineString line,
-    final Node<T> fromNode, final double fromAngle, final Node<T> toNode,
-    final double toAngle) {
+  public Edge(final int id, final Graph<T> graph, final T object,
+    final LineString line, final Node<T> fromNode, final double fromAngle,
+    final Node<T> toNode, final double toAngle) {
+    this.id = id;
     this.graph = graph;
-    this.fromNodeId = fromNode.getNodeId();
+    this.fromNodeId = fromNode.getId();
     this.fromAngle = fromAngle;
-    this.toNodeId = toNode.getNodeId();
+    this.toNodeId = toNode.getId();
     this.toAngle = toAngle;
     this.object = object;
     this.line = line;
@@ -242,7 +245,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public double getAngle(final Node<T> node) {
     if (node.getGraph() == graph) {
-      final int nodeId = node.getNodeId();
+      final int nodeId = node.getId();
       if (nodeId == fromNodeId) {
         return fromAngle;
       } else if (nodeId == toNodeId) {
@@ -311,6 +314,10 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return graph;
   }
 
+  public int getId() {
+    return id;
+  }
+
   public double getLength() {
     return length;
   }
@@ -347,7 +354,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public Node<T> getOppositeNode(final Node<T> node) {
     if (node.getGraph() == node.getGraph()) {
-      final int nodeId = node.getNodeId();
+      final int nodeId = node.getId();
       if (fromNodeId == nodeId) {
         return getToNode();
       } else if (toNodeId == nodeId) {
@@ -369,9 +376,14 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return graph.getTypeName(this);
   }
 
+  @Override
+  public int hashCode() {
+    return id;
+  }
+
   public boolean hasNode(final Node<T> node) {
     if (node.getGraph() == graph) {
-      final int nodeId = node.getNodeId();
+      final int nodeId = node.getId();
       if (fromNodeId == nodeId) {
         return true;
       } else if (toNodeId == nodeId) {
@@ -392,7 +404,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    */
   public boolean isForwards(final Node<T> node) {
     if (node.getGraph() == graph) {
-      final int nodeId = node.getNodeId();
+      final int nodeId = node.getId();
       if (fromNodeId == nodeId) {
         return true;
       } else if (toNodeId == nodeId) {

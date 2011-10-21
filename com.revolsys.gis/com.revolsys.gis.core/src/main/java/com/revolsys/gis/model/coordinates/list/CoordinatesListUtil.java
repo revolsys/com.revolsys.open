@@ -254,7 +254,7 @@ public class CoordinatesListUtil {
     final CoordinatesList points2, final double tolerance) {
     final Set<Coordinates> pointSet1 = getCoordinatesSet2d(points1);
     final Set<Coordinates> pointSet2 = new TreeSet<Coordinates>();
-    for (int i = 1; i < points2.size() - 2; i++) {
+    for (int i = 0; i < points2.size() - 1; i++) {
       Coordinates point2 = points2.get(i);
       if (pointSet1.contains(point2)) {
         pointSet1.remove(point2);

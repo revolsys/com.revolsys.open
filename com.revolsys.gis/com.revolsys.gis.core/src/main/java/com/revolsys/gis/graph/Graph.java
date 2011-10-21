@@ -75,6 +75,8 @@ public class Graph<T> {
 
   private int nodeId;
 
+  private int edgeId;
+
   protected void add(final Edge<T> edge) {
     edges.add(edge);
     if (edgeIndex != null) {
@@ -108,8 +110,8 @@ public class Graph<T> {
     final Node<T> toNode = getNode(to);
     final double fromAngle = from.angle2d(fromDirection);
     final double toAngle = to.angle2d(toDirection);
-    final Edge<T> edge = new Edge<T>(this, object, line, fromNode, fromAngle,
-      toNode, toAngle);
+    final Edge<T> edge = new Edge<T>(++edgeId, this, object, line, fromNode,
+      fromAngle, toNode, toAngle);
     add(edge);
     return edge;
   }
@@ -137,20 +139,6 @@ public class Graph<T> {
       }
     } else {
       return null;
-    }
-  }
-
-  public boolean hasEdgeBetween(Coordinates fromPoint, Coordinates toPoint) {
-    Node<T> fromNode = findNode(fromPoint);
-    if (fromNode == null) {
-      return false;
-    } else {
-      Node<T> toNode = findNode(toPoint);
-      if (toNode == null) {
-        return false;
-      } else {
-        return fromNode.hasEdgeTo(toNode);
-      }
     }
   }
 
@@ -417,7 +405,7 @@ public class Graph<T> {
     if (node == null) {
       node = new Node<T>(++nodeId, this, point);
       nodes.put(node, node);
-      nodesById.put(node.getNodeId(), node);
+      nodesById.put(node.getId(), node);
       if (nodeIndex != null) {
         nodeIndex.add(node);
       }
@@ -520,6 +508,21 @@ public class Graph<T> {
     } else {
       final String className = edge.getClass().getName();
       return new QName(className);
+    }
+  }
+
+  public boolean hasEdgeBetween(final Coordinates fromPoint,
+    final Coordinates toPoint) {
+    final Node<T> fromNode = findNode(fromPoint);
+    if (fromNode == null) {
+      return false;
+    } else {
+      final Node<T> toNode = findNode(toPoint);
+      if (toNode == null) {
+        return false;
+      } else {
+        return fromNode.hasEdgeTo(toNode);
+      }
     }
   }
 

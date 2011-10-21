@@ -41,18 +41,6 @@ public class Node<T> extends AbstractCoordinates {
     return edges.indexOf(edge);
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(final QName typeName,
-    final Node<T> node0, final Node<T> node1) {
-    final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
-    for (Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
-      Edge<T> edge = (Edge<T>)edgeIter.next();
-      if (!edge.getTypeName().equals(typeName)) {
-        edgeIter.remove();
-      }
-    }
-    return edges;
-  }
-
   public static <T> Collection<Edge<T>> getEdgesBetween(final Node<T> node0,
     final Node<T> node1) {
     if (node1 == null) {
@@ -74,6 +62,25 @@ public class Node<T> extends AbstractCoordinates {
     return commonEdges;
   }
 
+  public static <T> Collection<Edge<T>> getEdgesBetween(final QName typeName,
+    final Node<T> node0, final Node<T> node1) {
+    final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
+    for (final Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
+      final Edge<T> edge = edgeIter.next();
+      if (!edge.getTypeName().equals(typeName)) {
+        edgeIter.remove();
+      }
+    }
+    return edges;
+  }
+
+  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,
+    final Edge<V> edge) {
+    final int index = getEdgeIndex(edges, edge);
+    final int nextIndex = (index + 1) % edges.size();
+    return edges.get(nextIndex);
+  }
+
   public static <T> boolean hasEdgesBetween(final QName typeName,
     final Node<T> node0, final Node<T> node1) {
     if (node1 == null) {
@@ -88,14 +95,14 @@ public class Node<T> extends AbstractCoordinates {
         }
       }
     } else {
-      for (Edge<T> edge : node0.getEdges()) {
+      for (final Edge<T> edge : node0.getEdges()) {
         if (edge.getTypeName().equals(typeName)) {
           if (edge.hasNode(node1)) {
             return true;
           }
         }
       }
-      for (Edge<T> edge : node1.getEdges()) {
+      for (final Edge<T> edge : node1.getEdges()) {
         if (edge.getTypeName().equals(typeName)) {
           if (edge.hasNode(node0)) {
             return true;
@@ -104,44 +111,6 @@ public class Node<T> extends AbstractCoordinates {
       }
     }
     return false;
-  }
-
-  public Coordinates get3dCoordinates(QName typeName) {
-    if (!isRemoved()) {
-
-      final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typeName);
-      if (!edges.isEmpty()) {
-        Coordinates coordinates = null;
-        for (Edge<T> edge : edges) {
-          LineString line = edge.getLine();
-          CoordinatesList points = CoordinatesListUtil.get(line);
-          Coordinates point = null;
-          if (edge.getFromNode() == this) {
-            point = points.get(0);
-          } else if (edge.getToNode() == this) {
-            point = points.get(points.size() - 1);
-          }
-          if (point != null) {
-            double z = point.getZ();
-            if (z == 0 || Double.isNaN(z)) {
-              coordinates = point;
-            } else {
-              return point;
-            }
-          }
-        }
-        return coordinates;
-      }
-    }
-    return null;
-
-  }
-
-  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,
-    final Edge<V> edge) {
-    final int index = getEdgeIndex(edges, edge);
-    final int nextIndex = (index + 1) % edges.size();
-    return edges.get(nextIndex);
   }
 
   private Map<String, Object> attributes = Collections.emptyMap();
@@ -154,17 +123,17 @@ public class Node<T> extends AbstractCoordinates {
 
   private List<Edge<T>> outEdges = new ArrayList<Edge<T>>();
 
-  private final int nodeId;
+  private final int id;
 
-  protected Node(int nodeId, final Graph<T> graph, final Coordinates point) {
-    this.nodeId = nodeId;
+  private double x;
+
+  private double y;
+
+  protected Node(final int nodeId, final Graph<T> graph, final Coordinates point) {
+    this.id = nodeId;
     this.graph = graph;
     this.x = point.getX();
     this.y = point.getY();
-  }
-
-  public int getNodeId() {
-    return nodeId;
   }
 
   protected void addInEdge(final Edge<T> edge) {
@@ -183,6 +152,11 @@ public class Node<T> extends AbstractCoordinates {
     updateAttributes();
   }
 
+  @Override
+  public Coordinates clone() {
+    return new DoubleCoordinates(x, y);
+  }
+
   public int compareTo(final Node<T> node) {
     return compareTo((Coordinates)node);
   }
@@ -191,11 +165,42 @@ public class Node<T> extends AbstractCoordinates {
     return this.x == x && this.y == y;
   }
 
+  public Coordinates get3dCoordinates(final QName typeName) {
+    if (!isRemoved()) {
+
+      final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typeName);
+      if (!edges.isEmpty()) {
+        Coordinates coordinates = null;
+        for (final Edge<T> edge : edges) {
+          final LineString line = edge.getLine();
+          final CoordinatesList points = CoordinatesListUtil.get(line);
+          Coordinates point = null;
+          if (edge.getFromNode() == this) {
+            point = points.get(0);
+          } else if (edge.getToNode() == this) {
+            point = points.get(points.size() - 1);
+          }
+          if (point != null) {
+            final double z = point.getZ();
+            if (z == 0 || Double.isNaN(z)) {
+              coordinates = point;
+            } else {
+              return point;
+            }
+          }
+        }
+        return coordinates;
+      }
+    }
+    return null;
+
+  }
+
   @SuppressWarnings("unchecked")
   public <D> D getAttribute(final String name) {
     Object value = attributes.get(name);
     if (value instanceof ObjectAttributeProxy) {
-      final ObjectAttributeProxy proxy = (ObjectAttributeProxy)value;
+      final ObjectAttributeProxy<D,Node<T>> proxy = (ObjectAttributeProxy<D,Node<T>>)value;
       value = proxy.getValue(this);
     }
     return (D)value;
@@ -237,19 +242,6 @@ public class Node<T> extends AbstractCoordinates {
     return getEdgesBetween(this, node);
   }
 
-  public boolean hasEdgeTo(final Node<T> node) {
-    if (node == this) {
-      return false;
-    } else {
-      for (Edge<T> edge : getEdges()) {
-        if (edge.hasNode(node)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   /**
    * Get all the edges from a node which do not have an attribute with the
    * specified name.
@@ -270,6 +262,10 @@ public class Node<T> extends AbstractCoordinates {
 
   public Graph<T> getGraph() {
     return graph;
+  }
+
+  public int getId() {
+    return id;
   }
 
   public int getInEdgeIndex(final Edge<T> edge) {
@@ -315,6 +311,18 @@ public class Node<T> extends AbstractCoordinates {
     return edges;
   }
 
+  public double getValue(final int index) {
+    switch (index) {
+      case 0:
+        return x;
+      case 1:
+        return y;
+
+      default:
+        return Double.NaN;
+    }
+  }
+
   public boolean hasAttribute(final String name) {
     return attributes.containsKey(name);
   }
@@ -331,8 +339,36 @@ public class Node<T> extends AbstractCoordinates {
     }
   }
 
+  public boolean hasEdgeTo(final Node<T> node) {
+    if (node == this) {
+      return false;
+    } else {
+      for (final Edge<T> edge : getEdges()) {
+        if (edge.hasNode(node)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return id;
+  }
+
   public boolean isRemoved() {
     return edges == null;
+  }
+
+  public boolean move(final Coordinates newCoordinates) {
+    final Node<T> newNode = graph.getNode(newCoordinates);
+    if (equals(newNode)) {
+      return false;
+    } else {
+      graph.moveNode(this, newNode);
+      return true;
+    }
   }
 
   void remove() {
@@ -360,6 +396,17 @@ public class Node<T> extends AbstractCoordinates {
       attributes = new HashMap<String, Object>();
     }
     attributes.put(name, value);
+  }
+
+  public void setValue(final int index, final double value) {
+    switch (index) {
+      case 0:
+        x = value;
+      break;
+      case 1:
+        y = value;
+      break;
+    }
   }
 
   private void sortEdges() {
@@ -422,51 +469,10 @@ public class Node<T> extends AbstractCoordinates {
   private void updateAttributes() {
     for (final Object attribute : attributes.values()) {
       if (attribute instanceof ObjectAttributeProxy) {
-        final ObjectAttributeProxy proxy = (ObjectAttributeProxy)attribute;
+        @SuppressWarnings("unchecked")
+        final ObjectAttributeProxy<Object,Node<T>> proxy = (ObjectAttributeProxy<Object,Node<T>>)attribute;
         proxy.clearValue();
       }
-    }
-  }
-
-  private double x;
-
-  private double y;
-
-  public double getValue(int index) {
-    switch (index) {
-      case 0:
-        return x;
-      case 1:
-        return y;
-
-      default:
-        return Double.NaN;
-    }
-  }
-
-  public void setValue(int index, double value) {
-    switch (index) {
-      case 0:
-        x = value;
-      break;
-      case 1:
-        y = value;
-      break;
-    }
-  }
-
-  @Override
-  public Coordinates clone() {
-    return new DoubleCoordinates(x, y);
-  }
-
-  public boolean move(Coordinates newCoordinates) {
-    Node<T> newNode = graph.getNode(newCoordinates);
-    if (equals(newNode)) {
-      return false;
-    } else {
-      graph.moveNode(this, newNode);
-      return true;
     }
   }
 
