@@ -770,7 +770,13 @@ public class Graph<T> {
   }
 
   public <V extends Coordinates> List<Edge<T>> splitEdge(final Edge<T> edge,
-    final Collection<V> nodes) {
+    Collection<V> nodes) {
+    return splitEdge(edge, nodes, 0.0);
+  }
+
+  public <V extends Coordinates> List<Edge<T>> splitEdge(final Edge<T> edge,
+    Collection<V> splitPoints, double maxDistance) {
+    Collection<V>  nodes = new ArrayList<V>(splitPoints);
     final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
     if (edge.isRemoved()) {
       return Collections.emptyList();
@@ -782,21 +788,25 @@ public class Graph<T> {
 
       for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
         final Coordinates node = nodeIter.next();
-        if (points.equal2d(0, node)) {
+        final double distance = points.distance(0, node);
+        if (distance < maxDistance) {
           nodeIter.remove();
         }
       }
-      final Map<Coordinates, Double> nodeDistance = new HashMap<Coordinates, Double>();
+      final Map<Coordinates, Double> nodeDistanceMap = new HashMap<Coordinates, Double>();
       final Map<Coordinates, Integer> nodeSegment = new HashMap<Coordinates, Integer>();
 
       for (int i = 1; i < points.size() && !nodes.isEmpty(); i++) {
         for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
           final Coordinates node = nodeIter.next();
-          if (points.equal2d(i, node)) {
+          final double nodeDistance = points.distance(i, node);
+          if (nodeDistance < maxDistance) {
             if (i < points.size() - 1) {
               splitVertices.add(i);
               splitIndexes.add(i);
             }
+            nodeDistanceMap.remove(node);
+            nodeSegment.remove(node);
             nodeIter.remove();
           } else {
             final int segmentIndex = i - 1;
@@ -806,23 +816,23 @@ public class Graph<T> {
             final double y1 = points.getY(segmentIndex);
             final double x2 = points.getX(i);
             final double y2 = points.getY(i);
-            final double distance = LineSegmentUtil.distance(x1, y1, x2, y2, x,
+            final double segmentDistance = LineSegmentUtil.distance(x1, y1, x2, y2, x,
               y);
-            if (distance == 0) {
-              nodeDistance.put(node, distance);
+            if (segmentDistance == 0) {
+              nodeDistanceMap.put(node, segmentDistance);
               nodeSegment.put(node, segmentIndex);
               nodeIter.remove();
             } else {
               final double projectionFactor = LineSegmentUtil.projectionFactor(
                 x1, y1, x2, y2, x, y);
               if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-                final Double closestDistance = nodeDistance.get(node);
+                final Double closestDistance = nodeDistanceMap.get(node);
                 if (closestDistance == null) {
                   nodeSegment.put(node, segmentIndex);
-                  nodeDistance.put(node, distance);
-                } else if (closestDistance.compareTo(distance) > 1) {
+                  nodeDistanceMap.put(node, segmentDistance);
+                } else if (closestDistance.compareTo(segmentDistance) > 0) {
                   nodeSegment.put(node, segmentIndex);
-                  nodeDistance.put(node, distance);
+                  nodeDistanceMap.put(node, segmentDistance);
                 }
               }
             }
@@ -864,7 +874,25 @@ public class Graph<T> {
             for (final Coordinates splitPoint : splitNodes) {
               Node<T> node = getNode(splitPoint);
               final QName typeName = edge.getTypeName();
-              final Coordinates point = node.get3dCoordinates(typeName);
+              Coordinates point = splitPoint;
+              double splitPointZ = splitPoint.getZ();
+              if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
+                if (splitPoint instanceof Node<?>) {
+                  Node<?> splitNode = (Node<?>)splitPoint;
+                  point = splitNode.get3dCoordinates(typeName);
+                  splitPointZ = point.getZ();
+                }
+                if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
+                  point = node.get3dCoordinates(typeName);
+                }
+                if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
+                  final Coordinates p1 = points.get(index);
+                  final Coordinates p2 = points.get(index + 1);
+                  double z = LineSegmentUtil.getElevation(p1, p2, point);
+                  point = new DoubleCoordinates(point.getX(), point.getY(), z);
+                }
+              }
+
               final CoordinatesList newPoints;
               if (startIndex > index) {
                 newPoints = CoordinatesListUtil.create(points.getNumAxis(),

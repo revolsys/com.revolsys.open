@@ -59,6 +59,18 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  public double distance(final int index, final Coordinates point) {
+    if (index < size()) {
+      final double x1 = getX(index);
+      final double y1 = getY(index);
+      final double x2 = point.getX();
+      final double y2 = point.getY();
+      return MathUtil.distance(x1, y1, x2, y2);
+    } else {
+      return Double.NaN;
+    }
+  }
+
   public boolean equal(final int index, final Coordinates point) {
     final int numAxis = Math.max(getNumAxis(), point.getNumAxis());
     return equal(index, point, numAxis);
@@ -212,7 +224,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     final int size = size();
     final byte numAxis = getNumAxis();
     final double[] coordinates = new double[size * numAxis];
-     int k = 0;
+    int k = 0;
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < numAxis; j++) {
         final double coordinate = getValue(i, j);

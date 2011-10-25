@@ -506,7 +506,18 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public List<Edge<T>> split(List<Coordinates> points) {
-   return getGraph().splitEdge(this, points);
-    
+    final Graph<T> graph = getGraph();
+    return graph.splitEdge(this, points);
+
+  }
+
+  public List<Edge<T>> split(Coordinates... points) {
+    return split(Arrays.asList(points));
+  }
+
+  public List<Edge<T>> split(List<Coordinates> points,
+    double maxDistance) {
+    final Graph<T> graph = getGraph();
+    return graph.splitEdge(this, points,maxDistance);
   }
 }

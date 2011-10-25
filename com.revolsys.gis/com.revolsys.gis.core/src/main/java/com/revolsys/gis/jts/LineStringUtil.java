@@ -998,17 +998,19 @@ public final class LineStringUtil {
           if (newPoints == null) {
             newPoints = new DoubleListCoordinatesList(points);
           }
-          if (i == 0) {
-            newPoints.remove(1);
-          } else if (i == points.size() - 1) {
-            newPoints.remove(points.size() - 2 - numRemoved);
-          } else {
-            Coordinates midPoint = LineSegmentUtil.midPoint(factory,
-              points.get(i - 1), points.get(i));
-            newPoints.setPoint(i - 1 - numRemoved, midPoint);
-            newPoints.remove(i - numRemoved);
+          if (newPoints.size() > 2) {
+            if (i == 1) {
+              newPoints.remove(1);
+            } else if (i == points.size() - 1) {
+              newPoints.remove(points.size() - 2 - numRemoved);
+            } else {
+              Coordinates midPoint = LineSegmentUtil.midPoint(factory,
+                points.get(i - 1), points.get(i));
+              newPoints.setPoint(i - 1 - numRemoved, midPoint);
+              newPoints.remove(i - numRemoved);
+            }
+            numRemoved++;
           }
-          numRemoved++;
         }
       }
       if (newPoints == null) {

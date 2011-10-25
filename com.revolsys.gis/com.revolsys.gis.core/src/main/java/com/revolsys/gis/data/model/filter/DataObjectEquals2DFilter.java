@@ -29,7 +29,7 @@ public class DataObjectEquals2DFilter implements Filter<DataObject> {
 
   public DataObjectEquals2DFilter(
     final DataObject searchObject,
-    final Set<String> equalExclude) {
+    final Collection<String> equalExclude) {
     this.searchObject = searchObject;
     if (equalExclude != null) {
       this.equalExclude.addAll(equalExclude);

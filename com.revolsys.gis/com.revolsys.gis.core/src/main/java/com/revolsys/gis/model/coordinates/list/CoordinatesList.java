@@ -14,6 +14,8 @@ public interface CoordinatesList extends CoordinateSequence,
 
   double distance(int index, CoordinatesList other, int otherIndex);
 
+  double distance(int index, Coordinates point);
+
   boolean equal(int i, Coordinates point);
 
   boolean equal(int i, Coordinates point, int numAxis);

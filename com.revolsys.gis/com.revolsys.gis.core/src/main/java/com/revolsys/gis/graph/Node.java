@@ -192,7 +192,7 @@ public class Node<T> extends AbstractCoordinates {
         return coordinates;
       }
     }
-    return null;
+    return this;
 
   }
 
