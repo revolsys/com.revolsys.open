@@ -715,6 +715,10 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return PROPERTY_NAME;
   }
 
+  public String getReverseAttributeName(final String attributeName) {
+    return reverseAttributeNameMap.get(attributeName);
+  }
+
   public DataObject getReverse(final DataObject object) {
     final DataObject reverse = object.clone();
 

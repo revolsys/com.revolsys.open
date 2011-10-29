@@ -19,6 +19,8 @@ import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -159,41 +161,29 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   /** additional attributes stored on the edge. */
   private Map<String, Object> attributes = Collections.emptyMap();
 
-  /** The angle of the line at the fromNode. */
-  private final double fromAngle;
-
   private final int fromNodeId;
 
   private final int id;
 
   /** The graph the edge is part of. */
-  private final Graph<T> graph;
-
-  private double length;
+  private Graph<T> graph;
 
   /** The line geometry between the from and to nodes. */
   private LineString line;
 
   /** The object representing the edge. */
-  private final T object;
-
-  /** The angle of the line at the toNode. */
-  private final double toAngle;
+  private T object;
 
   private final int toNodeId;
 
   public Edge(final int id, final Graph<T> graph, final T object,
-    final LineString line, final Node<T> fromNode, final double fromAngle,
-    final Node<T> toNode, final double toAngle) {
+    final LineString line, final Node<T> fromNode, final Node<T> toNode) {
     this.id = id;
     this.graph = graph;
     this.fromNodeId = fromNode.getId();
-    this.fromAngle = fromAngle;
     this.toNodeId = toNode.getId();
-    this.toAngle = toAngle;
     this.object = object;
     this.line = line;
-    this.length = line.getLength();
     attributes.clear();
     fromNode.addOutEdge(this);
     toNode.addInEdge(this);
@@ -247,9 +237,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     if (node.getGraph() == graph) {
       final int nodeId = node.getId();
       if (nodeId == fromNodeId) {
-        return fromAngle;
+        return getFromAngle();
       } else if (nodeId == toNodeId) {
-        return toAngle;
+        return getToAngle();
 
       }
     }
@@ -303,7 +293,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public double getFromAngle() {
-    return fromAngle;
+    final LineString line = getLine();
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    return CoordinatesListUtil.angleToNext(points, 0);
   }
 
   public Node<T> getFromNode() {
@@ -319,7 +311,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public double getLength() {
-    return length;
+    final LineString line = getLine();
+    return line.getLength();
   }
 
   public LineString getLine() {
@@ -365,7 +358,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public double getToAngle() {
-    return toAngle;
+    final LineString line = getLine();
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    return CoordinatesListUtil.angleToPrevious(points, points.size() - 1);
   }
 
   public Node<T> getToNode() {
@@ -426,7 +421,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public boolean isRemoved() {
-    return line == null;
+    return graph == null;
   }
 
   public boolean isWithinDistance(final Coordinates point, final double distance) {
@@ -442,7 +437,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     graph.remove(this);
   }
 
-  void remove(final Graph<T> graph) {
+  void removeInternal() {
     final Node<T> fromNode = graph.getNode(fromNodeId);
     if (fromNode != null) {
       fromNode.remove(this);
@@ -451,8 +446,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     if (toNode != null) {
       toNode.remove(this);
     }
+    graph = null;
     line = null;
-    length = 0;
+    object = null;
   }
 
   public List<Edge<T>> replace(final LineString... lines) {
@@ -480,17 +476,48 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     attributes.put(name, value);
   }
 
+  public List<Edge<T>> split(final Coordinates... points) {
+    return split(Arrays.asList(points));
+  }
+
+  public List<Edge<T>> split(final List<Coordinates> points) {
+    final Graph<T> graph = getGraph();
+    return graph.splitEdge(this, points);
+
+  }
+
+  public <V extends Coordinates> List<Edge<T>> split(Collection<V> splitPoints) {
+    return graph.splitEdge(this, splitPoints);
+  }
+
+  public <V extends Coordinates> List<Edge<T>> split(
+    final Collection<V> points, final double maxDistance) {
+    final Graph<T> graph = getGraph();
+    return graph.splitEdge(this, points, maxDistance);
+  }
+
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer(getTypeName().toString());
     sb.append(' ');
     if (isRemoved()) {
-      sb.insert(0, "Removed: ");
+      sb.insert(0, "Removed Edge");
     } else {
-      sb.append("LINESTRING(");
-      sb.append(getFromNode().toString().replaceAll(",", " "));
+      sb.append(id);
+      sb.append('{');
+      sb.append(fromNodeId);
+      sb.append(',');
+      sb.append(toNodeId);
+      sb.append("}\tLINESTRING(");
+      final Node<T> fromNode = getFromNode();
+      sb.append(fromNode.getX());
+      sb.append(" ");
+      sb.append(fromNode.getY());
       sb.append(",");
-      sb.append(getToNode().toString().replaceAll(",", " "));
+      final Node<T> toNode = getToNode();
+      sb.append(toNode.getX());
+      sb.append(" ");
+      sb.append(toNode.getY());
       sb.append(")");
     }
     return sb.toString();
@@ -503,21 +530,5 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   public boolean touches(final Edge<DataObject> edge) {
     final Collection<Node<T>> nodes1 = getCommonNodes(edge);
     return !nodes1.isEmpty();
-  }
-
-  public List<Edge<T>> split(List<Coordinates> points) {
-    final Graph<T> graph = getGraph();
-    return graph.splitEdge(this, points);
-
-  }
-
-  public List<Edge<T>> split(Coordinates... points) {
-    return split(Arrays.asList(points));
-  }
-
-  public List<Edge<T>> split(List<Coordinates> points,
-    double maxDistance) {
-    final Graph<T> graph = getGraph();
-    return graph.splitEdge(this, points,maxDistance);
   }
 }

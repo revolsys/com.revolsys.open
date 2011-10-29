@@ -32,6 +32,7 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
         return compare;
       }
     }
+
     return 0;
   }
 

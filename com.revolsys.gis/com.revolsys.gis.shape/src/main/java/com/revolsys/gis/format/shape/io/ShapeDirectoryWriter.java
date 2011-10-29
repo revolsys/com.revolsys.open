@@ -14,6 +14,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Writer;
@@ -28,6 +29,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private boolean useNamespaceAsSubDirectory;
 
+  private Statistics statistics;
   public ShapeDirectoryWriter() {
   }
 
@@ -44,6 +46,9 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       } catch (final RuntimeException e) {
         e.printStackTrace();
       }
+    }
+    if (statistics != null) {
+      statistics.disconnect();
     }
   }
 
@@ -113,6 +118,8 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
+    statistics = new Statistics("Write Shape " + baseDirectory.getAbsolutePath());
+    statistics.connect();
   }
 
   public void setUseNamespaceAsSubDirectory(
@@ -130,9 +137,9 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   public void write(final DataObject object) {
-
-    final Writer<DataObject> writer = getWriter(object);
+   final Writer<DataObject> writer = getWriter(object);
     writer.write(object);
+    statistics.add(object);
   }
 
 }

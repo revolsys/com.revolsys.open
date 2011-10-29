@@ -52,6 +52,76 @@ public final class LineStringUtil {
 
   }
 
+  public static LineString cleanShortSegments(final LineString line) {
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
+    if (line.getLength() > 2) {
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      DoubleListCoordinatesList newPoints = null;
+      int numRemoved = 0;
+      for (int i = 1; i < points.size(); i++) {
+        final double length = points.distance(i - 1, points, i);
+        if (length < 2) {
+          if (newPoints == null) {
+            newPoints = new DoubleListCoordinatesList(points);
+          }
+          if (newPoints.size() > 2) {
+            if (i == 1) {
+              final Coordinates p1 = points.get(0);
+              final Coordinates p2 = points.get(1);
+              final Coordinates p3 = points.get(2);
+              double angle = CoordinatesUtil.angle(p1, p2, p3);
+              if (angle > Math.toRadians(170)) {
+                newPoints.remove(1);
+                numRemoved++;
+              }
+            } else if (i == points.size() - 1) {
+              final Coordinates p1 = points.get(i - 2);
+              final Coordinates p2 = points.get(i - 1);
+              final Coordinates p3 = points.get(i);
+              double angle = CoordinatesUtil.angle(p1, p2, p3);
+              if (angle > Math.toRadians(170)) {
+                newPoints.remove(points.size() - 2 - numRemoved);
+                numRemoved++;
+              }
+            } else {
+              final Coordinates p1 = points.get(i - 2);
+              final Coordinates p2 = points.get(i - 1);
+              final Coordinates p3 = points.get(i);
+              final Coordinates p4 = points.get(i + 1);
+              double angle1 = CoordinatesUtil.angle(p1, p2, p3);
+              double angle2 = CoordinatesUtil.angle(p2, p3, p4);
+              boolean removed = false;
+              if (angle1 > angle2) {
+                if (angle1 > Math.toRadians(170)) {
+                  newPoints.remove(i - 1 - numRemoved);
+                  removed = true;
+                }
+              } else if (angle2 > Math.toRadians(170)) {
+                newPoints.remove(i - numRemoved);
+                removed = true;
+              }
+              if (!removed) {
+                final Coordinates midPoint = LineSegmentUtil.midPoint(factory,
+                  p2, p3);
+                newPoints.setPoint(i - 1 - numRemoved, midPoint);
+                newPoints.remove(i - numRemoved);
+              }
+              numRemoved++;
+            }
+
+          }
+        }
+      }
+      if (newPoints == null) {
+        return line;
+      } else {
+        return factory.createLineString(newPoints);
+      }
+    } else {
+      return line;
+    }
+  }
+
   public static double distance(final Coordinates point,
     final Geometry geometry, final double tolerance) {
     final double x = point.getX();
@@ -70,12 +140,10 @@ public final class LineStringUtil {
     return distance(x, y, line, tolerance);
   }
 
-  public static boolean equalWithinDistance(final LineString line1,
-    final LineString line2, final double maxDistance) {
-    CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    CoordinatesList points2 = CoordinatesListUtil.get(line2);
-    return CoordinatesListUtil.equalWithinTolerance(points1, points2,
-      maxDistance);
+  public static double distance(final Coordinates point, final LineString line,
+    final int index, final double maxDistance) {
+    final Coordinates point2 = CoordinatesListUtil.get(line, index);
+    return point.distance(point2);
   }
 
   public static double distance(final double aX1, final double aY1,
@@ -280,6 +348,14 @@ public final class LineStringUtil {
     return equalsIgnoreDirection(line1, line2, 2);
   }
 
+  public static boolean equalWithinDistance(final LineString line1,
+    final LineString line2, final double maxDistance) {
+    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
+    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    return CoordinatesListUtil.equalWithinTolerance(points1, points2,
+      maxDistance);
+  }
+
   public static Map<String, Number> findClosestSegmentAndCoordinate(
     final LineString line, final Coordinates point) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -433,6 +509,11 @@ public final class LineStringUtil {
     return z;
   }
 
+  public static Coordinates getFromPoint(final LineString line) {
+    final int i = 0;
+    return getPoint(line, i);
+  }
+
   public static double getLength(final MultiLineString lines) {
     double length = 0;
     for (int i = 0; i < lines.getNumGeometries(); i++) {
@@ -457,6 +538,16 @@ public final class LineStringUtil {
       }
     }
     return null;
+  }
+
+  private static Coordinates getPoint(final LineString line, final int i) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    return points.get(i);
+  }
+
+  public static Coordinates getToPoint(final LineString line) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    return points.get(points.size() - 1);
   }
 
   public static boolean hasEqualExact2d(final List<LineString> lines,
@@ -758,6 +849,44 @@ public final class LineStringUtil {
     return false;
   }
 
+  public static boolean isWithinDistance(final Coordinates point,
+    final LineString line, final int index, final double maxDistance) {
+    final Coordinates point2 = CoordinatesListUtil.get(line, index);
+    return point.distance(point2) < maxDistance;
+  }
+
+  public static boolean isWithinDistanceOfEnds(final Coordinates point,
+    final LineString line, final double maxDistance) {
+    if (isWithinDistance(point, line, 0, maxDistance)) {
+      return true;
+    } else {
+      return isWithinDistance(point, line, line.getNumPoints() - 1, maxDistance);
+    }
+  }
+
+  public static boolean isEndsWithinDistanceOfEnds(final LineString line1,
+    final LineString line2, final double maxDistance) {
+    final Coordinates fromPoint = getFromPoint(line1);
+    if (isWithinDistanceOfEnds(fromPoint, line2, maxDistance)) {
+      final Coordinates toPoint = getToPoint(line1);
+      return isWithinDistanceOfEnds(toPoint, line2, maxDistance);
+    } else {
+      return false;
+    }
+  }
+
+  public static LineString merge(final Coordinates point,
+    final LineString line1, final LineString line2) {
+    final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
+    final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
+    final CoordinatesList coordinates = CoordinatesListUtil.merge(point,
+      coordinates1, coordinates2);
+    final GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final LineString line = factory.createLineString(coordinates);
+    line.setUserData(line1.getUserData());
+    return line;
+  }
+
   /**
    * Merge two lines that share common coordinates at either the start or end.
    * If the lines touch only at their start coordinates, the line2 will be
@@ -774,18 +903,6 @@ public final class LineStringUtil {
     final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
     final CoordinatesList coordinates = CoordinatesListUtil.merge(coordinates1,
       coordinates2);
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
-    final LineString line = factory.createLineString(coordinates);
-    line.setUserData(line1.getUserData());
-    return line;
-  }
-
-  public static LineString merge(final Coordinates point,
-    final LineString line1, final LineString line2) {
-    final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
-    final CoordinatesList coordinates = CoordinatesListUtil.merge(point,
-      coordinates1, coordinates2);
     final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.createLineString(coordinates);
     line.setUserData(line1.getUserData());
@@ -957,69 +1074,33 @@ public final class LineStringUtil {
     return subLineString(line, null, 0, length, coordinate);
   }
 
-  private void createLineString(final LineString line,
-    final CoordinateSequence coordinates, final Coordinate startCoordinate,
-    final int startIndex, final int endIndex, final Coordinate endCoordinate,
-    final List<LineString> lines) {
-    final CoordinateSequence newCoordinates = CoordinateSequenceUtil.subSequence(
-      coordinates, startCoordinate, startIndex, endIndex - startIndex + 1,
-      endCoordinate);
-    if (newCoordinates.size() > 1) {
-      final LineString newLine = line.getFactory().createLineString(
-        newCoordinates);
-      lines.add(newLine);
+  public static boolean isEndsWithinDistance(LineString line1,
+    LineString line2, double maxDistance) {
+    Coordinates fromPoint = getFromPoint(line1);
+    if (isEndsWithinDistance(line2, fromPoint, maxDistance)) {
+      return true;
+    } else {
+      Coordinates toPoint = getToPoint(line1);
+      if (isEndsWithinDistance(line2, toPoint, maxDistance)) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
-  public static Coordinates getFromPoint(LineString line) {
-    final int i = 0;
-    return getPoint(line, i);
-  }
-
-  private static Coordinates getPoint(LineString line, final int i) {
-    CoordinatesList points = CoordinatesListUtil.get(line);
-    return points.get(i);
-  }
-
-  public static Coordinates getToPoint(LineString line) {
-    CoordinatesList points = CoordinatesListUtil.get(line);
-    return points.get(points.size() - 1);
-  }
-
-  public static LineString cleanShortSegments(LineString line) {
-    GeometryFactory factory = GeometryFactory.getFactory(line);
-    if (line.getLength() > 2) {
-      CoordinatesList points = CoordinatesListUtil.get(line);
-      DoubleListCoordinatesList newPoints = null;
-      int numRemoved = 0;
-      for (int i = 1; i < points.size(); i++) {
-        final double distance = points.distance(i - 1, points, i);
-        if (distance < 2) {
-          if (newPoints == null) {
-            newPoints = new DoubleListCoordinatesList(points);
-          }
-          if (newPoints.size() > 2) {
-            if (i == 1) {
-              newPoints.remove(1);
-            } else if (i == points.size() - 1) {
-              newPoints.remove(points.size() - 2 - numRemoved);
-            } else {
-              Coordinates midPoint = LineSegmentUtil.midPoint(factory,
-                points.get(i - 1), points.get(i));
-              newPoints.setPoint(i - 1 - numRemoved, midPoint);
-              newPoints.remove(i - numRemoved);
-            }
-            numRemoved++;
-          }
-        }
-      }
-      if (newPoints == null) {
-        return line;
-      } else {
-        return factory.createLineString(newPoints);
-      }
+  public static boolean isEndsWithinDistance(LineString line,
+    Coordinates point, double maxDistance) {
+    Coordinates fromPoint = getFromPoint(line);
+    if (fromPoint.distance(point) < maxDistance) {
+      return true;
     } else {
-      return line;
+      Coordinates toPoint = getToPoint(line);
+      if (toPoint.distance(point) < maxDistance) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 }

@@ -53,9 +53,24 @@ public class LineSegment extends AbstractCoordinatesList {
     this.coordinates2 = coordinates2;
   }
 
+  public LineSegment(final LineString line) {
+    this(CoordinatesListUtil.get(line, 0), CoordinatesListUtil.get(line,
+      line.getNumPoints() - 1));
+  }
+
   @Override
   public LineSegment clone() {
     return new LineSegment(geometryFactory, coordinates1, coordinates2);
+  }
+
+  public boolean contains(final Coordinates coordinate) {
+    if (get(0).equals(coordinate)) {
+      return true;
+    } else if (get(1).equals(coordinate)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public double distance(final Coordinates p) {
@@ -82,29 +97,11 @@ public class LineSegment extends AbstractCoordinatesList {
     return line;
   }
 
-  public Coordinates project(final Coordinates p) {
-    return LineSegmentUtil.project(coordinates1, coordinates2,
-      projectionFactor(p));
-  }
-
-  public double projectionFactor(final Coordinates p) {
-    return LineSegmentUtil.projectionFactor(coordinates1, coordinates2, p);
-  }
-
-  public int size() {
-    return 2;
-  }
-
-  @Override
-  public String toString() {
-    return getLine().toString();
-  }
-
   public byte getNumAxis() {
     return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
   }
 
-  public double getValue(int index, int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     switch (index) {
       case 0:
         return coordinates1.getValue(axisIndex);
@@ -116,7 +113,33 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
-  public void setValue(int index, int axisIndex, double value) {
+  public List<Coordinates> intersection(
+    final CoordinatesPrecisionModel precisionModel,
+    final LineSegment lineSegment2) {
+    return LineSegmentUtil.intersection(precisionModel, coordinates1,
+      coordinates2, lineSegment2.coordinates1, lineSegment2.coordinates2);
+  }
+
+  public Coordinates intersection(final LineSegment lineSegment2) {
+    return LineSegmentUtil.intersection(coordinates1, coordinates2,
+      lineSegment2.coordinates1, lineSegment2.coordinates2);
+  }
+
+  public boolean intersects(final Coordinates point, final double maxDistance) {
+    return LineSegmentUtil.isPointOnLine(coordinates1, coordinates2, point,
+      maxDistance);
+  }
+
+  public Coordinates project(final Coordinates p) {
+    return LineSegmentUtil.project(coordinates1, coordinates2,
+      projectionFactor(p));
+  }
+
+  public double projectionFactor(final Coordinates p) {
+    return LineSegmentUtil.projectionFactor(coordinates1, coordinates2, p);
+  }
+
+  public void setValue(final int index, final int axisIndex, final double value) {
     switch (index) {
       case 0:
         coordinates1.setValue(axisIndex, value);
@@ -128,25 +151,13 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
-  public boolean contains(Coordinates coordinate) {
-    if (get(0).equals(coordinate)) {
-      return true;
-    } else if (get(1).equals(coordinate)) {
-      return true;
-    } else {
-      return false;
-    }
+  public int size() {
+    return 2;
   }
 
-  public Coordinates intersection(LineSegment lineSegment2) {
-    return LineSegmentUtil.intersection(coordinates1, coordinates2,
-      lineSegment2.coordinates1, lineSegment2.coordinates2);
-  }
-
-  public List<Coordinates> intersection(CoordinatesPrecisionModel precisionModel,
-    LineSegment lineSegment2) {
-    return LineSegmentUtil.intersection(precisionModel,coordinates1, coordinates2,
-      lineSegment2.coordinates1, lineSegment2.coordinates2);
+  @Override
+  public String toString() {
+    return getLine().toString();
   }
 
 }

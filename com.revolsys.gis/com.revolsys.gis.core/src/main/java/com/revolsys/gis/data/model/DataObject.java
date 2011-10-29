@@ -34,6 +34,8 @@ public interface DataObject extends Map<String, Object> {
    */
   DataObject clone();
 
+  void delete();
+  
   /**
    * Get the factory which created the instance.
    * 

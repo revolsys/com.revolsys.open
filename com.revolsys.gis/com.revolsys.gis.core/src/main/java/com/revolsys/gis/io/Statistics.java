@@ -130,9 +130,7 @@ public class Statistics {
     sb.append("\t");
     sb.append(totalCount);
     sb.append("\n");
-    if (totalCount > 0) {
-      log.info(sb.toString());
-    }
+    log.info(sb.toString());
   }
 
   public void setMessage(final String message) {

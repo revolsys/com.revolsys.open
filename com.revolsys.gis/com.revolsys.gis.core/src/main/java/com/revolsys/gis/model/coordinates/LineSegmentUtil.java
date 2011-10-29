@@ -357,8 +357,14 @@ public class LineSegmentUtil {
     final double x = x1 + r * (x2 - x1);
     final double y = y1 + r * (y2 - y1);
 
-    if (Double.isNaN(z1) || Double.isNaN(z2)) {
-      return new DoubleCoordinates(x, y);
+    if (Double.isNaN(z1)) {
+      if (Double.isNaN(z2)) {
+        return new DoubleCoordinates(x, y);
+      } else {
+        return new DoubleCoordinates(x, y, z2);
+      }
+    } else if (Double.isNaN(z2)) {
+      return new DoubleCoordinates(x, y, z1);
     } else {
       final double z = z1 + r * (z2 - z1);
       return new DoubleCoordinates(x, y, z);
@@ -494,14 +500,7 @@ public class LineSegmentUtil {
     } else if (point.equals2d(lineEnd)) {
       return false;
     } else {
-      double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
-      if (distance < maxDistance) {
-        double projectionFactor = projectionFactor(lineStart, lineEnd, point);
-        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-          return true;
-        }
-      }
-      return false;
+      return isPointOnLine(lineStart, lineEnd, point, maxDistance);
     }
   }
 

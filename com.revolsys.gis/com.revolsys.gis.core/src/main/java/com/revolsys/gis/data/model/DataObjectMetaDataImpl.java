@@ -137,12 +137,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     WeakUuidObjectMap.putObject(uuid, this);
   }
 
-  private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
-    IOException {
-    ois.defaultReadObject();
-    WeakUuidObjectMap.putObject(uuid, this);
-  }
-
   public void addAttribute(final Attribute attribute) {
     final int index = attributeNames.size();
     final String name = attribute.getName();
@@ -246,6 +240,14 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   public DataObject createDataObject() {
     return dataObjectFactory.createDataObject(this);
+  }
+
+  public void delete(final DataObject dataObject) {
+    if (dataObjectStore == null) {
+      throw new UnsupportedOperationException();
+    } else {
+      dataObjectStore.delete(dataObject);
+    }
   }
 
   @Override
@@ -456,6 +458,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
       }
     }
     return false;
+  }
+
+  private void readObject(final ObjectInputStream ois)
+    throws ClassNotFoundException, IOException {
+    ois.defaultReadObject();
+    WeakUuidObjectMap.putObject(uuid, this);
   }
 
   public void replaceAttribute(final Attribute attribute,

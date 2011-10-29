@@ -42,11 +42,11 @@ public interface DataObjectMetaData extends ObjectWithProperties {
 
   DataObject createDataObject();
 
+  void delete(DataObject dataObject);
+
   Attribute getAttribute(CharSequence name);
 
   Attribute getAttribute(int index);
-
-  UUID getUuid();
 
   /**
    * Get the number of attributes supported by the type.
@@ -97,6 +97,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    */
   int getAttributeScale(int index);
 
+  DataType getAttributeType(CharSequence name);
+
   /**
    * Get the type name of the attribute at the specified index.
    * 
@@ -104,8 +106,6 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @return The attribute type name.
    */
   DataType getAttributeType(int index);
-
-  DataType getAttributeType(CharSequence name);
 
   DataObjectFactory getDataObjectFactory();
 
@@ -118,8 +118,6 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   Map<String, Object> getDefaultValues();
 
   Attribute getGeometryAttribute();
-
-  GeometryFactory getGeometryFactory();
 
   /**
    * Get the index of the primary Geometry attribute.
@@ -149,6 +147,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    */
   List<String> getGeometryAttributeNames();
 
+  GeometryFactory getGeometryFactory();
+
   Attribute getIdAttribute();
 
   /**
@@ -172,6 +172,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @return The name.
    */
   QName getName();
+
+  UUID getUuid();
 
   /**
    * Check to see if the type has the specified attribute name.

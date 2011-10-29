@@ -1,0 +1,131 @@
+package com.revolsys.gis.graph.linestring;
+
+import org.apache.commons.jexl.junit.Asserter;
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.wkt.WktParser;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+
+public class LineStringRelateTest {
+  private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(
+    EpsgCoordinateSystems.getCoordinateSystem(3005),
+    new SimpleCoordinatesPrecisionModel(1000));
+
+  final WktParser wkt = new WktParser(GEOMETRY_FACTORY);
+
+  private static final double[] OFFSETS = {
+    1200000, 570000, 0
+  };
+
+  public static LineString createLineString(double... coordinates) {
+    final int numAxis = 2;
+    DoubleCoordinatesList points = new DoubleCoordinatesList(coordinates.length
+      / numAxis, numAxis);
+    for (int i = 0; i < points.size(); i++) {
+      for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+        final double value = OFFSETS[axisIndex]
+          + coordinates[i * numAxis + axisIndex];
+        points.setValue(i, axisIndex, value);
+      }
+    }
+
+    return GEOMETRY_FACTORY.createLineString(points);
+  }
+
+  public static MultiLineString createMultiLineString(double... coordinates) {
+    LineString line = createLineString(coordinates);
+    return GEOMETRY_FACTORY.createMultiLineString(line);
+  }
+
+  @Test
+  public void testIntersects() {
+    LineString line1 = createLineString(20, 20, 40, 20, 60, 20);
+    LineString line2 = createLineString(40, 20, 60, 20, 80, 20);
+    MultiLineString expectedIntersection = createMultiLineString(40, 20, 60, 20);
+    testIntersection(line1, line2, expectedIntersection);
+
+  }
+
+  @Test
+  public void testEndOverlaps() {
+    final LineString line1 = createLineString(20, 20, 40, 20, 60, 20);
+    final LineString line2 = createLineString(40, 20, 60, 20, 80, 20);
+    final MultiLineString line1OverlapLine2 = createMultiLineString(40, 20, 60,
+      20);
+
+    // ---
+    // ---
+    testEndOverlaps(line1, line2, line1OverlapLine2, true);
+
+    // ---
+    // ---
+    testEndOverlaps(line1, line1, null, false);
+
+    // ---
+    // \--
+    testEndOverlaps(line1, createLineString(60, 20, 60, 20, 80, 20), null,
+      false);
+
+    // ---
+    // --
+    testEndOverlaps(line1, createLineString(20, 20, 40, 20), null, false);
+
+    // ---
+    // 10---
+    testEndOverlaps(line1, line2, 10, line1OverlapLine2, true);
+
+    // ---
+    // 5---
+    testEndOverlaps(line1, createLineString(20, 20, 40, 20), 5, null, false);
+  }
+
+  public void testEndOverlaps(LineString line1, LineString line2,
+    MultiLineString expectedIntersection, boolean expectedValue) {
+    LineStringRelate relate = new LineStringRelate(line1, line2);
+    final boolean endOverlaps = relate.isEndOverlaps(1);
+    Assert.assertEquals("Ends overlaps\n" + line1 + "\n" + line2 + "\n",
+      expectedValue, endOverlaps);
+    if (endOverlaps) {
+      assertEquals(expectedIntersection, relate.getOverlap());
+    }
+
+  }
+
+  public void testEndOverlaps(LineString line1, LineString line2,
+    double endDistance, MultiLineString expectedIntersection,
+    boolean expectedValue) {
+    LineStringRelate relate = new LineStringRelate(line1, line2);
+    final boolean endOverlaps = relate.isEndOverlaps(1);
+    Assert.assertEquals("Ends overlaps\n" + line1 + "\n" + line2 + "\n",
+      expectedValue, endOverlaps);
+    if (endOverlaps) {
+      final MultiLineString overlap = relate.getOverlap();
+      final LineString overlapLine = (LineString)overlap.getGeometryN(0);
+      if (!LineStringUtil.isEndsWithinDistance(overlapLine, line1, 30.0)) {
+        assertEquals(expectedIntersection, overlap);
+      }
+    }
+
+  }
+
+  public void testIntersection(LineString line1, LineString line2,
+    MultiLineString expectedIntersection) {
+    LineStringRelate relate = new LineStringRelate(line1, line2);
+    final MultiLineString intersection = relate.getOverlap();
+    assertEquals(expectedIntersection, intersection);
+  }
+
+  public void assertEquals(Geometry geometry1, final Geometry geometry2) {
+    final boolean equals = geometry1.equalsExact(geometry2);
+    Assert.assertTrue(geometry1 + "!=" + geometry2, equals);
+  }
+}

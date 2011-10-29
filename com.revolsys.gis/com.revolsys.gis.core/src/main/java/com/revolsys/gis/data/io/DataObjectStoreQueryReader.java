@@ -70,7 +70,9 @@ public class DataObjectStoreQueryReader extends
       if (StringUtils.hasText(whereClause)) {
         query.setWhereClause(whereClause);
       }
-      query.setBoundingBox(boundingBox);
+      if (boundingBox != null) {
+        query.setBoundingBox(boundingBox);
+      }
       final AbstractIterator<DataObject> iterator = dataStore.createIterator(
         query, getProperties());
       queryIndex++;

@@ -39,7 +39,11 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
   private final PrecisionModel precisionModel = new PrecisionModel(1000);
 
   private boolean equals(final Geometry geometry1, final Geometry geometry2) {
-    if (geometry1.getClass() == geometry2.getClass()) {
+    if (geometry1 == null) {
+      return geometry2 == null;
+    } else if (geometry2 == null) {
+      return false;
+    } else if (geometry1.getClass() == geometry2.getClass()) {
       if (geometry1 instanceof GeometryCollection) {
         if (geometry1.getNumGeometries() == geometry2.getNumGeometries()) {
           for (int i = 0; i < geometry1.getNumGeometries(); i++) {
@@ -111,7 +115,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     final String geometryAttributeName = metaData.getGeometryAttributeName();
     for (final String attributeName : metaData.getAttributeNames()) {
       if (!equalExclude.contains(attributeName)
-        && !geometryAttributeName.equals(attributeName)) {
+        && !attributeName.equals(geometryAttributeName)) {
         final Object value1 = object1.getValue(attributeName);
         final Object value2 = object2.getValue(attributeName);
         if (!EqualsRegistry.INSTANCE.equals(value1, value2)) {
@@ -181,6 +185,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     final Channel<DataObject>[] channels = new Channel[] {
       in, otherIn
     };
+    DataObject previousEqualObject = null;
+
     final DataObject[] objects = new DataObject[2];
     final boolean[] guard = new boolean[] {
       true, true
@@ -200,33 +206,39 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
       } else {
         final DataObject readObject = channels[index].read();
         if (readObject != null) {
-          DataObject sourceObject;
-          DataObject otherObject;
-          final int oppositeIndex = (index + 1) % 2;
-          if (index == 0) {
-            sourceObject = readObject;
-            otherObject = objects[oppositeIndex];
+          if (previousEqualObject != null
+            && EqualsRegistry.INSTANCE.equals(previousEqualObject, readObject)) {
+            if (index == 0) {
+              DataObjectLog.error(getClass(), "Duplicate in " + sourceName,
+                readObject);
+            } else {
+              DataObjectLog.error(getClass(), "Duplicate in " + otherName,
+                readObject);
+            }
           } else {
-            sourceObject = objects[oppositeIndex];
-            otherObject = readObject;
-          }
-          if (objects[oppositeIndex] == null) {
-            objects[index] = readObject;
-            guard[index] = false;
-            guard[oppositeIndex] = true;
-          } else {
-            final Object value = readObject.getValue(attributeName);
+            DataObject sourceObject;
+            DataObject otherObject;
+            final int oppositeIndex = (index + 1) % 2;
+            if (index == 0) {
+              sourceObject = readObject;
+              otherObject = objects[oppositeIndex];
+            } else {
+              sourceObject = objects[oppositeIndex];
+              otherObject = readObject;
+            }
+            Object value = readObject.getValue(attributeName);
             if (value == null) {
               DataObjectLog.error(getClass(), "Missing key value for "
                 + attributeName, readObject);
+            } else if (objects[oppositeIndex] == null) {
+              objects[index] = readObject;
+              guard[index] = false;
+              guard[oppositeIndex] = true;
             } else {
-              Comparable<Object> comparator;
-              if (index == 0) {
-                comparator = otherObject.getValue(attributeName);
-              } else {
-                comparator = sourceObject.getValue(attributeName);
-              }
-              final int compare = comparator.compareTo(value);
+              Comparable<Object> sourceComparator = sourceObject.getValue(attributeName);
+              Object otherValue = otherObject.getValue(attributeName);
+              // TODO duplicates
+              final int compare = sourceComparator.compareTo(otherValue);
               if (compare == 0) {
                 if (!geometryEquals(sourceObject, otherObject)) {
                   final String geometryAttributeName = sourceObject.getMetaData()
@@ -252,7 +264,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
                 objects[1] = null;
                 guard[0] = true;
                 guard[1] = true;
-              } else if (compare > 1) { // other object is bigger, keep other
+                previousEqualObject = sourceObject;
+              } else if (compare < 0) { // other object is bigger, keep other
                                         // object
                 logNoMatch(sourceObject, false);
                 objects[0] = null;

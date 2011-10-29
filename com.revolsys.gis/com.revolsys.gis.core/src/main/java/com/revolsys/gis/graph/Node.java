@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
+import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -115,13 +117,11 @@ public class Node<T> extends AbstractCoordinates {
 
   private Map<String, Object> attributes = Collections.emptyMap();
 
-  private List<Edge<T>> edges = new ArrayList<Edge<T>>();
+  private Graph<T> graph;
 
-  private final Graph<T> graph;
+  private int[] inEdgeIds = new int[0];
 
-  private List<Edge<T>> inEdges = new ArrayList<Edge<T>>();
-
-  private List<Edge<T>> outEdges = new ArrayList<Edge<T>>();
+  private int[] outEdgeIds = new int[0];
 
   private final int id;
 
@@ -137,18 +137,28 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   protected void addInEdge(final Edge<T> edge) {
-    edges.clear();
-    inEdges.add(edge);
-    final EdgeToAngleComparator<T> comparator = EdgeToAngleComparator.get();
-    Collections.sort(inEdges, comparator);
+    inEdgeIds = addEdge(inEdgeIds, edge);
     updateAttributes();
   }
 
+  private int[] addEdge(final int[] oldEdgeIds, Edge<T> edge) {
+    final Graph<T> graph = getGraph();
+    final List<Edge<T>> edges = graph.getEdges(oldEdgeIds);
+    edges.add(edge);
+    final EdgeToAngleComparator<T> comparator = EdgeToAngleComparator.get();
+    Collections.sort(edges, comparator);
+    return graph.getEdgeIds(edges);
+  }
+
+  public int[] removeEdge(final int[] oldEdgeIds, Edge<T> edge) {
+    final Graph<T> graph = getGraph();
+    final List<Edge<T>> edges = graph.getEdges(oldEdgeIds);
+    edges.remove(edge);
+    return graph.getEdgeIds(edges);
+  }
+
   protected void addOutEdge(final Edge<T> edge) {
-    edges.clear();
-    outEdges.add(edge);
-    final EdgeFromAngleComparator<T> comparator = EdgeFromAngleComparator.get();
-    Collections.sort(outEdges, comparator);
+    outEdgeIds = addEdge(outEdgeIds, edge);
     updateAttributes();
   }
 
@@ -200,7 +210,7 @@ public class Node<T> extends AbstractCoordinates {
   public <D> D getAttribute(final String name) {
     Object value = attributes.get(name);
     if (value instanceof ObjectAttributeProxy) {
-      final ObjectAttributeProxy<D,Node<T>> proxy = (ObjectAttributeProxy<D,Node<T>>)value;
+      final ObjectAttributeProxy<D, Node<T>> proxy = (ObjectAttributeProxy<D, Node<T>>)value;
       value = proxy.getValue(this);
     }
     return (D)value;
@@ -211,7 +221,7 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   public int getDegree() {
-    return inEdges.size() + outEdges.size();
+    return inEdgeIds.length + outEdgeIds.length;
   }
 
   /**
@@ -232,185 +242,10 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   public List<Edge<T>> getEdges() {
-    if (edges != null && edges.isEmpty()) {
-      sortEdges();
-    }
-    return new ArrayList<Edge<T>>(edges);
-  }
-
-  public Collection<Edge<T>> getEdgesTo(final Node<T> node) {
-    return getEdgesBetween(this, node);
-  }
-
-  /**
-   * Get all the edges from a node which do not have an attribute with the
-   * specified name.
-   * 
-   * @param node The node to get the edges for.
-   * @param attributeName The attribute name.
-   * @return The list of edges without the attribute.
-   */
-  public List<Edge<T>> getEdgesWithoutAttribute(final String attributeName) {
-    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
-    for (final Edge<T> edge : getEdges()) {
-      if (edge.getAttribute(attributeName) == null) {
-        edges.add(edge);
-      }
-    }
-    return edges;
-  }
-
-  public Graph<T> getGraph() {
-    return graph;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public int getInEdgeIndex(final Edge<T> edge) {
-    return inEdges.indexOf(edge);
-  }
-
-  public List<Edge<T>> getInEdges() {
-    return inEdges;
-  }
-
-  public Edge<T> getNextEdge(final Edge<T> edge) {
-    final List<Edge<T>> edges = getEdges();
-    return getNextEdge(edges, edge);
-  }
-
-  public Edge<T> getNextInEdge(final Edge<T> edge) {
-    final int index = getInEdgeIndex(edge);
-    final int nextIndex = (index + 1) % inEdges.size();
-    return inEdges.get(nextIndex);
-  }
-
-  public Edge<T> getNextOutEdge(final Edge<T> edge) {
-    final int index = getOutEdgeIndex(edge);
-    final int nextIndex = (index + 1) % outEdges.size();
-    return outEdges.get(nextIndex);
-  }
-
-  public int getOutEdgeIndex(final Edge<T> edge) {
-    return outEdges.indexOf(edge);
-  }
-
-  public List<Edge<T>> getOutEdges() {
-    return outEdges;
-  }
-
-  public List<Edge<T>> getOutEdgesTo(final Node<T> node) {
-    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
-    for (final Edge<T> edge : outEdges) {
-      if (edge.getToNode() == node) {
-        edges.add(edge);
-      }
-    }
-    return edges;
-  }
-
-  public double getValue(final int index) {
-    switch (index) {
-      case 0:
-        return x;
-      case 1:
-        return y;
-
-      default:
-        return Double.NaN;
-    }
-  }
-
-  public boolean hasAttribute(final String name) {
-    return attributes.containsKey(name);
-  }
-
-  public boolean hasEdge(final Edge<T> edge) {
-    return edges.contains(edge);
-  }
-
-  public boolean hasEdges() {
-    if (isRemoved()) {
-      return false;
-    } else {
-      return !getEdges().isEmpty();
-    }
-  }
-
-  public boolean hasEdgeTo(final Node<T> node) {
-    if (node == this) {
-      return false;
-    } else {
-      for (final Edge<T> edge : getEdges()) {
-        if (edge.hasNode(node)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return id;
-  }
-
-  public boolean isRemoved() {
-    return edges == null;
-  }
-
-  public boolean move(final Coordinates newCoordinates) {
-    final Node<T> newNode = graph.getNode(newCoordinates);
-    if (equals(newNode)) {
-      return false;
-    } else {
-      graph.moveNode(this, newNode);
-      return true;
-    }
-  }
-
-  void remove() {
-    edges = null;
-    inEdges = null;
-    outEdges = null;
-    attributes = null;
-  }
-
-  public void remove(final Edge<T> edge) {
-    if (!isRemoved()) {
-      edges.remove(edge);
-      inEdges.remove(edge);
-      outEdges.remove(edge);
-      if (inEdges.isEmpty() && outEdges.isEmpty()) {
-        graph.remove(this);
-      } else {
-        updateAttributes();
-      }
-    }
-  }
-
-  public void setAttribute(final String name, final Object value) {
-    if (attributes.isEmpty()) {
-      attributes = new HashMap<String, Object>();
-    }
-    attributes.put(name, value);
-  }
-
-  public void setValue(final int index, final double value) {
-    switch (index) {
-      case 0:
-        x = value;
-      break;
-      case 1:
-        y = value;
-      break;
-    }
-  }
-
-  private void sortEdges() {
+    final ArrayList<Edge<T>> edges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> inEdges = getInEdges();
     final Iterator<Edge<T>> inIterator = inEdges.iterator();
+    final List<Edge<T>> outEdges = getOutEdges();
     final Iterator<Edge<T>> outIterator = outEdges.iterator();
     if (!inIterator.hasNext()) {
       edges.addAll(outEdges);
@@ -455,22 +290,255 @@ public class Node<T> extends AbstractCoordinates {
         }
       } while (inEdge != null || outEdge != null);
     }
+    return edges;
+  }
+
+  public Collection<Edge<T>> getEdgesTo(final Node<T> node) {
+    return getEdgesBetween(this, node);
+  }
+
+  /**
+   * Get all the edges from a node which do not have an attribute with the
+   * specified name.
+   * 
+   * @param node The node to get the edges for.
+   * @param attributeName The attribute name.
+   * @return The list of edges without the attribute.
+   */
+  public List<Edge<T>> getEdgesWithoutAttribute(final String attributeName) {
+    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
+    for (final Edge<T> edge : getEdges()) {
+      if (edge.getAttribute(attributeName) == null) {
+        edges.add(edge);
+      }
+    }
+    return edges;
+  }
+
+  public Graph<T> getGraph() {
+    return graph;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public int getInEdgeIndex(final Edge<T> edge) {
+    return getInEdges().indexOf(edge);
+  }
+
+  public List<Edge<T>> getInEdges() {
+    final Graph<T> graph = getGraph();
+    return graph.getEdges(inEdgeIds);
+  }
+
+  public Edge<T> getNextEdge(final Edge<T> edge) {
+    final List<Edge<T>> edges = getEdges();
+    return getNextEdge(edges, edge);
+  }
+
+  public Edge<T> getNextInEdge(final Edge<T> edge) {
+    final int index = getInEdgeIndex(edge);
+    final int nextIndex = (index + 1) % inEdgeIds.length;
+    final Graph<T> graph = getGraph();
+    return graph.getEdge(inEdgeIds[nextIndex]);
+  }
+
+  public Edge<T> getNextOutEdge(final Edge<T> edge) {
+    final int index = getOutEdgeIndex(edge);
+    final int nextIndex = (index + 1) % outEdgeIds.length;
+    final Graph<T> graph = getGraph();
+    return graph.getEdge(outEdgeIds[nextIndex]);
+  }
+
+  public int getOutEdgeIndex(final Edge<T> edge) {
+    return getOutEdges().indexOf(edge);
+  }
+
+  public List<Edge<T>> getOutEdges() {
+    final Graph<T> graph = getGraph();
+    return graph.getEdges(outEdgeIds);
+  }
+
+  public List<Edge<T>> getOutEdgesTo(final Node<T> node) {
+    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
+    for (final Edge<T> edge : getOutEdges()) {
+      if (edge.getToNode() == node) {
+        edges.add(edge);
+      }
+    }
+    return edges;
+  }
+
+  public double getValue(final int index) {
+    switch (index) {
+      case 0:
+        return x;
+      case 1:
+        return y;
+
+      default:
+        return Double.NaN;
+    }
+  }
+
+  public boolean hasAttribute(final String name) {
+    return attributes.containsKey(name);
+  }
+
+  public boolean hasEdge(final Edge<T> edge) {
+    if (edge.getGraph() == getGraph()) {
+      int edgeId = edge.getId();
+      for (int i = 0; i < inEdgeIds.length; i++) {
+        int inEdgeId = inEdgeIds[i];
+        if (inEdgeId == edgeId) {
+          return true;
+        }
+      }
+      for (int i = 0; i < outEdgeIds.length; i++) {
+        int inEdgeId = outEdgeIds[i];
+        if (inEdgeId == edgeId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean hasEdges() {
+    if (isRemoved()) {
+      return false;
+    } else {
+      return !getEdges().isEmpty();
+    }
+  }
+
+  public boolean hasEdgeTo(final Node<T> node) {
+    if (node == this) {
+      return false;
+    } else {
+      for (final Edge<T> edge : getEdges()) {
+        if (edge.hasNode(node)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return id;
+  }
+
+  public boolean isRemoved() {
+    return graph == null;
+  }
+
+  public boolean move(final Coordinates newCoordinates) {
+    if (isRemoved()) {
+      return false;
+    } else {
+      final Node<T> newNode = graph.getNode(newCoordinates);
+      if (equals(newNode)) {
+        return false;
+      } else {
+        graph.nodeMoved(this, newNode);
+        int numEdges = getDegree();
+        final Set<Edge<T>> edges = new HashSet<Edge<T>>(getInEdges());
+        edges.addAll(getOutEdges());
+        for (final Edge<T> edge : edges) {
+          if (!edge.isRemoved()) {
+            final LineString line = edge.getLine();
+            LineString newLine;
+            if (edge.isForwards(this)) {
+              newLine = LineStringUtil.subLineString(line, newNode, 1,
+                line.getNumPoints() - 1, null);
+            } else {
+              newLine = LineStringUtil.subLineString(line, null, 0,
+                line.getNumPoints() - 1, newNode);
+            }
+            graph.replaceEdge(edge, newLine);
+            if (!edge.isRemoved()) {
+              throw new RuntimeException("Not node Removed");
+            }
+          }
+        }
+        if (!isRemoved()) {
+          throw new RuntimeException("Not node Removed");
+        }
+        if (newNode.getDegree() != numEdges) {
+          throw new RuntimeException("numEdges");
+        }
+        return true;
+      }
+    }
+  }
+
+  void remove() {
+    graph = null;
+    inEdgeIds = null;
+    outEdgeIds = null;
+    attributes = null;
+  }
+
+  public void remove(final Edge<T> edge) {
+    if (!isRemoved()) {
+      outEdgeIds = removeEdge(outEdgeIds, edge);
+      inEdgeIds = removeEdge(inEdgeIds, edge);
+      if (inEdgeIds.length == 0 && outEdgeIds.length == 0) {
+        graph.remove(this);
+      } else {
+        updateAttributes();
+      }
+    }
+  }
+
+  public void setAttribute(final String name, final Object value) {
+    if (attributes.isEmpty()) {
+      attributes = new HashMap<String, Object>();
+    }
+    attributes.put(name, value);
+  }
+
+  public void setValue(final int index, final double value) {
+    switch (index) {
+      case 0:
+        x = value;
+      break;
+      case 1:
+        y = value;
+      break;
+    }
   }
 
   @Override
   public String toString() {
+    final StringBuffer sb = new StringBuffer("Node: ");
+    sb.append(' ');
     if (isRemoved()) {
-      return "removed:" + getCoordinates().toString();
+      sb.insert(0, "Removed");
     } else {
-      return super.toString();
+      sb.append(id);
+      sb.append('{');
+      sb.append(Arrays.toString(inEdgeIds));
+      sb.append(',');
+      sb.append(Arrays.toString(outEdgeIds));
+      sb.append("}\tPOINT(");
+      sb.append(getX());
+      sb.append(" ");
+      sb.append(getY());
+      sb.append(")");
     }
+    return sb.toString();
+
   }
 
   private void updateAttributes() {
     for (final Object attribute : attributes.values()) {
       if (attribute instanceof ObjectAttributeProxy) {
         @SuppressWarnings("unchecked")
-        final ObjectAttributeProxy<Object,Node<T>> proxy = (ObjectAttributeProxy<Object,Node<T>>)attribute;
+        final ObjectAttributeProxy<Object, Node<T>> proxy = (ObjectAttributeProxy<Object, Node<T>>)attribute;
         proxy.clearValue();
       }
     }

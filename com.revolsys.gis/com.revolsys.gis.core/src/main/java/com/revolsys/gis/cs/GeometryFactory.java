@@ -439,7 +439,12 @@ public class GeometryFactory extends
       return createLineString(coordinatesList);
     }
   }
+  
+  public MultiLineString createMultiLineString(LineString... lines) {
+    return super.createMultiLineString(lines);
+  }
 
+  
   public MultiLineString createMultiLineString(final List<?> lines) {
     final LineString[] lineArray = toLineStringArray(this, lines);
     return createMultiLineString(lineArray);

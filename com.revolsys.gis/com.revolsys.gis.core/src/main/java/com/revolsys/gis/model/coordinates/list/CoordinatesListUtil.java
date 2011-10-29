@@ -2,11 +2,15 @@ package com.revolsys.gis.model.coordinates.list;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -17,11 +21,13 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -38,6 +44,135 @@ public class CoordinatesListUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
+
+  public static <V extends Coordinates> List<LineString> split(
+    final LineString line, Collection<V> splitPoints, final double maxDistance) {
+    splitPoints = new ArrayList<V>(splitPoints);
+    final List<LineString> lines = new ArrayList<LineString>();
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Set<Integer> splitVertices = new TreeSet<Integer>();
+    final Set<Integer> splitIndexes = new TreeSet<Integer>();
+
+    for (final Iterator<V> iter = splitPoints.iterator(); iter.hasNext();) {
+      final Coordinates node = iter.next();
+      final double distance = points.distance(0, node);
+      if (distance < maxDistance) {
+        iter.remove();
+      }
+    }
+    final Map<Coordinates, Double> pointDistanceMap = new HashMap<Coordinates, Double>();
+    final Map<Coordinates, Integer> pointSegment = new HashMap<Coordinates, Integer>();
+
+    for (int i = 1; i < points.size() && !splitPoints.isEmpty(); i++) {
+      for (final Iterator<V> nodeIter = splitPoints.iterator(); nodeIter.hasNext();) {
+        final Coordinates point = nodeIter.next();
+        final double pointDistance = points.distance(i, point);
+        if (pointDistance < maxDistance) {
+          if (i < points.size() - 1) {
+            splitVertices.add(i);
+            splitIndexes.add(i);
+          }
+          pointDistanceMap.remove(point);
+          pointSegment.remove(point);
+          nodeIter.remove();
+        } else {
+          final int segmentIndex = i - 1;
+          final double x = point.getX();
+          final double y = point.getY();
+          final double x1 = points.getX(segmentIndex);
+          final double y1 = points.getY(segmentIndex);
+          final double x2 = points.getX(i);
+          final double y2 = points.getY(i);
+          final double segmentDistance = LineSegmentUtil.distance(x1, y1, x2,
+            y2, x, y);
+          if (segmentDistance == 0) {
+            pointDistanceMap.put(point, segmentDistance);
+            pointSegment.put(point, segmentIndex);
+            nodeIter.remove();
+          } else {
+            final double projectionFactor = LineSegmentUtil.projectionFactor(
+              x1, y1, x2, y2, x, y);
+            if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+              final Double closestDistance = pointDistanceMap.get(point);
+              if (closestDistance == null) {
+                pointSegment.put(point, segmentIndex);
+                pointDistanceMap.put(point, segmentDistance);
+              } else if (closestDistance.compareTo(segmentDistance) > 0) {
+                pointSegment.put(point, segmentIndex);
+                pointDistanceMap.put(point, segmentDistance);
+              }
+            }
+          }
+        }
+      }
+    }
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final Map<Integer, Set<Coordinates>> segmentSplitPoints = new TreeMap<Integer, Set<Coordinates>>();
+    for (final Entry<Coordinates, Integer> entry : pointSegment.entrySet()) {
+      final Coordinates splitPoint = entry.getKey();
+      final Integer index = entry.getValue();
+      Set<Coordinates> splitNodes = segmentSplitPoints.get(index);
+      if (splitNodes == null) {
+        final Coordinates point = points.get(index);
+        splitNodes = new TreeSet<Coordinates>(
+          new CoordinatesDistanceComparator(point));
+        segmentSplitPoints.put(index, splitNodes);
+        splitIndexes.add(index);
+      }
+      splitNodes.add(splitPoint);
+      splitPoints.remove(splitPoint);
+    }
+    if (splitPoints.isEmpty()) {
+      int startIndex = 0;
+      Coordinates startPoint = null;
+      for (final Integer index : splitIndexes) {
+        if (splitVertices.contains(index)) {
+          final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
+            startPoint, startIndex, index - startIndex + 1, null);
+          final LineString newLine = geometryFactory.createLineString(newPoints);
+          lines.add(newLine);
+          startPoint = null;
+          startIndex = index;
+        }
+        final Set<Coordinates> splitNodes = segmentSplitPoints.get(index);
+        if (splitNodes != null) {
+          for (final Coordinates splitPoint : splitNodes) {
+            Coordinates point = splitPoint;
+            double splitPointZ = splitPoint.getZ();
+            if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
+              if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
+                final Coordinates p1 = points.get(index);
+                final Coordinates p2 = points.get(index + 1);
+                final double z = LineSegmentUtil.getElevation(p1, p2, point);
+                point = new DoubleCoordinates(point.getX(), point.getY(), z);
+              }
+            }
+
+            final CoordinatesList newPoints;
+            if (startIndex > index) {
+              newPoints = CoordinatesListUtil.create(points.getNumAxis(),
+                startPoint, point);
+            } else {
+              newPoints = CoordinatesListUtil.subList(points, startPoint,
+                startIndex, index - startIndex + 1, point);
+            }
+            final LineString newLine = geometryFactory.createLineString(newPoints);
+            lines.add(newLine);
+            startPoint = point;
+            startIndex = index + 1;
+          }
+        }
+      }
+      final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
+        startPoint, startIndex);
+      final LineString newLine = geometryFactory.createLineString(newPoints);
+      lines.add(newLine);
+
+      return lines;
+    } else {
+      return Collections.singletonList(line);
+    }
+  }
 
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
@@ -59,6 +194,41 @@ public class CoordinatesListUtil {
       previousCoordinate.next();
     }
 
+  }
+
+  public static double angleToNext(final CoordinatesList points, final int i) {
+    final double x1 = points.getX(i);
+    final double y1 = points.getY(i);
+    double x2;
+    double y2;
+    int j = i + 1;
+    do {
+      x2 = points.getX(j);
+      y2 = points.getY(j);
+      j++;
+    } while (x1 == x2 && y1 == y2 && j < points.size());
+    final double angle = MathUtil.angle(x1, y1, x2, y2);
+    return angle;
+  }
+
+  public static double angleToPrevious(final CoordinatesList points, final int i) {
+    if (i > 0) {
+      final double x1 = points.getX(i);
+      final double y1 = points.getY(i);
+      double x2;
+      double y2;
+      int j = i - 1;
+      do {
+        x2 = points.getX(j);
+        y2 = points.getY(j);
+        j--;
+      } while (x1 == x2 && y1 == y2 && j > -1);
+      final double angle = MathUtil.angle(x1, y1, x2, y2);
+      return angle;
+    } else {
+      throw new IllegalArgumentException(
+        "Index must be > 0 to calculate previous angle");
+    }
   }
 
   public static double angle(final CoordinatesList points, final int i1,
@@ -695,16 +865,21 @@ public class CoordinatesListUtil {
         final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
         final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
           node1, node2);
-        if (movedNodes != null) {
-          movedNodes.put(node1.clone(), midPoint);
+        if (!node1.equals2d(midPoint)) {
+          if (movedNodes != null) {
+            movedNodes.put(node1.clone(), midPoint);
+          }
+          node1.move(midPoint);
         }
-        node1.move(midPoint);
-
-        if (movedNodes != null) {
-          movedNodes.put(node2.clone(), midPoint);
+        if (!node2.equals2d(midPoint)) {
+          if (movedNodes != null) {
+            movedNodes.put(node2.clone(), midPoint);
+          }
+          node2.move(midPoint);
         }
-        node2.move(midPoint);
       }
+    } else if (!nodes2.isEmpty()) {
+      NoOp.noOp();
     }
     return true;
   }

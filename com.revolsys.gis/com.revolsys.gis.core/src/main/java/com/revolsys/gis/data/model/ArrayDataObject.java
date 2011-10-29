@@ -71,18 +71,6 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   protected DataObjectState state = DataObjectState.New;
 
-  private void writeObject(ObjectOutputStream oos) throws IOException {
-    oos.writeObject(metaData.getUuid());
-    oos.defaultWriteObject();
-  }
-
-  private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
-    IOException {
-    UUID metaDataUuid = (UUID)ois.readObject();
-    metaData = WeakUuidObjectMap.getObject(metaDataUuid);
-    ois.defaultReadObject();
-  }
-
   /**
    * Construct a new ArrayDataObject as a deep clone of the attribute values.
    * Objects can only be cloned if they have a publically accessible
@@ -162,6 +150,10 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
     }
     return value;
+  }
+
+  public void delete() {
+    getMetaData().delete(this);
   }
 
   @Override
@@ -343,6 +335,13 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   @Override
   public int hashCode() {
     return attributes.hashCode();
+  }
+
+  private void readObject(final ObjectInputStream ois)
+    throws ClassNotFoundException, IOException {
+    final UUID metaDataUuid = (UUID)ois.readObject();
+    metaData = WeakUuidObjectMap.getObject(metaDataUuid);
+    ois.defaultReadObject();
   }
 
   /**
@@ -536,5 +535,10 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
         throw new IllegalStateException(
           "Cannot modify an object which has been deleted");
     }
+  }
+
+  private void writeObject(final ObjectOutputStream oos) throws IOException {
+    oos.writeObject(metaData.getUuid());
+    oos.defaultWriteObject();
   }
 }

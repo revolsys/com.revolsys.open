@@ -1,5 +1,6 @@
 package com.revolsys.collection;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,6 +10,7 @@ public class ArrayUtil {
     if (list == null) {
       return null;
     } else {
+      @SuppressWarnings("unchecked")
       final T[] array = (T[])new Object[list.size()];
       return list.toArray(array);
     }
@@ -19,6 +21,11 @@ public class ArrayUtil {
     return o;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T[] create(Class<T> clazz,int size) {
+    return (T[])Array.newInstance(clazz,size);
+  }
+  
   public static int[] createDoubleArray(
     final List<Integer> list) {
     if (list == null) {
