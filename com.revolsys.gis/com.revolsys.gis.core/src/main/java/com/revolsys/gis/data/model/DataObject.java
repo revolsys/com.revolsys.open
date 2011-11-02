@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface DataObject extends Map<String, Object> {
@@ -36,6 +38,7 @@ public interface DataObject extends Map<String, Object> {
 
   void delete();
   
+  QName getTypeName();
   /**
    * Get the factory which created the instance.
    * 

@@ -29,6 +29,41 @@ public class DataObjectEquals implements Equals<DataObject> {
     return EqualsRegistry.INSTANCE.equals(value1, value2);
   }
 
+  public static boolean equals(Collection<String> excludedAttributes,
+    final DataObject object1, final DataObject object2,
+    final String attributeName) {
+    DataObjectMetaData metaData = object1.getMetaData();
+    if (excludedAttributes.contains(attributeName)) {
+      return true;
+    } else if (excludedAttributes.contains(EXCLUDE_ID)
+      && attributeName.equals(metaData.getIdAttributeName())) {
+      return true;
+    } else if (excludedAttributes.contains(EXCLUDE_GEOMETRY)
+      && attributeName.equals(metaData.getGeometryAttributeName())) {
+      return true;
+    } else {
+      final Object value1 = object1.getValue(attributeName);
+      final Object value2 = object2.getValue(attributeName);
+      return EqualsRegistry.INSTANCE.equals(value1, value2);
+    }
+  }
+
+  public static boolean isAttributeIgnored(
+    final DataObjectMetaData metaData, Collection<String> excludedAttributes,
+    final String attributeName) {
+    if (excludedAttributes.contains(attributeName)) {
+      return true;
+    } else if (excludedAttributes.contains(EXCLUDE_ID)
+      && attributeName.equals(metaData.getIdAttributeName())) {
+      return true;
+    } else if (excludedAttributes.contains(EXCLUDE_GEOMETRY)
+      && attributeName.equals(metaData.getGeometryAttributeName())) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private EqualsRegistry equalsRegistry;
 
   public boolean equals(final DataObject object1, final DataObject object2,

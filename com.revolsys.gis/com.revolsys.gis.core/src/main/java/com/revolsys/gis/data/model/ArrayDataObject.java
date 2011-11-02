@@ -214,6 +214,10 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return state;
   }
 
+  public QName getTypeName() {
+    return getMetaData().getName();
+  }
+
   /**
    * Get the value of the attribute with the specified name.
    * 

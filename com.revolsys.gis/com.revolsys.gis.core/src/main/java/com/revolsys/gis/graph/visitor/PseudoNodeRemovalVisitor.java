@@ -21,6 +21,7 @@ import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
+import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.ObjectProcessor;
 
 /**
@@ -124,6 +125,9 @@ public class PseudoNodeRemovalVisitor extends
   }
 
   public boolean visit(final Node<DataObject> node) {
+    if (node.equals(1216090.409, 473112.314)) {
+      NoOp.noOp();
+    }
     if (node.getEdges().size() > 1) {
       if (equalExcludeAttributes == null) {
         equalExcludeAttributes = new HashSet<String>(EQUAL_EXCLUDE);

@@ -24,16 +24,18 @@ public class EdgeEvent<T> extends EventObject {
 
   private final QName typeName;
 
-  public EdgeEvent(
-    final Edge<T> edge) {
+  @Override
+  public Edge<T> getSource() {
+    return (Edge<T>)super.getSource();
+  }
+
+  public EdgeEvent(final Edge<T> edge) {
     super(edge);
     this.line = edge.getLine();
     this.typeName = edge.getTypeName();
   }
 
-  public EdgeEvent(
-    final Edge<T> edge,
-    final String ruleName,
+  public EdgeEvent(final Edge<T> edge, final String ruleName,
     final String action) {
     super(edge);
     this.line = edge.getLine();
@@ -42,11 +44,8 @@ public class EdgeEvent<T> extends EventObject {
     this.action = action;
   }
 
-  public EdgeEvent(
-    final Edge<T> edge,
-    final String ruleName,
-    final String action,
-    final String notes) {
+  public EdgeEvent(final Edge<T> edge, final String ruleName,
+    final String action, final String notes) {
     super(edge);
     this.line = edge.getLine();
     this.typeName = edge.getTypeName();
@@ -65,6 +64,10 @@ public class EdgeEvent<T> extends EventObject {
 
   public LineString getLine() {
     return line;
+  }
+
+  public T getObject() {
+    return getEdge().getObject();
   }
 
   public String getNotes() {

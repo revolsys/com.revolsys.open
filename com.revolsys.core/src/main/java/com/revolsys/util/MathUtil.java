@@ -492,7 +492,7 @@ public final class MathUtil {
     return doubles;
   }
 
-  public static double[] toDoubleArray(final String[] values) {
+  public static double[] toDoubleArray(final String... values) {
     final double[] doubles = new double[values.length];
     for (int i = 0; i < doubles.length; i++) {
       doubles[i] = Double.valueOf(values[i]);
@@ -504,5 +504,13 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
+  }
+
+  public static double[] toDoubleArraySplit(String value) {
+    return toDoubleArray(value.split(","));
+  }
+
+  public static double[] toDoubleArraySplit(String value, String regex) {
+    return toDoubleArray(value.split(regex));
   }
 }

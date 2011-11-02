@@ -24,6 +24,7 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -246,7 +247,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       final DataObjectMetaData metaData = getMetaData();
       final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(metaData);
       for (final String attributeName : metaData.getAttributeNames()) {
-        if (!equalExcludeAttributes.contains(attributeName)
+        if (!DataObjectEquals.isAttributeIgnored(metaData,
+          equalExcludeAttributes, attributeName)
           && !equalIgnore.isAttributeIgnored(attributeName)) {
           if (!canMerge(attributeName, point, object1, object2,
             equalExcludeAttributes)) {

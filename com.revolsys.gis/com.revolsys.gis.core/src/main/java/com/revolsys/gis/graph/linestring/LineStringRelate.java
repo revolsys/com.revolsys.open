@@ -130,8 +130,10 @@ public class LineStringRelate {
       if (outEdges.isEmpty()) {
         previousNode = null;
       } else if (outEdges.size() > 1) {
-        throw new IllegalArgumentException("Cannot handle overlaps\n"
-          + getRelateLine1() + "\n " + getRelateLine2());
+        System.err.println("Cannot handle overlaps\n" + getLine1() + "\n "
+          + getLine2());
+        final GeometryFactory factory = GeometryFactory.getFactory(line1);
+        return factory.createMultiLineString();
       } else {
         final Edge<LineSegment> edge = outEdges.get(0);
         final LineSegment line = edge.getObject();

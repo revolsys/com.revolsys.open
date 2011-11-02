@@ -93,7 +93,12 @@ public final class LineStringUtil {
               boolean removed = false;
               if (angle1 > angle2) {
                 if (angle1 > Math.toRadians(170)) {
-                  newPoints.remove(i - 1 - numRemoved);
+                  if (i - 1 - numRemoved == 0) {
+                    newPoints.remove(i - numRemoved);
+                  } else {
+                    newPoints.remove(i - 1 - numRemoved);
+
+                  }
                   removed = true;
                 }
               } else if (angle2 > Math.toRadians(170)) {

@@ -861,7 +861,6 @@ public class Graph<T> {
   public <V extends Coordinates> List<Edge<T>> splitEdge(final Edge<T> edge,
     final Collection<V> splitPoints, final double maxDistance) {
     final Collection<V> nodes = new ArrayList<V>(splitPoints);
-    final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
     if (edge.isRemoved()) {
       return Collections.emptyList();
     } else {
@@ -941,15 +940,14 @@ public class Graph<T> {
         nodes.remove(node);
       }
       if (nodes.isEmpty()) {
+        List<CoordinatesList> newLines = new ArrayList<CoordinatesList>();
         int startIndex = 0;
         Coordinates startPoint = null;
         for (final Integer index : splitIndexes) {
           if (splitVertices.contains(index)) {
             final CoordinatesList newPoints = CoordinatesListUtil.subList(
               points, startPoint, startIndex, index - startIndex + 1, null);
-            final Edge<T> newEdge = createEdge(geometryFactory, object,
-              newPoints);
-            newEdges.add(newEdge);
+            newLines.add(newPoints);
             startPoint = null;
             startIndex = index;
           }
@@ -985,9 +983,7 @@ public class Graph<T> {
                 newPoints = CoordinatesListUtil.subList(points, startPoint,
                   startIndex, index - startIndex + 1, point);
               }
-              final Edge<T> newEdge = createEdge(geometryFactory, object,
-                newPoints);
-              newEdges.add(newEdge);
+              newLines.add(newPoints);
               startPoint = point;
               startIndex = index + 1;
             }
@@ -995,10 +991,20 @@ public class Graph<T> {
         }
         final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
           startPoint, startIndex);
-        final Edge<T> newEdge = createEdge(geometryFactory, object, newPoints);
-        newEdges.add(newEdge);
-        edge.remove();
-        return newEdges;
+        newLines.add(newPoints);
+
+        if (newLines.size() > 1) {
+          List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
+          for (CoordinatesList edgePoints : newLines) {
+            final Edge<T> newEdge = createEdge(geometryFactory, object,
+              edgePoints);
+            newEdges.add(newEdge);
+          }
+          edge.remove();
+          return newEdges;
+        } else {
+          return Collections.singletonList(edge);
+        }
       } else {
         return Collections.singletonList(edge);
       }

@@ -161,7 +161,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       if (outEdges.isEmpty()) {
         previousNode = null;
       } else if (outEdges.size() > 1) {
-        throw new IllegalArgumentException("Cannot handle overlaps");
+        System.err.println("Cannot handle overlaps " + points);
+        return geometryFactory.createLineString(points);
       } else {
         final Edge<LineSegment> edge = outEdges.get(0);
         final LineSegment line = edge.getObject();
