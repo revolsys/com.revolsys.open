@@ -206,6 +206,10 @@ public class BoundingBox extends Envelope {
     this(GeometryFactory.getFactory(geometry), geometry.getEnvelopeInternal());
   }
 
+  public BoundingBox(Coordinates point1, Coordinates point2) {
+    this(null, point1.getX(), point1.getY(), point2.getX(), point2.getY());
+  }
+
   public BoundingBox convert(final GeometryFactory geometryFactory) {
     if (this.geometryFactory == null || geometryFactory == null
       || this.geometryFactory.equals(geometryFactory)) {
@@ -393,7 +397,7 @@ public class BoundingBox extends Envelope {
   }
 
   private void initIfNotNull() {
-    if (maxX != -1 && minX  != 0 && maxY !=-1 && minY != 0) {
+    if (maxX != -1 && minX != 0 && maxY != -1 && minY != 0) {
       init(minX, maxX, minY, maxY);
     }
   }

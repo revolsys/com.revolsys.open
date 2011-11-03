@@ -48,11 +48,11 @@ public final class HttpRequestUtils {
     url.append(serverName);
 
     if ("http".equals(scheme)) {
-      if (serverPort != 80) {
+      if (serverPort != 80 && serverPort !=-1) {
         url.append(":").append(serverPort);
       }
     } else if ("https".equals(scheme)) {
-      if (serverPort != 443) {
+      if (serverPort != 443 && serverPort !=-1) {
         url.append(":").append(serverPort);
       }
     }

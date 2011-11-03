@@ -6,6 +6,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -58,6 +59,11 @@ public class LineSegment extends AbstractCoordinatesList {
       line.getNumPoints() - 1));
   }
 
+  public double angle() {
+    return Math.atan2(coordinates2.getY() - coordinates1.getY(),
+      coordinates2.getX() - coordinates1.getX());
+  }
+
   @Override
   public LineSegment clone() {
     return new LineSegment(geometryFactory, coordinates1, coordinates2);
@@ -75,6 +81,20 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public double distance(final Coordinates p) {
     return LineSegmentUtil.distance(coordinates1, coordinates2, p);
+  }
+
+  public LineSegment extend(final double startDistance, final double endDistance) {
+    final double angle = angle();
+    final Coordinates c1 = CoordinatesUtil.offset(coordinates1, angle,
+      -startDistance);
+    final Coordinates c2 = CoordinatesUtil.offset(coordinates2, angle,
+      endDistance);
+    return new LineSegment(c1, c2);
+
+  }
+
+  public double getElevation(final Coordinates point) {
+    return CoordinatesUtil.getElevation(coordinates1, coordinates2, point);
   }
 
   public Envelope getEnvelope() {
@@ -137,6 +157,13 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public double projectionFactor(final Coordinates p) {
     return LineSegmentUtil.projectionFactor(coordinates1, coordinates2, p);
+  }
+
+  public void setElevationOnPoint(
+    final CoordinatesPrecisionModel precisionModel, final Coordinates point) {
+    final double z = getElevation(point);
+    point.setZ(z);
+    precisionModel.makePrecise(point);
   }
 
   public void setValue(final int index, final int axisIndex, final double value) {

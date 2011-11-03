@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.coordinates.list;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -17,6 +18,13 @@ public class PointArrayCoordinatesList extends AbstractCoordinatesList {
 
   public PointArrayCoordinatesList(byte numAxis) {
     this.numAxis = numAxis;
+  }
+
+  public PointArrayCoordinatesList(byte numAxis,Coordinates... points) {
+    this.numAxis =numAxis;
+    for (Coordinates point : points) {
+      add(point);
+    }
   }
 
   public void clear() {
