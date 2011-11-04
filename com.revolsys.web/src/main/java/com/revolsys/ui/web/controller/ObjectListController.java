@@ -138,7 +138,7 @@ public class ObjectListController extends BaseController {
 
     Map<String, Object> model = new HashMap<String, Object>();
     if (pager.getNumResults() > 0) {
-      Map<String, Object> parameters = request.getParameterMap();
+      Map parameters = request.getParameterMap();
       ResultPagerView pagerView = new ResultPagerView(pager,
         request.getRequestURI(), parameters);
       listContainer.add(0, pagerView);

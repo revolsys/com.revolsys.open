@@ -32,18 +32,12 @@
     </plugins>
   </build>
   <dependencies>
-  	<dependency>
-  		<groupId>javax.servlet</groupId>
-  		<artifactId>servlet-api</artifactId>
-  		<version>2.4</version>
-  		<scope>provided</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>javax.servlet.jsp</groupId>
-  		<artifactId>jsp-api</artifactId>
-  		<version>2.0</version>
-  		<scope>provided</scope>
-  	</dependency>
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <version>6.0</version>
+      <scope>provided</scope>
+    </dependency>
   	<dependency>
   		<groupId>com.revolsys</groupId>
   		<artifactId>com.revolsys.core</artifactId>
@@ -51,7 +45,7 @@
   	</dependency>
   	<dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.web.servlet</artifactId>
+      <artifactId>spring-webmvc</artifactId>
       <version>${org.springframework.version}</version>
       <exclusions>
         <exclusion>
@@ -77,14 +71,14 @@
   		</exclusions>
   	</dependency>
   	<dependency>
-  		<groupId>org.apache.commons</groupId>
-  		<artifactId>com.springsource.org.apache.commons.fileupload</artifactId>
-  		<version>1.2.1</version>
+  		<groupId>commons-fileupload</groupId>
+  		<artifactId>commons-fileupload</artifactId>
+  		<version>1.2.2</version>
   	</dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>com.springsource.org.apache.commons.io</artifactId>
-      <version>1.4.0</version>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
     </dependency>
     <dependency>
     	<groupId>org.springframework.security</groupId>
@@ -128,40 +122,4 @@
     	</exclusions>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-        <id>open.revolsys.com</id>
-        <url>http://open.revolsys.com/m2/repository/</url>
-        <releases>
-           <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>        
-     </repository>
-    <repository>
-        <id>snapshot.open.revolsys.com</id>
-        <url>http://open.revolsys.com/m2/snapshotRepository/</url>
-        <releases>
-           <enabled>false</enabled>
-        </releases>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>        
-     </repository>
-  </repositories>
-
-  <distributionManagement>
-  	<repository>
-  		<id>open.revolsys.com</id>
-  		<name>Revolution Systems Maven Repository</name>
-  		<url>file:../../maven/com.revolsys.open/repository/</url>
-  	</repository>
-  	<snapshotRepository>
-  		<id>snapshots-open.revolsys.com</id>
-  		<name>Revolution Systems Maven Snapshot Repository</name>
-  		<url>file:../../maven/com.revolsys.open/snapshotRepository/</url>
-      <uniqueVersion>false</uniqueVersion>
-  	</snapshotRepository>
-  </distributionManagement>
 </project>

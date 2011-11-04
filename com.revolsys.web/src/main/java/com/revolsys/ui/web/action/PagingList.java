@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -115,8 +116,9 @@ public class PagingList extends SpringFrameworkAction {
       }
       List results = pager.getList();
       if (pager.getNumResults() > 0) {
+        final Map parameterMap = request.getParameterMap();
         ResultPagerView pagerView = new ResultPagerView(pager,
-          request.getRequestURI(), request.getParameterMap());
+          request.getRequestURI(), parameterMap);
         request.setAttribute("pager", pagerView);
       }
       Element listView = builder.createTableView(results, "objectList", null,

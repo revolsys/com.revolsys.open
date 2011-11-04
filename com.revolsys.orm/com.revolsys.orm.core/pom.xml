@@ -39,7 +39,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.jdbc</artifactId>
+      <artifactId>spring-jdbc</artifactId>
       <version>${org.springframework.version}</version>
       <exclusions>
         <exclusion>
@@ -50,7 +50,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.orm</artifactId>
+      <artifactId>spring-orm</artifactId>
       <version>${org.springframework.version}</version>
       <exclusions>
         <exclusion>
@@ -61,7 +61,7 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.web</artifactId>
+      <artifactId>spring-web</artifactId>
       <version>${org.springframework.version}</version>
       <scope>provided</scope>
       <exclusions>
@@ -72,10 +72,10 @@
       </exclusions>
     </dependency>
     <dependency>
-    	<groupId>javax.servlet</groupId>
-    	<artifactId>servlet-api</artifactId>
-    	<version>2.4</version>
-    	<scope>provided</scope>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <version>6.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

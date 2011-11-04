@@ -126,7 +126,7 @@ public class PageInfoHttpMessageConverter extends
 
     final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
     for (final String method : pageInfo.getMethods()) {
-      final Map<String, Object> parameterMap = request.getParameterMap();
+      final Map parameterMap = request.getParameterMap();
       writeMethod(writer, url, pageInfo, method, parameterMap);
     }
 
