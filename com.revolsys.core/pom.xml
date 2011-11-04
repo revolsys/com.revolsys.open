@@ -1,13 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<artifactId>com.revolsys</artifactId>
-		<groupId>com.revolsys</groupId>
-		<version>TRUNK-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+  <parent>
+    <artifactId>com.revolsys</artifactId>
+    <groupId>com.revolsys</groupId>
+    <version>TRUNK-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>com.revolsys.core</artifactId>
   <name>RS Utilities</name>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -58,10 +62,10 @@
       <artifactId>commons-beanutils-core</artifactId>
       <version>1.8.3</version>
       <exclusions>
-      	<exclusion>
-      		<artifactId>commons-logging</artifactId>
-      		<groupId>commons-logging</groupId>
-      	</exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -69,14 +73,14 @@
       <artifactId>commons-jexl</artifactId>
       <version>1.1</version>
       <exclusions>
-      	<exclusion>
-      		<artifactId>commons-logging</artifactId>
-      		<groupId>commons-logging</groupId>
-      	</exclusion>
-      	<exclusion>
-      		<artifactId>junit</artifactId>
-      		<groupId>junit</groupId>
-      	</exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -85,14 +89,14 @@
       <version>4.0.7</version>
     </dependency>
     <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-log4j12</artifactId>
-    	<version>${org.slf4j.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>jcl-over-slf4j</artifactId>
-    	<version>${org.slf4j.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -120,13 +124,11 @@
           <artifactId>commons-logging</artifactId>
           <groupId>commons-logging</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>javax</groupId>
+          <artifactId>jms</artifactId>
+        </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -141,17 +143,17 @@
       </exclusions>
     </dependency>
     <dependency>
-    	<groupId>javax.annotation</groupId>
-    	<artifactId>jsr250-api</artifactId>
-    	<version>1.0</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
+      <groupId>javax.annotation</groupId>
+      <artifactId>jsr250-api</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-    	<groupId>javax.jms</groupId>
-    	<artifactId>jms</artifactId>
-    	<version>1.1</version>
-    	<scope>provided</scope>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <version>6.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <groupId>com.revolsys</groupId>
