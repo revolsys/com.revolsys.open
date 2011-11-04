@@ -10,10 +10,10 @@
   <name>Revolution Systems Open Library</name>
   <version>TRUNK-SNAPSHOT</version>
   <scm>
-    <connection>scm:svn:http://open.revolsys.com/svn/repos/com.revolsys/</connection>
-    <developerConnection>scm:svn:https://secure.revolsys.com/svn/open.revolsys.com/com.revolsys/</developerConnection>
-    <tag>trunk</tag>
-    <url>https://secure.revolsys.com/websvn/listing.php?repname=open.revolsys.com&amp;path=%2Fcom.revolsys%2F&amp;rev=0&amp;sc=0</url>
+    <connection>scm:git:git://github.com/revolsys/com.revolsys.open.git</connection>
+    <developerConnection>scm:git:git@github.com:revolsys/com.revolsys.open.git</developerConnection>
+    <tag>master</tag>
+    <url>https://github.com/revolsys/com.revolsys.open</url>
   </scm>
   
   <modules>
