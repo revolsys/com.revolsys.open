@@ -242,4 +242,8 @@ public class Triangle extends DoubleCoordinatesList {
   public String toString() {
     return new WKTWriter(3).write(getPolygon());
   }
+
+  public boolean intersectsCircumCircle(Coordinates point) {
+    return circumcircle.contains(point);
+  }
 }

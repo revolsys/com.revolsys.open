@@ -2,6 +2,7 @@ package com.revolsys.gis.tin;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -256,7 +257,6 @@ public class TriangulatedIrregularNetwork {
   private void addTriangle(final Triangle triangle) {
     final Circle circle = triangle.getCircumcircle();
     circumCircleIndex.insert(circle.getEnvelopeInternal(), triangle);
-    // triangleIndex.insert(triangle.getEnvelopeInternal(), triangle);
   }
 
   private void addTriangleCorderEdge(final Triangle triangle,
@@ -528,8 +528,7 @@ public class TriangulatedIrregularNetwork {
 
   @SuppressWarnings("unchecked")
   public void insertNode(final Coordinates coordinate) {
-    final List<Triangle> triangles = circumCircleIndex.query(new BoundingBox(
-      coordinate));
+    final List<Triangle> triangles = getTrianglesCircumcircleIntersections(coordinate);
     if (!triangles.isEmpty()) {
       final TreeSet<Coordinates> exterior = new TreeSet<Coordinates>(
         new Comparator<Coordinates>() {
@@ -569,6 +568,19 @@ public class TriangulatedIrregularNetwork {
         }
       }
     }
+  }
+
+  public List<Triangle> getTrianglesCircumcircleIntersections(
+    final Coordinates point) {
+    final Envelope envelope = new BoundingBox(point);
+    final List<Triangle> triangles = circumCircleIndex.query(envelope);
+    for (Iterator<Triangle> iterator = triangles.iterator(); iterator.hasNext();) {
+      Triangle triangle = iterator.next();
+      if (!triangle.intersectsCircumCircle(point)) {
+        iterator.remove();
+      }
+    }
+    return triangles;
   }
 
   public void insertNode(final Point point) {
