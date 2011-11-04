@@ -23,18 +23,12 @@
     <dependency>
       <groupId>com.oracle</groupId>
       <artifactId>ojdbc14</artifactId>
-      <version>10.2.0.3.0</version>
+      <version>10.2.0.4.0</version>
     </dependency>
     <dependency>
+      <groupId>com.revolsys.gis.oracle.sdoapi</groupId>
       <artifactId>sdoapi</artifactId>
-      <groupId>com.oracle</groupId>
-      <version>10.2.0</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>ojdbc14</artifactId>
-          <groupId>com.oracle</groupId>
-        </exclusion>
-      </exclusions>
+      <version>10.2.0.4.0</version>
     </dependency>
   </dependencies>
 </project>
