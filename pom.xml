@@ -78,7 +78,7 @@
           </execution>
         </executions>
         <configuration>
-          <doUpdate>true</doUpdate>
+          <doUpdate>false</doUpdate>
           <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
           <revisionOnScmFailure>true</revisionOnScmFailure>
         </configuration>
