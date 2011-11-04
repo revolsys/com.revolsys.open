@@ -19,13 +19,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
   public static FileGdbDataObjectStore create(final File file) {
     FileGdbDataObjectStore dataObjectStore;
-    try {
-      Class.forName("com.esri.arcgis.geodatabase.IWorkspace");
-      dataObjectStore = new com.revolsys.gis.esri.gdb.file.arcobjects.ArcObjectsFileGdbDataObjectStore(
-        file);
-    } catch (final ClassNotFoundException e) {
-      dataObjectStore = new CapiFileGdbDataObjectStore(file);
-    }
+    dataObjectStore = new CapiFileGdbDataObjectStore(file);
     return dataObjectStore;
   }
 
