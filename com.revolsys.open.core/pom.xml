@@ -2,16 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>com.revolsys.open.core</artifactId>
   <groupId>com.revolsys.open</groupId>
-
-
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <name>RS Utilities</name>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-
-
-    <version>2011.11.07.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
 
   <build>

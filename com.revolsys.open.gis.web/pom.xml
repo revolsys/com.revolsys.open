@@ -7,14 +7,16 @@
     <groupId>com.revolsys.open</groupId>
 
 
-    <version>2011.11.07.RELEASE</version>
+    <version>TRUNK-SNAPSHOT
+</version>
   </parent>
   <groupId>com.revolsys.open</groupId>
 
 
   <artifactId>com.revolsys.open.gis.web</artifactId>
   <name>GIS Web</name>
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT
+</version>
   <dependencies>
   	<dependency>
   		<groupId>com.revolsys.open</groupId>
