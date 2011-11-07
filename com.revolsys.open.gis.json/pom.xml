@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="
-    http://maven.apache.org/POM/4.0.0
-    http://maven.apache.org/maven-v4_0_0.xsd
-  "
->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd   ">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
 
 
   <artifactId>com.revolsys.open.gis.json</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2011.11.07.RELEASE</version>
   <name>GIS JSON &amp; GeoJSON</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
@@ -21,7 +14,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2011.11.07.RELEASE</version>
   </parent>
   <dependencies>
     <dependency>
