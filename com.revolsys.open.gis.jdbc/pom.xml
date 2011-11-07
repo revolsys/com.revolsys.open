@@ -6,7 +6,7 @@
     <groupId>com.revolsys.open</groupId>
 
 
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2011.11.07.RELEASE</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
@@ -14,7 +14,7 @@
 
   <artifactId>com.revolsys.open.gis.jdbc</artifactId>
   <name>GIS JDBC Tools</name>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2011.11.07.RELEASE</version>
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
