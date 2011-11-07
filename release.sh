@@ -4,12 +4,20 @@ else
   VERSION=`date +%Y.%m.%d.RELEASE`
 fi
 
+mvn clean
+
 git pull
-git tag -d $VERSION
-git push origin :$VERSION
-mvn release:clean
-mvn release:prepare -DautoVersionSubmodules=true -DdevelopmentVersion=TRUNK-SNAPSHOT -DreleaseVersion=${VERSION} -Dtag=${VERSION} -DupdateWorkingCopyVersions=false -DpreparationGoals=clean
-mvn release:perform
+git branch releases
+git checkout releases
+git merge master
+
+find . -name pom.xml  -exec sed -i "s/TRUNK-SNAPSHOT/$VERSION/g" {} \;
+
+git tag -f $VERSION
+git checkout master
+git branch -D releases
 git push origin
 git push origin :$VERSION
 git push origin $VERSION
+
+mvn release:perform -Dmaven.test.skip=true -tag $VERSION
