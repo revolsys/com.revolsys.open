@@ -106,9 +106,9 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private String username = "api.user2@revolsys.com";
+  private String username ;
 
-  private String password = "Tdnmatm1";
+  private String password ;
 
   private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
 
