@@ -4,7 +4,7 @@
 
 
   <artifactId>com.revolsys.open.gis.dbase</artifactId>
-  <version>TRUNK-SNAPSHOT
+  <version>2011.11.07.RELEASE
 </version>
   <name>GIS dBase Tools</name>
   <parent>
@@ -14,7 +14,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>TRUNK-SNAPSHOT
+    <version>2011.11.07.RELEASE
 </version>
   </parent>
   <dependencies>

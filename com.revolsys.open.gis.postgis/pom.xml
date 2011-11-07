@@ -5,7 +5,7 @@
 
 
   <artifactId>com.revolsys.open.gis.postgis</artifactId>
-  <version>TRUNK-SNAPSHOT
+  <version>2011.11.07.RELEASE
 </version>
   <url>http://www.revolsys.com</url>
   <parent>
@@ -15,7 +15,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>TRUNK-SNAPSHOT
+    <version>2011.11.07.RELEASE
 </version>
   </parent>
   <dependencies>

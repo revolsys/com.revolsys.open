@@ -5,7 +5,7 @@
 
   <artifactId>com.revolsys.open.gis.csv</artifactId>
   <packaging>jar</packaging>
-  <version>TRUNK-SNAPSHOT
+  <version>2011.11.07.RELEASE
 </version>
   <name>com.revolys.gis.csv</name>
   <url>http://maven.apache.org</url>
@@ -16,7 +16,7 @@
   	<groupId>com.revolsys.open</groupId>
 
 
-  	<version>TRUNK-SNAPSHOT
+  	<version>2011.11.07.RELEASE
 </version>
   </parent>
   <dependencies>
