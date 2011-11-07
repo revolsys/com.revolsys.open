@@ -5,24 +5,18 @@
 >
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
-
-
   <artifactId>com.revolsys.open.parent</artifactId>
   <packaging>pom</packaging>
   <name>Revolution Systems Open Library</name>
   <version>TRUNK-SNAPSHOT</version>
-
+  <description>The parent module of the Revolution Systems Open Library.</description>
+  <url>http://open.revolsys.com/</url>
+  
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
     <version>7</version>
   </parent>
-
-  <scm>
-    <connection>scm:git:git@github.com:revolsys/com.revolsys.open.git</connection>
-    <developerConnection>scm:git:git@github.com:revolsys/com.revolsys.open.git</developerConnection>
-    <url>https://github.com/revolsys/com.revolsys.open</url>
-  </scm>
 
   <licenses>
     <license>
@@ -33,6 +27,25 @@
     </license>
   </licenses>
 
+  <scm>
+    <connection>scm:git:git@github.com:revolsys/com.revolsys.open.git</connection>
+    <developerConnection>scm:git:git@github.com:revolsys/com.revolsys.open.git</developerConnection>
+    <url>https://github.com/revolsys/com.revolsys.open</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>paustin</id>
+      <name>Paul Austin</name>
+      <email>paul.austin@revolsys.com</email>
+    </developer>
+  </developers>
+  
+  <organization>
+    <name>Revolution Systems Inc.</name>
+    <url>http://www.revolsys.com/</url>
+  </organization>
+ 
   <modules>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.orm.core</module>
@@ -64,10 +77,6 @@
     <module>com.revolsys.open.gis.google.fusiontables</module>
 <!--     <module>com.revolsys.open.gis.server</module> -->
   </modules>
-  <organization>
-    <name>Revolution Systems Inc.</name>
-    <url>http://www.revolsys.com/</url>
-  </organization>
   <build>
     <plugins>
       <plugin>
@@ -106,20 +115,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <distributionManagement>
-    <repository>
-      <id>open.revolsys.com</id>
-      <name>Revolution Systems Maven Repository</name>
-      <url>file:../../maven/com.revolsys.open/repository/</url>
-    </repository>
-    <snapshotRepository>
-      <id>snapshots-open.revolsys.com</id>
-      <name>Revolution Systems Maven Snapshot Repository</name>
-      <url>file:../../maven/com.revolsys.open/snapshotRepository/</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-  </distributionManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
