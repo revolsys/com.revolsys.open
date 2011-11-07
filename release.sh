@@ -20,5 +20,5 @@ git push origin
 git push origin :$VERSION
 git push origin $VERSION
 
-mvn release:perform -Darguments="-Dmaven.test.skip=true" -Dtag $VERSION -DconnectionUrl=scm:git:git@github.com:revolsys/com.revolsys.open.git
+mvn release:perform -DconnectionUrl=scm:git:git@github.com:revolsys/com.revolsys.open.git -Dtag=$VERSION -DlocalCheckout=true -Darguments="-Dmaven.test.skip=true"
 
