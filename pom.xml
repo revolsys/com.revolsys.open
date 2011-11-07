@@ -4,15 +4,23 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.revolsys</groupId>
-  <artifactId>com.revolsys</artifactId>
+  <groupId>com.revolsys.open</groupId>
+
+
+  <artifactId>com.revolsys.open.parent</artifactId>
   <packaging>pom</packaging>
   <name>Revolution Systems Open Library</name>
   <version>TRUNK-SNAPSHOT</version>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <scm>
-    <connection>scm:git:git://github.com/revolsys/com.revolsys.open.git</connection>
+    <connection>scm:git:git@github.com:revolsys/com.revolsys.open.git</connection>
     <developerConnection>scm:git:git@github.com:revolsys/com.revolsys.open.git</developerConnection>
-    <tag>master</tag>
     <url>https://github.com/revolsys/com.revolsys.open</url>
   </scm>
 
@@ -26,10 +34,35 @@
   </licenses>
 
   <modules>
-    <module>com.revolsys.core</module>
-    <module>com.revolsys.orm</module>
-    <module>com.revolsys.web</module>
-    <module>com.revolsys.gis</module>
+    <module>com.revolsys.open.core</module>
+    <module>com.revolsys.open.orm.core</module>
+    <module>com.revolsys.open.orm.hibernate</module>
+    <module>com.revolsys.open.orm.jpa</module>
+    <module>com.revolsys.open.web</module>
+    <module>com.revolsys.open.gis.core</module>
+    <module>com.revolsys.open.gis.csv</module>
+    <module>com.revolsys.open.gis.dbase</module>
+    <module>com.revolsys.open.gis.ecsv</module>
+    <module>com.revolsys.open.gis.gpx</module>
+    <module>com.revolsys.open.gis.gml</module>
+    <module>com.revolsys.open.gis.jdbc</module>
+    <module>com.revolsys.open.gis.json</module>
+    <module>com.revolsys.open.gis.kml</module>
+    <module>com.revolsys.open.gis.mdb</module>
+    <module>com.revolsys.open.gis.moep</module>
+    <module>com.revolsys.open.gis.mysql</module>
+    <module>com.revolsys.open.gis.oracle</module>
+    <module>com.revolsys.open.gis.postgis</module>
+    <module>com.revolsys.open.gis.saif</module>
+    <module>com.revolsys.open.gis.shape</module>
+    <module>com.revolsys.open.gis.grid</module>
+    <module>com.revolsys.open.gis.html</module>
+    <module>com.revolsys.open.gis.web</module>
+    <module>com.revolsys.open.gis.dgn</module>
+    <module>com.revolsys.open.gis.esri.gdb.xml</module>
+    <module>com.revolsys.open.gis.esri.gdb.file</module>
+    <module>com.revolsys.open.gis.google.fusiontables</module>
+<!--     <module>com.revolsys.open.gis.server</module> -->
   </modules>
   <organization>
     <name>Revolution Systems Inc.</name>

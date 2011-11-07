@@ -1,0 +1,67 @@
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.revolsys.open</groupId>
+
+
+  <artifactId>com.revolsys.open.gis.esri.gdb.file</artifactId>
+  <packaging>jar</packaging>
+  <name>Revolution Systems Open Library - ESRI File Geodatabase</name>
+  <version>TRUNK-SNAPSHOT</version>
+  <parent>
+    <groupId>com.revolsys.open</groupId>
+
+
+    <artifactId>com.revolsys.open.parent</artifactId>
+
+
+    <version>TRUNK-SNAPSHOT</version>
+  </parent>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/lib</directory>
+      </resource>
+    </resources>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.revolsys.open</groupId>
+
+
+      <artifactId>com.revolsys.open.gis.core</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.revolsys.open</groupId>
+
+
+      <artifactId>com.revolsys.open.gis.shape</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.revolsys.open</groupId>
+
+
+      <artifactId>com.revolsys.open.gis.esri.gdb.xml</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+
