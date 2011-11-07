@@ -6,7 +6,7 @@
   <artifactId>com.revolsys.open.gis.esri.gdb.file</artifactId>
   <packaging>jar</packaging>
   <name>Revolution Systems Open Library - ESRI File Geodatabase</name>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2011.11.07.RELEASE</version>
   <parent>
     <groupId>com.revolsys.open</groupId>
 
@@ -14,7 +14,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2011.11.07.RELEASE</version>
   </parent>
 
   <build>
