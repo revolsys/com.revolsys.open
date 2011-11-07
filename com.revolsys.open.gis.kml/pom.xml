@@ -4,7 +4,7 @@
 
 
   <artifactId>com.revolsys.open.gis.kml</artifactId>
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <name>GIS KML Tools</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
@@ -13,7 +13,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>2011.11.07.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>

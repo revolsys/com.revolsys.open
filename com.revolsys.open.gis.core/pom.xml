@@ -7,7 +7,7 @@
     <groupId>com.revolsys.open</groupId>
 
 
-    <version>2011.11.07.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
@@ -15,7 +15,7 @@
 
   <artifactId>com.revolsys.open.gis.core</artifactId>
   <name>GIS Tools</name>
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>

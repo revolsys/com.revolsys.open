@@ -5,14 +5,14 @@
 
   <artifactId>com.revolsys.open.orm.core</artifactId>
   <name>Revolution Systems - ORM Core</name>
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
   	<artifactId>com.revolsys.open.parent</artifactId>
 
 
   	<groupId>com.revolsys.open</groupId>
-  	<version>2011.11.07.RELEASE</version>
+  	<version>TRUNK-SNAPSHOT</version>
   </parent>
   <build>
     <plugins>

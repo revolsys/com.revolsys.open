@@ -6,7 +6,7 @@
 
   <artifactId>com.revolsys.open.gis.grid</artifactId>
   <name>Map Grids</name>
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
 
@@ -14,7 +14,7 @@
     <groupId>com.revolsys.open</groupId>
 
 
-    <version>2011.11.07.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
   	<dependency>

@@ -7,14 +7,14 @@
     <groupId>com.revolsys.open</groupId>
 
 
-    <version>2011.11.07.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <groupId>com.revolsys.open</groupId>
 
 
   <artifactId>com.revolsys.open.gis.google.fusiontables</artifactId>
   <name>GIS Google Fusion Tables</name>
-  <version>2011.11.07.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>com.google.api.client</groupId>
@@ -34,7 +34,7 @@
 
 
   		<artifactId>com.revolsys.open.gis.kml</artifactId>
-  		<version>2011.11.07.RELEASE</version>
+  		<version>TRUNK-SNAPSHOT</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
