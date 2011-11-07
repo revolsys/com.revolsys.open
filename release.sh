@@ -20,4 +20,5 @@ git push origin
 git push origin :$VERSION
 git push origin $VERSION
 
-mvn release:perform -Darguments="maven.test.skip=true" -Dtag $VERSION
+mvn release:perform -Darguments="maven.test.skip=true" -Dtag $VERSION -DconnectionUrl=scm:git:git@github.com:revolsys/com.revolsys.open.git
+
