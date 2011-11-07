@@ -5,7 +5,7 @@
 
 
   <artifactId>com.revolsys.open.gis.json</artifactId>
-  <version>2011.11.07.RELEASE
+  <version>TRUNK-SNAPSHOT
 </version>
   <name>GIS JSON &amp; GeoJSON</name>
   <parent>
@@ -15,7 +15,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>2011.11.07.RELEASE
+    <version>TRUNK-SNAPSHOT
 </version>
   </parent>
   <dependencies>

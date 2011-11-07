@@ -4,7 +4,7 @@
 
 
   <artifactId>com.revolsys.open.gis.oracle</artifactId>
-  <version>2011.11.07.RELEASE
+  <version>TRUNK-SNAPSHOT
 </version>
   <name>GIS Oracle Tools</name>
   <parent>
@@ -14,7 +14,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>2011.11.07.RELEASE
+    <version>TRUNK-SNAPSHOT
 </version>
   </parent>
   <dependencies>

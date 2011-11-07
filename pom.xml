@@ -4,7 +4,7 @@
   <artifactId>com.revolsys.open.parent</artifactId>
   <packaging>pom</packaging>
   <name>Revolution Systems Open Library</name>
-  <version>2011.11.07.RELEASE
+  <version>TRUNK-SNAPSHOT
 </version>
   <description>The parent module of the Revolution Systems Open Library.</description>
   <url>http://open.revolsys.com/</url>
