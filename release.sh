@@ -4,7 +4,8 @@ else
   VERSION=`date +%Y.%m.%d.RELEASE`
 fi
 
-if [ -n `git status | grep "nothing to commit"`]; then
+STATUS=`git status | grep "nothing to commit"`
+if [ -n "$STATUS" ]; then
   mvn clean
 
   git pull
