@@ -20,4 +20,4 @@ git push origin
 git push origin :$VERSION
 git push origin $VERSION
 
-mvn release:perform -Dmaven.test.skip=true -tag $VERSION
+mvn release:perform -Darguments="maven.test.skip=true" -Dtag $VERSION
