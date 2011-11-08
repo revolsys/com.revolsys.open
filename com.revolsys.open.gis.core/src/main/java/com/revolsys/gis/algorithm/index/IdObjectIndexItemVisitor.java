@@ -1,17 +1,18 @@
-package com.revolsys.gis.graph;
+package com.revolsys.gis.algorithm.index;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.graph.AbstractItemVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 
-public final class IdObjectQuadTreeVisitor<T> extends
+public final class IdObjectIndexItemVisitor<T> extends
   AbstractItemVisitor<Integer> {
-  private AbstractIdObjectQuadTree<T> index;
+  private IdObjectIndex<T> index;
 
   private final Envelope envelope;
 
   private final Visitor<T> visitor;
 
-  public IdObjectQuadTreeVisitor(AbstractIdObjectQuadTree<T> index,
+  public IdObjectIndexItemVisitor(IdObjectIndex<T> index,
     Envelope envelope, Visitor<T> visitor) {
     this.index = index;
     this.envelope = envelope;

@@ -5,12 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.algorithm.index.IdObjectIndex;
+import com.revolsys.gis.algorithm.index.IdObjectIndexItemVisitor;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
-  Iterable<T> {
+  Iterable<T>, IdObjectIndex<T> {
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {
@@ -26,14 +28,6 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
     return object;
   }
 
-  public abstract Envelope getEnvelope(T object);
-
-  public abstract int getId(T object);
-
-  public abstract T getObject(Integer id);
-
-  public abstract List<T> getObjects(List<Integer> ids);
-
   public Iterator<T> iterator() {
     return queryAll().iterator();
   }
@@ -46,7 +40,7 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
   }
 
   public void query(final Envelope envelope, final Visitor<T> visitor) {
-    final IdObjectQuadTreeVisitor<T> itemVisitor = new IdObjectQuadTreeVisitor<T>(
+    final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
       this, envelope, visitor);
     this.query(envelope, itemVisitor);
   }

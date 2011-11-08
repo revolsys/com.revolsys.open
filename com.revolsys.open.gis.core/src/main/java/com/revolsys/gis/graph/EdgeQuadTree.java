@@ -18,24 +18,20 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
     add(ids);
   }
 
-  @Override
   public Envelope getEnvelope(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final Envelope envelope = line.getEnvelopeInternal();
     return envelope;
   }
 
-  @Override
   public int getId(final Edge<T> edge) {
     return edge.getId();
   }
 
-  @Override
   public Edge<T> getObject(final Integer id) {
     return graph.getEdge(id);
   }
 
-  @Override
   public List<Edge<T>> getObjects(final List<Integer> ids) {
     return graph.getEdges(ids);
   }

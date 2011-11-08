@@ -23,7 +23,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
     final NodeQuadTree<T> index = graph.getNodeIndex();
     final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(
       line, results);
-    index.query(env, visitor);
+    index.visit(env, visitor);
     return results.getList();
   }
 

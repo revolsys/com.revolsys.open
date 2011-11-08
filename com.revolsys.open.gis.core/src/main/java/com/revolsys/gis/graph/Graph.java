@@ -279,7 +279,7 @@ public class Graph<T> {
       point, distance, results);
     final Envelope envelope = new BoundingBox(point);
     envelope.expandBy(distance);
-    getNodeIndex().query(envelope, visitor);
+    getNodeIndex().visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;
@@ -320,7 +320,7 @@ public class Graph<T> {
       geometry, distance, results);
     final Envelope envelope = geometry.getEnvelopeInternal();
     envelope.expandBy(distance);
-    getNodeIndex().query(envelope, visitor);
+    getNodeIndex().visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;
@@ -555,7 +555,7 @@ public class Graph<T> {
     final FilterListVisitor<Node<T>> results = new FilterListVisitor<Node<T>>(
       filter);
     final NodeQuadTree<T> nodeIndex = getNodeIndex();
-    nodeIndex.query(envelope, results);
+    nodeIndex.visit(envelope, results);
     final List<Node<T>> nodes = results.getResults();
     if (comparator == null) {
       Collections.sort(nodes);

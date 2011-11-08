@@ -24,7 +24,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
     final NodeQuadTree<T> index = graph.getNodeIndex();
     final NodeWithinDistanceOfGeometryVisitor<T> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
       geometry, maxDistance, results);
-    index.query(env, visitor);
+    index.visit(env, visitor);
     return results.getList();
   }
 
