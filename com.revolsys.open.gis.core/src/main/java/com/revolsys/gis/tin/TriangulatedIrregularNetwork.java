@@ -40,53 +40,33 @@ public class TriangulatedIrregularNetwork {
 
   private double tolerance;
 
+  private BoundingBox boundingBox;
+
   public TriangulatedIrregularNetwork(final BoundingBox boundingBox) {
     this(boundingBox.getGeometryFactory(), boundingBox);
   }
 
   public TriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
-    final BoundingBox envelope) {
+    final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
     setGeometryFactory(geometryFactory);
-    final Coordinates c1 = new DoubleCoordinates(envelope.getMinX(),
-      envelope.getMinY(), 0);
-    final Coordinates c2 = new DoubleCoordinates(envelope.getMaxX(),
-      envelope.getMinY(), 0);
-    final Coordinates c3 = new DoubleCoordinates(envelope.getMaxX(),
-      envelope.getMaxY(), 0);
-    final Coordinates c4 = new DoubleCoordinates(envelope.getMinX(),
-      envelope.getMaxY(), 0);
-    addTriangle(Triangle.createClockwiseTriangle(c1, c2, c3));
-    addTriangle(Triangle.createClockwiseTriangle(c1, c3, c4));
+    final double minX = geometryFactory.makeXyPrecise(boundingBox.getMinX() - 100);
+    final double minY = geometryFactory.makeXyPrecise(boundingBox.getMinY() - 100);
+    final double maxX = geometryFactory.makeXyPrecise(boundingBox.getMaxX() + 100);
+    final double maxY = geometryFactory.makeXyPrecise(boundingBox.getMaxY() + 100);
+    final Coordinates c1 = new DoubleCoordinates(minX, minY, 0);
+    final Coordinates c2 = new DoubleCoordinates(maxX, minY, 0);
+    final Coordinates c3 = new DoubleCoordinates(maxX, maxY, 0);
+    final Coordinates c4 = new DoubleCoordinates(minX, maxY, 0);
+    final Triangle triangle1 = Triangle.createClockwiseTriangle(c1, c2, c3);
+    addTriangle(triangle1);
+    final Triangle triangle2 = Triangle.createClockwiseTriangle(c1, c3, c4);
+    addTriangle(triangle2);
   }
 
   public TriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
     final Envelope envelope) {
-    setGeometryFactory(geometryFactory);
-    final Coordinates c1 = new DoubleCoordinates(envelope.getMinX(),
-      envelope.getMinY(), 0);
-    final Coordinates c2 = new DoubleCoordinates(envelope.getMaxX(),
-      envelope.getMinY(), 0);
-    final Coordinates c3 = new DoubleCoordinates(envelope.getMaxX(),
-      envelope.getMaxY(), 0);
-    final Coordinates c4 = new DoubleCoordinates(envelope.getMinX(),
-      envelope.getMaxY(), 0);
-    addTriangle(Triangle.createClockwiseTriangle(c1, c2, c3));
-    addTriangle(Triangle.createClockwiseTriangle(c1, c3, c4));
-  }
-
-  public TriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
-    final Polygon polygon) {
-    setGeometryFactory(geometryFactory);
-    final CoordinatesList coords = CoordinatesListUtil.get(polygon.getExteriorRing());
-    addTriangle(Triangle.createClockwiseTriangle(coords.get(0), coords.get(1),
-      coords.get(2)));
-  }
-
-  public TriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
-    final Triangle triangle) {
-    setGeometryFactory(geometryFactory);
-
-    addTriangle(triangle);
+    this(geometryFactory, new BoundingBox(geometryFactory, envelope));
   }
 
   private void addBreaklineIntersect(final Triangle triangle,
@@ -514,7 +494,8 @@ public class TriangulatedIrregularNetwork {
         iterator.remove();
       }
     }
-    return triangles;
+    System.out.println(triangles.size());
+      return triangles;
   }
 
   public void insertEdge(final LineSegment breakline) {
@@ -547,38 +528,40 @@ public class TriangulatedIrregularNetwork {
   private Set<Coordinates> nodes = new HashSet<Coordinates>();
 
   public void insertNode(final Coordinates coordinate) {
-    final Coordinates point = new DoubleCoordinates(coordinate, 3);
-    geometryFactory.makePrecise(point);
-    if (nodes.contains(point)) {
-      NoOp.noOp();
-    } else {
-      final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
-      if (!triangles.isEmpty()) {
-        final AngleFromPointComparator comparator = new AngleFromPointComparator(
-          point);
-        final TreeSet<Coordinates> exterior = new TreeSet<Coordinates>(
-          comparator);
-        for (final Triangle triangle : triangles) {
-          final Circle circle = triangle.getCircumcircle();
-          if (circle.contains(point)) {
-            removeTriangle(triangle);
-            if (!point.equals2d(triangle.getP0())) {
-              exterior.add(triangle.getP0());
-            }
-            if (!point.equals2d(triangle.getP1())) {
-              exterior.add(triangle.getP1());
-            }
-            if (!point.equals2d(triangle.getP2())) {
-              exterior.add(triangle.getP2());
+    if (boundingBox.contains(coordinate)) {
+      final Coordinates point = new DoubleCoordinates(coordinate, 3);
+      geometryFactory.makePrecise(point);
+      if (nodes.contains(point)) {
+        NoOp.noOp();
+      } else {
+        final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
+        if (!triangles.isEmpty()) {
+          final AngleFromPointComparator comparator = new AngleFromPointComparator(
+            point);
+          final TreeSet<Coordinates> exterior = new TreeSet<Coordinates>(
+            comparator);
+          for (final Triangle triangle : triangles) {
+            final Circle circle = triangle.getCircumcircle();
+            if (circle.contains(point)) {
+              removeTriangle(triangle);
+              if (!point.equals2d(triangle.getP0())) {
+                exterior.add(triangle.getP0());
+              }
+              if (!point.equals2d(triangle.getP1())) {
+                exterior.add(triangle.getP1());
+              }
+              if (!point.equals2d(triangle.getP2())) {
+                exterior.add(triangle.getP2());
+              }
             }
           }
-        }
 
-        if (!exterior.isEmpty()) {
-          Coordinates previousCorner = exterior.last();
-          for (final Coordinates corner : exterior) {
-            addTriangle(new Triangle(point, previousCorner, corner));
-            previousCorner = corner;
+          if (!exterior.isEmpty()) {
+            Coordinates previousCorner = exterior.last();
+            for (final Coordinates corner : exterior) {
+              addTriangle(new Triangle(point, previousCorner, corner));
+              previousCorner = corner;
+            }
           }
         }
       }

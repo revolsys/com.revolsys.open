@@ -1,5 +1,7 @@
 package com.revolsys.gis.model.coordinates;
 
+import java.nio.channels.UnsupportedAddressTypeException;
+
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinates implements Coordinates {
@@ -23,7 +25,13 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   @Override
-  public abstract Coordinates clone();
+  public Coordinates clone() {
+    try {
+      return (Coordinates)super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new UnsupportedOperationException();
+    }
+  }
 
   public int compareTo(final Coordinates other) {
     final double x = getX();

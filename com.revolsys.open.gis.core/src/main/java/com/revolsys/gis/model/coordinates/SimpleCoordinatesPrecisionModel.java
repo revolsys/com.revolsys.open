@@ -3,7 +3,7 @@ package com.revolsys.gis.model.coordinates;
 import java.io.Serializable;
 
 public class SimpleCoordinatesPrecisionModel implements
-  CoordinatesPrecisionModel,Serializable {
+  CoordinatesPrecisionModel, Serializable {
   public static SimpleCoordinatesPrecisionModel FLOATING = new SimpleCoordinatesPrecisionModel();
 
   public static double makePrecise(final double value, final double scale) {
@@ -48,23 +48,35 @@ public class SimpleCoordinatesPrecisionModel implements
     return scaleZ;
   }
 
+  public boolean isFloating() {
+    return scaleXY <= 0 && scaleZ <= 0;
+  }
+
   public void makePrecise(final Coordinates coordinates) {
     if (scaleXY > 0) {
       final double x = coordinates.getX();
-      final double newX = makePrecise(x, scaleXY);
+      final double newX = makeXyPrecise(x);
       coordinates.setX(newX);
 
       final double y = coordinates.getY();
-      final double newY = makePrecise(y, scaleXY);
+      final double newY = makeXyPrecise(y);
       coordinates.setY(newY);
     }
     if (scaleZ > 0) {
       if (coordinates.getNumAxis() > 2) {
         final double z = coordinates.getZ();
-        final double newZ = makePrecise(z, scaleZ);
+        final double newZ = makeZPrecise(z);
         coordinates.setZ(newZ);
       }
     }
+  }
+
+  public double makeXyPrecise(final double value) {
+    return makePrecise(value, scaleXY);
+  }
+
+  public double makeZPrecise(final double value) {
+    return makePrecise(value, scaleZ);
   }
 
   public void setScaleXY(final double scaleXY) {
@@ -86,9 +98,5 @@ public class SimpleCoordinatesPrecisionModel implements
     } else {
       return "scale(xy=" + scaleXY + ",z=" + scaleZ + "]";
     }
-  }
-
-  public boolean isFloating() {
-    return scaleXY <= 0 && scaleZ <= 0;
   }
 }

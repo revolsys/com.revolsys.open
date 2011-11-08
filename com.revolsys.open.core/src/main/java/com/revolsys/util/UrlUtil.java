@@ -16,6 +16,7 @@
 package com.revolsys.util;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
@@ -52,8 +53,7 @@ public final class UrlUtil {
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
-  public static String getFileBaseName(
-    final URL url) {
+  public static String getFileBaseName(final URL url) {
     final String name = getFileName(url);
     final int dotIndex = name.lastIndexOf('.');
     if (dotIndex != -1) {
@@ -63,14 +63,24 @@ public final class UrlUtil {
     }
   }
 
-  public static String getFileName(
-    final URL url) {
+  public static String getFileName(final URL url) {
     final String path = url.getPath();
     final int index = path.lastIndexOf('/');
     if (index != -1) {
       return path.substring(index + 1);
     } else {
       return path;
+    }
+  }
+
+  public static URL getParent(final URL url) {
+    final String path = url.getPath();
+    final int index = path.lastIndexOf('/');
+    if (index != -1) {
+      final String parentPath = path.substring(0, index);
+      return getUrl(parentPath);
+    } else {
+      return url;
     }
   }
 
@@ -82,10 +92,17 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(
-    final Object baseUrl,
+  public static String getUrl(final Object baseUrl,
     final Map<String, ? extends Object> parameters) {
     return getUrl(baseUrl.toString(), parameters);
+  }
+
+  public static URL getUrl(final String urlString) {
+    try {
+      return new URL(urlString);
+    } catch (final MalformedURLException e) {
+      throw new IllegalArgumentException("Unknown URL", e);
+    }
   }
 
   /**
@@ -96,8 +113,7 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(
-    final String baseUrl,
+  public static String getUrl(final String baseUrl,
     final Map<String, ? extends Object> parameters) {
     final StringBuffer query = new StringBuffer();
     if (parameters != null) {
@@ -115,8 +131,9 @@ public final class UrlUtil {
             if (value instanceof String[]) {
               final String[] values = (String[])value;
               for (int i = 0; i < values.length; i++) {
-                query.append(name).append('=').append(
-                  URLEncoder.encode(values[i], "US-ASCII"));
+                query.append(name)
+                  .append('=')
+                  .append(URLEncoder.encode(values[i], "US-ASCII"));
                 if (i < values.length - 1) {
                   query.append('&');
                 }
@@ -124,15 +141,17 @@ public final class UrlUtil {
             } else if (value instanceof List) {
               final List values = (List)value;
               for (int i = 0; i < values.size(); i++) {
-                query.append(name).append('=').append(
-                  URLEncoder.encode((String)values.get(i), "US-ASCII"));
+                query.append(name)
+                  .append('=')
+                  .append(URLEncoder.encode((String)values.get(i), "US-ASCII"));
                 if (i < values.size() - 1) {
                   query.append('&');
                 }
               }
             } else {
-              query.append(name).append('=').append(
-                URLEncoder.encode(value.toString(), "US-ASCII"));
+              query.append(name)
+                .append('=')
+                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
             }
           } catch (final UnsupportedEncodingException e) {
             throw new Error(e);
@@ -155,20 +174,17 @@ public final class UrlUtil {
     }
   }
 
-  public static boolean isValidEmail(
-    final String email) {
+  public static boolean isValidEmail(final String email) {
     return EMAIL_PATTERN.matcher(email).matches();
   }
 
-  public static Map<String, String> parseMatrixParams(
-    final String matrixParams) {
+  public static Map<String, String> parseMatrixParams(final String matrixParams) {
     final Map<String, String> params = new LinkedHashMap<String, String>();
     parseMatrixParams(matrixParams, params);
     return params;
   }
 
-  public static void parseMatrixParams(
-    final String matrixParams,
+  public static void parseMatrixParams(final String matrixParams,
     final Map<String, String> params) {
     for (final String param : matrixParams.split(";")) {
       final String[] paramParts = param.split("=");

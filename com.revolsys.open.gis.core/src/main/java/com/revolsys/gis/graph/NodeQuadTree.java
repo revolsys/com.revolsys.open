@@ -31,7 +31,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectQuadTree<Node<T>> {
   public Envelope getEnvelope(final Node<T> object) {
     final double x = object.getX();
     final double y = object.getY();
-    final Envelope envelope = new Envelope(x, y, x, y);
+    final Envelope envelope = new Envelope(x, x, y, y);
     return envelope;
   }
 

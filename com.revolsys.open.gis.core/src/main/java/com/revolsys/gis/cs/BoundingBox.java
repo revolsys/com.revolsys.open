@@ -496,4 +496,10 @@ public class BoundingBox extends Envelope {
     return "(" + getMinX() + "," + getMinY() + " " + getMaxX() + ","
       + getMaxY() + ")";
   }
+
+  public boolean contains(Coordinates coordinate) {
+    final double x = coordinate.getX();
+    final double y = coordinate.getY();
+    return contains(x, y);
+  }
 }
