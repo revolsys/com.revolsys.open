@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>com.revolsys.open.parent</artifactId>
-
-
-    <groupId>com.revolsys.open</groupId>
-
-
-    <version>TRUNK-SNAPSHOT
-</version>
-  </parent>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://maven.apache.org/POM/4.0.0
+    http://maven.apache.org/maven-v4_0_0.xsd
+  "
+>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
-
-
   <artifactId>com.revolsys.open.gis.core</artifactId>
   <name>GIS Tools</name>
-  <version>TRUNK-SNAPSHOT
-</version>
+  <version>TRUNK-SNAPSHOT</version>
+  <parent>
+    <artifactId>com.revolsys.open.parent</artifactId>
+    <groupId>com.revolsys.open</groupId>
+    <version>TRUNK-SNAPSHOT</version>
+  </parent>
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-
-
       <artifactId>com.revolsys.open.core</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -30,6 +27,12 @@
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
       <version>1.11</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xercesImpl</artifactId>
+          <groupId>xerces</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.measure</groupId>

@@ -18,8 +18,12 @@ package com.revolsys.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The JavaBeanUtil is a utility class that provides methods to set/get
@@ -28,32 +32,15 @@ import org.apache.commons.beanutils.PropertyUtils;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
-  /**
-   * Set the value of the named propery on the object. Any exceptions are
-   * wrapped as runtime exceptions.
-   * 
-   * @param object The object.
-   * @param propertyName The name of the property.
-   * @param value The property value.
-   */
-  public static void setProperty(final Object object,
-    final String propertyName, final Object value) {
+  private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
+
+  public static Method getMethod(final Class<?> clazz, final String name,
+    final Class<?>... parameterTypes) {
     try {
-      PropertyUtils.setProperty(object, propertyName, value);
-    } catch (final IllegalAccessException e) {
-      throw new RuntimeException("Unable to set property " + propertyName, e);
-    } catch (final InvocationTargetException e) {
-      final Throwable t = e.getCause();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      } else if (t instanceof Error) {
-        throw (Error)t;
-      } else {
-        throw new RuntimeException("Unable to set property " + propertyName, e);
-      }
+      final Method method = clazz.getMethod(name, parameterTypes);
+      return method;
     } catch (final NoSuchMethodException e) {
-      throw new IllegalArgumentException("Property " + propertyName
-        + " does not exist");
+      throw new IllegalArgumentException(e);
     }
   }
 
@@ -86,16 +73,16 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T invokeConstructor(Constructor<? extends T> constructor,
-    Object... args) {
+  public static <T> T invokeConstructor(
+    final Constructor<? extends T> constructor, final Object... args) {
     try {
-      T object = constructor.newInstance(args);
+      final T object = constructor.newInstance(args);
       return object;
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       throw e;
-    } catch (Error e) {
+    } catch (final Error e) {
       throw e;
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       final Throwable t = e.getTargetException();
       if (t instanceof RuntimeException) {
         throw (RuntimeException)t;
@@ -104,41 +91,78 @@ public final class JavaBeanUtil {
       } else {
         throw new RuntimeException(t.getMessage(), t);
       }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-  public static <T> T invokeMethod(Method method, Object object,
-    Object... args) {
-    try {
-      @SuppressWarnings("unchecked")
-      T result = (T)method.invoke(object, args);
-      return result;
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Error e) {
-      throw e;
-    } catch (InvocationTargetException e) {
-      final Throwable t = e.getTargetException();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      } else if (t instanceof Error) {
-        throw (Error)t;
-      } else {
-        throw new RuntimeException(t.getMessage(), t);
-      }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static Method getMethod(Class<?> clazz, String name,
-    Class<?>... parameterTypes) {
+  public static <T> T invokeMethod(final Method method, final Object object,
+    final Object... args) {
     try {
-      Method method = clazz.getMethod(name, parameterTypes);
-      return method;
-    } catch (NoSuchMethodException e) {
-      throw new IllegalArgumentException(e);
+      @SuppressWarnings("unchecked")
+      final T result = (T)method.invoke(object, args);
+      return result;
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException(t.getMessage(), t);
+      }
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static void setProperties(final Object object,
+    final Map<String, Object> properties) {
+    for (final Entry<String, Object> property : properties.entrySet()) {
+      final String propertyName = property.getKey();
+      final Object value = property.getValue();
+      try {
+        PropertyUtils.setProperty(object, propertyName, value);
+      } catch (final InvocationTargetException e) {
+        final Throwable t = e.getCause();
+        LOG.error("Unable to set property " + propertyName, t);
+      } catch (final Throwable e) {
+        LOG.error("Unable to set property " + propertyName, e);
+      }
+    }
+
+  }
+
+  /**
+   * Set the value of the named propery on the object. Any exceptions are
+   * wrapped as runtime exceptions.
+   * 
+   * @param object The object.
+   * @param propertyName The name of the property.
+   * @param value The property value.
+   */
+  public static void setProperty(final Object object,
+    final String propertyName, final Object value) {
+    try {
+      PropertyUtils.setProperty(object, propertyName, value);
+    } catch (final IllegalAccessException e) {
+      throw new RuntimeException("Unable to set property " + propertyName, e);
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getCause();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException("Unable to set property " + propertyName, e);
+      }
+    } catch (final NoSuchMethodException e) {
+      throw new IllegalArgumentException("Property " + propertyName
+        + " does not exist");
     }
   }
 

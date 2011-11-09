@@ -74,10 +74,10 @@ public final class UrlUtil {
   }
 
   public static URL getParent(final URL url) {
-    final String path = url.getPath();
-    final int index = path.lastIndexOf('/');
+    final String urlString = url.toString();
+    final int index = urlString.lastIndexOf('/');
     if (index != -1) {
-      final String parentPath = path.substring(0, index);
+      final String parentPath = urlString.substring(0, index);
       return getUrl(parentPath);
     } else {
       return url;
