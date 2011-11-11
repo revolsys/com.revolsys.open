@@ -32,4 +32,8 @@ public class ByteStringConverter implements StringConverter<Byte> {
       return null;
     }
   }
+
+  public Class<Byte> getConvertedClass() {
+    return Byte.class;
+  }
 }

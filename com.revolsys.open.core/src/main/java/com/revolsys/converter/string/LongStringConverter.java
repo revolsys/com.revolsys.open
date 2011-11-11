@@ -32,4 +32,8 @@ public class LongStringConverter implements StringConverter<Long> {
       return null;
     }
   }
+
+  public Class<Long> getConvertedClass() {
+    return Long.class;
+  }
 }

@@ -32,4 +32,8 @@ public class BigDecimalStringConverter implements StringConverter<BigDecimal> {
     }
   }
 
+  public Class<BigDecimal> getConvertedClass() {
+     return BigDecimal.class;
+  }
+
 }

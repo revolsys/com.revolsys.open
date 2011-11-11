@@ -32,4 +32,8 @@ public class DoubleStringConverter implements StringConverter<Double> {
       return null;
     }
   }
+
+  public Class<Double> getConvertedClass() {
+    return Double.class;
+  }
 }

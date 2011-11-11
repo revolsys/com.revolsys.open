@@ -32,4 +32,8 @@ public class ShortStringConverter implements StringConverter<Short> {
       return null;
     }
   }
+
+  public Class<Short> getConvertedClass() {
+    return Short.class;
+  }
 }

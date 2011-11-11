@@ -32,4 +32,8 @@ public class IntegerStringConverter implements StringConverter<Integer> {
       return null;
     }
   }
+
+  public Class<Integer> getConvertedClass() {
+    return Integer.class;
+  }
 }

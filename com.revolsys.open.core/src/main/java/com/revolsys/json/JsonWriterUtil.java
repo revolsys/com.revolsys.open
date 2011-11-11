@@ -1,22 +1,12 @@
 package com.revolsys.json;
 
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public final class JsonWriterUtil {
-
-  public static String toString(Map<String, ? extends Object> values) {
-    StringWriter writer = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(writer);
-    write(printWriter, values);
-    printWriter.close();
-    return writer.toString();
-  }
-
   public static void write(final PrintWriter out,
     final List<? extends Object> values) {
     startList(out);

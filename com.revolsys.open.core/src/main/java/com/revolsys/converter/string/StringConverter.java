@@ -8,4 +8,6 @@ public interface StringConverter<T> {
   T toObject(String string);
   
   T toObject(Object value);
+  
+  Class<T> getConvertedClass();
 }

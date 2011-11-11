@@ -32,4 +32,8 @@ public class BigIntegerStringConverter implements StringConverter<BigInteger> {
     }
   }
 
+  public Class<BigInteger> getConvertedClass() {
+    return BigInteger.class;
+  }
+
 }

@@ -32,4 +32,8 @@ public class FloatStringConverter implements StringConverter<Float> {
       return null;
     }
   }
+
+  public Class<Float> getConvertedClass() {
+    return Float.class;
+  }
 }

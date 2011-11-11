@@ -21,4 +21,8 @@ public class StringStringConverter implements StringConverter<String> {
     return string;
   }
 
+  public Class<String> getConvertedClass() {
+    return String.class;
+  }
+
 }

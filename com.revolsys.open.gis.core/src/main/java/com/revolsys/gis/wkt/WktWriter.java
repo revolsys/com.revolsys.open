@@ -54,6 +54,22 @@ public class WktWriter {
   private static final NumberFormat FORMAT = new DecimalFormat(
     "#.#########################");
 
+  public static String toString(Geometry geometry, boolean writeSrid) {
+    StringWriter out = new StringWriter();
+    PrintWriter writer = new PrintWriter(out);
+    if (writeSrid) {
+      int srid = geometry.getSRID();
+      if (srid > 0) {
+        writer.print("SRID=");
+        writer.print(srid);
+        writer.print(';');
+      }
+    }
+    write(writer, geometry);
+    writer.flush();
+    return out.toString();
+  }
+
   public static String toString(Geometry geometry) {
     StringWriter out = new StringWriter();
     PrintWriter writer = new PrintWriter(out);

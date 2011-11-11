@@ -29,4 +29,8 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
       return null;
     }
   }
+
+  public Class<Boolean> getConvertedClass() {
+    return Boolean.class;
+  }
 }
