@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.filter.Filter;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class RTreeLeaf<T> extends RTreeNode<T> {
@@ -89,6 +90,22 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
       Envelope envelope = envelopes[i];
       expandToInclude(envelope);
     }
+  }
+
+  @Override
+  public boolean visit(Envelope envelope, Filter<T> filter, Visitor<T> visitor) {
+    for (int i = 0; i < size; i++) {
+      Envelope objectEnvelope = envelopes[i];
+      if (envelope.intersects(objectEnvelope)) {
+        T object = getObject(i);
+        if (filter.accept(object)) {
+          if (!visitor.visit(object)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 
   @Override

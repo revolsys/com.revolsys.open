@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.revolsys.collection.ArrayUtil;
 import com.revolsys.collection.Visitor;
+import com.revolsys.filter.Filter;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class RTreeBranch<T> extends RTreeNode<T> implements
@@ -126,6 +127,19 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
       RTreeNode<T> node = nodes[i];
       if (envelope.intersects(node)) {
         if (!node.visit(envelope, visitor)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean visit(Envelope envelope, Filter<T> filter, Visitor<T> visitor) {
+    for (int i = 0; i < size; i++) {
+      RTreeNode<T> node = nodes[i];
+      if (envelope.intersects(node)) {
+        if (!node.visit(envelope, filter, visitor)) {
           return false;
         }
       }
