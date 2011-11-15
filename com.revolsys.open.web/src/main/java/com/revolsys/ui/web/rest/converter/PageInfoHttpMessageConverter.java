@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.QName;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
@@ -23,6 +24,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
@@ -126,6 +128,7 @@ public class PageInfoHttpMessageConverter extends
 
     final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
     for (final String method : pageInfo.getMethods()) {
+      @SuppressWarnings("rawtypes")
       final Map parameterMap = request.getParameterMap();
       writeMethod(writer, url, pageInfo, method, parameterMap);
     }
@@ -187,10 +190,10 @@ public class PageInfoHttpMessageConverter extends
     writer.close();
   }
 
-  private void writeHtmlField(final XmlWriter writer, final ParameterInfo parameter,
-    final Map<String, ?> formValues) {
+  private void writeHtmlField(final XmlWriter writer,
+    final ParameterInfo parameter, final Map<String, ?> formValues) {
     final String parameterName = parameter.getName();
-    
+
     final Object value = formValues.get(parameterName);
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
@@ -218,10 +221,10 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  private void writeHtmlFileField(final XmlWriter writer, final ParameterInfo parameter,
-    final Map<String, ?> formValues) {
+  private void writeHtmlFileField(final XmlWriter writer,
+    final ParameterInfo parameter, final Map<String, ?> formValues) {
     final String name = parameter.getName();
-     final Object value = formValues.get(name);
+    final Object value = formValues.get(name);
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
 
@@ -236,12 +239,12 @@ public class PageInfoHttpMessageConverter extends
     writer.endTag(HtmlUtil.DD);
   }
 
-  private void writeHtmlSelect(final XmlWriter writer, final ParameterInfo parameter,
-    final Map<String, ?> formValues, 
+  private void writeHtmlSelect(final XmlWriter writer,
+    final ParameterInfo parameter, final Map<String, ?> formValues,
     final List<? extends Object> values) {
     final String name = parameter.getName();
     final boolean optional = !parameter.isRequired();
-     final Object value = formValues.get(name);
+    final Object value = formValues.get(name);
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
 
@@ -253,7 +256,7 @@ public class PageInfoHttpMessageConverter extends
     writer.startTag(HtmlUtil.DD);
     HtmlUtil.serializeSelect(writer, name, value, optional, values);
     writeDescription(writer, parameter);
-     writer.endTag(HtmlUtil.DD);
+    writer.endTag(HtmlUtil.DD);
   }
 
   private void writeMethod(final XmlWriter writer, final String url,
@@ -262,8 +265,8 @@ public class PageInfoHttpMessageConverter extends
     final Collection<ParameterInfo> parameters = pageInfo.getParameters();
     final boolean hasParameters = !parameters.isEmpty();
     if (hasParameters) {
-//      final String title = method;
-//      writer.element(HtmlUtil.H2, title);
+      // final String title = method;
+      // writer.element(HtmlUtil.H2, title);
 
       if (hasParameters) {
         writer.startTag(HtmlUtil.FORM);
@@ -283,23 +286,24 @@ public class PageInfoHttpMessageConverter extends
         writer.attribute(HtmlUtil.ATTR_METHOD, method);
         writer.startTag(HtmlUtil.DL);
         for (final ParameterInfo parameter : parameters) {
-           final List<Object> options = parameter.getAllowedValues();
+          final List<Object> options = parameter.getAllowedValues();
           if (options.isEmpty()) {
-            if (parameter.getType().equals("xsd:base64Binary")) {
+            if (parameter.getType().equals(new QName("xsd", "base64Binary"))) {
               writeHtmlFileField(writer, parameter, values);
             } else {
               writeHtmlField(writer, parameter, values);
             }
           } else {
-            writeHtmlSelect(writer, parameter, values,
-               options);
+            writeHtmlSelect(writer, parameter, values, options);
           }
         }
       }
       final List<MediaType> mediaTypes = pageInfo.getMediaTypes();
       if (!mediaTypes.isEmpty()) {
-        ParameterInfo parameter = new ParameterInfo("format", true, "string", "Select the file format to return the result data in.", mediaTypes);
-        writeHtmlSelect(writer, parameter, values,  mediaTypes);
+        ParameterInfo parameter = new ParameterInfo("format", true,
+          DataTypes.STRING,
+          "Select the file format to return the result data in.", mediaTypes);
+        writeHtmlSelect(writer, parameter, values, mediaTypes);
       }
       writer.endTag(HtmlUtil.DL);
       HtmlUtil.serializeSubmitInput(writer, "Submit", "submit");

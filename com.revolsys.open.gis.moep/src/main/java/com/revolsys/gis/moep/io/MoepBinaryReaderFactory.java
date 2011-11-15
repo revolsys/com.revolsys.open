@@ -5,8 +5,10 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.model.DataObjectFactory;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 
-public class MoepBinaryReaderFactory extends AbstractDataObjectAndGeometryReaderFactory {
+public class MoepBinaryReaderFactory extends
+  AbstractDataObjectAndGeometryReaderFactory {
 
   /** The factory instance. */
   public static final MoepBinaryReaderFactory INSTANCE = new MoepBinaryReaderFactory();
@@ -25,9 +27,13 @@ public class MoepBinaryReaderFactory extends AbstractDataObjectAndGeometryReader
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     return new MoepBinaryReader(null, resource, dataObjectFactory);
+  }
+
+  public DataObjectReader createDataObjectReader(DataObjectMetaData metaData,
+    final Resource resource, final DataObjectFactory dataObjectFactory) {
+    throw new UnsupportedOperationException();
   }
 }

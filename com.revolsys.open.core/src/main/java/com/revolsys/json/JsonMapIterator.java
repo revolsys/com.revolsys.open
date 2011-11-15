@@ -18,12 +18,16 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
 
   private final JsonParser parser;
 
-  public JsonMapIterator(
-    final Reader in)
-    throws IOException {
-    this.parser = new JsonParser(in);
+  public JsonMapIterator(final Reader in) throws IOException {
+    this(in, false);
+  }
 
-    if (parser.hasNext()) {
+  public JsonMapIterator(final Reader in, boolean single) throws IOException {
+    this.parser = new JsonParser(in);
+    if (single) {
+      hasNext = true;
+      readNextRecord();
+    } else if (parser.hasNext()) {
       EventType event = parser.next();
       if (event == EventType.startDocument) {
         if (parser.hasNext()) {
@@ -42,6 +46,9 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
                 }
               }
             }
+          } else if (event == EventType.startArray) {
+            hasNext = true;
+            readNextRecord();
           }
         }
       }
@@ -90,7 +97,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
 
     if (hasNext && parser.hasNext()) {
       final EventType event = parser.next();
-      if (event == EventType.endArray) {
+      if (event == EventType.endArray || event == EventType.endDocument) {
         hasNext = false;
         close();
         return null;

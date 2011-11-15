@@ -4,24 +4,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.gis.data.model.types.DataType;
+
 public class ParameterInfo {
   private final String name;
 
   private final boolean required;
 
-  private final String type;
+  private final DataType type;
 
   private final String description;
 
   private final List<Object> allowedValues = new ArrayList<Object>();
 
   public ParameterInfo(final String name, final boolean required,
-    final String type, final String description, final Object... allowedValues) {
+    final DataType type, final String description, final Object... allowedValues) {
     this(name, required, type, description, Arrays.asList(allowedValues));
   }
 
   public ParameterInfo(final String name, final boolean required,
-    final String type, final String description,
+    final DataType type, final String description,
     final List<?> allowedValues) {
     this.name = name;
     this.required = required;
@@ -42,7 +44,7 @@ public class ParameterInfo {
     return name;
   }
 
-  public String getType() {
+  public DataType getType() {
     return type;
   }
 

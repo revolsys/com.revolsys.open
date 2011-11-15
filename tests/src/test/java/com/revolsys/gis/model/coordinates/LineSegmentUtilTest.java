@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.coordinates;
 
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,8 +12,9 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.MapReader;
 import com.revolsys.io.MapReaderFactory;
+import com.revolsys.io.Reader;
+import com.revolsys.spring.InputStreamResource;
 
 public class LineSegmentUtilTest {
 
@@ -29,7 +29,7 @@ public class LineSegmentUtilTest {
     final String extension = FileUtil.getFileNameExtension(filename);
     final MapReaderFactory factory = registry.getFactoryByFileExtension(
       MapReaderFactory.class, extension);
-    final MapReader reader = factory.createMapReader(new InputStreamReader(
+    final Reader<Map<String, Object>> reader = factory.createMapReader(new InputStreamResource(filename,
       resource.getInputStream()));
     for (Map<String, Object> testCase : reader) {
       String name = (String)testCase.get("name");

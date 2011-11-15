@@ -49,8 +49,6 @@
     <module>com.revolsys.open.orm.hibernate</module>
     <module>com.revolsys.open.orm.jpa</module>
     <module>com.revolsys.open.web</module>
-    <module>com.revolsys.open.gis.core</module>
-    <module>com.revolsys.open.gis.csv</module>
     <module>com.revolsys.open.gis.dbase</module>
     <module>com.revolsys.open.gis.ecsv</module>
     <module>com.revolsys.open.gis.gpx</module>
@@ -58,9 +56,7 @@
     <module>com.revolsys.open.gis.jdbc</module>
     <module>com.revolsys.open.gis.json</module>
     <module>com.revolsys.open.gis.kml</module>
-    <module>com.revolsys.open.gis.mdb</module>
     <module>com.revolsys.open.gis.moep</module>
-    <module>com.revolsys.open.gis.mysql</module>
     <module>com.revolsys.open.gis.oracle</module>
     <module>com.revolsys.open.gis.postgis</module>
     <module>com.revolsys.open.gis.saif</module>

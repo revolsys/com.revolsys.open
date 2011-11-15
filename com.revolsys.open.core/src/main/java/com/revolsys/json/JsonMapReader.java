@@ -3,19 +3,18 @@ package com.revolsys.json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.MapReader;
+import com.revolsys.io.Reader;
 
 public class JsonMapReader extends AbstractReader<Map<String, Object>>
-  implements MapReader {
+  implements Reader<Map<String, Object>> {
 
-  private final Reader in;
+  private final java.io.Reader in;
 
   private Iterator<Map<String, Object>> iterator;
 
@@ -23,7 +22,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
     this.in = new InputStreamReader(in, Charset.forName("UTF-8"));
   }
 
-  public JsonMapReader(final Reader in) {
+  public JsonMapReader(final java.io.Reader in) {
     this.in = in;
   }
 

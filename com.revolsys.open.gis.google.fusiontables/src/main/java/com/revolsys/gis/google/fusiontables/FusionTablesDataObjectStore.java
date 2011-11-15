@@ -47,8 +47,9 @@ import com.revolsys.gis.google.fusiontables.attribute.DateTimeAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.GeometryAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.NumberAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.StringAttribute;
-import com.revolsys.io.MapReader;
+import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.spring.InputStreamResource;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
@@ -135,11 +136,12 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private MapReader createMapReader(final String sql) {
+  private Reader<Map<String, Object>> createMapReader(final String sql) {
     try {
       final HttpResponse response = executeQuery(sql);
       final InputStream in = response.getContent();
-      final MapReader reader = new CsvMapIoFactory().createMapReader(in);
+      InputStreamResource resource = new InputStreamResource("in.csv", in);
+      final Reader<Map<String, Object>> reader = AbstractMapReaderFactory.mapReader(resource);
       return reader;
     } catch (final IOException e) {
       throw new RuntimeException("Unable to invoke query " + sql, e);
@@ -267,7 +269,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
 
   private List<Attribute> getAttributes(final String tableId) {
     final List<Attribute> attributes = new ArrayList<Attribute>();
-    final MapReader reader = createMapReader("DESCRIBE " + tableId);
+    final Reader<Map<String, Object>> reader = createMapReader("DESCRIBE " + tableId);
     attributes.add(new NumberAttribute("rowid"));
     for (final Map<String, Object> map : reader) {
       final String name = (String)map.get("name");
@@ -390,7 +392,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     final Map<QName, DataObjectMetaData> metaDataMap) {
     final List<QName> typeNames = new ArrayList<QName>();
     final String namespace = schema.getName();
-    final MapReader reader = createMapReader("SHOW TABLES");
+    final Reader<Map<String, Object>> reader = createMapReader("SHOW TABLES");
     for (final Map<String, Object> map : reader) {
       final String tableId = (String)map.get("table id");
       final String tableName = (String)map.get("name");

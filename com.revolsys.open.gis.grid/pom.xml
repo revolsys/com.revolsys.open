@@ -29,7 +29,7 @@
   		<groupId>com.revolsys.open</groupId>
 
 
-  		<artifactId>com.revolsys.open.gis.core</artifactId>
+  		<artifactId>com.revolsys.open.core</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   </dependencies>

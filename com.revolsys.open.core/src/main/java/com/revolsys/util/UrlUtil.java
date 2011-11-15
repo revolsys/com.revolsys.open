@@ -63,6 +63,10 @@ public final class UrlUtil {
     }
   }
 
+  public static String getFileName(final String url) {
+    return getFileName(getUrl(url));
+  }
+
   public static String getFileName(final URL url) {
     final String path = url.getPath();
     final int index = path.lastIndexOf('/');

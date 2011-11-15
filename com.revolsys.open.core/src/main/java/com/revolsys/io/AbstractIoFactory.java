@@ -21,14 +21,11 @@ public abstract class AbstractIoFactory implements IoFactory {
 
   private final String name;
 
-  public AbstractIoFactory(
-    final String name) {
+  public AbstractIoFactory(final String name) {
     this.name = name;
   }
 
-  private void add(
-    final Map<String, Set<String>> mapSet,
-    final String key,
+  private void add(final Map<String, Set<String>> mapSet, final String key,
     final String value) {
     Set<String> set = mapSet.get(key);
     if (set == null) {
@@ -38,8 +35,7 @@ public abstract class AbstractIoFactory implements IoFactory {
     set.add(value);
   }
 
-  protected void addMediaTypeAndFileExtension(
-    final String mediaType,
+  protected void addMediaTypeAndFileExtension(final String mediaType,
     final String fileExtension) {
     mediaTypes.add(mediaType);
     fileExtensions.add(fileExtension);
@@ -47,8 +43,7 @@ public abstract class AbstractIoFactory implements IoFactory {
     add(fileExtensionToMediaType, fileExtension, mediaType);
   }
 
-  public String getFileExtension(
-    final String mediaType) {
+  public String getFileExtension(final String mediaType) {
     final Set<String> fileExtensions = mediaTypeToFileExtension.get(mediaType);
     if (fileExtensions == null) {
       return null;
@@ -67,8 +62,7 @@ public abstract class AbstractIoFactory implements IoFactory {
     return fileExtensions;
   }
 
-  public String getMediaType(
-    final String fileExtension) {
+  public String getMediaType(final String fileExtension) {
     final Set<String> mediaTypes = fileExtensionToMediaType.get(fileExtension);
     if (mediaTypes == null) {
       return null;
@@ -91,4 +85,8 @@ public abstract class AbstractIoFactory implements IoFactory {
     return name;
   }
 
+  @Override
+  public String toString() {
+    return getName();
+  }
 }
