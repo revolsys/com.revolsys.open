@@ -3,6 +3,11 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 public class Projection implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 6199958151692874551L;
+
   private Authority authority;
 
   private final String name;

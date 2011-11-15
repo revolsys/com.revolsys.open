@@ -15,6 +15,11 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineSegment extends AbstractCoordinatesList {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 3905321662159212931L;
+
   private static final GeometryFactory FACTORY = new GeometryFactory();
 
   public static void visit(final LineString line,

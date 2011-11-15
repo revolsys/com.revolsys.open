@@ -23,7 +23,7 @@ public class IteratorReader<T> extends AbstractReader<T> {
 
   public void close() {
     if (iterator instanceof AbstractIterator) {
-      AbstractIterator i = (AbstractIterator)iterator;
+      AbstractIterator<T> i = (AbstractIterator<T>)iterator;
       i.close();
     }
     iterator = null;
@@ -57,6 +57,7 @@ public class IteratorReader<T> extends AbstractReader<T> {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <C> C getProperty(
     String name) {

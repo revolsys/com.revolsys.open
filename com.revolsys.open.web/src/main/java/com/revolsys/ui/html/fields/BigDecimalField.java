@@ -19,9 +19,9 @@ import java.math.BigDecimal;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.xml.io.XmlWriter;
 
 public class BigDecimalField extends Field {
   private int size = 10;

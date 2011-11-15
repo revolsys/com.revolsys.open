@@ -1,9 +1,6 @@
 package com.revolsys.gis.geometry.io;
 
-import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;

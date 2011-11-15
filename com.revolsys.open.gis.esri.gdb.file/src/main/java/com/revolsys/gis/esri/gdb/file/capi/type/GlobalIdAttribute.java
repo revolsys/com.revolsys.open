@@ -4,7 +4,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.xml.model.Field;
+import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class GlobalIdAttribute extends AbstractFileGdbAttribute {
   public GlobalIdAttribute(final Field field) {

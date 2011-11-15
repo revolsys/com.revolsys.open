@@ -16,7 +16,7 @@
 
   <bean
     id="postgresDataStore"
-    class="com.revolsys.gis.jdbc.io.JdbcFactory"
+    class="com.revolsys.jdbc.io.JdbcFactory"
     factory-method="createDataObjectStore"
   >
     <constructor-arg

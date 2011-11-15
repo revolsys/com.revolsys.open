@@ -9,6 +9,11 @@ import com.revolsys.gis.graph.Node;
 public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
   implements NodeEventListener<T> {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 491848000001273343L;
+
   public void nodeEvent(
     final Node<T> node,
     final QName typeName,

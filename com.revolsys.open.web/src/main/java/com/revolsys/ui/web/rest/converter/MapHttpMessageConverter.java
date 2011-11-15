@@ -21,7 +21,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
-import com.revolsys.json.JsonParserUtil;
+import com.revolsys.io.json.JsonParserUtil;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 
 public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {

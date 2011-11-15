@@ -5,6 +5,11 @@ import java.io.Serializable;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Spheroid implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -8349864136575195872L;
+
   private final Authority authority;
 
   private boolean deprecated;

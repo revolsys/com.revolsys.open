@@ -32,14 +32,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.ecsv.io.EcsvConstants;
-import com.revolsys.gis.ecsv.io.EcsvIoFactory;
 import com.revolsys.gis.ecsv.service.EcsvServiceConstants;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.io.ecsv.EcsvConstants;
+import com.revolsys.io.ecsv.EcsvIoFactory;
 import com.revolsys.spring.InputStreamResource;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class EcsvDataObjectStore extends AbstractDataObjectStore {

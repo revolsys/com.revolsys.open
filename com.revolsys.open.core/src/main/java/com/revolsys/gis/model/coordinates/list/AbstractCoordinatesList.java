@@ -12,6 +12,11 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractCoordinatesList implements CoordinatesList,
   Cloneable {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 9211011581013036939L;
+
   private void append(final StringBuffer s, final int i, final byte numAxis) {
     s.append(getX(i));
     s.append(' ');

@@ -3,6 +3,11 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 public class Datum implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 4603557237435332398L;
+
   private final Authority authority;
 
   private boolean deprecated;

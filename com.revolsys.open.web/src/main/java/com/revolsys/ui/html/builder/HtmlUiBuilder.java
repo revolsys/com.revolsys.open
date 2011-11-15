@@ -44,6 +44,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.web.context.ServletContextAware;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.orm.core.DataAccessObject;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.html.HtmlUtil;
@@ -76,7 +77,6 @@ import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class HtmlUiBuilder implements BeanFactoryAware, ServletContextAware {
 

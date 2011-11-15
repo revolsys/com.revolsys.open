@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.xml.model.Field;
+import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class IntegerAttribute extends AbstractFileGdbAttribute {
   public IntegerAttribute(final Field field) {

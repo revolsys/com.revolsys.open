@@ -27,14 +27,16 @@ public class EdgePair<T> {
     return edge2;
   }
 
-  public <T> T getProperty1(
+  @SuppressWarnings("unchecked")
+  public <V> V getProperty1(
     final String name) {
-    return (T)properties1.get(name);
+    return (V)properties1.get(name);
   }
 
-  public <T> T getProperty2(
+  @SuppressWarnings("unchecked")
+  public <V> V getProperty2(
     final String name) {
-    return (T)properties2.get(name);
+    return (V)properties2.get(name);
   }
 
   public void setProperty1(

@@ -3,6 +3,11 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 public class PrimeMeridian implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -2580130961723669616L;
+
   private final Authority authority;
 
   private boolean deprecated;

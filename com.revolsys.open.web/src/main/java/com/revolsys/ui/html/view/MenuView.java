@@ -22,11 +22,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.web.config.Menu;
 import com.revolsys.ui.web.config.MenuItem;
 import com.revolsys.ui.web.config.WebUiContext;
-import com.revolsys.xml.io.XmlWriter;
 
 public class MenuView extends ObjectView {
   private static final Logger log = Logger.getLogger(MenuView.class);

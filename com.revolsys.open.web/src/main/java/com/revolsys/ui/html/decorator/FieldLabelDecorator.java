@@ -17,10 +17,10 @@ package com.revolsys.ui.html.decorator;
 
 import java.util.Iterator;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
-import com.revolsys.xml.io.XmlWriter;
 
 public class FieldLabelDecorator implements Decorator {
   private String label = "";

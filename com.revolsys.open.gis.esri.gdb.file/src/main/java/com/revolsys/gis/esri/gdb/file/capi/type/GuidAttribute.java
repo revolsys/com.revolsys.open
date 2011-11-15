@@ -5,7 +5,7 @@ import java.util.WeakHashMap;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.xml.model.Field;
+import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class GuidAttribute extends AbstractFileGdbAttribute {
   private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();

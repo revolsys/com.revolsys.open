@@ -12,14 +12,14 @@
   "
 >
   <bean
-    class="com.revolsys.gis.jdbc.io.JdbcFactory"
+    class="com.revolsys.jdbc.io.JdbcFactory"
     factory-method="register"
   >
     <constructor-arg value="PostgreSQL" />
     <constructor-arg value="com.revolsys.gis.postgis.PostGisDataObjectStore" />
   </bean>  
   <bean
-    class="com.revolsys.gis.jdbc.io.JdbcFactory"
+    class="com.revolsys.jdbc.io.JdbcFactory"
     factory-method="register"
   >
     <constructor-arg

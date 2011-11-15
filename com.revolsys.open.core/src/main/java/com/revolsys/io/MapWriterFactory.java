@@ -5,4 +5,8 @@ import java.io.Writer;
 public interface MapWriterFactory extends IoFactory {
   MapWriter getWriter(
     final Writer out);
+  
+  boolean isGeometrySupported();
+  
+  boolean isCustomAttributionSupported();
 }

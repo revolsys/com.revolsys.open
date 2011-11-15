@@ -3,8 +3,8 @@ package com.revolsys.gis.google.fusiontables.attribute;
 import java.io.StringReader;
 
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.kml.io.KmlGeometryIterator;
-import com.revolsys.gis.kml.io.KmlWriterUtil;
+import com.revolsys.io.kml.KmlGeometryIterator;
+import com.revolsys.io.kml.KmlWriterUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryAttribute extends FusionTablesAttribute {

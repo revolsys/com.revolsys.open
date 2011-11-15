@@ -8,6 +8,7 @@ import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.GenericCollectionTypeResolver;
 
+@SuppressWarnings("rawtypes")
 public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
 
   private List<List<T>> sourceLists;

@@ -19,9 +19,9 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.xml.io.XmlWriter;
 
 public class HtmlUiBuilderPropertyReadOnlyField extends Field {
 

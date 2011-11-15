@@ -21,15 +21,8 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.ObjectProcessor;
-import com.vividsolutions.jts.geom.LineString;
 
 public class ItersectsNodeEdgeCleanupVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {

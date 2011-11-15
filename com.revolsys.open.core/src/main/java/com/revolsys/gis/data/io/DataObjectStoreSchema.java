@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.xml.QNameComparator;
+import com.revolsys.io.xml.QNameComparator;
 
 public class DataObjectStoreSchema {
   private final AbstractDataObjectStore dataObjectStore;

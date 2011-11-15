@@ -3,8 +3,8 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class AutoCompleteTextField extends TextField {
   private int maxResults = 25;

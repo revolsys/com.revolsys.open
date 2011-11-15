@@ -11,12 +11,11 @@ import com.vividsolutions.jts.algorithm.Angle;
  * @param <T> The type of object stored on the edges in the graph.
  */
 public class EdgeToAngleComparator<T> implements Comparator<Edge<T>> {
-  @SuppressWarnings("unchecked")
-  private static final EdgeToAngleComparator INSTANCE = new EdgeToAngleComparator();
+  private static final EdgeToAngleComparator<?> INSTANCE = new EdgeToAngleComparator<Object>();
 
   @SuppressWarnings("unchecked")
   public static <T> EdgeToAngleComparator<T> get() {
-    return INSTANCE;
+    return (EdgeToAngleComparator<T>)INSTANCE;
   }
 
   /**

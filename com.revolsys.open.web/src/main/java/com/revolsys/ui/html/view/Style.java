@@ -16,8 +16,8 @@
 package com.revolsys.ui.html.view;
 
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class Style extends Element {
   private String content;

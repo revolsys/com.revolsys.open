@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,7 +34,7 @@ public class IoFactoryRegistry {
           properties.load(resourceUrl.openStream());
           final String factoryClassNames = properties.getProperty("com.revolsys.io.IoFactory.factoryClassNames");
           for (final String factoryClassName : factoryClassNames.split(",")) {
-            final Class<?> factoryClass = Class.forName(factoryClassName);
+            final Class<?> factoryClass = Class.forName(factoryClassName.trim());
             if (IoFactory.class.isAssignableFrom(factoryClass)) {
               final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
               INSTANCE.addFactory(factory);
@@ -100,7 +101,7 @@ public class IoFactoryRegistry {
     final Class<F> factoryClass) {
     Set<IoFactory> factories = classFactories.get(factoryClass);
     if (factories == null) {
-      factories = new HashSet<IoFactory>();
+      factories = new LinkedHashSet<IoFactory>();
       classFactories.put(factoryClass, factories);
     }
     return (Set<F>)factories;
@@ -165,7 +166,7 @@ public class IoFactoryRegistry {
 
   public <F extends IoFactory> F getFactoryByResource(
     final Class<F> factoryClass, final Resource resource) {
-     String fileName;
+    String fileName;
     if (resource instanceof UrlResource) {
       UrlResource urlResoure = (UrlResource)resource;
       try {

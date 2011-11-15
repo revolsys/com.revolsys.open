@@ -9,6 +9,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class CoordinateEventListenerList extends
   LinkedHashSet<CoordinateEventListener> implements CoordinateEventListener {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 3504994646284361341L;
+
   public void coordinateEvent(
     final Coordinate coordinate,
     final QName typeName,

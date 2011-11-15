@@ -16,8 +16,8 @@
 package com.revolsys.ui.html.decorator;
 
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.view.Element;
-import com.revolsys.xml.io.XmlWriter;
 
 public class EmptyDecorator implements Decorator {
   public void serialize(final XmlWriter out, final Element element) {

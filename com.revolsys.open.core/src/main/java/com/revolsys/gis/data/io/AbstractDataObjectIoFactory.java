@@ -11,7 +11,6 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
@@ -20,14 +19,6 @@ import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractDataObjectIoFactory extends
   AbstractDataObjectReaderFactory implements DataObjectWriterFactory {
-
-  protected static DataObjectWriterFactory getDataObjectWriterFactory(
-    final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
-    final DataObjectWriterFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      DataObjectWriterFactory.class, resource);
-    return readerFactory;
-  }
 
   public static Writer<DataObject> dataObjectWriter(
     final DataObjectMetaData metaData, final Resource resource) {
@@ -41,10 +32,25 @@ public abstract class AbstractDataObjectIoFactory extends
     }
   }
 
+  protected static DataObjectWriterFactory getDataObjectWriterFactory(
+    final Resource resource) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final DataObjectWriterFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      DataObjectWriterFactory.class, resource);
+    return readerFactory;
+  }
+
+  private final boolean geometrySupported;
+
+  private final boolean customAttributionSupported;
+
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractDataObjectIoFactory(final String name, final boolean binary) {
+  public AbstractDataObjectIoFactory(final String name, final boolean binary,
+    final boolean geometrySupported, final boolean customAttributionSupported) {
     super(name, binary);
+    this.geometrySupported = geometrySupported;
+    this.customAttributionSupported = customAttributionSupported;
   }
 
   /**
@@ -75,6 +81,14 @@ public abstract class AbstractDataObjectIoFactory extends
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
     return coordinateSystems.contains(coordinateSystem);
+  }
+
+  public boolean isCustomAttributionSupported() {
+    return customAttributionSupported;
+  }
+
+  public boolean isGeometrySupported() {
+    return geometrySupported;
   }
 
   protected void setCoordinateSystems(

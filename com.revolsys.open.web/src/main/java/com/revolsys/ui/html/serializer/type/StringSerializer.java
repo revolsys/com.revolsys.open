@@ -3,7 +3,7 @@ package com.revolsys.ui.html.serializer.type;
 import java.io.IOException;
 import java.util.Locale;
 
-import com.revolsys.xml.io.XmlWriter;
+import com.revolsys.io.xml.io.XmlWriter;
 
 /**
  * Serialize an object as a string..

@@ -1,6 +1,5 @@
 package com.revolsys.gis.data.io;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -12,11 +11,9 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
-import com.revolsys.gis.wkt.WktDataObjectIterator;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
@@ -29,8 +26,19 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
   public AbstractDataObjectAndGeometryIoFactory(final String name,
-    boolean binary) {
+    boolean binary, boolean customAttributionSupported) {
     super(name, binary);
+    this.customAttributionSupported = customAttributionSupported;
+  }
+
+  public boolean isGeometrySupported() {
+    return true;
+  }
+
+  private boolean customAttributionSupported;
+
+  public boolean isCustomAttributionSupported() {
+    return customAttributionSupported;
   }
 
   /**

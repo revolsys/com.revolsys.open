@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.serializer;
 
-import com.revolsys.xml.io.XmlWriter;
+import com.revolsys.io.xml.io.XmlWriter;
 
 public interface TableSerializer {
   int getColumnCount();

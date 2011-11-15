@@ -10,6 +10,11 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 8655274386401351222L;
+
   private final AngularUnit angularUnit;
 
   private Area area;

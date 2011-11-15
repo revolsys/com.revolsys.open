@@ -22,9 +22,9 @@ import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.xml.io.XmlWriter;
 
 public class Element implements Cloneable {
   private ElementContainer container;

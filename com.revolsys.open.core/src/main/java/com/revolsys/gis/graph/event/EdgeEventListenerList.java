@@ -7,6 +7,11 @@ import com.revolsys.gis.graph.Edge;
 public class EdgeEventListenerList<T> extends LinkedHashSet<EdgeEventListener>
   implements EdgeEventListener<T> {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 4332907382649828764L;
+
   public void edgeEvent(
     final Edge<T> edge,
     final String ruleName,

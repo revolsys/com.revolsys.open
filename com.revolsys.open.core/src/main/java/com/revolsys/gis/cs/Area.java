@@ -5,6 +5,11 @@ import java.io.Serializable;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class Area implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 2662773652065582230L;
+
   private final Authority authority;
 
   private final boolean deprecated;

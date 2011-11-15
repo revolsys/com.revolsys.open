@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
-import com.revolsys.gis.esri.gdb.xml.model.CodedValueDomain;
-import com.revolsys.gis.esri.gdb.xml.model.Domain;
-import com.revolsys.gis.esri.gdb.xml.model.EsriGdbXmlSerializer;
+import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
+import com.revolsys.io.esri.gdb.xml.model.Domain;
+import com.revolsys.io.esri.gdb.xml.model.EsriGdbXmlSerializer;
 
 public class FileGdbDomainCodeTable implements CodeTable {
   private final CodedValueDomain domain;

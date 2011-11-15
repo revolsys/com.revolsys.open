@@ -29,11 +29,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class Form extends ElementContainer {
   public static final String FORM_TASK_PARAM = "rs_form_task";

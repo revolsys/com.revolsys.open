@@ -4,6 +4,10 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 
 public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 872633273329727308L;
   private final CoordinateSequence coordinateSequence;
 
   public CoordinateSequenceCoordinateList(

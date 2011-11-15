@@ -10,6 +10,11 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class RTreeNode<T> extends Envelope {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -8110404083135361671L;
+
   public RTreeNode() {
   }
 

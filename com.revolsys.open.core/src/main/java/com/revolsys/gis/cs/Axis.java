@@ -3,6 +3,11 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 public class Axis implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 5463484439488623454L;
+
   private final String direction;
 
   private final String name;

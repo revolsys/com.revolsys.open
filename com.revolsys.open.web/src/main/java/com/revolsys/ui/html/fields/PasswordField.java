@@ -16,8 +16,8 @@
 package com.revolsys.ui.html.fields;
 
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class PasswordField extends TextField {
 

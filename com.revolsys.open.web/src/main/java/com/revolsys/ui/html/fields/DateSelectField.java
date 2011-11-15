@@ -20,16 +20,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.xml.io.XmlWriter;
 
 public class DateSelectField extends Field {
 
@@ -41,9 +40,9 @@ public class DateSelectField extends Field {
 
   private final Logger log = Logger.getLogger(DateSelectField.class);
 
-  private static final List DAY_OPTIONS;
+  private static final List<FieldValue> DAY_OPTIONS;
 
-  private static final List MONTH_OPTIONS;
+  private static final List<FieldValue> MONTH_OPTIONS;
 
   private static final String[] MONTHS = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
@@ -51,13 +50,13 @@ public class DateSelectField extends Field {
   };
 
   static {
-    List dayOptions = new ArrayList();
+    List<FieldValue> dayOptions = new ArrayList<FieldValue>();
     for (byte i = 1; i <= 31; i++) {
       String val = String.valueOf(i);
       dayOptions.add(new FieldValue(new Byte(i), val, val));
     }
     DAY_OPTIONS = Collections.unmodifiableList(dayOptions);
-    List monthOptions = new ArrayList();
+    List<FieldValue> monthOptions = new ArrayList<FieldValue>();
     for (byte i = 0; i < MONTHS.length; i++) {
       String val = String.valueOf(i);
       monthOptions.add(new FieldValue(new Byte(i), val, MONTHS[i]));
@@ -65,7 +64,7 @@ public class DateSelectField extends Field {
     MONTH_OPTIONS = Collections.unmodifiableList(monthOptions);
   }
 
-  private List yearOptions = new ArrayList();
+  private List<FieldValue> yearOptions = new ArrayList<FieldValue>();
 
   private String dayStringValue;
 
@@ -115,7 +114,7 @@ public class DateSelectField extends Field {
   }
 
   private void serializeSelect(final XmlWriter out, final String part,
-    final List options) {
+    final List<FieldValue> options) {
     String name = getName() + part;
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_ID, name);
@@ -125,7 +124,7 @@ public class DateSelectField extends Field {
   }
 
   private void serializeOptions(final XmlWriter out, final String part,
-    final List options) {
+    final List<FieldValue> options) {
     String stringValue = "";
     if (part.equals(DAY_KEY)) {
       stringValue = dayStringValue;
@@ -134,10 +133,8 @@ public class DateSelectField extends Field {
     } else if (part.equals(YEAR_KEY)) {
       stringValue = yearStringValue;
     }
-    for (Iterator optionIter = options.iterator(); optionIter.hasNext();) {
-      FieldValue option = (FieldValue)optionIter.next();
+    for (FieldValue option : options) {
       out.startTag(HtmlUtil.OPTION);
-      boolean selected = false;
       if (option.getStringValue().equals(stringValue)) {
         out.attribute(HtmlUtil.ATTR_SELECTED, "true");
       }

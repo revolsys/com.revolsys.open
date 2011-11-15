@@ -17,10 +17,10 @@ package com.revolsys.ui.html.layout;
 
 import java.util.Iterator;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.xml.io.XmlWriter;
 
 public class DefinitionListLayout implements ElementContainerLayout {
   private String cssClass;

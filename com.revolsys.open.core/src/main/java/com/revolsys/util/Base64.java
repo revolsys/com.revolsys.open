@@ -1642,8 +1642,7 @@ public class Base64 {
 
     // Isolate options
     final int gzip = (options & GZIP);
-    final int dontBreakLines = (options & DONT_BREAK_LINES);
-
+   
     try {
       // ObjectOutputStream -> (GZIP) -> Base64 -> ByteArrayOutputStream
       baos = new java.io.ByteArrayOutputStream();

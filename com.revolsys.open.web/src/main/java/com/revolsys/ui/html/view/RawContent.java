@@ -16,7 +16,7 @@
 package com.revolsys.ui.html.view;
 
 
-import com.revolsys.xml.io.XmlWriter;
+import com.revolsys.io.xml.io.XmlWriter;
 
 /**
  * @author paustin

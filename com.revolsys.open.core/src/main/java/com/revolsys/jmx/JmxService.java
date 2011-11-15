@@ -122,7 +122,6 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The attribute values.
    */
-  @SuppressWarnings("unchecked")
   public List<Attribute> getAttributes(
     final String serverId,
     final String objectId) {

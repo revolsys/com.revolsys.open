@@ -15,8 +15,8 @@
  */
 package com.revolsys.ui.html.layout;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.xml.io.XmlWriter;
 
 public interface ElementContainerLayout {
   void serialize(XmlWriter out, ElementContainer container);

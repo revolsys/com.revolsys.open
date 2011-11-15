@@ -13,13 +13,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.orm.core.DataAccessObject;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.web.config.ActionConfig;
 import com.revolsys.ui.web.exception.ActionException;
 import com.revolsys.ui.web.exception.ActionInitException;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class AjaxSearch extends SpringFrameworkAction {
 private static final Logger log = Logger.getLogger(AjaxSearch.class);

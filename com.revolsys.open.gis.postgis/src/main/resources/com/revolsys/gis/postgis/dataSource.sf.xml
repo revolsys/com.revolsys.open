@@ -13,7 +13,7 @@
 >
   <bean
     id="postgresDataSource"
-    class="com.revolsys.gis.jdbc.io.JdbcDataSourceFactoryBean"
+    class="com.revolsys.jdbc.io.JdbcDataSourceFactoryBean"
     p:url="jdbc:postgresql://localhost:5432/postgres"
     p:username="postgres"
     p:password=""

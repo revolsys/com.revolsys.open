@@ -14,6 +14,11 @@ import com.vividsolutions.jts.geom.Envelope;
 public class RTreeBranch<T> extends RTreeNode<T> implements
   Iterable<RTreeNode<T>> {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -6766833009366142439L;
+
   private RTreeNode<T>[] nodes;
 
   private int size;

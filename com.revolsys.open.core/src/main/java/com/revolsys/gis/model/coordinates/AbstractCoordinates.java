@@ -1,7 +1,5 @@
 package com.revolsys.gis.model.coordinates;
 
-import java.nio.channels.UnsupportedAddressTypeException;
-
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinates implements Coordinates {

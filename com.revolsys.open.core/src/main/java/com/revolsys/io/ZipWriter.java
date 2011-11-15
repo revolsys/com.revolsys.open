@@ -21,7 +21,7 @@ public class ZipWriter<T> extends DelegatingWriter<T> {
 
   public ZipWriter(
     File tempDirectory,
-    Writer writer,
+    Writer<T> writer,
     OutputStream out) {
     super(writer);
     this.tempDirectory = tempDirectory;

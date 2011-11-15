@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderFactory;
 import com.revolsys.ui.web.config.WebUiContext;
-import com.revolsys.xml.io.XmlWriter;
 
 public class ObjectDetailView extends ObjectView {
   private static final Logger log = Logger.getLogger(ObjectDetailView.class);

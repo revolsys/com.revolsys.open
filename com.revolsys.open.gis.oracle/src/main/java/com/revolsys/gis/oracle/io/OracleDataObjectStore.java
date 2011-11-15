@@ -20,13 +20,13 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
-import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;

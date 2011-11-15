@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 /**
  * Serialize a date with just the date fields.

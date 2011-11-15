@@ -2,7 +2,6 @@ package com.revolsys.gis.data.io;
 
 import java.util.Map;
 
-
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;

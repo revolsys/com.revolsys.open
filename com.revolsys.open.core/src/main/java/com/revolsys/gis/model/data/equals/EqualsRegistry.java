@@ -18,7 +18,7 @@ public class EqualsRegistry implements Equals<Object> {
 
   public static final EqualsRegistry INSTANCE = new EqualsRegistry();
 
-  private final Map<Class<?>, Equals> classEqualsMap = new HashMap<Class<?>, Equals>();
+  private final Map<Class<?>, Equals<?>> classEqualsMap = new HashMap<Class<?>, Equals<?>>();
 
   public EqualsRegistry() {
     register(Object.class, DEFAULT_EQUALS);
@@ -52,12 +52,12 @@ public class EqualsRegistry implements Equals<Object> {
       if (object2 == null) {
         return true;
       } else {
-        final Equals equals = getEquals(object2.getClass());
+        final Equals<Object> equals = getEquals(object2.getClass());
         return equals.equals(object2, object1, exclude);
       }
     } else {
       try {
-        final Equals equals = getEquals(object1.getClass());
+        final Equals<Object> equals = getEquals(object1.getClass());
         return equals.equals(object1, object2, exclude);
       } catch (final ClassCastException e) {
         return false;
@@ -65,12 +65,13 @@ public class EqualsRegistry implements Equals<Object> {
     }
   }
 
-  public Equals getEquals(
+  public Equals<Object> getEquals(
     final Class<?> clazz) {
     if (clazz == null) {
       return DEFAULT_EQUALS;
     } else {
-      Equals equals = classEqualsMap.get(clazz);
+      @SuppressWarnings("unchecked")
+      Equals<Object> equals = (Equals<Object>)classEqualsMap.get(clazz);
       if (equals == null) {
         final Class<?>[] interfaces = clazz.getInterfaces();
         if (interfaces != null) {
@@ -90,7 +91,7 @@ public class EqualsRegistry implements Equals<Object> {
 
   public void register(
     final Class<?> clazz,
-    final Equals equals) {
+    final Equals<?> equals) {
     classEqualsMap.put(clazz, equals);
     equals.setEqualsRegistry(this);
   }

@@ -15,9 +15,9 @@
  */
 package com.revolsys.ui.html.view;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
 import com.revolsys.ui.model.LabelValueListModel;
-import com.revolsys.xml.io.XmlWriter;
 
 /**
  * @author paustin

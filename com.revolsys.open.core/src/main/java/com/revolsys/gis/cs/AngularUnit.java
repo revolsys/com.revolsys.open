@@ -9,6 +9,11 @@ import javax.measure.unit.Unit;
 
 public class AngularUnit implements Serializable {
   /**
+   * 
+   */
+  private static final long serialVersionUID = -3508138430785747634L;
+
+  /**
    * Get the angular unit representing the conversion factor from
    * {@link SI#RADIAN}.
    * 

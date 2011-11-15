@@ -23,11 +23,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.layout.ElementContainerLayout;
 import com.revolsys.ui.html.layout.RawLayout;
-import com.revolsys.xml.io.XmlWriter;
 
 public class ElementContainer extends Element {
   private List<ElementContainer> containers = new ArrayList<ElementContainer>();

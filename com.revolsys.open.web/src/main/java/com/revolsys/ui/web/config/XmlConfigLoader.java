@@ -25,9 +25,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.xml.io.SimpleXmlProcessorContext;
-import com.revolsys.xml.io.StaxUtils;
-import com.revolsys.xml.io.XmlProcessorContext;
+import com.revolsys.io.xml.io.SimpleXmlProcessorContext;
+import com.revolsys.io.xml.io.StaxUtils;
+import com.revolsys.io.xml.io.XmlProcessorContext;
 
 public class XmlConfigLoader {
   private static final Logger log = Logger.getLogger(XmlConfigLoader.class);

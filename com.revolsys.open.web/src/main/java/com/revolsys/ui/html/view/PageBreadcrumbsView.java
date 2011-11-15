@@ -15,10 +15,10 @@
  */
 package com.revolsys.ui.html.view;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
-import com.revolsys.xml.io.XmlWriter;
 
 public class PageBreadcrumbsView extends ObjectView {
   private String cssClass = "breadcrumbsMenu";

@@ -1,6 +1,10 @@
 package com.revolsys.gis.model.coordinates.list;
 
 public class ReverseCoordinatesList extends AbstractCoordinatesList {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 8489637345116642703L;
   private final CoordinatesList coordinateList;
 
   public ReverseCoordinatesList(

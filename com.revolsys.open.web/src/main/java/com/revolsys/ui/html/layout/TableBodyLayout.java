@@ -20,10 +20,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.xml.io.XmlWriter;
 
 public class TableBodyLayout implements ElementContainerLayout {
   private static final Logger log = Logger.getLogger(TableLayout.class);

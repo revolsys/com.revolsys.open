@@ -19,9 +19,7 @@
   <dependencies>
   	<dependency>
   		<groupId>com.revolsys.open</groupId>
-
-
-  		<artifactId>com.revolsys.open.gis.web</artifactId>
+  		<artifactId>com.revolsys.open.web</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>
@@ -29,20 +27,6 @@
 
 
   		<artifactId>com.revolsys.open.gis.ecsv</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.revolsys.open</groupId>
-
-
-  		<artifactId>com.revolsys.open.gis.html</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.revolsys.open</groupId>
-
-
-  		<artifactId>com.revolsys.open.gis.kml</artifactId>
   		<version>${project.version}</version>
   	</dependency>
   	<dependency>

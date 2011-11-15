@@ -15,9 +15,9 @@
  */
 package com.revolsys.ui.html.view;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.xml.io.XmlWriter;
 
 public class PathBreadcrumbView extends Element {
 

@@ -6,6 +6,11 @@ import java.util.TreeMap;
 public class DataObjectStoreSchemaMapProxy extends
   TreeMap<String, DataObjectStoreSchema> {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -1711922998363200190L;
+
   private Map<String, DataObjectStoreSchema> map;
 
   private AbstractDataObjectStore dataObjectStore;

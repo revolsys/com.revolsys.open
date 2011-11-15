@@ -3,7 +3,6 @@ package com.revolsys.gis.postgis;
 import java.sql.SQLException;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
@@ -17,9 +16,9 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.gis.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
 

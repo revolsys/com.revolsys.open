@@ -21,8 +21,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.xml.io.XmlWriter;
 
 public class FormTag extends BodyTagSupport {
   /** The unique serial version UID for the class. */

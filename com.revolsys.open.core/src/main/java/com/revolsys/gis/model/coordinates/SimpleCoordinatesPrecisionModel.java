@@ -4,6 +4,11 @@ import java.io.Serializable;
 
 public class SimpleCoordinatesPrecisionModel implements
   CoordinatesPrecisionModel, Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -1119410280750540081L;
+
   public static SimpleCoordinatesPrecisionModel FLOATING = new SimpleCoordinatesPrecisionModel();
 
   public static double makePrecise(final double value, final double scale) {

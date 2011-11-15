@@ -21,11 +21,11 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.gis.jdbc.io.JdbcConstants;
-import com.revolsys.gis.jdbc.io.SqlFunction;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.io.JdbcConstants;
+import com.revolsys.jdbc.io.SqlFunction;
 
 public class StGeometryAttributeAdder extends JdbcAttributeAdder {
   private static final Logger LOG = LoggerFactory.getLogger(StGeometryAttributeAdder.class);

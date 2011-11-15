@@ -2,8 +2,8 @@ package com.revolsys.ui.html.view;
 
 import java.io.IOException;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 public class XhtmlDocument {
 	private Element body;

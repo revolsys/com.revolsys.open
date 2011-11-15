@@ -13,7 +13,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.jdbc.io.JdbcDdlWriter;
+import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class PostgisDdlWriter extends JdbcDdlWriter {

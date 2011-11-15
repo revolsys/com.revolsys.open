@@ -14,9 +14,8 @@ import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
-import org.springframework.beans.NotWritablePropertyException;
 
-import com.revolsys.gis.jdbc.io.DataSourceFactory;
+import com.revolsys.jdbc.io.DataSourceFactory;
 
 public class OracleDataSourceFactory implements DataSourceFactory {
   public static final List<String> URL_PATTERNS = Arrays.asList("jdbc:oracle:thin:(?:([^/]+)(?:/([^@]+))?)?@(?://)?([^:]+)(?::([^:]+))[:/](.+)");

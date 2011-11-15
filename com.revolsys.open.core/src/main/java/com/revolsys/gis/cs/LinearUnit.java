@@ -9,6 +9,11 @@ import javax.measure.unit.Unit;
 
 public class LinearUnit implements Serializable {
   /**
+   * 
+   */
+  private static final long serialVersionUID = 4000991484199279234L;
+
+  /**
    * Get the linear unit representing the conversion factor from
    * {@link SI#METER}.
    * 

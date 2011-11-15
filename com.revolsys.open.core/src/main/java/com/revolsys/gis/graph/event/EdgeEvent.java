@@ -8,6 +8,11 @@ import com.revolsys.gis.graph.Edge;
 import com.vividsolutions.jts.geom.LineString;
 
 public class EdgeEvent<T> extends EventObject {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -2271176357444777709L;
+
   public static final String EDGE_ADDED = "Added";
 
   public static final String EDGE_CHANGED = "Changed";

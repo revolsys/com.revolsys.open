@@ -18,7 +18,6 @@ package com.revolsys.io.filter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -36,10 +35,10 @@ import java.util.List;
  */
 public class MultipleFilenameFilter implements FilenameFilter {
   /** The filters to exclude files from the results. */
-  private final List exclusionFilters = new ArrayList();
+  private final List<FilenameFilter> exclusionFilters = new ArrayList<FilenameFilter>();
 
   /** The filters to include files from the results. */
-  private final List filters = new ArrayList();
+  private final List<FilenameFilter> filters = new ArrayList<FilenameFilter>();
 
   /**
    * Check to see if the file should be included in the list of matched files
@@ -48,17 +47,13 @@ public class MultipleFilenameFilter implements FilenameFilter {
    * @param filename The name of the file.
    * @return True if the file matched, false otherwise.
    */
-  public boolean accept(
-    final File directory,
-    final String filename) {
-    for (final Iterator excludes = exclusionFilters.iterator(); excludes.hasNext();) {
-      final FilenameFilter filter = (FilenameFilter)excludes.next();
+  public boolean accept(final File directory, final String filename) {
+    for (final FilenameFilter filter : exclusionFilters) {
       if (filter.accept(directory, filename)) {
         return false;
       }
     }
-    for (final Iterator includes = filters.iterator(); includes.hasNext();) {
-      final FilenameFilter filter = (FilenameFilter)includes.next();
+    for (final FilenameFilter filter : filters) {
       if (filter.accept(directory, filename)) {
         return true;
       }
@@ -71,8 +66,7 @@ public class MultipleFilenameFilter implements FilenameFilter {
    * 
    * @param filter The filename filter.
    */
-  public void addExclusionFilter(
-    final FilenameFilter filter) {
+  public void addExclusionFilter(final FilenameFilter filter) {
     exclusionFilters.add(filter);
   }
 
@@ -81,8 +75,7 @@ public class MultipleFilenameFilter implements FilenameFilter {
    * 
    * @param filter The filename filter.
    */
-  public void addFilter(
-    final FilenameFilter filter) {
+  public void addFilter(final FilenameFilter filter) {
     filters.add(filter);
   }
 

@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   private static final Logger LOG = LoggerFactory.getLogger(ArcSdeOracleStGeometryJdbcAttribute.class);

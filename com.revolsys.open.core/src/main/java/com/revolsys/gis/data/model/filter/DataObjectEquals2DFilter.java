@@ -2,7 +2,6 @@ package com.revolsys.gis.data.model.filter;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;

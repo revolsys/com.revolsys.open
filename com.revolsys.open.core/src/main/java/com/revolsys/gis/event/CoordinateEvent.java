@@ -7,6 +7,11 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class CoordinateEvent extends EventObject {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -1809350055079477785L;
+
   public static final String NODE_ADDED = "Coordinate added";
 
   public static final String NODE_CHANGED = "Coordinate changed";

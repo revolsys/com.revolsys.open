@@ -1,7 +1,6 @@
 package com.revolsys.gis.model.coordinates.list;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;

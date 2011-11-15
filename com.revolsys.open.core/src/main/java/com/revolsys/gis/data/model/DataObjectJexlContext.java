@@ -16,7 +16,6 @@ public class DataObjectJexlContext implements JexlContext {
     this.map.setObject(object);
   }
 
-  @SuppressWarnings("unchecked")
   public Map getVars() {
     return map;
   }
@@ -26,7 +25,6 @@ public class DataObjectJexlContext implements JexlContext {
     this.map.setObject(object);
   }
 
-  @SuppressWarnings("unchecked")
   public void setVars(
     final Map map) {
     this.map.putAll(map);

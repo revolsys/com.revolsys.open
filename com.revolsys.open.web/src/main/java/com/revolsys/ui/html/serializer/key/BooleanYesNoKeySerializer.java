@@ -2,8 +2,8 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.util.Locale;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 /**
  * Serialize a boolean as the Yes or No strings.

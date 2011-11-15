@@ -49,23 +49,9 @@
     <module>com.revolsys.open.orm.hibernate</module>
     <module>com.revolsys.open.orm.jpa</module>
     <module>com.revolsys.open.web</module>
-    <module>com.revolsys.open.gis.dbase</module>
     <module>com.revolsys.open.gis.ecsv</module>
-    <module>com.revolsys.open.gis.gpx</module>
-    <module>com.revolsys.open.gis.gml</module>
-    <module>com.revolsys.open.gis.jdbc</module>
-    <module>com.revolsys.open.gis.json</module>
-    <module>com.revolsys.open.gis.kml</module>
-    <module>com.revolsys.open.gis.moep</module>
     <module>com.revolsys.open.gis.oracle</module>
     <module>com.revolsys.open.gis.postgis</module>
-    <module>com.revolsys.open.gis.saif</module>
-    <module>com.revolsys.open.gis.shape</module>
-    <module>com.revolsys.open.gis.grid</module>
-    <module>com.revolsys.open.gis.html</module>
-    <module>com.revolsys.open.gis.web</module>
-    <module>com.revolsys.open.gis.dgn</module>
-    <module>com.revolsys.open.gis.esri.gdb.xml</module>
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.gis.google.fusiontables</module>
 <!--     <module>com.revolsys.open.gis.server</module> -->

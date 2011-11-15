@@ -11,7 +11,6 @@ import com.vividsolutions.jts.algorithm.Angle;
  * @param <T> The type of object stored on the edges in the graph.
  */
 public class EdgeFromAngleComparator<T> implements Comparator<Edge<T>> {
-  @SuppressWarnings("unchecked")
   private static final EdgeFromAngleComparator INSTANCE = new EdgeFromAngleComparator();
 
   @SuppressWarnings("unchecked")

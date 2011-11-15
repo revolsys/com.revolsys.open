@@ -137,10 +137,14 @@ public class ScriptTool {
     properties.setRequired(false);
     options.addOption(version);
 
-    Option property = OptionBuilder.withArgName("property=value")
-      .hasArgs(2)
-      .withValueSeparator()
-      .withDescription("use value for given property")
+    OptionBuilder
+      .withDescription("use value for given property");
+    OptionBuilder.withArgName("property=value");
+    OptionBuilder
+      .withValueSeparator();
+    OptionBuilder
+      .hasArgs(2);
+    Option property = OptionBuilder
       .create("D");
 
     options.addOption(property);

@@ -16,9 +16,9 @@
 package com.revolsys.ui.html.view;
 
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
-import com.revolsys.xml.io.XmlWriter;
 
 public class DetailView extends Element {
   private String cssClass = "detail";

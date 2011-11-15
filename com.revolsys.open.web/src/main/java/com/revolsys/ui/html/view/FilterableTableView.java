@@ -19,12 +19,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.layout.TableBodyLayout;
 import com.revolsys.ui.html.serializer.RowsTableSerializer;
-import com.revolsys.xml.io.XmlWriter;
 
 public class FilterableTableView extends ElementContainer {
   private String cssClass = "table";

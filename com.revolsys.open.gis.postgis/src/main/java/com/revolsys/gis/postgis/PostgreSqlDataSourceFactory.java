@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.springframework.beans.DirectFieldAccessor;
 
-import com.revolsys.gis.jdbc.io.DataSourceFactory;
+import com.revolsys.jdbc.io.DataSourceFactory;
 
 public class PostgreSqlDataSourceFactory implements DataSourceFactory {
   private static final String URL_REGEX = "jdbc:postgresql:(?://([^:]+)(?::(\\d+))?/)?(.+)";

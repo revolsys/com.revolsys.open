@@ -3,9 +3,9 @@ package com.revolsys.ui.html.serializer.key;
 import java.math.BigDecimal;
 import java.util.Locale;
 
+import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
-import com.revolsys.xml.io.XmlWriter;
 
 /**
  * Serialize a percent with the % sign.

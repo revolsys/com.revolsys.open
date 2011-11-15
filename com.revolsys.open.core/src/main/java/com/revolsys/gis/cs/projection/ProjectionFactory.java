@@ -78,7 +78,6 @@ public final class ProjectionFactory {
           operations.add(new UnitConverstionOperation(linearUnit1, SI.METRE));
         }
         operations.add(inverseOperation);
-        final GeographicCoordinateSystem gcs1 = pcs1.getGeographicCoordinateSystem();
       } else if (cs1 instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem gcs1 = (GeographicCoordinateSystem)cs1;
         final Unit<Angle> angularUnit1 = gcs1.getUnit();

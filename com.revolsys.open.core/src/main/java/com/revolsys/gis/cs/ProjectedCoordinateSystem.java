@@ -13,6 +13,11 @@ import javax.measure.unit.Unit;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1902383026085071877L;
+
   private Area area;
 
   private final Authority authority;

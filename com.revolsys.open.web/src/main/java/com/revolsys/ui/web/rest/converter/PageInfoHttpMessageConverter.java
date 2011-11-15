@@ -31,15 +31,15 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.NamedLinkedHashMap;
+import com.revolsys.io.xml.XmlConstants;
+import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.wadl.WadlConstants;
 import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;
 import com.revolsys.ui.model.ParameterInfo;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.xml.XmlConstants;
-import com.revolsys.xml.io.XmlWriter;
-import com.revolsys.xml.wadl.WadlConstants;
 
 public class PageInfoHttpMessageConverter extends
   AbstractHttpMessageConverter<PageInfo> implements WadlConstants {

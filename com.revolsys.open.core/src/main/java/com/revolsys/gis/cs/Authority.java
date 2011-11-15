@@ -3,6 +3,11 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 public class Authority implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 6255702398027894174L;
+
   private final String code;
 
   private final String name;

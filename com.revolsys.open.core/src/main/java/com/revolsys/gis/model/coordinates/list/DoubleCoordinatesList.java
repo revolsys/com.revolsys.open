@@ -7,6 +7,11 @@ import com.revolsys.util.MathUtil;
 
 public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 7579865828939708871L;
+
   double[] coordinates;
 
   private final byte numAxis;

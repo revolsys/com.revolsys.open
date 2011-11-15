@@ -2,6 +2,11 @@ package com.revolsys.gis.model.coordinates.list;
 
 public class RingCoordinatesList extends DoubleCoordinatesList {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 5660399503744099455L;
+
   public RingCoordinatesList(
     final CoordinatesList coordinatesList) {
     super(coordinatesList.subList(0, coordinatesList.size() - 1));
