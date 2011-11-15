@@ -20,6 +20,7 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory {
     super(ShapefileConstants.DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE,
       ShapefileConstants.FILE_EXTENSION);
+    setSingleFile(false);
   }
 
   @Override

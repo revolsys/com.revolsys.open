@@ -41,6 +41,17 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     return customAttributionSupported;
   }
 
+  private boolean singleFile = true;
+  
+  
+  public boolean isSingleFile() {
+    return singleFile;
+  }
+
+  protected void setSingleFile(boolean singleFile) {
+    this.singleFile = singleFile;
+  }
+
   /**
    * Create a writer to write to the specified resource.
    * 

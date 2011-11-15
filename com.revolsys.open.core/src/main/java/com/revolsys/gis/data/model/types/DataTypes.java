@@ -21,6 +21,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -67,27 +69,13 @@ public final class DataTypes {
   public static final DataType GEOMETRY = new SimpleDataType("Geometry",
     Geometry.class);
 
-  public static final DataType POINT = new SimpleDataType("Point", Point.class);
-
-  public static final DataType LINE_STRING = new SimpleDataType("LineString",
-    LineString.class);
-
-  public static final DataType MULTI_LINE_STRING = new SimpleDataType(
-    "MultiLineString", MultiLineString.class);
-
-  public static final DataType POLYGON = new SimpleDataType("Polygon",
-    Polygon.class);
-
-  public static final DataType MULTI_POINT = new SimpleDataType("MultiPoint",
-    Point.class);
-
-  public static final DataType MULTI_POLYGON = new SimpleDataType(
-    "MultiPolygon", Polygon.class);
-
   public static final DataType INT = new SimpleDataType("int", Integer.class);
 
   public static final DataType INTEGER = new SimpleDataType("integer",
     BigInteger.class);
+
+  public static final DataType LINE_STRING = new SimpleDataType("LineString",
+    LineString.class);
 
   public static final DataType LIST = new CollectionDataType("List",
     List.class, OBJECT);
@@ -96,7 +84,23 @@ public final class DataTypes {
 
   public static final DataType LONG = new SimpleDataType("long", Long.class);
 
+  public static final DataType MAP = new SimpleDataType("Map", Map.class);
+
+  public static final DataType MULTI_LINE_STRING = new SimpleDataType(
+    "MultiLineString", MultiLineString.class);
+
+  public static final DataType MULTI_POINT = new SimpleDataType("MultiPoint",
+    MultiPoint.class);
+
+  public static final DataType MULTI_POLYGON = new SimpleDataType(
+    "MultiPolygon", MultiPolygon.class);
+
   static final Map<QName, DataType> NAME_TYPE_MAP = new HashMap<QName, DataType>();
+
+  public static final DataType POINT = new SimpleDataType("Point", Point.class);
+
+  public static final DataType POLYGON = new SimpleDataType("Polygon",
+    Polygon.class);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
@@ -110,8 +114,6 @@ public final class DataTypes {
 
   public static final DataType STRING = new SimpleDataType("string",
     String.class);
-
-  public static final DataType MAP = new SimpleDataType("Map", Map.class);
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();
@@ -129,8 +131,7 @@ public final class DataTypes {
     }
   }
 
-  public static DataType getType(
-    final Class<?> clazz) {
+  public static DataType getType(final Class<?> clazz) {
     final String className = clazz.getName();
     final DataType type = CLASS_TYPE_MAP.get(className);
     if (type == null) {
@@ -146,8 +147,7 @@ public final class DataTypes {
     }
   }
 
-  public static DataType getType(
-    final QName typeName) {
+  public static DataType getType(final QName typeName) {
     final DataType type = NAME_TYPE_MAP.get(typeName);
     if (type == null) {
       return OBJECT;
@@ -156,8 +156,7 @@ public final class DataTypes {
     }
   }
 
-  public static void register(
-    final DataType type) {
+  public static void register(final DataType type) {
     final QName typeName = type.getName();
     NAME_TYPE_MAP.put(typeName, type);
     final Class<?> typeClass = type.getJavaClass();

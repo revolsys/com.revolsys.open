@@ -40,6 +40,8 @@ public abstract class AbstractDataObjectIoFactory extends
     return readerFactory;
   }
 
+  private boolean singleFile = true;
+
   private final boolean geometrySupported;
 
   private final boolean customAttributionSupported;
@@ -91,6 +93,10 @@ public abstract class AbstractDataObjectIoFactory extends
     return geometrySupported;
   }
 
+  public boolean isSingleFile() {
+    return singleFile;
+  }
+
   protected void setCoordinateSystems(
     final CoordinateSystem... coordinateSystems) {
     setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
@@ -100,5 +106,9 @@ public abstract class AbstractDataObjectIoFactory extends
   protected void setCoordinateSystems(
     final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
+  }
+
+  protected void setSingleFile(final boolean singleFile) {
+    this.singleFile = singleFile;
   }
 }

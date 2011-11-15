@@ -30,4 +30,6 @@ public interface DataObjectWriterFactory extends IoFactory {
   boolean isCustomAttributionSupported();
 
   boolean isGeometrySupported();
+  
+  boolean isSingleFile();
 }

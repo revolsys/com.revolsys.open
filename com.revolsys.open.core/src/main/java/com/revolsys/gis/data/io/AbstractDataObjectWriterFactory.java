@@ -22,7 +22,7 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
   implements DataObjectWriterFactory {
 
   public static Writer<DataObject> dataObjectWriter(
-    DataObjectMetaData metaData, final Resource resource) {
+    final DataObjectMetaData metaData, final Resource resource) {
     final DataObjectWriterFactory writerFactory = getDataObjectWriterFactory(resource);
     if (writerFactory == null) {
       return null;
@@ -41,17 +41,49 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
     return writerFactory;
   }
 
+  private boolean singleFile = true;
+
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  private boolean geometrySupported;
+  private final boolean geometrySupported;
 
-  private boolean customAttributionSupported;
+  private final boolean customAttributionSupported;
 
-  public AbstractDataObjectWriterFactory(String name,
-    boolean geometrySupported, boolean customAttributionSupported) {
+  public AbstractDataObjectWriterFactory(final String name,
+    final boolean geometrySupported, final boolean customAttributionSupported) {
     super(name);
     this.geometrySupported = geometrySupported;
     this.customAttributionSupported = customAttributionSupported;
+  }
+
+  /**
+   * Create a writer to write to the specified resource.
+   * 
+   * @param metaData The metaData for the type of data to write.
+   * @param resource The resource to write to.
+   * @return The writer.
+   */
+  public Writer<DataObject> createDataObjectWriter(
+    final DataObjectMetaData metaData, final Resource resource) {
+    final OutputStream out = SpringUtil.getOutputStream(resource);
+    final String fileName = resource.getFilename();
+    final String baseName = FileUtil.getBaseName(fileName);
+    return createDataObjectWriter(baseName, metaData, out);
+  }
+
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream) {
+    return createDataObjectWriter(baseName, metaData, outputStream,
+      Charset.defaultCharset());
+  }
+
+  public Set<CoordinateSystem> getCoordinateSystems() {
+    return coordinateSystems;
+  }
+
+  public boolean isCoordinateSystemSupported(
+    final CoordinateSystem coordinateSystem) {
+    return coordinateSystems.contains(coordinateSystem);
   }
 
   public boolean isCustomAttributionSupported() {
@@ -62,41 +94,22 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
     return geometrySupported;
   }
 
-  public Set<CoordinateSystem> getCoordinateSystems() {
-    return coordinateSystems;
+  public boolean isSingleFile() {
+    return singleFile;
   }
 
-  protected void setCoordinateSystems(Set<CoordinateSystem> coordinateSystems) {
+  protected void setCoordinateSystems(
+    final CoordinateSystem... coordinateSystems) {
+    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
+      Arrays.asList(coordinateSystems)));
+  }
+
+  protected void setCoordinateSystems(
+    final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
   }
 
-  public boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem) {
-    return coordinateSystems.contains(coordinateSystem);
-  }
-
-  /**
-   * Create a writer to write to the specified resource.
-   * 
-   * @param metaData The metaData for the type of data to write.
-   * @param resource The resource to write to.
-   * @return The writer.
-   */
-  public Writer<DataObject> createDataObjectWriter(DataObjectMetaData metaData,
-    final Resource resource) {
-    final OutputStream out = SpringUtil.getOutputStream(resource);
-    final String fileName = resource.getFilename();
-    final String baseName = FileUtil.getBaseName(fileName);
-    return createDataObjectWriter(baseName, metaData, out);
-  }
-
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream) {
-    return createDataObjectWriter(baseName, metaData, outputStream,
-      Charset.defaultCharset());
-  }
-
-  protected void setCoordinateSystems(CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-      Arrays.asList(coordinateSystems)));
+  protected void setSingleFile(final boolean singleFile) {
+    this.singleFile = singleFile;
   }
 }
