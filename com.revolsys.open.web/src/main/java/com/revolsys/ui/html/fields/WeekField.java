@@ -1,7 +1,7 @@
 package com.revolsys.ui.html.fields;
 
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
 public class WeekField extends TextField {

@@ -30,9 +30,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.io.xml.io.StaxUtils;
-import com.revolsys.io.xml.io.XmlProcessor;
-import com.revolsys.io.xml.io.XmlProcessorContext;
+import com.revolsys.io.xml.StaxUtils;
+import com.revolsys.io.xml.XmlProcessor;
+import com.revolsys.io.xml.XmlProcessorContext;
 import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.html.view.Style;
 import com.revolsys.ui.web.exception.PageNotFoundException;

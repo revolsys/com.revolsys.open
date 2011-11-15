@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
 /**

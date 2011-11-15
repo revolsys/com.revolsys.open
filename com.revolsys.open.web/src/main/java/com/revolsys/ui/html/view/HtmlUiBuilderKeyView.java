@@ -22,7 +22,7 @@ package com.revolsys.ui.html.view;
 
 import java.util.Locale;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 /**

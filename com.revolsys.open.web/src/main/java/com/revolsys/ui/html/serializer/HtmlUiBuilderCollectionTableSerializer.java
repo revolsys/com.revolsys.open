@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializer {

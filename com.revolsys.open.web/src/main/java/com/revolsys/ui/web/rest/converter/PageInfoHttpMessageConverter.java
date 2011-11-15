@@ -32,7 +32,7 @@ import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.NamedLinkedHashMap;
 import com.revolsys.io.xml.XmlConstants;
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.wadl.WadlConstants;
 import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;

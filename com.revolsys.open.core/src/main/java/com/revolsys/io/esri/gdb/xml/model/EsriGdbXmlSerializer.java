@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.xml.XmlConstants;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.io.xml.io.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 

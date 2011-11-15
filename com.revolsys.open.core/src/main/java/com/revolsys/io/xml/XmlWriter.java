@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.io.xml.io;
+package com.revolsys.io.xml;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,7 +33,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.io.xml.XsiConstants;
 
 /**
  * <p>

@@ -17,7 +17,7 @@ package com.revolsys.ui.html;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 
 public final class HtmlUtil {
   public static final String HTML_NS_URI = "http://www.w3.org/1999/xhtml";

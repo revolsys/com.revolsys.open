@@ -2,8 +2,8 @@ package com.revolsys.io.gml.type;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.gml.GmlConstants;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.io.xml.io.XmlWriter;
 
 public abstract class AbstractGmlFieldType implements
   GmlFieldType, GmlConstants {

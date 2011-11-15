@@ -2,7 +2,7 @@ package com.revolsys.io.esri.gdb.xml.type;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 
 public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 

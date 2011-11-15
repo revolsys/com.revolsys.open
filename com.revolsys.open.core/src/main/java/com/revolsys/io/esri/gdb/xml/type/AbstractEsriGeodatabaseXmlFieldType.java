@@ -3,8 +3,8 @@ package com.revolsys.io.esri.gdb.xml.type;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.io.xml.io.XmlWriter;
 
 public abstract class AbstractEsriGeodatabaseXmlFieldType implements
   EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {

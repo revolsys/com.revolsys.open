@@ -1,7 +1,7 @@
 package com.revolsys.io.csv;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;
 
-  private final Map<DataObjectMetaData, CsvWriter> writers = new HashMap<DataObjectMetaData, CsvWriter>();
+  private final Map<DataObjectMetaData, CsvDataObjectWriter> writers = new HashMap<DataObjectMetaData, CsvDataObjectWriter>();
 
   public CsvDirectoryWriter() {
   }
@@ -27,7 +27,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   public void close() {
-    for (final CsvWriter writer : writers.values()) {
+    for (final CsvDataObjectWriter writer : writers.values()) {
       try {
         writer.close();
       } catch (final RuntimeException e) {
@@ -41,7 +41,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   public void flush() {
-    for (CsvWriter writer : writers.values()) {
+    for (CsvDataObjectWriter writer : writers.values()) {
       writer.flush();
     }
   }
@@ -50,16 +50,16 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     return directory.getAbsolutePath();
   }
 
-  private CsvWriter getWriter(
+  private CsvDataObjectWriter getWriter(
     final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
-    CsvWriter writer = writers.get(metaData);
+    CsvDataObjectWriter writer = writers.get(metaData);
     if (writer == null) {
       try {
 
         final File file = new File(directory, metaData.getName().toString()
           + ".csv");
-        writer = new CsvWriter(metaData, new FileOutputStream(file));
+        writer = new CsvDataObjectWriter(metaData, new FileWriter(file));
         final Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
           writer.setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(geometry));
@@ -82,7 +82,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   public void write(
     final DataObject object) {
 
-    final CsvWriter writer = getWriter(object);
+    final CsvDataObjectWriter writer = getWriter(object);
     writer.write(object);
   }
 

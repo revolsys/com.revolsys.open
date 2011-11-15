@@ -67,7 +67,7 @@ import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.io.esri.gdb.xml.model.Workspace;
 import com.revolsys.io.esri.gdb.xml.model.WorkspaceDefinition;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
-import com.revolsys.io.xml.io.XmlProcessor;
+import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 

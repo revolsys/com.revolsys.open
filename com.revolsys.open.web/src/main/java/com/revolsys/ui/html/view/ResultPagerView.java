@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.orm.core.ResultPager;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.util.UrlUtil;

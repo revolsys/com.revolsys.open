@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.io.xml.io;
+package com.revolsys.io.xml;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -38,8 +38,6 @@ import org.apache.commons.beanutils.converters.ShortConverter;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.beans.EnumConverter;
-import com.revolsys.io.xml.XmlConstants;
-import com.revolsys.io.xml.XsiConstants;
 import com.revolsys.util.CaseConverter;
 
 /**

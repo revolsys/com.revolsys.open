@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer;
 
 import java.util.Locale;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.domain.PhoneNumber;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.util.JavaBeanUtil;

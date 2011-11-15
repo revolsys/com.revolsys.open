@@ -3,11 +3,11 @@ package com.revolsys.ui.html.serializer.type;
 import java.io.IOException;
 import java.util.Locale;
 
-import com.revolsys.io.xml.io.XmlWriter;
+import com.revolsys.io.xml.XmlWriter;
 
 /**
  * The ObjectSerializer interface defines a method to serailize an object of a
- * known type to an {@link com.revolsys.io.xml.io.XmlWriter}.
+ * known type to an {@link com.revolsys.io.xml.XmlWriter}.
  * 
  * @author Paul Austin
  */

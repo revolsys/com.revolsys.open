@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.io.xml.io;
+package com.revolsys.io.xml;
 
 import javax.xml.stream.Location;
 

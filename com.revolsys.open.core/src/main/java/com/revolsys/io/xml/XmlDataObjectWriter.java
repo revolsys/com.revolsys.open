@@ -14,7 +14,6 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.NamedObject;
-import com.revolsys.io.xml.io.XmlWriter;
 
 public class XmlDataObjectWriter extends AbstractWriter<DataObject> {
 
