@@ -24,4 +24,10 @@ if [ -n "$STATUS" ]; then
   git push origin $VERSION
 
   mvn release:perform -DconnectionUrl=scm:git:git@github.com:revolsys/com.revolsys.open.git -Dtag=$VERSION -DlocalCheckout=true
+  if [ $? -eq 0 ]; then
+    mvn nexus:staging-close -Dnexus.version=$VERSION -DserverAuthId=sonatype-nexus-staging -Dnexus.automaticDiscovery=true
+    if [ $? -eq 0 ]; then
+      mvn nexus:staging-release -DtargetRepositoryId=releases -Dnexus.version=$VERSION -DserverAuthId=sonatype-nexus-staging -Dnexus.automaticDiscovery=true
+    fi
+  fi
 fi
