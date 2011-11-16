@@ -36,6 +36,7 @@ public class IoFactoryRegistry {
           for (final String factoryClassName : factoryClassNames.split(",")) {
             final Class<?> factoryClass = Class.forName(factoryClassName.trim());
             if (IoFactory.class.isAssignableFrom(factoryClass)) {
+              @SuppressWarnings("unchecked")
               final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
               INSTANCE.addFactory(factory);
             } else {
@@ -68,6 +69,7 @@ public class IoFactoryRegistry {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void addFactory(final IoFactory factory,
     final Class<? extends IoFactory> factoryClass) {
     final Class<?>[] interfaces = factoryClass.getInterfaces();

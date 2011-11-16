@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -46,7 +48,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBox(getGeometryFactory(), lon, lat, lon - tileWidth, lat + tileHeight);
+    return new BoundingBox(getGeometryFactory(), lon, lat, lon - tileWidth, lat
+      + tileHeight);
   }
 
   public double getLatitude(final int block) {
@@ -106,26 +109,21 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   public int getNtsBlock(final String mapTileName) {
-    final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
-    if (matcher.matches()) {
-      final String name = matcher.group(1);
-      final int block = Integer.parseInt(name);
-      return block;
-    } else {
-      throw new IllegalArgumentException(mapTileName
-        + " does not start with a valid NTS block");
+    if (StringUtils.hasText(mapTileName)) {
+      final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
+      if (matcher.matches()) {
+        final String name = matcher.group(1);
+        final int block = Integer.parseInt(name);
+        return block;
+      }
     }
+    throw new IllegalArgumentException(mapTileName
+      + " does not start with a valid NTS block");
   }
 
   public PrecisionModel getPrecisionModel() {
     return precisionModel;
   }
-
-  // public String getFormattedMapTileName(
-  // String name) {
-  // // TODO Auto-generated method stub
-  // return null;
-  // }
 
   public RectangularMapTile getTileByLocation(final double x, final double y) {
     final String mapTileName = getMapTileName(x, y);

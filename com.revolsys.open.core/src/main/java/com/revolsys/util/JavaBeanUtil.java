@@ -18,6 +18,9 @@ package com.revolsys.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -42,6 +45,43 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  public static String getPropertyName(String methodName) {
+    String propertyName;
+    if (methodName.startsWith("is")) {
+      propertyName = methodName.substring(2, 3).toLowerCase()
+        + methodName.substring(3);
+    } else {
+      propertyName = methodName.substring(3, 4).toLowerCase()
+        + methodName.substring(4);
+    }
+    return propertyName;
+  }
+
+  public static Class<?> getTypeParameterClass(Method method,
+    Class<?> expectedRawClass) {
+    final Type resultListReturnType = method.getGenericReturnType();
+    if (resultListReturnType instanceof ParameterizedType) {
+      ParameterizedType parameterizedType = (ParameterizedType)resultListReturnType;
+      final Type rawType = parameterizedType.getRawType();
+      if (rawType == expectedRawClass) {
+        final Type[] typeArguments = parameterizedType.getActualTypeArguments();
+        if (typeArguments.length == 1) {
+          Type resultType = typeArguments[0];
+          if (resultType instanceof Class<?>) {
+            Class<?> resultClass = (Class<?>)resultType;
+            return resultClass;
+          } else {
+            throw new IllegalArgumentException(method.getName()
+              + " must return " + expectedRawClass.getName()
+              + " with 1 generic type parameter that is a class");
+          }
+        }
+      }
+    }
+    throw new IllegalArgumentException(method.getName() + " must return "
+      + expectedRawClass.getName() + " with 1 generic class parameter");
   }
 
   /**

@@ -5,6 +5,8 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
@@ -68,6 +70,35 @@ public class JsonDataObjectIoFactory extends
     final Charset charset) {
     return new JsonDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));
+  }
+
+  public static String toString(DataObjectMetaData metaData,
+    List<DataObject> list) {
+    final StringWriter writer = new StringWriter();
+    final JsonDataObjectWriter dataObjectWriter = new JsonDataObjectWriter(
+      metaData, writer);
+    for (DataObject object : list) {
+      dataObjectWriter.write(object);
+    }
+    dataObjectWriter.close();
+    return writer.toString();
+  }
+
+  public static List<DataObject> toDataObjectList(DataObjectMetaData metaData,
+    String string) {
+    final StringReader in = new StringReader(string);
+    final JsonDataObjectIterator iterator = new JsonDataObjectIterator(
+      metaData, in);
+    try {
+      List<DataObject> objects = new ArrayList<DataObject>();
+      while (iterator.hasNext()) {
+        DataObject object = iterator.next();
+        objects.add(object);
+      }
+      return objects;
+    } finally {
+      iterator.close();
+    }
   }
 
 }

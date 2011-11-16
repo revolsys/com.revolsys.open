@@ -49,8 +49,7 @@ public class DataObjectReaderHttpMessageConverter extends
     return requestAttributeNames;
   }
 
-  public void setRequestAttributeNames(
-    List<String> requestAttributeNames) {
+  public void setRequestAttributeNames(List<String> requestAttributeNames) {
     this.requestAttributeNames = requestAttributeNames;
   }
 
@@ -69,10 +68,8 @@ public class DataObjectReaderHttpMessageConverter extends
   }
 
   @Override
-  public DataObjectReader read(
-    final Class<? extends DataObjectReader> clazz,
-    final HttpInputMessage inputMessage)
-    throws IOException,
+  public DataObjectReader read(final Class<? extends DataObjectReader> clazz,
+    final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
       final HttpHeaders headers = inputMessage.getHeaders();
@@ -107,17 +104,13 @@ public class DataObjectReaderHttpMessageConverter extends
     }
   }
 
-  public void setGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
   @Override
-  public void write(
-    final DataObjectReader reader,
-    final MediaType mediaType,
-    final HttpOutputMessage outputMessage)
-    throws IOException,
+  public void write(final DataObjectReader reader, final MediaType mediaType,
+    final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     MediaType actualMediaType;
     if (mediaType == null) {
