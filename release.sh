@@ -13,7 +13,7 @@ if [ -n "$STATUS" ]; then
   git checkout releases
   git merge master
 
-  find . -name pom.xml  -exec sed -i "s/TRUNK-SNAPSHOT/$VERSION/g" {} \;
+  find . -name pom.xml  -exec sed -i "" -e "s/TRUNK-SNAPSHOT/$VERSION/g" {} \;
   git commit -a -m "Release $VERSION"
   git tag -f $VERSION
   
