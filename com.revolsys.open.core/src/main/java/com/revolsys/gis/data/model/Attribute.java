@@ -163,7 +163,7 @@ public class Attribute implements Cloneable {
    */
   public Attribute(final String name, final DataType type,
     final Integer length, final Integer scale, final Boolean required) {
-    this(name, type, length, scale, required, null);
+    this(name, type, length, scale, required, "");
   }
 
   /**
@@ -215,6 +215,35 @@ public class Attribute implements Cloneable {
       this.properties.putAll(properties);
     }
 
+  }
+
+  /**
+   * Construct a new attribute.
+   * 
+   * @param name The name of the attribute.
+   * @param type The data type of the attribute value.
+   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param scale The maximum number of decimal places.
+   * @param required The flag indicating if a value is required for the
+   *          attribute.
+   * @param properties The meta data properties about the attribute.
+   */
+  public Attribute(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
+    final String description) {
+    this.name = name;
+    this.description = description;
+    this.type = type;
+    if (required != null) {
+      this.required = required;
+    }
+    if (length != null) {
+      this.length = length;
+    }
+    if (scale != null) {
+      this.scale = scale;
+    }
+    this.description = description;
   }
 
   @Override
