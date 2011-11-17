@@ -99,7 +99,7 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public double getElevation(final Coordinates point) {
-    return CoordinatesUtil.getElevation(coordinates1, coordinates2, point);
+    return CoordinatesUtil.getElevation(point,coordinates1, coordinates2);
   }
 
   public Envelope getEnvelope() {

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.data.io.OutsideBoundaryWriter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.ChannelInput;
 import com.revolsys.parallel.channel.ChannelOutput;
@@ -24,28 +23,28 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   private Map<String, ChannelOutput<?>> outChannels = new LinkedHashMap<String, ChannelOutput<?>>();
 
-  private OutsideBoundaryWriter outsideBoundaryWriter;
+  private OutsideBoundaryObjects outsideBoundaryObjects = new OutsideBoundaryObjects();
 
   @Override
   public void execute(final BoundingBox boundingBox) {
-    if (outsideBoundaryWriter != null) {
-      outsideBoundaryWriter.expandBoundary(boundingBox.toGeometry());
-    }
-
+     outsideBoundaryObjects.expandBoundary(boundingBox.toGeometry());
+  
     final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(
       scriptName, attributes);
     executor.setLogScriptInfo(isLogScriptInfo());
     executor.addBean("boundingBox", boundingBox);
-    if (outsideBoundaryWriter != null) {
-      final Set<DataObject> outsideBoundaryObjects = outsideBoundaryWriter.getAndClearOutsideBoundaryObjects();
-      executor.addBean("outsideBoundaryObjects", outsideBoundaryObjects);
-    }
+      final Set<DataObject> objects = this.outsideBoundaryObjects.getAndClearObjects();
+      executor.addBean("outsideBoundaryObjects", objects);
     executor.addBeans(beans);
     executor.addBeans(inChannels);
     executor.addBeans(outChannels);
     executor.run();
   }
 
+  public OutsideBoundaryObjects getOutsideBoundaryObjects() {
+    return outsideBoundaryObjects;
+  }
+  
   public Map<String, Object> getAttributes() {
     return attributes;
   }
@@ -62,9 +61,6 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     return outChannels;
   }
 
-  public OutsideBoundaryWriter getOutsideBoundaryWriter() {
-    return outsideBoundaryWriter;
-  }
 
   public String getScriptName() {
     return scriptName;
@@ -107,10 +103,6 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     this.outChannels = outChannels;
   }
 
-  public void setOutsideBoundaryWriter(
-    final OutsideBoundaryWriter outsideBoundaryWriter) {
-    this.outsideBoundaryWriter = outsideBoundaryWriter;
-  }
 
   public void setScriptName(final String scriptName) {
     this.scriptName = scriptName;

@@ -109,6 +109,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       final String attributeName = attributeNames.get(i);
       final Attribute attribute = metaData.getAttribute(attributeName);
       if (attribute == null) {
+        // TODO add attribue with object type
         throw new IllegalArgumentException("Attribute does not exist "
           + metaData.getName() + "." + attributeName);
       } else {
@@ -124,11 +125,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final QName typeName = metaData.getName();
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
-    if (attributeNames.isEmpty()) {
+    if (attributeNames.isEmpty() || attributeNames.remove("*")) {
       addColumnNames(sql, metaData, tablePrefix);
-    } else {
-      addColumnNames(sql, metaData, tablePrefix, attributeNames);
     }
+    addColumnNames(sql, metaData, tablePrefix, attributeNames);
     sql.append(" FROM ");
     if (StringUtils.hasText(fromClause)) {
       sql.append(fromClause);

@@ -459,10 +459,15 @@ public class TriangulatedIrregularNetwork {
         0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
       final Coordinates intersectCoordinates = oppositeEdge.intersection(segment);
       if (intersectCoordinates != null) {
-        segment = new LineSegment(t0, intersectCoordinates);
-        return segment.getElevation(coordinate);
+        double z = oppositeEdge.getElevation(intersectCoordinates);
+        if (!Double.isNaN(z)) {
+          final double x = intersectCoordinates.getX();
+          final double y = intersectCoordinates.getY();
+          Coordinates end = new DoubleCoordinates(x, y, z);
+          segment = new LineSegment(t0, end);
+          return segment.getElevation(coordinate);
+        }
       }
-      // TODO fix
     }
     return Double.NaN;
   }
