@@ -6,7 +6,7 @@ import org.springframework.transaction.support.TransactionCallback;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodTransactionCallback implements TransactionCallback {
+public class InvokeMethodTransactionCallback implements TransactionCallback<Object> {
 
   private Object[] args;
 

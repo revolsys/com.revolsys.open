@@ -132,10 +132,14 @@ public class PostGisDataObjectStore extends AbstractJdbcDataObjectStore {
       final double x2 = boundingBox.getMaxX();
       final double y2 = boundingBox.getMaxY();
       String whereClause = boundingBoxQuery.getWhereClause();
+      final String geometryAttributeName = metaData.getGeometryAttributeName();
       if (StringUtils.hasText(whereClause)) {
-        whereClause = "(" + whereClause + ") AND GEOMETRY && ?";
+        whereClause = "(" + whereClause + ") AND " +
+        		geometryAttributeName +
+        		" && ?";
       } else {
-        whereClause = "GEOMETRY && ?";
+        whereClause = geometryAttributeName +
+        		" && ?";
       }
       boundingBoxQuery.setWhereClause(whereClause);
       final PGbox box = new PGbox(x1, y1, x2, y2);

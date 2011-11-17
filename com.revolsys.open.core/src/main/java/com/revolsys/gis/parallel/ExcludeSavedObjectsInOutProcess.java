@@ -53,7 +53,7 @@ public class ExcludeSavedObjectsInOutProcess extends
   }
 
   private String getId(final DataObject object) {
-    final String id = object.getIdValue();
+    final Object id = object.getIdValue();
     if (id == null) {
       return null;
     } else {

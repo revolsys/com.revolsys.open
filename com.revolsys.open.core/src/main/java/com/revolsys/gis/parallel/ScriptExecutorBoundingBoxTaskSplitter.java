@@ -27,14 +27,14 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   @Override
   public void execute(final BoundingBox boundingBox) {
-     outsideBoundaryObjects.expandBoundary(boundingBox.toGeometry());
-  
+    outsideBoundaryObjects.expandBoundary(boundingBox.toGeometry());
+
     final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(
       scriptName, attributes);
     executor.setLogScriptInfo(isLogScriptInfo());
     executor.addBean("boundingBox", boundingBox);
-      final Set<DataObject> objects = this.outsideBoundaryObjects.getAndClearObjects();
-      executor.addBean("outsideBoundaryObjects", objects);
+    final Set<DataObject> objects = this.outsideBoundaryObjects.getAndClearObjects();
+    executor.addBean("outsideBoundaryObjects", objects);
     executor.addBeans(beans);
     executor.addBeans(inChannels);
     executor.addBeans(outChannels);
@@ -44,7 +44,7 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
   public OutsideBoundaryObjects getOutsideBoundaryObjects() {
     return outsideBoundaryObjects;
   }
-  
+
   public Map<String, Object> getAttributes() {
     return attributes;
   }
@@ -60,7 +60,6 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
   public Map<String, ChannelOutput<?>> getOutChannels() {
     return outChannels;
   }
-
 
   public String getScriptName() {
     return scriptName;
@@ -102,7 +101,6 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
   public void setOutChannels(final Map<String, ChannelOutput<?>> outChannels) {
     this.outChannels = outChannels;
   }
-
 
   public void setScriptName(final String scriptName) {
     this.scriptName = scriptName;

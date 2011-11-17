@@ -7,8 +7,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class InvokeMethodInTransaction {
   private static final Object[] EMPTY_ARGS = new Object[0];
 
-  private BeanFactory beanFactory;
-
   private boolean throwExceptions;
 
   private int propagationBehavior = -1;
@@ -90,6 +88,7 @@ public class InvokeMethodInTransaction {
 
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T execute(final Object object, final String methodName) {
     return (T)execute(object, methodName, EMPTY_ARGS);
   }

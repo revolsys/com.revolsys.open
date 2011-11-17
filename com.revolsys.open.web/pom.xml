@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd   ">
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd   "
+>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
-
-
   <artifactId>com.revolsys.open.web</artifactId>
-  <version>TRUNK-SNAPSHOT
-</version>
+  <version>TRUNK-SNAPSHOT</version>
   <name>Revolution Systems Web</name>
   <packaging>jar</packaging>
-	<parent>
-		<artifactId>com.revolsys.open.parent</artifactId>
-		<groupId>com.revolsys.open</groupId>
-
-
-		<version>TRUNK-SNAPSHOT
-</version>
-	</parent>
+  <parent>
+    <artifactId>com.revolsys.open.parent</artifactId>
+    <groupId>com.revolsys.open</groupId>
+    <version>TRUNK-SNAPSHOT</version>
+  </parent>
   <build>
     <plugins>
       <plugin>
@@ -32,19 +30,22 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
-      <version>6.0</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
       <scope>provided</scope>
     </dependency>
-  	<dependency>
-  		<groupId>com.revolsys.open</groupId>
-
-
-  		<artifactId>com.revolsys.open.core</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.revolsys.open</groupId>
+      <artifactId>com.revolsys.open.core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
       <version>${org.springframework.version}</version>
@@ -55,45 +56,43 @@
         </exclusion>
       </exclusions>
     </dependency>
-  	<dependency>
-  		<groupId>com.revolsys.open</groupId>
-
-
-  		<artifactId>com.revolsys.open.orm.core</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.apache.xbean</groupId>
-  		<artifactId>xbean-spring</artifactId>
-  		<version>3.5</version>
-  		<exclusions>
-  			<exclusion>
-  				<artifactId>commons-logging</artifactId>
-  				<groupId>commons-logging</groupId>
-  			</exclusion>
-  		</exclusions>
-  	</dependency>
-  	<dependency>
-  		<groupId>commons-fileupload</groupId>
-  		<artifactId>commons-fileupload</artifactId>
-  		<version>1.2.2</version>
-  	</dependency>
+    <dependency>
+      <groupId>com.revolsys.open</groupId>
+      <artifactId>com.revolsys.open.orm.core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xbean</groupId>
+      <artifactId>xbean-spring</artifactId>
+      <version>3.5</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2.2</version>
+    </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>1.4</version>
     </dependency>
     <dependency>
-    	<groupId>org.springframework.security</groupId>
-    	<artifactId>spring-security-web</artifactId>
-    	<version>${org.springframework.version}</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
-    	<exclusions>
-    		<exclusion>
-    			<artifactId>spring-expression</artifactId>
-    			<groupId>org.springframework</groupId>
-    		</exclusion>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <version>${org.springframework.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-expression</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
         <exclusion>
           <artifactId>spring-core</artifactId>
           <groupId>org.springframework</groupId>
@@ -115,14 +114,14 @@
           <groupId>org.springframework</groupId>
         </exclusion>
         <exclusion>
-        	<artifactId>aspectjrt</artifactId>
-        	<groupId>org.aspectj</groupId>
+          <artifactId>aspectjrt</artifactId>
+          <groupId>org.aspectj</groupId>
         </exclusion>
         <exclusion>
-        	<artifactId>aspectjweaver</artifactId>
-        	<groupId>org.aspectj</groupId>
+          <artifactId>aspectjweaver</artifactId>
+          <groupId>org.aspectj</groupId>
         </exclusion>
-    	</exclusions>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

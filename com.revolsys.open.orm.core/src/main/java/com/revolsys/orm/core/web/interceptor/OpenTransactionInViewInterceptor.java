@@ -18,6 +18,11 @@ import org.springframework.web.context.request.WebRequestInterceptor;
 
 public class OpenTransactionInViewInterceptor extends
   DefaultTransactionDefinition implements WebRequestInterceptor {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -9132327865691554649L;
+
   private static final String ATTRIBUTE = OpenTransactionInViewInterceptor.class.getName();
 
   private static final String LEVEL = OpenTransactionInViewInterceptor.class.getName()

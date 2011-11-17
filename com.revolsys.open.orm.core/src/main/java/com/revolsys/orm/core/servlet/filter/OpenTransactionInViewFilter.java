@@ -40,7 +40,7 @@ public class OpenTransactionInViewFilter extends OncePerRequestFilter {
     PlatformTransactionManager transactionManager = lookupTransactionManager(request);
 
     TransactionTemplate template = new TransactionTemplate(transactionManager);
-    Exception exception = (Exception)template.execute(new TransactionCallback() {
+    Exception exception = (Exception)template.execute(new TransactionCallback<Object>() {
       public Object doInTransaction(
         TransactionStatus status) {
         try {

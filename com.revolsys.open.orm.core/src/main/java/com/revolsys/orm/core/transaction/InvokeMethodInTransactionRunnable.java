@@ -10,13 +10,10 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class InvokeMethodInTransactionRunnable implements Runnable {
-  private static final Object[] EMPTY_ARGS = new Object[0];
 
   private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodInTransactionRunnable.class);
 
   private final Object[] args;
-
-  private BeanFactory beanFactory;
 
   private final String methodName;
 
@@ -34,13 +31,9 @@ public class InvokeMethodInTransactionRunnable implements Runnable {
    * @param propagationBehavior
    * @param rollback
    */
-  public InvokeMethodInTransactionRunnable(
-    final BeanFactory beanFactory,
-    final int propagationBehavior,
-    final boolean rollback,
-    final Object object,
-    final String methodName,
-    final Object... args) {
+  public InvokeMethodInTransactionRunnable(final BeanFactory beanFactory,
+    final int propagationBehavior, final boolean rollback, final Object object,
+    final String methodName, final Object... args) {
     this((PlatformTransactionManager)beanFactory.getBean("transactionManager"),
       propagationBehavior, rollback, object, methodName, args);
   }
@@ -50,12 +43,9 @@ public class InvokeMethodInTransactionRunnable implements Runnable {
    * @param throwExceptions
    * @param propagationBehavior
    */
-  public InvokeMethodInTransactionRunnable(
-    final BeanFactory beanFactory,
-    final int propagationBehavior,
-    final Object object,
-    final String methodName,
-    final Object... args) {
+  public InvokeMethodInTransactionRunnable(final BeanFactory beanFactory,
+    final int propagationBehavior, final Object object,
+    final String methodName, final Object... args) {
     this(beanFactory, propagationBehavior, false, object, methodName, args);
   }
 
@@ -63,21 +53,15 @@ public class InvokeMethodInTransactionRunnable implements Runnable {
    * @param beanFactory
    * @param throwExceptions
    */
-  public InvokeMethodInTransactionRunnable(
-    final BeanFactory beanFactory,
-    final Object object,
-    final String methodName,
-    final Object... args) {
+  public InvokeMethodInTransactionRunnable(final BeanFactory beanFactory,
+    final Object object, final String methodName, final Object... args) {
     this(beanFactory, -1, object, methodName, args);
   }
 
   public InvokeMethodInTransactionRunnable(
     final PlatformTransactionManager transactionManager,
-    final int propagationBehavior,
-    final boolean rollback,
-    final Object object,
-    final String methodName,
-    final Object... args) {
+    final int propagationBehavior, final boolean rollback, final Object object,
+    final String methodName, final Object... args) {
     this.transactionManager = transactionManager;
     this.propagationBehavior = propagationBehavior;
     this.rollback = rollback;
@@ -94,10 +78,8 @@ public class InvokeMethodInTransactionRunnable implements Runnable {
    */
   public InvokeMethodInTransactionRunnable(
     final PlatformTransactionManager transactionManager,
-    final int propagationBehavior,
-    final Object object,
-    final String methodName,
-    final Object... args) {
+    final int propagationBehavior, final Object object,
+    final String methodName, final Object... args) {
     this(transactionManager, propagationBehavior, false, object, methodName,
       args);
   }
@@ -107,10 +89,8 @@ public class InvokeMethodInTransactionRunnable implements Runnable {
    * @param throwExceptions
    */
   public InvokeMethodInTransactionRunnable(
-    final PlatformTransactionManager transactionManager,
-    final Object object,
-    final String methodName,
-    final Object... args) {
+    final PlatformTransactionManager transactionManager, final Object object,
+    final String methodName, final Object... args) {
     this(transactionManager, -1, object, methodName, args);
   }
 

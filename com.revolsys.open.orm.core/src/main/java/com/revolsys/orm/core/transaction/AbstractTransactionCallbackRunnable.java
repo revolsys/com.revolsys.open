@@ -7,6 +7,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public abstract class AbstractTransactionCallbackRunnable extends
   DefaultTransactionDefinition implements Runnable, TransactionCallback<Void> {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -2139776082029553417L;
   private final PlatformTransactionManager transactionManager;
 
   public AbstractTransactionCallbackRunnable(

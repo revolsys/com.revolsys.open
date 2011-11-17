@@ -101,12 +101,11 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private void addColumnNames(final StringBuffer sql,
     final DataObjectMetaData metaData, final String tablePrefix,
-    final List<String> attributeNames) {
-    for (int i = 0; i < attributeNames.size(); i++) {
-      if (i > 0) {
+    final List<String> attributeNames, boolean hasColumns) {
+    for (String attributeName : attributeNames) {
+      if (hasColumns) {
         sql.append(", ");
       }
-      final String attributeName = attributeNames.get(i);
       final Attribute attribute = metaData.getAttribute(attributeName);
       if (attribute == null) {
         sql.append(attributeName);
@@ -114,6 +113,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       } else {
         addAttributeName(sql, tablePrefix, attribute);
       }
+      hasColumns = true;
     }
   }
 
@@ -124,10 +124,12 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final QName typeName = metaData.getName();
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
+    boolean hasColumns = false;
     if (attributeNames.isEmpty() || attributeNames.remove("*")) {
       addColumnNames(sql, metaData, tablePrefix);
+      hasColumns = true;
     }
-    addColumnNames(sql, metaData, tablePrefix, attributeNames);
+    addColumnNames(sql, metaData, tablePrefix, attributeNames, hasColumns);
     sql.append(" FROM ");
     if (StringUtils.hasText(fromClause)) {
       sql.append(fromClause);
