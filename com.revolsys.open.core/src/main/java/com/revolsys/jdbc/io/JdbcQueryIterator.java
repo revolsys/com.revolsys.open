@@ -239,7 +239,8 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         }
       }
 
-      final List<String> attributeNames = query.getAttributeNames();
+      final List<String> attributeNames = new ArrayList<String>(
+        query.getAttributeNames());
       final String fromClause = query.getFromClause();
       final String where = query.getWhereClause();
       final List<String> orderBy = query.getOrderBy();
@@ -268,14 +269,20 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       if (metaData == null) {
         metaData = dataStore.getMetaData(tableName, resultSetMetaData);
       }
-      final List<String> attributeNames = query.getAttributeNames();
+      final List<String> attributeNames = new ArrayList<String>(
+        query.getAttributeNames());
       if (attributeNames.isEmpty()) {
-        this.attributes = metaData.getAttributes();
-      }
-      for (final String attributeName : attributeNames) {
-        final Attribute attribute = metaData.getAttribute(attributeName);
-        if (attribute != null) {
-          attributes.add(attribute);
+        this.attributes.addAll(metaData.getAttributes());
+      } else {
+        for (final String attributeName : attributeNames) {
+          if (attributeName.equals("*")) {
+            this.attributes.addAll(metaData.getAttributes());
+          } else {
+            final Attribute attribute = metaData.getAttribute(attributeName);
+            if (attribute != null) {
+              attributes.add(attribute);
+            }
+          }
         }
       }
 
