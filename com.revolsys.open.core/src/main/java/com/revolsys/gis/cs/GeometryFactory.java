@@ -20,6 +20,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
+import com.revolsys.io.wkt.WktParser;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -199,6 +200,8 @@ public class GeometryFactory extends
   private final CoordinateSystem coordinateSystem;
 
   private int numAxis = 2;
+
+  private final WktParser wktParser = new WktParser(this);
 
   public GeometryFactory() {
     super(
@@ -427,7 +430,6 @@ public class GeometryFactory extends
     }
   }
 
-  @Override
   public MultiLineString createMultiLineString(final LineString... lines) {
     return super.createMultiLineString(lines);
   }
@@ -526,6 +528,11 @@ public class GeometryFactory extends
 
   public CoordinateSystem getCoordinateSystem() {
     return coordinateSystem;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T getGeometry(final String wkt) {
+    return (T)wktParser.parseGeometry(wkt);
   }
 
   private LinearRing getLinearRing(final List<?> rings, final int index) {

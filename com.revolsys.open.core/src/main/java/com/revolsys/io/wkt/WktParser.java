@@ -170,7 +170,8 @@ public class WktParser {
     }
   }
 
-  public Geometry parseGeometry(final String value) {
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T parseGeometry(final String value) {
     if (StringUtils.hasLength(value)) {
       GeometryFactory geometryFactory = this.geometryFactory;
       final StringBuffer text = new StringBuffer(value);
@@ -182,17 +183,17 @@ public class WktParser {
         hasText(text, ";");
       }
       if (hasText(text, "POINT")) {
-        return parsePoint(geometryFactory, text);
+        return (T)parsePoint(geometryFactory, text);
       } else if (hasText(text, "LINESTRING")) {
-        return parseLineString(geometryFactory, text);
+        return (T)parseLineString(geometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
-        return parsePolygon(geometryFactory, text);
+        return (T)parsePolygon(geometryFactory, text);
       } else if (hasText(text, "MULTIPOINT")) {
-        return parseMultiPoint(geometryFactory, text);
+        return (T)parseMultiPoint(geometryFactory, text);
       } else if (hasText(text, "MULTILINESTRING")) {
-        return parseMultiLineString(geometryFactory, text);
+        return (T)parseMultiLineString(geometryFactory, text);
       } else if (hasText(text, "MULTIPOLYGON")) {
-        return parseMultiPolygon(geometryFactory, text);
+        return (T)parseMultiPolygon(geometryFactory, text);
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
