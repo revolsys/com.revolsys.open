@@ -116,7 +116,7 @@ Version    = "version"      ; Name of the version property
 
 Version    = "schemaRecords" ; Name of the version property
              COMMA
-             "list<anyURI>"  ; TypeName of the version property value
+             "list&lt;anyURI&gt;"  ; TypeName of the version property value
              COMMA
              List            ; 
              CRLF
