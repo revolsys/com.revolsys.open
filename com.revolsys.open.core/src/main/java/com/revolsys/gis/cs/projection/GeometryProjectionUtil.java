@@ -7,7 +7,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryProjectionUtil {
   public static CoordinateSystem getCoordinateSystem(final Geometry geometry) {
-    com.vividsolutions.jts.geom.GeometryFactory geometryFactory = geometry.getFactory();
+    com.vividsolutions.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     if (geometryFactory instanceof GeometryFactory) {
       GeometryFactory factory = (GeometryFactory)geometryFactory;
       return factory.getCoordinateSystem();

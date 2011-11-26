@@ -39,61 +39,81 @@ public class GeometryFactory extends
   CoordinatesPrecisionModel {
   private static final long serialVersionUID = 4328651897279304108L;
 
-  private static Map<Integer, GeometryFactory> factories = new HashMap<Integer, GeometryFactory>();
+  private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
 
+  /**
+   * get a 3d geometry factory with no coordinate system and a floating scale.
+   */
+  public static GeometryFactory getFactory() {
+    return getFactory(0, 3, 0, 0);
+  }
+
+  /**
+   * get a 3d geometry factory with a floating scale.
+   */
   public static GeometryFactory getFactory(
     final CoordinateSystem coordinateSystem) {
-    final int srid = getId(coordinateSystem);
-    synchronized (factories) {
-      GeometryFactory factory = factories.get(srid);
-      if (factory == null) {
-        factory = new GeometryFactory(coordinateSystem);
-        factories.put(srid, factory);
-      }
-      return factory;
-    }
+    final int crsId = getId(coordinateSystem);
+    return getFactory(crsId, 3, 0, 0);
+  }
+
+  public static GeometryFactory getFactory(final double scaleXy) {
+    return getFactory(0, 3, scaleXy, 0);
   }
 
   public static GeometryFactory getFactory(final Geometry geometry) {
     if (geometry == null) {
-      return null;
+      return getFactory(0, 3, 0, 0);
     } else {
-      final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
+      final com.vividsolutions.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
       if (factory instanceof GeometryFactory) {
         return (GeometryFactory)factory;
       } else {
-        final int srid = geometry.getSRID();
-        final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-        if (coordinateSystem == null) {
-          return null;
+        final int crsId = geometry.getSRID();
+        final PrecisionModel precisionModel = factory.getPrecisionModel();
+        if (precisionModel.isFloating()) {
+          return getFactory(crsId, 3, 0, 0);
         } else {
-          final PrecisionModel precisionModel = factory.getPrecisionModel();
-          if (precisionModel.isFloating()) {
-            return new GeometryFactory(coordinateSystem);
-          } else {
-            final CoordinatesPrecisionModel coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
-              precisionModel.getScale());
-            return new GeometryFactory(coordinateSystem,
-              coordinatesPrecisionModel);
-          }
+          final double scaleXy = precisionModel.getScale();
+          return getFactory(crsId, 3, scaleXy, 0);
         }
       }
     }
   }
 
-  public static GeometryFactory getFactory(final int srid) {
-    GeometryFactory factory = factories.get(srid);
-    if (factory == null) {
-      factory = getFactory(EpsgCoordinateSystems.getCoordinateSystem(srid));
-    }
-    return factory;
+  /**
+   * get a 3d geometry factory with a floating scale.
+   */
+  public static GeometryFactory getFactory(final int crsId) {
+    return getFactory(crsId, 3, 0, 0);
   }
 
-  public static GeometryFactory getFactory(final int srid, final int scale) {
-    final GeometryFactory factory = new GeometryFactory(
-      EpsgCoordinateSystems.getCoordinateSystem(srid),
-      new SimpleCoordinatesPrecisionModel(scale));
-    return factory;
+  public static GeometryFactory getFactory(final int crsId,
+    final double scaleXy, final double scaleZ) {
+    return getFactory(crsId, 3, scaleXy, scaleZ);
+  }
+
+  /**
+   * Get a 2D geometry factory with the specified scale
+   * @param crsId
+   * @param scale
+   * @return
+   */
+  public static GeometryFactory getFactory(final int crsId, final double scale) {
+    return getFactory(crsId, 2, scale, 0);
+  }
+
+  public static GeometryFactory getFactory(final int crsId, final int numAxis,
+    final double scaleXY, final double scaleZ) {
+    synchronized (factories) {
+      final String key = crsId + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
+      GeometryFactory factory = factories.get(key);
+      if (factory == null) {
+        factory = new GeometryFactory(crsId, numAxis, scaleXY, scaleZ);
+        factories.put(key, factory);
+      }
+      return factory;
+    }
   }
 
   private static Set<Class<?>> getGeometryClassSet(
@@ -141,7 +161,7 @@ public class GeometryFactory extends
   public static MultiPolygon toMultiPolygon(final List<Polygon> polygons) {
     final GeometryFactory geometryFactory;
     if (polygons.isEmpty()) {
-      geometryFactory = new GeometryFactory();
+      geometryFactory = GeometryFactory.getFactory();
     } else {
       geometryFactory = getFactory(polygons.get(0));
     }
@@ -203,35 +223,6 @@ public class GeometryFactory extends
 
   private final WktParser wktParser = new WktParser(this);
 
-  public GeometryFactory() {
-    super(
-      PrecisionModelUtil.getPrecisionModel(SimpleCoordinatesPrecisionModel.FLOATING),
-      0, DoubleCoordinatesListFactory.INSTANCE);
-    this.coordinateSystem = null;
-    this.coordinatesPrecisionModel = SimpleCoordinatesPrecisionModel.FLOATING;
-  }
-
-  public GeometryFactory(
-    final CoordinatesPrecisionModel coordinatesPrecisionModel) {
-    super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel), 0,
-      new DoubleCoordinatesListFactory());
-    this.coordinatesPrecisionModel = coordinatesPrecisionModel;
-    this.coordinateSystem = null;
-  }
-
-  public GeometryFactory(final CoordinatesPrecisionModel precisionModel,
-    final int numAxis) {
-    super(PrecisionModelUtil.getPrecisionModel(precisionModel), 0,
-      DoubleCoordinatesListFactory.INSTANCE);
-    this.coordinateSystem = null;
-    this.coordinatesPrecisionModel = precisionModel;
-    this.numAxis = numAxis;
-  }
-
-  public GeometryFactory(final CoordinateSystem coordinateSystem) {
-    this(coordinateSystem, new SimpleCoordinatesPrecisionModel());
-  }
-
   public GeometryFactory(final CoordinateSystem coordinateSystem,
     final CoordinatesPrecisionModel coordinatesPrecisionModel) {
     super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel),
@@ -240,46 +231,11 @@ public class GeometryFactory extends
     this.coordinatesPrecisionModel = coordinatesPrecisionModel;
   }
 
-  public GeometryFactory(final CoordinateSystem coordinateSystem,
-    final CoordinatesPrecisionModel precisionModel, final int numAxis) {
-    this(coordinateSystem, precisionModel);
-    this.numAxis = numAxis;
-  }
-
-  public GeometryFactory(final CoordinateSystem coordinateSystem,
+  public GeometryFactory(final int crsId, final int numAxis,
     final double scaleXY, final double scaleZ) {
-    this(coordinateSystem, new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
-  }
-
-  public GeometryFactory(final CoordinateSystem coordinateSystem,
-    final int numAxis) {
-    this(coordinateSystem, new SimpleCoordinatesPrecisionModel(), numAxis);
-  }
-
-  public GeometryFactory(final GeometryFactory geometryFactory,
-    final int numAxis) {
-    this(geometryFactory.getCoordinateSystem(),
-      geometryFactory.getCoordinatesPrecisionModel());
+    this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
+      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
     this.numAxis = numAxis;
-  }
-
-  public GeometryFactory(final int crsId) {
-    this(EpsgCoordinateSystems.getCoordinateSystem(crsId));
-  }
-
-  public GeometryFactory(final int crsId, final double scaleXY) {
-    this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
-      new SimpleCoordinatesPrecisionModel(scaleXY), 2);
-  }
-
-  public GeometryFactory(final int crsId, final double scaleXY,
-    final double scaleZ) {
-    this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
-      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ), 3);
-  }
-
-  public GeometryFactory(final int crsId, final int numAxis) {
-    this(EpsgCoordinateSystems.getCoordinateSystem(crsId), numAxis);
   }
 
   private CoordinatesList createCoordinatesList(final CoordinatesList points) {
@@ -430,6 +386,7 @@ public class GeometryFactory extends
     }
   }
 
+  @Override
   public MultiLineString createMultiLineString(final LineString... lines) {
     return super.createMultiLineString(lines);
   }

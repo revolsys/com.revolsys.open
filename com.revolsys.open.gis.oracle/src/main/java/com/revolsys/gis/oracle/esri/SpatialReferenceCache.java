@@ -28,20 +28,17 @@ public class SpatialReferenceCache {
   public SpatialReferenceCache() {
   }
 
-  public SpatialReferenceCache(
-    final Connection connection) {
+  public SpatialReferenceCache(final Connection connection) {
     setConnection(connection);
   }
 
-  public SpatialReferenceCache(
-    final Connection connection,
+  public SpatialReferenceCache(final Connection connection,
     final DataSource dataSource) {
     setConnection(connection);
     setDataSource(dataSource);
   }
 
-  public SpatialReferenceCache(
-    final DataSource dataSource) {
+  public SpatialReferenceCache(final DataSource dataSource) {
     setDataSource(dataSource);
   }
 
@@ -53,8 +50,7 @@ public class SpatialReferenceCache {
     return dataSource;
   }
 
-  public SpatialReference getSpatialReference(
-    final int esriSrid) {
+  public SpatialReference getSpatialReference(final int esriSrid) {
     SpatialReference spatialReference = spatialReferences.get(esriSrid);
     if (spatialReference == null) {
       final String sql = "SELECT SRID, SR_NAME, X_OFFSET, Y_OFFSET, Z_OFFSET, M_OFFSET, XYUNITS, Z_SCALE, M_SCALE, CS_ID, DEFINITION FROM SDE.ST_SPATIAL_REFERENCES WHERE SRID = ?";
@@ -75,11 +71,8 @@ public class SpatialReferenceCache {
               final int srid = resultSet.getInt(10);
               final BigDecimal scale = resultSet.getBigDecimal(7);
               final BigDecimal zScale = resultSet.getBigDecimal(8);
-              final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-              final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
-                scale.intValue(), zScale.intValue());
-              final GeometryFactory geometryFactory = new GeometryFactory(
-                coordinateSystem, precisionModel);
+              final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+                srid, scale.intValue(), zScale.intValue());
               spatialReference = new SpatialReference(geometryFactory);
               spatialReference.setEsriSrid(esriSrid);
               spatialReference.setName(resultSet.getString(2));
@@ -109,13 +102,11 @@ public class SpatialReferenceCache {
     return spatialReference;
   }
 
-  public void setConnection(
-    final Connection connection) {
+  public void setConnection(final Connection connection) {
     this.connection = connection;
   }
 
-  public void setDataSource(
-    final DataSource dataSource) {
+  public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
 }

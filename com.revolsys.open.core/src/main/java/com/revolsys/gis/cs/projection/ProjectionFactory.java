@@ -41,8 +41,7 @@ public final class ProjectionFactory {
       LambertConicConformal.class);
   }
 
-  public static <T extends Geometry> T convert(
-    final T geometry,
+  public static <T extends Geometry> T convert(final T geometry,
     final GeometryFactory targetGeometryFactory) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     if (geometryFactory == targetGeometryFactory) {
@@ -61,8 +60,7 @@ public final class ProjectionFactory {
   }
 
   public static CoordinatesOperation getCoordinatesOperation(
-    final CoordinateSystem cs1,
-    final CoordinateSystem cs2) {
+    final CoordinateSystem cs1, final CoordinateSystem cs2) {
     if (cs1.equals(cs2)) {
       return null;
     } else {
@@ -186,7 +184,7 @@ public final class ProjectionFactory {
     final CoordinateSystem sourceCoordinateSystem,
     final CoordinateSystem targetCoordinateSystem) {
     return getGeometryOperation(sourceCoordinateSystem, targetCoordinateSystem,
-      new GeometryFactory(targetCoordinateSystem));
+      GeometryFactory.getFactory(targetCoordinateSystem));
   }
 
   /**
@@ -201,8 +199,7 @@ public final class ProjectionFactory {
    * @return The geometry operation.
    */
   public static GeometryOperation getGeometryOperation(
-    final CoordinateSystem cs1,
-    final CoordinateSystem cs2,
+    final CoordinateSystem cs1, final CoordinateSystem cs2,
     final GeometryFactory geometryFactory) {
     final CoordinatesOperation operation = getCoordinatesOperation(cs1, cs2);
     if (operation == null) {
@@ -308,8 +305,7 @@ public final class ProjectionFactory {
    * @param name The name.
    * @param projectionClass The projection class.
    */
-  public static void registerCoordinatesProjection(
-    final String name,
+  public static void registerCoordinatesProjection(final String name,
     final Class<? extends CoordinatesProjection> projectionClass) {
     projectionClasses.put(name, projectionClass);
   }

@@ -93,9 +93,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
             coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
           }
           setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
-          final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
-          geometryFactory = new GeometryFactory(coordinateSystem,
-            precisionModel);
+          geometryFactory = GeometryFactory.getFactory(coordinateSystem);
         } catch (final Exception e) {
           e.printStackTrace();
         }

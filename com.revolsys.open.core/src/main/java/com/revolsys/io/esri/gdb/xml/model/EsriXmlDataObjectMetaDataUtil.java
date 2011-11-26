@@ -278,7 +278,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       String indexName = index.getName();
       if (indexName.endsWith("_PK")) {
         final List<Field> indexFields = index.getFields();
-        final Field indexField = CollectionUtil.get(indexFields,0);
+        final Field indexField = CollectionUtil.get(indexFields, 0);
         final String idName = indexField.getName();
         metaData.setIdAttributeName(idName);
       }
@@ -290,9 +290,11 @@ public class EsriXmlDataObjectMetaDataUtil implements
       final SpatialReference spatialReference = featureClass.getSpatialReference();
       GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
-        geometryFactory = new GeometryFactory(geometryFactory, 4);
+        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSRID(),
+          4, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       } else if (featureClass.isHasZ()) {
-        geometryFactory = new GeometryFactory(geometryFactory, 3);
+        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSRID(),
+          3, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       }
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,

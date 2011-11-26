@@ -80,11 +80,10 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       CoordinatesPrecisionModel precisionModel = dataStore.getPrecisionModel();
       final GeometryFactory geometryFactory;
       if (precisionModel == null) {
-        geometryFactory = new GeometryFactory(srid, numAxis);
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, 0, 0);
       } else {
-        geometryFactory = new GeometryFactory(
-          EpsgCoordinateSystems.getCoordinateSystem(srid), precisionModel,
-          numAxis);
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis,
+          precisionModel.getScaleXY(), 0);
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,
         dataType, length, scale, required, null, srid, numAxis, geometryFactory);

@@ -617,7 +617,7 @@ public class TriangulatedIrregularNetwork {
     final Envelope envelope = circumcircle.getEnvelopeInternal();
     if (!circumCircleIndex.remove(envelope, triangle)) {
       System.err.println(circumcircle.toGeometry());
-      System.err.println(new BoundingBox(new GeometryFactory(), envelope).toPolygon(1));
+      System.err.println(new BoundingBox(GeometryFactory.getFactory(), envelope).toPolygon(1));
       System.err.println(triangle);
       circumCircleIndex.remove(envelope, triangle);
     }

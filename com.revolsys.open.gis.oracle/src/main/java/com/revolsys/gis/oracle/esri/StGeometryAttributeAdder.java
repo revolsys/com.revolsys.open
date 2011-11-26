@@ -13,15 +13,12 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.JdbcConstants;
@@ -38,20 +35,17 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private boolean available = true;
 
-  public StGeometryAttributeAdder(
-    final Connection connection) {
+  public StGeometryAttributeAdder(final Connection connection) {
     this.connection = connection;
     spatialReferences = new SpatialReferenceCache(connection, dataSource);
   }
 
-  public StGeometryAttributeAdder(
-    final DataSource dataSource) {
+  public StGeometryAttributeAdder(final DataSource dataSource) {
     this.dataSource = dataSource;
     spatialReferences = new SpatialReferenceCache(connection, dataSource);
   }
 
-  public StGeometryAttributeAdder(
-    final DataSource dataSource,
+  public StGeometryAttributeAdder(final DataSource dataSource,
     final Connection connection) {
     this.dataSource = dataSource;
     this.connection = connection;
@@ -59,12 +53,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final int sqlType,
-    final int length,
-    final int scale,
+  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, final int sqlType, final int length, final int scale,
     final boolean required) {
     if (available) {
       final QName typeName = metaData.getName();
@@ -104,11 +94,10 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
         "SDE.ST_BUFFER(", ")"));
       if (spatialReference != null) {
         final int srid = spatialReference.getSrid();
-        final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
         final Double scaleXy = spatialReference.getXyScale();
         final Double scaleZ = spatialReference.getZScale();
-        GeometryFactory geometryFactory = new GeometryFactory(coordinateSystem,
-          new SimpleCoordinatesPrecisionModel(scaleXy, scaleZ));
+        GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
+          scaleXy, scaleZ);
         attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
           geometryFactory);
       }
@@ -119,11 +108,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private <T> T getColumnProperty(
-    final DataObjectStoreSchema schema,
-    final QName typeName,
-    final String columnName,
-    final String propertyName) {
+  private <T> T getColumnProperty(final DataObjectStoreSchema schema,
+    final QName typeName, final String columnName, final String propertyName) {
     final Map<QName, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
     final Map<String, Map<String, Object>> columnsProperties = esriColumnProperties.get(typeName);
     if (columnsProperties != null) {
@@ -136,11 +122,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     return null;
   }
 
-  private int getIntegerColumnProperty(
-    final DataObjectStoreSchema schema,
-    final QName typeName,
-    final String columnName,
-    final String propertyName) {
+  private int getIntegerColumnProperty(final DataObjectStoreSchema schema,
+    final QName typeName, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typeName, columnName,
       propertyName);
     if (value instanceof Number) {
@@ -152,8 +135,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public void initialize(
-    final DataObjectStoreSchema schema) {
+  public void initialize(final DataObjectStoreSchema schema) {
     if (available) {
       Map<QName, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
       if (esriColumnProperties == null) {
@@ -182,8 +164,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private void initializeColumnProperties(
-    final DataObjectStoreSchema schema,
+  private void initializeColumnProperties(final DataObjectStoreSchema schema,
     final Connection connection,
     final Map<QName, Map<String, Map<String, Object>>> esriColumnProperties)
     throws SQLException {
@@ -221,11 +202,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private void setColumnProperty(
     final Map<QName, Map<String, Map<String, Object>>> esriColumnProperties,
-    final String schemaName,
-    final String tableName,
-    final String columnName,
-    final String propertyName,
-    final Object propertyValue) {
+    final String schemaName, final String tableName, final String columnName,
+    final String propertyName, final Object propertyValue) {
     final QName typeName = new QName(schemaName, tableName);
     Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typeName);
     if (typeColumnMap == null) {

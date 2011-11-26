@@ -791,7 +791,7 @@ public final class JtsGeometryUtil {
       clockwiseSegment.p0, clockwiseSegment.p1, counterClockwiseSegment.p1,
       counterClockwiseSegment.p0, clockwiseSegment.p0
     };
-    final GeometryFactory factory = new GeometryFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory();
     final LinearRing exteriorRing = factory.createLinearRing(coords);
     return factory.createPolygon(exteriorRing, null);
   }
@@ -915,7 +915,7 @@ public final class JtsGeometryUtil {
   public static Geometry intersection2DZFloating(
     final LineString line1,
     final LineString line2) {
-    final GeometryFactory factory = new GeometryFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory();
     final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
     final LineString line1Floating = factory.createLineString(coordinates1);
     final CoordinateSequence coordinates2 = line2.getCoordinateSequence();

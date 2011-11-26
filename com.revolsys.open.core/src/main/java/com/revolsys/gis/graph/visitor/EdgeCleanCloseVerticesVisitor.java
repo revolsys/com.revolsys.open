@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import javax.xml.namespace.QName;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.event.CoordinateEventListenerList;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -16,7 +17,6 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
@@ -91,7 +91,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
     final CoordinateSequence coordinates = lineString.getCoordinateSequence();
     final int numCoordinates = coordinates.size();
     if (numCoordinates > 2) {
-      final GeometryFactory geometryFactory = lineString.getFactory();
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(lineString);
       final CoordinateSequenceCoordinatesIterator ordinates = new CoordinateSequenceCoordinatesIterator(
         coordinates);
       final LinkedHashSet<Integer> removeIndicies = new LinkedHashSet<Integer>();

@@ -3,6 +3,7 @@ package com.revolsys.ui.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class PageInfo extends AbstractDocumentedObject {
   private List<MediaType> inputContentTypes = new ArrayList<MediaType>();
 
   private String url;
+
+  private Map<String, Object> attributes = new HashMap<String, Object>();
 
   public PageInfo() {
   }
@@ -67,6 +70,10 @@ public class PageInfo extends AbstractDocumentedObject {
     return new PageInfo(this);
   }
 
+  public Map<String, Object> getAttributes() {
+    return attributes;
+  }
+
   public List<MediaType> getInputContentTypes() {
     return inputContentTypes;
   }
@@ -93,6 +100,14 @@ public class PageInfo extends AbstractDocumentedObject {
 
   public String getUrl() {
     return url;
+  }
+
+  public void setAttribute(final String name, final Object value) {
+    attributes.put(name, value);
+  }
+
+  public void setAttributes(final Map<String, Object> attributes) {
+    this.attributes = attributes;
   }
 
   @Override

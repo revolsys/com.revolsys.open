@@ -16,9 +16,8 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 public class LineStringRelateTest {
-  private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(
-    EpsgCoordinateSystems.getCoordinateSystem(3005),
-    new SimpleCoordinatesPrecisionModel(1000));
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+    3005, 1000.0, 1.0);
 
   final WktParser wkt = new WktParser(GEOMETRY_FACTORY);
 

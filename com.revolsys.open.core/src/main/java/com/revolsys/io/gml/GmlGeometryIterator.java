@@ -50,7 +50,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
 	protected void doInit() {
 		geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
 		if (geometryFactory == null) {
-			geometryFactory = new GeometryFactory();
+			geometryFactory = GeometryFactory.getFactory();
 		}
 	}
 

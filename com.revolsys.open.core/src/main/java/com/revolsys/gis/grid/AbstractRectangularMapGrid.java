@@ -12,7 +12,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
   public Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem) {
-    return getPolygon(mapTileName, new GeometryFactory(coordinateSystem));
+    return getPolygon(mapTileName,  GeometryFactory.getFactory(coordinateSystem));
   }
 
   public BoundingBox getBoundingBox(String mapTileName, int srid) {

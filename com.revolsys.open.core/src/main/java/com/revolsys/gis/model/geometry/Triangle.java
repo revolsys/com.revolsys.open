@@ -49,7 +49,7 @@ public class Triangle extends DoubleCoordinatesList {
 
   private Envelope envelope = new Envelope();
 
-  private GeometryFactory geometryFactory = new GeometryFactory(0, 1);
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1.0);
 
   public Triangle() {
     super(3, 2);

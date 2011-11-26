@@ -24,7 +24,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
-      this.geometryFactory = new GeometryFactory();
+      this.geometryFactory = GeometryFactory.getFactory();
     }
   }
 

@@ -20,7 +20,7 @@ public class LineSegment extends AbstractCoordinatesList {
    */
   private static final long serialVersionUID = 3905321662159212931L;
 
-  private static final GeometryFactory FACTORY = new GeometryFactory();
+  private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
 
   public static void visit(final LineString line,
     final Visitor<LineSegment> visitor) {

@@ -140,13 +140,13 @@ public class SpatialReference {
     if (geometryFactory == null) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
-        final CoordinatesPrecisionModel precisionModel;
         if (xYScale == 1.1258999068426238E13) {
-          precisionModel = new SimpleCoordinatesPrecisionModel(0, zScale);
+          geometryFactory = GeometryFactory.getFactory(
+            coordinateSystem.getId(), 0, zScale);
         } else {
-          precisionModel = new SimpleCoordinatesPrecisionModel(xYScale, zScale);
+          geometryFactory = GeometryFactory.getFactory(
+            coordinateSystem.getId(), xYScale, zScale);
         }
-        geometryFactory = new GeometryFactory(coordinateSystem, precisionModel);
       }
     }
     return geometryFactory;

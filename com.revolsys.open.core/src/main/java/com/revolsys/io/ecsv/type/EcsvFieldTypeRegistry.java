@@ -22,7 +22,7 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
 
   public EcsvFieldTypeRegistry(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      this.geometryFactory = new GeometryFactory();
+      this.geometryFactory = GeometryFactory.getFactory();
     } else {
       this.geometryFactory = geometryFactory;
     }

@@ -28,7 +28,7 @@ public class DirectionalAttributesTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(DirectionalAttributesTest.class);
 
-  private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory();
 
   private static final String DIRECTIONAL = "DIRECTIONAL";
 

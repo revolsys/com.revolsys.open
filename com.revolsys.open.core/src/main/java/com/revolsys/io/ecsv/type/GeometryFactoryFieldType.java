@@ -27,12 +27,13 @@ public class GeometryFactoryFieldType extends AbstractEcsvFieldType {
       int srid = Integer.parseInt(values[0]);
       double scaleXy = Double.parseDouble(values[1]);
       if (values.length == 2) {
-        GeometryFactory geometryFactory = new GeometryFactory(srid, scaleXy);
+        GeometryFactory geometryFactory = GeometryFactory.getFactory(srid, 2,
+          scaleXy, 0);
         return geometryFactory;
       } else {
         double scaleZ = Double.parseDouble(values[2]);
-        GeometryFactory geometryFactory = new GeometryFactory(srid, scaleXy,
-          scaleZ);
+        GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
+          scaleXy, scaleZ);
         return geometryFactory;
       }
     } else {

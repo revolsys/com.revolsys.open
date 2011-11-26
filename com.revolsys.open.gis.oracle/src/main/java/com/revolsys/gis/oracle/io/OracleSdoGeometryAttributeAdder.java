@@ -138,16 +138,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       columnName, OracleSdoGeometryJdbcAttribute.COORDINATE_PRECISION_PROPERTY);
 
     final double geometryScale = 1 / precision;
-    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
-      geometryScale);
-    final GeometryFactory geometryFactory;
-    if (coordinateSystem == null) {
-      geometryFactory = new GeometryFactory(precisionModel, dimension);
-    } else {
-      geometryFactory = new GeometryFactory(coordinateSystem, precisionModel,
-        dimension);
-    }
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
+      dimension, geometryScale, 0);
     DataType dataType = DataTypes.GEOMETRY;
     final String schemaName = typeName.getNamespaceURI();
     final String tableName = typeName.getLocalPart();

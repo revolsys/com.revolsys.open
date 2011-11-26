@@ -51,7 +51,7 @@ public class Circle extends DoubleCoordinates {
   }
 
   public Geometry toGeometry() {
-    final GeometryFactory factory = new GeometryFactory();
+    final GeometryFactory factory = GeometryFactory.getFactory();
     final Point point = factory.createPoint(this);
     return point.buffer(radius);
   }

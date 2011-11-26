@@ -73,8 +73,7 @@ public class ShapeFileReader extends XbaseFileReader {
    * 
    * @param file The file to read.
    */
-  public ShapeFileReader(
-    final File file) {
+  public ShapeFileReader(final File file) {
     this(file, null);
   }
 
@@ -84,9 +83,7 @@ public class ShapeFileReader extends XbaseFileReader {
    * @param file The file to read.
    * @param typeName The name of the type to create for the data objects.
    */
-  public ShapeFileReader(
-    final File file,
-    final String typeName) {
+  public ShapeFileReader(final File file, final String typeName) {
     setFile(file);
     setTypeName(typeName);
   }
@@ -112,8 +109,7 @@ public class ShapeFileReader extends XbaseFileReader {
    * @throws IOException If an I/O error occurs
    */
   @Override
-  public DataObject loadDataObject()
-    throws IOException {
+  public DataObject loadDataObject() throws IOException {
     final DataObject object = super.loadDataObject();
     object.setGeometryValue(geometryReader.readGeometry(in));
     return object;
@@ -124,8 +120,7 @@ public class ShapeFileReader extends XbaseFileReader {
    * 
    * @throws IOException If an I/O error occurs.
    */
-  private void loadHeader()
-    throws IOException {
+  private void loadHeader() throws IOException {
     final int fileCode = in.readInt();
     in.skipBytes(20);
     final int fileLength = in.readInt();
@@ -146,8 +141,7 @@ public class ShapeFileReader extends XbaseFileReader {
   }
 
   @Override
-  protected DataObjectMetaData loadSchema(
-    final EndianInput in)
+  protected DataObjectMetaData loadSchema(final EndianInput in)
     throws IOException {
     final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)super.loadSchema(in);
     try {
@@ -170,16 +164,14 @@ public class ShapeFileReader extends XbaseFileReader {
     final File file = getFile();
     File projFile = new File(file.getParentFile(),
       FileUtil.getFileNamePrefix(file) + ".prj");
-    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
-    geometryFactory = new GeometryFactory(precisionModel);
+    geometryFactory = GeometryFactory.getFactory();
     if (projFile.exists()) {
       try {
         final CoordinateSystem coordinateSystem = new WktCsParser(
           new FileInputStream(projFile)).parse();
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         srid = EsriCoordinateSystems.getCrsId(esriCoordinateSystem);
-        geometryFactory = new GeometryFactory(esriCoordinateSystem,
-          precisionModel);
+        geometryFactory = GeometryFactory.getFactory(srid);
       } catch (IOException e) {
         log.error("Unable to read projection file: " + projFile);
       }
@@ -187,25 +179,22 @@ public class ShapeFileReader extends XbaseFileReader {
 
     geometryReader = new JtsGeometryConverter(geometryFactory);
     super.open();
-    
+
   }
 
   @Override
-  public void setFile(
-    final File file) {
+  public void setFile(final File file) {
     super.setFile(new File(file.getParentFile(),
       FileUtil.getFileNamePrefix(file) + ".dbf"));
     this.shapeFile = file;
   }
 
-  public void setSrid(
-    final int srid) {
+  public void setSrid(final int srid) {
     this.srid = srid;
   }
 
   @Override
-  protected void skipDataObject()
-    throws IOException {
+  protected void skipDataObject() throws IOException {
     super.skipDataObject();
     in.readInt();
     final int recordLength = in.readInt();

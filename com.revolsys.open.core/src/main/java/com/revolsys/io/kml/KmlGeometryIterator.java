@@ -25,8 +25,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   Kml22Constants {
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    COORDINATE_SYSTEM);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(COORDINATE_SYSTEM);
 
   private final XMLStreamReader in;
 

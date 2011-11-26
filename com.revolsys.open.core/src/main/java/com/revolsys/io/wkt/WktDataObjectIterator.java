@@ -49,13 +49,13 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
     GeometryFactory geometryFactory;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute == null) {
-      geometryFactory = new GeometryFactory();
+      geometryFactory = GeometryFactory.getFactory();
     } else {
       geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       if (geometryFactory == null) {
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         if (geometryFactory == null) {
-          geometryFactory = new GeometryFactory();
+          geometryFactory = GeometryFactory.getFactory();
         }
         geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
           geometryFactory);

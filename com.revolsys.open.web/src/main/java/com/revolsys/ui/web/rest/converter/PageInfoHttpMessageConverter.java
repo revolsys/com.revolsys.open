@@ -337,7 +337,7 @@ public class PageInfoHttpMessageConverter extends
         .entrySet()) {
         final String childPath = childPage.getKey();
         final PageInfo childPageInfo = childPage.getValue();
-        final Map<String, String> childPageMap = new NamedLinkedHashMap<String, String>(
+        final Map<String, Object> childPageMap = new NamedLinkedHashMap<String, Object>(
           "resource");
         String childUri;
         if (childPath.startsWith("/")) {
@@ -348,6 +348,12 @@ public class PageInfoHttpMessageConverter extends
         childPageMap.put("resourceUri", childUri);
         childPageMap.put("title", childPageInfo.getTitle());
         childPageMap.put("description", childPageInfo.getDescription());
+        for (Entry<String, Object> attribute : childPageInfo.getAttributes()
+          .entrySet()) {
+          String key = attribute.getKey();
+          Object value = attribute.getValue();
+          childPageMap.put(key, value);
+        }
         writer.write(childPageMap);
       }
       writer.close();

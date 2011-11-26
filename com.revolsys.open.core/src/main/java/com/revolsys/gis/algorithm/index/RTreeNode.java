@@ -32,6 +32,6 @@ public abstract class RTreeNode<T> extends Envelope {
 
   @Override
   public String toString() {
-    return new BoundingBox(new GeometryFactory(), this).toPolygon(1).toString();
+    return new BoundingBox(GeometryFactory.getFactory(), this).toPolygon(1).toString();
   }
 }

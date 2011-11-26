@@ -310,9 +310,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final int centreX = readLEInt(in);
     final int centreY = readLEInt(in);
     center = new DoubleCoordinates(centreX, centreY);
-    final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
-      1);
-    factory = new GeometryFactory(coordinateSystem, precisionModel);
+    factory = GeometryFactory.getFactory(coordinateSystem.getId(), 1.0, 1.0);
     setProperty(IoConstants.GEOMETRY_FACTORY, factory);
   }
 

@@ -25,7 +25,7 @@ public class FeatureDatasetTest {
     newMetaData.addAttribute("name", DataTypes.STRING, 255, false);
     newMetaData.addAttribute("geometry", DataTypes.POINT, true);
     newMetaData.setIdAttributeName("id");
-    final GeometryFactory geometryFactory = new GeometryFactory(4326);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
     newMetaData.setGeometryFactory(geometryFactory);
 
     final String datasetName = "target/Create.gdb";
@@ -51,8 +51,7 @@ public class FeatureDatasetTest {
       }
       dataStore.close();
 
-      dataStore = FileGdbDataObjectStoreFactory.create(new File(
-        datasetName));
+      dataStore = FileGdbDataObjectStoreFactory.create(new File(datasetName));
       dataStore.initialize();
       dataStore.setDefaultSchema("test");
       DataObjectStoreSchema schema = dataStore.getSchema("test");

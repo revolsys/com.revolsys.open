@@ -31,7 +31,7 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
     final Graph<T> graph,
     final Node<T> node,
     final double maxDistance) {
-    final GeometryFactory geometryFactory = new GeometryFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Coordinates coordinate = node;
     final Geometry geometry = geometryFactory.createPoint(coordinate);
     return edgesWithiDistance(graph, geometry, maxDistance);
@@ -41,7 +41,7 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
     final Graph<T> graph,
     final Coordinates point,
     final double maxDistance) {
-    final GeometryFactory geometryFactory = new GeometryFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Geometry geometry = geometryFactory.createPoint(point);
     return edgesWithiDistance(graph, geometry, maxDistance);
 

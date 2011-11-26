@@ -35,9 +35,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private final JsonParser in;
 
-  public GeoJsonGeometryIterator(
-    final Resource resource)
-    throws IOException {
+  public GeoJsonGeometryIterator(final Resource resource) throws IOException {
     this.in = new JsonParser(resource);
   }
 
@@ -50,8 +48,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   protected void doInit() {
     geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (geometryFactory == null) {
-      geometryFactory = new GeometryFactory(
-        EpsgCoordinateSystems.getCoordinateSystem(4326));
+      geometryFactory = GeometryFactory.getFactory(4326);
     }
     if (in.hasNext()) {
       in.next();
@@ -59,14 +56,12 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   @Override
-  protected void finalize()
-    throws Throwable {
+  protected void finalize() throws Throwable {
     close();
   }
 
   @Override
-  protected Geometry getNext()
-    throws NoSuchElementException {
+  protected Geometry getNext() throws NoSuchElementException {
     String type = null;
     do {
       do {
@@ -112,8 +107,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
    * @param values The list to add the points coordinates to.
    * @return The dimension of the coordinate read.
    */
-  private int readCoordinatesListCoordinates(
-    final List<Number> values) {
+  private int readCoordinatesListCoordinates(final List<Number> values) {
     int dimension = 0;
     if (in.getEvent() == EventType.startArray || in.hasNext()
       && in.next() == EventType.startArray) {
@@ -235,7 +229,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
           if (name.startsWith(URN_OGC_DEF_CRS_EPSG)) {
             int srid = Integer.parseInt(name.substring(URN_OGC_DEF_CRS_EPSG.length()));
             factory = GeometryFactory.getFactory(srid);
-          } else  if (name.startsWith(EPSG)) {
+          } else if (name.startsWith(EPSG)) {
             int srid = Integer.parseInt(name.substring(EPSG.length()));
             factory = GeometryFactory.getFactory(srid);
           }

@@ -7,7 +7,7 @@ import com.revolsys.gis.model.geometry.LineSegment;
 
 public class CoordinatesListIndexLineSegmentIterator implements
   Iterator<LineSegment>, Iterable<LineSegment> {
-  private static final GeometryFactory FACTORY = new GeometryFactory();
+  private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
 
   private GeometryFactory factory;
 

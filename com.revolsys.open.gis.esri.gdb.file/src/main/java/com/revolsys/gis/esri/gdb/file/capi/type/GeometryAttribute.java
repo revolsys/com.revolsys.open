@@ -73,7 +73,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       EndianOutput.class, Geometry.class);
   }
 
-  private GeometryFactory geometryFactory = new GeometryFactory();
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
   private Method readMethod;
 

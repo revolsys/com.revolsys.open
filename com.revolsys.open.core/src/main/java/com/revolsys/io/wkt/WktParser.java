@@ -28,7 +28,7 @@ public class WktParser {
   }
 
   public WktParser() {
-    this(new GeometryFactory());
+    this(GeometryFactory.getFactory());
   }
 
   private int getNumAxis(final StringBuffer text) {
@@ -164,8 +164,8 @@ public class WktParser {
     if (i < 0) {
       return null;
     } else {
-      final String numberText = text.substring(0, i+1);
-      text.delete(0, i+1);
+      final String numberText = text.substring(0, i + 1);
+      text.delete(0, i + 1);
       return Integer.valueOf(numberText);
     }
   }
@@ -229,7 +229,9 @@ public class WktParser {
       }
       GeometryFactory axisGeometryFactory = axisToGeometryFactoryMap.get(numAxis);
       if (axisGeometryFactory == null) {
-        axisGeometryFactory = new GeometryFactory(geometryFactory, numAxis);
+        axisGeometryFactory = GeometryFactory.getFactory(
+          geometryFactory.getSRID(), numAxis, geometryFactory.getScaleXY(),
+          geometryFactory.getScaleZ());
         axisToGeometryFactoryMap.put(numAxis, axisGeometryFactory);
       }
       return axisGeometryFactory;

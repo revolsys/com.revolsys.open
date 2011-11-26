@@ -40,7 +40,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   private Coordinates fromPoint;
 
   public LineStringGraph(final CoordinatesList points) {
-    setGeometryFactory(new GeometryFactory());
+    setGeometryFactory(GeometryFactory.getFactory());
     setPoints(points);
   }
 

@@ -40,7 +40,7 @@ public class JtsGeometryConverter {
   private final GeometryFactory geometryFactory;
 
   public JtsGeometryConverter() {
-    this(new GeometryFactory());
+    this(GeometryFactory.getFactory());
   }
 
   public JtsGeometryConverter(final GeometryFactory geometryFactory) {

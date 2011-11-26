@@ -26,7 +26,7 @@ public class Polygon2DConverter implements ShapefileGeometryConverter {
     if (geometryFactory != null) {
       this.geometryFactory = geometryFactory;
     } else {
-      this.geometryFactory = new GeometryFactory();
+      this.geometryFactory = GeometryFactory.getFactory();
     }
   }
 

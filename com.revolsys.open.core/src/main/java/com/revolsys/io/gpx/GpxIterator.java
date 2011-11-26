@@ -83,9 +83,7 @@ public class GpxIterator implements DataObjectIterator {
 
   private File file;
 
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    EpsgCoordinateSystems.getCoordinateSystem(4326),
-    new SimpleCoordinatesPrecisionModel());
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
 
   private boolean hasNext = true;
 

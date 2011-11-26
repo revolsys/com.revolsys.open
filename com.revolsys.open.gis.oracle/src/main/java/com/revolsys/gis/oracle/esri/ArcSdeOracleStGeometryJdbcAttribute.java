@@ -44,19 +44,15 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
   private GeometryFactory geometryFactory;
 
-  public ArcSdeOracleStGeometryJdbcAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final int scale,
-    final boolean required,
-    final Map<QName, Object> properties,
-    final SpatialReference spatialReference,
-    final int dimension) {
+  public ArcSdeOracleStGeometryJdbcAttribute(final String name,
+    final DataType type, final int length, final int scale,
+    final boolean required, final Map<QName, Object> properties,
+    final SpatialReference spatialReference, final int dimension) {
     super(name, type, -1, length, scale, required, properties);
     this.spatialReference = spatialReference;
-    this.geometryFactory = new GeometryFactory(
-      spatialReference.getGeometryFactory(), dimension);
+    final GeometryFactory factory = spatialReference.getGeometryFactory();
+    this.geometryFactory = GeometryFactory.getFactory(factory.getSRID(),
+      dimension, factory.getScaleXY(), factory.getScaleZ());
     this.dimension = dimension;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
   }
@@ -69,15 +65,12 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public void addStatementPlaceHolder(
-    final StringBuffer sql) {
+  public void addStatementPlaceHolder(final StringBuffer sql) {
     sql.append("SDE.ST_GEOMETRY(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
   }
 
   @Override
-  public void addColumnName(
-    StringBuffer sql,
-    String tablePrefix) {
+  public void addColumnName(StringBuffer sql, String tablePrefix) {
     sql.append(tablePrefix);
     sql.append(".GEOMETRY.ENTITY, ");
     sql.append(tablePrefix);
@@ -87,18 +80,16 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final DataObject object)
-    throws SQLException {
+  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final DataObject object) throws SQLException {
     final Geometry geometry;
 
     final int entity = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
       final int numPoints = resultSet.getInt(columnIndex + 1);
       final Blob blob = resultSet.getBlob(columnIndex + 2);
-      InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(), 32000);
+      InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(),
+        32000);
 
       final Double xOffset = spatialReference.getXOffset();
       final Double yOffset = spatialReference.getYOffset();
@@ -141,11 +132,8 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final Object value)
-    throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
     int index = parameterIndex;
 
     if (value instanceof Geometry) {
