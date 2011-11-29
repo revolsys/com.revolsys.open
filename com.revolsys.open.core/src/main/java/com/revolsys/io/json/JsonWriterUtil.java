@@ -10,19 +10,21 @@ public final class JsonWriterUtil {
   public static void write(final PrintWriter out,
     final List<? extends Object> values) {
     startList(out);
-    int i = 0;
-    final int size = values.size();
-    final Iterator<? extends Object> iterator = values.iterator();
-    while (i < size - 1) {
-      final Object value = iterator.next();
-      write(out, value);
-      endAttribute(out);
-      i++;
-    }
-    if (iterator.hasNext()) {
-      final Object value = iterator.next();
-      write(out, value);
-      out.print("\n");
+    if (values != null) {
+      int i = 0;
+      final int size = values.size();
+      final Iterator<? extends Object> iterator = values.iterator();
+      while (i < size - 1) {
+        final Object value = iterator.next();
+        write(out, value);
+        endAttribute(out);
+        i++;
+      }
+      if (iterator.hasNext()) {
+        final Object value = iterator.next();
+        write(out, value);
+        out.print("\n");
+      }
     }
     endList(out);
   }
@@ -39,24 +41,25 @@ public final class JsonWriterUtil {
     final Map<String, ? extends Object> values) {
 
     startObject(out);
-
-    final Set<String> fields = values.keySet();
-    int i = 0;
-    final int size = fields.size();
-    final Iterator<String> iterator = fields.iterator();
-    while (i < size - 1) {
-      final String key = iterator.next();
-      final Object value = values.get(key);
-      label(out, key);
-      write(out, value);
-      endAttribute(out);
-      i++;
-    }
-    if (iterator.hasNext()) {
-      final String key = iterator.next();
-      final Object value = values.get(key);
-      label(out, key);
-      write(out, value);
+    if (values != null) {
+      final Set<String> fields = values.keySet();
+      int i = 0;
+      final int size = fields.size();
+      final Iterator<String> iterator = fields.iterator();
+      while (i < size - 1) {
+        final String key = iterator.next();
+        final Object value = values.get(key);
+        label(out, key);
+        write(out, value);
+        endAttribute(out);
+        i++;
+      }
+      if (iterator.hasNext()) {
+        final String key = iterator.next();
+        final Object value = values.get(key);
+        label(out, key);
+        write(out, value);
+      }
     }
     endObject(out);
   }

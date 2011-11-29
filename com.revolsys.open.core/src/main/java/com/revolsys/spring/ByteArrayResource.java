@@ -1,23 +1,21 @@
 package com.revolsys.spring;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.springframework.core.io.Resource;
 
-public class InputStreamResource extends
-  org.springframework.core.io.InputStreamResource {
+public class ByteArrayResource extends
+  org.springframework.core.io.ByteArrayResource {
 
   private final String filename;
 
-  public InputStreamResource(String filename, InputStream inputStream,
-    String description) {
-    super(inputStream, description);
+  public ByteArrayResource(String filename, byte[] data, String description) {
+    super(data, description);
     this.filename = filename;
   }
 
-  public InputStreamResource(String filename, InputStream inputStream) {
-    super(inputStream);
+  public ByteArrayResource(String filename, byte[] data) {
+    super(data);
     this.filename = filename;
   }
 

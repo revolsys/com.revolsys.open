@@ -65,7 +65,7 @@ public class GeometryFactory extends
     if (geometry == null) {
       return getFactory(0, 3, 0, 0);
     } else {
-      final com.vividsolutions.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
+      final com.vividsolutions.jts.geom.GeometryFactory factory = geometry.getFactory();
       if (factory instanceof GeometryFactory) {
         return (GeometryFactory)factory;
       } else {

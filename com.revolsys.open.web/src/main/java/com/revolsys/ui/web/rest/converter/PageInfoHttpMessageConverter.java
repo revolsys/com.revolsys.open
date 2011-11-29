@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -89,9 +90,6 @@ public class PageInfoHttpMessageConverter extends
         url = HttpRequestUtils.getServerUrl();
         url += urlPathHelper.getOriginatingRequestUri(request);
       }
-      if (url.charAt(url.length() - 1) != '/') {
-        url += '/';
-      }
 
       final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
       if (extension != null) {
@@ -145,6 +143,8 @@ public class PageInfoHttpMessageConverter extends
         String childUri;
         if (childPath.startsWith("/")) {
           childUri = childPath;
+        } else if (url.charAt(url.length() - 1) != '/') {
+          childUri = url + "/" + childPath;
         } else {
           childUri = url + childPath;
         }
@@ -323,7 +323,7 @@ public class PageInfoHttpMessageConverter extends
       final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
         out, charset));
       writer.setProperty(IoConstants.INDENT_PROPERTY, true);
-      writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);
+      writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
       final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
       String callback = request.getParameter("jsonp");
       if (callback == null) {
@@ -332,32 +332,43 @@ public class PageInfoHttpMessageConverter extends
       if (callback != null) {
         writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
       }
-
-      for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
-        .entrySet()) {
-        final String childPath = childPage.getKey();
-        final PageInfo childPageInfo = childPage.getValue();
-        final Map<String, Object> childPageMap = new NamedLinkedHashMap<String, Object>(
-          "resource");
-        String childUri;
-        if (childPath.startsWith("/")) {
-          childUri = childPath;
-        } else {
-          childUri = url + childPath;
-        }
-        childPageMap.put("resourceUri", childUri);
-        childPageMap.put("title", childPageInfo.getTitle());
-        childPageMap.put("description", childPageInfo.getDescription());
-        for (Entry<String, Object> attribute : childPageInfo.getAttributes()
-          .entrySet()) {
-          String key = attribute.getKey();
-          Object value = attribute.getValue();
-          childPageMap.put(key, value);
-        }
-        writer.write(childPageMap);
-      }
+      Map<String, Object> page = getMap(url, pageInfo);
+      writer.write(page);
       writer.close();
     }
+  }
+
+  private Map<String, Object> getMap(String url, PageInfo pageInfo) {
+    final Map<String, Object> pageMap = new NamedLinkedHashMap<String, Object>(
+      "resource");
+    pageMap.put("resourceUri", url);
+    pageMap.put("title", pageInfo.getTitle());
+    pageMap.put("description", pageInfo.getDescription());
+    for (Entry<String, Object> attribute : pageInfo.getAttributes().entrySet()) {
+      String key = attribute.getKey();
+      Object value = attribute.getValue();
+      pageMap.put(key, value);
+    }
+    List<Map<String, Object>> childPages = new ArrayList<Map<String, Object>>();
+    for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
+      .entrySet()) {
+      final String childPath = childPage.getKey();
+      final PageInfo childPageInfo = childPage.getValue();
+      String childUri;
+      if (childPath.startsWith("/")) {
+        childUri = childPath;
+      } else if (url.charAt(url.length() - 1) != '/') {
+        childUri = url + "/" + childPath;
+      } else {
+        childUri = url + childPath;
+      }
+      Map<String, Object> childPageMap = getMap(childUri, childPageInfo);
+      childPages.add(childPageMap);
+    }
+    if (!childPages.isEmpty()) {
+      pageMap.put("resources", childPages);
+    }
+    return pageMap;
   }
 
   private void writeUriList(final OutputStream out, final String url,

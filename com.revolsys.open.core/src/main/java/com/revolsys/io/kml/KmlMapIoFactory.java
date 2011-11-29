@@ -1,10 +1,12 @@
 package com.revolsys.io.kml;
 
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
+import java.io.OutputStream;
 
 public class KmlMapIoFactory extends AbstractIoFactory implements
   MapWriterFactory {
@@ -12,6 +14,11 @@ public class KmlMapIoFactory extends AbstractIoFactory implements
     super(Kml22Constants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(Kml22Constants.MEDIA_TYPE,
       Kml22Constants.FILE_EXTENSION);
+  }
+
+  public MapWriter getWriter(OutputStream out) {
+    Writer writer = new OutputStreamWriter(out);
+    return getWriter(writer);
   }
 
   public MapWriter getWriter(final Writer out) {
