@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.orm.jpa</artifactId>
-  <name>ORM JPA</name>
+  <name>RS ORM JPA</name>
   <version>TRUNK-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>

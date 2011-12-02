@@ -8,7 +8,7 @@
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.web</artifactId>
   <version>TRUNK-SNAPSHOT</version>
-  <name>Revolution Systems Web</name>
+  <name>RS Web</name>
   <packaging>jar</packaging>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>

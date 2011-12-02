@@ -7,7 +7,7 @@
   <artifactId>com.revolsys.open.core</artifactId>
   <groupId>com.revolsys.open</groupId>
   <version>TRUNK-SNAPSHOT</version>
-  <name>RS Utilities</name>
+  <name>RS Core</name>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>

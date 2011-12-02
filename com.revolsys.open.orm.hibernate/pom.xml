@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.orm.hibernate</artifactId>
-  <name>Revolution Systems - ORM Hibernate</name>
+  <name>RS ORM Hibernate</name>
   <version>TRUNK-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>

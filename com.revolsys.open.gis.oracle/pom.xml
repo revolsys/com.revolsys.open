@@ -7,7 +7,7 @@
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.gis.oracle</artifactId>
   <version>TRUNK-SNAPSHOT</version>
-  <name>GIS Oracle Tools</name>
+  <name>RS Oracle</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>

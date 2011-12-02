@@ -15,10 +15,11 @@ if [ -n "$STATUS" ]; then
     rsync -a ${dir}/ target/gh-pages/${module}/
   done
   cd target/gh-pages
+  git add --all .
   git commit -a -m "Site update"
   git push
   cd ../..
-  git push origin gh-pages
+  git push 
 else
   echo Checkin changes before creating site
 fi

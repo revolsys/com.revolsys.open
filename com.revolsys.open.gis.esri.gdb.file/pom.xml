@@ -7,7 +7,7 @@
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.gis.esri.gdb.file</artifactId>
   <packaging>jar</packaging>
-  <name>Revolution Systems Open Library - ESRI File Geodatabase</name>
+  <name>RS ESRI File Geodatabase</name>
   <version>TRUNK-SNAPSHOT</version>
   <parent>
     <groupId>com.revolsys.open</groupId>

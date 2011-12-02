@@ -10,7 +10,7 @@
   <name>Revolution Systems Open Library</name>
   <version>TRUNK-SNAPSHOT</version>
   <description>The parent module of the Revolution Systems Open Library.</description>
-  <url>http://open.revolsys.com/</url>
+  <url>http://revolsys.github.com/com.revolsys.open/</url>
 
   <licenses>
     <license>
@@ -40,13 +40,17 @@
     <url>http://www.revolsys.com/</url>
   </organization>
 
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/revolsys/com.revolsys.open/issues</url>
+  </issueManagement>
+
   <modules>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.orm.core</module>
     <module>com.revolsys.open.orm.hibernate</module>
     <module>com.revolsys.open.orm.jpa</module>
     <module>com.revolsys.open.web</module>
-    <module>com.revolsys.open.gis.ecsv</module>
     <module>com.revolsys.open.gis.oracle</module>
     <module>com.revolsys.open.gis.postgresql</module>
     <module>com.revolsys.open.gis.esri.gdb.file</module>
@@ -129,11 +133,6 @@
                 <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
               </configuration>
-              <!-- simpler configuration without reportSets available for usual cases -->
-              <reports>
-                <report>dependencies</report>
-                <report>scm</report>
-              </reports>
             </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -145,7 +144,7 @@
       </plugin>
     </plugins>
     <extensions>
-       <extension>
+      <extension>
         <groupId>org.apache.maven.scm</groupId>
         <artifactId>maven-scm-provider-gitexe</artifactId>
         <version>1.5</version>
@@ -155,7 +154,7 @@
         <artifactId>maven-scm-manager-plexus</artifactId>
         <version>1.5</version>
       </extension>
-       <extension>
+      <extension>
         <groupId>org.kathrynhuxtable.maven.wagon</groupId>
         <artifactId>wagon-gitsite</artifactId>
         <version>0.4</version>
@@ -200,5 +199,6 @@
     <org.springframework.version>3.0.5.RELEASE</org.springframework.version>
     <org.springframework.security.version>3.0.5.RELEASE</org.springframework.security.version>
     <osgi.bundle.vendor>${project.organization.name}</osgi.bundle.vendor>
+    <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
   </properties>
 </project>
