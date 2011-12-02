@@ -99,6 +99,11 @@ public class GeometryFactory extends
     return getFactory(crsId, 2, scale, 0);
   }
 
+  public static GeometryFactory getFactory(final int crsId,
+    final double scaleXy, final double scaleZ) {
+    return getFactory(crsId, 3, scaleXy, scaleZ);
+  }
+
   /**
    * Get a 2D geometry factory with the specified scale
    * @param crsId
@@ -107,11 +112,6 @@ public class GeometryFactory extends
    */
   public static GeometryFactory getFactory(final int crsId, final int numAxis) {
     return getFactory(crsId, numAxis, 0, 0);
-  }
-
-  public static GeometryFactory getFactory(final int crsId,
-    final double scaleXy, final double scaleZ) {
-    return getFactory(crsId, 3, scaleXy, scaleZ);
   }
 
   public static GeometryFactory getFactory(final int crsId, final int numAxis,
@@ -158,6 +158,9 @@ public class GeometryFactory extends
       } else if (value instanceof CoordinateSequence) {
         final CoordinateSequence coordinates = (CoordinateSequence)value;
         lineStrings[i] = factory.createLineString(coordinates);
+      } else if (value instanceof double[]) {
+        final double[] points = (double[])value;
+        lineStrings[i] = factory.createLineString(points);
       }
     }
     return lineStrings;
@@ -202,6 +205,9 @@ public class GeometryFactory extends
         pointArray[i] = factory.createPoint(coordinates);
       } else if (value instanceof CoordinateSequence) {
         final CoordinateSequence coordinates = (CoordinateSequence)value;
+        pointArray[i] = factory.createPoint(coordinates);
+      } else if (value instanceof double[]) {
+        final double[] coordinates = (double[])value;
         pointArray[i] = factory.createPoint(coordinates);
       }
       i++;
@@ -274,6 +280,17 @@ public class GeometryFactory extends
     return newPoints;
   }
 
+  public CoordinatesList createCoordinatesList(final double... coordinates) {
+    final CoordinatesList newPoints = new DoubleCoordinatesList(this.numAxis,
+      coordinates);
+    return newPoints;
+  }
+
+  public CoordinatesList createCoordinatesList(final int size) {
+    final CoordinatesList points = new DoubleCoordinatesList(size, this.numAxis);
+    return points;
+  }
+
   public Geometry createEmptyGeometry() {
     return createPoint((Coordinate)null);
   }
@@ -286,7 +303,7 @@ public class GeometryFactory extends
       final int srid = getSRID();
       final int geometrySrid = geometry.getSRID();
       if (srid == 0 && geometrySrid != 0) {
-        GeometryFactory geometryFactory = GeometryFactory.getFactory(
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           geometrySrid, numAxis, getScaleXY(), getScaleZ());
         return geometryFactory.createGeometry(geometry);
       } else if (srid != 0 && geometrySrid != srid) {
@@ -381,6 +398,11 @@ public class GeometryFactory extends
     return super.createLinearRing(points);
   }
 
+  public LinearRing createLinearRing(final double... coordinates) {
+    final CoordinatesList points = createCoordinatesList(coordinates);
+    return createLinearRing(points);
+  }
+
   public LinearRing createLinearRing(final LinearRing linearRing) {
     final CoordinatesList points = CoordinatesListUtil.get(linearRing);
     final CoordinatesList newPoints = createCoordinatesList(points);
@@ -398,6 +420,11 @@ public class GeometryFactory extends
     }
     final LineString line = super.createLineString(points);
     return line;
+  }
+
+  public LineString createLineString(final double... coordinates) {
+    final CoordinatesList points = createCoordinatesList(coordinates);
+    return createLineString(points);
   }
 
   public LineString createLineString(final LineString lineString) {
@@ -474,8 +501,8 @@ public class GeometryFactory extends
     return super.createPoint(points);
   }
 
-  public Point createPoint(final double x, final double y) {
-    final DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
+  public Point createPoint(final double... coordinates) {
+    final DoubleCoordinates coords = new DoubleCoordinates(numAxis, coordinates);
     return createPoint(coordinates);
   }
 
@@ -533,13 +560,19 @@ public class GeometryFactory extends
     final Object ring = rings.get(index);
     if (ring instanceof LinearRing) {
       return (LinearRing)ring;
-
     } else if (ring instanceof CoordinatesList) {
       final CoordinatesList points = (CoordinatesList)ring;
       return createLinearRing(points);
     } else if (ring instanceof CoordinateSequence) {
       final CoordinateSequence points = (CoordinateSequence)ring;
       return createLinearRing(points);
+    } else if (ring instanceof LineString) {
+      final LineString line = (LineString)ring;
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      return createLinearRing(points);
+    } else if (ring instanceof double[]) {
+      final double[] coordinates = (double[])ring;
+      return createLinearRing(coordinates);
     } else {
       return null;
     }

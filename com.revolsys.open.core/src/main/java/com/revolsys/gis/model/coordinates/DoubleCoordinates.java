@@ -32,6 +32,12 @@ public class DoubleCoordinates extends AbstractCoordinates {
     }
   }
 
+  public DoubleCoordinates(int numAxis, double[] coordinates) {
+    this.coordinates = new double[numAxis];
+    System.arraycopy(coordinates, 0, this.coordinates, 0,
+      Math.min(numAxis, coordinates.length));
+  }
+
   @Override
   public DoubleCoordinates clone() {
     return new DoubleCoordinates(coordinates);

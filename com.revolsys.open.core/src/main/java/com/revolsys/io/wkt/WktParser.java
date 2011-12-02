@@ -174,30 +174,34 @@ public class WktParser {
   public <T extends Geometry> T parseGeometry(final String value) {
     if (StringUtils.hasLength(value)) {
       GeometryFactory geometryFactory = this.geometryFactory;
+      Geometry geometry;
       final StringBuffer text = new StringBuffer(value);
       if (hasText(text, "SRID=")) {
         Integer srid = parseInteger(text);
-        if (srid != null) {
-          geometryFactory = GeometryFactory.getFactory(srid,
-            this.geometryFactory.getNumAxis(),
-            this.geometryFactory.getScaleXY(), this.geometryFactory.getScaleZ());
+        if (srid != null && srid != this.geometryFactory.getSRID()) {
+          geometryFactory = GeometryFactory.getFactory(srid, 3);
         }
         hasText(text, ";");
       }
       if (hasText(text, "POINT")) {
-        return (T)parsePoint(geometryFactory, text);
+        geometry = parsePoint(geometryFactory, text);
       } else if (hasText(text, "LINESTRING")) {
-        return (T)parseLineString(geometryFactory, text);
+        geometry = parseLineString(geometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
-        return (T)parsePolygon(geometryFactory, text);
+        geometry = parsePolygon(geometryFactory, text);
       } else if (hasText(text, "MULTIPOINT")) {
-        return (T)parseMultiPoint(geometryFactory, text);
+        geometry = parseMultiPoint(geometryFactory, text);
       } else if (hasText(text, "MULTILINESTRING")) {
-        return (T)parseMultiLineString(geometryFactory, text);
+        geometry = parseMultiLineString(geometryFactory, text);
       } else if (hasText(text, "MULTIPOLYGON")) {
-        return (T)parseMultiPolygon(geometryFactory, text);
+        geometry = parseMultiPolygon(geometryFactory, text);
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
+      }
+      if (geometryFactory == this.geometryFactory) {
+        return (T)geometry;
+      } else {
+        return (T)this.geometryFactory.createGeometry(geometry);
       }
     } else {
       return null;
