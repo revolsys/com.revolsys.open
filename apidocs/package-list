@@ -23,8 +23,6 @@ com.revolsys.gis.data.model.filter
 com.revolsys.gis.data.model.property
 com.revolsys.gis.data.model.types
 com.revolsys.gis.data.visitor
-com.revolsys.gis.ecsv.service
-com.revolsys.gis.ecsv.service.client
 com.revolsys.gis.esri.gdb.file
 com.revolsys.gis.esri.gdb.file.capi
 com.revolsys.gis.esri.gdb.file.capi.swig
