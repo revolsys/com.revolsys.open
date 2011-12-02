@@ -1,0 +1,4 @@
+com.revolsys.orm.hibernate.callback
+com.revolsys.orm.hibernate.dao
+com.revolsys.orm.hibernate.interceptor
+com.revolsys.orm.hibernate.servlet.filter
