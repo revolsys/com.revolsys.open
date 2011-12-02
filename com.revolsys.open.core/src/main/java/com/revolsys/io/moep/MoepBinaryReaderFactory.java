@@ -25,6 +25,7 @@ public class MoepBinaryReaderFactory extends
   public MoepBinaryReaderFactory() {
     super("MOEP (BC Ministry of Environment and Parks)", true);
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");
+    setCustomAttributionSupported(false);
   }
 
   public DataObjectReader createDataObjectReader(final Resource resource,

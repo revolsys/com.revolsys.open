@@ -51,8 +51,6 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderF
 
   private boolean geometrySupported;
 
-  private boolean customAttributionSupported;
-
   private final boolean binary;
 
   public AbstractDataObjectReaderFactory(

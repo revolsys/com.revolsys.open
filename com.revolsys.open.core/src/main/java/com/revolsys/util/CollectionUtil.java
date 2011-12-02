@@ -3,11 +3,13 @@ package com.revolsys.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -29,6 +31,14 @@ public final class CollectionUtil {
       }
 
     }
+  }
+
+  public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
+    final Map<K, V> map) {
+    MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(map);
+    Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
+    sortedMap.putAll(map);
+    return new LinkedHashMap<K, V>(sortedMap);
   }
 
   public static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues,

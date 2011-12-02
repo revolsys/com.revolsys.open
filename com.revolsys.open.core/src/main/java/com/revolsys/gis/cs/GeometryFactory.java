@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -88,11 +89,6 @@ public class GeometryFactory extends
     return getFactory(crsId, 3, 0, 0);
   }
 
-  public static GeometryFactory getFactory(final int crsId,
-    final double scaleXy, final double scaleZ) {
-    return getFactory(crsId, 3, scaleXy, scaleZ);
-  }
-
   /**
    * Get a 2D geometry factory with the specified scale
    * @param crsId
@@ -101,6 +97,21 @@ public class GeometryFactory extends
    */
   public static GeometryFactory getFactory(final int crsId, final double scale) {
     return getFactory(crsId, 2, scale, 0);
+  }
+
+  /**
+   * Get a 2D geometry factory with the specified scale
+   * @param crsId
+   * @param scale
+   * @return
+   */
+  public static GeometryFactory getFactory(final int crsId, final int numAxis) {
+    return getFactory(crsId, numAxis, 0, 0);
+  }
+
+  public static GeometryFactory getFactory(final int crsId,
+    final double scaleXy, final double scaleZ) {
+    return getFactory(crsId, 3, scaleXy, scaleZ);
   }
 
   public static GeometryFactory getFactory(final int crsId, final int numAxis,
@@ -238,11 +249,27 @@ public class GeometryFactory extends
     this.numAxis = numAxis;
   }
 
-  private CoordinatesList createCoordinatesList(final CoordinatesList points) {
+  public CoordinatesList createCoordinatesList(final CoordinateSequence points) {
     final int size = points.size();
+    final CoordinatesList newPoints = new DoubleCoordinatesList(size,
+      this.numAxis);
+    final int numAxis2 = points.getDimension();
+    final int numAxis = Math.min(this.numAxis, numAxis2);
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < numAxis; j++) {
+        final double coordinate = points.getOrdinate(i, j);
+        newPoints.setValue(i, j, coordinate);
+      }
+    }
+    return newPoints;
+  }
+
+  public CoordinatesList createCoordinatesList(final CoordinatesList points) {
+    final int size = points.size();
+    final CoordinatesList newPoints = new DoubleCoordinatesList(size,
+      this.numAxis);
     final byte numAxis2 = points.getNumAxis();
     final int numAxis = Math.min(this.numAxis, numAxis2);
-    final CoordinatesList newPoints = new DoubleCoordinatesList(size, numAxis);
     points.copy(0, newPoints, 0, numAxis, size);
     return newPoints;
   }
@@ -255,55 +282,65 @@ public class GeometryFactory extends
   public Geometry createGeometry(final Geometry geometry) {
     if (geometry == null) {
       return null;
-    } else if (geometry instanceof MultiPoint) {
-      final List<Point> geometries = new ArrayList<Point>();
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Point subGeometry = (Point)geometry.getGeometryN(i);
-        final Point newSubGeometry = createPoint(subGeometry);
-        geometries.add(newSubGeometry);
-      }
-      return createMultiPoint(geometries);
-    } else if (geometry instanceof MultiLineString) {
-      final List<LineString> geometries = new ArrayList<LineString>();
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final LineString subGeometry = (LineString)geometry.getGeometryN(i);
-        final LineString newSubGeometry = createLineString(subGeometry);
-        geometries.add(newSubGeometry);
-      }
-      return createMultiLineString(geometries);
-    } else if (geometry instanceof MultiPolygon) {
-      final List<Polygon> geometries = new ArrayList<Polygon>();
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Polygon subGeometry = (Polygon)geometry.getGeometryN(i);
-        final Polygon newSubGeometry = createPolygon(subGeometry);
-        geometries.add(newSubGeometry);
-      }
-      return createMultiPolygon(geometries);
-    } else if (geometry instanceof GeometryCollection) {
-      final List<Geometry> geometries = new ArrayList<Geometry>();
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        final Geometry subGeometry = geometry.getGeometryN(i);
-        final Geometry newSubGeometry = createGeometry(subGeometry);
-        geometries.add(newSubGeometry);
-      }
-      return createGeometryCollection(geometries);
-    } else if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return createPoint(point);
-    } else if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return createPoint(point);
-    } else if (geometry instanceof LinearRing) {
-      final LinearRing linearRing = (LinearRing)geometry;
-      return createLinearRing(linearRing);
-    } else if (geometry instanceof LineString) {
-      final LineString lineString = (LineString)geometry;
-      return createLineString(lineString);
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      return createPolygon(polygon);
     } else {
-      throw new RuntimeException("Unknown geometry type " + geometry);
+      final int srid = getSRID();
+      final int geometrySrid = geometry.getSRID();
+      if (srid == 0 && geometrySrid != 0) {
+        GeometryFactory geometryFactory = GeometryFactory.getFactory(
+          geometrySrid, numAxis, getScaleXY(), getScaleZ());
+        return geometryFactory.createGeometry(geometry);
+      } else if (srid != 0 && geometrySrid != srid) {
+        return GeometryProjectionUtil.perform(geometry, this);
+      } else if (geometry instanceof MultiPoint) {
+        final List<Point> geometries = new ArrayList<Point>();
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+          final Point subGeometry = (Point)geometry.getGeometryN(i);
+          final Point newSubGeometry = createPoint(subGeometry);
+          geometries.add(newSubGeometry);
+        }
+        return createMultiPoint(geometries);
+      } else if (geometry instanceof MultiLineString) {
+        final List<LineString> geometries = new ArrayList<LineString>();
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+          final LineString subGeometry = (LineString)geometry.getGeometryN(i);
+          final LineString newSubGeometry = createLineString(subGeometry);
+          geometries.add(newSubGeometry);
+        }
+        return createMultiLineString(geometries);
+      } else if (geometry instanceof MultiPolygon) {
+        final List<Polygon> geometries = new ArrayList<Polygon>();
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+          final Polygon subGeometry = (Polygon)geometry.getGeometryN(i);
+          final Polygon newSubGeometry = createPolygon(subGeometry);
+          geometries.add(newSubGeometry);
+        }
+        return createMultiPolygon(geometries);
+      } else if (geometry instanceof GeometryCollection) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+          final Geometry subGeometry = geometry.getGeometryN(i);
+          final Geometry newSubGeometry = createGeometry(subGeometry);
+          geometries.add(newSubGeometry);
+        }
+        return createGeometryCollection(geometries);
+      } else if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        return createPoint(point);
+      } else if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        return createPoint(point);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing linearRing = (LinearRing)geometry;
+        return createLinearRing(linearRing);
+      } else if (geometry instanceof LineString) {
+        final LineString lineString = (LineString)geometry;
+        return createLineString(lineString);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        return createPolygon(polygon);
+      } else {
+        throw new RuntimeException("Unknown geometry type " + geometry);
+      }
     }
   }
 
@@ -325,6 +362,11 @@ public class GeometryFactory extends
         return createGeometryCollection(geometryArray);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T createGeometry(final String wkt) {
+    return (T)wktParser.parseGeometry(wkt);
   }
 
   public GeometryCollection createGeometryCollection(
@@ -485,11 +527,6 @@ public class GeometryFactory extends
 
   public CoordinateSystem getCoordinateSystem() {
     return coordinateSystem;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends Geometry> T getGeometry(final String wkt) {
-    return (T)wktParser.parseGeometry(wkt);
   }
 
   private LinearRing getLinearRing(final List<?> rings, final int index) {

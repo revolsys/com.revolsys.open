@@ -26,30 +26,9 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
   public AbstractDataObjectAndGeometryIoFactory(final String name,
-    boolean binary, boolean customAttributionSupported) {
+    final boolean binary, final boolean customAttributionSupported) {
     super(name, binary);
-    this.customAttributionSupported = customAttributionSupported;
-  }
-
-  public boolean isGeometrySupported() {
-    return true;
-  }
-
-  private boolean customAttributionSupported;
-
-  public boolean isCustomAttributionSupported() {
-    return customAttributionSupported;
-  }
-
-  private boolean singleFile = true;
-  
-  
-  public boolean isSingleFile() {
-    return singleFile;
-  }
-
-  protected void setSingleFile(boolean singleFile) {
-    this.singleFile = singleFile;
+    setCustomAttributionSupported(customAttributionSupported);
   }
 
   /**
@@ -59,8 +38,8 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
    * @param resource The resource to write to.
    * @return The writer.
    */
-  public Writer<DataObject> createDataObjectWriter(DataObjectMetaData metaData,
-    final Resource resource) {
+  public Writer<DataObject> createDataObjectWriter(
+    final DataObjectMetaData metaData, final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
@@ -100,21 +79,29 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     return geometryWriter;
   }
 
+  @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
     return coordinateSystems;
   }
 
+  @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
     return coordinateSystems.contains(coordinateSystem);
   }
 
+  public boolean isGeometrySupported() {
+    return true;
+  }
+
+  @Override
   protected void setCoordinateSystems(
     final CoordinateSystem... coordinateSystems) {
     setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
       Arrays.asList(coordinateSystems)));
   }
 
+  @Override
   protected void setCoordinateSystems(
     final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;

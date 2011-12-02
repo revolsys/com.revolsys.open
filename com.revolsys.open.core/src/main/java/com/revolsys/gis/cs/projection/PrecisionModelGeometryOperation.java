@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -20,15 +18,11 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class CoordinatesOperationGeometryOperation implements GeometryOperation {
+public class PrecisionModelGeometryOperation implements GeometryOperation {
   private final GeometryFactory geometryFactory;
 
-  private final CoordinatesOperation operation;
-
-  public CoordinatesOperationGeometryOperation(
-    final CoordinatesOperation operation,
+  public PrecisionModelGeometryOperation(
     final GeometryFactory geometryFactory) {
-    this.operation = operation;
     this.geometryFactory = geometryFactory;
   }
 
@@ -49,21 +43,10 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public CoordinatesList perform(
     final CoordinatesList coordinates) {
-    final int numAxis = coordinates.getDimension();
-    final int size = coordinates.size();
-    final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
-      geometryFactory.getNumAxis());
-    final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
-      coordinates);
-    final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
-      newCoordinates);
-    final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
-    for (int i = 0; i < size; i++) {
-      sourceCoordinates.setIndex(i);
-      targetCoordinates.setIndex(i);
-      operation.perform(sourceCoordinates, targetCoordinates);
-    }
-    newCoordinates.makePrecise(precisionModel);
+    final int numAxis = geometryFactory.getNumAxis();
+    final CoordinatesList newCoordinates =  new DoubleCoordinatesList(coordinates,
+      numAxis);
+     newCoordinates.makePrecise(geometryFactory);
     return newCoordinates;
   }
 

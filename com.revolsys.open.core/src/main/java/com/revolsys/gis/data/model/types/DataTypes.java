@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -68,6 +69,9 @@ public final class DataTypes {
 
   public static final DataType GEOMETRY = new SimpleDataType("Geometry",
     Geometry.class);
+
+  public static final DataType GEOMETRY_COLLECTION = new SimpleDataType("GeometryCollection",
+    GeometryCollection.class);
 
   public static final DataType INT = new SimpleDataType("int", Integer.class);
 

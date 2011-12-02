@@ -51,6 +51,10 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     return readerFactory;
   }
 
+  private boolean singleFile = true;
+
+  private boolean customAttributionSupported = true;
+
   public AbstractDataObjectAndGeometryReaderFactory(final String name,
     final boolean binary) {
     super(name, binary);
@@ -117,8 +121,25 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     return geometryReader;
   }
 
-  public Reader<Map<String, Object>> createMapReader(Resource resource) {
-    Reader reader = createDataObjectReader(resource);
+  public Reader<Map<String, Object>> createMapReader(final Resource resource) {
+    final Reader reader = createDataObjectReader(resource);
     return reader;
+  }
+
+  public boolean isCustomAttributionSupported() {
+    return customAttributionSupported;
+  }
+
+  public boolean isSingleFile() {
+    return singleFile;
+  }
+
+  protected void setCustomAttributionSupported(
+    final boolean customAttributionSupported) {
+    this.customAttributionSupported = customAttributionSupported;
+  }
+
+  protected void setSingleFile(final boolean singleFile) {
+    this.singleFile = singleFile;
   }
 }

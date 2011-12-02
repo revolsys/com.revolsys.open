@@ -6,6 +6,10 @@ import org.springframework.core.io.Resource;
 
 public abstract class AbstractMapReaderFactory extends AbstractIoFactory
   implements MapReaderFactory {
+  private boolean singleFile = true;
+
+  protected boolean customAttributionSupported = true;
+
   public AbstractMapReaderFactory(String name) {
     super(name);
   }
@@ -25,5 +29,22 @@ public abstract class AbstractMapReaderFactory extends AbstractIoFactory
     final MapReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
       MapReaderFactory.class, resource);
     return readerFactory;
+  }
+
+  public boolean isCustomAttributionSupported() {
+    return customAttributionSupported;
+  }
+
+  protected void setCustomAttributionSupported(
+    boolean customAttributionSupported) {
+    this.customAttributionSupported = customAttributionSupported;
+  }
+
+  public boolean isSingleFile() {
+    return singleFile;
+  }
+
+  protected void setSingleFile(final boolean singleFile) {
+    this.singleFile = singleFile;
   }
 }

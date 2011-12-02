@@ -29,6 +29,7 @@ public class GpxReaderFactory extends
     super("GPS Exchange Format", false);
     addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE,
       GpxConstants.FILE_EXTENSION);
+    setCustomAttributionSupported(false);
   }
 
   /**

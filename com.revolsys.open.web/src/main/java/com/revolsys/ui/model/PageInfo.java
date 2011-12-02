@@ -24,7 +24,7 @@ public class PageInfo extends AbstractDocumentedObject {
 
   private String url;
 
-  private Map<String, Object> attributes = new HashMap<String, Object>();
+  private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
   public PageInfo() {
   }

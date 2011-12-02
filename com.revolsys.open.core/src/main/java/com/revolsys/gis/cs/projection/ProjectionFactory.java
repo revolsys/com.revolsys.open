@@ -227,7 +227,7 @@ public final class ProjectionFactory {
     final CoordinatesOperation operation = getCoordinatesOperation(
       sourceCoordinateSystem, targetCoordinateSystem);
     if (operation == null) {
-      return null;
+      return new PrecisionModelGeometryOperation(targetGeometryFactory);
     } else {
       return new CoordinatesOperationGeometryOperation(operation,
         targetGeometryFactory);

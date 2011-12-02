@@ -20,8 +20,8 @@
  */
 package com.revolsys.gis.data.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +61,7 @@ public class Attribute implements Cloneable {
   /** The data type of the attribute value. */
   private DataType type;
 
-  private List<Object> allowedValues = new ArrayList<Object>();
+  private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
 
   public Attribute() {
   }
@@ -197,6 +197,35 @@ public class Attribute implements Cloneable {
    */
   public Attribute(final String name, final DataType type,
     final Integer length, final Integer scale, final Boolean required,
+    final String description) {
+    this.name = name;
+    this.description = description;
+    this.type = type;
+    if (required != null) {
+      this.required = required;
+    }
+    if (length != null) {
+      this.length = length;
+    }
+    if (scale != null) {
+      this.scale = scale;
+    }
+    this.description = description;
+  }
+
+  /**
+   * Construct a new attribute.
+   * 
+   * @param name The name of the attribute.
+   * @param type The data type of the attribute value.
+   * @param length The maximum length of an attribute value, 0 for no maximum.
+   * @param scale The maximum number of decimal places.
+   * @param required The flag indicating if a value is required for the
+   *          attribute.
+   * @param properties The meta data properties about the attribute.
+   */
+  public Attribute(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
     final String description, final Map<QName, Object> properties) {
     this.name = name;
     this.description = description;
@@ -217,33 +246,8 @@ public class Attribute implements Cloneable {
 
   }
 
-  /**
-   * Construct a new attribute.
-   * 
-   * @param name The name of the attribute.
-   * @param type The data type of the attribute value.
-   * @param length The maximum length of an attribute value, 0 for no maximum.
-   * @param scale The maximum number of decimal places.
-   * @param required The flag indicating if a value is required for the
-   *          attribute.
-   * @param properties The meta data properties about the attribute.
-   */
-  public Attribute(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final String description) {
-    this.name = name;
-    this.description = description;
-    this.type = type;
-    if (required != null) {
-      this.required = required;
-    }
-    if (length != null) {
-      this.length = length;
-    }
-    if (scale != null) {
-      this.scale = scale;
-    }
-    this.description = description;
+  public void addAllowedValue(final Object value, final Object text) {
+    this.allowedValues.put(value, text);
   }
 
   @Override
@@ -262,8 +266,8 @@ public class Attribute implements Cloneable {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> List<T> getAllowedValues() {
-    return (List<T>)allowedValues;
+  public Map<?, ?> getAllowedValues() {
+    return allowedValues;
   }
 
   public String getDescription() {
@@ -352,7 +356,13 @@ public class Attribute implements Cloneable {
   }
 
   public void setAllowedValues(final List<?> allowedValues) {
-    this.allowedValues.addAll(allowedValues);
+    for (final Object allowedValue : allowedValues) {
+      this.allowedValues.put(allowedValue, allowedValue);
+    }
+  }
+
+  public void setAllowedValues(final Map<?, ?> allowedValues) {
+    this.allowedValues.putAll(allowedValues);
   }
 
   void setIndex(final int index) {

@@ -40,11 +40,7 @@ public abstract class AbstractDataObjectIoFactory extends
     return readerFactory;
   }
 
-  private boolean singleFile = true;
-
   private final boolean geometrySupported;
-
-  private final boolean customAttributionSupported;
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
@@ -52,7 +48,7 @@ public abstract class AbstractDataObjectIoFactory extends
     final boolean geometrySupported, final boolean customAttributionSupported) {
     super(name, binary);
     this.geometrySupported = geometrySupported;
-    this.customAttributionSupported = customAttributionSupported;
+    setCustomAttributionSupported(customAttributionSupported);
   }
 
   /**
@@ -85,16 +81,8 @@ public abstract class AbstractDataObjectIoFactory extends
     return coordinateSystems.contains(coordinateSystem);
   }
 
-  public boolean isCustomAttributionSupported() {
-    return customAttributionSupported;
-  }
-
   public boolean isGeometrySupported() {
     return geometrySupported;
-  }
-
-  public boolean isSingleFile() {
-    return singleFile;
   }
 
   protected void setCoordinateSystems(
@@ -106,9 +94,5 @@ public abstract class AbstractDataObjectIoFactory extends
   protected void setCoordinateSystems(
     final Set<CoordinateSystem> coordinateSystems) {
     this.coordinateSystems = coordinateSystems;
-  }
-
-  protected void setSingleFile(final boolean singleFile) {
-    this.singleFile = singleFile;
   }
 }

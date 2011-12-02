@@ -178,7 +178,9 @@ public class WktParser {
       if (hasText(text, "SRID=")) {
         Integer srid = parseInteger(text);
         if (srid != null) {
-          geometryFactory = GeometryFactory.getFactory(srid);
+          geometryFactory = GeometryFactory.getFactory(srid,
+            this.geometryFactory.getNumAxis(),
+            this.geometryFactory.getScaleXY(), this.geometryFactory.getScaleZ());
         }
         hasText(text, ";");
       }

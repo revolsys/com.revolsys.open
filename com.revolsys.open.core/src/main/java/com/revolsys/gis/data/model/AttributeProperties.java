@@ -17,4 +17,7 @@ public interface AttributeProperties {
 
   QName ATTRIBUTE_ALLOWED_TYPE_NAMES = new QName("http://gis.revolsys.com/",
     "attributeTypeNames");
+
+  QName VALIDATE_GEOMETRY = new QName("http://gis.revolsys.com/",
+    "validateGeometry");
 }

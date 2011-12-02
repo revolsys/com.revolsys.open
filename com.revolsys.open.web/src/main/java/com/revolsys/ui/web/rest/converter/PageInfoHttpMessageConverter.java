@@ -89,6 +89,8 @@ public class PageInfoHttpMessageConverter extends
       if (url == null) {
         url = HttpRequestUtils.getServerUrl();
         url += urlPathHelper.getOriginatingRequestUri(request);
+      } else if (url.startsWith("/")) {
+        url = HttpRequestUtils.getServerUrl() + url;
       }
 
       final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
@@ -241,10 +243,36 @@ public class PageInfoHttpMessageConverter extends
 
   private void writeHtmlSelect(final XmlWriter writer,
     final ParameterInfo parameter, final Map<String, ?> formValues,
+    final Map<? extends Object, ? extends Object> values) {
+    final String name = parameter.getName();
+    final boolean optional = !parameter.isRequired();
+    Object value = formValues.get(name);
+    if (value == null) {
+      value = parameter.getDefaultValue();
+    }
+    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.LABEL);
+
+    writer.attribute(HtmlUtil.ATTR_FOR, name);
+    writer.text(CaseConverter.toCapitalizedWords(name));
+    writer.endTag(HtmlUtil.LABEL);
+    writer.endTag(HtmlUtil.DT);
+
+    writer.startTag(HtmlUtil.DD);
+    HtmlUtil.serializeSelect(writer, name, value, optional, values);
+    writeDescription(writer, parameter);
+    writer.endTag(HtmlUtil.DD);
+  }
+
+  private void writeHtmlSelect(final XmlWriter writer,
+    final ParameterInfo parameter, final Map<String, ?> formValues,
     final List<? extends Object> values) {
     final String name = parameter.getName();
     final boolean optional = !parameter.isRequired();
-    final Object value = formValues.get(name);
+    Object value = formValues.get(name);
+    if (value == null) {
+      value = parameter.getDefaultValue();
+    }
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
 
@@ -286,9 +314,9 @@ public class PageInfoHttpMessageConverter extends
         writer.attribute(HtmlUtil.ATTR_METHOD, method);
         writer.startTag(HtmlUtil.DL);
         for (final ParameterInfo parameter : parameters) {
-          final List<Object> options = parameter.getAllowedValues();
+          final Map<Object, Object> options = parameter.getAllowedValues();
           if (options.isEmpty()) {
-            if (parameter.getType().equals(new QName("xsd", "base64Binary"))) {
+            if (parameter.getType().equals(DataTypes.BASE64_BINARY)) {
               writeHtmlFileField(writer, parameter, values);
             } else {
               writeHtmlField(writer, parameter, values);
@@ -354,14 +382,7 @@ public class PageInfoHttpMessageConverter extends
       .entrySet()) {
       final String childPath = childPage.getKey();
       final PageInfo childPageInfo = childPage.getValue();
-      String childUri;
-      if (childPath.startsWith("/")) {
-        childUri = childPath;
-      } else if (url.charAt(url.length() - 1) != '/') {
-        childUri = url + "/" + childPath;
-      } else {
-        childUri = url + childPath;
-      }
+      String childUri = getUrl(url, childPath);
       Map<String, Object> childPageMap = getMap(childUri, childPageInfo);
       childPages.add(childPageMap);
     }
@@ -369,6 +390,18 @@ public class PageInfoHttpMessageConverter extends
       pageMap.put("resources", childPages);
     }
     return pageMap;
+  }
+
+  private String getUrl(String parentUrl, final String childUrl) {
+    String childUri;
+    if (childUrl.startsWith("/")) {
+      childUri = HttpRequestUtils.getServerUrl() + childUrl;
+    } else if (parentUrl.charAt(parentUrl.length() - 1) != '/') {
+      childUri = parentUrl + "/" + childUrl;
+    } else {
+      childUri = parentUrl + childUrl;
+    }
+    return childUri;
   }
 
   private void writeUriList(final OutputStream out, final String url,

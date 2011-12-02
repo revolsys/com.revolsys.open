@@ -17,7 +17,7 @@ import com.revolsys.spring.OutputStreamResource;
 
 public class XBaseDataObjectIoFactory extends AbstractDataObjectIoFactory {
   public XBaseDataObjectIoFactory() {
-    super("dBase", true, false, true);
+    super("D-Base", true, false, true);
     addMediaTypeAndFileExtension("application/dbase", "dbf");
     addMediaTypeAndFileExtension("application/dbf", "dbf");
   }
