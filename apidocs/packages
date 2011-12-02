@@ -1,5 +1,4 @@
-com.revolsys.orm.core
-com.revolsys.orm.core.servlet.filter
-com.revolsys.orm.core.servlet.listener
-com.revolsys.orm.core.transaction
-com.revolsys.orm.core.web.interceptor
+com.revolsys.orm.hibernate.callback
+com.revolsys.orm.hibernate.dao
+com.revolsys.orm.hibernate.interceptor
+com.revolsys.orm.hibernate.servlet.filter
