@@ -1,5 +1,6 @@
 STATUS=`git status | grep "nothing to commit"`
 if [ -n "$STATUS" ]; then
+  git push
   git pull
   mvn clean site
 
@@ -16,6 +17,8 @@ if [ -n "$STATUS" ]; then
   cd target/gh-pages
   git commit -a -m "Site update"
   git push
+  cd ../..
+  git push origin gh-pages
 else
   echo Checkin changes before creating site
 fi
