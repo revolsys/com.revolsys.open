@@ -55,7 +55,6 @@
     <module>com.revolsys.open.gis.postgresql</module>
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.gis.google.fusiontables</module>
-<!--     <module>com.revolsys.open.gis.server</module> -->
   </modules>
   <build>
     <plugins>
@@ -143,23 +142,6 @@
         </configuration>
       </plugin>
     </plugins>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.scm</groupId>
-        <artifactId>maven-scm-provider-gitexe</artifactId>
-        <version>1.5</version>
-      </extension>
-      <extension>
-        <groupId>org.apache.maven.scm</groupId>
-        <artifactId>maven-scm-manager-plexus</artifactId>
-        <version>1.5</version>
-      </extension>
-      <extension>
-        <groupId>org.kathrynhuxtable.maven.wagon</groupId>
-        <artifactId>wagon-gitsite</artifactId>
-        <version>0.4</version>
-      </extension>
-    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
