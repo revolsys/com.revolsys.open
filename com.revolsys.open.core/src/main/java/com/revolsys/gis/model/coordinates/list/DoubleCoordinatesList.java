@@ -20,8 +20,8 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
   }
 
-  public DoubleCoordinatesList(final CoordinatesList coordinatesList,
-    final int numAxis) {
+  public DoubleCoordinatesList(final int numAxis,
+    final CoordinatesList coordinatesList) {
     this(coordinatesList.size(), numAxis);
     coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
   }

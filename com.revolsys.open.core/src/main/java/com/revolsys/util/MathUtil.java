@@ -17,6 +17,7 @@ package com.revolsys.util;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -26,6 +27,9 @@ import java.util.List;
  * @author Paul Austin
  */
 public final class MathUtil {
+  private static final NumberFormat FORMAT = new DecimalFormat(
+    "#.#########################");
+
   public static final int BYTES_IN_DOUBLE = 8;
 
   public static final int BYTES_IN_INT = 4;
@@ -500,17 +504,23 @@ public final class MathUtil {
     return doubles;
   }
 
+  public static double[] toDoubleArraySplit(final String value) {
+    return toDoubleArray(value.split(","));
+  }
+
+  public static double[] toDoubleArraySplit(final String value,
+    final String regex) {
+    return toDoubleArray(value.split(regex));
+  }
+
+  public static String toString(final double value) {
+    return FORMAT.format(value);
+  }
+
   /**
    * Construct a new MathUtil.
    */
   private MathUtil() {
   }
 
-  public static double[] toDoubleArraySplit(String value) {
-    return toDoubleArray(value.split(","));
-  }
-
-  public static double[] toDoubleArraySplit(String value, String regex) {
-    return toDoubleArray(value.split(regex));
-  }
 }

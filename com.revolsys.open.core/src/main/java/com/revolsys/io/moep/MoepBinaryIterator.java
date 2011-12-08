@@ -307,8 +307,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
     final String submissionDateString = readString(6);
 
-    final int centreX = readLEInt(in);
-    final int centreY = readLEInt(in);
+    final double centreX = readLEInt(in);
+    final double centreY = readLEInt(in);
     center = new DoubleCoordinates(centreX, centreY);
     factory = GeometryFactory.getFactory(coordinateSystem.getId(), 1.0, 1.0);
     setProperty(IoConstants.GEOMETRY_FACTORY, factory);

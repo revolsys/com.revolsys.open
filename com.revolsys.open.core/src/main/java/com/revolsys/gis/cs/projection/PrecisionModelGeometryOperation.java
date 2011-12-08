@@ -44,8 +44,8 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
   public CoordinatesList perform(
     final CoordinatesList coordinates) {
     final int numAxis = geometryFactory.getNumAxis();
-    final CoordinatesList newCoordinates =  new DoubleCoordinatesList(coordinates,
-      numAxis);
+    final CoordinatesList newCoordinates =  new DoubleCoordinatesList(numAxis,
+      coordinates);
      newCoordinates.makePrecise(geometryFactory);
     return newCoordinates;
   }

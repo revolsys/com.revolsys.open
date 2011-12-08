@@ -73,7 +73,7 @@ public class CoordinatesUtil {
     } catch (NotRepresentableException ex) {
       // MD - not sure what we can do to prevent this (robustness problem)
       // Idea - can we condition which edges we choose?
-      throw new IllegalStateException(ex.getMessage());
+      throw new IllegalStateException(ex.getMessage() +" POLYGON(("+ x1 +" " + y1 +","+ x2 +" " + y2 +","+ x3 +" " + y3 +","+ x1 +" " + y1 +"))");
     }
     return cc;
   }

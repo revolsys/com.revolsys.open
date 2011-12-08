@@ -364,7 +364,7 @@ public class GpxIterator implements DataObjectIterator {
       int pointNumAxis = parseTrackPoint(points);
       numAxis = Math.max(numAxis, pointNumAxis);
     }
-    return new DoubleCoordinatesList(points, numAxis);
+    return new DoubleCoordinatesList(numAxis, points);
   }
 
   private DataObject parseRoutPoint(double index) throws XMLStreamException {

@@ -102,7 +102,11 @@ public abstract class AbstractDataObjectStore extends
 
   public void addStatistic(final String statisticName, final DataObject object) {
     statistics.add(statisticName, object);
+  }
 
+  public void addStatistic(final String statisticName, final QName typeName,
+    int count) {
+    statistics.add(statisticName, typeName, count);
   }
 
   @PreDestroy

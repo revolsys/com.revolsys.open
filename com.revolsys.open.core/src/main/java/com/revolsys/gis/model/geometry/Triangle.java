@@ -35,20 +35,6 @@ public class Triangle extends DoubleCoordinatesList {
 
   }
 
-  public static Coordinates circumCentre(final CoordinatesList points) {
-    final double x1 = points.getX(0);
-    final double y1 = points.getY(0);
-    final double x2 = points.getX(1);
-    final double y2 = points.getY(1);
-    final double x3 = points.getX(2);
-    final double y3 = points.getY(2);
-    return CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3, y3);
-  }
-
-  private Circle circumcircle;
-
-  private Envelope envelope = new Envelope();
-
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1.0);
 
   public Triangle() {
@@ -61,7 +47,7 @@ public class Triangle extends DoubleCoordinatesList {
   }
 
   public Triangle(final CoordinatesList points) {
-    super(points);
+    super(3, points);
     init();
   }
 
@@ -70,7 +56,7 @@ public class Triangle extends DoubleCoordinatesList {
   }
 
   public Triangle(final int numAxis, final CoordinatesList points) {
-    super(points, numAxis);
+    super(numAxis, points);
     init();
   }
 
@@ -122,20 +108,6 @@ public class Triangle extends DoubleCoordinatesList {
     return true;
   }
 
-  private void createCircumcircle() {
-    final double x1 = getX(0);
-    final double y1 = getY(0);
-    final double x2 = getX(1);
-    final double y2 = getY(1);
-    final double x3 = getX(2);
-    final double y3 = getY(2);
-    final double angleB = MathUtil.angle(x1, y1, x2, y2, x3, y3);
-
-    final double radius = getP0().distance(getP2()) / Math.sin(angleB) * 0.5;
-    final Coordinates coordinate = getCircumcentre();
-    circumcircle = new Circle(coordinate, radius);
-  }
-
   public boolean equals(final Triangle triangle) {
     final HashSet<Coordinates> coords = new HashSet<Coordinates>();
     coords.add(triangle.getP0());
@@ -148,23 +120,26 @@ public class Triangle extends DoubleCoordinatesList {
   }
 
   /**
-   * Computes the circumcentre of a triangle. The circumcentre is the centre of
-   * the circumcircle, the smallest circle which encloses the triangle.
-   * 
-   * @return The circumcentre of the triangle.
-   */
-  public Coordinates getCircumcentre() {
-    return circumCentre(this);
-  }
-
-  /**
    * Computes the circumcircle of a triangle. The circumcircle is the smallest
    * circle which encloses the triangle.
    * 
    * @return The circumcircle of the triangle.
    */
   public Circle getCircumcircle() {
-    return circumcircle;
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    final double x3 = getX(2);
+    final double y3 = getY(2);
+
+    final Coordinates centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3,
+      y3);
+    final double angleB = MathUtil.angle(x1, y1, x2, y2, x3, y3);
+    final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB)
+      * 0.5;
+
+    return new Circle(centre, radius);
   }
 
   /**
@@ -173,6 +148,12 @@ public class Triangle extends DoubleCoordinatesList {
    * @return The envelope.
    */
   public Envelope getEnvelopeInternal() {
+    Envelope envelope = new Envelope();
+    for (int i = 0; i < 3; i++) {
+      double x = getX(i);
+      double y = getY(i);
+      envelope.expandToInclude(x, y);
+    }
     return envelope;
   }
 
@@ -198,12 +179,6 @@ public class Triangle extends DoubleCoordinatesList {
     if (size() > 3) {
       throw new IllegalArgumentException(
         "A traingle must have exeactly 3 points not " + size());
-    }
-    createCircumcircle();
-    for (int i = 0; i < 3; i++) {
-      double x = getX(i);
-      double y = getY(i);
-      envelope.expandToInclude(x, y);
     }
   }
 
@@ -244,6 +219,6 @@ public class Triangle extends DoubleCoordinatesList {
   }
 
   public boolean intersectsCircumCircle(Coordinates point) {
-    return circumcircle.contains(point);
+    return getCircumcircle().contains(point);
   }
 }

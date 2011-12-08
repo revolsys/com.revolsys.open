@@ -11,7 +11,6 @@ import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.Reader;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,10 +44,4 @@ public interface JdbcDataObjectStore extends DataObjectStore {
   void setDataSource(DataSource dataSource);
 
   void setLabel(String label);
-
-  Statistics getUpdateStatistics();
-
-  Statistics getInsertStatistics();
-
-  Statistics getDeleteStatistics();
 }

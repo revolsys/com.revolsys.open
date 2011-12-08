@@ -4,7 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.parallel.process.AbstractProcess;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   private Logger log = LoggerFactory.getLogger(getClass());
@@ -17,7 +21,17 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
 
   private boolean logScriptInfo;
 
+  private Geometry boundary;
+
   public abstract void execute(BoundingBox cellBoundingBox);
+
+  public Geometry getBoundary() {
+    return boundary;
+  }
+
+  public void setBoundary(Geometry boundary) {
+    this.boundary = boundary;
+  }
 
   public BoundingBox getBoundingBox() {
     return boundingBox;
@@ -35,6 +49,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
     preRun();
     try {
       if (boundingBox != null) {
+        GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
         final double xInc = boundingBox.getWidth() / numX;
         final double yInc = boundingBox.getHeight() / numY;
         double y = boundingBox.getMinY();
@@ -42,11 +57,14 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
           double x = boundingBox.getMinX();
           for (int i = 0; i < numX; i++) {
             final BoundingBox cellBoundingBox = new BoundingBox(
-              boundingBox.getGeometryFactory(), x, y, x + xInc, y + yInc);
-            if (logScriptInfo) {
-              log.info("Processing bounding box " + boundingBox);
+              geometryFactory, x, y, x + xInc, y + yInc);
+            if (preparedBoundary == null
+              || preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
+              if (logScriptInfo) {
+                log.info("Processing bounding box " + cellBoundingBox.toPolygon(1));
+              }
+              execute(cellBoundingBox);
             }
-            execute(cellBoundingBox);
             x += xInc;
           }
           y += yInc;
@@ -58,7 +76,14 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   }
 
   protected void preRun() {
+    if (boundingBox != null) {
+      if (boundary != null) {
+        preparedBoundary = PreparedGeometryFactory.prepare(boundary);
+      }
+    }
   }
+
+  private PreparedGeometry preparedBoundary;
 
   protected void postRun() {
   }

@@ -40,7 +40,6 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
@@ -61,12 +60,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   private String[] excludeTablePatterns = new String[0];
 
   private boolean flushBetweenTypes;
-
-  private Statistics deleteStatistics;
-
-  private Statistics insertStatistics;
-
-  private Statistics updateStatistics;
 
   private String hints;
 
@@ -127,18 +120,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     if (writer != null) {
       setSharedAttribute("writer", null);
       writer.close();
-    }
-    if (insertStatistics != null) {
-      insertStatistics.disconnect();
-      insertStatistics = null;
-    }
-    if (updateStatistics != null) {
-      updateStatistics.disconnect();
-      updateStatistics = null;
-    }
-    if (deleteStatistics != null) {
-      deleteStatistics.disconnect();
-      deleteStatistics = null;
     }
   }
 
@@ -270,18 +251,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
-  public Statistics getDeleteStatistics() {
-    if (deleteStatistics == null) {
-      if (getLabel() == null) {
-        deleteStatistics = new Statistics("Delete");
-      } else {
-        deleteStatistics = new Statistics(getLabel() + " Delete");
-      }
-      deleteStatistics.connect();
-    }
-    return deleteStatistics;
-  }
-
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     throw new UnsupportedOperationException(
       "Cannot create SQL to generate Primary Key for " + metaData);
@@ -289,18 +258,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public String getHints() {
     return hints;
-  }
-
-  public Statistics getInsertStatistics() {
-    if (insertStatistics == null) {
-      if (getLabel() == null) {
-        insertStatistics = new Statistics("Insert");
-      } else {
-        insertStatistics = new Statistics(getLabel() + " Insert");
-      }
-      insertStatistics.connect();
-    }
-    return insertStatistics;
   }
 
   public DataObjectMetaData getMetaData(final QName typeName,
@@ -379,18 +336,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public String getSqlSuffix() {
     return sqlSuffix;
-  }
-
-  public Statistics getUpdateStatistics() {
-    if (updateStatistics == null) {
-      if (getLabel() == null) {
-        updateStatistics = new Statistics("Update");
-      } else {
-        updateStatistics = new Statistics(getLabel() + " Update");
-      }
-      updateStatistics.connect();
-    }
-    return updateStatistics;
   }
 
   public synchronized JdbcWriter getWriter() {

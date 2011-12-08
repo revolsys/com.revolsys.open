@@ -12,6 +12,7 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -66,15 +67,6 @@ public class BoundingBox extends Envelope {
   /**
    * Construct a new Bounding Box.
    * 
-   * @param geometryFactory The geometry factory.
-   */
-  public BoundingBox(final int srid) {
-    this.geometryFactory = GeometryFactory.getFactory(srid);
-  }
-
-  /**
-   * Construct a new Bounding Box.
-   * 
    * @param boundingBox The bounding box to clone.
    */
   public BoundingBox(final BoundingBox boundingBox) {
@@ -86,6 +78,14 @@ public class BoundingBox extends Envelope {
 
   public BoundingBox(final Coordinates point) {
     this(null, point.getX(), point.getY());
+  }
+
+  public BoundingBox(final Coordinates point1, final Coordinates point2) {
+    this(null, point1.getX(), point1.getY(), point2.getX(), point2.getY());
+  }
+
+  public BoundingBox(final Geometry geometry) {
+    this(GeometryFactory.getFactory(geometry), geometry.getEnvelopeInternal());
   }
 
   /**
@@ -159,6 +159,12 @@ public class BoundingBox extends Envelope {
     this.maxZ = Math.max(coordinate1.z, coordinate2.z);
   }
 
+  public BoundingBox(final GeometryFactory geometryFactory,
+    final Coordinates point1, final Coordinates point2) {
+    this(geometryFactory, point1.getX(), point1.getY(), point2.getX(),
+      point2.getY());
+  }
+
   /**
    * Construct a new Bounding Box.
    * 
@@ -202,12 +208,19 @@ public class BoundingBox extends Envelope {
     this.maxZ = Double.NaN;
   }
 
-  public BoundingBox(Geometry geometry) {
-    this(GeometryFactory.getFactory(geometry), geometry.getEnvelopeInternal());
+  /**
+   * Construct a new Bounding Box.
+   * 
+   * @param geometryFactory The geometry factory.
+   */
+  public BoundingBox(final int srid) {
+    this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
-  public BoundingBox(Coordinates point1, Coordinates point2) {
-    this(null, point1.getX(), point1.getY(), point2.getX(), point2.getY());
+  public boolean contains(final Coordinates coordinate) {
+    final double x = coordinate.getX();
+    final double y = coordinate.getY();
+    return contains(x, y);
   }
 
   public BoundingBox convert(final GeometryFactory geometryFactory) {
@@ -308,36 +321,6 @@ public class BoundingBox extends Envelope {
     }
   }
 
-  public void setMaxZ(double maxZ) {
-    if (isNull()) {
-      this.minZ = maxZ;
-      this.maxZ = maxZ;
-    }
-    if (maxZ < this.minZ) {
-      this.minZ = maxZ;
-    }
-    if (maxZ > this.maxZ) {
-      this.maxZ = maxZ;
-    }
-  }
-
-  public void setMinZ(double minZ) {
-    if (isNull()) {
-      this.minZ = minZ;
-      this.maxZ = minZ;
-    }
-    if (minZ < this.minZ) {
-      this.minZ = minZ;
-    }
-    if (minZ > this.maxZ) {
-      this.maxZ = minZ;
-    }
-  }
-
-  public void setGeometryFactory(GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
   public <Q extends Quantity> Measurable<Q> getMinimumX() {
     final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMinX(), unit);
@@ -361,6 +344,12 @@ public class BoundingBox extends Envelope {
     return Measure.valueOf(width, getCoordinateSystem().getLengthUnit());
   }
 
+  private void initIfNotNull() {
+    if (maxX != -1 && minX != 0 && maxY != -1 && minY != 0) {
+      init(minX, maxX, minY, maxY);
+    }
+  }
+
   public BoundingBox intersection(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isNull() || convertedBoundingBox.isNull()
@@ -381,6 +370,10 @@ public class BoundingBox extends Envelope {
     return intersects((Envelope)convertedBoundingBox);
   }
 
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public void setMaxX(final double maxX) {
     this.maxX = maxX;
     initIfNotNull();
@@ -391,20 +384,40 @@ public class BoundingBox extends Envelope {
     initIfNotNull();
   }
 
+  public void setMaxZ(final double maxZ) {
+    if (isNull()) {
+      this.minZ = maxZ;
+      this.maxZ = maxZ;
+    }
+    if (maxZ < this.minZ) {
+      this.minZ = maxZ;
+    }
+    if (maxZ > this.maxZ) {
+      this.maxZ = maxZ;
+    }
+  }
+
   public void setMinX(final double minX) {
     this.minX = minX;
     initIfNotNull();
   }
 
-  private void initIfNotNull() {
-    if (maxX != -1 && minX != 0 && maxY != -1 && minY != 0) {
-      init(minX, maxX, minY, maxY);
-    }
-  }
-
   public void setMinY(final double minY) {
     this.minY = minY;
     initIfNotNull();
+  }
+
+  public void setMinZ(final double minZ) {
+    if (isNull()) {
+      this.minZ = minZ;
+      this.maxZ = minZ;
+    }
+    if (minZ < this.minZ) {
+      this.minZ = minZ;
+    }
+    if (minZ > this.maxZ) {
+      this.maxZ = minZ;
+    }
   }
 
   public Geometry toGeometry() {
@@ -493,13 +506,24 @@ public class BoundingBox extends Envelope {
 
   @Override
   public String toString() {
-    return "(" + getMinX() + "," + getMinY() + " " + getMaxX() + ","
-      + getMaxY() + ")";
+    if (geometryFactory == null) {
+      return "BBOX(" + getMinX() + "," + getMinY() + " " + getMaxX() + ","
+        + getMaxY() + ")";
+    } else {
+      return "SRID=" + geometryFactory.getSRID() + ";BBOX(" + getMinX() + ","
+        + getMinY() + " " + getMaxX() + "," + getMaxY() + ")";
+    }
   }
 
-  public boolean contains(Coordinates coordinate) {
-    final double x = coordinate.getX();
-    final double y = coordinate.getY();
-    return contains(x, y);
+  public String getId() {
+    String string = MathUtil.toString(getMinX()) + "_"
+      + MathUtil.toString(getMinY()) + "_" + MathUtil.toString(getMaxX()) + "_"
+      + MathUtil.toString(getMaxY());
+    if (geometryFactory == null) {
+      return string;
+    } else {
+      return geometryFactory.getSRID() + "-" + string;
+    }
   }
+
 }

@@ -18,19 +18,23 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DataObjectStore extends DataObjectMetaDataFactory {
   void addCodeTable(CodeTable codeTable);
 
+  void addStatistic(String name, DataObject object);
+
+  void addStatistic(String name, QName typeName, int count);
+
+  void close();
+
+  DataObject create(DataObjectMetaData metaData);
+
+  DataObject create(QName typeName);
+
+  Object createPrimaryIdValue(QName typeName);
+
   Query createQuery(final QName typeName, String whereClause,
     final BoundingBox boundingBox);
 
   DataObjectReader createReader(QName typeName, String query,
     List<Object> parameters);
-
-  void close();
-
-  DataObject create(QName typeName);
-
-  DataObject create(DataObjectMetaData metaData);
-
-  Object createPrimaryIdValue(QName typeName);
 
   Writer<DataObject> createWriter();
 
@@ -63,8 +67,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
    */
   List<DataObjectStoreSchema> getSchemas();
 
-  void addStatistic(String name, DataObject object);
-
   /**
    * Get the list of type names (including name space) in the name space.
    * 
@@ -83,10 +85,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   DataObject load(QName typeName, Object id);
 
-  Reader<DataObject> query(Query... queries);
-
-  DataObject queryFirst(Query query);
-
   Reader<DataObject> query(List<Query> queries);
 
   Reader<DataObject> query(QName typeName);
@@ -94,6 +92,10 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   Reader<DataObject> query(QName typeName, BoundingBox boundingBox);
 
   Reader<DataObject> query(QName typeName, Geometry geometry);
+
+  Reader<DataObject> query(Query... queries);
+
+  DataObject queryFirst(Query query);
 
   void setLabel(String label);
 

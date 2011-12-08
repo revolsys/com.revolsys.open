@@ -41,10 +41,6 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     executor.run();
   }
 
-  public OutsideBoundaryObjects getOutsideBoundaryObjects() {
-    return outsideBoundaryObjects;
-  }
-
   public Map<String, Object> getAttributes() {
     return attributes;
   }
@@ -61,12 +57,17 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     return outChannels;
   }
 
+  public OutsideBoundaryObjects getOutsideBoundaryObjects() {
+    return outsideBoundaryObjects;
+  }
+
   public String getScriptName() {
     return scriptName;
   }
 
   @Override
   protected void postRun() {
+    super.postRun();
     for (final ChannelInput<?> in : inChannels.values()) {
       in.readDisconnect();
     }
@@ -78,6 +79,7 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   @Override
   protected void preRun() {
+    super.preRun();
     for (final ChannelInput<?> in : inChannels.values()) {
       in.readConnect();
     }
@@ -100,6 +102,11 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   public void setOutChannels(final Map<String, ChannelOutput<?>> outChannels) {
     this.outChannels = outChannels;
+  }
+
+  public void setOutsideBoundaryObjects(
+    final OutsideBoundaryObjects outsideBoundaryObjects) {
+    this.outsideBoundaryObjects = outsideBoundaryObjects;
   }
 
   public void setScriptName(final String scriptName) {

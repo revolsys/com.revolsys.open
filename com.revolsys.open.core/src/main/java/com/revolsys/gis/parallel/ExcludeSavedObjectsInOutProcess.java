@@ -8,6 +8,7 @@ import java.util.Set;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -18,7 +19,7 @@ public class ExcludeSavedObjectsInOutProcess extends
 
   private Set<String> originalIds = new HashSet<String>();
 
-  private Statistics statistics = new Statistics(
+  private StatisticsMap statistics = new StatisticsMap(
     "Excluded as already loaded from previous area");
 
   @Override
@@ -28,7 +29,7 @@ public class ExcludeSavedObjectsInOutProcess extends
     statistics = null;
   }
 
-  public Statistics getStatistics() {
+  public StatisticsMap getStatistics() {
     return statistics;
   }
 
@@ -44,11 +45,12 @@ public class ExcludeSavedObjectsInOutProcess extends
     if (id == null) {
       out.write(object);
     } else if (originalIds.contains(id.toString())) {
-      statistics.add(object);
+      statistics.add("Excluded as already loaded from previous area", object);
     } else {
       final Set<String> ids = Collections.singleton(id);
       final Geometry geometry = object.getGeometryValue();
       JtsGeometryUtil.setGeometryProperty(geometry, "ORIGINAL_IDS", ids);
+      out.write(object);
     }
   }
 
@@ -71,7 +73,7 @@ public class ExcludeSavedObjectsInOutProcess extends
     }
   }
 
-  public void setStatistics(final Statistics statistics) {
+  public void setStatistics(final StatisticsMap statistics) {
     this.statistics = statistics;
   }
 }
