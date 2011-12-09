@@ -39,13 +39,13 @@ public class SpringUtil {
     }
   }
 
-  private static OutputStream getFileOutputStream(final Resource resource)
+  public static OutputStream getFileOutputStream(final Resource resource)
     throws IOException, FileNotFoundException {
     final File file = resource.getFile();
     return new FileOutputStream(file);
   }
 
-  private static InputStream getInputStream(final Resource resource) {
+  public static InputStream getInputStream(final Resource resource) {
     try {
       return resource.getInputStream();
     } catch (final IOException e) {
@@ -82,7 +82,7 @@ public class SpringUtil {
     return new PrintWriter(writer);
   }
 
-  private static Reader getReader(final Resource resource) {
+  public static Reader getReader(final Resource resource) {
     final InputStream in = getInputStream(resource);
     return new InputStreamReader(in);
   }
@@ -94,8 +94,40 @@ public class SpringUtil {
     return resource.createRelative(newFileName);
   }
 
+  public static Resource getResource(final Resource resource,
+    final CharSequence childPath) {
+    try {
+      return resource.createRelative(childPath.toString());
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Cannot create resource " + resource
+        + childPath, e);
+    }
+  }
+
   public static Writer getWriter(final Resource resource) {
     final OutputStream stream = getOutputStream(resource);
     return new OutputStreamWriter(stream);
+  }
+
+  public static void copy(Resource source, Resource target) {
+    InputStream in = getInputStream(source);
+    try {
+      if (target instanceof FileSystemResource) {
+        FileSystemResource fileResource = (FileSystemResource)target;
+        File file = fileResource.getFile();
+        File parent = file.getParentFile();
+        if (!parent.exists()) {
+          parent.mkdirs();
+        }
+      }
+      OutputStream out = getOutputStream(target);
+      try {
+        FileUtil.copy(in, out);
+      } finally {
+        FileUtil.closeSilent(out);
+      }
+    } finally {
+      FileUtil.closeSilent(in);
+    }
   }
 }

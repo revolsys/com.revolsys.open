@@ -101,7 +101,7 @@ public class TinReader {
       boundingBox = this.boundingBox;
     }
     final TriangulatedIrregularNetwork tin = new TriangulatedIrregularNetwork(
-      boundingBox, false);
+      boundingBox, true);
 
     if (line.startsWith("ENDT")) {
       tin.insertNodes(nodeIdMap.values());

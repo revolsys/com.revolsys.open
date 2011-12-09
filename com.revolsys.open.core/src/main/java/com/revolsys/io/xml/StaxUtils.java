@@ -16,6 +16,7 @@
 package com.revolsys.io.xml;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.springframework.core.io.Resource;
+
+import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.ExceptionUtil;
 
 /**
  * The StaxUtils class provides utility methods for processing XML using the
@@ -46,6 +50,7 @@ public final class StaxUtils {
     } catch (final XMLStreamException e) {
     }
   }
+
   public static QName getXmlQName(NamespaceContext context, String value) {
     if (value == null) {
       return null;
@@ -61,6 +66,7 @@ public final class StaxUtils {
       }
     }
   }
+
   public static QName getQNameAttribute(XMLStreamReader in, QName attributeName) {
     String value = StaxUtils.getAttribute(in, attributeName);
     NamespaceContext namespaceContext = in.getNamespaceContext();
@@ -68,10 +74,10 @@ public final class StaxUtils {
     return qName;
   }
 
-  public static XMLStreamReader createXmlReader(final Resource resource)
-    throws IOException {
+  public static XMLStreamReader createXmlReader(final Resource resource) {
     try {
-      return StaxUtils.FACTORY.createXMLStreamReader(resource.getInputStream());
+      InputStream inputStream = SpringUtil.getInputStream(resource);
+      return StaxUtils.FACTORY.createXMLStreamReader(inputStream);
     } catch (final XMLStreamException e) {
       throw new IllegalArgumentException(e.getMessage(), e);
     }
@@ -96,34 +102,16 @@ public final class StaxUtils {
     }
   }
 
-  public static String getElementText(final XMLStreamReader parser)
-    throws XMLStreamException {
+  public static String getElementText(final XMLStreamReader parser) {
     final StringBuffer text = new StringBuffer();
-    parser.require(XMLStreamConstants.START_ELEMENT, null, null);
-    while (parser.next() != XMLStreamConstants.END_ELEMENT) {
+    require(parser, XMLStreamConstants.START_ELEMENT, null, null);
+    while (next(parser) != XMLStreamConstants.END_ELEMENT) {
       switch (parser.getEventType()) {
         case XMLStreamConstants.CHARACTERS:
           text.append(parser.getText());
         break;
         case XMLStreamConstants.START_ELEMENT:
           text.append(getElementText(parser));
-        break;
-      }
-    }
-    return text.toString();
-  }
-
-  public static String getChildText(final XMLStreamReader parser)
-    throws XMLStreamException {
-    final StringBuffer text = new StringBuffer();
-    parser.require(XMLStreamConstants.START_ELEMENT, null, null);
-    while (parser.next() != XMLStreamConstants.END_ELEMENT) {
-      switch (parser.getEventType()) {
-        case XMLStreamConstants.CHARACTERS:
-          text.append(parser.getText());
-        break;
-        case XMLStreamConstants.START_ELEMENT:
-          skipSubTree(parser);
         break;
       }
     }
@@ -155,7 +143,7 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static boolean matchElementLocalName(final XMLStreamReader parser,
-    final QName element) throws XMLStreamException {
+    final QName element) {
     final String currentLocalName = parser.getLocalName();
     final String elementLocalName = element.getLocalPart();
     return currentLocalName.equals(elementLocalName);
@@ -168,10 +156,18 @@ public final class StaxUtils {
    * @param element The expected XML element.
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
-  public static void require(final XMLStreamReader parser, final QName element)
-    throws XMLStreamException {
-    parser.require(XMLStreamConstants.START_ELEMENT, element.getNamespaceURI(),
-      element.getLocalPart());
+  public static void require(final XMLStreamReader parser, final QName element) {
+    require(parser, XMLStreamConstants.START_ELEMENT,
+      element.getNamespaceURI(), element.getLocalPart());
+  }
+
+  public static void require(final XMLStreamReader parser, int type,
+    String namespaceURI, String localPart) {
+    try {
+      parser.require(type,namespaceURI, localPart);
+    } catch (XMLStreamException e) {
+     ExceptionUtil.throwUncheckedException(e);
+    }
   }
 
   /**
@@ -182,8 +178,8 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static void requireLocalName(final XMLStreamReader parser,
-    final QName element) throws XMLStreamException {
-    parser.require(XMLStreamConstants.START_ELEMENT, null,
+    final QName element) {
+    require(parser, XMLStreamConstants.START_ELEMENT, null,
       element.getLocalPart());
   }
 
@@ -193,12 +189,11 @@ public final class StaxUtils {
    * @param parser The STAX XML parser.
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
-  public static void skipSubTree(final XMLStreamReader parser)
-    throws XMLStreamException {
-    parser.require(XMLStreamConstants.START_ELEMENT, null, null);
+  public static void skipSubTree(final XMLStreamReader parser) {
+    require(parser, XMLStreamConstants.START_ELEMENT, null, null);
     int level = 1;
     while (level > 0) {
-      final int eventType = parser.next();
+      final int eventType = next(parser);
       if (eventType == XMLStreamConstants.END_ELEMENT) {
         --level;
       } else if (eventType == XMLStreamConstants.START_ELEMENT) {
@@ -213,9 +208,8 @@ public final class StaxUtils {
    * @param parser The STAX XML parser.
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
-  public static int skipToEndElement(final XMLStreamReader parser)
-    throws XMLStreamException {
-    while (parser.next() != XMLStreamConstants.END_ELEMENT) {
+  public static int skipToEndElement(final XMLStreamReader parser) {
+    while (next(parser) != XMLStreamConstants.END_ELEMENT) {
       if (parser.getEventType() == XMLStreamConstants.END_DOCUMENT) {
         return parser.getEventType();
       }
@@ -230,11 +224,11 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static void skipToEndElement(final XMLStreamReader parser,
-    final QName name) throws XMLStreamException {
+    final QName name) {
     while (!parser.isEndElement() || !parser.getName().equals(name)) {
-      parser.next();
+      next(parser);
     }
-    parser.next();
+    next(parser);
   }
 
   /**
@@ -244,12 +238,12 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static void skipToEndElementByLocalName(final XMLStreamReader parser,
-    final QName name) throws XMLStreamException {
+    final QName name) {
     while (!parser.isEndElement()
       || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
-      parser.next();
+      next(parser);
     }
-    parser.next();
+    next(parser);
   }
 
   /**
@@ -258,14 +252,21 @@ public final class StaxUtils {
    * @param parser The STAX XML parser.
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
-  public static int skipToStartElement(final XMLStreamReader parser)
-    throws XMLStreamException {
-    while (parser.next() != XMLStreamConstants.START_ELEMENT) {
+  public static int skipToStartElement(final XMLStreamReader parser) {
+    while (next(parser) != XMLStreamConstants.START_ELEMENT) {
       if (parser.getEventType() == XMLStreamConstants.END_DOCUMENT) {
         return parser.getEventType();
       }
     }
     return parser.getEventType();
+  }
+
+  public static int next(final XMLStreamReader parser) {
+    try {
+      return parser.next();
+    } catch (XMLStreamException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
   }
 
   /**
@@ -279,10 +280,10 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static boolean skipToStartElements(final XMLStreamReader parser,
-    final Collection<QName> elementNames) throws XMLStreamException {
+    final Collection<QName> elementNames) {
     QName elementName = null;
     do {
-      while (parser.next() != XMLStreamConstants.START_ELEMENT) {
+      while (next(parser) != XMLStreamConstants.START_ELEMENT) {
         if (parser.getEventType() == XMLStreamConstants.END_DOCUMENT) {
           return false;
         }
@@ -302,7 +303,7 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static boolean skipToChildStartElements(final XMLStreamReader parser,
-    final QName... elementNames) throws XMLStreamException {
+    final QName... elementNames) {
     final List<QName> names = Arrays.asList(elementNames);
     return skipToChildStartElements(parser, names);
   }
@@ -317,13 +318,13 @@ public final class StaxUtils {
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
   public static boolean skipToChildStartElements(final XMLStreamReader parser,
-    final Collection<QName> elementNames) throws XMLStreamException {
+    final Collection<QName> elementNames) {
     int count = 0;
     QName elementName = null;
     if (parser.isEndElement()) {
       elementName = parser.getName();
       if (elementNames.contains(elementName)) {
-        parser.nextTag();
+        nextTag(parser);
       } else {
         return false;
       }
@@ -335,7 +336,7 @@ public final class StaxUtils {
       }
     }
     do {
-      while (parser.next() != XMLStreamConstants.START_ELEMENT) {
+      while (next(parser) != XMLStreamConstants.START_ELEMENT) {
         if (parser.getEventType() == XMLStreamConstants.END_DOCUMENT) {
           return false;
         } else if (parser.isEndElement()) {
@@ -351,15 +352,22 @@ public final class StaxUtils {
     return true;
   }
 
+  public static int nextTag(final XMLStreamReader parser) {
+    try {
+      return parser.nextTag();
+    } catch (XMLStreamException e) {
+     return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
   /**
    * Skip any whitespace until an start or end of element is found.
    * 
    * @param parser The STAX XML parser.
    * @throws XMLStreamException If an exception processing the XML occurs.
    */
-  public static int skipWhitespace(final XMLStreamReader parser)
-    throws XMLStreamException {
-    while (parser.next() == XMLStreamConstants.CHARACTERS
+  public static int skipWhitespace(final XMLStreamReader parser) {
+    while (next(parser) == XMLStreamConstants.CHARACTERS
       && parser.isWhiteSpace()) {
       switch (parser.getEventType()) {
         case XMLStreamConstants.END_DOCUMENT:
@@ -371,9 +379,13 @@ public final class StaxUtils {
   }
 
   public static void startElement(final XMLStreamWriter writer,
-    final QName element) throws XMLStreamException {
-    writer.writeStartElement(element.getPrefix(), element.getLocalPart(),
-      element.getNamespaceURI());
+    final QName element) {
+    try {
+      writer.writeStartElement(element.getPrefix(), element.getLocalPart(),
+        element.getNamespaceURI());
+    } catch (XMLStreamException e) {
+      ExceptionUtil.throwUncheckedException(e);
+    }
   }
 
   /**

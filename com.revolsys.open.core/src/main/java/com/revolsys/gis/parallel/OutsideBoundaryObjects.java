@@ -3,12 +3,16 @@ package com.revolsys.gis.parallel;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 public class OutsideBoundaryObjects {
+  private static final Logger LOG = LoggerFactory.getLogger(OutsideBoundaryObjects.class);
 
   private Set<DataObject> objects = new LinkedHashSet<DataObject>();
 
@@ -39,6 +43,7 @@ public class OutsideBoundaryObjects {
 
   public Set<DataObject> getAndClearObjects() {
     final Set<DataObject> objects = this.objects;
+    LOG.info("Outside boundary objects size=" + this.objects.size());
     clear();
     return objects;
   }
@@ -60,8 +65,7 @@ public class OutsideBoundaryObjects {
     this.preparedBoundary = PreparedGeometryFactory.prepare(boundary);
   }
 
-  public void setObjects(
-    final Set<DataObject> objects) {
+  public void setObjects(final Set<DataObject> objects) {
     this.objects = objects;
   }
 

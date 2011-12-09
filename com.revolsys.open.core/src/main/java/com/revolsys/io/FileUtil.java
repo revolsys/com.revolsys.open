@@ -38,6 +38,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.io.filter.PatternFilenameFilter;
+import com.revolsys.util.ExceptionUtil;
 
 /**
  * The FileUtil class is a utility class for performing common tasks with
@@ -83,7 +84,6 @@ public final class FileUtil {
     }
 
   }
-  
 
   /**
    * Close the input stream without throwing an I/O exception if the close
@@ -273,18 +273,20 @@ public final class FileUtil {
    * 
    * @param in The input stream to read the contents from.
    * @param out The output stream to write the contents to.
-   * @throws IOException If an I/O error occurs.
    */
-  public static long copy(final InputStream in, final OutputStream out)
-    throws IOException {
-    final byte[] buffer = new byte[4906];
-    long numBytes = 0;
-    int count;
-    while ((count = in.read(buffer)) > -1) {
-      out.write(buffer, 0, count);
-      numBytes += count;
+  public static long copy(final InputStream in, final OutputStream out) {
+    try {
+      final byte[] buffer = new byte[4906];
+      long numBytes = 0;
+      int count;
+      while ((count = in.read(buffer)) > -1) {
+        out.write(buffer, 0, count);
+        numBytes += count;
+      }
+      return numBytes;
+    } catch (IOException e) {
+      return ExceptionUtil.throwUncheckedException(e);
     }
-    return numBytes;
   }
 
   /**

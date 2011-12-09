@@ -38,11 +38,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   }
 
   public KmlGeometryIterator(final Resource resource) {
-    try {
-      this.in = StaxUtils.createXmlReader(resource);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException("Unable to open resource " + resource);
-    }
+    this.in = StaxUtils.createXmlReader(resource);
   }
 
   @Override
@@ -52,13 +48,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   @Override
   protected void doInit() {
-    try {
-      // StaxUtils.skipToStartElement(this.in);
-      // StaxUtils.requireLocalName(this.in, KML);
-      StaxUtils.skipToStartElement(this.in);
-    } catch (final XMLStreamException e) {
-      throw new RuntimeException("Error initializing file ", e);
-    }
+    StaxUtils.skipToStartElement(this.in);
   }
 
   @Override

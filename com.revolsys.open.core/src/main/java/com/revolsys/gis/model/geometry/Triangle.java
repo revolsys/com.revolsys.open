@@ -9,7 +9,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
@@ -18,7 +18,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTWriter;
 
-public class Triangle extends DoubleCoordinatesList {
+public class Triangle extends AbstractCoordinatesList {
   private static final long serialVersionUID = -4513931832875328029L;
 
   public static Triangle createClockwiseTriangle(final Coordinates c0,
@@ -35,44 +35,58 @@ public class Triangle extends DoubleCoordinatesList {
 
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1.0);
+  private double[] coordinates = new double[9];
+
+  public byte getNumAxis() {
+    return 3;
+  }
+
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+    0, 1.0);
 
   public Triangle() {
-    super(3, 2);
   }
 
   public Triangle(final Coordinates... points) {
-    super((byte)3, points);
-    init();
+    if (points.length > 3) {
+      throw new IllegalArgumentException(
+        "A traingle must have exeactly 3 points not " + size());
+    }
+    for (int i = 0; i < 3; i++) {
+      Coordinates point = points[i];
+      setPoint(i, point);
+    }
   }
 
-  public Triangle(final CoordinatesList points) {
-    super(3, points);
-    init();
+  public double getValue(final int index, int axisIndex) {
+    int coordinateIndex = getCoordinatesIndex(index, axisIndex);
+    return coordinates[coordinateIndex];
   }
 
-  public Triangle(final int numAxis) {
-    super(3, numAxis);
+  private int getCoordinatesIndex(final int index, int axisIndex) {
+    final byte numAxis = 3;
+    axisIndex = axisIndex % 3;
+    if (axisIndex < 0) {
+      axisIndex = 3 - axisIndex;
+    }
+
+    int coordinateIndex = index * numAxis + axisIndex;
+    return coordinateIndex;
   }
 
-  public Triangle(final int numAxis, final CoordinatesList points) {
-    super(numAxis, points);
-    init();
+  public void setValue(final int index, final int axisIndex, final double value) {
+    int coordinateIndex = getCoordinatesIndex(index, axisIndex);
+    coordinates[coordinateIndex] = value;
   }
 
-  public Triangle(final int numAxis, final double... coordinates) {
-    super(numAxis, coordinates);
-    init();
+  public int size() {
+    return 3;
   }
 
-  public Triangle(final int numAxis, final List<? extends Number> coordinates) {
-    super(numAxis, coordinates);
-    init();
-  }
-
-  private void addIntersection(final Set<Coordinates> coordinates,
-    final Coordinates line1Start, final Coordinates line1End,
-    final Coordinates line2Start, final Coordinates line2End) {
+  private void addIntersection(final GeometryFactory geometryFactory,
+    final Set<Coordinates> coordinates, final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
+    final Coordinates line2End) {
     final List<Coordinates> intersections = LineSegmentUtil.intersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
     coordinates.addAll(intersections);
@@ -169,20 +183,14 @@ public class Triangle extends DoubleCoordinatesList {
     return get(2);
   }
 
-  public Polygon getPolygon() {
+  public Polygon getPolygon(GeometryFactory geometryFactory) {
     final LinearRing shell = geometryFactory.createLinearRing(new DoubleCoordinatesList(
       getNumAxis(), getP0(), getP1(), getP2(), getP0()));
     return geometryFactory.createPolygon(shell, null);
   }
 
-  public void init() {
-    if (size() > 3) {
-      throw new IllegalArgumentException(
-        "A traingle must have exeactly 3 points not " + size());
-    }
-  }
-
-  public LineSegment intersection(final LineSegment line) {
+  public LineSegment intersection(final GeometryFactory geometryFactory,
+    final LineSegment line) {
     final Coordinates lc0 = line.get(0);
     final Coordinates lc1 = line.get(1);
     final boolean lc0Contains = contains(lc0);
@@ -191,9 +199,9 @@ public class Triangle extends DoubleCoordinatesList {
       return line;
     } else {
       final Set<Coordinates> coordinates = new HashSet<Coordinates>();
-      addIntersection(coordinates, lc0, lc1, getP0(), getP1());
-      addIntersection(coordinates, lc0, lc1, getP1(), getP2());
-      addIntersection(coordinates, lc0, lc1, getP2(), getP0());
+      addIntersection(geometryFactory, coordinates, lc0, lc1, getP0(), getP1());
+      addIntersection(geometryFactory, coordinates, lc0, lc1, getP1(), getP2());
+      addIntersection(geometryFactory, coordinates, lc0, lc1, getP2(), getP0());
 
       final Iterator<Coordinates> coordIterator = coordinates.iterator();
       if (coordIterator.hasNext()) {
@@ -215,7 +223,7 @@ public class Triangle extends DoubleCoordinatesList {
 
   @Override
   public String toString() {
-    return new WKTWriter(3).write(getPolygon());
+    return new WKTWriter(3).write(getPolygon(GEOMETRY_FACTORY));
   }
 
   public boolean intersectsCircumCircle(Coordinates point) {

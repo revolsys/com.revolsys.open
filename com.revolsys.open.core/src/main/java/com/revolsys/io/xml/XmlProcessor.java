@@ -370,7 +370,7 @@ public abstract class XmlProcessor {
       String xsiLocalName = xsiName.getLocalPart();
       Converter converter = typeNameConverterMap.get(xsiName);
       if (converter != null) {
-        String text = StaxUtils.getChildText(parser);
+        String text = StaxUtils.getElementText(parser);
         return (T)converter.convert(null, text);
       } else if (tagNameClassMap.containsKey(xsiLocalName)) {
         objectClass = tagNameClassMap.get(xsiLocalName);
@@ -386,7 +386,7 @@ public abstract class XmlProcessor {
       try {
         final Method method = getProcessMethod(element);
         if (method == null) {
-          return (T)StaxUtils.getChildText(parser);
+          return (T)StaxUtils.getElementText(parser);
         } else {
           return (T)method.invoke(this, new Object[] {
             parser

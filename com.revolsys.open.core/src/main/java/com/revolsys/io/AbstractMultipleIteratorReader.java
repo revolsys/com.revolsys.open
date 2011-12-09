@@ -1,6 +1,7 @@
 package com.revolsys.io;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 
@@ -13,6 +14,8 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   private boolean open;
 
+  private boolean loadNext = true;
+
   @PreDestroy
   public void close() {
     if (iterator != null) {
@@ -24,7 +27,6 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   public void open() {
     if (!open) {
       open = true;
-      hasNext();
     }
   }
 
@@ -34,19 +36,22 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   }
 
   public boolean hasNext() {
-    if (iterator == null) {
-      iterator = getNextIterator();
+    if (loadNext) {
       if (iterator == null) {
-        close();
-        return false;
+        iterator = getNextIterator();
+        if (iterator == null) {
+          close();
+          return false;
+        }
       }
-    }
-    while (!iterator.hasNext()) {
-      iterator.close();
-      iterator = getNextIterator();
-      if (iterator == null) {
-        return false;
+      while (!iterator.hasNext()) {
+        iterator.close();
+        iterator = getNextIterator();
+        if (iterator == null) {
+          return false;
+        }
       }
+      loadNext =false;
     }
     return true;
   }
@@ -54,9 +59,14 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   protected abstract AbstractIterator<T> getNextIterator();
 
   public T next() {
-    final T object = iterator.next();
-    process(object);
-    return object;
+    if (hasNext()) {
+      final T object = iterator.next();
+      process(object);
+      loadNext = true;
+      return object;
+    } else {
+      throw new NoSuchElementException();
+    }
   }
 
   protected void process(T object) {

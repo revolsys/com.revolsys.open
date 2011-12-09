@@ -1,20 +1,14 @@
 package com.revolsys.gis.data.io;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.collection.DelegatingIterator;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
 
 public class DelegatingReader<T> extends AbstractReader<T> {
   private Reader<T> reader;
-
-  private List<T> objects = new ArrayList<T>();
 
   private Iterator<T> iterator;
 
@@ -42,10 +36,6 @@ public class DelegatingReader<T> extends AbstractReader<T> {
     }
   }
 
-  public List<T> getObjects() {
-    return objects;
-  }
-
   @Override
   public Map<String, Object> getProperties() {
     return reader.getProperties();
@@ -64,27 +54,12 @@ public class DelegatingReader<T> extends AbstractReader<T> {
   public Iterator<T> iterator() {
     if (iterator == null) {
       iterator = reader.iterator();
-      if (objects != null && !objects.isEmpty()) {
-        iterator = createIterator(iterator, objects);
-      }
     }
     return iterator;
   }
 
-  protected Iterator<T> createIterator(Iterator<T> iterator, Collection<T> objects) {
-    return new DelegatingIterator<T>(iterator, objects);
-  }
-
   public void open() {
     reader.open();
-  }
-
-  public void setObjects(final Collection<T> objects) {
-    this.objects = new ArrayList<T>(objects);
-  }
-
-  public void setObjects(final List<T> objects) {
-    this.objects = new ArrayList<T>(objects);
   }
 
   @Override

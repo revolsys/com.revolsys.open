@@ -3,6 +3,7 @@ package com.revolsys.gis.data.io;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
@@ -13,10 +14,9 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.io.AbstractMultipleIteratorReader;
 
-public class DataObjectStoreQueryReader extends
-  AbstractMultipleIteratorReader<DataObject> implements DataObjectReader {
+public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
+  implements DataObjectReader {
 
   private AbstractDataObjectStore dataStore;
 
@@ -28,12 +28,12 @@ public class DataObjectStoreQueryReader extends
 
   private String whereClause;
 
-  private int queryIndex = 0;
-
   public DataObjectStoreQueryReader() {
+    setIterator(new DataStoreMultipleQueryIterator(this));
   }
 
   public DataObjectStoreQueryReader(final AbstractDataObjectStore dataStore) {
+    this();
     setDataStore(dataStore);
   }
 
@@ -55,18 +55,20 @@ public class DataObjectStoreQueryReader extends
     queries.add(query);
   }
 
-  public AbstractDataObjectStore getDataStore() {
-    return dataStore;
-  }
-
-  public DataObjectMetaData getMetaData() {
-    return ((DataObjectIterator)iterator()).getMetaData();
-  }
-
   @Override
-  protected AbstractIterator<DataObject> getNextIterator() {
-    if (queryIndex < queries.size()) {
-      final Query query = queries.get(queryIndex);
+  @PreDestroy
+  public void close() {
+    super.close();
+    boundingBox = null;
+    dataStore = null;
+    queries = null;
+    typeNames = null;
+    whereClause = null;
+  }
+
+  protected AbstractIterator<DataObject> createQueryIterator(final int i) {
+    if (i < queries.size()) {
+      final Query query = queries.get(i);
       if (StringUtils.hasText(whereClause)) {
         query.setWhereClause(whereClause);
       }
@@ -75,10 +77,21 @@ public class DataObjectStoreQueryReader extends
       }
       final AbstractIterator<DataObject> iterator = dataStore.createIterator(
         query, getProperties());
-      queryIndex++;
       return iterator;
     }
-    return null;
+    throw new NoSuchElementException();
+  }
+
+  public AbstractDataObjectStore getDataStore() {
+    return dataStore;
+  }
+
+  public DataObjectMetaData getMetaData() {
+    return ((DataObjectIterator)iterator()).getMetaData();
+  }
+
+  public List<Query> getQueries() {
+    return queries;
   }
 
   public String getWhereClause() {
@@ -103,6 +116,7 @@ public class DataObjectStoreQueryReader extends
         }
       }
     }
+    super.open();
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -121,17 +135,6 @@ public class DataObjectStoreQueryReader extends
     for (final Query query : queries) {
       addQuery(query);
     }
-  }
-
-  @Override
-  @PreDestroy
-  public void close() {
-    super.close();
-    boundingBox = null;
-    dataStore = null;
-    queries = null;
-    typeNames = null;
-    whereClause = null;
   }
 
   /**

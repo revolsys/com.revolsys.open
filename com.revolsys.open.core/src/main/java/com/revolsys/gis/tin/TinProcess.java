@@ -12,6 +12,8 @@ import org.springframework.core.io.FileSystemResource;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -34,16 +36,6 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   private Map<String, Object> updatedAttributeValues;
 
   private File tinCache;
-
-  @Override
-  protected void destroy() {
-    if (tinIn != null) {
-      tinIn.readDisconnect();
-    }
-    if (tinReader != null) {
-      tinReader.close();
-    }
-  }
 
   public BoundingBox getBoundingBox() {
     return boundingBox;
@@ -77,6 +69,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     if (tinCache != null && tinCache.exists()) {
       final File tinFile = new File(tinCache, boundingBox.getId() + ".tin");
       if (tinFile.exists()) {
+        LOG.info("Loading tin from file " + tinFile);
         final FileSystemResource resource = new FileSystemResource(tinFile);
         try {
           tin = TinReader.read(boundingBox, resource);
@@ -86,20 +79,23 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
       }
     }
     if (tin == null) {
+      LOG.info("Loading tin from database");
       tin = new TriangulatedIrregularNetwork(boundingBox);
-      final List<LineString> lines = new ArrayList<LineString>();
+      List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
       if (tinIn != null) {
         readTinFeatures(tin, lines, tinIn);
       }
       if (tinReader != null) {
         readTinFeatures(tin, lines, tinReader);
       }
-      for (final LineString line : lines) {
+      for (final CoordinatesList line : lines) {
         tin.insertNodes(line);
       }
-      for (final LineString line : lines) {
+      for (final CoordinatesList line : lines) {
         tin.insertEdge(line);
       }
+      lines = null;
+      tin.finishEditing();
       if (tinCache != null) {
         final File tinFile = new File(tinCache, boundingBox.getId() + ".tin");
         try {
@@ -116,7 +112,17 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   @Override
   protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
+    if (tin == null) {
+      LOG.info("Tin not created as there were no features");
+    }
     this.tin = null;
+    if (tinIn != null) {
+      tinIn.readDisconnect();
+    }
+    if (tinReader != null) {
+      tinReader.close();
+    }
+    this.boundingBox = null;
   }
 
   @Override
@@ -133,10 +139,12 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         final LineString newLine = tin.getElevation(line);
         if (line != newLine) {
           object.setGeometryValue(newLine);
-          if (updatedAttributeValues != null) {
-            for (final Entry<String, Object> entry : updatedAttributeValues.entrySet()) {
-              final String key = entry.getKey();
-              final Object value = entry.getValue();
+        }
+        if (updatedAttributeValues != null) {
+          for (final Entry<String, Object> entry : updatedAttributeValues.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (object.getValueByPath(key) == null) {
               object.setValueByPath(key, value);
             }
           }
@@ -147,7 +155,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   private void readTinFeatures(final TriangulatedIrregularNetwork tin,
-    final List<LineString> lines, final Iterable<DataObject> iterable) {
+    final List<CoordinatesList> lines, final Iterable<DataObject> iterable) {
     for (final DataObject object : iterable) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {
@@ -155,7 +163,8 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         tin.insertNode(point);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
-        lines.add(line);
+        CoordinatesList points = CoordinatesListUtil.get(line);
+        lines.add(points);
       }
     }
   }
