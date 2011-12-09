@@ -192,13 +192,13 @@ public class MultiInputSelector {
     return select(msecs, nsecs, Arrays.asList(channels));
   }
 
-  public synchronized <T extends SelectableInput, R extends T> T selectChannelInput(
+  public synchronized <T extends SelectableInput, R extends T> R selectChannelInput(
     final List<T> channels) {
     int index = select(Long.MAX_VALUE, channels);
     if (index == -1) {
       return null;
     } else {
-      return channels.get(index);
+      return (R)channels.get(index);
     }
   }
 
