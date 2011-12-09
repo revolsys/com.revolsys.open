@@ -285,7 +285,7 @@ public final class FileUtil {
       }
       return numBytes;
     } catch (IOException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return (Long)ExceptionUtil.throwUncheckedException(e);
     }
   }
 

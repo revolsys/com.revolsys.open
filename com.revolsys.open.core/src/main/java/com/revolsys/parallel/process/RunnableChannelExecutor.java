@@ -84,7 +84,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
         }
         final MultiInputSelector selector = new MultiInputSelector();
         try {
-          final Channel<Runnable> channel = selector.selectChannelInput(channels);
+          final Channel<Runnable> channel = (Channel<Runnable>)selector.selectChannelInput(channels);
           if (channel != null) {
             final Runnable runnable = channel.read();
             execute(runnable);

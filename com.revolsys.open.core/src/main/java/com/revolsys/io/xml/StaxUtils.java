@@ -265,7 +265,7 @@ public final class StaxUtils {
     try {
       return parser.next();
     } catch (XMLStreamException e) {
-      return ExceptionUtil.throwUncheckedException(e);
+      return (Integer)ExceptionUtil.throwUncheckedException(e);
     }
   }
 
@@ -356,7 +356,7 @@ public final class StaxUtils {
     try {
       return parser.nextTag();
     } catch (XMLStreamException e) {
-     return ExceptionUtil.throwUncheckedException(e);
+     return (Integer)ExceptionUtil.throwUncheckedException(e);
     }
   }
 
