@@ -60,11 +60,12 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   protected Map<String, Object> getNext() throws NoSuchElementException {
     if (hasNext) {
       Map<String, Object> map = readMap();
-
-      hasNext = false;
+      if (StaxUtils.skipToStartElement(in) != XMLStreamConstants.START_ELEMENT) {
+        hasNext = false;
+      }
       return map;
     } else {
-      throw new NoSuchElementException();
+        throw new NoSuchElementException();
     }
   }
 
