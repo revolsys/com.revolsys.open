@@ -65,7 +65,7 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
       }
       return map;
     } else {
-        throw new NoSuchElementException();
+      throw new NoSuchElementException();
     }
   }
 
@@ -148,8 +148,10 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
           }
         break;
+        case XMLStreamConstants.COMMENT:
+        break;
         default:
-          System.err.println(in.getText());
+          System.err.println(in.getEventType() + " " + in.getText());
         break;
       }
     }

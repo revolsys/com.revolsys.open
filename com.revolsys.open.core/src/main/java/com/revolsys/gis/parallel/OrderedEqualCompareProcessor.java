@@ -253,7 +253,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
 
                   if (!notEqualAttributeNames.isEmpty()) {
                     final String attributeNames = CollectionUtil.toString(
-                      notEqualAttributeNames, ",");
+                      ",", notEqualAttributeNames);
                     DataObjectLog.error(getClass(), sourceName + " "
                       + attributeNames, sourceObject);
                     DataObjectLog.error(getClass(), otherName + " "

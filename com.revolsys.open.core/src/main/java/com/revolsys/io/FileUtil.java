@@ -333,17 +333,22 @@ public final class FileUtil {
    * @return The temportary directory.
    * @throws IOException If there was an exception creating the directory.
    */
-  public static File createTempDirectory(final String prefix,
-    final String suffix) throws IOException {
-    final File file = File.createTempFile(prefix, suffix);
-    if (!file.delete()) {
-      throw new IOException("Cannot delete temporary file");
+  public static File createTempDirectory(
+    final String prefix,
+    final String suffix) {
+    try {
+      final File file = File.createTempFile(prefix, suffix);
+      if (!file.delete()) {
+        throw new IOException("Cannot delete temporary file");
+      }
+      if (!file.mkdirs()) {
+        throw new IOException("Cannot create temporary directory");
+      }
+      file.deleteOnExit();
+      return file;
+    } catch (Exception e) {
+      return ExceptionUtil.throwUncheckedException(e);
     }
-    if (!file.mkdirs()) {
-      throw new IOException("Cannot create temporary directory");
-    }
-    file.deleteOnExit();
-    return file;
   }
 
   /**
@@ -351,10 +356,9 @@ public final class FileUtil {
    * directory.
    * 
    * @param directory The directory to delete.
-   * @throws IOException If a file or directory could not be deleted.
    */
-  public static void deleteDirectory(final File directory) {
-    deleteDirectory(directory, true);
+  public static boolean deleteDirectory(final File directory) {
+    return deleteDirectory(directory, true);
   }
 
   /**
@@ -365,17 +369,22 @@ public final class FileUtil {
    * @param deleteRoot Flag indicating if the directory should also be deleted.
    * @throws IOException If a file or directory could not be deleted.
    */
-  public static void deleteDirectory(final File directory,
+  public static boolean deleteDirectory(
+    final File directory,
     final boolean deleteRoot) {
+    boolean deleted = true;
     final File[] files = directory.listFiles();
     if (files != null) {
       for (int i = 0; i < files.length; i++) {
         final File file = files[i];
         if (file.exists()) {
           if (file.isDirectory()) {
-            deleteDirectory(file, true);
+            if (!deleteDirectory(file, true)) {
+              deleted = false;
+            }
           } else {
             if (!file.delete() && file.exists()) {
+              deleted = false;
               LOG.error("Cannot delete file: " + getCanonicalPath(file));
             }
           }
@@ -384,9 +393,11 @@ public final class FileUtil {
     }
     if (deleteRoot) {
       if (!directory.delete() && directory.exists()) {
+        deleted = false;
         LOG.error("Cannot delete directory: " + getCanonicalPath(directory));
       }
     }
+    return deleted;
   }
 
   /**
@@ -491,7 +502,8 @@ public final class FileUtil {
     return getBaseName(fileName);
   }
 
-  public static File getFileWithExtension(final File file,
+  public static File getFileWithExtension(
+    final File file,
     final String extension) {
     final File parentFile = file.getParentFile();
     final String baseName = FileUtil.getFileNamePrefix(file);
@@ -513,7 +525,8 @@ public final class FileUtil {
    * @return The relative path.
    * @throws IOException If an I/O error occurs.
    */
-  public static String getRelativePath(final File parentDirectory,
+  public static String getRelativePath(
+    final File parentDirectory,
     final File file) throws IOException {
     final String parentPath = getCanonicalPath(parentDirectory);
     final String filePath = getCanonicalPath(file);

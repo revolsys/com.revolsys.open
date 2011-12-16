@@ -54,7 +54,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     if (delete) {
       perms.add("DELETE");
     }
-    out.print(CollectionUtil.toString(perms, ", "));
+    out.print(CollectionUtil.toString(", ", perms));
     out.print(" ON ");
     writeTableName(typeName);
     out.print(" TO ");
@@ -203,7 +203,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.println(" AS ( ");
     out.println("  SELECT ");
     out.print("  ");
-    out.println(CollectionUtil.toString(columnNames, ",\n  "));
+    out.println(CollectionUtil.toString(",\n  ", columnNames));
     out.print("  FROM ");
     writeTableName(queryTypeName);
     out.println();

@@ -12,19 +12,52 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 import com.revolsys.io.FileUtil;
 
 public class SpringUtil {
 
+  public static void copy(final Resource source, final Resource target) {
+    final InputStream in = getInputStream(source);
+    try {
+      if (target instanceof FileSystemResource) {
+        final FileSystemResource fileResource = (FileSystemResource)target;
+        final File file = fileResource.getFile();
+        final File parent = file.getParentFile();
+        if (!parent.exists()) {
+          parent.mkdirs();
+        }
+      }
+      final OutputStream out = getOutputStream(target);
+      try {
+        FileUtil.copy(in, out);
+      } finally {
+        FileUtil.closeSilent(out);
+      }
+    } finally {
+      FileUtil.closeSilent(in);
+    }
+  }
+
   public static BufferedReader getBufferedReader(final Resource resource) {
     final Reader in = getReader(resource);
     return new BufferedReader(in);
+  }
+
+  public static File getFile(final Resource resource) {
+    try {
+      return resource.getFile();
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Cannot get File for resource "
+        + resource, e);
+    }
   }
 
   public static File getFileOrCreateTempFile(final Resource resource)
@@ -87,47 +120,44 @@ public class SpringUtil {
     return new InputStreamReader(in);
   }
 
-  public static Resource getResourceWithExtension(final Resource resource,
+  public static Resource getResource(
+    final Resource resource,
+    final CharSequence childPath) {
+    try {
+      return resource.createRelative(childPath.toString());
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Cannot create resource " + resource
+        + childPath, e);
+    }
+  }
+
+  public static Resource getResource(final String url) {
+    try {
+      return new UrlResource(url);
+    } catch (final MalformedURLException e) {
+      throw new RuntimeException("URL not valid " + url, e);
+    }
+  }
+
+  public static Resource getResourceWithExtension(
+    final Resource resource,
     final String extension) throws IOException {
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     final String newFileName = baseName + "." + extension;
     return resource.createRelative(newFileName);
   }
 
-  public static Resource getResource(final Resource resource,
-    final CharSequence childPath) {
+  public static URL getUrl(final Resource resource) {
     try {
-      return resource.createRelative(childPath.toString());
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Cannot create resource " + resource
-        + childPath, e);
+      return resource.getURL();
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Cannot get URL for resource "
+        + resource, e);
     }
   }
 
   public static Writer getWriter(final Resource resource) {
     final OutputStream stream = getOutputStream(resource);
     return new OutputStreamWriter(stream);
-  }
-
-  public static void copy(Resource source, Resource target) {
-    InputStream in = getInputStream(source);
-    try {
-      if (target instanceof FileSystemResource) {
-        FileSystemResource fileResource = (FileSystemResource)target;
-        File file = fileResource.getFile();
-        File parent = file.getParentFile();
-        if (!parent.exists()) {
-          parent.mkdirs();
-        }
-      }
-      OutputStream out = getOutputStream(target);
-      try {
-        FileUtil.copy(in, out);
-      } finally {
-        FileUtil.closeSilent(out);
-      }
-    } finally {
-      FileUtil.closeSilent(in);
-    }
   }
 }

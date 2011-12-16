@@ -26,18 +26,22 @@ public class ShapefileZipIoFactory extends
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
   }
 
-  public DataObjectReader createDataObjectReader(Resource resource,
+  public DataObjectReader createDataObjectReader(
+    Resource resource,
     DataObjectFactory factory) {
     return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
       factory);
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
+  public Writer<DataObject> createDataObjectWriter(
+    String baseName,
+    DataObjectMetaData metaData,
+    OutputStream outputStream,
+    Charset charset) {
     File directory;
     try {
       directory = FileUtil.createTempDirectory(baseName, "zipDir");
-    } catch (IOException e) {
+    } catch (Throwable e) {
       throw new RuntimeException("Unable to create temporary directory", e);
     }
     Resource tempResource = new FileSystemResource(new File(directory, baseName
