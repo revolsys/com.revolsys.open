@@ -8,8 +8,6 @@ import java.net.URLStreamHandler;
 
 import org.springframework.core.io.Resource;
 
-import sun.net.www.ParseUtil;
-
 public class MavenUrlStreamHandler extends URLStreamHandler {
 
   private MavenRepository mavenRepository;
@@ -37,7 +35,7 @@ public class MavenUrlStreamHandler extends URLStreamHandler {
           String entryName = "/";
 
           if (++separator != file.length()) {
-            entryName = file.substring(separator, file.length());
+            entryName = file.substring(separator-1, file.length());
           }
           String jarUrl = "jar:" + resourceUrl + "!" + entryName;
           return new URL(jarUrl).openConnection();

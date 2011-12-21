@@ -26,6 +26,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -66,21 +69,6 @@ public final class FileUtil {
     try {
       in.close();
     } catch (final IOException e) {
-    }
-
-  }
-
-  public static File getFile(Resource resource) throws IOException {
-    if (resource instanceof FileSystemResource) {
-      FileSystemResource fileResource = (FileSystemResource)resource;
-      return fileResource.getFile();
-    } else {
-      String fileName = resource.getFilename();
-      String ext = getFileNameExtension(fileName);
-      File file = File.createTempFile(fileName, "." + ext);
-      copy(resource.getInputStream(), file);
-      file.deleteOnExit();
-      return file;
     }
 
   }
@@ -165,6 +153,30 @@ public final class FileUtil {
     } else {
       return path.replace(UNIX_FILE_SEPARATOR, separator).replace(
         WINDOWS_FILE_SEPARATOR, separator);
+    }
+  }
+
+  public static void copy(final File src, final File dest) throws IOException {
+    if (src.isDirectory()) {
+      dest.mkdirs();
+      final File[] files = src.listFiles();
+      if (files != null) {
+        for (final File file : files) {
+          final String name = file.getName();
+          final File destFile = new File(dest, name);
+          copy(file, destFile);
+        }
+      }
+    } else {
+      final FileInputStream in = new FileInputStream(src);
+      File destFile;
+      if (dest.isDirectory()) {
+        final String name = src.getName();
+        destFile = new File(dest, name);
+      } else {
+        destFile = dest;
+      }
+      copy(in, destFile);
     }
   }
 
@@ -284,7 +296,7 @@ public final class FileUtil {
         numBytes += count;
       }
       return numBytes;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       return (Long)ExceptionUtil.throwUncheckedException(e);
     }
   }
@@ -346,8 +358,16 @@ public final class FileUtil {
       }
       file.deleteOnExit();
       return file;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  public static File createTempFile(final String prefix, final String suffix) {
+    try {
+      return File.createTempFile(prefix, suffix);
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -398,6 +418,26 @@ public final class FileUtil {
       }
     }
     return deleted;
+  }
+
+  public static void deleteDirectory(
+    final File directory,
+    final FilenameFilter filter) {
+    final File[] files = directory.listFiles();
+    if (files != null) {
+      for (int i = 0; i < files.length; i++) {
+        final File file = files[i];
+        if (file.exists() && filter.accept(directory, file.getName())) {
+          if (file.isDirectory()) {
+            deleteDirectory(file, true);
+          } else {
+            if (!file.delete() && file.exists()) {
+              LOG.error("Cannot delete file: " + getCanonicalPath(file));
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -469,6 +509,21 @@ public final class FileUtil {
     }
   }
 
+  public static File getFile(final Resource resource) throws IOException {
+    if (resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)resource;
+      return fileResource.getFile();
+    } else {
+      final String fileName = resource.getFilename();
+      final String ext = getFileNameExtension(fileName);
+      final File file = File.createTempFile(fileName, "." + ext);
+      copy(resource.getInputStream(), file);
+      file.deleteOnExit();
+      return file;
+    }
+
+  }
+
   public static String getFileName(final String fileName) {
     int slashIndex = fileName.lastIndexOf('/');
     if (slashIndex != -1) {
@@ -536,59 +591,18 @@ public final class FileUtil {
     return filePath;
   }
 
+  public static URL toUrl(final File file) {
+    try {
+      return file.toURI().toURL();
+    } catch (final MalformedURLException e) {
+      throw new IllegalArgumentException("Cannot get file url " + file, e);
+    }
+  }
+
   /**
    * Construct a new FileUtil.
    */
   private FileUtil() {
   }
 
-  public static void copy(File src, File dest) throws IOException {
-    if (src.isDirectory()) {
-      dest.mkdirs();
-      File[] files = src.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          String name = file.getName();
-          File destFile = new File(dest, name);
-          copy(file, destFile);
-        }
-      }
-    } else {
-      FileInputStream in = new FileInputStream(src);
-      File destFile;
-      if (dest.isDirectory()) {
-        String name = src.getName();
-        destFile = new File(dest, name);
-      } else {
-        destFile = dest;
-      }
-      copy(in, destFile);
-    }
-  }
-
-  public static void deleteDirectory(File directory, FilenameFilter filter) {
-    final File[] files = directory.listFiles();
-    if (files != null) {
-      for (int i = 0; i < files.length; i++) {
-        final File file = files[i];
-        if (file.exists() && filter.accept(directory, file.getName())) {
-          if (file.isDirectory()) {
-            deleteDirectory(file, true);
-          } else {
-            if (!file.delete() && file.exists()) {
-              LOG.error("Cannot delete file: " + getCanonicalPath(file));
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public static File createTempFile(String prefix, String suffix) {
-    try {
-      return File.createTempFile(prefix, suffix);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 }

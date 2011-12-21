@@ -15,6 +15,8 @@
  */
 package com.revolsys.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -88,6 +90,17 @@ public final class UrlUtil {
     }
   }
 
+  public static String getParentString(final URL url) {
+    final String urlString = url.toString();
+    final int index = urlString.lastIndexOf('/');
+    if (index != -1) {
+      final String parentPath = urlString.substring(0, index);
+      return parentPath;
+    } else {
+      return urlString;
+    }
+  }
+
   /**
    * Create a new URL from the baseUrl with the additional query string
    * parameters.
@@ -96,7 +109,8 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(final Object baseUrl,
+  public static String getUrl(
+    final Object baseUrl,
     final Map<String, ? extends Object> parameters) {
     return getUrl(baseUrl.toString(), parameters);
   }
@@ -117,7 +131,8 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(final String baseUrl,
+  public static String getUrl(
+    final String baseUrl,
     final Map<String, ? extends Object> parameters) {
     final StringBuffer query = new StringBuffer();
     if (parameters != null) {
@@ -188,7 +203,8 @@ public final class UrlUtil {
     return params;
   }
 
-  public static void parseMatrixParams(final String matrixParams,
+  public static void parseMatrixParams(
+    final String matrixParams,
     final Map<String, String> params) {
     for (final String param : matrixParams.split(";")) {
       final String[] paramParts = param.split("=");
@@ -206,5 +222,18 @@ public final class UrlUtil {
    * Construct a new UrlUtil.
    */
   private UrlUtil() {
+  }
+
+  public static InputStream getInputStream(URL url) {
+    try {
+      return url.openStream();
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Cannot open stream for: " + url, e);
+    }
+  }
+
+  public static InputStream getInputStream(String urlString) {
+    URL url = getUrl(urlString);
+    return getInputStream(url);
   }
 }

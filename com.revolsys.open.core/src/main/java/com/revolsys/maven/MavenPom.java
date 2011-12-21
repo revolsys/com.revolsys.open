@@ -25,7 +25,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     return mavenRepository.createClassLoader(getMavenId());
   }
 
-  public ClassLoader createClassLoader(Set<String> exclusionIds) {
+  public ClassLoader createClassLoader(Collection<String> exclusionIds) {
     String id = getMavenId();
     return mavenRepository.createClassLoader(id, exclusionIds);
   }

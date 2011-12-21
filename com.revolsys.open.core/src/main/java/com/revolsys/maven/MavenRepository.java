@@ -79,12 +79,12 @@ public class MavenRepository implements URLStreamHandlerFactory {
     }
   }
 
-  public ClassLoader createClassLoader(final String id) {
+  public URLClassLoader createClassLoader(final String id) {
     final Set<String> exclusionIds = Collections.emptySet();
     return createClassLoader(id, exclusionIds);
   }
 
-  public ClassLoader createClassLoader(
+  public URLClassLoader createClassLoader(
     final String id,
     final Collection<String> exclusionIds) {
     final MavenPom pom = getPom(id);
@@ -136,8 +136,10 @@ public class MavenRepository implements URLStreamHandlerFactory {
     String version;
     if (parts.length == 5) {
       version = parts[3];
-    } else {
+    } else if (parts.length == 6) {
       version = parts[4];
+    } else {
+      version = parts[2];
     }
 
     return getPom(groupId, artifactId, version);
