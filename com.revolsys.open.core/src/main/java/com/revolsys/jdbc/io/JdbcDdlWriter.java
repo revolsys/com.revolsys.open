@@ -37,8 +37,13 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.close();
   }
 
-  public void writeGrant(QName typeName, String username, boolean select,
-    boolean insert, boolean update, boolean delete) {
+  public void writeGrant(
+    QName typeName,
+    String username,
+    boolean select,
+    boolean insert,
+    boolean update,
+    boolean delete) {
 
     out.print("GRANT ");
     List<String> perms = new ArrayList<String>();
@@ -109,8 +114,10 @@ public abstract class JdbcDdlWriter implements Cloneable {
     }
   }
 
-  public void writeAddForeignKeyConstraint(final DataObjectMetaData metaData,
-    final String attributeName, final DataObjectMetaData referencedMetaData) {
+  public void writeAddForeignKeyConstraint(
+    final DataObjectMetaData metaData,
+    final String attributeName,
+    final DataObjectMetaData referencedMetaData) {
     final QName typeName = metaData.getName();
     final QName referencedTypeName = referencedMetaData.getName();
     final String referencedAttributeName = referencedMetaData.getIdAttributeName();
@@ -120,8 +127,10 @@ public abstract class JdbcDdlWriter implements Cloneable {
       referencedTypeName, referencedAttributeName);
   }
 
-  public void writeAddForeignKeyConstraint(final DataObjectMetaData metaData,
-    final String attributeName, final String referenceTablePrefix,
+  public void writeAddForeignKeyConstraint(
+    final DataObjectMetaData metaData,
+    final String attributeName,
+    final String referenceTablePrefix,
     final DataObjectMetaData referencedMetaData) {
     final QName typeName = metaData.getName();
     final QName referencedTypeName = referencedMetaData.getName();
@@ -132,9 +141,12 @@ public abstract class JdbcDdlWriter implements Cloneable {
       referencedTypeName, referencedAttributeName);
   }
 
-  public void writeAddForeignKeyConstraint(final QName typeName,
-    final String constraintName, final String attributeName,
-    final QName referencedTypeName, final String referencedAttributeName) {
+  public void writeAddForeignKeyConstraint(
+    final QName typeName,
+    final String constraintName,
+    final String attributeName,
+    final QName referencedTypeName,
+    final String referencedAttributeName) {
     out.print("ALTER TABLE ");
     writeTableName(typeName);
     out.print(" ADD CONSTRAINT ");
@@ -157,8 +169,10 @@ public abstract class JdbcDdlWriter implements Cloneable {
     }
   }
 
-  public void writeAddPrimaryKeyConstraint(final QName typeName,
-    final String constraintName, final String columnName) {
+  public void writeAddPrimaryKeyConstraint(
+    final QName typeName,
+    final String constraintName,
+    final String columnName) {
     out.print("ALTER TABLE ");
     writeTableName(typeName);
     out.print(" ADD CONSTRAINT ");
@@ -182,11 +196,19 @@ public abstract class JdbcDdlWriter implements Cloneable {
   public String getSequenceName(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String schema = typeName.getNamespaceURI().toLowerCase();
-    final String tableName = typeName.getLocalPart().toLowerCase();
-    final String idAttributeName = metaData.getIdAttributeName().toLowerCase();
-    final String sequenceName = schema + "." + tableName + "_"
-      + idAttributeName + "_seq";
-    return sequenceName;
+    String shortName = ShortNameProperty.getShortName(metaData);
+    if (StringUtils.hasText(shortName)) {
+      final String sequenceName = schema + "." + shortName.toLowerCase()
+        + "_seq";
+      return sequenceName;
+    } else {
+      final String tableName = typeName.getLocalPart().toLowerCase();
+      final String idAttributeName = metaData.getIdAttributeName()
+        .toLowerCase();
+      final String sequenceName = schema + "." + tableName + "_"
+        + idAttributeName + "_seq";
+      return sequenceName;
+    }
   }
 
   public void writeCreateSequence(final String sequenceName) {
@@ -195,7 +217,9 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.println(";");
   }
 
-  public void writeCreateView(final QName typeName, QName queryTypeName,
+  public void writeCreateView(
+    final QName typeName,
+    QName queryTypeName,
     List<String> columnNames) {
     out.println();
     out.print("CREATE VIEW ");
@@ -303,7 +327,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.print(tableName);
   }
 
-  public void writeResetSequence(DataObjectMetaData metaData,
+  public void writeResetSequence(
+    DataObjectMetaData metaData,
     List<DataObject> values) {
     throw new UnsupportedOperationException();
   }

@@ -1,22 +1,18 @@
 package com.revolsys.gis.data.model;
 
-
 public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
   static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
 
-  private static ShortNameProperty getProperty(
-    final DataObject object) {
+  private static ShortNameProperty getProperty(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     return getProperty(metaData);
   }
 
-  private static ShortNameProperty getProperty(
-    final DataObjectMetaData metaData) {
+  private static ShortNameProperty getProperty(final DataObjectMetaData metaData) {
     return metaData.getProperty(PROPERTY_NAME);
   }
 
-  public static String getShortName(
-    final DataObject object) {
+  public static String getShortName(final DataObject object) {
     final ShortNameProperty property = getProperty(object);
     if (property == null) {
       return null;
@@ -25,8 +21,7 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  public static String getShortName(
-    final DataObjectMetaData metaData) {
+  public static String getShortName(final DataObjectMetaData metaData) {
     final ShortNameProperty property = getProperty(metaData);
     if (property == null) {
       return null;
@@ -40,8 +35,7 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
   public ShortNameProperty() {
   }
 
-  public ShortNameProperty(
-    final String shortName) {
+  public ShortNameProperty(final String shortName) {
     this.shortName = shortName;
   }
 
@@ -58,8 +52,12 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
     return shortName;
   }
 
-  public void setShortName(
-    final String shortName) {
+  public void setShortName(final String shortName) {
     this.shortName = shortName;
+  }
+
+  @Override
+  public String toString() {
+    return shortName;
   }
 }

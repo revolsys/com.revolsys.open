@@ -45,11 +45,19 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   public String getSequenceName(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String schema = getDatabaseSchemaName(typeName.getNamespaceURI());
-    final String tableName = getDatabaseTableName(typeName);
-    final String idAttributeName = metaData.getIdAttributeName().toLowerCase();
-    final String sequenceName = schema + "." + tableName + "_"
-      + idAttributeName + "_seq";
-    return sequenceName;
+    String shortName = ShortNameProperty.getShortName(metaData);
+    if (StringUtils.hasText(shortName)) {
+      final String sequenceName = schema + "." + shortName.toLowerCase()
+        + "_seq";
+      return sequenceName;
+    } else {
+      final String tableName = getDatabaseTableName(typeName);
+      final String idAttributeName = metaData.getIdAttributeName()
+        .toLowerCase();
+      final String sequenceName = schema + "." + tableName + "_"
+        + idAttributeName + "_seq";
+      return sequenceName;
+    }
   }
 
   public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
@@ -119,7 +127,8 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     addAttributeAdder("geometry", geometryAttributeAdder);
   }
 
-  public Query createBoundingBoxQuery(final Query query,
+  public Query createBoundingBoxQuery(
+    final Query query,
     final BoundingBox boundingBox) {
     Query boundingBoxQuery = query.clone();
     final QName typeName = boundingBoxQuery.getTypeName();
@@ -134,12 +143,10 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       String whereClause = boundingBoxQuery.getWhereClause();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       if (StringUtils.hasText(whereClause)) {
-        whereClause = "(" + whereClause + ") AND " +
-        		geometryAttributeName +
-        		" && ?";
+        whereClause = "(" + whereClause + ") AND " + geometryAttributeName
+          + " && ?";
       } else {
-        whereClause = geometryAttributeName +
-        		" && ?";
+        whereClause = geometryAttributeName + " && ?";
       }
       boundingBoxQuery.setWhereClause(whereClause);
       final PGbox box = new PGbox(x1, y1, x2, y2);
