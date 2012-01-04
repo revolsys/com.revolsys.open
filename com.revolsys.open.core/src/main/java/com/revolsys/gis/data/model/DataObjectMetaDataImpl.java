@@ -29,13 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.WeakUuidObjectMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -63,7 +63,9 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
 
-  private final UUID uuid = UUID.randomUUID();
+  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
+
+  private final int instanceId = INSTANCE_IDS.getAndIncrement();
 
   private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
@@ -87,7 +89,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
     this(metaData.getName(), metaData.getProperties(), metaData.getAttributes());
     setIdAttributeIndex(metaData.getIdAttributeIndex());
-    WeakUuidObjectMap.putObject(uuid, this);
+    METADATA_CACHE.put(instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
@@ -96,7 +98,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
-    WeakUuidObjectMap.putObject(uuid, this);
+    METADATA_CACHE.put(instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
@@ -105,12 +107,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
-    WeakUuidObjectMap.putObject(uuid, this);
+    METADATA_CACHE.put(instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final QName name) {
     this.name = name;
-    WeakUuidObjectMap.putObject(uuid, this);
+    METADATA_CACHE.put(instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final QName name, final Attribute... attributes) {
@@ -134,7 +136,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
       addAttribute(attribute.clone());
     }
     cloneProperties(properties);
-    WeakUuidObjectMap.putObject(uuid, this);
+    METADATA_CACHE.put(instanceId, this);
   }
 
   public void addAttribute(final Attribute attribute) {
@@ -167,34 +169,45 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     attribute.setIndex(index);
   }
 
-  public Attribute addAttribute(final String name, final DataType type,
+  public Attribute addAttribute(
+    final String name,
+    final DataType type,
     final boolean required) {
     final Attribute attribute = new Attribute(name, type, required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public Attribute addAttribute(final String name, final DataType type,
-    final int length, final boolean required) {
+  public Attribute addAttribute(
+    final String name,
+    final DataType type,
+    final int length,
+    final boolean required) {
     final Attribute attribute = new Attribute(name, type, length, required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public Attribute addAttribute(final String name, final DataType type,
-    final int length, final int scale, final boolean required) {
+  public Attribute addAttribute(
+    final String name,
+    final DataType type,
+    final int length,
+    final int scale,
+    final boolean required) {
     final Attribute attribute = new Attribute(name, type, length, scale,
       required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public void addDefaultValue(final String attributeName,
+  public void addDefaultValue(
+    final String attributeName,
     final Object defaultValue) {
     defaultValues.put(attributeName, defaultValue);
   }
 
-  public void addRestriction(final String attributePath,
+  public void addRestriction(
+    final String attributePath,
     final Collection<Object> values) {
     restrictions.put(attributePath, values);
   }
@@ -426,8 +439,8 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return schema;
   }
 
-  public UUID getUuid() {
-    return uuid;
+  public int getInstanceId() {
+    return instanceId;
   }
 
   public boolean hasAttribute(final CharSequence name) {
@@ -460,13 +473,16 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return false;
   }
 
+  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
+
   private void readObject(final ObjectInputStream ois)
     throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
-    WeakUuidObjectMap.putObject(uuid, this);
+    METADATA_CACHE.put(instanceId, this);
   }
 
-  public void replaceAttribute(final Attribute attribute,
+  public void replaceAttribute(
+    final Attribute attribute,
     final Attribute newAttribute) {
     final String name = attribute.getName();
     final String lowerName = name.toLowerCase();
@@ -546,5 +562,9 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   @Override
   public String toString() {
     return name.toString();
+  }
+
+  public static DataObjectMetaData getMetaData(int instanceId) {
+    return METADATA_CACHE.get(instanceId);
   }
 }

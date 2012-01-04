@@ -173,7 +173,7 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    */
   QName getName();
 
-  UUID getUuid();
+  int getInstanceId();
 
   /**
    * Check to see if the type has the specified attribute name.

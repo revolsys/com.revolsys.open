@@ -33,6 +33,8 @@ public interface Page extends Comparable<Page> {
 
   void writeBytes(byte[] bytes);
 
+  void writeBytes(byte[] bytes, int offset, int count);
+
   void writeDouble(double d);
 
   void writeFloat(float f);

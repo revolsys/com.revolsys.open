@@ -18,7 +18,7 @@ public class FilePageManager implements PageManager {
 
   private WeakHashMap<Integer, Page> pages = new WeakHashMap<Integer, Page>();
 
-  private Set<Page> freePages = new TreeSet<Page>();
+  private Set<Integer> freePageIndexes = new TreeSet<Integer>();
 
   public FilePageManager() {
     this(FileUtil.createTempFile("pages", ".pf"));
@@ -33,8 +33,12 @@ public class FilePageManager implements PageManager {
     }
   }
 
-  public void freePage(Page page) {
-    freePages.add(page);
+  public void removePage(Page page) {
+    synchronized (pages) {
+      page.clear();
+      page.flush();
+      freePageIndexes.add(page.getIndex());
+    }
   }
 
   public int getPageSize() {
@@ -42,39 +46,50 @@ public class FilePageManager implements PageManager {
   }
 
   public Page createPage() {
-    if (freePages.isEmpty()) {
-      try {
-        int index = (int)(randomAccessFile.length() / pageSize);
-        Page page = new ByteArrayPage(this, index, pageSize);
-        pages.put(page.getIndex(), page);
-        write(page);
-        return page;
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+    synchronized (pages) {
+      if (freePageIndexes.isEmpty()) {
+        try {
+          int index = (int)(randomAccessFile.length() / pageSize);
+          Page page = new ByteArrayPage(this, index, pageSize);
+          pages.put(page.getIndex(), page);
+          write(page);
+          return page;
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        final Iterator<Integer> iterator = freePageIndexes.iterator();
+        Integer pageIndex = iterator.next();
+        iterator.remove();
+        return loadPage(pageIndex);
       }
-    } else {
-      final Iterator<Page> iterator = freePages.iterator();
-      Page page = iterator.next();
-      iterator.remove();
-      return page;
     }
   }
 
   public Page getPage(int index) {
     synchronized (pages) {
-      try {
+      if (freePageIndexes.contains(index)) {
+        throw new IllegalArgumentException("Page does not exist " + index);
+      } else {
         Page page = pages.get(index);
         if (page == null) {
-          page = new ByteArrayPage(this, index, pageSize);
-          randomAccessFile.seek(index * pageSize);
-          final byte[] content = page.getContent();
-          randomAccessFile.read(content);
-          pages.put(index, page);
+          page = loadPage(index);
         }
         return page;
-      } catch (IOException e) {
-        throw new RuntimeException(e);
       }
+    }
+  }
+
+  private Page loadPage(int index) {
+    try {
+      Page page = new ByteArrayPage(this, index, pageSize);
+      randomAccessFile.seek(index * pageSize);
+      final byte[] content = page.getContent();
+      randomAccessFile.read(content);
+      pages.put(index, page);
+      return page;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -87,17 +102,19 @@ public class FilePageManager implements PageManager {
   }
 
   public void write(Page page) {
-    if (page.getPageManager() == this) {
-      synchronized (randomAccessFile) {
-        try {
-          final int index = page.getIndex();
-          if (index >= 0) {
-            randomAccessFile.seek(index * pageSize);
-            final byte[] content = page.getContent();
-            randomAccessFile.write(content);
+    synchronized (pages) {
+      if (page.getPageManager() == this) {
+        synchronized (randomAccessFile) {
+          try {
+            final int index = page.getIndex();
+            if (index >= 0) {
+              randomAccessFile.seek(index * pageSize);
+              final byte[] content = page.getContent();
+              randomAccessFile.write(content);
+            }
+          } catch (IOException e) {
+            throw new RuntimeException(e);
           }
-        } catch (IOException e) {
-          throw new RuntimeException(e);
         }
       }
     }

@@ -35,13 +35,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.collection.WeakUuidObjectMap;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
@@ -350,8 +348,8 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   private void readObject(final ObjectInputStream ois)
     throws ClassNotFoundException, IOException {
-    final UUID metaDataUuid = (UUID)ois.readObject();
-    metaData = WeakUuidObjectMap.getObject(metaDataUuid);
+    final int metaDataInstanceId = ois.readInt();
+    metaData = DataObjectMetaDataImpl.getMetaData(metaDataInstanceId);
     ois.defaultReadObject();
   }
 
@@ -549,7 +547,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   }
 
   private void writeObject(final ObjectOutputStream oos) throws IOException {
-    oos.writeObject(metaData.getUuid());
+    oos.writeInt(metaData.getInstanceId());
     oos.defaultWriteObject();
   }
 }

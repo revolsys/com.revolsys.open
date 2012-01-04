@@ -35,11 +35,16 @@ public class MemoryPageManager implements PageManager {
   }
 
   public Page getPage(int index) {
-    return pages.get(index);
+    Page page = pages.get(index);
+    if (freePages.contains(page)) {
+      throw new IllegalArgumentException("Page does not exist " + index);
+    } else {
+      return page;
+    }
   }
 
   public int getNumPages() {
-    return pages.size();
+    return pages.size() - freePages.size();
   }
 
   public Page createTempPage() {
@@ -47,5 +52,9 @@ public class MemoryPageManager implements PageManager {
   }
 
   public void write(Page page) {
+  }
+
+  public void removePage(Page page) {
+    freePages.add(page);
   }
 }

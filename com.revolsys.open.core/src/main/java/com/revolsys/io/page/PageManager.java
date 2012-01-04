@@ -13,4 +13,6 @@ public interface PageManager {
   Page createTempPage();
 
   void write(Page page);
+
+  void removePage(Page dataPage);
 }
