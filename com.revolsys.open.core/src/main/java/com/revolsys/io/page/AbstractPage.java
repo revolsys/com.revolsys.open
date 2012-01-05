@@ -127,6 +127,12 @@ public abstract class AbstractPage implements Page {
     return bytes;
   }
 
+  public byte[] readBytes(byte[] bytes, int offset, int count) {
+    System.arraycopy(getContent(), getOffset(), bytes, offset, count);
+    setOffset(getOffset() + count);
+    return bytes;
+  }
+
   public void writeByte(final byte b) {
     if (getOffset() > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
@@ -145,7 +151,7 @@ public abstract class AbstractPage implements Page {
 
   public void writeBytes(final byte[] bytes, int offset, int count) {
     for (int i = 0; i < count; i++) {
-      final int b = bytes[offset+i];
+      final int b = bytes[offset + i];
       writeByte(b);
     }
   }

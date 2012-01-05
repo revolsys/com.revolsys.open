@@ -15,6 +15,8 @@ public interface Page extends Comparable<Page> {
 
   byte[] readBytes(int size);
 
+  byte[] readBytes(byte[] bytes, int offset, int count);
+
   double readDouble();
 
   float readFloat();

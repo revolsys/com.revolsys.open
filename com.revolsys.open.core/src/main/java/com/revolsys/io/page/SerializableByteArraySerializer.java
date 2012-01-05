@@ -9,7 +9,7 @@ import com.revolsys.util.ExceptionUtil;
 
 public class SerializableByteArraySerializer<T> implements PageValueManager<T> {
   @SuppressWarnings("unchecked")
-  public <V extends T> V readFromByteArray(final byte[] bytes) {
+  public <V extends T> V getValue(final byte[] bytes) {
     try {
       final ByteArrayInputStream bIn = new ByteArrayInputStream(bytes);
       final ObjectInputStream in = new ObjectInputStream(bIn);
@@ -19,15 +19,19 @@ public class SerializableByteArraySerializer<T> implements PageValueManager<T> {
     }
   }
 
+  public byte[] getBytes(Page page) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  
   public <V extends T> V readFromPage(final Page page) {
-    throw new UnsupportedOperationException();
-  }
+    byte[] bytes = getBytes(page);
+    return getValue(bytes);
+ }
 
-  public <V extends T> V removeFromPage(final Page page) {
-    return readFromPage(page);
-  }
 
-  public byte[] writeToByteArray(final T value) {
+  public byte[] getBytes(final T value) {
     try {
       final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
       final ObjectOutputStream out = new ObjectOutputStream(bOut);
@@ -38,5 +42,6 @@ public class SerializableByteArraySerializer<T> implements PageValueManager<T> {
       return (byte[])ExceptionUtil.throwUncheckedException(e);
     }
   }
+
 
 }

@@ -28,37 +28,33 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   public static MethodPageValueManager<String> STRING = new MethodPageValueManager<String>(
     "String");
 
-  public static Byte readByteFromByteArray(final byte[] bytes) {
+  public static Byte getByteValue(final byte[] bytes) {
     return bytes[0];
   }
 
-  public static Byte readByteFromPage(final Page page) {
-    return page.readByte();
+  public static byte[] getByteBytes(final Page page) {
+    return page.readBytes(1);
   }
 
-  public static Double readDoubleFromByteArray(final byte[] bytes) {
-    final long l = readLongFromByteArray(bytes);
+  public static Double getDoubleValue(final byte[] bytes) {
+    final long l = getLongValue(bytes);
     return Double.longBitsToDouble(l);
   }
 
-  public <V extends T> V removeFromPage(Page page) {
-    return readFromPage(page);
+  public static byte[] getDoubleBytes(final Page page) {
+    return page.readBytes(8);
   }
 
-  public static Double readDoubleFromPage(final Page page) {
-    return page.readDouble();
-  }
-
-  public static Float readFloatFromByteArray(final byte[] bytes) {
-    final int i = readIntFromByteArray(bytes);
+  public static Float getFloatValue(final byte[] bytes) {
+    final int i = getIntValue(bytes);
     return Float.intBitsToFloat(i);
   }
 
-  public static Float readFloatFromPage(final Page page) {
-    return page.readFloat();
+  public static byte[] getFloatBytes(final Page page) {
+    return page.readBytes(4);
   }
 
-  public static Integer readIntFromByteArray(final byte[] bytes) {
+  public static Integer getIntValue(final byte[] bytes) {
     final int b1 = bytes[0] & 0xFF;
     final int b2 = bytes[1] & 0xFF;
     final int b3 = bytes[2] & 0xFF;
@@ -66,11 +62,11 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     return (b1 << 24) + (b2 << 16) + (b3 << 8) + (b4 << 0);
   }
 
-  public static Integer readIntFromPage(final Page page) {
-    return page.readInt();
+  public static byte[] getIntBytes(final Page page) {
+    return page.readBytes(4);
   }
 
-  public static Long readLongFromByteArray(final byte[] bytes) {
+  public static Long getLongValue(final byte[] bytes) {
     final int b1 = bytes[0] & 0xFF;
     final int b2 = bytes[1] & 0xFF;
     final int b3 = bytes[2] & 0xFF;
@@ -84,50 +80,53 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
       + ((long)(b5 & 255) << 24) + ((b6 & 255) << 16) + ((b7 & 255) << 8) + ((b8 & 255) << 0));
   }
 
-  public static Long readLongFromPage(final Page page) {
-    return page.readLong();
+  public static byte[] getLongBytes(final Page page) {
+    return page.readBytes(8);
   }
 
-  public static Short readShortFromByteArray(final byte[] bytes) {
+  public static Short getShortValue(final byte[] bytes) {
     final int b1 = bytes[0] & 0xFF;
     final int b2 = bytes[1] & 0xFF;
     return (short)((b1 << 8) + (b2 << 0));
   }
 
-  public static Short readShortFromPage(final Page page) {
-    return page.readShort();
+  public static byte[] getShortBytes(final Page page) {
+    return page.readBytes(2);
   }
 
-  public static String readStringFromByteArray(final byte[] bytes) {
-    final int size = readIntFromByteArray(bytes);
+  public static String getStringValue(final byte[] bytes) {
+    final int size = getIntValue(bytes);
     final byte[] stringBytes = new byte[size];
     System.arraycopy(bytes, 4, stringBytes, 0, size);
     return new String(stringBytes, Charset.forName("UTF-8"));
   }
 
-  public static String readStringFromPage(final Page page) {
-    final int size = page.readInt();
-    final byte[] bytes = page.readBytes(size);
-    return new String(bytes, Charset.forName("UTF-8"));
+  public static byte[] getStringBytes(final Page page) {
+    byte[] bytes = getIntBytes(page);
+    final int size = getIntValue(bytes);
+    final byte[] stringBytes = new byte[size + 4];
+    System.arraycopy(bytes, 0, stringBytes, 0, 4);
+    page.readBytes(stringBytes, 4, size);
+    return stringBytes;
   }
 
-  public static byte[] writeByteToByteArray(final Byte b) {
+  public static byte[] getValueByteBytes(final Byte b) {
     return new byte[] {
       b
     };
   }
 
-  public static byte[] writeDoubleToByteArray(final Double d) {
+  public static byte[] getValueDoubleBytes(final Double d) {
     final long l = Double.doubleToLongBits(d);
-    return writeLongToByteArray(l);
+    return getValueLongBytes(l);
   }
 
-  public static byte[] writeFloatToByteArray(final Float f) {
+  public static byte[] getValueFloatBytes(final Float f) {
     final int i = Float.floatToIntBits(f);
-    return writeIntToByteArray(i);
+    return getValueIntBytes(i);
   }
 
-  public static byte[] writeIntToByteArray(final Integer i) {
+  public static byte[] getValueIntBytes(final Integer i) {
     final byte b1 = (byte)((i >>> 24) & 0xFF);
     final byte b2 = (byte)((i >>> 16) & 0xFF);
     final byte b3 = (byte)((i >>> 8) & 0xFF);
@@ -137,7 +136,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     };
   }
 
-  public static byte[] writeLongToByteArray(final Long l) {
+  public static byte[] getValueLongBytes(final Long l) {
     final byte b1 = (byte)(l >>> 56);
     final byte b2 = (byte)(l >>> 48);
     final byte b3 = (byte)(l >>> 40);
@@ -151,7 +150,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     };
   }
 
-  public static byte[] writeShortToByteArray(final Short s) {
+  public static byte[] getValueShortBytes(final Short s) {
     final byte b1 = (byte)((s >>> 8) & 0xFF);
     final byte b2 = (byte)((s >>> 0) & 0xFF);
     return new byte[] {
@@ -159,10 +158,10 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     };
   }
 
-  public static byte[] writeStringToByteArray(final String s) {
+  public static byte[] getValueStringBytes(final String s) {
     final byte[] stringBytes = s.getBytes(Charset.forName("UTF-8"));
     final int size = stringBytes.length;
-    final byte[] sizeBytes = writeIntToByteArray(size);
+    final byte[] sizeBytes = getValueIntBytes(size);
     final byte[] bytes = new byte[stringBytes.length + sizeBytes.length];
     System.arraycopy(sizeBytes, 0, bytes, 0, sizeBytes.length);
     System.arraycopy(stringBytes, 0, bytes, sizeBytes.length,
@@ -170,11 +169,11 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     return bytes;
   }
 
-  private Method byteArrayReadMethod;
+  private Method getValueMethod;
 
   private Method byteArrayWriteMethod;
 
-  private Method pageReadMethod;
+  private Method getBytesMethod;
 
   private String typeName;
 
@@ -182,8 +181,8 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   }
 
   protected MethodPageValueManager(final String typeName) {
-    this(typeName, "write" + typeName + "ToByteArray", "read" + typeName
-      + "FromByteArray", "read" + typeName + "FromPage");
+    this(typeName, "getValue" + typeName + "Bytes", "get" + typeName
+      + "Value", "get" + typeName + "Bytes");
   }
 
   protected MethodPageValueManager(final String typeName,
@@ -194,10 +193,10 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
         byteArrayWriteMethod = method;
       }
       if (method.getName().equals(byteArrayReadMethodName)) {
-        byteArrayReadMethod = method;
+        getValueMethod = method;
       }
       if (method.getName().equals(pageReadMethodName)) {
-        pageReadMethod = method;
+        getBytesMethod = method;
       }
     }
     this.typeName = typeName;
@@ -205,13 +204,17 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends T> V readFromByteArray(final byte[] bytes) {
-    return (V)JavaBeanUtil.invokeMethod(byteArrayReadMethod, getClass(), bytes);
+  public <V extends T> V getValue(final byte[] bytes) {
+    return (V)JavaBeanUtil.invokeMethod(getValueMethod, getClass(), bytes);
   }
 
-  @SuppressWarnings("unchecked")
+  public byte[] getBytes(Page page) {
+    return (byte[])JavaBeanUtil.invokeMethod(getBytesMethod, getClass(), page);
+  }
+
   public <V extends T> V readFromPage(final Page page) {
-    return (V)JavaBeanUtil.invokeMethod(pageReadMethod, getClass(), page);
+    byte[] bytes = getBytes(page);
+    return getValue(bytes);
   }
 
   @Override
@@ -219,7 +222,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     return typeName;
   }
 
-  public byte[] writeToByteArray(final T value) {
+  public byte[] getBytes(final T value) {
     return JavaBeanUtil.invokeMethod(byteArrayWriteMethod, getClass(), value);
   }
 }

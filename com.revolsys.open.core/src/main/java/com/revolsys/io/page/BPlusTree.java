@@ -2,12 +2,27 @@ package com.revolsys.io.page;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class BPlusTree<K, V> extends AbstractMap<K, V> {
+  private class PutResult {
+    private V oldValue;
+
+    private byte[] newKeyBytes;
+
+    private byte[] newPageIndexBytes;
+
+    public void clear() {
+      newKeyBytes = null;
+      newPageIndexBytes = null;
+    }
+
+    public boolean wasSplit() {
+      return newKeyBytes != null;
+    }
+  }
+
   public static final byte INTERIOR = 0;
 
   public static final byte LEAF = 1;
@@ -54,8 +69,6 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
 
   private final int minSize;
 
-  private final PageValueManager<Integer> pageIndexManager = MethodPageValueManager.INT;
-
   private final PageManager pages;
 
   private final int rootPageIndex = 0;
@@ -74,6 +87,12 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
     }
   }
 
+  @Override
+  public Set<Entry<K, V>> entrySet() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   protected V get(final int pageIndex, final K key) {
     final Page page = pages.getPage(pageIndex);
     page.setOffset(0);
@@ -87,34 +106,20 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
     }
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
   public V get(final Object key) {
     return get(rootPageIndex, (K)key);
-  }
-
-  private K getFirstKey(final Page page) {
-    page.setOffset(0);
-    final int pageType = page.readByte();
-    skipHeader(page);
-    if (pageType == INTERIOR) {
-      // skip pointer
-      readPageIndex(page);
-      final K firstKey = keyManager.readFromPage(page);
-      return firstKey;
-    } else if (pageType == LEAF) {
-      final K firstKey = keyManager.readFromPage(page);
-      return firstKey;
-    } else {
-      throw new IllegalArgumentException("Unknown page type");
-    }
   }
 
   @SuppressWarnings("unchecked")
   private V getInterior(final Page page, final K key) {
     final int numBytes = page.readShort();
-    int previousPageIndex = readPageIndex(page);
+    final int pageIndex = page.readInt();
+    int previousPageIndex = pageIndex;
     while (page.getOffset() < numBytes) {
       final K currentKey = keyManager.readFromPage(page);
-      final int nextPageIndex = readPageIndex(page);
+      final int nextPageIndex = page.readInt();
       final int compare = ((Comparable<K>)currentKey).compareTo(key);
       if (compare > 0) {
         return get(previousPageIndex, key);
@@ -151,17 +156,19 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
     final byte pageType = page.readByte();
     final int numBytes = page.readShort();
     if (pageType == INTERIOR) {
-      int childPageIndex = readPageIndex(page);
+      final int pageIndex1 = page.readInt();
+      int childPageIndex = pageIndex1;
       pageIndexes.add(childPageIndex);
       System.out.print("I");
       System.out.print(page.getIndex());
       System.out.print("\t");
       System.out.print(numBytes);
       System.out.print("\t");
-      System.out.print(pageIndex);
+      System.out.print(pageIndex1);
       while (page.getOffset() < numBytes) {
         final K value = keyManager.readFromPage(page);
-        childPageIndex = readPageIndex(page);
+        final int pageIndex2 = page.readInt();
+        childPageIndex = pageIndex2;
         pageIndexes.add(childPageIndex);
         System.out.print("<-");
         System.out.print(value);
@@ -195,23 +202,28 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
     }
   }
 
-  protected List<Page> put(final int pageIndex, final K key, final V value) {
+  protected PutResult put(
+    final int pageIndex,
+    final Integer nextPageIndex,
+    final K key,
+    final V value) {
     final Page page = pages.getPage(pageIndex);
     page.setOffset(0);
     final byte pageType = page.readByte();
     if (pageType == INTERIOR) {
       return putInterior(page, key, value);
     } else if (pageType == LEAF) {
-      return putLeaf(page, key, value);
+      return putLeaf(page, nextPageIndex, key, value);
     } else {
       throw new IllegalArgumentException("Unknown page type " + pageType);
     }
   }
 
+  @Override
   public V put(final K key, final V value) {
-    final List<Page> childPages = put(rootPageIndex, key, value);
-    if (!childPages.isEmpty()) {
-      final Page rootPage = childPages.get(0);
+    final PutResult result = put(rootPageIndex, null, key, value);
+    if (result.wasSplit()) {
+      final Page rootPage = pages.getPage(rootPageIndex);
       final Page leftPage = pages.createPage();
       leftPage.setContent(rootPage);
 
@@ -220,87 +232,125 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
       writePageHeader(rootPage, pageType);
 
       final int firstChildPageIndex = leftPage.getIndex();
-      final byte[] firstChildPageIndexBytes = pageIndexManager.writeToByteArray(firstChildPageIndex);
-      rootPage.writeBytes(firstChildPageIndexBytes);
+      rootPage.writeInt(firstChildPageIndex);
 
-      for (int i = 1; i < childPages.size(); i++) {
-        final Page childPage = childPages.get(i);
-        final K childFirstKey = getFirstKey(childPage);
-        final byte[] keyBytes = keyManager.writeToByteArray(childFirstKey);
-        rootPage.writeBytes(keyBytes);
+      final byte[] keyBytes = result.newKeyBytes;
+      rootPage.writeBytes(keyBytes);
 
-        final int childPageIndex = childPage.getIndex();
-        final byte[] childPageIndexBytes = pageIndexManager.writeToByteArray(childPageIndex);
-        rootPage.writeBytes(childPageIndexBytes);
-      }
+      rootPage.writeBytes(result.newPageIndexBytes);
       setNumBytes(rootPage);
       rootPage.flush();
     }
-    return null;
+    return result.oldValue;
   }
 
-  private void putChildInteriorPages(
-    final List<Page> childPages,
-    final List<Integer> pageIndexes,
-    final List<K> keys) {
-    for (int i = 1; i < childPages.size(); i++) {
-      final Page childPage = childPages.get(i);
-      final int childPageIndex = childPage.getIndex();
-      final K childFirstKey = getFirstKey(childPage);
-      keys.add(childFirstKey);
-      pageIndexes.add(childPageIndex);
-    }
-  }
-
-  private List<Page> putInterior(final Page page, final K key, final V value) {
-    final List<Integer> pageIndexes = new ArrayList<Integer>();
-    final List<K> keys = new ArrayList<K>();
+  private PutResult putInterior(final Page page, final K key, final V value) {
+    PutResult result = null;
+    final List<byte[]> pageIndexesBytes = new ArrayList<byte[]>();
+    final List<byte[]> keysBytes = new ArrayList<byte[]>();
     final int numBytes = page.readShort();
-    int previousPageIndex = readPageIndex(page);
-    pageIndexes.add(previousPageIndex);
+    final byte[] pageIndexBytes = MethodPageValueManager.getIntBytes(page);
+    byte[] previousPageIndexBytes = pageIndexBytes;
+    pageIndexesBytes.add(previousPageIndexBytes);
     while (page.getOffset() < numBytes) {
-      final K currentKey = keyManager.readFromPage(page);
-      keys.add(currentKey);
-      final int nextPageIndex = readPageIndex(page);
-      pageIndexes.add(nextPageIndex);
+      final byte[] currentKeyBytes = keyManager.getBytes(page);
+      final K currentKey = keyManager.getValue(currentKeyBytes);
+      final byte[] nextPageIndexBytes = MethodPageValueManager.getIntBytes(page);
+      if (result == null) {
+        @SuppressWarnings("unchecked")
+        final int compare = ((Comparable<K>)currentKey).compareTo(key);
+        if (compare > 0) {
+          final int previousPageIndex = MethodPageValueManager.getIntValue(previousPageIndexBytes);
+          final int nextPageIndex = MethodPageValueManager.getIntValue(nextPageIndexBytes);
+          result = put(previousPageIndex, nextPageIndex, key, value);
+          if (result.wasSplit()) {
+            pageIndexesBytes.add(result.newPageIndexBytes);
+            keysBytes.add(result.newKeyBytes);
+          } else {
+            return result;
+          }
+        }
+      }
+      keysBytes.add(currentKeyBytes);
+      pageIndexesBytes.add(nextPageIndexBytes);
+      previousPageIndexBytes = nextPageIndexBytes;
+    }
+    if (result == null) {
+      final int previousPageIndex = MethodPageValueManager.getIntValue(previousPageIndexBytes);
+      result = put(previousPageIndex, null, key, value);
+      if (result.wasSplit()) {
+        pageIndexesBytes.add(result.newPageIndexBytes);
+        keysBytes.add(result.newKeyBytes);
+      } else {
+        return result;
+      }
+    }
+    updateOrSplitInteriorPage(result, page, keysBytes, pageIndexesBytes);
+    return result;
+  }
+
+  private PutResult putLeaf(
+    final Page page,
+    final Integer nextPageIndex,
+    final K key,
+    final V value) {
+    final PutResult result = new PutResult();
+    final byte[] keyBytes = keyManager.getBytes(key);
+    final List<byte[]> keysBytes = new ArrayList<byte[]>();
+    final List<byte[]> valuesBytes = new ArrayList<byte[]>();
+    final byte[] valueBytes = valueManager.getBytes(value);
+
+    boolean newValueWritten = false;
+    final int numBytes = page.readShort();
+    while (page.getOffset() < numBytes) {
+      final byte[] currentKeyBytes = keyManager.getBytes(page);
+      final K currentKey = keyManager.getValue(currentKeyBytes);
+      final byte[] currentValueBytes = valueManager.getBytes(page);
       @SuppressWarnings("unchecked")
       final int compare = ((Comparable<K>)currentKey).compareTo(key);
-      if (compare > 0) {
-        final List<Page> childPages = put(previousPageIndex, key, value);
-        if (childPages.isEmpty()) {
-          return Collections.emptyList();
-        } else {
-          putChildInteriorPages(childPages, pageIndexes, keys);
 
-          // Add remaining child keys and pages indexes
-          while (page.getOffset() < numBytes) {
-            final K childKey = keyManager.readFromPage(page);
-            keys.add(childKey);
-            final int childPageIndex = readPageIndex(page);
-            pageIndexes.add(childPageIndex);
-          }
-
-          return updateOrSplitInteriorPage(page, numBytes, pageIndexes, keys);
-        }
-
+      if (compare >= 0) {
+        keysBytes.add(keyBytes);
+        valuesBytes.add(valueBytes);
+        newValueWritten = true;
       }
-      previousPageIndex = nextPageIndex;
+      if (compare == 0) {
+        result.oldValue = valueManager.getValue(currentValueBytes);
+      } else {
+        keysBytes.add(currentKeyBytes);
+        valuesBytes.add(currentValueBytes);
+      }
+
     }
-    final List<Page> childPages = put(previousPageIndex, key, value);
-    if (childPages.isEmpty()) {
-      return Collections.emptyList();
+    if (!newValueWritten) {
+      keysBytes.add(keyBytes);
+      valuesBytes.add(valueBytes);
+    }
+    updateOrSplitLeafPage(result, page, numBytes, keysBytes, valuesBytes);
+    return result;
+  }
+
+  private V remove(final int pageIndex, final K key) {
+    final Page page = pages.getPage(pageIndex);
+    page.setOffset(0);
+    final byte pageType = page.readByte();
+    if (pageType == INTERIOR) {
+      return removeInterior(page, key);
+    } else if (pageType == LEAF) {
+      return removeLeaf(page, key);
     } else {
-      putChildInteriorPages(childPages, pageIndexes, keys);
-
-      final Page rightPage = childPages.get(1);
-      skipHeader(rightPage);
-
-      return updateOrSplitInteriorPage(page, numBytes, pageIndexes, keys);
+      throw new IllegalArgumentException("Unknown page type " + pageType);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public V remove(final Object key) {
+    return remove(rootPageIndex, (K)key);
   }
 
   private V removeInterior(final Page page, final K key) {
-    V value = null;
+    final V value = null;
     // final List<Integer> pageIndexes = new ArrayList<Integer>();
     // final List<K> keys = new ArrayList<K>();
     // final int numBytes = page.readShort();
@@ -345,83 +395,47 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
     //
     // return updateOrSplitInteriorPage(page, numBytes, pageIndexes, keys);
     // }
-    // TODO remove
     return value;
-  }
-
-  private List<Page> putLeaf(final Page page, final K key, final V value) {
-    final List<K> keys = new ArrayList<K>();
-    final List<V> values = new ArrayList<V>();
-
-    boolean newValueWritten = false;
-    final int numBytes = page.readShort();
-    while (page.getOffset() < numBytes) {
-      final K currentKey = keyManager.readFromPage(page);
-      final V currentValue = valueManager.readFromPage(page);
-      @SuppressWarnings("unchecked")
-      final int compare = ((Comparable<K>)currentKey).compareTo(key);
-      if (compare > 0) {
-        keys.add(key);
-        values.add(value);
-        newValueWritten = true;
-      }
-      keys.add(currentKey);
-      values.add(currentValue);
-
-    }
-    if (!newValueWritten) {
-      keys.add(key);
-      values.add(value);
-    }
-    return updateOrSplitLeafPage(page, numBytes, keys, values);
   }
 
   private V removeLeaf(final Page page, final K key) {
-    V value = null;
-    final List<K> keys = new ArrayList<K>();
-    final List<V> values = new ArrayList<V>();
-
-    final int numBytes = page.readShort();
-    while (page.getOffset() < numBytes) {
-      final K currentKey = keyManager.readFromPage(page);
-      @SuppressWarnings("unchecked")
-      final int compare = ((Comparable<K>)currentKey).compareTo(key);
-      if (compare == 0) {
-        value = valueManager.removeFromPage(page);
-      } else {
-        final V currentValue = valueManager.readFromPage(page);
-        keys.add(currentKey);
-        values.add(currentValue);
-      }
-    }
-
-    updateOrSplitLeafPage(page, numBytes, keys, values);
+    final V value = null;
+    // final List<K> keys = new ArrayList<K>();
+    // final List<V> values = new ArrayList<V>();
+    //
+    // final int numBytes = page.readShort();
+    // while (page.getOffset() < numBytes) {
+    // final K currentKey = keyManager.readFromPage(page);
+    // @SuppressWarnings("unchecked")
+    // final int compare = ((Comparable<K>)currentKey).compareTo(key);
+    // if (compare == 0) {
+    // value = valueManager.removeFromPage(page);
+    // } else {
+    // final V currentValue = valueManager.readFromPage(page);
+    // keys.add(currentKey);
+    // values.add(currentValue);
+    // }
+    // }
+    //
+    // updateOrSplitLeafPage(page, numBytes, keys, values);
     return value;
   }
 
-  public int readPageIndex(final Page page) {
-    final int pageIndex = ((Number)pageIndexManager.readFromPage(page)).intValue();
-    return pageIndex;
-  }
-
-  private void setInteriorIndexAndKeyBytes(
+  private void setInteriorKeyAndValueBytes(
     final Page page,
-    final List<byte[]> pageIndexesBytes,
     final List<byte[]> keysBytes,
+    final List<byte[]> pageIndexesBytes,
     final int startIndex,
     final int endIndex) {
     page.setOffset(0);
     page.writeByte(INTERIOR);
     page.writeShort((short)0);
     int i = startIndex;
+    writeBytes(page, pageIndexesBytes, i);
     for (; i < endIndex; i++) {
-      final byte[] pageIndexBytes = pageIndexesBytes.get(i);
-      page.writeBytes(pageIndexBytes);
-      final byte[] keyBytes = keysBytes.get(i);
-      page.writeBytes(keyBytes);
+      writeBytes(page, keysBytes, i);
+      writeBytes(page, pageIndexesBytes, i + 1);
     }
-    final byte[] pageIndexBytes = pageIndexesBytes.get(i);
-    page.writeBytes(pageIndexBytes);
     setNumBytes(page);
     page.clearBytes(page.getOffset());
     page.flush();
@@ -438,84 +452,63 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
     page.writeShort((short)0);
     int i = startIndex;
     for (; i < endIndex; i++) {
-      final byte[] keyBytes = keysBytes.get(i);
-      page.writeBytes(keyBytes);
-      final byte[] valueBytes = valuesBytes.get(i);
-      page.writeBytes(valueBytes);
+      writeBytes(page, keysBytes, i);
+      writeBytes(page, valuesBytes, i);
     }
     setNumBytes(page);
     page.clearBytes(page.getOffset());
     page.flush();
   }
 
-  private List<Page> updateOrSplitInteriorPage(
+  private void updateOrSplitInteriorPage(
+    final PutResult result,
     final Page page,
-    final int oldNumBytes,
-    final List<Integer> pageIndexes,
-    final List<K> keys) {
-    final List<byte[]> pageIndexesBytes = new ArrayList<byte[]>();
-    final List<byte[]> keysBytes = new ArrayList<byte[]>();
-    int numBytes = 3;
-    final int largeValueIndex = -1;
+    final List<byte[]> keysBytes,
+    final List<byte[]> pageIndexBytes) {
+    result.clear();
+    int numBytes = headerSize;
     int splitIndex = -1;
     int i = 0;
-    while (i < keys.size()) {
-      final int pageIndex = pageIndexes.get(i);
-      final byte[] pageIndexBytes = pageIndexManager.writeToByteArray(pageIndex);
-      pageIndexesBytes.add(pageIndexBytes);
-      numBytes += pageIndexBytes.length;
-
-      if (i > 0 && splitIndex == -1 && numBytes > minSize) {
-        splitIndex = i;
-      }
-      final K key = keys.get(i);
-      final byte[] keyBytes = keyManager.writeToByteArray(key);
-      keysBytes.add(keyBytes);
-      numBytes += keyBytes.length;
+    numBytes += pageIndexBytes.get(0).length;
+    while (i < keysBytes.size()) {
+      numBytes += keysBytes.get(i).length;
+      numBytes += pageIndexBytes.get(i + 1).length;
 
       i++;
+      if (splitIndex == -1 && numBytes > minSize) {
+        splitIndex = i;
+      }
     }
-    final int pageIndex = pageIndexes.get(i);
-    final byte[] pageIndexBytes = pageIndexManager.writeToByteArray(pageIndex);
-    pageIndexesBytes.add(pageIndexBytes);
-    numBytes += pageIndexBytes.length;
 
     if (numBytes < page.getSize()) {
-      setInteriorIndexAndKeyBytes(page, pageIndexesBytes, keysBytes, 0,
+      setInteriorKeyAndValueBytes(page, keysBytes, pageIndexBytes, 0,
         keysBytes.size());
-      return Collections.emptyList();
-    } else if (largeValueIndex >= 0) {
-      throw new RuntimeException("Splitting not supported");
     } else {
-      setInteriorIndexAndKeyBytes(page, pageIndexesBytes, keysBytes, 0,
+      setInteriorKeyAndValueBytes(page, keysBytes, pageIndexBytes, 0,
         splitIndex);
       final Page rightPage = pages.createPage();
-      setInteriorIndexAndKeyBytes(rightPage, pageIndexesBytes, keysBytes,
+      setInteriorKeyAndValueBytes(rightPage, keysBytes, pageIndexBytes,
         splitIndex, keysBytes.size());
-      return Arrays.asList(page, rightPage);
+
+      result.newPageIndexBytes = MethodPageValueManager.getValueIntBytes(rightPage.getIndex());
+      result.newKeyBytes = keysBytes.get(splitIndex);
     }
   }
 
-  private List<Page> updateOrSplitLeafPage(
+  private void updateOrSplitLeafPage(
+    final PutResult result,
     final Page page,
     final int oldNumBytes,
-    final List<K> keys,
-    final List<V> values) {
-    final List<byte[]> valuesBytes = new ArrayList<byte[]>();
-    final List<byte[]> keysBytes = new ArrayList<byte[]>();
+    final List<byte[]> keysBytes,
+    final List<byte[]> valuesBytes) {
     int numBytes = headerSize;
-    final int largeValueIndex = -1;
     int splitIndex = -1;
     int i = 0;
-    while (i < keys.size()) {
-      final K key = keys.get(i);
-      final byte[] keyBytes = keyManager.writeToByteArray(key);
-      keysBytes.add(keyBytes);
+    while (i < keysBytes.size()) {
+      final byte[] keyBytes = keysBytes.get(i);
       numBytes += keyBytes.length;
 
-      final V value = values.get(i);
-      final byte[] valueBytes = valueManager.writeToByteArray(value);
-      valuesBytes.add(valueBytes);
+      final byte[] valueBytes = valuesBytes.get(i);
       numBytes += valueBytes.length;
 
       i++;
@@ -526,39 +519,22 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
 
     if (numBytes < page.getSize()) {
       setLeafKeyAndValueBytes(page, keysBytes, valuesBytes, 0, keysBytes.size());
-      return Collections.emptyList();
-    } else if (largeValueIndex >= 0) {
-      throw new RuntimeException("Splitting not supported");
     } else {
       setLeafKeyAndValueBytes(page, keysBytes, valuesBytes, 0, splitIndex);
       final Page rightPage = pages.createPage();
       setLeafKeyAndValueBytes(rightPage, keysBytes, valuesBytes, splitIndex,
         keysBytes.size());
-      return Arrays.asList(page, rightPage);
+
+      result.newPageIndexBytes = MethodPageValueManager.getValueIntBytes(rightPage.getIndex());
+      result.newKeyBytes = keysBytes.get(splitIndex);
     }
   }
 
-  @Override
-  public Set<Entry<K, V>> entrySet() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public V remove(Object key) {
-    return remove(rootPageIndex, (K)key);
-  }
-
-  private V remove(int pageIndex, K key) {
-    final Page page = pages.getPage(pageIndex);
-    page.setOffset(0);
-    final byte pageType = page.readByte();
-    if (pageType == INTERIOR) {
-      return removeInterior(page, key);
-    } else if (pageType == LEAF) {
-      return removeLeaf(page, key);
-    } else {
-      throw new IllegalArgumentException("Unknown page type " + pageType);
-    }
+  public void writeBytes(
+    final Page page,
+    final List<byte[]> bytesList,
+    final int i) {
+    final byte[] pageIndexBytes = bytesList.get(i);
+    page.writeBytes(pageIndexBytes);
   }
 }
