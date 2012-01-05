@@ -163,6 +163,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
     attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
       "SDO_GEOM.SDO_BUFFER(", "," + precision + ")"));
+    attribute.setProperty(JdbcConstants.FUNCTION_EQUAL, new SqlFunction(
+      "SDO_EQUAL(", ") = 'TRUE'"));
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
 

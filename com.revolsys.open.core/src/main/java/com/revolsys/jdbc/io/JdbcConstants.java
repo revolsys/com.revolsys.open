@@ -7,5 +7,7 @@ public interface JdbcConstants {
     "http://gis.revolsys.com/jdbc/function", "intersects");
 
   QName FUNCTION_BUFFER = new QName("http://gis.revolsys.com/jdbc/function",
-    "buffer");
+      "buffer");
+  QName FUNCTION_EQUAL = new QName("http://gis.revolsys.com/jdbc/function",
+      "equals");
 }
