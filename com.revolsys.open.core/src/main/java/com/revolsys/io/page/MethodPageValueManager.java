@@ -32,6 +32,9 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     return bytes[0];
   }
 
+  public void disposeBytes(byte[] bytes) {
+  }
+
   public static byte[] getByteBytes(final Page page) {
     return page.readBytes(1);
   }
@@ -181,8 +184,8 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   }
 
   protected MethodPageValueManager(final String typeName) {
-    this(typeName, "getValue" + typeName + "Bytes", "get" + typeName
-      + "Value", "get" + typeName + "Bytes");
+    this(typeName, "getValue" + typeName + "Bytes", "get" + typeName + "Value",
+      "get" + typeName + "Bytes");
   }
 
   protected MethodPageValueManager(final String typeName,

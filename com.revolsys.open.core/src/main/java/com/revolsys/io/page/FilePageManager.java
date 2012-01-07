@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,10 +34,10 @@ public class FilePageManager implements PageManager {
     }
   }
 
-  public void removePage(Page page) {
+  public synchronized void removePage(Page page) {
     synchronized (pages) {
       page.clear();
-      page.flush();
+      write(page);
       freePageIndexes.add(page.getIndex());
     }
   }
@@ -45,15 +46,15 @@ public class FilePageManager implements PageManager {
     return pageSize;
   }
 
-  public Page createPage() {
+  public synchronized Page createPage() {
     synchronized (pages) {
+      Page page;
       if (freePageIndexes.isEmpty()) {
         try {
           int index = (int)(randomAccessFile.length() / pageSize);
-          Page page = new ByteArrayPage(this, index, pageSize);
+          page = new ByteArrayPage(this, index, pageSize);
           pages.put(page.getIndex(), page);
           write(page);
-          return page;
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
@@ -61,12 +62,14 @@ public class FilePageManager implements PageManager {
         final Iterator<Integer> iterator = freePageIndexes.iterator();
         Integer pageIndex = iterator.next();
         iterator.remove();
-        return loadPage(pageIndex);
+        page = loadPage(pageIndex);
       }
+      pagesInUse.add(page);
+      return page;
     }
   }
 
-  public Page getPage(int index) {
+  public synchronized Page getPage(int index) {
     synchronized (pages) {
       if (freePageIndexes.contains(index)) {
         throw new IllegalArgumentException("Page does not exist " + index);
@@ -75,7 +78,13 @@ public class FilePageManager implements PageManager {
         if (page == null) {
           page = loadPage(index);
         }
-        return page;
+        if (pagesInUse.contains(page)) {
+          throw new IllegalArgumentException("Page is currently being used "
+            + index);
+        } else {
+          pagesInUse.add(page);
+          return page;
+        }
       }
     }
   }
@@ -101,22 +110,28 @@ public class FilePageManager implements PageManager {
     return new ByteArrayPage(this, -1, pageSize);
   }
 
-  public void write(Page page) {
-    synchronized (pages) {
-      if (page.getPageManager() == this) {
-        synchronized (randomAccessFile) {
-          try {
-            final int index = page.getIndex();
-            if (index >= 0) {
-              randomAccessFile.seek(index * pageSize);
-              final byte[] content = page.getContent();
-              randomAccessFile.write(content);
-            }
-          } catch (IOException e) {
-            throw new RuntimeException(e);
+  public synchronized void write(Page page) {
+    if (page.getPageManager() == this) {
+      synchronized (randomAccessFile) {
+        try {
+          final int index = page.getIndex();
+          if (index >= 0) {
+            randomAccessFile.seek(index * pageSize);
+            final byte[] content = page.getContent();
+            randomAccessFile.write(content);
           }
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
       }
     }
   }
+
+  public synchronized void releasePage(Page page) {
+    write(page);
+    pagesInUse.remove(page);
+  }
+
+  private Set<Page> pagesInUse = new HashSet<Page>();
+
 }

@@ -8,4 +8,6 @@ public interface PageValueManager<T> {
   byte[] getBytes(final Page page);
   
   byte[] getBytes(final T value);
+  
+  void disposeBytes(final byte[] bytes);
 }

@@ -21,13 +21,11 @@ import org.apache.log4j.Logger;
 public final class JdbcUtils {
   private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
 
-  public static String cleanObjectName(
-    final String objectName) {
+  public static String cleanObjectName(final String objectName) {
     return objectName.replaceAll("[^a-zA-Z\\._]", "");
   }
 
-  public static void close(
-    final Connection connection) {
+  public static void close(final Connection connection) {
     if (connection != null) {
       try {
         connection.close();
@@ -55,8 +53,7 @@ public final class JdbcUtils {
     close(connection);
   }
 
-  public static void close(
-    final ResultSet resultSet) {
+  public static void close(final ResultSet resultSet) {
     if (resultSet != null) {
       try {
         resultSet.close();
@@ -68,8 +65,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static void close(
-    final Statement statement) {
+  public static void close(final Statement statement) {
     if (statement != null) {
       try {
         statement.close();
@@ -81,15 +77,12 @@ public final class JdbcUtils {
     }
   }
 
-  public static void close(
-    final Statement statement,
-    final ResultSet resultSet) {
+  public static void close(final Statement statement, final ResultSet resultSet) {
     close(resultSet);
     close(statement);
   }
 
-  public static void commit(
-    final Connection connection) {
+  public static void commit(final Connection connection) {
     try {
       connection.commit();
     } catch (final SQLException e) {
@@ -127,8 +120,7 @@ public final class JdbcUtils {
   public static int executeUpdate(
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       for (int i = 0; i < parameters.length; i++) {
@@ -145,8 +137,7 @@ public final class JdbcUtils {
   public static int executeUpdate(
     final DataSource dataSource,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return executeUpdate(connection, sql, parameters);
@@ -155,23 +146,21 @@ public final class JdbcUtils {
     }
   }
 
-  public static Connection getConnection(
-    final DataSource dataSource) {
+  public static Connection getConnection(final DataSource dataSource) {
     try {
       return dataSource.getConnection();
     } catch (final SQLException e) {
       throw new RuntimeException(
         "SQL error getting connection from data source", e);
     } catch (final Throwable e) {
-      throw new RuntimeException("Unknown error getting connection from data source " ,
-        e);
+      throw new RuntimeException(
+        "Unknown error getting connection from data source ", e);
     }
   }
 
   public static void lockTable(
     final Connection connection,
-    final String tableName)
-    throws SQLException {
+    final String tableName) throws SQLException {
     final String sql = "LOCK TABLE " + tableName + " IN EXCLUSIVE MODE";
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -181,8 +170,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> readMap(
-    final ResultSet rs)
+  public static Map<String, Object> readMap(final ResultSet rs)
     throws SQLException {
     final Map<String, Object> values = new LinkedHashMap<String, Object>();
     final ResultSetMetaData metaData = rs.getMetaData();
@@ -197,8 +185,7 @@ public final class JdbcUtils {
   public static Date selectDate(
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       for (int i = 0; i < parameters.length; i++) {
@@ -224,8 +211,7 @@ public final class JdbcUtils {
     final DataSource dataSource,
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return JdbcUtils.selectDate(connection, sql, parameters);
     } else {
@@ -236,8 +222,7 @@ public final class JdbcUtils {
   public static Date selectDate(
     final DataSource dataSource,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return selectDate(connection, sql, parameters);
@@ -249,8 +234,7 @@ public final class JdbcUtils {
   public static int selectInt(
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       for (int i = 0; i < parameters.length; i++) {
@@ -276,8 +260,7 @@ public final class JdbcUtils {
     final DataSource dataSource,
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return JdbcUtils.selectInt(connection, sql, parameters);
     } else {
@@ -288,11 +271,13 @@ public final class JdbcUtils {
   public static int selectInt(
     final DataSource dataSource,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) {
     final Connection connection = getConnection(dataSource);
     try {
       return selectInt(connection, sql, parameters);
+    } catch (SQLException e) {
+      throw new RuntimeException("Unable to execute " + sql + " "
+        + Arrays.toString(parameters), e);
     } finally {
       close(connection);
     }
@@ -302,8 +287,7 @@ public final class JdbcUtils {
     final Connection connection,
     final String sql,
     final int columnIndex,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final List<T> results = new ArrayList<T>();
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -329,8 +313,7 @@ public final class JdbcUtils {
   public static long selectLong(
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       for (int i = 0; i < parameters.length; i++) {
@@ -356,8 +339,7 @@ public final class JdbcUtils {
     final DataSource dataSource,
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return JdbcUtils.selectLong(connection, sql, parameters);
     } else {
@@ -368,8 +350,7 @@ public final class JdbcUtils {
   public static long selectLong(
     final DataSource dataSource,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return selectLong(connection, sql, parameters);
@@ -381,8 +362,7 @@ public final class JdbcUtils {
   public static Map<String, Object> selectMap(
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       for (int i = 0; i < parameters.length; i++) {
@@ -394,7 +374,8 @@ public final class JdbcUtils {
         if (resultSet.next()) {
           return readMap(resultSet);
         } else {
-          throw new IllegalArgumentException("Value not found for " + sql +" " + Arrays.asList(parameters));
+          throw new IllegalArgumentException("Value not found for " + sql + " "
+            + Arrays.asList(parameters));
         }
       } finally {
         close(resultSet);
@@ -407,8 +388,7 @@ public final class JdbcUtils {
   public static Map<String, Object> selectMap(
     final DataSource dataSource,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return selectMap(connection, sql, parameters);
@@ -420,8 +400,7 @@ public final class JdbcUtils {
   public static String selectString(
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       for (int i = 0; i < parameters.length; i++) {
@@ -447,8 +426,7 @@ public final class JdbcUtils {
     final DataSource dataSource,
     final Connection connection,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     if (dataSource == null) {
       return JdbcUtils.selectString(connection, sql, parameters);
     } else {
@@ -459,8 +437,7 @@ public final class JdbcUtils {
   public static String selectString(
     final DataSource dataSource,
     final String sql,
-    final Object... parameters)
-    throws SQLException {
+    final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
       return selectString(connection, sql, parameters);
@@ -473,8 +450,7 @@ public final class JdbcUtils {
 
   }
 
-  public static String getTableName(
-    final QName typeName) {
+  public static String getTableName(final QName typeName) {
     final String namespaceURI = typeName.getNamespaceURI();
     final String localPart = typeName.getLocalPart();
     if (namespaceURI == "") {

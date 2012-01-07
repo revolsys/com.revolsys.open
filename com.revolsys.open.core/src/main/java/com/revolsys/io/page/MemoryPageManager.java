@@ -1,6 +1,7 @@
 package com.revolsys.io.page;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -11,39 +12,42 @@ public class MemoryPageManager implements PageManager {
 
   private List<Page> pages = new ArrayList<Page>();
 
-  private Set<Page> freePages = new TreeSet<Page>();
+  private Set<Page> pagesInUse = new HashSet<Page>();
 
-  public void freePage(Page page) {
-    freePages.add(page);
-  }
+  private Set<Page> freePages = new TreeSet<Page>();
 
   public int getPageSize() {
     return pageSize;
   }
 
-  public Page createPage() {
+  public synchronized Page createPage() {
+    Page page;
     if (freePages.isEmpty()) {
-      Page page = new ByteArrayPage(this, pages.size(), pageSize);
+      page = new ByteArrayPage(this, pages.size(), pageSize);
       pages.add(page);
-      return page;
     } else {
       final Iterator<Page> iterator = freePages.iterator();
-      Page page = iterator.next();
+      page = iterator.next();
       iterator.remove();
-      return page;
     }
+    pagesInUse.add(page);
+    return page;
   }
 
-  public Page getPage(int index) {
+  public synchronized Page getPage(int index) {
     Page page = pages.get(index);
     if (freePages.contains(page)) {
       throw new IllegalArgumentException("Page does not exist " + index);
+    } else if (pagesInUse.contains(page)) {
+      throw new IllegalArgumentException("Page is currently being used "
+        + index);
     } else {
+      pagesInUse.add(page);
       return page;
     }
   }
 
-  public int getNumPages() {
+  public synchronized int getNumPages() {
     return pages.size() - freePages.size();
   }
 
@@ -54,7 +58,12 @@ public class MemoryPageManager implements PageManager {
   public void write(Page page) {
   }
 
-  public void removePage(Page page) {
+  public synchronized void removePage(Page page) {
     freePages.add(page);
+    pagesInUse.remove(page);
+  }
+
+  public synchronized void releasePage(Page page) {
+    pagesInUse.remove(page);
   }
 }

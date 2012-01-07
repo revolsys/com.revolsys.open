@@ -14,5 +14,7 @@ public interface PageManager {
 
   void write(Page page);
 
-  void removePage(Page dataPage);
+  void removePage(Page page);
+  
+  void releasePage(Page page);
 }
