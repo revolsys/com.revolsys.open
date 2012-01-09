@@ -406,11 +406,11 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   final float loadFactor;
 
   /**
-   * The number of times this HashMap has been structurally modified
-   * Structural modifications are those that change the number of mappings in
-   * the HashMap or otherwise modify its internal structure (e.g., rehash).
-   * This field is used to make iterators on Collection-views of the HashMap
-   * fail-fast. (See ConcurrentModificationException).
+   * The number of times this HashMap has been structurally modified Structural
+   * modifications are those that change the number of mappings in the HashMap
+   * or otherwise modify its internal structure (e.g., rehash). This field is
+   * used to make iterators on Collection-views of the HashMap fail-fast. (See
+   * ConcurrentModificationException).
    */
   transient volatile int modCount;
 
@@ -419,8 +419,8 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   private static final long serialVersionUID = 362498820763181265L;
 
   /**
-   * Constructs an empty <tt>HashMap</tt> with the default initial capacity
-   * (16) and the default load factor (0.75).
+   * Constructs an empty <tt>HashMap</tt> with the default initial capacity (16)
+   * and the default load factor (0.75).
    */
   @SuppressWarnings("unchecked")
   public IntHashMap() {
@@ -431,29 +431,24 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Constructs an empty <tt>HashMap</tt> with the specified initial
-   * capacity and the default load factor (0.75).
+   * Constructs an empty <tt>HashMap</tt> with the specified initial capacity
+   * and the default load factor (0.75).
    * 
-   * @param initialCapacity
-   *            the initial capacity.
-   * @throws IllegalArgumentException
-   *             if the initial capacity is negative.
+   * @param initialCapacity the initial capacity.
+   * @throws IllegalArgumentException if the initial capacity is negative.
    */
   public IntHashMap(final int initialCapacity) {
     this(initialCapacity, DEFAULT_LOAD_FACTOR);
   }
 
   /**
-   * Constructs an empty <tt>HashMap</tt> with the specified initial
-   * capacity and load factor.
+   * Constructs an empty <tt>HashMap</tt> with the specified initial capacity
+   * and load factor.
    * 
-   * @param initialCapacity
-   *            The initial capacity.
-   * @param loadFactor
-   *            The load factor.
-   * @throws IllegalArgumentException
-   *             if the initial capacity is negative or the load factor is
-   *             nonpositive.
+   * @param initialCapacity The initial capacity.
+   * @param loadFactor The load factor.
+   * @throws IllegalArgumentException if the initial capacity is negative or the
+   *           load factor is nonpositive.
    */
   @SuppressWarnings("unchecked")
   public IntHashMap(int initialCapacity, final float loadFactor) {
@@ -484,9 +479,8 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   /**
    * Add a new entry with the specified key, value and hash code to the
    * specified bucket. It is the responsibility of this method to resize the
-   * table if appropriate.
-   * 
-   * Subclass overrides this to alter the behavior of put method.
+   * table if appropriate. Subclass overrides this to alter the behavior of put
+   * method.
    * 
    * @param key
    * @param value
@@ -541,13 +535,10 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Returns <tt>true</tt> if this map contains a mapping for the specified
-   * key.
+   * Returns <tt>true</tt> if this map contains a mapping for the specified key.
    * 
-   * @param key
-   *            The key whose presence in this map is to be tested
-   * @return <tt>true</tt> if this map contains a mapping for the specified
-   *         key.
+   * @param key The key whose presence in this map is to be tested
+   * @return <tt>true</tt> if this map contains a mapping for the specified key.
    */
   public boolean containsKey(final int key) {
     final int i = indexFor(key, table.length);
@@ -579,13 +570,12 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Returns <tt>true</tt> if this map maps one or more keys to the
-   * specified value.
+   * Returns <tt>true</tt> if this map maps one or more keys to the specified
+   * value.
    * 
-   * @param value
-   *            value whose presence in this map is to be tested.
-   * @return <tt>true</tt> if this map maps one or more keys to the
-   *         specified value.
+   * @param value value whose presence in this map is to be tested.
+   * @return <tt>true</tt> if this map maps one or more keys to the specified
+   *         value.
    */
   public boolean containsValue(final Object value) {
     if (value == null) {
@@ -607,7 +597,6 @@ public class IntHashMap<T> implements Cloneable, Serializable {
    * Like addEntry<T> except that this version is used when creating entries as
    * part of Map construction or "pseudo-construction" (cloning,
    * deserialization). This version needn't worry about resizing the table.
-   * 
    * Subclass overrides this to alter the behavior of HashMap(Map), clone, and
    * readObject.
    * 
@@ -622,14 +611,13 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Returns a collection view of the mappings contained in this map. Each
-   * element in the returned collection is a <tt>Map.Entry</tt>. The
-   * collection is backed by the map, so changes to the map are reflected in
-   * the collection, and vice-versa. The collection supports element removal,
-   * which removes the corresponding mapping from the map, via the
-   * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-   * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
-   * operations. It does not support the <tt>add</tt> or <tt>addAll</tt>
-   * operations.
+   * element in the returned collection is a <tt>Map.Entry</tt>. The collection
+   * is backed by the map, so changes to the map are reflected in the
+   * collection, and vice-versa. The collection supports element removal, which
+   * removes the corresponding mapping from the map, via the
+   * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>,
+   * <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not support the
+   * <tt>add</tt> or <tt>addAll</tt> operations.
    * 
    * @return a collection view of the mappings contained in this map.
    * @see Map.Entry
@@ -641,14 +629,13 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Returns the value to which the specified key is mapped in this identity
-   * hash map, or <tt>null</tt> if the map contains no mapping for this key.
-   * A return value of <tt>null</tt> does not <i>necessarily</i> indicate
-   * that the map contains no mapping for the key; it is also possible that
-   * the map explicitly maps the key to <tt>null</tt>. The
-   * <tt>containsKey</tt> method may be used to distinguish these two cases.
+   * hash map, or <tt>null</tt> if the map contains no mapping for this key. A
+   * return value of <tt>null</tt> does not <i>necessarily</i> indicate that the
+   * map contains no mapping for the key; it is also possible that the map
+   * explicitly maps the key to <tt>null</tt>. The <tt>containsKey</tt> method
+   * may be used to distinguish these two cases.
    * 
-   * @param key
-   *            the key whose associated value is to be returned.
+   * @param key the key whose associated value is to be returned.
    * @return the value to which this map maps the specified key, or
    *         <tt>null</tt> if the map contains no mapping for this key.
    * @see #put(int, Object)
@@ -668,8 +655,8 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Returns the entry associated with the specified key in the HashMap.
-   * Returns null if the HashMap contains no mapping for this key.
+   * Returns the entry associated with the specified key in the HashMap. Returns
+   * null if the HashMap contains no mapping for this key.
    * 
    * @param key
    * @return The Entry<T> object for the given hash key
@@ -685,10 +672,9 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Initialization hook for subclasses. This method is called in all
-   * constructors and pseudo-constructors (clone, readObject) after HashMap
-   * has been initialized but before any entries have been inserted. (In the
-   * absence of this method, readObject would require explicit knowledge of
-   * subclasses.)
+   * constructors and pseudo-constructors (clone, readObject) after HashMap has
+   * been initialized but before any entries have been inserted. (In the absence
+   * of this method, readObject would require explicit knowledge of subclasses.)
    */
   void init() {
   }
@@ -703,13 +689,12 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Returns a set view of the keys contained in this map. The set is backed
-   * by the map, so changes to the map are reflected in the set, and
-   * vice-versa. The set supports element removal, which removes the
-   * corresponding mapping from this map, via the <tt>Iterator.remove</tt>,
-   * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and
-   * <tt>clear</tt> operations. It does not support the <tt>add</tt> or
-   * <tt>addAll</tt> operations.
+   * Returns a set view of the keys contained in this map. The set is backed by
+   * the map, so changes to the map are reflected in the set, and vice-versa.
+   * The set supports element removal, which removes the corresponding mapping
+   * from this map, via the <tt>Iterator.remove</tt>, <tt>Set.remove</tt>,
+   * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations. It
+   * does not support the <tt>add</tt> or <tt>addAll</tt> operations.
    * 
    * @return a set view of the keys contained in this map.
    */
@@ -737,17 +722,14 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Associates the specified value with the specified key in this map. If the
-   * map previously contained a mapping for this key, the old value is
-   * replaced.
+   * map previously contained a mapping for this key, the old value is replaced.
    * 
-   * @param key
-   *            key with which the specified value is to be associated.
-   * @param value
-   *            value to be associated with the specified key.
-   * @return previous value associated with specified key, or <tt>null</tt>
-   *         if there was no mapping for key. A <tt>null</tt> return can
-   *         also indicate that the HashMap previously associated
-   *         <tt>null</tt> with the specified key.
+   * @param key key with which the specified value is to be associated.
+   * @param value value to be associated with the specified key.
+   * @return previous value associated with specified key, or <tt>null</tt> if
+   *         there was no mapping for key. A <tt>null</tt> return can also
+   *         indicate that the HashMap previously associated <tt>null</tt> with
+   *         the specified key.
    */
   public Object put(final int key, final T value) {
     final int i = indexFor(key, table.length);
@@ -772,10 +754,8 @@ public class IntHashMap<T> implements Cloneable, Serializable {
    * mappings will replace any mappings that this map had for any of the keys
    * currently in the specified map.
    * 
-   * @param m
-   *            mappings to be stored in this map.
-   * @throws NullPointerException
-   *             if the specified map is null.
+   * @param m mappings to be stored in this map.
+   * @throws NullPointerException if the specified map is null.
    */
   public void putAll(final IntHashMap<T> m) {
     final int numKeysToBeAdded = m.size();
@@ -829,9 +809,9 @@ public class IntHashMap<T> implements Cloneable, Serializable {
     final int i = indexFor(key, table.length);
 
     /**
-     * Look for preexisting entry for key. This will never happen for clone
-     * or deserialize. It will only happen for construction if the input Map
-     * is a sorted map whose ordering is inconsistent w/ equals.
+     * Look for preexisting entry for key. This will never happen for clone or
+     * deserialize. It will only happen for construction if the input Map is a
+     * sorted map whose ordering is inconsistent w/ equals.
      */
     for (Entry<T> e = table[i]; e != null; e = e.next) {
       if (key == e.key) {
@@ -844,8 +824,8 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Reconstitute the <tt>HashMap</tt> instance from a stream (i.e.,
-   * deserialize it).
+   * Reconstitute the <tt>HashMap</tt> instance from a stream (i.e., deserialize
+   * it).
    * 
    * @param s
    * @throws IOException
@@ -877,16 +857,19 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   /**
    * Removes the mapping for this key from this map if present.
    * 
-   * @param key
-   *            key whose mapping is to be removed from the map.
-   * @return previous value associated with specified key, or <tt>null</tt>
-   *         if there was no mapping for key. A <tt>null</tt> return can
-   *         also indicate that the map previously associated <tt>null</tt>
-   *         with the specified key.
+   * @param key key whose mapping is to be removed from the map.
+   * @return previous value associated with specified key, or <tt>null</tt> if
+   *         there was no mapping for key. A <tt>null</tt> return can also
+   *         indicate that the map previously associated <tt>null</tt> with the
+   *         specified key.
    */
-  public Object remove(final int key) {
+  public T remove(final int key) {
     final Entry<T> e = removeEntryForKey(key);
-    return (e == null ? e : e.value);
+    if (e == null) {
+      return null;
+    } else {
+      return e.value;
+    }
   }
 
   /**
@@ -958,18 +941,15 @@ public class IntHashMap<T> implements Cloneable, Serializable {
   }
 
   /**
-   * Rehashes the contents of this map into a new array with a larger
-   * capacity. This method is called automatically when the number of keys in
-   * this map reaches its threshold.
+   * Rehashes the contents of this map into a new array with a larger capacity.
+   * This method is called automatically when the number of keys in this map
+   * reaches its threshold. If current capacity is MAXIMUM_CAPACITY, this method
+   * does not resize the map, but but sets threshold to Integer.MAX_VALUE. This
+   * has the effect of preventing future calls.
    * 
-   * If current capacity is MAXIMUM_CAPACITY, this method does not resize the
-   * map, but but sets threshold to Integer.MAX_VALUE. This has the effect of
-   * preventing future calls.
-   * 
-   * @param newCapacity
-   *            the new capacity, MUST be a power of two; must be greater than
-   *            current capacity unless current capacity is MAXIMUM_CAPACITY
-   *            (in which case value is irrelevant).
+   * @param newCapacity the new capacity, MUST be a power of two; must be
+   *          greater than current capacity unless current capacity is
+   *          MAXIMUM_CAPACITY (in which case value is irrelevant).
    */
   void resize(final int newCapacity) {
     final Entry<T>[] oldTable = table;
@@ -1020,13 +1000,12 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Returns a collection view of the values contained in this map. The
-   * collection is backed by the map, so changes to the map are reflected in
-   * the collection, and vice-versa. The collection supports element removal,
-   * which removes the corresponding mapping from this map, via the
-   * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-   * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
-   * operations. It does not support the <tt>add</tt> or <tt>addAll</tt>
-   * operations.
+   * collection is backed by the map, so changes to the map are reflected in the
+   * collection, and vice-versa. The collection supports element removal, which
+   * removes the corresponding mapping from this map, via the
+   * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>, <tt>removeAll</tt>,
+   * <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not support the
+   * <tt>add</tt> or <tt>addAll</tt> operations.
    * 
    * @return a collection view of the values contained in this map.
    */
@@ -1039,18 +1018,15 @@ public class IntHashMap<T> implements Cloneable, Serializable {
    * Save the state of the <tt>HashMap</tt> instance to a stream (i.e.,
    * serialize it).
    * 
-   * @param s
-   *            The ObjectOutputStream
+   * @param s The ObjectOutputStream
    * @throws IOException
-   * 
    * @serialData The <i>capacity</i> of the HashMap (the length of the bucket
    *             array) is emitted (int), followed by the <i>size</i> of the
-   *             HashMap (the number of key-value mappings), followed by the
-   *             key (Object) and value (Object) for each key-value mapping
+   *             HashMap (the number of key-value mappings), followed by the key
+   *             (Object) and value (Object) for each key-value mapping
    *             represented by the HashMap The key-value mappings are emitted
    *             in the order that they are returned by
    *             <tt>entrySet().iterator()</tt>.
-   * 
    */
   private void writeObject(final java.io.ObjectOutputStream s)
     throws IOException {
