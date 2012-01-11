@@ -14,6 +14,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import com.ctc.wstx.util.StringUtil;
 import com.revolsys.io.xml.XmlMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.CollectionUtil;
@@ -71,12 +72,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
    * @param root
    */
   public MavenRepository(final Resource root) {
-    if (root == null) {
-      this.root = new FileSystemResource(System.getProperty("user.home")
-        + "/.m2/repository/");
-    } else {
-      this.root = root;
-    }
+    setRoot(root);
   }
 
   public URLClassLoader createClassLoader(final String id) {
@@ -222,6 +218,11 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   public void setRoot(final Resource root) {
-    this.root = root;
+    if (root != null) {
+      this.root = root;
+    } else {
+      this.root = new FileSystemResource(System.getProperty("user.home")
+        + "/.m2/repository/");
+    }
   }
 }
