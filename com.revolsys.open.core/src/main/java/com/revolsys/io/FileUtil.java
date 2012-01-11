@@ -23,8 +23,10 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,6 +73,17 @@ public final class FileUtil {
     } catch (final IOException e) {
     }
 
+  }
+
+  public static String getString(InputStream in) {
+    try {
+      Reader reader = new InputStreamReader(in);
+      StringWriter out = new StringWriter();
+      copy(reader, out);
+      return out.toString();
+    } finally {
+      closeSilent(in);
+    }
   }
 
   /**
@@ -326,15 +339,19 @@ public final class FileUtil {
    * @param out The writer to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(final Reader in, final Writer out) throws IOException {
-    final char[] buffer = new char[4906];
-    long numBytes = 0;
-    int count;
-    while ((count = in.read(buffer)) > -1) {
-      out.write(buffer, 0, count);
-      numBytes += count;
+  public static long copy(final Reader in, final Writer out) {
+    try {
+      final char[] buffer = new char[4906];
+      long numBytes = 0;
+      int count;
+      while ((count = in.read(buffer)) > -1) {
+        out.write(buffer, 0, count);
+        numBytes += count;
+      }
+      return numBytes;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-    return numBytes;
   }
 
   /**

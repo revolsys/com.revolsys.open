@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import com.revolsys.io.FileUtil;
+
 /**
  * The UrlUtil class is a utility class for processing and create URL strings.
  * 
@@ -55,6 +57,16 @@ public final class UrlUtil {
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
+  public static String getContent(final String urlString) {
+    try {
+      final URL url = UrlUtil.getUrl(urlString);
+      final InputStream in = url.openStream();
+      return FileUtil.getString(in);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to read " + urlString);
+    }
+  }
+
   public static String getFileBaseName(final URL url) {
     final String name = getFileName(url);
     final int dotIndex = name.lastIndexOf('.');
@@ -76,6 +88,19 @@ public final class UrlUtil {
       return path.substring(index + 1);
     } else {
       return path;
+    }
+  }
+
+  public static InputStream getInputStream(final String urlString) {
+    final URL url = getUrl(urlString);
+    return getInputStream(url);
+  }
+
+  public static InputStream getInputStream(final URL url) {
+    try {
+      return url.openStream();
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Cannot open stream for: " + url, e);
     }
   }
 
@@ -222,18 +247,5 @@ public final class UrlUtil {
    * Construct a new UrlUtil.
    */
   private UrlUtil() {
-  }
-
-  public static InputStream getInputStream(URL url) {
-    try {
-      return url.openStream();
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Cannot open stream for: " + url, e);
-    }
-  }
-
-  public static InputStream getInputStream(String urlString) {
-    URL url = getUrl(urlString);
-    return getInputStream(url);
   }
 }
