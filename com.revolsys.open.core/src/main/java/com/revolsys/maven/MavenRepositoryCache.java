@@ -17,22 +17,23 @@ public class MavenRepositoryCache extends MavenRepository {
   public MavenRepositoryCache() {
   }
 
-  public MavenRepositoryCache(Resource root) {
+  public MavenRepositoryCache(final Resource root) {
     super(root);
   }
 
-  public MavenRepositoryCache(Resource root, String... repositoryUrls) {
+  public MavenRepositoryCache(final Resource root,
+    final String... repositoryUrls) {
     super(root);
     for (String repository : repositoryUrls) {
       if (!repository.endsWith("/")) {
         repository += '/';
       }
-      Resource resource = SpringUtil.getResource(repository);
+      final Resource resource = SpringUtil.getResource(repository);
       this.repositories.add(new MavenRepository(resource));
     }
   }
 
-  public MavenRepositoryCache(String... repositoryUrls) {
+  public MavenRepositoryCache(final String... repositoryUrls) {
     this(null, repositoryUrls);
   }
 
@@ -42,27 +43,33 @@ public class MavenRepositoryCache extends MavenRepository {
 
   @Override
   protected void handleMissingResource(
-    Resource resource,
-    String groupId,
-    String artifactId,
-    String type,
-    String classifier,
-    String version) {
-    for (MavenRepository repository : repositories) {
-      Resource repositoryResource = repository.getResource(groupId, artifactId,
-        type, classifier, version);
+    final Resource resource,
+    final String groupId,
+    final String artifactId,
+    final String type,
+    final String classifier,
+    final String version) {
+    for (final MavenRepository repository : repositories) {
+      final Resource repositoryResource = repository.getResource(groupId,
+        artifactId, type, classifier, version);
       if (repositoryResource.exists()) {
         try {
           SpringUtil.copy(repositoryResource, resource);
           return;
-        } catch (Exception e) {
+        } catch (final Exception e) {
           LOG.warn("Unable to download " + repositoryResource, e);
         }
       }
     }
   }
 
-  public void setRepositories(List<MavenRepository> repositories) {
+  public void setRepositories(final List<MavenRepository> repositories) {
     this.repositories = repositories;
+  }
+
+  public void setRepositoryLocations(final List<Resource> repositoryLocations) {
+    for (final Resource resource : repositoryLocations) {
+      repositories.add(new MavenRepository(resource));
+    }
   }
 }
