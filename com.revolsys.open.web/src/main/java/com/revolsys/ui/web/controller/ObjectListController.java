@@ -14,8 +14,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.revolsys.orm.core.DataAccessObject;
-import com.revolsys.orm.core.ResultPager;
+import com.revolsys.collection.ResultPager;
+import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.form.Form;

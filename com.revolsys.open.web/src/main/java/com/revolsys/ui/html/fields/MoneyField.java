@@ -15,14 +15,9 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import com.revolsys.io.xml.XmlWriter;
 
 public class MoneyField extends BigDecimalField {
-  private int size = 10;
-
-  private String inputValue = "";
-
   public MoneyField(final String name, final boolean required) {
     super(name, 2, required);
   }

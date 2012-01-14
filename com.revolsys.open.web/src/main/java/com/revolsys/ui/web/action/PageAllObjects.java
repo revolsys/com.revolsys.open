@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.orm.core.DataAccessObject;
-import com.revolsys.orm.core.ResultPager;
+import com.revolsys.collection.ResultPager;
+import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderFactory;

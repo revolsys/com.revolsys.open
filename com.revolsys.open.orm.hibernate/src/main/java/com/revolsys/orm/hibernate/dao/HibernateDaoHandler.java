@@ -43,8 +43,8 @@ import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.revolsys.collection.ResultPager;
 import com.revolsys.orm.core.NamedQueryParameter;
-import com.revolsys.orm.core.ResultPager;
 import com.revolsys.orm.hibernate.callback.HibernateNamedQueryCallback;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;

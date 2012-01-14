@@ -22,7 +22,7 @@ import org.hibernate.Query;
 import org.hibernate.ScrollableResults;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
-import com.revolsys.orm.core.ResultPager;
+import com.revolsys.collection.ResultPager;
 
 /**
  * The HibernateQueryPager is an implementation of {@link ResultPager} that

@@ -1,13 +1,15 @@
-package com.revolsys.orm.core;
+package com.revolsys.gis.data.io;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.ResultPager;
+
 public interface DataAccessObject<T> {
   void clearCache();
 
-  ResultPager page(final Map<String, Object> where,
+  ResultPager<T> page(final Map<String, Object> where,
     final Map<String, Boolean> orderBy);
 
   <V> List<V> list(final String propertyName, final Map<String, Object> where,

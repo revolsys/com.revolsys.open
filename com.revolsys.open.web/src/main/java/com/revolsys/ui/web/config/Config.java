@@ -215,14 +215,6 @@ public class Config implements Serializable {
     return page;
   }
 
-  public String getPageUri(
-    final String pageRef,
-    final Map parameters)
-    throws PageNotFoundException {
-    Page page = getPage(pageRef);
-    return page.getFullUrl(parameters);
-
-  }
 
   public String getPath(
     final Page page) {

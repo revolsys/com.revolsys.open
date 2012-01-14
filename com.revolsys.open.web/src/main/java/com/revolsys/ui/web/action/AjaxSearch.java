@@ -13,8 +13,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.orm.core.DataAccessObject;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.web.config.ActionConfig;
 import com.revolsys.ui.web.exception.ActionException;

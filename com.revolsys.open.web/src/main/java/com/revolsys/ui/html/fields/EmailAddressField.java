@@ -15,6 +15,8 @@
  */
 package com.revolsys.ui.html.fields;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.util.UrlUtil;
 
 public class EmailAddressField extends TextField {
@@ -28,26 +30,13 @@ public class EmailAddressField extends TextField {
     super(name, 25, 150, defaultValue, required);
   }
 
-  public boolean isValid() {
-    boolean valid = true;
-    if (!super.isValid()) {
-      valid = false;
-    } else if (hasValue()) {
-      int length = getInputValue().length();
-      if (length > getMaxLength()) {
-        addValidationError("Cannot exceed " + getMaxLength() + " characters");
-        valid = false;
-      } else if (length < getMinLength()) {
-        addValidationError("Must be at least " + getMinLength() + " characters");
-        valid = false;
-      } else if (!UrlUtil.isValidEmail(getInputValue())) {
-        addValidationError("Enter a valid email address");
-        valid = false;
+  @Override
+  public void setTextValue(String value) {
+    super.setTextValue(value);
+    if (StringUtils.hasText(value)) {
+      if (!UrlUtil.isValidEmail(getInputValue())) {
+        throw new IllegalArgumentException("Enter a valid email address");
       }
     }
-    if (valid) {
-      setValue(getInputValue());
-    }
-    return valid;
   }
 }

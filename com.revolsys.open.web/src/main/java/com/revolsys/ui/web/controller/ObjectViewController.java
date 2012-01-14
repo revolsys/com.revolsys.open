@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeansException;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.revolsys.orm.core.DataAccessObject;
+import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.MenuElement;

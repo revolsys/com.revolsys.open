@@ -42,7 +42,7 @@ public class PercentField extends BigDecimalField {
         format.setMinimumFractionDigits(0);
         format.setMaximumFractionDigits(getScale());
         inputValue = format.format(getValue());
-        }
+      }
     }
     setInputValue(inputValue);
   }
@@ -52,40 +52,17 @@ public class PercentField extends BigDecimalField {
     out.write(" %");
   }
 
-  public boolean isValid() {
-    boolean valid = true;
-    if (!super.isValid()) {
-      valid = false;
-    } else if (hasValue()) {
-      int length = getInputValue().length();
-      if (length > getSize()) {
-        addValidationError("Cannot exceed " + getSize() + " characters");
-        valid = false;
-      }
+  @Override
+  public void setTextValue(String value) {
+    super.setTextValue(value);
+    BigDecimal percent = getValue();
+    if (percent.scale() > getScale()) {
+      throw new IllegalArgumentException("Scale must be <= " + getScale());
+    } else if (percent.compareTo(new BigDecimal("100")) > 0) {
+      throw new IllegalArgumentException("Must be <= 100 %");
+    } else {
+      setValue(percent.divide(new BigDecimal("100"), 3,
+        BigDecimal.ROUND_HALF_UP));
     }
-    if (valid) {
-      if (hasValue()) {
-        try {
-          BigDecimal percent = new BigDecimal(getInputValue());
-          if (((BigDecimal)getValue()).scale() > getScale()) {
-            addValidationError("Scale must be <= " + getScale());
-            valid = false;
-          }
-          if (percent.compareTo(new BigDecimal("100")) > 0) {
-            addValidationError("Must be <= 100 %");
-            valid = false;
-          } else {
-            setValue(percent.divide(new BigDecimal("100"), 3,
-              BigDecimal.ROUND_HALF_UP));
-          }
-        } catch (NumberFormatException e) {
-          addValidationError("Must be a valid number");
-          valid = false;
-        }
-      } else {
-        setValue(null);
-      }
-    }
-    return valid;
   }
 }

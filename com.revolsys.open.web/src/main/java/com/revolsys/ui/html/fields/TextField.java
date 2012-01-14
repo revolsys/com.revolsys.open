@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -48,13 +47,6 @@ public class TextField extends Field {
     this.size = size;
   }
 
-  public TextField(final String name, final int size,
-    final String defaultValue, final boolean required) {
-    super(name, required);
-    this.size = size;
-    setInitialValue(defaultValue);
-  }
-
   public TextField(final String name, final int size, final int maxLength,
     final boolean required) {
     this(name, size, required);
@@ -68,12 +60,6 @@ public class TextField extends Field {
     this.maxLength = maxLength;
   }
 
-  public TextField(final String name, final int size, final int maxLength,
-    final String defaultValue, final boolean required) {
-    this(name, size, defaultValue, required);
-    this.maxLength = maxLength;
-  }
-
   public TextField(final String name, final int size, final int minLength,
     final int maxLength, final String defaultValue, final boolean required) {
     this(name, size, maxLength, defaultValue, required);
@@ -82,6 +68,23 @@ public class TextField extends Field {
         + ") must be <= maxLength (" + minLength + ")");
     }
     this.minLength = minLength;
+  }
+
+  public TextField(final String name, final int size, final int maxLength,
+    final String defaultValue, final boolean required) {
+    this(name, size, defaultValue, required);
+    this.maxLength = maxLength;
+  }
+
+  public TextField(final String name, final int size,
+    final String defaultValue, final boolean required) {
+    super(name, required);
+    this.size = size;
+    setInitialValue(defaultValue);
+  }
+
+  public String getInputValue() {
+    return inputValue;
   }
 
   /**
@@ -102,26 +105,61 @@ public class TextField extends Field {
     return size;
   }
 
+  public String getStringValue() {
+    return (String)getValue();
+  }
+
+  public String getStyle() {
+    return style;
+  }
+
+  @Override
   public boolean hasValue() {
     return inputValue != null && !inputValue.equals("");
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     inputValue = request.getParameter(getName());
     if (inputValue == null) {
       setValue(getInitialValue(request));
+      if (getValue() != null) {
+        inputValue = getValue().toString();
+      }
     }
   }
 
-  public void setValue(final Object value) {
-    super.setValue(value);
-    if (value != null) {
-      inputValue = value.toString();
-    } else {
-      inputValue = null;
+  @Override
+  public boolean isValid() {
+    boolean valid = true;
+    if (!super.isValid()) {
+      valid = false;
+    } else if (hasValue()) {
+      final int length = inputValue.length();
+      if (length > maxLength) {
+        addValidationError("Cannot exceed " + maxLength + " characters");
+        valid = false;
+      } else if (length < minLength) {
+        addValidationError("Must be at least " + minLength + " characters");
+        valid = false;
+      }
     }
+    if (valid) {
+      try {
+        if (inputValue != null && inputValue.length() > 0) {
+          setTextValue(inputValue);
+        } else {
+          setTextValue(null);
+        }
+      } catch (final IllegalArgumentException e) {
+        addValidationError(e.getMessage());
+        valid = false;
+      }
+    }
+    return valid;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
@@ -140,48 +178,35 @@ public class TextField extends Field {
     out.endTag(HtmlUtil.INPUT);
   }
 
-  public boolean isValid() {
-    boolean valid = true;
-    if (!super.isValid()) {
-      valid = false;
-    } else if (hasValue()) {
-      int length = inputValue.length();
-      if (length > maxLength) {
-        addValidationError("Cannot exceed " + maxLength + " characters");
-        valid = false;
-      } else if (length < minLength) {
-        addValidationError("Must be at least " + minLength + " characters");
-        valid = false;
-      }
-    }
-    if (valid) {
-      if (inputValue != null && inputValue.length() > 0) {
-        super.setValue(inputValue);
-      } else {
-        super.setValue(null);
-      }
-    }
-    return valid;
-  }
-
   protected void setInputValue(final String inputValue) {
     this.inputValue = inputValue;
   }
 
-  public String getInputValue() {
-    return inputValue;
+  public void setSize(final int size) {
+    this.size = size;
   }
 
-  public String getStringValue() {
-    return (String)getValue();
-  }
-
-  public String getStyle() {
-    return style;
-  }
-
-  public void setStyle(String style) {
+  public void setStyle(final String style) {
     this.style = style;
+  }
+
+  @Override
+  public void setValue(final Object value) {
+    super.setValue(value);
+    if (value != null) {
+      inputValue = value.toString();
+    } else {
+      inputValue = null;
+    }
+  }
+
+  public void setTextValue(final String value) {
+    super.setValue(value);
+    if (value != null) {
+      inputValue = value.toString();
+    } else {
+      inputValue = null;
+    }
   }
 
 }

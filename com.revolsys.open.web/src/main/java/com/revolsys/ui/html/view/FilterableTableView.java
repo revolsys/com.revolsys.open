@@ -23,6 +23,7 @@ import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.fields.Field;
+import com.revolsys.ui.html.fields.TextField;
 import com.revolsys.ui.html.layout.TableBodyLayout;
 import com.revolsys.ui.html.serializer.RowsTableSerializer;
 
@@ -58,6 +59,10 @@ public class FilterableTableView extends ElementContainer {
       if (element instanceof Field) {
         Field field = (Field)element;
         field.setRequired(false);
+      }
+      if (element instanceof TextField) {
+        TextField textField = (TextField)element;
+        textField.setSize(1);
       }
       searchFields.add(element);
     }
@@ -133,7 +138,9 @@ public class FilterableTableView extends ElementContainer {
     out.endTag(HtmlUtil.TBODY);
   }
 
-  protected void serializeRow(final XmlWriter out, final int row,
+  protected void serializeRow(
+    final XmlWriter out,
+    final int row,
     final int rowCount) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
@@ -179,7 +186,9 @@ public class FilterableTableView extends ElementContainer {
     }
   }
 
-  protected void serializeFooterRow(final XmlWriter out, final int row,
+  protected void serializeFooterRow(
+    final XmlWriter out,
+    final int row,
     final int rowCount) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);

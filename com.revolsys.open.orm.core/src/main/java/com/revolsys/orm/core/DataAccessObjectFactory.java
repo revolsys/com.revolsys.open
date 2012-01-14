@@ -15,6 +15,8 @@
  */
 package com.revolsys.orm.core;
 
+import com.revolsys.gis.data.io.DataAccessObject;
+
 /**
  * The DataAccessObjectFactory interface defines the methods that factories that
  * return {@link DataAccessObject} implementations for a class must implement.

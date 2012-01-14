@@ -25,27 +25,4 @@ public class UrlField extends TextField {
     super(name, 40, 1000, defaultValue, required);
   }
 
-  public boolean isValid() {
-    boolean valid = true;
-    if (!super.isValid()) {
-      valid = false;
-    } else if (hasValue()) {
-      int length = getInputValue().length();
-      if (length > getMaxLength()) {
-        setInputValue(getInputValue().substring(0, getMaxLength()));
-        addValidationError("Cannot exceed " + getMaxLength() + " characters");
-        valid = false;
-      } else if (length < getMinLength()) {
-        addValidationError("Must be at least " + getMinLength() + " characters");
-        valid = false;
-        // } else if (!GenericValidator.isUrl(inputValue)) {
-        // addValidationError("Enter a valid URL");
-        // valid = false;
-      }
-    }
-    if (valid) {
-      setValue(getInputValue());
-    }
-    return valid;
-  }
 }

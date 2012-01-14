@@ -15,90 +15,37 @@
  */
 package com.revolsys.ui.html.fields;
 
+import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.ui.html.form.Form;
-
-public class LongField extends Field {
-  private int size = 10;
-
-  private int maxLength = 19;
-
-  private String inputValue = "";
+public class LongField extends TextField {
 
   private long minimumValue = Long.MIN_VALUE;
 
   private long maximumValue = Long.MAX_VALUE;
 
   public LongField(final String name, final boolean required) {
-    super(name, required);
+    super(name, 10, 19, "", required);
   }
 
-  public String getInputValue() {
-    return inputValue;
-  }
-
-  public boolean hasValue() {
-    return inputValue != null && !inputValue.equals("");
-  }
-
-  public void initialize(final Form form, final HttpServletRequest request) {
-    inputValue = request.getParameter(getName());
-    if (inputValue == null) {
-      setValue(getInitialValue(request));
-      if (getValue() != null) {
-        inputValue = getValue().toString();
-      }
-    }
-  }
-
-  public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "text");
-    out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(size));
-    out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(maxLength));
-    if (inputValue != null) {
-      out.attribute(HtmlUtil.ATTR_VALUE, inputValue);
-    }
-    out.endTag(HtmlUtil.INPUT);
-  }
-
-  public boolean isValid() {
-    boolean valid = true;
-    if (!super.isValid()) {
-      valid = false;
-    } else if (hasValue()) {
-      int length = inputValue.length();
-      if (length > maxLength) {
-        addValidationError("Cannot exceed " + maxLength + " characters");
-        valid = false;
-      }
-    } else {
-      return true;
-    }
-    if (valid) {
+  @Override
+  public void setTextValue(final String value) {
+    super.setTextValue(value);
+    if (StringUtils.hasLength(value)) {
       try {
-        Long longValue = new Long(inputValue);
-        if (longValue.longValue() < minimumValue) {
-          addValidationError("Must be >= " + minimumValue);
-          valid = false;
-        } else if (longValue.longValue() > maximumValue) {
-          addValidationError("Must be <= " + maximumValue);
-          valid = false;
+        final Long longValue = new Long(value);
+        if (longValue < minimumValue) {
+          throw new IllegalArgumentException("Must be >= " + minimumValue);
+        } else if (longValue > maximumValue) {
+          throw new IllegalArgumentException("Must be <= " + maximumValue);
         } else {
           setValue(longValue);
         }
-      } catch (NumberFormatException e) {
-        addValidationError("Must be a valid number");
-        valid = false;
+      } catch (final NumberFormatException e) {
+        throw new IllegalArgumentException("Must be a valid number");
       }
+    } else {
+      super.setValue(null);
     }
-    return valid;
   }
 
   /**

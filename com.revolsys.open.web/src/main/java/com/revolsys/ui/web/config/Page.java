@@ -15,9 +15,11 @@
  */
 package com.revolsys.ui.web.config;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.jexl.Expression;
 import org.apache.log4j.Logger;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.util.UriTemplate;
 
 import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.util.CaseConverter;
@@ -65,11 +71,12 @@ public class Page extends Component {
 
   private Expression titleExpression;
 
-  public Page(
-    final Page page) {
+  private UriTemplate uriTemplate;
+
+  public Page(final Page page) {
     super(page);
     menuId = page.menuId;
-    path = page.path;
+    setPath(page.path);
     title = page.title;
     properties.putAll(page.properties);
     arguments.addAll(page.arguments);
@@ -78,10 +85,7 @@ public class Page extends Component {
     attributesMap.putAll(page.attributesMap);
   }
 
-  public Page(
-    final String name,
-    final String title,
-    final String path,
+  public Page(final String name, final String title, final String path,
     final boolean secure) {
     super(name);
     setTitle(title);
@@ -89,8 +93,7 @@ public class Page extends Component {
     this.secure = secure;
   }
 
-  public void addArgument(
-    final Argument argument) {
+  public void addArgument(final Argument argument) {
     if (!hasArgument(argument.getName())) {
       arguments.add(argument);
       argumentsMap.put(argument.getName(), argument);
@@ -102,8 +105,7 @@ public class Page extends Component {
     }
   }
 
-  public void addAttribute(
-    final Attribute attribute) {
+  public void addAttribute(final Attribute attribute) {
     if (!hasArgument(attribute.getName())) {
       attributes.add(attribute);
       attributesMap.put(attribute.getName(), attribute);
@@ -115,13 +117,11 @@ public class Page extends Component {
     }
   }
 
-  public void addMenu(
-    final Menu menu) {
+  public void addMenu(final Menu menu) {
     menus.put(menu.getName(), menu);
   }
 
-  public void addPage(
-    final Page page) {
+  public void addPage(final Page page) {
     pages.put(page.getName(), page);
     pathMap.put(page.getPath(), page);
     page.setParent(this);
@@ -143,9 +143,7 @@ public class Page extends Component {
     }
   }
 
-  public void addProperty(
-    final String name,
-    final String value) {
+  public void addProperty(final String name, final String value) {
     properties.put(name, value);
   }
 
@@ -155,8 +153,7 @@ public class Page extends Component {
   }
 
   @Override
-  public boolean equals(
-    final Object o) {
+  public boolean equals(final Object o) {
     if (o instanceof Page) {
       final Page p = (Page)o;
       if (super.equals(o)
@@ -209,34 +206,57 @@ public class Page extends Component {
     return getFullUrl(parameters);
   }
 
-  public String getFullUrl(
-    final Map<String, ? extends Object> parameters) {
-    final WebUiContext context = WebUiContext.get();
+  private HttpServletRequest getRequest() {
+    ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    HttpServletRequest request = requestAttributes.getRequest();
+    return request;
+  }
+
+  public Map<String, Object> getUriTemplateVariables(
+    Map<String, Object> parameters) {
+    HttpServletRequest request = getRequest();
+    final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+    Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
+    for (String name : uriTemplate.getVariableNames()) {
+      Object value = parameters.remove(name);
+      if (value == null) {
+        value = pathVariables.get(name);
+        if (value == null) {
+          value = request.getParameter(name);
+        }
+      }
+      if (value != null) {
+        uriTemplateVariables.put(name, value);
+      }
+    }
+    return uriTemplateVariables;
+  }
+
+  public String getFullUrl(final Map<String, ? extends Object> parameters) {
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
       parameters);
-    if (context != null) {
-      final HttpServletRequest request = context.getRequest();
-      if (request != null) {
-        for (final Argument argument : arguments) {
-          final String name = argument.getName();
-          if (!uriParameters.containsKey(name)) {
-            final String value = request.getParameter(name);
-            if (value != null) {
-              uriParameters.put(name, value);
-            }
+    final HttpServletRequest request = getRequest();
+    if (request != null) {
+      for (final Argument argument : arguments) {
+        final String name = argument.getName();
+        if (!uriParameters.containsKey(name)) {
+          final String value = request.getParameter(name);
+          if (value != null) {
+            uriParameters.put(name, value);
           }
         }
       }
     }
-    return UrlUtil.getUrl(getFullPath(), uriParameters);
+    Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
+    URI path = uriTemplate.expand(uriTemplateVariables);
+    return UrlUtil.getUrl(path, uriParameters);
   }
 
   public Layout getLayout() {
     return layout;
   }
 
-  public Menu getMenu(
-    final String name) {
+  public Menu getMenu(final String name) {
     return menus.get(name);
   }
 
@@ -244,8 +264,7 @@ public class Page extends Component {
     return menuId;
   }
 
-  public Page getPage(
-    final String name) {
+  public Page getPage(final String name) {
     if (name == null) {
       return null;
     }
@@ -280,8 +299,7 @@ public class Page extends Component {
     return pathMap;
   }
 
-  public String getProperty(
-    final String name) {
+  public String getProperty(final String name) {
     return properties.get(name);
   }
 
@@ -294,13 +312,11 @@ public class Page extends Component {
     }
   }
 
-  public boolean hasArgument(
-    final String name) {
+  public boolean hasArgument(final String name) {
     return argumentsMap.containsKey(name);
   }
 
-  public boolean hasAttribute(
-    final String name) {
+  public boolean hasAttribute(final String name) {
     return attributesMap.containsKey(name);
   }
 
@@ -318,46 +334,40 @@ public class Page extends Component {
     return secure;
   }
 
-  public void setLayout(
-    final Layout layout) {
+  public void setLayout(final Layout layout) {
     this.layout = layout;
     layout.setPage(this);
   }
 
-  public void setMenuId(
-    final long menuId) {
+  public void setMenuId(final long menuId) {
     this.menuId = menuId;
   }
 
-  public void setParent(
-    final Page parent) {
+  public void setParent(final Page parent) {
     this.parent = parent;
     if (parent.isSecure()) {
       secure = true;
     }
   }
 
-  public void setPath(
-    final String path) {
+  public void setPath(final String path) {
     if (path != null) {
       this.path = path;
     } else {
       this.path = "/" + CaseConverter.toLowerCamelCase(getName());
     }
+    uriTemplate = new UriTemplate(this.path);
   }
 
-  public void setPathMap(
-    final Map<String, Page> pathMap) {
+  public void setPathMap(final Map<String, Page> pathMap) {
     this.pathMap = pathMap;
   }
 
-  public final void setSecure(
-    final boolean secure) {
+  public final void setSecure(final boolean secure) {
     this.secure = secure;
   }
 
-  public void setTitle(
-    final String title) {
+  public void setTitle(final String title) {
     if (title != null) {
       this.title = title;
       try {

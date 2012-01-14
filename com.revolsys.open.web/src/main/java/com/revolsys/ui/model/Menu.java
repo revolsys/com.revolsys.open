@@ -294,8 +294,9 @@ public class Menu implements Cloneable {
       try {
         titleExpression = JexlUtil.createExpression(this.title);
       } catch (Exception e) {
-        LOG.error("Error creating expression '" + this.title + "': "
-          + e.getMessage(), e);
+        LOG.error(
+          "Error creating expression '" + this.title + "': " + e.getMessage(),
+          e);
         titleExpression = null;
       }
     } else {
@@ -313,8 +314,8 @@ public class Menu implements Cloneable {
       try {
         uriExpression = JexlUtil.createExpression(this.uri);
       } catch (Exception e) {
-        LOG.error("Error creating expression '" + this.uri + "': "
-          + e.getMessage(), e);
+        LOG.error(
+          "Error creating expression '" + this.uri + "': " + e.getMessage(), e);
         uriExpression = null;
       }
     } else {

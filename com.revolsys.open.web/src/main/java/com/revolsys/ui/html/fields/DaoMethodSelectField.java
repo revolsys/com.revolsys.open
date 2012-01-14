@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.MethodUtils;
 
-import com.revolsys.orm.core.DataAccessObject;
+import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.ui.html.form.Form;
 
 public class DaoMethodSelectField extends SelectField {

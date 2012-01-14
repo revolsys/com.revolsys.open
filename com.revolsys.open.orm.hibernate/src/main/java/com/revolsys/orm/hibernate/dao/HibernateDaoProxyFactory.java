@@ -19,8 +19,8 @@ import java.lang.reflect.Proxy;
 
 import org.hibernate.SessionFactory;
 
+import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.orm.core.DaoProxyFactory;
-import com.revolsys.orm.core.DataAccessObject;
 import com.revolsys.orm.core.DomainClass;
 
 /**

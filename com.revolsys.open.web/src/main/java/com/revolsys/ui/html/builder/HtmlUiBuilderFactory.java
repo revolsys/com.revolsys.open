@@ -40,11 +40,11 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     this.beanFactory = beanFactory;
   }
 
-  public <T extends HtmlUiBuilder> T get(final Class<?> objectClass) {
+  public <T extends HtmlUiBuilder<?>> T get(final Class<?> objectClass) {
     return (T)get(beanFactory, objectClass);
   }
 
-  public <T extends HtmlUiBuilder> T get(final String objectClassName) {
+  public <T extends HtmlUiBuilder<?>> T get(final String objectClassName) {
     return (T)get(beanFactory, objectClassName);
   }
 

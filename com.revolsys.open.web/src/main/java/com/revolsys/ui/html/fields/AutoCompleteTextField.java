@@ -35,6 +35,7 @@ public class AutoCompleteTextField extends TextField {
 
   public void initialize(final HttpServletRequest request) {
     this.request = request;
+    super.initialize(request);
   }
 
   public int getMaxResults() {
