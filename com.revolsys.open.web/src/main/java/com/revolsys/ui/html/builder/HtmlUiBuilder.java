@@ -341,7 +341,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         final Object id = searchForm.getValue("idLink");
         Object object = null;
         try {
-          object = dataAccessObject.load(Integer.valueOf(id.toString()));
+          object = loadObject(id);
         } catch (final Exception e) {
         }
         if (object == null) {
@@ -368,8 +368,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
       }
     }
-    final ResultPager<T> pager = dataAccessObject.page(whereClause,
-      Collections.singletonMap("id", true));
+    final ResultPager<T> pager = getObjectList(whereClause);
 
     List<?> results = Collections.emptyList();
     int pageSize;
@@ -418,6 +417,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     return view;
 
+  }
+
+  protected ResultPager<T> getObjectList(final Map<String, Object> filter) {
+    return dataAccessObject.page(filter,
+      Collections.singletonMap("id", true));
   }
 
   public Element createObjectViewPage(
@@ -891,10 +895,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   protected T loadObject() {
+    final String idString = getUriTemplateVariable(idParameterName);
+    return loadObject(idString);
+  }
+
+  protected T loadObject(final Object id) {
     try {
-      final String idString = getUriTemplateVariable(idParameterName);
-      final long id = Long.parseLong(idString);
-      final T object = dataAccessObject.load(id);
+      final long longId = Long.parseLong(id.toString());
+      final T object = dataAccessObject.load(longId);
       return object;
     } catch (final NumberFormatException e) {
       return null;
