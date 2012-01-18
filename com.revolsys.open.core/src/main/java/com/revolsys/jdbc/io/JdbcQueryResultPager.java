@@ -1,38 +1,28 @@
-/*
- * Copyright 2004-2005 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package com.revolsys.orm.hibernate.dao;
+package com.revolsys.jdbc.io;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.ScrollableResults;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import javax.annotation.PreDestroy;
+import javax.sql.DataSource;
+import javax.xml.namespace.QName;
 
 import com.revolsys.collection.ResultPager;
+import com.revolsys.gis.data.io.Query;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectFactory;
+import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.util.ExceptionUtil;
 
-/**
- * The HibernateQueryPager is an implementation of {@link ResultPager} that
- * allows paging over a Hibernate {@link Query}.
- * 
- * @author Paul Austin
- */
-public class HibernateQueryPager<T> implements ResultPager<T> {
+public class JdbcQueryResultPager implements ResultPager<DataObject> {
   /** The objects in the current page. */
-  private List<T> results;
+  private List<DataObject> results;
 
   /** The number of objects in a page. */
   private int pageSize = 10;
@@ -43,36 +33,83 @@ public class HibernateQueryPager<T> implements ResultPager<T> {
   /** The total number of results. */
   private int numResults;
 
-  /** The Hibernate query. */
-  private Query query;
-
   /** The number of pages. */
   private int numPages;
 
-  /**
-   * Construct a new HibernateQueryPager.
-   * 
-   * @param query The Hibernate query.
-   */
-  public HibernateQueryPager(final Query query) {
-    this.query = query;
-    ScrollableResults scrollableResults = query.scroll();
-    scrollableResults.last();
-    this.numResults = scrollableResults.getRowNumber() + 1;
+  private Connection connection;
+
+  private DataSource dataSource;
+
+  private DataObjectFactory dataObjectFactory;
+
+  private JdbcDataObjectStore dataStore;
+
+  private DataObjectMetaData metaData;
+
+  private PreparedStatement statement;
+
+  private ResultSet resultSet;
+
+  public JdbcQueryResultPager(final JdbcDataObjectStore dataStore,
+    final Map<String, Object> properties, final Query query) {
+    this.connection = dataStore.getConnection();
+    this.dataSource = dataStore.getDataSource();
+
+    if (dataSource != null) {
+      try {
+        this.connection = JdbcUtils.getConnection(dataSource);
+        boolean autoCommit = false;
+        if (properties.get("autoCommit") == Boolean.TRUE) {
+          autoCommit = true;
+        }
+        this.connection.setAutoCommit(autoCommit);
+      } catch (final SQLException e) {
+        throw new IllegalArgumentException("Unable to create connection", e);
+      }
+    }
+    this.dataObjectFactory = dataStore.getDataObjectFactory();
+    this.dataStore = dataStore;
+
+    init(query);
   }
 
-  /**
-   * Construct a new HibernateQueryPager.
-   * 
-   * @param query The Hibernate query.
-   * @param pageNumber The current page number.
-   * @param pageSize The number of objects per page.
-   */
-  public HibernateQueryPager(final Query query, final int pageNumber,
-    final int pageSize) {
-    this(query);
-    setPageSize(pageSize);
-    setPageNumber(pageNumber);
+  protected void init(final Query query) {
+    final QName tableName = query.getTypeName();
+    metaData = query.getMetaData();
+    if (metaData == null) {
+      metaData = dataStore.getMetaData(tableName);
+      query.setMetaData(metaData);
+    }
+
+    String sql = JdbcQueryIterator.getSql(query);
+
+    try {
+      statement = connection.prepareStatement(sql,
+        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+      statement.setFetchSize(pageSize);
+
+      resultSet = JdbcQueryIterator.getResultSet(metaData, statement, query);
+      resultSet.last();
+      this.numResults = resultSet.getRow();
+    } catch (final SQLException e) {
+      JdbcUtils.close(statement, resultSet);
+      throw new RuntimeException("Error executing query:" + sql, e);
+    }
+  }
+
+  @PreDestroy
+  public void close() {
+    JdbcUtils.close(statement, resultSet);
+    if (dataSource != null) {
+      JdbcUtils.close(connection);
+    }
+    connection = null;
+    dataObjectFactory = null;
+    dataSource = null;
+    dataStore = null;
+    metaData = null;
+    resultSet = null;
+    statement = null;
   }
 
   /**
@@ -89,7 +126,7 @@ public class HibernateQueryPager<T> implements ResultPager<T> {
    * 
    * @return The list of objects in the current page.
    */
-  public List<T> getList() {
+  public List<DataObject> getList() {
     if (results == null) {
       throw new IllegalStateException(
         "The page number must be set using setPageNumber");
@@ -231,17 +268,28 @@ public class HibernateQueryPager<T> implements ResultPager<T> {
    * Update the cached results for the current page.
    */
   private void updateResults() {
-    if (pageNumber != -1) {
-      try {
-        query.setFirstResult(pageNumber * pageSize);
-        query.setMaxResults(pageSize);
-        this.results = query.list();
-      } catch (HibernateException e) {
-        throw SessionFactoryUtils.convertHibernateAccessException(e);
+    results = new ArrayList<DataObject>();
+    try {
+      if (pageNumber != -1) {
+        if (resultSet.absolute(pageNumber * pageSize + 1)) {
+          int i = 0;
+          do {
+            DataObject object = JdbcQueryIterator.getNextObject(dataStore,
+              metaData, metaData.getAttributes(), dataObjectFactory, resultSet);
+            results.add(object);
+            i++;
+          } while (resultSet.next() && i < pageSize);
+        }
       }
+    } catch (Throwable t) {
+      close();
+      ExceptionUtil.throwUncheckedException(t);
     }
   }
 
-  public void close() {
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    close();
   }
 }

@@ -52,7 +52,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   public void addAttributeAlias(String columnName) {
     attributeAliases.add(columnName);
   }
-  
+
   protected void addValues(final Reader<DataObject> allCodes) {
     for (final DataObject code : allCodes) {
       addValue(code);
@@ -158,7 +158,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   @Override
-  protected synchronized Object loadId(final List<Object> values,
+  protected synchronized Object loadId(
+    final List<Object> values,
     final boolean createId) {
     Object id = null;
     if (createId && loadAll) {
@@ -252,9 +253,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
-  public void setValueAttributeNames(final String valueColumn) {
-    this.valueAttributeNames.clear();
-    this.valueAttributeNames.add(valueColumn);
+  public void setValueAttributeName(final String valueColumns) {
+    setValueAttributeNames(valueColumns);
   }
 
   public void setValueAttributeNames(final String... valueColumns) {

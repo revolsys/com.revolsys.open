@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -83,6 +84,10 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public AbstractJdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
+  }
+  @Override
+  public ResultPager<DataObject> page(Query query) {
+    return new JdbcQueryResultPager(this, getProperties(), query);
   }
 
   protected void addAttribute(final DataObjectMetaDataImpl metaData,

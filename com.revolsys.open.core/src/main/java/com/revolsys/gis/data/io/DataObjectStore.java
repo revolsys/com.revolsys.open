@@ -2,9 +2,11 @@ package com.revolsys.gis.data.io;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -30,10 +32,14 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   Object createPrimaryIdValue(QName typeName);
 
-  Query createQuery(final QName typeName, String whereClause,
+  Query createQuery(
+    final QName typeName,
+    String whereClause,
     final BoundingBox boundingBox);
 
-  DataObjectReader createReader(QName typeName, String query,
+  DataObjectReader createReader(
+    QName typeName,
+    String query,
     List<Object> parameters);
 
   Writer<DataObject> createWriter();
@@ -94,6 +100,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   Reader<DataObject> query(QName typeName, Geometry geometry);
 
   Reader<DataObject> query(Query... queries);
+
+  ResultPager<DataObject> page(Query query);
 
   DataObject queryFirst(Query query);
 

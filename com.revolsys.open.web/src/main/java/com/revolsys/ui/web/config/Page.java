@@ -217,10 +217,13 @@ public class Page extends Component {
     HttpServletRequest request = getRequest();
     final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
     Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
+
     for (String name : uriTemplate.getVariableNames()) {
       Object value = parameters.remove(name);
       if (value == null) {
-        value = pathVariables.get(name);
+        if (pathVariables != null) {
+          value = pathVariables.get(name);
+        }
         if (value == null) {
           value = request.getParameter(name);
         }

@@ -243,4 +243,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
       }
     }
   }
+
+  public void close() {
+  }
 }

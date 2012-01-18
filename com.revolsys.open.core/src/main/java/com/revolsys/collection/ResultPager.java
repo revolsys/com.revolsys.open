@@ -138,4 +138,6 @@ public interface ResultPager<T> {
    */
   void setPageSize(
     int pageSize);
+  
+  void close();
 }

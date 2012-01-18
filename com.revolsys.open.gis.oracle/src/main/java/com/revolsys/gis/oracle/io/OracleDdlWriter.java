@@ -5,12 +5,15 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
@@ -69,7 +72,8 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeResetSequence(DataObjectMetaData metaData,
+  public void writeResetSequence(
+    DataObjectMetaData metaData,
     List<DataObject> values) {
     PrintWriter out = getOut();
     Long nextValue = 0L;
@@ -123,10 +127,20 @@ public class OracleDdlWriter extends JdbcDdlWriter {
 
   public String getSequenceName(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
-    final String schemaName = typeName.getNamespaceURI().toUpperCase();
-    final String tableName = typeName.getLocalPart().toUpperCase();
-    final String sequenceName = schemaName + "." + tableName + "_SEQ";
-    return sequenceName;
+    final String schema = typeName.getNamespaceURI().toUpperCase();
+    ShortNameProperty shortNameProperty = ShortNameProperty.getProperty(metaData);
+    String shortName = null;
+    if (shortNameProperty != null) {
+      shortName = shortNameProperty.getShortName();
+    }
+    if (StringUtils.hasText(shortName) && shortNameProperty.isUseForSequence()) {
+      final String sequenceName = schema + "." + shortName.toUpperCase()
+        + "_SEQ";
+      return sequenceName;
+    } else {
+      final String tableName = typeName.getLocalPart().toUpperCase();
+      return schema + "." + tableName + "_SEQ";
+    }
   }
 
   public void writeGeometryMetaData(final DataObjectMetaData metaData) {
@@ -235,7 +249,9 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     out.println(";");
   }
 
-  public void writeAlterOwner(final String objectType, final String objectName,
+  public void writeAlterOwner(
+    final String objectType,
+    final String objectName,
     final String owner) {
     PrintWriter out = getOut();
     out.print("ALTER ");

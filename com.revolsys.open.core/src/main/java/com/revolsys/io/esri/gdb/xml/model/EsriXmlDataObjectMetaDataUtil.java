@@ -60,8 +60,10 @@ public class EsriXmlDataObjectMetaDataUtil implements
     }
   }
 
-  private static void addGeometryField(final GeometryType shapeType,
-    final DETable table, final Attribute attribute) {
+  private static void addGeometryField(
+    final GeometryType shapeType,
+    final DETable table,
+    final Attribute attribute) {
     final Field field = addField(table, attribute);
     final DEFeatureClass featureClass = (DEFeatureClass)table;
     final SpatialReference spatialReference = featureClass.getSpatialReference();
@@ -85,7 +87,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
   }
 
   public static DEFeatureDataset createDEFeatureDataset(
-    final String schemaName, final SpatialReference spatialReference) {
+    final String schemaName,
+    final SpatialReference spatialReference) {
     final DEFeatureDataset dataset = new DEFeatureDataset();
     String name;
     final int slashIndex = schemaName.lastIndexOf('\\');
@@ -120,7 +123,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
   }
 
   public static List<DEFeatureDataset> createDEFeatureDatasets(
-    final String schemaName, final SpatialReference spatialReference) {
+    final String schemaName,
+    final SpatialReference spatialReference) {
     final List<DEFeatureDataset> datasets = new ArrayList<DEFeatureDataset>();
     String path = "";
     for (final String name : schemaName.split("\\\\")) {
@@ -133,7 +137,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return datasets;
   }
 
-  public static DETable createDETable(final DataObjectMetaData metaData,
+  public static DETable createDETable(
+    final DataObjectMetaData metaData,
     final SpatialReference spatialReference) {
     final QName typeName = metaData.getName();
     final String schemaName = typeName.getNamespaceURI();
@@ -146,8 +151,10 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return createDETable(schemaPath, metaData, spatialReference);
   }
 
-  public static DETable createDETable(final String schemaPath,
-    final DataObjectMetaData metaData, final SpatialReference spatialReference) {
+  public static DETable createDETable(
+    final String schemaPath,
+    final DataObjectMetaData metaData,
+    final SpatialReference spatialReference) {
     DETable table;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     boolean hasGeometry = false;
@@ -218,7 +225,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return table;
   }
 
-  public static DETable getDETable(final DataObjectMetaData metaData,
+  public static DETable getDETable(
+    final DataObjectMetaData metaData,
     final SpatialReference spatialReference) {
     DETable table = metaData.getProperty(DE_TABLE_PROPERTY);
     if (table == null) {
@@ -227,15 +235,26 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return table;
   }
 
-  public static DataObjectMetaData getMetaData(final String schemaName,
-    final CodedValueDomain domain) {
-    final String tableName = domain.getName();
+  public static DataObjectMetaData getMetaData(
+    final String schemaName,
+    final CodedValueDomain domain,
+    boolean appendIdToName) {
+    final String tableName;
+    if (appendIdToName) {
+      tableName = domain.getName() + "_ID";
+    } else {
+      tableName = domain.getName();
+    }
     final QName typeName = new QName(schemaName, tableName);
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
-    metaData.addAttribute(tableName + "_ID", dataType, true);
-    metaData.addAttribute("VALUE", DataTypes.STRING, 255, true);
+    int length = 0;
+    for (CodedValue codedValue : domain.getCodedValues()) {
+      length = Math.max(length, codedValue.getCode().toString().length());
+    }
+    metaData.addAttribute(tableName, dataType, length, true);
+    metaData.addAttribute("DESCRIPTION", DataTypes.STRING, 255, true);
     metaData.setIdAttributeIndex(0);
     return metaData;
   }
@@ -248,13 +267,16 @@ public class EsriXmlDataObjectMetaDataUtil implements
    * @param deTable
    * @return
    */
-  public static DataObjectMetaData getMetaData(final String schemaName,
+  public static DataObjectMetaData getMetaData(
+    final String schemaName,
     final DETable deTable) {
     return getMetaData(schemaName, deTable, true);
   }
 
-  public static DataObjectMetaData getMetaData(final String schemaName,
-    final DETable deTable, final boolean ignoreEsriFields) {
+  public static DataObjectMetaData getMetaData(
+    final String schemaName,
+    final DETable deTable,
+    final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
     final QName typeName = new QName(schemaName, tableName);
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
@@ -304,8 +326,11 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return metaData;
   }
 
-  private static void addField(final DataObjectMetaDataImpl metaData,
-    final DETable deTable, final String tableName, final Field field,
+  private static void addField(
+    final DataObjectMetaDataImpl metaData,
+    final DETable deTable,
+    final String tableName,
+    final Field field,
     final String fieldName) {
     final FieldType fieldType = field.getType();
     int precision = field.getPrecision();
@@ -354,13 +379,14 @@ public class EsriXmlDataObjectMetaDataUtil implements
     }
   }
 
-  public static List<DataObject> getValues(DataObjectMetaData metaData,
+  public static List<DataObject> getValues(
+    DataObjectMetaData metaData,
     CodedValueDomain domain) {
     List<DataObject> values = new ArrayList<DataObject>();
     for (CodedValue codedValue : domain.getCodedValues()) {
       DataObject value = new ArrayDataObject(metaData);
       value.setIdValue(codedValue.getCode());
-      value.setValue("VALUE", codedValue.getName());
+      value.setValue("DESCRIPTION", codedValue.getName());
       values.add(value);
     }
     return values;

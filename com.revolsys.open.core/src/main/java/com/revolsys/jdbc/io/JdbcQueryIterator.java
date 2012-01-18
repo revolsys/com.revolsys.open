@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
@@ -30,6 +31,202 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
+  public static void addAttributeName(
+    final StringBuffer sql,
+    final String tablePrefix,
+    final Attribute attribute) {
+    if (attribute instanceof JdbcAttribute) {
+      final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+      jdbcAttribute.addColumnName(sql, tablePrefix);
+    } else {
+      sql.append(attribute.getName());
+    }
+  }
+
+  public static void addColumnNames(
+    final StringBuffer sql,
+    final DataObjectMetaData metaData,
+    final String tablePrefix) {
+    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+      if (i > 0) {
+        sql.append(", ");
+      }
+      final Attribute attribute = metaData.getAttribute(i);
+      addAttributeName(sql, tablePrefix, attribute);
+    }
+  }
+
+  public static void addColumnNames(
+    final StringBuffer sql,
+    final DataObjectMetaData metaData,
+    final String tablePrefix,
+    final List<String> attributeNames,
+    boolean hasColumns) {
+    for (final String attributeName : attributeNames) {
+      if (hasColumns) {
+        sql.append(", ");
+      }
+      final Attribute attribute = metaData.getAttribute(attributeName);
+      if (attribute == null) {
+        sql.append(attributeName);
+      } else {
+        addAttributeName(sql, tablePrefix, attribute);
+      }
+      hasColumns = true;
+    }
+  }
+
+  public static String createSql(
+    final DataObjectMetaData metaData,
+    final String tablePrefix,
+    final String fromClause,
+    final List<String> attributeNames,
+    final Map<String, Object> filter,
+    String where,
+    final List<String> orderBy) {
+    final QName typeName = metaData.getName();
+    final StringBuffer sql = new StringBuffer();
+    sql.append("SELECT ");
+    boolean hasColumns = false;
+    if (attributeNames.isEmpty() || attributeNames.remove("*")) {
+      addColumnNames(sql, metaData, tablePrefix);
+      hasColumns = true;
+    }
+    addColumnNames(sql, metaData, tablePrefix, attributeNames, hasColumns);
+    sql.append(" FROM ");
+    if (StringUtils.hasText(fromClause)) {
+      sql.append(fromClause);
+    } else {
+      final String tableName = JdbcUtils.getTableName(typeName);
+      sql.append(tableName);
+      sql.append(" ");
+      sql.append(tablePrefix);
+    }
+    if (filter != null) {
+      final StringBuffer filterWhere = new StringBuffer();
+      boolean first = true;
+      for (final Entry<String, Object> entry : filter.entrySet()) {
+        if (first) {
+          first = false;
+        } else {
+          filterWhere.append(" AND ");
+        }
+        final String key = entry.getKey();
+        final Object value = entry.getValue();
+        if (value == null) {
+          filterWhere.append(key);
+          filterWhere.append(" IS NULL");
+        } else {
+          final Attribute attribute = metaData.getAttribute(key);
+          if (attribute instanceof JdbcAttribute) {
+            final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+            filterWhere.append(key);
+            filterWhere.append(" = ");
+            jdbcAttribute.addInsertStatementPlaceHolder(sql, false);
+          } else {
+            filterWhere.append(key);
+            filterWhere.append(" = ?");
+          }
+        }
+      }
+      if (filterWhere.length() > 0) {
+        if (StringUtils.hasText(where)) {
+          where = "(" + where + ") AND (" + filterWhere + ")";
+        } else {
+          where = filterWhere.toString();
+        }
+      }
+    }
+    if (StringUtils.hasText(where)) {
+      sql.append(" WHERE ");
+      sql.append(where);
+    }
+    if (!orderBy.isEmpty()) {
+      sql.append(" ORDER BY ");
+      for (int i = 0; i < orderBy.size(); i++) {
+        if (i > 0) {
+          sql.append(", ");
+        }
+        final String name = orderBy.get(i);
+        sql.append(name);
+      }
+    }
+    return sql.toString();
+  }
+
+  public static DataObject getNextObject(
+    final JdbcDataObjectStore dataStore,
+    final DataObjectMetaData metaData,
+    final List<Attribute> attributes,
+    final DataObjectFactory dataObjectFactory,
+    final ResultSet resultSet) {
+    final DataObject object = dataObjectFactory.createDataObject(metaData);
+    int columnIndex = 1;
+
+    for (final Attribute attribute : attributes) {
+      final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+      try {
+        columnIndex = jdbcAttribute.setAttributeValueFromResultSet(resultSet,
+          columnIndex, object);
+      } catch (final SQLException e) {
+        throw new RuntimeException("Unable to get value " + (columnIndex + 1)
+          + " from result set", e);
+      }
+    }
+    object.setState(DataObjectState.Persisted);
+    dataStore.addStatistic("query", object);
+    return object;
+  }
+
+  public static int setPreparedStatementFilterParameters(
+    final DataObjectMetaData metaData,
+    final PreparedStatement statement,
+    int parameterIndex,
+    final Map<String, Object> filter) throws SQLException {
+    if (filter != null) {
+      for (final Entry<String, Object> entry : filter.entrySet()) {
+        final String key = entry.getKey();
+        final Object value = entry.getValue();
+        if (value != null) {
+          final Attribute attribute = metaData.getAttribute(key);
+          JdbcAttribute jdbcAttribute;
+          if (attribute instanceof JdbcAttribute) {
+            jdbcAttribute = (JdbcAttribute)attribute;
+
+          } else {
+            jdbcAttribute = new JdbcAttribute();
+          }
+          parameterIndex = jdbcAttribute.setPreparedStatementValue(statement,
+            parameterIndex, value);
+        }
+      }
+    }
+    return parameterIndex;
+  }
+
+  public static int setPreparedStatementParameters(
+    final Query query,
+    final PreparedStatement statement) throws SQLException {
+    final List<Object> parameters = query.getParameters();
+    final List<Attribute> parameterAttributes = query.getParameterAttributes();
+
+    int statementParameterIndex = 1;
+    for (int i = 0; i < parameters.size(); i++) {
+      final Attribute attribute = parameterAttributes.get(i);
+      JdbcAttribute jdbcAttribute;
+      if (attribute instanceof JdbcAttribute) {
+        jdbcAttribute = (JdbcAttribute)attribute;
+
+      } else {
+        jdbcAttribute = new JdbcAttribute();
+      }
+      final Object value = parameters.get(i);
+      statementParameterIndex = jdbcAttribute.setPreparedStatementValue(
+        statement, statementParameterIndex, value);
+    }
+    return statementParameterIndex;
+  }
+
   private Connection connection;
 
   private final int currentQueryIndex = -1;
@@ -40,7 +237,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private JdbcDataObjectStore dataStore;
 
-  private int fetchSize = 10;
+  private final int fetchSize = 10;
 
   private DataObjectMetaData metaData;
 
@@ -50,7 +247,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private PreparedStatement statement;
 
-  private List<Attribute> attributes = new ArrayList<Attribute>();
+  private final List<Attribute> attributes = new ArrayList<Attribute>();
 
   private Query query;
 
@@ -76,84 +273,6 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     this.dataStore = dataStore;
     this.query = query;
 
-  }
-
-  private void addAttributeName(final StringBuffer sql,
-    final String tablePrefix, final Attribute attribute) {
-    if (attribute instanceof JdbcAttribute) {
-      final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
-      jdbcAttribute.addColumnName(sql, tablePrefix);
-    } else {
-      sql.append(attribute.getName());
-    }
-  }
-
-  private void addColumnNames(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix) {
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
-      if (i > 0) {
-        sql.append(", ");
-      }
-      final Attribute attribute = metaData.getAttribute(i);
-      addAttributeName(sql, tablePrefix, attribute);
-    }
-  }
-
-  private void addColumnNames(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix,
-    final List<String> attributeNames, boolean hasColumns) {
-    for (String attributeName : attributeNames) {
-      if (hasColumns) {
-        sql.append(", ");
-      }
-      final Attribute attribute = metaData.getAttribute(attributeName);
-      if (attribute == null) {
-        sql.append(attributeName);
-        this.metaData = null;
-      } else {
-        addAttributeName(sql, tablePrefix, attribute);
-      }
-      hasColumns = true;
-    }
-  }
-
-  private String createSql(final DataObjectMetaData metaData,
-    final String tablePrefix, final String fromClause,
-    final List<String> attributeNames, final String where,
-    final List<String> orderBy) {
-    final QName typeName = metaData.getName();
-    final StringBuffer sql = new StringBuffer();
-    sql.append("SELECT ");
-    boolean hasColumns = false;
-    if (attributeNames.isEmpty() || attributeNames.remove("*")) {
-      addColumnNames(sql, metaData, tablePrefix);
-      hasColumns = true;
-    }
-    addColumnNames(sql, metaData, tablePrefix, attributeNames, hasColumns);
-    sql.append(" FROM ");
-    if (StringUtils.hasText(fromClause)) {
-      sql.append(fromClause);
-    } else {
-      final String tableName = JdbcUtils.getTableName(typeName);
-      sql.append(tableName);
-      sql.append(" ");
-      sql.append(tablePrefix);
-    }
-    if (StringUtils.hasText(where)) {
-      sql.append(" WHERE ");
-      sql.append(where);
-    }
-    if (!orderBy.isEmpty()) {
-      sql.append(" ORDER BY ");
-      for (int i = 0; i < orderBy.size(); i++) {
-        if (i > 0) {
-          sql.append(", ");
-        }
-        final String name = orderBy.get(i);
-        sql.append(name);
-      }
-    }
-    return sql.toString();
   }
 
   @Override
@@ -193,22 +312,8 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   protected DataObject getNext() throws NoSuchElementException {
     try {
       if (resultSet.next()) {
-        final DataObject object = dataObjectFactory.createDataObject(metaData);
-        int columnIndex = 1;
-
-        for (final Attribute attribute : attributes) {
-          final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
-          try {
-            columnIndex = jdbcAttribute.setAttributeValueFromResultSet(
-              resultSet, columnIndex, object);
-          } catch (final SQLException e) {
-            close();
-            throw new RuntimeException("Unable to get value "
-              + (columnIndex + 1) + " from result set", e);
-          }
-        }
-        object.setState(DataObjectState.Persisted);
-        dataStore.addStatistic("query", object);
+        final DataObject object = getNextObject(dataStore, metaData,
+          attributes, dataObjectFactory, resultSet);
         return object;
       } else {
         close();
@@ -228,42 +333,17 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   protected ResultSet getResultSet(final Query query) {
     final QName tableName = query.getTypeName();
-    final String dbTableName = JdbcUtils.getTableName(tableName);
     metaData = query.getMetaData();
-    String sql = query.getSql();
-    if (sql == null) {
-      if (metaData == null) {
-        metaData = dataStore.getMetaData(tableName);
-        if (metaData == null) {
-          throw new IllegalArgumentException("Unknown table name " + tableName);
-        }
-      }
-
-      final List<String> attributeNames = new ArrayList<String>(
-        query.getAttributeNames());
-      final String fromClause = query.getFromClause();
-      final String where = query.getWhereClause();
-      final List<String> orderBy = query.getOrderBy();
-      sql = createSql(metaData, "T", fromClause, attributeNames, where, orderBy);
-    } else {
-      if (metaData == null) {
-        if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
-          metaData = dataStore.getMetaData(tableName);
-          final StringBuffer newSql = new StringBuffer("SELECT ");
-          addColumnNames(newSql, metaData, dbTableName);
-          newSql.append(" FROM ");
-          newSql.append(sql.substring(14));
-          sql = newSql.toString();
-        }
-      }
+    if (metaData == null) {
+      metaData = dataStore.getMetaData(tableName);
+      query.setMetaData(metaData);
     }
+    String sql = getSql(query);
     try {
       statement = connection.prepareStatement(sql);
       statement.setFetchSize(fetchSize);
 
-      setPreparedStatementParameters(query, statement);
-
-      resultSet = statement.executeQuery();
+      resultSet = getResultSet(metaData, statement, query);
       final ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 
       if (metaData == null) {
@@ -299,25 +379,48 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     return resultSet;
   }
 
-  public void setPreparedStatementParameters(final Query query,
-    final PreparedStatement statement) throws SQLException {
-    final List<Object> parameters = query.getParameters();
-    final List<Attribute> parameterAttributes = query.getParameterAttributes();
+  public static ResultSet getResultSet(
+    final DataObjectMetaData metaData,
+    PreparedStatement statement,
+    final Query query) throws SQLException {
+    final Map<String, Object> filter = query.getFilter();
+    int parameterIndex = setPreparedStatementParameters(query, statement);
+    parameterIndex = setPreparedStatementFilterParameters(metaData, statement,
+      parameterIndex, filter);
 
-    int statementParameterIndex = 1;
-    for (int i = 0; i < parameters.size(); i++) {
-      final Attribute attribute = parameterAttributes.get(i);
-      JdbcAttribute jdbcAttribute;
-      if (attribute instanceof JdbcAttribute) {
-        jdbcAttribute = (JdbcAttribute)attribute;
+    return statement.executeQuery();
+  }
 
-      } else {
-        jdbcAttribute = new JdbcAttribute();
+  public static String getSql(final Query query) {
+    final QName tableName = query.getTypeName();
+    final String dbTableName = JdbcUtils.getTableName(tableName);
+
+    String sql = query.getSql();
+    DataObjectMetaData metaData = query.getMetaData();
+    if (sql == null) {
+      if (metaData == null) {
+        throw new IllegalArgumentException("Unknown table name " + tableName);
       }
-      final Object value = parameters.get(i);
-      statementParameterIndex = jdbcAttribute.setPreparedStatementValue(
-        statement, statementParameterIndex, value);
+      final List<String> attributeNames = new ArrayList<String>(
+        query.getAttributeNames());
+      final String fromClause = query.getFromClause();
+      final String where = query.getWhereClause();
+      final List<String> orderBy = query.getOrderBy();
+      Map<String, Object> filter = query.getFilter();
+      sql = createSql(metaData, "T", fromClause, attributeNames, filter, where,
+        orderBy);
+      query.setSql(sql);
+    } else {
+      if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
+        final StringBuffer newSql = new StringBuffer("SELECT ");
+        addColumnNames(newSql, metaData, dbTableName);
+        newSql.append(" FROM ");
+        newSql.append(sql.substring(14));
+        sql = newSql.toString();
+        query.setSql(sql);
+      }
     }
+    return sql;
   }
 
 }

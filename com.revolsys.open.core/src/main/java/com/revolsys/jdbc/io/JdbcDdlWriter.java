@@ -193,22 +193,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     return sequenceName;
   }
 
-  public String getSequenceName(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String schema = typeName.getNamespaceURI().toLowerCase();
-    String shortName = ShortNameProperty.getShortName(metaData);
-    if (StringUtils.hasText(shortName)) {
-      final String sequenceName = schema + "." + shortName.toLowerCase()
-        + "_seq";
-      return sequenceName;
-    } else {
-      final String tableName = typeName.getLocalPart().toLowerCase();
-      final String idAttributeName = metaData.getIdAttributeName()
-        .toLowerCase();
-      final String sequenceName = schema + "." + tableName + "_"
-        + idAttributeName + "_seq";
-      return sequenceName;
-    }
+  public  String getSequenceName(final DataObjectMetaData metaData) {
+    throw new UnsupportedOperationException();
   }
 
   public void writeCreateSequence(final String sequenceName) {

@@ -26,7 +26,6 @@ import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.SetObject;
-import com.revolsys.util.JavaBeanUtil;
 
 public class HtmlUiBuilderObjectForm extends Form {
   private static final Logger log = Logger.getLogger(HtmlUiBuilderObjectForm.class);
@@ -39,10 +38,8 @@ public class HtmlUiBuilderObjectForm extends Form {
 
   private Object object;
 
-  public HtmlUiBuilderObjectForm(
-    final Object object,
-    final HtmlUiBuilder uiBuilder,
-    final List<String> fieldKeys) {
+  public HtmlUiBuilderObjectForm(final Object object,
+    final HtmlUiBuilder uiBuilder, final List<String> fieldKeys) {
     super(uiBuilder.getTypeName());
     this.object = object;
     this.builder = uiBuilder;
@@ -50,10 +47,8 @@ public class HtmlUiBuilderObjectForm extends Form {
     this.fieldKeys = fieldKeys;
   }
 
-  public HtmlUiBuilderObjectForm(
-    final Object object,
-    final HtmlUiBuilder uiBuilder,
-    final String formName,
+  public HtmlUiBuilderObjectForm(final Object object,
+    final HtmlUiBuilder uiBuilder, final String formName,
     final List<String> fieldKeys) {
     super(formName);
     this.object = object;
@@ -69,7 +64,7 @@ public class HtmlUiBuilderObjectForm extends Form {
       String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
         try {
-          return JavaBeanUtil.getProperty(object, propertyName);
+          return builder.getValue(object, propertyName);
         } catch (IllegalArgumentException e) {
           return null;
         }
@@ -78,8 +73,7 @@ public class HtmlUiBuilderObjectForm extends Form {
     return null;
   }
 
-  public void initialize(
-    final HttpServletRequest request) {
+  public void initialize(final HttpServletRequest request) {
     for (String key : fieldKeys) {
       if (!getFieldNames().contains(key)) {
         Element field = builder.getField(request, key);
@@ -110,7 +104,7 @@ public class HtmlUiBuilderObjectForm extends Form {
             && fieldKeys.contains(propertyName)) {
             Object value = field.getValue();
             try {
-              JavaBeanUtil.setProperty(object, propertyName, value);
+              builder.setValue(object, propertyName, value);
             } catch (IllegalArgumentException e) {
               field.addValidationError(e.getMessage());
               valid = false;
@@ -126,8 +120,7 @@ public class HtmlUiBuilderObjectForm extends Form {
     return valid;
   }
 
-  public void setFieldKeys(
-    final List fieldKeys) {
+  public void setFieldKeys(final List fieldKeys) {
     this.fieldKeys = fieldKeys;
   }
 

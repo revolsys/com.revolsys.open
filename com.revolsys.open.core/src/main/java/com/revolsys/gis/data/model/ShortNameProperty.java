@@ -3,12 +3,12 @@ package com.revolsys.gis.data.model;
 public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
   static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
 
-  private static ShortNameProperty getProperty(final DataObject object) {
+  public static ShortNameProperty getProperty(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     return getProperty(metaData);
   }
 
-  private static ShortNameProperty getProperty(final DataObjectMetaData metaData) {
+  public static ShortNameProperty getProperty(final DataObjectMetaData metaData) {
     return metaData.getProperty(PROPERTY_NAME);
   }
 
@@ -29,6 +29,8 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
       return property.getShortName();
     }
   }
+
+  private boolean useForSequence = true;
 
   private String shortName;
 
@@ -52,8 +54,16 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
     return shortName;
   }
 
+  public boolean isUseForSequence() {
+    return useForSequence;
+  }
+
   public void setShortName(final String shortName) {
     this.shortName = shortName;
+  }
+
+  public void setUseForSequence(final boolean useForSequence) {
+    this.useForSequence = useForSequence;
   }
 
   @Override

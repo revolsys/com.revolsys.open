@@ -56,16 +56,17 @@ public class ObjectListController extends BaseController {
     int index = 0;
     actionMenu.addMenuItem(index++, new Menu("Search", "#",
       "document.forms['searchForm'].submit(); return false;"));
-    actionMenu.addMenuItem(index++, new Menu("Clear Search",
-      htmlUiBuilder.getPageUrl("list")));
+    actionMenu.addMenuItem(index++,
+      new Menu("Clear Search", htmlUiBuilder.getPageUrl("list")));
     if (htmlUiBuilder.hasPageUrl("add")) {
-      actionMenu.addMenuItem(index++, new Menu("Add",
-        htmlUiBuilder.getPageUrl("add")));
+      actionMenu.addMenuItem(index++,
+        new Menu("Add", htmlUiBuilder.getPageUrl("add")));
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected ModelAndView handleRequestInternal(HttpServletRequest request,
+  protected ModelAndView handleRequestInternal(
+    HttpServletRequest request,
     HttpServletResponse response) throws Exception {
     ElementContainer view = new ElementContainer();
 
@@ -117,40 +118,43 @@ public class ObjectListController extends BaseController {
     }
     ResultPager pager = dataAccessObject.page(whereClause,
       Collections.singletonMap("id", true));
-
-    List<?> results = Collections.emptyList();
-    int pageSize;
     try {
-      pageSize = Integer.parseInt(request.getParameter("pageSize"));
-    } catch (Throwable t) {
-      pageSize = defaultPageSize;
+      List<?> results = Collections.emptyList();
+      int pageSize;
+      try {
+        pageSize = Integer.parseInt(request.getParameter("pageSize"));
+      } catch (Throwable t) {
+        pageSize = defaultPageSize;
+      }
+      pager.setPageSize(Math.min(maxPageSize, pageSize));
+      try {
+        String page = request.getParameter("page");
+        pager.setPageNumber(Integer.parseInt(page));
+      } catch (Throwable t) {
+        pager.setPageNumber(1);
+      }
+      results = pager.getList();
+
+      listView.setRows(results);
+
+      Map<String, Object> model = new HashMap<String, Object>();
+      if (pager.getNumResults() > 0) {
+        Map parameters = request.getParameterMap();
+        ResultPagerView pagerView = new ResultPagerView(pager,
+          request.getRequestURI(), parameters);
+        listContainer.add(0, pagerView);
+        listContainer.add(pagerView);
+
+      }
+      model.put("title", htmlUiBuilder.getPluralTitle());
+      model.put("uiBuilder", htmlUiBuilder);
+      MenuElement actionMenu = getActionMenuElement(request);
+      model.put("view", Arrays.asList(view, actionMenu));
+
+      return new ModelAndView("view", model);
+    } finally {
+      pager.close();
     }
-    pager.setPageSize(Math.min(maxPageSize, pageSize));
-    try {
-      String page = request.getParameter("page");
-      pager.setPageNumber(Integer.parseInt(page));
-    } catch (Throwable t) {
-      pager.setPageNumber(1);
-    }
-    results = pager.getList();
-
-    listView.setRows(results);
-
-    Map<String, Object> model = new HashMap<String, Object>();
-    if (pager.getNumResults() > 0) {
-      Map parameters = request.getParameterMap();
-      ResultPagerView pagerView = new ResultPagerView(pager,
-        request.getRequestURI(), parameters);
-      listContainer.add(0, pagerView);
-      listContainer.add(pagerView);
-
-    }
-    model.put("title", htmlUiBuilder.getPluralTitle());
-    model.put("uiBuilder", htmlUiBuilder);
-    MenuElement actionMenu = getActionMenuElement(request);
-    model.put("view", Arrays.asList(view, actionMenu));
-
-    return new ModelAndView("view", model);
   }
 
   public void setDataAccessObject(final DataAccessObject<?> dataAccessObject) {

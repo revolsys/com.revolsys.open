@@ -31,7 +31,8 @@ public class ListResultPager<T> implements ResultPager<T> {
    */
   public List<T> getList() {
     int startIndex = getStartIndex() - 1;
-    return list.subList(startIndex, getEndIndex());
+    int endIndex = getEndIndex();
+    return list.subList(startIndex, endIndex);
   }
 
   /**
@@ -63,9 +64,9 @@ public class ListResultPager<T> implements ResultPager<T> {
    */
   public int getEndIndex() {
     if (pageNumber < getNumPages() - 1) {
-      return (pageNumber + 1) * pageSize - 1;
+      return (pageNumber + 1) * pageSize;
     } else {
-      return list.size() - 1;
+      return list.size();
     }
   }
 
@@ -163,5 +164,8 @@ public class ListResultPager<T> implements ResultPager<T> {
    */
   public void setPageSize(final int pageSize) {
     this.pageSize = pageSize;
+  }
+
+  public void close() {
   }
 }

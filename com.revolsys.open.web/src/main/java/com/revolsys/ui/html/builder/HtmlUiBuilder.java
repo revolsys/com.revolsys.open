@@ -7,10 +7,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.html.HtmlUtil;
@@ -84,7 +87,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   protected static String getUriTemplateVariable(final String name) {
-    Map<String, String> parameters = getUriTemplateVariables();
+    final Map<String, String> parameters = getUriTemplateVariables();
     return parameters.get(name);
   }
 
@@ -106,8 +109,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   protected Map<Class<?>, TypeSerializer> classSerializers = new HashMap<Class<?>, TypeSerializer>();
 
   private HttpServletRequestJexlContext context;
-
-  private DataAccessObject<T> dataAccessObject;
 
   private int defaultPageSize = 25;
 
@@ -319,6 +320,120 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return (F)createForm(object, formName, keys, locale);
   }
 
+  public Element createObjectEditPage(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws IOException, ServletException {
+    final T object = loadObject();
+    if (object == null) {
+      throw new NoSuchRequestHandlingMethodException(request);
+    } else {
+      // if (!canEditObject(request, object)) {
+      // response.sendError(HttpServletResponse.SC_FORBIDDEN,
+      // "No permission to edit " + getTypeName() + " #" + getId());
+      // return null;
+      // }
+      final Map<String, Object> parameters = new HashMap<String, Object>();
+      final Object id = getValue(object, getIdPropertyName());
+      parameters.put(getIdParameterName(), id);
+
+      final String keyListName = "edit";
+      final Set<String> parameterNamesToSave = new HashSet<String>();
+      parameterNamesToSave.add(getIdParameterName());
+
+      final Form form = createForm(object, keyListName, request.getLocale());
+      for (final String param : parameterNamesToSave) {
+        form.addSavedParameter(param, request.getParameter(param));
+      }
+      form.initialize(request);
+
+      if (form.isPosted() && form.isMainFormTask()) {
+        if (form.isValid()) {
+          updateObject(object);
+          parameters.put("message", "Saved");
+
+          final String url = getPageUrl("view", parameters);
+          response.sendRedirect(url);
+          return null;
+        } else {
+          setRollbackOnly(object);
+        }
+      } else {
+        setRollbackOnly(object);
+      }
+
+      request.setAttribute("title", "Edit " + getTitle() + " #" + getId());
+
+      final Menu actionMenu = new Menu();
+      actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("view", parameters)));
+      actionMenu.addMenuItem(new Menu("Refresh", getPageUrl("edit", parameters)));
+      actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
+        + form.getName() + "'].submit()"));
+
+      final MenuElement actionMenuElement = new MenuElement(actionMenu,
+        "actionMenu");
+      final ElementContainer view = new ElementContainer(form,
+        actionMenuElement);
+      return view;
+    }
+  }
+
+  public Element createObjectAddPage(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws IOException, ServletException {
+    final T object = createObject();
+    // if (!canAddObject(request)) {
+    // response.sendError(HttpServletResponse.SC_FORBIDDEN,
+    // "No permission to edit " + getTypeName() + " #" + getId());
+    // return null;
+    // }
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+
+    final String keyListName = "add";
+    final Set<String> parameterNamesToSave = new HashSet<String>();
+
+    final Form form = createForm(object, keyListName, request.getLocale());
+    for (final String param : parameterNamesToSave) {
+      form.addSavedParameter(param, request.getParameter(param));
+    }
+    form.initialize(request);
+
+    if (form.isPosted() && form.isMainFormTask()) {
+      if (form.isValid()) {
+        if (preInsert(form, object)) {
+          insertObject(object);
+          parameters.put("message", "Saved");
+          final Object id = getValue(object, getIdPropertyName());
+          parameters.put(getIdParameterName(), id);
+
+          final String url = getPageUrl("view", parameters);
+          response.sendRedirect(url);
+          return null;
+        }
+      }
+    }
+
+    request.setAttribute("title", "Add " + getTitle());
+
+    final Menu actionMenu = new Menu();
+    actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("list", parameters)));
+    actionMenu.addMenuItem(new Menu("Refresh", getPageUrl("add", parameters)));
+    actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
+      + form.getName() + "'].submit()"));
+
+    final MenuElement actionMenuElement = new MenuElement(actionMenu,
+      "actionMenu");
+    final ElementContainer view = new ElementContainer(form, actionMenuElement);
+    return view;
+  }
+
+  protected T createObject() {
+    return null;
+  }
+
+  protected boolean preInsert(Form form, T object) {
+    return true;
+  }
+
   public Element createObjectListPage(
     final HttpServletRequest request,
     final HttpServletResponse response) throws IOException {
@@ -369,59 +484,62 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
     }
     final ResultPager<T> pager = getObjectList(whereClause);
-
-    List<?> results = Collections.emptyList();
-    int pageSize;
     try {
-      pageSize = Integer.parseInt(request.getParameter("pageSize"));
-    } catch (final Throwable t) {
-      pageSize = defaultPageSize;
+
+      List<?> results = Collections.emptyList();
+      int pageSize;
+      try {
+        pageSize = Integer.parseInt(request.getParameter("pageSize"));
+      } catch (final Throwable t) {
+        pageSize = defaultPageSize;
+      }
+      pager.setPageSize(Math.min(maxPageSize, pageSize));
+      try {
+        final String page = request.getParameter("page");
+        pager.setPageNumber(Integer.parseInt(page));
+      } catch (final Throwable t) {
+        pager.setPageNumber(1);
+      }
+      results = pager.getList();
+
+      listView.setRows(results);
+
+      final ElementContainer view = new ElementContainer();
+      view.add(searchForm);
+
+      final Map<String, Object> model = new HashMap<String, Object>();
+      if (pager.getNumResults() > 0) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> parameters = request.getParameterMap();
+        final ResultPagerView pagerView = new ResultPagerView(pager,
+          request.getRequestURI(), parameters);
+        listContainer.add(0, pagerView);
+        listContainer.add(pagerView);
+
+      }
+
+      model.put("title", getPluralTitle());
+      model.put("uiBuilder", this);
+      final Menu actionMenu = new Menu();
+      actionMenu.addMenuItem(new Menu("Search", "#",
+        "document.forms['searchForm'].submit(); return false;"));
+      String clearUrl = getPageUrl("list",
+        Collections.<String, Object> emptyMap());
+      actionMenu.addMenuItem(new Menu("Clear Search", clearUrl));
+      if (hasPageUrl("add")) {
+        String addUrl = getPageUrl("add",
+          Collections.<String, Object> emptyMap());
+        actionMenu.addMenuItem(new Menu("Add", addUrl));
+      }
+      final MenuElement actionMenuElement = new MenuElement(actionMenu,
+        "actionMenu");
+      view.add(actionMenuElement);
+
+      return view;
+    } finally {
+      pager.close();
     }
-    pager.setPageSize(Math.min(maxPageSize, pageSize));
-    try {
-      final String page = request.getParameter("page");
-      pager.setPageNumber(Integer.parseInt(page));
-    } catch (final Throwable t) {
-      pager.setPageNumber(1);
-    }
-    results = pager.getList();
 
-    listView.setRows(results);
-
-    final ElementContainer view = new ElementContainer();
-    view.add(searchForm);
-
-    final Map<String, Object> model = new HashMap<String, Object>();
-    if (pager.getNumResults() > 0) {
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> parameters = request.getParameterMap();
-      final ResultPagerView pagerView = new ResultPagerView(pager,
-        request.getRequestURI(), parameters);
-      listContainer.add(0, pagerView);
-      listContainer.add(pagerView);
-
-    }
-
-    model.put("title", getPluralTitle());
-    model.put("uiBuilder", this);
-    final Menu actionMenu = new Menu();
-    actionMenu.addMenuItem(new Menu("Search", "#",
-      "document.forms['searchForm'].submit(); return false;"));
-    actionMenu.addMenuItem(new Menu("Clear Search", getPageUrl("list")));
-    if (hasPageUrl("add")) {
-      actionMenu.addMenuItem(new Menu("Add", getPageUrl("add")));
-    }
-    final MenuElement actionMenuElement = new MenuElement(actionMenu,
-      "actionMenu");
-    view.add(actionMenuElement);
-
-    return view;
-
-  }
-
-  protected ResultPager<T> getObjectList(final Map<String, Object> filter) {
-    return dataAccessObject.page(filter,
-      Collections.singletonMap("id", true));
   }
 
   public Element createObjectViewPage(
@@ -438,18 +556,21 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (object == null) {
       throw new NoSuchRequestHandlingMethodException(request);
     } else {
-      final Element listView = createDetailView(object, "objectView", "view",
+      final Element detailView = createDetailView(object, "objectView", "view",
         request.getLocale());
-      final String id = getUriTemplateVariable(idParameterName);
+      final String id = getId();
       request.setAttribute("title", getTitle() + " #" + id);
       final Menu actionMenu = new Menu();
       if (hasPageUrl("edit")) {
-        actionMenu.addMenuItem(new Menu("Edit", getPageUrl("edit")));
+        final Map<String, String> parameters = Collections.singletonMap(
+          getIdParameterName(), id);
+        final String url = getPageUrl("edit", parameters);
+        actionMenu.addMenuItem(new Menu("Edit", url));
       }
 
       final MenuElement actionMenuElement = new MenuElement(actionMenu,
         "actionMenu");
-      final ElementContainer view = new ElementContainer(listView,
+      final ElementContainer view = new ElementContainer(detailView,
         actionMenuElement);
       return view;
     }
@@ -574,10 +695,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public DataAccessObject<T> getDataAccessObject() {
-    return dataAccessObject;
-  }
-
   public int getDefaultPageSize() {
     return defaultPageSize;
   }
@@ -634,6 +751,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return fields;
   }
 
+  public String getId() {
+    return getUriTemplateVariable(idParameterName);
+  }
+
   /**
    * @return Returns the idParameterName.
    */
@@ -643,6 +764,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public String getIdPropertyName() {
     return idPropertyName;
+  }
+
+  public Object getIdValue(final Object object) {
+    return getValue(object, idPropertyName);
   }
 
   /**
@@ -803,6 +928,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return nullLabels;
   }
 
+  protected ResultPager<T> getObjectList(final Map<String, Object> filter) {
+    throw new UnsupportedOperationException();
+  }
+
   private Page getPage(final String path) {
     Page linkPage = null;
     final WebUiContext webUiContext = WebUiContext.get();
@@ -831,11 +960,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public String getPageUrl(
     final String name,
     final Map<String, ? extends Object> parameters) {
-    final String url = pageUrls.get(name);
-    if (url == null) {
+
+    final Page page = getPage(name);
+    if (page == null) {
       return null;
     } else {
-      return getUrl(url, parameters);
+      final String url = page.getFullUrl(parameters);
+      if (url.startsWith("/")) {
+        final String contextPath = urlPathHelper.getOriginatingContextPath(getRequest());
+        return contextPath + url;
+      } else {
+        return url;
+      }
     }
   }
 
@@ -855,20 +991,30 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return typeName;
   }
 
-  private String getUrl(
-    final String url,
-    final Map<String, ? extends Object> parameters) {
-    try {
-      final Expression expression = JexlUtil.createExpression(url);
-      if (expression != null) {
-        context.setAttributes(parameters);
-        return (String)JexlUtil.evaluateExpression(context, expression);
-      }
-    } catch (final Exception e) {
-    } finally {
-      context.clearAttributes();
+  public Object getValue(final Object object, final String key) {
+    if (object instanceof DataObject) {
+      final DataObject dataObject = (DataObject)object;
+      return dataObject.getValueByPath(key);
+    } else if (object instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, ?> map = (Map<String, ?>)object;
+      return map.get(key);
+    } else {
+      return JavaBeanUtil.getProperty(object, key);
     }
-    return url;
+  }
+
+  public void setValue(final Object object, final String key, final Object value) {
+    if (object instanceof DataObject) {
+      final DataObject dataObject = (DataObject)object;
+      dataObject.setValueByPath(key, value);
+    } else if (object instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> map = (Map<String, Object>)object;
+      map.put(key, value);
+    } else {
+      JavaBeanUtil.setProperty(object, key, value);
+    }
   }
 
   public boolean hasPageUrl(final String pageName) {
@@ -876,7 +1022,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void idLink(final XmlWriter out, final Object object) {
-    final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
+    final Object id = getIdValue(object);
     if (id != null) {
       final Map<String, Object> parameters = Collections.singletonMap(
         idParameterName, id);
@@ -890,23 +1036,20 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final HttpServletRequest request) {
   }
 
+  protected void insertObject(final T object) {
+  }
+
   public boolean isUsePathVariables() {
     return usePathVariables;
   }
 
   protected T loadObject() {
-    final String idString = getUriTemplateVariable(idParameterName);
+    final String idString = getId();
     return loadObject(idString);
   }
 
   protected T loadObject(final Object id) {
-    try {
-      final long longId = Long.parseLong(id.toString());
-      final T object = dataAccessObject.load(longId);
-      return object;
-    } catch (final NumberFormatException e) {
-      return null;
-    }
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -941,12 +1084,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
 
         HtmlUiBuilder<? extends Object> uiBuilder = this;
-        String[] parts = valueKey.split("\\.");
+        final String[] parts = valueKey.split("\\.");
         Object currentObject = object;
         for (int i = 0; i < parts.length - 1; i++) {
-          String keyName = parts[i];
+          final String keyName = parts[i];
           try {
-            currentObject = JavaBeanUtil.getProperty(currentObject, keyName);
+            currentObject = getValue(currentObject, keyName);
             if (currentObject == null) {
               serializeNullLabel(out, keyName, locale);
               return;
@@ -961,12 +1104,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
             return;
           }
         }
-        String lastKey = parts[parts.length - 1];
+        final String lastKey = parts[parts.length - 1];
         if (path == null) {
           if (uiBuilder == this) {
             try {
-              final Object value = JavaBeanUtil.getProperty(currentObject, key);
+              final Object value = getValue(currentObject, lastKey);
               if (value == null) {
+                serializeNullLabel(out, lastKey, locale);
+                return;
               } else {
                 final TypeSerializer typeSerializer = classSerializers.get(value.getClass());
                 if (typeSerializer == null) {
@@ -1009,39 +1154,33 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  protected void serializeLink(
-    final XmlWriter out,
-    final Object object,
-    String key,
-    String path,
-    final Locale locale) {
-    final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
-    final Page linkPage = getPage(path);
-    if (linkPage != null) {
-      out.startTag(HtmlUtil.A);
-      final Map<String, Object> parameters = new HashMap<String, Object>();
-      parameters.put(idParameterName, id);
-      String url = linkPage.getFullUrl(parameters);
-      if (url.startsWith("/")) {
-        final String contextPath = urlPathHelper.getOriginatingContextPath(getRequest());
-        url = contextPath + url;
-      }
-      out.attribute(HtmlUtil.ATTR_HREF, url);
-      serialize(out, object, key, locale);
-      out.endTag(HtmlUtil.A);
-    }
-  }
-
   public void serializeIdLink(
     final XmlWriter out,
     final String path,
     final Object id) {
-    final Page page = getPage(path);
-    if (page != null) {
-      final Map<String, Object> parameters = Collections.singletonMap(
-        idParameterName, id);
-      final String url = page.getFullUrl(parameters);
+    final Map<String, Object> parameters = Collections.singletonMap(
+      idParameterName, id);
+    final String url = getPageUrl(path, parameters);
+    if (url != null) {
       HtmlUtil.serializeA(out, null, url, id);
+    }
+  }
+
+  protected void serializeLink(
+    final XmlWriter out,
+    final Object object,
+    final String key,
+    final String path,
+    final Locale locale) {
+    final Object id = getIdValue(object);
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put(idParameterName, id);
+    final String url = getPageUrl(path, parameters);
+    if (url != null) {
+      out.startTag(HtmlUtil.A);
+      out.attribute(HtmlUtil.ATTR_HREF, url);
+      serialize(out, object, key, locale);
+      out.endTag(HtmlUtil.A);
     }
   }
 
@@ -1049,12 +1188,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final XmlWriter out,
     final String pageName,
     final Object object) {
-    final Object id = JavaBeanUtil.getProperty(object, idPropertyName);
-    final Page page = getPage(pageName);
-    if (page != null) {
-      final Map<String, Object> parameters = Collections.singletonMap(
-        idParameterName, id);
-      final String url = page.getFullUrl(parameters);
+    final Object id = getIdValue(object);
+    final Map<String, Object> parameters = Collections.singletonMap(
+      idParameterName, id);
+    final String url = getPageUrl(pageName, parameters);
+    if (url != null) {
       HtmlUtil.serializeA(out, null, url, pageName);
     }
   }
@@ -1096,10 +1234,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    */
   public void setBuilderFactory(final HtmlUiBuilderFactory builderFactory) {
     this.builderFactory = builderFactory;
-  }
-
-  public void setDataAccessObject(final DataAccessObject<T> dataAccessObject) {
-    this.dataAccessObject = dataAccessObject;
   }
 
   public void setDefaultPageSize(final int defaultPageSize) {
@@ -1193,6 +1327,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     this.pluralTitle = pluralTitle;
   }
 
+  public void setRollbackOnly(final T object) {
+  }
+
   public void setServletContext(final ServletContext servletContext) {
     context = new HttpServletRequestJexlContext(servletContext);
   }
@@ -1210,6 +1347,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void setUsePathVariables(final boolean usePathVariables) {
     this.usePathVariables = usePathVariables;
+  }
+
+  protected void updateObject(final T object) {
   }
 
   public boolean validateForm(final HtmlUiBuilderObjectForm form) {

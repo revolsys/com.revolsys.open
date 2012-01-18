@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -40,6 +41,8 @@ public class Query implements Cloneable {
   private Geometry geometry;
 
   private List<String> orderBy = new ArrayList<String>();
+
+  private Map<String, Object> filter;
 
   public Query() {
   }
@@ -139,6 +142,10 @@ public class Query implements Cloneable {
     return boundingBox;
   }
 
+  public Map<String, Object> getFilter() {
+    return filter;
+  }
+
   public String getFromClause() {
     return fromClause;
   }
@@ -193,6 +200,10 @@ public class Query implements Cloneable {
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+  }
+
+  public void setFilter(final Map<String, Object> filter) {
+    this.filter = filter;
   }
 
   public void setFromClause(final String fromClause) {

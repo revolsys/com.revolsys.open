@@ -16,6 +16,8 @@ import javax.xml.namespace.QName;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.ListResultPager;
+import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
@@ -104,8 +106,10 @@ public abstract class AbstractDataObjectStore extends
     statistics.add(statisticName, object);
   }
 
-  public void addStatistic(final String statisticName, final QName typeName,
-    int count) {
+  public void addStatistic(
+    final String statisticName,
+    final QName typeName,
+    final int count) {
     statistics.add(statisticName, typeName, count);
   }
 
@@ -135,12 +139,14 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public Query createBoundingBoxQuery(final Query query,
+  public Query createBoundingBoxQuery(
+    final Query query,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
-  protected AbstractIterator<DataObject> createIterator(final Query query,
+  protected AbstractIterator<DataObject> createIterator(
+    final Query query,
     final Map<String, Object> properties) {
     throw new UnsupportedOperationException();
   }
@@ -149,7 +155,9 @@ public abstract class AbstractDataObjectStore extends
     return null;
   }
 
-  public Query createQuery(final QName typeName, final String whereClause,
+  public Query createQuery(
+    final QName typeName,
+    final String whereClause,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
@@ -160,8 +168,10 @@ public abstract class AbstractDataObjectStore extends
     return reader;
   }
 
-  public DataObjectReader createReader(final QName typeName,
-    final String query, final List<Object> parameters) {
+  public DataObjectReader createReader(
+    final QName typeName,
+    final String query,
+    final List<Object> parameters) {
     throw new UnsupportedOperationException();
   }
 
@@ -325,10 +335,17 @@ public abstract class AbstractDataObjectStore extends
   }
 
   protected abstract void loadSchemaDataObjectMetaData(
-    DataObjectStoreSchema schema, Map<QName, DataObjectMetaData> metaDataMap);
+    DataObjectStoreSchema schema,
+    Map<QName, DataObjectMetaData> metaDataMap);
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
+
+  public ResultPager<DataObject> page(final Query query) {
+    final Reader<DataObject> results = query(query);
+    final List<DataObject> list = results.read();
+    return new ListResultPager<DataObject>(list);
+  }
 
   public Reader<DataObject> query(final List<Query> queries) {
     final DataObjectStoreQueryReader reader = createReader();

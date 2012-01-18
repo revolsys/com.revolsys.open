@@ -85,7 +85,8 @@ public class PagingList extends SpringFrameworkAction {
     }
   }
 
-  public void process(final HttpServletRequest request,
+  public void process(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws ActionException, IOException {
     try {
       Object[] args = new Object[queryArgs.size()];
@@ -101,29 +102,33 @@ public class PagingList extends SpringFrameworkAction {
         i++;
       }
       ResultPager pager = (ResultPager)pageMethod.invoke(dao, args);
-      int pageSize;
       try {
-        pageSize = Integer.parseInt(request.getParameter("pageSize"));
-      } catch (Throwable t) {
-        pageSize = DEFAULT_PAGE_SIZE;
+        int pageSize;
+        try {
+          pageSize = Integer.parseInt(request.getParameter("pageSize"));
+        } catch (Throwable t) {
+          pageSize = DEFAULT_PAGE_SIZE;
+        }
+        pager.setPageSize(Math.min(MAX_PAGE_SIZE, pageSize));
+        try {
+          String page = request.getParameter("page");
+          pager.setPageNumber(Integer.parseInt(page));
+        } catch (Throwable t) {
+          pager.setPageNumber(1);
+        }
+        List results = pager.getList();
+        if (pager.getNumResults() > 0) {
+          final Map parameterMap = request.getParameterMap();
+          ResultPagerView pagerView = new ResultPagerView(pager,
+            request.getRequestURI(), parameterMap);
+          request.setAttribute("pager", pagerView);
+        }
+        Element listView = builder.createTableView(results, "objectList", null,
+          keyListName, request.getLocale());
+        request.setAttribute("list", listView);
+      } finally {
+        pager.close();
       }
-      pager.setPageSize(Math.min(MAX_PAGE_SIZE, pageSize));
-      try {
-        String page = request.getParameter("page");
-        pager.setPageNumber(Integer.parseInt(page));
-      } catch (Throwable t) {
-        pager.setPageNumber(1);
-      }
-      List results = pager.getList();
-      if (pager.getNumResults() > 0) {
-        final Map parameterMap = request.getParameterMap();
-        ResultPagerView pagerView = new ResultPagerView(pager,
-          request.getRequestURI(), parameterMap);
-        request.setAttribute("pager", pagerView);
-      }
-      Element listView = builder.createTableView(results, "objectList", null,
-        keyListName, request.getLocale());
-      request.setAttribute("list", listView);
     } catch (IllegalAccessException e) {
       throw new ActionException(e.getMessage(), e);
     } catch (InvocationTargetException e) {
