@@ -42,7 +42,7 @@ public class Query implements Cloneable {
 
   private List<String> orderBy = new ArrayList<String>();
 
-  private Map<String, Object> filter;
+  private Map<String, ? extends Object> filter;
 
   public Query() {
   }
@@ -142,7 +142,7 @@ public class Query implements Cloneable {
     return boundingBox;
   }
 
-  public Map<String, Object> getFilter() {
+  public Map<String, ? extends Object> getFilter() {
     return filter;
   }
 
@@ -202,7 +202,7 @@ public class Query implements Cloneable {
     this.boundingBox = boundingBox;
   }
 
-  public void setFilter(final Map<String, Object> filter) {
+  public void setFilter(final Map<String, ? extends Object> filter) {
     this.filter = filter;
   }
 

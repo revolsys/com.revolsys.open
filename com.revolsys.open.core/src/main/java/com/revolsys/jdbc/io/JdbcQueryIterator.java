@@ -81,7 +81,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final String tablePrefix,
     final String fromClause,
     final List<String> attributeNames,
-    final Map<String, Object> filter,
+    final Map<String, ? extends Object> filter,
     String where,
     final List<String> orderBy) {
     final QName typeName = metaData.getName();
@@ -105,7 +105,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     if (filter != null) {
       final StringBuffer filterWhere = new StringBuffer();
       boolean first = true;
-      for (final Entry<String, Object> entry : filter.entrySet()) {
+      for (final Entry<String, ?> entry : filter.entrySet()) {
         if (first) {
           first = false;
         } else {
@@ -122,7 +122,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
             final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
             filterWhere.append(key);
             filterWhere.append(" = ");
-            jdbcAttribute.addInsertStatementPlaceHolder(sql, false);
+            jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
           } else {
             filterWhere.append(key);
             filterWhere.append(" = ?");
@@ -182,9 +182,9 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final DataObjectMetaData metaData,
     final PreparedStatement statement,
     int parameterIndex,
-    final Map<String, Object> filter) throws SQLException {
+    final Map<String, ? extends Object> filter) throws SQLException {
     if (filter != null) {
-      for (final Entry<String, Object> entry : filter.entrySet()) {
+      for (final Entry<String, ?> entry : filter.entrySet()) {
         final String key = entry.getKey();
         final Object value = entry.getValue();
         if (value != null) {
@@ -383,7 +383,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final DataObjectMetaData metaData,
     PreparedStatement statement,
     final Query query) throws SQLException {
-    final Map<String, Object> filter = query.getFilter();
+    final Map<String, ? extends Object> filter = query.getFilter();
     int parameterIndex = setPreparedStatementParameters(query, statement);
     parameterIndex = setPreparedStatementFilterParameters(metaData, statement,
       parameterIndex, filter);
@@ -406,7 +406,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       final String fromClause = query.getFromClause();
       final String where = query.getWhereClause();
       final List<String> orderBy = query.getOrderBy();
-      Map<String, Object> filter = query.getFilter();
+      Map<String, ? extends Object> filter = query.getFilter();
       sql = createSql(metaData, "T", fromClause, attributeNames, filter, where,
         orderBy);
       query.setSql(sql);
