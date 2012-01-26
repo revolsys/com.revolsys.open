@@ -1,6 +1,6 @@
 #!/bin/sh
-
-APP_HOME=`dirname $0`/..
+BIN_DIR=`dirname $0`
+APP_HOME=$(readlink -f $BIN_DIR/..)
                                
 LOCALCLASSPATH="$APP_HOME/config:$LOCALCLASSPATH"
 

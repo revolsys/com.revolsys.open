@@ -1,6 +1,6 @@
 #!/bin/sh
 BIN_DIR=`dirname $0`
-APP_HOME=`dirname $0`/..
+APP_HOME=$(readlink -f $BIN_DIR/..)
 
 export LOCALCLASSPATH=$APP_HOME/etc:$APP_HOME/scripts
 export JAVA_OPTS=
