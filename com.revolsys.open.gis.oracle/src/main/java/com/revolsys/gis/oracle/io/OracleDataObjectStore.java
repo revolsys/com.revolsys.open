@@ -46,20 +46,29 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     setDataSource(dataSource);
   }
 
+  public String getSequenceName(final DataObjectMetaData metaData) {
+    final QName typeName = metaData.getName();
+    final String schema = getDatabaseSchemaName(typeName.getNamespaceURI());
+    String shortName = ShortNameProperty.getShortName(metaData);
+    if (StringUtils.hasText(shortName)) {
+      final String sequenceName = schema + "." + shortName.toLowerCase()
+        + "_SEQ";
+      return sequenceName;
+    } else {
+      final String tableName = getDatabaseTableName(typeName);
+      final String sequenceName = schema + "." + tableName + "_SEQ";
+      return sequenceName;
+    }
+  }
+
   @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
-    final String shortName = ShortNameProperty.getShortName(metaData);
-    if (shortName == null) {
-      ShortNameProperty.getShortName(metaData);
-      throw new IllegalArgumentException("No sequence for "
-        + metaData.getName());
-    }
-    return shortName + "_SEQ.NEXTVAL";
+    String sequenceName = getSequenceName(metaData);
+    return sequenceName + ".NEXTVAL";
   }
 
   public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
-    final String shortName = ShortNameProperty.getShortName(metaData);
-    final String sequenceName = shortName + "_SEQ";
+    final String sequenceName = getSequenceName(metaData);
     return getNextPrimaryKey(sequenceName);
   }
 
@@ -130,7 +139,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public Query createBoundingBoxQuery(final Query query,
+  public Query createBoundingBoxQuery(
+    final Query query,
     final BoundingBox boundingBox) {
     Query boundingBoxQuery = query.clone();
     final QName typeName = boundingBoxQuery.getTypeName();

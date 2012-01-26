@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -23,7 +22,7 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
 
 public class TextAreaField extends Field {
-  private int cols;
+  private int cols = 5;
 
   private int minLength = 0;
 
@@ -31,7 +30,10 @@ public class TextAreaField extends Field {
 
   private String inputValue = "";
 
-  private int rows;
+  private int rows = 50;
+
+  public TextAreaField() {
+  }
 
   /**
    * @param name

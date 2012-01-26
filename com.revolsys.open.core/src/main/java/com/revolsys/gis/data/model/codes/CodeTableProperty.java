@@ -1,5 +1,6 @@
 package com.revolsys.gis.data.model.codes;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return property;
   }
 
+  private String creationTimestampAttributeName;
+
+  private String modificationTimestampAttributeName;
+
   private List<String> attributeAliases = new ArrayList<String>();
 
   private DataObjectStore dataStore;
@@ -42,21 +47,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private QName typeName;
 
-  public QName getTypeName() {
-    return typeName;
-  }
-
   public CodeTableProperty() {
   }
 
-  public void addAttributeAlias(String columnName) {
+  public void addAttributeAlias(final String columnName) {
     attributeAliases.add(columnName);
-  }
-
-  protected void addValues(final Reader<DataObject> allCodes) {
-    for (final DataObject code : allCodes) {
-      addValue(code);
-    }
   }
 
   public void addValue(final DataObject code) {
@@ -67,6 +62,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
       values.add(value);
     }
     addValue(id, values);
+  }
+
+  protected void addValues(final Reader<DataObject> allCodes) {
+    for (final DataObject code : allCodes) {
+      addValue(code);
+    }
   }
 
   @Override
@@ -80,16 +81,17 @@ public class CodeTableProperty extends AbstractCodeTable implements
   protected synchronized Object createId(final List<Object> values) {
     // TODO prevent duplicates from other threads/processes
     final DataObject code = dataStore.create(typeName);
-    DataObjectMetaData metaData = code.getMetaData();
+    final DataObjectMetaData metaData = code.getMetaData();
     Object id = dataStore.createPrimaryIdValue(typeName);
     if (id == null) {
-      Attribute idAttribute = metaData.getIdAttribute();
-      if (idAttribute != null)
+      final Attribute idAttribute = metaData.getIdAttribute();
+      if (idAttribute != null) {
         if (Number.class.isAssignableFrom(idAttribute.getType().getJavaClass())) {
           id = getNextId();
         } else {
           id = UUID.randomUUID().toString();
         }
+      }
     }
     code.setIdValue(id);
     for (int i = 0; i < valueAttributeNames.size(); i++) {
@@ -97,6 +99,15 @@ public class CodeTableProperty extends AbstractCodeTable implements
       final Object value = values.get(i);
       code.setValue(name, value);
     }
+
+    final Timestamp now = new Timestamp(System.currentTimeMillis());
+    if (creationTimestampAttributeName != null) {
+      code.setValue(creationTimestampAttributeName, now);
+    }
+    if (modificationTimestampAttributeName != null) {
+      code.setValue(modificationTimestampAttributeName, now);
+    }
+
     dataStore.insert(code);
     id = code.getIdValue();
     return id;
@@ -105,6 +116,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
   @Override
   public List<String> getAttributeAliases() {
     return attributeAliases;
+  }
+
+  public String getCreationTimestampAttributeName() {
+    return creationTimestampAttributeName;
   }
 
   public DataObjectStore getDataStore() {
@@ -139,8 +154,16 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return metaData;
   }
 
+  public String getModificationTimestampAttributeName() {
+    return modificationTimestampAttributeName;
+  }
+
   public String getPropertyName() {
     return PROPERTY_NAME;
+  }
+
+  public QName getTypeName() {
+    return typeName;
   }
 
   @Override
@@ -167,7 +190,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       id = getId(values, false);
     } else {
       final StringBuffer where = new StringBuffer();
-      List<Object> queryValues = new ArrayList<Object>();
+      final List<Object> queryValues = new ArrayList<Object>();
       if (!values.isEmpty()) {
         int i = 0;
         for (final String attributeName : valueAttributeNames) {
@@ -175,7 +198,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
             where.append(" AND ");
           }
           where.append(attributeName);
-          Object value = values.get(i);
+          final Object value = values.get(i);
           if (value == null) {
             where.append(" IS NULL");
           } else {
@@ -185,7 +208,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
           i++;
         }
       }
-      Query query = new Query(typeName);
+      final Query query = new Query(typeName);
       query.setWhereClause(where.toString());
       query.setParameters(queryValues);
       final Reader<DataObject> reader = dataStore.query(query);
@@ -223,6 +246,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
     this.attributeAliases = columnAliases;
   }
 
+  public void setCreationTimestampAttributeName(
+    final String creationTimestampAttributeName) {
+    this.creationTimestampAttributeName = creationTimestampAttributeName;
+  }
+
   public void setLoadAll(final boolean loadAll) {
     this.loadAll = loadAll;
   }
@@ -246,15 +274,20 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
+  public void setModificationTimestampAttributeName(
+    final String modificationTimestampAttributeName) {
+    this.modificationTimestampAttributeName = modificationTimestampAttributeName;
+  }
+
+  public void setValueAttributeName(final String valueColumns) {
+    setValueAttributeNames(valueColumns);
+  }
+
   public void setValueAttributeNames(final List<String> valueColumns) {
     this.valueAttributeNames.clear();
     for (final String column : valueColumns) {
       this.valueAttributeNames.add(column);
     }
-  }
-
-  public void setValueAttributeName(final String valueColumns) {
-    setValueAttributeNames(valueColumns);
   }
 
   public void setValueAttributeNames(final String... valueColumns) {
