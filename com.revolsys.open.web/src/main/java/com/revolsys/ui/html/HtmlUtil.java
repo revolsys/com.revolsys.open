@@ -180,6 +180,9 @@ public final class HtmlUtil {
 
   public static final QName ATTR_LANG = new QName("xml", "lang");
 
+  public static final QName IFRAME = new QName(HTML_NS_URI, "iframe",
+    HTML_NS_PREFIX);
+
   public static void serializeA(
     final XmlWriter out,
     final String cssClass,
@@ -200,9 +203,7 @@ public final class HtmlUtil {
     }
   }
 
-  public static void serializeB(
-    final XmlWriter out,
-    final String content) {
+  public static void serializeB(final XmlWriter out, final String content) {
     out.startTag(B);
     out.text(content);
     out.endTag(B);
@@ -285,17 +286,13 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializePre(
-    final XmlWriter out,
-    final String text) {
+  public static void serializePre(final XmlWriter out, final String text) {
     out.startTag(PRE);
     out.text(text);
     out.endTag(PRE);
   }
 
-  public static void serializeScript(
-    final XmlWriter out,
-    final String script) {
+  public static void serializeScript(final XmlWriter out, final String script) {
     out.startTag(SCRIPT);
     out.attribute(ATTR_TYPE, "text/javascript");
     out.text(script);

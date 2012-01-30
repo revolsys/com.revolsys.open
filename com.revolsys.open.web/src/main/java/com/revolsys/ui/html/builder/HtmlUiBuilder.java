@@ -503,9 +503,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ElementContainer view = new ElementContainer();
     view.add(searchForm);
 
-    final Map<String, Object> model = new HashMap<String, Object>();
-    model.put("title", getPluralTitle());
-    model.put("uiBuilder", this);
+    request.setAttribute("title", getPluralTitle());
     final Menu actionMenu = new Menu();
     actionMenu.addMenuItem(new Menu("Search", "#",
       "document.forms['searchForm'].submit(); return false;"));
@@ -566,17 +564,17 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final HttpServletRequest request,
     final HttpServletResponse response) throws IOException, ServletException {
     final Object object = loadObject();
-    return createObjectViewPage(request, response, object);
+    return createObjectViewPage(request, response, object, "view");
   }
 
   protected ElementContainer createObjectViewPage(
     final HttpServletRequest request,
     final HttpServletResponse response,
-    final Object object) throws NoSuchRequestHandlingMethodException {
+    final Object object, String keyListName) throws NoSuchRequestHandlingMethodException {
     if (object == null) {
       throw new NoSuchRequestHandlingMethodException(request);
     } else {
-      final Element detailView = createDetailView(object, "objectView", "view",
+      final Element detailView = createDetailView(object, "objectView", keyListName,
         request.getLocale());
       final String id = getId();
       request.setAttribute("title", getTitle() + " #" + id);
@@ -623,7 +621,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Collection<V> results,
     final String keyListName,
     final Locale locale) {
-    return createTableView(results, null, null, keyListName, locale);
+    return createTableView(results, "objectList", null, keyListName, locale);
   }
 
   /**

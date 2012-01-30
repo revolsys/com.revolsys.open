@@ -36,7 +36,8 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(final Object id,
+  protected synchronized void addValue(
+    final Object id,
     final List<Object> values) {
     if (id instanceof Number) {
       final Number number = (Number)id;
@@ -218,7 +219,9 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
       if (values == null) {
         synchronized (this) {
           values = loadValues(id);
-          addValue(id, values);
+          if (values != null) {
+            addValue(id, values);
+          }
         }
       }
       if (values != null) {
