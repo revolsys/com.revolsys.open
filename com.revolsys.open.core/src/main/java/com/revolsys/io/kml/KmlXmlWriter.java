@@ -5,16 +5,32 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.springframework.util.StringUtils;
+
+import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
+import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.UrlUtil;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
+  public static void append(final StringBuffer buffer, final Geometry geometry) {
+    final KmlXmlWriter writer = new KmlXmlWriter(
+      new StringBufferWriter(buffer), false);
+
+    writer.writeGeometry(geometry);
+    writer.close();
+  }
 
   public KmlXmlWriter(final OutputStream out) {
     super(out);
@@ -42,6 +58,25 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     super(out, useNamespaces);
   }
 
+  public void write(final CoordinateSequence coordinateSequence) {
+    startTag(Kml22Constants.COORDINATES);
+    final boolean hasZ = coordinateSequence.getDimension() > 2;
+    for (int i = 0; i < coordinateSequence.size(); i++) {
+      write(String.valueOf(coordinateSequence.getX(i)));
+      write(',');
+      write(String.valueOf(coordinateSequence.getY(i)));
+      if (hasZ) {
+        final double z = coordinateSequence.getOrdinate(i, 2);
+        if (!Double.isNaN(z)) {
+          write(',');
+          write(String.valueOf(z));
+        }
+      }
+      write(' ');
+    }
+    endTag();
+  }
+
   public void writeData(final String name, final Object value) {
     if (value != null) {
       startTag(DATA);
@@ -51,8 +86,62 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     }
   }
 
+  public void writeExtendedData(Map<String, ? extends Object> data) {
+    boolean hasValues = false;
+    for (Entry<String, ? extends Object> entry : data.entrySet()) {
+      final String attributeName = entry.getKey();
+      final Object value = entry.getValue();
+      if (!(value instanceof Geometry)) {
+        if (value != null) {
+          String stringValue = value.toString();
+          if (StringUtils.hasText(stringValue)) {
+            if (!hasValues) {
+              hasValues = true;
+              startTag(EXTENDED_DATA);
+            }
+            startTag(DATA);
+            attribute(NAME, attributeName);
+            element(VALUE, value);
+            endTag(DATA);
+          }
+        }
+      }
+    }
+    if (hasValues) {
+      endTag(EXTENDED_DATA);
+    }
+  }
+
   public void writeGeometry(final Geometry geometry) {
-    KmlWriterUtil.writeGeometry(this, geometry);
+    if (geometry != null) {
+      final int numGeometries = geometry.getNumGeometries();
+      if (numGeometries > 1) {
+        startTag(Kml22Constants.MULTI_GEOMETRY);
+        for (int i = 0; i < numGeometries; i++) {
+          writeGeometry(geometry.getGeometryN(i));
+        }
+        endTag();
+      } else {
+        final Geometry geoGraphicsGeom = GeometryProjectionUtil.perform(
+          geometry, Kml22Constants.COORDINATE_SYSTEM);
+        if (geoGraphicsGeom instanceof Point) {
+          final Point point = (Point)geoGraphicsGeom;
+          writePoint(point);
+        } else if (geoGraphicsGeom instanceof LinearRing) {
+          final LinearRing line = (LinearRing)geoGraphicsGeom;
+          writeLinearRing(line);
+        } else if (geoGraphicsGeom instanceof LineString) {
+          final LineString line = (LineString)geoGraphicsGeom;
+          writeLineString(line);
+        } else if (geoGraphicsGeom instanceof Polygon) {
+          final Polygon polygon = (Polygon)geoGraphicsGeom;
+          writePolygon(polygon);
+        } else if (geoGraphicsGeom instanceof GeometryCollection) {
+          final GeometryCollection collection = (GeometryCollection)geoGraphicsGeom;
+          writeMultiGeometry(collection);
+        }
+      }
+    }
   }
 
   public void writeLatLonBox(final Envelope envelope) {
@@ -65,8 +154,37 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writeNetworkLink(final Envelope envelope, final String name,
-    final Integer minLod, final Integer maxLod, final String href) {
+  public void writeLinearRing(final LineString ring) {
+    startTag(Kml22Constants.LINEAR_RING);
+    final CoordinateSequence coordinateSequence = ring.getCoordinateSequence();
+    write(coordinateSequence);
+    endTag();
+
+  }
+
+  public void writeLineString(final LineString line) {
+    startTag(Kml22Constants.LINE_STRING);
+    final CoordinateSequence coordinateSequence = line.getCoordinateSequence();
+    write(coordinateSequence);
+    endTag();
+  }
+
+  public void writeMultiGeometry(final GeometryCollection collection) {
+    startTag(Kml22Constants.MULTI_GEOMETRY);
+    for (int i = 0; i < collection.getNumGeometries(); i++) {
+      final Geometry geometry = collection.getGeometryN(i);
+      writeGeometry(geometry);
+    }
+    endTag(Kml22Constants.MULTI_GEOMETRY);
+
+  }
+
+  public void writeNetworkLink(
+    final Envelope envelope,
+    final String name,
+    final Integer minLod,
+    final Integer maxLod,
+    final String href) {
 
     startTag(NETWORK_LINK);
     if (name != null) {
@@ -82,8 +200,26 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemarkLineString(final Envelope envelope,
-    final String name, final String styleUrl) {
+  public void writePlacemark(
+    final Geometry geometry,
+    final String name,
+    final String styleUrl) {
+    startTag(PLACEMARK);
+    if (name != null) {
+      element(NAME, name);
+    }
+    if (styleUrl != null) {
+      element(STYLE_URL, styleUrl);
+    }
+    writeGeometry(geometry);
+
+    endTag();
+  }
+
+  public void writePlacemarkLineString(
+    final Envelope envelope,
+    final String name,
+    final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -124,8 +260,10 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemarkLineString(final LineString lineString,
-    final String name, final String styleUrl) {
+  public void writePlacemarkLineString(
+    final LineString lineString,
+    final String name,
+    final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -134,14 +272,16 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     if (styleUrl != null) {
       element(STYLE_URL, styleUrl);
     }
-    KmlWriterUtil.writeLineString(this, lineString);
+    writeLineString(lineString);
 
     endTag();
 
   }
 
-  public void writePlacemarkLineString(final Polygon polygon,
-    final String name, final String styleUrl) {
+  public void writePlacemarkLineString(
+    final Polygon polygon,
+    final String name,
+    final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -151,13 +291,15 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       element(STYLE_URL, styleUrl);
     }
     final LineString exteriorRing = polygon.getExteriorRing();
-    KmlWriterUtil.writeLineString(this, exteriorRing);
+    writeLineString(exteriorRing);
 
     endTag();
 
   }
 
-  public void writePlacemarkPoint(final Envelope envelope, final String name,
+  public void writePlacemarkPoint(
+    final Envelope envelope,
+    final String name,
     final String styleUrl) {
 
     startTag(PLACEMARK);
@@ -179,7 +321,9 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writePlacemarkPolygon(final Polygon polygon, final String name,
+  public void writePlacemarkPolygon(
+    final Polygon polygon,
+    final String name,
     final String styleUrl) {
 
     startTag(PLACEMARK);
@@ -189,20 +333,35 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     if (styleUrl != null) {
       element(STYLE_URL, styleUrl);
     }
-    startTag(POLYGON);
-    startTag(OUTER_BOUNDARY_IS);
-    startTag(LINEAR_RING);
-    final LineString exteriorRing = polygon.getExteriorRing();
-    KmlWriterUtil.writeLineString(this, exteriorRing);
-    endTag();
-    endTag();
-    endTag();
+    writePolygon(polygon);
 
     endTag();
 
   }
 
-  public void writeRegion(final Envelope envelope, final Integer minLod,
+  public void writePoint(final Point point) {
+    startTag(Kml22Constants.POINT);
+    write(point.getCoordinateSequence());
+    endTag();
+  }
+
+  public void writePolygon(final Polygon polygon) {
+    startTag(Kml22Constants.POLYGON);
+    startTag(Kml22Constants.OUTER_BOUNDARY_IS);
+    writeLinearRing(polygon.getExteriorRing());
+    endTag();
+    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+      startTag(Kml22Constants.INNER_BOUNDARY_IS);
+      final LineString ring = polygon.getInteriorRingN(i);
+      writeLinearRing(ring);
+      endTag();
+    }
+    endTag();
+  }
+
+  public void writeRegion(
+    final Envelope envelope,
+    final Integer minLod,
     final Integer maxLod) {
     startTag(REGION);
 
@@ -224,8 +383,10 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeWmsGroundOverlay(final Envelope envelope,
-    final String baseUrl, final String name) {
+  public void writeWmsGroundOverlay(
+    final Envelope envelope,
+    final String baseUrl,
+    final String name) {
 
     startTag(GROUND_OVERLAY);
     if (name != null) {

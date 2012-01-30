@@ -16,6 +16,22 @@ public interface Kml22Constants {
 
   String KML_NS_URI = "http://www.opengis.net/kml/2.2";
 
+  QName COLOR = new QName(KML_NS_URI, "color");
+
+  QName VISIBLITY = new QName(KML_NS_URI, "visibility");
+
+  QName SCALE = new QName(KML_NS_URI, "scale");
+
+  QName COLOR_MODE = new QName(KML_NS_URI, "colorMode");
+
+  QName LABEL_STYLE = new QName(KML_NS_URI, "LabelStyle");
+
+  QName ICON_STYLE = new QName(KML_NS_URI, "IconStyle");
+
+  QName FILL = new QName(KML_NS_URI, "fill");
+
+  QName POLY_STYLE = new QName(KML_NS_URI, "PolyStyle");
+
   QName COORDINATES = new QName(KML_NS_URI, "coordinates");
 
   QName DESCRIPTION = new QName(KML_NS_URI, "description");
@@ -37,6 +53,8 @@ public interface Kml22Constants {
   QName INNER_BOUNDARY_IS = new QName(KML_NS_URI, "innerBoundaryIs");
 
   QName KML = new QName(KML_NS_URI, "kml");
+
+  QName FOLDER = new QName(KML_NS_URI, "Folder");
 
   QName LAT_LON_ALT_BOX = new QName(KML_NS_URI, "LatLonAltBox");
 

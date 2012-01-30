@@ -42,7 +42,7 @@ public class FilterableTableView extends ElementContainer {
 
   public FilterableTableView(final HtmlUiBuilder htmlUiBuilder,
     final RowsTableSerializer model, final String cssClass, final String title,
-    final List<String> keyList) {
+    final List<String> keyList, boolean showSearchFields) {
     this.model = model;
     this.cssClass = cssClass;
     this.title = title;

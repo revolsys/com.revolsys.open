@@ -11,15 +11,12 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
     super(NtsConstants.WIDTH_250000, NtsConstants.HEIGHT_250000);
   }
 
-  protected Nts250000RectangularMapGrid(
-    final double width,
-    final double height) {
+  protected Nts250000RectangularMapGrid(final double width, final double height) {
     super(width, height);
   }
 
   @Override
-  public double getLatitude(
-    final String mapTileName) {
+  public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -31,9 +28,7 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
     }
   }
 
-  protected double getLatitude(
-    final String blockName,
-    final String letter) {
+  protected double getLatitude(final String blockName, final String letter) {
     final int block = Integer.parseInt(blockName);
     double latitude = getLatitude(block);
     final int letterRow = GridUtil.getLetter16Row(letter.charAt(0));
@@ -43,8 +38,7 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
-  public double getLongitude(
-    final String mapTileName) {
+  public double getLongitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -57,9 +51,7 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
     }
   }
 
-  public double getLongitude(
-    final String blockName,
-    final String letter) {
+  public double getLongitude(final String blockName, final String letter) {
     final int block = Integer.parseInt(blockName);
     double longitude = getLongitude(block);
     final int letterCol = GridUtil.getLetter16Col(letter.charAt(0));
@@ -69,9 +61,7 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     final String block = super.getMapTileName(x, y);
     final double yInSheet = Math.abs(92 + y) % NtsConstants.HEIGHT_1000000;
     final int row = (int)Math.floor(yInSheet / NtsConstants.HEIGHT_250000);
@@ -83,13 +73,16 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
-  public String getFormattedMapTileName(
-    String name) {
+  public String getFormattedMapTileName(String name) {
     return name.toUpperCase();
   }
 
-  public char getLetter(
-    final String sheet) {
-      return sheet.charAt(sheet.length() - 4);
+  public char getLetter(final String sheet) {
+    char firstChar = sheet.charAt(0);
+    if (firstChar == '0' || firstChar == '1') {
+      return sheet.charAt(3);
+    } else {
+      return sheet.charAt(2);
     }
+  }
 }

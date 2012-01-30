@@ -4,7 +4,7 @@ import java.io.StringReader;
 
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.kml.KmlGeometryIterator;
-import com.revolsys.io.kml.KmlWriterUtil;
+import com.revolsys.io.kml.KmlXmlWriter;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryAttribute extends FusionTablesAttribute {
@@ -14,7 +14,7 @@ public class GeometryAttribute extends FusionTablesAttribute {
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       buffer.append('\'');
-      KmlWriterUtil.append(buffer, geometry);
+      KmlXmlWriter.append(buffer, geometry);
       buffer.append('\'');
     } else {
       throw new IllegalArgumentException("Expecting a geometry");

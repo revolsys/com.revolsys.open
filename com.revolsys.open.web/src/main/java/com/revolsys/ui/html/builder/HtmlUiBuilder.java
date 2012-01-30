@@ -239,12 +239,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String cssClass,
     final String title,
     final List<String> keys,
-    final Locale locale) {
+    final Locale locale,
+    boolean showSearchFields) {
 
     final HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
       this, keys, locale);
     return new FilterableTableView(this, model, cssClass + " " + typeName,
-      title, keys);
+      title, keys, showSearchFields);
 
   }
 
@@ -252,9 +253,26 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String cssClass,
     final String title,
     final String keyList,
-    final Locale locale) {
+    final Locale locale,
+    boolean showSearchFields) {
     final List<String> keyListkeyList = getKeyList(keyList);
-    return createFilterableTableView(cssClass, title, keyListkeyList, locale);
+    return createFilterableTableView(cssClass, title, keyListkeyList, locale,
+      showSearchFields);
+  }
+
+  public Element createObjectListView(
+    HttpServletRequest request,
+    ResultPager<T> pager,
+    final String cssClass,
+    final String title,
+    final String keyList,
+    final Locale locale) {
+    ElementContainer listContainer = new ElementContainer();
+    final List<String> keyListkeyList = getKeyList(keyList);
+    FilterableTableView tableView = createFilterableTableView(cssClass, title,
+      keyListkeyList, locale, false);
+    updateObjectListView(request, listContainer, tableView, pager);
+    return listContainer;
   }
 
   /**
@@ -320,6 +338,59 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return (F)createForm(object, formName, keys, locale);
   }
 
+  protected T createObject() {
+    return null;
+  }
+
+  public Element createObjectAddPage(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws IOException, ServletException {
+    final T object = createObject();
+    // if (!canAddObject(request)) {
+    // response.sendError(HttpServletResponse.SC_FORBIDDEN,
+    // "No permission to edit " + getTypeName() + " #" + getId());
+    // return null;
+    // }
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+
+    final String keyListName = "add";
+    final Set<String> parameterNamesToSave = new HashSet<String>();
+
+    final Form form = createForm(object, keyListName, request.getLocale());
+    for (final String param : parameterNamesToSave) {
+      form.addSavedParameter(param, request.getParameter(param));
+    }
+    form.initialize(request);
+
+    if (form.isPosted() && form.isMainFormTask()) {
+      if (form.isValid()) {
+        if (preInsert(form, object)) {
+          insertObject(object);
+          parameters.put("message", "Saved");
+          final Object id = getValue(object, getIdPropertyName());
+          parameters.put(getIdParameterName(), id);
+
+          final String url = getPageUrl("view", parameters);
+          response.sendRedirect(url);
+          return null;
+        }
+      }
+    }
+
+    request.setAttribute("title", "Add " + getTitle());
+
+    final Menu actionMenu = new Menu();
+    actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("list", parameters)));
+    actionMenu.addMenuItem(new Menu("Refresh", getPageUrl("add", parameters)));
+    actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
+      + form.getName() + "'].submit()"));
+
+    final MenuElement actionMenuElement = new MenuElement(actionMenu,
+      "actionMenu");
+    final ElementContainer view = new ElementContainer(form, actionMenuElement);
+    return view;
+  }
+
   public Element createObjectEditPage(
     final HttpServletRequest request,
     final HttpServletResponse response) throws IOException, ServletException {
@@ -377,71 +448,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public Element createObjectAddPage(
+  public ElementContainer createObjectListPage(
     final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
-    final T object = createObject();
-    // if (!canAddObject(request)) {
-    // response.sendError(HttpServletResponse.SC_FORBIDDEN,
-    // "No permission to edit " + getTypeName() + " #" + getId());
-    // return null;
-    // }
-    final Map<String, Object> parameters = new HashMap<String, Object>();
-
-    final String keyListName = "add";
-    final Set<String> parameterNamesToSave = new HashSet<String>();
-
-    final Form form = createForm(object, keyListName, request.getLocale());
-    for (final String param : parameterNamesToSave) {
-      form.addSavedParameter(param, request.getParameter(param));
-    }
-    form.initialize(request);
-
-    if (form.isPosted() && form.isMainFormTask()) {
-      if (form.isValid()) {
-        if (preInsert(form, object)) {
-          insertObject(object);
-          parameters.put("message", "Saved");
-          final Object id = getValue(object, getIdPropertyName());
-          parameters.put(getIdParameterName(), id);
-
-          final String url = getPageUrl("view", parameters);
-          response.sendRedirect(url);
-          return null;
-        }
-      }
-    }
-
-    request.setAttribute("title", "Add " + getTitle());
-
-    final Menu actionMenu = new Menu();
-    actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("list", parameters)));
-    actionMenu.addMenuItem(new Menu("Refresh", getPageUrl("add", parameters)));
-    actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
-      + form.getName() + "'].submit()"));
-
-    final MenuElement actionMenuElement = new MenuElement(actionMenu,
-      "actionMenu");
-    final ElementContainer view = new ElementContainer(form, actionMenuElement);
-    return view;
-  }
-
-  protected T createObject() {
-    return null;
-  }
-
-  protected boolean preInsert(Form form, T object) {
-    return true;
-  }
-
-  public Element createObjectListPage(
-    final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException {
-
-    final ElementContainer listContainer = new ElementContainer();
+    final HttpServletResponse response, Map<String, Object> filter) throws IOException {
 
     final FilterableTableView listView = createFilterableTableView(
-      "objectList", null, "list", request.getLocale());
+      "objectList", null, "list", request.getLocale(), true);
+    final ElementContainer listContainer = new ElementContainer();
     listContainer.add(listView);
 
     final Form searchForm = new Form("searchForm");
@@ -483,7 +496,39 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
       }
     }
+    
     final ResultPager<T> pager = getObjectList(whereClause);
+    updateObjectListView(request, listContainer, listView, pager);
+
+    final ElementContainer view = new ElementContainer();
+    view.add(searchForm);
+
+    final Map<String, Object> model = new HashMap<String, Object>();
+    model.put("title", getPluralTitle());
+    model.put("uiBuilder", this);
+    final Menu actionMenu = new Menu();
+    actionMenu.addMenuItem(new Menu("Search", "#",
+      "document.forms['searchForm'].submit(); return false;"));
+    final String clearUrl = getPageUrl("list",
+      Collections.<String, Object> emptyMap());
+    actionMenu.addMenuItem(new Menu("Clear Search", clearUrl));
+    if (hasPageUrl("add")) {
+      final String addUrl = getPageUrl("add",
+        Collections.<String, Object> emptyMap());
+      actionMenu.addMenuItem(new Menu("Add", addUrl));
+    }
+    final MenuElement actionMenuElement = new MenuElement(actionMenu,
+      "actionMenu");
+    view.add(actionMenuElement);
+
+    return view;
+  }
+
+  private void updateObjectListView(
+    HttpServletRequest request,
+    ElementContainer listContainer,
+    FilterableTableView listView,
+    ResultPager<T> pager) {
     try {
 
       List<?> results = Collections.emptyList();
@@ -504,10 +549,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
       listView.setRows(results);
 
-      final ElementContainer view = new ElementContainer();
-      view.add(searchForm);
-
-      final Map<String, Object> model = new HashMap<String, Object>();
       if (pager.getNumResults() > 0) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> parameters = request.getParameterMap();
@@ -515,41 +556,20 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           request.getRequestURI(), parameters);
         listContainer.add(0, pagerView);
         listContainer.add(pagerView);
-
       }
-
-      model.put("title", getPluralTitle());
-      model.put("uiBuilder", this);
-      final Menu actionMenu = new Menu();
-      actionMenu.addMenuItem(new Menu("Search", "#",
-        "document.forms['searchForm'].submit(); return false;"));
-      String clearUrl = getPageUrl("list",
-        Collections.<String, Object> emptyMap());
-      actionMenu.addMenuItem(new Menu("Clear Search", clearUrl));
-      if (hasPageUrl("add")) {
-        String addUrl = getPageUrl("add",
-          Collections.<String, Object> emptyMap());
-        actionMenu.addMenuItem(new Menu("Add", addUrl));
-      }
-      final MenuElement actionMenuElement = new MenuElement(actionMenu,
-        "actionMenu");
-      view.add(actionMenuElement);
-
-      return view;
     } finally {
       pager.close();
     }
-
   }
 
-  public Element createObjectViewPage(
+  public ElementContainer createObjectViewPage(
     final HttpServletRequest request,
     final HttpServletResponse response) throws IOException, ServletException {
     final Object object = loadObject();
     return createObjectViewPage(request, response, object);
   }
 
-  protected Element createObjectViewPage(
+  protected ElementContainer createObjectViewPage(
     final HttpServletRequest request,
     final HttpServletResponse response,
     final Object object) throws NoSuchRequestHandlingMethodException {
@@ -619,11 +639,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @param objectClass<?> The object class.
    * @return The builder.
    */
-  public <V> HtmlUiBuilder<V> getBuilder(final Class<?> objectClass) {
+  public <O,H extends HtmlUiBuilder<O>> H getBuilder(final Class<O> objectClass) {
     if (builderFactory != null) {
       return builderFactory.get(objectClass);
     } else {
-      return HtmlUiBuilderFactory.get(beanFactory, objectClass);
+      return (H)HtmlUiBuilderFactory.get(beanFactory, objectClass);
     }
   }
 
@@ -1004,19 +1024,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public void setValue(final Object object, final String key, final Object value) {
-    if (object instanceof DataObject) {
-      final DataObject dataObject = (DataObject)object;
-      dataObject.setValueByPath(key, value);
-    } else if (object instanceof Map) {
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> map = (Map<String, Object>)object;
-      map.put(key, value);
-    } else {
-      JavaBeanUtil.setProperty(object, key, value);
-    }
-  }
-
   public boolean hasPageUrl(final String pageName) {
     return pageUrls.containsKey(pageName);
   }
@@ -1050,6 +1057,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   protected T loadObject(final Object id) {
     throw new UnsupportedOperationException();
+  }
+
+  protected boolean preInsert(final Form form, final T object) {
+    return true;
   }
 
   /**
@@ -1347,6 +1358,19 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void setUsePathVariables(final boolean usePathVariables) {
     this.usePathVariables = usePathVariables;
+  }
+
+  public void setValue(final Object object, final String key, final Object value) {
+    if (object instanceof DataObject) {
+      final DataObject dataObject = (DataObject)object;
+      dataObject.setValueByPath(key, value);
+    } else if (object instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> map = (Map<String, Object>)object;
+      map.put(key, value);
+    } else {
+      JavaBeanUtil.setProperty(object, key, value);
+    }
   }
 
   protected void updateObject(final T object) {

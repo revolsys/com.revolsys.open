@@ -73,7 +73,7 @@ public class ObjectListController extends BaseController {
     ElementContainer listContainer = new ElementContainer();
 
     FilterableTableView listView = htmlUiBuilder.createFilterableTableView(
-      "objectList", null, "list", request.getLocale());
+      "objectList", null, "list", request.getLocale(), true);
     listContainer.add(listView);
 
     Form searchForm = new Form("searchForm");

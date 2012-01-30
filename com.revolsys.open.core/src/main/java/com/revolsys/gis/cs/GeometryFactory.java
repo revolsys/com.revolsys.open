@@ -91,6 +91,7 @@ public class GeometryFactory extends
 
   /**
    * Get a 2D geometry factory with the specified scale
+   * 
    * @param crsId
    * @param scale
    * @return
@@ -99,13 +100,16 @@ public class GeometryFactory extends
     return getFactory(crsId, 2, scale, 0);
   }
 
-  public static GeometryFactory getFactory(final int crsId,
-    final double scaleXy, final double scaleZ) {
+  public static GeometryFactory getFactory(
+    final int crsId,
+    final double scaleXy,
+    final double scaleZ) {
     return getFactory(crsId, 3, scaleXy, scaleZ);
   }
 
   /**
    * Get a 2D geometry factory with the specified scale
+   * 
    * @param crsId
    * @param scale
    * @return
@@ -114,8 +118,11 @@ public class GeometryFactory extends
     return getFactory(crsId, numAxis, 0, 0);
   }
 
-  public static GeometryFactory getFactory(final int crsId, final int numAxis,
-    final double scaleXY, final double scaleZ) {
+  public static GeometryFactory getFactory(
+    final int crsId,
+    final int numAxis,
+    final double scaleXY,
+    final double scaleZ) {
     synchronized (factories) {
       final String key = crsId + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
       GeometryFactory factory = factories.get(key);
@@ -144,7 +151,8 @@ public class GeometryFactory extends
     }
   }
 
-  public static LineString[] toLineStringArray(final GeometryFactory factory,
+  public static LineString[] toLineStringArray(
+    final GeometryFactory factory,
     final List<?> lines) {
     final LineString[] lineStrings = new LineString[lines.size()];
     for (int i = 0; i < lines.size(); i++) {
@@ -167,7 +175,8 @@ public class GeometryFactory extends
   }
 
   public static MultiPolygon toMultiPolygon(
-    final GeometryFactory geometryFactory, final List<?> polygons) {
+    final GeometryFactory geometryFactory,
+    final List<?> polygons) {
     final Polygon[] polygonArray = toPolygonArray(geometryFactory, polygons);
     return geometryFactory.createMultiPolygon(polygonArray);
   }
@@ -186,7 +195,8 @@ public class GeometryFactory extends
     return toMultiPolygon(Arrays.asList(polygons));
   }
 
-  public static Point[] toPointArray(final GeometryFactory factory,
+  public static Point[] toPointArray(
+    final GeometryFactory factory,
     final Collection<?> points) {
     final Point[] pointArray = new Point[points.size()];
     int i = 0;
@@ -216,7 +226,8 @@ public class GeometryFactory extends
   }
 
   @SuppressWarnings("unchecked")
-  public static Polygon[] toPolygonArray(final GeometryFactory factory,
+  public static Polygon[] toPolygonArray(
+    final GeometryFactory factory,
     final List<?> polygonList) {
     final Polygon[] polygons = new Polygon[polygonList.size()];
     for (int i = 0; i < polygonList.size(); i++) {
@@ -633,5 +644,15 @@ public class GeometryFactory extends
           + ") " + coordinatesPrecisionModel;
       }
     }
+  }
+
+  public GeometryCollection createCollection(Geometry... geometries) {
+    List<Geometry> list = new ArrayList<Geometry>();
+    for (Geometry geometry : geometries) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        list.add(geometry.getGeometryN(i));
+      }
+    }
+    return createGeometryCollection(geometries);
   }
 }

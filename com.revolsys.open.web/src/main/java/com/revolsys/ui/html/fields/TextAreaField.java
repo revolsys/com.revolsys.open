@@ -22,7 +22,7 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
 
 public class TextAreaField extends Field {
-  private int cols = 5;
+  private int cols = 50;
 
   private int minLength = 0;
 
@@ -30,7 +30,7 @@ public class TextAreaField extends Field {
 
   private String inputValue = "";
 
-  private int rows = 50;
+  private int rows = 5;
 
   public TextAreaField() {
   }
@@ -41,8 +41,6 @@ public class TextAreaField extends Field {
    */
   public TextAreaField(final String name, final boolean required) {
     super(name, required);
-    this.cols = 50;
-    this.rows = 5;
   }
 
   public TextAreaField(final String name, final int cols, final int rows,
