@@ -654,10 +654,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @return The builder.
    */
   @SuppressWarnings("unchecked")
-  public <V> HtmlUiBuilder<V> getBuilder(final Object object) {
+  public <O, H extends HtmlUiBuilder<O>> H getBuilder(final Object object) {
     if (object != null) {
-      Class<V> class1 = (Class<V>)object.getClass();
-      return (HtmlUiBuilder<V>)getBuilder(class1);
+      Class<O> class1 = (Class<O>)object.getClass();
+      return (H)getBuilder(class1);
     } else {
       return null;
     }
@@ -670,10 +670,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @return The builder.
    */
   @SuppressWarnings("unchecked")
-  public <V> HtmlUiBuilder<V> getBuilder(final String className) {
+  public <O, H extends HtmlUiBuilder<O>> H getBuilder(final String className) {
     try {
-      final Class<V> clazz = (Class<V>)Class.forName(className);
-      return (HtmlUiBuilder<V>)getBuilder(clazz);
+      final Class<O> clazz = (Class<O>)Class.forName(className);
+      return (H)getBuilder(clazz);
     } catch (final ClassNotFoundException e) {
       return null;
     }
