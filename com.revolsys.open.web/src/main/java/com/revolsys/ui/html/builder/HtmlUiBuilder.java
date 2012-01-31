@@ -639,11 +639,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @param objectClass<?> The object class.
    * @return The builder.
    */
-  public <O, H extends HtmlUiBuilder<O>> H getBuilder(final Class<O> objectClass) {
+  public <H extends HtmlUiBuilder<?>> H getBuilder(final Class<?> objectClass) {
     if (builderFactory != null) {
       return builderFactory.get(objectClass);
     } else {
-      return (H)HtmlUiBuilderFactory.get(beanFactory, objectClass);
+      HtmlUiBuilder htmlUiBuilder = HtmlUiBuilderFactory.get(beanFactory,
+        objectClass);
+      return (H)htmlUiBuilder;
     }
   }
 
