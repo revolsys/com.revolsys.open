@@ -1,6 +1,5 @@
 package com.revolsys.gis.data.io;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
@@ -19,7 +18,7 @@ public class DataStoreMultipleQueryIterator extends
   private int queryIndex = 0;
 
   @Override
-  public Iterator<DataObject> getNextIterator() throws NoSuchElementException {
+  public AbstractIterator<DataObject> getNextIterator() throws NoSuchElementException {
     final AbstractIterator<DataObject> iterator = reader.createQueryIterator(queryIndex);
     queryIndex++;
     return iterator;

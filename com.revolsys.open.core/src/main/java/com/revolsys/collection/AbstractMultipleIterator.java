@@ -1,16 +1,18 @@
 package com.revolsys.collection;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 
 public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
-  private Iterator<T> iterator;
+  private AbstractIterator<T> iterator;
 
   @PreDestroy
   public final void doClose() {
-    iterator = null;
+    if (iterator != null) {
+      iterator.close();
+      iterator = null;
+    }
   }
 
   protected T getNext() throws NoSuchElementException {
@@ -19,6 +21,7 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
         iterator = getNextIterator();
       }
       while (!iterator.hasNext()) {
+        iterator.close();
         iterator = getNextIterator();
       }
       return iterator.next();
@@ -35,6 +38,7 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
    * @return
    * @throws NoSuchElementException
    */
-  public abstract Iterator<T> getNextIterator() throws NoSuchElementException;
+  public abstract AbstractIterator<T> getNextIterator()
+    throws NoSuchElementException;
 
 }

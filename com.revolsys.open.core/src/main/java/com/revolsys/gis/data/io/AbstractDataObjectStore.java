@@ -364,8 +364,8 @@ public abstract class AbstractDataObjectStore extends
 
   public DataObject queryFirst(final Query query) {
     final Reader<DataObject> reader = query(query);
-    final Iterator<DataObject> iterator = reader.iterator();
     try {
+      final Iterator<DataObject> iterator = reader.iterator();
       if (iterator.hasNext()) {
         final DataObject object = iterator.next();
         return object;

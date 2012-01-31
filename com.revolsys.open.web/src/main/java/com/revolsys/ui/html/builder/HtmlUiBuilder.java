@@ -377,7 +377,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
     }
 
-    request.setAttribute("title", "Add " + getTitle());
+    String title = "Add " + getTitle();
+    request.setAttribute("title", title);
+    request.setAttribute("pageHeading", title);
 
     final Menu actionMenu = new Menu();
     actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("list", parameters)));
@@ -504,7 +506,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ElementContainer view = new ElementContainer();
     view.add(searchForm);
 
-    request.setAttribute("title", getPluralTitle());
+    String title = getPluralTitle();
+    request.setAttribute("title", title);
+    request.setAttribute("pageHeading", title);
+
     final Menu actionMenu = new Menu();
     actionMenu.addMenuItem(new Menu("Search", "#",
       "document.forms['searchForm'].submit(); return false;"));
@@ -579,7 +584,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Element detailView = createDetailView(object, "objectView",
         keyListName, request.getLocale());
       final String id = getId();
-      request.setAttribute("title", getTitle() + " #" + id);
+      String title = getTitle() + " #" + id;
+      request.setAttribute("title", title);
+      request.setAttribute("pageHeading", title);
+
       final Menu actionMenu = new Menu();
       if (hasPageUrl("edit")) {
         final Map<String, String> parameters = Collections.singletonMap(
