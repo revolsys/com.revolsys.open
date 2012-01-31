@@ -450,7 +450,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public ElementContainer createObjectListPage(
     final HttpServletRequest request,
-    final HttpServletResponse response, Map<String, Object> filter) throws IOException {
+    final HttpServletResponse response,
+    Map<String, Object> filter) throws IOException {
 
     final FilterableTableView listView = createFilterableTableView(
       "objectList", null, "list", request.getLocale(), true);
@@ -496,7 +497,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
       }
     }
-    
+
     final ResultPager<T> pager = getObjectList(whereClause);
     updateObjectListView(request, listContainer, listView, pager);
 
@@ -570,12 +571,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   protected ElementContainer createObjectViewPage(
     final HttpServletRequest request,
     final HttpServletResponse response,
-    final Object object, String keyListName) throws NoSuchRequestHandlingMethodException {
+    final Object object,
+    String keyListName) throws NoSuchRequestHandlingMethodException {
     if (object == null) {
       throw new NoSuchRequestHandlingMethodException(request);
     } else {
-      final Element detailView = createDetailView(object, "objectView", keyListName,
-        request.getLocale());
+      final Element detailView = createDetailView(object, "objectView",
+        keyListName, request.getLocale());
       final String id = getId();
       request.setAttribute("title", getTitle() + " #" + id);
       final Menu actionMenu = new Menu();
@@ -637,7 +639,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @param objectClass<?> The object class.
    * @return The builder.
    */
-  public <O,H extends HtmlUiBuilder<O>> H getBuilder(final Class<O> objectClass) {
+  public <O, H extends HtmlUiBuilder<O>> H getBuilder(final Class<O> objectClass) {
     if (builderFactory != null) {
       return builderFactory.get(objectClass);
     } else {
@@ -654,7 +656,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   @SuppressWarnings("unchecked")
   public <V> HtmlUiBuilder<V> getBuilder(final Object object) {
     if (object != null) {
-      return (HtmlUiBuilder<V>)getBuilder(object.getClass());
+      Class<V> class1 = (Class<V>)object.getClass();
+      return (HtmlUiBuilder<V>)getBuilder(class1);
     } else {
       return null;
     }
@@ -669,7 +672,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   @SuppressWarnings("unchecked")
   public <V> HtmlUiBuilder<V> getBuilder(final String className) {
     try {
-      final Class<?> clazz = Class.forName(className);
+      final Class<V> clazz = (Class<V>)Class.forName(className);
       return (HtmlUiBuilder<V>)getBuilder(clazz);
     } catch (final ClassNotFoundException e) {
       return null;
