@@ -1197,6 +1197,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (url != null) {
       out.startTag(HtmlUtil.A);
       out.attribute(HtmlUtil.ATTR_HREF, url);
+      out.attribute(HtmlUtil.ATTR_TARGET, "_top");
       serialize(out, object, key, locale);
       out.endTag(HtmlUtil.A);
     }

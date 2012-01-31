@@ -183,6 +183,8 @@ public final class HtmlUtil {
   public static final QName IFRAME = new QName(HTML_NS_URI, "iframe",
     HTML_NS_PREFIX);
 
+  public static final QName ATTR_TARGET = new QName("target");
+
   public static void serializeA(
     final XmlWriter out,
     final String cssClass,

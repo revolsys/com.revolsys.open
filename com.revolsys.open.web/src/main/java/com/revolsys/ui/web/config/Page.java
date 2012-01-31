@@ -33,6 +33,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriTemplate;
 
+import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JexlUtil;
@@ -252,7 +253,8 @@ public class Page extends Component {
     }
     Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
     URI path = uriTemplate.expand(uriTemplateVariables);
-    return UrlUtil.getUrl(path, uriParameters);
+    String url = UrlUtil.getUrl(path, uriParameters);
+    return PathAliasController.getPath(url);
   }
 
   public Layout getLayout() {
