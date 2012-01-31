@@ -29,6 +29,10 @@ public class IFrame extends Element {
     out.startTag(HtmlUtil.IFRAME);
     out.attribute(HtmlUtil.ATTR_SRC, src);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    out.startTag(HtmlUtil.A);
+    out.attribute(HtmlUtil.ATTR_HREF, src);
+    out.text(src);
+    out.endTag();
     out.endTag(HtmlUtil.IFRAME);
   }
 }
