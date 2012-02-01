@@ -25,13 +25,13 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
   @SuppressWarnings("unchecked")
   public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
-    final String objectClassName) {
-    String beanName = objectClassName + "-htmlbuilder";
+    final String typeName) {
+    String beanName = typeName + "-htmlbuilder";
     if (factory.containsBean(beanName)) {
       return (T)factory.getBean(beanName);
     } else {
       throw new IllegalArgumentException("No HTML UI Builder defined for: "
-        + objectClassName);
+        + typeName);
     }
 
   }

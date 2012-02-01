@@ -521,10 +521,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         Collections.<String, Object> emptyMap());
       actionMenu.addMenuItem(new Menu("Add", addUrl));
     }
-    final MenuElement actionMenuElement = new MenuElement(actionMenu,
-      "actionMenu");
-    view.add(actionMenuElement);
-
+    if (actionMenu.getMenus().size() > 0) {
+      final MenuElement actionMenuElement = new MenuElement(actionMenu,
+        "actionMenu");
+      view.add(actionMenuElement);
+    }
     return view;
   }
 
@@ -596,10 +597,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         actionMenu.addMenuItem(new Menu("Edit", url));
       }
 
-      final MenuElement actionMenuElement = new MenuElement(actionMenu,
-        "actionMenu");
-      final ElementContainer view = new ElementContainer(detailView,
-        actionMenuElement);
+      final ElementContainer view = new ElementContainer(detailView);
+      if (actionMenu.getMenus().size() > 0) {
+        final MenuElement actionMenuElement = new MenuElement(actionMenu,
+          "actionMenu");
+        view.add(actionMenuElement);
+      }
       return view;
     }
   }
@@ -682,15 +685,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @return The builder.
    */
   @SuppressWarnings("unchecked")
-  public <H extends HtmlUiBuilder<?>> H getBuilder(final String className) {
-    try {
-      final Class<?> clazz = Class.forName(className);
-      @SuppressWarnings("rawtypes")
-      HtmlUiBuilder builder = getBuilder(clazz);
-      return (H)builder;
-    } catch (final ClassNotFoundException e) {
-      return null;
-    }
+  public <H extends HtmlUiBuilder<?>> H getBuilder(final String typeName) {
+    @SuppressWarnings("rawtypes")
+    HtmlUiBuilder htmlUiBuilder = HtmlUiBuilderFactory.get(beanFactory,
+      typeName);
+    return (H)htmlUiBuilder;
   }
 
   /**

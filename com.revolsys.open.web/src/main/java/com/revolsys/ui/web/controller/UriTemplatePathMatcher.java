@@ -49,7 +49,7 @@ public class UriTemplatePathMatcher implements PathMatcher {
     String pattern,
     String path) {
     String regex = pattern;
-    regex = regex.replaceAll("\\*\\*", "(.+)");
+//    regex = regex.replaceAll("\\*\\*", "(.*)");
     regex = regex.replaceAll("\\*", "([^/]+)");
     regex = regex.replaceAll("\\(\\[\\^/\\]\\+\\)\\(\\[\\^/\\]\\+\\)", "(.*)");
     regex = regex.replaceAll("\\?", "(.?)");
