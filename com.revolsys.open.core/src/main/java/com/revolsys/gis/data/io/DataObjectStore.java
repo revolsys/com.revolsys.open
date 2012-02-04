@@ -13,6 +13,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;

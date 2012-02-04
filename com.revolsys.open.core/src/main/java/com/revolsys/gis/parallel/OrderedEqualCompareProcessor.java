@@ -92,7 +92,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     }
   }
 
-  private boolean geometryEquals(final DataObject object1,
+  protected boolean geometryEquals(final DataObject object1,
     final DataObject object2) {
     final Geometry geometry1 = object1.getGeometryValue();
     final Geometry geometry2 = object2.getGeometryValue();

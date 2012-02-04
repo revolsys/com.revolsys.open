@@ -878,8 +878,6 @@ public class CoordinatesListUtil {
           node2.move(midPoint);
         }
       }
-    } else if (!nodes2.isEmpty()) {
-      NoOp.noOp();
     }
     return true;
   }

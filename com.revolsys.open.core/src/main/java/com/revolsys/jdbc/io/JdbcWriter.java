@@ -100,7 +100,8 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     setDataSource(dataStore.getDataSource());
   }
 
-  private void addSqlColumEqualsPlaceholder(final StringBuffer sqlBuffer,
+  private void addSqlColumEqualsPlaceholder(
+    final StringBuffer sqlBuffer,
     final JdbcAttribute attribute) {
     final String attributeName = attribute.getName();
     if (quoteColumnNames) {
@@ -154,9 +155,11 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void close(final Map<QName, String> sqlMap,
+  private void close(
+    final Map<QName, String> sqlMap,
     final Map<QName, PreparedStatement> statementMap,
-    final Map<QName, Integer> batchCountMap, final String statisticName) {
+    final Map<QName, Integer> batchCountMap,
+    final String statisticName) {
     for (final Entry<QName, PreparedStatement> entry : statementMap.entrySet()) {
       final QName typeName = entry.getKey();
       final PreparedStatement statement = entry.getValue();
@@ -224,9 +227,11 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       "Delete");
   }
 
-  private void flush(final Map<QName, String> sqlMap,
+  private void flush(
+    final Map<QName, String> sqlMap,
     final Map<QName, PreparedStatement> statementMap,
-    final Map<QName, Integer> batchCountMap, final String statisticName) {
+    final Map<QName, Integer> batchCountMap,
+    final String statisticName) {
     for (final Entry<QName, PreparedStatement> entry : statementMap.entrySet()) {
       final QName typeName = entry.getKey();
       final PreparedStatement statement = entry.getValue();
@@ -301,7 +306,8 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return hints;
   }
 
-  private String getInsertSql(final DataObjectMetaData type,
+  private String getInsertSql(
+    final DataObjectMetaData type,
     final boolean generatePrimaryKey) {
     final QName typeName = type.getName();
     final String tableName = getTableName(typeName);
@@ -400,13 +406,17 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
       sqlBuffer.append(tableName);
       sqlBuffer.append(" set ");
+      boolean first = true;
       for (int i = 0; i < type.getAttributeCount(); i++) {
         if (i != type.getIdAttributeIndex()) {
-          final JdbcAttribute attribute = (JdbcAttribute)type.getAttribute(i);
-          addSqlColumEqualsPlaceholder(sqlBuffer, attribute);
-          if (i < type.getAttributeCount() - 1) {
+          if (first) {
+            first = false;
+          } else {
             sqlBuffer.append(", ");
           }
+          final JdbcAttribute attribute = (JdbcAttribute)type.getAttribute(i);
+          addSqlColumEqualsPlaceholder(sqlBuffer, attribute);
+
         }
       }
       sqlBuffer.append(" where ");
@@ -450,7 +460,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void insert(final DataObject object, final QName typeName,
+  private void insert(
+    final DataObject object,
+    final QName typeName,
     final DataObjectMetaData metaData) throws SQLException {
     PreparedStatement statement = typeInsertStatementMap.get(typeName);
     if (statement == null) {
@@ -484,7 +496,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void insertSequence(final DataObject object, final QName typeName,
+  private void insertSequence(
+    final DataObject object,
+    final QName typeName,
     final DataObjectMetaData metaData) throws SQLException {
     PreparedStatement statement = typeInsertSequenceStatementMap.get(typeName);
     if (statement == null) {
@@ -529,8 +543,11 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return quoteColumnNames;
   }
 
-  private void processCurrentBatch(final QName typeName, final String sql,
-    final PreparedStatement statement, final Map<QName, Integer> batchCountMap,
+  private void processCurrentBatch(
+    final QName typeName,
+    final String sql,
+    final PreparedStatement statement,
+    final Map<QName, Integer> batchCountMap,
     final String statisticName) throws SQLException {
     Integer batchCount = batchCountMap.get(typeName);
     if (batchCount == null) {

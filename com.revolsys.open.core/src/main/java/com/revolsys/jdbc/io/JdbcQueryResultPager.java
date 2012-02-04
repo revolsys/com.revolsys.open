@@ -13,10 +13,10 @@ import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.util.ExceptionUtil;
 

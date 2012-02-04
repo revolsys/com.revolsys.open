@@ -89,7 +89,7 @@ public class FieldDefinition {
           format.append("#");
         }
         precisionModel = new PrecisionModel(Math.pow(10, decimalPlaces));
-      } else if (decimalPlaces == -1) {
+      } else if (decimalPlaces == -1 && length > 2) {
         format.append(".");
         for (int i = 0; i < length - 2; i++) {
           format.append("#");

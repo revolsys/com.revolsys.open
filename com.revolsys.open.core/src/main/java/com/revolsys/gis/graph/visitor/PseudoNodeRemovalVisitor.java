@@ -62,6 +62,9 @@ public class PseudoNodeRemovalVisitor extends
   public void init() {
     mergedStatistics = new Statistics("Merged at psuedo node");
     mergedStatistics.connect();
+    if (equalExcludeAttributes == null) {
+      equalExcludeAttributes = new HashSet<String>(EQUAL_EXCLUDE);
+    }
   }
 
   private void mergeEdgePairs(
@@ -101,7 +104,7 @@ public class PseudoNodeRemovalVisitor extends
     final Node<DataObject> node,
     final DataObject object1,
     final DataObject object2) {
-    return DirectionalAttributes.mergeLongest(node, object1, object2);
+    return DirectionalAttributes.merge(node, object1, object2);
   }
 
   public void process(final DataObjectGraph graph) {
@@ -131,14 +134,7 @@ public class PseudoNodeRemovalVisitor extends
   }
 
   public boolean visit(final Node<DataObject> node) {
-    if (node.equals(1216090.409, 473112.314)) {
-      NoOp.noOp();
-    }
     if (node.getEdges().size() > 1) {
-      if (equalExcludeAttributes == null) {
-        equalExcludeAttributes = new HashSet<String>(EQUAL_EXCLUDE);
-      }
-
       processPseudoNodes(node);
     }
     return true;

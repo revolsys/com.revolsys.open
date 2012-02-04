@@ -15,14 +15,21 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.config.AttributesBeanConfigurer;
+import com.revolsys.util.JavaBeanUtil;
 
 public class SpringUtil {
+
+  public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
   public static void copy(final Resource source, final Resource target) {
     final InputStream in = getInputStream(source);
@@ -159,5 +166,31 @@ public class SpringUtil {
   public static Writer getWriter(final Resource resource) {
     final OutputStream stream = getOutputStream(resource);
     return new OutputStreamWriter(stream);
+  }
+
+  public static boolean setBeanProperty(
+    final ConfigurableListableBeanFactory factory,
+    final String key,
+    final Object value) {
+    final int index = key.indexOf('.');
+    if (index == -1) {
+      return false;
+    } else {
+      final String beanName = key.substring(0, index);
+      final String propertyName = key.substring(index + 1);
+      if (factory.containsBean(beanName)) {
+        final BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
+        if (beanDefinition.isPrototype()) {
+          AttributesBeanConfigurer.setAttributeValue(factory, beanName,
+            propertyName, value);
+        } else {
+          final Object bean = factory.getBean(beanName);
+          JavaBeanUtil.setProperty(bean, propertyName, value);
+        }
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 }

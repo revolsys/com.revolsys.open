@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,7 @@ import org.springframework.util.StringValueResolver;
 import com.revolsys.collection.AttributeMap;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.spring.BeanReference;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.factory.Parameter;
 import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
@@ -66,8 +66,6 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   private String placeholderPrefix = DEFAULT_PLACEHOLDER_PREFIX;
 
   private String placeholderSuffix = DEFAULT_PLACEHOLDER_SUFFIX;
-
-  public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
   public AttributesBeanConfigurer() {
   }
@@ -195,7 +193,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
         BeanReference reference = (BeanReference)value;
         value = reference.getBean();
       }
-      final Matcher matcher = KEY_PATTERN.matcher(key);
+      final Matcher matcher = SpringUtil.KEY_PATTERN.matcher(key);
       if (matcher.matches()) {
         final String beanName = matcher.group(1);
         final String mapKey = matcher.group(2);
@@ -395,7 +393,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   /**
    * Apply the given property value to the corresponding bean.
    */
-  protected void setAttributeValue(
+  public static void setAttributeValue(
     final ConfigurableListableBeanFactory factory, final String beanName,
     final String property, final Object value) {
 

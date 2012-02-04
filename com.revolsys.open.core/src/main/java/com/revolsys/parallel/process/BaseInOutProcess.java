@@ -1,6 +1,5 @@
 package com.revolsys.parallel.process;
 
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.parallel.channel.Channel;
 
 public class BaseInOutProcess<I, O> extends AbstractInOutProcess<I, O> {
@@ -15,8 +14,6 @@ public class BaseInOutProcess<I, O> extends AbstractInOutProcess<I, O> {
         I object = in.read();
         if (object != null) {
           process(in, out, object);
-        } else  {
-          NoOp.noOp();
         }
       }
     } finally {

@@ -125,8 +125,6 @@ public class Graph<T> {
       if (graph1.findNode(node2) == null) {
         moveToMidpoint(movedNodes, graph1, node1, node2);
       }
-    } else if (!nodes2.isEmpty()) {
-      NoOp.noOp();
     }
     return true;
   }

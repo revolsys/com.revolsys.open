@@ -43,8 +43,8 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   }
 
   @Override
-  protected ResultPager<T> getObjectList(final Map<String, Object> filter) {
-    return dataAccessObject.page(filter, Collections.singletonMap("id", true));
+  public ResultPager<T> getObjectList(final Map<String, Object> filter) {
+    return dataAccessObject.page(filter, Collections.singletonMap(getIdPropertyName(), true));
   }
 
   @Override
@@ -54,7 +54,7 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   }
 
   @Override
-  protected T loadObject(final Object id) {
+  public T loadObject(final Object id) {
     try {
       final long longId = Long.parseLong(id.toString());
       final T object = dataAccessObject.load(longId);

@@ -1,4 +1,4 @@
-package com.revolsys.gis.data.io;
+package com.revolsys.gis.data.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.jdbc.JdbcUtils;

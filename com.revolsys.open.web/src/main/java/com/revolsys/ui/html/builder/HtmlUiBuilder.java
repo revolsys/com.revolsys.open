@@ -27,6 +27,7 @@ import org.apache.commons.jexl.context.HashMapContext;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -40,6 +41,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.ui.html.decorator.CollapsibleBox;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
 import com.revolsys.ui.html.fields.Field;
@@ -62,12 +64,12 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.ElementLabel;
 import com.revolsys.ui.html.view.FilterableTableView;
+import com.revolsys.ui.html.view.IFrame;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.html.view.RawContent;
 import com.revolsys.ui.html.view.ResultPagerView;
 import com.revolsys.ui.html.view.TableView;
 import com.revolsys.ui.model.Menu;
-import com.revolsys.ui.web.config.HttpServletRequestJexlContext;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.util.CaseConverter;
@@ -107,8 +109,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   private HtmlUiBuilderFactory builderFactory;
 
   protected Map<Class<?>, TypeSerializer> classSerializers = new HashMap<Class<?>, TypeSerializer>();
-
-  private HttpServletRequestJexlContext context;
 
   private int defaultPageSize = 25;
 
@@ -216,6 +216,24 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     nullLabels.put(key, label);
   }
 
+  public IFrame createCollapsibleIframe(
+    final Class<?> builderClass,
+    final String pageName) {
+    return createCollapsibleIframe(builderClass.getName(), pageName);
+  }
+
+  public IFrame createCollapsibleIframe(
+    final String builderName,
+    final String pageName) {
+    final HtmlUiBuilder<?> appBuilder = getBuilder(builderName);
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("plain", true);
+    final String link = appBuilder.getPageUrl(pageName, parameters);
+    final Decorator decorator = new CollapsibleBox(appBuilder.getPluralTitle());
+    final IFrame iFrame = new IFrame(link, "autoHeight", decorator);
+    return iFrame;
+  }
+
   public Element createDetailView(
     final Object object,
     final String cssClass,
@@ -240,7 +258,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String title,
     final List<String> keys,
     final Locale locale,
-    boolean showSearchFields) {
+    final boolean showSearchFields) {
 
     final HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
       this, keys, locale);
@@ -254,25 +272,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String title,
     final String keyList,
     final Locale locale,
-    boolean showSearchFields) {
+    final boolean showSearchFields) {
     final List<String> keyListkeyList = getKeyList(keyList);
     return createFilterableTableView(cssClass, title, keyListkeyList, locale,
       showSearchFields);
-  }
-
-  public Element createObjectListView(
-    HttpServletRequest request,
-    ResultPager<T> pager,
-    final String cssClass,
-    final String title,
-    final String keyList,
-    final Locale locale) {
-    ElementContainer listContainer = new ElementContainer();
-    final List<String> keyListkeyList = getKeyList(keyList);
-    FilterableTableView tableView = createFilterableTableView(cssClass, title,
-      keyListkeyList, locale, false);
-    updateObjectListView(request, listContainer, tableView, pager);
-    return listContainer;
   }
 
   /**
@@ -344,8 +347,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Element createObjectAddPage(
     final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
+    final HttpServletResponse response,
+    final Map<String, Object> defaultValues,
+    String keyListPrefix) throws IOException, ServletException {
     final T object = createObject();
+
+    JavaBeanUtil.setProperties(object, defaultValues);
+
     // if (!canAddObject(request)) {
     // response.sendError(HttpServletResponse.SC_FORBIDDEN,
     // "No permission to edit " + getTypeName() + " #" + getId());
@@ -353,10 +361,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     // }
     final Map<String, Object> parameters = new HashMap<String, Object>();
 
-    final String keyListName = "add";
+    final String addName = getName(keyListPrefix, "add");
     final Set<String> parameterNamesToSave = new HashSet<String>();
 
-    final Form form = createForm(object, keyListName, request.getLocale());
+    final Form form = createForm(object, addName, request.getLocale());
     for (final String param : parameterNamesToSave) {
       form.addSavedParameter(param, request.getParameter(param));
     }
@@ -370,20 +378,24 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           final Object id = getValue(object, getIdPropertyName());
           parameters.put(getIdParameterName(), id);
 
-          final String url = getPageUrl("view", parameters);
+          postInsert(object);
+          String viewName = getName(keyListPrefix, "view");
+          final String url = getPageUrl(viewName, parameters);
           response.sendRedirect(url);
           return null;
         }
       }
     }
 
-    String title = "Add " + getTitle();
+    final String title = "Add " + getTitle();
     request.setAttribute("title", title);
     request.setAttribute("pageHeading", title);
 
     final Menu actionMenu = new Menu();
-    actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("list", parameters)));
-    actionMenu.addMenuItem(new Menu("Refresh", getPageUrl("add", parameters)));
+    String listName = getName(keyListPrefix, "list");
+    actionMenu.addMenuItem(new Menu("Cancel", getPageUrl(listName, parameters)));
+    actionMenu.addMenuItem(new Menu("Clear Fields", getPageUrl(addName,
+      parameters)));
     actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
       + form.getName() + "'].submit()"));
 
@@ -395,8 +407,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Element createObjectEditPage(
     final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
-    final T object = loadObject();
+    final HttpServletResponse response,
+    final T object,
+    final String keyListPrefix) throws IOException, ServletException {
     if (object == null) {
       throw new NoSuchRequestHandlingMethodException(request);
     } else {
@@ -409,22 +422,24 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Object id = getValue(object, getIdPropertyName());
       parameters.put(getIdParameterName(), id);
 
-      final String keyListName = "edit";
       final Set<String> parameterNamesToSave = new HashSet<String>();
       parameterNamesToSave.add(getIdParameterName());
 
-      final Form form = createForm(object, keyListName, request.getLocale());
+      String editName = getName(keyListPrefix, "edit");
+      final Form form = createForm(object, editName, request.getLocale());
       for (final String param : parameterNamesToSave) {
         form.addSavedParameter(param, request.getParameter(param));
       }
       form.initialize(request);
 
+      String viewName = getName(keyListPrefix, "view");
       if (form.isPosted() && form.isMainFormTask()) {
-        if (form.isValid()) {
+        if (form.isValid() && preUpdate(form, object)) {
           updateObject(object);
+          postUpdate(object);
           parameters.put("message", "Saved");
 
-          final String url = getPageUrl("view", parameters);
+          final String url = getPageUrl(viewName, parameters);
           response.sendRedirect(url);
           return null;
         } else {
@@ -434,11 +449,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         setRollbackOnly(object);
       }
 
-      request.setAttribute("title", "Edit " + getTitle() + " #" + getId());
+      request.setAttribute("title", "Edit " + getTitle() + " #" + id);
 
       final Menu actionMenu = new Menu();
-      actionMenu.addMenuItem(new Menu("Cancel", getPageUrl("view", parameters)));
-      actionMenu.addMenuItem(new Menu("Refresh", getPageUrl("edit", parameters)));
+      actionMenu.addMenuItem(new Menu("Cancel",
+        getPageUrl(viewName, parameters)));
+      actionMenu.addMenuItem(new Menu("Revert to Saved", getPageUrl(editName,
+        parameters)));
       actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
         + form.getName() + "'].submit()"));
 
@@ -453,7 +470,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public ElementContainer createObjectListPage(
     final HttpServletRequest request,
     final HttpServletResponse response,
-    Map<String, Object> filter) throws IOException {
+    final Map<String, Object> filter) throws IOException {
 
     final FilterableTableView listView = createFilterableTableView(
       "objectList", null, "list", request.getLocale(), true);
@@ -506,7 +523,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ElementContainer view = new ElementContainer();
     view.add(searchForm);
 
-    String title = getPluralTitle();
+    final String title = getPluralTitle();
     request.setAttribute("title", title);
     request.setAttribute("pageHeading", title);
 
@@ -529,69 +546,42 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return view;
   }
 
-  private void updateObjectListView(
-    HttpServletRequest request,
-    ElementContainer listContainer,
-    FilterableTableView listView,
-    ResultPager<T> pager) {
-    try {
-
-      List<?> results = Collections.emptyList();
-      int pageSize;
-      try {
-        pageSize = Integer.parseInt(request.getParameter("pageSize"));
-      } catch (final Throwable t) {
-        pageSize = defaultPageSize;
-      }
-      pager.setPageSize(Math.min(maxPageSize, pageSize));
-      try {
-        final String page = request.getParameter("page");
-        pager.setPageNumber(Integer.parseInt(page));
-      } catch (final Throwable t) {
-        pager.setPageNumber(1);
-      }
-      results = pager.getList();
-
-      listView.setRows(results);
-
-      if (pager.getNumResults() > 0) {
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> parameters = request.getParameterMap();
-        final ResultPagerView pagerView = new ResultPagerView(pager,
-          request.getRequestURI(), parameters);
-        listContainer.add(0, pagerView);
-        listContainer.add(pagerView);
-      }
-    } finally {
-      pager.close();
-    }
+  public Element createObjectListView(
+    final HttpServletRequest request,
+    final ResultPager<T> pager,
+    final String cssClass,
+    final String title,
+    final String keyList,
+    final Locale locale) {
+    final ElementContainer listContainer = new ElementContainer();
+    final List<String> keyListkeyList = getKeyList(keyList);
+    final FilterableTableView tableView = createFilterableTableView(cssClass,
+      title, keyListkeyList, locale, false);
+    listContainer.add(tableView);
+    updateObjectListView(request, listContainer, tableView, pager);
+    return listContainer;
   }
 
   public ElementContainer createObjectViewPage(
     final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
-    final Object object = loadObject();
-    return createObjectViewPage(request, response, object, "view");
-  }
-
-  protected ElementContainer createObjectViewPage(
-    final HttpServletRequest request,
     final HttpServletResponse response,
     final Object object,
-    String keyListName) throws NoSuchRequestHandlingMethodException {
+    final String keyListPrefix) throws NoSuchRequestHandlingMethodException {
     if (object == null) {
       throw new NoSuchRequestHandlingMethodException(request);
     } else {
+
       final Element detailView = createDetailView(object, "objectView",
-        keyListName, request.getLocale());
-      final String id = getId();
-      String title = getTitle() + " #" + id;
+        getName(keyListPrefix, "view"), request.getLocale());
+      final Object id = getIdValue(object);
+      final String title = getTitle() + " #" + id;
       request.setAttribute("title", title);
       request.setAttribute("pageHeading", title);
 
       final Menu actionMenu = new Menu();
-      if (hasPageUrl("edit")) {
-        final Map<String, String> parameters = Collections.singletonMap(
+      String editPageName = getName(keyListPrefix, "edit");
+      if (hasPageUrl(editPageName)) {
+        final Map<String, Object> parameters = Collections.singletonMap(
           getIdParameterName(), id);
         final String url = getPageUrl("edit", parameters);
         actionMenu.addMenuItem(new Menu("Edit", url));
@@ -604,6 +594,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         view.add(actionMenuElement);
       }
       return view;
+    }
+  }
+
+  private String getName(String prefix, String keyListName) {
+    if (StringUtils.hasText(prefix)) {
+      return prefix + CaseConverter.toUpperFirstChar(keyListName);
+    } else {
+      return keyListName;
     }
   }
 
@@ -654,7 +652,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (builderFactory != null) {
       return builderFactory.get(objectClass);
     } else {
-      HtmlUiBuilder htmlUiBuilder = HtmlUiBuilderFactory.get(beanFactory,
+      final HtmlUiBuilder htmlUiBuilder = HtmlUiBuilderFactory.get(beanFactory,
         objectClass);
       return (H)htmlUiBuilder;
     }
@@ -669,9 +667,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   @SuppressWarnings("unchecked")
   public <H extends HtmlUiBuilder<?>> H getBuilder(final Object object) {
     if (object != null) {
-      Class<?> class1 = (Class<?>)object.getClass();
+      final Class<?> class1 = object.getClass();
       @SuppressWarnings("rawtypes")
-      HtmlUiBuilder builder = getBuilder(class1);
+      final HtmlUiBuilder builder = getBuilder(class1);
       return (H)builder;
     } else {
       return null;
@@ -687,7 +685,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   @SuppressWarnings("unchecked")
   public <H extends HtmlUiBuilder<?>> H getBuilder(final String typeName) {
     @SuppressWarnings("rawtypes")
-    HtmlUiBuilder htmlUiBuilder = HtmlUiBuilderFactory.get(beanFactory,
+    final HtmlUiBuilder htmlUiBuilder = HtmlUiBuilderFactory.get(beanFactory,
       typeName);
     return (H)htmlUiBuilder;
   }
@@ -783,10 +781,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Element> getFields() {
     return fields;
-  }
-
-  public String getId() {
-    return getUriTemplateVariable(idParameterName);
   }
 
   /**
@@ -962,7 +956,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return nullLabels;
   }
 
-  protected ResultPager<T> getObjectList(final Map<String, Object> filter) {
+  public ResultPager<T> getObjectList(final Map<String, Object> filter) {
     throw new UnsupportedOperationException();
   }
 
@@ -1064,16 +1058,21 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return usePathVariables;
   }
 
-  protected T loadObject() {
-    final String idString = getId();
-    return loadObject(idString);
-  }
-
-  protected T loadObject(final Object id) {
+  public T loadObject(final Object id) {
     throw new UnsupportedOperationException();
   }
 
+  protected void postInsert(final T object) {
+  }
+
+  protected void postUpdate(final T object) {
+  }
+
   protected boolean preInsert(final Form form, final T object) {
+    return true;
+  }
+
+  protected boolean preUpdate(final Form form, final T object) {
     return true;
   }
 
@@ -1357,7 +1356,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void setServletContext(final ServletContext servletContext) {
-    context = new HttpServletRequestJexlContext(servletContext);
   }
 
   public void setTitle(final String typeLabel) {
@@ -1389,6 +1387,44 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   protected void updateObject(final T object) {
+  }
+
+  private void updateObjectListView(
+    final HttpServletRequest request,
+    final ElementContainer listContainer,
+    final FilterableTableView listView,
+    final ResultPager<T> pager) {
+    try {
+
+      List<?> results = Collections.emptyList();
+      int pageSize;
+      try {
+        pageSize = Integer.parseInt(request.getParameter("pageSize"));
+      } catch (final Throwable t) {
+        pageSize = defaultPageSize;
+      }
+      pager.setPageSize(Math.min(maxPageSize, pageSize));
+      try {
+        final String page = request.getParameter("page");
+        pager.setPageNumber(Integer.parseInt(page));
+      } catch (final Throwable t) {
+        pager.setPageNumber(1);
+      }
+      results = pager.getList();
+
+      listView.setRows(results);
+
+      if (pager.getNumResults() > 0) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> parameters = request.getParameterMap();
+        final ResultPagerView pagerView = new ResultPagerView(pager,
+          request.getRequestURI(), parameters);
+        listContainer.add(0, pagerView);
+        listContainer.add(pagerView);
+      }
+    } finally {
+      pager.close();
+    }
   }
 
   public boolean validateForm(final HtmlUiBuilderObjectForm form) {

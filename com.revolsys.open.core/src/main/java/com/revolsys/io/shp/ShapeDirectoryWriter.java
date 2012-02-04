@@ -25,11 +25,12 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private boolean useZeroForNull = true;
 
-  private final Map<DataObjectMetaData, Writer<DataObject>> writers = new HashMap<DataObjectMetaData, Writer<DataObject>>();
+  private Map<DataObjectMetaData, Writer<DataObject>> writers = new HashMap<DataObjectMetaData, Writer<DataObject>>();
 
   private boolean useNamespaceAsSubDirectory;
 
   private Statistics statistics;
+
   public ShapeDirectoryWriter() {
   }
 
@@ -40,15 +41,19 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   @Override
   @PreDestroy
   public void close() {
-    for (final Writer<DataObject> writer : writers.values()) {
-      try {
-        writer.close();
-      } catch (final RuntimeException e) {
-        e.printStackTrace();
+    if (writers != null) {
+      for (final Writer<DataObject> writer : writers.values()) {
+        try {
+          writer.close();
+        } catch (final RuntimeException e) {
+          e.printStackTrace();
+        }
       }
+      writers = null;
     }
     if (statistics != null) {
       statistics.disconnect();
+      statistics = null;
     }
   }
 
@@ -118,7 +123,8 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
-    statistics = new Statistics("Write Shape " + baseDirectory.getAbsolutePath());
+    statistics = new Statistics("Write Shape "
+      + baseDirectory.getAbsolutePath());
     statistics.connect();
   }
 
@@ -137,7 +143,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   public void write(final DataObject object) {
-   final Writer<DataObject> writer = getWriter(object);
+    final Writer<DataObject> writer = getWriter(object);
     writer.write(object);
     statistics.add(object);
   }

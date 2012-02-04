@@ -12,11 +12,11 @@ import java.util.UUID;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.Query;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.Reader;
 
 public class CodeTableProperty extends AbstractCodeTable implements
