@@ -583,7 +583,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (hasPageUrl(editPageName)) {
         final Map<String, Object> parameters = Collections.singletonMap(
           getIdParameterName(), id);
-        final String url = getPageUrl("edit", parameters);
+        final String url = getPageUrl(editPageName, parameters);
         actionMenu.addMenuItem(new Menu("Edit", url));
       }
 
