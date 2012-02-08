@@ -39,6 +39,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -444,8 +445,10 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     }
   }
 
-  public <T> T setValueByPath(final CharSequence attributePath,
-    final DataObject source, final String sourceAttributePath) {
+  public <T> T setValueByPath(
+    final CharSequence attributePath,
+    final DataObject source,
+    final String sourceAttributePath) {
     @SuppressWarnings("unchecked")
     final T value = (T)source.getValueByPath(sourceAttributePath);
     setValueByPath(attributePath, value);
@@ -479,6 +482,8 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
             + metaData.getName() + "." + name);
         }
         setValue(name, value);
+      } else if (value == null || !StringUtils.hasText(value.toString())) {
+        setValue(codeTableAttributeName, null);
       } else {
         Object targetValue;
         if (codeTableValueName == null) {
