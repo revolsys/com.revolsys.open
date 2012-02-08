@@ -23,9 +23,9 @@ import java.util.Map;
 
 public class Menu extends MenuItem {
 
-  private ArrayList items = new ArrayList();
+  private ArrayList<MenuItem> items = new ArrayList<MenuItem>();
 
-  private Map itemMap = new HashMap();
+  private Map<String,MenuItem> itemMap = new HashMap<String,MenuItem>();
 
   public Menu() {
   }
@@ -43,11 +43,11 @@ public class Menu extends MenuItem {
     }
   }
 
-  public Collection getItems() {
+  public Collection<MenuItem> getItems() {
     return items;
   }
 
-  public Map getNamedItems() {
+  public Map<String,MenuItem> getNamedItems() {
     return itemMap;
   }
 

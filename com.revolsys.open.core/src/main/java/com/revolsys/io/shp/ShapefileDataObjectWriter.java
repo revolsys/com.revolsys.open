@@ -136,23 +136,30 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     throws IOException {
     if (geometryFactory != null) {
       CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      int srid = coordinateSystem.getId();
-      Resource prjResource = SpringUtil.getResourceWithExtension(resource,
-        "prj");
-      if (!(prjResource instanceof NonExistingResource)) {
-        OutputStream out = SpringUtil.getOutputStream(prjResource);
-        final PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
-        CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-          "ESRI", String.valueOf(srid)));
-        EsriCsWktWriter.write(writer, esriCoordinateSystem);
-        writer.close();
+      if (coordinateSystem != null) {
+        int srid = coordinateSystem.getId();
+        Resource prjResource = SpringUtil.getResourceWithExtension(resource,
+          "prj");
+        if (!(prjResource instanceof NonExistingResource)) {
+          OutputStream out = SpringUtil.getOutputStream(prjResource);
+          final PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(out));
+          CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
+            "ESRI", String.valueOf(srid)));
+          EsriCsWktWriter.write(writer, esriCoordinateSystem);
+          writer.close();
+        }
       }
     }
   }
 
   @Override
-  protected int addDbaseField(final String name, final DataType dataType,
-    final Class<?> typeJavaClass, final int length, final int scale) {
+  protected int addDbaseField(
+    final String name,
+    final DataType dataType,
+    final Class<?> typeJavaClass,
+    final int length,
+    final int scale) {
     if (Geometry.class.isAssignableFrom(typeJavaClass)) {
       addField(new FieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0));
       return 0;
@@ -245,7 +252,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected boolean writeField(final DataObject object,
+  protected boolean writeField(
+    final DataObject object,
     final FieldDefinition field) throws IOException {
     if (field.getName() == geometryPropertyName) {
       final long recordIndex = out.getFilePointer();

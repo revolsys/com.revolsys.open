@@ -18,7 +18,7 @@ public class CsvWriter {
    * @param reader The reader to the CSV file.
    * @throws IOException
    */
-  public CsvWriter(final Writer out) throws IOException {
+  public CsvWriter(final Writer out) {
     this.out = new PrintWriter(out);
   }
 
@@ -26,7 +26,7 @@ public class CsvWriter {
     write(values.toArray());
   }
 
-  public void write(Object[] values) {
+  public void write(Object... values) {
     for (int i = 0; i < values.length; i++) {
       Object value = values[i];
       if (value != null) {

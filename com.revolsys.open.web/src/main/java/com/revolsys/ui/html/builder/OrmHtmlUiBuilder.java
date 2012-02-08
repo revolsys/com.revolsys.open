@@ -14,6 +14,10 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   public OrmHtmlUiBuilder() {
   }
 
+  public OrmHtmlUiBuilder(final String typeName) {
+    setTypeName(typeName);
+  }
+
   public OrmHtmlUiBuilder(final String typeName, final String title) {
     super(typeName, title);
   }
@@ -43,8 +47,14 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   }
 
   @Override
-  public ResultPager<T> getObjectList(final Map<String, Object> filter) {
-    return dataAccessObject.page(filter, Collections.singletonMap(getIdPropertyName(), true));
+  public ResultPager<T> getResultPager(final Map<String, Object> filter) {
+    return getResultPager(filter, getOrderBy());
+  }
+
+  public ResultPager<T> getResultPager(
+    final Map<String, Object> filter,
+    Map<String, Boolean> orderBy) {
+    return dataAccessObject.page(filter, orderBy);
   }
 
   @Override

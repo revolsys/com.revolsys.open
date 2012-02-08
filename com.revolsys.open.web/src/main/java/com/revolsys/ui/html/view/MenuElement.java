@@ -58,9 +58,10 @@ public class MenuElement extends Element {
     return showRoot;
   }
 
-  private void menu(final XmlWriter out, final Collection<Menu> items,
+  private void menu(
+    final XmlWriter out,
+    final Collection<Menu> items,
     final int level) {
-    // Collection items = menu.getItems();
     if (items.size() > 0) {
       out.startTag(HtmlUtil.UL);
       for (Menu menu : items) {
@@ -86,8 +87,7 @@ public class MenuElement extends Element {
     this.jexlContext = new JexlHttpServletRequestContext(request);
   }
 
-  private void menuLink(final XmlWriter out, final Menu menu)
-    {
+  private void menuLink(final XmlWriter out, final Menu menu) {
     String uri = menu.getLink(jexlContext);
     String linkTitle = menu.getLinkTitle();
     String onClick = menu.getOnClick();
@@ -99,6 +99,7 @@ public class MenuElement extends Element {
       out.attribute(HtmlUtil.ATTR_HREF, uri);
       out.attribute(HtmlUtil.ATTR_TITLE, linkTitle);
       out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
+      out.attribute(HtmlUtil.ATTR_TARGET, menu.getTarget());
 
       out.text(linkTitle);
       out.endTag(HtmlUtil.A);

@@ -19,7 +19,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,7 +31,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriTemplate;
+import org.springframework.web.util.UrlPathHelper;
 
+import com.revolsys.spring.StringTemplate;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.util.CaseConverter;
@@ -41,6 +42,17 @@ import com.revolsys.util.UrlUtil;
 
 public class Page extends Component {
   private static final Logger LOG = Logger.getLogger(Page.class);
+
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+
+  public String getAbsoluteUrl(final String url) {
+    if (url.startsWith("/")) {
+      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(getRequest());
+      return contextPath + url;
+    } else {
+      return url;
+    }
+  }
 
   private final List<Argument> arguments = new ArrayList<Argument>();
 
@@ -74,11 +86,16 @@ public class Page extends Component {
 
   private UriTemplate uriTemplate;
 
+  private StringTemplate titleTemplate;
+
+  public Page() {
+  }
+
   public Page(final Page page) {
     super(page);
     menuId = page.menuId;
     setPath(page.path);
-    title = page.title;
+    setTitle(page.title);
     properties.putAll(page.properties);
     arguments.addAll(page.arguments);
     argumentsMap.putAll(page.argumentsMap);
@@ -207,7 +224,7 @@ public class Page extends Component {
     return getFullUrl(parameters);
   }
 
-  private HttpServletRequest getRequest() {
+  private static HttpServletRequest getRequest() {
     ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
     HttpServletRequest request = requestAttributes.getRequest();
     return request;
@@ -254,7 +271,7 @@ public class Page extends Component {
     Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
     URI path = uriTemplate.expand(uriTemplateVariables);
     String url = UrlUtil.getUrl(path, uriParameters);
-    return PathAliasController.getPath(url);
+    return getAbsoluteUrl(PathAliasController.getPath(url));
   }
 
   public Layout getLayout() {
@@ -317,6 +334,20 @@ public class Page extends Component {
     }
   }
 
+  public String getExpandedTitle() {
+    Map<String, Object> parameters = Collections.<String, Object> emptyMap();
+    return getTitle(parameters);
+  }
+
+  public String getTitle(Map<String, Object> parameters) {
+    if (titleTemplate == null) {
+      return title;
+    } else {
+      Map<String, Object> uriTemplateVariables = getUriTemplateVariables(parameters);
+      return titleTemplate.expand(uriTemplateVariables);
+    }
+  }
+
   public boolean hasArgument(final String name) {
     return argumentsMap.containsKey(name);
   }
@@ -375,6 +406,10 @@ public class Page extends Component {
   public void setTitle(final String title) {
     if (title != null) {
       this.title = title;
+      titleTemplate = new StringTemplate(title);
+      if (titleTemplate.getVariableNames().isEmpty()) {
+        titleTemplate = null;
+      }
       try {
         titleExpression = JexlUtil.createExpression(title);
       } catch (final Exception e) {

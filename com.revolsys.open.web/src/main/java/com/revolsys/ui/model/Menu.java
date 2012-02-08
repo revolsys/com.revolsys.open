@@ -27,9 +27,9 @@ public class Menu implements Cloneable {
 
   private String onClick;
 
-  private Map<String, String> parameters = new HashMap<String, String>();
+  private Map<String, Object> parameters = new HashMap<String, Object>();
 
-  private Map<String, String> staticParameters = new HashMap<String, String>();
+  private Map<String, Object> staticParameters = new HashMap<String, Object>();
 
   private String title;
 
@@ -39,9 +39,9 @@ public class Menu implements Cloneable {
 
   private Expression uriExpression;
 
-  private UriResolver uriResolver;
-
   private boolean visible = true;
+  
+  private String target;
 
   public Menu() {
   }
@@ -49,6 +49,14 @@ public class Menu implements Cloneable {
   public Menu(final String title, final String uri) {
     setTitle(title);
     setUri(uri);
+  }
+
+  public String getTarget() {
+    return target;
+  }
+
+  public void setTarget(String target) {
+    this.target = target;
   }
 
   public Menu(String title, String uri, String onClick) {
@@ -88,12 +96,12 @@ public class Menu implements Cloneable {
     }
   }
 
-  public void addParameter(final String name, final String value) {
+  public void addParameter(final String name, final Object value) {
     if (value != null) {
       parameters.put(name, value);
       Expression expression = null;
       try {
-        expression = JexlUtil.createExpression(value);
+        expression = JexlUtil.createExpression(value.toString());
       } catch (Exception e) {
         LOG.error("Invalid Jexl Expression '" + value + "': " + e.getMessage(),
           e);
@@ -110,10 +118,10 @@ public class Menu implements Cloneable {
     }
   }
 
-  public void addParameters(final Map<String, String> parameters) {
-    for (Entry<String, String> parameter : parameters.entrySet()) {
+  public void addParameters(final Map<String, ? extends Object> parameters) {
+    for (Entry<String, ? extends Object> parameter : parameters.entrySet()) {
       String name = parameter.getKey();
-      String value = parameter.getValue();
+      Object value = parameter.getValue();
       addParameter(name, value);
     }
   }
@@ -126,7 +134,6 @@ public class Menu implements Cloneable {
     menu.addParameters(parameters);
     menu.setTitle(title);
     menu.setUri(uri);
-    menu.setUriResolver(uriResolver);
     menu.setVisible(visible);
     return menu;
   }
@@ -137,14 +144,14 @@ public class Menu implements Cloneable {
   }
 
   public String getLink() {
-    return getLink(uriResolver, null);
+    return getLink(null);
+  }
+
+  public String getAnchor() {
+    return anchor;
   }
 
   public String getLink(final JexlContext context) {
-    return getLink(null, context);
-  }
-
-  public String getLink(final UriResolver uriResolver, final JexlContext context) {
     String baseUri = uri;
     if (uriExpression != null) {
       if (context != null) {
@@ -152,9 +159,6 @@ public class Menu implements Cloneable {
       } else {
         baseUri = null;
       }
-    }
-    if (uriResolver != null) {
-      baseUri = uriResolver.resolveUri(baseUri);
     }
 
     if (baseUri == null) {
@@ -223,7 +227,7 @@ public class Menu implements Cloneable {
   /**
    * @return Returns the parameters.
    */
-  public Map getParameters() {
+  public Map<String, Object> getParameters() {
     return parameters;
   }
 
@@ -322,10 +326,6 @@ public class Menu implements Cloneable {
       this.uri = null;
       this.uriExpression = null;
     }
-  }
-
-  public void setUriResolver(UriResolver uriResolver) {
-    this.uriResolver = uriResolver;
   }
 
   public void setVisible(final boolean visible) {

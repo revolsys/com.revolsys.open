@@ -68,7 +68,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   }
 
   @Override
-  public ResultPager<DataObject> getObjectList(
+  public ResultPager<DataObject> getResultPager(
     final Map<String, Object> filter) {
     final Query query = new Query(tableName);
     query.setFilter(filter);

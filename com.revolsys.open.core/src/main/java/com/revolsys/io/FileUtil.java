@@ -622,4 +622,11 @@ public final class FileUtil {
   private FileUtil() {
   }
 
+  public static Writer getWriter(File file) {
+    try {
+      return new FileWriter(file);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Unable to open file " + file, e);
+    }
+  }
 }

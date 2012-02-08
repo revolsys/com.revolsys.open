@@ -20,6 +20,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.spring.SpringUtil;
 
 public class JsonMapIoFactory extends AbstractMapReaderFactory implements
   MapWriterFactory {
@@ -53,6 +54,11 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     } catch (final IOException e) {
       throw new RuntimeException("Unable to open stream for " + resource, e);
     }
+  }
+
+  public MapWriter getWriter(Resource resource) {
+    Writer writer = SpringUtil.getWriter(resource);
+    return getWriter(writer);
   }
 
   public static Map<String, String> toMap(final String string) {

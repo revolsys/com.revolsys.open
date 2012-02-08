@@ -47,7 +47,8 @@ public final class DataObjectUtil {
    * @param geometry The new geometry.
    * @return The copied object.
    */
-  public static <T extends DataObject> T copy(final T object,
+  public static <T extends DataObject> T copy(
+    final T object,
     final Geometry geometry) {
     final Geometry oldGeometry = object.getGeometryValue();
     final T newObject = (T)object.clone();
@@ -60,7 +61,8 @@ public final class DataObjectUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getAttributeByPath(final DataObject object,
+  public static <T> T getAttributeByPath(
+    final DataObject object,
     final String path) {
     final DataObjectMetaData metaData = object.getMetaData();
     final DataObjectStore dataStore = metaData.getDataObjectStore();
@@ -113,6 +115,15 @@ public final class DataObjectUtil {
       }
     }
     return (T)propertyValue;
+  }
+
+  public static Integer getInteger(DataObject object, String attributeName) {
+    Number value = object.getValue(attributeName);
+    if (value == null) {
+      return null;
+    } else {
+      return value.intValue();
+    }
   }
 
   private DataObjectUtil() {

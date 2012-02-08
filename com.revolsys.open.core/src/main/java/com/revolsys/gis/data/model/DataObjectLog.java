@@ -25,7 +25,9 @@ public class DataObjectLog {
     return dataObjectLog;
   }
 
-  public static void error(final Class<?> logCategory, final String message,
+  public static void error(
+    final Class<?> logCategory,
+    final String message,
     final DataObject object) {
     final DataObjectLog dataObjectLog = getForThread();
     if (object == null) {
@@ -37,6 +39,40 @@ public class DataObjectLog {
       log.error(message + "\t" + metaData.getName() + object.getIdValue());
     } else {
       dataObjectLog.error(message, object);
+    }
+  }
+
+  public static void warn(
+    final Class<?> logCategory,
+    final String message,
+    final DataObject object) {
+    final DataObjectLog dataObjectLog = getForThread();
+    if (object == null) {
+      final Logger log = LoggerFactory.getLogger(logCategory);
+      log.warn(message + "\tnull");
+    } else if (dataObjectLog == null) {
+      final DataObjectMetaData metaData = object.getMetaData();
+      final Logger log = LoggerFactory.getLogger(logCategory);
+      log.warn(message + "\t" + metaData.getName() + object.getIdValue());
+    } else {
+      dataObjectLog.warn(message, object);
+    }
+  }
+
+  public static void info(
+    final Class<?> logCategory,
+    final String message,
+    final DataObject object) {
+    final DataObjectLog dataObjectLog = getForThread();
+    if (object == null) {
+      final Logger log = LoggerFactory.getLogger(logCategory);
+      log.info(message + "\tnull");
+    } else if (dataObjectLog == null) {
+      final DataObjectMetaData metaData = object.getMetaData();
+      final Logger log = LoggerFactory.getLogger(logCategory);
+      log.info(message + "\t" + metaData.getName() + object.getIdValue());
+    } else {
+      dataObjectLog.info(message, object);
     }
   }
 
@@ -57,10 +93,23 @@ public class DataObjectLog {
   }
 
   public synchronized void error(final Object message, final DataObject object) {
+    log("ERROR", message, object);
+  }
+
+  public synchronized void warn(final Object message, final DataObject object) {
+    log("WARNING", message, object);
+  }
+
+  public synchronized void info(final Object message, final DataObject object) {
+    log("INFO", message, object);
+  }
+
+  public void log(String logLevel, final Object message, final DataObject object) {
     if (writer != null) {
       final DataObjectMetaData logMetaData = getLogMetaData(object);
       final DataObject logObject = new ArrayDataObject(logMetaData, object);
       logObject.setValue("LOGMESSAGE", message);
+      logObject.setValue("LOGLEVEL", logLevel);
       writer.write(logObject);
     }
   }
@@ -86,6 +135,7 @@ public class DataObjectLog {
       final QName logTypeName = new QName(namespaceURI, logTableName);
       logMetaData = new DataObjectMetaDataImpl(logTypeName);
       logMetaData.addAttribute("LOGMESSAGE", DataTypes.STRING, 255, true);
+      logMetaData.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);
       for (final Attribute attribute : metaData.getAttributes()) {
         final Attribute logAttribute = new Attribute(attribute);
         logMetaData.addAttribute(logAttribute);

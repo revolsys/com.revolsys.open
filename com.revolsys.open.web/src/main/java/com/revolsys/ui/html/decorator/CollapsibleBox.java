@@ -8,8 +8,15 @@ public class CollapsibleBox implements Decorator {
 
   private String title;
 
+  private boolean open;
+
   public CollapsibleBox(String title) {
     this.title = title;
+  }
+
+  public CollapsibleBox(String title, boolean open) {
+    this.title = title;
+    this.open = open;
   }
 
   public void serialize(XmlWriter out, Element element) {
@@ -17,6 +24,11 @@ public class CollapsibleBox implements Decorator {
     out.attribute(HtmlUtil.ATTR_CLASS, "collapsibleBox");
 
     out.startTag(HtmlUtil.DIV);
+    if (open) {
+      out.attribute(HtmlUtil.ATTR_CLASS, "open");
+    } else {
+      out.attribute(HtmlUtil.ATTR_CLASS, "closed");
+    }
 
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "title");

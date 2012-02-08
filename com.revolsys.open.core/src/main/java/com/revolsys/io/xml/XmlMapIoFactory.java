@@ -12,6 +12,7 @@ import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.spring.SpringUtil;
 
 public class XmlMapIoFactory extends AbstractMapReaderFactory implements
   MapWriterFactory {
@@ -38,6 +39,11 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
     Reader<Map<String, Object>> reader = new IteratorReader<Map<String, Object>>(
       iterator);
     return reader;
+  }
+
+  public MapWriter getWriter(Resource resource) {
+    Writer writer = SpringUtil.getWriter(resource);
+    return getWriter(writer);
   }
 
   public MapWriter getWriter(OutputStream out) {
