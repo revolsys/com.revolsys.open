@@ -12,11 +12,15 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.postgresql.ds.PGPoolingDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
 
 import com.revolsys.jdbc.io.DataSourceFactory;
 
 public class PostgreSQLDataSourceFactory implements DataSourceFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLDataSourceFactory.class);
+
   private static final String URL_REGEX = "jdbc:postgresql:(?://([^:]+)(?::(\\d+))?/)?(.+)";
 
   public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
@@ -41,7 +45,12 @@ public class PostgreSQLDataSourceFactory implements DataSourceFactory {
       for (Entry<String, Object> property : newConfig.entrySet()) {
         String name = property.getKey();
         Object value = property.getValue();
-        dataSourceBean.setPropertyValue(name, value);
+        try {
+          dataSourceBean.setPropertyValue(name, value);
+        } catch (Throwable t) {
+          LOG.error("Unable to set data source property " + name + " = "
+            + value + " for " + url, t);
+        }
       }
 
       dataSource.setDatabaseName(databaseName);
@@ -55,7 +64,7 @@ public class PostgreSQLDataSourceFactory implements DataSourceFactory {
       }
       return dataSource;
     } else {
-      throw new IllegalArgumentException("");
+      throw new IllegalArgumentException("Not a valid postgres JDBC URL " + url);
     }
   }
 

@@ -451,12 +451,16 @@ public final class JdbcUtils {
   }
 
   public static String getTableName(final QName typeName) {
-    final String namespaceURI = typeName.getNamespaceURI();
-    final String localPart = typeName.getLocalPart();
-    if (namespaceURI == "") {
-      return localPart;
+    if (typeName == null) {
+      return null;
     } else {
-      return namespaceURI + "." + localPart;
+      final String namespaceURI = typeName.getNamespaceURI();
+      final String localPart = typeName.getLocalPart();
+      if (namespaceURI == "") {
+        return localPart;
+      } else {
+        return namespaceURI + "." + localPart;
+      }
     }
   }
 }

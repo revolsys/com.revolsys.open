@@ -1,5 +1,6 @@
 package com.revolsys.collection;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ListResultPager<T> implements ResultPager<T> {
@@ -30,9 +31,13 @@ public class ListResultPager<T> implements ResultPager<T> {
    * @return The list of objects in the current page.
    */
   public List<T> getList() {
-    int startIndex = getStartIndex() - 1;
-    int endIndex = getEndIndex();
-    return list.subList(startIndex, endIndex);
+    if (getNumResults() == 0) {
+      return Collections.emptyList();
+    } else {
+      int startIndex = getStartIndex() - 1;
+      int endIndex = getEndIndex();
+      return list.subList(startIndex, endIndex);
+    }
   }
 
   /**
@@ -50,10 +55,13 @@ public class ListResultPager<T> implements ResultPager<T> {
    * @return The index of the first object in the current page.
    */
   public int getStartIndex() {
-    if (pageNumber < getNumPages() - 1) {
+    int numPages = getNumPages();
+    if (numPages == 0) {
+      return 0;
+    } else if (pageNumber < numPages - 1) {
       return (pageNumber * pageSize) + 1;
     } else {
-      return ((getNumPages() - 1) * pageSize) + 1;
+      return ((numPages - 1) * pageSize) + 1;
     }
   }
 
@@ -63,7 +71,10 @@ public class ListResultPager<T> implements ResultPager<T> {
    * @return The index of the last object in the current page.
    */
   public int getEndIndex() {
-    if (pageNumber < getNumPages() - 1) {
+    int numPages = getNumPages();
+    if (numPages == 0) {
+      return 0;
+    } else if (pageNumber < numPages - 1) {
       return (pageNumber + 1) * pageSize;
     } else {
       return list.size();

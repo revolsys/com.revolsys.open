@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
@@ -163,9 +164,11 @@ public class Form extends ElementContainer {
     }
   }
 
+  private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
+  
   public void initialize(final HttpServletRequest request) {
     if (action == null || action.trim().length() == 0) {
-      action = request.getRequestURI();
+      action = URL_HELPER.getOriginatingRequestUri(request);
     }
     // ensure the formTaskField is initialized first so that it can be used
     // by the other fields

@@ -335,8 +335,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final QName tableName = query.getTypeName();
     metaData = query.getMetaData();
     if (metaData == null) {
-      metaData = dataStore.getMetaData(tableName);
-      query.setMetaData(metaData);
+      if (tableName != null) {
+        metaData = dataStore.getMetaData(tableName);
+        query.setMetaData(metaData);
+      }
     }
     String sql = getSql(query);
     try {
