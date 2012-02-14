@@ -38,6 +38,10 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
     }
   }
 
+  protected void lockObject(T object) {
+    dataAccessObject.lockAndRefresh(object);
+  }
+  
   public DataAccessObject<T> getDataAccessObject() {
     return dataAccessObject;
   }

@@ -24,49 +24,43 @@ public class PathAliasController implements Controller {
   private static final String PATH_PREFIX = PathAliasController.class.getName()
     + ".originalPrefix";
 
-  private static final Logger LOG = LoggerFactory.getLogger(PathAliasController.class);
-
   public static boolean forward(
     final HttpServletRequest request,
     final HttpServletResponse response,
     final String path) throws IOException, ServletException {
-    try {
-      final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
-      if (requestDispatcher == null) {
-        return false;
+    final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
+    if (requestDispatcher == null) {
+      return false;
+    } else {
+      final HttpServletRequest wrappedRequest;
+      if (request instanceof DefaultMultipartHttpServletRequest) {
+        final DefaultMultipartHttpServletRequest multiPartRequest = (DefaultMultipartHttpServletRequest)request;
+        wrappedRequest = new DefaultMultipartHttpServletRequest(
+          multiPartRequest, multiPartRequest.getMultiFileMap(),
+          new HashMap<String, String[]>()) {
+          @Override
+          public String getPathInfo() {
+            return path;
+          }
+        };
       } else {
-        final HttpServletRequest wrappedRequest;
-        if (request instanceof DefaultMultipartHttpServletRequest) {
-          final DefaultMultipartHttpServletRequest multiPartRequest = (DefaultMultipartHttpServletRequest)request;
-          wrappedRequest = new DefaultMultipartHttpServletRequest(
-            multiPartRequest, multiPartRequest.getMultiFileMap(),
-            new HashMap<String, String[]>()) {
-            @Override
-            public String getPathInfo() {
-              return path;
-            }
-          };
-        } else {
-          wrappedRequest = new HttpServletRequestWrapper(request) {
-            @Override
-            public String getPathInfo() {
-              return path;
-            }
-          };
-        }
-        final Object forwardPath = request.getAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE);
-        if (forwardPath == null) {
-          final String originalUri = request.getRequestURI();
-          wrappedRequest.setAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE,
-            originalUri);
-        }
-
-        requestDispatcher.forward(wrappedRequest, response);
-        wrappedRequest.setAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE,
-          forwardPath);
+        wrappedRequest = new HttpServletRequestWrapper(request) {
+          @Override
+          public String getPathInfo() {
+            return path;
+          }
+        };
       }
-    } catch (final ServletException e) {
-      LOG.error("Unable to include path " + path, e);
+      final Object forwardPath = request.getAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE);
+      if (forwardPath == null) {
+        final String originalUri = request.getRequestURI();
+        wrappedRequest.setAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE,
+          originalUri);
+      }
+
+      requestDispatcher.forward(wrappedRequest, response);
+      wrappedRequest.setAttribute(WebUtils.FORWARD_REQUEST_URI_ATTRIBUTE,
+        forwardPath);
     }
     return true;
   }
@@ -118,9 +112,7 @@ public class PathAliasController implements Controller {
           RequestAttributes.SCOPE_REQUEST);
       }
       path = path.replaceFirst(prefix, aliasPrefix);
-      if (forward(request, response, path)) {
-        return null;
-      } else {
+      if (!forward(request, response, path)) {
         throw new NoSuchRequestHandlingMethodException(request);
       }
     }

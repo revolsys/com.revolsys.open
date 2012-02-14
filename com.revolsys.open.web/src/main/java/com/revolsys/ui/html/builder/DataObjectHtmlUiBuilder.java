@@ -68,11 +68,23 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   }
 
   @Override
-  public ResultPager<DataObject> getResultPager(
-    final Map<String, Object> filter) {
+  public ResultPager<DataObject> getResultPager(final Map<String, Object> filter) {
     final Query query = new Query(tableName);
     query.setFilter(filter);
     return dataStore.page(query);
+  }
+
+  public List<DataObject> getAllObjects() {
+    final Query query = new Query(tableName);
+    Reader<DataObject> reader = dataStore.query(query);
+    return reader.read();
+  }
+
+  public List<DataObject> getAllObjects(String... orderBy) {
+    final Query query = new Query(tableName);
+    query.setOrderBy(orderBy);
+    Reader<DataObject> reader = dataStore.query(query);
+    return reader.read();
   }
 
   public QName getTableName() {

@@ -27,7 +27,9 @@ import org.apache.commons.jexl.context.HashMapContext;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -75,6 +77,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
 
+@ResponseStatus(reason = "Access Denied", value = HttpStatus.FORBIDDEN)
 public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private static final Pattern LINK_KEY_PATTERN = Pattern.compile("link\\(([\\w/]+),([\\w.]+)\\)");
@@ -608,13 +611,15 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<T> results,
     final String prefix) {
     final String pageName = getName(prefix, "list");
-    final TableView tableView = createTableView(results, pageName,
+    final ElementContainer tableView = createTableView(results, pageName, null,
       request.getLocale());
+    String title = getPageTitle(pageName);
+    tableView.setDecorator(new CollapsibleBox(title, true));
 
     final ElementContainer container = new ElementContainer();
     container.add(tableView);
 
-    setPageTitleAttribute(request, pageName);
+    setTitleAttribute(request, pageName);
 
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "add", "Add", "_top");
@@ -659,7 +664,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Element detailView = createDetailView(object, "objectView",
         keyList, request.getLocale());
       detailView.setDecorator(new CollapsibleBox("Details", true));
-      
+
       final String title = page.getExpandedTitle();
       request.setAttribute("title", title);
       request.setAttribute("pageHeading", title);
@@ -673,24 +678,29 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public TableView createTableView(
+  public ElementContainer createTableView(
     final Collection<?> rows,
     final String cssClass,
     final String title,
     final String keyListName,
+    final String noRecordsMessage,
     final Locale locale) {
     final List<String> keys = getKeyList(keyListName);
     final HtmlUiBuilderCollectionTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
       this, keys, locale);
     model.setRows(rows);
-    return new TableView(model, cssClass + " " + typeName, title);
+    TableView tableView = new TableView(model, cssClass + " " + typeName,
+      title, noRecordsMessage);
+    return new ElementContainer(tableView);
   }
 
-  public <V> TableView createTableView(
+  public <V> ElementContainer createTableView(
     final Collection<V> results,
     final String keyListName,
+    final String noRecordsMessage,
     final Locale locale) {
-    return createTableView(results, "objectList", null, keyListName, locale);
+    return createTableView(results, "objectList", null, keyListName,
+      noRecordsMessage, locale);
   }
 
   /**
@@ -1456,6 +1466,23 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       request.setAttribute("title", title);
       request.setAttribute("pageHeading", title);
     }
+  }
+
+  public String getPageTitle(final String pageName) {
+    final Page page = getPage(pageName);
+    if (page == null) {
+      return null;
+    } else {
+      final String title = page.getExpandedTitle();
+      return title;
+    }
+  }
+
+  public void setTitleAttribute(
+    final HttpServletRequest request,
+    final String pageName) {
+    final String title = getPageTitle(pageName);
+    request.setAttribute("title", title);
   }
 
   public void setPageUrls(final Map<String, String> pageUrls) {

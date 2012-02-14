@@ -36,6 +36,7 @@ import org.springframework.web.util.UrlPathHelper;
 import com.revolsys.spring.StringTemplate;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.exception.PageNotFoundException;
+import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
@@ -45,10 +46,12 @@ public class Page extends Component {
 
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
-  public String getAbsoluteUrl(final String url) {
+  public static String getAbsoluteUrl(final String url) {
     if (url.startsWith("/")) {
-      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(getRequest());
-      return contextPath + url;
+      HttpServletRequest request = getRequest();
+      String serverUrl = HttpRequestUtils.getServerUrl(request);
+      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
+      return serverUrl + contextPath + url;
     } else {
       return url;
     }

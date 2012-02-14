@@ -103,14 +103,6 @@
           <groupId>org.springframework</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>aspectjrt</artifactId>
-          <groupId>org.aspectj</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>aspectjweaver</artifactId>
-          <groupId>org.aspectj</groupId>
-        </exclusion>
-        <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>

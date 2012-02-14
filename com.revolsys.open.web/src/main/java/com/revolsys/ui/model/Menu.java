@@ -11,6 +11,8 @@ import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
 
+import com.revolsys.ui.web.config.Page;
+import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
@@ -160,7 +162,6 @@ public class Menu implements Cloneable {
         baseUri = null;
       }
     }
-
     if (baseUri == null) {
       if (anchor != null) {
         return "#" + anchor;
@@ -168,13 +169,14 @@ public class Menu implements Cloneable {
         return null;
       }
     } else {
-      Map params;
+      baseUri = Page.getAbsoluteUrl(PathAliasController.getPath(baseUri));
+      
+      Map<String,Object> params;
       if (context != null) {
-        params = new HashMap(staticParameters);
-        for (Iterator paramIter = dynamicParameters.entrySet().iterator(); paramIter.hasNext();) {
-          Map.Entry param = (Map.Entry)paramIter.next();
-          Object key = param.getKey();
-          Expression expression = (Expression)param.getValue();
+        params = new HashMap<String,Object>(staticParameters);
+        for (Entry<String,Expression> param : dynamicParameters.entrySet()) {
+          String key = param.getKey();
+          Expression expression = param.getValue();
           Object value = JexlUtil.evaluateExpression(context, expression);
           params.put(key, value);
         }

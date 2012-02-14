@@ -15,6 +15,8 @@
  */
 package com.revolsys.ui.html.view;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.serializer.TableSerializer;
@@ -40,7 +42,7 @@ public class TableView extends Element {
   }
 
   public TableView(final TableSerializer model, final String cssClass,
-    final String title) {
+    final String title, String noRecordsMessgae) {
     this.model = model;
     if (cssClass != null && cssClass.trim().length() > 0) {
       this.cssClass += " " + cssClass;
@@ -49,6 +51,9 @@ public class TableView extends Element {
       this.title = title.trim();
     }
     this.title = title;
+    if (StringUtils.hasText(noRecordsMessgae)) {
+      this.noRecordsMessgae = noRecordsMessgae;
+    }
   }
 
   public void serializeElement(final XmlWriter out) {
@@ -116,7 +121,9 @@ public class TableView extends Element {
     out.endTag(HtmlUtil.TBODY);
   }
 
-  protected void serializeRow(final XmlWriter out, final int row,
+  protected void serializeRow(
+    final XmlWriter out,
+    final int row,
     final int rowCount) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
@@ -162,7 +169,9 @@ public class TableView extends Element {
     }
   }
 
-  protected void serializeFooterRow(final XmlWriter out, final int row,
+  protected void serializeFooterRow(
+    final XmlWriter out,
+    final int row,
     final int rowCount) {
     int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
