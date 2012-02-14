@@ -56,7 +56,7 @@ public class DateTimeAttribute extends FusionTablesAttribute {
       try {
         return DATE_FORMAT.parse(string);
       } catch (final ParseException e) {
-        throw new IllegalArgumentException("Expecting a YYYY-MM-DD date");
+        return string;
       }
     }
   }

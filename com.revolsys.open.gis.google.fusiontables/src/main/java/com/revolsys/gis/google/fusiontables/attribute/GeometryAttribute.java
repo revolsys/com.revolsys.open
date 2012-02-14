@@ -40,12 +40,16 @@ public class GeometryAttribute extends FusionTablesAttribute {
     if (string.trim().length() == 0) {
       return null;
     } else {
-      final KmlGeometryIterator geometryIterator = new KmlGeometryIterator(
-        new StringReader(string));
-      if (geometryIterator.hasNext()) {
-        return geometryIterator.next();
-      } else {
-        return null;
+      try {
+        final KmlGeometryIterator geometryIterator = new KmlGeometryIterator(
+          new StringReader(string));
+        if (geometryIterator.hasNext()) {
+          return geometryIterator.next();
+        } else {
+          return null;
+        }
+      } catch (Exception e) {
+        return string;
       }
     }
   }

@@ -33,10 +33,14 @@ public class NumberAttribute extends FusionTablesAttribute {
 
   @Override
   public Object parseString(final String string) {
-    if (string.trim().length() == 0) {
-      return null;
-    } else {
-      return new BigDecimal(string);
+    try {
+      if (string.trim().length() == 0) {
+        return null;
+      } else {
+        return new BigDecimal(string);
+      }
+    } catch (Exception e) {
+      return string;
     }
   }
 }
