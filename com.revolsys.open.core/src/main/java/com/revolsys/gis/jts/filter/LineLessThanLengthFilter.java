@@ -9,13 +9,11 @@ public class LineLessThanLengthFilter implements Filter<Geometry> {
   public LineLessThanLengthFilter() {
   }
 
-  public LineLessThanLengthFilter(
-    final double length) {
+  public LineLessThanLengthFilter(final double length) {
     this.length = length;
   }
 
-  public boolean accept(
-    final Geometry geometry) {
+  public boolean accept(final Geometry geometry) {
     return geometry.getLength() < length;
   }
 
@@ -23,8 +21,7 @@ public class LineLessThanLengthFilter implements Filter<Geometry> {
     return length;
   }
 
-  public void setLength(
-    final double length) {
+  public void setLength(final double length) {
     this.length = length;
   }
 }

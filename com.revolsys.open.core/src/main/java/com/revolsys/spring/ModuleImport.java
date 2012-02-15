@@ -73,7 +73,8 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   }
 
   protected GenericBeanDefinition createTargetBeanDefinition(
-    final BeanDefinitionRegistry beanFactory, final String beanName) {
+    final BeanDefinitionRegistry beanFactory,
+    final String beanName) {
     final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
     if (beanDefinition == null) {
       return null;
@@ -247,8 +248,10 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   }
 
   protected void registerTargetBeanDefinition(
-    final BeanDefinitionRegistry registry, final BeanFactory beanFactory,
-    final String beanName, final String alias) {
+    final BeanDefinitionRegistry registry,
+    final BeanFactory beanFactory,
+    final String beanName,
+    final String alias) {
     final BeanDefinition beanDefinition = createTargetBeanDefinition(
       (BeanDefinitionRegistry)beanFactory, beanName);
     if (beanDefinition != null) {

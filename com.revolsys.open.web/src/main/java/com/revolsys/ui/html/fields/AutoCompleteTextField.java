@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -16,6 +15,21 @@ public class AutoCompleteTextField extends TextField {
   public AutoCompleteTextField() {
   }
 
+  public String getDataUrl() {
+    return dataUrl;
+  }
+
+  public int getMaxResults() {
+    return maxResults;
+  }
+
+  @Override
+  public void initialize(final HttpServletRequest request) {
+    this.request = request;
+    super.initialize(request);
+  }
+
+  @Override
   public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
     String url = dataUrl;
@@ -33,24 +47,11 @@ public class AutoCompleteTextField extends TextField {
     out.endTag(HtmlUtil.SCRIPT);
   }
 
-  public void initialize(final HttpServletRequest request) {
-    this.request = request;
-    super.initialize(request);
-  }
-
-  public int getMaxResults() {
-    return maxResults;
+  public void setDataUrl(final String dataUrl) {
+    this.dataUrl = dataUrl;
   }
 
   public void setMaxResults(final int maxResults) {
     this.maxResults = maxResults;
-  }
-
-  public String getDataUrl() {
-    return dataUrl;
-  }
-
-  public void setDataUrl(final String dataUrl) {
-    this.dataUrl = dataUrl;
   }
 }

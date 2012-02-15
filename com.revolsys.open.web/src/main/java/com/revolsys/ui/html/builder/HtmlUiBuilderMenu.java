@@ -11,26 +11,22 @@ import com.revolsys.ui.web.config.Page;
 public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   private BeanFactory beanFactory;
 
-  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-    this.beanFactory = beanFactory;
-  }
-
   private String typeName;
 
   private String pageName;
 
   @Override
-  public String getLink(JexlContext context) {
+  public String getLink(final JexlContext context) {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
       beanFactory, typeName);
     if (htmlUiBuilder == null) {
       return null;
     } else {
-      String link = htmlUiBuilder.getPageUrl(pageName, getParameters());
+      final String link = htmlUiBuilder.getPageUrl(pageName, getParameters());
       if (link == null) {
         return null;
       } else {
-        String anchor = getAnchor();
+        final String anchor = getAnchor();
         if (anchor == null) {
           return link;
         } else {
@@ -40,31 +36,36 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
     }
   }
 
-  public String getTypeName() {
-    return typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    this.typeName = typeName;
+  @Override
+  public String getLinkTitle(final JexlContext context) {
+    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
+      beanFactory, typeName);
+    if (htmlUiBuilder == null) {
+      return null;
+    } else {
+      final Page page = htmlUiBuilder.getPage(pageName);
+      return page.getExpandedTitle();
+    }
   }
 
   public String getPageName() {
     return pageName;
   }
 
-  public void setPageName(String pageName) {
+  public String getTypeName() {
+    return typeName;
+  }
+
+  public void setBeanFactory(final BeanFactory beanFactory)
+    throws BeansException {
+    this.beanFactory = beanFactory;
+  }
+
+  public void setPageName(final String pageName) {
     this.pageName = pageName;
   }
 
-  @Override
-  public String getLinkTitle(JexlContext context) {
-    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typeName);
-    if (htmlUiBuilder == null) {
-      return null;
-    } else {
-      Page page = htmlUiBuilder.getPage(pageName);
-      return page.getExpandedTitle();
-    }
+  public void setTypeName(final String typeName) {
+    this.typeName = typeName;
   }
 }

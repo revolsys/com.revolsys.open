@@ -17,32 +17,15 @@ public class MediaTypeUtil {
 
   static final String CONTENT_TYPE_HEADER = "Content-type";
 
-  public static MediaType getMediaTypeFromFilename(
-    Map<String, MediaType> extensionToMediaTypeMap, final String filename) {
-    String extension = StringUtils.getFilenameExtension(filename);
-    return getMediaTypeFromParameter(extensionToMediaTypeMap, extension);
-  }
-
-  public static MediaType getMediaTypeFromParameter(
-    Map<String, MediaType> extensionToMediaTypeMap, final String extension) {
-    if (!StringUtils.hasText(extension)) {
-      return null;
-    } else if (extension.matches("[^/]+/[^/]+")) {
-      return MediaType.valueOf(extension);
-    } else {
-      String lowerExtension = extension.toLowerCase(Locale.ENGLISH);
-      final MediaType mediaType = extensionToMediaTypeMap.get(lowerExtension);
-      return mediaType;
-    }
-  }
-
   public static List<MediaType> getAcceptedMediaTypes(
     final HttpServletRequest request,
-    Map<String, MediaType> extensionToMediaTypeMap,
-    final List<String> mediaTypeOrder, UrlPathHelper urlPathHelper,
-    String parameterName, MediaType defaultMediaType) {
-    List<MediaType> mediaTypes = new ArrayList<MediaType>();
-    for (String source : mediaTypeOrder) {
+    final Map<String, MediaType> extensionToMediaTypeMap,
+    final List<String> mediaTypeOrder,
+    final UrlPathHelper urlPathHelper,
+    final String parameterName,
+    final MediaType defaultMediaType) {
+    final List<MediaType> mediaTypes = new ArrayList<MediaType>();
+    for (final String source : mediaTypeOrder) {
       if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
         final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
@@ -65,19 +48,54 @@ public class MediaTypeUtil {
         if (StringUtils.hasText(acceptHeader)) {
           mediaTypes.addAll(MediaType.parseMediaTypes(acceptHeader));
         }
-      } else if (source.equals("defaultMediaType"))
+      } else if (source.equals("defaultMediaType")) {
         if (defaultMediaType != null) {
           mediaTypes.add(defaultMediaType);
         }
+      }
     }
     return mediaTypes;
   }
 
-  public static MediaType getRequestMediaType(final HttpServletRequest request,
-    Map<String, MediaType> extensionToMediaTypeMap,
-    final List<String> mediaTypeOrder, UrlPathHelper urlPathHelper,
-    String parameterName, MediaType defaultMediaType, String fileName) {
-    for (String source : mediaTypeOrder) {
+  public static MediaType getContentType(final HttpServletRequest request) {
+    final String contentTypeHeader = request.getHeader(CONTENT_TYPE_HEADER);
+    if (StringUtils.hasText(contentTypeHeader)) {
+      return MediaType.parseMediaType(contentTypeHeader);
+    } else {
+      return null;
+    }
+  }
+
+  public static MediaType getMediaTypeFromFilename(
+    final Map<String, MediaType> extensionToMediaTypeMap,
+    final String filename) {
+    final String extension = StringUtils.getFilenameExtension(filename);
+    return getMediaTypeFromParameter(extensionToMediaTypeMap, extension);
+  }
+
+  public static MediaType getMediaTypeFromParameter(
+    final Map<String, MediaType> extensionToMediaTypeMap,
+    final String extension) {
+    if (!StringUtils.hasText(extension)) {
+      return null;
+    } else if (extension.matches("[^/]+/[^/]+")) {
+      return MediaType.valueOf(extension);
+    } else {
+      final String lowerExtension = extension.toLowerCase(Locale.ENGLISH);
+      final MediaType mediaType = extensionToMediaTypeMap.get(lowerExtension);
+      return mediaType;
+    }
+  }
+
+  public static MediaType getRequestMediaType(
+    final HttpServletRequest request,
+    final Map<String, MediaType> extensionToMediaTypeMap,
+    final List<String> mediaTypeOrder,
+    final UrlPathHelper urlPathHelper,
+    final String parameterName,
+    final MediaType defaultMediaType,
+    final String fileName) {
+    for (final String source : mediaTypeOrder) {
       if (source.equals("fileName")) {
         final MediaType mediaType = getMediaTypeFromFilename(
           extensionToMediaTypeMap, fileName);
@@ -103,20 +121,12 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("acceptHeader")) {
         return getContentType(request);
-      } else if (source.equals("defaultMediaType"))
+      } else if (source.equals("defaultMediaType")) {
         if (defaultMediaType != null) {
           return defaultMediaType;
         }
+      }
     }
     return null;
-  }
-
-  public static MediaType getContentType(final HttpServletRequest request) {
-    final String contentTypeHeader = request.getHeader(CONTENT_TYPE_HEADER);
-    if (StringUtils.hasText(contentTypeHeader)) {
-      return MediaType.parseMediaType(contentTypeHeader);
-    } else {
-      return null;
-    }
   }
 }

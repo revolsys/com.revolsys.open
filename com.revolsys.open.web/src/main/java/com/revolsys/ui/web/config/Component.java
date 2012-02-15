@@ -37,7 +37,7 @@ public class Component {
 
   private String file;
 
-  private HashMap fields = new HashMap();
+  private final HashMap fields = new HashMap();
 
   private Collection actions = new LinkedHashSet();
 
@@ -45,11 +45,21 @@ public class Component {
 
   private Collection scripts = new LinkedHashSet();
 
-  private Collection onLoads = new LinkedHashSet();
+  private final Collection onLoads = new LinkedHashSet();
 
   private String area;
 
   public Component() {
+  }
+
+  public Component(final Component component) {
+    this.name = component.name;
+    this.file = component.file;
+    fields.putAll(component.fields);
+    actions.addAll(component.actions);
+    scripts.addAll(component.scripts);
+    styles.addAll(component.styles);
+    onLoads.addAll(component.onLoads);
   }
 
   public Component(final String name) {
@@ -66,38 +76,12 @@ public class Component {
     this.file = file;
   }
 
-  public Component(final Component component) {
-    this.name = component.name;
-    this.file = component.file;
-    fields.putAll(component.fields);
-    actions.addAll(component.actions);
-    scripts.addAll(component.scripts);
-    styles.addAll(component.styles);
-    onLoads.addAll(component.onLoads);
+  public void addAction(final ActionConfig actionConfig) {
+    actions.add(actionConfig);
   }
 
-  public String getArea() {
-    return area;
-  }
-
-  public void setArea(final String area) {
-    this.area = area;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setFile(final String file) {
-    this.file = file;
-  }
-
-  public String getFile() {
-    return file;
+  public void addActions(final Collection actionConfigs) {
+    this.actions.addAll(actionConfigs);
   }
 
   public void addField(final Field field) {
@@ -109,92 +93,12 @@ public class Component {
   }
 
   public void addField(final String name, final String value) {
-    String lastValue = (String)fields.get(name);
+    final String lastValue = (String)fields.get(name);
     if (lastValue != EMPTY_STRING) {
       throw new IllegalArgumentException("Value already exists for the field "
         + name);
     }
     fields.put(name, value);
-  }
-
-  public String getField(final String name) {
-    return null;
-  }
-
-  public void addAction(final ActionConfig actionConfig) {
-    actions.add(actionConfig);
-  }
-
-  public void addActions(final Collection actionConfigs) {
-    this.actions.addAll(actionConfigs);
-  }
-
-  public Collection getActions() {
-    return actions;
-  }
-
-  /**
-   * @param actions The actions to set.
-   */
-  public void setActions(Collection actions) {
-    this.actions = actions;
-  }
-
-  public void invokeActions(final ServletContext context,
-    final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
-    Iterator i = actions.iterator();
-    while (i.hasNext()) {
-      ActionConfig actionConfig = (ActionConfig)i.next();
-      IafAction action = actionConfig.getAction();
-      action.process(request, response);
-    }
-  }
-
-  public void addStyle(final String style) {
-    styles.add(style);
-  }
-
-  public void addStyle(final Style style) {
-    styles.add(style.getFile());
-  }
-
-  public void addStyles(final Collection styles) {
-    this.styles.addAll(styles);
-  }
-
-  public Collection getStyles() {
-    return styles;
-  }
-
-  /**
-   * @param styles The styles to set.
-   */
-  public void setStyles(Collection styles) {
-    this.styles = styles;
-  }
-
-  public void addScript(final Script script) {
-    scripts.add(script.getFile());
-  }
-
-  public void addScript(final String script) {
-    scripts.add(script);
-  }
-
-  public void addScripts(final Collection scripts) {
-    this.scripts.addAll(scripts);
-  }
-
-  public Collection getScripts() {
-    return scripts;
-  }
-
-  /**
-   * @param scripts The scripts to set.
-   */
-  public void setScripts(Collection scripts) {
-    this.scripts = scripts;
   }
 
   public void addOnLoad(final OnLoad onLoad) {
@@ -209,20 +113,39 @@ public class Component {
     this.onLoads.addAll(onLoads);
   }
 
-  public Collection getOnLoads() {
-    return onLoads;
+  public void addScript(final Script script) {
+    scripts.add(script.getFile());
   }
 
-  public void setPage(final Page page) {
-    page.addActions(actions);
-    page.addScripts(scripts);
-    page.addStyles(styles);
-    page.addOnLoads(onLoads);
+  public void addScript(final String script) {
+    scripts.add(script);
   }
 
+  public void addScripts(final Collection scripts) {
+    this.scripts.addAll(scripts);
+  }
+
+  public void addStyle(final String style) {
+    styles.add(style);
+  }
+
+  public void addStyle(final Style style) {
+    styles.add(style.getFile());
+  }
+
+  public void addStyles(final Collection styles) {
+    this.styles.addAll(styles);
+  }
+
+  @Override
+  public Object clone() {
+    return new Component(this);
+  }
+
+  @Override
   public boolean equals(final Object o) {
     if (o instanceof Component) {
-      Component c = (Component)o;
+      final Component c = (Component)o;
       if (equalsWithNull(c.name, name) && equalsWithNull(c.file, file)
         && c.styles.equals(styles) && c.scripts.equals(scripts)
         && c.onLoads.equals(onLoads)) {
@@ -242,26 +165,107 @@ public class Component {
     }
   }
 
+  public Collection getActions() {
+    return actions;
+  }
+
+  public String getArea() {
+    return area;
+  }
+
+  public String getField(final String name) {
+    return null;
+  }
+
+  public String getFile() {
+    return file;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Collection getOnLoads() {
+    return onLoads;
+  }
+
+  public Collection getScripts() {
+    return scripts;
+  }
+
+  public Collection getStyles() {
+    return styles;
+  }
+
   /**
    * Generate the hash code for the object.
    * 
    * @return The hashCode.
    */
+  @Override
   public int hashCode() {
-    if (name != null){
-    return name.hashCode();
+    if (name != null) {
+      return name.hashCode();
     } else {
       return super.hashCode();
     }
-  }
-
-  public Object clone() {
-    return new Component(this);
   }
 
   public void includeComponent(final PageContext context)
     throws ServletException, IOException {
     context.getOut().flush();
     context.include(getFile());
+  }
+
+  public void invokeActions(
+    final ServletContext context,
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws ServletException, IOException {
+    final Iterator i = actions.iterator();
+    while (i.hasNext()) {
+      final ActionConfig actionConfig = (ActionConfig)i.next();
+      final IafAction action = actionConfig.getAction();
+      action.process(request, response);
+    }
+  }
+
+  /**
+   * @param actions The actions to set.
+   */
+  public void setActions(final Collection actions) {
+    this.actions = actions;
+  }
+
+  public void setArea(final String area) {
+    this.area = area;
+  }
+
+  public void setFile(final String file) {
+    this.file = file;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  public void setPage(final Page page) {
+    page.addActions(actions);
+    page.addScripts(scripts);
+    page.addStyles(styles);
+    page.addOnLoads(onLoads);
+  }
+
+  /**
+   * @param scripts The scripts to set.
+   */
+  public void setScripts(final Collection scripts) {
+    this.scripts = scripts;
+  }
+
+  /**
+   * @param styles The styles to set.
+   */
+  public void setStyles(final Collection styles) {
+    this.styles = styles;
   }
 }

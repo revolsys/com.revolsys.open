@@ -9,8 +9,7 @@ public class GridUtil {
 
   public static final int TWELTH_GRID_HEIGHT = 3;
 
-  public static String formatSheetNumber100(
-    final int sheetNumber) {
+  public static String formatSheetNumber100(final int sheetNumber) {
     if (sheetNumber < 10) {
       return "00" + sheetNumber;
     } else if (sheetNumber < 100) {
@@ -58,9 +57,7 @@ public class GridUtil {
     }
   }
 
-  public static char getLetter16(
-    final int row,
-    final int col) {
+  public static char getLetter16(final int row, final int col) {
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
     } else {
@@ -68,8 +65,7 @@ public class GridUtil {
     }
   }
 
-  public static int getLetter16Col(
-    final char c) {
+  public static int getLetter16Col(final char c) {
     final int num = Character.toLowerCase(c) - 'a';
     final int lineNumber = getLetter16Row(c);
     if (lineNumber % 2 == 0) {
@@ -79,8 +75,7 @@ public class GridUtil {
     }
   }
 
-  public static int getLetter16Row(
-    final char c) {
+  public static int getLetter16Row(final char c) {
     final int num = Character.toLowerCase(c) - 'a';
     return num / SIXTEENTH_GRID_SQUARE;
   }
@@ -104,8 +99,7 @@ public class GridUtil {
     }
   }
 
-  public static int getLetter4Col(
-    final char c) {
+  public static int getLetter4Col(final char c) {
     switch (Character.toLowerCase(c)) {
       case 'a':
       case 'd':
@@ -118,15 +112,12 @@ public class GridUtil {
     }
   }
 
-  public static int getLetter4Row(
-    final char c) {
+  public static int getLetter4Row(final char c) {
     final int num = Character.toLowerCase(c) - 'a';
     return num / QUARTER_GRID_SQUARE;
   }
 
-  public static char getLetter8(
-    final int row,
-    final int col) {
+  public static char getLetter8(final int row, final int col) {
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
     } else {
@@ -134,8 +125,7 @@ public class GridUtil {
     }
   }
 
-  public static int getLetter8Col(
-    final char c) {
+  public static int getLetter8Col(final char c) {
     final int num = Character.toLowerCase(c) - 'a';
     final int lineNumber = getLetter16Row(c);
     if (lineNumber % 2 == 0) {
@@ -145,8 +135,7 @@ public class GridUtil {
     }
   }
 
-  public static int getLetter8Row(
-    final char c) {
+  public static int getLetter8Row(final char c) {
     final int num = Character.toLowerCase(c) - 'a';
     return num / SIXTEENTH_GRID_SQUARE;
   }
@@ -167,16 +156,12 @@ public class GridUtil {
     return formatSheetNumber100(sheetNumber);
   }
 
-  public static String getNumber100(
-    final int row,
-    final int col) {
+  public static String getNumber100(final int row, final int col) {
     final int sheetNumber = row * HUNDREDTH_GRID_SQUARE + (col + 1);
     return formatSheetNumber100(sheetNumber);
   }
 
-  public static int getNumber16(
-    final int row,
-    final int col) {
+  public static int getNumber16(final int row, final int col) {
     if (row % 2 == 0) {
       return 1 + row * SIXTEENTH_GRID_SQUARE + col;
     } else {
@@ -184,26 +169,21 @@ public class GridUtil {
     }
   }
 
-  public static String getNumber4(
-    final int row,
-    final int col) {
+  public static String getNumber4(final int row, final int col) {
     final int sheetNumber = row * QUARTER_GRID_SQUARE + (col + 1);
     return String.valueOf(sheetNumber);
   }
 
-  public static int getNumberCol100(
-    final int sheetNumber) {
+  public static int getNumberCol100(final int sheetNumber) {
     final int col = 9 - ((sheetNumber - 1) % HUNDREDTH_GRID_SQUARE);
     return col;
   }
 
-  public static int getNumberCol100(
-    final String sheetNumber) {
+  public static int getNumberCol100(final String sheetNumber) {
     return getNumberCol100(Integer.parseInt(sheetNumber));
   }
 
-  public static int getNumberCol16(
-    final int num) {
+  public static int getNumberCol16(final int num) {
     final int lineNumber = getNumberRow16(num);
     if (lineNumber % 2 == 0) {
       return (num - 1) % SIXTEENTH_GRID_SQUARE;
@@ -212,38 +192,31 @@ public class GridUtil {
     }
   }
 
-  public static int getNumberCol4(
-    final int num) {
+  public static int getNumberCol4(final int num) {
     return (num - 1) % QUARTER_GRID_SQUARE;
   }
 
-  public static int getNumberCol4(
-    final String num) {
+  public static int getNumberCol4(final String num) {
     return getNumberCol4(Integer.parseInt(num));
   }
 
-  public static int getNumberRow100(
-    final int sheetNumber) {
+  public static int getNumberRow100(final int sheetNumber) {
     return (sheetNumber - 1) / HUNDREDTH_GRID_SQUARE;
   }
 
-  public static int getNumberRow100(
-    final String sheetNumber) {
+  public static int getNumberRow100(final String sheetNumber) {
     return getNumberRow100(Integer.parseInt(sheetNumber));
   }
 
-  public static int getNumberRow16(
-    final int num) {
+  public static int getNumberRow16(final int num) {
     return (num - 1) / SIXTEENTH_GRID_SQUARE;
   }
 
-  public static int getNumberRow4(
-    final int num) {
+  public static int getNumberRow4(final int num) {
     return (num - 1) / QUARTER_GRID_SQUARE;
   }
 
-  public static int getNumberRow4(
-    final String num) {
+  public static int getNumberRow4(final String num) {
     return getNumberRow4(Integer.parseInt(num));
   }
 }

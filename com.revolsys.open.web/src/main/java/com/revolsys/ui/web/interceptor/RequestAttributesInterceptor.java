@@ -27,19 +27,37 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
     urlPathHelper.setAlwaysUseFullPath(true);
   }
 
+  public void afterCompletion(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final Object handler,
+    final Exception ex) throws Exception {
+  }
+
+  public Map<String, Map<String, Object>> getAttributeMappings() {
+    return attributeMappings;
+  }
+
+  public void postHandle(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final Object handler,
+    final ModelAndView modelAndView) throws Exception {
+
+  }
+
   public boolean preHandle(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    Object handler)
-    throws ServletException {
-    String path = urlPathHelper.getLookupPathForRequest(request);
-    for (Entry<String, Map<String, Object>> mapping : attributeMappings.entrySet()) {
-      String pattern = mapping.getKey();
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final Object handler) throws ServletException {
+    final String path = urlPathHelper.getLookupPathForRequest(request);
+    for (final Entry<String, Map<String, Object>> mapping : attributeMappings.entrySet()) {
+      final String pattern = mapping.getKey();
       if (pathMatcher.match(pattern, path)) {
-        Map<String, Object> attributes = mapping.getValue();
-        for (Entry<String, Object> attribute : attributes.entrySet()) {
-          String name = attribute.getKey();
-          Object value = attribute.getValue();
+        final Map<String, Object> attributes = mapping.getValue();
+        for (final Entry<String, Object> attribute : attributes.entrySet()) {
+          final String name = attribute.getKey();
+          final Object value = attribute.getValue();
           if (request.getAttribute(name) == null) {
             request.setAttribute(name, value);
           }
@@ -47,32 +65,6 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
       }
     }
     return true;
-  }
-
-  public Map<String, Map<String, Object>> getAttributeMappings() {
-    return attributeMappings;
-  }
-
-  public void setAttributeMappings(
-    final Map<String, Map<String, Object>> attributeMappings) {
-    this.attributeMappings = attributeMappings;
-  }
-
-  public void afterCompletion(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    Object handler,
-    Exception ex)
-    throws Exception {
-  }
-
-  public void postHandle(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    Object handler,
-    ModelAndView modelAndView)
-    throws Exception {
-
   }
 
   /**
@@ -86,9 +78,23 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
    * @see #setCacheMappings
    * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
    */
-  public void setAlwaysUseFullPath(
-    boolean alwaysUseFullPath) {
+  public void setAlwaysUseFullPath(final boolean alwaysUseFullPath) {
     this.urlPathHelper.setAlwaysUseFullPath(alwaysUseFullPath);
+  }
+
+  public void setAttributeMappings(
+    final Map<String, Map<String, Object>> attributeMappings) {
+    this.attributeMappings = attributeMappings;
+  }
+
+  /**
+   * Set the PathMatcher implementation to use for matching URL paths against
+   * registered URL patterns, for determining cache mappings. Default is
+   * AntPathMatcher.
+   */
+  public void setPathMatcher(final PathMatcher pathMatcher) {
+    Assert.notNull(pathMatcher, "PathMatcher must not be null");
+    this.pathMatcher = pathMatcher;
   }
 
   /**
@@ -104,8 +110,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
    * @see #setCacheMappings
    * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
    */
-  public void setUrlDecode(
-    boolean urlDecode) {
+  public void setUrlDecode(final boolean urlDecode) {
     this.urlPathHelper.setUrlDecode(urlDecode);
   }
 
@@ -115,20 +120,8 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
    * @param urlPathHelper The UrlPathHelper to use for resolution of lookup
    *          paths.
    */
-  public void setUrlPathHelper(
-    UrlPathHelper urlPathHelper) {
+  public void setUrlPathHelper(final UrlPathHelper urlPathHelper) {
     Assert.notNull(urlPathHelper, "UrlPathHelper must not be null");
     this.urlPathHelper = urlPathHelper;
-  }
-
-  /**
-   * Set the PathMatcher implementation to use for matching URL paths against
-   * registered URL patterns, for determining cache mappings. Default is
-   * AntPathMatcher.
-   */
-  public void setPathMatcher(
-    PathMatcher pathMatcher) {
-    Assert.notNull(pathMatcher, "PathMatcher must not be null");
-    this.pathMatcher = pathMatcher;
   }
 }

@@ -27,8 +27,7 @@ public class LambertConicConformal implements CoordinatesProjection {
 
   private final double y0;
 
-  public LambertConicConformal(
-    final ProjectedCoordinateSystem cs) {
+  public LambertConicConformal(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
     final double latitudeOfProjection = cs.getDoubleParameter("latitude_of_false_origin");
@@ -62,9 +61,7 @@ public class LambertConicConformal implements CoordinatesProjection {
     this.rho0 = a * f * Math.pow(t0, n);
   }
 
-  public void inverse(
-    final Coordinates from,
-    final Coordinates to) {
+  public void inverse(final Coordinates from, final Coordinates to) {
     double x = from.getX() - x0;
     double y = from.getY() - y0;
 
@@ -101,15 +98,12 @@ public class LambertConicConformal implements CoordinatesProjection {
     }
   }
 
-  private double m(
-    final double phi) {
+  private double m(final double phi) {
     final double sinPhi = Math.sin(phi);
     return Math.cos(phi) / Math.sqrt(1 - ee * sinPhi * sinPhi);
   }
 
-  public void project(
-    final Coordinates from,
-    final Coordinates to) {
+  public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getX();
     final double phi = from.getY();
 
@@ -128,8 +122,7 @@ public class LambertConicConformal implements CoordinatesProjection {
     }
   }
 
-  private double t(
-    final double phi) {
+  private double t(final double phi) {
     final double sinPhi = Math.sin(phi);
     final double eSinPhi = e * sinPhi;
 

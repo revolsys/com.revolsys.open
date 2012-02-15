@@ -12,9 +12,7 @@ public class EdgePair<T> {
 
   private final Map<String, Object> properties2 = new HashMap<String, Object>();
 
-  public EdgePair(
-    final Edge<T> edge1,
-    final Edge<T> edge2) {
+  public EdgePair(final Edge<T> edge1, final Edge<T> edge2) {
     this.edge1 = edge1;
     this.edge2 = edge2;
   }
@@ -28,26 +26,20 @@ public class EdgePair<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getProperty1(
-    final String name) {
+  public <V> V getProperty1(final String name) {
     return (V)properties1.get(name);
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getProperty2(
-    final String name) {
+  public <V> V getProperty2(final String name) {
     return (V)properties2.get(name);
   }
 
-  public void setProperty1(
-    final String name,
-    final Object value) {
+  public void setProperty1(final String name, final Object value) {
     properties1.put(name, value);
   }
 
-  public void setProperty2(
-    final String name,
-    final Object value) {
+  public void setProperty2(final String name, final Object value) {
     properties2.put(name, value);
   }
 }

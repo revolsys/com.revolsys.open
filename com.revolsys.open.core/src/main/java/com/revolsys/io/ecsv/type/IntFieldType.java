@@ -5,17 +5,16 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class IntFieldType extends NumberFieldType {
-   public IntFieldType() {
+  public IntFieldType() {
     super(DataTypes.INT);
   }
 
-  public Object parseValue(
-    String text) {
+  public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
-        return Integer.parseInt(text);
+      return Integer.parseInt(text);
     } else {
       return null;
     }
- }
+  }
 
 }

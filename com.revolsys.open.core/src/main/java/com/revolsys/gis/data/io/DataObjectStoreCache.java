@@ -11,8 +11,7 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.cs.BoundingBox;
 
 public class DataObjectStoreCache {
-  public static DataObjectStoreCache getCache(
-    final DataObjectStore dataStore) {
+  public static DataObjectStoreCache getCache(final DataObjectStore dataStore) {
     return new DataObjectStoreCache(dataStore);
   }
 
@@ -24,13 +23,11 @@ public class DataObjectStoreCache {
 
   private QName typeName;
 
-  public DataObjectStoreCache(
-    final DataObjectStore dataStore) {
+  public DataObjectStoreCache(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
 
-  private void addBoundingBox(
-    final BoundingBox boundingBox) {
+  private void addBoundingBox(final BoundingBox boundingBox) {
     synchronized (loadTasks) {
       if (!loadTasks.containsKey(boundingBox)) {
         loadTasks.put(boundingBox, new DataStoreQueryTask(dataStore, typeName,
@@ -39,8 +36,7 @@ public class DataObjectStoreCache {
     }
   }
 
-  public List getObjects(
-    final BoundingBox boundingBox) {
+  public List getObjects(final BoundingBox boundingBox) {
     final List objects = cachedObejcts.get(boundingBox);
     if (objects == null) {
       addBoundingBox(boundingBox);
@@ -48,8 +44,7 @@ public class DataObjectStoreCache {
     return objects;
   }
 
-  public void removeObjects(
-    final BoundingBox boundingBox) {
+  public void removeObjects(final BoundingBox boundingBox) {
     synchronized (loadTasks) {
       final DataStoreQueryTask task = loadTasks.get(boundingBox);
       if (task != null) {

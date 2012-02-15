@@ -29,8 +29,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
 
   private boolean singleObject;
 
-  public GeoJsonDataObjectWriter(
-    final Writer out) {
+  public GeoJsonDataObjectWriter(final Writer out) {
     this.out = new JsonWriter(new BufferedWriter(out));
     this.out.setIndent(true);
   }
@@ -50,9 +49,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
   }
 
-  private void coordinate(
-    final CoordinatesList coordinates,
-    final int i) {
+  private void coordinate(final CoordinatesList coordinates, final int i) {
     final double x = coordinates.getX(i);
     out.print('[');
     out.value(x);
@@ -69,8 +66,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.print(']');
   }
 
-  private void coordinates(
-    final CoordinatesList coordinates) {
+  private void coordinates(final CoordinatesList coordinates) {
     out.startList();
     out.indent();
     coordinate(coordinates, 0);
@@ -82,20 +78,17 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endList();
   }
 
-  private void coordinates(
-    final LineString line) {
+  private void coordinates(final LineString line) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     coordinates(coordinates);
   }
 
-  public void coordinates(
-    final Point point) {
+  public void coordinates(final Point point) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(point);
     coordinate(coordinates, 0);
   }
 
-  public void coordinates(
-    final Polygon polygon) {
+  public void coordinates(final Polygon polygon) {
     out.startList();
     out.indent();
 
@@ -115,8 +108,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.flush();
   }
 
-  private void geometry(
-    final Geometry geometry) {
+  private void geometry(final Geometry geometry) {
     out.startObject();
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
@@ -140,16 +132,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endObject();
   }
 
-  private void line(
-    final LineString line) {
+  private void line(final LineString line) {
     type(LINE_STRING);
     out.endAttribute();
     out.label(COORDINATES);
     coordinates(line);
   }
 
-  private void multiLineString(
-    final MultiLineString multiLineString) {
+  private void multiLineString(final MultiLineString multiLineString) {
     type(MULTI_LINE_STRING);
 
     out.endAttribute();
@@ -168,8 +158,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endList();
   }
 
-  private void multiPoint(
-    final MultiPoint multiPoint) {
+  private void multiPoint(final MultiPoint multiPoint) {
     type(MULTI_POINT);
 
     out.endAttribute();
@@ -188,8 +177,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endList();
   }
 
-  private void multiPolygon(
-    final MultiPolygon multiPolygon) {
+  private void multiPolygon(final MultiPolygon multiPolygon) {
     type(MULTI_POLYGON);
 
     out.endAttribute();
@@ -208,16 +196,14 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endList();
   }
 
-  private void point(
-    final Point point) {
+  private void point(final Point point) {
     type(POINT);
     out.endAttribute();
     out.label(COORDINATES);
     coordinates(point);
   }
 
-  private void polygon(
-    final Polygon polygon) {
+  private void polygon(final Polygon polygon) {
     type(POLYGON);
 
     out.endAttribute();
@@ -225,8 +211,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     coordinates(polygon);
   }
 
-  private void srid(
-    final int srid) {
+  private void srid(final int srid) {
     final String urn = URN_OGC_DEF_CRS_EPSG + srid;
     out.label(CRS);
     out.startObject();
@@ -240,14 +225,12 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endObject();
   }
 
-  private void type(
-    final String type) {
+  private void type(final String type) {
     out.label(TYPE);
     out.value(type);
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     if (initialized) {
       out.endAttribute();
     } else {
@@ -323,7 +306,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   private void writeSrid() {
     final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (geometryFactory != null) {
-      int srid = geometryFactory.getSRID();
+      final int srid = geometryFactory.getSRID();
       if (srid != 0) {
         out.endAttribute();
         srid(srid);

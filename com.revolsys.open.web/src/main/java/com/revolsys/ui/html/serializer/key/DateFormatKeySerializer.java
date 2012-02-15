@@ -3,7 +3,6 @@ package com.revolsys.ui.html.serializer.key;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
@@ -13,7 +12,7 @@ import com.revolsys.util.JavaBeanUtil;
  * 
  * @author Paul Austin
  */
-public class DateFormatKeySerializer implements KeySerializer {
+public class DateFormatKeySerializer extends AbstractKeySerializer {
 
   /** The date format style. */
   private String dateFormat = "dd-MMM-yyyy";
@@ -21,41 +20,9 @@ public class DateFormatKeySerializer implements KeySerializer {
   /**
    * Construct a new DateFormatKeySerializer.
    */
-  public DateFormatKeySerializer() {
-  }
-
-  /**
-   * Construct a new DateFormatKeySerializer.
-   * 
-   * @param dateFormat The date format pattern.
-   */
-  public DateFormatKeySerializer(
-    final String dateFormat) {
+  public DateFormatKeySerializer(final String name, final String dateFormat) {
+    super(name);
     this.dateFormat = dateFormat;
-  }
-
-  /**
-   * Serialize the value to the XML writer using the settings from the Locale.
-   * 
-   * @param out The XML writer to serialize to.
-   * @param object The object to get the value from.
-   * @param key The key of the property on the object to serialize.
-   * @param locale The locale.
-   */
-  public void serialize(
-    final XmlWriter out,
-    final Object object,
-    final String key,
-    final Locale locale) {
-    Object value = JavaBeanUtil.getProperty(object, key);
-    DateFormat format = new SimpleDateFormat(dateFormat, locale);
-    if (value == null) {
-      out.text("-");
-    } else if (value instanceof Date) {
-      out.text(format.format(value));
-    } else {
-      out.text(value);
-    }
   }
 
   /**
@@ -68,12 +35,29 @@ public class DateFormatKeySerializer implements KeySerializer {
   }
 
   /**
+   * Serialize the value to the XML writer.
+   * 
+   * @param out The XML writer to serialize to.
+   * @param object The object to get the value from.
+   */
+  public void serialize(final XmlWriter out, final Object object) {
+    final Object value = JavaBeanUtil.getProperty(object, getName());
+    final DateFormat format = new SimpleDateFormat(dateFormat);
+    if (value == null) {
+      out.text("-");
+    } else if (value instanceof Date) {
+      out.text(format.format(value));
+    } else {
+      out.text(value);
+    }
+  }
+
+  /**
    * Set the dete format.
    * 
    * @param dateFormat The date format.
    */
-  public void setDateFormat(
-    final String dateFormat) {
+  public void setDateFormat(final String dateFormat) {
     this.dateFormat = dateFormat;
   }
 

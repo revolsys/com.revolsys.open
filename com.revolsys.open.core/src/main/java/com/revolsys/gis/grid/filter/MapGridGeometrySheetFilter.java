@@ -22,13 +22,14 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
   /** The map sheet name. */
   private String sheet;
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     if (sheet != null && grid != null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
-        Geometry geographicsGeometry = GeometryProjectionUtil.perform(geometry, 4326);
-        final Coordinate centroid = geographicsGeometry.getCentroid().getCoordinate();
+        final Geometry geographicsGeometry = GeometryProjectionUtil.perform(
+          geometry, 4326);
+        final Coordinate centroid = geographicsGeometry.getCentroid()
+          .getCoordinate();
         final String geometrySheet = grid.getMapTileName(centroid.x, centroid.y);
         if (geometrySheet != null) {
           if (sheet.equals(geometrySheet) == !inverse) {
@@ -64,24 +65,21 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
   /**
    * @param grid the grid to set
    */
-  public void setGrid(
-    final RectangularMapGrid grid) {
+  public void setGrid(final RectangularMapGrid grid) {
     this.grid = grid;
   }
 
   /**
    * @param inverse the inverse to set
    */
-  public void setInverse(
-    final boolean inverse) {
+  public void setInverse(final boolean inverse) {
     this.inverse = inverse;
   }
 
   /**
    * @param sheet the sheet to set
    */
-  public void setSheet(
-    final String sheet) {
+  public void setSheet(final String sheet) {
     this.sheet = sheet;
   }
 

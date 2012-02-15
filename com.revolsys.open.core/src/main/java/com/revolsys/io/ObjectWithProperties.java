@@ -17,8 +17,7 @@ public interface ObjectWithProperties {
    * @param name The name of the property to get.
    * @return The property.
    */
-  <C> C getProperty(
-    String name);
+  <C> C getProperty(String name);
 
   void setProperty(String name, Object value);
 }

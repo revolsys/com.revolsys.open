@@ -10,12 +10,8 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.model.DataObject;
 
 public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
-  public JdbcBigDecimalAttribute(
-    final String name,
-    final int sqlType,
-    final int length,
-    final int scale,
-    final boolean required,
+  public JdbcBigDecimalAttribute(final String name, final int sqlType,
+    final int length, final int scale, final boolean required,
     final Map<QName, Object> properties) {
     super(name, sqlType, length, scale, required, properties);
   }
@@ -30,8 +26,7 @@ public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
   public int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
-    final DataObject object)
-    throws SQLException {
+    final DataObject object) throws SQLException {
     final BigDecimal value = resultSet.getBigDecimal(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;

@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HttpMessageConverterViewController {
 
   @RequestMapping("/view/httpMessageConverter")
-  public void render(final Map<String, ?> model,
-    final HttpServletRequest request, final HttpServletResponse response)
-    throws Exception {
+  public void render(
+    final Map<String, ?> model,
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws Exception {
     final HttpMessageConverterView view = HttpMessageConverterView.getMessageConverterView();
     if (view != null) {
       view.render(response);

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -50,10 +49,12 @@ public class PhoneNumberField extends Field {
     return inputValue;
   }
 
+  @Override
   public boolean hasValue() {
     return inputValue != null && !inputValue.equals("");
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     inputValue = request.getParameter(getName());
     if (inputValue == null) {
@@ -61,35 +62,14 @@ public class PhoneNumberField extends Field {
     }
   }
 
-  public void setValue(final Object value) {
-    super.setValue(value);
-    if (value != null) {
-      inputValue = PhoneNumber.format(value.toString());
-    } else {
-      inputValue = null;
-    }
-  }
-
-  public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "text");
-    out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(FIELD_SIZE));
-    out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(FIELD_MAX_LENGTH));
-    if (inputValue != null) {
-      out.attribute(HtmlUtil.ATTR_VALUE, inputValue);
-    }
-    out.endTag(HtmlUtil.INPUT);
-  }
-
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      String phoneValue = PhoneNumber.normalize(inputValue);
-      int length = phoneValue.length();
+      final String phoneValue = PhoneNumber.normalize(inputValue);
+      final int length = phoneValue.length();
       if (length > VALUE_MAX_LENGTH) {
         addValidationError("Cannot exceed " + VALUE_MAX_LENGTH + " characters");
         valid = false;
@@ -108,5 +88,29 @@ public class PhoneNumberField extends Field {
       setValue(null);
     }
     return valid;
+  }
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    out.startTag(HtmlUtil.INPUT);
+    out.attribute(HtmlUtil.ATTR_ID, getName());
+    out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.attribute(HtmlUtil.ATTR_TYPE, "text");
+    out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(FIELD_SIZE));
+    out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(FIELD_MAX_LENGTH));
+    if (inputValue != null) {
+      out.attribute(HtmlUtil.ATTR_VALUE, inputValue);
+    }
+    out.endTag(HtmlUtil.INPUT);
+  }
+
+  @Override
+  public void setValue(final Object value) {
+    super.setValue(value);
+    if (value != null) {
+      inputValue = PhoneNumber.format(value.toString());
+    } else {
+      inputValue = null;
+    }
   }
 }

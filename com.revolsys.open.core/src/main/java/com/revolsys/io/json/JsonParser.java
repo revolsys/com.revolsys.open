@@ -32,22 +32,16 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
 
   private final Reader reader;
 
-  public JsonParser(
-    final InputStream in)
-    throws IOException {
+  public JsonParser(final InputStream in) throws IOException {
     this(new InputStreamReader(in));
   }
 
-  public JsonParser(
-    final Reader reader)
-    throws IOException {
+  public JsonParser(final Reader reader) throws IOException {
     this.reader = new BufferedReader(reader);
     currentCharacter = this.reader.read();
   }
 
-  public JsonParser(
-    final Resource in)
-    throws IOException {
+  public JsonParser(final Resource in) throws IOException {
     this(in.getInputStream());
   }
 
@@ -166,8 +160,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     }
   }
 
-  private void processNumber()
-    throws IOException {
+  private void processNumber() throws IOException {
     final StringBuffer text = new StringBuffer();
     if (currentCharacter == '-') {
       text.append((char)currentCharacter);
@@ -201,8 +194,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     nextValue = new BigDecimal(text.toString());
   }
 
-  private void processString()
-    throws IOException {
+  private void processString() throws IOException {
     final StringBuffer text = new StringBuffer();
     currentCharacter = reader.read();
     while (currentCharacter != '"') {
@@ -222,7 +214,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
             text.setLength(text.length() - 1);
           break;
           case 'u':
-            // TODO process hex
+          // TODO process hex
           break;
           default:
             text.append((char)currentCharacter);
@@ -239,8 +231,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
   public void remove() {
   }
 
-  private void skipWhitespace()
-    throws IOException {
+  private void skipWhitespace() throws IOException {
     while (Character.isWhitespace(currentCharacter)) {
       currentCharacter = reader.read();
     }

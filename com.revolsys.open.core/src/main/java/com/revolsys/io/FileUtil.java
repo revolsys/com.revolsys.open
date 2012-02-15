@@ -30,7 +30,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -73,17 +72,6 @@ public final class FileUtil {
     } catch (final IOException e) {
     }
 
-  }
-
-  public static String getString(InputStream in) {
-    try {
-      Reader reader = new InputStreamReader(in);
-      StringWriter out = new StringWriter();
-      copy(reader, out);
-      return out.toString();
-    } finally {
-      closeSilent(in);
-    }
   }
 
   /**
@@ -349,7 +337,7 @@ public final class FileUtil {
         numBytes += count;
       }
       return numBytes;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -608,6 +596,25 @@ public final class FileUtil {
     return filePath;
   }
 
+  public static String getString(final InputStream in) {
+    try {
+      final Reader reader = new InputStreamReader(in);
+      final StringWriter out = new StringWriter();
+      copy(reader, out);
+      return out.toString();
+    } finally {
+      closeSilent(in);
+    }
+  }
+
+  public static Writer getWriter(final File file) {
+    try {
+      return new FileWriter(file);
+    } catch (final IOException e) {
+      throw new IllegalArgumentException("Unable to open file " + file, e);
+    }
+  }
+
   public static URL toUrl(final File file) {
     try {
       return file.toURI().toURL();
@@ -620,13 +627,5 @@ public final class FileUtil {
    * Construct a new FileUtil.
    */
   private FileUtil() {
-  }
-
-  public static Writer getWriter(File file) {
-    try {
-      return new FileWriter(file);
-    } catch (IOException e) {
-      throw new IllegalArgumentException("Unable to open file " + file, e);
-    }
   }
 }

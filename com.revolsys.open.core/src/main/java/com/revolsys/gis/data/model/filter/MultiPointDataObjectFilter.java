@@ -11,8 +11,7 @@ public class MultiPointDataObjectFilter implements Filter<DataObject> {
   private MultiPointDataObjectFilter() {
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     return geometry instanceof MultiPoint;
   }

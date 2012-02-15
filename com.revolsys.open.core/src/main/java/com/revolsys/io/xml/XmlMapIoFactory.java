@@ -34,20 +34,20 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
     addMediaTypeAndFileExtension("text/xml", "xml");
   }
 
-  public Reader<Map<String, Object>> createMapReader(Resource resource) {
-    XmlMapIterator iterator = new XmlMapIterator(resource);
-    Reader<Map<String, Object>> reader = new IteratorReader<Map<String, Object>>(
+  public Reader<Map<String, Object>> createMapReader(final Resource resource) {
+    final XmlMapIterator iterator = new XmlMapIterator(resource);
+    final Reader<Map<String, Object>> reader = new IteratorReader<Map<String, Object>>(
       iterator);
     return reader;
   }
 
-  public MapWriter getWriter(Resource resource) {
-    Writer writer = SpringUtil.getWriter(resource);
+  public MapWriter getWriter(final OutputStream out) {
+    final Writer writer = new OutputStreamWriter(out);
     return getWriter(writer);
   }
 
-  public MapWriter getWriter(OutputStream out) {
-    Writer writer = new OutputStreamWriter(out);
+  public MapWriter getWriter(final Resource resource) {
+    final Writer writer = SpringUtil.getWriter(resource);
     return getWriter(writer);
   }
 
@@ -55,6 +55,7 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
     return new XmlMapWriter(out);
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return true;
   }

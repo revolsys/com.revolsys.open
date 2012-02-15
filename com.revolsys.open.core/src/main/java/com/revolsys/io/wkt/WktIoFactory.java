@@ -26,21 +26,25 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
-    return new WktDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
-  }
-
-  public DataObjectReader createDataObjectReader(Resource resource,
-    DataObjectFactory factory) {
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
+    final DataObjectFactory factory) {
     try {
       final WktDataObjectIterator iterator = new WktDataObjectIterator(factory,
         resource);
 
       return new DataObjectIteratorReader(iterator);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
+  }
+
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
+    return new WktDataObjectWriter(metaData, new OutputStreamWriter(
+      outputStream, charset));
   }
 }

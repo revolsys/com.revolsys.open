@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -24,9 +23,9 @@ import com.revolsys.ui.html.HtmlUtil;
  * @version 1.0
  */
 public class ImageElement extends Element {
-  private String src;
+  private final String src;
 
-  private String alt;
+  private final String alt;
 
   public ImageElement(final String src) {
     this(src, null);
@@ -43,9 +42,11 @@ public class ImageElement extends Element {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter)
+   * @see
+   * com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter
+   * )
    */
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.IMG);
     out.attribute(HtmlUtil.ATTR_SRC, src);

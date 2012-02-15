@@ -1,11 +1,7 @@
 package com.revolsys.io.json;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -13,13 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.io.Resource;
-
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Writer;
 
@@ -30,7 +23,8 @@ public class JsonDataObjectIoFactory extends
   public static final JsonDataObjectIoFactory INSTANCE = new JsonDataObjectIoFactory();
 
   public static final DataObject toDataObject(
-    final DataObjectMetaData metaData, final String string) {
+    final DataObjectMetaData metaData,
+    final String string) {
     final StringReader in = new StringReader(string);
     final JsonDataObjectIterator iterator = new JsonDataObjectIterator(
       metaData, in, true);
@@ -46,7 +40,8 @@ public class JsonDataObjectIoFactory extends
   }
 
   public static List<DataObject> toDataObjectList(
-    final DataObjectMetaData metaData, final String string) {
+    final DataObjectMetaData metaData,
+    final String string) {
     final StringReader in = new StringReader(string);
     final JsonDataObjectIterator iterator = new JsonDataObjectIterator(
       metaData, in);
@@ -74,7 +69,8 @@ public class JsonDataObjectIoFactory extends
     return writer.toString();
   }
 
-  public static String toString(final DataObjectMetaData metaData,
+  public static String toString(
+    final DataObjectMetaData metaData,
     final List<DataObject> list) {
     final StringWriter writer = new StringWriter();
     final JsonDataObjectWriter dataObjectWriter = new JsonDataObjectWriter(
@@ -86,7 +82,8 @@ public class JsonDataObjectIoFactory extends
     return writer.toString();
   }
 
-  public static String toString(final DataObjectMetaData metaData,
+  public static String toString(
+    final DataObjectMetaData metaData,
     final Map<String, ? extends Object> parameters) {
     final DataObject object = new ArrayDataObject(metaData);
     for (final String attributeName : metaData.getAttributeNames()) {
@@ -101,8 +98,10 @@ public class JsonDataObjectIoFactory extends
     addMediaTypeAndFileExtension("application/json", "json");
   }
 
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream,
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
     final Charset charset) {
     return new JsonDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));

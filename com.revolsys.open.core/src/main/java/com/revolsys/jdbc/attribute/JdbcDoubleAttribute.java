@@ -11,26 +11,23 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcDoubleAttribute extends JdbcAttribute {
-  public JdbcDoubleAttribute(
-    final String name,
-    final int sqlType,
-    final int length,
-    final boolean required,
+  public JdbcDoubleAttribute(final String name, final int sqlType,
+    final int length, final boolean required,
     final Map<QName, Object> properties) {
     super(name, DataTypes.DOUBLE, sqlType, length, 0, required, properties);
   }
 
   @Override
   public JdbcDoubleAttribute clone() {
-    return new JdbcDoubleAttribute(getName(), getSqlType(), getLength(), isRequired(), getProperties());
+    return new JdbcDoubleAttribute(getName(), getSqlType(), getLength(),
+      isRequired(), getProperties());
   }
-  
+
   @Override
   public int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
-    final DataObject object)
-    throws SQLException {
+    final DataObject object) throws SQLException {
     final double longValue = resultSet.getDouble(columnIndex);
     if (!resultSet.wasNull()) {
       object.setValue(getIndex(), Double.valueOf(longValue));
@@ -42,8 +39,7 @@ public class JdbcDoubleAttribute extends JdbcAttribute {
   public int setPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
-    final Object value)
-    throws SQLException {
+    final Object value) throws SQLException {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {

@@ -21,13 +21,11 @@ public class MaxPointDistanceFilter implements CoordinateFilter {
 
   private final PointPairDistance minPtDist = new PointPairDistance();
 
-  public MaxPointDistanceFilter(
-    final Geometry geom) {
+  public MaxPointDistanceFilter(final Geometry geom) {
     this.geom = geom;
   }
 
-  public void filter(
-    final Coordinate pt) {
+  public void filter(final Coordinate pt) {
     minPtDist.initialize();
     euclideanDist.computeDistance(geom, pt, minPtDist);
     maxPtDist.setMaximum(minPtDist);

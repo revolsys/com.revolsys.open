@@ -58,8 +58,7 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression createExpression(
-    final String expression)
+  public static Expression createExpression(final String expression)
     throws Exception {
     return createExpression(expression, DEFAULT_EXPRESSION_PATTERN);
   }
@@ -88,8 +87,7 @@ public final class JexlUtil {
    */
   public static Expression createExpression(
     final String expression,
-    final String expressionPattern)
-    throws Exception {
+    final String expressionPattern) throws Exception {
     final String newExpression = expression.replaceAll("\n", "");
     // Wrap the entires expression in '' and replace the expressions in the
     // form "${expr)" to ' + expr + '

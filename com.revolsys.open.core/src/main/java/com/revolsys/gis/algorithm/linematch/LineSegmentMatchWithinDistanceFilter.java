@@ -15,16 +15,14 @@ public class LineSegmentMatchWithinDistanceFilter implements
   private final Node<LineSegmentMatch> node;
 
   public LineSegmentMatchWithinDistanceFilter(
-    final Node<LineSegmentMatch> node,
-    final double maxDistance) {
+    final Node<LineSegmentMatch> node, final double maxDistance) {
     this.node = node;
     this.maxDistance = maxDistance;
     this.envelope = new BoundingBox(node);
     envelope.expandBy(maxDistance);
   }
 
-  public boolean accept(
-    final Edge<LineSegmentMatch> edge) {
+  public boolean accept(final Edge<LineSegmentMatch> edge) {
     if (!edge.hasNode(node) && edge.distance(node) < maxDistance) {
       return true;
     } else {

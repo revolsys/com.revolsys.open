@@ -7,9 +7,9 @@ import com.revolsys.filter.Filter;
 import com.vividsolutions.jts.geom.Envelope;
 
 public interface EnvelopeSpatialIndex<T> {
-  List<T> find(Envelope envelope, Filter<T> filter);
-
   List<T> find(Envelope envelope);
+
+  List<T> find(Envelope envelope, Filter<T> filter);
 
   List<T> findAll();
 

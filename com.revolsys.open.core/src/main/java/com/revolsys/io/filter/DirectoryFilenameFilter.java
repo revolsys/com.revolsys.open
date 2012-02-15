@@ -36,9 +36,7 @@ public class DirectoryFilenameFilter implements FilenameFilter {
    * @param filename The name of the file.
    * @return True if the file matched, false otherwise.
    */
-  public boolean accept(
-    final File directory,
-    final String filename) {
+  public boolean accept(final File directory, final String filename) {
     try {
       return new File(directory, filename).getCanonicalFile().isDirectory();
     } catch (final IOException e) {

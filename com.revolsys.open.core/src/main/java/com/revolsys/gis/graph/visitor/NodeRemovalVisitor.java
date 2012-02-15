@@ -31,10 +31,8 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
 
   private final DataObjectGraph graph;
 
-  public NodeRemovalVisitor(
-    final DataObjectMetaData metaData,
-    final DataObjectGraph graph,
-    final Collection<String> excludedAttributes) {
+  public NodeRemovalVisitor(final DataObjectMetaData metaData,
+    final DataObjectGraph graph, final Collection<String> excludedAttributes) {
     super();
     this.graph = graph;
     if (excludedAttributes != null) {
@@ -108,8 +106,7 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
     }
   }
 
-  public boolean visit(
-    final Node<DataObject> node) {
+  public boolean visit(final Node<DataObject> node) {
     if (node.getDegree() == 2) {
       final List<Edge<DataObject>> edges = node.getEdges();
       if (edges.size() == 2) {

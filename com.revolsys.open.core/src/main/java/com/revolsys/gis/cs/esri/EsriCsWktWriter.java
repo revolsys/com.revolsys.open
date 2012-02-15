@@ -17,17 +17,14 @@ import com.revolsys.gis.cs.Spheroid;
 
 public class EsriCsWktWriter {
 
-  public static String toWkt(
-    final CoordinateSystem coordinateSystem) {
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter out = new PrintWriter(stringWriter);
+  public static String toWkt(final CoordinateSystem coordinateSystem) {
+    final StringWriter stringWriter = new StringWriter();
+    final PrintWriter out = new PrintWriter(stringWriter);
     write(out, coordinateSystem);
     return stringWriter.toString();
   }
 
-  public static void write(
-    final PrintWriter out,
-    final AngularUnit unit) {
+  public static void write(final PrintWriter out, final AngularUnit unit) {
     out.print(",UNIT[");
     write(out, unit.getName());
     out.write(',');
@@ -47,9 +44,7 @@ public class EsriCsWktWriter {
     }
   }
 
-  public static void write(
-    final PrintWriter out,
-    final Datum datum) {
+  public static void write(final PrintWriter out, final Datum datum) {
     out.print("DATUM[");
     write(out, datum.getName());
     final Spheroid spheroid = datum.getSpheroid();
@@ -82,9 +77,7 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
-    final LinearUnit unit) {
+  public static void write(final PrintWriter out, final LinearUnit unit) {
     out.print(",UNIT[");
     write(out, unit.getName());
     out.write(',');
@@ -92,9 +85,7 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  private static void write(
-    final PrintWriter out,
-    final Number number) {
+  private static void write(final PrintWriter out, final Number number) {
     out.print(new DecimalFormat("#0.################").format(number));
 
   }
@@ -138,17 +129,13 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
-    final Projection projection) {
+  public static void write(final PrintWriter out, final Projection projection) {
     out.print("PROJECTION[");
     write(out, projection.getName());
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
-    final Spheroid spheroid) {
+  public static void write(final PrintWriter out, final Spheroid spheroid) {
     out.print("SPHEROID[");
     write(out, spheroid.getName());
     out.write(',');
@@ -160,9 +147,7 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
-    final String value) {
+  public static void write(final PrintWriter out, final String value) {
     out.write('"');
     if (value != null) {
       out.print(value);

@@ -26,10 +26,8 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    * @param file The the file.
    * @param factory The factory used to create DataObject instances.
    */
-  public MoepBinaryReader(
-    final MoepDirectoryReader moepDirectoryReader,
-    final Resource resource,
-    final DataObjectFactory factory) {
+  public MoepBinaryReader(final MoepDirectoryReader moepDirectoryReader,
+    final Resource resource, final DataObjectFactory factory) {
     try {
       final InputStream in = resource.getInputStream();
       this.iterator = new MoepBinaryIterator(moepDirectoryReader,
@@ -44,9 +42,7 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    * @param url The url to the file.
    * @param factory The factory used to create DataObject instances.
    */
-  public MoepBinaryReader(
-    final URL url,
-    final DataObjectFactory factory) {
+  public MoepBinaryReader(final URL url, final DataObjectFactory factory) {
     try {
       final InputStream in = url.openStream();
       final String path = url.getPath();
@@ -73,10 +69,6 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
     return iterator.getProperties();
   }
 
-  public void open() {
-    iterator.hasNext();
-  }
-
   /**
    * Get the iterator for the MOEP file.
    * 
@@ -84,6 +76,10 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    */
   public Iterator iterator() {
     return iterator;
+  }
+
+  public void open() {
+    iterator.hasNext();
   }
 
 }

@@ -13,14 +13,16 @@ import com.revolsys.io.Writer;
 public class KmlDataObjectWriterFactory extends
   AbstractDataObjectAndGeometryWriterFactory {
   public KmlDataObjectWriterFactory() {
-    super(Kml22Constants.FORMAT_DESCRIPTION,true,true);
+    super(Kml22Constants.FORMAT_DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(Kml22Constants.MEDIA_TYPE,
       Kml22Constants.FILE_EXTENSION);
     setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));
   }
 
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream,
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);

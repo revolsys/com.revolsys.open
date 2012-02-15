@@ -28,9 +28,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
    * @param reader
    * @throws IOException
    */
-  public CsvMapIterator(
-    final Reader in)
-    throws IOException {
+  public CsvMapIterator(final Reader in) throws IOException {
     this.in = new CsvIterator(in);
     readRecordHeader();
   }
@@ -62,8 +60,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
     }
   }
 
-  private Map<String, Object> parseMap(
-    final List<String> record) {
+  private Map<String, Object> parseMap(final List<String> record) {
     recordCount++;
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (int i = 0; i < fieldNames.size() && i < record.size(); i++) {
@@ -81,8 +78,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
    * 
    * @throws IOException If there was an error reading the header.
    */
-  private void readRecordHeader()
-    throws IOException {
+  private void readRecordHeader() throws IOException {
     if (hasNext()) {
       fieldNames = in.next();
     }

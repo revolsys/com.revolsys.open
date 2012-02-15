@@ -21,56 +21,44 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     this(12, 32);
   }
 
-  public RTree(int minEntries, int maxEntries) {
+  public RTree(final int minEntries, final int maxEntries) {
     this.minEntries = minEntries;
     this.maxEntries = maxEntries;
     root = new RTreeLeaf<T>(maxEntries);
   }
 
-  public void put(Envelope envelope, T object) {
-    LinkedList<RTreeBranch<T>> path = new LinkedList<RTreeBranch<T>>();
-    RTreeLeaf<T> leaf = chooseLeaf(path, root, envelope);
-    if (leaf.getSize() == maxEntries) {
-      List<RTreeNode<T>> newNodes = leaf.split(envelope, object);
-      replace(path, leaf, newNodes);
+  private RTreeLeaf<T> chooseLeaf(
+    final List<RTreeBranch<T>> path,
+    final RTreeNode<T> node,
+    final Envelope envelope) {
+    if (node instanceof RTreeLeaf) {
+      return (RTreeLeaf<T>)node;
     } else {
-      leaf.add(envelope, object);
-    }
-    size++;
-  }
-
-  private void replace(LinkedList<RTreeBranch<T>> path, RTreeNode<T> oldNode,
-    List<RTreeNode<T>> newNodes) {
-    if (path.isEmpty()) {
-      root = new RTreeBranch<T>(maxEntries, newNodes);
-    } else {
-      RTreeBranch<T> parentNode = path.removeLast();
-      if (parentNode.getSize() + newNodes.size() - 1 >= maxEntries) {
-        List<RTreeNode<T>> newParentNodes = parentNode.split(oldNode, newNodes);
-        replace(path, parentNode, newParentNodes);
-      } else {
-        parentNode.replace(oldNode, newNodes);
+      final RTreeBranch<T> branch = (RTreeBranch<T>)node;
+      branch.expandToInclude(envelope);
+      path.add(branch);
+      double minExpansion = Float.MAX_VALUE;
+      RTreeNode<T> next = null;
+      for (final RTreeNode<T> childNode : branch) {
+        final double expansion = getRequiredExpansion(childNode, envelope);
+        if (expansion < minExpansion) {
+          minExpansion = expansion;
+          next = childNode;
+        } else if (expansion == minExpansion) {
+          final double childArea = childNode.getArea();
+          final double minArea = next.getArea();
+          if (childArea < minArea) {
+            next = childNode;
+          }
+        }
       }
-    }
-
-  }
-
-  public int getSize() {
-    return size;
-  }
-
-  public boolean remove(Envelope envelope, T object) {
-    // TODO rebalance after remove
-    LinkedList<RTreeNode<T>> path = new LinkedList<RTreeNode<T>>();
-    if (root.remove(path, envelope, object)) {
-      size--;
-      return true;
-    } else {
-      return false;
+      return chooseLeaf(path, next, envelope);
     }
   }
 
-  private double getRequiredExpansion(RTreeNode<T> node, Envelope envelope) {
+  private double getRequiredExpansion(
+    final RTreeNode<T> node,
+    final Envelope envelope) {
     double areaExpansion = 0;
 
     final double minX1 = node.getMinX();
@@ -83,8 +71,8 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     final double maxY1 = node.getMaxY();
     final double maxY2 = envelope.getMaxY();
 
-    double maxWidth = Math.max(maxX1, maxX2) - Math.min(minX1, minX2);
-    double maxHeight = Math.max(maxY1, maxY2) - Math.min(minY1, minY2);
+    final double maxWidth = Math.max(maxX1, maxX2) - Math.min(minX1, minX2);
+    final double maxHeight = Math.max(maxY1, maxY2) - Math.min(minY1, minY2);
     if (minX1 > minX2) {
       areaExpansion += (minX1 - minX2) * maxHeight;
     }
@@ -101,40 +89,63 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     return areaExpansion;
   }
 
-  private RTreeLeaf<T> chooseLeaf(List<RTreeBranch<T>> path, RTreeNode<T> node,
-    Envelope envelope) {
-    if (node instanceof RTreeLeaf) {
-      return (RTreeLeaf<T>)node;
+  public int getSize() {
+    return size;
+  }
+
+  public void put(final Envelope envelope, final T object) {
+    final LinkedList<RTreeBranch<T>> path = new LinkedList<RTreeBranch<T>>();
+    final RTreeLeaf<T> leaf = chooseLeaf(path, root, envelope);
+    if (leaf.getSize() == maxEntries) {
+      final List<RTreeNode<T>> newNodes = leaf.split(envelope, object);
+      replace(path, leaf, newNodes);
     } else {
-      RTreeBranch<T> branch = (RTreeBranch<T>)node;
-      branch.expandToInclude(envelope);
-      path.add(branch);
-      double minExpansion = Float.MAX_VALUE;
-      RTreeNode<T> next = null;
-      for (RTreeNode<T> childNode : branch) {
-        double expansion = getRequiredExpansion(childNode, envelope);
-        if (expansion < minExpansion) {
-          minExpansion = expansion;
-          next = childNode;
-        } else if (expansion == minExpansion) {
-          double childArea = childNode.getArea();
-          double minArea = next.getArea();
-          if (childArea < minArea) {
-            next = childNode;
-          }
-        }
-      }
-      return chooseLeaf(path, next, envelope);
+      leaf.add(envelope, object);
     }
+    size++;
+  }
+
+  public boolean remove(final Envelope envelope, final T object) {
+    // TODO rebalance after remove
+    final LinkedList<RTreeNode<T>> path = new LinkedList<RTreeNode<T>>();
+    if (root.remove(path, envelope, object)) {
+      size--;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void replace(
+    final LinkedList<RTreeBranch<T>> path,
+    final RTreeNode<T> oldNode,
+    final List<RTreeNode<T>> newNodes) {
+    if (path.isEmpty()) {
+      root = new RTreeBranch<T>(maxEntries, newNodes);
+    } else {
+      final RTreeBranch<T> parentNode = path.removeLast();
+      if (parentNode.getSize() + newNodes.size() - 1 >= maxEntries) {
+        final List<RTreeNode<T>> newParentNodes = parentNode.split(oldNode,
+          newNodes);
+        replace(path, parentNode, newParentNodes);
+      } else {
+        parentNode.replace(oldNode, newNodes);
+      }
+    }
+
+  }
+
+  public void visit(
+    final Envelope envelope,
+    final Filter<T> filter,
+    final Visitor<T> visitor) {
+    root.visit(envelope, filter, visitor);
   }
 
   public void visit(final Envelope envelope, final Visitor<T> visitor) {
     root.visit(envelope, visitor);
   }
 
-  public void visit(final Envelope envelope, final Filter<T> filter, final Visitor<T> visitor) {
-    root.visit(envelope, filter, visitor);
-  }
   public void visit(final Visitor<T> visitor) {
     root.visit(visitor);
   }

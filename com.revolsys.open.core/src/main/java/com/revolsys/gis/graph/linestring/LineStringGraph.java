@@ -50,25 +50,45 @@ public class LineStringGraph extends Graph<LineSegment> {
     setLineString(LineStringUtil.cleanShortSegments(line));
   }
 
-  @Override
-  protected LineSegment clone(LineSegment object, LineString line) {
-    return new LineSegment(line);
-  }
-
   public LineStringGraph(final LineString lineString) {
     setGeometryFactory(GeometryFactory.getFactory(lineString));
     setLineString(lineString);
   }
 
   @Override
-  public void nodeMoved(Node<LineSegment> node, Node<LineSegment> newNode) {
-    if (fromPoint.equals2d(node)) {
-      fromPoint = new DoubleCoordinates(newNode);
-    }
+  protected LineSegment clone(final LineSegment object, final LineString line) {
+    return new LineSegment(line);
   }
-  
+
+  public LineString getLine() {
+    final DoubleListCoordinatesList newPoints = new DoubleListCoordinatesList(
+      points.getNumAxis());
+    Node<LineSegment> previousNode = getNode(fromPoint);
+    newPoints.add(previousNode);
+    do {
+      final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
+      if (outEdges.isEmpty()) {
+        previousNode = null;
+      } else if (outEdges.size() > 1) {
+        System.err.println("Cannot handle overlaps " + points);
+        return geometryFactory.createLineString(points);
+      } else {
+        final Edge<LineSegment> edge = outEdges.get(0);
+        final LineSegment line = edge.getObject();
+        final Node<LineSegment> nextNode = edge.getToNode();
+
+        newPoints.add(line.get(1));
+
+        previousNode = nextNode;
+      }
+
+    } while (previousNode != null && !previousNode.equals2d(fromPoint));
+    return geometryFactory.createLineString(newPoints);
+  }
+
   public Map<Edge<LineSegment>, List<Node<LineSegment>>> getPointsOnEdges(
-    final Graph<LineSegment> graph1, final double tolerance) {
+    final Graph<LineSegment> graph1,
+    final double tolerance) {
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = new HashMap<Edge<LineSegment>, List<Node<LineSegment>>>();
     for (final Edge<LineSegment> edge : getEdges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
@@ -141,6 +161,15 @@ public class LineStringGraph extends Graph<LineSegment> {
     return false;
   }
 
+  @Override
+  public void nodeMoved(
+    final Node<LineSegment> node,
+    final Node<LineSegment> newNode) {
+    if (fromPoint.equals2d(node)) {
+      fromPoint = new DoubleCoordinates(newNode);
+    }
+  }
+
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     setPrecisionModel(geometryFactory);
@@ -149,32 +178,6 @@ public class LineStringGraph extends Graph<LineSegment> {
   private void setLineString(final LineString lineString) {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     setPoints(points);
-  }
-
-  public LineString getLine() {
-    final DoubleListCoordinatesList newPoints = new DoubleListCoordinatesList(
-      points.getNumAxis());
-    Node<LineSegment> previousNode = getNode(fromPoint);
-    newPoints.add(previousNode);
-    do {
-      final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
-      if (outEdges.isEmpty()) {
-        previousNode = null;
-      } else if (outEdges.size() > 1) {
-        System.err.println("Cannot handle overlaps " + points);
-        return geometryFactory.createLineString(points);
-      } else {
-        final Edge<LineSegment> edge = outEdges.get(0);
-        final LineSegment line = edge.getObject();
-        final Node<LineSegment> nextNode = edge.getToNode();
-
-        newPoints.add(line.get(1));
-
-        previousNode = nextNode;
-      }
-
-    } while (previousNode != null && !previousNode.equals2d(fromPoint));
-    return geometryFactory.createLineString(newPoints);
   }
 
   private void setPoints(final CoordinatesList points) {
@@ -190,7 +193,8 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   @Override
   public <V extends Coordinates> List<Edge<LineSegment>> splitEdge(
-    final Edge<LineSegment> edge, final Collection<V> nodes) {
+    final Edge<LineSegment> edge,
+    final Collection<V> nodes) {
     final List<Edge<LineSegment>> newEdges = new ArrayList<Edge<LineSegment>>();
     if (!edge.isRemoved()) {
       final Node<LineSegment> fromNode = edge.getFromNode();

@@ -9,9 +9,7 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.parallel.channel.Channel;
 
 public class ChannelOutEdgeVisitor<T> implements Visitor<Edge<T>> {
-  public static <T> void write(
-    final Graph<T> graph,
-    final Channel<T> out) {
+  public static <T> void write(final Graph<T> graph, final Channel<T> out) {
     final Visitor<Edge<T>> visitor = new ChannelOutEdgeVisitor<T>(out);
     graph.visitEdges(visitor);
   }
@@ -29,13 +27,11 @@ public class ChannelOutEdgeVisitor<T> implements Visitor<Edge<T>> {
 
   private final Channel<T> out;
 
-  public ChannelOutEdgeVisitor(
-    final Channel<T> out) {
+  public ChannelOutEdgeVisitor(final Channel<T> out) {
     this.out = out;
   }
 
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     if (out == null) {
       return false;
     } else {

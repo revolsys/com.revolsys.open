@@ -23,12 +23,12 @@ public class MapEquals implements Equals<Map<String, Object>> {
     } else {
       final Set<String> keys1 = map1.keySet();
       final Set<String> keys2 = map2.keySet();
-      for (String key : keys1) {
+      for (final String key : keys1) {
         if (!keys2.contains(key) && !exclude.contains(key)) {
           return false;
         }
       }
-      for (String key : keys2) {
+      for (final String key : keys2) {
         if (!keys1.contains(key) && !exclude.contains(key)) {
           return false;
         }
@@ -47,8 +47,7 @@ public class MapEquals implements Equals<Map<String, Object>> {
     return true;
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }
 }

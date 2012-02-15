@@ -16,8 +16,7 @@ import com.revolsys.util.ObjectProcessor;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-public class GraphProcessor extends
-  BaseInOutProcess<DataObject, DataObject> {
+public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
   private static final Logger LOG = LoggerFactory.getLogger(GraphProcessor.class);
 
   private DataObjectGraph graph;
@@ -44,7 +43,8 @@ public class GraphProcessor extends
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
+  protected void postRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (out != null) {
       processGraph();
@@ -56,8 +56,10 @@ public class GraphProcessor extends
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;

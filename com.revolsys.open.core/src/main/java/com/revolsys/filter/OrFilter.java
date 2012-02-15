@@ -11,18 +11,15 @@ public class OrFilter<T> implements Filter<T> {
   public OrFilter() {
   }
 
-  public OrFilter(
-    final Collection<Filter<T>> filters) {
+  public OrFilter(final Collection<Filter<T>> filters) {
     this.filters.addAll(filters);
   }
 
-  public OrFilter(
-    final Filter<T>... filters) {
+  public OrFilter(final Filter<T>... filters) {
     this(Arrays.asList(filters));
   }
 
-  public boolean accept(
-    final T object) {
+  public boolean accept(final T object) {
     for (final Filter<T> filter : filters) {
       if (filter.accept(object)) {
         return true;
@@ -35,8 +32,7 @@ public class OrFilter<T> implements Filter<T> {
     return filters;
   }
 
-  public void setFilters(
-    List<Filter<T>> filters) {
+  public void setFilters(final List<Filter<T>> filters) {
     this.filters = filters;
   }
 

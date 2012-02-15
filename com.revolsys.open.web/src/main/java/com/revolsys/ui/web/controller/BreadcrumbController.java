@@ -41,7 +41,8 @@ public class BreadcrumbController implements Controller {
     urlPathHelper.setAlwaysUseFullPath(true);
   }
 
-  public ModelAndView handleRequest(final HttpServletRequest request,
+  public ModelAndView handleRequest(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     final String path = urlPathHelper.getOriginatingRequestUri(request);
     final String contextPath = urlPathHelper.getOriginatingContextPath(request);

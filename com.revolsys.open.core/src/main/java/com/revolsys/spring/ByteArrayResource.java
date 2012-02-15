@@ -9,23 +9,24 @@ public class ByteArrayResource extends
 
   private final String filename;
 
-  public ByteArrayResource(String filename, byte[] data, String description) {
+  public ByteArrayResource(final String filename, final byte[] data) {
+    super(data);
+    this.filename = filename;
+  }
+
+  public ByteArrayResource(final String filename, final byte[] data,
+    final String description) {
     super(data, description);
     this.filename = filename;
   }
 
-  public ByteArrayResource(String filename, byte[] data) {
-    super(data);
-    this.filename = filename;
+  @Override
+  public Resource createRelative(final String relativePath) throws IOException {
+    return new NonExistingResource();
   }
 
   @Override
   public String getFilename() throws IllegalStateException {
     return filename;
-  }
-
-  @Override
-  public Resource createRelative(String relativePath) throws IOException {
-    return new NonExistingResource();
   }
 }

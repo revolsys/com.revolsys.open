@@ -28,13 +28,16 @@ public class MoepBinaryReaderFactory extends
     setCustomAttributionSupported(false);
   }
 
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public DataObjectReader createDataObjectReader(
+    final DataObjectMetaData metaData,
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
-    return new MoepBinaryReader(null, resource, dataObjectFactory);
+    throw new UnsupportedOperationException();
   }
 
-  public DataObjectReader createDataObjectReader(DataObjectMetaData metaData,
-    final Resource resource, final DataObjectFactory dataObjectFactory) {
-    throw new UnsupportedOperationException();
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory) {
+    return new MoepBinaryReader(null, resource, dataObjectFactory);
   }
 }

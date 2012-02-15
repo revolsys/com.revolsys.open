@@ -42,21 +42,9 @@ public class DataObjectLog {
     }
   }
 
-  public static void warn(
-    final Class<?> logCategory,
-    final String message,
-    final DataObject object) {
-    final DataObjectLog dataObjectLog = getForThread();
-    if (object == null) {
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\tnull");
-    } else if (dataObjectLog == null) {
-      final DataObjectMetaData metaData = object.getMetaData();
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + metaData.getName() + object.getIdValue());
-    } else {
-      dataObjectLog.warn(message, object);
-    }
+  public static DataObjectLog getForThread() {
+    final DataObjectLog dataObjectLog = ThreadSharedAttributes.getAttribute(KEY);
+    return dataObjectLog;
   }
 
   public static void info(
@@ -76,9 +64,21 @@ public class DataObjectLog {
     }
   }
 
-  public static DataObjectLog getForThread() {
-    final DataObjectLog dataObjectLog = ThreadSharedAttributes.getAttribute(KEY);
-    return dataObjectLog;
+  public static void warn(
+    final Class<?> logCategory,
+    final String message,
+    final DataObject object) {
+    final DataObjectLog dataObjectLog = getForThread();
+    if (object == null) {
+      final Logger log = LoggerFactory.getLogger(logCategory);
+      log.warn(message + "\tnull");
+    } else if (dataObjectLog == null) {
+      final DataObjectMetaData metaData = object.getMetaData();
+      final Logger log = LoggerFactory.getLogger(logCategory);
+      log.warn(message + "\t" + metaData.getName() + object.getIdValue());
+    } else {
+      dataObjectLog.warn(message, object);
+    }
   }
 
   private Writer<DataObject> writer;
@@ -94,24 +94,6 @@ public class DataObjectLog {
 
   public synchronized void error(final Object message, final DataObject object) {
     log("ERROR", message, object);
-  }
-
-  public synchronized void warn(final Object message, final DataObject object) {
-    log("WARNING", message, object);
-  }
-
-  public synchronized void info(final Object message, final DataObject object) {
-    log("INFO", message, object);
-  }
-
-  public void log(String logLevel, final Object message, final DataObject object) {
-    if (writer != null) {
-      final DataObjectMetaData logMetaData = getLogMetaData(object);
-      final DataObject logObject = new ArrayDataObject(logMetaData, object);
-      logObject.setValue("LOGMESSAGE", message);
-      logObject.setValue("LOGLEVEL", logLevel);
-      writer.write(logObject);
-    }
   }
 
   private DataObjectMetaData getLogMetaData(final DataObject object) {
@@ -150,7 +132,28 @@ public class DataObjectLog {
     return writer;
   }
 
+  public synchronized void info(final Object message, final DataObject object) {
+    log("INFO", message, object);
+  }
+
+  public void log(
+    final String logLevel,
+    final Object message,
+    final DataObject object) {
+    if (writer != null) {
+      final DataObjectMetaData logMetaData = getLogMetaData(object);
+      final DataObject logObject = new ArrayDataObject(logMetaData, object);
+      logObject.setValue("LOGMESSAGE", message);
+      logObject.setValue("LOGLEVEL", logLevel);
+      writer.write(logObject);
+    }
+  }
+
   public void setWriter(final Writer<DataObject> writer) {
     this.writer = writer;
+  }
+
+  public synchronized void warn(final Object message, final DataObject object) {
+    log("WARNING", message, object);
   }
 }

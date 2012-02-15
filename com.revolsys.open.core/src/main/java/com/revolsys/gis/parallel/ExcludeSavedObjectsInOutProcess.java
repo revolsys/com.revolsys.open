@@ -28,6 +28,16 @@ public class ExcludeSavedObjectsInOutProcess extends
     statistics = null;
   }
 
+  private String getId(final DataObject object) {
+    final Object id = object.getIdValue();
+    if (id == null) {
+      return null;
+    } else {
+      final DataObjectMetaData metaData = object.getMetaData();
+      return metaData.getName() + "." + id;
+    }
+  }
+
   public StatisticsMap getStatistics() {
     return statistics;
   }
@@ -38,8 +48,10 @@ public class ExcludeSavedObjectsInOutProcess extends
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     final String id = getId(object);
     if (id == null) {
       out.write(object);
@@ -50,16 +62,6 @@ public class ExcludeSavedObjectsInOutProcess extends
       final Geometry geometry = object.getGeometryValue();
       JtsGeometryUtil.setGeometryProperty(geometry, "ORIGINAL_IDS", ids);
       out.write(object);
-    }
-  }
-
-  private String getId(final DataObject object) {
-    final Object id = object.getIdValue();
-    if (id == null) {
-      return null;
-    } else {
-      DataObjectMetaData metaData = object.getMetaData();
-      return metaData.getName() + "." + id;
     }
   }
 

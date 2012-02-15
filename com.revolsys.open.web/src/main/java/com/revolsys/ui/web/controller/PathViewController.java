@@ -34,9 +34,10 @@ import org.springframework.web.servlet.mvc.Controller;
 
 public class PathViewController implements Controller {
 
-  public static boolean include(final HttpServletRequest request,
-    final HttpServletResponse response, final Object object)
-    throws IOException, ServletException {
+  public static boolean include(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final Object object) throws IOException, ServletException {
     if (object == null) {
       return false;
     } else {
@@ -60,7 +61,8 @@ public class PathViewController implements Controller {
     }
   }
 
-  public ModelAndView handleRequest(final HttpServletRequest request,
+  public ModelAndView handleRequest(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     final String attributeName = request.getParameter("attributeName");
     if (attributeName != null) {

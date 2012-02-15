@@ -18,32 +18,32 @@ public class BeanReference implements BeanFactoryAware {
   }
 
   /**
-   * @param bean The bean to set.
-   */
-  public void setBean(final String bean) {
-    this.bean = bean;
-  }
-
-  /**
    * @return Returns the name.
    */
   public String getName() {
     return name;
   }
 
-  /**
-   * @param name The name to set.
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public Object getReferencedBean() {
     return factory.getBean(bean);
+  }
+
+  /**
+   * @param bean The bean to set.
+   */
+  public void setBean(final String bean) {
+    this.bean = bean;
   }
 
   public void setBeanFactory(final BeanFactory factory) {
     this.factory = factory;
 
+  }
+
+  /**
+   * @param name The name to set.
+   */
+  public void setName(final String name) {
+    this.name = name;
   }
 }

@@ -21,18 +21,6 @@ package com.revolsys.ui.model;
  */
 public interface TableModel {
 
-  int getColumnCount();
-
-  int getBodyRowCount();
-
-  /**
-   * Get the contents for a header cell.
-   * 
-   * @param col The column index.
-   * @return The contents.
-   */
-  String getHeaderCell(int col);
-
   /**
    * Get the contents for a body cell.
    * 
@@ -41,4 +29,16 @@ public interface TableModel {
    * @return The contents.
    */
   String getBodyCell(int row, int col);
+
+  int getBodyRowCount();
+
+  int getColumnCount();
+
+  /**
+   * Get the contents for a header cell.
+   * 
+   * @param col The column index.
+   * @return The contents.
+   */
+  String getHeaderCell(int col);
 }

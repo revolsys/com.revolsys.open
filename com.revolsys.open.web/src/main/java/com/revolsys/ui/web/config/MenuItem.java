@@ -38,9 +38,9 @@ public class MenuItem implements Cloneable, Comparable {
 
   private Expression uriExpression;
 
-  private Map parameters = new HashMap();
+  private final Map parameters = new HashMap();
 
-  private Map properties = new HashMap();
+  private final Map properties = new HashMap();
 
   private Map staticParameters = new HashMap();
 
@@ -75,8 +75,8 @@ public class MenuItem implements Cloneable, Comparable {
   public void addParameter(final String name, final Object value)
     throws Exception {
     if (value instanceof String) {
-      String stringValue = (String)value;
-      Expression expression = JexlUtil.createExpression(stringValue);
+      final String stringValue = (String)value;
+      final Expression expression = JexlUtil.createExpression(stringValue);
       if (expression != null) {
         parameters.put(name, expression);
       } else {
@@ -95,38 +95,21 @@ public class MenuItem implements Cloneable, Comparable {
     properties.put(name, value);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * @return Returns the condition.
-   */
-  public Expression getCondition() {
-    return condition;
-  }
-
-  /**
-   * @param condition The condition to set.
-   */
-  public void setCondition(final String condition) {
-    if (condition != null) {
-      try {
-        this.condition = JexlUtil.createExpression(condition);
-      } catch (Throwable e) {
-        log.error("Invalid Condition", e);
-      }
-    } else {
-      this.condition = null;
+  @Override
+  public Object clone() {
+    try {
+      return super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  public String getProperty(final String name) {
-    return (String)properties.get(name);
-  }
-
-  public Map getProperties() {
-    return properties;
+  public int compareTo(final Object o) {
+    if (o instanceof MenuItem) {
+      final MenuItem menuItem = (MenuItem)o;
+      return title.compareTo(menuItem.getTitle());
+    }
+    return 1;
   }
 
   /**
@@ -137,14 +120,34 @@ public class MenuItem implements Cloneable, Comparable {
   }
 
   /**
-   * @param anchor The anchor to set.
+   * @return Returns the condition.
    */
-  public void setAnchor(final String anchor) {
-    this.anchor = anchor;
+  public Expression getCondition() {
+    return condition;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public final Map getParameters() {
+    return parameters;
+  }
+
+  public Map getProperties() {
+    return properties;
+  }
+
+  public String getProperty(final String name) {
+    return (String)properties.get(name);
+  }
+
+  public final Map getStaticParameters() {
+    return staticParameters;
   }
 
   public String getTitle() {
-    WebUiContext context = WebUiContext.get();
+    final WebUiContext context = WebUiContext.get();
     if (titleExpression != null) {
       return (String)context.evaluateExpression(titleExpression);
     } else {
@@ -152,29 +155,8 @@ public class MenuItem implements Cloneable, Comparable {
     }
   }
 
-  public void setTitle(final String title) {
-    if (title != null) {
-      Expression titleExpression = null;
-      try {
-        titleExpression = JexlUtil.createExpression(title);
-      } catch (Exception e) {
-        log.error(e.getMessage(), e);
-      }
-      if (titleExpression == null) {
-        this.title = title;
-        this.titleExpression = null;
-      } else {
-        this.title = null;
-        this.titleExpression = titleExpression;
-      }
-    } else {
-      this.title = null;
-      this.titleExpression = null;
-    }
-  }
-
   public String getUri() {
-    WebUiContext context = WebUiContext.get();
+    final WebUiContext context = WebUiContext.get();
     String uri = this.uri;
     if (uri != null) {
       // If this is the first call to getUri update the uri with any static
@@ -191,11 +173,11 @@ public class MenuItem implements Cloneable, Comparable {
       }
     }
     if (uri != null && parameters.size() > 0) {
-      Map qsParams = new HashMap();
-      for (Iterator params = parameters.entrySet().iterator(); params.hasNext();) {
-        Map.Entry param = (Map.Entry)params.next();
-        Object key = param.getKey();
-        Object value = context.evaluateExpression((Expression)param.getValue());
+      final Map qsParams = new HashMap();
+      for (final Iterator params = parameters.entrySet().iterator(); params.hasNext();) {
+        final Map.Entry param = (Map.Entry)params.next();
+        final Object key = param.getKey();
+        final Object value = context.evaluateExpression((Expression)param.getValue());
         qsParams.put(key, value);
       }
       if (anchor == null) {
@@ -212,12 +194,71 @@ public class MenuItem implements Cloneable, Comparable {
     }
   }
 
+  public boolean isVisible() {
+    final WebUiContext context = WebUiContext.get();
+    if (condition != null) {
+      return ((Boolean)context.evaluateExpression(condition)).booleanValue();
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * @param anchor The anchor to set.
+   */
+  public void setAnchor(final String anchor) {
+    this.anchor = anchor;
+  }
+
+  /**
+   * @param condition The condition to set.
+   */
+  public void setCondition(final String condition) {
+    if (condition != null) {
+      try {
+        this.condition = JexlUtil.createExpression(condition);
+      } catch (final Throwable e) {
+        log.error("Invalid Condition", e);
+      }
+    } else {
+      this.condition = null;
+    }
+  }
+
+  /**
+   * @param refname
+   */
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  public void setTitle(final String title) {
+    if (title != null) {
+      Expression titleExpression = null;
+      try {
+        titleExpression = JexlUtil.createExpression(title);
+      } catch (final Exception e) {
+        log.error(e.getMessage(), e);
+      }
+      if (titleExpression == null) {
+        this.title = title;
+        this.titleExpression = null;
+      } else {
+        this.title = null;
+        this.titleExpression = titleExpression;
+      }
+    } else {
+      this.title = null;
+      this.titleExpression = null;
+    }
+  }
+
   public void setUri(final String uri) {
     if (uri != null) {
       Expression uriExpression = null;
       try {
         uriExpression = JexlUtil.createExpression(uri.replaceAll(" ", "%20"));
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }
       if (uriExpression == null) {
@@ -231,45 +272,5 @@ public class MenuItem implements Cloneable, Comparable {
       this.uri = null;
       this.uriExpression = null;
     }
-  }
-
-  public boolean isVisible() {
-    WebUiContext context = WebUiContext.get();
-    if (condition != null) {
-      return ((Boolean)context.evaluateExpression(condition)).booleanValue();
-    } else {
-      return true;
-    }
-  }
-
-  public Object clone() {
-    try {
-      return super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * @param refname
-   */
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  public final Map getStaticParameters() {
-    return staticParameters;
-  }
-
-  public final Map getParameters() {
-    return parameters;
-  }
-
-  public int compareTo(final Object o) {
-    if (o instanceof MenuItem) {
-      MenuItem menuItem = (MenuItem)o;
-      return title.compareTo(menuItem.getTitle());
-    }
-    return 1;
   }
 }

@@ -15,6 +15,16 @@ public class Nts50000RectangularMapGrid extends Nts250000RectangularMapGrid {
     super(width, height);
   }
 
+  public String getCellNumber(final String tileName) {
+    final int index = tileName.indexOf('/');
+    final String cellNumber = tileName.substring(index + 1);
+    if (cellNumber.length() == 1) {
+      return "0" + cellNumber;
+    } else {
+      return cellNumber;
+    }
+  }
+
   @Override
   public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
@@ -86,15 +96,5 @@ public class Nts50000RectangularMapGrid extends Nts250000RectangularMapGrid {
     final int col = (int)Math.floor(xInSheet / NtsConstants.WIDTH_50000) % 4;
     return letterBlock + "/" + GridUtil.getNumber16(row, col);
 
-  }
-
-  public String getCellNumber(String tileName) {
-    int index = tileName.indexOf('/');
-    String cellNumber = tileName.substring(index + 1);
-    if (cellNumber.length() == 1) {
-      return "0" + cellNumber;
-    } else {
-      return cellNumber;
-    }
   }
 }

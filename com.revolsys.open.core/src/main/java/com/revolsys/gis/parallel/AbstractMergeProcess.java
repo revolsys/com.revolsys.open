@@ -12,7 +12,7 @@ import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public abstract class AbstractMergeProcess extends
-  AbstractInOutProcess<DataObject,DataObject> {
+  AbstractInOutProcess<DataObject, DataObject> {
 
   private static final int OTHER_INDEX = 1;
 
@@ -22,8 +22,7 @@ public abstract class AbstractMergeProcess extends
 
   private int otherInBufferSize = 0;
 
-  protected boolean acceptObject(
-    final DataObject object) {
+  protected boolean acceptObject(final DataObject object) {
     return true;
   }
 
@@ -64,8 +63,7 @@ public abstract class AbstractMergeProcess extends
    * 
    * @param object The object to add.
    */
-  protected abstract void addOtherObject(
-    DataObject object);
+  protected abstract void addOtherObject(DataObject object);
 
   private DataObjectMetaData addSavedObjects(
     final DataObjectMetaData currentType,
@@ -158,8 +156,7 @@ public abstract class AbstractMergeProcess extends
    * 
    * @param object The object to add.
    */
-  protected abstract void addSourceObject(
-    DataObject object);
+  protected abstract void addSourceObject(DataObject object);
 
   /**
    * @return the in
@@ -187,9 +184,7 @@ public abstract class AbstractMergeProcess extends
 
   @Override
   @SuppressWarnings("unchecked")
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void run(final Channel<DataObject> in, final Channel<DataObject> out) {
     setUp();
     try {
       DataObjectMetaData currentType = null;
@@ -319,14 +314,12 @@ public abstract class AbstractMergeProcess extends
   /**
    * @param in the in to set
    */
-  public void setOtherIn(
-    final Channel<DataObject> in) {
+  public void setOtherIn(final Channel<DataObject> in) {
     this.otherIn = in;
     in.readConnect();
   }
 
-  public void setOtherInBufferSize(
-    final int otherInBufferSize) {
+  public void setOtherInBufferSize(final int otherInBufferSize) {
     this.otherInBufferSize = otherInBufferSize;
   }
 

@@ -66,57 +66,24 @@ public class LineStringRelate {
     return graph2;
   }
 
-  public boolean isEndOverlaps(double maxDistance) {
-    if (isOverlaps()) {
-      boolean overlaps = false;
-      final boolean from1Within = isWithin2(fromPoint1, maxDistance);
-      final boolean to1Within = isWithin2(toPoint1, 1);
-      if (from1Within != to1Within) {
-        final boolean from2Within = isWithin1(fromPoint2, 1);
-        final boolean to2Within = isWithin1(toPoint2, 1);
-        if (from2Within != to2Within) {
-          overlaps = true;
-        }
-      }
-      if (overlaps) {
-        final MultiLineString intersection = getOverlap();
-        if (intersection.getNumGeometries() == 1) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public LineString getLine1() {
+    return line1;
   }
 
-  public boolean isWithin1(Coordinates point, double maxDistance) {
-    return isWithin(graph1, fromPoint1, toPoint1, point, maxDistance);
+  public LineString getLine2() {
+    return line2;
   }
 
-  public boolean isWithin2(Coordinates point, double maxDistance) {
-    return isWithin(graph2, fromPoint2, toPoint2, point, maxDistance);
-  }
-
-  private boolean isWithin(final LineStringGraph graph,
-    final Coordinates fromPoint, final Coordinates toPoint, Coordinates point,
-    double maxDistance) {
-    if (point.distance(fromPoint) < maxDistance) {
-      return false;
-    } else if (point.distance(toPoint) < maxDistance) {
-      return false;
+  public Coordinates getMovedCoordinate(
+    final Map<Coordinates, Coordinates> movedNodes,
+    final LineString line,
+    final int i) {
+    final Coordinates coordinates = CoordinatesListUtil.get(line, i);
+    if (movedNodes.containsKey(coordinates)) {
+      return movedNodes.get(coordinates);
     } else {
-      if (!graph.findNodes(point, maxDistance).isEmpty()) {
-        return true;
-      }
-      final List<Edge<LineSegment>> edges = graph.findEdges(point, maxDistance);
-      for (Edge<LineSegment> edge : edges) {
-        LineSegment line = edge.getObject();
-        if (line.intersects(point, maxDistance)) {
-          return true;
-        }
-      }
-
+      return coordinates;
     }
-    return false;
   }
 
   public MultiLineString getOverlap() {
@@ -172,25 +139,6 @@ public class LineStringRelate {
     return graph2.getLine();
   }
 
-  public LineString getLine1() {
-    return line1;
-  }
-
-  public LineString getLine2() {
-    return line2;
-  }
-
-  public Coordinates getMovedCoordinate(
-    final Map<Coordinates, Coordinates> movedNodes, final LineString line,
-    final int i) {
-    final Coordinates coordinates = CoordinatesListUtil.get(line, i);
-    if (movedNodes.containsKey(coordinates)) {
-      return movedNodes.get(coordinates);
-    } else {
-      return coordinates;
-    }
-  }
-
   public boolean isContained() {
     return isContains(graph2, graph1);
   }
@@ -199,7 +147,8 @@ public class LineStringRelate {
     return isContains(graph1, graph2);
   }
 
-  private boolean isContains(final Graph<LineSegment> graph1,
+  private boolean isContains(
+    final Graph<LineSegment> graph1,
     final Graph<LineSegment> graph2) {
     for (final Edge<LineSegment> edge : graph2.edges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
@@ -209,6 +158,28 @@ public class LineStringRelate {
       }
     }
     return true;
+  }
+
+  public boolean isEndOverlaps(final double maxDistance) {
+    if (isOverlaps()) {
+      boolean overlaps = false;
+      final boolean from1Within = isWithin2(fromPoint1, maxDistance);
+      final boolean to1Within = isWithin2(toPoint1, 1);
+      if (from1Within != to1Within) {
+        final boolean from2Within = isWithin1(fromPoint2, 1);
+        final boolean to2Within = isWithin1(toPoint2, 1);
+        if (from2Within != to2Within) {
+          overlaps = true;
+        }
+      }
+      if (overlaps) {
+        final MultiLineString intersection = getOverlap();
+        if (intersection.getNumGeometries() == 1) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public boolean isEqual() {
@@ -234,7 +205,8 @@ public class LineStringRelate {
     }
   }
 
-  private boolean isOverlaps(final LineStringGraph graph1,
+  private boolean isOverlaps(
+    final LineStringGraph graph1,
     final LineStringGraph graph2) {
     for (final Edge<LineSegment> edge : graph1.edges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
@@ -244,6 +216,40 @@ public class LineStringRelate {
       }
     }
     return false;
+  }
+
+  private boolean isWithin(
+    final LineStringGraph graph,
+    final Coordinates fromPoint,
+    final Coordinates toPoint,
+    final Coordinates point,
+    final double maxDistance) {
+    if (point.distance(fromPoint) < maxDistance) {
+      return false;
+    } else if (point.distance(toPoint) < maxDistance) {
+      return false;
+    } else {
+      if (!graph.findNodes(point, maxDistance).isEmpty()) {
+        return true;
+      }
+      final List<Edge<LineSegment>> edges = graph.findEdges(point, maxDistance);
+      for (final Edge<LineSegment> edge : edges) {
+        final LineSegment line = edge.getObject();
+        if (line.intersects(point, maxDistance)) {
+          return true;
+        }
+      }
+
+    }
+    return false;
+  }
+
+  public boolean isWithin1(final Coordinates point, final double maxDistance) {
+    return isWithin(graph1, fromPoint1, toPoint1, point, maxDistance);
+  }
+
+  public boolean isWithin2(final Coordinates point, final double maxDistance) {
+    return isWithin(graph2, fromPoint2, toPoint2, point, maxDistance);
   }
 
   public void splitEdgesCloseToNodes(final double maxDistance) {

@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
   private final CoordinatesList points;
 
-  private CoordinatesList reversePoints;
+  private final CoordinatesList reversePoints;
 
   public LineStartsSharesStartOrEndFilter(final LineString line) {
     this.points = CoordinatesListUtil.get(line);
@@ -36,8 +36,8 @@ public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
   }
 
   public boolean accept(final LineString line) {
-    CoordinatesList points = CoordinatesListUtil.get(line);
-    
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+
     if (this.points.startsWith(points, this.points.getNumAxis())) {
       return true;
     } else if (this.reversePoints.startsWith(points.reverse(),

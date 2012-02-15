@@ -14,16 +14,9 @@ import com.revolsys.io.IoFactoryRegistry;
 public class FileDataObjectReaderFactory implements
   FactoryBean<DataObjectReader> {
 
-  public static DataObjectReader dataObjectReader(final Resource resource,
-    final DataObjectFactory factory) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(
-        resource, factory);
-      return reader;
-    }
+  public static DataObjectReader dataObjectReader(final File file) {
+    final Resource resource = new FileSystemResource(file);
+    return dataObjectReader(resource);
   }
 
   public static DataObjectReader dataObjectReader(final Resource resource) {
@@ -36,9 +29,17 @@ public class FileDataObjectReaderFactory implements
     }
   }
 
-  public static DataObjectReader dataObjectReader(final File file) {
-    Resource resource = new FileSystemResource(file);
-    return dataObjectReader(resource);
+  public static DataObjectReader dataObjectReader(
+    final Resource resource,
+    final DataObjectFactory factory) {
+    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    if (readerFactory == null) {
+      return null;
+    } else {
+      final DataObjectReader reader = readerFactory.createDataObjectReader(
+        resource, factory);
+      return reader;
+    }
   }
 
   protected static DataObjectReaderFactory getDataObjectReaderFactory(

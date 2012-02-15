@@ -42,16 +42,12 @@ public class GpxWriter extends AbstractWriter<DataObject> {
 
   private final XmlWriter out;
 
-  public GpxWriter(
-    final File file)
-    throws IOException {
+  public GpxWriter(final File file) throws IOException {
     this(new FileWriter(file));
     this.file = file;
   }
 
-  public GpxWriter(
-    final Writer writer)
-    throws IOException {
+  public GpxWriter(final Writer writer) throws IOException {
     out = new XmlWriter(new BufferedWriter(writer));
     out.setIndent(false);
     out.startDocument();
@@ -61,14 +57,16 @@ public class GpxWriter extends AbstractWriter<DataObject> {
       "Revolution Systems Inc. - GIS");
   }
 
-  public void flush() {
-    out.flush();
-  }
-
+  @Override
   public void close() {
     out.endTag();
     out.endDocument();
     out.close();
+  }
+
+  @Override
+  public void flush() {
+    out.flush();
   }
 
   public String getCommentAttribute() {
@@ -83,27 +81,24 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     return nameAttribute;
   }
 
+  public void setCommentAttribute(final String commentAttribute) {
+    this.commentAttribute = commentAttribute;
+  }
+
+  public void setDescriptionAttribute(final String descriptionAttribute) {
+    this.descriptionAttribute = descriptionAttribute;
+  }
+
+  public void setNameAttribute(final String nameAttribute) {
+    this.nameAttribute = nameAttribute;
+  }
+
+  @Override
   public String toString() {
     return file.getAbsolutePath();
   }
 
-  public void setCommentAttribute(
-    final String commentAttribute) {
-    this.commentAttribute = commentAttribute;
-  }
-
-  public void setDescriptionAttribute(
-    final String descriptionAttribute) {
-    this.descriptionAttribute = descriptionAttribute;
-  }
-
-  public void setNameAttribute(
-    final String nameAttribute) {
-    this.nameAttribute = nameAttribute;
-  }
-
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     try {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {
@@ -116,8 +111,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void writeAttributes(
-    final DataObject object) {
+  private void writeAttributes(final DataObject object) {
     final Object time = object.getValue("timestamp");
     if (time != null) {
       if (time instanceof Date) {
@@ -144,9 +138,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void writeTrack(
-    final DataObject object)
-    throws IOException {
+  private void writeTrack(final DataObject object) throws IOException {
     out.startTag(GpxConstants.TRACK_ELEMENT);
     final LineString line = object.getGeometryValue();
     final int srid = line.getSRID();
@@ -175,9 +167,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     out.endTag(GpxConstants.TRACK_ELEMENT);
   }
 
-  private void writeWaypoint(
-    final DataObject wayPoint)
-    throws IOException {
+  private void writeWaypoint(final DataObject wayPoint) throws IOException {
     out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometryValue();
     final Coordinate coordinate = point.getCoordinate();

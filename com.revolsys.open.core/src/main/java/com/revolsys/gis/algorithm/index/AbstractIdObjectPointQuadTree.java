@@ -9,7 +9,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractIdObjectPointQuadTree<T> extends
   AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
 
-  private PointSpatialIndex<Integer> index = new PointQuadTree<Integer>();
+  private final PointSpatialIndex<Integer> index = new PointQuadTree<Integer>();
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {
@@ -24,12 +24,28 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
     return object;
   }
 
+  public abstract Coordinates getCoordinates(T object);
+
   public void put(final Coordinates point, final T object) {
     final int id = getId(object);
     index.put(point, id);
   }
 
-  public abstract Coordinates getCoordinates(T object);
+  public boolean remove(final Coordinates point, final T object) {
+    final int id = getId(object);
+    return index.remove(point, id);
+  }
+
+  public boolean remove(final T object) {
+    final Coordinates point = getCoordinates(object);
+    return remove(point, object);
+  }
+
+  public void removeAll(final Collection<T> objects) {
+    for (final T object : objects) {
+      remove(object);
+    }
+  }
 
   public void visit(final Envelope envelope, final Visitor<T> visitor) {
     final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(
@@ -43,21 +59,4 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
     index.visit(itemVisitor);
   }
 
-  public boolean remove(final T object) {
-    final Coordinates point = getCoordinates(object);
-    return remove(point, object);
-  }
-
-  public boolean remove(final Coordinates point, final T object) {
-    final int id = getId(object);
-    return index.remove(point, id);
-  }
-
-  public void removeAll(final Collection<T> objects) {
-    for (final T object : objects) {
-      remove(object);
-    }
-  }
-
-  
 }

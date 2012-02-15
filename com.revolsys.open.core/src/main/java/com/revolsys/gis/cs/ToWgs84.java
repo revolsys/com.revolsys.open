@@ -18,8 +18,7 @@ public class ToWgs84 {
 
   private final double ppm;
 
-  public ToWgs84(
-    final List<Object> values) {
+  public ToWgs84(final List<Object> values) {
     dx = ((Number)values.get(0)).doubleValue();
     dy = ((Number)values.get(1)).doubleValue();
     dz = ((Number)values.get(2)).doubleValue();
@@ -30,8 +29,7 @@ public class ToWgs84 {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {

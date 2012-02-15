@@ -110,7 +110,8 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
+  protected void postRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (tin == null) {
       LOG.info("Tin not created as there were no features");
@@ -126,8 +127,10 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     if (tin == null) {
       loadTin();
     }
@@ -154,8 +157,10 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     out.write(object);
   }
 
-  private void readTinFeatures(final TriangulatedIrregularNetwork tin,
-    final List<CoordinatesList> lines, final Iterable<DataObject> iterable) {
+  private void readTinFeatures(
+    final TriangulatedIrregularNetwork tin,
+    final List<CoordinatesList> lines,
+    final Iterable<DataObject> iterable) {
     for (final DataObject object : iterable) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {
@@ -163,7 +168,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         tin.insertNode(point);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
-        CoordinatesList points = CoordinatesListUtil.get(line);
+        final CoordinatesList points = CoordinatesListUtil.get(line);
         lines.add(points);
       }
     }

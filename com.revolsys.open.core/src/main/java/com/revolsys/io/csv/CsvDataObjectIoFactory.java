@@ -24,16 +24,20 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory {
       CsvConstants.FILE_EXTENSION);
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
-    return new CsvDataObjectWriter(metaData, new OutputStreamWriter(
-      outputStream, charset));
-  }
-
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     final CsvDataObjectIterator iterator = new CsvDataObjectIterator(resource,
       dataObjectFactory);
     return new DataObjectIteratorReader(iterator);
+  }
+
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
+    return new CsvDataObjectWriter(metaData, new OutputStreamWriter(
+      outputStream, charset));
   }
 }

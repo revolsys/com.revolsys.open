@@ -53,6 +53,24 @@ public class ItersectsNodeEdgeCleanupVisitor extends
     splitStatistics.connect();
   }
 
+  private boolean moveEndUndershoots(
+    final QName typeName,
+    final Node<DataObject> node1,
+    final Node<DataObject> node2) {
+    boolean matched = false;
+    if (!node2.hasEdgeTo(node1)) {
+      final Set<Double> angles1 = NodeAttributes.getEdgeAnglesByType(node2,
+        typeName);
+      final Set<Double> angles2 = NodeAttributes.getEdgeAnglesByType(node1,
+        typeName);
+      if (angles1.size() == 1 && angles2.size() == 1) {
+
+        matched = node1.getGraph().moveNodesToMidpoint(typeName, node2, node1);
+      }
+    }
+    return matched;
+  }
+
   public void process(final DataObjectGraph graph) {
     graph.visitEdges(this);
   }
@@ -77,7 +95,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends
         for (int i = 0; i < nodes.size(); i++) {
           Node<DataObject> node1 = nodes.get(i);
           for (int j = i + 1; j < nodes.size(); j++) {
-            Node<DataObject> node2 = nodes.get(j);
+            final Node<DataObject> node2 = nodes.get(j);
             if (node1.distance(node2) < 2) {
               if (edge.distance(node1) <= edge.distance(node2)) {
                 nodes.remove(j);
@@ -105,21 +123,5 @@ public class ItersectsNodeEdgeCleanupVisitor extends
 
     }
     return true;
-  }
-
-  private boolean moveEndUndershoots(final QName typeName,
-    final Node<DataObject> node1, final Node<DataObject> node2) {
-    boolean matched = false;
-    if (!node2.hasEdgeTo(node1)) {
-      final Set<Double> angles1 = NodeAttributes.getEdgeAnglesByType(node2,
-        typeName);
-      final Set<Double> angles2 = NodeAttributes.getEdgeAnglesByType(node1,
-        typeName);
-      if (angles1.size() == 1 && angles2.size() == 1) {
-
-        matched = node1.getGraph().moveNodesToMidpoint(typeName, node2, node1);
-      }
-    }
-    return matched;
   }
 }

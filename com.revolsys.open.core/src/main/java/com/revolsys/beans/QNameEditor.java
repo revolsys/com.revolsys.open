@@ -8,12 +8,7 @@ public class QNameEditor extends PropertyEditorSupport {
   public QNameEditor() {
   }
 
-  public void setAsText(
-    final String text)
-    throws IllegalArgumentException {
-    setValue(QName.valueOf(text));
-  }
-
+  @Override
   public String getAsText() {
     final QName value = (QName)getValue();
     if (value == null) {
@@ -21,5 +16,10 @@ public class QNameEditor extends PropertyEditorSupport {
     } else {
       return value.toString();
     }
+  }
+
+  @Override
+  public void setAsText(final String text) throws IllegalArgumentException {
+    setValue(QName.valueOf(text));
   }
 }

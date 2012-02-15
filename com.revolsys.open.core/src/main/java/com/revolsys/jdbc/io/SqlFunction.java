@@ -5,20 +5,16 @@ public class SqlFunction {
 
   private String suffix = ")";
 
-  public SqlFunction(
-    final String functionName) {
+  public SqlFunction(final String functionName) {
     this.prefix = functionName + "(";
   }
 
-  public SqlFunction(
-    final String prefix,
-    final String suffix) {
+  public SqlFunction(final String prefix, final String suffix) {
     this.prefix = prefix;
     this.suffix = suffix;
   }
 
-  public String toSql(
-    final Object... parameters) {
+  public String toSql(final Object... parameters) {
     final StringBuffer sql = new StringBuffer();
     sql.append(prefix);
     if (parameters.length > 0) {

@@ -31,10 +31,8 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<DataObject>> {
 
   private final DataObjectGraph graph;
 
-  public PolygonNodeRemovalVisitor(
-    final DataObjectMetaData metaData,
-    final DataObjectGraph graph,
-    final Collection<String> excludedAttributes) {
+  public PolygonNodeRemovalVisitor(final DataObjectMetaData metaData,
+    final DataObjectGraph graph, final Collection<String> excludedAttributes) {
     super();
     this.graph = graph;
     if (excludedAttributes != null) {
@@ -108,8 +106,7 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<DataObject>> {
     }
   }
 
-  public boolean visit(
-    final Node<DataObject> node) {
+  public boolean visit(final Node<DataObject> node) {
     final Set<Edge<DataObject>> edges = new LinkedHashSet<Edge<DataObject>>(
       node.getEdges());
     while (edges.size() > 1) {

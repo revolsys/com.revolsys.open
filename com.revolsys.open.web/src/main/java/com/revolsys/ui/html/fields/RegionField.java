@@ -47,14 +47,60 @@ public class RegionField extends Field {
    * @param name
    * @param required
    */
-  public RegionField(
-    final String name,
-    final boolean required) {
+  public RegionField(final String name, final boolean required) {
     super(name, required);
   }
 
-  public void serializeElement(
-    final XmlWriter out) {
+  @Override
+  public boolean hasValue() {
+    return stringValue != null && !stringValue.equals("");
+  }
+
+  @Override
+  public void initialize(final Form form, final HttpServletRequest request) {
+    stringValue = request.getParameter(getName());
+  }
+
+  @Override
+  public boolean isValid() {
+    boolean valid = true;
+    if (!super.isValid()) {
+      valid = false;
+    } else if (hasValue()) {
+      if (regions.size() > 0) {
+        final Region region = Region.getRegionByName(countryCode, stringValue);
+        if (region == null) {
+          addValidationError("Invalid Value");
+          valid = false;
+        } else {
+          setValue(region.getName());
+        }
+      } else {
+        setValue(stringValue);
+      }
+    }
+    return valid;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.revolsys.ui.html.form.Field#postInit()
+   */
+  @Override
+  public void postInit(final HttpServletRequest request) {
+    final CountryField countryField = (CountryField)getForm().getField(
+      "country");
+    countryCode = countryField.getCountryCode();
+    if (countryCode != null) {
+      regions = Region.getRegions(countryCode);
+    }
+    if (stringValue == null) {
+      setValue(getInitialValue(request));
+    }
+  }
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
     if (regions.size() > 0) {
       serializeSelectField(out);
     } else {
@@ -62,13 +108,22 @@ public class RegionField extends Field {
     }
   }
 
+  private void serializeOptions(final XmlWriter out) {
+    for (final Region region : regions) {
+      out.startTag(HtmlUtil.OPTION);
+      if (region.getName().equals(stringValue)) {
+        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+      }
+      out.text(region.getName());
+      out.endTag(HtmlUtil.OPTION);
+    }
+  }
+
   /**
    * @param out
    * @throws IOException
    */
-  private void serializeSelectField(
-    final XmlWriter out)
-    {
+  private void serializeSelectField(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
@@ -76,9 +131,7 @@ public class RegionField extends Field {
     out.endTag(HtmlUtil.SELECT);
   }
 
-  private void serializeTextField(
-    final XmlWriter out)
-    {
+  private void serializeTextField(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
@@ -91,76 +144,17 @@ public class RegionField extends Field {
     out.endTag(HtmlUtil.INPUT);
   }
 
-  private void serializeOptions(
-    final XmlWriter out)
-    {
-    for (Region region : regions) {
-      out.startTag(HtmlUtil.OPTION);
-      if (region.getName().equals(stringValue)) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
-      }
-      out.text(region.getName());
-      out.endTag(HtmlUtil.OPTION);
-    }
-  }
-
-  public void initialize(
-    final Form form,
-    final HttpServletRequest request) {
-    stringValue = request.getParameter(getName());
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.revolsys.ui.html.form.Field#postInit()
-   */
-  public void postInit(
-    HttpServletRequest request) {
-    CountryField countryField = (CountryField)getForm().getField("country");
-    countryCode = countryField.getCountryCode();
-    if (countryCode != null) {
-      regions = Region.getRegions(countryCode);
-    }
-    if (stringValue == null) {
-      setValue(getInitialValue(request));
-    }
-  }
-
-  public void setValue(
-    final Object value) {
+  @Override
+  public void setValue(final Object value) {
     super.setValue(value);
     stringValue = null;
     if (regions.size() > 0) {
       if (value != null) {
-        Region region = Region.getRegionByName(countryCode, (String)value);
+        final Region region = Region.getRegionByName(countryCode, (String)value);
         if (region != null) {
           stringValue = region.getName();
         }
       }
     }
-  }
-
-  public boolean hasValue() {
-    return stringValue != null && !stringValue.equals("");
-  }
-
-  public boolean isValid() {
-    boolean valid = true;
-    if (!super.isValid()) {
-      valid = false;
-    } else if (hasValue()) {
-      if (regions.size() > 0) {
-        Region region = Region.getRegionByName(countryCode, stringValue);
-        if (region == null) {
-          addValidationError("Invalid Value");
-          valid = false;
-        } else {
-          setValue(region.getName());
-        }
-      } else {
-        setValue(stringValue);
-      }
-    }
-    return valid;
   }
 }

@@ -41,9 +41,9 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <pre>
  *       &lt;link rel=&quot;stylesheet&quot; href=&quot;/style/main.css&quot; text=&quot;text/css&quot; /&gt;
  * </pre>
- * 
  * <p>
- * <i>NOTE: The Style tag must only be used in the head section of a HTML page.</i>
+ * <i>NOTE: The Style tag must only be used in the head section of a HTML
+ * page.</i>
  * </p>
  * <p>
  * <b>Example</b>
@@ -59,7 +59,6 @@ import com.revolsys.ui.web.config.WebUiContext;
  *         .
  *       &lt;/html&gt;
  * </pre>
- * 
  * <dl>
  * <dt><B>Input Attributes: </B>
  * <dd><code>page</code> - A PageDefinition bean containing the defintion of
@@ -79,40 +78,52 @@ public class StylesTag extends TagSupport {
   private static final Logger log = Logger.getLogger(StylesTag.class);
 
   /**
+   * Process the end tag.
+   * 
+   * @return EVAL_PAGE
+   * @throws JspException If there was an exception processing the tag.
+   */
+  @Override
+  public int doEndTag() throws JspException {
+    return EVAL_PAGE;
+  }
+
+  /**
    * Process the start tag.
    * 
    * @return SKIP_BODY
    * @throws JspException If there was an exception processing the tag.
    */
+  @Override
   public int doStartTag() throws JspException {
     try {
-      WebUiContext context = WebUiContext.get();
+      final WebUiContext context = WebUiContext.get();
       if (context != null) {
-        Page page = (Page)context.getPage();
+        final Page page = context.getPage();
         if (page != null) {
-          Collection styles = page.getStyles();
+          final Collection styles = page.getStyles();
           String contextPath = context.getContextPath();
           if (contextPath.equals("/")) {
             contextPath = "";
           }
-          JspWriter out = pageContext.getOut();
-          Iterator styleIter = styles.iterator();
+          final JspWriter out = pageContext.getOut();
+          final Iterator styleIter = styles.iterator();
           while (styleIter.hasNext()) {
-            String style = (String)styleIter.next();
+            final String style = (String)styleIter.next();
             out.print("<link rel=\"stylesheet\" href=\"");
             out.print(style);
             out.println("\" type=\"text/css\" />");
           }
         }
       }
-      SiteNodeController controller = (SiteNodeController)pageContext.findAttribute("rsWebController");
+      final SiteNodeController controller = (SiteNodeController)pageContext.findAttribute("rsWebController");
       if (controller instanceof PageController) {
-        PageController page = (PageController)controller;
+        final PageController page = (PageController)controller;
         serializeElements(page.getStyles());
       }
 
       return SKIP_BODY;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       log.error(t.getMessage(), t);
       throw new JspTagException(t.getMessage(), t);
     }
@@ -125,22 +136,12 @@ public class StylesTag extends TagSupport {
    * @throws IOException If there was an error writing the styles.
    */
   private void serializeElements(final Collection styles) throws IOException {
-    JspWriter out = pageContext.getOut();
-    Iterator elements = styles.iterator();
+    final JspWriter out = pageContext.getOut();
+    final Iterator elements = styles.iterator();
     while (elements.hasNext()) {
-      Element element = (Element)elements.next();
+      final Element element = (Element)elements.next();
       element.serialize(out);
     }
-  }
-
-  /**
-   * Process the end tag.
-   * 
-   * @return EVAL_PAGE
-   * @throws JspException If there was an exception processing the tag.
-   */
-  public int doEndTag() throws JspException {
-    return EVAL_PAGE;
   }
 
 }

@@ -70,8 +70,8 @@ public final class DataTypes {
   public static final DataType GEOMETRY = new SimpleDataType("Geometry",
     Geometry.class);
 
-  public static final DataType GEOMETRY_COLLECTION = new SimpleDataType("GeometryCollection",
-    GeometryCollection.class);
+  public static final DataType GEOMETRY_COLLECTION = new SimpleDataType(
+    "GeometryCollection", GeometryCollection.class);
 
   public static final DataType INT = new SimpleDataType("int", Integer.class);
 

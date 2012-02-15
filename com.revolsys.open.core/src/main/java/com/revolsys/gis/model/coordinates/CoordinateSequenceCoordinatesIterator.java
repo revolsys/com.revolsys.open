@@ -17,8 +17,7 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   }
 
   public CoordinateSequenceCoordinatesIterator(
-    final CoordinateSequence coordinates,
-    final int index) {
+    final CoordinateSequence coordinates, final int index) {
     this.coordinates = coordinates;
     this.index = index;
   }
@@ -37,8 +36,7 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
     return (byte)coordinates.getDimension();
   }
 
-  public double getValue(
-    final int axisIndex) {
+  public double getValue(final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       return coordinates.getOrdinate(this.index, axisIndex);
     } else {
@@ -46,9 +44,7 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
     }
   }
 
-  public double getValue(
-    final int relativeIndex,
-    final int axisIndex) {
+  public double getValue(final int relativeIndex, final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       return coordinates.getOrdinate(this.index + relativeIndex, axisIndex);
     } else {
@@ -78,14 +74,11 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
 
   }
 
-  public void setIndex(
-    final int index) {
+  public void setIndex(final int index) {
     this.index = index;
   }
 
-  public void setValue(
-    final int axisIndex,
-    final double value) {
+  public void setValue(final int axisIndex, final double value) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       coordinates.setOrdinate(this.index, axisIndex, value);
     }

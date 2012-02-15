@@ -53,12 +53,42 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     super.setComparator(new EdgeLengthComparator<DataObject>(true));
   }
 
+  @PreDestroy
+  public void destroy() {
+    if (duplicateStatistics != null) {
+      duplicateStatistics.disconnect();
+    }
+    duplicateStatistics = null;
+  }
+
   public Set<String> getEqualExcludeAttributes() {
     return equalExcludeAttributes;
   }
 
   public Comparator<DataObject> getNewerComparator() {
     return newerComparator;
+  }
+
+  @PostConstruct
+  public void init() {
+    duplicateStatistics = new Statistics("Duplicate intersecting lines");
+    duplicateStatistics.connect();
+  }
+
+  private boolean middleCoordinatesEqual(
+    final CoordinatesList points1,
+    final CoordinatesList points2) {
+    if (points1.size() == points2.size()) {
+      for (int i = 1; i < points2.size(); i++) {
+        if (!points1.equal(i, points1, i, 2)) {
+          return false;
+        }
+      }
+      return true;
+
+    } else {
+      return false;
+    }
   }
 
   public void process(final DataObjectGraph graph) {
@@ -103,7 +133,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     }
 
     final Filter<DataObject> notEqualLineFilter = new NotFilter<DataObject>(
-      new DataObjectGeometryFilter<LineString>(new EqualFilter<LineString>(line)));
+      new DataObjectGeometryFilter<LineString>(
+        new EqualFilter<LineString>(line)));
 
     final DataObjectGeometryFilter<LineString> linearIntersectionFilter = new DataObjectGeometryFilter<LineString>(
       new LinearIntersectionFilter(line));
@@ -116,14 +147,14 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
 
     if (!intersectingEdges.isEmpty()) {
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {
-        CoordinatesList points = CoordinatesListUtil.get(line);
+        final CoordinatesList points = CoordinatesListUtil.get(line);
         if (points.size() > 2) {
-          Edge<DataObject> edge2 = intersectingEdges.get(0);
-          LineString line2 = edge2.getLine();
-          CoordinatesList points2 = CoordinatesListUtil.get(line2);
+          final Edge<DataObject> edge2 = intersectingEdges.get(0);
+          final LineString line2 = edge2.getLine();
+          final CoordinatesList points2 = CoordinatesListUtil.get(line2);
 
           if (middleCoordinatesEqual(points, points2)) {
-            boolean firstEqual = points.equal(0, points2, 0, 2);
+            final boolean firstEqual = points.equal(0, points2, 0, 2);
             if (!firstEqual) {
               final Node<DataObject> fromNode1 = edge.getFromNode();
               final Node<DataObject> fromNode2 = edge2.getFromNode();
@@ -132,7 +163,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
                 return true;
               }
             }
-            boolean lastEqual = points.equal(points.size() - 1, points2,
+            final boolean lastEqual = points.equal(points.size() - 1, points2,
               points.size() - 1, 2);
             if (!lastEqual) {
               final Node<DataObject> toNode1 = edge.getToNode();
@@ -148,35 +179,6 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
       LOG.error("Has intersecting edges " + line);
     }
     return true;
-  }
-
-  private boolean middleCoordinatesEqual(CoordinatesList points1,
-    CoordinatesList points2) {
-    if (points1.size() == points2.size()) {
-      for (int i = 1; i < points2.size(); i++) {
-        if (!points1.equal(i, points1, i, 2)) {
-          return false;
-        }
-      }
-      return true;
-
-    } else {
-      return false;
-    }
-  }
-
-  @PostConstruct
-  public void init() {
-    duplicateStatistics = new Statistics("Duplicate intersecting lines");
-    duplicateStatistics.connect();
-  }
-
-  @PreDestroy
-  public void destroy() {
-    if (duplicateStatistics != null) {
-      duplicateStatistics.disconnect();
-    }
-    duplicateStatistics = null;
   }
 
 }

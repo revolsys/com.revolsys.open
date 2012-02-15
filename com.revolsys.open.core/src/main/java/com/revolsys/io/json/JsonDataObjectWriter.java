@@ -239,7 +239,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
   private void write(final Map<String, ? extends Object> values) {
     startObject();
     boolean first = true;
-    for (Entry<String, ? extends Object> entry : values.entrySet()) {
+    for (final Entry<String, ? extends Object> entry : values.entrySet()) {
       final String key = entry.getKey();
       final Object value = entry.getValue();
       if (value != null) {

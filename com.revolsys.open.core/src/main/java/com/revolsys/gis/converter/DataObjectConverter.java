@@ -26,7 +26,6 @@ import com.revolsys.gis.data.model.DataObject;
 
 public interface DataObjectConverter<T> extends Converter<DataObject, T> {
 
-  T convert(
-    DataObject object);
+  T convert(DataObject object);
 
 }

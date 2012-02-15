@@ -7,8 +7,15 @@ public class SystemPropertyFactoryBean implements FactoryBean<String> {
 
   private String defaultValue;
 
-  public String getObject()
-    throws Exception {
+  public String getDefaultValue() {
+    return defaultValue;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getObject() throws Exception {
     final String propertyValue = System.getProperty(name);
     if (propertyValue == null) {
       return defaultValue;
@@ -25,21 +32,11 @@ public class SystemPropertyFactoryBean implements FactoryBean<String> {
     return true;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(
-    String name) {
-    this.name = name;
-  }
-
-  public String getDefaultValue() {
-    return defaultValue;
-  }
-
-  public void setDefaultValue(
-    String defaultValue) {
+  public void setDefaultValue(final String defaultValue) {
     this.defaultValue = defaultValue;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
   }
 }

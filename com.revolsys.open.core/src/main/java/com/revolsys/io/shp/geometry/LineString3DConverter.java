@@ -109,7 +109,8 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private void writePolyLineZHeader(final EndianOutput out,
+  private void writePolyLineZHeader(
+    final EndianOutput out,
     final Geometry geometry) throws IOException {
     final int numCoordinates = geometry.getNumPoints();
     final int numGeometries = geometry.getNumGeometries();

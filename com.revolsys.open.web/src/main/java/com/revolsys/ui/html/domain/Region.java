@@ -33,24 +33,35 @@ public final class Region {
 
   private static Map countryRegionNameMap = new HashMap();
 
-  private Country country;
-
-  private String code;
-
-  private String name;
-
-  public static List getRegions(final Country country) {
-    List regions = (List)countryRegions.get(country);
-    if (regions == null) {
-      loadRegions(country);
-      regions = (List)countryRegions.get(country);
+  public static Region getRegion(final String countryRegioncode) {
+    final StringTokenizer st = new StringTokenizer(countryRegioncode, "-");
+    final String countryCode = st.nextToken();
+    final Country country = Country.getCountry(countryCode);
+    if (country != null && st.hasMoreTokens()) {
+      final String regionCode = st.nextToken();
+      return getRegionByCode(country, regionCode);
     }
-    return regions;
+    return null;
   }
 
-  public static List getRegions(final String countryCode) {
-    Country country = Country.getCountry(countryCode);
-    return getRegions(country);
+  public static Region getRegionByCode(final Country country, final String code) {
+    return (Region)getRegionCodeMap(country).get(code.toUpperCase());
+  }
+
+  public static Region getRegionByCode(
+    final String countryCode,
+    final String code) {
+    return getRegionByCode(Country.getCountry(countryCode), code);
+  }
+
+  public static Region getRegionByName(final Country country, final String name) {
+    return (Region)getRegionNameMap(country).get(name.toUpperCase());
+  }
+
+  public static Region getRegionByName(
+    final String countryCode,
+    final String name) {
+    return getRegionByName(Country.getCountry(countryCode), name);
   }
 
   public static Map getRegionCodeMap(final Country country) {
@@ -71,33 +82,18 @@ public final class Region {
     return regions;
   }
 
-  public static Region getRegion(final String countryRegioncode) {
-    StringTokenizer st = new StringTokenizer(countryRegioncode, "-");
-    String countryCode = st.nextToken();
-    Country country = Country.getCountry(countryCode);
-    if (country != null && st.hasMoreTokens()) {
-      String regionCode = st.nextToken();
-      return getRegionByCode(country, regionCode);
+  public static List getRegions(final Country country) {
+    List regions = (List)countryRegions.get(country);
+    if (regions == null) {
+      loadRegions(country);
+      regions = (List)countryRegions.get(country);
     }
-    return null;
+    return regions;
   }
 
-  public static Region getRegionByCode(final String countryCode,
-    final String code) {
-    return getRegionByCode(Country.getCountry(countryCode), code);
-  }
-
-  public static Region getRegionByCode(final Country country, final String code) {
-    return (Region)getRegionCodeMap(country).get(code.toUpperCase());
-  }
-
-  public static Region getRegionByName(final String countryCode,
-    final String name) {
-    return getRegionByName(Country.getCountry(countryCode), name);
-  }
-
-  public static Region getRegionByName(final Country country, final String name) {
-    return (Region)getRegionNameMap(country).get(name.toUpperCase());
+  public static List getRegions(final String countryCode) {
+    final Country country = Country.getCountry(countryCode);
+    return getRegions(country);
   }
 
   private static void loadRegions(final Country country) {
@@ -117,18 +113,19 @@ public final class Region {
       regions = new ArrayList();
       regionMap = new HashMap();
       regionNameMap = new HashMap();
-      BufferedReader lineReader = new BufferedReader(new InputStreamReader(in));
+      final BufferedReader lineReader = new BufferedReader(
+        new InputStreamReader(in));
       try {
         for (String line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
-          StringTokenizer columns = new StringTokenizer(line, "\t");
-          String code = columns.nextToken();
-          String name = columns.nextToken();
-          Region region = new Region(country, code, name);
+          final StringTokenizer columns = new StringTokenizer(line, "\t");
+          final String code = columns.nextToken();
+          final String name = columns.nextToken();
+          final Region region = new Region(country, code, name);
           regions.add(region);
           regionMap.put(region.getCode().toUpperCase(), region);
           regionNameMap.put(region.getName().toUpperCase(), region);
         }
-      } catch (IOException e) {
+      } catch (final IOException e) {
         e.printStackTrace();
       }
     }
@@ -137,15 +134,22 @@ public final class Region {
     countryRegionNameMap.put(country, regionNameMap);
   }
 
+  private final Country country;
+
+  private final String code;
+
+  private final String name;
+
   private Region(final Country country, final String code, final String name) {
     this.country = country;
     this.code = code.intern();
     this.name = name.intern();
   }
 
+  @Override
   public boolean equals(final Object object) {
     if (object instanceof Region) {
-      Region region = (Region)object;
+      final Region region = (Region)object;
       return region.toString().equals(toString());
     } else {
       return false;
@@ -164,10 +168,12 @@ public final class Region {
     return name;
   }
 
+  @Override
   public int hashCode() {
     return toString().hashCode();
   }
 
+  @Override
   public String toString() {
     return country.getCodeAplha2() + "-" + getCode();
   }

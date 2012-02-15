@@ -42,8 +42,10 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
     return boundingBox.toPolygon(factory, numPoints);
   }
 
-  public Polygon getPolygon(final GeometryFactory factory,
-    final int numXPoints, final int numYPoints) {
+  public Polygon getPolygon(
+    final GeometryFactory factory,
+    final int numXPoints,
+    final int numYPoints) {
     return boundingBox.toPolygon(factory, numXPoints, numYPoints);
   }
 

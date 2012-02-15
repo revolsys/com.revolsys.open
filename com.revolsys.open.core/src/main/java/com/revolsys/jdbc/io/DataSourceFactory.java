@@ -7,8 +7,9 @@ import javax.sql.DataSource;
 
 public interface DataSourceFactory {
 
-  DataSource createDataSource(Map<String, Object> connectionProperties) throws SQLException;
-
   void closeDataSource(DataSource dataSource);
+
+  DataSource createDataSource(Map<String, Object> connectionProperties)
+    throws SQLException;
 
 }

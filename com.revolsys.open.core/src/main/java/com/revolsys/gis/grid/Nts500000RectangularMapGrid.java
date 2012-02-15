@@ -12,8 +12,7 @@ public class Nts500000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
-  public double getLatitude(
-    final String mapTileName) {
+  public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String name = matcher.group(1);
@@ -31,8 +30,7 @@ public class Nts500000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
-  public double getLongitude(
-    final String mapTileName) {
+  public double getLongitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String name = matcher.group(1);
@@ -50,9 +48,7 @@ public class Nts500000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     final String block = super.getMapTileName(x, y);
     String northSouth;
     final double yInSheet = Math.abs(92 + y) % NtsConstants.HEIGHT_1000000;

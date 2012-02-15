@@ -12,8 +12,7 @@ public class LineStringDataObjectFilter implements Filter<DataObject> {
   private LineStringDataObjectFilter() {
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     return geometry instanceof LineString;
   }

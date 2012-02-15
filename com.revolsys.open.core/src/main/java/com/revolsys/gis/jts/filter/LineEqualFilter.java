@@ -26,13 +26,11 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineEqualFilter implements Filter<LineString> {
   private final LineString geometry;
 
-  public LineEqualFilter(
-    final LineString geometry) {
+  public LineEqualFilter(final LineString geometry) {
     this.geometry = geometry;
   }
 
-  public boolean accept(
-    final LineString geometry) {
+  public boolean accept(final LineString geometry) {
     if (this.geometry.equals(geometry)) {
       return true;
     } else {

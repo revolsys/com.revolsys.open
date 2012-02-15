@@ -29,14 +29,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Equals2DFilter<T extends Geometry> implements Filter<T> {
   private final T geometry;
 
-  public Equals2DFilter(
-    final T geometry) {
+  public Equals2DFilter(final T geometry) {
     this.geometry = geometry;
   }
 
-  public boolean accept(
-    final T geometry) {
-    if (Geometry2DEquals.INSTANCE.equals(this.geometry, geometry, Collections.<String>emptySet())) {
+  public boolean accept(final T geometry) {
+    if (Geometry2DEquals.INSTANCE.equals(this.geometry, geometry,
+      Collections.<String> emptySet())) {
       return true;
     } else {
       return false;

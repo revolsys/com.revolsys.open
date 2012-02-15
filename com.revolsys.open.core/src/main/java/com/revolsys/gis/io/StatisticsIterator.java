@@ -9,8 +9,7 @@ public class StatisticsIterator implements Iterator<DataObject> {
 
   private Statistics statistics;
 
-  public StatisticsIterator(
-    final Iterator<DataObject> iterator,
+  public StatisticsIterator(final Iterator<DataObject> iterator,
     final Statistics statistics) {
     this.iterator = iterator;
     setStatistics(statistics);
@@ -46,8 +45,7 @@ public class StatisticsIterator implements Iterator<DataObject> {
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(
-    final Statistics statistics) {
+  public void setStatistics(final Statistics statistics) {
     this.statistics = statistics;
     statistics.connect();
   }

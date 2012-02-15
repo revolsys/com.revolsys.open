@@ -15,27 +15,22 @@ public class DataObjectEqualsFilter implements Filter<DataObject> {
 
   private final DataObject searchObject;
 
-  public DataObjectEqualsFilter(
-    final DataObject searchObject) {
+  public DataObjectEqualsFilter(final DataObject searchObject) {
     this(null, searchObject, null);
   }
 
-  public DataObjectEqualsFilter(
-    final DataObject searchObject,
+  public DataObjectEqualsFilter(final DataObject searchObject,
     final Collection<String> equalExclude) {
     this(null, searchObject, equalExclude);
   }
 
-  public DataObjectEqualsFilter(
-    EqualsRegistry equalsRegistry,
+  public DataObjectEqualsFilter(final EqualsRegistry equalsRegistry,
     final DataObject searchObject) {
     this(null, searchObject, null);
   }
 
-  public DataObjectEqualsFilter(
-    EqualsRegistry equalsRegistry,
-    final DataObject searchObject,
-    final Collection<String> equalExclude) {
+  public DataObjectEqualsFilter(final EqualsRegistry equalsRegistry,
+    final DataObject searchObject, final Collection<String> equalExclude) {
     if (equalsRegistry != null) {
       this.equalsRegistry = equalsRegistry;
     }
@@ -45,8 +40,7 @@ public class DataObjectEqualsFilter implements Filter<DataObject> {
     }
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry serachGeometry = searchObject.getGeometryValue();
     final Geometry geometry = object.getGeometryValue();
 

@@ -85,9 +85,7 @@ public class SaifSchemaReader {
 
   }
 
-  private static void addType(
-    final String typeName,
-    final DataType dataType) {
+  private static void addType(final String typeName, final DataType dataType) {
     nameTypeMap.put(QName.valueOf(typeName), dataType);
   }
 
@@ -138,8 +136,7 @@ public class SaifSchemaReader {
 
   public void attributes(
     final DataObjectMetaData type,
-    final CsnIterator iterator)
-    throws IOException {
+    final CsnIterator iterator) throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_NAME
       || iterator.getNextEventType() == CsnIterator.OPTIONAL_ATTRIBUTE) {
       boolean required = true;
@@ -202,22 +199,17 @@ public class SaifSchemaReader {
 
   public void classAttributes(
     final DataObjectMetaData type,
-    final CsnIterator iterator)
-    throws IOException {
+    final CsnIterator iterator) throws IOException {
   }
 
-  public void comments(
-    final DataObjectMetaData type,
-    final CsnIterator iterator)
+  public void comments(final DataObjectMetaData type, final CsnIterator iterator)
     throws IOException {
     if (iterator.next() == CsnIterator.VALUE) {
       iterator.getStringValue();
     }
   }
 
-  public void defaults(
-    final DataObjectMetaData type,
-    final CsnIterator iterator)
+  public void defaults(final DataObjectMetaData type, final CsnIterator iterator)
     throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
@@ -235,9 +227,7 @@ public class SaifSchemaReader {
     return commonMetaDataProperties;
   }
 
-  private Object getDefinition(
-    final CsnIterator iterator)
-    throws IOException {
+  private Object getDefinition(final CsnIterator iterator) throws IOException {
     while (iterator.next() != CsnIterator.END_DEFINITION) {
       switch (iterator.getEventType()) {
         case CsnIterator.CLASS_NAME:
@@ -292,8 +282,7 @@ public class SaifSchemaReader {
     return currentClass;
   }
 
-  private DataObjectMetaDataFactory loadSchema(
-    final CsnIterator iterator)
+  private DataObjectMetaDataFactory loadSchema(final CsnIterator iterator)
     throws IOException {
     if (schema == null) {
       schema = new DataObjectMetaDataFactoryImpl();
@@ -317,15 +306,13 @@ public class SaifSchemaReader {
     return schema;
   }
 
-  public DataObjectMetaDataFactory loadSchema(
-    final File file)
+  public DataObjectMetaDataFactory loadSchema(final File file)
     throws IOException {
     final CsnIterator iterator = new CsnIterator(file);
     return loadSchema(iterator);
   }
 
-  public DataObjectMetaDataFactory loadSchema(
-    final String resource)
+  public DataObjectMetaDataFactory loadSchema(final String resource)
     throws IOException {
     final InputStream in = getClass().getResourceAsStream("/" + resource);
     if (in == null) {
@@ -337,13 +324,11 @@ public class SaifSchemaReader {
 
   public DataObjectMetaDataFactory loadSchema(
     final String fileName,
-    final InputStream in)
-    throws IOException {
+    final InputStream in) throws IOException {
     return loadSchema(new CsnIterator(fileName, in));
   }
 
-  public DataObjectMetaDataFactory loadSchemas(
-    final List<String> fileNames)
+  public DataObjectMetaDataFactory loadSchemas(final List<String> fileNames)
     throws IOException {
     for (final String fileName : fileNames) {
       final File file = new File(fileName);
@@ -356,8 +341,7 @@ public class SaifSchemaReader {
     return schema;
   }
 
-  private DataType processEnumeration(
-    final CsnIterator iterator)
+  private DataType processEnumeration(final CsnIterator iterator)
     throws IOException {
     QName name = null;
     final Set<String> allowedValues = new TreeSet<String>();
@@ -388,20 +372,19 @@ public class SaifSchemaReader {
 
   public void restricted(
     final DataObjectMetaData type,
-    final CsnIterator iterator)
-    throws IOException {
+    final CsnIterator iterator) throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
       String attributeName = iterator.getStringValue();
       boolean hasMore = true;
-      List<QName> typeNames = new ArrayList<QName>();
-      List<Object> values = new ArrayList<Object>();
+      final List<QName> typeNames = new ArrayList<QName>();
+      final List<Object> values = new ArrayList<Object>();
       while (hasMore) {
         switch (iterator.getNextEventType()) {
           case CsnIterator.CLASS_NAME:
             iterator.next();
             final QName typeName = iterator.getQNameValue();
-             typeNames.add(typeName);
+            typeNames.add(typeName);
           break;
           case CsnIterator.FORCE_TYPE:
             iterator.next();
@@ -430,9 +413,9 @@ public class SaifSchemaReader {
       }
       attributeName = attributeName.replaceFirst("position.geometry",
         "position");
-      int dotIndex = attributeName.indexOf('.');
+      final int dotIndex = attributeName.indexOf('.');
       if (dotIndex == -1) {
-        Attribute attribute = type.getAttribute(attributeName);
+        final Attribute attribute = type.getAttribute(attributeName);
         if (attribute != null) {
           if (!typeNames.isEmpty()) {
             attribute.setProperty(AttributeProperties.ALLOWED_TYPE_NAMES,
@@ -443,9 +426,9 @@ public class SaifSchemaReader {
           }
         }
       } else {
-        String key = attributeName.substring(0, dotIndex);
-        String subKey = attributeName.substring(dotIndex + 1);
-        Attribute attribute = type.getAttribute(key);
+        final String key = attributeName.substring(0, dotIndex);
+        final String subKey = attributeName.substring(dotIndex + 1);
+        final Attribute attribute = type.getAttribute(key);
         if (attribute != null) {
           if (!typeNames.isEmpty()) {
             Map<String, List<QName>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
@@ -472,21 +455,18 @@ public class SaifSchemaReader {
   }
 
   public void setCommonMetaDataProperties(
-    List<DataObjectMetaDataProperty> commonMetaDataProperties) {
+    final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
     this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
-  private void setMetaDataProperties(
-    final DataObjectMetaDataImpl metaData) {
+  private void setMetaDataProperties(final DataObjectMetaDataImpl metaData) {
     for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
       final DataObjectMetaDataProperty clonedProperty = property.clone();
       clonedProperty.setMetaData(metaData);
     }
   }
 
-  public void subclass(
-    final DataObjectMetaData type,
-    final CsnIterator iterator)
+  public void subclass(final DataObjectMetaData type, final CsnIterator iterator)
     throws IOException {
     if (iterator.next() == CsnIterator.CLASS_NAME) {
       final QName className = iterator.getQNameValue();

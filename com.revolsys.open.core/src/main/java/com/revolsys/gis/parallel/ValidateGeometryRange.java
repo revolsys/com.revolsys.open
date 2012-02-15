@@ -12,7 +12,8 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObject> {
+public class ValidateGeometryRange extends
+  BaseInOutProcess<DataObject, DataObject> {
   private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;
@@ -69,16 +70,11 @@ public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObjec
     return minZ;
   }
 
-  private boolean isValid(
-    final double min,
-    final double max,
-    final double value) {
+  private boolean isValid(final double min, final double max, final double value) {
     return (value >= min && value <= max);
   }
 
-  private boolean isValid(
-    final String type,
-    final Coordinate coordinate) {
+  private boolean isValid(final String type, final Coordinate coordinate) {
     if (!isValid(minX, maxY, coordinate.x)
       || !isValid(minY, maxY, coordinate.y)
       || !isValid(minZ, maxZ, coordinate.z)) {
@@ -103,9 +99,7 @@ public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObjec
     return valid;
   }
 
-  private boolean isValid(
-    final String type,
-    final Geometry geometry) {
+  private boolean isValid(final String type, final Geometry geometry) {
     boolean valid = true;
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry subGeometry = geometry.getGeometryN(i);
@@ -136,9 +130,7 @@ public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObjec
 
   }
 
-  private boolean isValid(
-    final String type,
-    final LineString line) {
+  private boolean isValid(final String type, final LineString line) {
     final CoordinateSequence coordinates = line.getCoordinateSequence();
     if (!isValid(type, coordinates)) {
       return false;
@@ -148,9 +140,9 @@ public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObjec
 
   @Override
   protected void process(
-    Channel<DataObject> in,
-    Channel<DataObject> out,
-    DataObject object) {
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     // TODO Auto-generated method stub
     final Geometry geometry = object.getGeometryValue();
     isValid(object.getMetaData().getName().toString(), geometry);
@@ -160,48 +152,42 @@ public class ValidateGeometryRange extends BaseInOutProcess<DataObject,DataObjec
   /**
    * @param maxX the maxX to set
    */
-  public void setMaxX(
-    final double maxX) {
+  public void setMaxX(final double maxX) {
     this.maxX = maxX;
   }
 
   /**
    * @param maxY the maxY to set
    */
-  public void setMaxY(
-    final double maxY) {
+  public void setMaxY(final double maxY) {
     this.maxY = maxY;
   }
 
   /**
    * @param maxZ the maxZ to set
    */
-  public void setMaxZ(
-    final double maxZ) {
+  public void setMaxZ(final double maxZ) {
     this.maxZ = maxZ;
   }
 
   /**
    * @param minX the minX to set
    */
-  public void setMinX(
-    final double minX) {
+  public void setMinX(final double minX) {
     this.minX = minX;
   }
 
   /**
    * @param minY the minY to set
    */
-  public void setMinY(
-    final double minY) {
+  public void setMinY(final double minY) {
     this.minY = minY;
   }
 
   /**
    * @param minZ the minZ to set
    */
-  public void setMinZ(
-    final double minZ) {
+  public void setMinZ(final double minZ) {
     this.minZ = minZ;
   }
 

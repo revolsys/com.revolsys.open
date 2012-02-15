@@ -16,21 +16,20 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.util.CollectionUtil;
 
-public class DataObjectStoreConnections implements
-  PropertyChangeSupportProxy {
+public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataObjectStoreConnections.class);
 
   private static DataObjectStoreConnections INSTANCE = new DataObjectStoreConnections();
 
-  private Map<String, DataObjectStore> dataStores = new HashMap<String, DataObjectStore>();
-
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
-
   public static DataObjectStoreConnections get() {
     return INSTANCE;
   }
+
+  private final Map<String, DataObjectStore> dataStores = new HashMap<String, DataObjectStore>();
+
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+    this);
 
   private final Preferences dataStoresPrefereneces;
 
@@ -47,6 +46,17 @@ public class DataObjectStoreConnections implements
     this(Preferences.userRoot(), preferencesPath);
   }
 
+  public void createConnection(
+    final String connectionName,
+    final Map<String, String> config) {
+    final Preferences preferences = getPreferences(connectionName);
+    for (final Entry<String, String> param : config.entrySet()) {
+      preferences.put(param.getKey(), param.getValue());
+    }
+    propertyChangeSupport.firePropertyChange(connectionName, null, preferences);
+
+  }
+
   public List<String> getConnectionNames() {
     try {
       final String[] names = dataStoresPrefereneces.childrenNames();
@@ -60,7 +70,7 @@ public class DataObjectStoreConnections implements
     DataObjectStore dataStore = dataStores.get(connectionName);
     if (dataStore == null) {
       final Preferences preferences = getPreferences(connectionName);
-      Map<String, Object> config = CollectionUtil.toMap(preferences);
+      final Map<String, Object> config = CollectionUtil.toMap(preferences);
       config.remove("productName");
       try {
         if (config.get("url") == null) {
@@ -70,7 +80,7 @@ public class DataObjectStoreConnections implements
           dataStore = DelegatingDataObjectStore.create(connectionName, config);
           dataStores.put(connectionName, dataStore);
         }
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         LOG.error("Unable to create data store " + connectionName, t);
       }
     }
@@ -93,21 +103,12 @@ public class DataObjectStoreConnections implements
     return dataStoresPrefereneces.node(connectionName);
   }
 
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return propertyChangeSupport;
+  }
+
   @Override
   public String toString() {
     return "Data Store Connections";
-  }
-
-  public void createConnection(String connectionName, Map<String, String> config) {
-    final Preferences preferences = getPreferences(connectionName);
-    for (Entry<String, String> param : config.entrySet()) {
-      preferences.put(param.getKey(), param.getValue());
-    }
-    propertyChangeSupport.firePropertyChange(connectionName, null, preferences);
-
-  }
-
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
   }
 }

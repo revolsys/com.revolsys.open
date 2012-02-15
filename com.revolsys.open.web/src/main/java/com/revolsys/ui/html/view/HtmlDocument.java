@@ -34,7 +34,7 @@ import com.revolsys.ui.html.HtmlUtil;
  */
 public class HtmlDocument extends ElementContainer {
 
-  private List<BufferedReader> styles = new ArrayList<BufferedReader>();
+  private final List<BufferedReader> styles = new ArrayList<BufferedReader>();
 
   public void addStyle(final InputStream styleIn) {
     styles.add(new BufferedReader(new InputStreamReader(styleIn)));
@@ -44,6 +44,7 @@ public class HtmlDocument extends ElementContainer {
     styles.add(new BufferedReader(styleIn));
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.HTML);
 
@@ -63,14 +64,14 @@ public class HtmlDocument extends ElementContainer {
   }
 
   private void serializeStyles(final XmlWriter out) {
-    for (BufferedReader reader : this.styles) {
+    for (final BufferedReader reader : this.styles) {
       out.startTag(HtmlUtil.STYLE);
       try {
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
           out.text(line);
           out.write('\n');
         }
-      } catch (IOException e) {
+      } catch (final IOException e) {
         LoggerFactory.getLogger(getClass()).error("Cannot read style", out);
       }
       out.endTag(HtmlUtil.STYLE);

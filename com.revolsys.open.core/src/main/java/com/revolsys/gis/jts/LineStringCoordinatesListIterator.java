@@ -15,15 +15,13 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   private final CoordinatesList points;
 
-  public LineStringCoordinatesListIterator(
-    final GeometryFactory factory,
+  public LineStringCoordinatesListIterator(final GeometryFactory factory,
     final CoordinatesList points) {
     this.factory = factory;
     this.points = points;
   }
 
-  public LineStringCoordinatesListIterator(
-    final LineString line) {
+  public LineStringCoordinatesListIterator(final LineString line) {
     this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line));
   }
 

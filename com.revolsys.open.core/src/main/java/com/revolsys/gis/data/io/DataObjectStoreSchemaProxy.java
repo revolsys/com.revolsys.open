@@ -6,20 +6,17 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 
 public class DataObjectStoreSchemaProxy extends DataObjectStoreSchema {
-  private DataObjectStoreSchema schema;
-
-  
+  private final DataObjectStoreSchema schema;
 
   public DataObjectStoreSchemaProxy(
-    AbstractDataObjectStore dataObjectStore,
-    String name,
-    DataObjectStoreSchema schema) {
+    final AbstractDataObjectStore dataObjectStore, final String name,
+    final DataObjectStoreSchema schema) {
     super(dataObjectStore, name);
     this.schema = schema;
   }
 
-  public synchronized DataObjectMetaData findMetaData(
-    final QName typeName) {
+  @Override
+  public synchronized DataObjectMetaData findMetaData(final QName typeName) {
     DataObjectMetaData metaData = super.findMetaData(typeName);
     if (metaData == null) {
       metaData = schema.findMetaData(typeName);
@@ -32,8 +29,8 @@ public class DataObjectStoreSchemaProxy extends DataObjectStoreSchema {
     return metaData;
   }
 
-  public synchronized DataObjectMetaData getMetaData(
-    final QName typeName) {
+  @Override
+  public synchronized DataObjectMetaData getMetaData(final QName typeName) {
     DataObjectMetaData metaData = findMetaData(typeName);
     if (metaData == null) {
       metaData = schema.getMetaData(typeName);

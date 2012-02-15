@@ -44,27 +44,30 @@ public class LoadObject extends SpringFrameworkAction {
 
   private Class objectClass;
 
+  @Override
   public void init(final ActionConfig config) throws ActionInitException {
     super.init(config);
     objectClassName = (String)config.getParameter("objectClassName");
     try {
       objectClass = Class.forName(objectClassName);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       throw new ActionInitException(e);
     }
     dao = SpringDaoFactory.get(getApplicationContext(), objectClassName);
     builder = HtmlUiBuilderFactory.get(getApplicationContext(), objectClassName);
   }
 
-  public void process(final HttpServletRequest request,
+  @Override
+  public void process(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws ActionException, IOException {
-    String idName = builder.getTypeName() + "Id";
-    Long id = (Long)request.getAttribute(idName);
+    final String idName = builder.getTypeName() + "Id";
+    final Long id = (Long)request.getAttribute(idName);
     if (id == null) {
       throw new PageNotFoundException(idName + " parameter not specified");
     } else {
 
-      Object object = dao.load(id);
+      final Object object = dao.load(id);
       if (object == null) {
         throw new PageNotFoundException(builder.getTitle()
           + " cannot be found with id " + id);

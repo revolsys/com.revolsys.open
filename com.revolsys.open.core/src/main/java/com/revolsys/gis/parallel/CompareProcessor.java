@@ -66,14 +66,6 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private boolean logNotEqualSource = true;
 
-  public boolean isLogNotEqualSource() {
-    return logNotEqualSource;
-  }
-
-  public void setLogNotEqualSource(boolean logNotEqualSource) {
-    this.logNotEqualSource = logNotEqualSource;
-  }
-
   @Override
   protected void addOtherObject(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
@@ -158,7 +150,13 @@ public class CompareProcessor extends AbstractMergeProcess {
     return notEqualSourceStatistics;
   }
 
-  private void logError(final DataObject object, final String message,
+  public boolean isLogNotEqualSource() {
+    return logNotEqualSource;
+  }
+
+  private void logError(
+    final DataObject object,
+    final String message,
     final boolean source) {
     if (excludeFilter == null || !excludeFilter.accept(object)) {
       if (source) {
@@ -205,11 +203,11 @@ public class CompareProcessor extends AbstractMergeProcess {
     final DataObject otherObject = otherPointMap.getFirstMatch(sourceObject,
       equalFilter);
     if (otherObject != null) {
-      Point sourcePoint = sourceObject.getGeometryValue();
-      double sourceZ = CoordinatesListUtil.get(sourcePoint).getZ(0);
+      final Point sourcePoint = sourceObject.getGeometryValue();
+      final double sourceZ = CoordinatesListUtil.get(sourcePoint).getZ(0);
 
-      Point otherPoint = otherObject.getGeometryValue();
-      double otherZ = CoordinatesListUtil.get(otherPoint).getZ(0);
+      final Point otherPoint = otherObject.getGeometryValue();
+      final double otherZ = CoordinatesListUtil.get(otherPoint).getZ(0);
 
       if (sourceZ == otherZ || Double.isNaN(sourceZ) && Double.isNaN(otherZ)) {
         equalStatistics.add(sourceObject);
@@ -227,7 +225,8 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   @Override
-  protected void processObjects(final DataObjectMetaData metaData,
+  protected void processObjects(
+    final DataObjectMetaData metaData,
     final Channel<DataObject> out) {
     if (otherIndex.size() + otherPointMap.size() == 0) {
       if (logNotEqualSource) {
@@ -340,6 +339,10 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   public void setLabel(final String label) {
     this.label = label;
+  }
+
+  public void setLogNotEqualSource(final boolean logNotEqualSource) {
+    this.logNotEqualSource = logNotEqualSource;
   }
 
   @Override

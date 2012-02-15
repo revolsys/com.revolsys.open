@@ -41,7 +41,6 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <pre>
  *       &lt;script language=&quot;JavaScript&quot; src=&quot;/js/main.js&quot;&gt;&lt;/script&gt;
  * </pre>
- * 
  * <p>
  * <i>NOTE: The Scripts tag should only be used in the head section of a HTML
  * page.</i>
@@ -60,7 +59,6 @@ import com.revolsys.ui.web.config.WebUiContext;
  *         .
  *       &lt;/html&gt;
  * </pre>
- * 
  * <dl>
  * <dt><B>Input Attributes: </B>
  * <dd><code>page</code> - A PageDefinition bean containing the defintion of
@@ -80,25 +78,37 @@ public class ScriptsTag extends TagSupport {
   private static final Logger log = Logger.getLogger(ScriptsTag.class);
 
   /**
+   * Process the end tag.
+   * 
+   * @return EVAL_PAGE
+   * @throws JspException If there was an exception processing the tag.
+   */
+  @Override
+  public int doEndTag() throws JspException {
+    return EVAL_PAGE;
+  }
+
+  /**
    * Process the start tag.
    * 
    * @return SKIP_BODY
    * @throws JspException If there was an exception processing the tag.
    */
+  @Override
   public int doStartTag() throws JspException {
     try {
-      WebUiContext context = WebUiContext.get();
+      final WebUiContext context = WebUiContext.get();
       if (context != null) {
-        Page page = (Page)context.getPage();
+        final Page page = context.getPage();
         if (page != null) {
-          JspWriter out = pageContext.getOut();
+          final JspWriter out = pageContext.getOut();
           String contextPath = context.getContextPath();
           if (contextPath.equals("/")) {
             contextPath = "";
           }
-          Iterator scripts = page.getScripts().iterator();
+          final Iterator scripts = page.getScripts().iterator();
           while (scripts.hasNext()) {
-            String script = (String)scripts.next();
+            final String script = (String)scripts.next();
             out.print("<script type=\"text/javascript\" src=\"");
             out.print(contextPath);
             out.print(script);
@@ -106,12 +116,12 @@ public class ScriptsTag extends TagSupport {
           }
         }
       }
-      SiteNodeController controller = (SiteNodeController)pageContext.findAttribute("rsWebController");
+      final SiteNodeController controller = (SiteNodeController)pageContext.findAttribute("rsWebController");
       if (controller instanceof PageController) {
-        PageController page = (PageController)controller;
+        final PageController page = (PageController)controller;
         writeScripts(page.getScripts());
       }
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       log.error(t.getMessage(), t);
     }
     return SKIP_BODY;
@@ -124,10 +134,10 @@ public class ScriptsTag extends TagSupport {
    * @throws IOException If there was an error writing the scripts.
    */
   private void writeScripts(final Collection scripts) throws IOException {
-    JspWriter out = pageContext.getOut();
-    for (Iterator scriptIter = scripts.iterator(); scriptIter.hasNext();) {
-      Script script = (Script)scriptIter.next();
-      String content = script.getContent();
+    final JspWriter out = pageContext.getOut();
+    for (final Iterator scriptIter = scripts.iterator(); scriptIter.hasNext();) {
+      final Script script = (Script)scriptIter.next();
+      final String content = script.getContent();
       if (content != null) {
         out.print("<script type=\"");
         out.print(script.getType());
@@ -142,15 +152,5 @@ public class ScriptsTag extends TagSupport {
         out.println("\">\n</script>");
       }
     }
-  }
-
-  /**
-   * Process the end tag.
-   * 
-   * @return EVAL_PAGE
-   * @throws JspException If there was an exception processing the tag.
-   */
-  public int doEndTag() throws JspException {
-    return EVAL_PAGE;
   }
 }

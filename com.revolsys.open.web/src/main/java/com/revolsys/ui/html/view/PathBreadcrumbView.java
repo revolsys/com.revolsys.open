@@ -21,23 +21,25 @@ import com.revolsys.util.CaseConverter;
 
 public class PathBreadcrumbView extends Element {
 
-  private String contextPath;
+  private final String contextPath;
 
   private String path;
 
-  private boolean addSlash ;
+  private boolean addSlash;
 
-  public PathBreadcrumbView(String contextPath, String path) {
+  public PathBreadcrumbView(final String contextPath, final String path) {
     this.contextPath = contextPath;
     this.path = path;
   }
 
-  public PathBreadcrumbView(String contextPath, String path, boolean addSlash) {
+  public PathBreadcrumbView(final String contextPath, final String path,
+    final boolean addSlash) {
     this.contextPath = contextPath;
     this.path = path;
     this.addSlash = addSlash;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     path = path.substring(contextPath.length());
     if (path.startsWith("/")) {
@@ -46,11 +48,11 @@ public class PathBreadcrumbView extends Element {
     if (path.endsWith("/")) {
       path = path.substring(0, path.length() - 1);
     }
-    int queryIndex = path.indexOf('?');
+    final int queryIndex = path.indexOf('?');
     if (queryIndex != -1) {
       path = path.substring(0, queryIndex - 1);
     }
-    int fragmentIndex = path.indexOf('#');
+    final int fragmentIndex = path.indexOf('#');
     if (fragmentIndex != -1) {
       path = path.substring(0, fragmentIndex - 1);
     }
@@ -68,13 +70,13 @@ public class PathBreadcrumbView extends Element {
       out.startTag(HtmlUtil.LI);
       HtmlUtil.serializeA(out, null, contextPath + "/", "HOME");
       out.endTag(HtmlUtil.LI);
-      String[] segments = path.split("/");
+      final String[] segments = path.split("/");
       String crumbPath = contextPath;
       if (addSlash) {
         crumbPath += "/";
       }
       for (int i = 0; i < segments.length - 1; i++) {
-        String segment = segments[i];
+        final String segment = segments[i];
         if (addSlash) {
           crumbPath += segment + "/";
         } else {
@@ -85,7 +87,7 @@ public class PathBreadcrumbView extends Element {
           CaseConverter.toCapitalizedWords(segment));
         out.endTag(HtmlUtil.LI);
       }
-      String segment = segments[segments.length - 1];
+      final String segment = segments[segments.length - 1];
       out.startTag(HtmlUtil.LI);
       out.text(CaseConverter.toCapitalizedWords(segment));
       out.endTag(HtmlUtil.LI);

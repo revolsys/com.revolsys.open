@@ -7,16 +7,12 @@ public class SimpleDataType implements DataType {
 
   private final QName name;
 
-  public SimpleDataType(
-    final QName name,
-    final Class<?> javaClass) {
+  public SimpleDataType(final QName name, final Class<?> javaClass) {
     this.name = name;
     this.javaClass = javaClass;
   }
 
-  public SimpleDataType(
-    final String name,
-    final Class<?> javaClass) {
+  public SimpleDataType(final String name, final Class<?> javaClass) {
     this.name = QName.valueOf(name);
     this.javaClass = javaClass;
   }

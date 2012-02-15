@@ -8,8 +8,7 @@ public interface ChannelOutput<T> {
    * 
    * @param value The object to write to the Channel.
    */
-  void write(
-    final T value);
+  void write(final T value);
 
   void writeConnect();
 

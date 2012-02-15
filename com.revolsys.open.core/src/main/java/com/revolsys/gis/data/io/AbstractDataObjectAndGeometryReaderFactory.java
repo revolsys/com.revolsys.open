@@ -22,7 +22,8 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
   private static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
 
   public static DataObjectReader dataObjectReader(
-    final FileSystemResource resource, final DataObjectFactory factory) {
+    final FileSystemResource resource,
+    final DataObjectFactory factory) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
@@ -105,7 +106,8 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @return The reader for the file.
    */
   public Reader<DataObject> createDirectoryDataObjectReader(
-    final File directory, final DataObjectFactory dataObjectFactory) {
+    final File directory,
+    final DataObjectFactory dataObjectFactory) {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);

@@ -19,11 +19,11 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
 
   private File directory;
 
-  public ZipDataObjectReader(Resource resource, String fileExtension,
-    DataObjectFactory factory) {
+  public ZipDataObjectReader(final Resource resource,
+    final String fileExtension, final DataObjectFactory factory) {
     try {
       final String baseName = FileUtil.getBaseName(resource.getFilename());
-      String zipEntryName = baseName + "." + fileExtension;
+      final String zipEntryName = baseName + "." + fileExtension;
       directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {
         final String[] files = directory.list(new ExtensionFilenameFilter(
@@ -39,16 +39,27 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
       } else {
         setReader(reader);
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Error reading resource " + resource, e);
     }
   }
 
-  protected boolean openFile(Resource resource, DataObjectFactory factory,
+  @Override
+  protected void doClose() {
+    FileUtil.deleteDirectory(directory);
+  }
+
+  public DataObjectMetaData getMetaData() {
+    return reader.getMetaData();
+  }
+
+  protected boolean openFile(
+    final Resource resource,
+    final DataObjectFactory factory,
     final String zipEntryName) {
-    File file = new File(directory, zipEntryName);
+    final File file = new File(directory, zipEntryName);
     if (file.exists()) {
-      FileSystemResource fileResource = new FileSystemResource(file);
+      final FileSystemResource fileResource = new FileSystemResource(file);
       reader = AbstractDataObjectAndGeometryReaderFactory.dataObjectReader(
         fileResource, factory);
       if (reader == null) {
@@ -61,14 +72,5 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
     } else {
       return false;
     }
-  }
-
-  @Override
-  protected void doClose() {
-    FileUtil.deleteDirectory(directory);
-  }
-
-  public DataObjectMetaData getMetaData() {
-    return reader.getMetaData();
   }
 }

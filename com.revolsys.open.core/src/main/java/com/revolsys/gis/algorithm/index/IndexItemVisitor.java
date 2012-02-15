@@ -15,16 +15,17 @@ import com.vividsolutions.jts.index.ItemVisitor;
 public class IndexItemVisitor implements ItemVisitor {
   private final Visitor<DataObject> visitor;
 
-  private Envelope envelope;
+  private final Envelope envelope;
 
-  public IndexItemVisitor(Envelope envelope, final Visitor<DataObject> visitor) {
+  public IndexItemVisitor(final Envelope envelope,
+    final Visitor<DataObject> visitor) {
     this.envelope = envelope;
     this.visitor = visitor;
   }
 
   public void visitItem(final Object item) {
-    DataObject object = (DataObject)item;
-    Envelope envelope = object.getGeometryValue().getEnvelopeInternal();
+    final DataObject object = (DataObject)item;
+    final Envelope envelope = object.getGeometryValue().getEnvelopeInternal();
     if (envelope.intersects(this.envelope)) {
       visitor.visit(object);
     }

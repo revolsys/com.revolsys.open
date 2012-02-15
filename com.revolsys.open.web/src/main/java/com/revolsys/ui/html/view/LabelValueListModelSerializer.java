@@ -24,7 +24,7 @@ import com.revolsys.ui.model.LabelValueListModel;
  * @version 1.0
  */
 public class LabelValueListModelSerializer implements LabelValueListSerializer {
-  private LabelValueListModel model;
+  private final LabelValueListModel model;
 
   private String labelCss;
 
@@ -53,9 +53,8 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
     return valueCss;
   }
 
-  public void serializeLabel(final XmlWriter out, final int index)
-    {
-    String label = model.getLabel(index);
+  public void serializeLabel(final XmlWriter out, final int index) {
+    final String label = model.getLabel(index);
     if (label != null) {
       out.text(label);
     } else {
@@ -63,9 +62,8 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
     }
   }
 
-  public void serializeValue(final XmlWriter out, final int index)
-    {
-    String value = model.getValue(index);
+  public void serializeValue(final XmlWriter out, final int index) {
+    final String value = model.getValue(index);
     if (value != null) {
       out.text(value);
     } else {

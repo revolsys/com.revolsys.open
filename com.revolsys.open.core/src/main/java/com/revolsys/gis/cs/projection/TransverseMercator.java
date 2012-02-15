@@ -53,8 +53,7 @@ public class TransverseMercator implements CoordinatesProjection {
    * 
    * @param coordinateSystem The coordinate system.
    */
-  public TransverseMercator(
-    final ProjectedCoordinateSystem coordinateSystem) {
+  public TransverseMercator(final ProjectedCoordinateSystem coordinateSystem) {
     this.coordinateSystem = coordinateSystem;
     final GeographicCoordinateSystem geographicCS = coordinateSystem.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
@@ -116,9 +115,7 @@ public class TransverseMercator implements CoordinatesProjection {
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
-  public void inverse(
-    final Coordinates from,
-    final Coordinates to) {
+  public void inverse(final Coordinates from, final Coordinates to) {
     final double x = from.getX();
     final double y = from.getY();
     final double m = m0 + (y - y0) / k0;
@@ -189,8 +186,7 @@ public class TransverseMercator implements CoordinatesProjection {
    * @param phi The phi value in radians.
    * @return The value of m.
    */
-  private double m(
-    final double phi) {
+  private double m(final double phi) {
     return a
       * ((1 - eSq / 4 - 3 * ePow4 / 64 - 5 * ePow6 / 256) * phi
         - (3 * eSq / 8 + 3 * ePow4 / 32 + 45 * ePow6 / 1024)
@@ -217,14 +213,12 @@ public class TransverseMercator implements CoordinatesProjection {
    * C = e &circ; 2 * cosϕ &circ; 2 / (1 – e &circ; 2)
    * A = (λ – λO) * cosϕ
    * ν = a / (1 – e &circ; 2 * sinϕ &circ; 2) &circ; 0.5
-   *</pre>
+   * </pre>
    * 
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
-  public void project(
-    final Coordinates from,
-    final Coordinates to) {
+  public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getValue(0);
     final double phi = from.getValue(1);
     final double cosPhi = Math.cos(phi);

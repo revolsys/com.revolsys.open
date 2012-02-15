@@ -70,16 +70,14 @@ public class StatisticsMultipleFilterProcess extends
   /**
    * @param statisticsName the statisticsName to set
    */
-  public void setStatisticsName(
-    final String statisticsName) {
+  public void setStatisticsName(final String statisticsName) {
     this.statisticsName = statisticsName;
   }
 
   /**
    * @param useStatistics the useStatistics to set
    */
-  public void setUseStatistics(
-    final boolean useStatistics) {
+  public void setUseStatistics(final boolean useStatistics) {
     this.useStatistics = useStatistics;
   }
 

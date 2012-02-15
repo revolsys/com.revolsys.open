@@ -16,20 +16,15 @@ public class PrimeMeridian implements Serializable {
 
   private final String name;
 
-  public PrimeMeridian(
-    final String name,
-    final double longitude,
+  public PrimeMeridian(final String name, final double longitude,
     final Authority authority) {
     this.name = name;
     this.longitude = longitude;
     this.authority = authority;
   }
 
-  public PrimeMeridian(
-    final String name,
-    final double longitude,
-    final Authority authority,
-    final boolean deprecated) {
+  public PrimeMeridian(final String name, final double longitude,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     this.longitude = longitude;
     this.authority = authority;
@@ -37,8 +32,7 @@ public class PrimeMeridian implements Serializable {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {

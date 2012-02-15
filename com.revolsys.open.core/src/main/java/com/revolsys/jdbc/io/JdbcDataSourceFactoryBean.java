@@ -22,29 +22,31 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
   private WeakReference<DataSource> dataSourceReference;
 
   private DataSourceFactory dataSourceFactory;
+
+  public void close() {
+    final DataSource dataSource = dataSourceReference.get();
+    if (dataSource != null) {
+      dataSourceFactory.closeDataSource(dataSource);
+    }
+  }
+
   public Map<String, Object> getConfig() {
     return config;
   }
 
   public DataSource getObject() throws Exception {
-    Map<String, Object> config = new HashMap<String, Object>(this.config);
+    final Map<String, Object> config = new HashMap<String, Object>(this.config);
     config.put("url", url);
     config.put("username", username);
     config.put("password", password);
     if (dataSourceReference == null) {
-       dataSourceFactory = JdbcFactory.getDataSourceFactory(url);
-      DataSource dataSource = dataSourceFactory.createDataSource(config);
-      dataSourceReference = new WeakReference<DataSource>(dataSource); 
+      dataSourceFactory = JdbcFactory.getDataSourceFactory(url);
+      final DataSource dataSource = dataSourceFactory.createDataSource(config);
+      dataSourceReference = new WeakReference<DataSource>(dataSource);
     }
     return dataSourceReference.get();
   }
 
-  public void close() {
-    DataSource dataSource = dataSourceReference.get();
-    if (dataSource != null) {
-      dataSourceFactory.closeDataSource(dataSource);
-    }
-  }
   public Class<?> getObjectType() {
     return DataSource.class;
   }

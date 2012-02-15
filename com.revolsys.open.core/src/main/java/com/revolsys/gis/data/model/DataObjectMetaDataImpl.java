@@ -86,6 +86,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   private final List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
 
+  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
+
+  public static DataObjectMetaData getMetaData(final int instanceId) {
+    return METADATA_CACHE.get(instanceId);
+  }
+
   public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
     this(metaData.getName(), metaData.getProperties(), metaData.getAttributes());
     setIdAttributeIndex(metaData.getIdAttributeIndex());
@@ -418,6 +424,10 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return getAttributeName(idAttributeIndex);
   }
 
+  public int getInstanceId() {
+    return instanceId;
+  }
+
   public QName getName() {
     return name;
   }
@@ -437,10 +447,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   public DataObjectStoreSchema getSchema() {
     return schema;
-  }
-
-  public int getInstanceId() {
-    return instanceId;
   }
 
   public boolean hasAttribute(final CharSequence name) {
@@ -472,8 +478,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
     return false;
   }
-
-  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
 
   private void readObject(final ObjectInputStream ois)
     throws ClassNotFoundException, IOException {
@@ -562,9 +566,5 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   @Override
   public String toString() {
     return name.toString();
-  }
-
-  public static DataObjectMetaData getMetaData(int instanceId) {
-    return METADATA_CACHE.get(instanceId);
   }
 }

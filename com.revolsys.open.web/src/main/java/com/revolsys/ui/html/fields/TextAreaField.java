@@ -51,20 +51,8 @@ public class TextAreaField extends Field {
   }
 
   public TextAreaField(final String name, final int cols, final int rows,
-    final String defaultValue, final boolean required) {
-    this(name, cols, rows, required);
-    this.inputValue = defaultValue;
-  }
-
-  public TextAreaField(final String name, final int cols, final int rows,
     final int maxLength, final boolean required) {
     this(name, cols, rows, required);
-    this.maxLength = maxLength;
-  }
-
-  public TextAreaField(final String name, final int cols, final int rows,
-    final int maxLength, final String defaultValue, final boolean required) {
-    this(name, cols, rows, defaultValue, required);
     this.maxLength = maxLength;
   }
 
@@ -77,6 +65,18 @@ public class TextAreaField extends Field {
         + ") must be <= maxLength (" + minLength + ")");
     }
     this.minLength = minLength;
+  }
+
+  public TextAreaField(final String name, final int cols, final int rows,
+    final int maxLength, final String defaultValue, final boolean required) {
+    this(name, cols, rows, defaultValue, required);
+    this.maxLength = maxLength;
+  }
+
+  public TextAreaField(final String name, final int cols, final int rows,
+    final String defaultValue, final boolean required) {
+    this(name, cols, rows, required);
+    this.inputValue = defaultValue;
   }
 
   public int getCols() {
@@ -99,10 +99,12 @@ public class TextAreaField extends Field {
     return rows;
   }
 
+  @Override
   public boolean hasValue() {
     return inputValue != null && !inputValue.equals("");
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     inputValue = request.getParameter(getName());
     if (inputValue == null) {
@@ -113,26 +115,13 @@ public class TextAreaField extends Field {
     }
   }
 
-  public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.TEXT_AREA);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(cols));
-    out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(rows));
-    if (inputValue != null) {
-      out.text(inputValue);
-    } else {
-      out.text("");
-    }
-    out.endTag(HtmlUtil.TEXT_AREA);
-  }
-
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      int length = inputValue.length();
+      final int length = inputValue.length();
       if (length > maxLength) {
         addValidationError("Cannot exceed " + maxLength + " characters");
         valid = false;
@@ -147,5 +136,36 @@ public class TextAreaField extends Field {
       setValue(null);
     }
     return valid;
+  }
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    out.startTag(HtmlUtil.TEXT_AREA);
+    out.attribute(HtmlUtil.ATTR_ID, getName());
+    out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(cols));
+    out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(rows));
+    if (inputValue != null) {
+      out.text(inputValue);
+    } else {
+      out.text("");
+    }
+    out.endTag(HtmlUtil.TEXT_AREA);
+  }
+
+  public void setCols(final int cols) {
+    this.cols = cols;
+  }
+
+  public void setMaxLength(final int maxLength) {
+    this.maxLength = maxLength;
+  }
+
+  public void setMinLength(final int minLength) {
+    this.minLength = minLength;
+  }
+
+  public void setRows(final int rows) {
+    this.rows = rows;
   }
 }

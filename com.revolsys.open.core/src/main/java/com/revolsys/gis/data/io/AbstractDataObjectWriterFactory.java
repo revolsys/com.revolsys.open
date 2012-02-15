@@ -22,7 +22,8 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
   implements DataObjectWriterFactory {
 
   public static Writer<DataObject> dataObjectWriter(
-    final DataObjectMetaData metaData, final Resource resource) {
+    final DataObjectMetaData metaData,
+    final Resource resource) {
     final DataObjectWriterFactory writerFactory = getDataObjectWriterFactory(resource);
     if (writerFactory == null) {
       return null;
@@ -64,15 +65,18 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
    * @return The writer.
    */
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData, final Resource resource) {
+    final DataObjectMetaData metaData,
+    final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
     return createDataObjectWriter(baseName, metaData, out);
   }
 
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream) {
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
   }

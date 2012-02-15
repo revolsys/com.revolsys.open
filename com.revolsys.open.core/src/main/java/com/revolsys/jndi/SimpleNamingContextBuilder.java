@@ -35,16 +35,14 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     return activated;
   }
 
-  private final Hashtable<String,Object> boundObjects = new Hashtable<String,Object>();
+  private final Hashtable<String, Object> boundObjects = new Hashtable<String, Object>();
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   public SimpleNamingContextBuilder() {
   }
 
-  public void activate()
-    throws IllegalStateException,
-    NamingException {
+  public void activate() throws IllegalStateException, NamingException {
     log.info("Activating simple JNDI environment");
     synchronized (initializationLock) {
       if (!initialized) {
@@ -59,9 +57,7 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     activated = this;
   }
 
-  public void bind(
-    final String name,
-    final Object obj) {
+  public void bind(final String name, final Object obj) {
     if (log.isInfoEnabled()) {
       log.info((new StringBuilder("Static JNDI binding: [")).append(name)
         .append("] = [")
@@ -116,8 +112,7 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     }
     return new InitialContextFactory() {
 
-      public Context getInitialContext(
-        final Hashtable environment) {
+      public Context getInitialContext(final Hashtable environment) {
         return new SimpleNamingContext("", boundObjects, environment);
       }
     };
@@ -133,4 +128,4 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
 // Messages from Jad:
 // Overlapped try statements detected. Not all exception handlers will be
 // resolved in the method activate
-// 
+//

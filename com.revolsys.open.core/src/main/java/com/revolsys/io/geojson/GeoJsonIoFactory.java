@@ -18,7 +18,7 @@ public class GeoJsonIoFactory extends
   AbstractDataObjectAndGeometryWriterFactory implements GeometryReaderFactory {
 
   public GeoJsonIoFactory() {
-    super(GeoJsonConstants.DESCRIPTION,true,true);
+    super(GeoJsonConstants.DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(GeoJsonConstants.MEDIA_TYPE,
       GeoJsonConstants.FILE_EXTENSION);
   }
@@ -32,8 +32,7 @@ public class GeoJsonIoFactory extends
       charset));
   }
 
-  public GeometryReader createGeometryReader(
-    final Resource resource) {
+  public GeometryReader createGeometryReader(final Resource resource) {
     try {
       final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(
         resource);

@@ -17,33 +17,23 @@ public class FilePageManager implements PageManager {
 
   private RandomAccessFile randomAccessFile;
 
-  private WeakHashMap<Integer, Page> pages = new WeakHashMap<Integer, Page>();
+  private final WeakHashMap<Integer, Page> pages = new WeakHashMap<Integer, Page>();
 
-  private Set<Integer> freePageIndexes = new TreeSet<Integer>();
+  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
+
+  private final Set<Page> pagesInUse = new HashSet<Page>();
 
   public FilePageManager() {
     this(FileUtil.createTempFile("pages", ".pf"));
   }
 
-  public FilePageManager(File file) {
+  public FilePageManager(final File file) {
     try {
       this.randomAccessFile = new RandomAccessFile(file, "rw");
-    } catch (FileNotFoundException e) {
+    } catch (final FileNotFoundException e) {
       throw new IllegalArgumentException("Unable to open file "
         + file.getAbsolutePath(), e);
     }
-  }
-
-  public synchronized void removePage(Page page) {
-    synchronized (pages) {
-      page.clear();
-      write(page);
-      freePageIndexes.add(page.getIndex());
-    }
-  }
-
-  public int getPageSize() {
-    return pageSize;
   }
 
   public synchronized Page createPage() {
@@ -51,16 +41,16 @@ public class FilePageManager implements PageManager {
       Page page;
       if (freePageIndexes.isEmpty()) {
         try {
-          int index = (int)(randomAccessFile.length() / pageSize);
+          final int index = (int)(randomAccessFile.length() / pageSize);
           page = new ByteArrayPage(this, index, pageSize);
           pages.put(page.getIndex(), page);
           write(page);
-        } catch (IOException e) {
+        } catch (final IOException e) {
           throw new RuntimeException(e);
         }
       } else {
         final Iterator<Integer> iterator = freePageIndexes.iterator();
-        Integer pageIndex = iterator.next();
+        final Integer pageIndex = iterator.next();
         iterator.remove();
         page = loadPage(pageIndex);
       }
@@ -69,7 +59,15 @@ public class FilePageManager implements PageManager {
     }
   }
 
-  public synchronized Page getPage(int index) {
+  public Page createTempPage() {
+    return new ByteArrayPage(this, -1, pageSize);
+  }
+
+  public int getNumPages() {
+    return pages.size();
+  }
+
+  public synchronized Page getPage(final int index) {
     synchronized (pages) {
       if (freePageIndexes.contains(index)) {
         throw new IllegalArgumentException("Page does not exist " + index);
@@ -89,28 +87,37 @@ public class FilePageManager implements PageManager {
     }
   }
 
-  private Page loadPage(int index) {
+  public int getPageSize() {
+    return pageSize;
+  }
+
+  private Page loadPage(final int index) {
     try {
-      Page page = new ByteArrayPage(this, index, pageSize);
+      final Page page = new ByteArrayPage(this, index, pageSize);
       randomAccessFile.seek(index * pageSize);
       final byte[] content = page.getContent();
       randomAccessFile.read(content);
       pages.put(index, page);
       return page;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public int getNumPages() {
-    return pages.size();
+  public synchronized void releasePage(final Page page) {
+    write(page);
+    pagesInUse.remove(page);
   }
 
-  public Page createTempPage() {
-    return new ByteArrayPage(this, -1, pageSize);
+  public synchronized void removePage(final Page page) {
+    synchronized (pages) {
+      page.clear();
+      write(page);
+      freePageIndexes.add(page.getIndex());
+    }
   }
 
-  public synchronized void write(Page page) {
+  public synchronized void write(final Page page) {
     if (page.getPageManager() == this) {
       synchronized (randomAccessFile) {
         try {
@@ -120,18 +127,11 @@ public class FilePageManager implements PageManager {
             final byte[] content = page.getContent();
             randomAccessFile.write(content);
           }
-        } catch (IOException e) {
+        } catch (final IOException e) {
           throw new RuntimeException(e);
         }
       }
     }
   }
-
-  public synchronized void releasePage(Page page) {
-    write(page);
-    pagesInUse.remove(page);
-  }
-
-  private Set<Page> pagesInUse = new HashSet<Page>();
 
 }

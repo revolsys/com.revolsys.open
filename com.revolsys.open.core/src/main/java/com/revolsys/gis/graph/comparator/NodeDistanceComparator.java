@@ -16,22 +16,17 @@ public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
 
   private final Node<T> node;
 
-  public NodeDistanceComparator(
-    final Node<T> node) {
+  public NodeDistanceComparator(final Node<T> node) {
     this.node = node;
     this.invert = false;
   }
 
-  public NodeDistanceComparator(
-    final Node<T> node,
-    final boolean invert) {
+  public NodeDistanceComparator(final Node<T> node, final boolean invert) {
     this.node = node;
     this.invert = invert;
   }
 
-  public int compare(
-    final Node<T> node1,
-    final Node<T> node2) {
+  public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
     final double distance1 = node1.distance(node);
     final double distance2 = node2.distance(node);

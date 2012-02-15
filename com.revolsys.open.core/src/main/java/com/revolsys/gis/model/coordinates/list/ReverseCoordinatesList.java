@@ -5,10 +5,10 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
    * 
    */
   private static final long serialVersionUID = 8489637345116642703L;
+
   private final CoordinatesList coordinateList;
 
-  public ReverseCoordinatesList(
-    final CoordinatesList coordinateList) {
+  public ReverseCoordinatesList(final CoordinatesList coordinateList) {
     this.coordinateList = coordinateList;
   }
 
@@ -21,9 +21,7 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
     return coordinateList.getNumAxis();
   }
 
-  public double getValue(
-    final int index,
-    final int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     return coordinateList.getValue(size() - index - 1, axisIndex);
   }
 
@@ -32,10 +30,7 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
     return coordinateList;
   }
 
-  public void setValue(
-    final int index,
-    final int axisIndex,
-    final double value) {
+  public void setValue(final int index, final int axisIndex, final double value) {
     coordinateList.setValue(size() - index - 1, axisIndex, value);
   }
 

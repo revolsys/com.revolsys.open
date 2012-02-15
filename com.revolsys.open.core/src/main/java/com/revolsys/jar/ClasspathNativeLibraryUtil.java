@@ -27,26 +27,10 @@ public class ClasspathNativeLibraryUtil {
   public final static boolean IS_DARWIN = OS_NAME.equals("Mac OS X")
     || OS_NAME.equals("Darwin");
 
-  public static String getLibraryPrefix() {
-    if (IS_WINDOWS) {
-      return "";
-    } else {
-      return "lib";
-    }
-  }
-
-  public static String getLibraryExtension() {
-    if (IS_WINDOWS) {
-      return "dll";
-    } else if (IS_DARWIN) {
-      return "dylib";
-    } else {
-      return "so";
-    }
-  }
+  public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
 
   public static String getArch() {
-    String osArch = OS_ARCH.toLowerCase();
+    final String osArch = OS_ARCH.toLowerCase();
     if (osArch.equals("i386")) {
       return "x86";
     } else if (osArch.startsWith("amd64") || osArch.startsWith("x86_64")) {
@@ -62,47 +46,21 @@ public class ClasspathNativeLibraryUtil {
     }
   }
 
-  public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
+  public static String getLibraryExtension() {
+    if (IS_WINDOWS) {
+      return "dll";
+    } else if (IS_DARWIN) {
+      return "dylib";
+    } else {
+      return "so";
+    }
+  }
 
-  public static void loadLibrary(final String name) {
-    synchronized (LIBRARY_LOADED_MAP) {
-      Boolean loaded = LIBRARY_LOADED_MAP.get(name);
-      if (loaded == null) {
-        final String prefix = getLibraryPrefix();
-        final String ext = getLibraryExtension();
-        final String arch = getArch();
-        final String operatingSystemName = getOperatingSystemName();
-        final String fileName = prefix + name + "-" + arch + "-"
-          + operatingSystemName + "." + ext;
-        String libraryName = "/native/" + fileName;
-        final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
-        if (url == null) {
-          try {
-            System.loadLibrary(name);
-          } catch (Throwable e) {
-            LOG.error("Unable to load shared library " + libraryName, e);
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-            throw new RuntimeException("Unable to load shared library "
-              + fileName, e);
-          }
-        } else {
-          try {
-            File directory = FileUtil.createTempDirectory("jni", "name");
-            File file = new File(directory, fileName);
-            file.deleteOnExit();
-            FileUtil.copy(url.openStream(), file);
-            System.load(file.getCanonicalPath());
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-          } catch (Throwable e) {
-            LOG.error("Unable to load shared library from classpath " + libraryName, e);
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-            throw new RuntimeException("Unable to load shared library "
-              + fileName, e);
-          }
-        }
-      } else if (!loaded) {
-        throw new RuntimeException("Unable to load shared library " + name);
-      }
+  public static String getLibraryPrefix() {
+    if (IS_WINDOWS) {
+      return "";
+    } else {
+      return "lib";
     }
   }
 
@@ -117,6 +75,49 @@ public class ClasspathNativeLibraryUtil {
       return "solaris";
     } else {
       return OS_NAME;
+    }
+  }
+
+  public static void loadLibrary(final String name) {
+    synchronized (LIBRARY_LOADED_MAP) {
+      final Boolean loaded = LIBRARY_LOADED_MAP.get(name);
+      if (loaded == null) {
+        final String prefix = getLibraryPrefix();
+        final String ext = getLibraryExtension();
+        final String arch = getArch();
+        final String operatingSystemName = getOperatingSystemName();
+        final String fileName = prefix + name + "-" + arch + "-"
+          + operatingSystemName + "." + ext;
+        final String libraryName = "/native/" + fileName;
+        final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
+        if (url == null) {
+          try {
+            System.loadLibrary(name);
+          } catch (final Throwable e) {
+            LOG.error("Unable to load shared library " + libraryName, e);
+            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+            throw new RuntimeException("Unable to load shared library "
+              + fileName, e);
+          }
+        } else {
+          try {
+            final File directory = FileUtil.createTempDirectory("jni", "name");
+            final File file = new File(directory, fileName);
+            file.deleteOnExit();
+            FileUtil.copy(url.openStream(), file);
+            System.load(file.getCanonicalPath());
+            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+          } catch (final Throwable e) {
+            LOG.error("Unable to load shared library from classpath "
+              + libraryName, e);
+            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+            throw new RuntimeException("Unable to load shared library "
+              + fileName, e);
+          }
+        }
+      } else if (!loaded) {
+        throw new RuntimeException("Unable to load shared library " + name);
+      }
     }
   }
 

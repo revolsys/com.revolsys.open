@@ -22,10 +22,9 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 
 public class RawLayout implements ElementContainerLayout {
-  public void serialize(final XmlWriter out, final ElementContainer container)
-    {
-    for (Iterator elements = container.getElements().iterator(); elements.hasNext();) {
-      Element element = (Element)elements.next();
+  public void serialize(final XmlWriter out, final ElementContainer container) {
+    for (final Iterator elements = container.getElements().iterator(); elements.hasNext();) {
+      final Element element = (Element)elements.next();
       element.serialize(out);
     }
   }

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -29,7 +28,7 @@ public class CheckBoxField extends Field {
 
   private Object falseValue = Boolean.FALSE;
 
-  private String selectedValue = "on";
+  private final String selectedValue = "on";
 
   private String onClick = null;
 
@@ -44,14 +43,44 @@ public class CheckBoxField extends Field {
     super(name, required);
   }
 
+  public Object getFalseValue() {
+    return falseValue;
+  }
+
+  public String getOnClick() {
+    return onClick;
+  }
+
+  public Object getTrueValue() {
+    return trueValue;
+  }
+
+  @Override
   public boolean hasValue() {
     return isSelected();
+  }
+
+  @Override
+  public void initialize(final Form form, final HttpServletRequest request) {
+    final String inputValue = request.getParameter(getName());
+    if (inputValue != null) {
+      selected = inputValue.equals(selectedValue);
+    } else if (request.getMethod() == "GET" || !getForm().isMainFormTask()) {
+      setValue(getInitialValue(request));
+      if (getValue() != null) {
+        selected = getValue().equals(trueValue);
+      }
+    } else {
+      setValue(falseValue);
+      selected = false;
+    }
   }
 
   public boolean isSelected() {
     return selected;
   }
 
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
@@ -69,47 +98,21 @@ public class CheckBoxField extends Field {
     return valid;
   }
 
-  public void initialize(final Form form, final HttpServletRequest request) {
-    String inputValue = request.getParameter(getName());
-    if (inputValue != null) {
-      selected = inputValue.equals(selectedValue);
-    } else if (request.getMethod() == "GET" || !getForm().isMainFormTask()) {
-      setValue(getInitialValue(request));
-      if (getValue() != null) {
-        selected = getValue().equals(trueValue);
-      }
-    } else {
-      setValue(falseValue);
-      selected = false;
-    }
-  }
-
-  public String getOnClick() {
-    return onClick;
-  }
-
-  public void setOnClick(final String onSelect) {
-    this.onClick = onSelect;
-  }
-
+  @Override
   public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeCheckBox(out, getName(), selectedValue, isSelected(),
       onClick);
-  }
-
-  public void setTrueValue(final Object trueValue) {
-    this.trueValue = trueValue;
-  }
-
-  public Object getTrueValue() {
-    return trueValue;
   }
 
   public void setFalseValue(final Object falseValue) {
     this.falseValue = falseValue;
   }
 
-  public Object getFalseValue() {
-    return falseValue;
+  public void setOnClick(final String onSelect) {
+    this.onClick = onSelect;
+  }
+
+  public void setTrueValue(final Object trueValue) {
+    this.trueValue = trueValue;
   }
 }

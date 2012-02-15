@@ -7,11 +7,11 @@ public class WeakUuidObjectMap extends WeakHashMap<UUID, Object> {
   private static WeakUuidObjectMap INSTANCE = new WeakUuidObjectMap();
 
   @SuppressWarnings("unchecked")
-  public static <T> T getObject(UUID uuid) {
+  public static <T> T getObject(final UUID uuid) {
     return (T)INSTANCE.get(uuid);
   }
 
-  public static void putObject(UUID uuid, Object value) {
+  public static void putObject(final UUID uuid, final Object value) {
     INSTANCE.put(uuid, value);
   }
 }

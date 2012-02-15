@@ -84,7 +84,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
         }
         final MultiInputSelector selector = new MultiInputSelector();
         try {
-          final Channel<Runnable> channel = (Channel<Runnable>)selector.selectChannelInput(channels);
+          final Channel<Runnable> channel = selector.selectChannelInput(channels);
           if (channel != null) {
             final Runnable runnable = channel.read();
             execute(runnable);
@@ -110,9 +110,9 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
 
   public void setBeanName(final String beanName) {
     this.beanName = beanName;
-    ThreadFactory threadFactory = getThreadFactory();
+    final ThreadFactory threadFactory = getThreadFactory();
     if (threadFactory instanceof NamedThreadFactory) {
-      NamedThreadFactory namedThreadFactory = (NamedThreadFactory)threadFactory;
+      final NamedThreadFactory namedThreadFactory = (NamedThreadFactory)threadFactory;
       namedThreadFactory.setNamePrefix(beanName + "-pool");
     }
   }
@@ -128,9 +128,9 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     this.processNetwork = processNetwork;
     if (processNetwork != null) {
       processNetwork.addProcess(this);
-      ThreadFactory threadFactory = getThreadFactory();
+      final ThreadFactory threadFactory = getThreadFactory();
       if (threadFactory instanceof NamedThreadFactory) {
-        NamedThreadFactory namedThreadFactory = (NamedThreadFactory)threadFactory;
+        final NamedThreadFactory namedThreadFactory = (NamedThreadFactory)threadFactory;
         namedThreadFactory.setParentGroup(processNetwork.getThreadGroup());
       }
     }

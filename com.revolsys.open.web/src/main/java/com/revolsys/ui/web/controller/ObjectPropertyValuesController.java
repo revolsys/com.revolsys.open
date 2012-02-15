@@ -20,49 +20,51 @@ public class ObjectPropertyValuesController implements Controller {
 
   private int maxResults = 25;
 
-  public ModelAndView handleRequest(final HttpServletRequest request,
-    final HttpServletResponse response) throws Exception {
-    String path = request.getPathInfo();
-    int index = path.lastIndexOf('/');
-    if (index != -1) {
-      String propertyName = path.substring(index + 1);
-      String query = request.getParameter("q");
-      String limit = request.getParameter("limit");
-      int max = maxResults;
-      if (limit != null) {
-        try {
-          max = Integer.parseInt(limit);
-        } catch (NumberFormatException e) {
-        }
-      }
-
-      Map<String, Object> where = new HashMap<String, Object>();
-      where.put(propertyName, "%" + query + "%");
-      Map<String, Boolean> order = Collections.singletonMap(propertyName, true);
-      List<String> results = dataAccessObject.list(propertyName, where, order,
-        max);
-      response.setContentType("text/plain");
-      PrintWriter writer = response.getWriter();
-      for (String result : results) {
-        writer.println(result);
-      }
-    }
-    return null;
-  }
-
   public DataAccessObject<?> getDataAccessObject() {
     return dataAccessObject;
-  }
-
-  public void setDataAccessObject(final DataAccessObject<?> dataAccessObject) {
-    this.dataAccessObject = dataAccessObject;
   }
 
   public int getMaxResults() {
     return maxResults;
   }
 
-  public void setMaxResults(int maxResults) {
+  public ModelAndView handleRequest(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws Exception {
+    final String path = request.getPathInfo();
+    final int index = path.lastIndexOf('/');
+    if (index != -1) {
+      final String propertyName = path.substring(index + 1);
+      final String query = request.getParameter("q");
+      final String limit = request.getParameter("limit");
+      int max = maxResults;
+      if (limit != null) {
+        try {
+          max = Integer.parseInt(limit);
+        } catch (final NumberFormatException e) {
+        }
+      }
+
+      final Map<String, Object> where = new HashMap<String, Object>();
+      where.put(propertyName, "%" + query + "%");
+      final Map<String, Boolean> order = Collections.singletonMap(propertyName,
+        true);
+      final List<String> results = dataAccessObject.list(propertyName, where,
+        order, max);
+      response.setContentType("text/plain");
+      final PrintWriter writer = response.getWriter();
+      for (final String result : results) {
+        writer.println(result);
+      }
+    }
+    return null;
+  }
+
+  public void setDataAccessObject(final DataAccessObject<?> dataAccessObject) {
+    this.dataAccessObject = dataAccessObject;
+  }
+
+  public void setMaxResults(final int maxResults) {
     this.maxResults = maxResults;
   }
 }

@@ -34,7 +34,6 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <pre>
  * onload = &quot;alert('hello');&quot;
  * </pre>
- * 
  * <p>
  * <i>NOTE: The OnLoads tag must only be used within the attribute list for the
  * body tag.</i>
@@ -53,7 +52,6 @@ import com.revolsys.ui.web.config.WebUiContext;
  *       .
  *     &lt;/html&gt;
  * </pre>
- * 
  * <dl>
  * <dt><B>Input Attributes: </B>
  * <dd><code>page</code> - A PageDefinition bean containing the defintion of
@@ -69,21 +67,32 @@ public class OnLoadTag extends TagSupport {
   private static final long serialVersionUID = -6153525324186562225L;
 
   /**
+   * Process the end tag.
+   * 
+   * @return EVAL_PAGE
+   */
+  @Override
+  public int doEndTag() throws JspException {
+    return EVAL_PAGE;
+  }
+
+  /**
    * Process the start tag.
    * 
    * @return SKIP_BODY
    */
+  @Override
   public int doStartTag() throws JspException {
     try {
-      WebUiContext context = WebUiContext.get();
+      final WebUiContext context = WebUiContext.get();
       if (context != null) {
-        Page page = (Page)context.getPage();
+        final Page page = context.getPage();
         if (page != null) {
-          JspWriter out = pageContext.getOut();
-          Iterator onLoads = page.getOnLoads().iterator();
+          final JspWriter out = pageContext.getOut();
+          final Iterator onLoads = page.getOnLoads().iterator();
           out.print("onload=\"");
           while (onLoads.hasNext()) {
-            String onLoad = (String)onLoads.next();
+            final String onLoad = (String)onLoads.next();
             out.print(onLoad);
             out.print("; ");
           }
@@ -91,17 +100,8 @@ public class OnLoadTag extends TagSupport {
         }
       }
       return SKIP_BODY;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new JspTagException(t);
     }
-  }
-
-  /**
-   * Process the end tag.
-   * 
-   * @return EVAL_PAGE
-   */
-  public int doEndTag() throws JspException {
-    return EVAL_PAGE;
   }
 }

@@ -6,7 +6,8 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryBufferProcess extends BaseInOutProcess<DataObject,DataObject> {
+public class GeometryBufferProcess extends
+  BaseInOutProcess<DataObject, DataObject> {
 
   private int buffer;
 
@@ -16,9 +17,9 @@ public class GeometryBufferProcess extends BaseInOutProcess<DataObject,DataObjec
 
   @Override
   protected void process(
-    Channel<DataObject> in,
-    Channel<DataObject> out,
-    DataObject object) {
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry == null) {
       out.write(object);
@@ -29,8 +30,7 @@ public class GeometryBufferProcess extends BaseInOutProcess<DataObject,DataObjec
     }
   }
 
-  public void setBuffer(
-    final int buffer) {
+  public void setBuffer(final int buffer) {
     this.buffer = buffer;
   }
 

@@ -28,19 +28,16 @@ import java.io.InputStream;
 import com.revolsys.io.EndianInput;
 
 public class EndianInputStream extends DataInputStream implements EndianInput {
-  public EndianInputStream(
-    final InputStream in) {
+  public EndianInputStream(final InputStream in) {
     super(in);
   }
 
-  public double readLEDouble()
-    throws IOException {
+  public double readLEDouble() throws IOException {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
   }
 
-  public int readLEInt()
-    throws IOException {
+  public int readLEInt() throws IOException {
     final int b1 = read();
     final int b2 = read();
     final int b3 = read();
@@ -53,8 +50,7 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     return value;
   }
 
-  public long readLELong()
-    throws IOException {
+  public long readLELong() throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
       value |= ((long)(read() & 0xff)) << shiftBy;
@@ -62,8 +58,7 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     return value;
   }
 
-  public short readLEShort()
-    throws IOException {
+  public short readLEShort() throws IOException {
     final int b1 = read();
     final int b2 = read();
     if ((b1 | b2) < 0) {

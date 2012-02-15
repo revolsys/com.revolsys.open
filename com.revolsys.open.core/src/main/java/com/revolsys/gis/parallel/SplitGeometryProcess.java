@@ -23,7 +23,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject> {
+public class SplitGeometryProcess extends
+  BaseInOutProcess<DataObject, DataObject> {
   /** The statistics to record the number new observations created. */
   private Statistics createdStatistics;
 
@@ -40,9 +41,13 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
 
   private GeometryFactory geometryFactory;
 
-  private void createLineString(final LineString line,
-    final CoordinateSequence coordinates, final Coordinate startCoordinate,
-    final int startIndex, final int endIndex, final Coordinate endCoordinate,
+  private void createLineString(
+    final LineString line,
+    final CoordinateSequence coordinates,
+    final Coordinate startCoordinate,
+    final int startIndex,
+    final int endIndex,
+    final Coordinate endCoordinate,
     final List<LineString> lines) {
     final CoordinateSequence newCoordinates = CoordinateSequenceUtil.subSequence(
       coordinates, startCoordinate, startIndex, endIndex - startIndex + 1,
@@ -53,7 +58,8 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
     }
   }
 
-  protected DataObject createSplitObject(final DataObject object,
+  protected DataObject createSplitObject(
+    final DataObject object,
     final LineString newLine) {
     return DataObjectUtil.copy(object, newLine);
   }
@@ -108,7 +114,8 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
+  protected void postRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (createdStatistics != null) {
       createdStatistics.disconnect();
@@ -119,7 +126,8 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
   }
 
   @Override
-  protected void preRun(final Channel<DataObject> in,
+  protected void preRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (createdStatistics != null) {
       createdStatistics.connect();
@@ -130,8 +138,10 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -190,7 +200,8 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
     this.tolerance = tolerance;
   }
 
-  protected List<DataObject> split(final DataObject object,
+  protected List<DataObject> split(
+    final DataObject object,
     final LineString line) {
     final PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
@@ -211,8 +222,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<DataObject,DataObject
         }
         int j = 0;
         for (final Coordinate intersection : intersections) {
-          if (!(isWithinDistanceOfBoundary(c0)
-            && isWithinDistanceOfBoundary(c1))) {
+          if (!(isWithinDistanceOfBoundary(c0) && isWithinDistanceOfBoundary(c1))) {
             if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
             } else if (i == lastIndex
               && intersection.distance(lastCoordinate) < tolerance) {

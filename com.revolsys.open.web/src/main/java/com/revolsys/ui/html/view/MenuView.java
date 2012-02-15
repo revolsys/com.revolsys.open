@@ -30,20 +30,64 @@ import com.revolsys.ui.web.config.WebUiContext;
 
 public class MenuView extends ObjectView {
   private static final Logger log = Logger.getLogger(MenuView.class);
+
   private String cssClass = "menu";
 
   private int numLevels = 1;
 
   private boolean showRoot;
 
+  private void menu(final XmlWriter out, final Collection items, final int level) {
+    // Collection items = menu.getItems();
+    if (items.size() > 0) {
+      out.startTag(HtmlUtil.UL);
+      for (final Iterator menuItemIter = items.iterator(); menuItemIter.hasNext();) {
+        final MenuItem menuItem = (MenuItem)menuItemIter.next();
+        if (menuItem.isVisible()) {
+          out.startTag(HtmlUtil.LI);
+
+          final String cssClass = menuItem.getProperty("cssClass");
+          if (cssClass != null) {
+            out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+          }
+          menuItemLink(out, menuItem);
+          if (level < numLevels && menuItem instanceof Menu) {
+            menu(out, ((Menu)menuItem).getItems(), level + 1);
+          }
+          out.endTag(HtmlUtil.LI);
+        }
+      }
+      out.endTag(HtmlUtil.UL);
+      out.startTag(HtmlUtil.DIV);
+      out.attribute(HtmlUtil.ATTR_CLASS, "end");
+      out.entityRef("nbsp");
+      out.endTag(HtmlUtil.DIV);
+    }
+  }
+
+  private void menuItemLink(final XmlWriter out, final MenuItem menuItem) {
+
+    final String uri = menuItem.getUri();
+    if (uri != null) {
+      out.startTag(HtmlUtil.A);
+      out.attribute(HtmlUtil.ATTR_HREF, uri);
+      out.attribute(HtmlUtil.ATTR_TITLE, menuItem.getTitle());
+      out.text(menuItem.getTitle());
+      out.endTag(HtmlUtil.A);
+    } else {
+      out.text(menuItem.getTitle());
+    }
+  }
+
+  @Override
   public void processProperty(final String name, final Object value) {
-    String stringValue = (String)value;
+    final String stringValue = (String)value;
     if (name.equals("cssClass")) {
       cssClass = value.toString();
     } else if (name.equals("numLevels")) {
       numLevels = Integer.parseInt(stringValue);
     } else if (name.equals("menuName")) {
-      WebUiContext context = WebUiContext.get();
+      final WebUiContext context = WebUiContext.get();
       setObject(context.getMenu(stringValue));
       if (getObject() == null) {
         throw new IllegalArgumentException("Menu " + value + " does not exist");
@@ -53,12 +97,13 @@ public class MenuView extends ObjectView {
     }
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
-    Menu menu = (Menu)getObject();
+    final Menu menu = (Menu)getObject();
     if (menu != null) {
-      List menuItems = new ArrayList();
-      for (Iterator items = menu.getItems().iterator(); items.hasNext();) {
-        MenuItem menuItem = (MenuItem)items.next();
+      final List menuItems = new ArrayList();
+      for (final Iterator items = menu.getItems().iterator(); items.hasNext();) {
+        final MenuItem menuItem = (MenuItem)items.next();
         if (menuItem.isVisible()) {
           menuItems.add(menuItem);
         }
@@ -79,50 +124,6 @@ public class MenuView extends ObjectView {
 
         out.endTag(HtmlUtil.DIV);
       }
-    }
-  }
-
-  private void menu(final XmlWriter out, final Collection items, final int level)
-    {
-    // Collection items = menu.getItems();
-    if (items.size() > 0) {
-      out.startTag(HtmlUtil.UL);
-      for (Iterator menuItemIter = items.iterator(); menuItemIter.hasNext();) {
-        MenuItem menuItem = (MenuItem)menuItemIter.next();
-        if (menuItem.isVisible()) {
-          out.startTag(HtmlUtil.LI);
-
-          String cssClass = menuItem.getProperty("cssClass");
-          if (cssClass != null) {
-            out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-          }
-          menuItemLink(out, menuItem);
-          if (level < numLevels && menuItem instanceof Menu) {
-            menu(out, ((Menu)menuItem).getItems(), level + 1);
-          }
-          out.endTag(HtmlUtil.LI);
-        }
-      }
-      out.endTag(HtmlUtil.UL);
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "end");
-      out.entityRef("nbsp");
-      out.endTag(HtmlUtil.DIV);
-    }
-  }
-
-  private void menuItemLink(final XmlWriter out, final MenuItem menuItem)
-    {
-
-    String uri = menuItem.getUri();
-    if (uri != null) {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, uri);
-      out.attribute(HtmlUtil.ATTR_TITLE, menuItem.getTitle());
-      out.text(menuItem.getTitle());
-      out.endTag(HtmlUtil.A);
-    } else {
-      out.text(menuItem.getTitle());
     }
   }
 }

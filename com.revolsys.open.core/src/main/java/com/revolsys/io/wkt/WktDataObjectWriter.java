@@ -32,14 +32,17 @@ public class WktDataObjectWriter extends AbstractWriter<DataObject> {
 
   }
 
-  public void flush() {
-    out.flush();
-  }
-
+  @Override
   public void close() {
     out.close();
   }
 
+  @Override
+  public void flush() {
+    out.flush();
+  }
+
+  @Override
   public String toString() {
     return metaData.getName().toString();
   }

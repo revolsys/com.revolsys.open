@@ -53,7 +53,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     duplicateStatistics = null;
   }
 
-  public boolean fixMissingZValues(final LineString line1,
+  public boolean fixMissingZValues(
+    final LineString line1,
     final LineString line2) {
     final CoordinatesList points1 = CoordinatesListUtil.get(line1);
     final CoordinatesList points2 = CoordinatesListUtil.get(line2);
@@ -81,8 +82,11 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  public boolean fixZValues(final CoordinatesList points1, final int index1,
-    final CoordinatesList points2, final int index2) {
+  public boolean fixZValues(
+    final CoordinatesList points1,
+    final int index1,
+    final CoordinatesList points2,
+    final int index2) {
     final double z1 = points1.getZ(index2);
     final double z2 = points2.getZ(index1);
     if (Double.isNaN(z1) || z1 == 0) {
@@ -110,7 +114,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     duplicateStatistics.connect();
   }
 
-  public boolean isReverse(final CoordinatesList points1,
+  public boolean isReverse(
+    final CoordinatesList points1,
     final CoordinatesList points2) {
     final int numPoints = points1.size();
     if (points1.equal(0, points2, numPoints - 1, 2)) {
@@ -135,7 +140,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     graph.visitEdges(this);
   }
 
-  private void processEqualEdge(final Edge<DataObject> edge1,
+  private void processEqualEdge(
+    final Edge<DataObject> edge1,
     final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
     final DataObject object2 = edge2.getObject();
@@ -196,8 +202,9 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  protected void removeDuplicate(final Edge<DataObject> removeEdge,
-    Edge<DataObject> keepEdge) {
+  protected void removeDuplicate(
+    final Edge<DataObject> removeEdge,
+    final Edge<DataObject> keepEdge) {
     removeEdge.remove();
     if (duplicateStatistics != null) {
       duplicateStatistics.add(removeEdge.getObject());

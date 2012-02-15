@@ -11,7 +11,7 @@ import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
-  private Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private BoundingBox boundingBox;
 
@@ -23,14 +23,12 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
 
   private Geometry boundary;
 
+  private PreparedGeometry preparedBoundary;
+
   public abstract void execute(BoundingBox cellBoundingBox);
 
   public Geometry getBoundary() {
     return boundary;
-  }
-
-  public void setBoundary(Geometry boundary) {
-    this.boundary = boundary;
   }
 
   public BoundingBox getBoundingBox() {
@@ -45,11 +43,26 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
     return numY;
   }
 
+  public boolean isLogScriptInfo() {
+    return logScriptInfo;
+  }
+
+  protected void postRun() {
+  }
+
+  protected void preRun() {
+    if (boundingBox != null) {
+      if (boundary != null) {
+        preparedBoundary = PreparedGeometryFactory.prepare(boundary);
+      }
+    }
+  }
+
   public void run() {
     preRun();
     try {
       if (boundingBox != null) {
-        GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+        final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
         final double xInc = boundingBox.getWidth() / numX;
         final double yInc = boundingBox.getHeight() / numY;
         double y = boundingBox.getMinY();
@@ -61,7 +74,8 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
             if (preparedBoundary == null
               || preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
               if (logScriptInfo) {
-                log.info("Processing bounding box " + cellBoundingBox.toPolygon(1));
+                log.info("Processing bounding box "
+                  + cellBoundingBox.toPolygon(1));
               }
               execute(cellBoundingBox);
             }
@@ -75,21 +89,16 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
     }
   }
 
-  protected void preRun() {
-    if (boundingBox != null) {
-      if (boundary != null) {
-        preparedBoundary = PreparedGeometryFactory.prepare(boundary);
-      }
-    }
-  }
-
-  private PreparedGeometry preparedBoundary;
-
-  protected void postRun() {
+  public void setBoundary(final Geometry boundary) {
+    this.boundary = boundary;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+  }
+
+  public void setLogScriptInfo(final boolean logScriptInfo) {
+    this.logScriptInfo = logScriptInfo;
   }
 
   public void setNumX(final int numX) {
@@ -98,14 +107,6 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
 
   public void setNumY(final int numY) {
     this.numY = numY;
-  }
-
-  public boolean isLogScriptInfo() {
-    return logScriptInfo;
-  }
-
-  public void setLogScriptInfo(final boolean logScriptInfo) {
-    this.logScriptInfo = logScriptInfo;
   }
 
 }

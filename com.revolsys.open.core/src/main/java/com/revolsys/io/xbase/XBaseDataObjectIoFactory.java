@@ -22,25 +22,31 @@ public class XBaseDataObjectIoFactory extends AbstractDataObjectIoFactory {
     addMediaTypeAndFileExtension("application/dbf", "dbf");
   }
 
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
-      XbaseIterator iterator = new XbaseIterator(resource, dataObjectFactory);
+      final XbaseIterator iterator = new XbaseIterator(resource,
+        dataObjectFactory);
 
       return new DataObjectIteratorReader(iterator);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
   }
 
   @Override
-  public Writer<DataObject> createDataObjectWriter(DataObjectMetaData metaData,
-    Resource resource) {
+  public Writer<DataObject> createDataObjectWriter(
+    final DataObjectMetaData metaData,
+    final Resource resource) {
     return new XbaseDataObjectWriter(metaData, resource);
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
     return createDataObjectWriter(metaData, new OutputStreamResource(baseName,
       outputStream));
   }

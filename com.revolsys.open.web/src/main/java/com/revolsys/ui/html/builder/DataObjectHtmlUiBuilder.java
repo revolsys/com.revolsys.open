@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
@@ -39,32 +41,20 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return dataStore.create(tableName);
   }
 
-  public DataObjectStore getDataStore() {
-    return dataStore;
+  public List<DataObject> getAllObjects(final String... orderBy) {
+    final Query query = new Query(tableName);
+    String idPropertyName = getIdPropertyName();
+    if (orderBy.length > 0) {
+      query.setOrderBy(orderBy);
+    } else if (StringUtils.hasText(idPropertyName)) {
+      query.setOrderBy(idPropertyName);
+    }
+    final Reader<DataObject> reader = dataStore.query(query);
+    return reader.read();
   }
 
-  protected boolean isPropertyUnique(DataObject object, String attributeName) {
-    Query query = new Query(tableName);
-    String value = object.getValue(attributeName);
-    Map<String, String> filter = Collections.singletonMap(attributeName, value);
-    query.setFilter(filter);
-    DataObjectStore dataStore = getDataStore();
-    Reader<DataObject> results = dataStore.query(query);
-    List<DataObject> objects = results.read();
-    if (object.getState() == DataObjectState.New) {
-      return objects.isEmpty();
-    } else {
-      Object id = object.getIdValue();
-      for (Iterator<DataObject> iterator = objects.iterator(); iterator.hasNext();) {
-        DataObject matchedObject = iterator.next();
-        Object matchedId = matchedObject.getIdValue();
-        if (EqualsRegistry.INSTANCE.equals(id, matchedId)) {
-          iterator.remove();
-        }
-      }
-      return objects.isEmpty();
-    }
-
+  public DataObjectStore getDataStore() {
+    return dataStore;
   }
 
   @Override
@@ -72,19 +62,6 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     final Query query = new Query(tableName);
     query.setFilter(filter);
     return dataStore.page(query);
-  }
-
-  public List<DataObject> getAllObjects() {
-    final Query query = new Query(tableName);
-    Reader<DataObject> reader = dataStore.query(query);
-    return reader.read();
-  }
-
-  public List<DataObject> getAllObjects(String... orderBy) {
-    final Query query = new Query(tableName);
-    query.setOrderBy(orderBy);
-    Reader<DataObject> reader = dataStore.query(query);
-    return reader.read();
   }
 
   public QName getTableName() {
@@ -102,6 +79,33 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     } finally {
       writer.close();
     }
+  }
+
+  protected boolean isPropertyUnique(
+    final DataObject object,
+    final String attributeName) {
+    final Query query = new Query(tableName);
+    final String value = object.getValue(attributeName);
+    final Map<String, String> filter = Collections.singletonMap(attributeName,
+      value);
+    query.setFilter(filter);
+    final DataObjectStore dataStore = getDataStore();
+    final Reader<DataObject> results = dataStore.query(query);
+    final List<DataObject> objects = results.read();
+    if (object.getState() == DataObjectState.New) {
+      return objects.isEmpty();
+    } else {
+      final Object id = object.getIdValue();
+      for (final Iterator<DataObject> iterator = objects.iterator(); iterator.hasNext();) {
+        final DataObject matchedObject = iterator.next();
+        final Object matchedId = matchedObject.getIdValue();
+        if (EqualsRegistry.INSTANCE.equals(id, matchedId)) {
+          iterator.remove();
+        }
+      }
+      return objects.isEmpty();
+    }
+
   }
 
   @Override

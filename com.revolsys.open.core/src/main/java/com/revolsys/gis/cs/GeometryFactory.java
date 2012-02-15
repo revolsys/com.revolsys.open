@@ -266,6 +266,16 @@ public class GeometryFactory extends
     this.numAxis = numAxis;
   }
 
+  public GeometryCollection createCollection(final Geometry... geometries) {
+    final List<Geometry> list = new ArrayList<Geometry>();
+    for (final Geometry geometry : geometries) {
+      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        list.add(geometry.getGeometryN(i));
+      }
+    }
+    return createGeometryCollection(geometries);
+  }
+
   public CoordinatesList createCoordinatesList(final CoordinateSequence points) {
     final int size = points.size();
     final CoordinatesList newPoints = new DoubleCoordinatesList(size,
@@ -644,15 +654,5 @@ public class GeometryFactory extends
           + ") " + coordinatesPrecisionModel;
       }
     }
-  }
-
-  public GeometryCollection createCollection(Geometry... geometries) {
-    List<Geometry> list = new ArrayList<Geometry>();
-    for (Geometry geometry : geometries) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
-        list.add(geometry.getGeometryN(i));
-      }
-    }
-    return createGeometryCollection(geometries);
   }
 }

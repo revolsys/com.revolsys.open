@@ -18,34 +18,47 @@ package com.revolsys.ui.html.serializer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
-public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializer {
-  private int colCount;
+public class HtmlUiBuilderCollectionTableSerializer implements
+  RowsTableSerializer {
+  private final int colCount;
 
-  private List keys;
+  private final List keys;
 
-  private HtmlUiBuilder builder;
+  private final HtmlUiBuilder builder;
 
   private int rowCount;
 
-  private List rows = new ArrayList();
-
-  private Locale locale;
+  private final List rows = new ArrayList();
 
   public HtmlUiBuilderCollectionTableSerializer(final HtmlUiBuilder builder,
-    final List keys, final Locale locale) {
+    final List keys) {
     this.builder = builder;
     this.keys = keys;
     this.colCount = keys.size();
-    this.locale = locale;
+  }
+
+  public String getBodyCssClass(final int row, final int col) {
+    return null;
+  }
+
+  public int getBodyRowCount() {
+    return rowCount;
   }
 
   public int getColumnCount() {
     return colCount;
+  }
+
+  public String getFooterCssClass(final int row, final int col) {
+    return null;
+  }
+
+  public int getFooterRowCount() {
+    return 0;
   }
 
   public String getHeaderCssClass(final int col) {
@@ -56,33 +69,28 @@ public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializ
     }
   }
 
-  public String getBodyCssClass(final int row, final int col) {
-    return null;
-  }
-
-  public String getFooterCssClass(final int row, final int col) {
-    return null;
-  }
-
-  public int getBodyRowCount() {
-    return rowCount;
-  }
-
-  public void serializeHeaderCell(final XmlWriter out, final int col)
-    {
+  public void serializeBodyCell(
+    final XmlWriter out,
+    final int row,
+    final int col) {
     if (col < colCount) {
-      String key = (String)keys.get(col);
-      out.text(builder.getLabel(key));
+      final Object object = rows.get(row);
+      builder.serialize(out, object, (String)keys.get(col));
     } else {
       out.entityRef("nbsp");
     }
   }
 
-  public void serializeBodyCell(final XmlWriter out, final int row,
+  public void serializeFooterCell(
+    final XmlWriter out,
+    final int row,
     final int col) {
+  }
+
+  public void serializeHeaderCell(final XmlWriter out, final int col) {
     if (col < colCount) {
-      Object object = rows.get(row);
-      builder.serialize(out, object, (String)keys.get(col), locale);
+      final String key = (String)keys.get(col);
+      out.text(builder.getLabel(key));
     } else {
       out.entityRef("nbsp");
     }
@@ -94,13 +102,5 @@ public class HtmlUiBuilderCollectionTableSerializer implements RowsTableSerializ
       this.rows.addAll(rows);
     }
     this.rowCount = this.rows.size();
-  }
-
-  public int getFooterRowCount() {
-    return 0;
-  }
-
-  public void serializeFooterCell(final XmlWriter out, final int row,
-    final int col) {
   }
 }

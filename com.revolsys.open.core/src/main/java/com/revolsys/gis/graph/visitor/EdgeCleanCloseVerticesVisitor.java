@@ -31,17 +31,14 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
 
   private Visitor<Edge<T>> visitor;
 
-  public EdgeCleanCloseVerticesVisitor(
-    final Graph<T> graph,
+  public EdgeCleanCloseVerticesVisitor(final Graph<T> graph,
     final double minDistance) {
     this.graph = graph;
     this.minDistance = minDistance;
   }
 
-  public EdgeCleanCloseVerticesVisitor(
-    final Graph<T> graph,
-    final double minDistance,
-    final Visitor<Edge<T>> visitor) {
+  public EdgeCleanCloseVerticesVisitor(final Graph<T> graph,
+    final double minDistance, final Visitor<Edge<T>> visitor) {
     this.graph = graph;
     this.minDistance = minDistance;
     this.visitor = visitor;
@@ -84,8 +81,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
    * @param edge The edge to visit.
    * @return true If further edges should be processed.
    */
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final QName typeName = edge.getTypeName();
     final LineString lineString = edge.getLine();
     final CoordinateSequence coordinates = lineString.getCoordinateSequence();
@@ -118,15 +114,21 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
 
           }
           if (fixed) {
-            coordinateListeners.coordinateEvent(new Coordinate(x2, y2),
-              typeName, "Short Segment", "Fixed", distance + " "
-                + Math.toDegrees(previousAngle) + " " + Math.toDegrees(angle)
-                + " " + Math.toDegrees(nextAngle));
+            coordinateListeners.coordinateEvent(
+              new Coordinate(x2, y2),
+              typeName,
+              "Short Segment",
+              "Fixed",
+              distance + " " + Math.toDegrees(previousAngle) + " "
+                + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           } else {
-            coordinateListeners.coordinateEvent(new Coordinate(x2, y2),
-              typeName, "Short Segment", "Review", distance + " "
-                + Math.toDegrees(previousAngle) + " " + Math.toDegrees(angle)
-                + " " + Math.toDegrees(nextAngle));
+            coordinateListeners.coordinateEvent(
+              new Coordinate(x2, y2),
+              typeName,
+              "Short Segment",
+              "Review",
+              distance + " " + Math.toDegrees(previousAngle) + " "
+                + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           }
         }
         x1 = x2;

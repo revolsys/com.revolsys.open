@@ -16,7 +16,7 @@
 package com.revolsys.ui.web.config;
 
 public class OnLoad {
-  private String script;
+  private final String script;
 
   public OnLoad(final String script) {
     this.script = script;

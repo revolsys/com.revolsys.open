@@ -11,15 +11,12 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
     super(MtoConstants.WIDTH_QUARTER, MtoConstants.HEIGHT_QUARTER);
   }
 
-  protected MtoRectangularMapGrid(
-    final double width,
-    final double height) {
+  protected MtoRectangularMapGrid(final double width, final double height) {
     super(width, height);
   }
 
   @Override
-  public double getLatitude(
-    final String mapTileName) {
+  public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -58,8 +55,7 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
   }
 
   @Override
-  public double getLongitude(
-    final String mapTileName) {
+  public double getLongitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -98,9 +94,7 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
   }
 
   @Override
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     final StringBuffer tileName = new StringBuffer(super.getMapTileName(x, y));
     for (int index = tileName.indexOf("/"); index != -1; index = tileName.indexOf("/")) {
       tileName.delete(index, index + 1);

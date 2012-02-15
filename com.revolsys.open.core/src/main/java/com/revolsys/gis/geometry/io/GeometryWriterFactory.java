@@ -12,12 +12,9 @@ import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface GeometryWriterFactory extends IoFactory {
-  Writer<Geometry> createGeometryWriter(
-    Resource resource);
+  Writer<Geometry> createGeometryWriter(Resource resource);
 
-  Writer<Geometry> createGeometryWriter(
-    String baseName,
-    OutputStream out);
+  Writer<Geometry> createGeometryWriter(String baseName, OutputStream out);
 
   Writer<Geometry> createGeometryWriter(
     String baseName,
@@ -26,6 +23,5 @@ public interface GeometryWriterFactory extends IoFactory {
 
   Set<CoordinateSystem> getCoordinateSystems();
 
-  boolean isCoordinateSystemSupported(
-    CoordinateSystem coordinateSystem);
+  boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem);
 }

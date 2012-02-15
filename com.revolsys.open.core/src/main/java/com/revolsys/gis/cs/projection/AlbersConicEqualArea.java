@@ -45,8 +45,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
   /** The false Northing. */
   private final double y0;
 
-  public AlbersConicEqualArea(
-    final ProjectedCoordinateSystem cs) {
+  public AlbersConicEqualArea(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
     final Double centralMeridian = cs.getDoubleParameter("longitude_of_false_origin");
@@ -85,9 +84,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * <p>
    * lambda =
    */
-  public void inverse(
-    final Coordinates from,
-    final Coordinates to) {
+  public void inverse(final Coordinates from, final Coordinates to) {
     final double x = from.getX() - x0;
     final double y = from.getY() - y0;
     final double theta = Math.atan(x / (rho0 - y));
@@ -135,8 +132,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * @param phi The lattitude in radians.
    * @return
    */
-  private double m(
-    final double phi) {
+  private double m(final double phi) {
     final double sinPhi = Math.sin(phi);
     final double m = Math.cos(phi) / Math.sqrt(1.0 - ee * sinPhi * sinPhi);
     return m;
@@ -155,9 +151,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * 
    * </pre>
    */
-  public void project(
-    final Coordinates from,
-    final Coordinates to) {
+  public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getX();
     final double phi = from.getY();
     final double q = q(phi);
@@ -189,8 +183,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * @param phi The lattitude in radians
    * @return
    */
-  private double q(
-    final double phi) {
+  private double q(final double phi) {
     final double sinPhi = Math.sin(phi);
     final double eSinPhi = e * sinPhi;
     final double q = (1.0 - ee)
@@ -205,8 +198,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * @param phi
    * @return
    */
-  private double qInverse(
-    final double rho) {
+  private double qInverse(final double rho) {
     return (c - rho * rho * n * n / (semiMajorAxis * semiMajorAxis)) / n;
   }
 }

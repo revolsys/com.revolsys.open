@@ -95,7 +95,8 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private void writePolyLineHeader(final EndianOutput out,
+  private void writePolyLineHeader(
+    final EndianOutput out,
     final Geometry geometry) throws IOException {
     final int numCoordinates = geometry.getNumPoints();
     final int numGeometries = geometry.getNumGeometries();

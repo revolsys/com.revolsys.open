@@ -28,6 +28,15 @@ public abstract class IafAction {
   private ActionConfig config;
 
   /**
+   * Get the configuration of the action.
+   * 
+   * @return The configuration of the action.
+   */
+  public ActionConfig getConfig() {
+    return config;
+  }
+
+  /**
    * Initialize the action.
    * 
    * @param config The configuration of the action.
@@ -43,16 +52,8 @@ public abstract class IafAction {
    * @throws ServletException If there was an error running the action.
    * @throws IOException If an I/O error occurred.
    */
-  public abstract void process(HttpServletRequest request,
+  public abstract void process(
+    HttpServletRequest request,
     HttpServletResponse response) throws ServletException, IOException;
-
-  /**
-   * Get the configuration of the action.
-   * 
-   * @return The configuration of the action.
-   */
-  public ActionConfig getConfig() {
-    return config;
-  }
 
 }

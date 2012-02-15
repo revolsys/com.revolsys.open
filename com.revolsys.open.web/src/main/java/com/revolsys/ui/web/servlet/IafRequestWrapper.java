@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class IafRequestWrapper extends HttpServletRequestWrapper {
 
-  public IafRequestWrapper(HttpServletRequest request) {
+  public IafRequestWrapper(final HttpServletRequest request) {
     super(request);
   }
 

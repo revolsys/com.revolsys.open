@@ -5,24 +5,32 @@ import com.revolsys.io.gml.GmlConstants;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
 
-public abstract class AbstractGmlFieldType implements
-  GmlFieldType, GmlConstants {
+public abstract class AbstractGmlFieldType implements GmlFieldType,
+  GmlConstants {
 
-  private String xmlSchemaTypeName;
+  private final String xmlSchemaTypeName;
 
-  private DataType dataType;
+  private final DataType dataType;
 
-
-  public AbstractGmlFieldType(
-    DataType dataType,
-    String xmlSchemaTypeName) {
+  public AbstractGmlFieldType(final DataType dataType,
+    final String xmlSchemaTypeName) {
     this.dataType = dataType;
     this.xmlSchemaTypeName = xmlSchemaTypeName;
-   }
+  }
 
-  public void writeValue(
-    XmlWriter out,
-    Object value) {
+  public DataType getDataType() {
+    return dataType;
+  }
+
+  protected String getType(final Object value) {
+    return xmlSchemaTypeName;
+  }
+
+  public String getXmlSchemaTypeName() {
+    return xmlSchemaTypeName;
+  }
+
+  public void writeValue(final XmlWriter out, final Object value) {
     if (value == null) {
       out.attribute(XsiConstants.NIL, true);
     } else {
@@ -30,22 +38,6 @@ public abstract class AbstractGmlFieldType implements
     }
   }
 
-  protected String getType(
-    Object value) {
-    return xmlSchemaTypeName;
-  }
-
-  protected abstract void writeValueText(
-    XmlWriter out,
-    Object value);
-
-
-  public String getXmlSchemaTypeName() {
-    return xmlSchemaTypeName;
-  }
-
-  public DataType getDataType() {
-    return dataType;
-  }
+  protected abstract void writeValueText(XmlWriter out, Object value);
 
 }

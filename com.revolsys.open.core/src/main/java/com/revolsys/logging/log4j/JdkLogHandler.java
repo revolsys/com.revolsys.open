@@ -25,8 +25,7 @@ public class JdkLogHandler extends Handler {
   }
 
   @Override
-  public void close()
-    throws SecurityException {
+  public void close() throws SecurityException {
   }
 
   @Override
@@ -34,8 +33,7 @@ public class JdkLogHandler extends Handler {
   }
 
   @Override
-  public void publish(
-    final LogRecord record) {
+  public void publish(final LogRecord record) {
     final Logger log = Logger.getLogger(record.getLoggerName());
     final Level level = record.getLevel();
     final String message = record.getMessage();

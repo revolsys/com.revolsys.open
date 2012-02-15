@@ -39,6 +39,12 @@ public class SqlDateSelectField extends Field {
 
   private static final String MONTH_KEY = "Month";
 
+  public static int getYear(final int offset) {
+    final Calendar date = new GregorianCalendar();
+    date.add(Calendar.YEAR, offset);
+    return date.get(Calendar.YEAR);
+  }
+
   private final Logger log = Logger.getLogger(SqlDateSelectField.class);
 
   private static final List DAY_OPTIONS;
@@ -51,21 +57,21 @@ public class SqlDateSelectField extends Field {
   };
 
   static {
-    List dayOptions = new ArrayList();
+    final List dayOptions = new ArrayList();
     for (byte i = 1; i <= 31; i++) {
-      String val = String.valueOf(i);
+      final String val = String.valueOf(i);
       dayOptions.add(new FieldValue(new Byte(i), val, val));
     }
     DAY_OPTIONS = Collections.unmodifiableList(dayOptions);
-    List monthOptions = new ArrayList();
+    final List monthOptions = new ArrayList();
     for (byte i = 0; i < MONTHS.length; i++) {
-      String val = String.valueOf(i);
+      final String val = String.valueOf(i);
       monthOptions.add(new FieldValue(new Byte(i), val, MONTHS[i]));
     }
     MONTH_OPTIONS = Collections.unmodifiableList(monthOptions);
   }
 
-  private List yearOptions = new ArrayList();
+  private final List yearOptions = new ArrayList();
 
   private String dayStringValue;
 
@@ -73,15 +79,9 @@ public class SqlDateSelectField extends Field {
 
   private String yearStringValue;
 
-  private int startYear;
+  private final int startYear;
 
-  private int endYear;
-
-  public static int getYear(final int offset) {
-    Calendar date = new GregorianCalendar();
-    date.add(Calendar.YEAR, offset);
-    return date.get(Calendar.YEAR);
-  }
+  private final int endYear;
 
   /**
    * @param name
@@ -99,67 +99,27 @@ public class SqlDateSelectField extends Field {
     final int startYear, final int endYear) {
     super(name, required);
     for (int i = startYear; i <= endYear; i++) {
-      String val = String.valueOf(i);
+      final String val = String.valueOf(i);
       yearOptions.add(new FieldValue(new Integer(i), val, val));
     }
     this.startYear = startYear;
     this.endYear = endYear;
   }
 
-  public void serializeElement(final XmlWriter out) {
-    serializeSelect(out, MONTH_KEY, MONTH_OPTIONS);
-    out.entityRef("nbsp");
-    serializeSelect(out, DAY_KEY, DAY_OPTIONS);
-    out.entityRef("nbsp");
-    serializeSelect(out, YEAR_KEY, yearOptions);
+  @Override
+  public boolean hasValue() {
+    return dayStringValue != null && !dayStringValue.equals("")
+      && monthStringValue != null && !monthStringValue.equals("")
+      && yearStringValue != null && !yearStringValue.equals("");
   }
 
-  private void serializeSelect(final XmlWriter out, final String part,
-    final List options) {
-    String name = getName() + part;
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ID, name);
-    out.attribute(HtmlUtil.ATTR_NAME, name);
-    serializeOptions(out, part, options);
-    out.endTag(HtmlUtil.SELECT);
-  }
-
-  private void serializeOptions(final XmlWriter out, final String part,
-    final List options) {
-    String stringValue = "";
-    if (part.equals(DAY_KEY)) {
-      stringValue = dayStringValue;
-    } else if (part.equals(MONTH_KEY)) {
-      stringValue = monthStringValue;
-    } else if (part.equals(YEAR_KEY)) {
-      stringValue = yearStringValue;
-    }
-    if (!isRequired()) {
-      out.startTag(HtmlUtil.OPTION);
-      out.attribute(HtmlUtil.ATTR_VALUE, "");
-      out.text("-");
-      out.endTag();
-    }
-    for (Iterator optionIter = options.iterator(); optionIter.hasNext();) {
-      FieldValue option = (FieldValue)optionIter.next();
-      out.startTag(HtmlUtil.OPTION);
-      if (option.getStringValue().equals(stringValue)) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
-      }
-      if (!option.getStringValue().equals(option.getLabel())) {
-        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
-      }
-      out.text(option.getLabel());
-      out.endTag(HtmlUtil.OPTION);
-    }
-  }
-
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     dayStringValue = request.getParameter(getName() + DAY_KEY);
     monthStringValue = request.getParameter(getName() + MONTH_KEY);
     yearStringValue = request.getParameter(getName() + YEAR_KEY);
-    Date date = (Date)getInitialValue(request);
-    Calendar calendar = Calendar.getInstance();
+    final Date date = (Date)getInitialValue(request);
+    final Calendar calendar = Calendar.getInstance();
     if (date != null) {
       calendar.setTime(date);
     }
@@ -175,12 +135,7 @@ public class SqlDateSelectField extends Field {
 
   }
 
-  public boolean hasValue() {
-    return dayStringValue != null && !dayStringValue.equals("")
-      && monthStringValue != null && !monthStringValue.equals("")
-      && yearStringValue != null && !yearStringValue.equals("");
-  }
-
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
@@ -191,13 +146,13 @@ public class SqlDateSelectField extends Field {
       int year = 1900;
       try {
         day = Integer.parseInt(dayStringValue);
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         addValidationError("Invalid Day");
         valid = false;
       }
       try {
         month = Integer.parseInt(monthStringValue);
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         addValidationError("Invalid Month");
         valid = false;
       }
@@ -208,19 +163,19 @@ public class SqlDateSelectField extends Field {
             + endYear);
           valid = false;
         }
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         addValidationError("Invalid Year");
         valid = false;
       }
 
       if (valid) {
         try {
-          Calendar date = Calendar.getInstance();
+          final Calendar date = Calendar.getInstance();
           date.clear();
           date.setLenient(false);
           date.set(year, month, day);
           setValue(new Date(date.getTimeInMillis()));
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
           log.debug(e.getMessage(), e);
           addValidationError("Invalid Date");
           valid = false;
@@ -229,5 +184,58 @@ public class SqlDateSelectField extends Field {
       }
     }
     return valid;
+  }
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    serializeSelect(out, MONTH_KEY, MONTH_OPTIONS);
+    out.entityRef("nbsp");
+    serializeSelect(out, DAY_KEY, DAY_OPTIONS);
+    out.entityRef("nbsp");
+    serializeSelect(out, YEAR_KEY, yearOptions);
+  }
+
+  private void serializeOptions(
+    final XmlWriter out,
+    final String part,
+    final List options) {
+    String stringValue = "";
+    if (part.equals(DAY_KEY)) {
+      stringValue = dayStringValue;
+    } else if (part.equals(MONTH_KEY)) {
+      stringValue = monthStringValue;
+    } else if (part.equals(YEAR_KEY)) {
+      stringValue = yearStringValue;
+    }
+    if (!isRequired()) {
+      out.startTag(HtmlUtil.OPTION);
+      out.attribute(HtmlUtil.ATTR_VALUE, "");
+      out.text("-");
+      out.endTag();
+    }
+    for (final Iterator optionIter = options.iterator(); optionIter.hasNext();) {
+      final FieldValue option = (FieldValue)optionIter.next();
+      out.startTag(HtmlUtil.OPTION);
+      if (option.getStringValue().equals(stringValue)) {
+        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+      }
+      if (!option.getStringValue().equals(option.getLabel())) {
+        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
+      }
+      out.text(option.getLabel());
+      out.endTag(HtmlUtil.OPTION);
+    }
+  }
+
+  private void serializeSelect(
+    final XmlWriter out,
+    final String part,
+    final List options) {
+    final String name = getName() + part;
+    out.startTag(HtmlUtil.SELECT);
+    out.attribute(HtmlUtil.ATTR_ID, name);
+    out.attribute(HtmlUtil.ATTR_NAME, name);
+    serializeOptions(out, part, options);
+    out.endTag(HtmlUtil.SELECT);
   }
 }

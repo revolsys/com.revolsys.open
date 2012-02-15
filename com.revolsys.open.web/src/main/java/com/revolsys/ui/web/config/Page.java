@@ -48,13 +48,19 @@ public class Page extends Component {
 
   public static String getAbsoluteUrl(final String url) {
     if (url.startsWith("/")) {
-      HttpServletRequest request = getRequest();
-      String serverUrl = HttpRequestUtils.getServerUrl(request);
+      final HttpServletRequest request = getRequest();
+      final String serverUrl = HttpRequestUtils.getServerUrl(request);
       final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
       return serverUrl + contextPath + url;
     } else {
       return url;
     }
+  }
+
+  private static HttpServletRequest getRequest() {
+    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    final HttpServletRequest request = requestAttributes.getRequest();
+    return request;
   }
 
   private final List<Argument> arguments = new ArrayList<Argument>();
@@ -214,6 +220,11 @@ public class Page extends Component {
     return attributes;
   }
 
+  public String getExpandedTitle() {
+    final Map<String, Object> parameters = Collections.<String, Object> emptyMap();
+    return getTitle(parameters);
+  }
+
   public String getFullPath() {
     if (secure) {
       return getAbsolutePath() + ".wps";
@@ -225,35 +236,6 @@ public class Page extends Component {
   public String getFullUrl() {
     final Map<String, Object> parameters = Collections.emptyMap();
     return getFullUrl(parameters);
-  }
-
-  private static HttpServletRequest getRequest() {
-    ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-    HttpServletRequest request = requestAttributes.getRequest();
-    return request;
-  }
-
-  public Map<String, Object> getUriTemplateVariables(
-    Map<String, Object> parameters) {
-    HttpServletRequest request = getRequest();
-    final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-    Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
-
-    for (String name : uriTemplate.getVariableNames()) {
-      Object value = parameters.remove(name);
-      if (value == null) {
-        if (pathVariables != null) {
-          value = pathVariables.get(name);
-        }
-        if (value == null) {
-          value = request.getParameter(name);
-        }
-      }
-      if (value != null) {
-        uriTemplateVariables.put(name, value);
-      }
-    }
-    return uriTemplateVariables;
   }
 
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
@@ -271,9 +253,9 @@ public class Page extends Component {
         }
       }
     }
-    Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
-    URI path = uriTemplate.expand(uriTemplateVariables);
-    String url = UrlUtil.getUrl(path, uriParameters);
+    final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
+    final URI path = uriTemplate.expand(uriTemplateVariables);
+    final String url = UrlUtil.getUrl(path, uriParameters);
     return getAbsoluteUrl(PathAliasController.getPath(url));
   }
 
@@ -337,18 +319,36 @@ public class Page extends Component {
     }
   }
 
-  public String getExpandedTitle() {
-    Map<String, Object> parameters = Collections.<String, Object> emptyMap();
-    return getTitle(parameters);
-  }
-
-  public String getTitle(Map<String, Object> parameters) {
+  public String getTitle(final Map<String, Object> parameters) {
     if (titleTemplate == null) {
       return title;
     } else {
-      Map<String, Object> uriTemplateVariables = getUriTemplateVariables(parameters);
+      final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(parameters);
       return titleTemplate.expand(uriTemplateVariables);
     }
+  }
+
+  public Map<String, Object> getUriTemplateVariables(
+    final Map<String, Object> parameters) {
+    final HttpServletRequest request = getRequest();
+    final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+    final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
+
+    for (final String name : uriTemplate.getVariableNames()) {
+      Object value = parameters.remove(name);
+      if (value == null) {
+        if (pathVariables != null) {
+          value = pathVariables.get(name);
+        }
+        if (value == null) {
+          value = request.getParameter(name);
+        }
+      }
+      if (value != null) {
+        uriTemplateVariables.put(name, value);
+      }
+    }
+    return uriTemplateVariables;
   }
 
   public boolean hasArgument(final String name) {

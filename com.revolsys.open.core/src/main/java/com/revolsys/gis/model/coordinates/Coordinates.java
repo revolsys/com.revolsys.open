@@ -9,26 +9,25 @@ public interface Coordinates extends Comparable<Coordinates> {
    * 
    * @return The angle in radians.
    */
-  double angle2d(
-    Coordinates other);
+  double angle2d(Coordinates other);
 
   Coordinates clone();
 
-  double distance(
-    Coordinates coordinates);
+  double distance(Coordinates coordinates);
 
-  boolean equals(
-    double... coordinates);
+  boolean equals(double... coordinates);
 
-  boolean equals2d(
-    Coordinates coordinates);
+  boolean equals2d(Coordinates coordinates);
 
   double[] getCoordinates();
 
+  double getM();
+
   byte getNumAxis();
 
-  double getValue(
-    int index);
+  long getTime();
+
+  double getValue(int index);
 
   double getX();
 
@@ -36,26 +35,15 @@ public interface Coordinates extends Comparable<Coordinates> {
 
   double getZ();
 
-  double getM();
+  void setM(double m);
 
-  long getTime();
+  void setTime(long time);
 
-  void setValue(
-    final int index,
-    final double value);
+  void setValue(final int index, final double value);
 
-  void setX(
-    double x);
+  void setX(double x);
 
-  void setY(
-    double y);
+  void setY(double y);
 
-  void setZ(
-    double z);
-
-  void setM(
-    double m);
-
-  void setTime(
-    long time);
+  void setZ(double z);
 }

@@ -20,8 +20,28 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory {
   /** The factory instance. */
   public static final EcsvIoFactory INSTANCE = new EcsvIoFactory();
 
+  public static DataObjectMetaData readSchema(final Resource resource) {
+    final EcsvDataObjectIterator iterator = new EcsvDataObjectIterator(resource);
+    try {
+      iterator.init();
+      final DataObjectMetaData metaData = iterator.getMetaData();
+      return metaData;
+    } finally {
+      iterator.close();
+    }
+  }
+
+  public static void writeSchema(
+    final DataObjectMetaData metaData,
+    final Resource resource) {
+    final java.io.Writer out = SpringUtil.getWriter(resource);
+    final EcsvDataObjectWriter writer = new EcsvDataObjectWriter(metaData, out);
+    writer.open();
+    writer.close();
+  }
+
   public EcsvIoFactory() {
-    super(EcsvConstants.DESCRIPTION, false,true);
+    super(EcsvConstants.DESCRIPTION, false, true);
     addMediaTypeAndFileExtension(EcsvConstants.MEDIA_TYPE,
       EcsvConstants.FILE_EXTENSION);
   }
@@ -33,35 +53,20 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory {
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public DataObjectReader createDataObjectReader(Resource resource,
-    DataObjectFactory dataObjectFactory) {
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory) {
     final EcsvDataObjectIterator iterator = new EcsvDataObjectIterator(
       resource, dataObjectFactory);
     return new DataObjectIteratorReader(iterator);
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
     return new EcsvDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));
-  }
-
-  public static void writeSchema(final DataObjectMetaData metaData,
-    Resource resource) {
-    java.io.Writer out = SpringUtil.getWriter(resource);
-    final EcsvDataObjectWriter writer = new EcsvDataObjectWriter(metaData, out);
-    writer.open();
-    writer.close();
-  }
-
-  public static DataObjectMetaData readSchema(Resource resource) {
-    EcsvDataObjectIterator iterator = new EcsvDataObjectIterator(resource);
-    try {
-      iterator.init();
-      final DataObjectMetaData metaData = iterator.getMetaData();
-      return metaData;
-    } finally {
-      iterator.close();
-    }
   }
 }

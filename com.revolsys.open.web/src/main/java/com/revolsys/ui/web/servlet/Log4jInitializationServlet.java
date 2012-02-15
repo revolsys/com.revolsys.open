@@ -45,6 +45,15 @@ public class Log4jInitializationServlet extends HttpServlet {
   public static final String DEFAULT_LOG4J_XML_LOCATION = "/WEB-INF/log4j.xml";
 
   /**
+   * Clean up the servlet by removing the logging configuration for the current
+   * context.
+   */
+  @Override
+  public void destroy() {
+    ContextClassLoaderRepositorySelector.remove();
+  }
+
+  /**
    * Initialize the logging for context by creating a new heirarchy for the
    * current thread context class context and loading the configuration from the
    * log4jXmlLocation context-param.
@@ -52,31 +61,24 @@ public class Log4jInitializationServlet extends HttpServlet {
    * @param config The servlet configuration.
    * @throws ServletException If there was a problem initializing the servlet.
    */
+  @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    Hierarchy hierarchy = ContextClassLoaderRepositorySelector.add();
-    ServletContext context = config.getServletContext();
+    final Hierarchy hierarchy = ContextClassLoaderRepositorySelector.add();
+    final ServletContext context = config.getServletContext();
     String log4jXml = context.getInitParameter("log4jXmlLocation");
     if (log4jXml == null) {
       log4jXml = DEFAULT_LOG4J_XML_LOCATION;
     }
     try {
-      InputStream log4JConfig = context.getResourceAsStream(log4jXml);
+      final InputStream log4JConfig = context.getResourceAsStream(log4jXml);
       if (log4JConfig != null) {
-        DOMConfigurator conf = new DOMConfigurator();
+        final DOMConfigurator conf = new DOMConfigurator();
         conf.doConfigure(log4JConfig, hierarchy);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new ServletException(e);
     }
-  }
-
-  /**
-   * Clean up the servlet by removing the logging configuration for the current
-   * context.
-   */
-  public void destroy() {
-    ContextClassLoaderRepositorySelector.remove();
   }
 
 }

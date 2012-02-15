@@ -70,8 +70,7 @@ public class ProcessorPipelineTool {
 
   private static final String SOURCE_FLE_EXTENSION = "sourceFileExtension";
 
-  private static Throwable getBeanExceptionCause(
-    final BeanCreationException e) {
+  private static Throwable getBeanExceptionCause(final BeanCreationException e) {
     Throwable cause = e.getCause();
     while (cause instanceof BeanCreationException
       || cause instanceof MethodInvocationException
@@ -87,8 +86,7 @@ public class ProcessorPipelineTool {
   /**
    * @param args
    */
-  public static void main(
-    final String[] args) {
+  public static void main(final String[] args) {
     final ProcessorPipelineTool app = new ProcessorPipelineTool();
     app.start(args);
   }
@@ -157,8 +155,7 @@ public class ProcessorPipelineTool {
   }
 
   @SuppressWarnings("unchecked")
-  public boolean processArguments(
-    final String[] args) {
+  public boolean processArguments(final String[] args) {
     try {
       final CommandLineParser parser = new PosixParser();
       commandLine = parser.parse(options, args);
@@ -340,8 +337,7 @@ public class ProcessorPipelineTool {
     }
   }
 
-  public void start(
-    final String[] args) {
+  public void start(final String[] args) {
     if (processArguments(args)) {
       run();
     } else {

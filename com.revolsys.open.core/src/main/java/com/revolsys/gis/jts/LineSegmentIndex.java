@@ -10,8 +10,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 public class LineSegmentIndex extends Quadtree {
-  public void insert(
-    final Geometry geometry) {
+  public void insert(final Geometry geometry) {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry subGeometry = geometry.getGeometryN(i);
       if (subGeometry instanceof LineString) {
@@ -21,14 +20,12 @@ public class LineSegmentIndex extends Quadtree {
     }
   }
 
-  public void insert(
-    final LineSegment3D lineSegment) {
+  public void insert(final LineSegment3D lineSegment) {
     final Envelope envelope = lineSegment.getEnvelope();
     insert(envelope, lineSegment);
   }
 
-  public void insert(
-    final LineString line) {
+  public void insert(final LineString line) {
     final CoordinateSequenceLineSegmentIterator segments = new CoordinateSequenceLineSegmentIterator(
       line.getCoordinateSequence());
     for (final LineSegment3D lineSegment : segments) {
@@ -37,7 +34,12 @@ public class LineSegmentIndex extends Quadtree {
   }
 
   public List<Coordinate> queryIntersections(
-    final LineSegment3D querySeg) {
+    final Coordinate c0,
+    final Coordinate c1) {
+    return queryIntersections(new LineSegment3D(c0, c1));
+  }
+
+  public List<Coordinate> queryIntersections(final LineSegment3D querySeg) {
     final Envelope env = new Envelope(querySeg.p0, querySeg.p1);
     final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(
       querySeg);
@@ -45,11 +47,5 @@ public class LineSegmentIndex extends Quadtree {
     final List<Coordinate> intersections = new ArrayList<Coordinate>(
       visitor.getIntersections());
     return intersections;
-  }
-
-  public List<Coordinate> queryIntersections(
-    Coordinate c0,
-    Coordinate c1) {
-    return queryIntersections(new LineSegment3D(c0, c1));
   }
 }

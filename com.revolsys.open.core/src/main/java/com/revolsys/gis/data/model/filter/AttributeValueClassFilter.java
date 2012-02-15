@@ -22,8 +22,7 @@ public class AttributeValueClassFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Object propertyValue = DataObjectUtil.getAttributeByPath(object,
       attributeName);
     return type.isInstance(propertyValue);
@@ -52,8 +51,7 @@ public class AttributeValueClassFilter implements Filter<DataObject> {
    * 
    * @param attributeName The attributeName name, or path to match.
    */
-  public void setAttributeName(
-    final String attributeName) {
+  public void setAttributeName(final String attributeName) {
     this.attributeName = attributeName;
   }
 
@@ -62,8 +60,7 @@ public class AttributeValueClassFilter implements Filter<DataObject> {
    * 
    * @param type The type to match.
    */
-  public void setType(
-    final String type) {
+  public void setType(final String type) {
     try {
       this.type = Class.forName(type);
     } catch (final ClassNotFoundException e) {

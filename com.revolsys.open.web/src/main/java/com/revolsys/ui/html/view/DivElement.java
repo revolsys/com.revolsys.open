@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -24,9 +23,9 @@ import com.revolsys.ui.html.HtmlUtil;
  * @version 1.0
  */
 public class DivElement extends Element {
-  private String cssClass;
+  private final String cssClass;
 
-  private String content;
+  private final String content;
 
   public DivElement(final String content) {
     this(null, content);
@@ -43,9 +42,11 @@ public class DivElement extends Element {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter)
+   * @see
+   * com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter
+   * )
    */
+  @Override
   public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeDiv(out, cssClass, content);
   }

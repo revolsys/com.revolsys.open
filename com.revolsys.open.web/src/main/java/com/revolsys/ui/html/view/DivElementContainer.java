@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -35,14 +34,14 @@ public class DivElementContainer extends ElementContainer {
     this(null, cssClass);
   }
 
-  public DivElementContainer(final String id, final String cssClass) {
-    this.id = id;
-    this.cssClass = cssClass;
-  }
-
   public DivElementContainer(final String cssClass, final Element element) {
     this(cssClass);
     this.add(element);
+  }
+
+  public DivElementContainer(final String id, final String cssClass) {
+    this.id = id;
+    this.cssClass = cssClass;
   }
 
   public DivElementContainer(final String id, final String cssClass,
@@ -53,9 +52,11 @@ public class DivElementContainer extends ElementContainer {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter)
+   * @see
+   * com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter
+   * )
    */
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     if (id != null) {

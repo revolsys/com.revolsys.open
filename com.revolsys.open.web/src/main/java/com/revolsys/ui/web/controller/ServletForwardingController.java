@@ -35,45 +35,31 @@ public class ServletForwardingController extends AbstractController implements
 
   private String beanName;
 
-  public void setServletName(
-    String servletName) {
-    this.servletName = servletName;
-  }
-
-  public void setBeanName(
-    String name) {
-    this.beanName = name;
-    if (this.servletName == null) {
-      this.servletName = name;
-    }
-  }
-
   @Override
   protected ModelAndView handleRequestInternal(
     HttpServletRequest request,
-    HttpServletResponse response)
-    throws Exception {
+    final HttpServletResponse response) throws Exception {
 
     final ServletContext servletContext = getServletContext();
-    RequestDispatcher rd = servletContext.getNamedDispatcher(this.servletName);
+    final RequestDispatcher rd = servletContext.getNamedDispatcher(this.servletName);
     if (rd == null) {
       throw new ServletException("No servlet with name '" + this.servletName
         + "' defined in web.xml");
     }
     final String dispatcherRequestPath = (String)request.getAttribute("org.apache.catalina.core.DISPATCHER_REQUEST_PATH");
     if (dispatcherRequestPath != null) {
-      String servletPath = request.getServletPath();
-      String pathInfo = request.getPathInfo();
+      final String servletPath = request.getServletPath();
+      final String pathInfo = request.getPathInfo();
       if (servletPath.equals("") && !pathInfo.equals(dispatcherRequestPath)) {
         request = new HttpServletRequestWrapper(request) {
           @Override
-          public String getRequestURI() {
-            return getContextPath() + getServletPath() + getPathInfo();
+          public String getPathInfo() {
+            return dispatcherRequestPath;
           }
 
           @Override
-          public String getPathInfo() {
-            return dispatcherRequestPath;
+          public String getRequestURI() {
+            return getContextPath() + getServletPath() + getPathInfo();
           }
         };
       }
@@ -88,6 +74,17 @@ public class ServletForwardingController extends AbstractController implements
       rd.forward(request, response);
     }
     return null;
+  }
+
+  public void setBeanName(final String name) {
+    this.beanName = name;
+    if (this.servletName == null) {
+      this.servletName = name;
+    }
+  }
+
+  public void setServletName(final String servletName) {
+    this.servletName = servletName;
   }
 
   /**
@@ -108,8 +105,8 @@ public class ServletForwardingController extends AbstractController implements
    * @see org.springframework.web.util.WebUtils#isIncludeRequest
    */
   protected boolean useInclude(
-    HttpServletRequest request,
-    HttpServletResponse response) {
+    final HttpServletRequest request,
+    final HttpServletResponse response) {
     return (WebUtils.isIncludeRequest(request) || response.isCommitted());
   }
 

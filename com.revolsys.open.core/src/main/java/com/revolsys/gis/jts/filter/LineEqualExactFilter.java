@@ -34,13 +34,13 @@ public class LineEqualExactFilter implements Filter<LineString> {
     this.points = CoordinatesListUtil.get(line);
   }
 
-  public LineEqualExactFilter(final LineString line, int numAxis) {
+  public LineEqualExactFilter(final LineString line, final int numAxis) {
     this.points = CoordinatesListUtil.get(line);
     this.numAxis = numAxis;
   }
 
   public boolean accept(final LineString line) {
-    CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesList points = CoordinatesListUtil.get(line);
 
     final boolean equal;
     if (numAxis >= 2) {

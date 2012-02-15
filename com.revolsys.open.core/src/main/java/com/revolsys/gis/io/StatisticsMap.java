@@ -32,7 +32,9 @@ public class StatisticsMap {
 
   }
 
-  public void add(final String statisticName, final DataObject object,
+  public void add(
+    final String statisticName,
+    final DataObject object,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(object, count);
@@ -43,7 +45,9 @@ public class StatisticsMap {
     statistics.add(type);
   }
 
-  public void add(final String statisticName, final DataObjectMetaData type,
+  public void add(
+    final String statisticName,
+    final DataObjectMetaData type,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type, count);
@@ -54,7 +58,9 @@ public class StatisticsMap {
     statistics.add(typeName);
   }
 
-  public void add(final String statisticName, final QName typeName,
+  public void add(
+    final String statisticName,
+    final QName typeName,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(typeName, count);
@@ -70,7 +76,9 @@ public class StatisticsMap {
     statistics.add(name);
   }
 
-  public void add(final String statisticName, final String name,
+  public void add(
+    final String statisticName,
+    final String name,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(name, count);
@@ -91,6 +99,10 @@ public class StatisticsMap {
     }
   }
 
+  public String getPrefix() {
+    return prefix;
+  }
+
   public synchronized Statistics getStatistics(final String statisticName) {
     if (statisticName == null) {
       return null;
@@ -107,10 +119,6 @@ public class StatisticsMap {
 
   public synchronized Set<String> getStatisticsNames() {
     return statisticsMap.keySet();
-  }
-
-  public String getPrefix() {
-    return prefix;
   }
 
   public void setPrefix(final String prefix) {

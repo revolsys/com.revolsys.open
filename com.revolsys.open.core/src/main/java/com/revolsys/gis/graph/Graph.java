@@ -52,7 +52,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.util.NoOp;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -92,63 +91,6 @@ public class Graph<T> {
 
   public void add(final NodeEventListener<T> listener) {
     nodeListeners.add(listener);
-  }
-
-  public boolean movePointsWithinTolerance(
-    final Map<Coordinates, Coordinates> movedNodes, final double maxDistance,
-    final Node<T> node1) {
-    final Graph<T> graph1 = node1.getGraph();
-    List<Node<T>> nodes2 = findNodes(node1, maxDistance);
-    if (nodes2.isEmpty()) {
-      nodes2 = findNodes(node1, maxDistance * 2);
-      if (nodes2.size() == 1) {
-        final Node<T> node2 = nodes2.get(0);
-        if (graph1.findNode(node2) == null) {
-          List<Edge<T>> inEdges = node2.getInEdges();
-          List<Edge<T>> outEdges = node2.getOutEdges();
-          if (inEdges.size() == 1 && outEdges.size() == 1) {
-            Edge<T> inEdge = inEdges.get(0);
-            if (inEdge.distance(node1) < maxDistance) {
-              moveToMidpoint(movedNodes, graph1, node1, node2);
-              return true;
-            }
-            Edge<T> outEdge = outEdges.get(0);
-            if (outEdge.distance(node1) < maxDistance) {
-              moveToMidpoint(movedNodes, graph1, node1, node2);
-              return true;
-            }
-          }
-        }
-      }
-    } else if (nodes2.size() == 1) {
-      final Node<T> node2 = nodes2.get(0);
-      if (graph1.findNode(node2) == null) {
-        moveToMidpoint(movedNodes, graph1, node1, node2);
-      }
-    }
-    return true;
-  }
-
-  public void moveToMidpoint(final Map<Coordinates, Coordinates> movedNodes,
-    final Graph<T> graph1, final Node<T> node1, final Node<T> node2) {
-    final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
-    final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
-      node1, node2);
-    if (!node1.equals2d(midPoint)) {
-      if (movedNodes != null) {
-        movedNodes.put(node1.clone(), midPoint);
-      }
-      node1.move(midPoint);
-    }
-    if (!node2.equals2d(midPoint)) {
-      if (movedNodes != null) {
-        movedNodes.put(node2.clone(), midPoint);
-      }
-      node2.move(midPoint);
-    }
-  }
-
-  public void nodeMoved(Node<T> node, Node<T> newNode) {
   }
 
   public Edge<T> add(final T object, final LineString line) {
@@ -191,7 +133,7 @@ public class Graph<T> {
 
   public boolean contains(final Edge<T> edge) {
     if (edge.getGraph() == this) {
-      int id = edge.getId();
+      final int id = edge.getId();
       return edgesById.containsKey(id);
     }
     return false;
@@ -201,7 +143,8 @@ public class Graph<T> {
     copyEdges(null, target);
   }
 
-  public void copyEdges(final Filter<Edge<T>> filter,
+  public void copyEdges(
+    final Filter<Edge<T>> filter,
     final Collection<Edge<T>> target) {
     if (filter == null) {
       target.addAll(edges);
@@ -214,7 +157,8 @@ public class Graph<T> {
     target.addAll(nodesByCoordinates.values());
   }
 
-  public void copyNodes(final Filter<Node<T>> filter,
+  public void copyNodes(
+    final Filter<Node<T>> filter,
     final Collection<Node<T>> target) {
     if (filter == null) {
       copyNodes(target);
@@ -223,8 +167,10 @@ public class Graph<T> {
     }
   }
 
-  public Edge<T> createEdge(final GeometryFactory geometryFactory,
-    final T object, final CoordinatesList points) {
+  public Edge<T> createEdge(
+    final GeometryFactory geometryFactory,
+    final T object,
+    final CoordinatesList points) {
     final LineString newLine = geometryFactory.createLineString(points);
     final T newObject = clone(object, newLine);
     final Edge<T> newEdge = add(newObject, newLine);
@@ -240,16 +186,16 @@ public class Graph<T> {
     return edges;
   }
 
+  public List<Edge<T>> findEdges(final Coordinates point, final double distance) {
+    return EdgeWithinDistanceVisitor.edgesWithinDistance(this, point, distance);
+  }
+
   public List<Edge<T>> findEdges(final EdgeVisitor<T> visitor) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     queryEdges(visitor, results);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
-  }
-
-  public List<Edge<T>> findEdges(final Coordinates point, final double distance) {
-    return EdgeWithinDistanceVisitor.edgesWithinDistance(this, point, distance);
   }
 
   /**
@@ -410,12 +356,13 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter) {
-    List<Edge<T>> edges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     copyEdges(filter, edges);
     return edges;
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
+  public List<Edge<T>> getEdges(
+    final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges(filter);
     if (comparator != null) {
@@ -424,8 +371,10 @@ public class Graph<T> {
     return targetEdges;
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Envelope envelope) {
+  public List<Edge<T>> getEdges(
+    final Filter<Edge<T>> filter,
+    final Comparator<Edge<T>> comparator,
+    final Envelope envelope) {
     final FilterListVisitor<Edge<T>> results = new FilterListVisitor<Edge<T>>(
       filter);
     final EdgeQuadTree<T> edgeIndex = getEdgeIndex();
@@ -440,13 +389,16 @@ public class Graph<T> {
 
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Geometry geometry) {
+  public List<Edge<T>> getEdges(
+    final Filter<Edge<T>> filter,
+    final Comparator<Edge<T>> comparator,
+    final Geometry geometry) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return getEdges(filter, comparator, envelope);
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
+  public List<Edge<T>> getEdges(
+    final Filter<Edge<T>> filter,
     final Envelope envelope) {
     final FilterListVisitor<Edge<T>> results = new FilterListVisitor<Edge<T>>(
       filter);
@@ -458,7 +410,8 @@ public class Graph<T> {
 
   }
 
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
+  public List<Edge<T>> getEdges(
+    final Filter<Edge<T>> filter,
     final Geometry geometry) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return getEdges(filter, envelope);
@@ -539,7 +492,8 @@ public class Graph<T> {
     }
   }
 
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
+  public List<Node<T>> getNodes(
+    final Filter<Node<T>> filter,
     final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes(filter);
     if (comparator != null) {
@@ -548,8 +502,10 @@ public class Graph<T> {
     return targetNodes;
   }
 
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
-    final Comparator<Node<T>> comparator, final Envelope envelope) {
+  public List<Node<T>> getNodes(
+    final Filter<Node<T>> filter,
+    final Comparator<Node<T>> comparator,
+    final Envelope envelope) {
     final FilterListVisitor<Node<T>> results = new FilterListVisitor<Node<T>>(
       filter);
     final NodeQuadTree<T> nodeIndex = getNodeIndex();
@@ -564,7 +520,8 @@ public class Graph<T> {
 
   }
 
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
+  public List<Node<T>> getNodes(
+    final Filter<Node<T>> filter,
     final Envelope envelope) {
     return getNodes(filter, null, envelope);
 
@@ -625,7 +582,8 @@ public class Graph<T> {
     return hasEdgeBetween(fromNode, toNode);
   }
 
-  public boolean hasEdgeBetween(final Coordinates fromPoint,
+  public boolean hasEdgeBetween(
+    final Coordinates fromPoint,
     final Coordinates toPoint) {
     final Node<T> fromNode = findNode(fromPoint);
     if (fromNode == null) {
@@ -647,7 +605,9 @@ public class Graph<T> {
    * @param edge1
    * @param edge2
    */
-  public Edge<T> merge(final Node<T> node, final Edge<T> edge1,
+  public Edge<T> merge(
+    final Node<T> node,
+    final Edge<T> edge1,
     final Edge<T> edge2) {
     if (edge1 != edge2 && edge1.hasNode(node) && edge2.hasNode(node)) {
       final T object1 = edge1.getObject();
@@ -688,8 +648,11 @@ public class Graph<T> {
     return newEdge;
   }
 
-  public void moveNode(final QName typeName, final Node<DataObject> fromNode,
-    final Node<DataObject> toNode, final Coordinates newPoint) {
+  public void moveNode(
+    final QName typeName,
+    final Node<DataObject> fromNode,
+    final Node<DataObject> toNode,
+    final Coordinates newPoint) {
     if (!fromNode.isRemoved() && !toNode.isRemoved()) {
       if (!fromNode.equals(toNode)) {
         final List<Edge<DataObject>> edges = NodeAttributes.getEdgesByType(
@@ -714,8 +677,10 @@ public class Graph<T> {
     }
   }
 
-  public boolean moveNodesToMidpoint(final QName typeName,
-    final Node<DataObject> node1, final Node<DataObject> node2) {
+  public boolean moveNodesToMidpoint(
+    final QName typeName,
+    final Node<DataObject> node1,
+    final Node<DataObject> node2) {
     final Coordinates point1 = node1.get3dCoordinates(typeName);
     final Coordinates point2 = node2.get3dCoordinates(typeName);
 
@@ -749,6 +714,67 @@ public class Graph<T> {
     }
   }
 
+  public boolean movePointsWithinTolerance(
+    final Map<Coordinates, Coordinates> movedNodes,
+    final double maxDistance,
+    final Node<T> node1) {
+    final Graph<T> graph1 = node1.getGraph();
+    List<Node<T>> nodes2 = findNodes(node1, maxDistance);
+    if (nodes2.isEmpty()) {
+      nodes2 = findNodes(node1, maxDistance * 2);
+      if (nodes2.size() == 1) {
+        final Node<T> node2 = nodes2.get(0);
+        if (graph1.findNode(node2) == null) {
+          final List<Edge<T>> inEdges = node2.getInEdges();
+          final List<Edge<T>> outEdges = node2.getOutEdges();
+          if (inEdges.size() == 1 && outEdges.size() == 1) {
+            final Edge<T> inEdge = inEdges.get(0);
+            if (inEdge.distance(node1) < maxDistance) {
+              moveToMidpoint(movedNodes, graph1, node1, node2);
+              return true;
+            }
+            final Edge<T> outEdge = outEdges.get(0);
+            if (outEdge.distance(node1) < maxDistance) {
+              moveToMidpoint(movedNodes, graph1, node1, node2);
+              return true;
+            }
+          }
+        }
+      }
+    } else if (nodes2.size() == 1) {
+      final Node<T> node2 = nodes2.get(0);
+      if (graph1.findNode(node2) == null) {
+        moveToMidpoint(movedNodes, graph1, node1, node2);
+      }
+    }
+    return true;
+  }
+
+  public void moveToMidpoint(
+    final Map<Coordinates, Coordinates> movedNodes,
+    final Graph<T> graph1,
+    final Node<T> node1,
+    final Node<T> node2) {
+    final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
+    final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
+      node1, node2);
+    if (!node1.equals2d(midPoint)) {
+      if (movedNodes != null) {
+        movedNodes.put(node1.clone(), midPoint);
+      }
+      node1.move(midPoint);
+    }
+    if (!node2.equals2d(midPoint)) {
+      if (movedNodes != null) {
+        movedNodes.put(node2.clone(), midPoint);
+      }
+      node2.move(midPoint);
+    }
+  }
+
+  public void nodeMoved(final Node<T> node, final Node<T> newNode) {
+  }
+
   public Iterable<Node<T>> nodes() {
     return nodesByCoordinates.values();
   }
@@ -759,7 +785,8 @@ public class Graph<T> {
     index.query(env, visitor);
   }
 
-  public void queryEdges(final EdgeVisitor<T> visitor,
+  public void queryEdges(
+    final EdgeVisitor<T> visitor,
     final Visitor<Edge<T>> matchVisitor) {
     visitor.setVisitor(matchVisitor);
     queryEdges(visitor);
@@ -830,7 +857,8 @@ public class Graph<T> {
     }
   }
 
-  public List<Edge<T>> replaceEdge(final Edge<T> edge,
+  public List<Edge<T>> replaceEdge(
+    final Edge<T> edge,
     final List<LineString> lines) {
     if (!edge.isRemoved()) {
       final List<Edge<T>> edges = new ArrayList<Edge<T>>();
@@ -851,13 +879,16 @@ public class Graph<T> {
     this.precisionModel = precisionModel;
   }
 
-  public <V extends Coordinates> List<Edge<T>> splitEdge(final Edge<T> edge,
+  public <V extends Coordinates> List<Edge<T>> splitEdge(
+    final Edge<T> edge,
     final Collection<V> nodes) {
     return splitEdge(edge, nodes, 0.0);
   }
 
-  public <V extends Coordinates> List<Edge<T>> splitEdge(final Edge<T> edge,
-    final Collection<V> splitPoints, final double maxDistance) {
+  public <V extends Coordinates> List<Edge<T>> splitEdge(
+    final Edge<T> edge,
+    final Collection<V> splitPoints,
+    final double maxDistance) {
     final Collection<V> nodes = new ArrayList<V>(splitPoints);
     if (edge.isRemoved()) {
       return Collections.emptyList();
@@ -938,7 +969,7 @@ public class Graph<T> {
         nodes.remove(node);
       }
       if (nodes.isEmpty()) {
-        List<CoordinatesList> newLines = new ArrayList<CoordinatesList>();
+        final List<CoordinatesList> newLines = new ArrayList<CoordinatesList>();
         int startIndex = 0;
         Coordinates startPoint = null;
         for (final Integer index : splitIndexes) {
@@ -992,8 +1023,8 @@ public class Graph<T> {
         newLines.add(newPoints);
 
         if (newLines.size() > 1) {
-          List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
-          for (CoordinatesList edgePoints : newLines) {
+          final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
+          for (final CoordinatesList edgePoints : newLines) {
             final Edge<T> newEdge = createEdge(geometryFactory, object,
               edgePoints);
             newEdges.add(newEdge);
@@ -1085,13 +1116,16 @@ public class Graph<T> {
     }
   }
 
-  public void visitEdges(final Comparator<Edge<T>> comparator,
+  public void visitEdges(
+    final Comparator<Edge<T>> comparator,
     final Visitor<Edge<T>> visitor) {
     visitEdges(null, comparator, visitor);
   }
 
-  public void visitEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Visitor<Edge<T>> visitor) {
+  public void visitEdges(
+    final Filter<Edge<T>> filter,
+    final Comparator<Edge<T>> comparator,
+    final Visitor<Edge<T>> visitor) {
     final LinkedList<Edge<T>> edges = new LinkedList<Edge<T>>();
     copyEdges(filter, edges);
     if (comparator != null) {
@@ -1128,7 +1162,8 @@ public class Graph<T> {
     }
   }
 
-  public void visitEdges(final Filter<Edge<T>> filter,
+  public void visitEdges(
+    final Filter<Edge<T>> filter,
     final Visitor<Edge<T>> visitor) {
     visitEdges(filter, null, visitor);
   }
@@ -1146,8 +1181,10 @@ public class Graph<T> {
     visitEdges(filter, comparator, visitor);
   }
 
-  public void visitNodes(final Filter<Node<T>> filter,
-    final Comparator<Node<T>> comparator, final Visitor<Node<T>> visitor) {
+  public void visitNodes(
+    final Filter<Node<T>> filter,
+    final Comparator<Node<T>> comparator,
+    final Visitor<Node<T>> visitor) {
     final List<Node<T>> nodes = new LinkedList<Node<T>>();
     copyNodes(filter, nodes);
     if (comparator != null) {
@@ -1185,7 +1222,8 @@ public class Graph<T> {
     }
   }
 
-  public void visitNodes(final Filter<Node<T>> filter,
+  public void visitNodes(
+    final Filter<Node<T>> filter,
     final Visitor<Node<T>> visitor) {
     visitNodes(filter, null, visitor);
   }
@@ -1203,7 +1241,8 @@ public class Graph<T> {
     visitNodes(filter, comparator, visitor);
   }
 
-  public void visitNodes(final Visitor<Node<T>> visitor,
+  public void visitNodes(
+    final Visitor<Node<T>> visitor,
     final Comparator<Node<T>> comparator) {
     visitNodes(null, comparator, visitor);
   }

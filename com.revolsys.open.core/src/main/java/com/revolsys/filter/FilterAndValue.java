@@ -5,15 +5,12 @@ public class FilterAndValue<F, V> implements Filter<F> {
 
   private V value;
 
-  public FilterAndValue(
-    final Filter<F> filter,
-    final V value) {
+  public FilterAndValue(final Filter<F> filter, final V value) {
     this.filter = filter;
     this.value = value;
   }
 
-  public boolean accept(
-    final F object) {
+  public boolean accept(final F object) {
     return filter.accept(object);
   }
 
@@ -25,13 +22,11 @@ public class FilterAndValue<F, V> implements Filter<F> {
     return value;
   }
 
-  public void setFilter(
-    final Filter<F> filter) {
+  public void setFilter(final Filter<F> filter) {
     this.filter = filter;
   }
 
-  public void setValue(
-    final V value) {
+  public void setValue(final V value) {
     this.value = value;
   }
 

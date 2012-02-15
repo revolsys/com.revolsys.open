@@ -14,7 +14,7 @@ import com.revolsys.io.xml.QNameComparator;
 public class DataObjectStoreSchema {
   private final AbstractDataObjectStore dataObjectStore;
 
-  private Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(
+  private final Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(
     new QNameComparator());
 
   private final String name;
@@ -27,17 +27,19 @@ public class DataObjectStoreSchema {
     this.name = name;
   }
 
-  public synchronized DataObjectMetaData findMetaData(final QName typeName) {
-    final DataObjectMetaData metaData = metaDataCache.get(typeName);
-    return metaData;
+  public void addMetaData(final DataObjectMetaData metaData) {
+    addMetaData(metaData.getName(), metaData);
   }
 
-  protected void addMetaData(QName typeName, DataObjectMetaData metaData) {
+  protected void addMetaData(
+    final QName typeName,
+    final DataObjectMetaData metaData) {
     metaDataCache.put(typeName, metaData);
   }
 
-  public void addMetaData(DataObjectMetaData metaData) {
-    addMetaData(metaData.getName(), metaData);
+  public synchronized DataObjectMetaData findMetaData(final QName typeName) {
+    final DataObjectMetaData metaData = metaDataCache.get(typeName);
+    return metaData;
   }
 
   public DataObjectStore getDataObjectStore() {
@@ -54,10 +56,6 @@ public class DataObjectStoreSchema {
     } else {
       return null;
     }
-  }
-
-  protected void refreshMetaData() {
-    dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
   }
 
   protected Map<QName, DataObjectMetaData> getMetaDataCache() {
@@ -89,6 +87,10 @@ public class DataObjectStoreSchema {
       refreshMetaData();
     }
     return new ArrayList<DataObjectMetaData>(metaDataCache.values());
+  }
+
+  protected void refreshMetaData() {
+    dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
   }
 
   public void setProperties(final Map<QName, Object> properties) {

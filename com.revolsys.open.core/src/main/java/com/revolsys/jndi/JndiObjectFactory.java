@@ -32,8 +32,7 @@ public class JndiObjectFactory implements BeanFactoryAware, FactoryBean {
     return jndiUrl;
   }
 
-  public Object getObject()
-    throws Exception {
+  public Object getObject() throws Exception {
     if (savedObject == null) {
       final Hashtable<Object, Object> initialEnvironment = new Hashtable<Object, Object>();
       final String initialFactory = System.getProperty(Context.INITIAL_CONTEXT_FACTORY);
@@ -61,8 +60,8 @@ public class JndiObjectFactory implements BeanFactoryAware, FactoryBean {
           synchronized (beanName.intern()) {
             savedObject = beanFactory.getBean(beanName);
             try {
-            context.bind(jndiUrl, savedObject);
-            } catch (NameNotFoundException e2) {
+              context.bind(jndiUrl, savedObject);
+            } catch (final NameNotFoundException e2) {
             }
           }
         }
@@ -85,18 +84,15 @@ public class JndiObjectFactory implements BeanFactoryAware, FactoryBean {
     return true;
   }
 
-  public void setBeanFactory(
-    final BeanFactory beanFactory) {
+  public void setBeanFactory(final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
-  public void setBeanName(
-    final String beanName) {
+  public void setBeanName(final String beanName) {
     this.beanName = beanName;
   }
 
-  public void setJndiUrl(
-    final String jndiUrl) {
+  public void setJndiUrl(final String jndiUrl) {
     this.jndiUrl = jndiUrl;
   }
 

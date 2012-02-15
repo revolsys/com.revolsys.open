@@ -6,9 +6,10 @@ import java.util.List;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 
-public abstract class AbstractPointSpatialIndex<T> implements PointSpatialIndex<T> {
+public abstract class AbstractPointSpatialIndex<T> implements
+  PointSpatialIndex<T> {
 
-  public List<T> find(Envelope envelope) {
+  public List<T> find(final Envelope envelope) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
     visit(envelope, visitor);
     return visitor.getList();
@@ -19,7 +20,6 @@ public abstract class AbstractPointSpatialIndex<T> implements PointSpatialIndex<
     visit(visitor);
     return visitor.getList();
   }
-  
 
   public Iterator<T> iterator() {
     return findAll().iterator();

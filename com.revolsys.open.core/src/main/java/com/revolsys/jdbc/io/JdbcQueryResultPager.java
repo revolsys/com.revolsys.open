@@ -73,30 +73,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     init(query);
   }
 
-  protected void init(final Query query) {
-    final QName tableName = query.getTypeName();
-    metaData = query.getMetaData();
-    if (metaData == null) {
-      metaData = dataStore.getMetaData(tableName);
-      query.setMetaData(metaData);
-    }
-
-    String sql = JdbcQueryIterator.getSql(query);
-
-    try {
-      statement = connection.prepareStatement(sql,
-        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-      statement.setFetchSize(pageSize);
-
-      resultSet = JdbcQueryIterator.getResultSet(metaData, statement, query);
-      resultSet.last();
-      this.numResults = resultSet.getRow();
-    } catch (final SQLException e) {
-      JdbcUtils.close(statement, resultSet);
-      throw new RuntimeException("Error executing query:" + sql, e);
-    }
-  }
-
   @PreDestroy
   public void close() {
     JdbcUtils.close(statement, resultSet);
@@ -112,44 +88,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     statement = null;
   }
 
-  /**
-   * Get the number of pages.
-   * 
-   * @return The number of pages.
-   */
-  public int getNumPages() {
-    return numPages + 1;
-  }
-
-  /**
-   * Get the list of objects in the current page.
-   * 
-   * @return The list of objects in the current page.
-   */
-  public List<DataObject> getList() {
-    if (results == null) {
-      throw new IllegalStateException(
-        "The page number must be set using setPageNumber");
-    }
-    return results;
-  }
-
-  /**
-   * Get the total number of results returned.
-   * 
-   * @return The total number of results returned.
-   */
-  public int getNumResults() {
-    return numResults;
-  }
-
-  /**
-   * Get the index of the first object in the current page.
-   * 
-   * @return The index of the first object in the current page.
-   */
-  public int getStartIndex() {
-    return (pageNumber * pageSize) + 1;
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    close();
   }
 
   /**
@@ -166,12 +108,43 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   }
 
   /**
+   * Get the list of objects in the current page.
+   * 
+   * @return The list of objects in the current page.
+   */
+  public List<DataObject> getList() {
+    if (results == null) {
+      throw new IllegalStateException(
+        "The page number must be set using setPageNumber");
+    }
+    return results;
+  }
+
+  /**
    * Get the page number of the next page.
    * 
    * @return Thepage number of the next page.
    */
   public int getNextPageNumber() {
     return pageNumber + 2;
+  }
+
+  /**
+   * Get the number of pages.
+   * 
+   * @return The number of pages.
+   */
+  public int getNumPages() {
+    return numPages + 1;
+  }
+
+  /**
+   * Get the total number of results returned.
+   * 
+   * @return The total number of results returned.
+   */
+  public int getNumResults() {
+    return numResults;
   }
 
   /**
@@ -202,6 +175,15 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   }
 
   /**
+   * Get the index of the first object in the current page.
+   * 
+   * @return The index of the first object in the current page.
+   */
+  public int getStartIndex() {
+    return (pageNumber * pageSize) + 1;
+  }
+
+  /**
    * Check to see if there is a next page.
    * 
    * @return True if there is a next page.
@@ -217,6 +199,30 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    */
   public boolean hasPreviousPage() {
     return pageNumber > 0;
+  }
+
+  protected void init(final Query query) {
+    final QName tableName = query.getTypeName();
+    metaData = query.getMetaData();
+    if (metaData == null) {
+      metaData = dataStore.getMetaData(tableName);
+      query.setMetaData(metaData);
+    }
+
+    final String sql = JdbcQueryIterator.getSql(query);
+
+    try {
+      statement = connection.prepareStatement(sql,
+        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+      statement.setFetchSize(pageSize);
+
+      resultSet = JdbcQueryIterator.getResultSet(metaData, statement, query);
+      resultSet.last();
+      this.numResults = resultSet.getRow();
+    } catch (final SQLException e) {
+      JdbcUtils.close(statement, resultSet);
+      throw new RuntimeException("Error executing query:" + sql, e);
+    }
   }
 
   /**
@@ -274,22 +280,17 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
         if (resultSet.absolute(pageNumber * pageSize + 1)) {
           int i = 0;
           do {
-            DataObject object = JdbcQueryIterator.getNextObject(dataStore,
-              metaData, metaData.getAttributes(), dataObjectFactory, resultSet);
+            final DataObject object = JdbcQueryIterator.getNextObject(
+              dataStore, metaData, metaData.getAttributes(), dataObjectFactory,
+              resultSet);
             results.add(object);
             i++;
           } while (resultSet.next() && i < pageSize);
         }
       }
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       close();
       ExceptionUtil.throwUncheckedException(t);
     }
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    close();
   }
 }

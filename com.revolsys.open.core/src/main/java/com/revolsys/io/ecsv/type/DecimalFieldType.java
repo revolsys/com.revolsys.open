@@ -7,17 +7,16 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class DecimalFieldType extends NumberFieldType {
-   public DecimalFieldType() {
+  public DecimalFieldType() {
     super(DataTypes.DECIMAL);
   }
 
-  public Object parseValue(
-    String text) {
+  public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
-         return new BigDecimal(text);
+      return new BigDecimal(text);
     } else {
       return null;
     }
- }
+  }
 
 }

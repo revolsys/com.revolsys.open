@@ -34,24 +34,26 @@ public class LoadObject extends SpringFrameworkAttributeLoader {
 
   private String idArgument;
 
-  public void init(final Attribute attribute) {
-    super.init(attribute);
-    idArgument = (String)attribute.getParameter("idArgument");
-    String objectClassName = (String)attribute.getParameter("objectClassName");
-    dao = SpringDaoFactory.get(getApplicationContext(), objectClassName);
-  }
-
-  public Object getValue(final HttpServletRequest request) throws ActionException {
-    Long id = (Long)request.getAttribute(idArgument);
+  public Object getValue(final HttpServletRequest request)
+    throws ActionException {
+    final Long id = (Long)request.getAttribute(idArgument);
     if (id == null) {
       throw new PageNotFoundException(idArgument + " parameter not specified");
     } else {
-      Object object = dao.load(id);
+      final Object object = dao.load(id);
       if (object == null) {
         throw new PageNotFoundException("Record not found with id " + id);
       } else {
         return object;
       }
     }
+  }
+
+  @Override
+  public void init(final Attribute attribute) {
+    super.init(attribute);
+    idArgument = (String)attribute.getParameter("idArgument");
+    final String objectClassName = (String)attribute.getParameter("objectClassName");
+    dao = SpringDaoFactory.get(getApplicationContext(), objectClassName);
   }
 }

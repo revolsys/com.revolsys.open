@@ -34,16 +34,16 @@ public class GlobalIdProperty extends AbstractDataObjectMetaDataProperty {
     return PROPERTY_NAME;
   }
 
+  public void setAttributeName(final String attributeName) {
+    this.attributeName = attributeName;
+  }
+
   @Override
-  public void setMetaData(DataObjectMetaData metaData) {
+  public void setMetaData(final DataObjectMetaData metaData) {
     if (attributeName == null) {
       attributeName = metaData.getIdAttributeName();
     }
     super.setMetaData(metaData);
-  }
-  
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
   }
 
 }

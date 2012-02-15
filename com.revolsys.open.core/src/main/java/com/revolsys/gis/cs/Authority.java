@@ -12,22 +12,17 @@ public class Authority implements Serializable {
 
   private final String name;
 
-  public Authority(
-    final String name,
-    final int code) {
+  public Authority(final String name, final int code) {
     this(name, String.valueOf(code));
   }
 
-  public Authority(
-    final String name,
-    final String code) {
+  public Authority(final String name, final String code) {
     this.name = name;
     this.code = code;
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {

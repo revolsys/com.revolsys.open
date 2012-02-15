@@ -58,34 +58,6 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   private String valueColumnName = "value";
 
   /**
-   * @param beanFactory The bean factory the bean is loaded from.
-   */
-  public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory) {
-    Map<String,String> properties = new HashMap<String,String>();
-    Connection connection  = null;
-    try {
-       connection = JdbcUtils.getConnection(dataSource);
-      String sql = "SELECT " + keyColumnName + ", " + valueColumnName
-        + " FROM " + tableName;
-      Statement statement = connection.createStatement();
-      ResultSet results = statement.executeQuery(sql);
-      while (results.next()) {
-        String key = results.getString(1);
-        String value = results.getString(2);
-        properties.put(key, value);
-      }
-
-    } catch (SQLException e) {
-      throw new BeanInitializationException(e.getMessage(), e);
-    } finally {
-      JdbcUtils.close(connection);
-    }
-
-    processProperties(beanFactory, properties);
-  }
-
-  /**
    * <p>
    * Convert the given merged properties, converting property values if
    * necessary. The result will then be processed.
@@ -100,11 +72,11 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
    * @see #processProperties
    */
   protected void convertProperties(final Map properties) {
-    Iterator propertyNames = properties.keySet().iterator();
+    final Iterator propertyNames = properties.keySet().iterator();
     while (propertyNames.hasNext()) {
-      String propertyName = (String)propertyNames.next();
-      String propertyValue = (String)properties.get(propertyName);
-      String convertedValue = convertPropertyValue(propertyValue);
+      final String propertyName = (String)propertyNames.next();
+      final String propertyValue = (String)properties.get(propertyName);
+      final String convertedValue = convertPropertyValue(propertyValue);
       if (!ObjectUtils.nullSafeEquals(propertyValue, convertedValue)) {
         properties.put(propertyName, convertedValue);
       }
@@ -131,24 +103,6 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   }
 
   /**
-   * Apply the given Properties to the bean factory.
-   * 
-   * @param beanFactory the bean factory used by the application context
-   * @param properties the Properties to apply
-   */
-  protected abstract void processProperties(
-    ConfigurableListableBeanFactory beanFactory, Map properties);
-
-  /**
-   * Set the data source used to load properties from.
-   * 
-   * @param dataSource The data source used to load properties from.
-   */
-  public final void setDataSource(final DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  /**
    * Get the name of the column containing property keys.
    * 
    * @return The name of the column containing property keys.
@@ -158,32 +112,12 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   }
 
   /**
-   * Set the name of the column containing property keys.
-   * 
-   * @param keyColumnName The name of the column containing property keys.
-   */
-  public final void setKeyColumnName(final String keyColumnName) {
-    this.keyColumnName = keyColumnName;
-  }
-
-  /**
    * Get the logger.
    * 
    * @return The logger.
    */
   protected Logger getLogger() {
     return logger;
-  }
-
-  /**
-   * Set the order value of this object, higher value meaning greater in terms
-   * of sorting.
-   * 
-   * @param order The order value of this object, higher value meaning greater
-   *          in terms of sorting.
-   */
-  public void setOrder(final int order) {
-    this.order = order;
   }
 
   /**
@@ -207,21 +141,88 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   }
 
   /**
-   * Set the name of the table containing configuration properties.
-   * 
-   * @param tableName The name of the table containing configuration properties.
-   */
-  public final void setTableName(final String tableName) {
-    this.tableName = tableName;
-  }
-
-  /**
    * Get The name of the column containing property values.
    * 
    * @return The name of the column containing property values.
    */
   public final String getValueColumnName() {
     return valueColumnName;
+  }
+
+  /**
+   * @param beanFactory The bean factory the bean is loaded from.
+   */
+  public void postProcessBeanFactory(
+    final ConfigurableListableBeanFactory beanFactory) {
+    final Map<String, String> properties = new HashMap<String, String>();
+    Connection connection = null;
+    try {
+      connection = JdbcUtils.getConnection(dataSource);
+      final String sql = "SELECT " + keyColumnName + ", " + valueColumnName
+        + " FROM " + tableName;
+      final Statement statement = connection.createStatement();
+      final ResultSet results = statement.executeQuery(sql);
+      while (results.next()) {
+        final String key = results.getString(1);
+        final String value = results.getString(2);
+        properties.put(key, value);
+      }
+
+    } catch (final SQLException e) {
+      throw new BeanInitializationException(e.getMessage(), e);
+    } finally {
+      JdbcUtils.close(connection);
+    }
+
+    processProperties(beanFactory, properties);
+  }
+
+  /**
+   * Apply the given Properties to the bean factory.
+   * 
+   * @param beanFactory the bean factory used by the application context
+   * @param properties the Properties to apply
+   */
+  protected abstract void processProperties(
+    ConfigurableListableBeanFactory beanFactory,
+    Map properties);
+
+  /**
+   * Set the data source used to load properties from.
+   * 
+   * @param dataSource The data source used to load properties from.
+   */
+  public final void setDataSource(final DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  /**
+   * Set the name of the column containing property keys.
+   * 
+   * @param keyColumnName The name of the column containing property keys.
+   */
+  public final void setKeyColumnName(final String keyColumnName) {
+    this.keyColumnName = keyColumnName;
+  }
+
+  /**
+   * Set the order value of this object, higher value meaning greater in terms
+   * of sorting.
+   * 
+   * @param order The order value of this object, higher value meaning greater
+   *          in terms of sorting.
+   */
+  public void setOrder(final int order) {
+    this.order = order;
+  }
+
+  /**
+   * Set the name of the table containing configuration properties.
+   * 
+   * @param tableName The name of the table containing configuration properties.
+   */
+  public final void setTableName(final String tableName) {
+    this.tableName = tableName;
   }
 
   /**

@@ -21,7 +21,6 @@ import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.util.ObjectProcessor;
 
 /**
@@ -94,7 +93,7 @@ public class PseudoNodeRemovalVisitor extends
     newObject.setIdValue(null);
 
     final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
-    Edge<DataObject> newEdge = graph.add(newObject);
+    final Edge<DataObject> newEdge = graph.add(newObject);
     graph.remove(edge1);
     graph.remove(edge2);
     return newEdge;

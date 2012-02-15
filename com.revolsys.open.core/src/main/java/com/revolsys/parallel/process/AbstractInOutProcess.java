@@ -27,22 +27,6 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     this.out = out;
   }
 
-  protected void destroy() {
-  }
-
-  /**
-   * @return the in
-   */
-  public Channel<I> getIn() {
-    if (in == null) {
-      final String channelName = getBeanName() + ".in";
-      final ChannelDataStore<I> buffer = createInDataStore();
-      final Channel<I> channel = new Channel<I>(channelName, buffer);
-      setIn(channel);
-    }
-    return in;
-  }
-
   protected ChannelDataStore<I> createInDataStore() {
     if (inBufferSize == 0) {
       return new ZeroBuffer<I>();
@@ -63,6 +47,26 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     }
   }
 
+  protected void destroy() {
+  }
+
+  /**
+   * @return the in
+   */
+  public Channel<I> getIn() {
+    if (in == null) {
+      final String channelName = getBeanName() + ".in";
+      final ChannelDataStore<I> buffer = createInDataStore();
+      final Channel<I> channel = new Channel<I>(channelName, buffer);
+      setIn(channel);
+    }
+    return in;
+  }
+
+  public int getInBufferSize() {
+    return inBufferSize;
+  }
+
   /**
    * @return the out
    */
@@ -76,20 +80,24 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     return out;
   }
 
+  public int getOutBufferSize() {
+    return outBufferSize;
+  }
+
   protected void init() {
   }
 
   public final void run() {
-    Logger log = Logger.getLogger(getClass());
+    final Logger log = Logger.getLogger(getClass());
     try {
       log.debug("Start");
       init();
       run(in, out);
-    } catch (ClosedException e) {
+    } catch (final ClosedException e) {
       log.debug("Shutdown");
-    } catch (ThreadDeath e) {
+    } catch (final ThreadDeath e) {
       log.debug("Shutdown");
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       log.error(e.getMessage(), e);
       getProcessNetwork().stop();
     } finally {
@@ -113,6 +121,10 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     in.readConnect();
   }
 
+  public void setInBufferSize(final int inBufferSize) {
+    this.inBufferSize = inBufferSize;
+  }
+
   /**
    * @param out the out to set
    */
@@ -121,19 +133,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     out.writeConnect();
   }
 
-  public int getInBufferSize() {
-    return inBufferSize;
-  }
-
-  public void setInBufferSize(int inBufferSize) {
-    this.inBufferSize = inBufferSize;
-  }
-
-  public int getOutBufferSize() {
-    return outBufferSize;
-  }
-
-  public void setOutBufferSize(int outBufferSize) {
+  public void setOutBufferSize(final int outBufferSize) {
     this.outBufferSize = outBufferSize;
   }
 

@@ -56,11 +56,6 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     }
   }
 
-  public MapWriter getWriter(Resource resource) {
-    Writer writer = SpringUtil.getWriter(resource);
-    return getWriter(writer);
-  }
-
   public static Map<String, String> toMap(final String string) {
     final Map<String, Object> map = toObjectMap(string);
     if (map.isEmpty()) {
@@ -115,10 +110,16 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     return getWriter(writer);
   }
 
+  public MapWriter getWriter(final Resource resource) {
+    final Writer writer = SpringUtil.getWriter(resource);
+    return getWriter(writer);
+  }
+
   public MapWriter getWriter(final Writer out) {
     return new JsonMapWriter(out);
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return true;
   }

@@ -16,18 +16,15 @@ public class StaticMethodFilter<T> implements Filter<T> {
   public StaticMethodFilter() {
   }
 
-  public StaticMethodFilter(
-    final Class<?> methodClass,
-    final String methodName,
-    Object... args) {
+  public StaticMethodFilter(final Class<?> methodClass,
+    final String methodName, final Object... args) {
     this.methodClass = methodClass;
     this.methodName = methodName;
     this.args = args;
     initialize();
   }
 
-  public boolean accept(
-    final T object) {
+  public boolean accept(final T object) {
     try {
       if (args.length == 0) {
         return (Boolean)method.invoke(null, object);
@@ -73,13 +70,11 @@ public class StaticMethodFilter<T> implements Filter<T> {
     }
   }
 
-  public void setMethodClass(
-    final Class<?> methodClass) {
+  public void setMethodClass(final Class<?> methodClass) {
     this.methodClass = methodClass;
   }
 
-  public void setMethodName(
-    final String methodName) {
+  public void setMethodName(final String methodName) {
     this.methodName = methodName;
   }
 

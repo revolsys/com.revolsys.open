@@ -31,6 +31,8 @@ public class JspTagException extends JspException {
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -566710852809417270L;
 
+  private Throwable rootCause;
+
   /**
    * Construct a new JspTagException.
    */
@@ -48,17 +50,6 @@ public class JspTagException extends JspException {
   }
 
   /**
-   * Construct a new JspTagException with an original Exception. This should be
-   * used to propagate the original exception.
-   * 
-   * @param rootCause The original exception that was thrown
-   */
-  public JspTagException(final Throwable rootCause) {
-    super(rootCause.getMessage());
-    this.rootCause = rootCause;
-  }
-
-  /**
    * Construct a new JspTagException with an original Exception and the
    * specified message. This should be used to propagate the original exception.
    * 
@@ -71,18 +62,40 @@ public class JspTagException extends JspException {
   }
 
   /**
+   * Construct a new JspTagException with an original Exception. This should be
+   * used to propagate the original exception.
+   * 
+   * @param rootCause The original exception that was thrown
+   */
+  public JspTagException(final Throwable rootCause) {
+    super(rootCause.getMessage());
+    this.rootCause = rootCause;
+  }
+
+  /**
    * Returns the detail message, including the message from the nested exception
    * if there is one.
    * 
    * @return the detail message
    */
+  @Override
   public String getMessage() {
     if (rootCause == null) {
       return super.getMessage();
     } else {
       return new StringBuffer(super.getMessage()).append(
-        "; nested exception is: \n\t").append(rootCause).toString();
+        "; nested exception is: \n\t")
+        .append(rootCause)
+        .toString();
     }
+  }
+
+  /**
+   * Prints the composite message to <code>System.err</code>.
+   */
+  @Override
+  public void printStackTrace() {
+    printStackTrace(System.err);
   }
 
   /**
@@ -91,6 +104,7 @@ public class JspTagException extends JspException {
    * 
    * @param ps the print stream
    */
+  @Override
   public void printStackTrace(final PrintStream ps) {
     if (rootCause == null) {
       super.printStackTrace(ps);
@@ -103,18 +117,12 @@ public class JspTagException extends JspException {
   }
 
   /**
-   * Prints the composite message to <code>System.err</code>.
-   */
-  public void printStackTrace() {
-    printStackTrace(System.err);
-  }
-
-  /**
    * Prints the composite message and the embedded stack trace to the specified
    * print writer <code>pw</code>.
    * 
    * @param pw the print writer
    */
+  @Override
   public void printStackTrace(final PrintWriter pw) {
     if (rootCause == null) {
       super.printStackTrace(pw);
@@ -125,6 +133,4 @@ public class JspTagException extends JspException {
       }
     }
   }
-
-  private Throwable rootCause;
 }

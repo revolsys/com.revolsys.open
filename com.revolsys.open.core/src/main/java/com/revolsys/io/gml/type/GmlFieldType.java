@@ -5,11 +5,9 @@ import com.revolsys.io.xml.XmlWriter;
 
 public interface GmlFieldType {
 
-  void writeValue(
-    XmlWriter out,
-    Object value);
+  DataType getDataType();
 
   String getXmlSchemaTypeName();
 
-  DataType getDataType();
+  void writeValue(XmlWriter out, Object value);
 }

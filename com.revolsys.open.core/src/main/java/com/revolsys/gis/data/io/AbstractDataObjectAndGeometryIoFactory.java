@@ -39,15 +39,18 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
    * @return The writer.
    */
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData, final Resource resource) {
+    final DataObjectMetaData metaData,
+    final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
     return createDataObjectWriter(baseName, metaData, out);
   }
 
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream) {
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
   }
@@ -58,15 +61,18 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(final String baseName,
+  public Writer<Geometry> createGeometryWriter(
+    final String baseName,
     final OutputStream out) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(final String baseName,
-    final OutputStream out, final Charset charset) {
+  public Writer<Geometry> createGeometryWriter(
+    final String baseName,
+    final OutputStream out,
+    final Charset charset) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
     return createGeometryWriter(dataObjectWriter);

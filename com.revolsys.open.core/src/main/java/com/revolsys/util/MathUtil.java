@@ -94,7 +94,10 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double angle(final double x1, final double y1, final double x2,
+  public static double angle(
+    final double x1,
+    final double y1,
+    final double x2,
     final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
@@ -114,22 +117,33 @@ public final class MathUtil {
    * @param y3 The third y coordinate.
    * @return The distance.
    */
-  public static double angle(final double x1, final double y1, final double x2,
-    final double y2, final double x3, final double y3) {
+  public static double angle(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2,
+    final double x3,
+    final double y3) {
     final double angle1 = angle(x2, y2, x1, y1);
     final double angle2 = angle(x2, y2, x3, y3);
     return angleDiff(angle1, angle2);
   }
 
-  public static double angle2d(final double x1, final double x2,
-    final double y1, final double y2) {
+  public static double angle2d(
+    final double x1,
+    final double x2,
+    final double y1,
+    final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     return Math.atan2(dy, dx);
   }
 
-  public static double angleDegrees(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static double angleDegrees(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2) {
     final double width = x2 - x1;
     final double height = y2 - y1;
     if (width == 0) {
@@ -171,7 +185,9 @@ public final class MathUtil {
     return delAngle;
   }
 
-  public static double angleDiff(final double angle1, final double angle2,
+  public static double angleDiff(
+    final double angle1,
+    final double angle2,
     final boolean clockwise) {
     if (clockwise) {
       if (angle2 < angle1) {
@@ -202,8 +218,11 @@ public final class MathUtil {
     return diff;
   }
 
-  public static double angleNorthDegrees(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static double angleNorthDegrees(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2) {
     final double angle = angleDegrees(x1, y1, x2, y2);
     return getNorthClockwiseAngle(angle);
   }
@@ -231,8 +250,11 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double distance(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static double distance(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
 
@@ -248,7 +270,8 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal divideCurrency(final BigDecimal left,
+  public static BigDecimal divideCurrency(
+    final BigDecimal left,
     final BigDecimal right) {
     return left.divide(right, CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
   }
@@ -261,7 +284,8 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(final BigDecimal left,
+  public static BigDecimal dividePercent(
+    final BigDecimal left,
     final BigDecimal right) {
     return left.divide(right, PERCENT_SCALE, BigDecimal.ROUND_HALF_UP);
   }
@@ -288,6 +312,37 @@ public final class MathUtil {
    */
   public static BigDecimal dividePercent(final double left, final int right) {
     return dividePercent(new BigDecimal(left), new BigDecimal(right));
+  }
+
+  /**
+   * Code taken from DRA FME scripts to calculate angles.
+   * 
+   * @param points
+   * @param i1
+   * @param i2
+   * @return
+   */
+  public static double getAngle(
+    final CoordinatesList points,
+    final int i1,
+    final int i2,
+    final boolean start) {
+    final double x1 = points.getX(i1);
+    final double y1 = points.getY(i1);
+    final double x2 = points.getX(i2);
+    final double y2 = points.getY(i2);
+    if (distance(x1, y1, x2, y2) < 1) {
+      if (start) {
+        if (i2 + 1 < points.size()) {
+          return getAngle(points, i1, i2 + 1, start);
+        }
+      } else {
+        if (i1 - 1 > 0) {
+          return getAngle(points, i1 - 1, i2, start);
+        }
+      }
+    }
+    return angleNorthDegrees(x1, y1, x2, y2);
   }
 
   /**
@@ -390,8 +445,13 @@ public final class MathUtil {
     return getInteger(integer).toString();
   }
 
-  public static boolean isAcute(final double x1, final double y1,
-    final double x2, final double y2, final double x3, final double y3) {
+  public static boolean isAcute(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2,
+    final double x3,
+    final double y3) {
     final double dx0 = x1 - x2;
     final double dy0 = y1 - y2;
     final double dx1 = x3 - x2;
@@ -437,7 +497,8 @@ public final class MathUtil {
    * @param scale The number of decimal places to show.
    * @return The percent String
    */
-  public static String percentToString(final BigDecimal decimalPercent,
+  public static String percentToString(
+    final BigDecimal decimalPercent,
     final int scale) {
     if (decimalPercent != null) {
       final DecimalFormat format = new DecimalFormat();
@@ -453,8 +514,13 @@ public final class MathUtil {
     }
   }
 
-  public static double pointLineDistance(final double x, final double y,
-    final double x1, final double y1, final double x2, final double y2) {
+  public static double pointLineDistance(
+    final double x,
+    final double y,
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2) {
     // if start==end, then use pt distance
     if (x1 == x2 && y1 == y2) {
       return distance(x, y, x1, y1);
@@ -510,7 +576,8 @@ public final class MathUtil {
     return toDoubleArray(value.split(","));
   }
 
-  public static double[] toDoubleArraySplit(final String value,
+  public static double[] toDoubleArraySplit(
+    final String value,
     final String regex) {
     return toDoubleArray(value.split(regex));
   }
@@ -523,37 +590,6 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
-  }
-
-  /**
-   * Code taken from DRA FME scripts to calculate angles.
-   * 
-   * @param points
-   * @param i1
-   * @param i2
-   * @return
-   */
-  public static double getAngle(
-    final CoordinatesList points,
-    final int i1,
-    final int i2,
-    final boolean start) {
-    final double x1 = points.getX(i1);
-    final double y1 = points.getY(i1);
-    final double x2 = points.getX(i2);
-    final double y2 = points.getY(i2);
-    if (distance(x1, y1, x2, y2) < 1) {
-      if (start) {
-        if (i2 + 1 < points.size()) {
-          return getAngle(points, i1, i2 + 1, start);
-        }
-      } else {
-        if (i1 - 1 > 0) {
-          return getAngle(points, i1 - 1, i2, start);
-        }
-      }
-    }
-    return angleNorthDegrees(x1, y1, x2, y2);
   }
 
 }

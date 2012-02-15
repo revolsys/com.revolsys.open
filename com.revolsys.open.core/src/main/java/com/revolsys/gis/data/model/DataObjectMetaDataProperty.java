@@ -1,6 +1,5 @@
 package com.revolsys.gis.data.model;
 
-
 public interface DataObjectMetaDataProperty extends Cloneable {
 
   DataObjectMetaDataProperty clone();
@@ -9,6 +8,5 @@ public interface DataObjectMetaDataProperty extends Cloneable {
 
   String getPropertyName();
 
-  void setMetaData(
-    DataObjectMetaData metaData);
+  void setMetaData(DataObjectMetaData metaData);
 }

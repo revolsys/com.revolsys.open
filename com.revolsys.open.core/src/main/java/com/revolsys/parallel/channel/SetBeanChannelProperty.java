@@ -16,8 +16,7 @@ public class SetBeanChannelProperty<T> extends SetBeanProperties implements
   private String outBeanName;
 
   @Override
-  public void afterPropertiesSet()
-    throws Exception {
+  public void afterPropertiesSet() throws Exception {
     if (outBeanName != null) {
       addBeanPropertyName(outBeanName, "out");
     }
@@ -59,29 +58,24 @@ public class SetBeanChannelProperty<T> extends SetBeanProperties implements
     return outBeanName;
   }
 
-  public void setBeanName(
-    final String name) {
+  public void setBeanName(final String name) {
     this.name = name;
   }
 
-  public void setBufferSize(
-    final int bufferSize) {
+  public void setBufferSize(final int bufferSize) {
     this.bufferSize = bufferSize;
   }
 
-  public void setChannel(
-    final Channel<T> channel) {
+  public void setChannel(final Channel<T> channel) {
     setValue(channel);
     setPropertyValue(channel);
   }
 
-  public void setInBeanName(
-    final String inBeanName) {
+  public void setInBeanName(final String inBeanName) {
     this.inBeanName = inBeanName;
   }
 
-  public void setOutBeanName(
-    final String outBeanName) {
+  public void setOutBeanName(final String outBeanName) {
     this.outBeanName = outBeanName;
   }
 }

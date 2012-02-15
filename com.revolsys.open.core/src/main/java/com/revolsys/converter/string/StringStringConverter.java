@@ -1,15 +1,15 @@
 package com.revolsys.converter.string;
 
 public class StringStringConverter implements StringConverter<String> {
+  public Class<String> getConvertedClass() {
+    return String.class;
+  }
+
   public boolean requiresQuotes() {
     return true;
   }
 
-  public String toString(String string) {
-    return string;
-  }
-
-  public String toObject(Object value) {
+  public String toObject(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -17,12 +17,12 @@ public class StringStringConverter implements StringConverter<String> {
     }
   }
 
-  public String toObject(String string) {
+  public String toObject(final String string) {
     return string;
   }
 
-  public Class<String> getConvertedClass() {
-    return String.class;
+  public String toString(final String string) {
+    return string;
   }
 
 }

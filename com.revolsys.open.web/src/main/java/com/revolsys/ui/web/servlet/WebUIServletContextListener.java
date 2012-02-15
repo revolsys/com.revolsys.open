@@ -30,21 +30,22 @@ public class WebUIServletContextListener implements ServletContextListener {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+   * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+   * ServletContextEvent)
    */
-  public final void contextInitialized(final ServletContextEvent event) {
+  public final void contextDestroyed(final ServletContextEvent event) {
+    final ClassLoader contextClassLoader = Thread.currentThread()
+      .getContextClassLoader();
+    LogFactory.releaseAll();
+    Introspector.flushCaches();
   }
 
   /*
    * (non-Javadoc)
-   * 
-   * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+   * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.
+   * ServletContextEvent)
    */
-  public final void contextDestroyed(final ServletContextEvent event) {
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    LogFactory.releaseAll();
-    Introspector.flushCaches();
+  public final void contextInitialized(final ServletContextEvent event) {
   }
 
 }

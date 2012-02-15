@@ -28,7 +28,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
-  private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
   public MapHttpMessageConverter() {
     super(Map.class, Collections.singleton(MediaType.APPLICATION_JSON),
@@ -36,24 +36,28 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
   }
 
   @Override
-  public Map read(Class<? extends Map> clazz, HttpInputMessage inputMessage)
-    throws IOException, HttpMessageNotReadableException {
+  public Map read(
+    final Class<? extends Map> clazz,
+    final HttpInputMessage inputMessage) throws IOException,
+    HttpMessageNotReadableException {
     try {
-      Map<String, Object> map = new HashMap<String, Object>();
-      InputStream in = inputMessage.getBody();
-      Map<String, Object> readMap = JsonParserUtil.read(in);
+      final Map<String, Object> map = new HashMap<String, Object>();
+      final InputStream in = inputMessage.getBody();
+      final Map<String, Object> readMap = JsonParserUtil.read(in);
       if (readMap != null) {
         map.putAll(readMap);
       }
       return map;
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       throw new HttpMessageNotReadableException(e.getMessage(), e);
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public void write(final Map map, final MediaType mediaType,
+  public void write(
+    final Map map,
+    final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     Charset charset = mediaType.getCharSet();
@@ -70,7 +74,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
       body, charset));
     writer.setProperty(IoConstants.INDENT_PROPERTY, true);
     writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
-    HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
     String callback = request.getParameter("jsonp");
     if (callback == null) {
       callback = request.getParameter("callback");

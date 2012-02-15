@@ -14,8 +14,10 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
 public class BoundingBoxIntersectsEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
-  public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
-    final Edge<T> edge, final double maxDistance) {
+  public static <T> List<Edge<T>> getEdges(
+    final Graph<T> graph,
+    final Edge<T> edge,
+    final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
 
     final LineString line = edge.getLine();
@@ -27,7 +29,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends NestedVisitor<Edge<T>> 
       boundingBox, results);
     final EdgeQuadTree<T> index = graph.getEdgeIndex();
     index.query(boundingBox, visitor);
-    List<Edge<T>> list = results.getList();
+    final List<Edge<T>> list = results.getList();
     list.remove(edge);
     return list;
 

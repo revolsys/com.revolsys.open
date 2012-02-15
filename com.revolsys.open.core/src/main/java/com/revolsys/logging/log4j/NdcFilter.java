@@ -9,8 +9,7 @@ public class NdcFilter extends Filter {
   private String ndc;
 
   @Override
-  public int decide(
-    final LoggingEvent logEvent) {
+  public int decide(final LoggingEvent logEvent) {
     final String logNdc = logEvent.getNDC();
     if ((ndc == logNdc || (ndc != null && ndc.equals(logNdc))) && acceptOnMatch) {
       return Filter.ACCEPT;
@@ -36,16 +35,14 @@ public class NdcFilter extends Filter {
   /**
    * @param acceptOnMatch the acceptOnMatch to set
    */
-  public void setAcceptOnMatch(
-    final boolean acceptOnMatch) {
+  public void setAcceptOnMatch(final boolean acceptOnMatch) {
     this.acceptOnMatch = acceptOnMatch;
   }
 
   /**
    * @param ndc the ndc to set
    */
-  public void setNdc(
-    final String ndc) {
+  public void setNdc(final String ndc) {
     this.ndc = ndc;
   }
 

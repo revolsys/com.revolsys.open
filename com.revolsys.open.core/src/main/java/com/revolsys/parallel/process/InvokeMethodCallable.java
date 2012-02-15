@@ -55,7 +55,7 @@ public class InvokeMethodCallable<T> implements Callable<T> {
   public T call() throws Exception {
     try {
       return (T)MethodUtils.invokeMethod(object, methodName, parameters);
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       ExceptionUtil.throwUncheckedException(e);
       return null;
     }

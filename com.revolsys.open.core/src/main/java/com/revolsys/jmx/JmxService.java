@@ -44,8 +44,7 @@ public class JmxService {
    * 
    * @param jmxServers The list of JMX server configurations.
    */
-  public JmxService(
-    final List<Map<String, Object>> jmxServers) {
+  public JmxService(final List<Map<String, Object>> jmxServers) {
     for (final Map<String, Object> server : jmxServers) {
       final String name = (String)server.get("name");
       if (name == null) {
@@ -155,8 +154,7 @@ public class JmxService {
    * @param serverId The name of the server.
    * @return The JMX connection.
    */
-  private MBeanServerConnection getConnection(
-    final String serverId) {
+  private MBeanServerConnection getConnection(final String serverId) {
     final Map<String, Object> server = getServerParams(serverId);
     final MBeanServerConnection connection = (MBeanServerConnection)server.get("connection");
     if (connection == null) {
@@ -177,9 +175,7 @@ public class JmxService {
    * @throws MalformedObjectNameException If the name of the object was not
    *           valid.
    */
-  private ObjectName getObjectName(
-    final String serverId,
-    final String objectId)
+  private ObjectName getObjectName(final String serverId, final String objectId)
     throws MalformedObjectNameException {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final String objectName = (String)object.get("objectName");
@@ -194,8 +190,7 @@ public class JmxService {
    * @return The server parameters.
    */
   @SuppressWarnings("unchecked")
-  private List<Map<String, Object>> getObjectParams(
-    final String serverId) {
+  private List<Map<String, Object>> getObjectParams(final String serverId) {
     final Map<String, Object> server = getServerParams(serverId);
     final List<Map<String, Object>> objects = (List<Map<String, Object>>)server.get("objects");
     if (objects == null) {
@@ -338,8 +333,7 @@ public class JmxService {
    * @param serverId The name of the server.
    * @return The server parameters.
    */
-  private Map<String, Object> getServerParams(
-    final String serverId) {
+  private Map<String, Object> getServerParams(final String serverId) {
     final Map<String, Object> server = jmxServers.get(serverId);
     if (server == null) {
       throw new IllegalArgumentException("Server " + serverId + " not found");
@@ -474,8 +468,7 @@ public class JmxService {
    * 
    * @param mapWriter The writer to write the attributes to.
    */
-  public void writeAttributes(
-    final MapWriter mapWriter) {
+  public void writeAttributes(final MapWriter mapWriter) {
     for (final String serverId : jmxServers.keySet()) {
       writeAttributes(mapWriter, serverId);
     }
@@ -487,9 +480,7 @@ public class JmxService {
    * @param mapWriter The writer to write the attributes to.
    * @param serverId The name of the server.
    */
-  public void writeAttributes(
-    final MapWriter mapWriter,
-    final String serverId) {
+  public void writeAttributes(final MapWriter mapWriter, final String serverId) {
     final List<Map<String, Object>> objects = getObjectParams(serverId);
     for (final Map<String, Object> object : objects) {
       final String objectId = (String)object.get("objectLabel");
@@ -594,8 +585,7 @@ public class JmxService {
    * 
    * @param mapWriter The writer to write the operations to.
    */
-  public void writeOperations(
-    final MapWriter mapWriter) {
+  public void writeOperations(final MapWriter mapWriter) {
     for (final String serverId : jmxServers.keySet()) {
       writeOperations(mapWriter, serverId);
     }
@@ -607,9 +597,7 @@ public class JmxService {
    * @param mapWriter The writer to write the operations to.
    * @param serverId The name of the server.
    */
-  public void writeOperations(
-    final MapWriter mapWriter,
-    final String serverId) {
+  public void writeOperations(final MapWriter mapWriter, final String serverId) {
     final List<Map<String, Object>> objects = getObjectParams(serverId);
     for (final Map<String, Object> object : objects) {
       final String objectId = (String)object.get("objectLabel");

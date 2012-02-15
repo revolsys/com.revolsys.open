@@ -34,8 +34,7 @@ public class PatternFileFilter implements FileFilter {
    * 
    * @param regex The regular expression.
    */
-  public PatternFileFilter(
-    final String regex) {
+  public PatternFileFilter(final String regex) {
     pattern = Pattern.compile(regex);
   }
 
@@ -45,8 +44,7 @@ public class PatternFileFilter implements FileFilter {
    * @param file The file.
    * @return True if the file matched, false otherwise.
    */
-  public boolean accept(
-    final File file) {
+  public boolean accept(final File file) {
     final String fileName = file.getName();
     return pattern.matcher(fileName).matches();
   }

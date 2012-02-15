@@ -38,12 +38,14 @@ public class Node<T> extends AbstractCoordinates {
     return points;
   }
 
-  public static <V> int getEdgeIndex(final List<Edge<V>> edges,
+  public static <V> int getEdgeIndex(
+    final List<Edge<V>> edges,
     final Edge<V> edge) {
     return edges.indexOf(edge);
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(final Node<T> node0,
+  public static <T> Collection<Edge<T>> getEdgesBetween(
+    final Node<T> node0,
     final Node<T> node1) {
     if (node1 == null) {
       return Collections.emptyList();
@@ -64,8 +66,10 @@ public class Node<T> extends AbstractCoordinates {
     return commonEdges;
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(final QName typeName,
-    final Node<T> node0, final Node<T> node1) {
+  public static <T> Collection<Edge<T>> getEdgesBetween(
+    final QName typeName,
+    final Node<T> node0,
+    final Node<T> node1) {
     final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
     for (final Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
       final Edge<T> edge = edgeIter.next();
@@ -76,15 +80,18 @@ public class Node<T> extends AbstractCoordinates {
     return edges;
   }
 
-  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,
+  public static <V> Edge<V> getNextEdge(
+    final List<Edge<V>> edges,
     final Edge<V> edge) {
     final int index = getEdgeIndex(edges, edge);
     final int nextIndex = (index + 1) % edges.size();
     return edges.get(nextIndex);
   }
 
-  public static <T> boolean hasEdgesBetween(final QName typeName,
-    final Node<T> node0, final Node<T> node1) {
+  public static <T> boolean hasEdgesBetween(
+    final QName typeName,
+    final Node<T> node0,
+    final Node<T> node1) {
     if (node1 == null) {
       return false;
     }
@@ -136,12 +143,7 @@ public class Node<T> extends AbstractCoordinates {
     this.y = point.getY();
   }
 
-  protected void addInEdge(final Edge<T> edge) {
-    inEdgeIds = addEdge(inEdgeIds, edge);
-    updateAttributes();
-  }
-
-  private int[] addEdge(final int[] oldEdgeIds, Edge<T> edge) {
+  private int[] addEdge(final int[] oldEdgeIds, final Edge<T> edge) {
     final Graph<T> graph = getGraph();
     final List<Edge<T>> edges = graph.getEdges(oldEdgeIds);
     edges.add(edge);
@@ -150,11 +152,9 @@ public class Node<T> extends AbstractCoordinates {
     return graph.getEdgeIds(edges);
   }
 
-  public int[] removeEdge(final int[] oldEdgeIds, Edge<T> edge) {
-    final Graph<T> graph = getGraph();
-    final List<Edge<T>> edges = graph.getEdges(oldEdgeIds);
-    edges.remove(edge);
-    return graph.getEdgeIds(edges);
+  protected void addInEdge(final Edge<T> edge) {
+    inEdgeIds = addEdge(inEdgeIds, edge);
+    updateAttributes();
   }
 
   protected void addOutEdge(final Edge<T> edge) {
@@ -388,15 +388,15 @@ public class Node<T> extends AbstractCoordinates {
 
   public boolean hasEdge(final Edge<T> edge) {
     if (edge.getGraph() == getGraph()) {
-      int edgeId = edge.getId();
+      final int edgeId = edge.getId();
       for (int i = 0; i < inEdgeIds.length; i++) {
-        int inEdgeId = inEdgeIds[i];
+        final int inEdgeId = inEdgeIds[i];
         if (inEdgeId == edgeId) {
           return true;
         }
       }
       for (int i = 0; i < outEdgeIds.length; i++) {
-        int inEdgeId = outEdgeIds[i];
+        final int inEdgeId = outEdgeIds[i];
         if (inEdgeId == edgeId) {
           return true;
         }
@@ -444,7 +444,7 @@ public class Node<T> extends AbstractCoordinates {
         return false;
       } else {
         graph.nodeMoved(this, newNode);
-        int numEdges = getDegree();
+        final int numEdges = getDegree();
         final Set<Edge<T>> edges = new HashSet<Edge<T>>(getInEdges());
         edges.addAll(getOutEdges());
         for (final Edge<T> edge : edges) {
@@ -492,6 +492,13 @@ public class Node<T> extends AbstractCoordinates {
         updateAttributes();
       }
     }
+  }
+
+  public int[] removeEdge(final int[] oldEdgeIds, final Edge<T> edge) {
+    final Graph<T> graph = getGraph();
+    final List<Edge<T>> edges = graph.getEdges(oldEdgeIds);
+    edges.remove(edge);
+    return graph.getEdgeIds(edges);
   }
 
   public void setAttribute(final String name, final Object value) {

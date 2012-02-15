@@ -220,7 +220,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       this.pathComparator = pathComparator;
     }
 
-    public int compare(final RequestMappingInfo info1,
+    public int compare(
+      final RequestMappingInfo info1,
       final RequestMappingInfo info2) {
       final String path1 = info1.bestMatchedPath();
       final String path2 = info2.bestMatchedPath();
@@ -271,137 +272,11 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         parameterNameDiscoverer, customArgumentResolvers, messageConverters);
     }
 
-    /**
-     * Resolves the given {@link RequestBody @RequestBody} annotation.
-     */
-    @SuppressWarnings("unchecked")
-    protected Object resolveRequestBody(MethodParameter methodParam,
-      NativeWebRequest webRequest, Object handler) throws Exception {
-
-      HttpInputMessage inputMessage = createHttpInputMessage(webRequest);
-      Class paramType = methodParam.getParameterType();
-
-      final HttpServletRequest httpRequest = ((ServletWebRequest)webRequest).getRequest();
-      MediaType contentType = MediaTypeUtil.getContentType(httpRequest);
-      if (contentType == null) {
-        contentType = MediaType.APPLICATION_FORM_URLENCODED;
-      }
-      if (!MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)
-        && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
-        contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
-          mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
-          defaultMediaType, "");
-      }
-
-      final HttpHeaders headers = inputMessage.getHeaders();
-      if (contentType == null) {
-        StringBuilder builder = new StringBuilder(
-          ClassUtils.getShortName(methodParam.getParameterType()));
-        String paramName = methodParam.getParameterName();
-        if (paramName != null) {
-          builder.append(' ');
-          builder.append(paramName);
-        }
-        throw new HttpMediaTypeNotSupportedException(
-          "Cannot extract @RequestBody parameter (" + builder.toString()
-            + "): no Content-Type found");
-      } else {
-        headers.setContentType(contentType);
-      }
-      List<MediaType> allSupportedMediaTypes = new ArrayList<MediaType>();
-      if (messageConverters != null) {
-        for (HttpMessageConverter<?> messageConverter : messageConverters) {
-          allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
-          if (messageConverter.canRead(paramType, contentType)) {
-            return messageConverter.read(paramType, inputMessage);
-          }
-        }
-        String body = null;
-        if (MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)) {
-          Charset charset = contentType.getCharSet();
-          if (charset == null) {
-            charset = Charset.forName(WebUtils.DEFAULT_CHARACTER_ENCODING);
-          }
-          String urlBody = FileCopyUtils.copyToString(new InputStreamReader(
-            inputMessage.getBody(), charset));
-
-          String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
-
-          MultiValueMap<String, String> values = new LinkedMultiValueMap<String, String>(
-            pairs.length);
-
-          for (String pair : pairs) {
-            int idx = pair.indexOf('=');
-            if (idx == -1) {
-              values.add(URLDecoder.decode(pair, charset.name()), null);
-            } else {
-              String name = URLDecoder.decode(pair.substring(0, idx),
-                charset.name());
-              String value = URLDecoder.decode(pair.substring(idx + 1),
-                charset.name());
-              values.add(name, value);
-            }
-          }
-          body = values.getFirst("body");
-        } else if (httpRequest instanceof MultipartHttpServletRequest) {
-          MultipartHttpServletRequest multiPartRequest = (MultipartHttpServletRequest)httpRequest;
-          final MultipartFile bodyFile = multiPartRequest.getFile("body");
-          contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
-            mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
-            defaultMediaType, bodyFile.getOriginalFilename());
-          headers.setContentType(contentType);
-          HttpInputMessage newInputMessage = new HttpInputMessage() {
-            public HttpHeaders getHeaders() {
-              return headers;
-            }
-
-            public InputStream getBody() throws IOException {
-              return bodyFile.getInputStream();
-            }
-          };
-          for (HttpMessageConverter<?> messageConverter : messageConverters) {
-            if (messageConverter.canRead(paramType, contentType)) {
-              return messageConverter.read(paramType, newInputMessage);
-            }
-          }
-
-        }
-        if (body == null) {
-          body = httpRequest.getParameter("body");
-        }
-
-        if (body != null) {
-          contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
-            mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
-            defaultMediaType, "");
-          headers.setContentType(contentType);
-          byte[] bytes;
-          bytes = body.getBytes();
-          final InputStream bodyIn = new ByteArrayInputStream(bytes);
-          HttpInputMessage newInputMessage = new HttpInputMessage() {
-
-            public HttpHeaders getHeaders() {
-              return headers;
-            }
-
-            public InputStream getBody() throws IOException {
-              return bodyIn;
-            }
-          };
-          for (HttpMessageConverter<?> messageConverter : messageConverters) {
-            if (messageConverter.canRead(paramType, contentType)) {
-              return messageConverter.read(paramType, newInputMessage);
-            }
-          }
-        }
-      }
-      throw new HttpMediaTypeNotSupportedException(contentType,
-        allSupportedMediaTypes);
-    }
-
     @Override
-    protected WebDataBinder createBinder(final NativeWebRequest webRequest,
-      final Object target, final String objectName) throws Exception {
+    protected WebDataBinder createBinder(
+      final NativeWebRequest webRequest,
+      final Object target,
+      final String objectName) throws Exception {
 
       return AnnotationMethodHandlerAdapter.this.createBinder(
         (HttpServletRequest)webRequest.getNativeRequest(), target, objectName);
@@ -415,17 +290,37 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     }
 
     @Override
-    protected void doBind(final WebDataBinder binder,
+    protected void doBind(
+      final WebDataBinder binder,
       final NativeWebRequest webRequest) throws Exception {
       final ServletRequestDataBinder servletBinder = (ServletRequestDataBinder)binder;
       servletBinder.bind((ServletRequest)webRequest.getNativeRequest());
     }
 
+    private MediaType getMediaType(
+      final List<MediaType> supportedMediaTypes,
+      final MediaType acceptedMediaType) {
+      for (final MediaType mediaType : supportedMediaTypes) {
+        if (mediaType.equals(acceptedMediaType)) {
+          return mediaType;
+        }
+      }
+      for (final MediaType mediaType : supportedMediaTypes) {
+        if (acceptedMediaType.isWildcardType()
+          || mediaType.includes(acceptedMediaType)) {
+          return mediaType;
+        }
+      }
+      return null;
+    }
+
     @SuppressWarnings("unchecked")
-    public ModelAndView getModelAndView(final Method handlerMethod,
-      final Class handlerType, final Object returnValue,
-      final ExtendedModelMap implicitModel, final ServletWebRequest webRequest)
-      throws Exception {
+    public ModelAndView getModelAndView(
+      final Method handlerMethod,
+      final Class handlerType,
+      final Object returnValue,
+      final ExtendedModelMap implicitModel,
+      final ServletWebRequest webRequest) throws Exception {
 
       final ResponseStatus responseStatusAnn = AnnotationUtils.findAnnotation(
         handlerMethod, ResponseStatus.class);
@@ -451,7 +346,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
       if (returnValue != null
         && AnnotationUtils.findAnnotation(handlerMethod, ResponseBody.class) != null) {
-        View view = handleResponseBody(returnValue, webRequest);
+        final View view = handleResponseBody(returnValue, webRequest);
         return new ModelAndView(view).addAllObjects(implicitModel);
       }
 
@@ -493,7 +388,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       }
     }
 
-    private View handleResponseBody(final Object returnValue,
+    private View handleResponseBody(
+      final Object returnValue,
       final ServletWebRequest webRequest) throws ServletException, IOException {
 
       final HttpServletRequest request = webRequest.getRequest();
@@ -515,7 +411,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
           for (final HttpMessageConverter<?> messageConverter : messageConverters) {
             allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
             if (messageConverter.canWrite(returnValueType, acceptedMediaType)) {
-              MediaType mediaType = getMediaType(
+              final MediaType mediaType = getMediaType(
                 messageConverter.getSupportedMediaTypes(), acceptedMediaType);
               this.responseArgumentUsed = true;
               return new HttpMessageConverterView(messageConverter, mediaType,
@@ -528,24 +424,9 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         allSupportedMediaTypes));
     }
 
-    private MediaType getMediaType(List<MediaType> supportedMediaTypes,
-      MediaType acceptedMediaType) {
-      for (MediaType mediaType : supportedMediaTypes) {
-        if (mediaType.equals(acceptedMediaType)) {
-          return mediaType;
-        }
-      }
-      for (MediaType mediaType : supportedMediaTypes) {
-        if (acceptedMediaType.isWildcardType()
-          || mediaType.includes(acceptedMediaType)) {
-          return mediaType;
-        }
-      }
-      return null;
-    }
-
     @Override
-    protected void raiseMissingParameterException(final String paramName,
+    protected void raiseMissingParameterException(
+      final String paramName,
       final Class paramType) throws Exception {
       throw new MissingServletRequestParameterException(paramName,
         paramType.getName());
@@ -558,9 +439,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     }
 
     @Override
-    protected Object resolveCookieValue(final String cookieName,
-      final Class paramType, final NativeWebRequest webRequest)
-      throws Exception {
+    protected Object resolveCookieValue(
+      final String cookieName,
+      final Class paramType,
+      final NativeWebRequest webRequest) throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       final Cookie cookieValue = WebUtils.getCookie(servletRequest, cookieName);
@@ -590,9 +472,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     @SuppressWarnings({
       "unchecked"
     })
-    protected String resolvePathVariable(final String pathVarName,
-      final Class paramType, final NativeWebRequest webRequest)
-      throws Exception {
+    protected String resolvePathVariable(
+      final String pathVarName,
+      final Class paramType,
+      final NativeWebRequest webRequest) throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       final Map<String, String> uriTemplateVariables = (Map<String, String>)servletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
@@ -604,8 +487,140 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       return uriTemplateVariables.get(pathVarName);
     }
 
+    /**
+     * Resolves the given {@link RequestBody @RequestBody} annotation.
+     */
     @Override
-    protected Object resolveStandardArgument(final Class parameterType,
+    @SuppressWarnings("unchecked")
+    protected Object resolveRequestBody(
+      final MethodParameter methodParam,
+      final NativeWebRequest webRequest,
+      final Object handler) throws Exception {
+
+      final HttpInputMessage inputMessage = createHttpInputMessage(webRequest);
+      final Class paramType = methodParam.getParameterType();
+
+      final HttpServletRequest httpRequest = ((ServletWebRequest)webRequest).getRequest();
+      MediaType contentType = MediaTypeUtil.getContentType(httpRequest);
+      if (contentType == null) {
+        contentType = MediaType.APPLICATION_FORM_URLENCODED;
+      }
+      if (!MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)
+        && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
+        contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
+          mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
+          defaultMediaType, "");
+      }
+
+      final HttpHeaders headers = inputMessage.getHeaders();
+      if (contentType == null) {
+        final StringBuilder builder = new StringBuilder(
+          ClassUtils.getShortName(methodParam.getParameterType()));
+        final String paramName = methodParam.getParameterName();
+        if (paramName != null) {
+          builder.append(' ');
+          builder.append(paramName);
+        }
+        throw new HttpMediaTypeNotSupportedException(
+          "Cannot extract @RequestBody parameter (" + builder.toString()
+            + "): no Content-Type found");
+      } else {
+        headers.setContentType(contentType);
+      }
+      final List<MediaType> allSupportedMediaTypes = new ArrayList<MediaType>();
+      if (messageConverters != null) {
+        for (final HttpMessageConverter<?> messageConverter : messageConverters) {
+          allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
+          if (messageConverter.canRead(paramType, contentType)) {
+            return messageConverter.read(paramType, inputMessage);
+          }
+        }
+        String body = null;
+        if (MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)) {
+          Charset charset = contentType.getCharSet();
+          if (charset == null) {
+            charset = Charset.forName(WebUtils.DEFAULT_CHARACTER_ENCODING);
+          }
+          final String urlBody = FileCopyUtils.copyToString(new InputStreamReader(
+            inputMessage.getBody(), charset));
+
+          final String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
+
+          final MultiValueMap<String, String> values = new LinkedMultiValueMap<String, String>(
+            pairs.length);
+
+          for (final String pair : pairs) {
+            final int idx = pair.indexOf('=');
+            if (idx == -1) {
+              values.add(URLDecoder.decode(pair, charset.name()), null);
+            } else {
+              final String name = URLDecoder.decode(pair.substring(0, idx),
+                charset.name());
+              final String value = URLDecoder.decode(pair.substring(idx + 1),
+                charset.name());
+              values.add(name, value);
+            }
+          }
+          body = values.getFirst("body");
+        } else if (httpRequest instanceof MultipartHttpServletRequest) {
+          final MultipartHttpServletRequest multiPartRequest = (MultipartHttpServletRequest)httpRequest;
+          final MultipartFile bodyFile = multiPartRequest.getFile("body");
+          contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
+            mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
+            defaultMediaType, bodyFile.getOriginalFilename());
+          headers.setContentType(contentType);
+          final HttpInputMessage newInputMessage = new HttpInputMessage() {
+            public InputStream getBody() throws IOException {
+              return bodyFile.getInputStream();
+            }
+
+            public HttpHeaders getHeaders() {
+              return headers;
+            }
+          };
+          for (final HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter.canRead(paramType, contentType)) {
+              return messageConverter.read(paramType, newInputMessage);
+            }
+          }
+
+        }
+        if (body == null) {
+          body = httpRequest.getParameter("body");
+        }
+
+        if (body != null) {
+          contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
+            mediaTypes, mediaTypeOrder, urlPathHelper, parameterName,
+            defaultMediaType, "");
+          headers.setContentType(contentType);
+          byte[] bytes;
+          bytes = body.getBytes();
+          final InputStream bodyIn = new ByteArrayInputStream(bytes);
+          final HttpInputMessage newInputMessage = new HttpInputMessage() {
+
+            public InputStream getBody() throws IOException {
+              return bodyIn;
+            }
+
+            public HttpHeaders getHeaders() {
+              return headers;
+            }
+          };
+          for (final HttpMessageConverter<?> messageConverter : messageConverters) {
+            if (messageConverter.canRead(paramType, contentType)) {
+              return messageConverter.read(paramType, newInputMessage);
+            }
+          }
+        }
+      }
+      throw new HttpMediaTypeNotSupportedException(contentType,
+        allSupportedMediaTypes);
+    }
+
+    @Override
+    protected Object resolveStandardArgument(
+      final Class parameterType,
       final NativeWebRequest webRequest) throws Exception {
       final HttpServletRequest request = (HttpServletRequest)webRequest.getNativeRequest();
       final HttpServletResponse response = (HttpServletResponse)webRequest.getNativeResponse();
@@ -646,8 +661,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     }
 
     @SuppressWarnings("unchecked")
-    private void extractHandlerMethodUriTemplates(final String mappedPath,
-      final String lookupPath, final HttpServletRequest request) {
+    private void extractHandlerMethodUriTemplates(
+      final String mappedPath,
+      final String lookupPath,
+      final HttpServletRequest request) {
       Map<String, String> variables = null;
       final boolean hasSuffix = (mappedPath.indexOf('.') != -1);
       if (!hasSuffix && pathMatcher.match(mappedPath + ".*", lookupPath)) {
@@ -693,8 +710,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
      * pattern} in the request, it is combined with the method-level pattern.
      * <li>Otherwise,
      */
-    private String getMatchedPattern(final String methodLevelPattern,
-      final String lookupPath, final HttpServletRequest request) {
+    private String getMatchedPattern(
+      final String methodLevelPattern,
+      final String lookupPath,
+      final HttpServletRequest request) {
       if (hasTypeLevelMapping()
         && (!ObjectUtils.isEmpty(getTypeLevelMapping().value()))) {
         final String[] typeLevelPatterns = getTypeLevelMapping().value();
@@ -725,7 +744,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       return null;
     }
 
-    private boolean isPathMatchInternal(final String pattern,
+    private boolean isPathMatchInternal(
+      final String pattern,
       final String lookupPath) {
       if (pattern.equals(lookupPath) || pathMatcher.match(pattern, lookupPath)) {
         return true;
@@ -912,6 +932,9 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
   private WebBindingInitializer webBindingInitializer;
 
+  private List<String> mediaTypeOrder = Arrays.asList("parameter", "fileName",
+    "pathExtension", "acceptHeader", "defaultMediaType");
+
   public AnnotationMethodHandlerAdapter() {
     // no restriction of HTTP methods by default
     super(false);
@@ -934,26 +957,21 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
    *      MethodParameter)
    */
   protected ServletRequestDataBinder createBinder(
-    final HttpServletRequest request, final Object target,
+    final HttpServletRequest request,
+    final Object target,
     final String objectName) throws Exception {
 
     return new ServletRequestDataBinder(target, objectName);
   }
 
-  public long getLastModified(final HttpServletRequest request,
+  public long getLastModified(
+    final HttpServletRequest request,
     final Object handler) {
     return -1;
   }
 
-  private List<String> mediaTypeOrder = Arrays.asList("parameter", "fileName",
-    "pathExtension", "acceptHeader", "defaultMediaType");
-
   public List<String> getMediaTypeOrder() {
     return mediaTypeOrder;
-  }
-
-  public void setMediaTypeOrder(List<String> mediaTypeOrder) {
-    this.mediaTypeOrder = mediaTypeOrder;
   }
 
   /**
@@ -981,8 +999,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     return this.order;
   }
 
-  public ModelAndView handle(final HttpServletRequest request,
-    final HttpServletResponse response, final Object handler) throws Exception {
+  public ModelAndView handle(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final Object handler) throws Exception {
 
     if (AnnotationUtils.findAnnotation(handler.getClass(),
       SessionAttributes.class) != null) {
@@ -1009,8 +1029,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     return invokeHandlerMethod(request, response, handler);
   }
 
-  protected ModelAndView invokeHandlerMethod(final HttpServletRequest request,
-    final HttpServletResponse response, final Object handler) throws Exception {
+  protected ModelAndView invokeHandlerMethod(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final Object handler) throws Exception {
 
     final ServletHandlerMethodResolver methodResolver = getMethodResolver(handler);
     final Method handlerMethod = methodResolver.resolveHandlerMethod(request);
@@ -1018,7 +1040,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       methodResolver);
     final ServletWebRequest webRequest = new ServletWebRequest(request,
       response);
-    RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     try {
       RequestContextHolder.setRequestAttributes(webRequest);
       final ExtendedModelMap implicitModel = new BindingAwareModelMap();
@@ -1135,6 +1157,10 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
    */
   public void setDefaultMediaType(final MediaType defaultContentType) {
     this.defaultMediaType = defaultContentType;
+  }
+
+  public void setMediaTypeOrder(final List<String> mediaTypeOrder) {
+    this.mediaTypeOrder = mediaTypeOrder;
   }
 
   /**

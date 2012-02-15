@@ -2,7 +2,6 @@ package com.revolsys.gis.data.io;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -92,6 +91,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   DataObject load(QName typeName, Object id);
 
+  ResultPager<DataObject> page(Query query);
+
   Reader<DataObject> query(List<Query> queries);
 
   Reader<DataObject> query(QName typeName);
@@ -101,8 +102,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   Reader<DataObject> query(QName typeName, Geometry geometry);
 
   Reader<DataObject> query(Query... queries);
-
-  ResultPager<DataObject> page(Query query);
 
   DataObject queryFirst(Query query);
 

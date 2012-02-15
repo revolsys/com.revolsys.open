@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -28,11 +27,6 @@ public class SubmitField extends Field {
     super(name, false);
   }
 
-  public SubmitField(final String name, final Object value) {
-    super(name, false);
-    setValue(value);
-  }
-
   public SubmitField(final String name, final boolean required) {
     super(name, required);
   }
@@ -43,11 +37,18 @@ public class SubmitField extends Field {
     setValue(value);
   }
 
-  public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeSubmitInput(out, getName(), getValue());
+  public SubmitField(final String name, final Object value) {
+    super(name, false);
+    setValue(value);
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
+  }
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    HtmlUtil.serializeSubmitInput(out, getName(), getValue());
   }
 
 }

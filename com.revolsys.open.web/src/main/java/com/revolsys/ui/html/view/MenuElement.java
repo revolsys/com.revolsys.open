@@ -51,6 +51,11 @@ public class MenuElement extends Element {
     return numLevels;
   }
 
+  @Override
+  public void initialize(final HttpServletRequest request) {
+    this.jexlContext = new JexlHttpServletRequestContext(request);
+  }
+
   /**
    * @return Returns the showRoot.
    */
@@ -64,11 +69,11 @@ public class MenuElement extends Element {
     final int level) {
     if (items.size() > 0) {
       out.startTag(HtmlUtil.UL);
-      for (Menu menu : items) {
+      for (final Menu menu : items) {
         if (menu.isVisible()) {
           out.startTag(HtmlUtil.LI);
 
-          String cssClass = menu.getCssClass();
+          final String cssClass = menu.getCssClass();
           if (cssClass != null) {
             out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
           }
@@ -83,14 +88,10 @@ public class MenuElement extends Element {
     }
   }
 
-  public void initialize(HttpServletRequest request) {
-    this.jexlContext = new JexlHttpServletRequestContext(request);
-  }
-
   private void menuLink(final XmlWriter out, final Menu menu) {
     String uri = menu.getLink(jexlContext);
-    String linkTitle = menu.getLinkTitle();
-    String onClick = menu.getOnClick();
+    final String linkTitle = menu.getLinkTitle();
+    final String onClick = menu.getOnClick();
     if (onClick != null && uri == null) {
       uri = "#";
     }
@@ -108,10 +109,11 @@ public class MenuElement extends Element {
     }
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     if (menu != null) {
-      List<Menu> menus = new ArrayList<Menu>();
-      for (Menu menuItem : menu.getMenus()) {
+      final List<Menu> menus = new ArrayList<Menu>();
+      for (final Menu menuItem : menu.getMenus()) {
         if (menuItem.isVisible()) {
           menus.add(menuItem);
         }
@@ -136,28 +138,28 @@ public class MenuElement extends Element {
   /**
    * @param cssClass The cssClass to set.
    */
-  public void setCssClass(String cssClass) {
+  public void setCssClass(final String cssClass) {
     this.cssClass = cssClass;
   }
 
   /**
    * @param menu The menu to set.
    */
-  public void setMenu(Menu menu) {
+  public void setMenu(final Menu menu) {
     this.menu = menu;
   }
 
   /**
    * @param numLevels The numLevels to set.
    */
-  public void setNumLevels(int numLevels) {
+  public void setNumLevels(final int numLevels) {
     this.numLevels = numLevels;
   }
 
   /**
    * @param showRoot The showRoot to set.
    */
-  public void setShowRoot(boolean showRoot) {
+  public void setShowRoot(final boolean showRoot) {
     this.showRoot = showRoot;
   }
 }

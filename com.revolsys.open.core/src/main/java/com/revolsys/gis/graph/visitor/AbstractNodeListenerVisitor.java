@@ -17,13 +17,11 @@ public abstract class AbstractNodeListenerVisitor<T> implements
 
   private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<T>();
 
-  public void addEdgeListener(
-    final EdgeEventListener<T> listener) {
+  public void addEdgeListener(final EdgeEventListener<T> listener) {
     edgeListeners.add(listener);
   }
 
-  public void addNodeListener(
-    final NodeEventListener<T> listener) {
+  public void addNodeListener(final NodeEventListener<T> listener) {
     nodeListeners.add(listener);
   }
 

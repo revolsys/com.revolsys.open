@@ -32,6 +32,13 @@ public class GpxReaderFactory extends
     setCustomAttributionSupported(false);
   }
 
+  public DataObjectReader createDataObjectReader(
+    final DataObjectMetaData metaData,
+    final Resource resource,
+    final DataObjectFactory factory) {
+    throw new UnsupportedOperationException();
+  }
+
   /**
    * Create a reader for the file using the specified data object factory.
    * 
@@ -39,20 +46,16 @@ public class GpxReaderFactory extends
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
-      DataObjectIterator iterator = new GpxIterator(resource,
+      final DataObjectIterator iterator = new GpxIterator(resource,
         dataObjectFactory, null);
       return new DataObjectIteratorReader(iterator);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to open resource " + resource,
         e);
     }
-  }
-
-  public DataObjectReader createDataObjectReader(DataObjectMetaData metaData,
-    Resource resource, DataObjectFactory factory) {
-    throw new UnsupportedOperationException();
   }
 }

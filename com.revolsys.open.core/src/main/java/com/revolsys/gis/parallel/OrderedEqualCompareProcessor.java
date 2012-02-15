@@ -169,7 +169,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
   private void logNoMatch(
     final DataObject[] objects,
     final Channel<DataObject> channel,
-    boolean other) {
+    final boolean other) {
     if (objects[0] != null) {
       logNoMatch(objects[0], false);
     }
@@ -180,6 +180,23 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
       final DataObject object = readObject(channel);
       logNoMatch(object, other);
     }
+  }
+
+  protected void logNotEqual(
+    final DataObject sourceObject,
+    final DataObject otherObject,
+    final Set<String> notEqualAttributeNames,
+    final boolean geometryEquals) {
+    final String attributeNames = CollectionUtil.toString(",",
+      notEqualAttributeNames);
+    DataObjectLog.error(getClass(), sourceName + " " + attributeNames,
+      sourceObject);
+    DataObjectLog.error(getClass(), otherName + " " + attributeNames,
+      otherObject);
+  }
+
+  protected DataObject readObject(final Channel<DataObject> channel) {
+    return channel.read();
   }
 
   @SuppressWarnings("unchecked")
@@ -208,7 +225,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         } else {
         }
       } else {
-        Channel<DataObject> channel = channels[index];
+        final Channel<DataObject> channel = channels[index];
         final DataObject readObject = readObject(channel);
         if (readObject != null) {
           if (previousEqualObject != null
@@ -231,7 +248,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
               sourceObject = objects[oppositeIndex];
               otherObject = readObject;
             }
-            Object value = readObject.getValue(attributeName);
+            final Object value = readObject.getValue(attributeName);
             if (value == null) {
               DataObjectLog.error(getClass(), "Missing key value for "
                 + attributeName, readObject);
@@ -240,15 +257,15 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
               guard[index] = false;
               guard[oppositeIndex] = true;
             } else {
-              Comparable<Object> sourceComparator = sourceObject.getValue(attributeName);
-              Object otherValue = otherObject.getValue(attributeName);
+              final Comparable<Object> sourceComparator = sourceObject.getValue(attributeName);
+              final Object otherValue = otherObject.getValue(attributeName);
               // TODO duplicates
               final int compare = sourceComparator.compareTo(otherValue);
               if (compare == 0) {
                 final Set<String> notEqualAttributeNames = getNotEqualAttributeNames(
                   sourceObject, otherObject);
 
-                boolean geometryEquals = geometryEquals(sourceObject,
+                final boolean geometryEquals = geometryEquals(sourceObject,
                   otherObject);
                 if (!geometryEquals) {
                   final String geometryAttributeName = sourceObject.getMetaData()
@@ -284,23 +301,6 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         }
       }
     }
-  }
-
-  protected DataObject readObject(Channel<DataObject> channel) {
-    return channel.read();
-  }
-
-  protected void logNotEqual(
-    DataObject sourceObject,
-    DataObject otherObject,
-    final Set<String> notEqualAttributeNames,
-    boolean geometryEquals) {
-    final String attributeNames = CollectionUtil.toString(",",
-      notEqualAttributeNames);
-    DataObjectLog.error(getClass(), sourceName + " " + attributeNames,
-      sourceObject);
-    DataObjectLog.error(getClass(), otherName + " " + attributeNames,
-      otherObject);
   }
 
   public void setAttributeName(final String attributeName) {

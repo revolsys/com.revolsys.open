@@ -41,7 +41,7 @@ public abstract class AbstractElementTag extends SimpleTagSupport {
   private static final Logger log = Logger.getLogger(AbstractElementTag.class);
 
   /** The exression to get the elements to write. */
-  private String elementExpression;
+  private final String elementExpression;
 
   /**
    * Construct a new AbstractElementTag.
@@ -58,19 +58,20 @@ public abstract class AbstractElementTag extends SimpleTagSupport {
    * @throws JspException If there was an exception processing the tag.
    * @throws IOException If an i/o error occurs.
    */
+  @Override
   public void doTag() throws JspException, IOException {
     try {
-      JspContext jspContext = getJspContext();
-      JspWriter out = jspContext.getOut();
-      ExpressionEvaluator expressionEvaluator = jspContext.getExpressionEvaluator();
-      Collection elements = (Collection)expressionEvaluator.evaluate(
+      final JspContext jspContext = getJspContext();
+      final JspWriter out = jspContext.getOut();
+      final ExpressionEvaluator expressionEvaluator = jspContext.getExpressionEvaluator();
+      final Collection elements = (Collection)expressionEvaluator.evaluate(
         elementExpression, Collection.class, jspContext.getVariableResolver(),
         null);
       if (elements != null) {
         serializeElements(out, elements);
       }
 
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       log.error(t.getMessage(), t);
       throw new JspTagException(t.getMessage(), t);
     }
@@ -85,9 +86,9 @@ public abstract class AbstractElementTag extends SimpleTagSupport {
    */
   private void serializeElements(final Writer out, final Collection elements)
     throws IOException {
-    Iterator elementIter = elements.iterator();
+    final Iterator elementIter = elements.iterator();
     while (elementIter.hasNext()) {
-      Element element = (Element)elementIter.next();
+      final Element element = (Element)elementIter.next();
       element.serialize(out, false);
     }
   }

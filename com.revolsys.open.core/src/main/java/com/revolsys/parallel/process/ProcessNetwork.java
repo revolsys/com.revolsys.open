@@ -81,7 +81,8 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
-  public Object postProcessAfterInitialization(final Object bean,
+  public Object postProcessAfterInitialization(
+    final Object bean,
     final String beanName) throws BeansException {
     if (bean instanceof TargetBeanFactoryBean) {
       final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
@@ -100,15 +101,15 @@ public class ProcessNetwork implements BeanPostProcessor,
       final Process process = (Process)bean;
       // Check to see if this was a target bean, if so make sure duplicate
       // threads aren't created
-      for (Entry<Process, Thread> entry : processes.entrySet()) {
-        Process otherProcess = entry.getKey();
+      for (final Entry<Process, Thread> entry : processes.entrySet()) {
+        final Process otherProcess = entry.getKey();
         if (otherProcess instanceof TargetBeanProcess) {
-          TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
+          final TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
           if (targetProcessBean.isInstanceCreated()) {
-            Process targetProcess = targetProcessBean.getProcess();
+            final Process targetProcess = targetProcessBean.getProcess();
             if (targetProcess == process) {
               synchronized (processes) {
-                Thread thread = entry.getValue();
+                final Thread thread = entry.getValue();
                 processes.put(targetProcess, thread);
                 processes.remove(otherProcess);
                 return bean;
@@ -122,7 +123,8 @@ public class ProcessNetwork implements BeanPostProcessor,
     return bean;
   }
 
-  public Object postProcessBeforeInitialization(final Object bean,
+  public Object postProcessBeforeInitialization(
+    final Object bean,
     final String beanName) throws BeansException {
     return bean;
   }
@@ -156,7 +158,7 @@ public class ProcessNetwork implements BeanPostProcessor,
   public void start() {
     synchronized (processes) {
       running = true;
-      for (Process process : new ArrayList<Process>(processes.keySet())) {
+      for (final Process process : new ArrayList<Process>(processes.keySet())) {
         process.setProcessNetwork(this);
         start(process);
       }
@@ -168,7 +170,7 @@ public class ProcessNetwork implements BeanPostProcessor,
     if (thread == null) {
       final Process runProcess;
       if (process instanceof TargetBeanProcess) {
-        TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
+        final TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
         runProcess = targetBeanProcess.getProcess();
         processes.remove(process);
       } else {

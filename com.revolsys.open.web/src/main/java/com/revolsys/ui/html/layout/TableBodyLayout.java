@@ -28,11 +28,11 @@ import com.revolsys.ui.html.view.ElementContainer;
 public class TableBodyLayout implements ElementContainerLayout {
   private static final Logger log = Logger.getLogger(TableLayout.class);
 
-  private String cssClass;
+  private final String cssClass;
 
-  private int numColumns;
+  private final int numColumns;
 
-  private List<String> cssClasses = new ArrayList<String>();
+  private final List<String> cssClasses = new ArrayList<String>();
 
   public TableBodyLayout(final int numColumns) {
     this(null, numColumns);
@@ -42,7 +42,7 @@ public class TableBodyLayout implements ElementContainerLayout {
     final String... cssClasses) {
     this.cssClass = cssClass;
     this.numColumns = numColumns;
-    for (String colCss : cssClasses) {
+    for (final String colCss : cssClasses) {
       this.cssClasses.add(colCss);
     }
     for (int i = cssClasses.length; i < numColumns; i++) {
@@ -50,29 +50,29 @@ public class TableBodyLayout implements ElementContainerLayout {
     }
   }
 
-  public void serialize(final XmlWriter out, final ElementContainer container)
-    {
+  public void serialize(final XmlWriter out, final ElementContainer container) {
     if (!container.getElements().isEmpty()) {
       serializeTbody(out, container);
     }
   }
 
-  private void serializeTbody(final XmlWriter out,
+  private void serializeTbody(
+    final XmlWriter out,
     final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     }
-    List<Element> elementList = container.getElements();
+    final List<Element> elementList = container.getElements();
     int i = 0;
     int rowNum = 0;
-    int numElements = elementList.size();
-    int lastRow = (numElements - 1) / numColumns;
-    for (Element element : elementList) {
-      int col = i % numColumns;
+    final int numElements = elementList.size();
+    final int lastRow = (numElements - 1) / numColumns;
+    for (final Element element : elementList) {
+      final int col = i % numColumns;
       String colCss = cssClasses.get(col);
-      boolean firstCol = col == 0;
-      boolean lastCol = (i + 1) % numColumns == 0 || i == numElements - 1;
+      final boolean firstCol = col == 0;
+      final boolean lastCol = (i + 1) % numColumns == 0 || i == numElements - 1;
       if (firstCol) {
         out.startTag(HtmlUtil.TR);
         String rowCss = "";

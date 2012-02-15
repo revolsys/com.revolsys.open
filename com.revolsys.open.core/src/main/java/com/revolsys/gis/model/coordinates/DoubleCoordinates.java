@@ -11,19 +11,7 @@ public class DoubleCoordinates extends AbstractCoordinates {
     this.coordinates = coordinates.getCoordinates();
   }
 
-  public DoubleCoordinates(final double... coordinates) {
-    this.coordinates = coordinates;
-  }
-
-  public DoubleCoordinates(final int dimension) {
-    this.coordinates = new double[dimension];
-  }
-
-  public DoubleCoordinates(final List<Number> coordinates) {
-    this(MathUtil.toDoubleArray(coordinates));
-  }
-
-  public DoubleCoordinates(Coordinates point, int numAxis) {
+  public DoubleCoordinates(final Coordinates point, final int numAxis) {
     this(numAxis);
     final int count = Math.min(numAxis, point.getNumAxis());
     for (int i = 0; i < count; i++) {
@@ -32,10 +20,22 @@ public class DoubleCoordinates extends AbstractCoordinates {
     }
   }
 
-  public DoubleCoordinates(int numAxis, double[] coordinates) {
+  public DoubleCoordinates(final double... coordinates) {
+    this.coordinates = coordinates;
+  }
+
+  public DoubleCoordinates(final int dimension) {
+    this.coordinates = new double[dimension];
+  }
+
+  public DoubleCoordinates(final int numAxis, final double[] coordinates) {
     this.coordinates = new double[numAxis];
     System.arraycopy(coordinates, 0, this.coordinates, 0,
       Math.min(numAxis, coordinates.length));
+  }
+
+  public DoubleCoordinates(final List<Number> coordinates) {
+    this(MathUtil.toDoubleArray(coordinates));
   }
 
   @Override

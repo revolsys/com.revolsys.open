@@ -21,17 +21,23 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
   private XMLStreamReader in;
 
-  private boolean single;
+  private final boolean single;
 
-  private Resource resource;
+  private final Resource resource;
 
   public XmlMapIterator(final Resource resource) {
     this(resource, false);
   }
 
-  public XmlMapIterator(final Resource resource, boolean single) {
+  public XmlMapIterator(final Resource resource, final boolean single) {
     this.resource = resource;
     this.single = single;
+  }
+
+  @Override
+  protected void doClose() {
+    super.doClose();
+    StaxUtils.closeSilent(in);
   }
 
   @Override
@@ -51,15 +57,9 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   }
 
   @Override
-  protected void doClose() {
-    super.doClose();
-    StaxUtils.closeSilent(in);
-  }
-
-  @Override
   protected Map<String, Object> getNext() throws NoSuchElementException {
     if (hasNext) {
-      Map<String, Object> map = readMap();
+      final Map<String, Object> map = readMap();
       if (StaxUtils.skipToStartElement(in) != XMLStreamConstants.START_ELEMENT) {
         hasNext = false;
       }
@@ -70,58 +70,16 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   }
 
   @SuppressWarnings("unchecked")
-  private Map<String, Object> readMap() {
-    String name = in.getLocalName();
-    Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
-    int textIndex = 0;
-    while (StaxUtils.next(in) != XMLStreamConstants.END_ELEMENT) {
-      switch (in.getEventType()) {
-        case XMLStreamConstants.CDATA:
-        case XMLStreamConstants.CHARACTERS:
-          String text = in.getText();
-          if (StringUtils.hasText(text)) {
-            map.put("xmlText" + ++textIndex, text);
-          }
-        break;
-        case XMLStreamConstants.SPACE:
-        break;
-        case XMLStreamConstants.START_ELEMENT:
-          final String tagName = in.getLocalName();
-          Object value = readElement();
-          Object oldValue = map.get(tagName);
-          if (oldValue == null) {
-            map.put(tagName, value);
-          } else {
-            List<Object> list;
-            if (oldValue instanceof List) {
-              list = (List<Object>)oldValue;
-            } else {
-              list = new ArrayList<Object>();
-              list.add(oldValue);
-              map.put(tagName, list);
-            }
-            list.add(value);
-
-          }
-        break;
-        default:
-        break;
-      }
-    }
-    return map;
-  }
-
-  @SuppressWarnings("unchecked")
   private Object readElement() {
-    String name = in.getLocalName();
-    Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
+    final String name = in.getLocalName();
+    final Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
     int textIndex = 0;
     int elementIndex = 0;
     while (StaxUtils.next(in) != XMLStreamConstants.END_ELEMENT) {
       switch (in.getEventType()) {
         case XMLStreamConstants.CDATA:
         case XMLStreamConstants.CHARACTERS:
-          String text = in.getText();
+          final String text = in.getText();
           if (StringUtils.hasText(text)) {
             map.put("xmlText" + ++textIndex, text);
           }
@@ -131,8 +89,8 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
         case XMLStreamConstants.START_ELEMENT:
           elementIndex++;
           final String tagName = in.getLocalName();
-          Object value = readElement();
-          Object oldValue = map.get(tagName);
+          final Object value = readElement();
+          final Object oldValue = map.get(tagName);
           if (oldValue == null) {
             map.put(tagName, value);
           } else {
@@ -157,11 +115,53 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
     }
     if (elementIndex == 0) {
       if (textIndex > 0) {
-        StringBuffer fullText = new StringBuffer();
-        for (Object text : map.values()) {
+        final StringBuffer fullText = new StringBuffer();
+        for (final Object text : map.values()) {
           fullText.append(text);
         }
         return fullText.toString();
+      }
+    }
+    return map;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> readMap() {
+    final String name = in.getLocalName();
+    final Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
+    int textIndex = 0;
+    while (StaxUtils.next(in) != XMLStreamConstants.END_ELEMENT) {
+      switch (in.getEventType()) {
+        case XMLStreamConstants.CDATA:
+        case XMLStreamConstants.CHARACTERS:
+          final String text = in.getText();
+          if (StringUtils.hasText(text)) {
+            map.put("xmlText" + ++textIndex, text);
+          }
+        break;
+        case XMLStreamConstants.SPACE:
+        break;
+        case XMLStreamConstants.START_ELEMENT:
+          final String tagName = in.getLocalName();
+          final Object value = readElement();
+          final Object oldValue = map.get(tagName);
+          if (oldValue == null) {
+            map.put(tagName, value);
+          } else {
+            List<Object> list;
+            if (oldValue instanceof List) {
+              list = (List<Object>)oldValue;
+            } else {
+              list = new ArrayList<Object>();
+              list.add(oldValue);
+              map.put(tagName, list);
+            }
+            list.add(value);
+
+          }
+        break;
+        default:
+        break;
       }
     }
     return map;

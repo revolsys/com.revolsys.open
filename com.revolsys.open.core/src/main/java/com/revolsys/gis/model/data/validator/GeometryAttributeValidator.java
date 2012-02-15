@@ -25,9 +25,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryAttributeValidator implements AttributeValueValidator {
 
-  public boolean isValid(
-    final Attribute attributeDefinition,
-    final Object value) {
+  public boolean isValid(final Attribute attributeDefinition, final Object value) {
     return (value instanceof Geometry);
 
   }

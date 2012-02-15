@@ -40,6 +40,17 @@ public class FilterUtil {
     }
   }
 
+  public static <T> boolean matches(
+    final List<T> objects,
+    final Filter<T> filter) {
+    for (final T object : objects) {
+      if (filter.accept(object)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static <T> void remove(
     final Collection<T> collection,
     final Filter<T> filter) {
@@ -62,16 +73,5 @@ public class FilterUtil {
         iterator.remove();
       }
     }
-  }
-
-  public static <T> boolean matches(
-    List<T> objects,
-    Filter<T> filter) {
-    for (T object : objects) {
-      if (filter.accept(object)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

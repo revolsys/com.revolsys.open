@@ -86,14 +86,14 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     }
   }
 
-  public void writeExtendedData(Map<String, ? extends Object> data) {
+  public void writeExtendedData(final Map<String, ? extends Object> data) {
     boolean hasValues = false;
-    for (Entry<String, ? extends Object> entry : data.entrySet()) {
+    for (final Entry<String, ? extends Object> entry : data.entrySet()) {
       final String attributeName = entry.getKey();
       final Object value = entry.getValue();
       if (!(value instanceof Geometry)) {
         if (value != null) {
-          String stringValue = value.toString();
+          final String stringValue = value.toString();
           if (StringUtils.hasText(stringValue)) {
             if (!hasValues) {
               hasValues = true;

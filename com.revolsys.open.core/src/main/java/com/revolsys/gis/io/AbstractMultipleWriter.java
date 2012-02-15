@@ -18,6 +18,7 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<DataObject> 
   public AbstractMultipleWriter() {
   }
 
+  @Override
   public void close() {
     for (final Writer<DataObject> writer : writers.values()) {
       try {
@@ -31,8 +32,7 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<DataObject> 
   protected abstract Writer<DataObject> createWriter(
     final DataObjectMetaData metaData);
 
-  private Writer<DataObject> getWriter(
-    final DataObjectMetaData metaData) {
+  private Writer<DataObject> getWriter(final DataObjectMetaData metaData) {
     Writer<DataObject> writer = writers.get(metaData);
     if (writer == null) {
       writer = createWriter(metaData);
@@ -41,8 +41,7 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<DataObject> 
     return writer;
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     final Writer<DataObject> writer = getWriter(metaData);
     writer.write(object);

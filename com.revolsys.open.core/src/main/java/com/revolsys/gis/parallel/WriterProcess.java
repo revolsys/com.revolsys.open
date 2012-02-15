@@ -11,21 +11,17 @@ public class WriterProcess extends BaseInProcess<DataObject> {
   public WriterProcess() {
   }
 
-  public WriterProcess(
-    final Channel<DataObject> in,
+  public WriterProcess(final Channel<DataObject> in,
     final Writer<DataObject> writer) {
     super(in);
     this.writer = writer;
   }
 
-  public WriterProcess(
-    final Writer<DataObject> writer) {
+  public WriterProcess(final Writer<DataObject> writer) {
     this.writer = writer;
   }
 
-  public WriterProcess(
-    final Writer<DataObject> writer,
-    final int inBufferSize) {
+  public WriterProcess(final Writer<DataObject> writer, final int inBufferSize) {
     super(inBufferSize);
     this.writer = writer;
   }
@@ -38,20 +34,16 @@ public class WriterProcess extends BaseInProcess<DataObject> {
   }
 
   @Override
-  protected void process(
-    Channel<DataObject> in,
-    DataObject object) {
-    writer.write(object);
-  }
-
-  @Override
-  protected void postRun(
-    Channel<DataObject> in) {
+  protected void postRun(final Channel<DataObject> in) {
     writer.close();
   }
 
-  public void setWriter(
-    final Writer<DataObject> writer) {
+  @Override
+  protected void process(final Channel<DataObject> in, final DataObject object) {
+    writer.write(object);
+  }
+
+  public void setWriter(final Writer<DataObject> writer) {
     this.writer = writer;
   }
 

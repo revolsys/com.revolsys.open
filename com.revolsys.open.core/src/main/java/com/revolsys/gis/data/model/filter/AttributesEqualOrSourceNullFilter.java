@@ -9,8 +9,10 @@ import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class AttributesEqualOrSourceNullFilter implements Filter<DataObject> {
-  public static boolean accept(final DataObject object1,
-    final DataObject object2, final Collection<String> attributeNames) {
+  public static boolean accept(
+    final DataObject object1,
+    final DataObject object2,
+    final Collection<String> attributeNames) {
     for (final String attributeName : attributeNames) {
       final Object value1 = DataObjectUtil.getAttributeByPath(object1,
         attributeName);
@@ -24,8 +26,10 @@ public class AttributesEqualOrSourceNullFilter implements Filter<DataObject> {
     return true;
   }
 
-  public static boolean accept(final DataObject object1,
-    final DataObject object2, final String... attributeNames) {
+  public static boolean accept(
+    final DataObject object1,
+    final DataObject object2,
+    final String... attributeNames) {
     return accept(object1, object2, Arrays.asList(attributeNames));
   }
 

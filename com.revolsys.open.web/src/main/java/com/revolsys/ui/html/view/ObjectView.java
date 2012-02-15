@@ -21,7 +21,7 @@ import java.util.Map;
 public class ObjectView extends Element {
   private Object object;
 
-  private Map properties = new HashMap();
+  private final Map properties = new HashMap();
 
   public Object getObject() {
     return object;
@@ -31,6 +31,9 @@ public class ObjectView extends Element {
     return properties.get(name);
   }
 
+  protected void processProperty(final String name, final Object value) {
+  }
+
   public void setObject(final Object object) {
     this.object = object;
   }
@@ -38,8 +41,5 @@ public class ObjectView extends Element {
   public void setProperty(final String name, final Object value) {
     properties.put(name, value);
     processProperty(name, value);
-  }
-
-  protected void processProperty(final String name, final Object value) {
   }
 }

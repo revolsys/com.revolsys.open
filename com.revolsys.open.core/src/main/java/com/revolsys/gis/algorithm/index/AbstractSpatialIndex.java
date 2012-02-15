@@ -9,13 +9,13 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractSpatialIndex<T> implements
   EnvelopeSpatialIndex<T> {
 
-  public List<T> find(Envelope envelope) {
+  public List<T> find(final Envelope envelope) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
     visit(envelope, visitor);
     return visitor.getList();
   }
 
-  public List<T> find(Envelope envelope, Filter<T> filter) {
+  public List<T> find(final Envelope envelope, final Filter<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
     visit(envelope, filter, visitor);
     return visitor.getList();

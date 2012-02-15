@@ -27,7 +27,8 @@ public class Sort extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
+  protected void postRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (comparator != null) {
       Collections.sort(objects, comparator);
@@ -38,8 +39,10 @@ public class Sort extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     objects.add(object);
   }
 

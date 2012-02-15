@@ -9,19 +9,15 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 public class ChainedCoordinatesOperation implements CoordinatesOperation {
   private final List<CoordinatesOperation> operations;
 
-  public ChainedCoordinatesOperation(
-    final CoordinatesOperation... operations) {
+  public ChainedCoordinatesOperation(final CoordinatesOperation... operations) {
     this(Arrays.asList(operations));
   }
 
-  public ChainedCoordinatesOperation(
-    final List<CoordinatesOperation> operations) {
+  public ChainedCoordinatesOperation(final List<CoordinatesOperation> operations) {
     this.operations = new ArrayList<CoordinatesOperation>(operations);
   }
 
-  public void perform(
-    final Coordinates from,
-    final Coordinates to) {
+  public void perform(final Coordinates from, final Coordinates to) {
     Coordinates source = from;
     final Coordinates target = to;
     for (final CoordinatesOperation operation : operations) {
@@ -29,6 +25,7 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
       source = target;
     }
   }
+
   @Override
   public String toString() {
     return operations.toString();

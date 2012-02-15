@@ -32,65 +32,38 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out = out;
   }
 
-  public void close() {
-    out.flush();
-    out.close();
-  }
-
-  public void writeGrant(
-    QName typeName,
-    String username,
-    boolean select,
-    boolean insert,
-    boolean update,
-    boolean delete) {
-
-    out.print("GRANT ");
-    List<String> perms = new ArrayList<String>();
-    if (select) {
-      perms.add("SELECT");
-    }
-    if (insert) {
-      perms.add("INSERT");
-    }
-    if (update) {
-      perms.add("UPDATE");
-    }
-    if (delete) {
-      perms.add("DELETE");
-    }
-    out.print(CollectionUtil.toString(", ", perms));
-    out.print(" ON ");
-    writeTableName(typeName);
-    out.print(" TO ");
-    out.print(username);
-    out.println(";");
-
-  }
-
   @Override
   public JdbcDdlWriter clone() {
     try {
       return (JdbcDdlWriter)super.clone();
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public JdbcDdlWriter clone(File file) {
+  public JdbcDdlWriter clone(final File file) {
     final JdbcDdlWriter clone = clone();
     clone.setOut(file);
     return clone;
+  }
+
+  public void close() {
+    out.flush();
+    out.close();
   }
 
   public PrintWriter getOut() {
     return out;
   }
 
+  public String getSequenceName(final DataObjectMetaData metaData) {
+    throw new UnsupportedOperationException();
+  }
+
   public String getTableAlias(final DataObjectMetaData metaData) {
-    String shortName = ShortNameProperty.getShortName(metaData);
+    final String shortName = ShortNameProperty.getShortName(metaData);
     if (shortName == null) {
-      QName typeName = metaData.getName();
+      final QName typeName = metaData.getName();
       return typeName.getLocalPart();
     } else {
       return shortName;
@@ -101,17 +74,17 @@ public abstract class JdbcDdlWriter implements Cloneable {
     out.println();
   }
 
-  public void setOut(final PrintWriter out) {
-    this.out = out;
-  }
-
   public void setOut(final File file) {
     try {
       final FileWriter writer = new FileWriter(file);
       out = new PrintWriter(writer);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void setOut(final PrintWriter out) {
+    this.out = out;
   }
 
   public void writeAddForeignKeyConstraint(
@@ -193,31 +166,10 @@ public abstract class JdbcDdlWriter implements Cloneable {
     return sequenceName;
   }
 
-  public  String getSequenceName(final DataObjectMetaData metaData) {
-    throw new UnsupportedOperationException();
-  }
-
   public void writeCreateSequence(final String sequenceName) {
     out.print("CREATE SEQUENCE ");
     out.print(sequenceName);
     out.println(";");
-  }
-
-  public void writeCreateView(
-    final QName typeName,
-    QName queryTypeName,
-    List<String> columnNames) {
-    out.println();
-    out.print("CREATE VIEW ");
-    writeTableName(typeName);
-    out.println(" AS ( ");
-    out.println("  SELECT ");
-    out.print("  ");
-    out.println(CollectionUtil.toString(",\n  ", columnNames));
-    out.print("  FROM ");
-    writeTableName(queryTypeName);
-    out.println();
-    out.println(");");
   }
 
   public void writeCreateTable(final DataObjectMetaData metaData) {
@@ -257,7 +209,55 @@ public abstract class JdbcDdlWriter implements Cloneable {
     }
   }
 
+  public void writeCreateView(
+    final QName typeName,
+    final QName queryTypeName,
+    final List<String> columnNames) {
+    out.println();
+    out.print("CREATE VIEW ");
+    writeTableName(typeName);
+    out.println(" AS ( ");
+    out.println("  SELECT ");
+    out.print("  ");
+    out.println(CollectionUtil.toString(",\n  ", columnNames));
+    out.print("  FROM ");
+    writeTableName(queryTypeName);
+    out.println();
+    out.println(");");
+  }
+
   public abstract void writeGeometryMetaData(final DataObjectMetaData metaData);
+
+  public void writeGrant(
+    final QName typeName,
+    final String username,
+    final boolean select,
+    final boolean insert,
+    final boolean update,
+    final boolean delete) {
+
+    out.print("GRANT ");
+    final List<String> perms = new ArrayList<String>();
+    if (select) {
+      perms.add("SELECT");
+    }
+    if (insert) {
+      perms.add("INSERT");
+    }
+    if (update) {
+      perms.add("UPDATE");
+    }
+    if (delete) {
+      perms.add("DELETE");
+    }
+    out.print(CollectionUtil.toString(", ", perms));
+    out.print(" ON ");
+    writeTableName(typeName);
+    out.print(" TO ");
+    out.print(username);
+    out.println(";");
+
+  }
 
   public void writeInsert(final DataObject row) {
     final DataObjectMetaData metaData = row.getMetaData();
@@ -299,6 +299,12 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   }
 
+  public void writeResetSequence(
+    final DataObjectMetaData metaData,
+    final List<DataObject> values) {
+    throw new UnsupportedOperationException();
+  }
+
   public void writeTableName(final QName typeName) {
     final String schemaName = typeName.getNamespaceURI();
     final String tableName = typeName.getLocalPart();
@@ -311,11 +317,5 @@ public abstract class JdbcDdlWriter implements Cloneable {
       out.print('.');
     }
     out.print(tableName);
-  }
-
-  public void writeResetSequence(
-    DataObjectMetaData metaData,
-    List<DataObject> values) {
-    throw new UnsupportedOperationException();
   }
 }

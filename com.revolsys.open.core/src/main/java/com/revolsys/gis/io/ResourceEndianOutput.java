@@ -13,17 +13,15 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.spring.SpringUtil;
 
 public class ResourceEndianOutput implements EndianOutput {
-  private Resource resource;
+  private final Resource resource;
 
-  private OutputStream resourceOut;
+  private final OutputStream resourceOut;
 
-  private File file;
+  private final File file;
 
   private EndianOutput out;
 
-  public ResourceEndianOutput(
-    Resource resource)
-    throws IOException {
+  public ResourceEndianOutput(final Resource resource) throws IOException {
     this.resource = resource;
     resourceOut = SpringUtil.getOutputStream(resource);
     file = SpringUtil.getFileOrCreateTempFile(resource);
@@ -32,12 +30,7 @@ public class ResourceEndianOutput implements EndianOutput {
     this.out = new EndianOutputStream(bufferedOut);
   }
 
-  public long length() throws IOException {
-    return out.length();
-  }
-
-  public void close()
-    throws IOException {
+  public void close() throws IOException {
     try {
       out.close();
     } finally {
@@ -55,9 +48,20 @@ public class ResourceEndianOutput implements EndianOutput {
     }
   }
 
-  public void seek(
-    long pos)
-    throws IOException {
+  public void flush() {
+    out.flush();
+
+  }
+
+  public long getFilePointer() throws IOException {
+    return out.getFilePointer();
+  }
+
+  public long length() throws IOException {
+    return out.length();
+  }
+
+  public void seek(final long pos) throws IOException {
     final LittleEndianRandomAccessFile raOut;
     if (out instanceof LittleEndianRandomAccessFile) {
       raOut = (LittleEndianRandomAccessFile)out;
@@ -70,86 +74,52 @@ public class ResourceEndianOutput implements EndianOutput {
     raOut.seek(pos);
   }
 
-  public void flush() {
-    out.flush();
-
-  }
-
-  public long getFilePointer()
-    throws IOException {
-    return out.getFilePointer();
-  }
-
-  public void write(
-    int i)
-    throws IOException {
+  public void write(final int i) throws IOException {
     out.write(i);
   }
 
-  public void writeBytes(
-    String s)
-    throws IOException {
+  public void writeBytes(final String s) throws IOException {
     out.writeBytes(s);
   }
 
-  public void writeDouble(
-    double d)
-    throws IOException {
+  public void writeDouble(final double d) throws IOException {
     out.writeDouble(d);
   }
 
-  public void writeFloat(
-    float f)
-    throws IOException {
+  public void writeFloat(final float f) throws IOException {
     out.writeFloat(f);
   }
 
-  public void writeInt(
-    int i)
-    throws IOException {
+  public void writeInt(final int i) throws IOException {
     out.writeInt(i);
   }
 
-  public void writeLEDouble(
-    double d)
-    throws IOException {
+  public void writeLEDouble(final double d) throws IOException {
     out.writeLEDouble(d);
   }
 
-  public void writeLEFloat(
-    float f)
-    throws IOException {
+  public void writeLEFloat(final float f) throws IOException {
     out.writeLEFloat(f);
   }
 
-  public void writeLEInt(
-    int i)
-    throws IOException {
+  public void writeLEInt(final int i) throws IOException {
     out.writeLEInt(i);
   }
 
-  public void writeLELong(
-    long l)
-    throws IOException {
+  public void writeLELong(final long l) throws IOException {
     out.writeLELong(l);
 
   }
 
-  public void writeLEShort(
-    short s)
-    throws IOException {
+  public void writeLEShort(final short s) throws IOException {
     out.writeLEShort(s);
   }
 
-  public void writeLong(
-    long l)
-    throws IOException {
+  public void writeLong(final long l) throws IOException {
     out.writeLong(l);
   }
 
-  public void writeShort(
-    short s)
-    throws IOException {
+  public void writeShort(final short s) throws IOException {
     out.writeShort(s);
   }
 

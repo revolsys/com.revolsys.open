@@ -1,7 +1,6 @@
 package com.revolsys.ui.html.serializer.key;
 
 import java.math.BigDecimal;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
@@ -12,25 +11,24 @@ import com.revolsys.util.MathUtil;
  * 
  * @author Paul Austin
  */
-public class MoneyKeySerializer implements KeySerializer {
+public class MoneyKeySerializer extends AbstractKeySerializer {
 
   /**
    * Construct a new MoneyKeySerializer.
    */
-  public MoneyKeySerializer() {
+  public MoneyKeySerializer(final String name) {
+    super(name);
   }
 
   /**
-   * Serialize the value to the XML writer using the settings from the Locale.
+   * Serialize the value to the XML writer.
    * 
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
-   * @param key The key of the property on the object to serialize.
-   * @param locale The locale.
    */
-  public void serialize(final XmlWriter out, final Object object,
-    final String key, final Locale locale) {
-    BigDecimal value = (BigDecimal)JavaBeanUtil.getProperty(object, key);
+  public void serialize(final XmlWriter out, final Object object) {
+    final BigDecimal value = (BigDecimal)JavaBeanUtil.getProperty(object,
+      getName());
     if (value != null) {
       out.text(MathUtil.currencyToString(value));
     } else {

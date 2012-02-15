@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineContainsWithinToleranceFilter implements Filter<LineString> {
   private final CoordinatesList points;
 
-  private Envelope envelope;
+  private final Envelope envelope;
 
   private double tolerance;
 
@@ -41,7 +41,7 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
   }
 
   public LineContainsWithinToleranceFilter(final LineString line,
-    double tolerance) {
+    final double tolerance) {
     this.points = CoordinatesListUtil.get(line);
     this.tolerance = tolerance;
     this.envelope = line.getEnvelopeInternal();
@@ -49,14 +49,14 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
   }
 
   public LineContainsWithinToleranceFilter(final LineString line,
-    double tolerance, boolean flip) {
+    final double tolerance, final boolean flip) {
     this(line, tolerance);
     this.flip = flip;
   }
 
   public boolean accept(final LineString line) {
     if (this.envelope.intersects(line.getEnvelopeInternal())) {
-      CoordinatesList points = CoordinatesListUtil.get(line);
+      final CoordinatesList points = CoordinatesListUtil.get(line);
 
       final boolean contains;
       if (flip) {

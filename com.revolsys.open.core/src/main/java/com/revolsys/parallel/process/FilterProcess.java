@@ -2,7 +2,7 @@ package com.revolsys.parallel.process;
 
 import com.revolsys.filter.Filter;
 
-public class FilterProcess<T> extends BaseInOutProcess<T,T> {
+public class FilterProcess<T> extends BaseInOutProcess<T, T> {
   private Filter<T> filter;
 
   private boolean invert = false;
@@ -15,14 +15,13 @@ public class FilterProcess<T> extends BaseInOutProcess<T,T> {
     return invert;
   }
 
-  protected void postAccept(
-    T object) {
+  protected void postAccept(final T object) {
   }
 
-  protected void postReject(
-    T object) {
+  protected void postReject(final T object) {
   }
 
+  @Override
   protected void process(
     final com.revolsys.parallel.channel.Channel<T> in,
     final com.revolsys.parallel.channel.Channel<T> out,
@@ -39,13 +38,11 @@ public class FilterProcess<T> extends BaseInOutProcess<T,T> {
     }
   }
 
-  public void setFilter(
-    Filter<T> filter) {
+  public void setFilter(final Filter<T> filter) {
     this.filter = filter;
   }
 
-  public void setInvert(
-    boolean invert) {
+  public void setInvert(final boolean invert) {
     this.invert = invert;
   }
 

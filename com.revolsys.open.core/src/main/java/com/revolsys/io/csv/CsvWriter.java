@@ -10,7 +10,7 @@ import com.revolsys.io.FileUtil;
 public class CsvWriter {
 
   /** The writer */
-  private PrintWriter out;
+  private final PrintWriter out;
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
@@ -22,15 +22,24 @@ public class CsvWriter {
     this.out = new PrintWriter(out);
   }
 
-  public void write(List<? extends Object> values) {
+  /**
+   * Closes the underlying reader.
+   * 
+   * @throws IOException if the close fails
+   */
+  public void close() {
+    FileUtil.closeSilent(out);
+  }
+
+  public void write(final List<? extends Object> values) {
     write(values.toArray());
   }
 
-  public void write(Object... values) {
+  public void write(final Object... values) {
     for (int i = 0; i < values.length; i++) {
-      Object value = values[i];
+      final Object value = values[i];
       if (value != null) {
-        String string = value.toString().replaceAll("\"", "\"\"");
+        final String string = value.toString().replaceAll("\"", "\"\"");
         out.write('"');
         out.write(string);
         out.write('"');
@@ -40,14 +49,5 @@ public class CsvWriter {
       }
     }
     out.println();
-  }
-
-  /**
-   * Closes the underlying reader.
-   * 
-   * @throws IOException if the close fails
-   */
-  public void close() {
-    FileUtil.closeSilent(out);
   }
 }

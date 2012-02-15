@@ -34,10 +34,8 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
 
   private final Node<T> node;
 
-  public EdgeLessThanDistanceToNodeVisitor(
-    final Node<T> node,
-    final double maxDistance,
-    final Visitor<Edge<T>> matchVisitor) {
+  public EdgeLessThanDistanceToNodeVisitor(final Node<T> node,
+    final double maxDistance, final Visitor<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.node = node;
     this.maxDistance = maxDistance;
@@ -47,8 +45,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
   }
 
   @Override
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final Envelope envelope = edge.getEnvelope();
     if (this.envelope.distance(envelope) < maxDistance) {
       if (!edge.hasNode(node)) {

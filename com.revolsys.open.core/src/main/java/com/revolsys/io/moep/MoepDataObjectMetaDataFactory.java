@@ -13,7 +13,7 @@ public class MoepDataObjectMetaDataFactory extends AbstractObjectWithProperties
   implements DataObjectMetaDataFactory {
   private static final Map<QName, DataObjectMetaData> META_DATA_CACHE = new HashMap<QName, DataObjectMetaData>();
 
-  public DataObjectMetaData getMetaData(QName typeName) {
+  public DataObjectMetaData getMetaData(final QName typeName) {
     synchronized (META_DATA_CACHE) {
       DataObjectMetaData metaData = META_DATA_CACHE.get(typeName);
       if (metaData == null) {

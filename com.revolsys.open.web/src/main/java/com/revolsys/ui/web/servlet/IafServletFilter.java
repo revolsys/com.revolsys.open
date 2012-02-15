@@ -47,41 +47,21 @@ public class IafServletFilter implements Filter {
 
   private Config rsWebUiConfig;
 
-  public void init(final FilterConfig filterConfig) throws ServletException {
-    String config = filterConfig.getInitParameter("config");
-    if (config == null) {
-      config = "/WEB-INF/iaf-config.xml";
-    }
-    ServletContext servletContext = filterConfig.getServletContext();
-    WebUiContext.setServletContext(servletContext);
-    WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-
-    try {
-      URL configResource = servletContext.getResource(config);
-      XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
-        servletContext);
-      rsWebUiConfig = configLoader.loadConfig();
-      servletContext.setAttribute("rsWebUiConfig", rsWebUiConfig);
-    } catch (InvalidConfigException e) {
-      log.error(e.getErrors(), e);
-      throw new UnavailableException("Cannot load a rsWebUiConfig resource from '"
-        + config + "' due to " + e.getErrors());
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-      throw new UnavailableException("Cannot load a rsWebUiConfig resource from '"
-        + config + "' due to " + e.getMessage());
-    }
+  public void destroy() {
+    rsWebUiConfig = null;
+    WebUiContext.setServletContext(null);
   }
 
-  public void doFilter(final ServletRequest request,
-    final ServletResponse response, final FilterChain chain)
-    throws IOException, ServletException {
+  public void doFilter(
+    final ServletRequest request,
+    final ServletResponse response,
+    final FilterChain chain) throws IOException, ServletException {
     try {
-      HttpServletRequest httpRequest = (HttpServletRequest)request;
-      HttpServletResponse httpResponse = (HttpServletResponse)response;
-      String contextPath = httpRequest.getContextPath();
-      WebUiContext.set(new WebUiContext(rsWebUiConfig, contextPath, null, httpRequest,
-        httpResponse));
+      final HttpServletRequest httpRequest = (HttpServletRequest)request;
+      final HttpServletResponse httpResponse = (HttpServletResponse)response;
+      final String contextPath = httpRequest.getContextPath();
+      WebUiContext.set(new WebUiContext(rsWebUiConfig, contextPath, null,
+        httpRequest, httpResponse));
       request.setAttribute("niceConfig", rsWebUiConfig);
       chain.doFilter(request, response);
     } finally {
@@ -89,8 +69,31 @@ public class IafServletFilter implements Filter {
     }
   }
 
-  public void destroy() {
-    rsWebUiConfig = null;
-    WebUiContext.setServletContext(null);
+  public void init(final FilterConfig filterConfig) throws ServletException {
+    String config = filterConfig.getInitParameter("config");
+    if (config == null) {
+      config = "/WEB-INF/iaf-config.xml";
+    }
+    final ServletContext servletContext = filterConfig.getServletContext();
+    WebUiContext.setServletContext(servletContext);
+    final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+
+    try {
+      final URL configResource = servletContext.getResource(config);
+      final XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
+        servletContext);
+      rsWebUiConfig = configLoader.loadConfig();
+      servletContext.setAttribute("rsWebUiConfig", rsWebUiConfig);
+    } catch (final InvalidConfigException e) {
+      log.error(e.getErrors(), e);
+      throw new UnavailableException(
+        "Cannot load a rsWebUiConfig resource from '" + config + "' due to "
+          + e.getErrors());
+    } catch (final Exception e) {
+      log.error(e.getMessage(), e);
+      throw new UnavailableException(
+        "Cannot load a rsWebUiConfig resource from '" + config + "' due to "
+          + e.getMessage());
+    }
   }
 }

@@ -21,8 +21,7 @@ public class Mercator1SP implements CoordinatesProjection {
 
   private final double y0;
 
-  public Mercator1SP(
-    final ProjectedCoordinateSystem cs) {
+  public Mercator1SP(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
     final double centralMeridian = cs.getDoubleParameter("longitude_of_natural_origin");
@@ -37,9 +36,7 @@ public class Mercator1SP implements CoordinatesProjection {
 
   }
 
-  public void inverse(
-    final Coordinates from,
-    final Coordinates to) {
+  public void inverse(final Coordinates from, final Coordinates to) {
     final double x = (from.getX() - x0);
     final double y = (from.getY() - y0);
 
@@ -65,9 +62,7 @@ public class Mercator1SP implements CoordinatesProjection {
     }
   }
 
-  public void project(
-    final Coordinates from,
-    final Coordinates to) {
+  public void project(final Coordinates from, final Coordinates to) {
     final double lambda = Math.toRadians(from.getX());
     final double phi = Math.toRadians(from.getY());
 

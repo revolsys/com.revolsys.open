@@ -16,7 +16,7 @@ import com.revolsys.io.Writer;
 public class GmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   implements GeometryReaderFactory {
   public GmlIoFactory() {
-    super(GmlConstants.FORMAT_DESCRIPTION,true,true);
+    super(GmlConstants.FORMAT_DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(GmlConstants.MEDIA_TYPE,
       GmlConstants.FILE_EXTENSION);
   }
@@ -31,8 +31,7 @@ public class GmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
     return new GmlDataObjectWriter(metaData, writer);
   }
 
-  public GeometryReader createGeometryReader(
-    final Resource resource) {
+  public GeometryReader createGeometryReader(final Resource resource) {
     final GmlGeometryIterator iterator = new GmlGeometryIterator(resource);
     return new GeometryReader(iterator);
   }

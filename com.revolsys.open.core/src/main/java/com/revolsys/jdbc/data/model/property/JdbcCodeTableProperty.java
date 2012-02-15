@@ -37,34 +37,6 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   }
 
   @Override
-  public void setMetaData(DataObjectMetaData metaData) {
-    super.setMetaData(metaData);
-    dataStore = (JdbcDataObjectStore)metaData.getDataObjectStore();
-    dataSource = dataStore.getDataSource();
-    if (metaData != null) {
-      this.tableName = JdbcUtils.getTableName(metaData.getName());
-
-      List<String> valueAttributeNames = getValueAttributeNames();
-      final String idColumn = metaData.getIdAttributeName();
-      this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
-      for (int i = 0; i < valueAttributeNames.size(); i++) {
-        final String columnName = valueAttributeNames.get(i);
-        this.insertSql += ", " + columnName;
-      }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getKey();
-      }
-      insertSql += ") VALUES (?";
-      for (int i = 0; i < valueAttributeNames.size(); i++) {
-        insertSql += ", ?";
-      }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getValue();
-      }
-      insertSql += ")";
-    }
-  }
-
   protected synchronized Object createId(final List<Object> values) {
     try {
       final Connection connection = JdbcUtils.getConnection(dataSource);
@@ -116,6 +88,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     return dataSource;
   }
 
+  @Override
   public JdbcDataObjectStore getDataStore() {
     return dataStore;
   }
@@ -132,6 +105,36 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     this.auditColumns = auditColumns;
   }
 
+  @Override
+  public void setMetaData(final DataObjectMetaData metaData) {
+    super.setMetaData(metaData);
+    dataStore = (JdbcDataObjectStore)metaData.getDataObjectStore();
+    dataSource = dataStore.getDataSource();
+    if (metaData != null) {
+      this.tableName = JdbcUtils.getTableName(metaData.getName());
+
+      final List<String> valueAttributeNames = getValueAttributeNames();
+      final String idColumn = metaData.getIdAttributeName();
+      this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
+      for (int i = 0; i < valueAttributeNames.size(); i++) {
+        final String columnName = valueAttributeNames.get(i);
+        this.insertSql += ", " + columnName;
+      }
+      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
+        insertSql += ", " + auditColumn.getKey();
+      }
+      insertSql += ") VALUES (?";
+      for (int i = 0; i < valueAttributeNames.size(); i++) {
+        insertSql += ", ?";
+      }
+      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
+        insertSql += ", " + auditColumn.getValue();
+      }
+      insertSql += ")";
+    }
+  }
+
+  @Override
   public String toString(final List<String> values) {
     final StringBuffer string = new StringBuffer(values.get(0));
     for (int i = 1; i < values.size(); i++) {

@@ -20,8 +20,7 @@ public class LinearUnit implements Serializable {
    * @param conversionFactor The conversion factor.
    * @return The linear unit.
    */
-  public static Unit<Length> getUnit(
-    final double conversionFactor) {
+  public static Unit<Length> getUnit(final double conversionFactor) {
     return getUnit(null, conversionFactor);
   }
 
@@ -72,26 +71,18 @@ public class LinearUnit implements Serializable {
 
   private Unit<Length> unit;
 
-  public LinearUnit(
-    final String name,
-    final double conversionFactor,
+  public LinearUnit(final String name, final double conversionFactor,
     final Authority authority) {
     this(name, null, conversionFactor, authority, false);
   }
 
-  public LinearUnit(
-    final String name,
-    final LinearUnit baseUnit,
-    final double conversionFactor,
-    final Authority authority) {
+  public LinearUnit(final String name, final LinearUnit baseUnit,
+    final double conversionFactor, final Authority authority) {
     this(name, baseUnit, conversionFactor, authority, false);
   }
 
-  public LinearUnit(
-    final String name,
-    final LinearUnit baseUnit,
-    final double conversionFactor,
-    final Authority authority,
+  public LinearUnit(final String name, final LinearUnit baseUnit,
+    final double conversionFactor, final Authority authority,
     final boolean deprecated) {
     this.name = name;
     this.baseUnit = baseUnit;
@@ -106,8 +97,7 @@ public class LinearUnit implements Serializable {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {

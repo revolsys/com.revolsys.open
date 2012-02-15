@@ -31,23 +31,69 @@ import org.springframework.web.util.UrlPathHelper;
 
 public class HttpServletRequestJexlContext implements JexlContext {
 
-  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
-  private ServletContext servletContext;
+  private final ServletContext servletContext;
 
-  private ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<Map<String, Object>>();
+  private final ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<Map<String, Object>>();
 
-  public HttpServletRequestJexlContext(ServletContext servletContext) {
+  public HttpServletRequestJexlContext(final ServletContext servletContext) {
     this.servletContext = servletContext;
   }
 
-  public void setVars(final Map arg0) {
+  public void clearAttributes() {
+    localAttributes.remove();
+  }
+
+  public Object getAttribute(final String key) {
+    final Map<String, Object> attributes = getAttributes();
+    return attributes.get(key);
+  }
+
+  private Map<String, Object> getAttributes() {
+    Map<String, Object> attributes = localAttributes.get();
+    if (attributes == null) {
+      attributes = new HashMap<String, Object>();
+      localAttributes.set(attributes);
+    }
+    return attributes;
+  }
+
+  private HttpServletRequest getRequest() {
+    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    final HttpServletRequest request = requestAttributes.getRequest();
+    return request;
   }
 
   public Map getVars() {
     return new AbstractMap<String, Object>() {
+      @Override
+      @SuppressWarnings("unchecked")
+      public Set<Entry<String, Object>> entrySet() {
+        final HttpServletRequest request = getRequest();
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.putAll(request.getParameterMap());
+        for (final Enumeration<String> names = request.getAttributeNames(); names.hasMoreElements();) {
+          final String name = names.nextElement();
+          map.put(name, request.getAttribute(name));
+        }
+        if (servletContext != null) {
+          for (final Enumeration<String> names = servletContext.getAttributeNames(); names.hasMoreElements();) {
+            final String name = names.nextElement();
+            map.put(name, servletContext.getAttribute(name));
+          }
+        }
+        final Map<String, Object> attributes = localAttributes.get();
+        if (attributes != null) {
+          map.putAll(attributes);
+        }
+        map.put("request", request);
+        map.put("requestURI", urlPathHelper.getOriginatingRequestUri(request));
+        return map.entrySet();
+      }
+
       public Object get(final String key) {
-        HttpServletRequest request = getRequest();
+        final HttpServletRequest request = getRequest();
         if (key.equals("request")) {
           return request;
         } else if (key.equals("requestURI")) {
@@ -69,63 +115,18 @@ public class HttpServletRequestJexlContext implements JexlContext {
           return value;
         }
       }
-
-      @SuppressWarnings("unchecked")
-      public Set<Entry<String, Object>> entrySet() {
-        HttpServletRequest request = getRequest();
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.putAll(request.getParameterMap());
-        for (Enumeration<String> names = request.getAttributeNames(); names.hasMoreElements();) {
-          String name = names.nextElement();
-          map.put(name, request.getAttribute(name));
-        }
-        if (servletContext != null) {
-          for (Enumeration<String> names = servletContext.getAttributeNames(); names.hasMoreElements();) {
-            String name = names.nextElement();
-            map.put(name, servletContext.getAttribute(name));
-          }
-        }
-        Map<String, Object> attributes = localAttributes.get();
-        if (attributes != null) {
-          map.putAll(attributes);
-        }
-        map.put("request", request);
-        map.put("requestURI", urlPathHelper.getOriginatingRequestUri(request));
-        return map.entrySet();
-      }
     };
   }
 
-  private HttpServletRequest getRequest() {
-    ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-    HttpServletRequest request = requestAttributes.getRequest();
-    return request;
-  }
-
-  public void clearAttributes() {
-    localAttributes.remove();
-  }
-
   public void setAttribute(final String key, final Object value) {
-    Map<String, Object> attributes = getAttributes();
+    final Map<String, Object> attributes = getAttributes();
     attributes.put(key, value);
   }
 
-  private Map<String, Object> getAttributes() {
-    Map<String, Object> attributes = localAttributes.get();
-    if (attributes == null) {
-      attributes = new HashMap<String, Object>();
-      localAttributes.set(attributes);
-    }
-    return attributes;
-  }
-
-  public Object getAttribute(final String key) {
-    Map<String, Object> attributes = getAttributes();
-    return attributes.get(key);
-  }
-
-  public void setAttributes(Map<String, ? extends Object> parameters) {
+  public void setAttributes(final Map<String, ? extends Object> parameters) {
     getAttributes().putAll(parameters);
+  }
+
+  public void setVars(final Map arg0) {
   }
 }

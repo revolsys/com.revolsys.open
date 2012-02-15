@@ -47,8 +47,7 @@ public class XbaseDatasetReader extends DataObjectDirectoryReader {
    * 
    * @param directory The directory containing the .dbf files.
    */
-  public XbaseDatasetReader(
-    final File directory) {
+  public XbaseDatasetReader(final File directory) {
     setFileExtensions("dbf");
     setDirectory(directory);
   }

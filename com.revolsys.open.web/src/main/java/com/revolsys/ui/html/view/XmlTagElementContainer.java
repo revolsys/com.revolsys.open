@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import javax.xml.namespace.QName;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -26,8 +25,9 @@ import com.revolsys.ui.html.HtmlUtil;
  * @version 1.0
  */
 public class XmlTagElementContainer extends ElementContainer {
-  private QName tagName;
-  private String cssClass;
+  private final QName tagName;
+
+  private final String cssClass;
 
   public XmlTagElementContainer(final QName tagName) {
     this(tagName, null, null);
@@ -37,7 +37,8 @@ public class XmlTagElementContainer extends ElementContainer {
     this(tagName, cssClass, null);
   }
 
-  public XmlTagElementContainer(final QName tagName, final String cssClass, final Element element) {
+  public XmlTagElementContainer(final QName tagName, final String cssClass,
+    final Element element) {
     this.tagName = tagName;
     this.cssClass = cssClass;
     this.add(element);
@@ -45,9 +46,11 @@ public class XmlTagElementContainer extends ElementContainer {
 
   /*
    * (non-Javadoc)
-   * 
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter)
+   * @see
+   * com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.XmlWriter
+   * )
    */
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(tagName);
     if (cssClass != null) {

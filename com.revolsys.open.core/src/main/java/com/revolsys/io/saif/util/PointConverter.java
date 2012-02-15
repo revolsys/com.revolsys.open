@@ -23,22 +23,19 @@ public class PointConverter implements OsnConverter {
 
   private final CoordinatesPrecisionModel precisionModel;
 
-  public PointConverter(
-    final GeometryFactory geometryFactory) {
+  public PointConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     precisionModel = geometryFactory.getCoordinatesPrecisionModel();
   }
 
-  public PointConverter(
-    final GeometryFactory geometryFactory,
+  public PointConverter(final GeometryFactory geometryFactory,
     final String geometryClass) {
     this.geometryFactory = geometryFactory;
     precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     this.geometryClass = geometryClass;
   }
 
-  public Object read(
-    final OsnIterator iterator) {
+  public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put("type", geometryClass);
     Geometry geometry = null;
@@ -84,15 +81,13 @@ public class PointConverter implements OsnConverter {
     values.put(attributeName, iterator.getValue());
   }
 
-  public void write(
-    final OsnSerializer serializer,
-    final Object object)
+  public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
       final CoordinatesList points = CoordinatesListUtil.get(point);
 
-      int numAxis = points.getNumAxis();
+      final int numAxis = points.getNumAxis();
       final double x = points.getX(0);
       final double y = points.getY(0);
       final double z = points.getZ(0);
@@ -124,8 +119,7 @@ public class PointConverter implements OsnConverter {
   protected void writeAttribute(
     final OsnSerializer serializer,
     final Map<String, Object> values,
-    final String name)
-    throws IOException {
+    final String name) throws IOException {
     final Object value = values.get(name);
     if (value != null) {
       serializer.endLine();
@@ -136,16 +130,14 @@ public class PointConverter implements OsnConverter {
 
   protected void writeAttributes(
     final OsnSerializer serializer,
-    final Map<String, Object> values)
-    throws IOException {
+    final Map<String, Object> values) throws IOException {
     writeEnumAttribute(serializer, values, "qualifier");
   }
 
   protected void writeEnumAttribute(
     final OsnSerializer serializer,
     final Map<String, Object> values,
-    final String name)
-    throws IOException {
+    final String name) throws IOException {
     final String value = (String)values.get(name);
     if (value != null) {
       serializer.endLine();

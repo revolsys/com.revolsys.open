@@ -5,26 +5,32 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class StatisticsProcess extends BaseInOutProcess<DataObject,DataObject> {
+public class StatisticsProcess extends BaseInOutProcess<DataObject, DataObject> {
 
   private Statistics statistics;
 
   @Override
-  protected void postRun(Channel<DataObject> in, Channel<DataObject> out) {
+  protected void postRun(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out) {
     if (statistics != null) {
       statistics.disconnect();
     }
   }
 
   @Override
-  protected void preRun(Channel<DataObject> in, Channel<DataObject> out) {
+  protected void preRun(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out) {
     statistics = new Statistics(getBeanName());
     statistics.connect();
   }
 
   @Override
-  protected void process(Channel<DataObject> in, Channel<DataObject> out,
-    DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     statistics.add(object);
     out.write(object);
   }

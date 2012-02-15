@@ -6,13 +6,11 @@ public class NotFilter<T> implements Filter<T> {
   public NotFilter() {
   }
 
-  public NotFilter(
-    final Filter<T> filter) {
+  public NotFilter(final Filter<T> filter) {
     this.filter = filter;
   }
 
-  public boolean accept(
-    final T object) {
+  public boolean accept(final T object) {
     return !filter.accept(object);
   }
 
@@ -20,8 +18,7 @@ public class NotFilter<T> implements Filter<T> {
     return filter;
   }
 
-  public void setFilter(
-    final Filter<T> filter) {
+  public void setFilter(final Filter<T> filter) {
     this.filter = filter;
   }
 

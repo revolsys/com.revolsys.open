@@ -20,10 +20,8 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   private final QName typeName;
 
-  public DataStoreQueryTask(
-    final DataObjectStore dataStore,
-    final QName typeName,
-    final BoundingBox boundingBox) {
+  public DataStoreQueryTask(final DataObjectStore dataStore,
+    final QName typeName, final BoundingBox boundingBox) {
     this.dataStore = dataStore;
     this.typeName = typeName;
     this.boundingBox = boundingBox;
@@ -33,6 +31,7 @@ public class DataStoreQueryTask extends AbstractProcess {
     objects = null;
   }
 
+  @Override
   public String getBeanName() {
     return getClass().getName();
   }
@@ -53,7 +52,7 @@ public class DataStoreQueryTask extends AbstractProcess {
     }
   }
 
-  public void setBeanName(
-    final String name) {
+  @Override
+  public void setBeanName(final String name) {
   }
 }

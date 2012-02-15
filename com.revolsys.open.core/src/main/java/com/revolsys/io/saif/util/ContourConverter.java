@@ -16,16 +16,14 @@ public class ContourConverter extends ArcConverter {
 
   private final OsnConverterRegistry converters;
 
-  public ContourConverter(
-    final GeometryFactory geometryFactory,
+  public ContourConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     super(geometryFactory, "Arc");
     this.converters = converters;
   }
 
   @Override
-  public Object read(
-    final OsnIterator iterator) {
+  public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put("type", GEOMETRY_CLASS);
     Geometry geometry = null;
@@ -56,9 +54,7 @@ public class ContourConverter extends ArcConverter {
   }
 
   @Override
-  public void write(
-    final OsnSerializer serializer,
-    final Object object)
+  public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     if (object instanceof LineString) {
       final LineString lineString = (LineString)object;

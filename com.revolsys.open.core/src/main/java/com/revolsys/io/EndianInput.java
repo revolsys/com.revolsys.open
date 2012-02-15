@@ -4,8 +4,7 @@ import java.io.IOException;
 
 public interface EndianInput {
 
-  void close()
-    throws IOException;
+  void close() throws IOException;
 
   /**
    * Read a byte.
@@ -13,8 +12,7 @@ public interface EndianInput {
    * @return The long.
    * @throws IOException If an I/O error occurs.
    */
-  int read()
-    throws IOException;
+  int read() throws IOException;
 
   /**
    * Read a byte.
@@ -22,9 +20,7 @@ public interface EndianInput {
    * @return The long.
    * @throws IOException If an I/O error occurs.
    */
-  int read(
-    byte[] buf)
-    throws IOException;
+  int read(byte[] buf) throws IOException;
 
   /**
    * Read a big endian double.
@@ -32,8 +28,7 @@ public interface EndianInput {
    * @return The double.
    * @throws IOException If an I/O error occurs.
    */
-  double readDouble()
-    throws IOException;
+  double readDouble() throws IOException;
 
   /**
    * Read a big endian int.
@@ -41,8 +36,7 @@ public interface EndianInput {
    * @return The int.
    * @throws IOException If an I/O error occurs.
    */
-  int readInt()
-    throws IOException;
+  int readInt() throws IOException;
 
   /**
    * Read a little endian double.
@@ -50,8 +44,7 @@ public interface EndianInput {
    * @return The double.
    * @throws IOException If an I/O error occurs.
    */
-  double readLEDouble()
-    throws IOException;
+  double readLEDouble() throws IOException;
 
   /**
    * Read a little endian int.
@@ -59,8 +52,7 @@ public interface EndianInput {
    * @return The int.
    * @throws IOException If an I/O error occurs.
    */
-  int readLEInt()
-    throws IOException;
+  int readLEInt() throws IOException;
 
   /**
    * Read a little endian long.
@@ -68,8 +60,7 @@ public interface EndianInput {
    * @return The long.
    * @throws IOException If an I/O error occurs.
    */
-  long readLELong()
-    throws IOException;
+  long readLELong() throws IOException;
 
   /**
    * Read a little endian short.
@@ -77,8 +68,7 @@ public interface EndianInput {
    * @return The short.
    * @throws IOException If an I/O error occurs.
    */
-  short readLEShort()
-    throws IOException;
+  short readLEShort() throws IOException;
 
   /**
    * Read a big endian long.
@@ -86,8 +76,7 @@ public interface EndianInput {
    * @return The long.
    * @throws IOException If an I/O error occurs.
    */
-  long readLong()
-    throws IOException;
+  long readLong() throws IOException;
 
   /**
    * Read a big endian short.
@@ -95,10 +84,7 @@ public interface EndianInput {
    * @return The short.
    * @throws IOException If an I/O error occurs.
    */
-  short readShort()
-    throws IOException;
+  short readShort() throws IOException;
 
-  int skipBytes(
-    int i)
-    throws IOException;
+  int skipBytes(int i) throws IOException;
 }

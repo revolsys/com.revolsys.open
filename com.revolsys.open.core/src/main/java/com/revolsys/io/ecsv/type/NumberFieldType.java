@@ -10,16 +10,13 @@ public abstract class NumberFieldType extends AbstractEcsvFieldType {
   private static final NumberFormat NUMBER_FORMAT = new DecimalFormat(
     "#.#########################");
 
-  public NumberFieldType(
-    DataType dataType) {
+  public NumberFieldType(final DataType dataType) {
     super(dataType);
   }
 
-  public void writeValue(
-    PrintWriter out,
-    Object value) {
+  public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof Number) {
-      Number number = (Number)value;
+      final Number number = (Number)value;
       final String formattedNumber = NUMBER_FORMAT.format(number);
       out.print(formattedNumber);
     }

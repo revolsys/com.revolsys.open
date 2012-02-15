@@ -24,6 +24,8 @@ public class InvalidConfigException extends Exception {
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = 2673339905395246016L;
 
+  private Collection errors;
+
   /**
    * Constructs an instance of <code>InvalidConfigException</code> with the
    * specified detail message.
@@ -48,6 +50,4 @@ public class InvalidConfigException extends Exception {
   public Collection getErrors() {
     return errors;
   }
-
-  private Collection errors;
 }

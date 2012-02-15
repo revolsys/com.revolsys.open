@@ -21,13 +21,11 @@ public class DataObjectEquals2DFilter implements Filter<DataObject> {
   /** The update feature to find a match for. */
   private final DataObject searchObject;
 
-  public DataObjectEquals2DFilter(
-    final DataObject searchObject) {
+  public DataObjectEquals2DFilter(final DataObject searchObject) {
     this(searchObject, null);
   }
 
-  public DataObjectEquals2DFilter(
-    final DataObject searchObject,
+  public DataObjectEquals2DFilter(final DataObject searchObject,
     final Collection<String> equalExclude) {
     this.searchObject = searchObject;
     if (equalExclude != null) {
@@ -35,8 +33,7 @@ public class DataObjectEquals2DFilter implements Filter<DataObject> {
     }
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry serachGeometry = searchObject.getGeometryValue();
     final Geometry geometry = object.getGeometryValue();
 

@@ -5,8 +5,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class CoordinateCoordinates extends AbstractCoordinates {
   private Coordinate coordinate;
 
-  public CoordinateCoordinates(
-    final Coordinate coordinate) {
+  public CoordinateCoordinates(final Coordinate coordinate) {
     this.coordinate = coordinate;
   }
 
@@ -29,8 +28,7 @@ public class CoordinateCoordinates extends AbstractCoordinates {
     }
   }
 
-  public double getValue(
-    final int index) {
+  public double getValue(final int index) {
     switch (index) {
       case 0:
         return coordinate.x;
@@ -43,14 +41,11 @@ public class CoordinateCoordinates extends AbstractCoordinates {
     }
   }
 
-  public void setCoordinate(
-    final Coordinate coordinate) {
+  public void setCoordinate(final Coordinate coordinate) {
     this.coordinate = coordinate;
   }
 
-  public void setValue(
-    final int index,
-    final double value) {
+  public void setValue(final int index, final double value) {
     switch (index) {
       case 0:
         coordinate.x = value;

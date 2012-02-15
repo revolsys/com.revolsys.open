@@ -12,7 +12,8 @@ public class AbstractTypeUiBuilder extends HtmlUiBuilder {
     super(typeName, typeLabel);
   }
 
-  public Element getField(HttpServletRequest request, final String key) {
+  @Override
+  public Element getField(final HttpServletRequest request, final String key) {
     if (key.equals("active")) {
       return new CheckBoxField(key, true);
     } else if (key.equals("name")) {

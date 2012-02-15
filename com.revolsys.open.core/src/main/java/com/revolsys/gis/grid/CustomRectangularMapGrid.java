@@ -25,6 +25,19 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private double originY;
 
+  public BoundingBox getBoundingBox(final String name) {
+    final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
+    if (coordinates.length == 2) {
+      final double x1 = coordinates[0];
+      final double y1 = coordinates[1];
+      final double x2 = x1 + tileWidth;
+      final double y2 = y1 + tileHeight;
+      return new BoundingBox(geometryFactory, x1, y1, x2, y2);
+    } else {
+      return null;
+    }
+  }
+
   public CoordinateSystem getCoordinateSystem() {
     return geometryFactory.getCoordinateSystem();
   }
@@ -35,6 +48,21 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
+  }
+
+  public double getGridValue(
+    final double origin,
+    final double gridSize,
+    final double value) {
+    final int xIndex = (int)Math.floor((value - origin) / gridSize);
+    final double minX = origin + xIndex * gridSize;
+    return minX;
+  }
+
+  public String getMapTileName(final Coordinates coordinates) {
+    final double x = coordinates.getX();
+    final double y = coordinates.getY();
+    return getMapTileName(x, y);
   }
 
   public String getMapTileName(final double x, final double y) {
@@ -62,24 +90,11 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   public RectangularMapTile getTileByName(final String name) {
-    BoundingBox boundingBox = getBoundingBox(name);
+    final BoundingBox boundingBox = getBoundingBox(name);
     if (boundingBox == null) {
       return null;
     } else {
       return new SimpleRectangularMapTile(this, name, name, boundingBox);
-    }
-  }
-
-  public BoundingBox getBoundingBox(final String name) {
-    final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
-    if (coordinates.length == 2) {
-      final double x1 = coordinates[0];
-      final double y1 = coordinates[1];
-      final double x2 = x1 + tileWidth;
-      final double y2 = y1 + tileHeight;
-      return new BoundingBox(geometryFactory, x1, y1, x2, y2);
-    } else {
-      return null;
     }
   }
 
@@ -112,13 +127,6 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return tiles;
   }
 
-  public double getGridValue(final double origin, final double gridSize,
-    final double value) {
-    final int xIndex = (int)Math.floor((value - origin) / gridSize);
-    final double minX = origin + xIndex * gridSize;
-    return minX;
-  }
-
   public double getTileWidth() {
     return tileWidth;
   }
@@ -141,12 +149,6 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public void setTileWidth(final double tileWidth) {
     this.tileWidth = tileWidth;
-  }
-
-  public String getMapTileName(Coordinates coordinates) {
-    final double x = coordinates.getX();
-    final double y = coordinates.getY();
-    return getMapTileName(x, y);
   }
 
 }

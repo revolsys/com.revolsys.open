@@ -36,18 +36,15 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
 
   private final double maxDistance;
 
-  public NodeWithinDistanceOfGeometryVisitor(
-    final Geometry geometry,
-    final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+  public NodeWithinDistanceOfGeometryVisitor(final Geometry geometry,
+    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
     this.geometryFactory = GeometryFactory.getFactory(geometry);
   }
 
-  public boolean visit(
-    final Node<T> node) {
+  public boolean visit(final Node<T> node) {
     final Coordinates coordinates = node;
     final Point point = geometryFactory.createPoint(coordinates);
     final double distance = geometry.distance(point);

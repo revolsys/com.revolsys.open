@@ -8,8 +8,7 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
 
   private ObjectWithProperties object;
 
-  public DelegatingObjectWithProperties(
-    Object object) {
+  public DelegatingObjectWithProperties(final Object object) {
     if (object instanceof ObjectWithProperties) {
       this.object = (ObjectWithProperties)object;
     } else {
@@ -22,16 +21,6 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     object = null;
   }
 
-  public final void setProperty(
-    String name,
-    Object value) {
-    if (object == null) {
-      properties.put(name, value);
-    } else {
-      object.setProperty(name, value);
-    }
-  }
-
   public final Map<String, Object> getProperties() {
     if (object == null) {
       return properties;
@@ -40,12 +29,19 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     }
   }
 
-  public <C> C getProperty(
-    String name) {
+  public <C> C getProperty(final String name) {
     if (object == null) {
       return (C)properties.get(name);
     } else {
       return (C)object.getProperty(name);
+    }
+  }
+
+  public final void setProperty(final String name, final Object value) {
+    if (object == null) {
+      properties.put(name, value);
+    } else {
+      object.setProperty(name, value);
     }
   }
 

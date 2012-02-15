@@ -7,8 +7,7 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
    */
   private static final long serialVersionUID = 5660399503744099455L;
 
-  public RingCoordinatesList(
-    final CoordinatesList coordinatesList) {
+  public RingCoordinatesList(final CoordinatesList coordinatesList) {
     super(coordinatesList.subList(0, coordinatesList.size() - 1));
   }
 
@@ -18,9 +17,7 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
   }
 
   @Override
-  public double getValue(
-    final int index,
-    final int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     if (axisIndex >= getNumAxis()) {
       return Double.NaN;
     } else {
@@ -33,10 +30,7 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
   }
 
   @Override
-  public void setValue(
-    final int index,
-    final int axisIndex,
-    final double value) {
+  public void setValue(final int index, final int axisIndex, final double value) {
     throw new UnsupportedOperationException();
   }
 

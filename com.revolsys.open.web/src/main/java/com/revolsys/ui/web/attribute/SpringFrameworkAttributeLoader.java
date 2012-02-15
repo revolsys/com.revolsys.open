@@ -27,12 +27,13 @@ public abstract class SpringFrameworkAttributeLoader implements AttributeLoader 
 
   private WebApplicationContext applicationContext;
 
-  public void init(final Attribute attribute) {
-    ServletContext servletContext = attribute.getConfig().getServletContext();
-    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-  }
-
   public WebApplicationContext getApplicationContext() {
     return applicationContext;
+  }
+
+  public void init(final Attribute attribute) {
+    final ServletContext servletContext = attribute.getConfig()
+      .getServletContext();
+    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
   }
 }

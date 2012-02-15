@@ -47,8 +47,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * 
    * @param filenames The file names.
    */
-  public NameFilenameFilter(
-    final Collection filenames) {
+  public NameFilenameFilter(final Collection filenames) {
     addNames(filenames);
   }
 
@@ -58,9 +57,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * @param filenames The file names.
    * @param readOnly Flag indicating if the filter can be modified.
    */
-  public NameFilenameFilter(
-    final Collection filenames,
-    final boolean readOnly) {
+  public NameFilenameFilter(final Collection filenames, final boolean readOnly) {
     addNames(filenames);
     this.readOnly = readOnly;
   }
@@ -70,8 +67,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * 
    * @param filename The file name.
    */
-  public NameFilenameFilter(
-    final String filename) {
+  public NameFilenameFilter(final String filename) {
     addName(filename);
   }
 
@@ -81,9 +77,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * @param filename The file name.
    * @param readOnly Flag indicating if the filter can be modified.
    */
-  public NameFilenameFilter(
-    final String filename,
-    final boolean readOnly) {
+  public NameFilenameFilter(final String filename, final boolean readOnly) {
     addName(filename);
     this.readOnly = readOnly;
   }
@@ -95,9 +89,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * @param filename The name of the file.
    * @return True if the file matched, false otherwise.
    */
-  public boolean accept(
-    final File directory,
-    final String filename) {
+  public boolean accept(final File directory, final String filename) {
     return names.contains(filename);
   }
 
@@ -106,8 +98,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * 
    * @param name The file name.
    */
-  public void addName(
-    final String name) {
+  public void addName(final String name) {
     if (readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
@@ -119,8 +110,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * 
    * @param names The file names.
    */
-  public void addNames(
-    final Collection names) {
+  public void addNames(final Collection names) {
     if (readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
@@ -145,8 +135,7 @@ public class NameFilenameFilter implements FilenameFilter {
    * 
    * @param readOnly The flag indicating if the filter can be modified.
    */
-  protected final void setReadOnly(
-    final boolean readOnly) {
+  protected final void setReadOnly(final boolean readOnly) {
     if (!readOnly && this.readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }

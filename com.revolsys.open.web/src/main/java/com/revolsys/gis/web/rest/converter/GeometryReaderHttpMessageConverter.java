@@ -41,8 +41,7 @@ public class GeometryReaderHttpMessageConverter extends
   @Override
   public GeometryReader read(
     final Class<? extends GeometryReader> clazz,
-    final HttpInputMessage inputMessage)
-    throws IOException,
+    final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
       final HttpHeaders headers = inputMessage.getHeaders();
@@ -77,8 +76,7 @@ public class GeometryReaderHttpMessageConverter extends
     }
   }
 
-  public void setGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 }

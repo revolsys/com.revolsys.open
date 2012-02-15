@@ -12,25 +12,25 @@ public abstract class AbstractVisitor<T> implements Visitor<T>, FilterProxy<T>,
   ComparatorProxy<T> {
   private Filter<T> filter;
 
-  public Filter<T> getFilter() {
-    return filter;
-  }
-
-  public void setFilter(Filter<T> filter) {
-    this.filter = filter;
-  }
-
   private Comparator<T> comparator;
 
   public Comparator<T> getComparator() {
     return comparator;
   }
 
-  public void setComparator(Comparator<T> comparator) {
+  public Filter<T> getFilter() {
+    return filter;
+  }
+
+  public void setComparator(final Comparator<T> comparator) {
     this.comparator = comparator;
   }
 
-  public void setFilters(Filter<T>... filters) {
+  public void setFilter(final Filter<T> filter) {
+    this.filter = filter;
+  }
+
+  public void setFilters(final Filter<T>... filters) {
     this.filter = new AndFilter<T>(filters);
   }
 }

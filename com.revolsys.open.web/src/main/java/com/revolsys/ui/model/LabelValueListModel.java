@@ -20,9 +20,9 @@ package com.revolsys.ui.model;
  * @version 1.0
  */
 public interface LabelValueListModel {
-  int getSize();
-
   String getLabel(int index);
+
+  int getSize();
 
   String getValue(int index);
 }

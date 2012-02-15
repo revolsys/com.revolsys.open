@@ -14,7 +14,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.ctc.wstx.util.StringUtil;
 import com.revolsys.io.xml.XmlMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.CollectionUtil;

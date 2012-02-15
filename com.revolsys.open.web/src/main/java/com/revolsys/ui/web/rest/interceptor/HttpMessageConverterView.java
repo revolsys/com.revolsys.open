@@ -51,13 +51,19 @@ public class HttpMessageConverterView extends AbstractView {
     return returnValue;
   }
 
+  public void render(final HttpServletResponse response) throws IOException {
+    messageConverter.write(returnValue, mediaType,
+      new ServletServerHttpResponse(response));
+  }
+
   @Override
-  protected void renderMergedOutputModel(final Map<String, Object> model,
-    final HttpServletRequest request, final HttpServletResponse response)
-    throws Exception {
+  protected void renderMergedOutputModel(
+    final Map<String, Object> model,
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws Exception {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
-    String path = (String)requestAttributes.getAttribute(
+    final String path = (String)requestAttributes.getAttribute(
       "httpMessageConverterTemplatePath", RequestAttributes.SCOPE_REQUEST);
     if (path == null
       || !Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML)
@@ -74,10 +80,5 @@ public class HttpMessageConverterView extends AbstractView {
       requestAttributes.setAttribute(NAME, savedView,
         RequestAttributes.SCOPE_REQUEST);
     }
-  }
-
-  public void render(final HttpServletResponse response) throws IOException {
-    messageConverter.write(returnValue, mediaType,
-      new ServletServerHttpResponse(response));
   }
 }

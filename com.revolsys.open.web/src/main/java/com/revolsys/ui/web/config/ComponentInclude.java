@@ -16,9 +16,9 @@
 package com.revolsys.ui.web.config;
 
 public class ComponentInclude {
-  private String area;
+  private final String area;
 
-  private Component component;
+  private final Component component;
 
   public ComponentInclude(final String file, final Component component) {
     this.area = file;

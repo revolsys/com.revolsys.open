@@ -59,8 +59,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * 
    * @param error The error.
    */
-  public void addError(
-    final XmlProcessorError error) {
+  public void addError(final XmlProcessorError error) {
     errors.add(error);
   }
 
@@ -70,8 +69,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param name The name of the attribute.
    * @return The attribute value.
    */
-  public Object getAttribute(
-    final String name) {
+  public Object getAttribute(final String name) {
     return attributes.get(name);
   }
 
@@ -108,9 +106,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param name The name of the attribute.
    * @param value The value of the attribute.
    */
-  public void setAttribute(
-    final String name,
-    final Object value) {
+  public void setAttribute(final String name, final Object value) {
     attributes.put(name, value);
   }
 }

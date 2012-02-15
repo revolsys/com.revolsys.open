@@ -10,8 +10,7 @@ public class StatisticsReader implements DataObjectReader {
   public StatisticsReader() {
   }
 
-  public StatisticsReader(
-    final DataObjectReader reader) {
+  public StatisticsReader(final DataObjectReader reader) {
     setReader(reader);
   }
 
@@ -25,10 +24,6 @@ public class StatisticsReader implements DataObjectReader {
    */
   public DataObjectReader getReader() {
     return reader;
-  }
-
-  public String toString() {
-    return reader.toString();
   }
 
   /**
@@ -62,8 +57,7 @@ public class StatisticsReader implements DataObjectReader {
   /**
    * @param reader the reader to set
    */
-  public void setReader(
-    final DataObjectReader reader) {
+  public void setReader(final DataObjectReader reader) {
     this.reader = reader;
     if (statistics == null) {
       setStatistics(new Statistics("Read " + reader.toString()));
@@ -73,8 +67,7 @@ public class StatisticsReader implements DataObjectReader {
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(
-    final Statistics statistics) {
+  public void setStatistics(final Statistics statistics) {
     if (this.statistics != null) {
 
     }
@@ -82,6 +75,11 @@ public class StatisticsReader implements DataObjectReader {
     if (statistics != null) {
       statistics.connect();
     }
+  }
+
+  @Override
+  public String toString() {
+    return reader.toString();
   }
 
 }

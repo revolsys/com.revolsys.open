@@ -7,17 +7,15 @@ import javax.xml.namespace.QName;
 
 public class QNameFactory {
 
-  private String namespaceUri;
+  private final String namespaceUri;
 
-  private Map<String, QName> qNames = new HashMap<String, QName>();
+  private final Map<String, QName> qNames = new HashMap<String, QName>();
 
-  public QNameFactory(
-    String namespaceUri) {
+  public QNameFactory(final String namespaceUri) {
     this.namespaceUri = namespaceUri;
   }
 
-  public QName getQName(
-    final String localPart) {
+  public QName getQName(final String localPart) {
     QName qName = qNames.get(localPart);
     if (qName == null) {
       qName = new QName(namespaceUri, localPart);

@@ -24,9 +24,7 @@ public class SchemaMapper {
    * @param from The type.
    * @param to The mapped type.
    */
-  public void addAttributeMapping(
-    final Attribute from,
-    final Attribute to) {
+  public void addAttributeMapping(final Attribute from, final Attribute to) {
     attributeMapping.put(from, to);
     attributeMapping.put(to, from);
   }
@@ -72,8 +70,7 @@ public class SchemaMapper {
     typeMapping.put(to, from);
   }
 
-  public DataObject convert(
-    final DataObject object) {
+  public DataObject convert(final DataObject object) {
     final DataObjectMetaData type = object.getMetaData();
     final DataObjectMetaData newType = getClassMapping(type);
     if (newType != null) {
@@ -99,8 +96,7 @@ public class SchemaMapper {
    * @param attribute The attribute to map.
    * @return The mapped attribute.
    */
-  public Attribute getAttributeMapping(
-    final Attribute attribute) {
+  public Attribute getAttributeMapping(final Attribute attribute) {
     return attributeMapping.get(attribute);
   }
 
@@ -110,8 +106,7 @@ public class SchemaMapper {
    * @param type The class to map.
    * @return The mapped class.
    */
-  public DataObjectMetaData getClassMapping(
-    final DataObjectMetaData type) {
+  public DataObjectMetaData getClassMapping(final DataObjectMetaData type) {
     return typeMapping.get(type);
   }
 
@@ -121,8 +116,7 @@ public class SchemaMapper {
    * @param type The type to convert.
    * @return The converter
    */
-  public ObjectConverter getTypeConverter(
-    final DataObjectMetaData type) {
+  public ObjectConverter getTypeConverter(final DataObjectMetaData type) {
     return typeConverter.get(type);
   }
 
@@ -132,8 +126,7 @@ public class SchemaMapper {
    * @param type The type to map.
    * @return The mapped type.
    */
-  public DataObjectMetaData getTypeMapping(
-    final DataObjectMetaData type) {
+  public DataObjectMetaData getTypeMapping(final DataObjectMetaData type) {
     return typeMapping.get(type);
   }
 
@@ -143,8 +136,7 @@ public class SchemaMapper {
    * @param type The type to convert.
    * @return The converter
    */
-  public boolean hasTypeConverter(
-    final DataObjectMetaData type) {
+  public boolean hasTypeConverter(final DataObjectMetaData type) {
     return typeConverter.containsKey(type);
   }
 }

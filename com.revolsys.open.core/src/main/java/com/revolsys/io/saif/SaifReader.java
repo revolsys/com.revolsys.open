@@ -136,8 +136,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @param file The SAIF archive file to read.
    */
-  public SaifReader(
-    final File file) {
+  public SaifReader(final File file) {
     setFile(file);
   }
 
@@ -149,8 +148,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @param fileName The name of the SAIF archive file to read.
    */
-  public SaifReader(
-    final String fileName) {
+  public SaifReader(final String fileName) {
     this(new File(fileName));
   }
 
@@ -209,8 +207,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     return file;
   }
 
-  private String getFileName(
-    final QName typeName) {
+  private String getFileName(final QName typeName) {
     return typeNameFileNameMap.get(typeName);
   }
 
@@ -248,9 +245,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     return importedObjects;
   }
 
-  private InputStream getInputStream(
-    final String fileName)
-    throws IOException {
+  private InputStream getInputStream(final String fileName) throws IOException {
     if (zipFile != null) {
       final ZipEntry entry = zipFile.getEntry(fileName);
       return zipFile.getInputStream(entry);
@@ -276,8 +271,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     return internallyReferencedObjects;
   }
 
-  public DataObjectMetaData getMetaData(
-    final QName typeName) {
+  public DataObjectMetaData getMetaData(final QName typeName) {
     return metaDataFactory.getMetaData(typeName);
   }
 
@@ -293,8 +287,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private <D extends DataObject> OsnReader getOsnReader(
     final DataObjectMetaDataFactory metaDataFactory,
     final DataObjectFactory factory,
-    final QName className)
-    throws IOException {
+    final QName className) throws IOException {
     String fileName = typeNameFileNameMap.get(className);
     if (fileName == null) {
       fileName = className.getLocalPart();
@@ -312,8 +305,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
 
   public <D extends DataObject> OsnReader getOsnReader(
     final QName className,
-    final DataObjectFactory factory)
-    throws IOException {
+    final DataObjectFactory factory) throws IOException {
     final DataObjectMetaDataFactory metaDataFactory = this.metaDataFactory;
     return getOsnReader(metaDataFactory, factory, className);
 
@@ -324,21 +316,15 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getProperty(
-    final String name) {
+  public <V> V getProperty(final String name) {
     return (V)properties.get(name);
-  }
-
-  public String toString() {
-    return file.getAbsolutePath();
   }
 
   public int getSrid() {
     return srid;
   }
 
-  private QName getTypeName(
-    final String fileName) {
+  private QName getTypeName(final String fileName) {
     return fileNameTypeNameMap.get(fileName);
   }
 
@@ -353,8 +339,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     return typeNames;
   }
 
-  private boolean hasData(
-    final QName typeName) {
+  private boolean hasData(final QName typeName) {
     final String fileName = getFileName(typeName);
     if (fileName == null) {
       return false;
@@ -383,8 +368,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * @throws IOException If there was an I/O error.
    */
   @SuppressWarnings("unchecked")
-  private void loadExportedObjects()
-    throws IOException {
+  private void loadExportedObjects() throws IOException {
     final boolean setNames = includeTypeNames.isEmpty();
     final OsnReader reader = getOsnReader(
       new SaifSchemaReader().loadSchema("com/revolsys/io/saif/saifzip.csn"),
@@ -430,8 +414,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @throws IOException If there was an I/O error.
    */
-  private void loadGlobalMetadata()
-    throws IOException {
+  private void loadGlobalMetadata() throws IOException {
     final OsnReader reader = getOsnReader(new QName("globmeta.osn"), factory);
     try {
       if (reader.hasNext()) {
@@ -447,8 +430,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @throws IOException If there was an I/O error.
    */
-  private void loadImportedObjects()
-    throws IOException {
+  private void loadImportedObjects() throws IOException {
     final OsnReader reader = getOsnReader(new QName("imports.dir"), factory);
     try {
       if (reader.hasNext()) {
@@ -464,8 +446,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @throws IOException If there was an I/O error.
    */
-  private void loadInternallyReferencedObjects()
-    throws IOException {
+  private void loadInternallyReferencedObjects() throws IOException {
     final OsnReader reader = getOsnReader(new QName("internal.dir"), factory);
     try {
       if (reader.hasNext()) {
@@ -516,8 +497,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @throws IOException If there was an I/O error.
    */
-  private void loadSchema()
-    throws IOException {
+  private void loadSchema() throws IOException {
     final SaifSchemaReader parser = new SaifSchemaReader();
 
     final InputStream in = getInputStream("clasdefs.csn");
@@ -531,8 +511,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     }
   }
 
-  private void loadSrid()
-    throws IOException {
+  private void loadSrid() throws IOException {
     final OsnReader reader = getOsnReader(new QName("refsys00.osn"), factory);
     try {
       if (reader.hasNext()) {
@@ -620,8 +599,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
 
   protected DataObject readObject(
     final String fileName,
-    final DataObjectFactory factory)
-    throws IOException {
+    final DataObjectFactory factory) throws IOException {
     final OsnReader reader = getOsnReader(new QName(fileName), factory);
     try {
       final DataObject object = reader.next();
@@ -654,8 +632,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   /**
    * @param excludeTypeNames the excludeTypeNames to set
    */
-  public void setExcludeTypeNames(
-    final Collection<String> excludeTypeNames) {
+  public void setExcludeTypeNames(final Collection<String> excludeTypeNames) {
     this.excludeTypeNames.clear();
     for (final String typeName : excludeTypeNames) {
       this.excludeTypeNames.add(QName.valueOf(typeName));
@@ -665,21 +642,18 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   /**
    * @param factory the factory to set
    */
-  public void setFactory(
-    final DataObjectFactory factory) {
+  public void setFactory(final DataObjectFactory factory) {
     this.factory = factory;
   }
 
-  public void setFile(
-    final File file) {
+  public void setFile(final File file) {
     this.file = file;
   }
 
   /**
    * @param includeTypeNames the includeTypeNames to set
    */
-  public void setIncludeTypeNames(
-    final Collection<String> includeTypeNames) {
+  public void setIncludeTypeNames(final Collection<String> includeTypeNames) {
     this.includeTypeNames.clear();
     for (final String typeName : includeTypeNames) {
       this.includeTypeNames.add(QName.valueOf(typeName));
@@ -691,8 +665,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * 
    * @param schema The schema definition.
    */
-  public void setMetaDataFactory(
-    final DataObjectMetaDataFactory metaDataFactory) {
+  public void setMetaDataFactory(final DataObjectMetaDataFactory metaDataFactory) {
     if (metaDataFactory != null) {
       this.metaDataFactory = metaDataFactory;
     } else {
@@ -700,14 +673,11 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     }
   }
 
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     properties.put(name, value);
   }
 
-  public void setSrid(
-    final int srid) {
+  public void setSrid(final int srid) {
     this.srid = srid;
   }
 
@@ -725,6 +695,11 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
       typeNameFileNameMap.put(name, value);
       fileNameTypeNameMap.put(value, name);
     }
+  }
+
+  @Override
+  public String toString() {
+    return file.getAbsolutePath();
   }
 
 }

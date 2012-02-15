@@ -29,6 +29,22 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   public CopyProcess() {
   }
 
+  private void copyAttribute(
+    final DataObject sourceObject,
+    final String sourceAttributeName,
+    final DataObject targetObject,
+    final String targetAttributeName) {
+    Object value = sourceObject.getValueByPath(sourceAttributeName);
+    final Map<Object, Object> valueMap = valueMaps.get(targetAttributeName);
+    if (valueMap != null) {
+      final Object mappedValue = valueMap.get(value);
+      if (mappedValue != null) {
+        value = mappedValue;
+      }
+    }
+    targetObject.setValue(targetAttributeName, value);
+  }
+
   public Map<String, String> getAttributeMap() {
     return attributeMap;
   }
@@ -59,8 +75,10 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     if (metaData == null) {
       out.write(object);
     } else {
@@ -69,29 +87,15 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
         copyAttribute(object, attributeName, targetObject, attributeName);
       }
       if (attributeMap != null) {
-        for (Entry<String, String> mapping : attributeMap.entrySet()) {
-          String sourceAttributeName = mapping.getKey();
-          String targetAttributeName = mapping.getValue();
+        for (final Entry<String, String> mapping : attributeMap.entrySet()) {
+          final String sourceAttributeName = mapping.getKey();
+          final String targetAttributeName = mapping.getValue();
           copyAttribute(object, sourceAttributeName, targetObject,
             targetAttributeName);
         }
       }
       out.write(targetObject);
     }
-  }
-
-  private void copyAttribute(final DataObject sourceObject,
-    final String sourceAttributeName, final DataObject targetObject,
-    final String targetAttributeName) {
-    Object value = sourceObject.getValueByPath(sourceAttributeName);
-    final Map<Object, Object> valueMap = valueMaps.get(targetAttributeName);
-    if (valueMap != null) {
-      final Object mappedValue = valueMap.get(value);
-      if (mappedValue != null) {
-        value = mappedValue;
-      }
-    }
-    targetObject.setValue(targetAttributeName, value);
   }
 
   public void setAttributeMap(final Map<String, String> attributeMap) {

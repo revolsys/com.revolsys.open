@@ -69,25 +69,16 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
 
   }
 
-  public XbaseFileWriter(
-    final File file,
-    final String typeName)
+  public XbaseFileWriter(final File file, final String typeName)
     throws IOException {
     this(file, typeName, false);
   }
 
-  public XbaseFileWriter(
-    final File file,
-    final String typeName,
-    final boolean append)
-    throws IOException {
+  public XbaseFileWriter(final File file, final String typeName,
+    final boolean append) throws IOException {
     this.file = file;
     this.typeName = typeName;
     this.append = append;
-  }
-
-  public void flush() {
-    out.flush();
   }
 
   protected int addDbaseField(
@@ -137,11 +128,11 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected boolean addField(
-    final FieldDefinition field) {
+  protected boolean addField(final FieldDefinition field) {
     return fields.add(field);
   }
 
+  @Override
   public void close() {
     try {
       out.write(0x1a);
@@ -165,20 +156,16 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @Override
+  public void flush() {
+    out.flush();
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
-  public String toString() {
-    return file.getAbsolutePath();
-  }
-
-  public boolean isAppend() {
-    return append;
-  }
-
-  protected void init()
-    throws IOException {
+  protected void init() throws IOException {
     if (!initialized) {
       initialized = true;
       if (append && file.exists()) {
@@ -202,22 +189,28 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  public boolean isAppend() {
+    return append;
+  }
+
   public boolean isUseZeroForNull() {
     return useZeroForNull;
   }
 
-  protected void setMetaData(
-    final DataObjectMetaData metaData) {
+  protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
   }
 
-  public void setUseZeroForNull(
-    final boolean useZeroForNull) {
+  public void setUseZeroForNull(final boolean useZeroForNull) {
     this.useZeroForNull = useZeroForNull;
   }
 
-  public void truncate()
-    throws IOException {
+  @Override
+  public String toString() {
+    return file.getAbsolutePath();
+  }
+
+  public void truncate() throws IOException {
     if (out instanceof EndianInputOutput) {
       final EndianInputOutput inOut = (EndianInputOutput)out;
       numRecords = 0;
@@ -231,8 +224,7 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     try {
       if (!initialized) {
         init();
@@ -252,8 +244,7 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
 
   protected boolean writeField(
     final DataObject object,
-    final FieldDefinition field)
-    throws IOException {
+    final FieldDefinition field) throws IOException {
     final Object value = object.getValue(field.getName());
 
     switch (field.getType()) {
@@ -331,8 +322,7 @@ public class XbaseFileWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void writeHeader()
-    throws IOException {
+  private void writeHeader() throws IOException {
     int recordLength = 1;
 
     fields.clear();

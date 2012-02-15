@@ -41,32 +41,6 @@ public class Log4jServletContextListener implements ServletContextListener {
   public static final String DEFAULT_LOG4J_XML_LOCATION = "/WEB-INF/log4j.xml";
 
   /**
-   * Initialize the logging for context by creating a new heirarchy for the
-   * current thread context class context and loading the configuration from the
-   * log4jXmlLocation context-param.
-   * 
-   * @param event The servlet context event.
-   */
-  public void contextInitialized(final ServletContextEvent event) {
-    Hierarchy hierarchy = ContextClassLoaderRepositorySelector.add();
-    ServletContext context = event.getServletContext();
-    String log4jXml = context.getInitParameter("log4jXmlLocation");
-    if (log4jXml == null) {
-      log4jXml = DEFAULT_LOG4J_XML_LOCATION;
-    }
-    try {
-      InputStream log4JConfig = context.getResourceAsStream(log4jXml);
-      if (log4JConfig != null) {
-        DOMConfigurator conf = new DOMConfigurator();
-        conf.doConfigure(log4JConfig, hierarchy);
-      }
-     } catch (Throwable e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
    * Clean up the context by removing the logging configuration for the current
    * context.
    * 
@@ -74,6 +48,32 @@ public class Log4jServletContextListener implements ServletContextListener {
    */
   public void contextDestroyed(final ServletContextEvent event) {
     ContextClassLoaderRepositorySelector.remove();
+  }
+
+  /**
+   * Initialize the logging for context by creating a new heirarchy for the
+   * current thread context class context and loading the configuration from the
+   * log4jXmlLocation context-param.
+   * 
+   * @param event The servlet context event.
+   */
+  public void contextInitialized(final ServletContextEvent event) {
+    final Hierarchy hierarchy = ContextClassLoaderRepositorySelector.add();
+    final ServletContext context = event.getServletContext();
+    String log4jXml = context.getInitParameter("log4jXmlLocation");
+    if (log4jXml == null) {
+      log4jXml = DEFAULT_LOG4J_XML_LOCATION;
+    }
+    try {
+      final InputStream log4JConfig = context.getResourceAsStream(log4jXml);
+      if (log4JConfig != null) {
+        final DOMConfigurator conf = new DOMConfigurator();
+        conf.doConfigure(log4JConfig, hierarchy);
+      }
+    } catch (final Throwable e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
   }
 
 }

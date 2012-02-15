@@ -12,28 +12,30 @@ public class InPlaceIterator extends AbstractCoordinates implements
 
   private int index = -1;
 
-  public InPlaceIterator(
-    final CoordinatesList coordinates) {
+  public InPlaceIterator(final CoordinatesList coordinates) {
     this.coordinates = coordinates;
   }
 
-  public InPlaceIterator(
-    CoordinatesList coordinates,
-    int index) {
+  public InPlaceIterator(final CoordinatesList coordinates, final int index) {
     this.coordinates = coordinates;
     this.index = index;
+  }
+
+  @Override
+  public InPlaceIterator clone() {
+    return new InPlaceIterator(coordinates, index);
   }
 
   public int getIndex() {
     return index;
   }
 
+  @Override
   public byte getNumAxis() {
     return coordinates.getNumAxis();
   }
 
-  public double getValue(
-    final int axisIndex) {
+  public double getValue(final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       return coordinates.getValue(this.index, axisIndex);
     } else {
@@ -41,9 +43,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
     }
   }
 
-  public double getValue(
-    final int relativeIndex,
-    final int axisIndex) {
+  public double getValue(final int relativeIndex, final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       return coordinates.getValue(this.index + relativeIndex, axisIndex);
     } else {
@@ -52,7 +52,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
   }
 
   public boolean hasNext() {
-    return index < coordinates.size()-1;
+    return index < coordinates.size() - 1;
   }
 
   public Iterator<Coordinates> iterator() {
@@ -73,14 +73,11 @@ public class InPlaceIterator extends AbstractCoordinates implements
 
   }
 
-  public void setIndex(
-    final int index) {
+  public void setIndex(final int index) {
     this.index = index;
   }
 
-  public void setValue(
-    final int axisIndex,
-    final double value) {
+  public void setValue(final int axisIndex, final double value) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       coordinates.setValue(this.index, axisIndex, value);
     }
@@ -109,10 +106,6 @@ public class InPlaceIterator extends AbstractCoordinates implements
     } else {
       return "";
     }
-  }
-  @Override
-  public InPlaceIterator clone() {
-    return new InPlaceIterator(coordinates, index);
   }
 
 }

@@ -34,13 +34,11 @@ public class LineCrossesFilter implements Filter<LineString> {
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance
    */
-  public LineCrossesFilter(
-    final LineString geometry) {
+  public LineCrossesFilter(final LineString geometry) {
     this.geometry = geometry;
   }
 
-  public boolean accept(
-    final LineString geometry) {
+  public boolean accept(final LineString geometry) {
     return geometry.crosses(this.geometry);
   }
 

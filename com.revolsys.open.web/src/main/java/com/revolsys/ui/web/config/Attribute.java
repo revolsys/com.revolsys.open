@@ -24,39 +24,40 @@ import org.apache.log4j.Logger;
 public class Attribute {
   private static final Logger log = Logger.getLogger(Attribute.class);
 
-  private String name;
+  private final String name;
 
-  private boolean inheritable;
+  private final boolean inheritable;
 
-  private Config config;
+  private final Config config;
 
   /** The initialization parameters for the argument. */
-  private HashMap parameters = new HashMap();
+  private final HashMap parameters = new HashMap();
 
-  private Class loaderClass;
+  private final Class loaderClass;
 
   private AttributeLoader loader;
 
   private Object value;
 
   public Attribute(final Config config, final String name, final Class type,
-    final String value, final boolean inheritable,
-    final Class loaderClass) {
+    final String value, final boolean inheritable, final Class loaderClass) {
     this.config = config;
     this.name = name;
     this.inheritable = inheritable;
     if (type != null) {
       try {
-        Constructor constructor = type.getConstructor(new Class[] {
+        final Constructor constructor = type.getConstructor(new Class[] {
           String.class
         });
-        this.value = constructor.newInstance(new Object[] {value});
-      } catch (InstantiationException e) {
+        this.value = constructor.newInstance(new Object[] {
+          value
+        });
+      } catch (final InstantiationException e) {
         throw new RuntimeException(e.getMessage(), e);
-      } catch (IllegalAccessException e) {
+      } catch (final IllegalAccessException e) {
         throw new RuntimeException(e.getMessage(), e);
-      } catch (InvocationTargetException e) {
-        Throwable t = e.getTargetException();
+      } catch (final InvocationTargetException e) {
+        final Throwable t = e.getTargetException();
         if (t instanceof RuntimeException) {
           throw (RuntimeException)t;
         } else if (t instanceof Error) {
@@ -65,44 +66,13 @@ public class Attribute {
           throw new RuntimeException(t.getMessage(), t);
         }
 
-      } catch (NoSuchMethodException e) {
+      } catch (final NoSuchMethodException e) {
         throw new IllegalArgumentException(
           type.getName()
             + " must have a constructor that takes a java.lang.String as an argument");
       }
     }
     this.loaderClass = loaderClass;
-  }
-
-  public void init() {
-    if (loaderClass != null) {
-      try {
-        this.loader = (AttributeLoader)loaderClass.newInstance();
-        this.loader.init(this);
-      } catch (Exception e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
-    }
-  }
-
-  public Config getConfig() {
-    return config;
-  }
-
-
-  public String getName() {
-    return name;
-  }
-
-  public Object getValue() {
-    return value;
-  }
-  public AttributeLoader getLoader() {
-    return loader;
-  }
-
-  public boolean isInheritable() {
-    return inheritable;
   }
 
   /**
@@ -124,6 +94,18 @@ public class Attribute {
     parameters.put(name, value);
   }
 
+  public Config getConfig() {
+    return config;
+  }
+
+  public AttributeLoader getLoader() {
+    return loader;
+  }
+
+  public String getName() {
+    return name;
+  }
+
   /**
    * Get the parameter value.
    * 
@@ -132,6 +114,25 @@ public class Attribute {
    */
   public Object getParameter(final String name) {
     return parameters.get(name);
+  }
+
+  public Object getValue() {
+    return value;
+  }
+
+  public void init() {
+    if (loaderClass != null) {
+      try {
+        this.loader = (AttributeLoader)loaderClass.newInstance();
+        this.loader.init(this);
+      } catch (final Exception e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+    }
+  }
+
+  public boolean isInheritable() {
+    return inheritable;
   }
 
 }

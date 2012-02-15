@@ -16,29 +16,15 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   public AbstractInProcess() {
   }
 
-  public AbstractInProcess(
-    final Channel<T> in) {
+  public AbstractInProcess(final Channel<T> in) {
     this.in = in;
   }
 
-  public AbstractInProcess(
-    int bufferSize) {
+  public AbstractInProcess(final int bufferSize) {
     this.inBufferSize = bufferSize;
   }
 
-  /**
-   * @return the bufferSize
-   */
-  public int getInBufferSize() {
-    return inBufferSize;
-  }
-
-  /**
-   * @param bufferSize the bufferSize to set
-   */
-  public void setInBufferSize(
-    int inBufferSize) {
-    this.inBufferSize = inBufferSize;
+  protected void destroy() {
   }
 
   /**
@@ -57,25 +43,26 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   }
 
   /**
-   * @param in the in to set
+   * @return the bufferSize
    */
-  public void setIn(
-    final Channel<T> in) {
-    this.in = in;
-    in.readConnect();
+  public int getInBufferSize() {
+    return inBufferSize;
+  }
+
+  protected void init() {
   }
 
   public final void run() {
-    Logger log = Logger.getLogger(getClass());
+    final Logger log = Logger.getLogger(getClass());
     try {
       log.debug("Start");
       init();
       run(getIn());
-    } catch (ThreadDeath e) {
+    } catch (final ThreadDeath e) {
       log.debug("Shutdown");
-    } catch (ClosedException e) {
+    } catch (final ClosedException e) {
       log.debug("Shutdown");
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       log.error(e.getMessage(), e);
       getProcessNetwork().stop();
     } finally {
@@ -86,12 +73,20 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
     }
   }
 
-  protected abstract void run(
-    Channel<T> in);
+  protected abstract void run(Channel<T> in);
 
-  protected void init() {
+  /**
+   * @param in the in to set
+   */
+  public void setIn(final Channel<T> in) {
+    this.in = in;
+    in.readConnect();
   }
 
-  protected void destroy() {
+  /**
+   * @param bufferSize the bufferSize to set
+   */
+  public void setInBufferSize(final int inBufferSize) {
+    this.inBufferSize = inBufferSize;
   }
 }

@@ -14,7 +14,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public static final UtmRectangularMapGrid INSTANCE = new UtmRectangularMapGrid();
-  
+
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
@@ -22,6 +22,10 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public static final double MIN_LAT = -80;
 
   public static final double MIN_LON = -180;
+
+  public static GeometryFactory getGeometryFactory() {
+    return GEOMETRY_FACTORY;
+  }
 
   private PrecisionModel precisionModel = new PrecisionModel(1);
 
@@ -38,10 +42,6 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public CoordinateSystem getCoordinateSystem() {
     return COORDINATE_SYSTEM;
-  }
-
-  public static GeometryFactory getGeometryFactory() {
-    return GEOMETRY_FACTORY;
   }
 
   public String getFormattedMapTileName(final String name) {
@@ -106,7 +106,9 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(final String sheet, final int east,
+  public String getMapTileName(
+    final String sheet,
+    final int east,
     final int north) {
     final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
       * getTileHeight());
@@ -114,28 +116,12 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return getMapTileName(lon, lat);
   }
 
-  public int getNad83Srid(final Geometry geometry) {
-    return getNad83Srid(getMapTileName(geometry));
-  }
- public int getNad83Srid(final double lon, final double lat) {
-    return getNad83Srid(getMapTileName(lon, lat));
+  public int getNad27Srid(final double lon, final double lat) {
+    return getNad27Srid(getMapTileName(lon, lat));
   }
 
-  public int getNad83Srid(final String sheet) {
-    final int horizontalZone = getHorizontalZone(sheet);
-    final int verticalZone = getVerticalZone(sheet);
-    if (horizontalZone < 24 && verticalZone >= 'n') {
-      return 26900 + horizontalZone;
-    } else {
-      throw new IllegalArgumentException("UTM Zone " + sheet
-        + " is not in North America");
-    }
-  }
   public int getNad27Srid(final Geometry geometry) {
     return getNad27Srid(getMapTileName(geometry));
-  }
- public int getNad27Srid(final double lon, final double lat) {
-    return getNad27Srid(getMapTileName(lon, lat));
   }
 
   public int getNad27Srid(final String sheet) {
@@ -143,6 +129,25 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     final int verticalZone = getVerticalZone(sheet);
     if (horizontalZone < 24 && verticalZone >= 'n') {
       return 26700 + horizontalZone;
+    } else {
+      throw new IllegalArgumentException("UTM Zone " + sheet
+        + " is not in North America");
+    }
+  }
+
+  public int getNad83Srid(final double lon, final double lat) {
+    return getNad83Srid(getMapTileName(lon, lat));
+  }
+
+  public int getNad83Srid(final Geometry geometry) {
+    return getNad83Srid(getMapTileName(geometry));
+  }
+
+  public int getNad83Srid(final String sheet) {
+    final int horizontalZone = getHorizontalZone(sheet);
+    final int verticalZone = getVerticalZone(sheet);
+    if (horizontalZone < 24 && verticalZone >= 'n') {
+      return 26900 + horizontalZone;
     } else {
       throw new IllegalArgumentException("UTM Zone " + sheet
         + " is not in North America");

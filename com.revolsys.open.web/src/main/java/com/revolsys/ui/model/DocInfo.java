@@ -31,6 +31,7 @@ public class DocInfo {
     this.description = description;
   }
 
+  @Override
   public DocInfo clone() {
     return new DocInfo(this);
   }

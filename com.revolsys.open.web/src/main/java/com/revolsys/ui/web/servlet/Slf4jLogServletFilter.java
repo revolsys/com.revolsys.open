@@ -21,29 +21,25 @@ public class Slf4jLogServletFilter implements Filter {
   }
 
   public void doFilter(
-    ServletRequest request,
-    ServletResponse response,
-    FilterChain chain)
-    throws IOException,
-    ServletException {
+    final ServletRequest request,
+    final ServletResponse response,
+    final FilterChain chain) throws IOException, ServletException {
     try {
       chain.doFilter(request, response);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw e;
-    } catch (ServletException e) {
+    } catch (final ServletException e) {
       throw e;
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       HttpServletLogUtil.logRequestException(log, null, e);
       throw e;
-    } catch (Error e) {
+    } catch (final Error e) {
       HttpServletLogUtil.logRequestException(log, null, e);
       throw e;
     }
   }
 
-  public void init(
-    FilterConfig filterConfig)
-    throws ServletException {
+  public void init(final FilterConfig filterConfig) throws ServletException {
     log = LoggerFactory.getLogger(getClass());
   }
 

@@ -43,25 +43,20 @@ public class ObjectSetOutputStream extends OutputStream {
 
   private int size = 0;
 
-  public ObjectSetOutputStream(
-    final File file)
-    throws IOException {
+  public ObjectSetOutputStream(final File file) throws IOException {
     this.file = file;
     prefix = ObjectSetUtil.getObjectSubsetPrefix(file);
     openFile();
   }
 
-  public ObjectSetOutputStream(
-    final File file,
-    final int maxSize)
+  public ObjectSetOutputStream(final File file, final int maxSize)
     throws IOException {
     this(file);
     this.maxSize = maxSize;
   }
 
   @Override
-  public void close()
-    throws IOException {
+  public void close() throws IOException {
     if (log.isDebugEnabled()) {
       log.debug("Closing object subset '" + file.getName() + "' from writing");
     }
@@ -69,21 +64,18 @@ public class ObjectSetOutputStream extends OutputStream {
   }
 
   @Override
-  public void flush()
-    throws IOException {
+  public void flush() throws IOException {
     out.flush();
   }
 
-  private void openFile()
-    throws IOException {
+  private void openFile() throws IOException {
     if (log.isDebugEnabled()) {
       log.debug("Creating object subset '" + file.getName() + "'");
     }
     out = new BufferedOutputStream(new FileOutputStream(file), 4096);
   }
 
-  private void openNextFile()
-    throws IOException {
+  private void openNextFile() throws IOException {
     out.write('\n');
     out.flush();
     close();
@@ -95,17 +87,12 @@ public class ObjectSetOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(
-    final byte[] b)
-    throws IOException {
+  public void write(final byte[] b) throws IOException {
     write(b, 0, b.length);
   }
 
   @Override
-  public void write(
-    final byte[] b,
-    final int off,
-    final int len)
+  public void write(final byte[] b, final int off, final int len)
     throws IOException {
     if (size >= maxSize) {
       openNextFile();
@@ -116,9 +103,7 @@ public class ObjectSetOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(
-    final int b)
-    throws IOException {
+  public void write(final int b) throws IOException {
     if (size >= maxSize) {
       openNextFile();
       size = 0;

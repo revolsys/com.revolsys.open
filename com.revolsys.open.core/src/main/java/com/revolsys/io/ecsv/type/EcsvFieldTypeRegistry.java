@@ -61,7 +61,8 @@ public class EcsvFieldTypeRegistry implements EcsvConstants {
     addFieldType(new GeometryFactoryFieldType());
   }
 
-  public void addFieldType(final DataType dataType,
+  public void addFieldType(
+    final DataType dataType,
     final EcsvFieldType fieldType) {
     typeMapping.put(dataType, fieldType);
   }

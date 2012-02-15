@@ -5,11 +5,11 @@ public abstract class AbstractDataObjectMetaDataProperty implements
   private DataObjectMetaData metaData;
 
   @Override
-  public  DataObjectMetaDataProperty clone() {
+  public DataObjectMetaDataProperty clone() {
     try {
-      DataObjectMetaDataProperty clone =(DataObjectMetaDataProperty)super.clone();
+      final DataObjectMetaDataProperty clone = (DataObjectMetaDataProperty)super.clone();
       return clone;
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
     }
   }
@@ -18,8 +18,7 @@ public abstract class AbstractDataObjectMetaDataProperty implements
     return metaData;
   }
 
-  public void setMetaData(
-    final DataObjectMetaData metaData) {
+  public void setMetaData(final DataObjectMetaData metaData) {
     if (this.metaData != null) {
       this.metaData.setProperty(getPropertyName(), null);
     }
@@ -28,6 +27,5 @@ public abstract class AbstractDataObjectMetaDataProperty implements
       metaData.setProperty(getPropertyName(), this);
     }
   }
-  
-  
+
 }

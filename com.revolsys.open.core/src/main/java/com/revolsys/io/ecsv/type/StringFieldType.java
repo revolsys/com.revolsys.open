@@ -18,9 +18,7 @@ public class StringFieldType extends AbstractEcsvFieldType {
    * @param value The value to write.
    * @see #writeString(PrintWriter, Object)
    */
-  public static void writeQuotedString(
-    final PrintWriter out,
-    final Object value) {
+  public static void writeQuotedString(final PrintWriter out, final Object value) {
     if (value != null) {
       out.print(DOUBLE_QUOTE);
       writeString(out, value);
@@ -36,9 +34,7 @@ public class StringFieldType extends AbstractEcsvFieldType {
    * @param value The value to write.
    * @see #writeQuotedString(PrintWriter, Object)
    */
-  public static void writeString(
-    final PrintWriter out,
-    final Object value) {
+  public static void writeString(final PrintWriter out, final Object value) {
     if (value != null) {
       for (final char c : value.toString().toCharArray()) {
         if (c == '"') {
@@ -54,18 +50,15 @@ public class StringFieldType extends AbstractEcsvFieldType {
     super(DataTypes.STRING);
   }
 
-  public Object parseValue(
-    final String text) {
+  public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
-        return new String(text);
+      return new String(text);
     } else {
       return null;
     }
- }
+  }
 
-  public void writeValue(
-    final PrintWriter out,
-    final Object value) {
+  public void writeValue(final PrintWriter out, final Object value) {
     writeQuotedString(out, value);
   }
 

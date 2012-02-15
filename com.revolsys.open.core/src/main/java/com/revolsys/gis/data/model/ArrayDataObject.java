@@ -70,13 +70,6 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   protected DataObjectState state = DataObjectState.New;
 
-  @Override
-  public Object put(String key, Object value) {
-    Object oldValue = getValue(key);
-    setValue(key, value);
-    return oldValue;
-  }
-
   /**
    * Construct a new ArrayDataObject as a deep clone of the attribute values.
    * Objects can only be cloned if they have a publically accessible
@@ -345,6 +338,13 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   @Override
   public int hashCode() {
     return attributes.hashCode();
+  }
+
+  @Override
+  public Object put(final String key, final Object value) {
+    final Object oldValue = getValue(key);
+    setValue(key, value);
+    return oldValue;
   }
 
   private void readObject(final ObjectInputStream ois)

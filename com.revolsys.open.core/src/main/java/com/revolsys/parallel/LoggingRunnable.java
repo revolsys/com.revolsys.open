@@ -8,17 +8,17 @@ public class LoggingRunnable implements Runnable {
 
   Runnable runnable;
 
-  public LoggingRunnable(Runnable runnable) {
+  public LoggingRunnable(final Runnable runnable) {
     this.runnable = runnable;
   }
 
   public void run() {
     try {
       runnable.run();
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       LOG.error(e.getMessage(), e);
       throw e;
-    } catch (Error e) {
+    } catch (final Error e) {
       LOG.error(e.getMessage(), e);
       throw e;
     }

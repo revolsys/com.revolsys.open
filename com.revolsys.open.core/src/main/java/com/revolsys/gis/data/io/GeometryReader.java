@@ -5,8 +5,7 @@ import java.util.Iterator;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryReader extends IteratorReader<Geometry> {
-  public GeometryReader(
-    Iterator<Geometry> iterator) {
+  public GeometryReader(final Iterator<Geometry> iterator) {
     super(iterator);
   }
 }

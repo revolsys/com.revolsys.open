@@ -29,8 +29,7 @@ public class RectangularMapGridFactory {
     GRID_NAMES = new ArrayList<String>(GRIDS_BY_NAME.keySet()).toArray(new String[0]);
   }
 
-  public static RectangularMapGrid getGrid(
-    final String name) {
+  public static RectangularMapGrid getGrid(final String name) {
     return GRIDS_BY_NAME.get(name);
   }
 

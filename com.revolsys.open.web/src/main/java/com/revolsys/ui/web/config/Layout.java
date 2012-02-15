@@ -29,11 +29,23 @@ public class Layout extends Component {
 
   private boolean page;
 
-  private Set areas = new HashSet();
+  private final Set areas = new HashSet();
 
-  private Map components = new HashMap();
+  private final Map components = new HashMap();
 
   public Layout() {
+  }
+
+  public Layout(final Layout layout) {
+    super(layout);
+    page = layout.page;
+    areas.addAll(layout.areas);
+    final Iterator keys = layout.components.keySet().iterator();
+    while (keys.hasNext()) {
+      final String key = (String)keys.next();
+      final Component component = (Component)layout.components.get(key);
+      components.put(key, component.clone());
+    }
   }
 
   public Layout(final String area, final String name, final String file,
@@ -42,32 +54,57 @@ public class Layout extends Component {
     this.page = page;
   }
 
-  public Layout(final Layout layout) {
-    super(layout);
-    page = layout.page;
-    areas.addAll(layout.areas);
-    Iterator keys = layout.components.keySet().iterator();
-    while (keys.hasNext()) {
-      String key = (String)keys.next();
-      Component component = (Component)layout.components.get(key);
-      components.put(key, component.clone());
-    }
-  }
-
-  public Object clone() {
-    return new Layout(this);
+  public void addArea(final Area area) {
+    areas.add(area.getName());
   }
 
   public void addArea(final String name) {
     areas.add(name);
   }
 
-  public void addArea(final Area area) {
-    areas.add(area.getName());
+  @Override
+  public Object clone() {
+    return new Layout(this);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (o instanceof Layout) {
+      final Layout l = (Layout)o;
+      if (super.equals(o) && l.page == page && l.areas.equals(areas)
+        && l.components.equals(components)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public Component getArea(final String name) {
     return null;
+  }
+
+  public Component getComponent(final String name) {
+    return (Component)components.get(name);
+  }
+
+  /**
+   * Generate the hash code for the object.
+   * 
+   * @return The hashCode.
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public void includeComponent(final PageContext context) throws IOException,
+    ServletException {
+    final WebUiContext niceContext = WebUiContext.get();
+    niceContext.pushLayout(this);
+    context.getOut().flush();
+    context.include(getFile());
+    niceContext.popLayout();
   }
 
   public boolean isPage() {
@@ -82,52 +119,20 @@ public class Layout extends Component {
     components.put(name, component);
   }
 
-  public Component getComponent(final String name) {
-    return (Component)components.get(name);
-  }
-
   /**
    * @param page The page to set.
    */
-  public void setPage(boolean page) {
+  public void setPage(final boolean page) {
     this.page = page;
   }
 
+  @Override
   public void setPage(final Page page) {
     super.setPage(page);
-    Iterator children = components.values().iterator();
+    final Iterator children = components.values().iterator();
     while (children.hasNext()) {
-      Component component = (Component)children.next();
+      final Component component = (Component)children.next();
       component.setPage(page);
     }
-  }
-
-  public boolean equals(final Object o) {
-    if (o instanceof Layout) {
-      Layout l = (Layout)o;
-      if (super.equals(o) && l.page == page && l.areas.equals(areas)
-        && l.components.equals(components)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Generate the hash code for the object.
-   * 
-   * @return The hashCode.
-   */
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  public void includeComponent(final PageContext context) throws IOException,
-    ServletException {
-    WebUiContext niceContext = WebUiContext.get();
-    niceContext.pushLayout(this);
-    context.getOut().flush();
-    context.include(getFile());
-    niceContext.popLayout();
   }
 }

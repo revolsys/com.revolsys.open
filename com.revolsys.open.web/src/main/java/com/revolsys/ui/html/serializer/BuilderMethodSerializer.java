@@ -3,11 +3,10 @@ package com.revolsys.ui.html.serializer;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
-import com.revolsys.ui.html.serializer.key.KeySerializer;
+import com.revolsys.ui.html.serializer.key.AbstractKeySerializer;
 import com.revolsys.ui.html.serializer.type.TypeSerializer;
 
 /**
@@ -15,12 +14,13 @@ import com.revolsys.ui.html.serializer.type.TypeSerializer;
  * 
  * @author Paul Austin
  */
-public class BuilderMethodSerializer implements TypeSerializer, KeySerializer {
+public class BuilderMethodSerializer extends AbstractKeySerializer implements
+  TypeSerializer {
   /** The HTML UI Builder */
-  private HtmlUiBuilder builder;
+  private final HtmlUiBuilder<?> builder;
 
   /** The method on the builder */
-  private Method method;
+  private final Method method;
 
   /**
    * Construt a new HtmlUiBuilderMethodSerializer.
@@ -28,33 +28,29 @@ public class BuilderMethodSerializer implements TypeSerializer, KeySerializer {
    * @param builder The HTML UI Builder the method is on.
    * @param method The serializer method.
    */
-  public BuilderMethodSerializer(
-    final HtmlUiBuilder builder,
-    final Method method) {
+  public BuilderMethodSerializer(final String name,
+    final HtmlUiBuilder<?> builder, final Method method) {
+    super(name);
     this.builder = builder;
     this.method = method;
   }
 
   /**
-   * Serialize the value to the XML writer using the settings from the Locale.
+   * Serialize the value to the XML writer.
    * 
    * @param out The XML writer to serialize to.
    * @param value The object to get the value from.
-   * @param locale The locale.
    * @throws IOException If there was an I/O error serializing the value.
    */
-  public void serialize(
-    final XmlWriter out,
-    final Object value,
-    final Locale locale) {
+  public void serialize(final XmlWriter out, final Object value) {
     try {
       method.invoke(builder, new Object[] {
         out, value
       });
-    } catch (IllegalAccessException e) {
+    } catch (final IllegalAccessException e) {
       throw new RuntimeException(e.getMessage(), e);
-    } catch (InvocationTargetException e) {
-      Throwable cause = e.getCause();
+    } catch (final InvocationTargetException e) {
+      final Throwable cause = e.getCause();
       if (cause instanceof RuntimeException) {
         throw (RuntimeException)cause;
       } else if (cause instanceof Error) {
@@ -64,13 +60,4 @@ public class BuilderMethodSerializer implements TypeSerializer, KeySerializer {
       }
     }
   }
-
-  public void serialize(
-    XmlWriter out,
-    Object value,
-    String key,
-    Locale locale) {
-    serialize(out, value, locale);
-  }
-
 }

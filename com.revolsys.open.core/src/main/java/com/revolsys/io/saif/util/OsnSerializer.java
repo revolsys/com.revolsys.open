@@ -88,11 +88,8 @@ public class OsnSerializer {
 
   private final QName typeName;
 
-  public OsnSerializer(
-    final QName typeName,
-    final File file,
-    final long maxSize,
-    final OsnConverterRegistry converters)
+  public OsnSerializer(final QName typeName, final File file,
+    final long maxSize, final OsnConverterRegistry converters)
     throws IOException {
     this.typeName = typeName;
     this.file = file;
@@ -107,16 +104,14 @@ public class OsnSerializer {
   public void attribute(
     final String name,
     final double value,
-    final boolean endLine)
-    throws IOException {
+    final boolean endLine) throws IOException {
     attribute(name, new BigDecimal(value), endLine);
   }
 
   public void attribute(
     final String name,
     final Object value,
-    final boolean endLine)
-    throws IOException {
+    final boolean endLine) throws IOException {
     attributeName(name);
     attributeValue(value);
     if (endLine || indentEnabled) {
@@ -128,8 +123,7 @@ public class OsnSerializer {
   public void attributeEnum(
     final String name,
     final String value,
-    final boolean endLine)
-    throws IOException {
+    final boolean endLine) throws IOException {
     attributeName(name);
     write(value);
     endAttribute();
@@ -139,24 +133,19 @@ public class OsnSerializer {
 
   }
 
-  public void attributeName(
-    final String name)
-    throws IOException {
+  public void attributeName(final String name) throws IOException {
     endElement = false;
     serializeIndent();
     write(name + ":");
     scope.addLast(ATTRIBUTE_SCOPE);
   }
 
-  public void attributeValue(
-    final Object value)
-    throws IOException {
+  public void attributeValue(final Object value) throws IOException {
     serializeValue(value);
     endAttribute();
   }
 
-  public void close()
-    throws IOException {
+  public void close() throws IOException {
     while (!scope.isEmpty()) {
       final Object scope = this.scope.getLast();
       if (scope == COLLECTION_SCOPE) {
@@ -190,8 +179,7 @@ public class OsnSerializer {
     scope.removeLast();
   }
 
-  public void endCollection()
-    throws IOException {
+  public void endCollection() throws IOException {
     endElement = true;
     decreaseIndent();
     serializeIndent();
@@ -202,13 +190,11 @@ public class OsnSerializer {
     endAttribute();
   }
 
-  public void endLine()
-    throws IOException {
+  public void endLine() throws IOException {
     write(lineSeparator);
   }
 
-  public void endObject()
-    throws IOException {
+  public void endObject() throws IOException {
     endElement = true;
     decreaseIndent();
     serializeIndent();
@@ -229,16 +215,14 @@ public class OsnSerializer {
     return indentEnabled;
   }
 
-  private void openFile()
-    throws IOException {
+  private void openFile() throws IOException {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Creating object subset '" + file.getName() + "'");
     }
     out = new BufferedOutputStream(new FileOutputStream(file), 4096);
   }
 
-  private void openNextFile()
-    throws IOException {
+  private void openNextFile() throws IOException {
     out.flush();
     out.close();
     index++;
@@ -248,17 +232,13 @@ public class OsnSerializer {
     openFile();
   }
 
-  public void serialize(
-    final DataObject object)
-    throws IOException {
+  public void serialize(final DataObject object) throws IOException {
     serializeStartObject(object);
     serializeAttributes(object);
     endObject();
   }
 
-  private void serialize(
-    final Date date)
-    throws IOException {
+  private void serialize(final Date date) throws IOException {
     startObject(DATE);
     if (date.equals(DateConverter.NULL_DATE)) {
       attribute("year", new BigDecimal(0), false);
@@ -292,9 +272,7 @@ public class OsnSerializer {
     endObject();
   }
 
-  private void serialize(
-    final Geometry geometry)
-    throws IOException {
+  private void serialize(final Geometry geometry) throws IOException {
     final String type = (String)JtsGeometryUtil.getGeometryProperty(geometry,
       "type");
     OsnConverter converter = converters.getConverter(type);
@@ -313,21 +291,15 @@ public class OsnSerializer {
     converter.write(this, geometry);
   }
 
-  public void serialize(
-    final List<Object> list)
-    throws IOException {
+  public void serialize(final List<Object> list) throws IOException {
     serializeCollection("List", list);
   }
 
-  public void serialize(
-    final Set<Object> set)
-    throws IOException {
+  public void serialize(final Set<Object> set) throws IOException {
     serializeCollection("Set", set);
   }
 
-  public void serialize(
-    final String string)
-    throws IOException {
+  public void serialize(final String string) throws IOException {
     write('"');
     String escapedString = string.replaceAll("\\\\", "\\\\\\\\");
     escapedString = escapedString.replaceAll("(\\\\)?\\x22", "\\\\\"");
@@ -335,9 +307,7 @@ public class OsnSerializer {
     write('"');
   }
 
-  public void serializeAttribute(
-    final String name,
-    final Object value)
+  public void serializeAttribute(final String name, final Object value)
     throws IOException {
     attributeName(name);
     if ((value instanceof Geometry) && name.equals("position")) {
@@ -351,9 +321,7 @@ public class OsnSerializer {
     }
   }
 
-  public void serializeAttributes(
-    final DataObject object)
-    throws IOException {
+  public void serializeAttributes(final DataObject object) throws IOException {
     final DataObjectMetaData type = object.getMetaData();
     final int attributeCount = type.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
@@ -397,8 +365,7 @@ public class OsnSerializer {
 
   private void serializeCollection(
     final String name,
-    final Collection<Object> collection)
-    throws IOException {
+    final Collection<Object> collection) throws IOException {
     startCollection(name);
     for (final Object value : collection) {
       serializeValue(value);
@@ -409,9 +376,7 @@ public class OsnSerializer {
     endCollection();
   }
 
-  public void serializeDataObject(
-    final DataObject object)
-    throws IOException {
+  public void serializeDataObject(final DataObject object) throws IOException {
     if (size >= maxSize) {
       openNextFile();
       size = 0;
@@ -419,25 +384,20 @@ public class OsnSerializer {
     serialize(object);
   }
 
-  public void serializeIndent()
-    throws IOException {
+  public void serializeIndent() throws IOException {
     if (indentEnabled) {
       write(indent);
     }
   }
 
-  public void serializeStartObject(
-    final DataObject object)
-    throws IOException {
+  public void serializeStartObject(final DataObject object) throws IOException {
     final DataObjectMetaData type = object.getMetaData();
     final QName typeName = type.getName();
     startObject(typeName);
   }
 
   @SuppressWarnings("unchecked")
-  public void serializeValue(
-    final Object value)
-    throws IOException {
+  public void serializeValue(final Object value) throws IOException {
     if (scope.getLast() == COLLECTION_SCOPE) {
       serializeIndent();
     }
@@ -463,14 +423,11 @@ public class OsnSerializer {
     }
   }
 
-  public void setIndentEnabled(
-    final boolean indentEnabled) {
+  public void setIndentEnabled(final boolean indentEnabled) {
     this.indentEnabled = indentEnabled;
   }
 
-  public void startCollection(
-    final String name)
-    throws IOException {
+  public void startCollection(final String name) throws IOException {
     endElement = false;
     write(name);
     write('{');
@@ -481,9 +438,7 @@ public class OsnSerializer {
     scope.addLast(COLLECTION_SCOPE);
   }
 
-  public void startObject(
-    final QName typeName)
-    throws IOException {
+  public void startObject(final QName typeName) throws IOException {
     endElement = false;
     String name = typeName.getLocalPart();
 
@@ -500,9 +455,7 @@ public class OsnSerializer {
     scope.addLast(typeName);
   }
 
-  public void startObject(
-    final String typeName)
-    throws IOException {
+  public void startObject(final String typeName) throws IOException {
     endElement = false;
     write(typeName);
     write('(');
@@ -518,31 +471,22 @@ public class OsnSerializer {
     return typeName.toString();
   }
 
-  public void write(
-    final byte[] b)
-    throws IOException {
+  public void write(final byte[] b) throws IOException {
     write(b, 0, b.length);
   }
 
-  public void write(
-    final byte[] b,
-    final int off,
-    final int len)
+  public void write(final byte[] b, final int off, final int len)
     throws IOException {
     out.write(b, off, len);
     size += len;
   }
 
-  public void write(
-    final int b)
-    throws IOException {
+  public void write(final int b) throws IOException {
     out.write(b);
     size += 1;
   }
 
-  public void write(
-    final String s)
-    throws IOException {
+  public void write(final String s) throws IOException {
     final byte[] bytes = s.getBytes();
     write(bytes, 0, bytes.length);
   }

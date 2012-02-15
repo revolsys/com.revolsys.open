@@ -4,13 +4,11 @@ import java.util.Map.Entry;
 
 public class DataObjectEntry implements Entry<String, Object> {
 
-  private DataObject dataObject;
+  private final DataObject dataObject;
 
-  private int index;
+  private final int index;
 
-  public DataObjectEntry(
-    DataObject dataObject,
-    int index) {
+  public DataObjectEntry(final DataObject dataObject, final int index) {
     this.dataObject = dataObject;
     this.index = index;
   }
@@ -23,8 +21,7 @@ public class DataObjectEntry implements Entry<String, Object> {
     return dataObject.getValue(index);
   }
 
-  public Object setValue(
-    Object value) {
+  public Object setValue(final Object value) {
     dataObject.setValue(index, value);
     return value;
   }

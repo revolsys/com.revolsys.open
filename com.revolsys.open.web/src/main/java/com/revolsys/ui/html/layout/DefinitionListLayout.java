@@ -32,13 +32,12 @@ public class DefinitionListLayout implements ElementContainerLayout {
     this.cssClass = cssClass;
   }
 
-  public void serialize(final XmlWriter out, final ElementContainer container)
-    {
+  public void serialize(final XmlWriter out, final ElementContainer container) {
     out.startTag(HtmlUtil.DL);
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     }
-    for (Iterator elements = container.getElements().iterator(); elements.hasNext();) {
+    for (final Iterator elements = container.getElements().iterator(); elements.hasNext();) {
       Element element = (Element)elements.next();
       out.startTag(HtmlUtil.DT);
       element.serialize(out);

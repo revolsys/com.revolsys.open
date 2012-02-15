@@ -16,6 +16,14 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   private final byte numAxis;
 
+  public DoubleCoordinatesList(final byte numAxis, final Coordinates... points) {
+    this(points.length, numAxis);
+    for (int i = 0; i < points.length; i++) {
+      final Coordinates point = points[i];
+      setPoint(i, point);
+    }
+  }
+
   public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
     this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
   }
@@ -39,14 +47,6 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   public DoubleCoordinatesList(final int numAxis,
     final List<? extends Number> coordinates) {
     this(numAxis, MathUtil.toDoubleArray(coordinates));
-  }
-
-  public DoubleCoordinatesList(byte numAxis, Coordinates... points) {
-    this(points.length, numAxis);
-    for (int i = 0; i < points.length; i++) {
-      Coordinates point = points[i];
-      setPoint(i, point);
-    }
   }
 
   @Override

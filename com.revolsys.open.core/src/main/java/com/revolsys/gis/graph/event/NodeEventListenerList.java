@@ -25,8 +25,7 @@ public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
     }
   }
 
-  public void nodeEvent(
-    final NodeEvent<T> nodeEvent) {
+  public void nodeEvent(final NodeEvent<T> nodeEvent) {
     for (final NodeEventListener<T> listener : this) {
       listener.nodeEvent(nodeEvent);
     }

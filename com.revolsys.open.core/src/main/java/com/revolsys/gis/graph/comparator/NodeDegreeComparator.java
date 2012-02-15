@@ -12,14 +12,11 @@ public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
   public NodeDegreeComparator() {
   }
 
-  public NodeDegreeComparator(
-    final boolean invert) {
+  public NodeDegreeComparator(final boolean invert) {
     this.invert = invert;
   }
 
-  public int compare(
-    final Node<T> node1,
-    final Node<T> node2) {
+  public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
     final int degree1 = node1.getDegree();
     final int degree2 = node2.getDegree();

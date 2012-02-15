@@ -36,23 +36,14 @@ public class FormTag extends BodyTagSupport {
 
   private ServletRequest request;
 
-  public int doStartTag() throws JspException {
-    if (name != null) {
-      request = pageContext.getRequest();
-      form = (Form)request.getAttribute(name);
-      oldFormAttribute = request.getAttribute("form");
-      request.setAttribute("form", form);
-    }
-    return (EVAL_BODY_INCLUDE);
-  }
-
+  @Override
   public int doEndTag() throws JspException {
     try {
       if (name != null) {
         if (form != null) {
-          Writer out = pageContext.getOut();
+          final Writer out = pageContext.getOut();
           out.flush();
-          XmlWriter xmlOut = new XmlWriter(out);
+          final XmlWriter xmlOut = new XmlWriter(out);
           form.serializeStartTag(xmlOut);
           bodyContent.writeOut(xmlOut);
           form.serializeEndTag(xmlOut);
@@ -61,9 +52,20 @@ public class FormTag extends BodyTagSupport {
         request.setAttribute("form", oldFormAttribute);
       }
       return EVAL_PAGE;
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new JspException(t.getMessage(), t);
     }
+  }
+
+  @Override
+  public int doStartTag() throws JspException {
+    if (name != null) {
+      request = pageContext.getRequest();
+      form = (Form)request.getAttribute(name);
+      oldFormAttribute = request.getAttribute("form");
+      request.setAttribute("form", form);
+    }
+    return (EVAL_BODY_INCLUDE);
   }
 
   public String getName() {

@@ -15,21 +15,21 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
   /** The writer */
   private final PrintWriter out;
 
-  private DataObjectMetaData metaData;
+  private final DataObjectMetaData metaData;
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
    * 
    * @param reader The reader to the CSV file.
    */
-  public CsvDataObjectWriter(DataObjectMetaData metaData, final Writer out) {
+  public CsvDataObjectWriter(final DataObjectMetaData metaData, final Writer out) {
     this.metaData = metaData;
     this.out = new PrintWriter(out);
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {
         this.out.print(',');
       }
-      String name = metaData.getAttributeName(i);
+      final String name = metaData.getAttributeName(i);
       string(name);
     }
     this.out.println();
@@ -38,12 +38,21 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
   /**
    * Closes the underlying reader.
    */
+  @Override
   public void close() {
     FileUtil.closeSilent(out);
   }
 
+  @Override
   public void flush() {
     out.flush();
+  }
+
+  private void string(final Object value) {
+    final String string = value.toString().replaceAll("\"", "\"\"");
+    out.print('"');
+    out.print(string);
+    out.print('"');
   }
 
   public void write(final DataObject object) {
@@ -53,16 +62,16 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
       }
       final Object value = object.getValue(i);
       if (value != null) {
-        String name = metaData.getAttributeName(i);
-        DataType dataType = metaData.getAttributeType(name);
+        final String name = metaData.getAttributeName(i);
+        final DataType dataType = metaData.getAttributeType(name);
 
         @SuppressWarnings("unchecked")
-        Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-        StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(dataTypeClass);
+        final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
+        final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {
-          String stringValue = converter.toString(value);
+          final String stringValue = converter.toString(value);
           if (converter.requiresQuotes()) {
             string(stringValue);
           } else {
@@ -72,13 +81,6 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
       }
     }
     out.println();
-  }
-
-  private void string(final Object value) {
-    final String string = value.toString().replaceAll("\"", "\"\"");
-    out.print('"');
-    out.print(string);
-    out.print('"');
   }
 
 }

@@ -41,7 +41,7 @@ public class ClassLoaderFactoryBean implements FactoryBean<ClassLoader> {
   public static URLClassLoader createClassLoader(
     final ClassLoader parentClassLoader,
     final File file) {
-    Collection<URL> urls = new LinkedHashSet<URL>();
+    final Collection<URL> urls = new LinkedHashSet<URL>();
     if (file.isDirectory()) {
       addJars(urls, file);
     } else if (JAR_FILTER.accept(file.getParentFile(), file.getName())) {

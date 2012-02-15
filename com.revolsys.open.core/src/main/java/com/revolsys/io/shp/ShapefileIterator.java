@@ -22,8 +22,6 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianInputStream;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -56,10 +54,6 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     name = QName.valueOf(baseName);
     this.in = new EndianInputStream(resource.getInputStream());
     this.resource = resource;
-  }
-
-  public DataObjectFactory getDataObjectFactory() {
-    return dataObjectFactory;
   }
 
   @Override
@@ -115,6 +109,10 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     }
   }
 
+  public DataObjectFactory getDataObjectFactory() {
+    return dataObjectFactory;
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
@@ -154,33 +152,33 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   private void loadHeader() throws IOException {
     in.readInt();
     in.skipBytes(20);
-    int fileLength = in.readInt();
-    int version = in.readLEInt();
-    int shapeType = in.readLEInt();
-    double minX = in.readLEDouble();
-    double minY = in.readLEDouble();
-    double maxX = in.readLEDouble();
-    double maxY = in.readLEDouble();
-    double minZ = in.readLEDouble();
-    double maxZ = in.readLEDouble();
-    double minM = in.readLEDouble();
-    double maxM = in.readLEDouble();
-  }
-
-  public void updateMetaData() {
-    assert this.metaData == null : "Cannot override metaData when set";
-    if (xbaseIterator != null) {
-      DataObjectMetaDataImpl metaData = xbaseIterator.getMetaData();
-      this.metaData = metaData;
-      if (metaData.getGeometryAttributeIndex() == -1) {
-        metaData.addAttribute("geometry", DataTypes.GEOMETRY, true);
-      }
-    }
+    final int fileLength = in.readInt();
+    final int version = in.readLEInt();
+    final int shapeType = in.readLEInt();
+    final double minX = in.readLEDouble();
+    final double minY = in.readLEDouble();
+    final double maxX = in.readLEDouble();
+    final double maxY = in.readLEDouble();
+    final double minZ = in.readLEDouble();
+    final double maxZ = in.readLEDouble();
+    final double minM = in.readLEDouble();
+    final double maxM = in.readLEDouble();
   }
 
   @Override
   public String toString() {
     return ShapefileConstants.DESCRIPTION + " " + resource;
+  }
+
+  public void updateMetaData() {
+    assert this.metaData == null : "Cannot override metaData when set";
+    if (xbaseIterator != null) {
+      final DataObjectMetaDataImpl metaData = xbaseIterator.getMetaData();
+      this.metaData = metaData;
+      if (metaData.getGeometryAttributeIndex() == -1) {
+        metaData.addAttribute("geometry", DataTypes.GEOMETRY, true);
+      }
+    }
   }
 
 }

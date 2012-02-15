@@ -8,8 +8,7 @@ import java.text.ParseException;
 public class SqlDateEditor extends PropertyEditorSupport {
   private final DateFormat dateFormat;
 
-  public SqlDateEditor(
-    final DateFormat dateFormat) {
+  public SqlDateEditor(final DateFormat dateFormat) {
     this.dateFormat = dateFormat;
   }
 
@@ -24,9 +23,7 @@ public class SqlDateEditor extends PropertyEditorSupport {
   }
 
   @Override
-  public void setAsText(
-    final String text)
-    throws IllegalArgumentException {
+  public void setAsText(final String text) throws IllegalArgumentException {
     if (text == null || text.trim().length() == 0) {
       setValue(null);
     } else {

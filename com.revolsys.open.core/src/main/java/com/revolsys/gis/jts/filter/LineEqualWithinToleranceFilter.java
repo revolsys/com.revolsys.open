@@ -34,13 +34,14 @@ public class LineEqualWithinToleranceFilter implements Filter<LineString> {
     this.points = CoordinatesListUtil.get(line);
   }
 
-  public LineEqualWithinToleranceFilter(final LineString line, double tolerance) {
+  public LineEqualWithinToleranceFilter(final LineString line,
+    final double tolerance) {
     this.points = CoordinatesListUtil.get(line);
     this.tolerance = tolerance;
   }
 
   public boolean accept(final LineString line) {
-    CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesList points = CoordinatesListUtil.get(line);
 
     final boolean equal = CoordinatesListUtil.equalWithinTolerance(this.points,
       points, tolerance);

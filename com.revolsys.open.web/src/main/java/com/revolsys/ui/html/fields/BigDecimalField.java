@@ -37,11 +37,38 @@ public class BigDecimalField extends TextField {
     this.scale = scale;
   }
 
+  public BigDecimal getMaximumValue() {
+    return maximumValue;
+  }
+
+  public BigDecimal getMinimumValue() {
+    return minimumValue;
+  }
+
+  /**
+   * @return Returns the scale.
+   */
+  public final int getScale() {
+    return scale;
+  }
+
+  public void setMaximumValue(final BigDecimal maximumValue) {
+    this.maximumValue = maximumValue;
+  }
+
+  public void setMinimumValue(final BigDecimal minimumValue) {
+    this.minimumValue = minimumValue;
+  }
+
+  public void setScale(final int scale) {
+    this.scale = scale;
+  }
+
   @Override
   public void setTextValue(final String value) {
     if (StringUtils.hasLength(value)) {
       try {
-        BigDecimal numericValue = new BigDecimal(value);
+        final BigDecimal numericValue = new BigDecimal(value);
         if ((numericValue).scale() > scale) {
           throw new IllegalArgumentException("Scale must be <= " + scale);
         } else if (minimumValue != null
@@ -53,38 +80,11 @@ public class BigDecimalField extends TextField {
         } else {
           setValue(numericValue);
         }
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         throw new IllegalArgumentException("Must be a valid number");
       }
     } else {
       setValue(null);
     }
-  }
-
-  public BigDecimal getMaximumValue() {
-    return maximumValue;
-  }
-
-  public void setMaximumValue(final BigDecimal maximumValue) {
-    this.maximumValue = maximumValue;
-  }
-
-  public BigDecimal getMinimumValue() {
-    return minimumValue;
-  }
-
-  public void setMinimumValue(final BigDecimal minimumValue) {
-    this.minimumValue = minimumValue;
-  }
-
-  /**
-   * @return Returns the scale.
-   */
-  public final int getScale() {
-    return scale;
-  }
-
-  public void setScale(final int scale) {
-    this.scale = scale;
   }
 }

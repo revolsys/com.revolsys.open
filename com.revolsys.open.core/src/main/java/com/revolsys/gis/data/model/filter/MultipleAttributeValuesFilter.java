@@ -29,8 +29,7 @@ public class MultipleAttributeValuesFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     for (final Entry<String, ? extends Object> entry : values.entrySet()) {
       final String attributeName = entry.getKey();
       final Object value = entry.getValue();
@@ -55,8 +54,7 @@ public class MultipleAttributeValuesFilter implements Filter<DataObject> {
     return values;
   }
 
-  public void setValues(
-    final Map<String, ? extends Object> values) {
+  public void setValues(final Map<String, ? extends Object> values) {
     this.values = values;
   }
 

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -32,21 +31,25 @@ public class ReadOnlyField extends Field {
     super(name, false);
   }
 
+  @Override
   public boolean hasValue() {
     return true;
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     setValue(getInitialValue(request));
   }
 
+  @Override
   public boolean isValid() {
     return true;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     if (getValue() != null) {
-      String valueString = getValue().toString();
+      final String valueString = getValue().toString();
       out.write(valueString);
       HtmlUtil.serializeHiddenInput(out, getName(), valueString);
     } else {

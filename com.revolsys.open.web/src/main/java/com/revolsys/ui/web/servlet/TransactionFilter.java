@@ -45,45 +45,39 @@ public class TransactionFilter implements Filter {
 
   private WebApplicationContext applicationContext;
 
-  public void init(
-    final FilterConfig config)
-    throws ServletException {
-    ServletContext servletContext = config.getServletContext();
-    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+  public void destroy() {
   }
 
   public void doFilter(
     final ServletRequest request,
     final ServletResponse response,
-    final FilterChain filterChain)
-    throws IOException,
-    ServletException {
-    AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)applicationContext.getBean("transactionManager");
-    TransactionTemplate template = new TransactionTemplate(transactionManager);
+    final FilterChain filterChain) throws IOException, ServletException {
+    final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)applicationContext.getBean("transactionManager");
+    final TransactionTemplate template = new TransactionTemplate(
+      transactionManager);
 
     try {
       template.execute(new TransactionCallback<Object>() {
-        public Object doInTransaction(
-          final TransactionStatus transaction) {
+        public Object doInTransaction(final TransactionStatus transaction) {
           try {
             filterChain.doFilter(request, response);
-            DefaultTransactionStatus defStatus = (DefaultTransactionStatus)transaction;
+            final DefaultTransactionStatus defStatus = (DefaultTransactionStatus)transaction;
             if (defStatus.isGlobalRollbackOnly()) {
               transaction.setRollbackOnly();
             }
-          } catch (Throwable e) {
+          } catch (final Throwable e) {
             transaction.setRollbackOnly();
             throw new RuntimeException(e.getMessage(), e);
           }
           return null;
         }
       });
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       Throwable cause = e.getCause();
       if (cause != null) {
         if (cause instanceof ServletException) {
-          ServletException se = (ServletException)cause;
-          Throwable servletCause = se.getRootCause();
+          final ServletException se = (ServletException)cause;
+          final Throwable servletCause = se.getRootCause();
           if (servletCause != null) {
             cause = servletCause;
           }
@@ -109,6 +103,8 @@ public class TransactionFilter implements Filter {
     }
   }
 
-  public void destroy() {
+  public void init(final FilterConfig config) throws ServletException {
+    final ServletContext servletContext = config.getServletContext();
+    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
   }
 }

@@ -106,7 +106,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(RECORD);
   }
 
-  private void writeDataElement(final DataObjectMetaData metaData,
+  private void writeDataElement(
+    final DataObjectMetaData metaData,
     final Geometry geometry) {
     final String dataElementType;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();

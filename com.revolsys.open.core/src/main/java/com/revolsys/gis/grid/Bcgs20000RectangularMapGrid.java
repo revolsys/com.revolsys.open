@@ -14,18 +14,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
 
   public static final Bcgs20000RectangularMapGrid INSTANCE = new Bcgs20000RectangularMapGrid();
 
-  @Override
-  public String getFormattedMapTileName(
-    String name) {
-    String tileName = getTileName(name);
-    int length = tileName.length();
-    tileName = tileName.substring(0, length - 3).toUpperCase() + "."
-      + tileName.substring(length - 3);
-    return tileName;
-  }
-
-  public static String getTileName(
-    final String mapTileName) {
+  public static String getTileName(final String mapTileName) {
     final Matcher matcher = FIND_NAME_PATTERN.matcher(mapTileName);
     if (matcher.find()) {
       return matcher.group(0).replaceAll("\\.", "").toLowerCase();
@@ -34,34 +23,26 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
     }
   }
 
-  public String getMapsheetWithPath(
-    final String mapsheet) {
-    final String mapTileName = getTileName(mapsheet);
-    final int block = getBlock(mapTileName);
-    final char letter = getLetter(mapTileName);
-    final StringBuffer path = new StringBuffer();
-    path.append(block);
-    path.append('/');
-    path.append(letter);
-    path.append('/');
-    path.append(mapTileName);
-    return path.toString();
-  }
-
   public Bcgs20000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_20000, BcgsConstants.HEIGHT_20000);
   }
 
-  protected Bcgs20000RectangularMapGrid(
-    final double width,
-    final double height) {
+  protected Bcgs20000RectangularMapGrid(final double width, final double height) {
     super(width, height);
     setPrecisionModel(new PrecisionModel(10));
   }
 
   @Override
-  public double getLatitude(
-    final String mapTileName) {
+  public String getFormattedMapTileName(final String name) {
+    String tileName = getTileName(name);
+    final int length = tileName.length();
+    tileName = tileName.substring(0, length - 3).toUpperCase() + "."
+      + tileName.substring(length - 3);
+    return tileName;
+  }
+
+  @Override
+  public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -88,8 +69,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
   }
 
   @Override
-  public double getLongitude(
-    final String mapTileName) {
+  public double getLongitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -114,10 +94,21 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
     return longitude;
   }
 
+  public String getMapsheetWithPath(final String mapsheet) {
+    final String mapTileName = getTileName(mapsheet);
+    final int block = getBlock(mapTileName);
+    final char letter = getLetter(mapTileName);
+    final StringBuffer path = new StringBuffer();
+    path.append(block);
+    path.append('/');
+    path.append(letter);
+    path.append('/');
+    path.append(mapTileName);
+    return path.toString();
+  }
+
   @Override
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     final String letterBlock = super.getMapTileName(x, y);
 
     final double xSheet = (x + 180) * 5;

@@ -15,21 +15,17 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
 
   }
 
-  public ReaderProcess(
-    final Channel<DataObject> out,
+  public ReaderProcess(final Channel<DataObject> out,
     final DataObjectReader reader) {
     super(out);
     this.reader = reader;
   }
 
-  public ReaderProcess(
-    final DataObjectReader reader) {
+  public ReaderProcess(final DataObjectReader reader) {
     this.reader = reader;
   }
 
-  public ReaderProcess(
-    final DataObjectReader reader,
-    final int bufferSize) {
+  public ReaderProcess(final DataObjectReader reader, final int bufferSize) {
     super(bufferSize);
     this.reader = reader;
   }
@@ -42,8 +38,7 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> out) {
+  protected void run(final Channel<DataObject> out) {
     final Logger log = Logger.getLogger(getClass());
     try {
       reader.open();
@@ -67,8 +62,7 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
   /**
    * @param reader the reader to set
    */
-  public void setReader(
-    final DataObjectReader reader) {
+  public void setReader(final DataObjectReader reader) {
     this.reader = reader;
   }
 

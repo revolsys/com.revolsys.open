@@ -16,26 +16,26 @@ import com.revolsys.io.Reader;
 public class MapReaderDataObjectReader extends AbstractReader<DataObject>
   implements DataObjectReader, Iterator<DataObject> {
 
-  private DataObjectMetaData metaData;
+  private final DataObjectMetaData metaData;
 
-  private Reader<Map<String, Object>> mapReader;
+  private final Reader<Map<String, Object>> mapReader;
 
   private boolean open;
 
   private Iterator<Map<String, Object>> mapIterator;
 
-  public MapReaderDataObjectReader(DataObjectMetaData metaData,
-    Reader<Map<String, Object>> mapReader) {
+  public MapReaderDataObjectReader(final DataObjectMetaData metaData,
+    final Reader<Map<String, Object>> mapReader) {
     this.metaData = metaData;
     this.mapReader = mapReader;
   }
 
-  public DataObjectMetaData getMetaData() {
-    return metaData;
+  public void close() {
+    mapReader.close();
   }
 
-  public Iterator<DataObject> iterator() {
-    return this;
+  public DataObjectMetaData getMetaData() {
+    return metaData;
   }
 
   public boolean hasNext() {
@@ -45,17 +45,21 @@ public class MapReaderDataObjectReader extends AbstractReader<DataObject>
     return mapIterator.hasNext();
   }
 
+  public Iterator<DataObject> iterator() {
+    return this;
+  }
+
   public DataObject next() {
     if (hasNext()) {
-      Map<String, Object> source = mapIterator.next();
-      DataObject target = new ArrayDataObject(metaData);
-      for (Attribute attribute : metaData.getAttributes()) {
-        String name = attribute.getName();
-        Object value = source.get(name);
+      final Map<String, Object> source = mapIterator.next();
+      final DataObject target = new ArrayDataObject(metaData);
+      for (final Attribute attribute : metaData.getAttributes()) {
+        final String name = attribute.getName();
+        final Object value = source.get(name);
         if (value != null) {
-          DataType dataType = metaData.getAttributeType(name);
-          Object convertedValue = StringConverterRegistry.toObject(dataType,
-            value);
+          final DataType dataType = metaData.getAttributeType(name);
+          final Object convertedValue = StringConverterRegistry.toObject(
+            dataType, value);
           target.setValue(name, convertedValue);
         }
       }
@@ -65,16 +69,12 @@ public class MapReaderDataObjectReader extends AbstractReader<DataObject>
     }
   }
 
-  public void remove() {
-    mapIterator.remove();
-  }
-
-  public void close() {
-    mapReader.close();
-  }
-
   public void open() {
     open = true;
     this.mapIterator = mapReader.iterator();
+  }
+
+  public void remove() {
+    mapIterator.remove();
   }
 }

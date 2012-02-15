@@ -10,9 +10,9 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 
 public class JsonMapWriter extends AbstractMapWriter {
-  public static String toString(Map<String, ? extends Object> values) {
-    StringWriter writer = new StringWriter();
-    JsonWriter jsonWriter = new JsonWriter(writer);
+  public static String toString(final Map<String, ? extends Object> values) {
+    final StringWriter writer = new StringWriter();
+    final JsonWriter jsonWriter = new JsonWriter(writer);
     jsonWriter.write(values);
     jsonWriter.close();
     return writer.toString();
@@ -29,22 +29,10 @@ public class JsonMapWriter extends AbstractMapWriter {
     this.out = new PrintWriter(out);
   }
 
-  private void writeHeader() {
-    final String callback = getProperty(IoConstants.JSONP_PROPERTY);
-    if (callback != null) {
-      this.out.print(callback);
-      this.out.print('(');
-    }
-    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
-    if (!singleObject) {
-      this.out.print("{\"items\": [\n");
-    }
-    written = true;
-  }
-
   /**
    * Closes the underlying reader.
    */
+  @Override
   public void close() {
     if (out != null) {
       try {
@@ -62,6 +50,7 @@ public class JsonMapWriter extends AbstractMapWriter {
     }
   }
 
+  @Override
   public void flush() {
     out.flush();
   }
@@ -73,5 +62,18 @@ public class JsonMapWriter extends AbstractMapWriter {
       writeHeader();
     }
     JsonWriterUtil.write(out, values);
+  }
+
+  private void writeHeader() {
+    final String callback = getProperty(IoConstants.JSONP_PROPERTY);
+    if (callback != null) {
+      this.out.print(callback);
+      this.out.print('(');
+    }
+    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!singleObject) {
+      this.out.print("{\"items\": [\n");
+    }
+    written = true;
   }
 }

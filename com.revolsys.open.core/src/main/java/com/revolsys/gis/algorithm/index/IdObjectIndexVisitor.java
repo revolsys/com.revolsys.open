@@ -3,11 +3,12 @@ package com.revolsys.gis.algorithm.index;
 import com.revolsys.collection.Visitor;
 
 public final class IdObjectIndexVisitor<T> implements Visitor<Integer> {
-  private IdObjectIndex<T> index;
+  private final IdObjectIndex<T> index;
 
   private final Visitor<T> visitor;
 
-  public IdObjectIndexVisitor(IdObjectIndex<T> index, Visitor<T> visitor) {
+  public IdObjectIndexVisitor(final IdObjectIndex<T> index,
+    final Visitor<T> visitor) {
     this.index = index;
     this.visitor = visitor;
   }

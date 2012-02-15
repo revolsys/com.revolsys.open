@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.namespace.QName;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
@@ -73,8 +72,49 @@ public class PageInfoHttpMessageConverter extends
     super(PageInfo.class, Collections.emptySet(), WRITE_MEDIA_TYPES);
   }
 
+  private Map<String, Object> getMap(final String url, final PageInfo pageInfo) {
+    final Map<String, Object> pageMap = new NamedLinkedHashMap<String, Object>(
+      "resource");
+    pageMap.put("resourceUri", url);
+    pageMap.put("title", pageInfo.getTitle());
+    pageMap.put("description", pageInfo.getDescription());
+    for (final Entry<String, Object> attribute : pageInfo.getAttributes()
+      .entrySet()) {
+      final String key = attribute.getKey();
+      final Object value = attribute.getValue();
+      pageMap.put(key, value);
+    }
+    final List<Map<String, Object>> childPages = new ArrayList<Map<String, Object>>();
+    for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
+      .entrySet()) {
+      final String childPath = childPage.getKey();
+      final PageInfo childPageInfo = childPage.getValue();
+      final String childUri = getUrl(url, childPath);
+      final Map<String, Object> childPageMap = getMap(childUri, childPageInfo);
+      childPages.add(childPageMap);
+    }
+    if (!childPages.isEmpty()) {
+      pageMap.put("resources", childPages);
+    }
+    return pageMap;
+  }
+
+  private String getUrl(final String parentUrl, final String childUrl) {
+    String childUri;
+    if (childUrl.startsWith("/")) {
+      childUri = HttpRequestUtils.getServerUrl() + childUrl;
+    } else if (parentUrl.charAt(parentUrl.length() - 1) != '/') {
+      childUri = parentUrl + "/" + childUrl;
+    } else {
+      childUri = parentUrl + childUrl;
+    }
+    return childUri;
+  }
+
   @Override
-  public void write(final PageInfo pageInfo, final MediaType mediaType,
+  public void write(
+    final PageInfo pageInfo,
+    final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     if (pageInfo != null) {
@@ -115,8 +155,22 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
+  private void writeDescription(
+    final XmlWriter writer,
+    final ParameterInfo parameter) {
+    final String description = parameter.getDescription();
+    if (StringUtils.hasText(description)) {
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "fieldDescription");
+      writer.text(description);
+      writer.endTag(HtmlUtil.DIV);
+    }
+  }
+
   @SuppressWarnings("unchecked")
-  private void writeHtml(final OutputStream out, final String url,
+  private void writeHtml(
+    final OutputStream out,
+    final String url,
     final PageInfo pageInfo) {
     final XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
@@ -192,8 +246,10 @@ public class PageInfoHttpMessageConverter extends
     writer.close();
   }
 
-  private void writeHtmlField(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues) {
+  private void writeHtmlField(
+    final XmlWriter writer,
+    final ParameterInfo parameter,
+    final Map<String, ?> formValues) {
     final String parameterName = parameter.getName();
 
     final Object value = formValues.get(parameterName);
@@ -212,19 +268,10 @@ public class PageInfoHttpMessageConverter extends
     writer.endTag(HtmlUtil.DD);
   }
 
-  private void writeDescription(final XmlWriter writer,
-    final ParameterInfo parameter) {
-    String description = parameter.getDescription();
-    if (StringUtils.hasText(description)) {
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "fieldDescription");
-      writer.text(description);
-      writer.endTag(HtmlUtil.DIV);
-    }
-  }
-
-  private void writeHtmlFileField(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues) {
+  private void writeHtmlFileField(
+    final XmlWriter writer,
+    final ParameterInfo parameter,
+    final Map<String, ?> formValues) {
     final String name = parameter.getName();
     final Object value = formValues.get(name);
     writer.startTag(HtmlUtil.DT);
@@ -241,31 +288,10 @@ public class PageInfoHttpMessageConverter extends
     writer.endTag(HtmlUtil.DD);
   }
 
-  private void writeHtmlSelect(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues,
-    final Map<? extends Object, ? extends Object> values) {
-    final String name = parameter.getName();
-    final boolean optional = !parameter.isRequired();
-    Object value = formValues.get(name);
-    if (value == null) {
-      value = parameter.getDefaultValue();
-    }
-    writer.startTag(HtmlUtil.DT);
-    writer.startTag(HtmlUtil.LABEL);
-
-    writer.attribute(HtmlUtil.ATTR_FOR, name);
-    writer.text(CaseConverter.toCapitalizedWords(name));
-    writer.endTag(HtmlUtil.LABEL);
-    writer.endTag(HtmlUtil.DT);
-
-    writer.startTag(HtmlUtil.DD);
-    HtmlUtil.serializeSelect(writer, name, value, optional, values);
-    writeDescription(writer, parameter);
-    writer.endTag(HtmlUtil.DD);
-  }
-
-  private void writeHtmlSelect(final XmlWriter writer,
-    final ParameterInfo parameter, final Map<String, ?> formValues,
+  private void writeHtmlSelect(
+    final XmlWriter writer,
+    final ParameterInfo parameter,
+    final Map<String, ?> formValues,
     final List<? extends Object> values) {
     final String name = parameter.getName();
     final boolean optional = !parameter.isRequired();
@@ -287,8 +313,36 @@ public class PageInfoHttpMessageConverter extends
     writer.endTag(HtmlUtil.DD);
   }
 
-  private void writeMethod(final XmlWriter writer, final String url,
-    final PageInfo pageInfo, final String method,
+  private void writeHtmlSelect(
+    final XmlWriter writer,
+    final ParameterInfo parameter,
+    final Map<String, ?> formValues,
+    final Map<? extends Object, ? extends Object> values) {
+    final String name = parameter.getName();
+    final boolean optional = !parameter.isRequired();
+    Object value = formValues.get(name);
+    if (value == null) {
+      value = parameter.getDefaultValue();
+    }
+    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.LABEL);
+
+    writer.attribute(HtmlUtil.ATTR_FOR, name);
+    writer.text(CaseConverter.toCapitalizedWords(name));
+    writer.endTag(HtmlUtil.LABEL);
+    writer.endTag(HtmlUtil.DT);
+
+    writer.startTag(HtmlUtil.DD);
+    HtmlUtil.serializeSelect(writer, name, value, optional, values);
+    writeDescription(writer, parameter);
+    writer.endTag(HtmlUtil.DD);
+  }
+
+  private void writeMethod(
+    final XmlWriter writer,
+    final String url,
+    final PageInfo pageInfo,
+    final String method,
     final Map<String, Object> values) {
     final Collection<ParameterInfo> parameters = pageInfo.getParameters();
     final boolean hasParameters = !parameters.isEmpty();
@@ -328,7 +382,7 @@ public class PageInfoHttpMessageConverter extends
       }
       final List<MediaType> mediaTypes = pageInfo.getMediaTypes();
       if (!mediaTypes.isEmpty()) {
-        ParameterInfo parameter = new ParameterInfo("format", true,
+        final ParameterInfo parameter = new ParameterInfo("format", true,
           DataTypes.STRING,
           "Select the file format to return the result data in.", mediaTypes);
         writeHtmlSelect(writer, parameter, values, mediaTypes);
@@ -339,8 +393,11 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  public void writeResourceList(final MediaType mediaType,
-    final Charset charset, final OutputStream out, final String url,
+  public void writeResourceList(
+    final MediaType mediaType,
+    final Charset charset,
+    final OutputStream out,
+    final String url,
     final PageInfo pageInfo) {
 
     final String mediaTypeString = mediaType.getType() + "/"
@@ -360,51 +417,15 @@ public class PageInfoHttpMessageConverter extends
       if (callback != null) {
         writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
       }
-      Map<String, Object> page = getMap(url, pageInfo);
+      final Map<String, Object> page = getMap(url, pageInfo);
       writer.write(page);
       writer.close();
     }
   }
 
-  private Map<String, Object> getMap(String url, PageInfo pageInfo) {
-    final Map<String, Object> pageMap = new NamedLinkedHashMap<String, Object>(
-      "resource");
-    pageMap.put("resourceUri", url);
-    pageMap.put("title", pageInfo.getTitle());
-    pageMap.put("description", pageInfo.getDescription());
-    for (Entry<String, Object> attribute : pageInfo.getAttributes().entrySet()) {
-      String key = attribute.getKey();
-      Object value = attribute.getValue();
-      pageMap.put(key, value);
-    }
-    List<Map<String, Object>> childPages = new ArrayList<Map<String, Object>>();
-    for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
-      .entrySet()) {
-      final String childPath = childPage.getKey();
-      final PageInfo childPageInfo = childPage.getValue();
-      String childUri = getUrl(url, childPath);
-      Map<String, Object> childPageMap = getMap(childUri, childPageInfo);
-      childPages.add(childPageMap);
-    }
-    if (!childPages.isEmpty()) {
-      pageMap.put("resources", childPages);
-    }
-    return pageMap;
-  }
-
-  private String getUrl(String parentUrl, final String childUrl) {
-    String childUri;
-    if (childUrl.startsWith("/")) {
-      childUri = HttpRequestUtils.getServerUrl() + childUrl;
-    } else if (parentUrl.charAt(parentUrl.length() - 1) != '/') {
-      childUri = parentUrl + "/" + childUrl;
-    } else {
-      childUri = parentUrl + childUrl;
-    }
-    return childUri;
-  }
-
-  private void writeUriList(final OutputStream out, final String url,
+  private void writeUriList(
+    final OutputStream out,
+    final String url,
     final PageInfo pageInfo) throws IOException {
     final Writer writer = new OutputStreamWriter(out,
       Charset.forName("US-ASCII"));
@@ -425,7 +446,9 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  private void writeWadl(final OutputStream out, final String url,
+  private void writeWadl(
+    final OutputStream out,
+    final String url,
     final PageInfo pageInfo) {
     final XmlWriter writer = new XmlWriter(out);
     writer.startDocument();
@@ -457,8 +480,11 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  private void writeWadlResource(final XmlWriter writer, final String url,
-    final PageInfo pageInfo, final boolean writeChildren) {
+  private void writeWadlResource(
+    final XmlWriter writer,
+    final String url,
+    final PageInfo pageInfo,
+    final boolean writeChildren) {
     writer.startTag(RESOURCE);
     writer.attribute(PATH, url);
     writeWadlDoc(writer, pageInfo);

@@ -4,7 +4,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
-public class SynchronizationProcess extends AbstractInOutProcess<DataObject,DataObject> {
+public class SynchronizationProcess extends
+  AbstractInOutProcess<DataObject, DataObject> {
   private int count = 0;
 
   @Override
@@ -14,9 +15,7 @@ public class SynchronizationProcess extends AbstractInOutProcess<DataObject,Data
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void run(final Channel<DataObject> in, final Channel<DataObject> out) {
     do {
       for (DataObject object = in.read(); object != null; object = in.read()) {
         out.write(object);

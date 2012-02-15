@@ -1,12 +1,12 @@
 package com.revolsys.parallel.process;
 
 public class ProcessRunnable implements Runnable {
-  private ProcessNetwork processManager;
+  private final ProcessNetwork processManager;
 
-  private Process process;
+  private final Process process;
 
-  public ProcessRunnable(ProcessNetwork processManager,
-    Process process) {
+  public ProcessRunnable(final ProcessNetwork processManager,
+    final Process process) {
     this.processManager = processManager;
     this.process = process;
   }

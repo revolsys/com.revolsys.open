@@ -36,11 +36,11 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
 
   public SharesLineSegmentsFilter(final LineString line) {
 
-    CoordinatesList points = CoordinatesListUtil.get(line);
-    Iterator<Coordinates> pointIterator = points.iterator();
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Iterator<Coordinates> pointIterator = points.iterator();
     Coordinates previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
-      Coordinates nextPoint = pointIterator.next();
+      final Coordinates nextPoint = pointIterator.next();
       segments.add(new LineSegment(previousPoint, nextPoint));
       previousPoint = nextPoint;
     }
@@ -48,12 +48,12 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
 
   public boolean accept(final LineString line) {
 
-    CoordinatesList points = CoordinatesListUtil.get(line);
-    Iterator<Coordinates> pointIterator = points.iterator();
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Iterator<Coordinates> pointIterator = points.iterator();
     Coordinates previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
-      Coordinates nextPoint = pointIterator.next();
-      LineSegment segment = new LineSegment(previousPoint, nextPoint);
+      final Coordinates nextPoint = pointIterator.next();
+      final LineSegment segment = new LineSegment(previousPoint, nextPoint);
       if (segments.contains(segment)) {
         return true;
       }

@@ -30,23 +30,26 @@ public class ElementComponent extends Component {
 
   private String attribute;
 
-  public ElementComponent(final String area, final String name, final String attribute) {
-    super(area, name);
-    setAttribute(attribute);
-  }
-
   public ElementComponent(final ElementComponent component) {
     super(component);
     setAttribute(component.attribute);
   }
 
+  public ElementComponent(final String area, final String name,
+    final String attribute) {
+    super(area, name);
+    setAttribute(attribute);
+  }
+
+  @Override
   public Object clone() {
     return new ElementComponent(this);
   }
 
+  @Override
   public boolean equals(final Object o) {
     if (o instanceof ElementComponent) {
-      ElementComponent c = (ElementComponent)o;
+      final ElementComponent c = (ElementComponent)o;
       if (equalsWithNull(c.attribute, attribute) && super.equals(o)) {
         return true;
       }
@@ -59,16 +62,18 @@ public class ElementComponent extends Component {
    * 
    * @return The hashCode.
    */
+  @Override
   public int hashCode() {
     return super.hashCode() + (attribute.hashCode() << 2);
   }
 
+  @Override
   public void includeComponent(final PageContext context)
     throws ServletException, IOException {
-    Object object = context.findAttribute(attribute);
+    final Object object = context.findAttribute(attribute);
     if (object instanceof Element) {
-      Element element = (Element)object;
-      Writer out = context.getOut();
+      final Element element = (Element)object;
+      final Writer out = context.getOut();
       element.serialize(out);
 
     }

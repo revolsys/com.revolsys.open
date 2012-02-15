@@ -37,16 +37,22 @@ public class DisplayElementTag extends TagSupport {
 
   private boolean useNamespaces = true;
 
+  @Override
+  public int doEndTag() throws JspException {
+    return EVAL_PAGE;
+  }
+
+  @Override
   public int doStartTag() throws JspException {
     if (name != null) {
-      HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+      final HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
       try {
-        Element element = (Element)request.getAttribute(name);
+        final Element element = (Element)request.getAttribute(name);
         if (element != null) {
-          Writer out = pageContext.getOut();
+          final Writer out = pageContext.getOut();
           element.serialize(out, useNamespaces);
         }
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         HttpServletLogUtil.logRequestException(log, request, t);
         throw new JspException(t.getMessage(), t);
       }
@@ -54,20 +60,16 @@ public class DisplayElementTag extends TagSupport {
     return SKIP_BODY;
   }
 
-  public int doEndTag() throws JspException {
-    return EVAL_PAGE;
-  }
-
   public String getName() {
     return name;
   }
 
-  public void setName(final String name) {
-    this.name = name;
-  }
-
   public boolean isUseNamespaces() {
     return useNamespaces;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
   }
 
   public void setUseNamespaces(final boolean useNamespaces) {

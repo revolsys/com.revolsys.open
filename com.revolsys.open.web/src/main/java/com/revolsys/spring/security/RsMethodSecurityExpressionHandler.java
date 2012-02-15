@@ -33,7 +33,7 @@ public class RsMethodSecurityExpressionHandler implements
 
   private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
-  private ExpressionParser expressionParser = new SpelExpressionParser();
+  private final ExpressionParser expressionParser = new SpelExpressionParser();
 
   private RoleHierarchy roleHierarchy;
 
@@ -47,11 +47,12 @@ public class RsMethodSecurityExpressionHandler implements
    * object.
    */
   public EvaluationContext createEvaluationContext(
-    Authentication auth,
-    MethodInvocation mi) {
-    MethodSecurityEvaluationContext ctx = new MethodSecurityEvaluationContext(
+    final Authentication auth,
+    final MethodInvocation mi) {
+    final MethodSecurityEvaluationContext ctx = new MethodSecurityEvaluationContext(
       auth, mi, parameterNameDiscoverer);
-    MethodSecurityExpressionRoot root = new MethodSecurityExpressionRoot(auth);
+    final MethodSecurityExpressionRoot root = new MethodSecurityExpressionRoot(
+      auth);
     root.setTrustResolver(trustResolver);
     root.setPermissionEvaluator(permissionEvaluator);
     root.setRoleHierarchy(roleHierarchy);
@@ -62,10 +63,10 @@ public class RsMethodSecurityExpressionHandler implements
 
   @SuppressWarnings("unchecked")
   public Object filter(
-    Object filterTarget,
-    Expression filterExpression,
-    EvaluationContext ctx) {
-    MethodSecurityExpressionRoot rootObject = (MethodSecurityExpressionRoot)ctx.getRootObject()
+    final Object filterTarget,
+    final Expression filterExpression,
+    final EvaluationContext ctx) {
+    final MethodSecurityExpressionRoot rootObject = (MethodSecurityExpressionRoot)ctx.getRootObject()
       .getValue();
     List retainList;
 
@@ -75,14 +76,14 @@ public class RsMethodSecurityExpressionHandler implements
     }
 
     if (filterTarget instanceof Collection) {
-      Collection collection = (Collection)filterTarget;
+      final Collection collection = (Collection)filterTarget;
       retainList = new ArrayList(collection.size());
 
       if (logger.isDebugEnabled()) {
         logger.debug("Filtering collection with " + collection.size()
           + " elements");
       }
-      for (Object filterObject : (Collection)filterTarget) {
+      for (final Object filterObject : (Collection)filterTarget) {
         rootObject.setFilterObject(filterObject);
 
         if (ExpressionUtils.evaluateAsBoolean(filterExpression, ctx)) {
@@ -101,7 +102,7 @@ public class RsMethodSecurityExpressionHandler implements
     }
 
     if (filterTarget.getClass().isArray()) {
-      Object[] array = (Object[])filterTarget;
+      final Object[] array = (Object[])filterTarget;
       retainList = new ArrayList(array.length);
 
       if (logger.isDebugEnabled()) {
@@ -120,8 +121,8 @@ public class RsMethodSecurityExpressionHandler implements
         logger.debug("Retaining elements: " + retainList);
       }
 
-      Object[] filtered = (Object[])Array.newInstance(filterTarget.getClass()
-        .getComponentType(), retainList.size());
+      final Object[] filtered = (Object[])Array.newInstance(
+        filterTarget.getClass().getComponentType(), retainList.size());
       for (int i = 0; i < retainList.size(); i++) {
         filtered[i] = retainList.get(i);
       }
@@ -139,23 +140,26 @@ public class RsMethodSecurityExpressionHandler implements
   }
 
   public void setParameterNameDiscoverer(
-    ParameterNameDiscoverer parameterNameDiscoverer) {
+    final ParameterNameDiscoverer parameterNameDiscoverer) {
     this.parameterNameDiscoverer = parameterNameDiscoverer;
   }
 
-  public void setPermissionEvaluator(PermissionEvaluator permissionEvaluator) {
+  public void setPermissionEvaluator(
+    final PermissionEvaluator permissionEvaluator) {
     this.permissionEvaluator = permissionEvaluator;
   }
 
-  public void setTrustResolver(AuthenticationTrustResolver trustResolver) {
-    this.trustResolver = trustResolver;
-  }
-
-  public void setReturnObject(Object returnObject, EvaluationContext ctx) {
+  public void setReturnObject(
+    final Object returnObject,
+    final EvaluationContext ctx) {
     ((MethodSecurityExpressionRoot)ctx.getRootObject().getValue()).setReturnObject(returnObject);
   }
 
-  public void setRoleHierarchy(RoleHierarchy roleHierarchy) {
+  public void setRoleHierarchy(final RoleHierarchy roleHierarchy) {
     this.roleHierarchy = roleHierarchy;
+  }
+
+  public void setTrustResolver(final AuthenticationTrustResolver trustResolver) {
+    this.trustResolver = trustResolver;
   }
 }

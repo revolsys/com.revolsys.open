@@ -18,9 +18,9 @@ package com.revolsys.ui.html.serializer;
 import com.revolsys.io.xml.XmlWriter;
 
 public interface LabelValueListSerializer {
-  int getSize();
-
   String getLabelCss(int index);
+
+  int getSize();
 
   String getValueCss(int index);
 

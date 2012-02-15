@@ -15,7 +15,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
   implements GeometryWriterFactory {
 
-  public static Writer<Geometry> createWriter(Resource resource) {
+  public static Writer<Geometry> createWriter(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
     final GeometryWriterFactory writerFactory = ioFactoryRegistry.getFactoryByResource(
       GeometryWriterFactory.class, resource);
@@ -51,7 +51,8 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
    * @param out The output stream to write to.
    * @return The writer.
    */
-  public Writer<Geometry> createGeometryWriter(String baseName,
+  public Writer<Geometry> createGeometryWriter(
+    final String baseName,
     final OutputStream out) {
     return createGeometryWriter(baseName, out, Charset.forName("UTF-8"));
 

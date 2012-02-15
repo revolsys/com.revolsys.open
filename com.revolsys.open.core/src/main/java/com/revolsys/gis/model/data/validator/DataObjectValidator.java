@@ -62,10 +62,12 @@ public class DataObjectValidator {
     setObjectValidator(DataTypes.DATE, new DateAttributeValidator());
     setObjectValidator(DataTypes.GEOMETRY, new GeometryAttributeValidator());
     setObjectValidator(DataTypes.POINT, new GeometryAttributeValidator());
-    setObjectValidator(DataTypes.MULTI_LINE_STRING, new GeometryAttributeValidator());
+    setObjectValidator(DataTypes.MULTI_LINE_STRING,
+      new GeometryAttributeValidator());
     setObjectValidator(DataTypes.POLYGON, new GeometryAttributeValidator());
     setObjectValidator(DataTypes.MULTI_POINT, new GeometryAttributeValidator());
-    setObjectValidator(DataTypes.MULTI_POLYGON, new GeometryAttributeValidator());
+    setObjectValidator(DataTypes.MULTI_POLYGON,
+      new GeometryAttributeValidator());
   }
 
   public void addValidators(
@@ -78,8 +80,7 @@ public class DataObjectValidator {
 
   }
 
-  public AttributeValueValidator getObjectValidator(
-    final DataType dataType) {
+  public AttributeValueValidator getObjectValidator(final DataType dataType) {
     AttributeValueValidator validator = objectValidators.get(dataType);
     if (validator == null) {
       if (dataType instanceof EnumerationDataType) {
@@ -101,8 +102,7 @@ public class DataObjectValidator {
     return validator;
   }
 
-  public boolean isValid(
-    final Object object) {
+  public boolean isValid(final Object object) {
     // TODO does not do checks from super classes
     if (object instanceof DataObject) {
       final DataObject dataObject = (DataObject)object;

@@ -28,15 +28,15 @@ public abstract class AbstractSpringFrameworkCommand implements Runnable {
   private static final ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
     "/applicationContext.xml");
 
-  public AbstractSpringFrameworkCommand() {
-  }
-
   public static ApplicationContext getApplicationContext() {
     return applicationContext;
   }
 
+  public AbstractSpringFrameworkCommand() {
+  }
+
   public void runInTransaction() {
-    InvokeMethodInTransaction invoker = new InvokeMethodInTransaction(
+    final InvokeMethodInTransaction invoker = new InvokeMethodInTransaction(
       getApplicationContext(), false, -1, false);
     invoker.execute(this, "run");
   }

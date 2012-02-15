@@ -7,8 +7,7 @@ public class Parameter implements FactoryBean<Object> {
 
   private Object value;
 
-  public Object getObject()
-    throws Exception {
+  public Object getObject() throws Exception {
     return value;
   }
 
@@ -32,13 +31,11 @@ public class Parameter implements FactoryBean<Object> {
     return true;
   }
 
-  public void setType(
-    Class type) {
+  public void setType(final Class type) {
     this.type = type;
   }
 
-  public void setValue(
-    Object value) {
+  public void setValue(final Object value) {
     this.value = value;
   }
 

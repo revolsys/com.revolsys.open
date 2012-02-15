@@ -26,8 +26,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   private final CoordinatesOperation operation;
 
   public CoordinatesOperationGeometryOperation(
-    final CoordinatesOperation operation,
-    final GeometryFactory geometryFactory) {
+    final CoordinatesOperation operation, final GeometryFactory geometryFactory) {
     this.operation = operation;
     this.geometryFactory = geometryFactory;
   }
@@ -47,8 +46,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public CoordinatesList perform(
-    final CoordinatesList coordinates) {
+  public CoordinatesList perform(final CoordinatesList coordinates) {
     final int numAxis = coordinates.getDimension();
     final int size = coordinates.size();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
@@ -67,8 +65,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     return newCoordinates;
   }
 
-  public LinearRing perform(
-    final LinearRing ring) {
+  public LinearRing perform(final LinearRing ring) {
     if (ring != null) {
       final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(ring));
       final LinearRing newRing = geometryFactory.createLinearRing(newCoordinates);
@@ -79,8 +76,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public LineString perform(
-    final LineString line) {
+  public LineString perform(final LineString line) {
     if (line != null) {
       final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(line));
       final LineString newLine = geometryFactory.createLineString(newCoordinates);
@@ -91,8 +87,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public MultiLineString perform(
-    final MultiLineString multiLineString) {
+  public MultiLineString perform(final MultiLineString multiLineString) {
     if (multiLineString != null) {
       final LineString[] newLineStrings = new LineString[multiLineString.getNumGeometries()];
       for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
@@ -109,8 +104,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public Geometry perform(
-    final MultiPoint multiPoint) {
+  public Geometry perform(final MultiPoint multiPoint) {
     if (multiPoint != null) {
       final Point[] newPoints = new Point[multiPoint.getNumGeometries()];
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
@@ -127,8 +121,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public MultiPolygon perform(
-    final MultiPolygon multiPolygon) {
+  public MultiPolygon perform(final MultiPolygon multiPolygon) {
     if (multiPolygon != null) {
       final Polygon[] newPolygons = new Polygon[multiPolygon.getNumGeometries()];
       for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
@@ -145,8 +138,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public Point perform(
-    final Point point) {
+  public Point perform(final Point point) {
     if (point != null) {
       final CoordinatesList newCoordinate = perform(CoordinatesListUtil.get(point));
       final Point newPoint = geometryFactory.createPoint(newCoordinate);
@@ -157,8 +149,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
   }
 
-  public Polygon perform(
-    final Polygon polygon) {
+  public Polygon perform(final Polygon polygon) {
 
     final LinearRing shell = (LinearRing)polygon.getExteriorRing();
     final LinearRing newShell = perform(shell);
@@ -174,8 +165,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Geometry> T perform(
-    final T geometry) {
+  public <T extends Geometry> T perform(final T geometry) {
     try {
       final Method method = getClass().getMethod("perform", geometry.getClass());
       return (T)method.invoke(this, geometry);

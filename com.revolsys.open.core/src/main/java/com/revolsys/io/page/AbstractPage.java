@@ -4,7 +4,7 @@ public abstract class AbstractPage implements Page {
 
   private final int index;
 
-  private PageManager pageManager;
+  private final PageManager pageManager;
 
   public AbstractPage(final PageManager pageManager, final int index) {
     this.index = index;
@@ -15,16 +15,12 @@ public abstract class AbstractPage implements Page {
     clearBytes(0);
   }
 
-  public void clearBytes(int startIndex) {
+  public void clearBytes(final int startIndex) {
     setOffset(startIndex);
     for (int i = startIndex; i < getSize(); i++) {
       writeByte(0);
     }
     setOffset(startIndex);
-  }
-
-  public PageManager getPageManager() {
-    return pageManager;
   }
 
   public int compareTo(final Page page) {
@@ -39,16 +35,16 @@ public abstract class AbstractPage implements Page {
     }
   }
 
-  protected abstract int readNextByte();
-
-  protected abstract void writeByte(final int b);
-
   public void flush() {
     pageManager.write(this);
   }
 
   public int getIndex() {
     return index;
+  }
+
+  public PageManager getPageManager() {
+    return pageManager;
   }
 
   @Override
@@ -63,6 +59,19 @@ public abstract class AbstractPage implements Page {
     }
     final int b1 = readNextByte();
     return (byte)b1;
+  }
+
+  public byte[] readBytes(final byte[] bytes, final int offset, final int count) {
+    System.arraycopy(getContent(), getOffset(), bytes, offset, count);
+    setOffset(getOffset() + count);
+    return bytes;
+  }
+
+  public byte[] readBytes(final int size) {
+    final byte[] bytes = new byte[size];
+    System.arraycopy(getContent(), getOffset(), bytes, 0, size);
+    setOffset(getOffset() + size);
+    return bytes;
   }
 
   public double readDouble() {
@@ -109,6 +118,8 @@ public abstract class AbstractPage implements Page {
     }
   }
 
+  protected abstract int readNextByte();
+
   public short readShort() {
     if (getOffset() + 2 > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
@@ -120,19 +131,6 @@ public abstract class AbstractPage implements Page {
     }
   }
 
-  public byte[] readBytes(final int size) {
-    final byte[] bytes = new byte[size];
-    System.arraycopy(getContent(), getOffset(), bytes, 0, size);
-    setOffset(getOffset() + size);
-    return bytes;
-  }
-
-  public byte[] readBytes(byte[] bytes, int offset, int count) {
-    System.arraycopy(getContent(), getOffset(), bytes, offset, count);
-    setOffset(getOffset() + count);
-    return bytes;
-  }
-
   public void writeByte(final byte b) {
     if (getOffset() > getSize()) {
       throw new ArrayIndexOutOfBoundsException(
@@ -142,6 +140,8 @@ public abstract class AbstractPage implements Page {
     }
   }
 
+  protected abstract void writeByte(final int b);
+
   public void writeBytes(final byte[] bytes) {
     for (int i = 0; i < bytes.length; i++) {
       final int b = bytes[i];
@@ -149,7 +149,7 @@ public abstract class AbstractPage implements Page {
     }
   }
 
-  public void writeBytes(final byte[] bytes, int offset, int count) {
+  public void writeBytes(final byte[] bytes, final int offset, final int count) {
     for (int i = 0; i < count; i++) {
       final int b = bytes[offset + i];
       writeByte(b);

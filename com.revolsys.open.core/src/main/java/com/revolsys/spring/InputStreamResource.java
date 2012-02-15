@@ -10,24 +10,25 @@ public class InputStreamResource extends
 
   private final String filename;
 
-  public InputStreamResource(String filename, InputStream inputStream,
-    String description) {
+  public InputStreamResource(final String filename,
+    final InputStream inputStream) {
+    super(inputStream);
+    this.filename = filename;
+  }
+
+  public InputStreamResource(final String filename,
+    final InputStream inputStream, final String description) {
     super(inputStream, description);
     this.filename = filename;
   }
 
-  public InputStreamResource(String filename, InputStream inputStream) {
-    super(inputStream);
-    this.filename = filename;
+  @Override
+  public Resource createRelative(final String relativePath) throws IOException {
+    return new NonExistingResource();
   }
 
   @Override
   public String getFilename() throws IllegalStateException {
     return filename;
-  }
-
-  @Override
-  public Resource createRelative(String relativePath) throws IOException {
-    return new NonExistingResource();
   }
 }

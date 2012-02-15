@@ -87,14 +87,11 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
   public XbaseFileReader() {
   }
 
-  public XbaseFileReader(
-    final File file) {
+  public XbaseFileReader(final File file) {
     this(file, null);
   }
 
-  public XbaseFileReader(
-    final File file,
-    final String typeName) {
+  public XbaseFileReader(final File file, final String typeName) {
     setFile(file);
     setTypeName(typeName);
   }
@@ -115,9 +112,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
 
   }
 
-  public String getAttributeName(
-    final String typeName,
-    final String columnName) {
+  public String getAttributeName(final String typeName, final String columnName) {
     final Map<String, String> names = getAttributeNames(typeName);
     return names.get(columnName);
   }
@@ -126,8 +121,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     return attributeNames;
   }
 
-  public Map<String, String> getAttributeNames(
-    final String typeName) {
+  public Map<String, String> getAttributeNames(final String typeName) {
     Map<String, String> names = attributeNames.get(typeName);
     if (names == null) {
       names = new HashMap<String, String>();
@@ -136,8 +130,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     return names;
   }
 
-  private Boolean getBoolean(
-    final int startIndex) {
+  private Boolean getBoolean(final int startIndex) {
     final char c = (char)recordBuffer[startIndex];
     switch (c) {
       case 't':
@@ -156,9 +149,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     }
   }
 
-  private Date getDate(
-    final int startIndex,
-    final int len) {
+  private Date getDate(final int startIndex, final int len) {
     final String dateString = getString(startIndex, len);
     try {
       if (dateString == null || dateString.trim().length() == 0) {
@@ -170,6 +161,10 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
       throw new IllegalStateException("'" + dateString
         + "' is not a date in 'YYYYMMDD' format");
     }
+  }
+
+  public File getFile() {
+    return file;
   }
 
   public String getFilePrefix() {
@@ -188,8 +183,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
   private Object getMemo(
     final byte[] record,
     final int startIndex,
-    final int len)
-    throws IOException {
+    final int len) throws IOException {
     final String memoIndexString = new String(record, startIndex, len).trim();
     if (memoIndexString.length() != 0) {
       final int memoIndex = Integer.parseInt(memoIndexString.trim());
@@ -227,9 +221,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     return metaData;
   }
 
-  private BigDecimal getNumber(
-    final int startIndex,
-    final int len) {
+  private BigDecimal getNumber(final int startIndex, final int len) {
     BigDecimal number = null;
     final String numberString = getString(startIndex, len);
     if (numberString.length() != 0) {
@@ -247,13 +239,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     return numRecords;
   }
 
-  public String toString() {
-    return file.getAbsolutePath();
-  }
-
-  private String getString(
-    final int startIndex,
-    final int len) {
+  private String getString(final int startIndex, final int len) {
     return new String(recordBuffer, startIndex, len).trim();
   }
 
@@ -281,8 +267,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     return this;
   }
 
-  protected DataObject loadDataObject()
-    throws IOException {
+  protected DataObject loadDataObject() throws IOException {
     if (in.read(recordBuffer) != recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of file");
     }
@@ -324,8 +309,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     return currentDataObject;
   }
 
-  private void loadHeader()
-    throws IOException {
+  private void loadHeader() throws IOException {
     version = in.read();
     final int year = in.read();
     final int month = in.read();
@@ -365,8 +349,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     }
   }
 
-  protected DataObjectMetaData loadSchema(
-    final EndianInput in)
+  protected DataObjectMetaData loadSchema(final EndianInput in)
     throws IOException {
     final XbaseSchemaReader xbaseSchemaReader = new XbaseSchemaReader(in,
       typeName, fieldDefinitions);
@@ -419,12 +402,7 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     this.attributeNames.put(typeName, attributeNames);
   }
 
-  public File getFile() {
-    return file;
-  }
-
-  public void setFile(
-    final File file) {
+  public void setFile(final File file) {
     this.file = file;
     filePrefix = FileUtil.getFileNamePrefix(file);
     if (typeName == null) {
@@ -432,15 +410,18 @@ public class XbaseFileReader extends AbstractReader<DataObject> implements
     }
   }
 
-  public void setTypeName(
-    final String typeName) {
+  public void setTypeName(final String typeName) {
     if (typeName != null) {
       this.typeName = typeName;
     }
   }
 
-  protected void skipDataObject()
-    throws IOException {
+  protected void skipDataObject() throws IOException {
     in.skipBytes(recordBuffer.length);
+  }
+
+  @Override
+  public String toString() {
+    return file.getAbsolutePath();
   }
 }

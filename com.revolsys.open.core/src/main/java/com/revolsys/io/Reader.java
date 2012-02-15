@@ -46,17 +46,12 @@ import com.revolsys.collection.Visitor;
  * @author Paul Austin
  * @param <T> The type of the item to read.
  */
-public interface Reader<T> extends Iterable<T>, ObjectWithProperties{
+public interface Reader<T> extends Iterable<T>, ObjectWithProperties {
   /**
    * Close the reader and all resources associated with it.
    */
   void close();
 
-  /**
-   * Open the reader so that it is ready to be read from.
-   */
-  void open();
-  
   /**
    * Return a new iterator for type T at the first item to read. Subsequent
    * calls to this method must return a new iterator. Implementors of this are
@@ -66,6 +61,11 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties{
    * @return The iterator.
    */
   Iterator<T> iterator();
+
+  /**
+   * Open the reader so that it is ready to be read from.
+   */
+  void open();
 
   /**
    * Read all items and return a List containing the items.
@@ -80,6 +80,5 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties{
    * 
    * @param visitor The visitor.
    */
-  void visit(
-    Visitor<T> visitor);
+  void visit(Visitor<T> visitor);
 }

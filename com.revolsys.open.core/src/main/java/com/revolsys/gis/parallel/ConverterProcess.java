@@ -6,15 +6,14 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class ConverterProcess extends BaseInOutProcess<DataObject,DataObject> {
+public class ConverterProcess extends BaseInOutProcess<DataObject, DataObject> {
 
   private Converter<DataObject, DataObject> converter;
 
   public ConverterProcess() {
   }
 
-  public ConverterProcess(
-    final Converter<DataObject, DataObject> converter) {
+  public ConverterProcess(final Converter<DataObject, DataObject> converter) {
     this.converter = converter;
   }
 
@@ -24,17 +23,16 @@ public class ConverterProcess extends BaseInOutProcess<DataObject,DataObject> {
 
   @Override
   protected void process(
-    Channel<DataObject> in,
-    Channel<DataObject> out,
-    DataObject object) {
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     if (converter != null) {
       final DataObject target = converter.convert(object);
       out.write(target);
     }
   }
 
-  public void setConverter(
-    final Converter<DataObject, DataObject> converter) {
+  public void setConverter(final Converter<DataObject, DataObject> converter) {
     this.converter = converter;
   }
 

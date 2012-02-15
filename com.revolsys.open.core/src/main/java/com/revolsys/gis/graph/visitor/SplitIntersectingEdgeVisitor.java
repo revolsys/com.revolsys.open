@@ -105,43 +105,6 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
   }
 
   /**
-   * Visit each edge in the graph to find other edges which linearly intersect
-   * the edge and are not geometrically equal. The current edge and the matched
-   * edge will be split into parts for each section which is equal and each
-   * section which is not equal.
-   * 
-   * @param edge The edge to process.
-   * @return True
-   */
-  public boolean visit(
-    Edge<DataObject> edge) {
-    final LineString line = edge.getLine();
-    final List<Edge<DataObject>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor.getEdges(
-      edge.getGraph(), edge);
-    if (!intersectEdges.isEmpty()) {
-      final Filter<Edge<DataObject>> edgeEqualFilter = new LineFilter<DataObject>(
-        new EqualFilter<LineString>(line));
-      FilterUtil.remove(intersectEdges, edgeEqualFilter);
-      for (Edge<DataObject> edge2 : intersectEdges) {
-        if (!edge2.isRemoved()) {
-          final LineString line2 = edge2.getLine();
-          final List<List<LineString>> lines = getSplitLines(line, line2);
-          final List<LineString> lines1 = lines.get(0);
-          final List<LineString> lines2 = lines.get(1);
-          if (!lines1.isEmpty() && !lines2.isEmpty()) {
-            if ((lines1.size() > 1 && lines2.size() > 1)) {
-              edge.replace(lines1);
-              edge2.replace(lines2);
-              return true;
-            }
-          }
-        }
-      }
-    }
-    return true;
-  }
-
-  /**
    * Split each of the two lines into segments which are either within or not
    * within 1m of the other line. The result is a list with the first element
    * being the list of split lines from the first line and the second element
@@ -165,5 +128,41 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
     final List<LineString> lines2 = getSplitLines(graph, line2, 1);
     lines.add(lines2);
     return lines;
+  }
+
+  /**
+   * Visit each edge in the graph to find other edges which linearly intersect
+   * the edge and are not geometrically equal. The current edge and the matched
+   * edge will be split into parts for each section which is equal and each
+   * section which is not equal.
+   * 
+   * @param edge The edge to process.
+   * @return True
+   */
+  public boolean visit(final Edge<DataObject> edge) {
+    final LineString line = edge.getLine();
+    final List<Edge<DataObject>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor.getEdges(
+      edge.getGraph(), edge);
+    if (!intersectEdges.isEmpty()) {
+      final Filter<Edge<DataObject>> edgeEqualFilter = new LineFilter<DataObject>(
+        new EqualFilter<LineString>(line));
+      FilterUtil.remove(intersectEdges, edgeEqualFilter);
+      for (final Edge<DataObject> edge2 : intersectEdges) {
+        if (!edge2.isRemoved()) {
+          final LineString line2 = edge2.getLine();
+          final List<List<LineString>> lines = getSplitLines(line, line2);
+          final List<LineString> lines1 = lines.get(0);
+          final List<LineString> lines2 = lines.get(1);
+          if (!lines1.isEmpty() && !lines2.isEmpty()) {
+            if ((lines1.size() > 1 && lines2.size() > 1)) {
+              edge.replace(lines1);
+              edge2.replace(lines2);
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return true;
   }
 }

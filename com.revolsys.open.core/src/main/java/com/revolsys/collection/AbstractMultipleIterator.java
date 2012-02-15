@@ -7,6 +7,7 @@ import javax.annotation.PreDestroy;
 public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
   private AbstractIterator<T> iterator;
 
+  @Override
   @PreDestroy
   public final void doClose() {
     if (iterator != null) {
@@ -15,6 +16,7 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
     }
   }
 
+  @Override
   protected T getNext() throws NoSuchElementException {
     try {
       if (iterator == null) {
@@ -25,7 +27,7 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
         iterator = getNextIterator();
       }
       return iterator.next();
-    } catch (NoSuchElementException e) {
+    } catch (final NoSuchElementException e) {
       iterator = null;
       throw e;
     }

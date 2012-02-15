@@ -12,54 +12,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public final class CollectionUtil {
-  public static final String replaceProperties(
-    CharSequence string,
-    Map<String, Object> properties) {
-    if (string == null) {
-      return null;
-    } else {
-      StringBuffer buffer = new StringBuffer();
-      for (int i = 0; i < string.length(); ++i) {
-        char c = string.charAt(i);
-        switch (c) {
-          case '$':
-            ++i;
-            if (i < string.length()) {
-              c = string.charAt(i);
-              if (c == '{') {
-                ++i;
-                StringBuffer propertyName = new StringBuffer();
-                for (; i < string.length() && c != '}'; ++i) {
-                  c = string.charAt(i);
-                  if (c != '}') {
-                    propertyName.append(c);
-                  }
-                }
-                Object value = null;
-                if (propertyName.length() > 0) {
-                  value = properties.get(propertyName.toString());
-
-                }
-                if (value == null) {
-                  buffer.append("${");
-                  buffer.append(propertyName);
-                  buffer.append("}");
-                } else {
-                  buffer.append(value);
-                }
-              }
-            }
-          break;
-
-          default:
-            buffer.append(c);
-          break;
-        }
-      }
-      return buffer.toString();
-    }
-  }
-
   public static void append(
     final StringBuffer string,
     final Collection<? extends Object> values) {
@@ -71,7 +23,7 @@ public final class CollectionUtil {
     final Collection<? extends Object> values,
     final String separator) {
     boolean first = true;
-    for (Object value : values) {
+    for (final Object value : values) {
       if (value != null) {
         if (first) {
           first = false;
@@ -130,6 +82,54 @@ public final class CollectionUtil {
       } else {
         return value;
       }
+    }
+  }
+
+  public static final String replaceProperties(
+    final CharSequence string,
+    final Map<String, Object> properties) {
+    if (string == null) {
+      return null;
+    } else {
+      final StringBuffer buffer = new StringBuffer();
+      for (int i = 0; i < string.length(); ++i) {
+        char c = string.charAt(i);
+        switch (c) {
+          case '$':
+            ++i;
+            if (i < string.length()) {
+              c = string.charAt(i);
+              if (c == '{') {
+                ++i;
+                final StringBuffer propertyName = new StringBuffer();
+                for (; i < string.length() && c != '}'; ++i) {
+                  c = string.charAt(i);
+                  if (c != '}') {
+                    propertyName.append(c);
+                  }
+                }
+                Object value = null;
+                if (propertyName.length() > 0) {
+                  value = properties.get(propertyName.toString());
+
+                }
+                if (value == null) {
+                  buffer.append("${");
+                  buffer.append(propertyName);
+                  buffer.append("}");
+                } else {
+                  buffer.append(value);
+                }
+              }
+            }
+          break;
+
+          default:
+            buffer.append(c);
+          break;
+        }
+      }
+      return buffer.toString();
     }
   }
 

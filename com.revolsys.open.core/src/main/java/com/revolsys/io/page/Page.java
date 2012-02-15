@@ -3,19 +3,25 @@ package com.revolsys.io.page;
 public interface Page extends Comparable<Page> {
   void clear();
 
+  void clearBytes(int startIndex);
+
+  void flush();
+
   byte[] getContent();
 
   int getIndex();
 
   int getOffset();
 
+  PageManager getPageManager();
+
   int getSize();
 
   byte readByte();
 
-  byte[] readBytes(int size);
-
   byte[] readBytes(byte[] bytes, int offset, int count);
+
+  byte[] readBytes(int size);
 
   double readDouble();
 
@@ -46,10 +52,4 @@ public interface Page extends Comparable<Page> {
   void writeLong(long l);
 
   void writeShort(short s);
-
-  void clearBytes(int startIndex);
-  
-  void flush();
-  
-  PageManager getPageManager();
 }

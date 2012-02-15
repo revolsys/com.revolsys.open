@@ -14,8 +14,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractDataObjectAndGeometryWriterFactory extends
   AbstractDataObjectWriterFactory implements GeometryWriterFactory {
 
-  public AbstractDataObjectAndGeometryWriterFactory(String name,
-    boolean geometrySupported, boolean customAttributionSupported) {
+  public AbstractDataObjectAndGeometryWriterFactory(final String name,
+    final boolean geometrySupported, final boolean customAttributionSupported) {
     super(name, geometrySupported, customAttributionSupported);
   }
 
@@ -25,15 +25,18 @@ public abstract class AbstractDataObjectAndGeometryWriterFactory extends
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(String baseName,
+  public Writer<Geometry> createGeometryWriter(
+    final String baseName,
     final OutputStream out) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(String baseName,
-    final OutputStream out, final Charset charset) {
+  public Writer<Geometry> createGeometryWriter(
+    final String baseName,
+    final OutputStream out,
+    final Charset charset) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
     return createGeometryWriter(dataObjectWriter);

@@ -11,7 +11,7 @@ import com.revolsys.gis.data.model.comparator.DataObjectMetaDataNameComparator;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class SortByType extends BaseInOutProcess<DataObject,DataObject> {
+public class SortByType extends BaseInOutProcess<DataObject, DataObject> {
 
   private final Map<DataObjectMetaData, Collection<DataObject>> objectsByType = new TreeMap<DataObjectMetaData, Collection<DataObject>>(
     new DataObjectMetaDataNameComparator());

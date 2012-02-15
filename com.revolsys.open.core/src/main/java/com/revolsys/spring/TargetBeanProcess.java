@@ -28,16 +28,16 @@ public class TargetBeanProcess implements Process {
     }
   }
 
-  public boolean isInstanceCreated() {
-    return bean.isInstanceCreated();
-  }
-
   public ProcessNetwork getProcessNetwork() {
     return processNetwork;
   }
 
   public BeanFactory getTargetBeanFactory() {
     return bean.getTargetBeanFactory();
+  }
+
+  public boolean isInstanceCreated() {
+    return bean.isInstanceCreated();
   }
 
   public void run() {

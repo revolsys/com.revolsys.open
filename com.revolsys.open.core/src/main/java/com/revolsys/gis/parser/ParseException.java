@@ -31,34 +31,26 @@ public class ParseException extends RuntimeException {
   public ParseException() {
   }
 
-  public ParseException(
-    final String message) {
+  public ParseException(final String message) {
     super(message);
   }
 
-  public ParseException(
-    final String location,
-    final String message) {
+  public ParseException(final String location, final String message) {
     super(message);
     this.location = location;
   }
 
-  public ParseException(
-    final String location,
-    final String message,
+  public ParseException(final String location, final String message,
     final Throwable cause) {
     super(message, cause);
     this.location = location;
   }
 
-  public ParseException(
-    final String message,
-    final Throwable cause) {
+  public ParseException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
-  public ParseException(
-    final Throwable cause) {
+  public ParseException(final Throwable cause) {
     super(cause);
   }
 

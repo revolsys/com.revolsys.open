@@ -28,11 +28,11 @@ import org.apache.commons.jexl.JexlContext;
 import org.springframework.web.util.UrlPathHelper;
 
 public class JexlHttpServletRequestContext implements JexlContext {
-  private HttpServletRequest request;
+  private final HttpServletRequest request;
 
-  private ServletContext servletContext;
+  private final ServletContext servletContext;
 
-  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   public JexlHttpServletRequestContext(final HttpServletRequest request) {
     this.request = request;
@@ -40,18 +40,33 @@ public class JexlHttpServletRequestContext implements JexlContext {
     this.servletContext = WebUiContext.getServletContext();
   }
 
-  public void setVars(final Map arg0) {
-  }
-
   public Map getVars() {
     return new AbstractMap() {
+      @Override
+      public Set entrySet() {
+        final Map map = new HashMap();
+        map.putAll(request.getParameterMap());
+        for (final Enumeration names = request.getAttributeNames(); names.hasMoreElements();) {
+          final String name = (String)names.nextElement();
+          map.put(name, request.getAttribute(name));
+        }
+        if (servletContext != null) {
+          for (final Enumeration names = servletContext.getAttributeNames(); names.hasMoreElements();) {
+            final String name = (String)names.nextElement();
+            map.put(name, servletContext.getAttribute(name));
+          }
+        }
+        return map.entrySet();
+      }
+
+      @Override
       public Object get(final Object key) {
         if (key.equals("request")) {
           return request;
         } else if (key.equals("requestURI")) {
           return urlPathHelper.getOriginatingRequestUri(request);
         }
-        String keyString = key.toString();
+        final String keyString = key.toString();
         Object value = null;
         if (servletContext != null) {
           value = servletContext.getAttribute(keyString);
@@ -68,23 +83,10 @@ public class JexlHttpServletRequestContext implements JexlContext {
           return value;
         }
       }
-
-      public Set entrySet() {
-        Map map = new HashMap();
-        map.putAll(request.getParameterMap());
-        for (Enumeration names = request.getAttributeNames(); names.hasMoreElements();) {
-          String name = (String)names.nextElement();
-          map.put(name, request.getAttribute(name));
-        }
-        if (servletContext != null) {
-          for (Enumeration names = servletContext.getAttributeNames(); names.hasMoreElements();) {
-            String name = (String)names.nextElement();
-            map.put(name, servletContext.getAttribute(name));
-          }
-        }
-        return map.entrySet();
-      }
     };
+  }
+
+  public void setVars(final Map arg0) {
   }
 
 }

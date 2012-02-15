@@ -15,15 +15,25 @@ public class PointLineProjection {
 
   private Boolean pointOnLine;
 
-  public PointLineProjection(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+  public PointLineProjection(final CoordinatesPrecisionModel precisionModel,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     this.precisionModel = precisionModel;
     this.lineStart = lineStart;
     this.lineEnd = lineEnd;
     this.point = point;
+  }
+
+  public Coordinates getProjectedPoint() {
+    if (projectedPoint == null) {
+      final double projectionFactor = getProjectionFactor();
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        projectedPoint = LineSegmentUtil.project(lineStart, lineEnd,
+          projectionFactor);
+        precisionModel.makePrecise(projectedPoint);
+      }
+    }
+    return projectedPoint;
   }
 
   public double getProjectionFactor() {
@@ -32,18 +42,6 @@ public class PointLineProjection {
         point);
     }
     return projectionFactor;
-  }
-
-  public Coordinates getProjectedPoint() {
-    if (projectedPoint == null) {
-      double projectionFactor = getProjectionFactor();
-      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        projectedPoint = LineSegmentUtil.project(lineStart, lineEnd,
-          projectionFactor);
-        precisionModel.makePrecise(projectedPoint);
-      }
-    }
-    return projectedPoint;
   }
 
   /**
@@ -59,7 +57,7 @@ public class PointLineProjection {
   public boolean isPointOnLine() {
     if (pointOnLine == null) {
       pointOnLine = Boolean.FALSE;
-      double projectionFactor = getProjectionFactor();
+      final double projectionFactor = getProjectionFactor();
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
         final Coordinates projectedPoint = getProjectedPoint();
         if (projectedPoint.equals2d(point)) {
@@ -70,15 +68,14 @@ public class PointLineProjection {
     return pointOnLine;
   }
 
-  public boolean isPointOnLine(
-    double maxDistance) {
-      double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
-      if (distance < maxDistance) {
-        double projectionFactor = getProjectionFactor();
-        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-         return true;
-        }
+  public boolean isPointOnLine(final double maxDistance) {
+    final double distance = LineSegmentUtil.distance(lineStart, lineEnd, point);
+    if (distance < maxDistance) {
+      final double projectionFactor = getProjectionFactor();
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        return true;
       }
+    }
     return false;
   }
 }

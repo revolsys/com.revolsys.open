@@ -13,8 +13,7 @@ public class LineSegmentIntersectionVisitor implements ItemVisitor {
 
   private final LineSegment3D querySeg;
 
-  public LineSegmentIntersectionVisitor(
-    final LineSegment3D querySeg) {
+  public LineSegmentIntersectionVisitor(final LineSegment3D querySeg) {
     this.querySeg = querySeg;
   }
 
@@ -22,8 +21,7 @@ public class LineSegmentIntersectionVisitor implements ItemVisitor {
     return intersections;
   }
 
-  public void visitItem(
-    final Object item) {
+  public void visitItem(final Object item) {
     final LineSegment3D segment = (LineSegment3D)item;
     if (Envelope.intersects(segment.p0, segment.p1, querySeg.p0, querySeg.p1)) {
       final Coordinate intersection = querySeg.intersection3D(segment);

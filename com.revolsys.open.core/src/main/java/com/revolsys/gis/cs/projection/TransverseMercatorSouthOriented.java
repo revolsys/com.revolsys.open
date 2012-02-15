@@ -40,8 +40,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
 
   private final double y0;
 
-  public TransverseMercatorSouthOriented(
-    final ProjectedCoordinateSystem cs) {
+  public TransverseMercatorSouthOriented(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
     final double centralMeridian = cs.getDoubleParameter("longitude_of_natural_origin");
@@ -68,8 +67,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     a8 = -315.0 * e8 / 131072.0;
   }
 
-  protected double footPointLatitude(
-    final double y) {
+  protected double footPointLatitude(final double y) {
     double lat1;
     double newlat = y / a;
     int i = 0;
@@ -89,9 +87,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     return lat1;
   }
 
-  public void inverse(
-    final Coordinates from,
-    final Coordinates to) {
+  public void inverse(final Coordinates from, final Coordinates to) {
     final double x = from.getX();
     final double y = from.getY();
 
@@ -135,9 +131,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     }
   }
 
-  public void project(
-    final Coordinates from,
-    final Coordinates to) {
+  public void project(final Coordinates from, final Coordinates to) {
     final double lon = Math.toRadians(from.getX());
     final double lat = Math.toRadians(from.getY());
     // ep2 = the second eccentricity squared.
@@ -190,8 +184,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     }
   }
 
-  private double s0(
-    final double lat) {
+  private double s0(final double lat) {
     return a
       * (a0 * lat - a2 * Math.sin(2.0 * lat) + a4 * Math.sin(4.0 * lat) - a6
         * Math.sin(6.0 * lat) + a8 * Math.sin(8.0 * lat));

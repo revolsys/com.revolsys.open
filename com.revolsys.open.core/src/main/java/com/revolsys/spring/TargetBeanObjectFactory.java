@@ -9,8 +9,7 @@ import org.springframework.beans.factory.ObjectFactory;
 /**
  * Independent inner class - for serialization purposes.
  */
-class TargetBeanObjectFactory implements ObjectFactory,
-  Serializable {
+class TargetBeanObjectFactory implements ObjectFactory, Serializable {
 
   /**
    * 
@@ -21,15 +20,13 @@ class TargetBeanObjectFactory implements ObjectFactory,
 
   private final String targetBeanName;
 
-  public TargetBeanObjectFactory(
-    BeanFactory beanFactory,
-    String targetBeanName) {
+  public TargetBeanObjectFactory(final BeanFactory beanFactory,
+    final String targetBeanName) {
     this.beanFactory = beanFactory;
     this.targetBeanName = targetBeanName;
   }
 
-  public Object getObject()
-    throws BeansException {
+  public Object getObject() throws BeansException {
     return this.beanFactory.getBean(this.targetBeanName);
   }
 }

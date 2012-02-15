@@ -31,9 +31,13 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private int addPart(final int partType, final int index,
-    final List<Integer> partIndexes, final List<Integer> partTypes,
-    final List<CoordinatesList> partPoints, final LineString ring) {
+  private int addPart(
+    final int partType,
+    final int index,
+    final List<Integer> partIndexes,
+    final List<Integer> partTypes,
+    final List<CoordinatesList> partPoints,
+    final LineString ring) {
     partIndexes.add(index);
     partTypes.add(partType);
     final CoordinatesList points = CoordinatesListUtil.get(ring);

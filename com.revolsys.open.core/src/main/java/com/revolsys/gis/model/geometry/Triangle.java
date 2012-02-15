@@ -21,8 +21,10 @@ import com.vividsolutions.jts.io.WKTWriter;
 public class Triangle extends AbstractCoordinatesList {
   private static final long serialVersionUID = -4513931832875328029L;
 
-  public static Triangle createClockwiseTriangle(final Coordinates c0,
-    final Coordinates c1, final Coordinates c2) {
+  public static Triangle createClockwiseTriangle(
+    final Coordinates c0,
+    final Coordinates c1,
+    final Coordinates c2) {
     try {
       if (CoordinatesUtil.orientationIndex(c0, c1, c2) == CGAlgorithms.CLOCKWISE) {
         return new Triangle(c0, c1, c2);
@@ -35,11 +37,7 @@ public class Triangle extends AbstractCoordinatesList {
 
   }
 
-  private double[] coordinates = new double[9];
-
-  public byte getNumAxis() {
-    return 3;
-  }
+  private final double[] coordinates = new double[9];
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
     0, 1.0);
@@ -53,39 +51,17 @@ public class Triangle extends AbstractCoordinatesList {
         "A traingle must have exeactly 3 points not " + size());
     }
     for (int i = 0; i < 3; i++) {
-      Coordinates point = points[i];
+      final Coordinates point = points[i];
       setPoint(i, point);
     }
   }
 
-  public double getValue(final int index, int axisIndex) {
-    int coordinateIndex = getCoordinatesIndex(index, axisIndex);
-    return coordinates[coordinateIndex];
-  }
-
-  private int getCoordinatesIndex(final int index, int axisIndex) {
-    final byte numAxis = 3;
-    axisIndex = axisIndex % 3;
-    if (axisIndex < 0) {
-      axisIndex = 3 - axisIndex;
-    }
-
-    int coordinateIndex = index * numAxis + axisIndex;
-    return coordinateIndex;
-  }
-
-  public void setValue(final int index, final int axisIndex, final double value) {
-    int coordinateIndex = getCoordinatesIndex(index, axisIndex);
-    coordinates[coordinateIndex] = value;
-  }
-
-  public int size() {
-    return 3;
-  }
-
-  private void addIntersection(final GeometryFactory geometryFactory,
-    final Set<Coordinates> coordinates, final Coordinates line1Start,
-    final Coordinates line1End, final Coordinates line2Start,
+  private void addIntersection(
+    final GeometryFactory geometryFactory,
+    final Set<Coordinates> coordinates,
+    final Coordinates line1Start,
+    final Coordinates line1End,
+    final Coordinates line2Start,
     final Coordinates line2End) {
     final List<Coordinates> intersections = LineSegmentUtil.intersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
@@ -156,19 +132,34 @@ public class Triangle extends AbstractCoordinatesList {
     return new Circle(centre, radius);
   }
 
+  private int getCoordinatesIndex(final int index, int axisIndex) {
+    final byte numAxis = 3;
+    axisIndex = axisIndex % 3;
+    if (axisIndex < 0) {
+      axisIndex = 3 - axisIndex;
+    }
+
+    final int coordinateIndex = index * numAxis + axisIndex;
+    return coordinateIndex;
+  }
+
   /**
    * Get the envelope of the Triangle.
    * 
    * @return The envelope.
    */
   public Envelope getEnvelopeInternal() {
-    Envelope envelope = new Envelope();
+    final Envelope envelope = new Envelope();
     for (int i = 0; i < 3; i++) {
-      double x = getX(i);
-      double y = getY(i);
+      final double x = getX(i);
+      final double y = getY(i);
       envelope.expandToInclude(x, y);
     }
     return envelope;
+  }
+
+  public byte getNumAxis() {
+    return 3;
   }
 
   public Coordinates getP0() {
@@ -183,13 +174,19 @@ public class Triangle extends AbstractCoordinatesList {
     return get(2);
   }
 
-  public Polygon getPolygon(GeometryFactory geometryFactory) {
+  public Polygon getPolygon(final GeometryFactory geometryFactory) {
     final LinearRing shell = geometryFactory.createLinearRing(new DoubleCoordinatesList(
       getNumAxis(), getP0(), getP1(), getP2(), getP0()));
     return geometryFactory.createPolygon(shell, null);
   }
 
-  public LineSegment intersection(final GeometryFactory geometryFactory,
+  public double getValue(final int index, final int axisIndex) {
+    final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
+    return coordinates[coordinateIndex];
+  }
+
+  public LineSegment intersection(
+    final GeometryFactory geometryFactory,
     final LineSegment line) {
     final Coordinates lc0 = line.get(0);
     final Coordinates lc1 = line.get(1);
@@ -221,12 +218,21 @@ public class Triangle extends AbstractCoordinatesList {
     }
   }
 
+  public boolean intersectsCircumCircle(final Coordinates point) {
+    return getCircumcircle().contains(point);
+  }
+
+  public void setValue(final int index, final int axisIndex, final double value) {
+    final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
+    coordinates[coordinateIndex] = value;
+  }
+
+  public int size() {
+    return 3;
+  }
+
   @Override
   public String toString() {
     return new WKTWriter(3).write(getPolygon(GEOMETRY_FACTORY));
-  }
-
-  public boolean intersectsCircumCircle(Coordinates point) {
-    return getCircumcircle().contains(point);
   }
 }

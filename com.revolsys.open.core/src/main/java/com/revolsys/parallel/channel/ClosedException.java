@@ -7,15 +7,15 @@ public class ClosedException extends RuntimeException {
     super();
   }
 
-  public ClosedException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public ClosedException(String message) {
+  public ClosedException(final String message) {
     super(message);
   }
 
-  public ClosedException(Throwable cause) {
+  public ClosedException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
+  public ClosedException(final Throwable cause) {
     super(cause);
   }
 

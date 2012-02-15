@@ -44,7 +44,7 @@ public class JavaComponent extends Component {
 
   private String className;
 
-  private Map properties = new HashMap();
+  private final Map properties = new HashMap();
 
   private Class componentClass;
 
@@ -52,25 +52,27 @@ public class JavaComponent extends Component {
 
   private Method setPropertyMethod;
 
-  public JavaComponent(final String area, final String name,
-    final String className) {
-    super(area, name);
-    setClassName(className);
-  }
-
   public JavaComponent(final JavaComponent component) {
     super(component);
     setClassName(component.className);
     this.properties.putAll(component.properties);
   }
 
+  public JavaComponent(final String area, final String name,
+    final String className) {
+    super(area, name);
+    setClassName(className);
+  }
+
+  @Override
   public Object clone() {
     return new JavaComponent(this);
   }
 
+  @Override
   public boolean equals(final Object o) {
     if (o instanceof JavaComponent) {
-      JavaComponent c = (JavaComponent)o;
+      final JavaComponent c = (JavaComponent)o;
       if (c.className.equals(className) && super.equals(o)) {
         return true;
       }
@@ -83,30 +85,32 @@ public class JavaComponent extends Component {
    * 
    * @return The hashCode.
    */
+  @Override
   public int hashCode() {
     return className.hashCode();
   }
 
+  @Override
   public void includeComponent(final PageContext context)
     throws ServletException, IOException {
     Object instance;
     try {
       instance = componentClass.newInstance();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new ServletException("Unable to create component instance", e);
     }
     try {
-      Iterator propertyNames = properties.keySet().iterator();
+      final Iterator propertyNames = properties.keySet().iterator();
       while (propertyNames.hasNext()) {
-        String propertyName = (String)propertyNames.next();
+        final String propertyName = (String)propertyNames.next();
         Object value = properties.get(propertyName);
-        WebUiContext niceContext = WebUiContext.get();
+        final WebUiContext niceContext = WebUiContext.get();
         try {
-          Expression expression = JexlUtil.createExpression(value.toString());
+          final Expression expression = JexlUtil.createExpression(value.toString());
           if (expression != null) {
             value = niceContext.evaluateExpression(expression);
           }
-        } catch (Exception e) {
+        } catch (final Exception e) {
           throw new ServletException(e.getMessage(), e);
         }
 
@@ -114,23 +118,23 @@ public class JavaComponent extends Component {
           propertyName, value
         });
       }
-    } catch (IllegalAccessException e) {
+    } catch (final IllegalAccessException e) {
       log.error("Unable to set component properties", e.getCause());
       throw new ServletException("Unable to set component properties", e);
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       log.error("Unable to set component properties", e.getCause());
       throw new ServletException("Unable to set component properties",
         e.getCause());
     }
     try {
-      Writer out = context.getOut();
+      final Writer out = context.getOut();
       serializeMethod.invoke(instance, new Object[] {
         out
       });
-    } catch (IllegalAccessException e) {
+    } catch (final IllegalAccessException e) {
       throw new ServletException("Unable to serialize component", e);
-    } catch (InvocationTargetException e) {
-      Throwable cause = e.getCause();
+    } catch (final InvocationTargetException e) {
+      final Throwable cause = e.getCause();
       log.error(cause.getMessage(), cause);
       if (cause instanceof IOException) {
         throw (IOException)cause;
@@ -143,13 +147,13 @@ public class JavaComponent extends Component {
     this.className = className;
     try {
       componentClass = Class.forName(className);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
     try {
       setPropertyMethod = componentClass.getMethod("setProperty",
         SET_PROPERTY_ARGS);
-    } catch (NoSuchMethodException e) {
+    } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(
         "Class "
           + className
@@ -158,7 +162,7 @@ public class JavaComponent extends Component {
     try {
       serializeMethod = componentClass.getMethod("serialize",
         SERIALIZE_METHOD_ARGS);
-    } catch (NoSuchMethodException e) {
+    } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(
         "Class "
           + className
@@ -170,10 +174,11 @@ public class JavaComponent extends Component {
     properties.put(name, value);
   }
 
+  @Override
   public String toString() {
-    StringBuffer s = new StringBuffer(className).append("(");
-    for (Iterator props = properties.entrySet().iterator(); props.hasNext();) {
-      Map.Entry prop = (Map.Entry)props.next();
+    final StringBuffer s = new StringBuffer(className).append("(");
+    for (final Iterator props = properties.entrySet().iterator(); props.hasNext();) {
+      final Map.Entry prop = (Map.Entry)props.next();
       s.append(prop.getKey()).append("=").append(prop.getValue());
       if (props.hasNext()) {
         s.append(",");

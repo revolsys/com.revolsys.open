@@ -6,20 +6,20 @@ import com.revolsys.ui.html.view.Element;
 
 public class CollapsibleBox implements Decorator {
 
-  private String title;
+  private final String title;
 
   private boolean open;
 
-  public CollapsibleBox(String title) {
+  public CollapsibleBox(final String title) {
     this.title = title;
   }
 
-  public CollapsibleBox(String title, boolean open) {
+  public CollapsibleBox(final String title, final boolean open) {
     this.title = title;
     this.open = open;
   }
 
-  public void serialize(XmlWriter out, Element element) {
+  public void serialize(final XmlWriter out, final Element element) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "collapsibleBox");
 

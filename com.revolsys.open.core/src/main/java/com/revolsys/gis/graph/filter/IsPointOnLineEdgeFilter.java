@@ -16,8 +16,7 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
 
   private final double maxDistance;
 
-  public IsPointOnLineEdgeFilter(final Edge<T> edge,
-    final double maxDistance) {
+  public IsPointOnLineEdgeFilter(final Edge<T> edge, final double maxDistance) {
     this.edge = edge;
     this.maxDistance = maxDistance;
     this.envelope = new Envelope(edge.getEnvelope());

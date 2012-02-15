@@ -15,13 +15,13 @@ public class InvokeStaticMethodRunnable implements Runnable {
   public static final Object[] NULL_PARAMETERS = new Object[0];
 
   /** The object to invoke the method on. */
-  private Class<?> clazz;
+  private final Class<?> clazz;
 
   /** The parameters to pass to the method. */
-  private Object[] parameters;
+  private final Object[] parameters;
 
   /** The name of the method to invoke. */
-  private String methodName;
+  private final String methodName;
 
   /**
    * Construct a new InvokeMethodRunnable with no parameters.
@@ -29,7 +29,8 @@ public class InvokeStaticMethodRunnable implements Runnable {
    * @param object The object to invoke the method on.
    * @param methodName The name of the method to invoke.
    */
-  public InvokeStaticMethodRunnable(final Class<?> clazz, final String methodName) {
+  public InvokeStaticMethodRunnable(final Class<?> clazz,
+    final String methodName) {
     this(clazz, methodName, NULL_PARAMETERS);
   }
 
@@ -40,8 +41,8 @@ public class InvokeStaticMethodRunnable implements Runnable {
    * @param methodName The name of the method to invoke.
    * @param parameters The parameters to pass to the method.
    */
-  public InvokeStaticMethodRunnable(final Class<?> clazz, final String methodName,
-    final Object... parameters) {
+  public InvokeStaticMethodRunnable(final Class<?> clazz,
+    final String methodName, final Object... parameters) {
     this.clazz = clazz;
     this.methodName = methodName;
     this.parameters = parameters;
@@ -53,7 +54,7 @@ public class InvokeStaticMethodRunnable implements Runnable {
   public void run() {
     try {
       MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       ExceptionUtil.throwUncheckedException(e);
     }
   }

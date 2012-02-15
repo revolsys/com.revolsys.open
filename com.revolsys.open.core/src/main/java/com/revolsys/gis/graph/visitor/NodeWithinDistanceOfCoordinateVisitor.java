@@ -14,25 +14,21 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements
 
   private final double maxDistance;
 
-  public NodeWithinDistanceOfCoordinateVisitor(
-    final Coordinate coordinate,
-    final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+  public NodeWithinDistanceOfCoordinateVisitor(final Coordinate coordinate,
+    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
     this.coordinates = new CoordinateCoordinates(coordinate);
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
   }
-  public NodeWithinDistanceOfCoordinateVisitor(
-    final Coordinates coordinates,
-    final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+
+  public NodeWithinDistanceOfCoordinateVisitor(final Coordinates coordinates,
+    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
     this.coordinates = coordinates;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
   }
 
-  public boolean visit(
-    final Node<T> node) {
+  public boolean visit(final Node<T> node) {
     final Coordinates coordinate = node;
     final double distance = this.coordinates.distance(coordinate);
     if (distance <= maxDistance) {

@@ -19,9 +19,7 @@ import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
@@ -45,11 +43,19 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private static final int TEXT = 6;
 
+  private static double getAngle(final double angle) {
+    double orientation = (90 - angle) % 360;
+    if (orientation < 0) {
+      orientation = 360 + orientation;
+    }
+    return orientation;
+  }
+
   public static void setGeometryProperties(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    Number angle = object.getValue(MoepConstants.ANGLE);
+    final Number angle = object.getValue(MoepConstants.ANGLE);
     if (angle != null) {
-      double orientation = getAngle(angle.doubleValue());
+      final double orientation = getAngle(angle.doubleValue());
       JtsGeometryUtil.setGeometryProperty(geometry, "orientation", orientation);
     }
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
@@ -144,14 +150,6 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     FileUtil.closeSilent(in);
   }
 
-  private static double getAngle(final double angle) {
-    double orientation = (90 - angle) % 360;
-    if (orientation < 0) {
-      orientation = 360 + orientation;
-    }
-    return orientation;
-  }
-
   private String getMapsheetFromFileName(final String fileName) {
     final File file = new File(fileName);
     final String baseName = FileUtil.getFileNamePrefix(file);
@@ -229,7 +227,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           object.setGeometryValue(textPoint);
           if (extraParams == 1) {
             final int angleInt = readLEInt(in);
-            int angle = angleInt / 10000;
+            final int angle = angleInt / 10000;
             object.setValue(MoepConstants.ANGLE, angle);
           }
           final int fontSize = readLEShort(in);
@@ -350,8 +348,10 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     return factory.createLineString(coords);
   }
 
-  private void readCoordinate(final InputStream in,
-    final CoordinatesList coords, final int index) throws IOException {
+  private void readCoordinate(
+    final InputStream in,
+    final CoordinatesList coords,
+    final int index) throws IOException {
     for (int i = 0; i < 2; i++) {
       int coordinate;
       if (coordinateBytes == 2) {
@@ -439,7 +439,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   public void remove() {
   }
 
-  private void setAdmissionHistory(final DataObject object,
+  private void setAdmissionHistory(
+    final DataObject object,
     final char reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.ADMIT_SOURCE_DATE,
@@ -455,7 +456,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       String.valueOf(reasonForChange));
   }
 
-  private void setRetirementHistory(final DataObject object,
+  private void setRetirementHistory(
+    final DataObject object,
     final char reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.RETIRE_SOURCE_DATE,

@@ -22,43 +22,35 @@ public class DataObjectQuadTree extends Quadtree {
   public DataObjectQuadTree() {
   }
 
-  public DataObjectQuadTree(
-    final List<DataObject> objects) {
+  public DataObjectQuadTree(final List<DataObject> objects) {
     insert(objects);
   }
 
-  public void insert(
-    final DataObject object) {
+  public void insert(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     final Envelope envelope = geometry.getEnvelopeInternal();
     insert(envelope, object);
   }
 
-  public void insert(
-    final List<DataObject> objects) {
+  public void insert(final List<DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
   }
 
-  public void insertAll(
-    final Collection<DataObject> objects) {
+  public void insertAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
   }
 
-  public void query(
-    final Envelope searchEnv,
-    final Visitor<DataObject> visitor) {
+  public void query(final Envelope searchEnv, final Visitor<DataObject> visitor) {
     final IndexItemVisitor itemVisitor = new IndexItemVisitor(searchEnv,
       visitor);
     super.query(searchEnv, itemVisitor);
   }
 
-  public void query(
-    final Geometry geometry,
-    final Visitor<DataObject> visitor) {
+  public void query(final Geometry geometry, final Visitor<DataObject> visitor) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     query(envelope, visitor);
   }
@@ -77,15 +69,13 @@ public class DataObjectQuadTree extends Quadtree {
     return queryList(geometry, filter);
   }
 
-  public List<DataObject> queryEnvelope(
-    final DataObject object) {
+  public List<DataObject> queryEnvelope(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     return queryEnvelope(geometry);
   }
 
   @SuppressWarnings("unchecked")
-  public List<DataObject> queryEnvelope(
-    final Geometry geometry) {
+  public List<DataObject> queryEnvelope(final Geometry geometry) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return query(envelope);
   }
@@ -122,8 +112,7 @@ public class DataObjectQuadTree extends Quadtree {
     return queryFirst(object, filter);
   }
 
-  public List<DataObject> queryIntersects(
-    final Geometry geometry) {
+  public List<DataObject> queryIntersects(final Geometry geometry) {
     final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
       geometry);
     return queryList(geometry, filter);
@@ -140,14 +129,6 @@ public class DataObjectQuadTree extends Quadtree {
     final Envelope envelope,
     final Filter<DataObject> filter) {
     return queryList(envelope, filter, null);
-  }
-
-  public List<DataObject> queryList(
-    final Geometry geometry,
-    final Filter<DataObject> filter,
-    final Comparator<DataObject> comparator) {
-    final Envelope envelope = geometry.getEnvelopeInternal();
-    return queryList(envelope, filter, comparator);
   }
 
   public List<DataObject> queryList(
@@ -172,15 +153,21 @@ public class DataObjectQuadTree extends Quadtree {
     return queryList(envelope, filter);
   }
 
-  public boolean remove(
-    final DataObject object) {
+  public List<DataObject> queryList(
+    final Geometry geometry,
+    final Filter<DataObject> filter,
+    final Comparator<DataObject> comparator) {
+    final Envelope envelope = geometry.getEnvelopeInternal();
+    return queryList(envelope, filter, comparator);
+  }
+
+  public boolean remove(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     final Envelope envelope = geometry.getEnvelopeInternal();
     return super.remove(envelope, object);
   }
 
-  public void remove(
-    final List<DataObject> objects) {
+  public void remove(final List<DataObject> objects) {
     for (final DataObject object : objects) {
       remove(object);
     }

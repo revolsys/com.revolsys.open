@@ -11,27 +11,23 @@ import javax.xml.namespace.QName;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcDecimalAttribute extends JdbcAttribute {
-  public JdbcDecimalAttribute(
-    final String name,
-    final int sqlType,
-    final int length,
-    final int scale,
-    final boolean required,
+  public JdbcDecimalAttribute(final String name, final int sqlType,
+    final int length, final int scale, final boolean required,
     final Map<QName, Object> properties) {
     super(name, DataTypes.DECIMAL, sqlType, length, scale, required, properties);
   }
 
   @Override
   public JdbcDecimalAttribute clone() {
-    return new JdbcDecimalAttribute(getName(), getSqlType(), getLength(), getScale(), isRequired(), getProperties());
+    return new JdbcDecimalAttribute(getName(), getSqlType(), getLength(),
+      getScale(), isRequired(), getProperties());
   }
-  
+
   @Override
   public int setPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
-    final Object value)
-    throws SQLException {
+    final Object value) throws SQLException {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {

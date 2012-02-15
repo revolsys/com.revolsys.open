@@ -14,15 +14,15 @@ public class ProcessNetworkServletContextListener implements
 
   private ProcessNetwork processNetwork;
 
-  public void contextDestroyed(ServletContextEvent servletContextEvent) {
+  public void contextDestroyed(final ServletContextEvent servletContextEvent) {
     if (processNetwork != null) {
       processNetwork.stop();
     }
   }
 
-  public void contextInitialized(ServletContextEvent servletContextEvent) {
-    ServletContext servletContext = servletContextEvent.getServletContext();
-    WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+  public void contextInitialized(final ServletContextEvent servletContextEvent) {
+    final ServletContext servletContext = servletContextEvent.getServletContext();
+    final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
     this.processNetwork = (ProcessNetwork)applicationContext.getBean("com.revolsys.parallel.process.ProcessNetwork");
     processNetwork.start();
   }

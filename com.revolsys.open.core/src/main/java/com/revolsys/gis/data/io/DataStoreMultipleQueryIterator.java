@@ -11,14 +11,15 @@ public class DataStoreMultipleQueryIterator extends
 
   final DataObjectStoreQueryReader reader;
 
-  public DataStoreMultipleQueryIterator(DataObjectStoreQueryReader reader) {
+  private int queryIndex = 0;
+
+  public DataStoreMultipleQueryIterator(final DataObjectStoreQueryReader reader) {
     this.reader = reader;
   }
 
-  private int queryIndex = 0;
-
   @Override
-  public AbstractIterator<DataObject> getNextIterator() throws NoSuchElementException {
+  public AbstractIterator<DataObject> getNextIterator()
+    throws NoSuchElementException {
     final AbstractIterator<DataObject> iterator = reader.createQueryIterator(queryIndex);
     queryIndex++;
     return iterator;

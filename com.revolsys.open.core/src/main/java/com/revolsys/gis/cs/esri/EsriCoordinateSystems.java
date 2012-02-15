@@ -57,14 +57,12 @@ public class EsriCoordinateSystems {
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(
-    final int crsId) {
+  public static CoordinateSystem getCoordinateSystem(final int crsId) {
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return coordinateSystem;
   }
 
-  public static int getCrsId(
-    final CoordinateSystem coordinateSystem) {
+  public static int getCrsId(final CoordinateSystem coordinateSystem) {
     final Authority authority = coordinateSystem.getAuthority();
     if (authority != null) {
       final String name = authority.getName();

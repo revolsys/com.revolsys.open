@@ -23,30 +23,35 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory {
     setSingleFile(false);
   }
 
+  public DataObjectReader createDataObjectReader(
+    final Resource resource,
+    final DataObjectFactory dataObjectFactory) {
+    try {
+      final ShapefileIterator iterator = new ShapefileIterator(resource,
+        dataObjectFactory);
+      return new DataObjectIteratorReader(iterator);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to create reader for " + resource, e);
+    }
+  }
+
   @Override
-  public Writer<DataObject> createDataObjectWriter(DataObjectMetaData metaData,
-    Resource resource) {
+  public Writer<DataObject> createDataObjectWriter(
+    final DataObjectMetaData metaData,
+    final Resource resource) {
     try {
       return new ShapefileDataObjectWriter(metaData, resource);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to create writer for " + resource, e);
     }
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
     return createDataObjectWriter(metaData, new OutputStreamResource(baseName,
       outputStream));
-  }
-
-  public DataObjectReader createDataObjectReader(final Resource resource,
-    final DataObjectFactory dataObjectFactory) {
-    try {
-      ShapefileIterator iterator = new ShapefileIterator(resource,
-        dataObjectFactory);
-      return new DataObjectIteratorReader(iterator);
-    } catch (IOException e) {
-      throw new RuntimeException("Unable to create reader for " + resource, e);
-    }
   }
 }

@@ -45,14 +45,6 @@ public class DataObjectReaderHttpMessageConverter extends
     IoConstants.JSONP_PROPERTY, IoConstants.TITLE_PROPERTY,
     IoConstants.DESCRIPTION_PROPERTY);
 
-  public List<String> getRequestAttributeNames() {
-    return requestAttributeNames;
-  }
-
-  public void setRequestAttributeNames(List<String> requestAttributeNames) {
-    this.requestAttributeNames = requestAttributeNames;
-  }
-
   private GeometryFactory geometryFactory;
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
@@ -67,8 +59,13 @@ public class DataObjectReaderHttpMessageConverter extends
     return geometryFactory;
   }
 
+  public List<String> getRequestAttributeNames() {
+    return requestAttributeNames;
+  }
+
   @Override
-  public DataObjectReader read(final Class<? extends DataObjectReader> clazz,
+  public DataObjectReader read(
+    final Class<? extends DataObjectReader> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -108,8 +105,14 @@ public class DataObjectReaderHttpMessageConverter extends
     this.geometryFactory = geometryFactory;
   }
 
+  public void setRequestAttributeNames(final List<String> requestAttributeNames) {
+    this.requestAttributeNames = requestAttributeNames;
+  }
+
   @Override
-  public void write(final DataObjectReader reader, final MediaType mediaType,
+  public void write(
+    final DataObjectReader reader,
+    final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     MediaType actualMediaType;
@@ -157,7 +160,7 @@ public class DataObjectReaderHttpMessageConverter extends
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }
-        HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+        final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
         String callback = request.getParameter("jsonp");
         if (callback == null) {
           callback = request.getParameter("callback");

@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.builder;
 
-import java.util.Collections;
 import java.util.Map;
 
 import com.revolsys.collection.ResultPager;
@@ -38,10 +37,6 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
     }
   }
 
-  protected void lockObject(T object) {
-    dataAccessObject.lockAndRefresh(object);
-  }
-  
   public DataAccessObject<T> getDataAccessObject() {
     return dataAccessObject;
   }
@@ -57,7 +52,7 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
 
   public ResultPager<T> getResultPager(
     final Map<String, Object> filter,
-    Map<String, Boolean> orderBy) {
+    final Map<String, Boolean> orderBy) {
     return dataAccessObject.page(filter, orderBy);
   }
 
@@ -76,6 +71,10 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
     } catch (final NumberFormatException e) {
       return null;
     }
+  }
+
+  protected void lockObject(final T object) {
+    dataAccessObject.lockAndRefresh(object);
   }
 
   public void setDataAccessObject(final DataAccessObject<T> dataAccessObject) {

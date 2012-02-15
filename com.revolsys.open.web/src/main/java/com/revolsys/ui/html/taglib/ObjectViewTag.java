@@ -30,43 +30,45 @@ public class ObjectViewTag extends TagSupport {
 
   private ObjectView view;
 
+  @Override
+  public int doEndTag() throws JspException {
+    return EVAL_PAGE;
+  }
+
+  @Override
   public int doStartTag() throws JspException {
     if (name != null) {
       try {
-        Object object = pageContext.findAttribute(name);
+        final Object object = pageContext.findAttribute(name);
         if (object != null) {
           view.setObject(object);
           view.serialize(pageContext.getOut());
         }
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         throw new JspException(t);
       }
     }
     return SKIP_BODY;
   }
 
-  public int doEndTag() throws JspException {
-    return EVAL_PAGE;
-  }
-
   public String getName() {
     return name;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
   }
 
   public String getViewClass() {
     return viewClass;
   }
 
+  public void setName(final String name) {
+    this.name = name;
+  }
+
   public void setViewClass(final String viewClass) {
     this.viewClass = viewClass;
     try {
-      Class klass = Class.forName(viewClass);
+      final Class klass = Class.forName(viewClass);
       view = (ObjectView)klass.newInstance();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new IllegalArgumentException("Unable to create class " + viewClass);
     }
   }

@@ -26,7 +26,7 @@ public abstract class AbstractCoordinates implements Coordinates {
   public Coordinates clone() {
     try {
       return (Coordinates)super.clone();
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       throw new UnsupportedOperationException();
     }
   }

@@ -36,9 +36,7 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
     setFileExtensions("bin");
   }
 
-  public MoepDirectoryReader(
-    final File directory)
-    throws IOException {
+  public MoepDirectoryReader(final File directory) throws IOException {
     setFileExtensions("bin");
     setDirectory(directory);
   }
@@ -51,8 +49,7 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
    * @throws IOException If an I/O error occurs.
    */
   @Override
-  protected Reader<DataObject> createReader(
-    final Resource resource) {
+  protected Reader<DataObject> createReader(final Resource resource) {
     return new MoepBinaryReader(this, resource, new ArrayDataObjectFactory());
   }
 
@@ -60,8 +57,8 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
     return integrationDate;
   }
 
-  public DataObjectMetaData getMetaData(
-    final QName typeName) {
+  @Override
+  public DataObjectMetaData getMetaData(final QName typeName) {
     if (typeName.equals(MoepConstants.TYPE_NAME)) {
       return MoepConstants.META_DATA;
     } else {
@@ -82,13 +79,12 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
   }
 
   @Override
-  public void setDirectory(
-    File directory) {
+  public void setDirectory(final File directory) {
     super.setDirectory(directory);
     final String name = directory.getName();
-    final File file = new File(directory,
-      name + "s.bin");
-    final Reader<DataObject> supDataReader = createReader(new FileSystemResource(file));
+    final File file = new File(directory, name + "s.bin");
+    final Reader<DataObject> supDataReader = createReader(new FileSystemResource(
+      file));
     for (final DataObject supData : supDataReader) {
       final String featureCode = supData.getValue(MoepConstants.FEATURE_CODE);
       if (featureCode.equals("KN00020000")) {

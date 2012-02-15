@@ -8,15 +8,13 @@ public class ValueCache<T> {
 
   private boolean readOnly = false;
 
-  public void addValue(
-    final T value) {
+  public void addValue(final T value) {
     if (!readOnly && !cache.containsKey(value)) {
       cache.put(value, value);
     }
   }
 
-  public T getValue(
-    final T value) {
+  public T getValue(final T value) {
     final T cachedValue = cache.get(value);
     if (cachedValue == null) {
       return value;
@@ -29,8 +27,7 @@ public class ValueCache<T> {
     return readOnly;
   }
 
-  public void setReadOnly(
-    final boolean readOnly) {
+  public void setReadOnly(final boolean readOnly) {
     this.readOnly = readOnly;
   }
 

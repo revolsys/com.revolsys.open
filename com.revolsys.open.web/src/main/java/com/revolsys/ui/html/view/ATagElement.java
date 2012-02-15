@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -24,15 +23,16 @@ import com.revolsys.ui.html.HtmlUtil;
  * @version 1.0
  */
 public class ATagElement extends Element {
-  private String content;
+  private final String content;
 
-  private String href;
+  private final String href;
 
   public ATagElement(final String href, final String content) {
     this.href = href;
     this.content = content;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeA(out, null, href, content);
   }

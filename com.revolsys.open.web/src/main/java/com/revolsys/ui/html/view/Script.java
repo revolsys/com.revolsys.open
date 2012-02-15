@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -33,15 +32,15 @@ public class Script extends Element {
     this.file = file;
   }
 
-  public String getFile() {
-    return file;
+  /**
+   * @return Returns the content.
+   */
+  public String getContent() {
+    return content;
   }
 
-  /**
-   * @param file The file to set.
-   */
-  public void setFile(final String file) {
-    this.file = file;
+  public String getFile() {
+    return file;
   }
 
   /**
@@ -51,27 +50,7 @@ public class Script extends Element {
     return type;
   }
 
-  /**
-   * @param type The type to set.
-   */
-  public void setType(final String type) {
-    this.type = type;
-  }
-
-  /**
-   * @return Returns the content.
-   */
-  public String getContent() {
-    return content;
-  }
-
-  /**
-   * @param content The content to set.
-   */
-  public void setContent(final String content) {
-    this.content = content;
-  }
-
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SCRIPT);
     out.attribute(HtmlUtil.ATTR_TYPE, type);
@@ -82,5 +61,26 @@ public class Script extends Element {
       out.write('\n');
     }
     out.endTag(HtmlUtil.SCRIPT);
+  }
+
+  /**
+   * @param content The content to set.
+   */
+  public void setContent(final String content) {
+    this.content = content;
+  }
+
+  /**
+   * @param file The file to set.
+   */
+  public void setFile(final String file) {
+    this.file = file;
+  }
+
+  /**
+   * @param type The type to set.
+   */
+  public void setType(final String type) {
+    this.type = type;
   }
 }

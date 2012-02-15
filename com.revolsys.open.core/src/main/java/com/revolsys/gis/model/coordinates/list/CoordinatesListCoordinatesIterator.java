@@ -24,8 +24,7 @@ public class CoordinatesListCoordinatesIterator implements
    * 
    * @param coordinates The coordinates list.
    */
-  public CoordinatesListCoordinatesIterator(
-    final CoordinatesList coordinates) {
+  public CoordinatesListCoordinatesIterator(final CoordinatesList coordinates) {
     this.coordinatesList = coordinates;
   }
 

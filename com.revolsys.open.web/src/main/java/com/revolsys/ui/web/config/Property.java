@@ -16,9 +16,9 @@
 package com.revolsys.ui.web.config;
 
 public class Property {
-  private String name;
+  private final String name;
 
-  private String value;
+  private final String value;
 
   public Property(final String name, final String value) {
     this.name = name;

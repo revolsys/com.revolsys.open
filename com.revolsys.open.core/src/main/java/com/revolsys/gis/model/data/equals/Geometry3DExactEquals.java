@@ -37,8 +37,7 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
     }
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }
 

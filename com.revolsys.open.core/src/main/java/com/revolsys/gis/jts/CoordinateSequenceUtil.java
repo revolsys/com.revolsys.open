@@ -26,9 +26,6 @@ public final class CoordinateSequenceUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
- 
-
-
   /**
    * Copy length coordinates in src staring at srcPos to dest at destPo. This
    * method silently truncates the number dimension if the src or dest does not
@@ -73,8 +70,6 @@ public final class CoordinateSequenceUtil {
       && coordinates.getOrdinate(index1, 1) == coordinates.getOrdinate(index2,
         1);
   }
-
-
 
   /**
    * Compare the coordinates of the two coordinate sequences up to the given
@@ -258,8 +253,7 @@ public final class CoordinateSequenceUtil {
     return new CoordinateSequenceIndexLineSegmentIterator(coordinateSequence);
   }
 
-  public static boolean isCCW(
-    final CoordinateSequence ring) {
+  public static boolean isCCW(final CoordinateSequence ring) {
     // # of points without closing endpoint
     final int nPts = ring.size() - 1;
 
@@ -330,9 +324,10 @@ public final class CoordinateSequenceUtil {
     final int index2,
     final int index) {
     // TODO Auto-generated method stub
-    return orientationIndex(ring.getOrdinate(index1, 0), ring.getOrdinate(
-      index1, 1), ring.getOrdinate(index2, 0), ring.getOrdinate(index2, 1),
-      ring.getOrdinate(index, 0), ring.getOrdinate(index, 1));
+    return orientationIndex(ring.getOrdinate(index1, 0),
+      ring.getOrdinate(index1, 1), ring.getOrdinate(index2, 0),
+      ring.getOrdinate(index2, 1), ring.getOrdinate(index, 0),
+      ring.getOrdinate(index, 1));
   }
 
   /**

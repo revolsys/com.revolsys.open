@@ -23,17 +23,14 @@ public class SplitEdgesCloseToNodeVisitor<T> extends
 
   private Collection<T> splitObjects = null;
 
-  public SplitEdgesCloseToNodeVisitor(
-    final Graph<T> graph,
+  public SplitEdgesCloseToNodeVisitor(final Graph<T> graph,
     final double maxDistance) {
     this.graph = graph;
     this.maxDistance = maxDistance;
   }
 
-  public SplitEdgesCloseToNodeVisitor(
-    final Graph<T> graph,
-    final String ruleName,
-    final double maxDistance) {
+  public SplitEdgesCloseToNodeVisitor(final Graph<T> graph,
+    final String ruleName, final double maxDistance) {
     this.graph = graph;
     this.ruleName = ruleName;
     this.maxDistance = maxDistance;
@@ -51,18 +48,15 @@ public class SplitEdgesCloseToNodeVisitor<T> extends
     return splitObjects;
   }
 
-  public void setNewEdges(
-    final Collection<Edge<T>> newEdges) {
+  public void setNewEdges(final Collection<Edge<T>> newEdges) {
     this.newEdges = newEdges;
   }
 
-  public void setSplitObjects(
-    final Collection<T> splitObjects) {
+  public void setSplitObjects(final Collection<T> splitObjects) {
     this.splitObjects = splitObjects;
   }
 
-  public boolean visit(
-    final Node<T> node) {
+  public boolean visit(final Node<T> node) {
     final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor.edgesWithinDistance(
       graph, node, maxDistance);
     for (final Edge<T> edge : closeEdges) {

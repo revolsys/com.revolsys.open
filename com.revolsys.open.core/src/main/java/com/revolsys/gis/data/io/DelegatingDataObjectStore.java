@@ -6,28 +6,35 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 public class DelegatingDataObjectStore implements InvocationHandler {
-  public static <T extends DataObjectStore> T create(String label,
-    Map<String, Object> config) {
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    Class<?>[] interfaces = new Class<?>[] {
-      DataObjectStoreFactoryRegistry.getDataObjectStoreInterfaceClass(config)
-    };
-    DelegatingDataObjectStore handler = new DelegatingDataObjectStore(label,config);
-    T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
-    return proxyStore;
-  }
-
-  public static <T extends DataObjectStore> T create(String label,
-    Class<T> interfaceClass, T dataObjectStore) {
-    ClassLoader classLoader = dataObjectStore.getClass().getClassLoader();
-    Class<?>[] interfaces = new Class<?>[] {
+  public static <T extends DataObjectStore> T create(
+    final String label,
+    final Class<T> interfaceClass,
+    final T dataObjectStore) {
+    final ClassLoader classLoader = dataObjectStore.getClass().getClassLoader();
+    final Class<?>[] interfaces = new Class<?>[] {
       interfaceClass
     };
-    DelegatingDataObjectStore handler = new DelegatingDataObjectStore(label,
-      dataObjectStore);
-    T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
+    final DelegatingDataObjectStore handler = new DelegatingDataObjectStore(
+      label, dataObjectStore);
+    final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
+      handler);
     return proxyStore;
 
+  }
+
+  public static <T extends DataObjectStore> T create(
+    final String label,
+    final Map<String, Object> config) {
+    final ClassLoader classLoader = Thread.currentThread()
+      .getContextClassLoader();
+    final Class<?>[] interfaces = new Class<?>[] {
+      DataObjectStoreFactoryRegistry.getDataObjectStoreInterfaceClass(config)
+    };
+    final DelegatingDataObjectStore handler = new DelegatingDataObjectStore(
+      label, config);
+    final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
+      handler);
+    return proxyStore;
   }
 
   private Map<String, Object> config;
@@ -66,14 +73,16 @@ public class DelegatingDataObjectStore implements InvocationHandler {
     return dataObjectStore;
   }
 
-  public Object invoke(final Object proxy, final Method method,
+  public Object invoke(
+    final Object proxy,
+    final Method method,
     final Object[] args) throws Throwable {
     if (method.getName().equals("toString")) {
       return label;
-    } else  if (method.getName().equals("hashCode")) {
+    } else if (method.getName().equals("hashCode")) {
       return label.hashCode();
-    } else  if (method.getName().equals("equals")) {
-      boolean equal = args[0] == proxy;
+    } else if (method.getName().equals("equals")) {
+      final boolean equal = args[0] == proxy;
       return equal;
     } else {
       final DataObjectStore dataObjectStore = getDataObjectStore();

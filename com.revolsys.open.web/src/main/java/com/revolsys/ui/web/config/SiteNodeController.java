@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * The SiteNodeController defines the interface for the types of controllers
  * that can
@@ -19,14 +18,16 @@ import javax.servlet.http.HttpServletResponse;
  * @author paustin
  */
 public interface SiteNodeController extends Cloneable {
-  SiteNode getNode();
+  Object clone();
 
-  void setNode(SiteNode node);
+  SiteNode getNode();
 
   String getPath();
 
-  void process(ServletContext servletConfig, HttpServletRequest request,
+  void process(
+    ServletContext servletConfig,
+    HttpServletRequest request,
     HttpServletResponse response) throws IOException, ServletException;
-  
-  Object clone();
+
+  void setNode(SiteNode node);
 }

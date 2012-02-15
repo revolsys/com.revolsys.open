@@ -33,7 +33,7 @@ public class SetCodeTableId extends
       final Converter<DataObject, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
-        DataObjectStore dataObjectStore = target.getMetaData()
+        final DataObjectStore dataObjectStore = target.getMetaData()
           .getDataObjectStore();
         if (dataObjectStore != null) {
           String codeTableValueName = null;
@@ -43,7 +43,7 @@ public class SetCodeTableId extends
             codeTableAttributeName = codeTableAttributeName.substring(0,
               dotIndex);
           }
-          CodeTable targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
+          final CodeTable targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
           if (targetCodeTable != null) {
             if (codeTableValueName == null) {
               sourceValue = targetCodeTable.getId(sourceValue);
@@ -60,7 +60,8 @@ public class SetCodeTableId extends
     target.setValue(targetAttributeName, codeId);
   }
 
-  public void setValueMapping(final String codeTableAttribute,
+  public void setValueMapping(
+    final String codeTableAttribute,
     final Converter<DataObject, Object> valueConverter) {
     codeTableValueConverters.put(codeTableAttribute, valueConverter);
 

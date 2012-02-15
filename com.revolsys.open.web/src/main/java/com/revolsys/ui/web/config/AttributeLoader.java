@@ -6,7 +6,7 @@ import com.revolsys.ui.web.exception.ActionException;
 
 public interface AttributeLoader {
 
-  void init(Attribute attribute);
-
   Object getValue(HttpServletRequest request) throws ActionException;
+
+  void init(Attribute attribute);
 }

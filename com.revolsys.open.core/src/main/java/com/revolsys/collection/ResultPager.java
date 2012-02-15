@@ -32,33 +32,7 @@ import java.util.List;
  * @param <T> The type of object to page.
  */
 public interface ResultPager<T> {
-  /**
-   * Get the number of pages.
-   * 
-   * @return The number of pages.
-   */
-  int getNumPages();
-
-  /**
-   * Get the list of objects in the current page.
-   * 
-   * @return The list of objects in the current page.
-   */
-  List<T> getList();
-
-  /**
-   * Get the total number of results returned.
-   * 
-   * @return The total number of results returned.
-   */
-  int getNumResults();
-
-  /**
-   * Get the index of the first object in the current page.
-   * 
-   * @return The index of the first object in the current page.
-   */
-  int getStartIndex();
+  void close();
 
   /**
    * Get the index of the last object in the current page.
@@ -68,11 +42,32 @@ public interface ResultPager<T> {
   int getEndIndex();
 
   /**
+   * Get the list of objects in the current page.
+   * 
+   * @return The list of objects in the current page.
+   */
+  List<T> getList();
+
+  /**
    * Get the page number of the next page.
    * 
    * @return Thepage number of the next page.
    */
   int getNextPageNumber();
+
+  /**
+   * Get the number of pages.
+   * 
+   * @return The number of pages.
+   */
+  int getNumPages();
+
+  /**
+   * Get the total number of results returned.
+   * 
+   * @return The total number of results returned.
+   */
+  int getNumResults();
 
   /**
    * Get the page number of the current page.
@@ -94,6 +89,13 @@ public interface ResultPager<T> {
    * @return Thepage number of the previous page.
    */
   int getPreviousPageNumber();
+
+  /**
+   * Get the index of the first object in the current page.
+   * 
+   * @return The index of the first object in the current page.
+   */
+  int getStartIndex();
 
   /**
    * Check to see if there is a next page.
@@ -128,16 +130,12 @@ public interface ResultPager<T> {
    * 
    * @param pageNumber The current page number.
    */
-  void setPageNumber(
-    int pageNumber);
+  void setPageNumber(int pageNumber);
 
   /**
    * Set the number of objects per page.
    * 
    * @param pageSize The number of objects per page.
    */
-  void setPageSize(
-    int pageSize);
-  
-  void close();
+  void setPageSize(int pageSize);
 }

@@ -15,8 +15,7 @@ import com.revolsys.io.FileUtil;
 public class ManifestUtil {
   private static final Logger LOG = Logger.getLogger(ManifestUtil.class);
 
-  public static String getImplementationVersion(
-    final String implementationTitle) {
+  public static String getImplementationVersion(final String implementationTitle) {
     final Manifest manifest = getManifestByImplementationTitle(implementationTitle);
     if (manifest != null) {
       return manifest.getMainAttributes().getValue(Name.IMPLEMENTATION_VERSION);

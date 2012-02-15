@@ -30,15 +30,16 @@ public class PercentField extends BigDecimalField {
     setSize(6);
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     String inputValue = request.getParameter(getName());
     if (inputValue == null) {
-      BigDecimal decimal = (BigDecimal)getInitialValue(request);
+      final BigDecimal decimal = (BigDecimal)getInitialValue(request);
       setValue(decimal);
       if (getValue() != null) {
         setValue(decimal.multiply(new BigDecimal(100)).setScale(getScale(),
           BigDecimal.ROUND_HALF_UP));
-        DecimalFormat format = new DecimalFormat();
+        final DecimalFormat format = new DecimalFormat();
         format.setMinimumFractionDigits(0);
         format.setMaximumFractionDigits(getScale());
         inputValue = format.format(getValue());
@@ -47,15 +48,16 @@ public class PercentField extends BigDecimalField {
     setInputValue(inputValue);
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
     out.write(" %");
   }
 
   @Override
-  public void setTextValue(String value) {
+  public void setTextValue(final String value) {
     super.setTextValue(value);
-    BigDecimal percent = getValue();
+    final BigDecimal percent = getValue();
     if (percent.scale() > getScale()) {
       throw new IllegalArgumentException("Scale must be <= " + getScale());
     } else if (percent.compareTo(new BigDecimal("100")) > 0) {

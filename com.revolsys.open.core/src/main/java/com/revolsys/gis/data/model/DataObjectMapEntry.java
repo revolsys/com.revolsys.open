@@ -3,13 +3,11 @@ package com.revolsys.gis.data.model;
 import java.util.Map.Entry;
 
 public class DataObjectMapEntry implements Entry<String, Object> {
-  private DataObject object;
+  private final DataObject object;
 
   private final int index;
 
-  public DataObjectMapEntry(
-    DataObject object,
-    int index) {
+  public DataObjectMapEntry(final DataObject object, final int index) {
     this.object = object;
     this.index = index;
   }
@@ -23,8 +21,7 @@ public class DataObjectMapEntry implements Entry<String, Object> {
     return object.getValue(index);
   }
 
-  public Object setValue(
-    final Object value) {
+  public Object setValue(final Object value) {
     object.setValue(index, value);
     return value;
   }

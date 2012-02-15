@@ -41,8 +41,17 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * 
    * @param maxSize The maximum number of Objects the Buffer can store
    */
-  public Buffer(int maxSize) {
+  public Buffer(final int maxSize) {
     this(new LinkedList<T>(), maxSize);
+  }
+
+  /**
+   * Construct a new Buffer with the no maximum size.
+   * 
+   * @param buffer The buffer to store the elements in.
+   */
+  public Buffer(final Queue<T> buffer) {
+    this(buffer, 0);
   }
 
   /**
@@ -51,76 +60,9 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * @param buffer The buffer to store the elements in.
    * @param size The maximum number of Objects the Buffer can store
    */
-  public Buffer(Queue<T> buffer, int maxSize) {
+  public Buffer(final Queue<T> buffer, final int maxSize) {
     this.buffer = buffer;
     this.maxSize = maxSize;
-  }
-
-  /**
-   * Construct a new Buffer with the no maximum size.
-   * 
-   * @param buffer The buffer to store the elements in.
-   */
-  public Buffer(Queue<T> buffer) {
-    this(buffer, 0);
-  }
-
-  /**
-   * Returns the first Object from the Buffer and removes the Object from the
-   * Buffer.
-   * <P>
-   * <I>NOTE: getState should be called before this method to check that the
-   * state is not EMPTY. If the state is EMPTY the Buffer will be left in an
-   * undefined state.</I>
-   * <P>
-   * Pre-condition: The state must not be EMPTY
-   * 
-   * @return The next available Object from the Buffer
-   */
-  protected synchronized T get() {
-    return buffer.remove();
-  }
-
-  /**
-   * Puts a new Object into the Buffer.
-   * <P>
-   * <I>NOTE: getState should be called before this method to check that the
-   * state is not FULL. If the state is FULL the Buffer will be left in an
-   * undefined state.</I>
-   * <P>
-   * Pre-condition: The state must not be FULL
-   * 
-   * @param value The object to put in the Buffer
-   */
-  protected synchronized void put(T value) {
-    if (maxSize == 0 || buffer.size() < maxSize) {
-      buffer.offer(value);
-    }
-  }
-
-  /**
-   * Returns the current state of the Buffer, should be called to ensure the
-   * Pre-conditions of the other methods are not broken.
-   * 
-   * @return The current state of the Buffer (EMPTY, NONEMPTYFULL or FULL)
-   */
-  protected synchronized int getState() {
-    if (buffer.isEmpty()) {
-      return EMPTY;
-    } else if (!discardIfFull && maxSize > 0 && buffer.size() == maxSize) {
-      return FULL;
-    } else {
-      return NONEMPTYFULL;
-    }
-  }
-
-  /**
-   * The number of items in the buffer.
-   * 
-   * @return The number of items in the buffer.
-   */
-  public int size() {
-    return buffer.size();
   }
 
   /**
@@ -140,8 +82,61 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * 
    * @return The cloned instance of this Object.
    */
+  @Override
   protected Object clone() {
     return new Buffer<T>(maxSize);
+  }
+
+  /**
+   * Returns the first Object from the Buffer and removes the Object from the
+   * Buffer.
+   * <P>
+   * <I>NOTE: getState should be called before this method to check that the
+   * state is not EMPTY. If the state is EMPTY the Buffer will be left in an
+   * undefined state.</I>
+   * <P>
+   * Pre-condition: The state must not be EMPTY
+   * 
+   * @return The next available Object from the Buffer
+   */
+  @Override
+  protected synchronized T get() {
+    return buffer.remove();
+  }
+
+  /**
+   * Returns the current state of the Buffer, should be called to ensure the
+   * Pre-conditions of the other methods are not broken.
+   * 
+   * @return The current state of the Buffer (EMPTY, NONEMPTYFULL or FULL)
+   */
+  @Override
+  protected synchronized int getState() {
+    if (buffer.isEmpty()) {
+      return EMPTY;
+    } else if (!discardIfFull && maxSize > 0 && buffer.size() == maxSize) {
+      return FULL;
+    } else {
+      return NONEMPTYFULL;
+    }
+  }
+
+  /**
+   * Puts a new Object into the Buffer.
+   * <P>
+   * <I>NOTE: getState should be called before this method to check that the
+   * state is not FULL. If the state is FULL the Buffer will be left in an
+   * undefined state.</I>
+   * <P>
+   * Pre-condition: The state must not be FULL
+   * 
+   * @param value The object to put in the Buffer
+   */
+  @Override
+  protected synchronized void put(final T value) {
+    if (maxSize == 0 || buffer.size() < maxSize) {
+      buffer.offer(value);
+    }
   }
 
   /**
@@ -150,13 +145,22 @@ public class Buffer<T> extends ChannelDataStore<T> {
    * @param object The object to remove.
    * @return True if the object was removed.
    */
-  public boolean remove(T object) {
+  public boolean remove(final T object) {
     if (buffer.contains(object)) {
       buffer.remove(object);
       return true;
     } else {
       return false;
     }
+  }
+
+  /**
+   * The number of items in the buffer.
+   * 
+   * @return The number of items in the buffer.
+   */
+  public int size() {
+    return buffer.size();
   }
 
   @Override

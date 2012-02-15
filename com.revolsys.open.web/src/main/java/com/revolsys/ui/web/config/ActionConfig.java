@@ -24,10 +24,10 @@ public class ActionConfig {
   private IafAction action;
 
   /** The application configuration. */
-  private Config config;
+  private final Config config;
 
   /** The initialization parameters for the action. */
-  private HashMap parameters = new HashMap();
+  private final HashMap parameters = new HashMap();
 
   /** The name of the IafAction subclass. */
   private String type;
@@ -41,30 +41,6 @@ public class ActionConfig {
   public ActionConfig(final Config config, final String type) {
     this.config = config;
     this.type = type;
-  }
-
-  /**
-   * Get the action for this config. If this is the first call a new instance of
-   * the class defined by "type" will be created and initialized.
-   * 
-   * @return The action instance.
-   * @throws ActionInitException If the action could not be initialized.
-   */
-  public IafAction getAction() throws ActionInitException {
-    if (action == null) {
-      try {
-        action = (IafAction)Class.forName(type).newInstance();
-        action.init(this);
-      } catch (ClassNotFoundException cnfe) {
-        throw new ActionInitException("Unable to find class: " + type, cnfe);
-      } catch (InstantiationException ie) {
-        throw new ActionInitException("Unable to instantiate class: " + type,
-          ie);
-      } catch (IllegalAccessException ie) {
-        throw new ActionInitException("Unable to access class: " + type, ie);
-      }
-    }
-    return action;
   }
 
   /**
@@ -87,12 +63,96 @@ public class ActionConfig {
   }
 
   /**
+   * Compare this action config with another. Two action configs are equal if
+   * the type and parameters are equal.
+   * 
+   * @param o The object to compare to.
+   * @return True if the two objects are equal.
+   */
+  @Override
+  public boolean equals(final Object o) {
+    if (o instanceof ActionConfig) {
+      final ActionConfig a = (ActionConfig)o;
+      if (a.type.equals(type) && a.parameters.equals(parameters)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get the action for this config. If this is the first call a new instance of
+   * the class defined by "type" will be created and initialized.
+   * 
+   * @return The action instance.
+   * @throws ActionInitException If the action could not be initialized.
+   */
+  public IafAction getAction() throws ActionInitException {
+    if (action == null) {
+      try {
+        action = (IafAction)Class.forName(type).newInstance();
+        action.init(this);
+      } catch (final ClassNotFoundException cnfe) {
+        throw new ActionInitException("Unable to find class: " + type, cnfe);
+      } catch (final InstantiationException ie) {
+        throw new ActionInitException("Unable to instantiate class: " + type,
+          ie);
+      } catch (final IllegalAccessException ie) {
+        throw new ActionInitException("Unable to access class: " + type, ie);
+      }
+    }
+    return action;
+  }
+
+  /**
+   * Get the parameter value as an boolean. See
+   * {@link Boolean#getBoolean(java.lang.String)} for more details.
+   * 
+   * @param name The parameter name.
+   * @return The parameter value.
+   */
+  public boolean getBooleanParameter(final String name) {
+    final String value = getStringParameter(name);
+    return Boolean.valueOf(value).booleanValue();
+  }
+
+  /**
    * Get the application configuration.
    * 
    * @return The application configuration.
    */
   public Config getConfig() {
     return config;
+  }
+
+  /**
+   * Get the parameter value as an int. If it is not a valid number
+   * Integer.MIN_VALUE will be returned.
+   * 
+   * @param name The parameter name.
+   * @return The parameter value.
+   */
+  public int getIntParameter(final String name) {
+    try {
+      return Integer.parseInt(getStringParameter(name));
+    } catch (final NumberFormatException nfe) {
+      return Integer.MIN_VALUE;
+    }
+  }
+
+  /**
+   * Get the parameter value as an long. If it is not a valid number
+   * Long.MIN_VALUE will be returned.
+   * 
+   * @param name The parameter name.
+   * @return The parameter value.
+   */
+  public long getLongParameter(final String name) {
+    try {
+      return Long.parseLong(getStringParameter(name));
+    } catch (final NumberFormatException nfe) {
+      return Long.MIN_VALUE;
+    }
   }
 
   /**
@@ -112,54 +172,12 @@ public class ActionConfig {
    * @return The parameter value.
    */
   public String getStringParameter(final String name) {
-    Object value = parameters.get(name);
+    final Object value = parameters.get(name);
     if (value != null) {
       return value.toString();
     } else {
       return null;
     }
-  }
-
-  /**
-   * Get the parameter value as an int. If it is not a valid number
-   * Integer.MIN_VALUE will be returned.
-   * 
-   * @param name The parameter name.
-   * @return The parameter value.
-   */
-  public int getIntParameter(final String name) {
-    try {
-      return Integer.parseInt(getStringParameter(name));
-    } catch (NumberFormatException nfe) {
-      return Integer.MIN_VALUE;
-    }
-  }
-
-  /**
-   * Get the parameter value as an long. If it is not a valid number
-   * Long.MIN_VALUE will be returned.
-   * 
-   * @param name The parameter name.
-   * @return The parameter value.
-   */
-  public long getLongParameter(final String name) {
-    try {
-      return Long.parseLong(getStringParameter(name));
-    } catch (NumberFormatException nfe) {
-      return Long.MIN_VALUE;
-    }
-  }
-
-  /**
-   * Get the parameter value as an boolean. See
-   * {@link Boolean#getBoolean(java.lang.String)} for more details.
-   * 
-   * @param name The parameter name.
-   * @return The parameter value.
-   */
-  public boolean getBooleanParameter(final String name) {
-    String value = getStringParameter(name);
-    return Boolean.valueOf(value).booleanValue();
   }
 
   /**
@@ -170,6 +188,16 @@ public class ActionConfig {
   }
 
   /**
+   * Get the hash code for the object.
+   * 
+   * @return The hash code.
+   */
+  @Override
+  public int hashCode() {
+    return type.hashCode() + (parameters.hashCode() << 2);
+  }
+
+  /**
    * @param type The type to set.
    */
   public void setType(final String type) {
@@ -177,36 +205,11 @@ public class ActionConfig {
   }
 
   /**
-   * Compare this action config with another. Two action configs are equal if
-   * the type and parameters are equal.
-   * 
-   * @param o The object to compare to.
-   * @return True if the two objects are equal.
-   */
-  public boolean equals(final Object o) {
-    if (o instanceof ActionConfig) {
-      ActionConfig a = (ActionConfig)o;
-      if (a.type.equals(type) && a.parameters.equals(parameters)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Get the hash code for the object.
-   * 
-   * @return The hash code.
-   */
-  public int hashCode() {
-    return type.hashCode() + (parameters.hashCode() << 2);
-  }
-
-  /**
    * Get the string representation of the object.
    * 
    * @return The string representation.
    */
+  @Override
   public String toString() {
     return new StringBuffer(type).append(" ").append(parameters).toString();
   }

@@ -19,8 +19,7 @@ public interface ChannelInput<T> extends Iterable<T> {
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
-  T read(
-    long timeout);
+  T read(long timeout);
 
   void readConnect();
 

@@ -15,14 +15,12 @@ public class ListDataObjectReader extends AbstractReader<DataObject> implements
 
   private List<DataObject> objects = new ArrayList<DataObject>();
 
-  public ListDataObjectReader(
-    final DataObjectMetaData metaData,
+  public ListDataObjectReader(final DataObjectMetaData metaData,
     final DataObject... objects) {
     this(metaData, Arrays.asList(objects));
   }
 
-  public ListDataObjectReader(
-    final DataObjectMetaData metaData,
+  public ListDataObjectReader(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
     this.metaData = metaData;
     this.objects = objects;

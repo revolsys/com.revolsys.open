@@ -8,19 +8,25 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
   public BaseInProcess() {
   }
 
-  public BaseInProcess(
-    final Channel<T> in) {
+  public BaseInProcess(final Channel<T> in) {
     super(in);
   }
 
-  public BaseInProcess(
-    final int bufferSize) {
+  public BaseInProcess(final int bufferSize) {
     super(bufferSize);
   }
 
+  protected void postRun(final Channel<T> in) {
+  }
+
+  protected void preRun(final Channel<T> in) {
+  }
+
+  protected void process(final Channel<T> in, final T object) {
+  }
+
   @Override
-  protected final void run(
-    final Channel<T> in) {
+  protected final void run(final Channel<T> in) {
     running = true;
     try {
       preRun(in);
@@ -37,19 +43,6 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
         running = false;
       }
     }
-  }
-
-  protected void process(
-    final Channel<T> in,
-    final T object) {
-  }
-
-  protected void preRun(
-    final Channel<T> in) {
-  }
-
-  protected void postRun(
-    final Channel<T> in) {
   }
 
 }

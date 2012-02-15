@@ -7,11 +7,12 @@ import com.revolsys.gis.model.geometry.LineSegment;
 
 public class PointOnLineSegment implements Filter<Coordinates> {
 
-  private LineSegment lineSegment;
+  private final LineSegment lineSegment;
 
-  private double maxDistance;
+  private final double maxDistance;
 
-  public PointOnLineSegment(LineSegment lineSegment, double maxDistance) {
+  public PointOnLineSegment(final LineSegment lineSegment,
+    final double maxDistance) {
     this.lineSegment = lineSegment;
     this.maxDistance = maxDistance;
   }

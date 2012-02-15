@@ -37,9 +37,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private final XmlWriter out;
 
-  public GmlDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Writer out) {
+  public GmlDataObjectWriter(final DataObjectMetaData metaData, final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
   }
@@ -89,17 +87,14 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   }
 
   @Override
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     if (name.equals(IoConstants.GEOMETRY_FACTORY)) {
       this.geometryFactory = (GeometryFactory)value;
     }
     super.setProperty(name, value);
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     if (!opened) {
       writeHeader();
     }

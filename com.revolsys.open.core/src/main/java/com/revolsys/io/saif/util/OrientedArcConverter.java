@@ -16,16 +16,14 @@ public class OrientedArcConverter extends ArcConverter {
 
   private final OsnConverterRegistry converters;
 
-  public OrientedArcConverter(
-    final GeometryFactory geometryFactory,
+  public OrientedArcConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     super(geometryFactory, "Arc");
     this.converters = converters;
   }
 
   @Override
-  public Object read(
-    final OsnIterator iterator) {
+  public Object read(final OsnIterator iterator) {
     Geometry geometry = null;
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put("type", GEOMETRY_CLASS);
@@ -48,9 +46,7 @@ public class OrientedArcConverter extends ArcConverter {
   }
 
   @Override
-  public void write(
-    final OsnSerializer serializer,
-    final Object object)
+  public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     if (object instanceof LineString) {
       final LineString lineString = (LineString)object;

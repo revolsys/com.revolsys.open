@@ -15,14 +15,16 @@ public interface DataObjectReaderFactory extends IoFactory {
 
   DataObjectReader createDataObjectReader(Resource resource);
 
-  DataObjectReader createDataObjectReader(Resource resource,
+  DataObjectReader createDataObjectReader(
+    Resource resource,
     DataObjectFactory factory);
 
   Reader<DataObject> createDirectoryDataObjectReader();
 
   Reader<DataObject> createDirectoryDataObjectReader(File file);
 
-  Reader<DataObject> createDirectoryDataObjectReader(File file,
+  Reader<DataObject> createDirectoryDataObjectReader(
+    File file,
     DataObjectFactory factory);
 
   Set<CoordinateSystem> getCoordinateSystems();

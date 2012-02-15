@@ -26,6 +26,11 @@ public class QueueOfNamedQueues<T> {
     }
   }
 
+  public void clear() {
+    valuesByName.clear();
+    sequenceQueuesByName.clear();
+  }
+
   public T element() {
     return element(new ArrayList<String>(sequenceQueuesByName.keySet()));
   }
@@ -37,6 +42,10 @@ public class QueueOfNamedQueues<T> {
     } else {
       return getHead(selectedName);
     }
+  }
+
+  public T element(final String... names) {
+    return element(Arrays.asList(names));
   }
 
   private T getHead(final String selectedName) {
@@ -99,6 +108,10 @@ public class QueueOfNamedQueues<T> {
     }
   }
 
+  public T peek(final String... names) {
+    return peek(Arrays.asList(names));
+  }
+
   public T poll() {
     return poll(new ArrayList<String>(sequenceQueuesByName.keySet()));
   }
@@ -110,6 +123,10 @@ public class QueueOfNamedQueues<T> {
     } else {
       return removeHead(selectedName);
     }
+  }
+
+  public T poll(final String... names) {
+    return poll(Arrays.asList(names));
   }
 
   public T remove() {
@@ -127,18 +144,6 @@ public class QueueOfNamedQueues<T> {
 
   public T remove(final String... names) {
     return remove(Arrays.asList(names));
-  }
-
-  public T element(final String... names) {
-    return element(Arrays.asList(names));
-  }
-
-  public T poll(final String... names) {
-    return poll(Arrays.asList(names));
-  }
-
-  public T peek(final String... names) {
-    return peek(Arrays.asList(names));
   }
 
   private T removeHead(final String selectedName) {

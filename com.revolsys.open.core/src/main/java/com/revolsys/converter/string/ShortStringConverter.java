@@ -3,20 +3,20 @@ package com.revolsys.converter.string;
 import org.springframework.util.StringUtils;
 
 public class ShortStringConverter implements StringConverter<Short> {
+  public Class<Short> getConvertedClass() {
+    return Short.class;
+  }
+
   public boolean requiresQuotes() {
     return false;
   }
 
-  public String toString(Short value) {
-    return value.toString();
-  }
-
-  public Short toObject(Object value) {
+  public Short toObject(final Object value) {
     if (value instanceof Short) {
-      Short integer = (Short)value;
+      final Short integer = (Short)value;
       return integer;
     } else if (value instanceof Number) {
-      Number number = (Number)value;
+      final Number number = (Number)value;
       return number.shortValue();
     } else if (value == null) {
       return null;
@@ -25,7 +25,7 @@ public class ShortStringConverter implements StringConverter<Short> {
     }
   }
 
-  public Short toObject(String string) {
+  public Short toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Short.valueOf(string);
     } else {
@@ -33,7 +33,7 @@ public class ShortStringConverter implements StringConverter<Short> {
     }
   }
 
-  public Class<Short> getConvertedClass() {
-    return Short.class;
+  public String toString(final Short value) {
+    return value.toString();
   }
 }

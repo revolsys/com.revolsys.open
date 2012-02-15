@@ -6,8 +6,7 @@ import com.revolsys.gis.graph.Graph;
 
 public class DeleteEdgeVisitor<T> implements Visitor<Edge<T>> {
 
-  public boolean visit(
-    Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final Graph<T> graph = edge.getGraph();
     graph.remove(edge);
     return true;

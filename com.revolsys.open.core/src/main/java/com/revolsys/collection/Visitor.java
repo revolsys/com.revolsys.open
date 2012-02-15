@@ -28,6 +28,5 @@ public interface Visitor<T> {
    * @param item The item to process.
    * @return True if further items are to be processed, false otherwise.
    */
-  boolean visit(
-    T item);
+  boolean visit(T item);
 }

@@ -41,16 +41,6 @@ public class ActionInitException extends ActionException {
   }
 
   /**
-   * Construct a new ActionInitException with an original Exception. This should
-   * be used to propagate the original exception.
-   * 
-   * @param rootCause The original exception that was thrown
-   */
-  public ActionInitException(final Throwable rootCause) {
-    super(rootCause);
-  }
-
-  /**
    * Construct a new ActionInitException with an original Exception and the
    * specified message. This should be used to propagate the original exception.
    * 
@@ -59,5 +49,15 @@ public class ActionInitException extends ActionException {
    */
   public ActionInitException(final String message, final Throwable rootCause) {
     super(message, rootCause);
+  }
+
+  /**
+   * Construct a new ActionInitException with an original Exception. This should
+   * be used to propagate the original exception.
+   * 
+   * @param rootCause The original exception that was thrown
+   */
+  public ActionInitException(final Throwable rootCause) {
+    super(rootCause);
   }
 }

@@ -11,13 +11,21 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class PointUtil {
 
-  public static Point getPointWithin(
-    Polygon polygon) {
+  public static Point createRandomPoint(
+    final GeometryFactory factory,
+    final Envelope envelope) {
+    final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
+    final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
+    final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
+    return factory.createPoint(coordinatesList);
+  }
+
+  public static Point getPointWithin(final Polygon polygon) {
     final GeometryFactory factory = GeometryFactory.getFactory(polygon);
-    Point centroid = polygon.getCentroid();
+    final Point centroid = polygon.getCentroid();
     if (centroid.within(polygon)) {
-      Coordinates coordinates = CoordinatesUtil.get(centroid);
-      CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
+      final Coordinates coordinates = CoordinatesUtil.get(centroid);
+      final CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
         coordinates.getX(), coordinates.getY());
       return factory.createPoint(coordinatesList);
     } else {
@@ -33,15 +41,6 @@ public class PointUtil {
       }
       return point;
     }
-  }
-
-  public static Point createRandomPoint(
-    GeometryFactory factory,
-    Envelope envelope) {
-    double x = envelope.getMinX() + envelope.getWidth() * Math.random();
-    double y = envelope.getMinY() + envelope.getHeight() * Math.random();
-    CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
-    return factory.createPoint(coordinatesList);
   }
 
 }

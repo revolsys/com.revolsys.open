@@ -36,19 +36,19 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   }
 
   @Override
+  public void close() throws IOException {
+    flush();
+    out.close();
+    super.close();
+  }
+
+  @Override
   public void flush() {
     try {
       out.flush();
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public void close() throws IOException {
-    flush();
-    out.close();
-    super.close();
   }
 
   public long getFilePointer() throws IOException {

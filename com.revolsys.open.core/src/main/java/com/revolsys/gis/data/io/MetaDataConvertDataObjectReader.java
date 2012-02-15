@@ -15,26 +15,26 @@ import com.revolsys.io.Reader;
 public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
   implements DataObjectReader, Iterator<DataObject> {
 
-  private DataObjectMetaData metaData;
+  private final DataObjectMetaData metaData;
 
-  private Reader<DataObject> reader;
+  private final Reader<DataObject> reader;
 
   private boolean open;
 
   private Iterator<DataObject> iterator;
 
-  public MetaDataConvertDataObjectReader(DataObjectMetaData metaData,
-    Reader<DataObject> reader) {
+  public MetaDataConvertDataObjectReader(final DataObjectMetaData metaData,
+    final Reader<DataObject> reader) {
     this.metaData = metaData;
     this.reader = reader;
   }
 
-  public DataObjectMetaData getMetaData() {
-    return metaData;
+  public void close() {
+    reader.close();
   }
 
-  public Iterator<DataObject> iterator() {
-    return this;
+  public DataObjectMetaData getMetaData() {
+    return metaData;
   }
 
   public boolean hasNext() {
@@ -44,17 +44,21 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
     return iterator.hasNext();
   }
 
+  public Iterator<DataObject> iterator() {
+    return this;
+  }
+
   public DataObject next() {
     if (hasNext()) {
-      DataObject source = iterator.next();
-      DataObject target = new ArrayDataObject(metaData);
-      for (Attribute attribute : metaData.getAttributes()) {
-        String name = attribute.getName();
-        Object value = source.getValue(name);
+      final DataObject source = iterator.next();
+      final DataObject target = new ArrayDataObject(metaData);
+      for (final Attribute attribute : metaData.getAttributes()) {
+        final String name = attribute.getName();
+        final Object value = source.getValue(name);
         if (value != null) {
-          DataType dataType = metaData.getAttributeType(name);
-          Object convertedValue = StringConverterRegistry.toObject(dataType,
-            value);
+          final DataType dataType = metaData.getAttributeType(name);
+          final Object convertedValue = StringConverterRegistry.toObject(
+            dataType, value);
           target.setValue(name, convertedValue);
         }
       }
@@ -64,16 +68,12 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
     }
   }
 
-  public void remove() {
-    iterator.remove();
-  }
-
-  public void close() {
-    reader.close();
-  }
-
   public void open() {
     open = true;
     this.iterator = reader.iterator();
+  }
+
+  public void remove() {
+    iterator.remove();
   }
 }

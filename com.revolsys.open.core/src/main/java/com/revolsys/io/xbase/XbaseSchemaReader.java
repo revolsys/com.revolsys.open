@@ -18,24 +18,19 @@ public class XbaseSchemaReader {
 
   private final String typeName;
 
-  public XbaseSchemaReader(
-    final EndianInput in,
-    final String typeName) {
+  public XbaseSchemaReader(final EndianInput in, final String typeName) {
     this.in = in;
     this.typeName = typeName;
   }
 
-  public XbaseSchemaReader(
-    final EndianInput in,
-    final String typeName,
+  public XbaseSchemaReader(final EndianInput in, final String typeName,
     final List<FieldDefinition> fieldDefinitions) {
     this.in = in;
     this.typeName = typeName;
     this.fieldDefinitions = fieldDefinitions;
   }
 
-  protected DataObjectMetaData getMetaData()
-    throws IOException {
+  protected DataObjectMetaData getMetaData() throws IOException {
     if (metaData == null) {
       metaData = new DataObjectMetaDataImpl(new QName(typeName));
       int b = in.read();

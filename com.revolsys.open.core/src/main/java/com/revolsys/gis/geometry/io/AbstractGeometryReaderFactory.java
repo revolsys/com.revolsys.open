@@ -14,8 +14,7 @@ import com.revolsys.io.IoFactoryRegistry;
 
 public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
   implements GeometryReaderFactory {
-  public static GeometryReader geometryReader(
-    final Resource resource) {
+  public static GeometryReader geometryReader(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
     final GeometryReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
       GeometryReaderFactory.class, resource);
@@ -31,9 +30,7 @@ public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 
-  public AbstractGeometryReaderFactory(
-    final String name,
-    final boolean binary) {
+  public AbstractGeometryReaderFactory(final String name, final boolean binary) {
     super(name);
     this.binary = binary;
   }
@@ -52,13 +49,13 @@ public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
   }
 
   protected void setCoordinateSystems(
-    final Set<CoordinateSystem> coordinateSystems) {
-    this.coordinateSystems = coordinateSystems;
+    final CoordinateSystem... coordinateSystems) {
+    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
+      Arrays.asList(coordinateSystems)));
   }
 
   protected void setCoordinateSystems(
-    CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-      Arrays.asList(coordinateSystems)));
+    final Set<CoordinateSystem> coordinateSystems) {
+    this.coordinateSystems = coordinateSystems;
   }
 }

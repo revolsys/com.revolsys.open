@@ -26,7 +26,7 @@ public class CountryField extends SelectField {
 
   public CountryField(final String name, final boolean required) {
     super(name, required);
-    for (Country country: Country.getCountries()){
+    for (final Country country : Country.getCountries()) {
       addOption(country, country.getCodeAplha2(), country.getName());
     }
   }

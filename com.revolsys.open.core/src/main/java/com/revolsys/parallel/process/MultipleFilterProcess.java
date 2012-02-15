@@ -9,51 +9,9 @@ import com.revolsys.filter.Filter;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
-public class MultipleFilterProcess<T> extends BaseInOutProcess<T,T> {
+public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   /** The map of filters to channels. */
-  private Map<Filter<T>, Channel<T>> filters = new LinkedHashMap<Filter<T>, Channel<T>>();
-
-  @Override
-  protected void preRun(Channel<T> in, Channel<T> out) {
-  }
-
-  protected void process(Channel<T> in, Channel<T> out, T object) {
-    for (Entry<Filter<T>, Channel<T>> entry : filters.entrySet()) {
-      Filter<T> filter = entry.getKey();
-      Channel<T> filterOut = entry.getValue();
-      if (processFilter(object, filter, filterOut)) {
-        return;
-      }
-    }
-    if (out != null) {
-      out.write(object);
-    }
-  }
-
-  @Override
-  protected void destroy() {
-    for (Iterator<Channel<T>> channels = filters.values().iterator(); channels.hasNext();) {
-      Channel<T> channel = channels.next();
-      if (channel != null) {
-        channel.writeDisconnect();
-      }
-    }
-  }
-
-  protected boolean processFilter(final T object, final Filter<T> filter,
-    final Channel<T> filterOut) {
-    if (filter.accept(object)) {
-      if (filterOut != null) {
-        try {
-          filterOut.write(object);
-        } catch (ClosedException e) {
-        }
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
+  private final Map<Filter<T>, Channel<T>> filters = new LinkedHashMap<Filter<T>, Channel<T>>();
 
   /**
    * Add the filter with the channel to write the data object to if the filter
@@ -69,6 +27,16 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T,T> {
     }
   }
 
+  @Override
+  protected void destroy() {
+    for (final Iterator<Channel<T>> channels = filters.values().iterator(); channels.hasNext();) {
+      final Channel<T> channel = channels.next();
+      if (channel != null) {
+        channel.writeDisconnect();
+      }
+    }
+  }
+
   /**
    * @return the filters
    */
@@ -76,13 +44,51 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T,T> {
     return filters;
   }
 
+  @Override
+  protected void preRun(final Channel<T> in, final Channel<T> out) {
+  }
+
+  @Override
+  protected void process(
+    final Channel<T> in,
+    final Channel<T> out,
+    final T object) {
+    for (final Entry<Filter<T>, Channel<T>> entry : filters.entrySet()) {
+      final Filter<T> filter = entry.getKey();
+      final Channel<T> filterOut = entry.getValue();
+      if (processFilter(object, filter, filterOut)) {
+        return;
+      }
+    }
+    if (out != null) {
+      out.write(object);
+    }
+  }
+
+  protected boolean processFilter(
+    final T object,
+    final Filter<T> filter,
+    final Channel<T> filterOut) {
+    if (filter.accept(object)) {
+      if (filterOut != null) {
+        try {
+          filterOut.write(object);
+        } catch (final ClosedException e) {
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * @param filters the filters to set
    */
-  public void setFilters(Map<Filter<T>, Channel<T>> filters) {
-    for (Entry<Filter<T>, Channel<T>> filterEntry : filters.entrySet()) {
-      Filter<T> filter = filterEntry.getKey();
-      Channel<T> channel = filterEntry.getValue();
+  public void setFilters(final Map<Filter<T>, Channel<T>> filters) {
+    for (final Entry<Filter<T>, Channel<T>> filterEntry : filters.entrySet()) {
+      final Filter<T> filter = filterEntry.getKey();
+      final Channel<T> channel = filterEntry.getValue();
       addFiler(filter, channel);
     }
   }

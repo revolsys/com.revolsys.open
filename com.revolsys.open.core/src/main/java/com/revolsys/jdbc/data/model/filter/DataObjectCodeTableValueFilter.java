@@ -23,7 +23,7 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
   private String name;
 
   /** The value to match. */
-  private List<Object> values = new ArrayList<Object>();
+  private final List<Object> values = new ArrayList<Object>();
 
   public DataObjectCodeTableValueFilter() {
   }
@@ -37,10 +37,6 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
   public DataObjectCodeTableValueFilter(final String attributeName,
     final Object... values) {
     this(attributeName, Arrays.asList(values));
-  }
-
-  public void setValue(Object value) {
-    setValues(Collections.singletonList(value));
   }
 
   /**
@@ -97,6 +93,10 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
    */
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public void setValue(final Object value) {
+    setValues(Collections.singletonList(value));
   }
 
   /**

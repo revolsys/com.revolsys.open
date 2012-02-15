@@ -17,9 +17,10 @@ public class ServerOverrideFilter implements Filter {
   public void destroy() {
   }
 
-  public void doFilter(final ServletRequest req,
-    final ServletResponse response, final FilterChain chain)
-    throws IOException, ServletException {
+  public void doFilter(
+    final ServletRequest req,
+    final ServletResponse response,
+    final FilterChain chain) throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest)req;
     request = new ServerOverrideHttpServletRequest(serverUrl, request);
     chain.doFilter(request, response);

@@ -56,8 +56,7 @@ public abstract class AbstractReader<T> extends AbstractObjectWithProperties
    * 
    * @param visitor The visitor.
    */
-  public void visit(
-    final Visitor<T> visitor) {
+  public void visit(final Visitor<T> visitor) {
     for (final T item : this) {
       if (!visitor.visit(item)) {
         return;

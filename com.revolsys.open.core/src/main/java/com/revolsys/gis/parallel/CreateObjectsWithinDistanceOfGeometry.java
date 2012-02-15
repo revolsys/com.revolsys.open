@@ -122,7 +122,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
 
   private void initializeGeometries(final Channel<DataObject> geometryIn) {
     if (geometryIn != null) {
-      for (DataObject object : geometryIn) {
+      for (final DataObject object : geometryIn) {
         geometryObjects.add(object);
       }
     }
@@ -133,14 +133,17 @@ public class CreateObjectsWithinDistanceOfGeometry extends
   }
 
   @Override
-  protected void preRun(final Channel<DataObject> in,
+  protected void preRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     initializeGeometries(geometryIn);
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     if (writeOriginal) {
       out.write(object);
     }

@@ -11,27 +11,51 @@ public class OutputStreamResource extends AbstractResource {
 
   private final String filename;
 
-  private OutputStream outputStream;
+  private final OutputStream outputStream;
 
   private String description;
 
   private boolean read;
 
-  public OutputStreamResource(String filename, OutputStream outputStream,
-    String description) {
+  public OutputStreamResource(final String filename,
+    final OutputStream outputStream) {
+    this.outputStream = outputStream;
+    this.filename = filename;
+  }
+
+  public OutputStreamResource(final String filename,
+    final OutputStream outputStream, final String description) {
     this.filename = filename;
     this.outputStream = outputStream;
     this.description = description;
   }
 
-  public OutputStreamResource(String filename, OutputStream outputStream) {
-    this.outputStream = outputStream;
-    this.filename = filename;
+  @Override
+  public Resource createRelative(final String relativePath) throws IOException {
+    return new NonExistingResource();
+  }
+
+  @Override
+  public boolean equals(final Object object) {
+    return (object == this);
   }
 
   @Override
   public boolean exists() {
     return true;
+  }
+
+  public String getDescription() {
+    return this.description;
+  }
+
+  @Override
+  public String getFilename() throws IllegalStateException {
+    return filename;
+  }
+
+  public InputStream getInputStream() throws IOException {
+    throw new IllegalArgumentException("No input stream exists");
   }
 
   public OutputStream getOutputStream() {
@@ -45,35 +69,12 @@ public class OutputStreamResource extends AbstractResource {
   }
 
   @Override
-  public boolean isOpen() {
-    return true;
-  }
-
-  @Override
-  public String getFilename() throws IllegalStateException {
-    return filename;
-  }
-
-  @Override
-  public Resource createRelative(String relativePath) throws IOException {
-    return new NonExistingResource();
-  }
-
-  public String getDescription() {
-    return this.description;
-  }
-
-  @Override
-  public boolean equals(Object object) {
-    return (object == this);
-  }
-
-  @Override
   public int hashCode() {
     return outputStream.hashCode();
   }
 
-  public InputStream getInputStream() throws IOException {
-    throw new IllegalArgumentException("No input stream exists");
+  @Override
+  public boolean isOpen() {
+    return true;
   }
 }

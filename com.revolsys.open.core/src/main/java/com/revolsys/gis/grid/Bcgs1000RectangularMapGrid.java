@@ -11,15 +11,12 @@ public class Bcgs1000RectangularMapGrid extends Bcgs2000RectangularMapGrid {
     super(BcgsConstants.WIDTH_1000, BcgsConstants.HEIGHT_1000);
   }
 
-  protected Bcgs1000RectangularMapGrid(
-    final double width,
-    final double height) {
+  protected Bcgs1000RectangularMapGrid(final double width, final double height) {
     super(width, height);
   }
 
   @Override
-  public double getLatitude(
-    final String mapTileName) {
+  public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -49,8 +46,7 @@ public class Bcgs1000RectangularMapGrid extends Bcgs2000RectangularMapGrid {
   }
 
   @Override
-  public double getLongitude(
-    final String mapTileName) {
+  public double getLongitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
       final String blockName = matcher.group(1);
@@ -80,9 +76,7 @@ public class Bcgs1000RectangularMapGrid extends Bcgs2000RectangularMapGrid {
   }
 
   @Override
-  public String getMapTileName(
-    final double x,
-    final double y) {
+  public String getMapTileName(final double x, final double y) {
     final String letterBlock = super.getMapTileName(x, y);
 
     final double xSheet = (x + 180) * 100;

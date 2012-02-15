@@ -38,7 +38,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * </p>
  * 
  * <pre>
- *     
+ * 
  *      &lt;%@ taglib uri=&quot;http://dev.nhigh.com/taglibs/nice&quot; prefix=&quot;nice&quot; %&gt;
  *      &lt;html&gt;
  *      &lt;head&gt;
@@ -50,13 +50,12 @@ import com.revolsys.ui.web.config.WebUiContext;
  *        .
  *      &lt;/body&gt;
  *      &lt;/html&gt;
- *      
- * </pre>
  * 
+ * </pre>
  * <dl>
  * <dt><B>Input Attributes: </B>
- * <dd><code>nice</code>- A Layout bean containing the component for the
- * current template.</dd>
+ * <dd><code>nice</code>- A Layout bean containing the component for the current
+ * template.</dd>
  * </dl>
  * 
  * @author P. D. Austin
@@ -70,36 +69,41 @@ public class IncludeTag extends TagSupport {
 
   private static final Logger log = Logger.getLogger(IncludeTag.class);
 
-  /**
-   * Process the start tag.
-   * 
-   * @return SKIP_BODY
-   */
-  public int doStartTag() throws JspException {
-    try {
-      WebUiContext context = WebUiContext.get();
-      if (context != null) {
-        Layout layout = context.getCurrentLayout();
-        if (layout != null) {
-          Component component = layout.getComponent(name);
-          if (component != null) {
-            component.includeComponent(pageContext);
-          }
-        }
-      }
-    } catch (Throwable t) {
-      log.error("Error including component: " + name, t);
-    }
-    return SKIP_BODY;
-  }
+  /** The name of the component to include */
+  private String name;
 
   /**
    * Process the end tag.
    * 
    * @return EVAL_PAGE
    */
+  @Override
   public int doEndTag() throws JspException {
     return EVAL_PAGE;
+  }
+
+  /**
+   * Process the start tag.
+   * 
+   * @return SKIP_BODY
+   */
+  @Override
+  public int doStartTag() throws JspException {
+    try {
+      final WebUiContext context = WebUiContext.get();
+      if (context != null) {
+        final Layout layout = context.getCurrentLayout();
+        if (layout != null) {
+          final Component component = layout.getComponent(name);
+          if (component != null) {
+            component.includeComponent(pageContext);
+          }
+        }
+      }
+    } catch (final Throwable t) {
+      log.error("Error including component: " + name, t);
+    }
+    return SKIP_BODY;
   }
 
   /**
@@ -119,7 +123,4 @@ public class IncludeTag extends TagSupport {
   public void setName(final String name) {
     this.name = name;
   }
-
-  /** The name of the component to include */
-  private String name;
 }

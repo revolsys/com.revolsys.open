@@ -27,14 +27,15 @@ import com.revolsys.ui.web.exception.ActionInitException;
 public abstract class SpringFrameworkAction extends IafAction {
   private WebApplicationContext applicationContext;
 
-  public void init(final ActionConfig actionConfig) throws ActionInitException {
-    super.init(actionConfig);
-    ServletContext servletContext = actionConfig.getConfig()
-      .getServletContext();
-    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-  }
-
   public WebApplicationContext getApplicationContext() {
     return applicationContext;
+  }
+
+  @Override
+  public void init(final ActionConfig actionConfig) throws ActionInitException {
+    super.init(actionConfig);
+    final ServletContext servletContext = actionConfig.getConfig()
+      .getServletContext();
+    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
   }
 }

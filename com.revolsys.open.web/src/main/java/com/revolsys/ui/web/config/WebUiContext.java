@@ -42,13 +42,11 @@ public class WebUiContext {
     return servletContext;
   }
 
-  public static void set(
-    final WebUiContext context) {
+  public static void set(final WebUiContext context) {
     local.set(context);
   }
 
-  public static void setServletContext(
-    final ServletContext servletContext) {
+  public static void setServletContext(final ServletContext servletContext) {
     WebUiContext.servletContext = servletContext;
   }
 
@@ -69,11 +67,8 @@ public class WebUiContext {
   public WebUiContext() {
   }
 
-  public WebUiContext(
-    final Config config,
-    final String contextPath,
-    final Page page,
-    final HttpServletRequest request,
+  public WebUiContext(final Config config, final String contextPath,
+    final Page page, final HttpServletRequest request,
     final HttpServletResponse response) {
     this.config = config;
     this.contextPath = contextPath;
@@ -85,8 +80,7 @@ public class WebUiContext {
     this.response = response;
   }
 
-  public Object evaluateExpression(
-    final Expression expression) {
+  public Object evaluateExpression(final Expression expression) {
     final JexlContext jexlContext = new JexlHttpServletRequestContext(request);
     try {
       return expression.evaluate(jexlContext);
@@ -97,8 +91,7 @@ public class WebUiContext {
     }
   }
 
-  public Object evaluateExpression(
-    final String expression) {
+  public Object evaluateExpression(final String expression) {
     try {
       return evaluateExpression(ExpressionFactory.createExpression(expression));
     } catch (final Exception e) {
@@ -124,8 +117,7 @@ public class WebUiContext {
     return menu;
   }
 
-  public Menu getMenu(
-    final String name) {
+  public Menu getMenu(final String name) {
     return config.getMenu(name);
   }
 
@@ -145,13 +137,11 @@ public class WebUiContext {
     return (Layout)layouts.pop();
   }
 
-  public void pushLayout(
-    final Layout layout) {
+  public void pushLayout(final Layout layout) {
     layouts.push(layout);
   }
 
-  public void setPage(
-    final Page page) {
+  public void setPage(final Page page) {
     this.page = page;
   }
 }

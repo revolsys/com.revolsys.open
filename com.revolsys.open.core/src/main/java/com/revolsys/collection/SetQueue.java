@@ -6,17 +6,22 @@ import java.util.LinkedHashSet;
 
 public class SetQueue<E> extends AbstractQueue<E> {
 
-  private LinkedHashSet<E> set = new LinkedHashSet<E>();
+  private final LinkedHashSet<E> set = new LinkedHashSet<E>();
 
-  public boolean offer(E o) {
+  @Override
+  public Iterator<E> iterator() {
+    return set.iterator();
+  }
+
+  public boolean offer(final E o) {
     set.add(o);
     return true;
   }
 
   public E peek() {
-    Iterator<E> iterator = iterator();
+    final Iterator<E> iterator = iterator();
     if (iterator.hasNext()) {
-      E value = iterator.next();
+      final E value = iterator.next();
       return value;
     } else {
       return null;
@@ -24,19 +29,14 @@ public class SetQueue<E> extends AbstractQueue<E> {
   }
 
   public E poll() {
-    Iterator<E> iterator = iterator();
+    final Iterator<E> iterator = iterator();
     if (iterator.hasNext()) {
-      E value = iterator.next();
+      final E value = iterator.next();
       iterator.remove();
       return value;
     } else {
       return null;
     }
-  }
-
-  @Override
-  public Iterator<E> iterator() {
-    return set.iterator();
   }
 
   @Override

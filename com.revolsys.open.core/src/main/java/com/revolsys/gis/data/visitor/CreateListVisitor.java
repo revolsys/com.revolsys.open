@@ -18,8 +18,7 @@ public class CreateListVisitor<T> implements Visitor<T> {
     return list;
   }
 
-  public boolean visit(
-    final T item) {
+  public boolean visit(final T item) {
     list.add(item);
     return true;
   }

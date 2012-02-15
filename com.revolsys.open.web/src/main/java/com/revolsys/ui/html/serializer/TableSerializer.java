@@ -18,21 +18,21 @@ package com.revolsys.ui.html.serializer;
 import com.revolsys.io.xml.XmlWriter;
 
 public interface TableSerializer {
-  int getColumnCount();
+  String getBodyCssClass(int row, int col);
 
   int getBodyRowCount();
+
+  int getColumnCount();
+
+  String getFooterCssClass(int row, int col);
 
   int getFooterRowCount();
 
   String getHeaderCssClass(int col);
 
-  String getFooterCssClass(int row, int col);
-
-  String getBodyCssClass(int row, int col);
-
-  void serializeHeaderCell(XmlWriter out, int col);
-
   void serializeBodyCell(XmlWriter out, int row, int col);
 
   void serializeFooterCell(XmlWriter out, int row, int col);
+
+  void serializeHeaderCell(XmlWriter out, int col);
 }

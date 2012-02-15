@@ -23,17 +23,17 @@ public class GeometryFactoryFieldType extends AbstractEcsvFieldType {
 
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
-      String[] values = text.split(",");
-      int srid = Integer.parseInt(values[0]);
-      double scaleXy = Double.parseDouble(values[1]);
+      final String[] values = text.split(",");
+      final int srid = Integer.parseInt(values[0]);
+      final double scaleXy = Double.parseDouble(values[1]);
       if (values.length == 2) {
-        GeometryFactory geometryFactory = GeometryFactory.getFactory(srid, 2,
-          scaleXy, 0);
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+          srid, 2, scaleXy, 0);
         return geometryFactory;
       } else {
-        double scaleZ = Double.parseDouble(values[2]);
-        GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
-          scaleXy, scaleZ);
+        final double scaleZ = Double.parseDouble(values[2]);
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+          srid, scaleXy, scaleZ);
         return geometryFactory;
       }
     } else {
@@ -43,7 +43,7 @@ public class GeometryFactoryFieldType extends AbstractEcsvFieldType {
 
   public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof GeometryFactory) {
-      GeometryFactory geometryFactory = (GeometryFactory)value;
+      final GeometryFactory geometryFactory = (GeometryFactory)value;
       out.print('"');
       final int srid = geometryFactory.getSRID();
       out.print(srid);

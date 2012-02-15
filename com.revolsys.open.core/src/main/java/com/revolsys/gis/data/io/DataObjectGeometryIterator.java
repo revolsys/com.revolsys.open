@@ -11,15 +11,15 @@ public class DataObjectGeometryIterator extends DelegatingObjectWithProperties
   implements Iterator<Geometry> {
   private Iterator<DataObject> iterator;
 
+  public DataObjectGeometryIterator(final Iterator<DataObject> iterator) {
+    super(iterator);
+    this.iterator = iterator;
+  }
+
+  @Override
   public void close() {
     super.close();
     iterator = null;
-  }
-
-  public DataObjectGeometryIterator(
-    Iterator<DataObject> iterator) {
-    super(iterator);
-    this.iterator = iterator;
   }
 
   public boolean hasNext() {

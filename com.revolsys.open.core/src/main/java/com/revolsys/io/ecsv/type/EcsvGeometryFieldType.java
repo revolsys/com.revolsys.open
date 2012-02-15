@@ -31,12 +31,11 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
   private final NumberFormat FORMAT = new DecimalFormat(
     "#.#########################");
 
-  private GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
-  private QName typeName;
+  private final QName typeName;
 
-  public EcsvGeometryFieldType(
-    final DataType dataType,
+  public EcsvGeometryFieldType(final DataType dataType,
     final GeometryFactory geometryFactory) {
     super(dataType);
     this.geometryFactory = geometryFactory;
@@ -44,13 +43,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
       _NS_PREFIX);
   }
 
-  @Override
-  public QName getTypeName() {
-    return typeName;
-  }
-
-  private int getDimension(
-    final Geometry geometry) {
+  private int getDimension(final Geometry geometry) {
     int dimension = 0;
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry subGeometry = geometry.getGeometryN(i);
@@ -61,8 +54,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     return dimension;
   }
 
-  private int getNumAxis(
-    final StringBuffer text) {
+  private int getNumAxis(final StringBuffer text) {
     if (text.charAt(0) == '[') {
       final int endAxisIndex = text.indexOf("]");
       if (endAxisIndex == -1) {
@@ -79,8 +71,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     return 2;
   }
 
-  private Map<String, String> getParameters(
-    final StringBuffer text) {
+  private Map<String, String> getParameters(final StringBuffer text) {
     if (text.charAt(0) == '{') {
       final int endIndex = text.indexOf("}");
       if (endIndex == -1) {
@@ -90,6 +81,11 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
       }
     }
     return Collections.emptyMap();
+  }
+
+  @Override
+  public QName getTypeName() {
+    return typeName;
   }
 
   private CoordinatesList parseCoordinates(
@@ -110,16 +106,107 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     }
   }
 
-  private Object parseLineString(
-    final StringBuffer text) {
+  private Object parseLineString(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     final Map<String, String> parameters = getParameters(text);
     final CoordinatesList points = parseCoordinates(text, numAxis);
     return geometryFactory.createLineString(points);
   }
 
-  private Object parsePoint(
-    final StringBuffer text) {
+  private Object parseMultiGeometry(final StringBuffer text) {
+    switch (text.charAt(0)) {
+      case 'P':
+        text.delete(0, 1);
+        return parseMultiPoint(text);
+      case 'L':
+        text.delete(0, 1);
+        return parseMultiLineString(text);
+      case 'A':
+        text.delete(0, 1);
+        return parseMultiPolygon(text);
+      default:
+        throw new IllegalArgumentException("Unknown geometry type");
+    }
+  }
+
+  private Object parseMultiLineString(final StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    final List<CoordinatesList> lines = parseParts(text, numAxis);
+    return geometryFactory.createMultiLineString(lines);
+  }
+
+  private Object parseMultiPoint(final StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    final List<CoordinatesList> points = parseParts(text, numAxis);
+    return geometryFactory.createMultiPoint(points);
+  }
+
+  private Object parseMultiPolygon(final StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    final List<List<CoordinatesList>> parts = parsePartsList(text, numAxis);
+    return geometryFactory.createMultiPolygon(parts);
+  }
+
+  private List<CoordinatesList> parseParts(
+    final StringBuffer text,
+    final int numAxis) {
+    final List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
+    final char firstChar = text.charAt(0);
+    switch (firstChar) {
+      case '(':
+        do {
+          text.delete(0, 1);
+          final CoordinatesList coordinates = parseCoordinates(text, numAxis);
+          lines.add(coordinates);
+        } while (text.charAt(0) == ',');
+        if (text.charAt(0) == ')') {
+          text.delete(0, 1);
+        } else {
+          throw new IllegalArgumentException("Expecting ) not" + text);
+        }
+      break;
+      case ')':
+        text.delete(0, 2);
+      break;
+
+      default:
+        throw new IllegalArgumentException("Expecting ( not" + text);
+    }
+    return lines;
+  }
+
+  private List<List<CoordinatesList>> parsePartsList(
+    final StringBuffer text,
+    final int numAxis) {
+    final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
+    final char firstChar = text.charAt(0);
+    switch (firstChar) {
+      case '(':
+        do {
+          text.delete(0, 1);
+          final List<CoordinatesList> parts = parseParts(text, numAxis);
+          partsList.add(parts);
+        } while (text.charAt(0) == ',');
+        if (text.charAt(0) == ')') {
+          text.delete(0, 1);
+        } else {
+          throw new IllegalArgumentException("Expecting ) not" + text);
+        }
+      break;
+      case ')':
+        text.delete(0, 2);
+      break;
+
+      default:
+        throw new IllegalArgumentException("Expecting ( not" + text);
+    }
+    return partsList;
+  }
+
+  private Object parsePoint(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     final Map<String, String> parameters = getParameters(text);
     final CoordinatesList points = parseCoordinates(text, numAxis);
@@ -132,8 +219,14 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     }
   }
 
-  public Object parseValue(
-    final String value) {
+  private Object parsePolygon(final StringBuffer text) {
+    final int numAxis = getNumAxis(text);
+    final Map<String, String> parameters = getParameters(text);
+    final List<CoordinatesList> parts = parseParts(text, numAxis);
+    return geometryFactory.createPolygon(parts);
+  }
+
+  public Object parseValue(final String value) {
     if (StringUtils.hasLength(value)) {
       final StringBuffer text = new StringBuffer(value);
       switch (text.charAt(0)) {
@@ -155,111 +248,6 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     } else {
       return geometryFactory.createPoint((Coordinates)null);
     }
-  }
-
-  private Object parseMultiGeometry(
-    StringBuffer text) {
-    switch (text.charAt(0)) {
-      case 'P':
-        text.delete(0, 1);
-        return parseMultiPoint(text);
-      case 'L':
-        text.delete(0, 1);
-        return parseMultiLineString(text);
-      case 'A':
-        text.delete(0, 1);
-        return parseMultiPolygon(text);
-      default:
-        throw new IllegalArgumentException("Unknown geometry type");
-    }
-  }
-
-  private Object parseMultiPoint(
-    StringBuffer text) {
-    final int numAxis = getNumAxis(text);
-    final Map<String, String> parameters = getParameters(text);
-    List<CoordinatesList> points = parseParts(text, numAxis);
-    return geometryFactory.createMultiPoint(points);
-  }
-
-  private Object parseMultiLineString(
-    StringBuffer text) {
-    final int numAxis = getNumAxis(text);
-    final Map<String, String> parameters = getParameters(text);
-    List<CoordinatesList> lines = parseParts(text, numAxis);
-    return geometryFactory.createMultiLineString(lines);
-  }
-
-  private Object parsePolygon(
-    StringBuffer text) {
-    final int numAxis = getNumAxis(text);
-    final Map<String, String> parameters = getParameters(text);
-    List<CoordinatesList> parts = parseParts(text, numAxis);
-    return geometryFactory.createPolygon(parts);
-  }
-
-  private Object parseMultiPolygon(
-    StringBuffer text) {
-    final int numAxis = getNumAxis(text);
-    final Map<String, String> parameters = getParameters(text);
-    List<List<CoordinatesList>> parts = parsePartsList(text, numAxis);
-    return geometryFactory.createMultiPolygon(parts);
-  }
-
-  private List<CoordinatesList> parseParts(
-    StringBuffer text,
-    final int numAxis) {
-    List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
-    final char firstChar = text.charAt(0);
-    switch (firstChar) {
-      case '(':
-        do {
-          text.delete(0, 1);
-          CoordinatesList coordinates = parseCoordinates(text, numAxis);
-          lines.add(coordinates);
-        } while (text.charAt(0) == ',');
-        if (text.charAt(0) == ')') {
-          text.delete(0, 1);
-        } else {
-          throw new IllegalArgumentException("Expecting ) not" + text);
-        }
-      break;
-      case ')':
-        text.delete(0, 2);
-      break;
-
-      default:
-        throw new IllegalArgumentException("Expecting ( not" + text);
-    }
-    return lines;
-  }
-
-  private List<List<CoordinatesList>> parsePartsList(
-    StringBuffer text,
-    final int numAxis) {
-    List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
-    final char firstChar = text.charAt(0);
-    switch (firstChar) {
-      case '(':
-        do {
-          text.delete(0, 1);
-          List<CoordinatesList> parts = parseParts(text, numAxis);
-          partsList.add(parts);
-        } while (text.charAt(0) == ',');
-        if (text.charAt(0) == ')') {
-          text.delete(0, 1);
-        } else {
-          throw new IllegalArgumentException("Expecting ) not" + text);
-        }
-      break;
-      case ')':
-        text.delete(0, 2);
-      break;
-
-      default:
-        throw new IllegalArgumentException("Expecting ( not" + text);
-    }
-    return partsList;
   }
 
   private void writeCoordinate(
@@ -474,9 +462,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     writeCoordinates(out, polygon, dimension);
   }
 
-  public void writeValue(
-    final PrintWriter out,
-    final Object object) {
+  public void writeValue(final PrintWriter out, final Object object) {
     if (object instanceof Geometry) {
       out.print(DOUBLE_QUOTE);
       final Geometry geometry = (Geometry)object;

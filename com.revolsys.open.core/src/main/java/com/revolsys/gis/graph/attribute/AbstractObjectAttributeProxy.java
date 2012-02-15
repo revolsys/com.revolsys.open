@@ -8,11 +8,9 @@ public abstract class AbstractObjectAttributeProxy<T, O> implements
     value = null;
   }
 
-  public abstract T createValue(
-    final O object);
+  public abstract T createValue(final O object);
 
-  public T getValue(
-    final O object) {
+  public T getValue(final O object) {
     if (value == null) {
       synchronized (this) {
         if (value == null) {

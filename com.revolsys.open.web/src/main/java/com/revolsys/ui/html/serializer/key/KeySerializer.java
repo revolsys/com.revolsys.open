@@ -1,7 +1,6 @@
 package com.revolsys.ui.html.serializer.key;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 
@@ -12,14 +11,16 @@ import com.revolsys.io.xml.XmlWriter;
  * @author Paul Austin
  */
 public interface KeySerializer {
+  String getLabel();
+
+  String getName();
+
   /**
-   * Serialize the value to the XML writer using the settings from the Locale.
+   * Serialize the value to the XML writer.
    * 
    * @param out The XML writer to serialize to.
-   * @param value The object to get the value from.
-   * @param key The key of the property on the object to serialize.
-   * @param locale The locale.
+   * @param object The object to get the value from.
    * @throws IOException If there was an I/O error serializing the value.
    */
-  void serialize(XmlWriter out, Object value, String key, Locale locale) ;
+  void serialize(XmlWriter out, Object object);
 }

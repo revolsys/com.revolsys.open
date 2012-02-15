@@ -26,8 +26,7 @@ import com.revolsys.orm.core.transaction.InvokeMethodInTransaction;
 public abstract class AbstractTransactionalCommand implements Runnable {
   private final BeanFactory beanFactory;
 
-  public AbstractTransactionalCommand(
-    final BeanFactory beanFactory) {
+  public AbstractTransactionalCommand(final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
@@ -36,7 +35,7 @@ public abstract class AbstractTransactionalCommand implements Runnable {
   }
 
   public void runInTransaction() {
-    InvokeMethodInTransaction invoker = new InvokeMethodInTransaction(
+    final InvokeMethodInTransaction invoker = new InvokeMethodInTransaction(
       getBeanFactory(), false, -1, false);
     invoker.execute(this, "run");
   }

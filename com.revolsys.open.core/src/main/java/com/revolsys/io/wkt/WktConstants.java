@@ -1,6 +1,5 @@
 package com.revolsys.io.wkt;
 
-
 public interface WktConstants {
 
   String FILE_EXTENSION = "wkt";

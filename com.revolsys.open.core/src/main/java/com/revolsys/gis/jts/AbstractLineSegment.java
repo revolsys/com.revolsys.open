@@ -11,27 +11,22 @@ public abstract class AbstractLineSegment implements LineSegment {
     super();
   }
 
-  public boolean contains(
-    final Coordinate coordinate) {
+  public boolean contains(final Coordinate coordinate) {
     final double x = coordinate.x;
     final double y = coordinate.y;
     return (x == getStartX() && y == getStartY())
       || (x == getEndX() && y == getEndY());
   }
 
-  public double getDistance(
-    final Coordinate coordinate) {
+  public double getDistance(final Coordinate coordinate) {
     return getDistance(coordinate.x, coordinate.y);
   }
 
-  public double getDistance(
-    final Coordinates point) {
+  public double getDistance(final Coordinates point) {
     return getDistance(point.getX(), point.getY());
   }
 
-  public double getDistance(
-    final double x,
-    final double y) {
+  public double getDistance(final double x, final double y) {
     final double x1 = getStartX();
     final double y1 = getStartY();
     final double x2 = getEndX();
@@ -48,19 +43,15 @@ public abstract class AbstractLineSegment implements LineSegment {
     return endCoordinates;
   }
 
-  public double getEndDistance(
-    final Coordinate coordinate) {
+  public double getEndDistance(final Coordinate coordinate) {
     return getEndDistance(coordinate.x, coordinate.y);
   }
 
-  public double getEndDistance(
-    final Coordinates point) {
+  public double getEndDistance(final Coordinates point) {
     return getEndDistance(point.getX(), point.getY());
   }
 
-  public double getEndDistance(
-    final double x,
-    final double y) {
+  public double getEndDistance(final double x, final double y) {
     return MathUtil.distance(x, y, getStartX(), getStartY());
   }
 
@@ -89,19 +80,15 @@ public abstract class AbstractLineSegment implements LineSegment {
     return startCoordinates;
   }
 
-  public double getStartDistance(
-    final Coordinate coordinate) {
+  public double getStartDistance(final Coordinate coordinate) {
     return getStartDistance(coordinate.x, coordinate.y);
   }
 
-  public double getStartDistance(
-    final Coordinates point) {
+  public double getStartDistance(final Coordinates point) {
     return getStartDistance(point.getX(), point.getY());
   }
 
-  public double getStartDistance(
-    final double x,
-    final double y) {
+  public double getStartDistance(final double x, final double y) {
     return MathUtil.distance(x, y, getEndX(), getEndY());
   }
 

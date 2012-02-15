@@ -59,8 +59,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
     return targetListClass;
   }
 
-  public void setSourceLists(
-    final List<List<T>> sourceLists) {
+  public void setSourceLists(final List<List<T>> sourceLists) {
     this.sourceLists = sourceLists;
   }
 
@@ -72,8 +71,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
    * 
    * @see java.util.ArrayList
    */
-  public void setTargetListClass(
-    final Class<List<T>> targetListClass) {
+  public void setTargetListClass(final Class<List<T>> targetListClass) {
     if (targetListClass == null) {
       throw new IllegalArgumentException("'targetListClass' must not be null");
     }

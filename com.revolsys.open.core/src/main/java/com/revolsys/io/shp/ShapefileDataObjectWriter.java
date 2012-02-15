@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private static final Logger LOG = Logger.getLogger(ShapefileDataObjectWriter.class);
 
-  private Envelope envelope = new Envelope();
+  private final Envelope envelope = new Envelope();
 
   private ShapefileGeometryWriter geometryConverter;
 
@@ -76,13 +76,13 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private ResourceEndianOutput out;
 
-  private Resource resource;
+  private final Resource resource;
 
   private int recordNumber = 1;
 
-  private double zMax = 0; // Double.MIN_VALUE;
+  private final double zMax = 0; // Double.MIN_VALUE;
 
-  private double zMin = 0; // Double.MAX_VALUE;
+  private final double zMin = 0; // Double.MAX_VALUE;
 
   private GeometryFactory geometryFactory;
 
@@ -90,67 +90,6 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     final Resource resource) throws IOException {
     super(metaData, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
-  }
-
-  @Override
-  protected void preFirstWrite(DataObject object) throws IOException {
-    if (geometryPropertyName != null) {
-      if (geometryFactory == null) {
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry != null) {
-          geometryFactory = GeometryFactory.getFactory(geometry);
-        }
-      }
-      createPrjFile(geometryFactory);
-    }
-  }
-
-  protected void init() throws IOException {
-    super.init();
-    final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)getMetaData();
-    if (metaData != null) {
-      geometryPropertyName = metaData.getGeometryAttributeName();
-      if (geometryPropertyName != null) {
-
-        this.out = new ResourceEndianOutput(resource);
-        writeHeader(this.out);
-
-        if (!hasField(geometryPropertyName)) {
-          addField(new FieldDefinition(geometryPropertyName,
-            FieldDefinition.OBJECT_TYPE, 0));
-        }
-
-        Resource indexResource = SpringUtil.getResourceWithExtension(resource,
-          "shx");
-        if (!(indexResource instanceof NonExistingResource)) {
-          indexOut = new ResourceEndianOutput(indexResource);
-          writeHeader(indexOut);
-        }
-
-        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-      }
-    }
-  }
-
-  private void createPrjFile(GeometryFactory geometryFactory)
-    throws IOException {
-    if (geometryFactory != null) {
-      CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        int srid = coordinateSystem.getId();
-        Resource prjResource = SpringUtil.getResourceWithExtension(resource,
-          "prj");
-        if (!(prjResource instanceof NonExistingResource)) {
-          OutputStream out = SpringUtil.getOutputStream(prjResource);
-          final PrintWriter writer = new PrintWriter(
-            new OutputStreamWriter(out));
-          CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-            "ESRI", String.valueOf(srid)));
-          EsriCsWktWriter.write(writer, esriCoordinateSystem);
-          writer.close();
-        }
-      }
-    }
   }
 
   @Override
@@ -215,6 +154,73 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     } else {
       throw new RuntimeException("Not supported" + geometry.getClass());
     }
+  }
+
+  private void createPrjFile(final GeometryFactory geometryFactory)
+    throws IOException {
+    if (geometryFactory != null) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem != null) {
+        final int srid = coordinateSystem.getId();
+        final Resource prjResource = SpringUtil.getResourceWithExtension(
+          resource, "prj");
+        if (!(prjResource instanceof NonExistingResource)) {
+          final OutputStream out = SpringUtil.getOutputStream(prjResource);
+          final PrintWriter writer = new PrintWriter(
+            new OutputStreamWriter(out));
+          final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
+            "ESRI", String.valueOf(srid)));
+          EsriCsWktWriter.write(writer, esriCoordinateSystem);
+          writer.close();
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void init() throws IOException {
+    super.init();
+    final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)getMetaData();
+    if (metaData != null) {
+      geometryPropertyName = metaData.getGeometryAttributeName();
+      if (geometryPropertyName != null) {
+
+        this.out = new ResourceEndianOutput(resource);
+        writeHeader(this.out);
+
+        if (!hasField(geometryPropertyName)) {
+          addField(new FieldDefinition(geometryPropertyName,
+            FieldDefinition.OBJECT_TYPE, 0));
+        }
+
+        final Resource indexResource = SpringUtil.getResourceWithExtension(
+          resource, "shx");
+        if (!(indexResource instanceof NonExistingResource)) {
+          indexOut = new ResourceEndianOutput(indexResource);
+          writeHeader(indexOut);
+        }
+
+        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+      }
+    }
+  }
+
+  @Override
+  protected void preFirstWrite(final DataObject object) throws IOException {
+    if (geometryPropertyName != null) {
+      if (geometryFactory == null) {
+        final Geometry geometry = object.getGeometryValue();
+        if (geometry != null) {
+          geometryFactory = GeometryFactory.getFactory(geometry);
+        }
+      }
+      createPrjFile(geometryFactory);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "ShapefileWriter(" + resource + ")";
   }
 
   private void updateHeader(final ResourceEndianOutput out) throws IOException {
@@ -301,10 +307,5 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     out.writeInt(recordLength);
     out.writeLEInt(ShapefileConstants.NULL_SHAPE);
     return ShapefileConstants.NULL_SHAPE;
-  }
-
-  @Override
-  public String toString() {
-    return "ShapefileWriter(" + resource + ")";
   }
 }

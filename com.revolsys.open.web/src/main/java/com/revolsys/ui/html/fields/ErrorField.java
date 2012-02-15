@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -33,25 +32,29 @@ public class ErrorField extends Field {
     super(name, true);
   }
 
+  @Override
   public boolean hasValue() {
     return false;
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
   }
 
+  @Override
   public boolean isValid() {
     return false;
   }
 
-  public void setMessage(final String message) {
-    this.message = message;
-  }
-
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "alert");
     out.write(message);
     out.endTag(HtmlUtil.DIV);
+  }
+
+  public void setMessage(final String message) {
+    this.message = message;
   }
 }

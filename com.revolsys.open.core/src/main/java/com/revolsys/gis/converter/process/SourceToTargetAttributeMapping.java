@@ -17,23 +17,23 @@ public class SourceToTargetAttributeMapping extends
     this.targetAttributeMappings = targetAttributeMappings;
   }
 
-  public void process(final DataObject source, final DataObject target) {
-    for (final SourceToTargetProcess<DataObject, DataObject> mapping : targetAttributeMappings.values()) {
-      mapping.process(source, target);
+  @Override
+  public void close() {
+    for (final SourceToTargetProcess<DataObject, DataObject> process : targetAttributeMappings.values()) {
+      process.close();
     }
   }
 
   @Override
   public void init() {
-    for (SourceToTargetProcess<DataObject, DataObject> process : targetAttributeMappings.values()) {
+    for (final SourceToTargetProcess<DataObject, DataObject> process : targetAttributeMappings.values()) {
       process.init();
     }
   }
 
-  @Override
-  public void close() {
-    for (SourceToTargetProcess<DataObject, DataObject> process : targetAttributeMappings.values()) {
-      process.close();
+  public void process(final DataObject source, final DataObject target) {
+    for (final SourceToTargetProcess<DataObject, DataObject> mapping : targetAttributeMappings.values()) {
+      mapping.process(source, target);
     }
   }
 

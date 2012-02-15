@@ -33,13 +33,11 @@ public class IntersectsFilter<T extends Geometry> implements Filter<T> {
   public IntersectsFilter() {
   }
 
-  public IntersectsFilter(
-    final Geometry geometry) {
+  public IntersectsFilter(final Geometry geometry) {
     setGeometry(geometry);
   }
 
-  public boolean accept(
-    final T geometry) {
+  public boolean accept(final T geometry) {
     if (preparedGeometry.intersects(geometry)) {
       return true;
     } else {
@@ -51,8 +49,7 @@ public class IntersectsFilter<T extends Geometry> implements Filter<T> {
     return geometry;
   }
 
-  public void setGeometry(
-    final Geometry geometry) {
+  public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
     this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
   }

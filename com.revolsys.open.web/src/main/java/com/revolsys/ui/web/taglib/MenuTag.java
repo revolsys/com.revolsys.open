@@ -9,18 +9,10 @@ import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;
 
 public class MenuTag extends AbstractMapElementTag {
-  private MenuElement element = new MenuElement();
+  private final MenuElement element = new MenuElement();
 
   public MenuTag() {
     super("${requestScope.rsWebController.menus}");
-  }
-
-  protected void serializeObject(final Writer out, final Object object)
-    throws IOException {
-    Menu menu = (Menu)object;
-    Logger.getLogger(MenuTag.class).debug(menu);
-    element.setMenu(menu);
-    element.serialize(out);
   }
 
   /**
@@ -31,24 +23,10 @@ public class MenuTag extends AbstractMapElementTag {
   }
 
   /**
-   * @param cssClass The cssClass to set.
-   */
-  public void setCssClass(String cssClass) {
-    element.setCssClass(cssClass);
-  }
-
-  /**
    * @return Returns the numLevels.
    */
   public int getNumLevels() {
     return element.getNumLevels();
-  }
-
-  /**
-   * @param numLevels The numLevels to set.
-   */
-  public void setNumLevels(int numLevels) {
-    element.setNumLevels(numLevels);
   }
 
   /**
@@ -58,10 +36,33 @@ public class MenuTag extends AbstractMapElementTag {
     return element.isShowRoot();
   }
 
+  @Override
+  protected void serializeObject(final Writer out, final Object object)
+    throws IOException {
+    final Menu menu = (Menu)object;
+    Logger.getLogger(MenuTag.class).debug(menu);
+    element.setMenu(menu);
+    element.serialize(out);
+  }
+
+  /**
+   * @param cssClass The cssClass to set.
+   */
+  public void setCssClass(final String cssClass) {
+    element.setCssClass(cssClass);
+  }
+
+  /**
+   * @param numLevels The numLevels to set.
+   */
+  public void setNumLevels(final int numLevels) {
+    element.setNumLevels(numLevels);
+  }
+
   /**
    * @param showRoot The showRoot to set.
    */
-  public void setShowRoot(boolean showRoot) {
+  public void setShowRoot(final boolean showRoot) {
     element.setShowRoot(showRoot);
   }
 }

@@ -13,8 +13,7 @@ public class CollectionFieldType extends AbstractEcsvFieldType {
 
   private final QName typeName;
 
-  public CollectionFieldType(
-    final DataType dataType) {
+  public CollectionFieldType(final DataType dataType) {
     super(dataType);
     this.typeName = new QName(_NS_URI, dataType.getName().getLocalPart(),
       _NS_PREFIX);
@@ -25,14 +24,11 @@ public class CollectionFieldType extends AbstractEcsvFieldType {
     return typeName;
   }
 
-  public Object parseValue(
-    final String text) {
+  public Object parseValue(final String text) {
     return null;
   }
 
-  public void writeValue(
-    final PrintWriter out,
-    final Object value) {
+  public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof Collection) {
       final Collection<Object> collection = (Collection<Object>)value;
       out.write(COLLECTION_START);

@@ -76,7 +76,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   /** The logging instance. */
   private final Logger log = Logger.getLogger(getClass());
 
-  private Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
+  private final Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
 
   /**
    * Construct a new AbstractDirectoryReader.
@@ -148,33 +148,19 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
       fileList = Arrays.asList(files);
     } else {
       fileList = new ArrayList<File>();
-      Map<String, File> fileBaseNameMap = new HashMap<String, File>();
-      for (File file : files) {
-        String baseName = FileUtil.getBaseName(file);
+      final Map<String, File> fileBaseNameMap = new HashMap<String, File>();
+      for (final File file : files) {
+        final String baseName = FileUtil.getBaseName(file);
         fileBaseNameMap.put(baseName, file);
       }
-      for (String baseName : baseFileNames) {
-        File file = fileBaseNameMap.get(baseName);
+      for (final String baseName : baseFileNames) {
+        final File file = fileBaseNameMap.get(baseName);
         if (file != null) {
           fileList.add(file);
         }
       }
     }
     return fileList;
-  }
-
-  @PostConstruct
-  public void open() {
-    for (File file : getFiles()) {
-      final FileSystemResource resource = new FileSystemResource(file);
-      Reader<T> reader = createReader(resource);
-      reader.open();
-      if (reader != null) {
-        readers.put(file, reader);
-      }
-    }
-    readerIterator = readers.entrySet().iterator();
-    hasNext();
   }
 
   /**
@@ -192,7 +178,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
             log.warn(t.getMessage(), t);
           }
         }
-        Entry<File, Reader<T>> entry = readerIterator.next();
+        final Entry<File, Reader<T>> entry = readerIterator.next();
         currentFile = entry.getKey();
         try {
           currentReader = entry.getValue();
@@ -230,6 +216,20 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
     } else {
       throw new NoSuchElementException();
     }
+  }
+
+  @PostConstruct
+  public void open() {
+    for (final File file : getFiles()) {
+      final FileSystemResource resource = new FileSystemResource(file);
+      final Reader<T> reader = createReader(resource);
+      reader.open();
+      if (reader != null) {
+        readers.put(file, reader);
+      }
+    }
+    readerIterator = readers.entrySet().iterator();
+    hasNext();
   }
 
   /**

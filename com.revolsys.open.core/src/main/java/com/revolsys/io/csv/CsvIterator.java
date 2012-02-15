@@ -28,8 +28,7 @@ public class CsvIterator implements Iterator<List<String>> {
    * @param reader The reader to the CSV file.
    * @throws IOException
    */
-  public CsvIterator(
-    final Reader in) {
+  public CsvIterator(final Reader in) {
     this.in = new BufferedReader(in);
 
     readNextRecord();
@@ -96,8 +95,7 @@ public class CsvIterator implements Iterator<List<String>> {
    * @return the comma-tokenized list of elements, or null if nextLine is null
    * @throws IOException if bad things happen during the read
    */
-  private List<String> parseLine(
-    String nextLine) {
+  private List<String> parseLine(String nextLine) {
     if (nextLine.length() == 0) {
       return Collections.emptyList();
     } else {

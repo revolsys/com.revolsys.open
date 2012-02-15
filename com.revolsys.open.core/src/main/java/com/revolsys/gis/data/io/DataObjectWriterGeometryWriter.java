@@ -10,17 +10,18 @@ import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectWriterGeometryWriter extends AbstractWriter<Geometry> {
-  private Writer<DataObject> writer;
+  private final Writer<DataObject> writer;
 
-  public DataObjectWriterGeometryWriter(
-    Writer<DataObject> writer) {
+  public DataObjectWriterGeometryWriter(final Writer<DataObject> writer) {
     this.writer = writer;
   }
 
+  @Override
   public void close() {
     writer.close();
   }
 
+  @Override
   public void flush() {
     writer.flush();
   }
@@ -30,20 +31,19 @@ public class DataObjectWriterGeometryWriter extends AbstractWriter<Geometry> {
     return writer.getProperties();
   }
 
-  public <V> V getProperty(
-    String name) {
+  @Override
+  public <V> V getProperty(final String name) {
     return (V)writer.getProperty(name);
   }
 
-  public void setProperty(
-    String name,
-    Object value) {
+  @Override
+  public void setProperty(final String name, final Object value) {
     writer.setProperty(name, value);
   }
 
-  public void write(
-    Geometry geometry) {
-    DataObject object = new ArrayDataObject(DataObjectUtil.GEOMETRY_META_DATA);
+  public void write(final Geometry geometry) {
+    final DataObject object = new ArrayDataObject(
+      DataObjectUtil.GEOMETRY_META_DATA);
     object.setGeometryValue(geometry);
     writer.write(object);
   }

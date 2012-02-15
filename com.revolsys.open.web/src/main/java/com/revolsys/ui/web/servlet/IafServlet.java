@@ -58,33 +58,144 @@ public final class IafServlet extends HttpServlet {
   private ServletContext servletContext;
 
   /**
+   * Handle the GET request. Calls processRequest to handle the request.
+   * 
+   * @param request the parameters of the client request
+   * @param response the response sent back to the client
+   * @exception ServletException if there was a problem handling the request
+   * @exception IOException if an input output error occurs when handling the
+   *              request
+   */
+  @Override
+  public void doGet(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws ServletException, IOException {
+    processRequest(request, response);
+  }
+
+  /**
+   * Handle the POST request. Calls processRequest to handle the request.
+   * 
+   * @param request the parameters of the client request
+   * @param response the response sent back to the client
+   * @exception ServletException if there was a problem handling the request
+   * @exception IOException if an input output error occurs when handling the
+   *              request
+   */
+  @Override
+  public void doPost(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws ServletException, IOException {
+    processRequest(request, response);
+  }
+
+  /**
+   * Forward the request to the specified resource.
+   * 
+   * @param path the path to the resource to forward to
+   * @param request the parameters of the client request
+   * @param response the response sent back to the client
+   * @exception ServletException if there was a problem handling the request
+   * @exception IOException if an input output error occurs when handling the
+   *              request
+   */
+  public void forward(
+    final String path,
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws ServletException, IOException {
+    if (!response.isCommitted()) {
+      getServletConfig().getServletContext()
+        .getRequestDispatcher(path)
+        .forward(request, response);
+    }
+  }
+
+  /**
    * Initialise the servlet. Loads the configuration from the
    * /WEB-INF/nice-config.xml file.
    * 
    * @param config The servlet configuration parameters
    * @exception ServletException if there was a problem initialising the servlet
    */
+  @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     try {
       servletContext = config.getServletContext();
-      URL configResource = servletContext.getResource("/WEB-INF/iaf-config.xml");
+      final URL configResource = servletContext.getResource("/WEB-INF/iaf-config.xml");
       WebUiContext.setServletContext(servletContext);
-      XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
+      final XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
         servletContext);
       applicationConfig = configLoader.loadConfig();
       servletContext.setAttribute("rsWebUiConfig", applicationConfig);
-    } catch (InvalidConfigException ice) {
+    } catch (final InvalidConfigException ice) {
       ice.printStackTrace();
       log.fatal(ice.getErrors());
       throw new UnavailableException(ice.getMessage() + ":" + ice.getErrors());
-    } catch (MalformedURLException mue) {
+    } catch (final MalformedURLException mue) {
       log.fatal(mue.getMessage(), mue);
       throw new UnavailableException("Failed to initialise Servlet");
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
       log.error(t.getMessage(), t);
 
+    }
+  }
+
+  /**
+   * @param page
+   * @param request
+   * @throws PageNotFoundException
+   */
+  private void processArguments(
+    final Page page,
+    final HttpServletRequest request) throws ActionException {
+    for (final Iterator arguments = page.getArguments().iterator(); arguments.hasNext();) {
+      final Argument argument = (Argument)arguments.next();
+      final String name = argument.getName();
+      Object value = null;
+      String stringValue = request.getParameter(name);
+      if (stringValue == null) {
+        stringValue = argument.getDefault();
+      }
+      if (stringValue != null) {
+        final Class argumentType = argument.getType();
+        try {
+          value = argument.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+          throw new PageNotFoundException(
+            "Page argument is not a valid number: " + name);
+        }
+      }
+      if (value != null) {
+        request.setAttribute(name, value);
+      } else if (argument.isRequired()) {
+        throw new PageNotFoundException("Missing page argument: " + name);
+      }
+    }
+  }
+
+  /**
+   * @param page
+   * @param request
+   * @throws PageNotFoundException
+   */
+  private void processAttributes(
+    final Page page,
+    final HttpServletRequest request) throws ActionException {
+    for (final Iterator attributes = page.getAttributes().iterator(); attributes.hasNext();) {
+      final Attribute attribute = (Attribute)attributes.next();
+      final String name = attribute.getName();
+      final AttributeLoader loader = attribute.getLoader();
+      Object value = null;
+      if (loader != null) {
+        value = loader.getValue(request);
+      } else {
+        value = attribute.getValue();
+      }
+      if (value != null) {
+        request.setAttribute(name, value);
+      }
     }
   }
 
@@ -105,24 +216,25 @@ public final class IafServlet extends HttpServlet {
    * @see PageNotFoundException
    * @see RedirectException
    */
-  public void processRequest(final HttpServletRequest request,
+  public void processRequest(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     try {
       String path = request.getServletPath();
-      String pathInfo = request.getPathInfo();
+      final String pathInfo = request.getPathInfo();
       if (pathInfo != null && !path.endsWith(pathInfo)) {
         path += pathInfo;
       }
 
       boolean secure = false;
-      String contextPath = request.getContextPath();
+      final String contextPath = request.getContextPath();
       if (path.endsWith(".wp")) {
         path = path.substring(0, path.length() - 3);
       } else if (path.endsWith(".wps")) {
         secure = true;
         path = path.substring(0, path.length() - 4);
       }
-      Page page = applicationConfig.getPage(contextPath + path);
+      final Page page = applicationConfig.getPage(contextPath + path);
       WebUiContext.set(new WebUiContext(applicationConfig, contextPath, page,
         request, response));
       if (page.isSecure() && !secure) {
@@ -134,133 +246,31 @@ public final class IafServlet extends HttpServlet {
       request.setAttribute("niceConfig", applicationConfig);
       request.setAttribute("nicePage", page);
 
-      String menuName = request.getParameter("menuName");
+      final String menuName = request.getParameter("menuName");
       request.setAttribute("menuSelected", menuName);
       request.setAttribute("title", page.getTitle());
       page.invokeActions(servletContext, request, response);
 
-      Layout layout = page.getLayout();
+      final Layout layout = page.getLayout();
       if (layout != null) {
-        String file = layout.getFile();
+        final String file = layout.getFile();
         if (file != null && file.length() > 0) {
           forward(file, request, response);
         }
       }
-    } catch (FinishRequestException fre) {
+    } catch (final FinishRequestException fre) {
       // Do nothing as the actions have handled the request
       return;
-    } catch (AuthenticationException pne) {
+    } catch (final AuthenticationException pne) {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-    } catch (PageNotFoundException pne) {
+    } catch (final PageNotFoundException pne) {
       log.error(pne.getMessage(), pne);
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
-    } catch (RedirectException re) {
+    } catch (final RedirectException re) {
       response.sendRedirect(response.encodeRedirectURL(re.getUrl()));
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       log.error(t.getMessage(), t);
       throw new ServletException(t);
-    }
-  }
-
-  /**
-   * @param page
-   * @param request
-   * @throws PageNotFoundException
-   */
-  private void processArguments(final Page page,
-    final HttpServletRequest request) throws ActionException {
-    for (Iterator arguments = page.getArguments().iterator(); arguments.hasNext();) {
-      Argument argument = (Argument)arguments.next();
-      String name = argument.getName();
-      Object value = null;
-      String stringValue = request.getParameter(name);
-      if (stringValue == null) {
-        stringValue = argument.getDefault();
-      }
-      if (stringValue != null) {
-        Class argumentType = argument.getType();
-        try {
-          value = argument.valueOf(stringValue);
-        } catch (NumberFormatException e) {
-          throw new PageNotFoundException(
-            "Page argument is not a valid number: " + name);
-        }
-      }
-      if (value != null) {
-        request.setAttribute(name, value);
-      } else if (argument.isRequired()) {
-        throw new PageNotFoundException("Missing page argument: " + name);
-      }
-    }
-  }
-
-  /**
-   * @param page
-   * @param request
-   * @throws PageNotFoundException
-   */
-  private void processAttributes(final Page page,
-    final HttpServletRequest request) throws ActionException {
-    for (Iterator attributes = page.getAttributes().iterator(); attributes.hasNext();) {
-      Attribute attribute = (Attribute)attributes.next();
-      String name = attribute.getName();
-      AttributeLoader loader = attribute.getLoader();
-      Object value = null;
-      if (loader != null) {
-        value = loader.getValue(request);
-      } else {
-        value = attribute.getValue();
-      }
-      if (value != null) {
-        request.setAttribute(name, value);
-      }
-    }
-  }
-
-  /**
-   * Handle the GET request. Calls processRequest to handle the request.
-   * 
-   * @param request the parameters of the client request
-   * @param response the response sent back to the client
-   * @exception ServletException if there was a problem handling the request
-   * @exception IOException if an input output error occurs when handling the
-   *              request
-   */
-  public void doGet(final HttpServletRequest request,
-    final HttpServletResponse response) throws ServletException, IOException {
-    processRequest(request, response);
-  }
-
-  /**
-   * Handle the POST request. Calls processRequest to handle the request.
-   * 
-   * @param request the parameters of the client request
-   * @param response the response sent back to the client
-   * @exception ServletException if there was a problem handling the request
-   * @exception IOException if an input output error occurs when handling the
-   *              request
-   */
-  public void doPost(final HttpServletRequest request,
-    final HttpServletResponse response) throws ServletException, IOException {
-    processRequest(request, response);
-  }
-
-  /**
-   * Forward the request to the specified resource.
-   * 
-   * @param path the path to the resource to forward to
-   * @param request the parameters of the client request
-   * @param response the response sent back to the client
-   * @exception ServletException if there was a problem handling the request
-   * @exception IOException if an input output error occurs when handling the
-   *              request
-   */
-  public void forward(final String path, final HttpServletRequest request,
-    final HttpServletResponse response) throws ServletException, IOException {
-    if (!response.isCommitted()) {
-      getServletConfig().getServletContext()
-        .getRequestDispatcher(path)
-        .forward(request, response);
     }
   }
 }

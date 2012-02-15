@@ -1,9 +1,7 @@
 package com.revolsys.util;
 
 public class CompareUtil {
-  public static <T> int compare(
-    final Comparable<T> object1,
-    final T object2) {
+  public static <T> int compare(final Comparable<T> object1, final T object2) {
     if (object1 == null) {
       if (object2 == null) {
         return 0;

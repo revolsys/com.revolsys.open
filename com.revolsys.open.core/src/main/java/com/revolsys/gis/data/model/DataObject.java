@@ -37,8 +37,7 @@ public interface DataObject extends Map<String, Object> {
   DataObject clone();
 
   void delete();
-  
-  QName getTypeName();
+
   /**
    * Get the factory which created the instance.
    * 
@@ -68,6 +67,8 @@ public interface DataObject extends Map<String, Object> {
   DataObjectMetaData getMetaData();
 
   DataObjectState getState();
+
+  QName getTypeName();
 
   /**
    * Get the value of the attribute with the specified name.
@@ -138,7 +139,9 @@ public interface DataObject extends Map<String, Object> {
    */
   void setValue(int index, Object value);
 
-  <T> T setValueByPath(CharSequence attributePath, DataObject source,
+  <T> T setValueByPath(
+    CharSequence attributePath,
+    DataObject source,
     String sourceAttributePath);
 
   void setValueByPath(CharSequence attributePath, Object value);

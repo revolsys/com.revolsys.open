@@ -11,9 +11,7 @@ public class NoRepeatArrayList extends ArrayList {
   private static final long serialVersionUID = -8395301622287658179L;
 
   @Override
-  public void add(
-    final int index,
-    final Object object) {
+  public void add(final int index, final Object object) {
     if (isEmpty()) {
       super.add(index, object);
     } else if (index > 0 && get(index - 1).equals(object)) {
@@ -26,8 +24,7 @@ public class NoRepeatArrayList extends ArrayList {
   }
 
   @Override
-  public boolean add(
-    final Object object) {
+  public boolean add(final Object object) {
     if (isEmpty()) {
       return super.add(object);
     } else if (!get(size() - 1).equals(object)) {
@@ -38,8 +35,7 @@ public class NoRepeatArrayList extends ArrayList {
   }
 
   @Override
-  public boolean addAll(
-    final Collection values) {
+  public boolean addAll(final Collection values) {
     ensureCapacity(size() + values.size());
     boolean modified = false;
     for (final Iterator iter = values.iterator(); iter.hasNext();) {
@@ -52,9 +48,7 @@ public class NoRepeatArrayList extends ArrayList {
   }
 
   @Override
-  public boolean addAll(
-    int index,
-    final Collection values) {
+  public boolean addAll(int index, final Collection values) {
     ensureCapacity(size() + values.size());
     for (final Iterator iter = values.iterator(); iter.hasNext();) {
       final Object value = iter.next();

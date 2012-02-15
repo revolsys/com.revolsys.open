@@ -8,10 +8,9 @@ import com.revolsys.io.ecsv.EcsvConstants;
 public abstract class AbstractEcsvFieldType implements EcsvFieldType,
   EcsvConstants {
 
-  private DataType dataType;
+  private final DataType dataType;
 
-  public AbstractEcsvFieldType(
-    DataType dataType) {
+  public AbstractEcsvFieldType(final DataType dataType) {
     this.dataType = dataType;
   }
 

@@ -17,8 +17,6 @@ public class BlackHole<T> extends BaseInProcess<T> {
    * @param object The object to process.
    */
   @Override
-  protected void process(
-    final Channel<T> in,
-    final T object) {
+  protected void process(final Channel<T> in, final T object) {
   }
 }

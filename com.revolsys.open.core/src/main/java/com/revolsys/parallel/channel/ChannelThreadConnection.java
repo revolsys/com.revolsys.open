@@ -6,7 +6,7 @@ public class ChannelThreadConnection {
 
   private static final ThreadLocalMap<ChannelOutput<?>, ChannelThreadConnection> connections = new ThreadLocalMap<ChannelOutput<?>, ChannelThreadConnection>();
 
-  public static void writeConnect(ChannelOutput<?> channel) {
+  public static void writeConnect(final ChannelOutput<?> channel) {
     synchronized (connections) {
       ChannelThreadConnection connection = connections.get(channel);
       if (connection == null) {
@@ -17,12 +17,13 @@ public class ChannelThreadConnection {
     }
   }
 
-  private ChannelOutput<?> channel;
+  private final ChannelOutput<?> channel;
 
-  private ChannelThreadConnection(ChannelOutput<?> channel) {
+  private ChannelThreadConnection(final ChannelOutput<?> channel) {
     this.channel = channel;
   }
 
+  @Override
   public void finalize() {
     channel.writeDisconnect();
   }

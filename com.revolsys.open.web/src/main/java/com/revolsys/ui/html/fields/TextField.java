@@ -190,8 +190,7 @@ public class TextField extends Field {
     this.style = style;
   }
 
-  @Override
-  public void setValue(final Object value) {
+  public void setTextValue(final String value) {
     super.setValue(value);
     if (value != null) {
       inputValue = value.toString();
@@ -200,7 +199,8 @@ public class TextField extends Field {
     }
   }
 
-  public void setTextValue(final String value) {
+  @Override
+  public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
       inputValue = value.toString();

@@ -10,21 +10,16 @@ public class IterableProcess<T> extends AbstractOutProcess<T> {
 
   }
 
-  public IterableProcess(
-    final Channel<T> out,
-    final Iterable<T> iterable) {
+  public IterableProcess(final Channel<T> out, final Iterable<T> iterable) {
     super(out);
     this.iterable = iterable;
   }
 
-  public IterableProcess(
-    final Iterable<T> iterable) {
+  public IterableProcess(final Iterable<T> iterable) {
     this.iterable = iterable;
   }
 
-  public IterableProcess(
-    final Iterable<T> iterable,
-    final int bufferSize) {
+  public IterableProcess(final Iterable<T> iterable, final int bufferSize) {
     super(bufferSize);
     this.iterable = iterable;
   }
@@ -37,29 +32,25 @@ public class IterableProcess<T> extends AbstractOutProcess<T> {
   }
 
   @Override
-  protected void run(
-    final Channel<T> out) {
+  protected void run(final Channel<T> out) {
     for (final T object : iterable) {
       write(out, object);
     }
   }
 
-  protected void write(
-    final Channel<T> out,
-    final T object) {
-    out.write(object);
-  }
-
   /**
    * @param iterable the iterable to set
    */
-  public void setIterable(
-    final Iterable<T> iterable) {
+  public void setIterable(final Iterable<T> iterable) {
     this.iterable = iterable;
   }
 
   @Override
   public String toString() {
     return iterable.toString();
+  }
+
+  protected void write(final Channel<T> out, final T object) {
+    out.write(object);
   }
 }

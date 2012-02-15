@@ -9,12 +9,16 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 
 public interface CoordinatesList extends CoordinateSequence,
   Iterable<Coordinates>, Serializable {
-  void copy(int sourceIndex, CoordinatesList target, int targetIndex,
-    int numAxis, int count);
-
-  double distance(int index, CoordinatesList other, int otherIndex);
+  void copy(
+    int sourceIndex,
+    CoordinatesList target,
+    int targetIndex,
+    int numAxis,
+    int count);
 
   double distance(int index, Coordinates point);
+
+  double distance(int index, CoordinatesList other, int otherIndex);
 
   boolean equal(int i, Coordinates point);
 
@@ -76,6 +80,9 @@ public interface CoordinatesList extends CoordinateSequence,
 
   CoordinatesList subList(int length, int index, int count);
 
-  CoordinatesList subList(int length, int sourceIndex, int targetIndex,
+  CoordinatesList subList(
+    int length,
+    int sourceIndex,
+    int targetIndex,
     int count);
 }

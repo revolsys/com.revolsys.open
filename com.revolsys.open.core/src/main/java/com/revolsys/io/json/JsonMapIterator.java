@@ -22,7 +22,8 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
     this(in, false);
   }
 
-  public JsonMapIterator(final Reader in, boolean single) throws IOException {
+  public JsonMapIterator(final Reader in, final boolean single)
+    throws IOException {
     this.parser = new JsonParser(in);
     if (single) {
       hasNext = true;

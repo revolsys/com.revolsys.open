@@ -20,9 +20,35 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GmlGeometryFieldType extends AbstractGmlFieldType {
-  public GmlGeometryFieldType(
-    final DataType dataType) {
+  public GmlGeometryFieldType(final DataType dataType) {
     super(dataType, "xs:" + dataType.getName().getLocalPart());
+  }
+
+  private void coordinates(final XmlWriter out, final CoordinatesList points) {
+    out.startTag(GmlConstants.COORDINATES);
+    final byte numAxis = points.getNumAxis();
+    boolean first = true;
+    for (int i = 0; i < points.size(); i++) {
+      if (first) {
+        first = false;
+      } else {
+        out.text(" ");
+      }
+      final double x = points.getX(i);
+      out.text(x);
+      final double y = points.getY(i);
+      out.text(",");
+      out.text(y);
+      if (numAxis > 2) {
+        final double z = points.getZ(i);
+        if (Double.isNaN(z)) {
+          out.text(0);
+        } else {
+          out.text(z);
+        }
+      }
+    }
+    out.endTag(GmlConstants.COORDINATES);
   }
 
   private void geometry(
@@ -56,7 +82,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void geometryCollection(
     final XmlWriter out,
     final GeometryCollection geometryCollection,
-    boolean writeSrsName) {
+    final boolean writeSrsName) {
     geometryCollection(out, MULTI_GEOMETRY, GEOMETRY_MEMBER,
       geometryCollection, writeSrsName);
   }
@@ -102,7 +128,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void multiLineString(
     final XmlWriter out,
     final MultiLineString multiLine,
-    boolean writeSrsName) {
+    final boolean writeSrsName) {
     geometryCollection(out, MULTI_LINE_STRING, LINE_STRING_MEMBER, multiLine,
       writeSrsName);
   }
@@ -110,14 +136,14 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void multiPoint(
     final XmlWriter out,
     final MultiPoint multiPoint,
-    boolean writeSrsName) {
+    final boolean writeSrsName) {
     geometryCollection(out, MULTI_POINT, POINT_MEMBER, multiPoint, writeSrsName);
   }
 
   private void multiPolygon(
     final XmlWriter out,
     final MultiPolygon multiPolygon,
-    boolean writeSrsName) {
+    final boolean writeSrsName) {
     geometryCollection(out, MULTI_POLYGON, POLYGON_MEMBER, multiPolygon,
       writeSrsName);
   }
@@ -155,9 +181,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(POLYGON);
   }
 
-  private void pos(
-    final XmlWriter out,
-    final Coordinates coordinates) {
+  private void pos(final XmlWriter out, final Coordinates coordinates) {
     out.startTag(GmlConstants.POS);
     final byte numAxis = coordinates.getNumAxis();
     out.attribute(GmlConstants.DIMENSION, numAxis);
@@ -178,38 +202,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(GmlConstants.POS);
   }
 
-  private void coordinates(
-    final XmlWriter out,
-    final CoordinatesList points) {
-    out.startTag(GmlConstants.COORDINATES);
-    final byte numAxis = points.getNumAxis();
-    boolean first = true;
-    for (int i = 0; i < points.size(); i++) {
-      if (first) {
-        first = false;
-      } else {
-        out.text(" ");
-      }
-      final double x = points.getX(i);
-      out.text(x);
-      final double y = points.getY(i);
-      out.text(",");
-      out.text(y);
-      if (numAxis > 2) {
-        final double z = points.getZ(i);
-        if (Double.isNaN(z)) {
-          out.text(0);
-        } else {
-          out.text(z);
-        }
-      }
-    }
-    out.endTag(GmlConstants.COORDINATES);
-  }
-
-  private void posList(
-    final XmlWriter out,
-    final CoordinatesList points) {
+  private void posList(final XmlWriter out, final CoordinatesList points) {
     out.startTag(GmlConstants.POS_LIST);
     final byte numAxis = points.getNumAxis();
     out.attribute(GmlConstants.DIMENSION, numAxis);
@@ -239,19 +232,17 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   }
 
   private void srsName(
-    XmlWriter out,
+    final XmlWriter out,
     final Geometry geometry,
-    boolean writeSrsName) {
+    final boolean writeSrsName) {
     if (writeSrsName) {
-      GeometryFactory factory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory factory = GeometryFactory.getFactory(geometry);
       GmlDataObjectWriter.srsName(out, factory);
     }
   }
 
   @Override
-  protected void writeValueText(
-    final XmlWriter out,
-    final Object value) {
+  protected void writeValueText(final XmlWriter out, final Object value) {
     geometry(out, value, true);
   }
 }

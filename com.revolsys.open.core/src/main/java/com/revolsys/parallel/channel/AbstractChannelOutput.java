@@ -1,12 +1,11 @@
 package com.revolsys.parallel.channel;
 
-
 public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
   /** Flag indicating if the channel has been closed. */
   private boolean closed = false;
 
   /** The monitor reads must synchronize on */
-  private Object monitor = new Object();
+  private final Object monitor = new Object();
 
   /** The name of the channel. */
   private String name;
@@ -18,7 +17,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
   private boolean writeClosed;
 
   /** The monitor writes must synchronize on */
-  private Object writeMonitor = new Object();
+  private final Object writeMonitor = new Object();
 
   /**
    * Constructs a new Channel<T> with a ZeroBuffer ChannelDataStore.
@@ -26,14 +25,15 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
   public AbstractChannelOutput() {
   }
 
-  public AbstractChannelOutput(
-    final String name) {
+  public AbstractChannelOutput(final String name) {
     this.name = name;
   }
 
   public void close() {
     closed = true;
   }
+
+  protected abstract void doWrite(T value);
 
   public String getName() {
     return name;
@@ -59,8 +59,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
    * 
    * @param value The object to write to the Channel.
    */
-  public void write(
-    final T value) {
+  public void write(final T value) {
     synchronized (writeMonitor) {
       synchronized (monitor) {
         if (closed) {
@@ -70,9 +69,6 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
       }
     }
   }
-
-  protected abstract void doWrite(
-    T value);
 
   public void writeConnect() {
     synchronized (monitor) {

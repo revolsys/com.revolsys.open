@@ -8,8 +8,7 @@ public class LineStringMitredBuffer implements LineSegmentVisitor {
 
   private final double distance;
 
-  public LineStringMitredBuffer(
-    final double distance) {
+  public LineStringMitredBuffer(final double distance) {
     this.distance = distance;
   }
 
@@ -20,8 +19,7 @@ public class LineStringMitredBuffer implements LineSegmentVisitor {
     return buffer;
   }
 
-  public boolean visit(
-    final LineSegment segment) {
+  public boolean visit(final LineSegment segment) {
     final Polygon segmentBuffer = JtsGeometryUtil.getMitredBuffer(segment,
       distance);
     if (buffer == null) {

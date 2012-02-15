@@ -103,23 +103,18 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   public SaifWriter() {
   }
 
-  public SaifWriter(
-    final File file)
-    throws IOException {
+  public SaifWriter(final File file) throws IOException {
     setFile(file);
   }
 
-  public SaifWriter(
-    final File file,
+  public SaifWriter(final File file,
     final DataObjectMetaDataFactory dataObjectMetaDataFactory)
     throws IOException {
     this(file);
     setDataObjectMetaDataFactory(dataObjectMetaDataFactory);
   }
 
-  public SaifWriter(
-    final String fileName)
-    throws IOException {
+  public SaifWriter(final String fileName) throws IOException {
     this(new File(fileName));
   }
 
@@ -143,6 +138,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @Override
   public void close() {
     if (tempDirectory != null) {
       try {
@@ -192,8 +188,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void createExports()
-    throws IOException {
+  private void createExports() throws IOException {
     final File exportsFile = new File(tempDirectory, "exports.dir");
     final OsnSerializer exportsSerializer = createSerializer(new QName(
       "ExportedObject"), exportsFile, Long.MAX_VALUE);
@@ -219,8 +214,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   private void createMissingDirObject(
     final String typeName,
-    final String fileName)
-    throws IOException {
+    final String fileName) throws IOException {
     if (!serializers.containsKey(typeName)) {
       final File file = new File(tempDirectory, fileName);
       final PrintStream out = new PrintStream(new FileOutputStream(file));
@@ -296,19 +290,18 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   protected OsnSerializer createSerializer(
     final QName typeName,
     final File file,
-    final long maxSize)
-    throws IOException {
+    final long maxSize) throws IOException {
     final OsnSerializer serializer = new OsnSerializer(typeName, file, maxSize,
       converters);
     serializer.setIndentEnabled(indentEnabled);
     return serializer;
   }
 
+  @Override
   public void flush() {
   }
 
-  private DataObjectMetaData getCompositeType(
-    final QName typeName) {
+  private DataObjectMetaData getCompositeType(final QName typeName) {
     String compositeTypeName = compositeTypeNames.get(typeName);
     if (compositeTypeName == null) {
       compositeTypeName = typeName + "Composite";
@@ -325,8 +318,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return maxSubsetSize;
   }
 
-  public String getObjectIdentifier(
-    final QName typeName) {
+  public String getObjectIdentifier(final QName typeName) {
     String objectIdentifier = objectIdentifiers.get(typeName);
     if (objectIdentifier == null) {
       objectIdentifier = typeName.getLocalPart();
@@ -350,8 +342,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
    * @param typeName The type name.
    * @return The object set name for the type name.
    */
-  public String getObjectSetName(
-    final QName typeName) {
+  public String getObjectSetName(final QName typeName) {
     return objectSetNames.get(typeName);
   }
 
@@ -359,8 +350,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return objectSetNames;
   }
 
-  private String getObjectSubsetName(
-    final QName typeName) {
+  private String getObjectSubsetName(final QName typeName) {
     String objectSubsetName = getObjectSetName(typeName);
     if (objectSubsetName == null) {
       objectSubsetName = typeName.getLocalPart();
@@ -377,9 +367,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return schemaResource;
   }
 
-  private OsnSerializer getSerializer(
-    final QName typeName)
-    throws IOException {
+  private OsnSerializer getSerializer(final QName typeName) throws IOException {
     OsnSerializer serializer = serializers.get(typeName);
     if (serializer == null) {
       initialize();
@@ -444,8 +432,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return tempDirectory;
   }
 
-  private void initialize()
-    throws IOException {
+  private void initialize() throws IOException {
     if (!initialized) {
       initialized = true;
       if (schemaResource != null) {
@@ -493,8 +480,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return indentEnabled;
   }
 
-  public void setCompositeTypeNames(
-    final Map<String, String> compositeTypeNames) {
+  public void setCompositeTypeNames(final Map<String, String> compositeTypeNames) {
     for (final Entry<String, String> entry : compositeTypeNames.entrySet()) {
       final String key = entry.getKey();
       final String value = entry.getValue();
@@ -512,9 +498,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public void setFile(
-    final File file)
-    throws IOException {
+  public void setFile(final File file) throws IOException {
     if (!file.isDirectory()) {
       final File parentDir = file.getParentFile();
       if (!parentDir.exists()) {
@@ -545,21 +529,18 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     initialize();
   }
 
-  public void setIndentEnabled(
-    final boolean indentEnabled) {
+  public void setIndentEnabled(final boolean indentEnabled) {
     this.indentEnabled = indentEnabled;
   }
 
-  public void setMaxSubsetSize(
-    final int maxSubsetSize) {
+  public void setMaxSubsetSize(final int maxSubsetSize) {
     this.maxSubsetSize = maxSubsetSize;
   }
 
   /**
    * @param objectIdentifiers the objectIdentifiers to set
    */
-  public void setObjectIdentifiers(
-    final Map<String, String> objectIdentifiers) {
+  public void setObjectIdentifiers(final Map<String, String> objectIdentifiers) {
     for (final Entry<String, String> entry : objectIdentifiers.entrySet()) {
       final String key = entry.getKey();
       final String value = entry.getValue();
@@ -582,14 +563,11 @@ public class SaifWriter extends AbstractWriter<DataObject> {
    * @param typeName The type name
    * @param subSetName The sub set name for the type name.
    */
-  public void setObjectSetName(
-    final String typeName,
-    final String subSetName) {
+  public void setObjectSetName(final String typeName, final String subSetName) {
     objectSetNames.put(QName.valueOf(typeName), subSetName);
   }
 
-  public void setObjectSetNames(
-    final Map<String, String> objectSetNames) {
+  public void setObjectSetNames(final Map<String, String> objectSetNames) {
     for (final Entry<String, String> entry : objectSetNames.entrySet()) {
       final String key = entry.getKey();
       final String value = entry.getValue();
@@ -597,19 +575,17 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public void setSchemaFileNames(
-    final List<String> schemaFileNames) {
+  public void setSchemaFileNames(final List<String> schemaFileNames) {
     this.schemaFileNames = schemaFileNames;
 
   }
 
-  public void setSchemaResource(
-    final String schemaResource)
-    throws IOException {
+  public void setSchemaResource(final String schemaResource) throws IOException {
     this.schemaResource = schemaResource;
 
   }
 
+  @Override
   public String toString() {
     return file.getAbsolutePath();
   }
@@ -620,8 +596,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
    * com.revolsys.gis.format.saif.io.Writer<DataObject>#write(com.revolsys.gis
    * .model.data.DataObject)
    */
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     try {
       final DataObjectMetaData type = object.getMetaData();
       final OsnSerializer serializer = getSerializer(type.getName());
@@ -642,8 +617,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     final OsnSerializer exportsSerializer,
     final String referenceId,
     final String compositeTypeName,
-    final String objectSubset)
-    throws IOException {
+    final String objectSubset) throws IOException {
     exportsSerializer.startObject("ExportedObjectHandle");
     exportsSerializer.attribute("referenceID", referenceId, true);
     exportsSerializer.attribute("type", compositeTypeName, true);

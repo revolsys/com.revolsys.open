@@ -3,17 +3,17 @@ package com.revolsys.converter.string;
 import org.springframework.util.StringUtils;
 
 public class BooleanStringConverter implements StringConverter<Boolean> {
+  public Class<Boolean> getConvertedClass() {
+    return Boolean.class;
+  }
+
   public boolean requiresQuotes() {
     return false;
   }
 
-  public String toString(Boolean value) {
-    return value.toString();
-  }
-
-  public Boolean toObject(Object value) {
+  public Boolean toObject(final Object value) {
     if (value instanceof Boolean) {
-      Boolean integer = (Boolean)value;
+      final Boolean integer = (Boolean)value;
       return integer;
     } else if (value == null) {
       return null;
@@ -22,7 +22,7 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
     }
   }
 
-  public Boolean toObject(String string) {
+  public Boolean toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Boolean.valueOf(string);
     } else {
@@ -30,7 +30,7 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
     }
   }
 
-  public Class<Boolean> getConvertedClass() {
-    return Boolean.class;
+  public String toString(final Boolean value) {
+    return value.toString();
   }
 }

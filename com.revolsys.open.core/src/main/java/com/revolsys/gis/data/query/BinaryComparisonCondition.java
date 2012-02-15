@@ -2,49 +2,52 @@ package com.revolsys.gis.data.query;
 
 public class BinaryComparisonCondition implements Condition {
 
-  public static Condition equal(Object left, Object right) {
+  public static Condition equal(final Object left, final Object right) {
     return new BinaryComparisonCondition(left, "=", right);
   }
 
-  public static Condition notEqual(Object left, Object right) {
-    return new BinaryComparisonCondition(left, "<>", right);
-  }
-
-  public static Condition lessThan(Object left, Object right) {
-    return new BinaryComparisonCondition(left, "<", right);
-  }
-
-  public static Condition lessThanOrEqual(Object left, Object right) {
-    return new BinaryComparisonCondition(left, "<=", right);
-  }
-
-  public static Condition greaterThan(Object left, Object right) {
+  public static Condition greaterThan(final Object left, final Object right) {
     return new BinaryComparisonCondition(left, ">", right);
   }
 
-  public static Condition greaterThanOrEqual(Object left, Object right) {
+  public static Condition greaterThanOrEqual(
+    final Object left,
+    final Object right) {
     return new BinaryComparisonCondition(left, ">=", right);
   }
 
-  public static Condition like(Object left, Object right) {
+  public static Condition lessThan(final Object left, final Object right) {
+    return new BinaryComparisonCondition(left, "<", right);
+  }
+
+  public static Condition lessThanOrEqual(final Object left, final Object right) {
+    return new BinaryComparisonCondition(left, "<=", right);
+  }
+
+  public static Condition like(final Object left, final Object right) {
     return new BinaryComparisonCondition(left, "LIKE", right);
   }
 
-  private String operator;
+  public static Condition notEqual(final Object left, final Object right) {
+    return new BinaryComparisonCondition(left, "<>", right);
+  }
 
-  private Object left;
+  private final String operator;
 
-  private Object right;
+  private final Object left;
 
-  public BinaryComparisonCondition(Object left, String operator, Object right) {
+  private final Object right;
+
+  public BinaryComparisonCondition(final Object left, final String operator,
+    final Object right) {
     this.left = left;
     this.operator = operator;
     this.right = right;
   }
 
-  public void appendSql(StringBuffer buffer) {
+  public void appendSql(final StringBuffer buffer) {
     if (left instanceof Condition) {
-      Condition condition = (Condition)left;
+      final Condition condition = (Condition)left;
       condition.appendSql(buffer);
     } else {
       buffer.append('?');
@@ -53,7 +56,7 @@ public class BinaryComparisonCondition implements Condition {
     buffer.append(operator);
     buffer.append(" ");
     if (right instanceof Condition) {
-      Condition condition = (Condition)right;
+      final Condition condition = (Condition)right;
       condition.appendSql(buffer);
     } else {
       buffer.append('?');

@@ -26,17 +26,12 @@ import com.revolsys.ui.model.TableModel;
  * @version 1.0
  */
 public class CsvWriter {
-  private Writer out;
+  private final Writer out;
 
   private boolean firstCol = true;
 
   public CsvWriter(final Writer out) {
     this.out = out;
-  }
-
-  public void print(final TableModel model) throws IOException {
-    printHeadings(model);
-    printRows(model);
   }
 
   public void print(final LabelValueListModel model) throws IOException {
@@ -45,30 +40,6 @@ public class CsvWriter {
       print(model.getValue(row));
       println();
     }
-  }
-
-  private void printHeadings(final TableModel model) throws IOException {
-    for (int col = 0; col < model.getColumnCount(); col++) {
-      String heading = model.getHeaderCell(col);
-      print(heading);
-    }
-    println();
-  }
-
-  private void printRows(final TableModel model) throws IOException {
-    for (int row = 0; row < model.getBodyRowCount(); row++) {
-      printRow(model, row);
-    }
-  }
-
-  private void printRow(final TableModel model, final int row)
-    throws IOException {
-    int colCount = model.getColumnCount();
-    for (int col = 0; col < colCount; col++) {
-      String value = model.getBodyCell(row, col);
-      print(value);
-    }
-    println();
   }
 
   public void print(final String value) throws IOException {
@@ -84,8 +55,37 @@ public class CsvWriter {
     out.write("\"");
   }
 
+  public void print(final TableModel model) throws IOException {
+    printHeadings(model);
+    printRows(model);
+  }
+
+  private void printHeadings(final TableModel model) throws IOException {
+    for (int col = 0; col < model.getColumnCount(); col++) {
+      final String heading = model.getHeaderCell(col);
+      print(heading);
+    }
+    println();
+  }
+
   public void println() throws IOException {
     out.write('\n');
     firstCol = true;
+  }
+
+  private void printRow(final TableModel model, final int row)
+    throws IOException {
+    final int colCount = model.getColumnCount();
+    for (int col = 0; col < colCount; col++) {
+      final String value = model.getBodyCell(row, col);
+      print(value);
+    }
+    println();
+  }
+
+  private void printRows(final TableModel model) throws IOException {
+    for (int row = 0; row < model.getBodyRowCount(); row++) {
+      printRow(model, row);
+    }
   }
 }

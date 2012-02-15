@@ -10,13 +10,12 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonParser;
-import com.revolsys.io.json.JsonParserUtil;
 import com.revolsys.io.json.JsonParser.EventType;
+import com.revolsys.io.json.JsonParserUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -177,6 +176,28 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
+  private GeometryFactory readCoordinateSystem() {
+    GeometryFactory factory = geometryFactory;
+    do {
+      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      if (PROPERTIES.equals(attributeName)) {
+        final Map<String, Object> properties = JsonParserUtil.getMap(in);
+        final String name = (String)properties.get("name");
+        if (name != null) {
+          if (name.startsWith(URN_OGC_DEF_CRS_EPSG)) {
+            final int srid = Integer.parseInt(name.substring(URN_OGC_DEF_CRS_EPSG.length()));
+            factory = GeometryFactory.getFactory(srid);
+          } else if (name.startsWith(EPSG)) {
+            final int srid = Integer.parseInt(name.substring(EPSG.length()));
+            factory = GeometryFactory.getFactory(srid);
+          }
+        }
+      }
+    } while (in.getEvent() != EventType.endObject
+      && in.getEvent() != EventType.endDocument);
+    return factory;
+  }
+
   private Geometry readGeometry() {
     final String geometryType = in.getValue();
     if (geometryType.equals(POINT)) {
@@ -216,28 +237,6 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       && in.getEvent() != EventType.endDocument);
     final LineString lineString = factory.createLineString(points);
     return lineString;
-  }
-
-  private GeometryFactory readCoordinateSystem() {
-    GeometryFactory factory = geometryFactory;
-    do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
-      if (PROPERTIES.equals(attributeName)) {
-        final Map<String, Object> properties = JsonParserUtil.getMap(in);
-        String name = (String)properties.get("name");
-        if (name != null) {
-          if (name.startsWith(URN_OGC_DEF_CRS_EPSG)) {
-            int srid = Integer.parseInt(name.substring(URN_OGC_DEF_CRS_EPSG.length()));
-            factory = GeometryFactory.getFactory(srid);
-          } else if (name.startsWith(EPSG)) {
-            int srid = Integer.parseInt(name.substring(EPSG.length()));
-            factory = GeometryFactory.getFactory(srid);
-          }
-        }
-      }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
-    return factory;
   }
 
   private Geometry readMultiLineString() {

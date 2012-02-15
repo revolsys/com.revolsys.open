@@ -30,14 +30,11 @@ public class DataObjectAttributeValidator implements AttributeValueValidator {
     this(new DataObjectValidator());
   }
 
-  public DataObjectAttributeValidator(
-    final DataObjectValidator validator) {
+  public DataObjectAttributeValidator(final DataObjectValidator validator) {
     this.validator = validator;
   }
 
-  public boolean isValid(
-    final Attribute attributeDefinition,
-    final Object value) {
+  public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value instanceof DataObject) {
       return validator.isValid(value);
     } else {

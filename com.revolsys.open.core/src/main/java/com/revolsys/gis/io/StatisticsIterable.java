@@ -26,19 +26,19 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     return iterable;
   }
 
+  /**
+   * @return the stats
+   */
+  public Statistics getStatistics() {
+    return statistics;
+  }
+
   @PostConstruct
   public void init() {
     if (this.statistics == null) {
       setStatistics(new Statistics("Read " + beanName + " "
         + iterable.toString()));
     }
-  }
-
-  /**
-   * @return the stats
-   */
-  public Statistics getStatistics() {
-    return statistics;
   }
 
   public Iterator<DataObject> iterator() {

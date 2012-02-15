@@ -1,17 +1,17 @@
 package com.revolsys.ui.html.fields;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
 public class WeekField extends TextField {
 
-  public WeekField(String name, boolean required) {
+  public WeekField(final String name, final boolean required) {
     super(name, required);
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
-    String id = getName();
+    final String id = getName();
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_ID, id);
     out.text(" ");

@@ -35,10 +35,8 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param attributeName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(
-    final String attributeName,
-    final boolean allowNulls,
-    final List<Object> values) {
+  public AttributeValuesFilter(final String attributeName,
+    final boolean allowNulls, final List<Object> values) {
     this.attributeName = attributeName;
     this.values = values;
     this.allowNulls = allowNulls;
@@ -50,10 +48,8 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param attributeName The attribute name.
    * @param values The array of values.
    */
-  public AttributeValuesFilter(
-    final String attributeName,
-    final boolean allowNulls,
-    final Object... values) {
+  public AttributeValuesFilter(final String attributeName,
+    final boolean allowNulls, final Object... values) {
     this(attributeName, allowNulls, Arrays.asList(values));
   }
 
@@ -63,8 +59,7 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param attributeName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(
-    final String attributeName,
+  public AttributeValuesFilter(final String attributeName,
     final List<Object> values) {
     this.attributeName = attributeName;
     this.values = values;
@@ -76,8 +71,7 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param attributeName The attribute name.
    * @param values The array of values.
    */
-  public AttributeValuesFilter(
-    final String attributeName,
+  public AttributeValuesFilter(final String attributeName,
     final Object... values) {
     this(attributeName, Arrays.asList(values));
   }
@@ -88,8 +82,7 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Object propertyValue = DataObjectUtil.getAttributeByPath(object,
       attributeName);
     if (propertyValue == null) {
@@ -99,7 +92,7 @@ public class AttributeValuesFilter implements Filter<DataObject> {
         return false;
       }
     } else {
-      for (Object value : values) {
+      for (final Object value : values) {
         if (EqualsRegistry.INSTANCE.equals(value, propertyValue)) {
           return true;
         }
@@ -128,8 +121,7 @@ public class AttributeValuesFilter implements Filter<DataObject> {
     return allowNulls;
   }
 
-  public void setAllowNulls(
-    final boolean allowNulls) {
+  public void setAllowNulls(final boolean allowNulls) {
     this.allowNulls = allowNulls;
   }
 
@@ -138,16 +130,14 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * 
    * @param attributeName The attributeName name, or path to match.
    */
-  public void setAttributeName(
-    final String attributeName) {
+  public void setAttributeName(final String attributeName) {
     this.attributeName = attributeName;
   }
 
   /**
    * @param values the values to set
    */
-  public void setValues(
-    final List<Object> values) {
+  public void setValues(final List<Object> values) {
     this.values = values;
   }
 

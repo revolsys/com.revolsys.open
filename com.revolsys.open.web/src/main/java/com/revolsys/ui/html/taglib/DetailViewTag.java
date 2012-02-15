@@ -34,46 +34,48 @@ public class DetailViewTag extends TagSupport {
 
   private LabelValueListSerializer model;
 
+  @Override
+  public int doEndTag() throws JspException {
+    return EVAL_PAGE;
+  }
+
+  @Override
   public int doStartTag() throws JspException {
     if (name != null) {
       try {
-        Object object = pageContext.findAttribute(name);
+        final Object object = pageContext.findAttribute(name);
         if (object != null) {
-          Writer out = pageContext.getOut();
+          final Writer out = pageContext.getOut();
           JavaBeanUtil.setProperty(model, "object", object);
-          DetailView view = new DetailView(model);
+          final DetailView view = new DetailView(model);
           view.serialize(out);
         }
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         throw new JspException(t);
       }
     }
     return SKIP_BODY;
   }
 
-  public int doEndTag() throws JspException {
-    return EVAL_PAGE;
+  public String getModelClass() {
+    return modelClass;
   }
 
   public String getName() {
     return name;
   }
 
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  public String getModelClass() {
-    return modelClass;
-  }
-
   public void setModelClass(final String modelClass) {
     this.modelClass = modelClass;
     try {
-      Class klass = Class.forName(modelClass);
+      final Class klass = Class.forName(modelClass);
       model = (LabelValueListSerializer)klass.newInstance();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       throw new IllegalArgumentException("Unable to create class " + modelClass);
     }
+  }
+
+  public void setName(final String name) {
+    this.name = name;
   }
 }

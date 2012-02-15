@@ -24,7 +24,7 @@ public class ListOfMapHttpMessageConverter extends
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
-  private IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
 
   public ListOfMapHttpMessageConverter() {
     super(ArrayListOfMap.class, null,
@@ -33,7 +33,9 @@ public class ListOfMapHttpMessageConverter extends
 
   @SuppressWarnings("unchecked")
   @Override
-  public void write(final ArrayListOfMap list, final MediaType mediaType,
+  public void write(
+    final ArrayListOfMap list,
+    final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     Charset charset = mediaType.getCharSet();
@@ -50,7 +52,7 @@ public class ListOfMapHttpMessageConverter extends
       body, charset));
     writer.setProperty(IoConstants.INDENT_PROPERTY, true);
     writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);
-    HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
     String callback = request.getParameter("jsonp");
     if (callback == null) {
       callback = request.getParameter("callback");
@@ -58,7 +60,7 @@ public class ListOfMapHttpMessageConverter extends
     if (callback != null) {
       writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
     }
-    for (Map<String, Object> map : (ArrayListOfMap<Object>)list) {
+    for (final Map<String, Object> map : (ArrayListOfMap<Object>)list) {
       writer.write(map);
     }
     writer.close();

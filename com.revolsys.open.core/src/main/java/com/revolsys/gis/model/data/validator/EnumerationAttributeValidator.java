@@ -27,14 +27,11 @@ public class EnumerationAttributeValidator implements AttributeValueValidator {
 
   private final EnumerationDataType dataType;
 
-  public EnumerationAttributeValidator(
-    final EnumerationDataType dataType) {
+  public EnumerationAttributeValidator(final EnumerationDataType dataType) {
     this.dataType = dataType;
   }
 
-  public boolean isValid(
-    final Attribute attributeDefinition,
-    final Object value) {
+  public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value != null) {
       final String stringValue = value.toString();
       return dataType.getAllowedValues().contains(stringValue);

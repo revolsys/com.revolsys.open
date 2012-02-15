@@ -14,22 +14,28 @@ import com.revolsys.io.Writer;
 
 public interface DataObjectWriterFactory extends IoFactory {
 
-  boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem);
+  Writer<DataObject> createDataObjectWriter(
+    DataObjectMetaData metaData,
+    Resource resource);
+
+  Writer<DataObject> createDataObjectWriter(
+    String baseName,
+    DataObjectMetaData metaData,
+    OutputStream outputStream);
+
+  Writer<DataObject> createDataObjectWriter(
+    String baseName,
+    DataObjectMetaData metaData,
+    OutputStream outputStream,
+    Charset charset);
 
   Set<CoordinateSystem> getCoordinateSystems();
 
-  Writer<DataObject> createDataObjectWriter(DataObjectMetaData metaData,
-    Resource resource);
-
-  Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream);
-
-  Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset);
+  boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem);
 
   boolean isCustomAttributionSupported();
 
   boolean isGeometrySupported();
-  
+
   boolean isSingleFile();
 }

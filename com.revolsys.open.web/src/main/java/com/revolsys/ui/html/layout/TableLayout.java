@@ -30,13 +30,13 @@ import com.revolsys.ui.html.view.ElementContainer;
 public class TableLayout implements ElementContainerLayout {
   private static final Logger log = Logger.getLogger(TableLayout.class);
 
-  private String cssClass;
+  private final String cssClass;
 
-  private int numColumns;
+  private final int numColumns;
 
-  private List titles;
+  private final List titles;
 
-  private List cssClasses = new ArrayList();
+  private final List cssClasses = new ArrayList();
 
   public TableLayout(final int numColumns) {
     this(null, numColumns);
@@ -62,8 +62,7 @@ public class TableLayout implements ElementContainerLayout {
     }
   }
 
-  public void serialize(final XmlWriter out, final ElementContainer container)
-    {
+  public void serialize(final XmlWriter out, final ElementContainer container) {
     if (!container.getElements().isEmpty()) {
       out.startTag(HtmlUtil.DIV);
       if (cssClass != null) {
@@ -81,20 +80,21 @@ public class TableLayout implements ElementContainerLayout {
     }
   }
 
-  private void serializeTbody(final XmlWriter out,
+  private void serializeTbody(
+    final XmlWriter out,
     final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
-    List elementList = container.getElements();
+    final List elementList = container.getElements();
     int i = 0;
     int rowNum = 0;
-    int numElements = elementList.size();
-    int lastRow = (numElements - 1) / numColumns;
-    for (Iterator elements = elementList.iterator(); elements.hasNext();) {
-      Element element = (Element)elements.next();
-      int col = i % numColumns;
+    final int numElements = elementList.size();
+    final int lastRow = (numElements - 1) / numColumns;
+    for (final Iterator elements = elementList.iterator(); elements.hasNext();) {
+      final Element element = (Element)elements.next();
+      final int col = i % numColumns;
       String colCss = (String)cssClasses.get(col);
-      boolean firstCol = col == 0;
-      boolean lastCol = (i + 1) % numColumns == 0 || i == numElements - 1;
+      final boolean firstCol = col == 0;
+      final boolean lastCol = (i + 1) % numColumns == 0 || i == numElements - 1;
       if (firstCol) {
         out.startTag(HtmlUtil.TR);
         String rowCss = "";
@@ -132,8 +132,8 @@ public class TableLayout implements ElementContainerLayout {
       out.startTag(HtmlUtil.THEAD);
       out.startTag(HtmlUtil.TR);
       int col = 0;
-      for (Iterator titleIter = titles.iterator(); titleIter.hasNext();) {
-        String title = (String)titleIter.next();
+      for (final Iterator titleIter = titles.iterator(); titleIter.hasNext();) {
+        final String title = (String)titleIter.next();
         out.startTag(HtmlUtil.TH);
         String colCssClass = (String)cssClasses.get(col);
         if (col == 0) {

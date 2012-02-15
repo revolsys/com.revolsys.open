@@ -1,13 +1,13 @@
 package com.revolsys.converter.string;
 
 public interface StringConverter<T> {
+  Class<T> getConvertedClass();
+
   boolean requiresQuotes();
 
-  String toString(T value);
+  T toObject(Object value);
 
   T toObject(String string);
-  
-  T toObject(Object value);
-  
-  Class<T> getConvertedClass();
+
+  String toString(T value);
 }

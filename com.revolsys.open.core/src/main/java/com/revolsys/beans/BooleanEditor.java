@@ -6,12 +6,7 @@ public class BooleanEditor extends PropertyEditorSupport {
   public BooleanEditor() {
   }
 
-  public void setAsText(
-    final String text)
-    throws IllegalArgumentException {
-    setValue(Boolean.valueOf(text));
-  }
-
+  @Override
   public String getAsText() {
     final Boolean value = (Boolean)getValue();
     if (value == null) {
@@ -19,5 +14,10 @@ public class BooleanEditor extends PropertyEditorSupport {
     } else {
       return value.toString();
     }
+  }
+
+  @Override
+  public void setAsText(final String text) throws IllegalArgumentException {
+    setValue(Boolean.valueOf(text));
   }
 }

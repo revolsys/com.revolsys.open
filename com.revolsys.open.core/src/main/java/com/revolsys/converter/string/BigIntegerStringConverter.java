@@ -5,17 +5,17 @@ import java.math.BigInteger;
 import org.springframework.util.StringUtils;
 
 public class BigIntegerStringConverter implements StringConverter<BigInteger> {
+  public Class<BigInteger> getConvertedClass() {
+    return BigInteger.class;
+  }
+
   public boolean requiresQuotes() {
     return false;
   }
 
-  public String toString(BigInteger number) {
-    return number.toString();
-  }
-
-  public BigInteger toObject(Object value) {
+  public BigInteger toObject(final Object value) {
     if (value instanceof BigInteger) {
-      BigInteger number = (BigInteger)value;
+      final BigInteger number = (BigInteger)value;
       return number;
     } else if (value == null) {
       return null;
@@ -24,7 +24,7 @@ public class BigIntegerStringConverter implements StringConverter<BigInteger> {
     }
   }
 
-  public BigInteger toObject(String string) {
+  public BigInteger toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return new BigInteger(string);
     } else {
@@ -32,8 +32,8 @@ public class BigIntegerStringConverter implements StringConverter<BigInteger> {
     }
   }
 
-  public Class<BigInteger> getConvertedClass() {
-    return BigInteger.class;
+  public String toString(final BigInteger number) {
+    return number.toString();
   }
 
 }

@@ -50,17 +50,7 @@ public class ElementLabel implements Decorator {
     out.endTag(HtmlUtil.DIV);
   }
 
-  protected void serializeLabel(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "label");
-    out.startTag(HtmlUtil.LABEL);
-    out.text(getLabel());
-    out.endTag(HtmlUtil.LABEL);
-    out.endTag(HtmlUtil.DIV);
-  }
-
-  protected void serializeField(final XmlWriter out, final Element element)
-    {
+  protected void serializeField(final XmlWriter out, final Element element) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "contents");
     element.serializeElement(out);
@@ -68,13 +58,22 @@ public class ElementLabel implements Decorator {
   }
 
   protected void serializeInstructions(final XmlWriter out) {
-    String instructions = getInstructions();
+    final String instructions = getInstructions();
     if (instructions != null) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "instructions");
       out.text(instructions);
       out.endTag(HtmlUtil.DIV);
     }
+  }
+
+  protected void serializeLabel(final XmlWriter out) {
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "label");
+    out.startTag(HtmlUtil.LABEL);
+    out.text(getLabel());
+    out.endTag(HtmlUtil.LABEL);
+    out.endTag(HtmlUtil.DIV);
   }
 
   public void setInstructions(final String instructions) {

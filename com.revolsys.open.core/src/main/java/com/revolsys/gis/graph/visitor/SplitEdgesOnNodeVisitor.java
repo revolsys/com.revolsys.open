@@ -9,13 +9,6 @@ import com.revolsys.gis.graph.Node;
 
 public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
 
-  public boolean visit(
-    Node<T> node) {
-    while (splitEdgesCloseToNode(node)) {
-    }
-    return true;
-  }
-
   /**
    * Split edges which the node is on the line of the edge. The edge will only
    * be split if the original node has at least one edge which shares the the
@@ -24,8 +17,7 @@ public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
    * @param node The node.
    * @return True if an edge was split, false otherwise.
    */
-  private boolean splitEdgesCloseToNode(
-    final Node<T> node) {
+  private boolean splitEdgesCloseToNode(final Node<T> node) {
     final Graph<T> graph = node.getGraph();
     final List<Edge<T>> nodeEdges = node.getEdges();
     if (!nodeEdges.isEmpty()) {
@@ -38,6 +30,12 @@ public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
       }
     }
     return false;
+  }
+
+  public boolean visit(final Node<T> node) {
+    while (splitEdgesCloseToNode(node)) {
+    }
+    return true;
   }
 
 }

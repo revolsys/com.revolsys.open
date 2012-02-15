@@ -35,8 +35,7 @@ public class PatternFilenameFilter implements FilenameFilter {
    * 
    * @param regex The regular expression.
    */
-  public PatternFilenameFilter(
-    final String regex) {
+  public PatternFilenameFilter(final String regex) {
     pattern = Pattern.compile(regex);
   }
 
@@ -47,10 +46,8 @@ public class PatternFilenameFilter implements FilenameFilter {
    * @param fileName The file name.
    * @return True if the file matched, false otherwise.
    */
-  public boolean accept(
-    final File directory,
-    final String fileName) {
-    boolean matches = pattern.matcher(fileName).matches();
+  public boolean accept(final File directory, final String fileName) {
+    final boolean matches = pattern.matcher(fileName).matches();
     return matches;
   }
 }

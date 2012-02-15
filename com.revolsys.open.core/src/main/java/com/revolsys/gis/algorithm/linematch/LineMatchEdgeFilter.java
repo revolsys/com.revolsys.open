@@ -72,10 +72,8 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
 
   private final Node<LineSegmentMatch> toNode;
 
-  public LineMatchEdgeFilter(
-    final Edge<LineSegmentMatch> edge,
-    final int index,
-    final double tolerance) {
+  public LineMatchEdgeFilter(final Edge<LineSegmentMatch> edge,
+    final int index, final double tolerance) {
     this.edge = edge;
     this.index = index;
     this.tolerance = tolerance;
@@ -88,8 +86,7 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
     this.toNode = edge.getToNode();
   }
 
-  public boolean accept(
-    final Edge<LineSegmentMatch> edge2) {
+  public boolean accept(final Edge<LineSegmentMatch> edge2) {
     if (edge2.getEnvelope().intersects(envelope)) {
       final LineSegmentMatch edgeMatch2 = edge2.getObject();
       if (!edgeMatch2.hasSegment(index)) {

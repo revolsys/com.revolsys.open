@@ -15,13 +15,11 @@ public class NodeMatchingEdgeFilter<T> implements Filter<Node<T>> {
 
   private final Filter<Edge<T>> edgeFilter;
 
-  public NodeMatchingEdgeFilter(
-    final Filter<Edge<T>> edgeFilter) {
+  public NodeMatchingEdgeFilter(final Filter<Edge<T>> edgeFilter) {
     this.edgeFilter = edgeFilter;
   }
 
-  public boolean accept(
-    final Node<T> node) {
+  public boolean accept(final Node<T> node) {
     for (final Edge<T> edge : node.getEdges()) {
       if (edgeFilter.accept(edge)) {
         return true;

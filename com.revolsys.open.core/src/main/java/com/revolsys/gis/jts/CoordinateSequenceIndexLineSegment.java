@@ -8,8 +8,7 @@ public class CoordinateSequenceIndexLineSegment extends AbstractLineSegment {
 
   private int index = -1;
 
-  public CoordinateSequenceIndexLineSegment(
-    final CoordinateSequence coordinates) {
+  public CoordinateSequenceIndexLineSegment(final CoordinateSequence coordinates) {
     this.coordinates = coordinates;
   }
 
@@ -17,8 +16,7 @@ public class CoordinateSequenceIndexLineSegment extends AbstractLineSegment {
     return coordinates.getDimension();
   }
 
-  public double getEndOrdinate(
-    final int ordinateIndex) {
+  public double getEndOrdinate(final int ordinateIndex) {
     return coordinates.getOrdinate(index + 1, ordinateIndex);
   }
 
@@ -26,13 +24,11 @@ public class CoordinateSequenceIndexLineSegment extends AbstractLineSegment {
     return index;
   }
 
-  public double getStartOrdinate(
-    final int ordinateIndex) {
+  public double getStartOrdinate(final int ordinateIndex) {
     return coordinates.getOrdinate(index, ordinateIndex);
   }
 
-  public void setIndex(
-    final int index) {
+  public void setIndex(final int index) {
     this.index = index;
   }
 

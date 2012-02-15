@@ -22,9 +22,7 @@ public class DataObjectTypeNameComparator implements Comparator<DataObject> {
     return name1.compareTo(name2);
   }
 
-  public int compare(
-    final DataObject object1,
-    final DataObject object2) {
+  public int compare(final DataObject object1, final DataObject object2) {
     return compareTypeNames(object1, object2);
   }
 }

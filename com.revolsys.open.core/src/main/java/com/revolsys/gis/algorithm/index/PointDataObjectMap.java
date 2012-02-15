@@ -30,8 +30,7 @@ public class PointDataObjectMap {
   public PointDataObjectMap() {
   }
 
-  public PointDataObjectMap(
-    final Comparator<DataObject> comparator) {
+  public PointDataObjectMap(final Comparator<DataObject> comparator) {
     this.comparator = comparator;
   }
 
@@ -42,8 +41,7 @@ public class PointDataObjectMap {
    * @param pointObjects The map of point objects.
    * @param object The object to add.
    */
-  public void add(
-    final DataObject object) {
+  public void add(final DataObject object) {
     final Point point = object.getGeometryValue();
     final Coordinates coordinates = CoordinatesUtil.get(point);
     List<DataObject> objects = objectMap.get(coordinates);
@@ -63,6 +61,14 @@ public class PointDataObjectMap {
   public void clear() {
     size = 0;
     objectMap = new HashMap<Coordinates, List<DataObject>>();
+  }
+
+  public List<DataObject> getAll() {
+    final List<DataObject> objects = new ArrayList<DataObject>();
+    for (final List<DataObject> objectsAtPoint : objectMap.values()) {
+      objects.addAll(objectsAtPoint);
+    }
+    return objects;
   }
 
   public Set<Coordinates> getCoordinates() {
@@ -89,8 +95,7 @@ public class PointDataObjectMap {
     return filteredObjects;
   }
 
-  public List<DataObject> getObjects(
-    final Coordinates coordinates) {
+  public List<DataObject> getObjects(final Coordinates coordinates) {
     final List<DataObject> objects = objectMap.get(coordinates);
     if (objects == null) {
       return Collections.emptyList();
@@ -99,22 +104,19 @@ public class PointDataObjectMap {
     }
   }
 
-  public List<DataObject> getObjects(
-    final DataObject object) {
+  public List<DataObject> getObjects(final DataObject object) {
     final Point point = object.getGeometryValue();
     final List<DataObject> objects = getObjects(point);
     return objects;
   }
 
-  public List<DataObject> getObjects(
-    final Point point) {
+  public List<DataObject> getObjects(final Point point) {
     final Coordinates coordinates = CoordinatesUtil.get(point);
     final List<DataObject> objects = getObjects(coordinates);
     return objects;
   }
 
-  public void remove(
-    final DataObject object) {
+  public void remove(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     final Coordinates coordinates = CoordinatesUtil.get(geometry);
     final List<DataObject> objects = objectMap.get(coordinates);
@@ -133,8 +135,7 @@ public class PointDataObjectMap {
     return size;
   }
 
-  public void sort(
-    DataObject object) {
+  public void sort(final DataObject object) {
     if (comparator != null) {
       final Geometry geometry = object.getGeometryValue();
       final Coordinate coordinate = geometry.getCoordinate();
@@ -145,8 +146,7 @@ public class PointDataObjectMap {
     }
   }
 
-  public void write(
-    final Channel<DataObject> out) {
+  public void write(final Channel<DataObject> out) {
     if (out != null) {
       for (final Coordinates coordinates : getCoordinates()) {
         final List<DataObject> objects = getObjects(coordinates);
@@ -155,13 +155,5 @@ public class PointDataObjectMap {
         }
       }
     }
-  }
-
-  public List<DataObject> getAll() {
-    List<DataObject> objects = new ArrayList<DataObject>();
-    for (List<DataObject> objectsAtPoint : objectMap.values()) {
-      objects.addAll(objectsAtPoint);
-    }
-    return objects;
   }
 }

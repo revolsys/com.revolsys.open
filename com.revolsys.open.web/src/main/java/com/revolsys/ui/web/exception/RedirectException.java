@@ -26,6 +26,8 @@ public class RedirectException extends ActionException {
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -8661796861568286704L;
 
+  private String url;
+
   /**
    * Construct a new RedirectException.
    */
@@ -44,6 +46,4 @@ public class RedirectException extends ActionException {
   public String getUrl() {
     return url;
   }
-
-  private String url;
 }

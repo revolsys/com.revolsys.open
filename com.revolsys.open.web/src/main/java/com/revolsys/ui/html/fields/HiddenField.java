@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -35,24 +34,26 @@ public class HiddenField extends Field {
     super(name, required);
   }
 
+  public HiddenField(final String name, final Object value) {
+    this(name, value.toString());
+  }
+
   public HiddenField(final String name, final String value) {
     super(name, false);
     this.inputValue = value;
     fixedValue = true;
   }
 
-  public HiddenField(final String name, final Object value) {
-    this(name, value.toString());
-  }
-
   public String getInputValue() {
     return inputValue;
   }
 
+  @Override
   public boolean hasValue() {
     return inputValue != null && !inputValue.equals("");
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     if (!fixedValue) {
       inputValue = request.getParameter(getName());
@@ -65,6 +66,7 @@ public class HiddenField extends Field {
     }
   }
 
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
@@ -76,6 +78,7 @@ public class HiddenField extends Field {
     return valid;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeHiddenInput(out, getName(), inputValue);
   }

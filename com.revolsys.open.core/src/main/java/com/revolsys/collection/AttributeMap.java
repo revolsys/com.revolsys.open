@@ -17,17 +17,17 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
   public AttributeMap() {
   }
 
-  public AttributeMap(final int initialCapacity, final float loadFactor,
-    final boolean accessOrder) {
-    super(initialCapacity, loadFactor, accessOrder);
+  public AttributeMap(final int initialCapacity) {
+    super(initialCapacity);
   }
 
-  public AttributeMap(final int initialCapacity, float loadFactor) {
+  public AttributeMap(final int initialCapacity, final float loadFactor) {
     super(initialCapacity, loadFactor);
   }
 
-  public AttributeMap(final int initialCapacity) {
-    super(initialCapacity);
+  public AttributeMap(final int initialCapacity, final float loadFactor,
+    final boolean accessOrder) {
+    super(initialCapacity, loadFactor, accessOrder);
   }
 
   public AttributeMap(final Map<? extends String, ? extends Object> m) {
@@ -43,16 +43,16 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     putAll(attributes);
   }
 
-  public void setProperties(Resource resource) {
+  public void setProperties(final Resource resource) {
     try {
-      Properties properties = new Properties();
+      final Properties properties = new Properties();
       properties.load(resource.getInputStream());
-      for (Entry<Object, Object> entry : properties.entrySet()) {
-        String key = (String)entry.getKey();
-        Object value = entry.getValue();
+      for (final Entry<Object, Object> entry : properties.entrySet()) {
+        final String key = (String)entry.getKey();
+        final Object value = entry.getValue();
         put(key, value);
       }
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       LOG.error("Cannot load properties from " + resource, e);
     }
   }

@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 
 /**
@@ -23,12 +22,13 @@ import com.revolsys.io.xml.XmlWriter;
  * @version 1.0
  */
 public class StringElement extends Element {
-  private String content;
+  private final String content;
 
   public StringElement(final String content) {
     this.content = content;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.text(content);
   }

@@ -35,20 +35,17 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
 
   private final double maxDistance;
 
-  private GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
-  public NodeLessThanDistanceOfGeometryVisitor(
-    final Geometry geometry,
-    final double maxDistance,
-    final Visitor<Node<T>> matchVisitor) {
+  public NodeLessThanDistanceOfGeometryVisitor(final Geometry geometry,
+    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
     this.geometryFactory = GeometryFactory.getFactory(geometry);
   }
 
-  public boolean visit(
-    final Node<T> node) {
+  public boolean visit(final Node<T> node) {
     final Coordinates coordinate = node;
     final Point point = geometryFactory.createPoint(coordinate);
     final double distance = geometry.distance(point);

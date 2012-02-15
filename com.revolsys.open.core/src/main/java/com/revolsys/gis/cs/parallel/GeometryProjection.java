@@ -7,7 +7,8 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryProjection extends BaseInOutProcess<DataObject,DataObject> {
+public class GeometryProjection extends
+  BaseInOutProcess<DataObject, DataObject> {
   private GeometryFactory geometryFactory;
 
   public GeometryFactory getGeometryFactory() {
@@ -16,14 +17,14 @@ public class GeometryProjection extends BaseInOutProcess<DataObject,DataObject> 
 
   @Override
   protected void process(
-    Channel<DataObject> in,
-    Channel<DataObject> out,
-    DataObject object) {
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
 
     if (geometry != null) {
-      Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
-        geometryFactory);
+      final Geometry projectedGeometry = GeometryProjectionUtil.perform(
+        geometry, geometryFactory);
       if (geometry != projectedGeometry) {
         object.setGeometryValue(projectedGeometry);
       }
@@ -31,8 +32,7 @@ public class GeometryProjection extends BaseInOutProcess<DataObject,DataObject> 
     out.write(object);
   }
 
-  public void setGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 }

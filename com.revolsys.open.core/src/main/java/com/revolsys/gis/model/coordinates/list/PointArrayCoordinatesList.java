@@ -15,48 +15,49 @@ public class PointArrayCoordinatesList extends AbstractCoordinatesList {
   public PointArrayCoordinatesList() {
   }
 
-  public PointArrayCoordinatesList(byte numAxis) {
+  public PointArrayCoordinatesList(final byte numAxis) {
     this.numAxis = numAxis;
   }
 
-  public PointArrayCoordinatesList(byte numAxis,Coordinates... points) {
-    this.numAxis =numAxis;
-    for (Coordinates point : points) {
+  public PointArrayCoordinatesList(final byte numAxis,
+    final Coordinates... points) {
+    this.numAxis = numAxis;
+    for (final Coordinates point : points) {
       add(point);
     }
+  }
+
+  public void add(final Coordinates coordinates) {
+    points.add(coordinates);
   }
 
   public void clear() {
     points.clear();
   }
 
-  public void add(Coordinates coordinates) {
-    points.add(coordinates);
+  @Override
+  public PointArrayCoordinatesList clone() {
+    final PointArrayCoordinatesList clone = (PointArrayCoordinatesList)super.clone();
+    clone.points = new ArrayList<Coordinates>(points);
+    return null;
   }
 
   public byte getNumAxis() {
     return numAxis;
   }
 
-  public double getValue(int index, int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     final Coordinates point = points.get(index);
     return point.getValue(axisIndex);
   }
 
-  public void setValue(int index, int axisIndex, double value) {
+  public void setValue(final int index, final int axisIndex, final double value) {
     final Coordinates point = points.get(index);
     point.setValue(axisIndex, value);
   }
 
   public int size() {
     return points.size();
-  }
-
-  @Override
-  public PointArrayCoordinatesList clone() {
-    PointArrayCoordinatesList clone = (PointArrayCoordinatesList)super.clone();
-    clone.points = new ArrayList<Coordinates>(points);
-    return null;
   }
 
 }

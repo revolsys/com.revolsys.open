@@ -9,7 +9,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ClipGeometryProcess extends BaseInOutProcess<DataObject,DataObject> {
+public class ClipGeometryProcess extends
+  BaseInOutProcess<DataObject, DataObject> {
 
   private Polygon clipPolygon;
 
@@ -22,9 +23,9 @@ public class ClipGeometryProcess extends BaseInOutProcess<DataObject,DataObject>
 
   @Override
   protected void process(
-    Channel<DataObject> in,
-    Channel<DataObject> out,
-    DataObject object) {
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
       final Geometry intersection = geometry.intersection(clipPolygon);
@@ -53,8 +54,7 @@ public class ClipGeometryProcess extends BaseInOutProcess<DataObject,DataObject>
   /**
    * @param clipPolygon the clipPolygon to set
    */
-  public void setClipPolygon(
-    final Polygon clipPolygon) {
+  public void setClipPolygon(final Polygon clipPolygon) {
     this.clipPolygon = clipPolygon;
   }
 

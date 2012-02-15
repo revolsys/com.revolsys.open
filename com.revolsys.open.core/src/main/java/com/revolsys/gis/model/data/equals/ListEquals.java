@@ -18,8 +18,8 @@ public class ListEquals implements Equals<List<?>> {
       return false;
     } else {
       for (int i = 0; i < list1.size(); i++) {
-        Object value1 = list1.get(i);
-        Object value2 = list2.get(i);
+        final Object value1 = list1.get(i);
+        final Object value2 = list2.get(i);
         if (!equalsRegistry.equals(value1, value2, exclude)) {
           return false;
         }
@@ -28,8 +28,7 @@ public class ListEquals implements Equals<List<?>> {
     return true;
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }
 }

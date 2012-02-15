@@ -26,17 +26,18 @@ import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.SetObject;
+import com.revolsys.util.JavaBeanUtil;
 
 public class HtmlUiBuilderObjectForm extends Form {
   private static final Logger log = Logger.getLogger(HtmlUiBuilderObjectForm.class);
 
-  private HtmlUiBuilder builder;
+  private final HtmlUiBuilder builder;
 
-  private String typeLabel;
+  private final String typeLabel;
 
   private List<String> fieldKeys;
 
-  private Object object;
+  private final Object object;
 
   public HtmlUiBuilderObjectForm(final Object object,
     final HtmlUiBuilder uiBuilder, final List<String> fieldKeys) {
@@ -57,15 +58,16 @@ public class HtmlUiBuilderObjectForm extends Form {
     this.fieldKeys = fieldKeys;
   }
 
+  @Override
   public Object getInitialValue(
     final Field field,
     final HttpServletRequest request) {
     if (object != null) {
-      String propertyName = field.getName();
+      final String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
         try {
-          return builder.getValue(object, propertyName);
-        } catch (IllegalArgumentException e) {
+          return JavaBeanUtil.getValue(object, propertyName);
+        } catch (final IllegalArgumentException e) {
           return null;
         }
       }
@@ -73,16 +75,21 @@ public class HtmlUiBuilderObjectForm extends Form {
     return null;
   }
 
+  public Object getObject() {
+    return object;
+  }
+
+  @Override
   public void initialize(final HttpServletRequest request) {
-    for (String key : fieldKeys) {
+    for (final String key : fieldKeys) {
       if (!getFieldNames().contains(key)) {
-        Element field = builder.getField(request, key);
+        final Element field = builder.getField(request, key);
         if (field instanceof SetObject) {
           ((SetObject)field).setObject(object);
         }
         if (field != null) {
           if (!getElements().contains(field)) {
-            Decorator label = builder.getFieldLabel(key,
+            final Decorator label = builder.getFieldLabel(key,
               (field instanceof Field));
 
             add(field, label);
@@ -94,18 +101,23 @@ public class HtmlUiBuilderObjectForm extends Form {
     super.initialize(request);
   }
 
+  public void setFieldKeys(final List fieldKeys) {
+    this.fieldKeys = fieldKeys;
+  }
+
+  @Override
   public boolean validate() {
     boolean valid = true;
     if (object != null) {
-      for (Field field : getFields().values()) {
+      for (final Field field : getFields().values()) {
         if (!field.hasValidationErrors() && !field.isReadOnly()) {
-          String propertyName = field.getName();
+          final String propertyName = field.getName();
           if (propertyName != Form.FORM_TASK_PARAM
             && fieldKeys.contains(propertyName)) {
-            Object value = field.getValue();
+            final Object value = field.getValue();
             try {
               builder.setValue(object, propertyName, value);
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
               field.addValidationError(e.getMessage());
               valid = false;
             }
@@ -118,13 +130,5 @@ public class HtmlUiBuilderObjectForm extends Form {
     }
     valid &= super.validate();
     return valid;
-  }
-
-  public void setFieldKeys(final List fieldKeys) {
-    this.fieldKeys = fieldKeys;
-  }
-
-  public Object getObject() {
-    return object;
   }
 }

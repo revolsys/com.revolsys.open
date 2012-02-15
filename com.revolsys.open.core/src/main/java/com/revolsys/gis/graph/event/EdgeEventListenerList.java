@@ -24,8 +24,7 @@ public class EdgeEventListenerList<T> extends LinkedHashSet<EdgeEventListener>
     }
   }
 
-  public void edgeEvent(
-    final EdgeEvent<T> edgeEvent) {
+  public void edgeEvent(final EdgeEvent<T> edgeEvent) {
     for (final EdgeEventListener<T> listener : this) {
       listener.edgeEvent(edgeEvent);
     }

@@ -44,8 +44,7 @@ public class DataObjectHttpMessageConverter extends
   @Override
   public DataObject read(
     final Class<? extends DataObject> clazz,
-    final HttpInputMessage inputMessage)
-    throws IOException,
+    final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     final DataObjectReader reader = readerConverter.read(
       DataObjectReader.class, inputMessage);
@@ -59,13 +58,11 @@ public class DataObjectHttpMessageConverter extends
     }
   }
 
-  public void setGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     readerConverter.setGeometryFactory(geometryFactory);
   }
 
-  public void setRequestAttributeNames(
-    final List<String> requestAttributeNames) {
+  public void setRequestAttributeNames(final List<String> requestAttributeNames) {
     readerConverter.setRequestAttributeNames(requestAttributeNames);
   }
 
@@ -73,8 +70,7 @@ public class DataObjectHttpMessageConverter extends
   public void write(
     final DataObject dataObject,
     final MediaType mediaType,
-    final HttpOutputMessage outputMessage)
-    throws IOException,
+    final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     if (dataObject != null) {
       final DataObjectMetaData metaData = dataObject.getMetaData();

@@ -26,6 +26,5 @@ public interface Filter<T> {
    * @param object The object to check.
    * @return True if the object matched the filter, false otherwise.
    */
-  boolean accept(
-    T object);
+  boolean accept(T object);
 }

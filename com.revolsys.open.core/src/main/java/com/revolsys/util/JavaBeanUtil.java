@@ -20,13 +20,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.revolsys.gis.data.model.DataObject;
 
 /**
  * The JavaBeanUtil is a utility class that provides methods to set/get
@@ -37,7 +38,9 @@ import org.slf4j.LoggerFactory;
 public final class JavaBeanUtil {
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
-  public static Method getMethod(final Class<?> clazz, final String name,
+  public static Method getMethod(
+    final Class<?> clazz,
+    final String name,
     final Class<?>... parameterTypes) {
     try {
       final Method method = clazz.getMethod(name, parameterTypes);
@@ -45,43 +48,6 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  public static String getPropertyName(String methodName) {
-    String propertyName;
-    if (methodName.startsWith("is")) {
-      propertyName = methodName.substring(2, 3).toLowerCase()
-        + methodName.substring(3);
-    } else {
-      propertyName = methodName.substring(3, 4).toLowerCase()
-        + methodName.substring(4);
-    }
-    return propertyName;
-  }
-
-  public static Class<?> getTypeParameterClass(Method method,
-    Class<?> expectedRawClass) {
-    final Type resultListReturnType = method.getGenericReturnType();
-    if (resultListReturnType instanceof ParameterizedType) {
-      ParameterizedType parameterizedType = (ParameterizedType)resultListReturnType;
-      final Type rawType = parameterizedType.getRawType();
-      if (rawType == expectedRawClass) {
-        final Type[] typeArguments = parameterizedType.getActualTypeArguments();
-        if (typeArguments.length == 1) {
-          Type resultType = typeArguments[0];
-          if (resultType instanceof Class<?>) {
-            Class<?> resultClass = (Class<?>)resultType;
-            return resultClass;
-          } else {
-            throw new IllegalArgumentException(method.getName()
-              + " must return " + expectedRawClass.getName()
-              + " with 1 generic type parameter that is a class");
-          }
-        }
-      }
-    }
-    throw new IllegalArgumentException(method.getName() + " must return "
-      + expectedRawClass.getName() + " with 1 generic class parameter");
   }
 
   /**
@@ -113,8 +79,47 @@ public final class JavaBeanUtil {
     }
   }
 
+  public static String getPropertyName(final String methodName) {
+    String propertyName;
+    if (methodName.startsWith("is")) {
+      propertyName = methodName.substring(2, 3).toLowerCase()
+        + methodName.substring(3);
+    } else {
+      propertyName = methodName.substring(3, 4).toLowerCase()
+        + methodName.substring(4);
+    }
+    return propertyName;
+  }
+
+  public static Class<?> getTypeParameterClass(
+    final Method method,
+    final Class<?> expectedRawClass) {
+    final Type resultListReturnType = method.getGenericReturnType();
+    if (resultListReturnType instanceof ParameterizedType) {
+      final ParameterizedType parameterizedType = (ParameterizedType)resultListReturnType;
+      final Type rawType = parameterizedType.getRawType();
+      if (rawType == expectedRawClass) {
+        final Type[] typeArguments = parameterizedType.getActualTypeArguments();
+        if (typeArguments.length == 1) {
+          final Type resultType = typeArguments[0];
+          if (resultType instanceof Class<?>) {
+            final Class<?> resultClass = (Class<?>)resultType;
+            return resultClass;
+          } else {
+            throw new IllegalArgumentException(method.getName()
+              + " must return " + expectedRawClass.getName()
+              + " with 1 generic type parameter that is a class");
+          }
+        }
+      }
+    }
+    throw new IllegalArgumentException(method.getName() + " must return "
+      + expectedRawClass.getName() + " with 1 generic class parameter");
+  }
+
   public static <T> T invokeConstructor(
-    final Constructor<? extends T> constructor, final Object... args) {
+    final Constructor<? extends T> constructor,
+    final Object... args) {
     try {
       final T object = constructor.newInstance(args);
       return object;
@@ -136,7 +141,9 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T invokeMethod(final Method method, final Object object,
+  public static <T> T invokeMethod(
+    final Method method,
+    final Object object,
     final Object... args) {
     try {
       @SuppressWarnings("unchecked")
@@ -160,7 +167,8 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static void setProperties(final Object object,
+  public static void setProperties(
+    final Object object,
     final Map<String, Object> properties) {
     for (final Entry<String, Object> property : properties.entrySet()) {
       final String propertyName = property.getKey();
@@ -185,8 +193,10 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @param value The property value.
    */
-  public static void setProperty(final Object object,
-    final String propertyName, final Object value) {
+  public static void setProperty(
+    final Object object,
+    final String propertyName,
+    final Object value) {
     try {
       PropertyUtils.setProperty(object, propertyName, value);
     } catch (final IllegalAccessException e) {
@@ -210,6 +220,19 @@ public final class JavaBeanUtil {
    * Construct a new JavaBeanUtil.
    */
   private JavaBeanUtil() {
+  }
+
+  public static Object getValue(final Object object, final String key) {
+    if (object instanceof DataObject) {
+      final DataObject dataObject = (DataObject)object;
+      return dataObject.getValueByPath(key);
+    } else if (object instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, ?> map = (Map<String, ?>)object;
+      return map.get(key);
+    } else {
+      return getProperty(object, key);
+    }
   }
 
 }

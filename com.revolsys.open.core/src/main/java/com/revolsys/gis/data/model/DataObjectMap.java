@@ -14,8 +14,7 @@ public class DataObjectMap extends AbstractMap<String, Object> {
   public DataObjectMap() {
   }
 
-  public DataObjectMap(
-    final DataObject object) {
+  public DataObjectMap(final DataObject object) {
     this.object = object;
   }
 
@@ -25,14 +24,12 @@ public class DataObjectMap extends AbstractMap<String, Object> {
   }
 
   @Override
-  public boolean containsKey(
-    final Object name) {
+  public boolean containsKey(final Object name) {
     return object.getMetaData().hasAttribute(name.toString());
   }
 
   @Override
-  public boolean containsValue(
-    final Object value) {
+  public boolean containsValue(final Object value) {
     if (value != null) {
       for (int i = 0; i < size(); i++) {
         final Object objectValue = object.getValue(i);
@@ -59,8 +56,7 @@ public class DataObjectMap extends AbstractMap<String, Object> {
   }
 
   @Override
-  public Object get(
-    final Object key) {
+  public Object get(final Object key) {
     return object.getValue(key.toString());
   }
 
@@ -75,16 +71,13 @@ public class DataObjectMap extends AbstractMap<String, Object> {
   }
 
   @Override
-  public Object put(
-    final String key,
-    final Object value) {
+  public Object put(final String key, final Object value) {
     object.setValue(key, value);
     return value;
   }
 
   @Override
-  public void putAll(
-    final Map<? extends String, ? extends Object> values) {
+  public void putAll(final Map<? extends String, ? extends Object> values) {
     for (final Entry<? extends String, ? extends Object> entry : values.entrySet()) {
       final String key = entry.getKey();
       final Object value = entry.getValue();
@@ -93,15 +86,13 @@ public class DataObjectMap extends AbstractMap<String, Object> {
   }
 
   @Override
-  public Object remove(
-    final Object key) {
+  public Object remove(final Object key) {
     final Object value = get(key);
     object.setValue(key.toString(), null);
     return value;
   }
 
-  public void setObject(
-    final DataObject object) {
+  public void setObject(final DataObject object) {
     this.object = object;
   }
 

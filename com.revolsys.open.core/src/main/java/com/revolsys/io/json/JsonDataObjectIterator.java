@@ -35,7 +35,7 @@ public class JsonDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   public JsonDataObjectIterator(final DataObjectMetaData metaData,
-    final Reader in, boolean single) {
+    final Reader in, final boolean single) {
     this.metaData = metaData;
     try {
       this.iterator = new JsonMapIterator(in, single);

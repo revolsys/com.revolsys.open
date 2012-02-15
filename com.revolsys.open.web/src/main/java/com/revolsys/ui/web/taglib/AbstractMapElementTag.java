@@ -38,15 +38,16 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
   private static final Logger log = Logger.getLogger(AbstractMapElementTag.class);
 
   /** The exression to get the elements to write. */
-  private String mapExpression;
+  private final String mapExpression;
 
   /** The key to the element in the map. */
   private String key;
-  
+
   /**
    * Construct a new AbstractElementTag.
    * 
-   * @param mapExpression The exression to get the map containing the element to write.
+   * @param mapExpression The exression to get the map containing the element to
+   *          write.
    */
   public AbstractMapElementTag(final String mapExpression) {
     this.mapExpression = mapExpression;
@@ -58,32 +59,30 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
    * @throws JspException If there was an exception processing the tag.
    * @throws IOException If an i/o error occurs.
    */
+  @Override
   public void doTag() throws JspException, IOException {
     try {
-      JspContext jspContext = getJspContext();
-      JspWriter out = jspContext.getOut();
-      ExpressionEvaluator expressionEvaluator = jspContext.getExpressionEvaluator();
-      Object t = expressionEvaluator.evaluate(
-              mapExpression, Object.class, jspContext.getVariableResolver(),
-              null);
+      final JspContext jspContext = getJspContext();
+      final JspWriter out = jspContext.getOut();
+      final ExpressionEvaluator expressionEvaluator = jspContext.getExpressionEvaluator();
+      final Object t = expressionEvaluator.evaluate(mapExpression,
+        Object.class, jspContext.getVariableResolver(), null);
       if (t instanceof Map) {
-        Map map = (Map)t;
+        final Map map = (Map)t;
         if (map != null) {
-          Object object = map.get(key);
+          final Object object = map.get(key);
           serializeObject(out, object);
-        }        
+        }
       } else {
         log.debug(t);
       }
 
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       log.error(t.getMessage(), t);
       throw new JspTagException(t.getMessage(), t);
     }
   }
 
-  protected abstract void serializeObject(Writer out, Object object) throws IOException;
-  
   /**
    * @return Returns the key.
    */
@@ -91,11 +90,14 @@ public abstract class AbstractMapElementTag extends SimpleTagSupport {
     return key;
   }
 
+  protected abstract void serializeObject(Writer out, Object object)
+    throws IOException;
+
   /**
    * @param key The key to set.
    */
   public void setKey(final String key) {
     this.key = key;
   }
-  
+
 }

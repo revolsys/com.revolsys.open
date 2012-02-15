@@ -24,16 +24,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
     }
   }
 
-  public void open() {
-    if (!open) {
-      open = true;
-    }
-  }
-
-  public Iterator<T> iterator() {
-    open();
-    return this;
-  }
+  protected abstract AbstractIterator<T> getNextIterator();
 
   public boolean hasNext() {
     if (loadNext) {
@@ -51,12 +42,15 @@ public abstract class AbstractMultipleIteratorReader<T> extends
           return false;
         }
       }
-      loadNext =false;
+      loadNext = false;
     }
     return true;
   }
 
-  protected abstract AbstractIterator<T> getNextIterator();
+  public Iterator<T> iterator() {
+    open();
+    return this;
+  }
 
   public T next() {
     if (hasNext()) {
@@ -69,7 +63,13 @@ public abstract class AbstractMultipleIteratorReader<T> extends
     }
   }
 
-  protected void process(T object) {
+  public void open() {
+    if (!open) {
+      open = true;
+    }
+  }
+
+  protected void process(final T object) {
   }
 
   public void remove() {

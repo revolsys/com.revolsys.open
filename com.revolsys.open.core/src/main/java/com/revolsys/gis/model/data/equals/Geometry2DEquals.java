@@ -14,8 +14,7 @@ public class Geometry2DEquals implements Equals<Geometry> {
     this(EqualsRegistry.INSTANCE);
   }
 
-  public Geometry2DEquals(
-    final EqualsRegistry equalsRegistry) {
+  public Geometry2DEquals(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }
 
@@ -46,8 +45,7 @@ public class Geometry2DEquals implements Equals<Geometry> {
     }
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }
 

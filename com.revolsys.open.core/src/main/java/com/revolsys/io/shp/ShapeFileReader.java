@@ -39,8 +39,6 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianInputStream;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.shp.geometry.JtsGeometryConverter;
@@ -162,7 +160,7 @@ public class ShapeFileReader extends XbaseFileReader {
   public void open() {
 
     final File file = getFile();
-    File projFile = new File(file.getParentFile(),
+    final File projFile = new File(file.getParentFile(),
       FileUtil.getFileNamePrefix(file) + ".prj");
     geometryFactory = GeometryFactory.getFactory();
     if (projFile.exists()) {
@@ -172,7 +170,7 @@ public class ShapeFileReader extends XbaseFileReader {
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         srid = EsriCoordinateSystems.getCrsId(esriCoordinateSystem);
         geometryFactory = GeometryFactory.getFactory(srid);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         log.error("Unable to read projection file: " + projFile);
       }
     }

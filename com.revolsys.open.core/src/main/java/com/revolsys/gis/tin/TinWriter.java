@@ -14,8 +14,10 @@ import com.revolsys.spring.SpringUtil;
 
 public class TinWriter {
 
-  public static void write(Resource resource, TriangulatedIrregularNetwork tin) {
-    TinWriter tinWriter = new TinWriter(resource);
+  public static void write(
+    final Resource resource,
+    final TriangulatedIrregularNetwork tin) {
+    final TinWriter tinWriter = new TinWriter(resource);
     try {
       tinWriter.write(tin);
     } finally {
@@ -23,16 +25,20 @@ public class TinWriter {
     }
   }
 
-  private PrintWriter out;
+  private final PrintWriter out;
 
   private int tinIndex = 0;
 
-  public TinWriter(Resource resource) {
+  public TinWriter(final Resource resource) {
     this.out = SpringUtil.getPrintWriter(resource);
     out.println("TIN");
   }
 
-  public void write(TriangulatedIrregularNetwork tin) {
+  public void close() {
+    out.close();
+  }
+
+  public void write(final TriangulatedIrregularNetwork tin) {
     out.println("BEGT");
 
     out.print("TNAM tin-");
@@ -41,11 +47,11 @@ public class TinWriter {
     out.println("TCOL 255 255 255");
 
     int nodeIndex = 0;
-    Map<Coordinates, Integer> nodeMap = new HashMap<Coordinates, Integer>();
-    Set<Coordinates> nodes = tin.getNodes();
+    final Map<Coordinates, Integer> nodeMap = new HashMap<Coordinates, Integer>();
+    final Set<Coordinates> nodes = tin.getNodes();
     out.print("VERT ");
     out.println(nodes.size());
-    for (Coordinates point : nodes) {
+    for (final Coordinates point : nodes) {
       nodeMap.put(point, ++nodeIndex);
       out.print(point.getX());
       out.print(' ');
@@ -54,16 +60,16 @@ public class TinWriter {
       out.println(point.getZ());
     }
 
-    List<Triangle> triangles = tin.getTriangles();
+    final List<Triangle> triangles = tin.getTriangles();
     out.print("TRI ");
     out.println(triangles.size());
-    for (Triangle triangle : triangles) {
+    for (final Triangle triangle : triangles) {
       for (int i = 0; i < 3; i++) {
         if (i > 0) {
           out.print(' ');
         }
-        Coordinates point = triangle.get(i);
-        Integer index = nodeMap.get(point);
+        final Coordinates point = triangle.get(i);
+        final Integer index = nodeMap.get(point);
         if (index == null) {
           System.out.println(point);
           System.out.println(triangle);
@@ -76,9 +82,5 @@ public class TinWriter {
     }
 
     out.println("ENDT");
-  }
-
-  public void close() {
-    out.close();
   }
 }

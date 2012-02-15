@@ -8,6 +8,7 @@ public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
    * 
    */
   private static final long serialVersionUID = 872633273329727308L;
+
   private final CoordinateSequence coordinateSequence;
 
   public CoordinateSequenceCoordinateList(
@@ -24,16 +25,11 @@ public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
     return (byte)coordinateSequence.getDimension();
   }
 
-  public double getValue(
-    final int index,
-    final int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     return coordinateSequence.getOrdinate(index, axisIndex);
   }
 
-  public void setValue(
-    final int index,
-    final int axisIndex,
-    final double value) {
+  public void setValue(final int index, final int axisIndex, final double value) {
     coordinateSequence.setOrdinate(index, axisIndex, value);
   }
 

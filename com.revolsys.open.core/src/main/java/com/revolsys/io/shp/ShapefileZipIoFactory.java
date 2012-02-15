@@ -27,30 +27,30 @@ public class ShapefileZipIoFactory extends
   }
 
   public DataObjectReader createDataObjectReader(
-    Resource resource,
-    DataObjectFactory factory) {
+    final Resource resource,
+    final DataObjectFactory factory) {
     return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
       factory);
   }
 
   public Writer<DataObject> createDataObjectWriter(
-    String baseName,
-    DataObjectMetaData metaData,
-    OutputStream outputStream,
-    Charset charset) {
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
     File directory;
     try {
       directory = FileUtil.createTempDirectory(baseName, "zipDir");
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       throw new RuntimeException("Unable to create temporary directory", e);
     }
-    Resource tempResource = new FileSystemResource(new File(directory, baseName
-      + ".shp"));
+    final Resource tempResource = new FileSystemResource(new File(directory,
+      baseName + ".shp"));
     try {
-      Writer<DataObject> shapeWriter = new ShapefileDataObjectWriter(metaData,
-        tempResource);
+      final Writer<DataObject> shapeWriter = new ShapefileDataObjectWriter(
+        metaData, tempResource);
       return new ZipWriter<DataObject>(directory, shapeWriter, outputStream);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to create shape writer", e);
     }
   }

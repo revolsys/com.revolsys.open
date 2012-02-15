@@ -32,6 +32,7 @@ public class XhtmlMapWriter extends AbstractMapWriter {
   /**
    * Closes the underlying writer.
    */
+  @Override
   public void close() {
     if (out != null) {
       try {
@@ -54,10 +55,12 @@ public class XhtmlMapWriter extends AbstractMapWriter {
     }
   }
 
+  @Override
   public void flush() {
     out.flush();
   }
 
+  @Override
   public void setProperty(final String name, final Object value) {
     if (name.equals(IoConstants.WRAP_PROPERTY)) {
       wrap = Boolean.valueOf(value.toString());
@@ -71,7 +74,7 @@ public class XhtmlMapWriter extends AbstractMapWriter {
     if (!opened) {
       if (title == null) {
         if (values instanceof NamedObject) {
-          String name = ((NamedObject)values).getName();
+          final String name = ((NamedObject)values).getName();
           if (name != null) {
             this.title = name;
           }

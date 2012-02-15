@@ -16,9 +16,9 @@
 package com.revolsys.ui.web.config;
 
 public class LayoutInclude {
-  private String area;
+  private final String area;
 
-  private Layout layout;
+  private final Layout layout;
 
   public LayoutInclude(final String area, final Layout layout) {
     this.area = area;

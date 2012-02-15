@@ -5,8 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 public class ArrayUtil {
-  public static <T> T[] create(
-    final Collection<T> list) {
+  @SuppressWarnings("unchecked")
+  public static <T> T[] create(final Class<T> clazz, final int size) {
+    return (T[])Array.newInstance(clazz, size);
+  }
+
+  public static <T> T[] create(final Collection<T> list) {
     if (list == null) {
       return null;
     } else {
@@ -16,18 +20,11 @@ public class ArrayUtil {
     }
   }
 
-  public static <T> T[] create(
-    final T... o) {
+  public static <T> T[] create(final T... o) {
     return o;
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T> T[] create(Class<T> clazz,int size) {
-    return (T[])Array.newInstance(clazz,size);
-  }
-  
-  public static int[] createDoubleArray(
-    final List<Integer> list) {
+  public static int[] createDoubleArray(final List<Integer> list) {
     if (list == null) {
       return null;
     } else {
@@ -39,8 +36,7 @@ public class ArrayUtil {
     }
   }
 
-  public static int[] createIntArray(
-    final List<Integer> list) {
+  public static int[] createIntArray(final List<Integer> list) {
     if (list == null) {
       return null;
     } else {

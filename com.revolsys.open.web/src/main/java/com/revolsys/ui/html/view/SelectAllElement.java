@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -24,11 +23,11 @@ import com.revolsys.ui.html.HtmlUtil;
  * @version 1.0
  */
 public class SelectAllElement extends Element {
-  private String cssClass;
+  private final String cssClass;
 
-  private String fieldName;
+  private final String fieldName;
 
-  private String formName;
+  private final String formName;
 
   public SelectAllElement(final String formName, final String fieldName,
     final String cssClass) {
@@ -37,6 +36,7 @@ public class SelectAllElement extends Element {
     this.formName = formName;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);

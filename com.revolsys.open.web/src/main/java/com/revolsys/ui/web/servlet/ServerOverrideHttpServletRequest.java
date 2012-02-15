@@ -18,14 +18,14 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
   private int serverPort;
 
   public ServerOverrideHttpServletRequest(final String serverUrl,
-    HttpServletRequest request) {
+    final HttpServletRequest request) {
     super(request);
 
     try {
-      URL url = new URL(serverUrl);
+      final URL url = new URL(serverUrl);
       scheme = url.getProtocol();
       serverName = url.getHost();
-       serverPort = url.getPort();
+      serverPort = url.getPort();
       if (serverPort == -1) {
         this.serverPort = url.getDefaultPort();
         this.serverUrl = scheme + "://" + serverName;
@@ -34,10 +34,35 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
         this.serverUrl = scheme + "://" + serverName + ":" + serverPort;
         this.secureServerUrl = "https://" + serverName;
       }
-    } catch (MalformedURLException e) {
+    } catch (final MalformedURLException e) {
       throw new IllegalArgumentException("Invalid URL " + serverUrl);
     }
 
+  }
+
+  @Override
+  public StringBuffer getRequestURL() {
+    String serverUrl;
+    final String scheme = super.getScheme();
+    if (scheme.equals("https")) {
+      serverUrl = secureServerUrl;
+    } else {
+      serverUrl = this.serverUrl;
+    }
+    final StringBuffer url = new StringBuffer(serverUrl);
+    final String contextPath = getContextPath();
+    if (contextPath != null) {
+      url.append(contextPath);
+    }
+    final String servletPath = getServletPath();
+    if (servletPath != null) {
+      url.append(servletPath);
+    }
+    final String pathInfo = getPathInfo();
+    if (pathInfo != null) {
+      url.append(pathInfo);
+    }
+    return url;
   }
 
   @Override
@@ -50,41 +75,16 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
   }
 
   @Override
+  public String getServerName() {
+    return serverName;
+  }
+
+  @Override
   public int getServerPort() {
     if (super.getScheme().equals("https")) {
       return super.getServerPort();
     } else {
       return serverPort;
     }
-  }
-
-  @Override
-  public String getServerName() {
-    return serverName;
-  }
-
-  @Override
-  public StringBuffer getRequestURL() {
-    String serverUrl;
-    final String scheme = super.getScheme();
-    if (scheme.equals("https")) {
-      serverUrl = secureServerUrl;
-    } else {
-      serverUrl = this.serverUrl;
-    }
-    StringBuffer url = new StringBuffer(serverUrl);
-    String contextPath = getContextPath();
-    if (contextPath != null) {
-      url.append(contextPath);
-    }
-    String servletPath = getServletPath();
-    if (servletPath != null) {
-      url.append(servletPath);
-    }
-    String pathInfo = getPathInfo();
-    if (pathInfo != null) {
-      url.append(pathInfo);
-    }
-    return url;
   }
 }

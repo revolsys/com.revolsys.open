@@ -14,8 +14,7 @@ public class JsonListMapWriter extends AbstractMapWriter {
 
   boolean written = false;
 
-  public JsonListMapWriter(
-    final Writer out) {
+  public JsonListMapWriter(final Writer out) {
     this.out = new PrintWriter(out);
     this.out.print("[");
   }
@@ -23,6 +22,7 @@ public class JsonListMapWriter extends AbstractMapWriter {
   /**
    * Closes the underlying reader.
    */
+  @Override
   public void close() {
     if (out != null) {
       try {
@@ -34,12 +34,12 @@ public class JsonListMapWriter extends AbstractMapWriter {
     }
   }
 
+  @Override
   public void flush() {
     out.flush();
   }
 
-  public void write(
-    final Map<String, ? extends Object> values) {
+  public void write(final Map<String, ? extends Object> values) {
     if (written) {
       out.print(",\n");
     } else {

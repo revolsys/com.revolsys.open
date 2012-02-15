@@ -18,7 +18,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class DataObjectGraph extends Graph<DataObject> {
 
   public static <T extends Geometry> Filter<Edge<DataObject>> getEdgeFilter(
-    Filter<T> geometryFilter) {
+    final Filter<T> geometryFilter) {
     final Filter<DataObject> objectFilter = new DataObjectGeometryFilter<T>(
       geometryFilter);
     final EdgeObjectFilter<DataObject> edgeFilter = new EdgeObjectFilter<DataObject>(
@@ -26,15 +26,15 @@ public class DataObjectGraph extends Graph<DataObject> {
     return edgeFilter;
   }
 
-  public Edge<DataObject> add(final DataObject object) {
-    final LineString line = object.getGeometryValue();
-    return add(object, line);
-  }
-
   public void add(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       add(object);
     }
+  }
+
+  public Edge<DataObject> add(final DataObject object) {
+    final LineString line = object.getGeometryValue();
+    return add(object, line);
   }
 
   /**
@@ -72,16 +72,16 @@ public class DataObjectGraph extends Graph<DataObject> {
   }
 
   public boolean hasEdge(final DataObject object) {
-    LineString line = object.getGeometryValue();
-    Coordinates fromPoint = LineStringUtil.getFromPoint(line);
-    Coordinates toPoint = LineStringUtil.getToPoint(line);
-    Node<DataObject> fromNode = findNode(fromPoint);
-    Node<DataObject> toNode = findNode(toPoint);
+    final LineString line = object.getGeometryValue();
+    final Coordinates fromPoint = LineStringUtil.getFromPoint(line);
+    final Coordinates toPoint = LineStringUtil.getToPoint(line);
+    final Node<DataObject> fromNode = findNode(fromPoint);
+    final Node<DataObject> toNode = findNode(toPoint);
     if (fromNode != null && toNode != null) {
-      Collection<Edge<DataObject>> edges = Node.getEdgesBetween(fromNode,
+      final Collection<Edge<DataObject>> edges = Node.getEdgesBetween(fromNode,
         toNode);
-      for (Edge<DataObject> edge : edges) {
-        LineString updateLine = edge.getLine();
+      for (final Edge<DataObject> edge : edges) {
+        final LineString updateLine = edge.getLine();
         if (updateLine.equals(line)) {
           return true;
         }

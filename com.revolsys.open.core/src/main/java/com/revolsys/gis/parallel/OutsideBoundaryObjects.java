@@ -24,6 +24,11 @@ public class OutsideBoundaryObjects {
     return objects.add(object);
   }
 
+  public boolean boundaryContains(final DataObject object) {
+    final Geometry geometry = object.getGeometryValue();
+    return boundaryContains(geometry);
+  }
+
   public boolean boundaryContains(final Geometry geometry) {
     return geometry == null || boundary == null
       || preparedBoundary.contains(geometry);
@@ -67,10 +72,5 @@ public class OutsideBoundaryObjects {
 
   public void setObjects(final Set<DataObject> objects) {
     this.objects = objects;
-  }
-
-  public boolean boundaryContains(DataObject object) {
-    final Geometry geometry = object.getGeometryValue();
-    return boundaryContains(geometry);
   }
 }

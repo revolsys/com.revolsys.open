@@ -21,18 +21,19 @@ public class CsvMapWriter extends AbstractMapWriter {
    * 
    * @param reader The reader to the CSV file.
    */
-  public CsvMapWriter(
-    final Writer out) {
+  public CsvMapWriter(final Writer out) {
     this.out = new PrintWriter(out);
   }
 
   /**
    * Closes the underlying reader.
    */
+  @Override
   public void close() {
     FileUtil.closeSilent(out);
   }
 
+  @Override
   public void flush() {
     out.flush();
   }
@@ -41,20 +42,17 @@ public class CsvMapWriter extends AbstractMapWriter {
     return fieldNames;
   }
 
-  public void setFieldNames(
-    final Collection<String> fieldNames) {
+  public void setFieldNames(final Collection<String> fieldNames) {
     assert this.fieldNames == null;
     this.fieldNames = new ArrayList<String>(fieldNames);
     write(fieldNames);
   }
 
-  public void write(
-    final Collection<? extends Object> values) {
+  public void write(final Collection<? extends Object> values) {
     write(values.toArray());
   }
 
-  public void write(
-    final Map<String, ? extends Object> values) {
+  public void write(final Map<String, ? extends Object> values) {
     final List<Object> fieldValues = new ArrayList<Object>();
     if (fieldNames == null) {
       setFieldNames(values.keySet());
@@ -66,8 +64,7 @@ public class CsvMapWriter extends AbstractMapWriter {
     write(fieldValues);
   }
 
-  public void write(
-    final Object... values) {
+  public void write(final Object... values) {
     for (int i = 0; i < values.length; i++) {
       final Object value = values[i];
       if (value != null) {

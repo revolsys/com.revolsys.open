@@ -3,20 +3,20 @@ package com.revolsys.converter.string;
 import org.springframework.util.StringUtils;
 
 public class IntegerStringConverter implements StringConverter<Integer> {
+  public Class<Integer> getConvertedClass() {
+    return Integer.class;
+  }
+
   public boolean requiresQuotes() {
     return false;
   }
 
-  public String toString(Integer value) {
-    return value.toString();
-  }
-
-  public Integer toObject(Object value) {
+  public Integer toObject(final Object value) {
     if (value instanceof Integer) {
-      Integer integer = (Integer)value;
+      final Integer integer = (Integer)value;
       return integer;
     } else if (value instanceof Number) {
-      Number number = (Number)value;
+      final Number number = (Number)value;
       return number.intValue();
     } else if (value == null) {
       return null;
@@ -25,7 +25,7 @@ public class IntegerStringConverter implements StringConverter<Integer> {
     }
   }
 
-  public Integer toObject(String string) {
+  public Integer toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Integer.valueOf(string);
     } else {
@@ -33,7 +33,7 @@ public class IntegerStringConverter implements StringConverter<Integer> {
     }
   }
 
-  public Class<Integer> getConvertedClass() {
-    return Integer.class;
+  public String toString(final Integer value) {
+    return value.toString();
   }
 }

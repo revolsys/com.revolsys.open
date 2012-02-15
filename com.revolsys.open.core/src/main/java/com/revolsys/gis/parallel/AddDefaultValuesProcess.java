@@ -37,7 +37,8 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
-public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,DataObject> {
+public class AddDefaultValuesProcess extends
+  AbstractInOutProcess<DataObject, DataObject> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
   private Set<String> excludedAttributeNames = new HashSet<String>();
@@ -56,8 +57,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,Dat
     }
   }
 
-  private Map<String, Object> getDefaultValues(
-    final DataObjectMetaData type) {
+  private Map<String, Object> getDefaultValues(final DataObjectMetaData type) {
     if (schemaName == null) {
       return type.getDefaultValues();
     } else {
@@ -94,8 +94,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,Dat
     return schemaName;
   }
 
-  private void process(
-    final DataObject dataObject) {
+  private void process(final DataObject dataObject) {
     final DataObjectMetaData type = dataObject.getMetaData();
 
     boolean process = true;
@@ -129,9 +128,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,Dat
   }
 
   @Override
-  protected void run(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void run(final Channel<DataObject> in, final Channel<DataObject> out) {
     for (DataObject dataObject = in.read(); dataObject != null; dataObject = in.read()) {
       process(dataObject);
       out.write(dataObject);
@@ -187,13 +184,11 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,Dat
    * 
    * @param excludedAttributeNames The names of the attributes to exclude.
    */
-  public void setExcludedAttributeNames(
-    final Set<String> excludedAttributeNames) {
+  public void setExcludedAttributeNames(final Set<String> excludedAttributeNames) {
     this.excludedAttributeNames = excludedAttributeNames;
   }
 
-  public void setMetaDataFactory(
-    final DataObjectMetaDataFactory metaDataFactory) {
+  public void setMetaDataFactory(final DataObjectMetaDataFactory metaDataFactory) {
     this.metaDataFactory = metaDataFactory;
   }
 
@@ -202,8 +197,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<DataObject,Dat
    * 
    * @param schemaName The schema name.
    */
-  public void setSchemaName(
-    final String schemaName) {
+  public void setSchemaName(final String schemaName) {
     this.schemaName = schemaName;
   }
 

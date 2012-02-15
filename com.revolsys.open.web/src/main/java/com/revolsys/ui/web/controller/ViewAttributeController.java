@@ -20,7 +20,6 @@
  */
 package com.revolsys.ui.web.controller;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -35,14 +34,15 @@ import com.revolsys.ui.html.view.Element;
 
 public class ViewAttributeController implements Controller {
 
-  public ModelAndView handleRequest(final HttpServletRequest request,
+  public ModelAndView handleRequest(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
-    String attributeName = request.getParameter("attributeName");
+    final String attributeName = request.getParameter("attributeName");
     if (attributeName != null) {
-      Object attribute = request.getAttribute(attributeName);
+      final Object attribute = request.getAttribute(attributeName);
       if (attribute instanceof Collection) {
-        Collection collection = (Collection)attribute;
-        for (Object object : collection) {
+        final Collection collection = (Collection)attribute;
+        for (final Object object : collection) {
           render(response, object);
         }
       } else {
@@ -55,9 +55,9 @@ public class ViewAttributeController implements Controller {
   private void render(final HttpServletResponse response, final Object object)
     throws IOException {
     if (object != null) {
-      PrintWriter out = response.getWriter();
+      final PrintWriter out = response.getWriter();
       if (object instanceof Element) {
-        Element element = (Element)object;
+        final Element element = (Element)object;
         element.serialize(out, false);
       } else {
         out.print(object);

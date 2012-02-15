@@ -13,7 +13,7 @@ public class LinearIntersectionFilter implements Filter<LineString> {
 
   private final PreparedGeometry preparedLine;
 
-  private Envelope envelope;
+  private final Envelope envelope;
 
   public LinearIntersectionFilter(final LineString line) {
     this.line = line;

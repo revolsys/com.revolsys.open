@@ -33,8 +33,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   private boolean wrap = true;
 
-  public XhtmlDataObjectWriter(
-    final DataObjectMetaData metaData,
+  public XhtmlDataObjectWriter(final DataObjectMetaData metaData,
     final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
@@ -64,9 +63,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     super.setProperty(name, value);
     if (value != null) {
       if (name.equals(IoConstants.WRAP_PROPERTY)) {
@@ -79,8 +76,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
     if (!opened) {
       writeHeader();
     }

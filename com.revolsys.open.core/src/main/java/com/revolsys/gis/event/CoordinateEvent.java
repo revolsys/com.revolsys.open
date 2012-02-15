@@ -28,17 +28,12 @@ public class CoordinateEvent extends EventObject {
 
   private QName typeName;
 
-  public CoordinateEvent(
-    final Coordinate coordinate) {
+  public CoordinateEvent(final Coordinate coordinate) {
     super(coordinate);
   }
 
-  public CoordinateEvent(
-    final Coordinate coordinate,
-    final QName typeName,
-    final String ruleName,
-    final String action,
-    final String notes) {
+  public CoordinateEvent(final Coordinate coordinate, final QName typeName,
+    final String ruleName, final String action, final String notes) {
     super(coordinate);
     this.typeName = typeName;
     this.ruleName = ruleName;
@@ -46,9 +41,7 @@ public class CoordinateEvent extends EventObject {
     this.notes = notes;
   }
 
-  public CoordinateEvent(
-    final Coordinate coordinate,
-    final String ruleName,
+  public CoordinateEvent(final Coordinate coordinate, final String ruleName,
     final String action) {
     super(coordinate);
     this.ruleName = ruleName;

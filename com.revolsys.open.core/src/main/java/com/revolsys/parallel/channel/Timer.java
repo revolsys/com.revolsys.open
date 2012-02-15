@@ -1,9 +1,9 @@
 package com.revolsys.parallel.channel;
 
 public class Timer implements SelectableInput {
-  private long time;
+  private final long time;
 
-  public Timer(long time) {
+  public Timer(final long time) {
     this.time = time;
   }
 
@@ -15,17 +15,17 @@ public class Timer implements SelectableInput {
     return isTimeout();
   }
 
+  public long getWaitTime() {
+    final long waitTime = time - System.currentTimeMillis();
+    return waitTime;
+  }
+
   public boolean isClosed() {
     return false;
   }
 
   public boolean isTimeout() {
-    boolean timeout = System.currentTimeMillis() > time;
+    final boolean timeout = System.currentTimeMillis() > time;
     return timeout;
-  }
-
-  public long getWaitTime() {
-    long waitTime = time - System.currentTimeMillis();
-    return waitTime;
   }
 }

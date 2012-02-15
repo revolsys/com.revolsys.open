@@ -6,13 +6,11 @@ import com.revolsys.gis.graph.Edge;
 public class NotMatchedEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
   private final int index;
 
-  public NotMatchedEdgeFilter(
-    int index) {
+  public NotMatchedEdgeFilter(final int index) {
     this.index = index;
   }
 
-  public boolean accept(
-    final Edge<LineSegmentMatch> edge) {
+  public boolean accept(final Edge<LineSegmentMatch> edge) {
     return edge.getObject().hasMatches(index);
   }
 

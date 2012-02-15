@@ -26,13 +26,11 @@ import com.vividsolutions.jts.geom.Geometry;
 public class EqualFilter<T extends Geometry> implements Filter<T> {
   private final T geometry;
 
-  public EqualFilter(
-    final T geometry) {
+  public EqualFilter(final T geometry) {
     this.geometry = geometry;
   }
 
-  public boolean accept(
-    final T geometry) {
+  public boolean accept(final T geometry) {
     if (this.geometry.equals(geometry)) {
       return true;
     } else {

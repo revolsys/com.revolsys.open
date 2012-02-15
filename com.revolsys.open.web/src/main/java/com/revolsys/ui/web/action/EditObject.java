@@ -49,27 +49,28 @@ public class EditObject extends SpringFrameworkAction {
 
   private Class objectClass;
 
-  private Map extraObjectAttributes = new HashMap();
+  private final Map extraObjectAttributes = new HashMap();
 
   private String nextPagePath;
 
+  @Override
   public void init(final ActionConfig config) throws ActionInitException {
     super.init(config);
-    String objectClassName = (String)config.getParameter("objectClassName");
+    final String objectClassName = (String)config.getParameter("objectClassName");
     try {
       objectClass = Class.forName(objectClassName);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       throw new ActionInitException(e);
     }
     dao = SpringDaoFactory.get(getApplicationContext(), objectClassName);
     builder = HtmlUiBuilderFactory.get(getApplicationContext(), objectClassName);
     nextPagePath = (String)config.getParameter("nextPage");
-    String attributeNames = (String)config.getParameter("extraObjectAttributes");
+    final String attributeNames = (String)config.getParameter("extraObjectAttributes");
     if (attributeNames != null) {
-      String[] names = attributeNames.split(",");
+      final String[] names = attributeNames.split(",");
       for (int i = 0; i < names.length; i++) {
-        String name = names[i];
-        String[] nameParts = name.split("=");
+        final String name = names[i];
+        final String[] nameParts = name.split("=");
         if (nameParts.length == 1) {
           extraObjectAttributes.put(name, name);
         } else {
@@ -79,44 +80,47 @@ public class EditObject extends SpringFrameworkAction {
     }
   }
 
-  public void process(final HttpServletRequest request,
+  @Override
+  public void process(
+    final HttpServletRequest request,
     final HttpServletResponse response) throws ActionException, IOException {
     Object object = request.getAttribute(builder.getTypeName());
-    boolean addMode = object == null;
+    final boolean addMode = object == null;
     String keyListName = "edit";
     if (addMode) {
       try {
         object = objectClass.newInstance();
-      } catch (InstantiationException e) {
+      } catch (final InstantiationException e) {
         throw new ActionException("Unable to instantiate " + objectClass + ":"
           + e.getMessage(), e);
-      } catch (IllegalAccessException e) {
+      } catch (final IllegalAccessException e) {
         throw new ActionException("Unable to instantiate " + objectClass + ":"
           + e.getMessage(), e);
       }
       keyListName = "add";
     }
-    Form form = builder.createForm(object, "objectEdit", builder.getKeyList(
-      keyListName, "form"), request.getLocale());
+    final Form form = builder.createForm(object, "objectEdit",
+      builder.getKeyList(keyListName, "form"));
     form.initialize(request);
     request.setAttribute("form", form);
 
     if (form.isPosted()) {
       if (form.isMainFormTask() && form.isValid()) {
-        for (Iterator attributes = extraObjectAttributes.entrySet().iterator(); attributes.hasNext();) {
-          Map.Entry entry = (Entry)attributes.next();
-          String attrubuteName = (String)entry.getValue();
-          String propertyName = (String)entry.getKey();
+        for (final Iterator attributes = extraObjectAttributes.entrySet()
+          .iterator(); attributes.hasNext();) {
+          final Map.Entry entry = (Entry)attributes.next();
+          final String attrubuteName = (String)entry.getValue();
+          final String propertyName = (String)entry.getKey();
           JavaBeanUtil.setProperty(object, propertyName,
             request.getAttribute(attrubuteName));
         }
-        Long id = (Long)JavaBeanUtil.getProperty(object, "id");
+        final Long id = (Long)JavaBeanUtil.getProperty(object, "id");
         if (id == null) {
           dao.persist(object);
         } else {
           dao.merge(object);
         }
-        Page currentPage = (Page)WebUiContext.get().getPage();
+        final Page currentPage = WebUiContext.get().getPage();
         Page nextPage = null;
         if (nextPagePath != null) {
           nextPage = currentPage.getPage(nextPagePath);

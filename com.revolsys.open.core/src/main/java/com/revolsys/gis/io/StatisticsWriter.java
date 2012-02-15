@@ -19,18 +19,19 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
   public StatisticsWriter() {
   }
 
-  public StatisticsWriter(
-    final Writer<DataObject> writer) {
+  public StatisticsWriter(final Writer<DataObject> writer) {
     setWriter(writer);
   }
 
+  @Override
   public void close() {
     writer.close();
     statistics.disconnect();
   }
 
-  public String toString() {
-    return writer.toString();
+  @Override
+  public void flush() {
+    writer.flush();
   }
 
   /**
@@ -38,10 +39,6 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
    */
   public Statistics getStatistics() {
     return statistics;
-  }
-
-  public void flush() {
-    writer.flush();
   }
 
   public Writer<DataObject> getWriter() {
@@ -56,26 +53,27 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
     statistics.connect();
   }
 
-  public void setBeanName(
-    final String beanName) {
+  public void setBeanName(final String beanName) {
     this.beanName = beanName.replaceAll("Stats", "");
   }
 
   /**
    * @param statistics the statistics to set
    */
-  public void setStatistics(
-    final Statistics statistics) {
+  public void setStatistics(final Statistics statistics) {
     this.statistics = statistics;
   }
 
-  public void setWriter(
-    final Writer<DataObject> writer) {
+  public void setWriter(final Writer<DataObject> writer) {
     this.writer = writer;
   }
 
-  public void write(
-    final DataObject object) {
+  @Override
+  public String toString() {
+    return writer.toString();
+  }
+
+  public void write(final DataObject object) {
     if (object != null) {
       writer.write(object);
       statistics.add(object);

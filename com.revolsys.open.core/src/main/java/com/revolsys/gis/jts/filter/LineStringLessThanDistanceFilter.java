@@ -43,17 +43,15 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
    * @param geometry The geometry to compare the data objects to to.
    * @param distance
    */
-  public LineStringLessThanDistanceFilter(
-    final LineString geometry,
+  public LineStringLessThanDistanceFilter(final LineString geometry,
     final double distance) {
     this.distance = distance;
     setGeometry(geometry);
   }
 
-  public boolean accept(
-    final LineString line) {
+  public boolean accept(final LineString line) {
     if (line.getEnvelopeInternal().intersects(envelope)) {
-      double distance = LineStringUtil.distance(line, this.geometry,
+      final double distance = LineStringUtil.distance(line, this.geometry,
         this.distance);
       if (distance < this.distance) {
         return true;
@@ -64,6 +62,15 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
       return false;
     }
 
+  }
+
+  /**
+   * Get the maximum distance the object can be from the source geometry.
+   * 
+   * @return The maximum distance the object can be from the source geometry.
+   */
+  public double getDistance() {
+    return distance;
   }
 
   public Envelope getEnvelope() {
@@ -79,24 +86,13 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
     return geometry;
   }
 
-  /**
-   * Get the maximum distance the object can be from the source geometry.
-   * 
-   * @return The maximum distance the object can be from the source geometry.
-   */
-  public double getDistance() {
-    return distance;
+  public void setDistance(final double distance) {
+    this.distance = distance;
   }
 
-  public void setGeometry(
-    final LineString geometry) {
+  public void setGeometry(final LineString geometry) {
     this.geometry = geometry;
     this.envelope = new Envelope(geometry.getEnvelopeInternal());
     this.envelope.expandBy(distance);
-  }
-
-  public void setDistance(
-    final double distance) {
-    this.distance = distance;
   }
 }

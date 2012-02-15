@@ -12,23 +12,22 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcTimestampAttribute extends JdbcAttribute {
-  public JdbcTimestampAttribute(
-    final String name,
-    final int sqlType,
-    final boolean required,
-    final Map<QName, Object> properties) {
+  public JdbcTimestampAttribute(final String name, final int sqlType,
+    final boolean required, final Map<QName, Object> properties) {
     super(name, DataTypes.DATE_TIME, sqlType, 0, 0, required, properties);
   }
+
   @Override
   public JdbcTimestampAttribute clone() {
-    return new JdbcTimestampAttribute(getName(), getSqlType(), isRequired(), getProperties());
+    return new JdbcTimestampAttribute(getName(), getSqlType(), isRequired(),
+      getProperties());
   }
+
   @Override
   public int setAttributeValueFromResultSet(
     final ResultSet resultSet,
     final int columnIndex,
-    final DataObject object)
-    throws SQLException {
+    final DataObject object) throws SQLException {
     final Timestamp value = resultSet.getTimestamp(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;
@@ -38,8 +37,7 @@ public class JdbcTimestampAttribute extends JdbcAttribute {
   public int setPreparedStatementValue(
     final PreparedStatement statement,
     final int parameterIndex,
-    final Object value)
-    throws SQLException {
+    final Object value) throws SQLException {
     if (value == null) {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);

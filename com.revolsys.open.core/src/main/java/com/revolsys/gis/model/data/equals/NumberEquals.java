@@ -29,7 +29,6 @@ public class NumberEquals implements Equals<Object> {
     }
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

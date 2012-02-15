@@ -27,7 +27,6 @@ public abstract class AbstractEquals<T> implements Equals<T> {
     return equalsRegistry;
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

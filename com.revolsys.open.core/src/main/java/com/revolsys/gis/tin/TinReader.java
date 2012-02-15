@@ -18,7 +18,8 @@ import com.revolsys.util.MathUtil;
 public class TinReader {
 
   public static TriangulatedIrregularNetwork read(
-    final BoundingBox boundingBox, final Resource resource) {
+    final BoundingBox boundingBox,
+    final Resource resource) {
     final TinReader tinReader = new TinReader(boundingBox, resource);
     try {
       final TriangulatedIrregularNetwork tin = tinReader.read();
@@ -29,7 +30,8 @@ public class TinReader {
   }
 
   public static TriangulatedIrregularNetwork read(
-    final GeometryFactory geometryFactory, final Resource resource) {
+    final GeometryFactory geometryFactory,
+    final Resource resource) {
     final TinReader tinReader = new TinReader(geometryFactory, resource);
     try {
       final TriangulatedIrregularNetwork tin = tinReader.read();
@@ -45,9 +47,9 @@ public class TinReader {
 
   private BoundingBox boundingBox;
 
-  public TinReader(final GeometryFactory geometryFactory,
-    final Resource resource) {
-    this.geometryFactory = geometryFactory;
+  public TinReader(final BoundingBox boundingBox, final Resource resource) {
+    this.boundingBox = boundingBox;
+    this.geometryFactory = boundingBox.getGeometryFactory();
     this.in = SpringUtil.getBufferedReader(resource);
     final String line = readLine();
     if (!"TIN".equals(line)) {
@@ -55,9 +57,9 @@ public class TinReader {
     }
   }
 
-  public TinReader(final BoundingBox boundingBox, final Resource resource) {
-    this.boundingBox = boundingBox;
-    this.geometryFactory = boundingBox.getGeometryFactory();
+  public TinReader(final GeometryFactory geometryFactory,
+    final Resource resource) {
+    this.geometryFactory = geometryFactory;
     this.in = SpringUtil.getBufferedReader(resource);
     final String line = readLine();
     if (!"TIN".equals(line)) {

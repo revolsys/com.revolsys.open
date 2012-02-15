@@ -10,26 +10,26 @@ import com.revolsys.ui.model.Menu;
 public abstract class BaseController extends AbstractController {
   private Menu actionMenu = new Menu();
 
+  public Menu getActionMenu() {
+    return actionMenu;
+  }
+
   public Menu getActionMenu(final HttpServletRequest request) {
-    Menu requestMenu = (Menu)request.getAttribute("actionMenu");
+    final Menu requestMenu = (Menu)request.getAttribute("actionMenu");
     if (requestMenu == null) {
       return actionMenu;
     } else {
-      Menu newMenu = actionMenu.clone();
+      final Menu newMenu = actionMenu.clone();
       newMenu.addAllMenuItems(requestMenu);
       return newMenu;
     }
   }
 
   public MenuElement getActionMenuElement(final HttpServletRequest request) {
-    Menu menu = getActionMenu(request);
-    MenuElement menuElement = new MenuElement(menu, "actionMenu");
+    final Menu menu = getActionMenu(request);
+    final MenuElement menuElement = new MenuElement(menu, "actionMenu");
     menuElement.initialize(request);
     return menuElement;
-  }
-
-  public Menu getActionMenu() {
-    return actionMenu;
   }
 
   public void setActionMenu(final Menu actionMenu) {

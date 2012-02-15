@@ -21,8 +21,7 @@ public final class JsonWriter {
 
   boolean startAttribute;
 
-  public JsonWriter(
-    final Writer out) {
+  public JsonWriter(final Writer out) {
     if (out instanceof PrintWriter) {
       this.out = (PrintWriter)out;
     } else {
@@ -30,8 +29,7 @@ public final class JsonWriter {
     }
   }
 
-  public void charSequence(
-    final CharSequence string) {
+  public void charSequence(final CharSequence string) {
     for (int i = 0; i < string.length(); i++) {
       final char c = string.charAt(i);
       switch (c) {
@@ -98,16 +96,14 @@ public final class JsonWriter {
     }
   }
 
-  public void label(
-    final String key) {
+  public void label(final String key) {
     indent();
     value(key);
     out.print(": ");
     startAttribute = true;
   }
 
-  public void list(
-    final List<? extends Object> values) {
+  public void list(final List<? extends Object> values) {
     startList();
     int i = 0;
     final int size = values.size();
@@ -125,18 +121,15 @@ public final class JsonWriter {
     endList();
   }
 
-  public void print(
-    final char value) {
+  public void print(final char value) {
     out.print(value);
   }
 
-  public void print(
-    final Object value) {
+  public void print(final Object value) {
     out.print(value);
   }
 
-  public void setIndent(
-    final boolean indent) {
+  public void setIndent(final boolean indent) {
     this.indent = indent;
   }
 
@@ -159,8 +152,7 @@ public final class JsonWriter {
   }
 
   @SuppressWarnings("unchecked")
-  public void value(
-    final Object value) {
+  public void value(final Object value) {
     if (value == null) {
       out.print("null");
     } else if (value instanceof Boolean) {
@@ -183,8 +175,7 @@ public final class JsonWriter {
     }
   }
 
-  public void write(
-    final Map<String, ? extends Object> values) {
+  public void write(final Map<String, ? extends Object> values) {
     startObject();
 
     final Set<String> fields = values.keySet();

@@ -30,13 +30,13 @@ import com.revolsys.ui.html.layout.ElementContainerLayout;
 import com.revolsys.ui.html.layout.RawLayout;
 
 public class ElementContainer extends Element {
-  private List<ElementContainer> containers = new ArrayList<ElementContainer>();
+  private final List<ElementContainer> containers = new ArrayList<ElementContainer>();
 
-  private List<Element> elements = new ArrayList<Element>();
+  private final List<Element> elements = new ArrayList<Element>();
 
-  private List<Element> elementsExternal = Collections.unmodifiableList(elements);
+  private final List<Element> elementsExternal = Collections.unmodifiableList(elements);
 
-  private Map<String, Field> fields = new HashMap<String, Field>();
+  private final Map<String, Field> fields = new HashMap<String, Field>();
 
   private ElementContainerLayout layout = new RawLayout();
 
@@ -57,18 +57,18 @@ public class ElementContainer extends Element {
       elements.add(element);
       element.setContainer(this);
       if (element instanceof Field) {
-        Field field = (Field)element;
+        final Field field = (Field)element;
         fields.put(field.getName(), field);
       } else if (element instanceof ElementContainer) {
-        ElementContainer container = (ElementContainer)element;
+        final ElementContainer container = (ElementContainer)element;
         containers.add(container);
       }
     }
     return this;
   }
 
-  public void add(Element... elements) {
-    for (Element element : elements) {
+  public void add(final Element... elements) {
+    for (final Element element : elements) {
       add(element);
     }
   }
@@ -81,7 +81,7 @@ public class ElementContainer extends Element {
     return this;
   }
 
-  public void add(int index, Element element) {
+  public void add(final int index, final Element element) {
     elements.add(index, element);
 
   }
@@ -95,11 +95,11 @@ public class ElementContainer extends Element {
   }
 
   public Field getField(final String name) {
-    Field field = (Field)fields.get(name);
+    Field field = fields.get(name);
     if (field != null) {
       return field;
     }
-    for (ElementContainer container : containers) {
+    for (final ElementContainer container : containers) {
       field = container.getField(name);
       if (field != null) {
         return field;
@@ -109,24 +109,26 @@ public class ElementContainer extends Element {
   }
 
   public List<String> getFieldNames() {
-    List<String> allFields = new ArrayList<String>();
+    final List<String> allFields = new ArrayList<String>();
     allFields.addAll(fields.keySet());
-    for (ElementContainer container : containers) {
+    for (final ElementContainer container : containers) {
       allFields.addAll(container.getFieldNames());
     }
     return allFields;
   }
 
   public Map<String, Field> getFields() {
-    Map<String, Field> allFields = new HashMap<String, Field>();
+    final Map<String, Field> allFields = new HashMap<String, Field>();
     allFields.putAll(fields);
-    for (ElementContainer container : containers) {
+    for (final ElementContainer container : containers) {
       allFields.putAll(container.getFields());
     }
     return allFields;
   }
 
-  public <T> T getInitialValue(final Field field, HttpServletRequest request) {
+  public <T> T getInitialValue(
+    final Field field,
+    final HttpServletRequest request) {
     return (T)getContainer().getInitialValue(field, request);
   }
 
@@ -137,12 +139,14 @@ public class ElementContainer extends Element {
     return layout;
   }
 
+  @Override
   public void initialize(final HttpServletRequest request) {
-    for (Element element : elements) {
+    for (final Element element : elements) {
       element.initialize(request);
     }
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     layout.serialize(out, this);
   }
@@ -156,7 +160,7 @@ public class ElementContainer extends Element {
 
   public boolean validate() {
     boolean valid = true;
-    for (ElementContainer container : containers) {
+    for (final ElementContainer container : containers) {
       valid &= container.validate();
     }
     return valid;

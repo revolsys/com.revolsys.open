@@ -50,9 +50,9 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private final List<String> fieldNames = new ArrayList<String>();
 
-  private Resource resource;
+  private final Resource resource;
 
-  private DataObjectMetaData metaData;
+  private final DataObjectMetaData metaData;
 
   private int numRecords = 0;
 
@@ -68,12 +68,12 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     this.resource = resource;
   }
 
-  public void flush() {
-    out.flush();
-  }
-
-  protected int addDbaseField(final String name, DataType dataType,
-    final Class<?> typeJavaClass, int length, final int scale) {
+  protected int addDbaseField(
+    final String name,
+    final DataType dataType,
+    final Class<?> typeJavaClass,
+    final int length,
+    final int scale) {
 
     FieldDefinition field = null;
     if (dataType == DataTypes.DECIMAL) {
@@ -119,15 +119,12 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return field.getLength();
   }
 
-  protected boolean hasField(final String name) {
-    return fieldNames.contains(name);
-  }
-
   protected void addField(final FieldDefinition field) {
     fieldNames.add(field.getName());
     fields.add(field);
   }
 
+  @Override
   public void close() {
     try {
       if (out != null) {
@@ -152,12 +149,17 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @Override
+  public void flush() {
+    out.flush();
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
-  public String toString() {
-    return resource.toString();
+  protected boolean hasField(final String name) {
+    return fieldNames.contains(name);
   }
 
   protected void init() throws IOException {
@@ -174,8 +176,16 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return useZeroForNull;
   }
 
+  protected void preFirstWrite(final DataObject object) throws IOException {
+  }
+
   public void setUseZeroForNull(final boolean useZeroForNull) {
     this.useZeroForNull = useZeroForNull;
+  }
+
+  @Override
+  public String toString() {
+    return resource.toString();
   }
 
   public void write(final DataObject object) {
@@ -199,10 +209,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected void preFirstWrite(DataObject object) throws IOException {
-  }
-
-  protected boolean writeField(final DataObject object,
+  protected boolean writeField(
+    final DataObject object,
     final FieldDefinition field) throws IOException {
     if (out == null) {
       return true;
@@ -220,16 +228,16 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           } else if (value instanceof Number) {
 
             Number number = (Number)value;
-            int decimalPlaces = field.getDecimalPlaces();
+            final int decimalPlaces = field.getDecimalPlaces();
             if (decimalPlaces >= 0) {
               if (number instanceof BigDecimal) {
-                BigDecimal bigDecimal = (BigDecimal)number;
+                final BigDecimal bigDecimal = (BigDecimal)number;
                 number = bigDecimal.setScale(decimalPlaces,
                   RoundingMode.HALF_UP);
               } else if ((number instanceof Double)
                 || (number instanceof Float)) {
-                double doubleValue = number.doubleValue();
-                PrecisionModel precisionModel = field.getPrecisionModel();
+                final double doubleValue = number.doubleValue();
+                final PrecisionModel precisionModel = field.getPrecisionModel();
                 number = precisionModel.makePrecise(doubleValue);
               }
             }
@@ -359,7 +367,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           final int length = field.getLength();
           final int decimalPlaces = field.getDecimalPlaces();
           out.writeBytes(name);
-          int numPad = 11 - name.length();
+          final int numPad = 11 - name.length();
           for (int i = 0; i < numPad; i++) {
             out.write(0);
           }

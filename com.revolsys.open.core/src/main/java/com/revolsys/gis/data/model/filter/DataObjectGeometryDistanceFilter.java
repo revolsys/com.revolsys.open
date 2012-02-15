@@ -37,15 +37,13 @@ public class DataObjectGeometryDistanceFilter implements Filter<DataObject> {
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance
    */
-  public DataObjectGeometryDistanceFilter(
-    final Geometry geometry,
+  public DataObjectGeometryDistanceFilter(final Geometry geometry,
     final double maxDistance) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
     final double distance = matchGeometry.distance(geometry);
     if (distance <= maxDistance) {

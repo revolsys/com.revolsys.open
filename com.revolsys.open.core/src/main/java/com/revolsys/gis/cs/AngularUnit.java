@@ -20,8 +20,7 @@ public class AngularUnit implements Serializable {
    * @param conversionFactor The conversion factor.
    * @return The angular unit.
    */
-  public static Unit<Angle> getUnit(
-    final double conversionFactor) {
+  public static Unit<Angle> getUnit(final double conversionFactor) {
     return getUnit(null, conversionFactor);
   }
 
@@ -72,19 +71,13 @@ public class AngularUnit implements Serializable {
 
   private Unit<Angle> unit;
 
-  public AngularUnit(
-    final String name,
-    final AngularUnit baseUnit,
-    final double conversionFactor,
-    final Authority authority) {
+  public AngularUnit(final String name, final AngularUnit baseUnit,
+    final double conversionFactor, final Authority authority) {
     this(name, baseUnit, conversionFactor, authority, false);
   }
 
-  public AngularUnit(
-    final String name,
-    final AngularUnit baseUnit,
-    final double conversionFactor,
-    final Authority authority,
+  public AngularUnit(final String name, final AngularUnit baseUnit,
+    final double conversionFactor, final Authority authority,
     final boolean deprecated) {
     this.name = name;
     this.baseUnit = baseUnit;
@@ -98,16 +91,13 @@ public class AngularUnit implements Serializable {
     }
   }
 
-  public AngularUnit(
-    final String name,
-    final double conversionFactor,
+  public AngularUnit(final String name, final double conversionFactor,
     final Authority authority) {
     this(name, null, conversionFactor, authority, false);
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {

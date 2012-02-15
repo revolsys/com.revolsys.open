@@ -20,6 +20,7 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -32,9 +33,9 @@ import com.revolsys.io.xml.XmlProcessorContext;
 public class XmlConfigLoader {
   private static final Logger log = Logger.getLogger(XmlConfigLoader.class);
 
-  private URL configFileUrl;
+  private final URL configFileUrl;
 
-  private XmlProcessorContext context = new SimpleXmlProcessorContext();
+  private final XmlProcessorContext context = new SimpleXmlProcessorContext();
 
   public XmlConfigLoader(final URL configFileUrl,
     final ServletContext servletContext) {
@@ -48,23 +49,23 @@ public class XmlConfigLoader {
   public synchronized Config loadConfig() throws InvalidConfigException {
     Config config = null;
     try {
-      XMLInputFactory factory = XMLInputFactory.newInstance();
+      final XMLInputFactory factory = XMLInputFactory.newInstance();
       factory.setXMLReporter(context);
-      XMLStreamReader parser = factory.createXMLStreamReader(configFileUrl.openStream());
+      final XMLStreamReader parser = factory.createXMLStreamReader(configFileUrl.openStream());
       try {
         StaxUtils.skipToStartElement(parser);
-        if (parser.getEventType() == XMLStreamReader.START_ELEMENT) {
+        if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
           config = (Config)new IafConfigXmlProcessor(context).process(parser);
         }
-      } catch (XMLStreamException e) {
+      } catch (final XMLStreamException e) {
         context.addError(e.getMessage(), e, parser.getLocation());
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         log.error(t.getMessage(), t);
         context.addError(t.getMessage(), t, parser.getLocation());
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       context.addError(e.getMessage(), e, null);
-    } catch (XMLStreamException e) {
+    } catch (final XMLStreamException e) {
       context.addError(e.getMessage(), e, null);
     }
     if (!context.getErrors().isEmpty()) {

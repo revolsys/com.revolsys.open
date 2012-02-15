@@ -37,18 +37,15 @@ public class JdbcUpdateStatementRunnable implements Runnable {
 
   }
 
-  public void setDataSource(
-    final DataSource dataSource) {
+  public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
-  public void setParameters(
-    final List<Object> parameters) {
+  public void setParameters(final List<Object> parameters) {
     this.parameters = parameters;
   }
 
-  public void setSql(
-    final String sql) {
+  public void setSql(final String sql) {
     this.sql = sql;
   }
 }

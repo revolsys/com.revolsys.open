@@ -40,16 +40,10 @@ public class MethodSecurityExpressionRoot extends SecurityExpressionRoot {
 
   private RoleHierarchy roleHierarchy;
 
-  MethodSecurityExpressionRoot(Authentication a) {
-    super(a);
-  }
-
   private Set<String> roles;
 
-  @Override
-  public void setRoleHierarchy(RoleHierarchy roleHierarchy) {
-    super.setRoleHierarchy(roleHierarchy);
-    this.roleHierarchy = roleHierarchy;
+  MethodSecurityExpressionRoot(final Authentication a) {
+    super(a);
   }
 
   public Set<String> getAuthoritySet() {
@@ -67,23 +61,31 @@ public class MethodSecurityExpressionRoot extends SecurityExpressionRoot {
     return roles;
   }
 
-  public boolean hasPermission(Object target, Object permission) {
+  public Object getFilterObject() {
+    return filterObject;
+  }
+
+  public Object getReturnObject() {
+    return returnObject;
+  }
+
+  public boolean hasPermission(final Object target, final Object permission) {
     return permissionEvaluator.hasPermission(authentication, target, permission);
   }
 
   public boolean hasPermission(
-    Object targetId,
-    String targetType,
-    Object permission) {
+    final Object targetId,
+    final String targetType,
+    final Object permission) {
     return permissionEvaluator.hasPermission(authentication,
       (Serializable)targetId, targetType, permission);
   }
 
-  public boolean hasRoleRegex(String regex) {
-    Pattern pattern = Pattern.compile(regex);
-    for (String role : getAuthoritySet()) {
-      Matcher matcher = pattern.matcher(role);
-      boolean matches = matcher.matches();
+  public boolean hasRoleRegex(final String regex) {
+    final Pattern pattern = Pattern.compile(regex);
+    for (final String role : getAuthoritySet()) {
+      final Matcher matcher = pattern.matcher(role);
+      final boolean matches = matcher.matches();
       if (matches) {
         return true;
       }
@@ -91,24 +93,23 @@ public class MethodSecurityExpressionRoot extends SecurityExpressionRoot {
     return false;
   }
 
-  public void setFilterObject(Object filterObject) {
+  public void setFilterObject(final Object filterObject) {
     this.filterObject = filterObject;
   }
 
-  public Object getFilterObject() {
-    return filterObject;
+  public void setPermissionEvaluator(
+    final PermissionEvaluator permissionEvaluator) {
+    this.permissionEvaluator = permissionEvaluator;
   }
 
-  public void setReturnObject(Object returnObject) {
+  public void setReturnObject(final Object returnObject) {
     this.returnObject = returnObject;
   }
 
-  public Object getReturnObject() {
-    return returnObject;
-  }
-
-  public void setPermissionEvaluator(PermissionEvaluator permissionEvaluator) {
-    this.permissionEvaluator = permissionEvaluator;
+  @Override
+  public void setRoleHierarchy(final RoleHierarchy roleHierarchy) {
+    super.setRoleHierarchy(roleHierarchy);
+    this.roleHierarchy = roleHierarchy;
   }
 
 }

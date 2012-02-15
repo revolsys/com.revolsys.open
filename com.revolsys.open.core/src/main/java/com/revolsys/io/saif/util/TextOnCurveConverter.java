@@ -22,15 +22,13 @@ public class TextOnCurveConverter implements OsnConverter {
 
   private final GeometryFactory geometryFactory;
 
-  public TextOnCurveConverter(
-    final GeometryFactory geometryFactory,
+  public TextOnCurveConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     this.geometryFactory = geometryFactory;
     this.converters = converters;
   }
 
-  public Object read(
-    final OsnIterator iterator) {
+  public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put(TYPE, "TextOnCurve");
     Geometry geometry = null;
@@ -63,9 +61,7 @@ public class TextOnCurveConverter implements OsnConverter {
     values.put(attributeName, iterator.getValue());
   }
 
-  public void write(
-    final OsnSerializer serializer,
-    final Object object)
+  public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     if (object instanceof MultiPoint) {
       final MultiPoint multiPoint = (MultiPoint)object;
@@ -89,8 +85,7 @@ public class TextOnCurveConverter implements OsnConverter {
   protected void writeAttribute(
     final OsnSerializer serializer,
     final String name,
-    final Object value)
-    throws IOException {
+    final Object value) throws IOException {
     if (value != null) {
       serializer.endLine();
       serializer.attribute(name, value, false);
@@ -100,8 +95,7 @@ public class TextOnCurveConverter implements OsnConverter {
 
   protected void writeAttributes(
     final OsnSerializer serializer,
-    final Map<String, Object> values)
-    throws IOException {
+    final Map<String, Object> values) throws IOException {
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String key = entry.getKey();
       if (key != TYPE) {

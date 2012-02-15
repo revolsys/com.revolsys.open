@@ -60,13 +60,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     this.deprecated = deprecated;
   }
 
-  public void setParameters(final Map<String, Object> parameters) {
-    this.parameters.putAll(parameters);
-    for (Entry<String, Object> param : parameters.entrySet()) {
-      lowerParameters.put(param.getKey().toLowerCase(), param.getValue());
-    }
-  }
-
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem,
     final Projection projection, final Map<String, Object> parameters,
@@ -83,10 +76,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       this.axis.add(axis.get(1));
     }
     this.authority = authority;
-  }
-
-  public int getId() {
-    return id;
   }
 
   @Override
@@ -143,10 +132,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return projectedBoundingBox;
   }
 
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.getFactory(this);
-  }
-
   public Authority getAuthority() {
     return authority;
   }
@@ -166,6 +151,14 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public GeographicCoordinateSystem getGeographicCoordinateSystem() {
     return geographicCoordinateSystem;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.getFactory(this);
+  }
+
+  public int getId() {
+    return id;
   }
 
   public Unit<Length> getLengthUnit() {
@@ -206,7 +199,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     if (projection != null) {
       result = prime * result + projection.hashCode();
     }
-    for (Entry<String, Object> entry : lowerParameters.entrySet()) {
+    for (final Entry<String, Object> entry : lowerParameters.entrySet()) {
       final String key = entry.getKey();
       result = prime * result + key.hashCode();
       result = prime * result + entry.getValue().hashCode();
@@ -220,6 +213,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public boolean isDeprecated() {
     return deprecated;
+  }
+
+  public void setParameters(final Map<String, Object> parameters) {
+    this.parameters.putAll(parameters);
+    for (final Entry<String, Object> param : parameters.entrySet()) {
+      lowerParameters.put(param.getKey().toLowerCase(), param.getValue());
+    }
   }
 
   @Override

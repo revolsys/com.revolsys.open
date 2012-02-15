@@ -6,19 +6,27 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 
 public class ProcessQueueWorker extends Thread {
-  private ProcessQueue queue;
+  private final ProcessQueue queue;
 
-  private Channel<Process> in;
+  private final Channel<Process> in;
 
   private Process process;
 
-  public ProcessQueueWorker(
-    final ProcessQueue queue) {
+  public ProcessQueueWorker(final ProcessQueue queue) {
     this.queue = queue;
     this.in = queue.getProcessChannel();
     setDaemon(true);
   }
 
+  public String getBeanName() {
+    return getClass().getName();
+  }
+
+  public Process getProcess() {
+    return process;
+  }
+
+  @Override
   public void run() {
     queue.addWorker(this);
     try {
@@ -29,32 +37,23 @@ public class ProcessQueueWorker extends Thread {
         } else {
           try {
             process.run();
-          } catch (Exception e) {
+          } catch (final Exception e) {
             if (!(e instanceof InterruptedException)) {
-              Class<? extends Process> processClass = process.getClass();
-              Logger log = Logger.getLogger(processClass);
+              final Class<? extends Process> processClass = process.getClass();
+              final Logger log = Logger.getLogger(processClass);
               log.error(e.getMessage(), e);
             }
           }
         }
         process = null;
       }
-    } catch (ClosedException e) {
+    } catch (final ClosedException e) {
       return;
     } finally {
       queue.removeWorker(this);
     }
   }
 
-  public Process getProcess() {
-    return process;
-  }
-
-  public String getBeanName() {
-    return getClass().getName();
-  }
-
-  public void setBeanName(
-    String name) {
+  public void setBeanName(final String name) {
   }
 }

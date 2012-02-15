@@ -37,12 +37,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     this.tileHeight = height;
   }
 
-  public CoordinateSystem getCoordinateSystem() {
-    return COORDINATE_SYSTEM;
-  }
-
-  public GeometryFactory getGeometryFactory() {
-    return GEOMETRY_FACTORY;
+  public int getBlock(final String sheet) {
+    return Integer.parseInt(sheet.substring(0, sheet.length() - 4));
   }
 
   public BoundingBox getBoundingBox(final String mapTileName) {
@@ -50,6 +46,18 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final double lon = getLongitude(mapTileName);
     return new BoundingBox(getGeometryFactory(), lon, lat, lon - tileWidth, lat
       + tileHeight);
+  }
+
+  public CoordinateSystem getCoordinateSystem() {
+    return COORDINATE_SYSTEM;
+  }
+
+  public String getFormattedMapTileName(final String name) {
+    return name;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return GEOMETRY_FACTORY;
   }
 
   public double getLatitude(final int block) {
@@ -70,10 +78,6 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public double getLongitude(final String mapTileName) {
     final int block = getNtsBlock(mapTileName);
     return getLongitude(block);
-  }
-
-  public String getFormattedMapTileName(String name) {
-    return name;
   }
 
   public String getMapTileName(final double x, final double y) {
@@ -100,7 +104,9 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(final String sheet, final int east,
+  public String getMapTileName(
+    final String sheet,
+    final int east,
     final int north) {
     final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
       * getTileHeight());
@@ -182,9 +188,5 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
   public void setPrecisionModel(final PrecisionModel precisionModel) {
     this.precisionModel = precisionModel;
-  }
-
-  public int getBlock(final String sheet) {
-    return Integer.parseInt(sheet.substring(0, sheet.length() - 4));
   }
 }

@@ -7,13 +7,11 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
 
   private int index = 0;
 
-  public CoordinatesListCoordinates(
-    final CoordinatesList coordinates) {
+  public CoordinatesListCoordinates(final CoordinatesList coordinates) {
     this.coordinates = coordinates;
   }
 
-  public CoordinatesListCoordinates(
-    final CoordinatesList coordinates,
+  public CoordinatesListCoordinates(final CoordinatesList coordinates,
     final int index) {
     this.coordinates = coordinates;
     this.index = index;
@@ -33,8 +31,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     return coordinates.getNumAxis();
   }
 
-  public double getValue(
-    final int index) {
+  public double getValue(final int index) {
     if (index >= 0 && index < coordinates.getNumAxis()) {
       return coordinates.getValue(this.index, index);
     } else {
@@ -42,14 +39,15 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     }
   }
 
-  public void setIndex(
-    final int index) {
+  public void next() {
+    index++;
+  }
+
+  public void setIndex(final int index) {
     this.index = index;
   }
 
-  public void setValue(
-    final int index,
-    final double value) {
+  public void setValue(final int index, final double value) {
     if (index >= 0 && index < coordinates.getNumAxis()) {
       coordinates.setValue(this.index, index, value);
     }
@@ -78,10 +76,6 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     } else {
       return "";
     }
-  }
-
-  public void next() {
-    index++;
   }
 
 }

@@ -29,27 +29,22 @@ public final class ObjectSetUtil {
     "u", "v", "w", "x", "y", "z"
   };
 
-  public static String getObjectSubsetName(
-    final String prefix,
-    final int index) {
+  public static String getObjectSubsetName(final String prefix, final int index) {
     return prefix + getObjectSubsetNumber(index) + ".osn";
   }
 
-  public static String getObjectSubsetNumber(
-    final int index) {
+  public static String getObjectSubsetNumber(final int index) {
     final int highByte = index / 36;
     final int lowByte = index % 36;
     return OBJECT_SUBSET_NUMBERS[highByte] + OBJECT_SUBSET_NUMBERS[lowByte];
   }
 
-  public static String getObjectSubsetPrefix(
-    final File file) {
+  public static String getObjectSubsetPrefix(final File file) {
     final String fileName = file.getName();
     return getObjectSubsetPrefix(fileName);
   }
 
-  public static String getObjectSubsetPrefix(
-    final String fileName) {
+  public static String getObjectSubsetPrefix(final String fileName) {
     return fileName.replaceAll("(\\d\\d)?.osn$", "");
   }
 

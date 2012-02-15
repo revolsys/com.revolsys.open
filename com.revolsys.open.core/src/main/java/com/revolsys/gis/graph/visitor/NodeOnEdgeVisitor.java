@@ -36,17 +36,14 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
 
   private final Node<T> node;
 
-  private Coordinates point;
+  private final Coordinates point;
 
-  private BoundingBox boundingBox;
+  private final BoundingBox boundingBox;
 
-  private double maxDistance;
+  private final double maxDistance;
 
-  public NodeOnEdgeVisitor(
-    final Node<T> node,
-    final BoundingBox boundingBox,
-    final double maxDistance,
-    final Visitor<Edge<T>> matchVisitor) {
+  public NodeOnEdgeVisitor(final Node<T> node, final BoundingBox boundingBox,
+    final double maxDistance, final Visitor<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.node = node;
     this.boundingBox = boundingBox;
@@ -55,8 +52,7 @@ public class NodeOnEdgeVisitor<T> extends NestedVisitor<Edge<T>> {
   }
 
   @Override
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     if (!edge.hasNode(node)) {
       final LineString line = edge.getLine();
       if (line.getEnvelopeInternal().intersects(boundingBox)) {

@@ -12,10 +12,20 @@ import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 
-public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderFactory
-  implements DataObjectReaderFactory {
+public abstract class AbstractDataObjectReaderFactory extends
+  AbstractMapReaderFactory implements DataObjectReaderFactory {
   /** The default data object dataObjectFactory instance. */
   private static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
+
+  public static DataObjectReader dataObjectReader(final Resource resource) {
+    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    if (readerFactory == null) {
+      return null;
+    } else {
+      final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
+      return reader;
+    }
+  }
 
   public static DataObjectReader dataObjectReader(
     final Resource resource,
@@ -26,17 +36,6 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderF
     } else {
       final DataObjectReader reader = readerFactory.createDataObjectReader(
         resource, factory);
-      return reader;
-    }
-  }
-
-  public static DataObjectReader dataObjectReader(
-    final Resource resource) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
       return reader;
     }
   }
@@ -53,18 +52,11 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderF
 
   private final boolean binary;
 
-  public AbstractDataObjectReaderFactory(
-    final String name,
-    final boolean binary) {
+  public AbstractDataObjectReaderFactory(final String name, final boolean binary) {
     super(name);
     this.binary = binary;
   }
 
-  public boolean isBinary() {
-   return binary;
-  }
-  
-  
   /**
    * Create a reader for the resource using the ({@link ArrayDataObjectFactory}
    * ).
@@ -72,8 +64,7 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderF
    * @param file The file to read.
    * @return The reader for the file.
    */
-  public DataObjectReader createDataObjectReader(
-    final Resource resource) {
+  public DataObjectReader createDataObjectReader(final Resource resource) {
     return createDataObjectReader(resource, DEFAULT_DATA_OBJECT_FACTORY);
 
   }
@@ -96,8 +87,7 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderF
    * @param directory The directory to read.
    * @return The reader for the file.
    */
-  public Reader<DataObject> createDirectoryDataObjectReader(
-    final File directory) {
+  public Reader<DataObject> createDirectoryDataObjectReader(final File directory) {
     return createDirectoryDataObjectReader(directory,
       DEFAULT_DATA_OBJECT_FACTORY);
 
@@ -119,9 +109,13 @@ public abstract class AbstractDataObjectReaderFactory extends AbstractMapReaderF
     directoryReader.setDirectory(directory);
     return directoryReader;
   }
-  
-  public Reader<Map<String, Object>> createMapReader(Resource resource) {
-    Reader reader = createDataObjectReader(resource);
+
+  public Reader<Map<String, Object>> createMapReader(final Resource resource) {
+    final Reader reader = createDataObjectReader(resource);
     return reader;
+  }
+
+  public boolean isBinary() {
+    return binary;
   }
 }

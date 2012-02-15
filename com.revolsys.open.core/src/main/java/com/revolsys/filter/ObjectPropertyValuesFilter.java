@@ -9,15 +9,13 @@ public class ObjectPropertyValuesFilter<T> implements Filter<T> {
 
   private final Collection<? extends Object> values;
 
-  public ObjectPropertyValuesFilter(
-    final String propertyName,
+  public ObjectPropertyValuesFilter(final String propertyName,
     final Collection<? extends Object> values) {
     this.propertyName = propertyName;
     this.values = values;
   }
 
-  public boolean accept(
-    final T object) {
+  public boolean accept(final T object) {
     try {
       final Object value = PropertyUtils.getProperty(object, propertyName);
       return values.contains(value);

@@ -129,8 +129,7 @@ public class Base64 {
      * @param in the <tt>java.io.InputStream</tt> from which to read data.
      * @since 1.3
      */
-    public InputStream(
-      final java.io.InputStream in) {
+    public InputStream(final java.io.InputStream in) {
       this(in, DECODE);
     } // end constructor
 
@@ -155,9 +154,7 @@ public class Base64 {
      * @see Base64#DONT_BREAK_LINES
      * @since 2.0
      */
-    public InputStream(
-      final java.io.InputStream in,
-      final int options) {
+    public InputStream(final java.io.InputStream in, final int options) {
       super(in);
       this.breakLines = (options & DONT_BREAK_LINES) != DONT_BREAK_LINES;
       this.encode = (options & ENCODE) == ENCODE;
@@ -179,8 +176,7 @@ public class Base64 {
      * @since 1.3
      */
     @Override
-    public int read()
-      throws java.io.IOException {
+    public int read() throws java.io.IOException {
       // Do we need to get data?
       if (position < 0) {
         if (encode) {
@@ -295,10 +291,7 @@ public class Base64 {
      * @since 1.3
      */
     @Override
-    public int read(
-      final byte[] dest,
-      final int off,
-      final int len)
+    public int read(final byte[] dest, final int off, final int len)
       throws java.io.IOException {
       int i;
       int b;
@@ -359,8 +352,7 @@ public class Base64 {
      *          written.
      * @since 1.3
      */
-    public OutputStream(
-      final java.io.OutputStream out) {
+    public OutputStream(final java.io.OutputStream out) {
       this(out, ENCODE);
     } // end constructor
 
@@ -386,9 +378,7 @@ public class Base64 {
      * @see Base64#DONT_BREAK_LINES
      * @since 1.3
      */
-    public OutputStream(
-      final java.io.OutputStream out,
-      final int options) {
+    public OutputStream(final java.io.OutputStream out, final int options) {
       super(out);
       this.breakLines = (options & DONT_BREAK_LINES) != DONT_BREAK_LINES;
       this.encode = (options & ENCODE) == ENCODE;
@@ -409,8 +399,7 @@ public class Base64 {
      * @since 1.3
      */
     @Override
-    public void close()
-      throws java.io.IOException {
+    public void close() throws java.io.IOException {
       // 1. Ensure that pending characters are written
       flushBase64();
 
@@ -426,8 +415,7 @@ public class Base64 {
      * Method added by PHIL. [Thanks, PHIL. -Rob] This pads the buffer without
      * closing the stream.
      */
-    public void flushBase64()
-      throws java.io.IOException {
+    public void flushBase64() throws java.io.IOException {
       if (position > 0) {
         if (encode) {
           out.write(encode3to4(b4, buffer, position, options));
@@ -456,8 +444,7 @@ public class Base64 {
      * 
      * @since 1.5.1
      */
-    public void suspendEncoding()
-      throws java.io.IOException {
+    public void suspendEncoding() throws java.io.IOException {
       flushBase64();
       this.suspendEncoding = true;
     } // end suspendEncoding
@@ -472,10 +459,7 @@ public class Base64 {
      * @since 1.3
      */
     @Override
-    public void write(
-      final byte[] theBytes,
-      final int off,
-      final int len)
+    public void write(final byte[] theBytes, final int off, final int len)
       throws java.io.IOException {
       // Encoding suspended?
       if (suspendEncoding) {
@@ -499,9 +483,7 @@ public class Base64 {
      * @since 1.3
      */
     @Override
-    public void write(
-      final int theByte)
-      throws java.io.IOException {
+    public void write(final int theByte) throws java.io.IOException {
       // Encoding suspended?
       if (suspendEncoding) {
         super.out.write(theByte);
@@ -876,8 +858,7 @@ public class Base64 {
    * @return the decoded data
    * @since 1.4
    */
-  public static byte[] decode(
-    final String s) {
+  public static byte[] decode(final String s) {
     return decode(s, NO_OPTIONS);
   }
 
@@ -890,9 +871,7 @@ public class Base64 {
    * @return the decoded data
    * @since 1.4
    */
-  public static byte[] decode(
-    final String s,
-    final int options) {
+  public static byte[] decode(final String s, final int options) {
     byte[] bytes;
     try {
       bytes = s.getBytes(PREFERRED_ENCODING);
@@ -1095,8 +1074,7 @@ public class Base64 {
    * @return decoded byte array or null if unsuccessful
    * @since 2.1
    */
-  public static byte[] decodeFromFile(
-    final String filename) {
+  public static byte[] decodeFromFile(final String filename) {
     byte[] decodedData = null;
     Base64.InputStream bis = null;
     try {
@@ -1181,8 +1159,7 @@ public class Base64 {
    * @return The decoded and deserialized object
    * @since 1.5
    */
-  public static Object decodeToObject(
-    final String encodedObject) {
+  public static Object decodeToObject(final String encodedObject) {
     // Decode and gunzip if necessary
     final byte[] objBytes = decode(encodedObject);
 
@@ -1218,8 +1195,7 @@ public class Base64 {
     return obj;
   } // end decodeObject
 
-  public static String encode(
-    final String string) {
+  public static String encode(final String string) {
     return encodeBytes(string.getBytes());
   }
 
@@ -1327,8 +1303,7 @@ public class Base64 {
    * @param source The data to convert
    * @since 1.4
    */
-  public static String encodeBytes(
-    final byte[] source) {
+  public static String encodeBytes(final byte[] source) {
     return encodeBytes(source, 0, source.length, NO_OPTIONS);
   } // end encodeBytes
 
@@ -1356,9 +1331,7 @@ public class Base64 {
    * @see Base64#DONT_BREAK_LINES
    * @since 2.0
    */
-  public static String encodeBytes(
-    final byte[] source,
-    final int options) {
+  public static String encodeBytes(final byte[] source, final int options) {
     return encodeBytes(source, 0, source.length, options);
   } // end encodeBytes
 
@@ -1544,8 +1517,7 @@ public class Base64 {
    * @return base64-encoded string or null if unsuccessful
    * @since 2.1
    */
-  public static String encodeFromFile(
-    final String filename) {
+  public static String encodeFromFile(final String filename) {
     String encodedData = null;
     Base64.InputStream bis = null;
     try {
@@ -1642,7 +1614,7 @@ public class Base64 {
 
     // Isolate options
     final int gzip = (options & GZIP);
-   
+
     try {
       // ObjectOutputStream -> (GZIP) -> Base64 -> ByteArrayOutputStream
       baos = new java.io.ByteArrayOutputStream();
@@ -1731,8 +1703,7 @@ public class Base64 {
    * which case one of them will be picked, though there is no guarantee as to
    * which one will be picked.
    */
-  private final static byte[] getAlphabet(
-    final int options) {
+  private final static byte[] getAlphabet(final int options) {
     if ((options & URL_SAFE) == URL_SAFE) {
       return _URL_SAFE_ALPHABET;
     } else if ((options & ORDERED) == ORDERED) {
@@ -1749,8 +1720,7 @@ public class Base64 {
    * URL_SAFE in which case one of them will be picked, though there is no
    * guarantee as to which one will be picked.
    */
-  private final static byte[] getDecodabet(
-    final int options) {
+  private final static byte[] getDecodabet(final int options) {
     if ((options & URL_SAFE) == URL_SAFE) {
       return _URL_SAFE_DECODABET;
     } else if ((options & ORDERED) == ORDERED) {
@@ -1766,8 +1736,7 @@ public class Base64 {
    * delete this method (in fact you probably should) if you're embedding this
    * code into a larger program.</strong>
    */
-  public final static void main(
-    final String[] args) {
+  public final static void main(final String[] args) {
     if (args.length < 3) {
       usage("Not enough arguments.");
     } // end if: args.length < 3
@@ -1794,8 +1763,7 @@ public class Base64 {
    * 
    * @param msg A message to include with usage info.
    */
-  private final static void usage(
-    final String msg) {
+  private final static void usage(final String msg) {
     System.err.println(msg);
     System.err.println("Usage: java Base64 -e|-d inputfile outputfile");
   } // end usage

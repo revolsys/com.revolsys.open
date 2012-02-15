@@ -7,19 +7,15 @@ import java.util.List;
 public class MultiComparator<T> implements Comparator<T> {
   private List<Comparator<T>> comparators;
 
-  public MultiComparator(
-    final Comparator<T>... comparators) {
+  public MultiComparator(final Comparator<T>... comparators) {
     this(Arrays.asList(comparators));
   }
 
-  public MultiComparator(
-    final List<Comparator<T>> comparators) {
+  public MultiComparator(final List<Comparator<T>> comparators) {
     this.comparators = comparators;
   }
 
-  public int compare(
-    final T object1,
-    final T object2) {
+  public int compare(final T object1, final T object2) {
     for (final Comparator<T> comparator : comparators) {
       final int compare = comparator.compare(object1, object2);
       if (compare != 0) {

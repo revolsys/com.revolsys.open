@@ -33,13 +33,11 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
    * 
    * @param geometry The geometry to compare the data objects to to.
    */
-  public DataObjectGeometryIntersectsFilter(
-    final Geometry geometry) {
+  public DataObjectGeometryIntersectsFilter(final Geometry geometry) {
     this.geometry = geometry;
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
     if (matchGeometry.intersects(geometry)) {
       return true;

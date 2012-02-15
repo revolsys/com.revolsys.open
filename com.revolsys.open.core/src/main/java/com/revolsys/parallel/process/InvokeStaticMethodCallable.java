@@ -51,23 +51,23 @@ public class InvokeStaticMethodCallable<T> implements Callable<T> {
     this.parameters = parameters;
   }
 
+  public T call() throws Exception {
+    try {
+      return (T)MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
+    } catch (final InvocationTargetException e) {
+      ExceptionUtil.throwCauseException(e);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    }
+    return null;
+  }
+
   /**
    * Execute the method.
    */
   public void run() {
-  }
-
-  public T call() throws Exception {
-    try {
-      return (T)MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
-    } catch (InvocationTargetException e) {
-      ExceptionUtil.throwCauseException(e);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Error e) {
-      throw e;
-    }
-    return null;
   }
 
   @Override

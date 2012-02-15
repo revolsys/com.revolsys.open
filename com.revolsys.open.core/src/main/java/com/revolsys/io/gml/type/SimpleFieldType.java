@@ -5,14 +5,12 @@ import com.revolsys.io.xml.XmlWriter;
 
 public class SimpleFieldType extends AbstractGmlFieldType {
 
-  public SimpleFieldType(
-    DataType dataType) {
+  public SimpleFieldType(final DataType dataType) {
     super(dataType, "xs:" + dataType.getName().getLocalPart());
   }
 
-  protected void writeValueText(
-    XmlWriter out,
-    Object value) {
+  @Override
+  protected void writeValueText(final XmlWriter out, final Object value) {
     out.text(value);
   }
 }

@@ -2,7 +2,6 @@ package com.revolsys.util;
 
 import javax.annotation.PostConstruct;
 
-
 public class SetPropertyValue {
 
   private Object bean;
@@ -15,9 +14,12 @@ public class SetPropertyValue {
     return bean;
   }
 
-  public void setBean(
-    Object bean) {
-    this.bean = bean;
+  public String getPropertyName() {
+    return propertyName;
+  }
+
+  public Object getValue() {
+    return value;
   }
 
   @PostConstruct
@@ -27,21 +29,15 @@ public class SetPropertyValue {
     }
   }
 
-  public String getPropertyName() {
-    return propertyName;
+  public void setBean(final Object bean) {
+    this.bean = bean;
   }
 
-  public void setPropertyName(
-    String propertyName) {
+  public void setPropertyName(final String propertyName) {
     this.propertyName = propertyName;
   }
 
-  public Object getValue() {
-    return value;
-  }
-
-  public void setValue(
-    Object value) {
+  public void setValue(final Object value) {
     this.value = value;
   }
 

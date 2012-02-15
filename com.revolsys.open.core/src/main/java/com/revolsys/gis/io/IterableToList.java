@@ -13,8 +13,7 @@ public class IterableToList<T> implements FactoryBean {
   public IterableToList() {
   }
 
-  public IterableToList(
-    final Iterable<T> iterable) {
+  public IterableToList(final Iterable<T> iterable) {
     this.iterable = iterable;
   }
 
@@ -32,8 +31,7 @@ public class IterableToList<T> implements FactoryBean {
     return list;
   }
 
-  public Object getObject()
-    throws Exception {
+  public Object getObject() throws Exception {
     return getList();
   }
 
@@ -45,8 +43,7 @@ public class IterableToList<T> implements FactoryBean {
     return true;
   }
 
-  public void setIterable(
-    final Iterable<T> iterable) {
+  public void setIterable(final Iterable<T> iterable) {
     this.iterable = iterable;
   }
 

@@ -20,16 +20,14 @@ public class SplitCrossingEdgesVisitor<T> extends
 
   private final SplitEdgesCloseToNodeVisitor<T> splitEdgesCloseToNodeVisitor;
 
-  public SplitCrossingEdgesVisitor(
-    final Graph<T> graph) {
+  public SplitCrossingEdgesVisitor(final Graph<T> graph) {
     this.graph = graph;
     splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<T>(graph,
       CROSSING_EDGES, 1);
   }
 
   @Override
-  public void addNodeListener(
-    final NodeEventListener<T> listener) {
+  public void addNodeListener(final NodeEventListener<T> listener) {
     splitEdgesCloseToNodeVisitor.addNodeListener(listener);
   }
 
@@ -41,18 +39,15 @@ public class SplitCrossingEdgesVisitor<T> extends
     return splitEdgesCloseToNodeVisitor.getSplitObjects();
   }
 
-  public void setNewEdges(
-    final Collection<Edge<T>> newEdges) {
+  public void setNewEdges(final Collection<Edge<T>> newEdges) {
     splitEdgesCloseToNodeVisitor.setNewEdges(newEdges);
   }
 
-  public void setSplitObjects(
-    final Collection<T> splitObjects) {
+  public void setSplitObjects(final Collection<T> splitObjects) {
     splitEdgesCloseToNodeVisitor.setSplitObjects(splitObjects);
   }
 
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final EdgeQuadTree<T> edgeIndex = graph.getEdgeIndex();
     final LineString line = edge.getLine();
     final List<Edge<T>> crossings = edgeIndex.queryCrosses(line);
@@ -65,7 +60,7 @@ public class SplitCrossingEdgesVisitor<T> extends
           line, crossLine);
         if (intersection != null) {
           graph.getPrecisionModel().makePrecise(intersection);
-           final Node<T> node = graph.getNode(intersection);
+          final Node<T> node = graph.getNode(intersection);
           splitEdgesCloseToNodeVisitor.visit(node);
         }
       }

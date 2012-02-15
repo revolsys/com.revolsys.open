@@ -13,8 +13,7 @@ public class FilterDataObjectConverter {
   public FilterDataObjectConverter() {
   }
 
-  public FilterDataObjectConverter(
-    final Filter<DataObject> filter,
+  public FilterDataObjectConverter(final Filter<DataObject> filter,
     final Converter<DataObject, DataObject> converter) {
     this.filter = filter;
     this.converter = converter;

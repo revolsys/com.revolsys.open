@@ -6,12 +6,11 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 
 public class SpatialReference {
 
-  public static SpatialReference get(final GeometryFactory geometryFactory,
+  public static SpatialReference get(
+    final GeometryFactory geometryFactory,
     final String wkt) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

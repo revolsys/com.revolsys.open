@@ -20,14 +20,12 @@
  */
 package com.revolsys.ui.html.view;
 
-import java.util.Locale;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 /**
- * The HtmlUiBuilderKeyView is an {@Element} for serializing the specified key
- * on the object using a {@link HtmlUiBuilder}.
+ * The HtmlUiBuilderKeyView is an {@Element} for serializing the
+ * specified key on the object using a {@link HtmlUiBuilder}.
  * 
  * @author Paul Austin
  */
@@ -38,11 +36,22 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
   /** The key to serialize on the builder. */
   private String key;
 
-  /** The locale. */
-  private Locale locale;
-
   /** The object to serialize. */
   private Object object;
+
+  /**
+   * Constuct a new HtmlUiBuilderKeyView.
+   * 
+   * @param builder The HTML UI builder.
+   * @param object The object to serialize.
+   * @param key The key to serialize on the builder.
+   */
+  public HtmlUiBuilderKeyView(final HtmlUiBuilder builder, final Object object,
+    final String key) {
+    this.builder = builder;
+    this.object = object;
+    this.key = key;
+  }
 
   /**
    * Constuct a new HtmlUiBuilderKeyView.
@@ -55,49 +64,12 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
   }
 
   /**
-   * Constuct a new HtmlUiBuilderKeyView.
-   * 
-   * @param builder The HTML UI builder.
-   * @param object The object to serialize.
-   * @param key The key to serialize on the builder.
-   */
-  public HtmlUiBuilderKeyView(final HtmlUiBuilder builder, final Object object,
-    final String key) {
-    this(builder, object, key, Locale.getDefault());
-  }
-
-  /**
-   * Constuct a new HtmlUiBuilderKeyView.
-   * 
-   * @param builder The HTML UI builder.
-   * @param object The object to serialize.
-   * @param key The key to serialize on the builder.
-   * @param locale The locale.
-   */
-  public HtmlUiBuilderKeyView(final HtmlUiBuilder builder, final Object object,
-    final String key, final Locale locale) {
-    this.builder = builder;
-    this.object = object;
-    this.key = key;
-    this.locale = locale;
-  }
-
-  /**
    * Get the HTML UI builder.
    * 
    * @return The HTML UI builder.
    */
   public HtmlUiBuilder getBuilder() {
     return builder;
-  }
-
-  /**
-   * Set the HTML UI builder.
-   * 
-   * @param builder The HTML UI builder.
-   */
-  public void setBuilder(final HtmlUiBuilder builder) {
-    this.builder = builder;
   }
 
   /**
@@ -110,33 +82,6 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
   }
 
   /**
-   * Set the key to serialize on the builder.
-   * 
-   * @param key The key to serialize on the builder.
-   */
-  public void setKey(final String key) {
-    this.key = key;
-  }
-
-  /**
-   * get the locale.
-   * 
-   * @return The locale.
-   */
-  public Locale getLocale() {
-    return locale;
-  }
-
-  /**
-   * Set the locale.
-   * 
-   * @param locale The locale.
-   */
-  public void setLocale(final Locale locale) {
-    this.locale = locale;
-  }
-
-  /**
    * Get the object to serialize.
    * 
    * @return The object to serialize.
@@ -146,22 +91,41 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
   }
 
   /**
+   * Serialize the key on the object using the builder.
+   * 
+   * @param out The XML writer to serialize to.
+   */
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    if (object != null) {
+      builder.serialize(out, object, key);
+    }
+  }
+
+  /**
+   * Set the HTML UI builder.
+   * 
+   * @param builder The HTML UI builder.
+   */
+  public void setBuilder(final HtmlUiBuilder builder) {
+    this.builder = builder;
+  }
+
+  /**
+   * Set the key to serialize on the builder.
+   * 
+   * @param key The key to serialize on the builder.
+   */
+  public void setKey(final String key) {
+    this.key = key;
+  }
+
+  /**
    * Set the object to serialize.
    * 
    * @param object The object to serialize.
    */
   public void setObject(final Object object) {
     this.object = object;
-  }
-
-  /**
-   * Serialize the key on the object using the builder.
-   * 
-   * @param out The XML writer to serialize to.
-   */
-  public void serializeElement(final XmlWriter out) {
-    if (object != null) {
-      builder.serialize(out, object, key, locale);
-    }
   }
 }

@@ -303,6 +303,17 @@ public class BoundingBox extends Envelope {
     return Measure.valueOf(height, getCoordinateSystem().getLengthUnit());
   }
 
+  public String getId() {
+    final String string = MathUtil.toString(getMinX()) + "_"
+      + MathUtil.toString(getMinY()) + "_" + MathUtil.toString(getMaxX()) + "_"
+      + MathUtil.toString(getMaxY());
+    if (geometryFactory == null) {
+      return string;
+    } else {
+      return geometryFactory.getSRID() + "-" + string;
+    }
+  }
+
   public <Q extends Quantity> Measurable<Q> getMaximumX() {
     final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMaxX(), unit);
@@ -452,8 +463,10 @@ public class BoundingBox extends Envelope {
     return toPolygon(factory, numSegments, numSegments);
   }
 
-  public Polygon toPolygon(final GeometryFactory geometryFactory,
-    final int numX, final int numY) {
+  public Polygon toPolygon(
+    final GeometryFactory geometryFactory,
+    final int numX,
+    final int numY) {
     final double xStep = getWidth() / numX;
     final double yStep = getHeight() / numY;
     final double minX = getMinX();
@@ -512,17 +525,6 @@ public class BoundingBox extends Envelope {
     } else {
       return "SRID=" + geometryFactory.getSRID() + ";BBOX(" + getMinX() + ","
         + getMinY() + " " + getMaxX() + "," + getMaxY() + ")";
-    }
-  }
-
-  public String getId() {
-    String string = MathUtil.toString(getMinX()) + "_"
-      + MathUtil.toString(getMinY()) + "_" + MathUtil.toString(getMaxX()) + "_"
-      + MathUtil.toString(getMaxY());
-    if (geometryFactory == null) {
-      return string;
-    } else {
-      return geometryFactory.getSRID() + "-" + string;
     }
   }
 

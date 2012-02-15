@@ -12,8 +12,7 @@ public class BooleanEquals implements Equals<Object> {
     return boolean1 == boolean2;
   }
 
-  private boolean getBoolean(
-    final Object object1) {
+  private boolean getBoolean(final Object object1) {
     if (object1 == null) {
       return false;
     } else if (object1 instanceof Boolean) {
@@ -23,7 +22,6 @@ public class BooleanEquals implements Equals<Object> {
     }
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

@@ -20,7 +20,7 @@ public class CoordinateSystems {
             || authority.equals("ESRI")) {
             return EsriCoordinateSystems.getCoordinateSystem(id);
           }
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
         }
       }
     }

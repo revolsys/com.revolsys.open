@@ -66,8 +66,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
     executor.shutdown();
   }
 
-  private void executeScript(
-    final DataObject object) {
+  private void executeScript(final DataObject object) {
     try {
       final JexlContext context = new HashMapContext();
       final Map<String, Object> vars = new HashMap<String, Object>(attributes);
@@ -127,34 +126,28 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
   }
 
   @Override
-  protected void process(
-    Channel<DataObject> in,
-    DataObject object) {
-    executeScript(object);
-  }
-
-  @Override
-  protected void postRun(
-    Channel<DataObject> in) {
+  protected void postRun(final Channel<DataObject> in) {
     tasks.clear();
     if (executor != null) {
       executor.shutdownNow();
     }
   }
 
-  public void setBeanFactory(
-    final BeanFactory beanFactory)
+  @Override
+  protected void process(final Channel<DataObject> in, final DataObject object) {
+    executeScript(object);
+  }
+
+  public void setBeanFactory(final BeanFactory beanFactory)
     throws BeansException {
     attributes.putAll(ThreadSharedAttributes.getAttributes());
   }
 
-  public void setExecutor(
-    final ExecutorService executor) {
+  public void setExecutor(final ExecutorService executor) {
     this.executor = executor;
   }
 
-  public void setMaxConcurrentScripts(
-    final int maxConcurrentScripts) {
+  public void setMaxConcurrentScripts(final int maxConcurrentScripts) {
     this.maxConcurrentScripts = maxConcurrentScripts;
     if (executor == null) {
       executor = new ThreadPoolExecutor(Math.min(maxConcurrentScripts, 10),
@@ -163,8 +156,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
     }
   }
 
-  public void setParameters(
-    final Map<String, String> parameters) {
+  public void setParameters(final Map<String, String> parameters) {
     this.parameters = parameters;
     for (final Entry<String, String> param : parameters.entrySet()) {
       final String key = param.getKey();
@@ -180,8 +172,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
     }
   }
 
-  public void setScript(
-    final String script) {
+  public void setScript(final String script) {
     this.script = script;
   }
 

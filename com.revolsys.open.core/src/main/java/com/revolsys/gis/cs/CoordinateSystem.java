@@ -13,11 +13,11 @@ public interface CoordinateSystem extends Serializable {
 
   Authority getAuthority();
 
+  int getId();
+
   Unit<Length> getLengthUnit();
 
   String getName();
-
-  int getId();
 
   <Q extends Quantity> Unit<Q> getUnit();
 }

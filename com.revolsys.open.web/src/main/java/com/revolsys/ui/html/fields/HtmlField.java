@@ -33,21 +33,9 @@ public class HtmlField extends Field {
     super(name, required);
   }
 
-  public HtmlField(final String name, final String defaultValue,
-    final boolean required) {
-    this(name, required);
-    this.inputValue = defaultValue;
-  }
-
   public HtmlField(final String name, final int maxLength,
     final boolean required) {
     this(name, required);
-    this.maxLength = maxLength;
-  }
-
-  public HtmlField(final String name, final int maxLength,
-    final String defaultValue, final boolean required) {
-    this(name, defaultValue, required);
     this.maxLength = maxLength;
   }
 
@@ -59,6 +47,18 @@ public class HtmlField extends Field {
         + ") must be <= maxLength (" + minLength + ")");
     }
     this.minLength = minLength;
+  }
+
+  public HtmlField(final String name, final int maxLength,
+    final String defaultValue, final boolean required) {
+    this(name, defaultValue, required);
+    this.maxLength = maxLength;
+  }
+
+  public HtmlField(final String name, final String defaultValue,
+    final boolean required) {
+    this(name, required);
+    this.inputValue = defaultValue;
   }
 
   public String getInputValue() {
@@ -73,16 +73,18 @@ public class HtmlField extends Field {
     return minLength;
   }
 
+  @Override
   public boolean hasValue() {
     return inputValue != null && !inputValue.equals("");
   }
 
   /*
    * (non-Javadoc)
-   * 
-   * @see com.revolsys.ui.html.form.Field#initialize(com.revolsys.ui.html.form.Form,
-   *      javax.servlet.http.HttpServletRequest)
+   * @see
+   * com.revolsys.ui.html.form.Field#initialize(com.revolsys.ui.html.form.Form,
+   * javax.servlet.http.HttpServletRequest)
    */
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     form.addOnSubmit(this.getName() + "IafHtml.updateTextArea()");
     inputValue = request.getParameter(getName());
@@ -94,12 +96,13 @@ public class HtmlField extends Field {
     }
   }
 
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      int length = inputValue.length();
+      final int length = inputValue.length();
       if (length > maxLength) {
         inputValue = inputValue.substring(0, maxLength);
         addValidationError("Cannot exceed " + maxLength + " characters");
@@ -115,6 +118,37 @@ public class HtmlField extends Field {
     return valid;
   }
 
+  private void serializeBlockFormatOption(
+    final XmlWriter out,
+    final String tag,
+    final String title) {
+    out.startTag(HtmlUtil.OPTION);
+    out.attribute(HtmlUtil.ATTR_VALUE, tag);
+    out.text(title);
+    out.endTag(HtmlUtil.OPTION);
+  }
+
+  private void serializeBlockFormatToolbarList(final XmlWriter out) {
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "blockFormat");
+
+    out.startTag(HtmlUtil.SELECT);
+    out.attribute(HtmlUtil.ATTR_ON_CHANGE, getName()
+      + "IafHtml.formatBlock(this.value);this.value=''");
+    serializeBlockFormatOption(out, "", ".. Select Paragraph Format");
+    serializeBlockFormatOption(out, "<p>", "Normal");
+    serializeBlockFormatOption(out, "<h1>", "Heading 1");
+    serializeBlockFormatOption(out, "<h2>", "Heading 2");
+    serializeBlockFormatOption(out, "<h3>", "Heading 3");
+    serializeBlockFormatOption(out, "<h4>", "Heading 4");
+    serializeBlockFormatOption(out, "<h5>", "Heading 5");
+    serializeBlockFormatOption(out, "<h6>", "Heading 6");
+    out.endTag(HtmlUtil.SELECT);
+
+    out.endTag(HtmlUtil.DIV);
+  }
+
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "htmlField");
@@ -166,18 +200,6 @@ public class HtmlField extends Field {
     out.endTag(HtmlUtil.DIV);
   }
 
-  private void serializeToolbarButton(final XmlWriter out,
-    final String cssClass, final String title, final String onClick)
-    {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "button " + cssClass);
-    out.attribute(HtmlUtil.ATTR_TITLE, title);
-    out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
-    out.text("");
-    out.endTag(HtmlUtil.DIV);
-
-  }
-
   private void serializeToolbar(final XmlWriter out) {
     // Toolbar row 1
     out.startTag(HtmlUtil.DIV);
@@ -219,32 +241,17 @@ public class HtmlField extends Field {
     out.endTag(HtmlUtil.DIV);
   }
 
-  private void serializeBlockFormatToolbarList(final XmlWriter out)
-    {
+  private void serializeToolbarButton(
+    final XmlWriter out,
+    final String cssClass,
+    final String title,
+    final String onClick) {
     out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "blockFormat");
-
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ON_CHANGE, getName()
-      + "IafHtml.formatBlock(this.value);this.value=''");
-    serializeBlockFormatOption(out, "", ".. Select Paragraph Format");
-    serializeBlockFormatOption(out, "<p>", "Normal");
-    serializeBlockFormatOption(out, "<h1>", "Heading 1");
-    serializeBlockFormatOption(out, "<h2>", "Heading 2");
-    serializeBlockFormatOption(out, "<h3>", "Heading 3");
-    serializeBlockFormatOption(out, "<h4>", "Heading 4");
-    serializeBlockFormatOption(out, "<h5>", "Heading 5");
-    serializeBlockFormatOption(out, "<h6>", "Heading 6");
-    out.endTag(HtmlUtil.SELECT);
-
+    out.attribute(HtmlUtil.ATTR_CLASS, "button " + cssClass);
+    out.attribute(HtmlUtil.ATTR_TITLE, title);
+    out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
+    out.text("");
     out.endTag(HtmlUtil.DIV);
-  }
 
-  private void serializeBlockFormatOption(final XmlWriter out,
-    final String tag, final String title) {
-    out.startTag(HtmlUtil.OPTION);
-    out.attribute(HtmlUtil.ATTR_VALUE, tag);
-    out.text(title);
-    out.endTag(HtmlUtil.OPTION);
   }
 }

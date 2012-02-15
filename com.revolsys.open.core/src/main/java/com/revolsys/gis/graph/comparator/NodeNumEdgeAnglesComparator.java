@@ -8,15 +8,12 @@ public class NodeNumEdgeAnglesComparator<T> extends NodeDegreeComparator<T> {
   public NodeNumEdgeAnglesComparator() {
   }
 
-  public NodeNumEdgeAnglesComparator(
-    final boolean invert) {
+  public NodeNumEdgeAnglesComparator(final boolean invert) {
     super(invert);
   }
 
   @Override
-  public int compare(
-    final Node<T> node1,
-    final Node<T> node2) {
+  public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
     final int numAngles1 = NodeAttributes.getEdgeAngles(node1).size();
     final int numAngles2 = NodeAttributes.getEdgeAngles(node2).size();

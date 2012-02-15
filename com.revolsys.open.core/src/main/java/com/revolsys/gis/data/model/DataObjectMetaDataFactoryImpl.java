@@ -32,15 +32,13 @@ public class DataObjectMetaDataFactoryImpl implements DataObjectMetaDataFactory 
 
   private final Map<QName, DataObjectMetaData> types = new LinkedHashMap<QName, DataObjectMetaData>();
 
-  public void addMetaData(
-    final DataObjectMetaData type) {
+  public void addMetaData(final DataObjectMetaData type) {
     if (type != null) {
       types.put(type.getName(), type);
     }
   }
 
-  public DataObjectMetaData getMetaData(
-    final QName typeName) {
+  public DataObjectMetaData getMetaData(final QName typeName) {
     return types.get(typeName);
   }
 
@@ -49,14 +47,11 @@ public class DataObjectMetaDataFactoryImpl implements DataObjectMetaDataFactory 
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getProperty(
-    final String name) {
+  public <V> V getProperty(final String name) {
     return (V)properties.get(name);
   }
 
-  public void setProperty(
-    final String name,
-    final Object value) {
+  public void setProperty(final String name, final Object value) {
     properties.put(name, value);
   }
 

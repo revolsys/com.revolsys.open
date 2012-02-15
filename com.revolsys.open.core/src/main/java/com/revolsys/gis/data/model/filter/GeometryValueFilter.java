@@ -5,13 +5,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryValueFilter implements Filter<DataObject> {
-  private Geometry geometry;
+  private final Geometry geometry;
 
-  public GeometryValueFilter(DataObject object) {
+  public GeometryValueFilter(final DataObject object) {
     this(object.getGeometryValue());
   }
 
-  public GeometryValueFilter(Geometry geometry) {
+  public GeometryValueFilter(final Geometry geometry) {
     this.geometry = geometry;
   }
 

@@ -1,7 +1,6 @@
 package com.revolsys.ui.html.serializer.key;
 
 import java.math.BigDecimal;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
@@ -12,36 +11,30 @@ import com.revolsys.util.MathUtil;
  * 
  * @author Paul Austin
  */
-public class PercentKeySerializer implements KeySerializer {
+public class PercentKeySerializer extends AbstractKeySerializer {
   /** The scale to display the percent as. */
   private int scale = MathUtil.PERCENT_SCALE - 2;
 
-  /**
-   * Construct a new PercentKeySerializer.
-   */
-  public PercentKeySerializer() {
+  public PercentKeySerializer(final String name) {
+    super(name);
   }
 
   /**
    * Construct a new PercentKeySerializer.
-   * 
-   * @param displayScale The scale to display the percent as.
    */
-  public PercentKeySerializer(final int displayScale) {
+  public PercentKeySerializer(final String name, final int displayScale) {
+    super(name);
     this.scale = displayScale;
   }
 
   /**
-   * Serialize the value to the XML writer using the settings from the Locale.
+   * Serialize the value to the XML writer.
    * 
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
-   * @param key The key of the property on the object to serialize.
-   * @param locale The locale.
    */
-  public void serialize(final XmlWriter out, final Object object,
-    final String key, final Locale locale) {
-    BigDecimal value = JavaBeanUtil.getProperty(object, key);
+  public void serialize(final XmlWriter out, final Object object) {
+    final BigDecimal value = JavaBeanUtil.getProperty(object, getName());
     if (value != null) {
       out.text(MathUtil.percentToString(value, scale));
     } else {

@@ -18,31 +18,23 @@ public class Datum implements Serializable {
 
   private ToWgs84 toWgs84;
 
-  public Datum(
-    final String name,
-    final Spheroid spheroid,
+  public Datum(final String name, final Spheroid spheroid,
     final Authority authority) {
     this.name = name;
     this.spheroid = spheroid;
     this.authority = authority;
   }
 
-  public Datum(
-    final String name,
-    final Spheroid spheroid,
-    final Authority authority,
-    final boolean deprecated) {
+  public Datum(final String name, final Spheroid spheroid,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     this.spheroid = spheroid;
     this.authority = authority;
     this.deprecated = deprecated;
   }
 
-  public Datum(
-    final String name,
-    final Spheroid spheroid,
-    final ToWgs84 toWgs84,
-    final Authority authority) {
+  public Datum(final String name, final Spheroid spheroid,
+    final ToWgs84 toWgs84, final Authority authority) {
     this.name = name;
     this.spheroid = spheroid;
     this.toWgs84 = toWgs84;
@@ -50,8 +42,7 @@ public class Datum implements Serializable {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object instanceof Datum) {
       final Datum datum = (Datum)object;
       if (name == null) {

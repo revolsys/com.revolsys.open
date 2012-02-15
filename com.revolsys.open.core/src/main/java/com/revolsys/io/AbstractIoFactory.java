@@ -25,7 +25,9 @@ public abstract class AbstractIoFactory implements IoFactory {
     this.name = name;
   }
 
-  private void add(final Map<String, Set<String>> mapSet, final String key,
+  private void add(
+    final Map<String, Set<String>> mapSet,
+    final String key,
     final String value) {
     Set<String> set = mapSet.get(key);
     if (set == null) {
@@ -35,7 +37,8 @@ public abstract class AbstractIoFactory implements IoFactory {
     set.add(value);
   }
 
-  protected void addMediaTypeAndFileExtension(final String mediaType,
+  protected void addMediaTypeAndFileExtension(
+    final String mediaType,
     final String fileExtension) {
     mediaTypes.add(mediaType);
     fileExtensions.add(fileExtension);

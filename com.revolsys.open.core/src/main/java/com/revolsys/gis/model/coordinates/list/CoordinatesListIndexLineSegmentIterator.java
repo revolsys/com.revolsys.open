@@ -9,19 +9,17 @@ public class CoordinatesListIndexLineSegmentIterator implements
   Iterator<LineSegment>, Iterable<LineSegment> {
   private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
 
-  private GeometryFactory factory;
+  private final GeometryFactory factory;
 
-  private CoordinatesList points;
+  private final CoordinatesList points;
 
   private int index = -1;
 
-  public CoordinatesListIndexLineSegmentIterator(
-    final CoordinatesList points) {
+  public CoordinatesListIndexLineSegmentIterator(final CoordinatesList points) {
     this(FACTORY, points);
   }
 
-  public CoordinatesListIndexLineSegmentIterator(
-    final GeometryFactory factory,
+  public CoordinatesListIndexLineSegmentIterator(final GeometryFactory factory,
     final CoordinatesList points) {
     this.factory = factory;
     this.points = points;
@@ -37,8 +35,7 @@ public class CoordinatesListIndexLineSegmentIterator implements
 
   public LineSegment next() {
     index++;
-    return new LineSegment(factory, points.get(index),
-      points.get(index + 1));
+    return new LineSegment(factory, points.get(index), points.get(index + 1));
   }
 
   public void remove() {

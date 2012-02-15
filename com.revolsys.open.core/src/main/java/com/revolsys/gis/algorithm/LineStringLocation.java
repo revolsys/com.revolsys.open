@@ -63,9 +63,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
 
   private int segmentIndex;
 
-  public LineStringLocation(
-    final LineString line,
-    final int segmentIndex,
+  public LineStringLocation(final LineString line, final int segmentIndex,
     final double segmentFraction) {
     this.line = line;
     this.segmentIndex = segmentIndex;
@@ -87,8 +85,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    *         <code>LineStringLocation</code> is less than, equal to, or greater
    *         than the specified <code>LineStringLocation</code>
    */
-  public int compareTo(
-    final LineStringLocation other) {
+  public int compareTo(final LineStringLocation other) {
     // compare segments
     if (segmentIndex < other.segmentIndex) {
       return -1;

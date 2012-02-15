@@ -25,6 +25,17 @@ import com.revolsys.util.JavaBeanUtil;
 public class ObjectElementContainer extends ElementContainer {
   private Object object;
 
+  @Override
+  public Object getInitialValue(
+    final Field field,
+    final HttpServletRequest request) {
+    if (object != null) {
+      final String propertyName = field.getName();
+      return JavaBeanUtil.getProperty(object, propertyName);
+    }
+    return null;
+  }
+
   public Object getObject() {
     return object;
   }
@@ -33,25 +44,18 @@ public class ObjectElementContainer extends ElementContainer {
     this.object = object;
   }
 
-  public Object getInitialValue(final Field field, HttpServletRequest request) {
-    if (object != null) {
-      String propertyName = field.getName();
-      return JavaBeanUtil.getProperty(object, propertyName);
-    }
-    return null;
-  }
-
+  @Override
   public boolean validate() {
     boolean valid = true;
     if (object != null) {
-      for (Iterator fields = getFields().values().iterator(); fields.hasNext();) {
-        Field field = (Field)fields.next();
+      for (final Iterator fields = getFields().values().iterator(); fields.hasNext();) {
+        final Field field = (Field)fields.next();
         if (!field.hasValidationErrors()) {
-          String propertyName = field.getName();
-          Object value = field.getValue();
+          final String propertyName = field.getName();
+          final Object value = field.getValue();
           try {
             JavaBeanUtil.setProperty(object, propertyName, value);
-          } catch (IllegalArgumentException e) {
+          } catch (final IllegalArgumentException e) {
             field.addValidationError(e.getMessage());
             valid = false;
           }

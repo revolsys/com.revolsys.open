@@ -239,7 +239,8 @@ public abstract class XmlProcessor {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T parseObject(final XMLStreamReader parser,
+  public <T> T parseObject(
+    final XMLStreamReader parser,
     final Class<? extends T> objectClass) throws XMLStreamException,
     IOException {
     try {
@@ -357,7 +358,7 @@ public abstract class XmlProcessor {
     final QName element = parser.getName();
 
     final String tagName = element.getLocalPart();
-    QName xsiName = StaxUtils.getQNameAttribute(parser, XsiConstants.TYPE);
+    final QName xsiName = StaxUtils.getQNameAttribute(parser, XsiConstants.TYPE);
     boolean hasMapping = false;
     Class<?> objectClass = null;
     if (xsiName == null) {
@@ -367,10 +368,10 @@ public abstract class XmlProcessor {
         hasMapping = true;
       }
     } else {
-      String xsiLocalName = xsiName.getLocalPart();
-      Converter converter = typeNameConverterMap.get(xsiName);
+      final String xsiLocalName = xsiName.getLocalPart();
+      final Converter converter = typeNameConverterMap.get(xsiName);
       if (converter != null) {
-        String text = StaxUtils.getElementText(parser);
+        final String text = StaxUtils.getElementText(parser);
         return (T)converter.convert(null, text);
       } else if (tagNameClassMap.containsKey(xsiLocalName)) {
         objectClass = tagNameClassMap.get(xsiLocalName);

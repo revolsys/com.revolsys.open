@@ -5,15 +5,13 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineIntersectsFilter implements Filter<LineString> {
-  private LineString line;
+  private final LineString line;
 
-  public LineIntersectsFilter(
-    LineString line) {
+  public LineIntersectsFilter(final LineString line) {
     this.line = line;
   }
 
-  public boolean accept(
-    LineString line) {
+  public boolean accept(final LineString line) {
     return LineStringUtil.intersects(this.line, line);
   }
 }

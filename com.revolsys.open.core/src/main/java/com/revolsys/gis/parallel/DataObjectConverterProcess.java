@@ -40,12 +40,14 @@ public class DataObjectConverterProcess extends
 
   private Statistics statistics = new Statistics("Converted");
 
-  public void addTypeConverter(final QName typeName,
+  public void addTypeConverter(
+    final QName typeName,
     final Converter<DataObject, DataObject> converter) {
     typeConverterMap.put(typeName, converter);
   }
 
-  public void addTypeFilterConverter(final QName typeName,
+  public void addTypeFilterConverter(
+    final QName typeName,
     final FilterDataObjectConverter filterConverter) {
 
     Collection<FilterDataObjectConverter> converters = typeFilterConverterMap.get(typeName);
@@ -127,14 +129,16 @@ public class DataObjectConverterProcess extends
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
+  protected void postRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     super.postRun(in, out);
     statistics.disconnect();
   }
 
   @Override
-  protected void preRun(final Channel<DataObject> in,
+  protected void preRun(
+    final Channel<DataObject> in,
     final Channel<DataObject> out) {
     statistics.connect();
     if (simpleMapping != null) {
@@ -167,8 +171,10 @@ public class DataObjectConverterProcess extends
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject source) {
+  protected void process(
+    final Channel<DataObject> in,
+    final Channel<DataObject> out,
+    final DataObject source) {
     final DataObject target = convert(source);
     if (target != null) {
       out.write(target);

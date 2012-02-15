@@ -60,8 +60,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * @param extensions The file extensions.
    * @param readOnly Flag indicating if the filter can be modified.
    */
-  public ExtensionFilenameFilter(
-    final boolean readOnly,
+  public ExtensionFilenameFilter(final boolean readOnly,
     final String... extensions) {
     this(Arrays.asList(extensions), readOnly);
   }
@@ -71,8 +70,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * 
    * @param extensions The file extensions.
    */
-  public ExtensionFilenameFilter(
-    final Collection<String> extensions) {
+  public ExtensionFilenameFilter(final Collection<String> extensions) {
     addExtensions(extensions);
   }
 
@@ -82,8 +80,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * @param extensions The file extensions.
    * @param readOnly Flag indicating if the filter can be modified.
    */
-  public ExtensionFilenameFilter(
-    final Collection<String> extensions,
+  public ExtensionFilenameFilter(final Collection<String> extensions,
     final boolean readOnly) {
     addExtensions(extensions);
     this.readOnly = readOnly;
@@ -94,8 +91,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * 
    * @param extensions The file extensions.
    */
-  public ExtensionFilenameFilter(
-    final String... extensions) {
+  public ExtensionFilenameFilter(final String... extensions) {
     this(Arrays.asList(extensions));
   }
 
@@ -106,9 +102,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * @param filename The name of the file.
    * @return True if the file matched, false otherwise.
    */
-  public boolean accept(
-    final File directory,
-    final String filename) {
+  public boolean accept(final File directory, final String filename) {
     String extension = "";
     final int index = filename.lastIndexOf(".");
     if (index > -1) {
@@ -122,8 +116,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * 
    * @param extension The file extension.
    */
-  public void addExtension(
-    final String extension) {
+  public void addExtension(final String extension) {
     if (readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
@@ -135,8 +128,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * 
    * @param extensions The file extensions.
    */
-  public void addExtensions(
-    final Collection extensions) {
+  public void addExtensions(final Collection extensions) {
     if (readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
@@ -161,8 +153,7 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * 
    * @param readOnly The flag indicating if the filter can be modified.
    */
-  protected final void setReadOnly(
-    final boolean readOnly) {
+  protected final void setReadOnly(final boolean readOnly) {
     if (!readOnly && this.readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }

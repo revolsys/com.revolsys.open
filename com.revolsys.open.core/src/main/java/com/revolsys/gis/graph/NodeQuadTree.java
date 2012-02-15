@@ -8,7 +8,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
-  private Graph<T> graph;
+  private final Graph<T> graph;
 
   public NodeQuadTree(final Graph<T> graph) {
     this.graph = graph;
@@ -16,6 +16,10 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
     add(ids);
   }
 
+  @Override
+  public Coordinates getCoordinates(final Node<T> node) {
+    return node;
+  }
 
   public Envelope getEnvelope(final Node<T> node) {
     final double x = node.getX();
@@ -34,10 +38,5 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
 
   public List<Node<T>> getObjects(final List<Integer> ids) {
     return graph.getNodes(ids);
-  }
-
-  @Override
-  public Coordinates getCoordinates(Node<T> node) {
-    return node;
   }
 }

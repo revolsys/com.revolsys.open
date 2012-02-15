@@ -44,20 +44,17 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
    * @param geometry The geometry to compare the data objects to to.
    * @param distance
    */
-  public LessThanDistanceFilter(
-    final LineString geometry,
-    final double distance) {
+  public LessThanDistanceFilter(final LineString geometry, final double distance) {
     this.distance = distance;
     setGeometry(geometry);
   }
 
-  public boolean accept(
-    final Geometry geometry) {
+  public boolean accept(final Geometry geometry) {
     if (geometry.getEnvelopeInternal().intersects(envelope)) {
       double distance;
       if (geometry instanceof LineString && this.geometry instanceof LineString) {
-        LineString line1 = (LineString)geometry;
-        LineString line2 = (LineString)this.geometry;
+        final LineString line1 = (LineString)geometry;
+        final LineString line2 = (LineString)this.geometry;
 
         distance = LineStringUtil.distance(line1, line2, this.distance);
       } else {
@@ -74,6 +71,15 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
 
   }
 
+  /**
+   * Get the maximum distance the object can be from the source geometry.
+   * 
+   * @return The maximum distance the object can be from the source geometry.
+   */
+  public double getDistance() {
+    return distance;
+  }
+
   public Envelope getEnvelope() {
     return envelope;
   }
@@ -87,24 +93,13 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
     return geometry;
   }
 
-  /**
-   * Get the maximum distance the object can be from the source geometry.
-   * 
-   * @return The maximum distance the object can be from the source geometry.
-   */
-  public double getDistance() {
-    return distance;
+  public void setDistance(final double distance) {
+    this.distance = distance;
   }
 
-  public void setGeometry(
-    final Geometry geometry) {
+  public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
     this.envelope = new Envelope(geometry.getEnvelopeInternal());
     this.envelope.expandBy(distance);
-  }
-
-  public void setDistance(
-    final double distance) {
-    this.distance = distance;
   }
 }

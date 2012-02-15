@@ -9,13 +9,11 @@ import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.io.IoFactory;
 
 public interface GeometryReaderFactory extends IoFactory {
-  GeometryReader createGeometryReader(
-    final Resource resource);
+  GeometryReader createGeometryReader(final Resource resource);
 
   Set<CoordinateSystem> getCoordinateSystems();
 
   boolean isBinary();
 
-  boolean isCoordinateSystemSupported(
-    CoordinateSystem coordinateSystem);
+  boolean isCoordinateSystemSupported(CoordinateSystem coordinateSystem);
 }

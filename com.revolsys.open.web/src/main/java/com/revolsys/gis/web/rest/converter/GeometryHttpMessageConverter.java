@@ -51,8 +51,7 @@ public class GeometryHttpMessageConverter extends
   @Override
   public Geometry read(
     final Class<? extends Geometry> clazz,
-    final HttpInputMessage inputMessage)
-    throws IOException,
+    final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     final HttpHeaders headers = inputMessage.getHeaders();
     final MediaType mediaType = headers.getContentType();
@@ -70,8 +69,8 @@ public class GeometryHttpMessageConverter extends
         throw new HttpMessageNotReadableException("Cannot read data in format"
           + mediaType);
       } else {
-        final Reader<Geometry> reader = readerFactory.createGeometryReader(new InputStreamResource("geometryUpload",
-          body));
+        final Reader<Geometry> reader = readerFactory.createGeometryReader(new InputStreamResource(
+          "geometryUpload", body));
         GeometryFactory factory = geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
@@ -93,8 +92,7 @@ public class GeometryHttpMessageConverter extends
     }
   }
 
-  public void setGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -102,8 +100,7 @@ public class GeometryHttpMessageConverter extends
   public void write(
     final Geometry geometry,
     final MediaType mediaType,
-    final HttpOutputMessage outputMessage)
-    throws IOException,
+    final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     MediaType actualMediaType;
     if (mediaType == null) {

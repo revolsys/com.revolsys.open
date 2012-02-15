@@ -24,17 +24,16 @@ public class EdgeTypeNameFilter<T> implements Filter<Edge<T>> {
    * 
    * @param typeNames The list of type names to accept.
    */
-  public EdgeTypeNameFilter(
-    final Collection<QName> typeNames) {
+  public EdgeTypeNameFilter(final Collection<QName> typeNames) {
     this.typeNames = typeNames;
   }
+
   /**
    * Construct a new EdgeTypeNameFilter.
    * 
    * @param typeNames The list of type names to accept.
    */
-  public EdgeTypeNameFilter(
-    final QName... typeNames) {
+  public EdgeTypeNameFilter(final QName... typeNames) {
     this(Arrays.asList(typeNames));
   }
 
@@ -45,8 +44,7 @@ public class EdgeTypeNameFilter<T> implements Filter<Edge<T>> {
    * @param edge The edge to filter.
    * @return True if the edge has one of the type names, false otherwise.
    */
-  public boolean accept(
-    final Edge<T> edge) {
+  public boolean accept(final Edge<T> edge) {
     final QName typeName = edge.getTypeName();
     return typeNames.contains(typeName);
   }

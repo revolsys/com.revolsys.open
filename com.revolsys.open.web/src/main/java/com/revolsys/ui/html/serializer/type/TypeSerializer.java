@@ -1,7 +1,6 @@
 package com.revolsys.ui.html.serializer.type;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import com.revolsys.io.xml.XmlWriter;
 
@@ -13,12 +12,11 @@ import com.revolsys.io.xml.XmlWriter;
  */
 public interface TypeSerializer {
   /**
-   * Serialize the value to the XML writer using the settings from the Locale.
+   * Serialize the value to the XML writer.
    * 
    * @param out The XML writer to serialize to.
    * @param value The object to get the value from.
-   * @param locale The locale.
    * @throws IOException If there was an I/O error serializing the value.
    */
-  void serialize(XmlWriter out, Object value, Locale locale);
+  void serialize(XmlWriter out, Object value);
 }

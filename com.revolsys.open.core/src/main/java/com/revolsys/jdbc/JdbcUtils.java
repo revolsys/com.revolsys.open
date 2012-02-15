@@ -158,6 +158,20 @@ public final class JdbcUtils {
     }
   }
 
+  public static String getTableName(final QName typeName) {
+    if (typeName == null) {
+      return null;
+    } else {
+      final String namespaceURI = typeName.getNamespaceURI();
+      final String localPart = typeName.getLocalPart();
+      if (namespaceURI == "") {
+        return localPart;
+      } else {
+        return namespaceURI + "." + localPart;
+      }
+    }
+  }
+
   public static void lockTable(
     final Connection connection,
     final String tableName) throws SQLException {
@@ -275,7 +289,7 @@ public final class JdbcUtils {
     final Connection connection = getConnection(dataSource);
     try {
       return selectInt(connection, sql, parameters);
-    } catch (SQLException e) {
+    } catch (final SQLException e) {
       throw new RuntimeException("Unable to execute " + sql + " "
         + Arrays.toString(parameters), e);
     } finally {
@@ -448,19 +462,5 @@ public final class JdbcUtils {
 
   private JdbcUtils() {
 
-  }
-
-  public static String getTableName(final QName typeName) {
-    if (typeName == null) {
-      return null;
-    } else {
-      final String namespaceURI = typeName.getNamespaceURI();
-      final String localPart = typeName.getLocalPart();
-      if (namespaceURI == "") {
-        return localPart;
-      } else {
-        return namespaceURI + "." + localPart;
-      }
-    }
   }
 }

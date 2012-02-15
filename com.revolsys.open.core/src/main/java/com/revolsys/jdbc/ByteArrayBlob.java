@@ -12,19 +12,16 @@ public class ByteArrayBlob implements Blob {
 
   private final long contentLength;
 
-  public ByteArrayBlob(
-    final byte[] content) {
+  public ByteArrayBlob(final byte[] content) {
     this.content = content;
     this.contentLength = content.length;
   }
 
-  public void free()
-    throws SQLException {
+  public void free() throws SQLException {
     throw new UnsupportedOperationException();
   }
 
-  public InputStream getBinaryStream()
-    throws SQLException {
+  public InputStream getBinaryStream() throws SQLException {
     if (content == null) {
       return null;
     } else {
@@ -32,51 +29,36 @@ public class ByteArrayBlob implements Blob {
     }
   }
 
-  public InputStream getBinaryStream(
-    final long pos,
-    final long length)
+  public InputStream getBinaryStream(final long pos, final long length)
     throws SQLException {
     return new ByteArrayInputStream(content, (int)pos - 1, (int)length);
   }
 
-  public byte[] getBytes(
-    final long pos,
-    final int length)
-    throws SQLException {
+  public byte[] getBytes(final long pos, final int length) throws SQLException {
     final byte[] bytes = new byte[length];
     System.arraycopy(content, 0, bytes, (int)pos - 1, length);
     throw new UnsupportedOperationException();
   }
 
-  public long length()
-    throws SQLException {
+  public long length() throws SQLException {
     return contentLength;
   }
 
-  public long position(
-    final Blob pattern,
-    final long start)
+  public long position(final Blob pattern, final long start)
     throws SQLException {
     throw new UnsupportedOperationException();
   }
 
-  public long position(
-    final byte pattern[],
-    final long start)
+  public long position(final byte pattern[], final long start)
     throws SQLException {
     throw new UnsupportedOperationException();
   }
 
-  public OutputStream setBinaryStream(
-    final long pos)
-    throws SQLException {
+  public OutputStream setBinaryStream(final long pos) throws SQLException {
     throw new UnsupportedOperationException();
   }
 
-  public int setBytes(
-    final long pos,
-    final byte[] bytes)
-    throws SQLException {
+  public int setBytes(final long pos, final byte[] bytes) throws SQLException {
     throw new UnsupportedOperationException();
   }
 
@@ -84,14 +66,11 @@ public class ByteArrayBlob implements Blob {
     final long pos,
     final byte[] bytes,
     final int offset,
-    final int len)
-    throws SQLException {
+    final int len) throws SQLException {
     throw new UnsupportedOperationException();
   }
 
-  public void truncate(
-    final long len)
-    throws SQLException {
+  public void truncate(final long len) throws SQLException {
     throw new UnsupportedOperationException();
   }
 

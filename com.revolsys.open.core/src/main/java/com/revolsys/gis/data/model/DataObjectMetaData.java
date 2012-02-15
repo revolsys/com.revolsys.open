@@ -22,7 +22,6 @@ package com.revolsys.gis.data.model;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
@@ -165,6 +164,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    */
   String getIdAttributeName();
 
+  int getInstanceId();
+
   /**
    * Get the name of the object type. Names are described using a {@link QName}
    * consisting of a namespaceUri and a name.
@@ -172,8 +173,6 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @return The name.
    */
   QName getName();
-
-  int getInstanceId();
 
   /**
    * Check to see if the type has the specified attribute name.

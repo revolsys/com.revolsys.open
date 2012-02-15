@@ -32,8 +32,7 @@ public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
   }
 
   public void postProcessBeanFactory(
-    final ConfigurableListableBeanFactory beanFactory)
-    throws BeansException {
+    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();
     final String logFilePath = logFile.getAbsolutePath();
     if (localAppender != null && logFile != null) {
@@ -60,8 +59,7 @@ public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
     }
   }
 
-  public void setLogFile(
-    final File logFile) {
+  public void setLogFile(final File logFile) {
     this.logFile = logFile;
   }
 }

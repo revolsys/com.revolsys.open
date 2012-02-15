@@ -18,13 +18,13 @@ public class MenuViewController {
 
   @RequestMapping("/view/menu/{menuName}")
   public void getMenu(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    @PathVariable String menuName) throws IOException {
-    Menu menu = (Menu)request.getAttribute(menuName);
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    @PathVariable final String menuName) throws IOException {
+    final Menu menu = (Menu)request.getAttribute(menuName);
     if (menu != null) {
-      MenuElement menuElement = new MenuElement(menu, menuName);
-      OutputStream out = response.getOutputStream();
+      final MenuElement menuElement = new MenuElement(menu, menuName);
+      final OutputStream out = response.getOutputStream();
       menuElement.serialize(out);
     }
   }

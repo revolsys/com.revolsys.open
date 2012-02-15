@@ -22,8 +22,9 @@ public class DaoMethodSelectField extends SelectField {
   public DaoMethodSelectField() {
   }
 
+  @Override
   public DaoMethodSelectField clone() {
-    DaoMethodSelectField field = new DaoMethodSelectField();
+    final DaoMethodSelectField field = new DaoMethodSelectField();
     field.setName(getName());
     field.setDefaultValue(getDefaultValue());
     field.setRequired(isRequired());
@@ -35,45 +36,46 @@ public class DaoMethodSelectField extends SelectField {
     return field;
   }
 
-  public void initialize(Form form, HttpServletRequest request) {
-    try {
-      List<Object> options = (List<Object>)MethodUtils.invokeMethod(
-        dataAccessObject, methodName, methodArguments.toArray());
-      for (Object option : options) {
-        addOption(option, option.toString());
-      }
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    }
-    super.initialize(form, request);
-  }
-
   public DataAccessObject<?> getDataAccessObject() {
     return dataAccessObject;
-  }
-
-  public void setDataAccessObject(DataAccessObject<?> dataAccessObject) {
-    this.dataAccessObject = dataAccessObject;
-  }
-
-  public String getMethodName() {
-    return methodName;
-  }
-
-  public void setMethodName(String methodName) {
-    this.methodName = methodName;
   }
 
   public List<Object> getMethodArguments() {
     return methodArguments;
   }
 
-  public void setMethodArguments(List<Object> methodArguments) {
+  public String getMethodName() {
+    return methodName;
+  }
+
+  @Override
+  public void initialize(final Form form, final HttpServletRequest request) {
+    try {
+      final List<Object> options = (List<Object>)MethodUtils.invokeMethod(
+        dataAccessObject, methodName, methodArguments.toArray());
+      for (final Object option : options) {
+        addOption(option, option.toString());
+      }
+    } catch (final NoSuchMethodException e) {
+      e.printStackTrace();
+    } catch (final IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (final InvocationTargetException e) {
+      e.printStackTrace();
+    }
+    super.initialize(form, request);
+  }
+
+  public void setDataAccessObject(final DataAccessObject<?> dataAccessObject) {
+    this.dataAccessObject = dataAccessObject;
+  }
+
+  public void setMethodArguments(final List<Object> methodArguments) {
     this.methodArguments = methodArguments;
+  }
+
+  public void setMethodName(final String methodName) {
+    this.methodName = methodName;
   }
 
 }

@@ -29,6 +29,16 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
 
   public static <T> List<Edge<T>> edgesWithinDistance(
     final Graph<T> graph,
+    final Coordinates point,
+    final double maxDistance) {
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final Geometry geometry = geometryFactory.createPoint(point);
+    return edgesWithiDistance(graph, geometry, maxDistance);
+
+  }
+
+  public static <T> List<Edge<T>> edgesWithinDistance(
+    final Graph<T> graph,
     final Node<T> node,
     final double maxDistance) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
@@ -37,38 +47,26 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
     return edgesWithiDistance(graph, geometry, maxDistance);
 
   }
-  public static <T> List<Edge<T>> edgesWithinDistance(
-    final Graph<T> graph,
-    final Coordinates point,
-    final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
-    final Geometry geometry = geometryFactory.createPoint(point);
-    return edgesWithiDistance(graph, geometry, maxDistance);
 
-  }
   private final Geometry geometry;
 
   private final double maxDistance;
 
-  public EdgeWithinDistanceVisitor(
-    final Geometry geometry,
+  public EdgeWithinDistanceVisitor(final Geometry geometry,
     final double maxDistance) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
   }
 
-  public EdgeWithinDistanceVisitor(
-    final Geometry geometry,
-    final double maxDistance,
-    final Visitor<Edge<T>> matchVisitor) {
+  public EdgeWithinDistanceVisitor(final Geometry geometry,
+    final double maxDistance, final Visitor<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.geometry = geometry;
     this.maxDistance = maxDistance;
   }
 
   @Override
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final double distance = line.distance(geometry);
     if (distance <= maxDistance) {

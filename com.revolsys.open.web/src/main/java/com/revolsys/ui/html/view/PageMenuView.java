@@ -15,15 +15,15 @@
  */
 package com.revolsys.ui.html.view;
 
-import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 
 public class PageMenuView extends MenuView {
+  @Override
   public void processProperty(final String name, final Object value) {
-    String stringValue = (String)value;
+    final String stringValue = (String)value;
     if (name.equals("menuName")) {
-      WebUiContext context = WebUiContext.get();
-      setObject(((Page)context.getPage()).getMenu(stringValue));
+      final WebUiContext context = WebUiContext.get();
+      setObject(context.getPage().getMenu(stringValue));
     } else {
       super.processProperty(name, value);
     }

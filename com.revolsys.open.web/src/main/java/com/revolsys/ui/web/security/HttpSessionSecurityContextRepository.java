@@ -160,23 +160,15 @@ public class HttpSessionSecurityContextRepository implements
 
   protected final Log logger = LogFactory.getLog(this.getClass());
 
-  private Class<? extends SecurityContext> securityContextClass = null;
+  private final Class<? extends SecurityContext> securityContextClass = null;
 
-  private Object contextObject = SecurityContextHolder.createEmptyContext();
+  private final Object contextObject = SecurityContextHolder.createEmptyContext();
 
-  private boolean cloneFromHttpSession = false;
+  private final boolean cloneFromHttpSession = false;
 
   private boolean allowSessionCreation = true;
 
   private boolean disableUrlRewriting = false;
-
-  public String getSpringSecurityContextKey() {
-    return springSecurityContextKey;
-  }
-
-  public void setSpringSecurityContextKey(String springSecurityContextKey) {
-    this.springSecurityContextKey = springSecurityContextKey;
-  }
 
   private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
@@ -222,6 +214,10 @@ public class HttpSessionSecurityContextRepository implements
       ReflectionUtils.handleReflectionException(e);
     }
     return context;
+  }
+
+  public String getSpringSecurityContextKey() {
+    return springSecurityContextKey;
   }
 
   public boolean isDisableUrlRewriting() {
@@ -285,8 +281,10 @@ public class HttpSessionSecurityContextRepository implements
     return (SecurityContext)contextFromSession;
   }
 
-  public void saveContext(final SecurityContext context,
-    final HttpServletRequest request, final HttpServletResponse response) {
+  public void saveContext(
+    final SecurityContext context,
+    final HttpServletRequest request,
+    final HttpServletResponse response) {
     final SaveToSessionResponseWrapper responseWrapper = (SaveToSessionResponseWrapper)response;
     if (!responseWrapper.isContextSaved()) {
       responseWrapper.saveContext(context);
@@ -299,5 +297,9 @@ public class HttpSessionSecurityContextRepository implements
 
   public void setDisableUrlRewriting(final boolean disableUrlRewriting) {
     this.disableUrlRewriting = disableUrlRewriting;
+  }
+
+  public void setSpringSecurityContextKey(final String springSecurityContextKey) {
+    this.springSecurityContextKey = springSecurityContextKey;
   }
 }

@@ -13,21 +13,18 @@ public class UnitConverstionOperation implements CoordinatesOperation {
 
   private final Unit<?> targetUnit;
 
-  public UnitConverstionOperation(
-    final Unit<?> sourceUnit,
+  public UnitConverstionOperation(final Unit<?> sourceUnit,
     final Unit<?> targetUnit) {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
     try {
       converter = sourceUnit.getConverterToAny(targetUnit);
-    } catch (ConversionException e) {
-     throw new IllegalArgumentException(e);
+    } catch (final ConversionException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 
-  public void perform(
-    final Coordinates from,
-    final Coordinates to) {
+  public void perform(final Coordinates from, final Coordinates to) {
     final int dimension = Math.min(from.getNumAxis(), to.getNumAxis());
     for (int i = 0; i < dimension; i++) {
       final double value = from.getValue(i);

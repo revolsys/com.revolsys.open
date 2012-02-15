@@ -1,7 +1,7 @@
 package com.revolsys.util;
 
 public class Pair<A, B> {
-  public static <A, B> Pair<A, B> create(A value1, B value2) {
+  public static <A, B> Pair<A, B> create(final A value1, final B value2) {
     return new Pair<A, B>(value1, value2);
   }
 

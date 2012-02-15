@@ -42,12 +42,16 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     addQuery(new Query(typeName, query));
   }
 
-  public void addQuery(final QName typeName, final String query,
+  public void addQuery(
+    final QName typeName,
+    final String query,
     final List<Object> parameters) {
     addQuery(new Query(typeName, query, parameters));
   }
 
-  public void addQuery(final QName typeName, final String query,
+  public void addQuery(
+    final QName typeName,
+    final String query,
     final Object... parameters) {
     addQuery(typeName, query, Arrays.asList(parameters));
   }

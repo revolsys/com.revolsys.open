@@ -15,16 +15,13 @@ public class DataObjectGeometryAreaComparitor implements Comparator<DataObject> 
   public DataObjectGeometryAreaComparitor() {
   }
 
-  public DataObjectGeometryAreaComparitor(
-    final boolean decending,
+  public DataObjectGeometryAreaComparitor(final boolean decending,
     final boolean clockwise) {
     this.decending = decending;
     this.clockwise = clockwise;
   }
 
-  public int compare(
-    final DataObject object1,
-    final DataObject object2) {
+  public int compare(final DataObject object1, final DataObject object2) {
     if (object1 == object2) {
       return 0;
     }

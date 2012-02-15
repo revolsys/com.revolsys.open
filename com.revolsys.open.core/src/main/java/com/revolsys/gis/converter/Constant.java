@@ -8,13 +8,11 @@ public class Constant<T> implements Converter<T, Object> {
   public Constant() {
   }
 
-  public Constant(
-    final Object value) {
+  public Constant(final Object value) {
     this.value = value;
   }
 
-  public Object convert(
-    final T source) {
+  public Object convert(final T source) {
     return value;
   }
 }

@@ -11,8 +11,7 @@ public class PointDataObjectFilter implements Filter<DataObject> {
   private PointDataObjectFilter() {
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     return geometry instanceof Point;
   }

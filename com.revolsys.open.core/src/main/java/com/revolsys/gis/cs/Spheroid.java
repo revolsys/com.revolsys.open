@@ -26,11 +26,8 @@ public class Spheroid implements Serializable {
 
   private double semiMinorAxis;
 
-  public Spheroid(
-    final String name,
-    final double semiMajorAxis,
-    final double inverseFlattening,
-    final Authority authority) {
+  public Spheroid(final String name, final double semiMajorAxis,
+    final double inverseFlattening, final Authority authority) {
     this.name = name;
     this.semiMajorAxis = semiMajorAxis;
     this.inverseFlattening = inverseFlattening;
@@ -43,13 +40,9 @@ public class Spheroid implements Serializable {
     eccentricity = Math.sqrt(eccentricitySquared);
   }
 
-  public Spheroid(
-    final String name,
-    final double semiMajorAxis,
-    final double semiMinorAxis,
-    final double inverseFlattening,
-    final Authority authority,
-    final boolean deprecated) {
+  public Spheroid(final String name, final double semiMajorAxis,
+    final double semiMinorAxis, final double inverseFlattening,
+    final Authority authority, final boolean deprecated) {
     this.name = name;
     this.semiMajorAxis = semiMajorAxis;
     this.inverseFlattening = inverseFlattening;
@@ -72,8 +65,7 @@ public class Spheroid implements Serializable {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
       final PrecisionModel precision = new PrecisionModel(1000000);
@@ -134,8 +126,7 @@ public class Spheroid implements Serializable {
     return deprecated;
   }
 
-  public double meridianRadiusOfCurvature(
-    final double latitude) {
+  public double meridianRadiusOfCurvature(final double latitude) {
     final double er = 1.0 - eccentricitySquared * Math.sin(latitude)
       * Math.sin(latitude);
     final double el = Math.pow(er, 1.5);
@@ -143,8 +134,7 @@ public class Spheroid implements Serializable {
     return m0;
   }
 
-  public double primeVerticalRadiusOfCurvature(
-    final double latitude) {
+  public double primeVerticalRadiusOfCurvature(final double latitude) {
     final double t1 = semiMajorAxis * semiMajorAxis;
     final double t2 = t1 * Math.cos(latitude) * Math.cos(latitude);
     final double t3 = semiMinorAxis * semiMinorAxis * Math.sin(latitude)

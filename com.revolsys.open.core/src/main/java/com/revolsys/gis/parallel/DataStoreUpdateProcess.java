@@ -38,6 +38,11 @@ public class DataStoreUpdateProcess extends BaseInProcess<DataObject> {
   public DataStoreUpdateProcess() {
   }
 
+  @PreDestroy
+  public void close() {
+    dataStore.close();
+  }
+
   /**
    * Get the data store.
    * 
@@ -48,25 +53,13 @@ public class DataStoreUpdateProcess extends BaseInProcess<DataObject> {
   }
 
   /**
-   * Set the data store.
-   * 
-   * @param dataStore The data store.
-   */
-  public void setDataStore(
-    final DataObjectStore dataStore) {
-    this.dataStore = dataStore;
-  }
-
-  /**
    * Process each object from the channel
    * 
    * @param in The input channel.
    * @param object The object to process.
    */
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in, final DataObject object) {
     final DataObjectState state = object.getState();
     switch (state) {
       case New:
@@ -84,9 +77,13 @@ public class DataStoreUpdateProcess extends BaseInProcess<DataObject> {
       break;
     }
   }
-  
-  @PreDestroy
-  public void close() {
-    dataStore.close();
+
+  /**
+   * Set the data store.
+   * 
+   * @param dataStore The data store.
+   */
+  public void setDataStore(final DataObjectStore dataStore) {
+    this.dataStore = dataStore;
   }
 }

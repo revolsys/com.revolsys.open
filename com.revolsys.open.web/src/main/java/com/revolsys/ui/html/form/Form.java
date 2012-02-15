@@ -49,7 +49,7 @@ public class Form extends ElementContainer {
 
   private String cssClass = "form";
 
-  private String defaultFormTask;
+  private final String defaultFormTask;
 
   private String formTask;
 
@@ -57,13 +57,15 @@ public class Form extends ElementContainer {
 
   private String name;
 
-  private List<String> onSubmit = new ArrayList<String>();
+  private final List<String> onSubmit = new ArrayList<String>();
 
   private boolean posted = false;
 
-  private Map<String, Object> savedParameters = new HashMap<String, Object>();
+  private final Map<String, Object> savedParameters = new HashMap<String, Object>();
 
   private String title;
+
+  private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
 
   /**
    * @param name
@@ -106,10 +108,10 @@ public class Form extends ElementContainer {
   }
 
   protected Map getActionParameters(final HttpServletRequest request) {
-    Set fieldNames = getFields().keySet();
-    Map parameters = new HashMap();
-    for (Enumeration paramNames = request.getParameterNames(); paramNames.hasMoreElements();) {
-      String fieldName = (String)paramNames.nextElement();
+    final Set fieldNames = getFields().keySet();
+    final Map parameters = new HashMap();
+    for (final Enumeration paramNames = request.getParameterNames(); paramNames.hasMoreElements();) {
+      final String fieldName = (String)paramNames.nextElement();
       if (!fieldNames.contains(fieldName) && !FORM_TASK_PARAM.equals(fieldName)) {
         parameters.put(fieldName, request.getParameterValues(fieldName));
       }
@@ -117,11 +119,14 @@ public class Form extends ElementContainer {
     return parameters;
   }
 
+  @Override
   public Form getForm() {
     return this;
   }
 
-  public Object getInitialValue(final Field field,
+  @Override
+  public Object getInitialValue(
+    final Field field,
     final HttpServletRequest request) {
     return null;
   }
@@ -143,7 +148,7 @@ public class Form extends ElementContainer {
   }
 
   public <T> T getValue(final String fieldName) {
-    Field field = getField(fieldName);
+    final Field field = getField(fieldName);
     if (field != null) {
       return (T)field.getValue();
     } else {
@@ -156,7 +161,7 @@ public class Form extends ElementContainer {
   }
 
   public boolean hasValue(final String fieldName) {
-    Field field = getField(fieldName);
+    final Field field = getField(fieldName);
     if (field != null) {
       return field.hasValue();
     } else {
@@ -164,8 +169,7 @@ public class Form extends ElementContainer {
     }
   }
 
-  private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
-  
+  @Override
   public void initialize(final HttpServletRequest request) {
     if (action == null || action.trim().length() == 0) {
       action = URL_HELPER.getOriginatingRequestUri(request);
@@ -174,20 +178,20 @@ public class Form extends ElementContainer {
     // by the other fields
     formTask = request.getParameter(FORM_TASK_PARAM);
 
-    String method = request.getMethod();
+    final String method = request.getMethod();
     posted = method.equalsIgnoreCase(POST_METHOD);
     preInit(request);
     super.initialize(request);
 
-    Map<String, Field> fieldMap = getFields();
-    Collection<Field> fields = fieldMap.values();
-    for (Field field : fields) {
+    final Map<String, Field> fieldMap = getFields();
+    final Collection<Field> fields = fieldMap.values();
+    for (final Field field : fields) {
       field.initialize(this, request);
     }
-    for (Field field : fields) {
+    for (final Field field : fields) {
       field.postInit(request);
     }
-    Map parameters = getActionParameters(request);
+    final Map parameters = getActionParameters(request);
     action = UrlUtil.getUrl(action, parameters);
   }
 
@@ -201,7 +205,7 @@ public class Form extends ElementContainer {
 
   public boolean isValid() {
     boolean success = true;
-    for (Field field : getFields().values()) {
+    for (final Field field : getFields().values()) {
       success &= field.isValid();
     }
     success &= validate();
@@ -211,11 +215,12 @@ public class Form extends ElementContainer {
   protected void preInit(final HttpServletRequest request) {
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     serializeStartTag(out);
     HtmlUtil.serializeHiddenInput(out, FORM_TASK_PARAM, defaultFormTask);
-    for (Entry<String, Object> savedParam : savedParameters.entrySet()) {
-      Object value = savedParam.getValue();
+    for (final Entry<String, Object> savedParam : savedParameters.entrySet()) {
+      final Object value = savedParam.getValue();
       if (value != null) {
         HtmlUtil.serializeHiddenInput(out, savedParam.getKey(), value);
       }
@@ -241,7 +246,7 @@ public class Form extends ElementContainer {
   public void serializeStartTag(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-    String title = getTitle();
+    final String title = getTitle();
     if (title != null) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "title");
@@ -250,8 +255,8 @@ public class Form extends ElementContainer {
     }
     out.startTag(HtmlUtil.FORM);
     if (onSubmit.size() > 0) {
-      StringBuffer submitScripts = new StringBuffer();
-      for (String script : onSubmit) {
+      final StringBuffer submitScripts = new StringBuffer();
+      for (final String script : onSubmit) {
         submitScripts.append(script).append(';');
       }
       out.attribute(HtmlUtil.ATTR_ON_SUBMIT, submitScripts.toString());
@@ -277,7 +282,7 @@ public class Form extends ElementContainer {
     this.method = method;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -289,7 +294,7 @@ public class Form extends ElementContainer {
   }
 
   public void setValue(final String fieldName, final Object value) {
-    Field field = getField(fieldName);
+    final Field field = getField(fieldName);
     if (field != null) {
       field.setValue(value);
     } else {

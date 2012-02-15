@@ -33,16 +33,10 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   private final PrimeMeridian primeMeridian;
 
-  public GeographicCoordinateSystem(
-    final int id,
-    final String name,
-    final Datum datum,
-    final PrimeMeridian primeMeridian,
-    final AngularUnit angularUnit,
-    final List<Axis> axis,
-    final Area area,
-    final Authority authority,
-    final boolean deprecated) {
+  public GeographicCoordinateSystem(final int id, final String name,
+    final Datum datum, final PrimeMeridian primeMeridian,
+    final AngularUnit angularUnit, final List<Axis> axis, final Area area,
+    final Authority authority, final boolean deprecated) {
     this.id = id;
     this.name = name;
     this.datum = datum;
@@ -57,13 +51,9 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.deprecated = deprecated;
   }
 
-  public GeographicCoordinateSystem(
-    final int id,
-    final String name,
-    final Datum datum,
-    final PrimeMeridian primeMeridian,
-    final AngularUnit angularUnit,
-    final List<Axis> axis,
+  public GeographicCoordinateSystem(final int id, final String name,
+    final Datum datum, final PrimeMeridian primeMeridian,
+    final AngularUnit angularUnit, final List<Axis> axis,
     final Authority authority) {
     this.id = id;
     this.name = name;
@@ -78,8 +68,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {
@@ -118,10 +107,6 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.getFactory(this);
-  }
-
   public Authority getAuthority() {
     return authority;
   }
@@ -132,6 +117,10 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   public Datum getDatum() {
     return datum;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.getFactory(this);
   }
 
   public int getId() {

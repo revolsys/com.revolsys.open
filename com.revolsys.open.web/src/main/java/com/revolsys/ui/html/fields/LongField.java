@@ -27,6 +27,38 @@ public class LongField extends TextField {
     super(name, 10, 19, "", required);
   }
 
+  public Long getLongValue() {
+    return (Long)getValue();
+  }
+
+  /**
+   * @return Returns the maximumValue.
+   */
+  public long getMaximumValue() {
+    return maximumValue;
+  }
+
+  /**
+   * @return Returns the minimumValue.
+   */
+  public long getMinimumValue() {
+    return minimumValue;
+  }
+
+  /**
+   * @param maximumValue The maximumValue to set.
+   */
+  public void setMaximumValue(final long maximumValue) {
+    this.maximumValue = maximumValue;
+  }
+
+  /**
+   * @param minimumValue The minimumValue to set.
+   */
+  public void setMinimumValue(final long minimumValue) {
+    this.minimumValue = minimumValue;
+  }
+
   @Override
   public void setTextValue(final String value) {
     super.setTextValue(value);
@@ -46,37 +78,5 @@ public class LongField extends TextField {
     } else {
       super.setValue(null);
     }
-  }
-
-  /**
-   * @return Returns the maximumValue.
-   */
-  public long getMaximumValue() {
-    return maximumValue;
-  }
-
-  /**
-   * @param maximumValue The maximumValue to set.
-   */
-  public void setMaximumValue(final long maximumValue) {
-    this.maximumValue = maximumValue;
-  }
-
-  /**
-   * @return Returns the minimumValue.
-   */
-  public long getMinimumValue() {
-    return minimumValue;
-  }
-
-  /**
-   * @param minimumValue The minimumValue to set.
-   */
-  public void setMinimumValue(final long minimumValue) {
-    this.minimumValue = minimumValue;
-  }
-
-  public Long getLongValue() {
-    return (Long)getValue();
   }
 }

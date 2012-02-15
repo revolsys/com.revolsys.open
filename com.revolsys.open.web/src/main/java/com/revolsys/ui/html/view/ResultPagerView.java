@@ -15,13 +15,13 @@ import com.revolsys.util.UrlUtil;
  */
 public class ResultPagerView extends Element {
   /** The result pager. */
-  private ResultPager pager;
+  private final ResultPager pager;
 
   /** The base URL. */
-  private String baseUrl;
+  private final String baseUrl;
 
   /** The parameters to include in the URLs. */
-  private Map<String, Object> parameters = new HashMap<String, Object>();
+  private final Map<String, Object> parameters = new HashMap<String, Object>();
 
   /**
    * Construct a new ResultPagerView.
@@ -38,12 +38,59 @@ public class ResultPagerView extends Element {
   }
 
   /**
+   * Serialize a link to the specified page numberm title and contents.
+   * 
+   * @param out The XML Writer.
+   * @param pageNumber The page number.
+   * @param title The title of the link.
+   * @param contents The contents of the link.
+   * @throws IOException If there was an exception serializing.
+   */
+  private void pageLink(
+    final XmlWriter out,
+    final int pageNumber,
+    final String title,
+    final String contents) {
+    parameters.put("page", String.valueOf(pageNumber));
+    final String url = UrlUtil.getUrl(baseUrl, parameters);
+    out.startTag(HtmlUtil.A);
+    out.attribute(HtmlUtil.ATTR_HREF, url);
+    out.attribute(HtmlUtil.ATTR_TITLE, title);
+    out.text(contents);
+    out.endTag(HtmlUtil.A);
+  }
+
+  /**
+   * Serialize a link to the specified page numberm title and contents.
+   * 
+   * @param out The XML Writer.
+   * @param pageNumber The page number.
+   * @param title The title of the link.
+   * @param contents The contents of the link.
+   * @throws IOException If there was an exception serializing.
+   */
+  private void pageLinkSpan(
+    final XmlWriter out,
+    final int pageNumber,
+    final String title,
+    final String contents) {
+    parameters.put("page", String.valueOf(pageNumber));
+    final String url = UrlUtil.getUrl(baseUrl, parameters);
+    out.startTag(HtmlUtil.A);
+    out.attribute(HtmlUtil.ATTR_HREF, url);
+    out.attribute(HtmlUtil.ATTR_TITLE, title);
+    out.element(HtmlUtil.SPAN, contents);
+    out.endTag(HtmlUtil.A);
+  }
+
+  /**
    * Serialize the view.
    * 
    * @param out The XML Writer.
    */
+  @Override
   public final void serializeElement(final XmlWriter out) {
-    int numPages = pager.getNumPages();
+    final int numPages = pager.getNumPages();
 
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "pager");
@@ -89,10 +136,10 @@ public class ResultPagerView extends Element {
           serializePageLink(out, pageNumber);
         }
       } else {
-        int currentPageNumber = pager.getPageNumber();
-        int fromPage = Math.max(1,
+        final int currentPageNumber = pager.getPageNumber();
+        final int fromPage = Math.max(1,
           Math.min(currentPageNumber - 3, numPages - 6));
-        int toPage = Math.min(numPages, fromPage + 6);
+        final int toPage = Math.min(numPages, fromPage + 6);
         if (fromPage > 1) {
           HtmlUtil.serializeSpan(out, "pageGap", "...");
         }
@@ -134,54 +181,13 @@ public class ResultPagerView extends Element {
    * @param pageNumber The page number.
    * @throws IOException If there was an exception serializing.
    */
-  private void serializePageLink(final XmlWriter out, final int pageNumber)
-    {
-    String contents = String.valueOf(pageNumber);
-    String title = "Page " + pageNumber;
+  private void serializePageLink(final XmlWriter out, final int pageNumber) {
+    final String contents = String.valueOf(pageNumber);
+    final String title = "Page " + pageNumber;
     if (pageNumber == pager.getPageNumber()) {
       HtmlUtil.serializeSpan(out, "pageNum selected", contents);
     } else {
       pageLink(out, pageNumber, title, contents);
     }
-  }
-
-  /**
-   * Serialize a link to the specified page numberm title and contents.
-   * 
-   * @param out The XML Writer.
-   * @param pageNumber The page number.
-   * @param title The title of the link.
-   * @param contents The contents of the link.
-   * @throws IOException If there was an exception serializing.
-   */
-  private void pageLink(final XmlWriter out, final int pageNumber,
-    final String title, final String contents) {
-    parameters.put("page", String.valueOf(pageNumber));
-    String url = UrlUtil.getUrl(baseUrl, parameters);
-    out.startTag(HtmlUtil.A);
-    out.attribute(HtmlUtil.ATTR_HREF, url);
-    out.attribute(HtmlUtil.ATTR_TITLE, title);
-    out.text(contents);
-    out.endTag(HtmlUtil.A);
-  }
-
-  /**
-   * Serialize a link to the specified page numberm title and contents.
-   * 
-   * @param out The XML Writer.
-   * @param pageNumber The page number.
-   * @param title The title of the link.
-   * @param contents The contents of the link.
-   * @throws IOException If there was an exception serializing.
-   */
-  private void pageLinkSpan(final XmlWriter out, final int pageNumber,
-    final String title, final String contents) {
-    parameters.put("page", String.valueOf(pageNumber));
-    String url = UrlUtil.getUrl(baseUrl, parameters);
-    out.startTag(HtmlUtil.A);
-    out.attribute(HtmlUtil.ATTR_HREF, url);
-    out.attribute(HtmlUtil.ATTR_TITLE, title);
-    out.element(HtmlUtil.SPAN, contents);
-    out.endTag(HtmlUtil.A);
   }
 }

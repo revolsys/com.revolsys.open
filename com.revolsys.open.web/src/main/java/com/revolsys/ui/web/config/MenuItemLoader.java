@@ -18,11 +18,11 @@ package com.revolsys.ui.web.config;
 import java.util.Collection;
 
 public interface MenuItemLoader {
-  void setProperty(String name, String value);
-
   Collection getItems();
 
   String getTitle();
 
   String getUri();
+
+  void setProperty(String name, String value);
 }

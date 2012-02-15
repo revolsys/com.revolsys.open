@@ -23,7 +23,7 @@ public abstract class AbstractHttpMessageConverter<T> implements
     if (contentTypes != null) {
       for (final Object mediaTypeObject : contentTypes) {
         if (mediaTypeObject instanceof MediaType) {
-          MediaType mediaType = (MediaType)mediaTypeObject;
+          final MediaType mediaType = (MediaType)mediaTypeObject;
           mediaTypes.add(mediaType);
 
         } else if (mediaTypeObject != null) {
@@ -113,7 +113,8 @@ public abstract class AbstractHttpMessageConverter<T> implements
     }
   }
 
-  public T read(final Class<? extends T> clazz,
+  public T read(
+    final Class<? extends T> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     return null;
@@ -132,7 +133,9 @@ public abstract class AbstractHttpMessageConverter<T> implements
     return false;
   }
 
-  public void write(final T object, final MediaType contentType,
+  public void write(
+    final T object,
+    final MediaType contentType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
   }

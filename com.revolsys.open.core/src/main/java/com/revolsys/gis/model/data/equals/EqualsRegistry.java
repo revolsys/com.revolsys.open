@@ -37,9 +37,7 @@ public class EqualsRegistry implements Equals<Object> {
     register(DataObject.class, new DataObjectEquals());
   }
 
-  public boolean equals(
-    final Object object1,
-    final Object object2) {
+  public boolean equals(final Object object1, final Object object2) {
     final Set<String> exclude = Collections.emptySet();
     return equals(object1, object2, exclude);
   }
@@ -65,8 +63,7 @@ public class EqualsRegistry implements Equals<Object> {
     }
   }
 
-  public Equals<Object> getEquals(
-    final Class<?> clazz) {
+  public Equals<Object> getEquals(final Class<?> clazz) {
     if (clazz == null) {
       return DEFAULT_EQUALS;
     } else {
@@ -89,14 +86,11 @@ public class EqualsRegistry implements Equals<Object> {
     }
   }
 
-  public void register(
-    final Class<?> clazz,
-    final Equals<?> equals) {
+  public void register(final Class<?> clazz, final Equals<?> equals) {
     classEqualsMap.put(clazz, equals);
     equals.setEqualsRegistry(this);
   }
 
-  public void setEqualsRegistry(
-    EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

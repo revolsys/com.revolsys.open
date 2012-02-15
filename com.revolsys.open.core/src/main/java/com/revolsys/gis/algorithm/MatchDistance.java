@@ -29,9 +29,7 @@ public final class MatchDistance {
    * @param b
    * @return
    */
-  public static double maxDistance(
-    final LineString a,
-    final LineString b) {
+  public static double maxDistance(final LineString a, final LineString b) {
     return VertexHausdorffDistance.distance(a, b);
   }
 
@@ -163,9 +161,7 @@ public final class MatchDistance {
    * @return
    * @see MaximalNearestSubline
    */
-  public static double trimmedDistance(
-    final LineString a,
-    final LineString b) {
+  public static double trimmedDistance(final LineString a, final LineString b) {
     final LineString trimA = MaximalNearestSubline.getMaximalNearestSubline(a,
       b);
     final LineString trimB = MaximalNearestSubline.getMaximalNearestSubline(b,

@@ -11,8 +11,7 @@ public class DataObjectJexlContext implements JexlContext {
   public DataObjectJexlContext() {
   }
 
-  public DataObjectJexlContext(
-    final DataObject object) {
+  public DataObjectJexlContext(final DataObject object) {
     this.map.setObject(object);
   }
 
@@ -20,13 +19,11 @@ public class DataObjectJexlContext implements JexlContext {
     return map;
   }
 
-  public void setObject(
-    final DataObject object) {
+  public void setObject(final DataObject object) {
     this.map.setObject(object);
   }
 
-  public void setVars(
-    final Map map) {
+  public void setVars(final Map map) {
     this.map.putAll(map);
   }
 }

@@ -7,16 +7,36 @@ import java.util.Map;
 
 public class AbstractDocumentedObject {
 
-  private Map<Locale, DocInfo> documentationByLocale = new LinkedHashMap<Locale, DocInfo>();
+  private final Map<Locale, DocInfo> documentationByLocale = new LinkedHashMap<Locale, DocInfo>();
 
-  private Map<String, Map<String, DocInfo>> documentationByLanguageAndCountry = new LinkedHashMap<String, Map<String, DocInfo>>();
+  private final Map<String, Map<String, DocInfo>> documentationByLanguageAndCountry = new LinkedHashMap<String, Map<String, DocInfo>>();
 
   public AbstractDocumentedObject() {
   }
 
-  public AbstractDocumentedObject(AbstractDocumentedObject docObject) {
-    for (DocInfo docInfo : docObject.getDocumentation()) {
+  public AbstractDocumentedObject(final AbstractDocumentedObject docObject) {
+    for (final DocInfo docInfo : docObject.getDocumentation()) {
       addDocumentation(docInfo.clone());
+    }
+  }
+
+  public void addDocumentation(final DocInfo documentation) {
+    final Locale locale = documentation.getLocale();
+    documentationByLocale.put(locale, documentation);
+    if (locale != null) {
+      final String language = locale.getLanguage();
+      final Map<String, DocInfo> documentationByCountry = getDocumentationByLanguage(language);
+      final String country = locale.getCountry();
+      documentationByCountry.put(country, documentation);
+    }
+  }
+
+  public String getDescription() {
+    final DocInfo docInfo = documentationByLocale.get(null);
+    if (docInfo == null) {
+      return null;
+    } else {
+      return docInfo.getDescription();
     }
   }
 
@@ -24,18 +44,7 @@ public class AbstractDocumentedObject {
     return documentationByLocale.values();
   }
 
-  public void addDocumentation(DocInfo documentation) {
-    Locale locale = documentation.getLocale();
-    documentationByLocale.put(locale, documentation);
-    if (locale != null) {
-      String language = locale.getLanguage();
-      Map<String, DocInfo> documentationByCountry = getDocumentationByLanguage(language);
-      String country = locale.getCountry();
-      documentationByCountry.put(country, documentation);
-    }
-  }
-
-  public Map<String, DocInfo> getDocumentationByLanguage(String language) {
+  public Map<String, DocInfo> getDocumentationByLanguage(final String language) {
     Map<String, DocInfo> documentationByCountry = documentationByLanguageAndCountry.get(language);
     if (documentationByCountry == null) {
       documentationByCountry = new LinkedHashMap<String, DocInfo>();
@@ -44,18 +53,8 @@ public class AbstractDocumentedObject {
     return documentationByCountry;
   }
 
-  protected void setTitle(String title) {
-    DocInfo docInfo = documentationByLocale.get(null);
-    if (docInfo == null) {
-      docInfo = new DocInfo(title);
-      addDocumentation(docInfo);
-    } else {
-      docInfo.setTitle(title);
-    }
-  }
-
   public String getTitle() {
-    DocInfo docInfo = documentationByLocale.get(null);
+    final DocInfo docInfo = documentationByLocale.get(null);
     if (docInfo == null) {
       return null;
     } else {
@@ -63,7 +62,7 @@ public class AbstractDocumentedObject {
     }
   }
 
-  protected void setDescription(String description) {
+  protected void setDescription(final String description) {
     DocInfo docInfo = documentationByLocale.get(null);
     if (docInfo == null) {
       docInfo = new DocInfo(null, description);
@@ -73,12 +72,13 @@ public class AbstractDocumentedObject {
     }
   }
 
-  public String getDescription() {
+  protected void setTitle(final String title) {
     DocInfo docInfo = documentationByLocale.get(null);
     if (docInfo == null) {
-      return null;
+      docInfo = new DocInfo(title);
+      addDocumentation(docInfo);
     } else {
-      return docInfo.getDescription();
+      docInfo.setTitle(title);
     }
   }
 }

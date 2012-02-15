@@ -23,7 +23,5 @@ package com.revolsys.gis.model.data.validator;
 import com.revolsys.gis.data.model.Attribute;
 
 public interface AttributeValueValidator {
-  boolean isValid(
-    Attribute attributeDefinition,
-    Object value);
+  boolean isValid(Attribute attributeDefinition, Object value);
 }

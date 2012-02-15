@@ -30,7 +30,7 @@ public class AndFilter<T> implements Filter<T> {
     return true;
   }
 
-  public void addFilter(Filter<T> filter) {
+  public void addFilter(final Filter<T> filter) {
     filters.add(filter);
   }
 

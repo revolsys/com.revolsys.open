@@ -14,22 +14,19 @@ public class UriFieldType extends AbstractEcsvFieldType {
 
   }
 
-  public void writeValue(
-    final PrintWriter out,
-    final Object value) {
-    StringFieldType.writeQuotedString(out, value);
-  }
-
-  public Object parseValue(
-    String text) {
+  public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
-       try {
-      return new URI(text);
-    } catch (URISyntaxException e) {
-      throw new IllegalArgumentException(text + " is not a valid URI", e);
-    }
+      try {
+        return new URI(text);
+      } catch (final URISyntaxException e) {
+        throw new IllegalArgumentException(text + " is not a valid URI", e);
+      }
     } else {
       return null;
     }
+  }
+
+  public void writeValue(final PrintWriter out, final Object value) {
+    StringFieldType.writeQuotedString(out, value);
   }
 }

@@ -19,11 +19,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class Parameter {
-  private String name;
+  private final String name;
 
   private Object value;
 
-  private Class type;
+  private final Class type;
 
   public Parameter(final String name, final String value) {
     this(name, value, String.class);
@@ -37,22 +37,22 @@ public class Parameter {
     } else {
 
       try {
-        Constructor constructor = type.getConstructor(new Class[] {
+        final Constructor constructor = type.getConstructor(new Class[] {
           String.class
         });
         this.value = constructor.newInstance(new Object[] {
           value
         });
-      } catch (NoSuchMethodException e) {
+      } catch (final NoSuchMethodException e) {
         throw new IllegalArgumentException(
           type.getName()
             + " must have a constructor that takes a java.lang.String as an argument");
-      } catch (InstantiationException e) {
+      } catch (final InstantiationException e) {
         throw new RuntimeException(e.getMessage(), e);
-      } catch (IllegalAccessException e) {
+      } catch (final IllegalAccessException e) {
         throw new RuntimeException(e.getMessage(), e);
-      } catch (InvocationTargetException e) {
-        Throwable t = e.getTargetException();
+      } catch (final InvocationTargetException e) {
+        final Throwable t = e.getTargetException();
         if (t instanceof RuntimeException) {
           throw (RuntimeException)t;
         } else if (t instanceof Error) {

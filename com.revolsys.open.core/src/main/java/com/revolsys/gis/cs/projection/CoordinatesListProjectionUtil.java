@@ -9,7 +9,7 @@ public class CoordinatesListProjectionUtil {
 
   public static CoordinatesList perform(
     final CoordinatesList coordinates,
-    CoordinatesOperation operation) {
+    final CoordinatesOperation operation) {
     final int dimension = coordinates.getDimension();
     final int size = coordinates.size();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
@@ -30,7 +30,7 @@ public class CoordinatesListProjectionUtil {
     final CoordinatesList coordinates,
     final CoordinateSystem fromCoordinateSystem,
     final CoordinateSystem toCoordinateSystem) {
-    CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
+    final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
       fromCoordinateSystem, toCoordinateSystem);
     return perform(coordinates, operation);
   }

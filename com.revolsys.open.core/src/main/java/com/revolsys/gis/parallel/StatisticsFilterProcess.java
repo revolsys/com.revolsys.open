@@ -40,28 +40,24 @@ public class StatisticsFilterProcess extends FilterProcess<DataObject> {
   }
 
   @Override
-  protected void postAccept(
-    final DataObject object) {
+  protected void postAccept(final DataObject object) {
     if (acceptStatistics != null) {
       acceptStatistics.add(object);
     }
   }
 
   @Override
-  protected void postReject(
-    final DataObject object) {
+  protected void postReject(final DataObject object) {
     if (rejectStatistics != null) {
       rejectStatistics.add(object);
     }
   }
 
-  public void setAcceptStatistics(
-    final Statistics acceptStatistics) {
+  public void setAcceptStatistics(final Statistics acceptStatistics) {
     this.acceptStatistics = acceptStatistics;
   }
 
-  public void setRejectStatistics(
-    final Statistics rejectStatistics) {
+  public void setRejectStatistics(final Statistics rejectStatistics) {
     this.rejectStatistics = rejectStatistics;
   }
 

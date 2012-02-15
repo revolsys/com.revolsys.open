@@ -5,27 +5,28 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.decorator.Decorator;
 
 public class IFrame extends Element {
-  private String src;
+  private final String src;
 
   private String cssClass;
 
-  public IFrame(String src) {
+  public IFrame(final String src) {
     this.src = src;
   }
 
-  public IFrame(String src, Decorator decorator) {
+  public IFrame(final String src, final Decorator decorator) {
     this.src = src;
     setDecorator(decorator);
   }
 
-  public IFrame(String src, String cssClass, Decorator decorator) {
+  public IFrame(final String src, final String cssClass,
+    final Decorator decorator) {
     this.src = src;
     this.cssClass = cssClass;
     setDecorator(decorator);
   }
 
   @Override
-  public void serializeElement(XmlWriter out) {
+  public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.IFRAME);
     out.attribute(HtmlUtil.ATTR_SRC, src);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);

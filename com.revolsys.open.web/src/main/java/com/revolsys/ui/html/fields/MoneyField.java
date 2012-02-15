@@ -22,6 +22,7 @@ public class MoneyField extends BigDecimalField {
     super(name, 2, required);
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.write("$ ");
     super.serializeElement(out);

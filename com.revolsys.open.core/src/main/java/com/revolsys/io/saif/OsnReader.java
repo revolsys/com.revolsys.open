@@ -41,11 +41,8 @@ public class OsnReader implements DataObjectReader {
 
   private ZipFile zipFile;
 
-  public OsnReader(
-    final DataObjectMetaDataFactory metaDataFactory,
-    final File directory,
-    final String fileName,
-    final int srid)
+  public OsnReader(final DataObjectMetaDataFactory metaDataFactory,
+    final File directory, final String fileName, final int srid)
     throws IOException {
     this.metaDataFactory = metaDataFactory;
     this.directory = directory;
@@ -54,11 +51,8 @@ public class OsnReader implements DataObjectReader {
     open();
   }
 
-  public OsnReader(
-    final DataObjectMetaDataFactory metaDataFactory,
-    final ZipFile zipFile,
-    final String fileName,
-    final int srid)
+  public OsnReader(final DataObjectMetaDataFactory metaDataFactory,
+    final ZipFile zipFile, final String fileName, final int srid)
     throws IOException {
     this.metaDataFactory = metaDataFactory;
     this.fileName = fileName;
@@ -76,8 +70,7 @@ public class OsnReader implements DataObjectReader {
    * @return The attribute definition.
    * @throws IOException If an I/O error occurs.
    */
-  private void addAttribute(
-    final DataObject dataObject) {
+  private void addAttribute(final DataObject dataObject) {
     if (osnIterator.getEventType() != OsnIterator.START_ATTRIBUTE) {
       if (osnIterator.next() != OsnIterator.START_ATTRIBUTE) {
         osnIterator.throwParseError("Excepecting an attribute name");
@@ -161,10 +154,6 @@ public class OsnReader implements DataObjectReader {
     return metaDataFactory;
   }
 
-  public String toString() {
-    return fileName;
-  }
-
   public boolean hasNext() {
     if (nextChecked) {
       return true;
@@ -237,8 +226,7 @@ public class OsnReader implements DataObjectReader {
   /**
    * @param factory the factory to set
    */
-  public void setFactory(
-    final DataObjectFactory factory) {
+  public void setFactory(final DataObjectFactory factory) {
     this.factory = factory;
   }
 
@@ -248,8 +236,7 @@ public class OsnReader implements DataObjectReader {
    * @return True if an object was found.
    * @throws IOException If an I/O error occurs.
    */
-  private boolean skipToFirstDataObject()
-    throws IOException {
+  private boolean skipToFirstDataObject() throws IOException {
     if (osnIterator.next() == OsnIterator.START_DEFINITION) {
       final QName typeName = osnIterator.getQNameValue();
       final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)metaDataFactory.getMetaData(typeName);
@@ -282,5 +269,10 @@ public class OsnReader implements DataObjectReader {
       osnIterator.throwParseError("Expecting a start of an object definition");
     }
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return fileName;
   }
 }

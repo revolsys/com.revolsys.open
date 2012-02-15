@@ -14,7 +14,9 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class NoOp {
 
-  public static void equals(final Coordinate point, final double x,
+  public static void equals(
+    final Coordinate point,
+    final double x,
     final double y) {
     final Coordinate coordinate2 = new Coordinate(x, y);
     if (point.equals2D(coordinate2)) {
@@ -22,27 +24,50 @@ public class NoOp {
     }
   }
 
-  public static void equals(final Coordinates coordinates1End,
+  public static void equals(
+    final Coordinates coordinates1End,
     final double... coordinates) {
     if (coordinates1End.equals(coordinates)) {
       noOp();
     }
   }
 
-  public static void equals(final DataObject object, final Double x,
+  public static void equals(
+    final DataObject object,
+    final double x,
+    final double y) {
+    equals(object.getGeometryValue(), x, y);
+  }
+
+  public static void equals(
+    final DataObject object,
+    final Double x,
     final Double y) {
     equals(object.getGeometryValue(), x, y);
   }
 
-  public static void equals(final DataObject object, final double x,
-    final double y) {
-    equals(object.getGeometryValue(), x, y);
-  }
-
-  public static void equals(final Geometry geometry, final double x,
+  public static void equals(
+    final Geometry geometry,
+    final double x,
     final double y) {
     final Coordinate coordinate1 = geometry.getCoordinate();
     equals(coordinate1, x, y);
+  }
+
+  public static boolean equals(
+    final LineString line,
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    if (points.get(0).equals(x1, y1)
+      && points.get(points.size() - 1).equals(x2, y2)) {
+      noOp();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public static void equals(final Object object1, final Object object2) {
@@ -81,6 +106,12 @@ public class NoOp {
     }
   }
 
+  public static void nan(final double value) {
+    if (Double.isNaN(value)) {
+      noOp();
+    }
+  }
+
   public static void noOp() {
   }
 
@@ -96,24 +127,6 @@ public class NoOp {
 
   public static void zeroLegthLine(final LineString line) {
     if (line.getLength() == 0) {
-      noOp();
-    }
-  }
-
-  public static boolean equals(LineString line, double x1, double y1,
-    double x2, double y2) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    if (points.get(0).equals(x1, y1)
-      && points.get(points.size() - 1).equals(x2, y2)) {
-      noOp();
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  public static void nan(double value) {
-    if (Double.isNaN(value)) {
       noOp();
     }
   }

@@ -9,15 +9,22 @@ import com.revolsys.collection.ResultPager;
 public interface DataAccessObject<T> {
   void clearCache();
 
-  ResultPager<T> page(final Map<String, Object> where,
-    final Map<String, Boolean> orderBy);
-
-  <V> List<V> list(final String propertyName, final Map<String, Object> where,
-    final Map<String, Boolean> orderBy);
+  T createInstance();
 
   void evict(T object);
 
   void flush();
+
+  <V> List<V> list(
+    final String propertyName,
+    final Map<String, Object> where,
+    final Map<String, Boolean> orderBy);
+
+  List<String> list(
+    String propertyName,
+    Map<String, Object> where,
+    Map<String, Boolean> order,
+    int limit);
 
   T load(long id);
 
@@ -29,6 +36,10 @@ public interface DataAccessObject<T> {
 
   void merge(T object);
 
+  ResultPager<T> page(
+    final Map<String, Object> where,
+    final Map<String, Boolean> orderBy);
+
   void persist(T object);
 
   void refresh(T object);
@@ -36,9 +47,4 @@ public interface DataAccessObject<T> {
   void remove(T object);
 
   void removeAll(Collection<T> objects);
-
-  T createInstance();
-
-  List<String> list(String propertyName, Map<String, Object> where,
-    Map<String, Boolean> order, int limit);
 }

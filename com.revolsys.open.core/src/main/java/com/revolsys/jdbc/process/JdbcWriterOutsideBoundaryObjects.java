@@ -17,7 +17,7 @@ public class JdbcWriterOutsideBoundaryObjects extends OutsideBoundaryObjects {
     return writer;
   }
 
-  public void setWriter(JdbcWriter writer) {
+  public void setWriter(final JdbcWriter writer) {
     this.writer = writer;
   }
 

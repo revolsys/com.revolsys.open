@@ -59,7 +59,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
   public synchronized void init() {
     if (!initialized) {
       initialized = true;
-         doInit();
+      doInit();
     }
   }
 

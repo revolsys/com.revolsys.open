@@ -28,13 +28,11 @@ public class DataObjectGeometryEquals2DExactFilter implements
   Filter<DataObject> {
   private final Geometry geometry;
 
-  public DataObjectGeometryEquals2DExactFilter(
-    final Geometry geometry) {
+  public DataObjectGeometryEquals2DExactFilter(final Geometry geometry) {
     this.geometry = geometry;
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
     if (geometry.equalsExact(matchGeometry)) {
       return true;

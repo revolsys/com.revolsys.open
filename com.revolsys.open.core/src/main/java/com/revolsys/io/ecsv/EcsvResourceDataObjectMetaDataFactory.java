@@ -20,40 +20,40 @@ public class EcsvResourceDataObjectMetaDataFactory extends
   AbstractObjectWithProperties implements ApplicationContextAware,
   DataObjectMetaDataFactory {
 
-  private Map<QName, DataObjectMetaData> metaDataMap = new HashMap<QName, DataObjectMetaData>();
+  private final Map<QName, DataObjectMetaData> metaDataMap = new HashMap<QName, DataObjectMetaData>();
 
   private String locationPattern;
 
   private ApplicationContext applicationContext;
 
+  public String getLocationPattern() {
+    return locationPattern;
+  }
+
+  public DataObjectMetaData getMetaData(final QName typeName) {
+    return metaDataMap.get(typeName);
+  }
+
   @PostConstruct
   public void init() {
     try {
-      for (Resource resource : applicationContext.getResources(locationPattern)) {
-        DataObjectMetaData metaData = EcsvIoFactory.readSchema(resource);
+      for (final Resource resource : applicationContext.getResources(locationPattern)) {
+        final DataObjectMetaData metaData = EcsvIoFactory.readSchema(resource);
         final QName name = metaData.getName();
         metaDataMap.put(name, metaData);
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to get resources for "
         + locationPattern);
     }
   }
 
-  public DataObjectMetaData getMetaData(QName typeName) {
-    return metaDataMap.get(typeName);
-  }
-
-  public String getLocationPattern() {
-    return locationPattern;
-  }
-
-  public void setLocationPattern(String locationPattern) {
-    this.locationPattern = locationPattern;
-  }
-
-  public void setApplicationContext(ApplicationContext applicationContext)
+  public void setApplicationContext(final ApplicationContext applicationContext)
     throws BeansException {
     this.applicationContext = applicationContext;
+  }
+
+  public void setLocationPattern(final String locationPattern) {
+    this.locationPattern = locationPattern;
   }
 }

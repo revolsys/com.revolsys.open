@@ -9,8 +9,9 @@ public class EnumerationSelectField extends SelectField {
   public EnumerationSelectField() {
   }
 
+  @Override
   public EnumerationSelectField clone() {
-    EnumerationSelectField field = new EnumerationSelectField();
+    final EnumerationSelectField field = new EnumerationSelectField();
     field.setName(getName());
     field.setDefaultValue(getDefaultValue());
     field.setRequired(isRequired());
@@ -24,12 +25,12 @@ public class EnumerationSelectField extends SelectField {
     return enumClass;
   }
 
-  public void setEnumClass(Class<? extends Enum<?>> enumClass) {
+  public void setEnumClass(final Class<? extends Enum<?>> enumClass) {
     this.enumClass = enumClass;
-    Enum<?>[] enumConstants = enumClass.getEnumConstants();
-    for (Enum<?> enumValue : enumConstants) {
-      String name = enumValue.name();
-      String label = CaseConverter.toCapitalizedWords(name);
+    final Enum<?>[] enumConstants = enumClass.getEnumConstants();
+    for (final Enum<?> enumValue : enumConstants) {
+      final String name = enumValue.name();
+      final String label = CaseConverter.toCapitalizedWords(name);
       addOption(enumValue, label);
     }
   }

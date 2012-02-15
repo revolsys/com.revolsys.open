@@ -33,15 +33,13 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
 
   private final Visitor<Edge<T>> matchVisitor;
 
-  public EdgeIntersectsLinearlyEdgeVisitor(
-    final Edge<T> edge,
+  public EdgeIntersectsLinearlyEdgeVisitor(final Edge<T> edge,
     final Visitor<Edge<T>> matchVisitor) {
     this.edge = edge;
     this.matchVisitor = matchVisitor;
   }
 
-  public boolean visit(
-    final Edge<T> edge2) {
+  public boolean visit(final Edge<T> edge2) {
     if (edge2 != edge) {
       final LineString line1 = edge.getLine();
       final LineString line2 = edge2.getLine();

@@ -14,7 +14,6 @@ public class ObjectEquals implements Equals<Object> {
     }
   }
 
-  public void setEqualsRegistry(
-    final EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

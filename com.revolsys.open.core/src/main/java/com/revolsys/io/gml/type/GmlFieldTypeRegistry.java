@@ -10,7 +10,7 @@ public class GmlFieldTypeRegistry {
 
   public static final GmlFieldTypeRegistry INSTANCE = new GmlFieldTypeRegistry();
 
-  private Map<DataType, GmlFieldType> typeMapping = new HashMap<DataType, GmlFieldType>();
+  private final Map<DataType, GmlFieldType> typeMapping = new HashMap<DataType, GmlFieldType>();
 
   public GmlFieldTypeRegistry() {
     addFieldType(new SimpleFieldType(DataTypes.ANY_URI));
@@ -34,20 +34,16 @@ public class GmlFieldTypeRegistry {
     addFieldType(new GmlGeometryFieldType(DataTypes.POLYGON));
   }
 
-  public void addFieldType(
-    final GmlFieldType fieldType) {
+  public void addFieldType(final DataType dataType, final GmlFieldType fieldType) {
+    typeMapping.put(dataType, fieldType);
+  }
+
+  public void addFieldType(final GmlFieldType fieldType) {
     final DataType dataType = fieldType.getDataType();
     addFieldType(dataType, fieldType);
   }
 
-  public void addFieldType(
-    final DataType dataType,
-    final GmlFieldType fieldType) {
-    typeMapping.put(dataType, fieldType);
-  }
-
-  public GmlFieldType getFieldType(
-    DataType dataType) {
+  public GmlFieldType getFieldType(final DataType dataType) {
     return typeMapping.get(dataType);
   }
 }

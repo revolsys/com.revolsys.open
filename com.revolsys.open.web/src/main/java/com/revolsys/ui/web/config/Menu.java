@@ -23,9 +23,9 @@ import java.util.Map;
 
 public class Menu extends MenuItem {
 
-  private ArrayList<MenuItem> items = new ArrayList<MenuItem>();
+  private final ArrayList<MenuItem> items = new ArrayList<MenuItem>();
 
-  private Map<String,MenuItem> itemMap = new HashMap<String,MenuItem>();
+  private final Map<String, MenuItem> itemMap = new HashMap<String, MenuItem>();
 
   public Menu() {
   }
@@ -37,31 +37,19 @@ public class Menu extends MenuItem {
 
   public void addMenuItem(final MenuItem menuItem) {
     items.add(menuItem);
-    String menuName = menuItem.getName();
+    final String menuName = menuItem.getName();
     if (menuName != null) {
       itemMap.put(menuName, menuItem);
     }
-  }
-
-  public Collection<MenuItem> getItems() {
-    return items;
-  }
-
-  public Map<String,MenuItem> getNamedItems() {
-    return itemMap;
-  }
-
-  public MenuItem getItem(final String name) {
-    return (MenuItem)itemMap.get(name);
   }
 
   public boolean contains(final String name) {
     if (this.getName().equals(name)) {
       return true;
     }
-    Iterator i = getItems().iterator();
+    final Iterator i = getItems().iterator();
     while (i.hasNext()) {
-      Menu m = (Menu)i.next();
+      final Menu m = (Menu)i.next();
       if (m.contains(name)) {
         return true;
       }
@@ -70,11 +58,11 @@ public class Menu extends MenuItem {
   }
 
   public MenuItem findHighlighted(final String name) {
-    Iterator i = getItems().iterator();
+    final Iterator i = getItems().iterator();
     while (i.hasNext()) {
-      MenuItem item = (MenuItem)i.next();
+      final MenuItem item = (MenuItem)i.next();
       if (item instanceof Menu) {
-        Menu menu = (Menu)item;
+        final Menu menu = (Menu)item;
         if (menu.contains(name)) {
           return menu;
         }
@@ -87,11 +75,11 @@ public class Menu extends MenuItem {
     if (this.getName().equals(name)) {
       return this;
     }
-    Iterator i = getItems().iterator();
+    final Iterator i = getItems().iterator();
     while (i.hasNext()) {
-      MenuItem item = (MenuItem)i.next();
+      final MenuItem item = (MenuItem)i.next();
       if (item instanceof Menu) {
-        MenuItem menu = ((Menu)item).findSelected(name);
+        final MenuItem menu = ((Menu)item).findSelected(name);
         if (menu != null) {
           return menu;
         }
@@ -101,4 +89,16 @@ public class Menu extends MenuItem {
     }
     return null;
   }
- }
+
+  public MenuItem getItem(final String name) {
+    return itemMap.get(name);
+  }
+
+  public Collection<MenuItem> getItems() {
+    return items;
+  }
+
+  public Map<String, MenuItem> getNamedItems() {
+    return itemMap;
+  }
+}

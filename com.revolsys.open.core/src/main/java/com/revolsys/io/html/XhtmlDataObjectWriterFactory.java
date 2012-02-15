@@ -18,8 +18,11 @@ public class XhtmlDataObjectWriterFactory extends
     addMediaTypeAndFileExtension("application/xhtml+xml", "html");
   }
 
-  public Writer<DataObject> createDataObjectWriter(String baseName,
-    DataObjectMetaData metaData, OutputStream outputStream, Charset charset) {
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
+    final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
     return new XhtmlDataObjectWriter(metaData, writer);

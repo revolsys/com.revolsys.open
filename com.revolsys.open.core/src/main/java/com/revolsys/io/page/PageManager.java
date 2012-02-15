@@ -2,19 +2,19 @@ package com.revolsys.io.page;
 
 public interface PageManager {
 
-  Page getPage(int index);
-
-  int getNumPages();
-
   Page createPage();
-
-  int getPageSize();
 
   Page createTempPage();
 
-  void write(Page page);
+  int getNumPages();
+
+  Page getPage(int index);
+
+  int getPageSize();
+
+  void releasePage(Page page);
 
   void removePage(Page page);
-  
-  void releasePage(Page page);
+
+  void write(Page page);
 }

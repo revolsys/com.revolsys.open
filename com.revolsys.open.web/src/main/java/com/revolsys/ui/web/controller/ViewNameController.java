@@ -16,13 +16,11 @@ public class ViewNameController implements Controller {
 
   public ModelAndView handleRequest(
     final HttpServletRequest request,
-    final HttpServletResponse response)
-    throws Exception {
+    final HttpServletResponse response) throws Exception {
     return new ModelAndView(viewName);
   }
 
-  public void setViewName(
-    final String viewName) {
+  public void setViewName(final String viewName) {
     this.viewName = viewName;
   }
 

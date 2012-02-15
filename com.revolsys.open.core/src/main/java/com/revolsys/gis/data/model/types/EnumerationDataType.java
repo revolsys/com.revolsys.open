@@ -8,9 +8,7 @@ public class EnumerationDataType extends SimpleDataType {
 
   private final Set<String> allowedValues;
 
-  public EnumerationDataType(
-    final QName name,
-    final Class<?> javaClass,
+  public EnumerationDataType(final QName name, final Class<?> javaClass,
     final Set<String> allowedValues) {
     super(name, javaClass);
     this.allowedValues = allowedValues;

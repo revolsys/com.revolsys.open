@@ -21,11 +21,11 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   public CsvDirectoryWriter() {
   }
 
-  public CsvDirectoryWriter(
-    final File baseDirectory) {
+  public CsvDirectoryWriter(final File baseDirectory) {
     setDirectory(baseDirectory);
   }
 
+  @Override
   public void close() {
     for (final CsvDataObjectWriter writer : writers.values()) {
       try {
@@ -36,22 +36,18 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public File getDirectory() {
-    return directory;
-  }
-
+  @Override
   public void flush() {
-    for (CsvDataObjectWriter writer : writers.values()) {
+    for (final CsvDataObjectWriter writer : writers.values()) {
       writer.flush();
     }
   }
 
-  public String toString() {
-    return directory.getAbsolutePath();
+  public File getDirectory() {
+    return directory;
   }
 
-  private CsvDataObjectWriter getWriter(
-    final DataObject object) {
+  private CsvDataObjectWriter getWriter(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     CsvDataObjectWriter writer = writers.get(metaData);
     if (writer == null) {
@@ -62,7 +58,8 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
         writer = new CsvDataObjectWriter(metaData, new FileWriter(file));
         final Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
-          writer.setProperty(IoConstants.GEOMETRY_FACTORY, GeometryFactory.getFactory(geometry));
+          writer.setProperty(IoConstants.GEOMETRY_FACTORY,
+            GeometryFactory.getFactory(geometry));
         }
         writers.put(metaData, writer);
       } catch (final IOException e) {
@@ -72,15 +69,17 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     return writer;
   }
 
-  public void setDirectory(
-    final File baseDirectory) {
+  public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
   }
 
+  @Override
+  public String toString() {
+    return directory.getAbsolutePath();
+  }
 
-  public void write(
-    final DataObject object) {
+  public void write(final DataObject object) {
 
     final CsvDataObjectWriter writer = getWriter(object);
     writer.write(object);

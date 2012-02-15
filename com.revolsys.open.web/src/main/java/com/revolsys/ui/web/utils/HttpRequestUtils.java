@@ -10,6 +10,16 @@ import org.springframework.web.util.WebUtils;
 public final class HttpRequestUtils {
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
+  public static String getFullRequestUrl() {
+    return getFullRequestUrl(getHttpServletRequest());
+  }
+
+  public static String getFullRequestUrl(final HttpServletRequest request) {
+    final String serverUrl = getServerUrl(request);
+    final String requestUri = getOriginatingRequestUri();
+    return serverUrl + requestUri;
+  }
+
   public static HttpServletRequest getHttpServletRequest() {
     final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
     final HttpServletRequest request = requestAttributes.getRequest();
@@ -48,26 +58,16 @@ public final class HttpRequestUtils {
     url.append(serverName);
 
     if ("http".equals(scheme)) {
-      if (serverPort != 80 && serverPort !=-1) {
+      if (serverPort != 80 && serverPort != -1) {
         url.append(":").append(serverPort);
       }
     } else if ("https".equals(scheme)) {
-      if (serverPort != 443 && serverPort !=-1) {
+      if (serverPort != 443 && serverPort != -1) {
         url.append(":").append(serverPort);
       }
     }
     return url.toString();
 
-  }
-
-  public static String getFullRequestUrl() {
-    return getFullRequestUrl(getHttpServletRequest());
-  }
-
-  public static String getFullRequestUrl(final HttpServletRequest request) {
-    String serverUrl = getServerUrl(request);
-    String requestUri = getOriginatingRequestUri();
-    return serverUrl + requestUri;
   }
 
   private HttpRequestUtils() {

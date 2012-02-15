@@ -11,27 +11,25 @@ public class DataObjectStoreSchemaMapProxy extends
    */
   private static final long serialVersionUID = -1711922998363200190L;
 
-  private Map<String, DataObjectStoreSchema> map;
+  private final Map<String, DataObjectStoreSchema> map;
 
-  private AbstractDataObjectStore dataObjectStore;
+  private final AbstractDataObjectStore dataObjectStore;
 
   public DataObjectStoreSchemaMapProxy(
-    AbstractDataObjectStore dataObjectStore,
-    Map<String, DataObjectStoreSchema> map) {
+    final AbstractDataObjectStore dataObjectStore,
+    final Map<String, DataObjectStoreSchema> map) {
     this.dataObjectStore = dataObjectStore;
     this.map = map;
   }
 
   @Override
-  public DataObjectStoreSchema get(
-    Object key) {
+  public DataObjectStoreSchema get(final Object key) {
     DataObjectStoreSchema schema = super.get(key);
     if (schema == null) {
       schema = map.get(key);
       if (schema != null) {
         final String name = schema.getName();
-        schema = new DataObjectStoreSchemaProxy(dataObjectStore,
-          name, schema);
+        schema = new DataObjectStoreSchemaProxy(dataObjectStore, name, schema);
         super.put(name, schema);
       }
     }
@@ -40,10 +38,10 @@ public class DataObjectStoreSchemaMapProxy extends
 
   @Override
   public DataObjectStoreSchema put(
-    String key,
-    DataObjectStoreSchema schema) {
-    final DataObjectStoreSchemaProxy schemaProxy = new DataObjectStoreSchemaProxy(dataObjectStore,
-        key, schema);
+    final String key,
+    final DataObjectStoreSchema schema) {
+    final DataObjectStoreSchemaProxy schemaProxy = new DataObjectStoreSchemaProxy(
+      dataObjectStore, key, schema);
     map.put(key, schema);
     return super.put(key, schemaProxy);
   }

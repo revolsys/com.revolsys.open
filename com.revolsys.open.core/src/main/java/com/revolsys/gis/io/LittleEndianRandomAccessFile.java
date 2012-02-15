@@ -28,16 +28,12 @@ import java.io.RandomAccessFile;
 public class LittleEndianRandomAccessFile extends RandomAccessFile implements
   EndianInputOutput {
 
-  public LittleEndianRandomAccessFile(
-    final File file,
-    final String mode)
+  public LittleEndianRandomAccessFile(final File file, final String mode)
     throws FileNotFoundException {
     super(file, mode);
   }
 
-  public LittleEndianRandomAccessFile(
-    final String name,
-    final String mode)
+  public LittleEndianRandomAccessFile(final String name, final String mode)
     throws FileNotFoundException {
     super(name, mode);
   }
@@ -49,8 +45,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEDouble()
    */
-  public double readLEDouble()
-    throws IOException {
+  public double readLEDouble() throws IOException {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
   }
@@ -59,8 +54,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEInt()
    */
-  public int readLEInt()
-    throws IOException {
+  public int readLEInt() throws IOException {
     final int b1 = read();
     final int b2 = read();
     final int b3 = read();
@@ -74,8 +68,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLELong()
    */
-  public long readLELong()
-    throws IOException {
+  public long readLELong() throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
       value |= ((long)(read() & 0xff)) << shiftBy;
@@ -87,8 +80,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEShort()
    */
-  public short readLEShort()
-    throws IOException {
+  public short readLEShort() throws IOException {
     final int b1 = read();
     final int b2 = read();
     final int value = (b2 << 8) + b1;
@@ -100,16 +92,12 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * @see
    * com.revolsys.gis.format.core.io.EndianInputOutput#writeLEDouble(double)
    */
-  public void writeLEDouble(
-    final double d)
-    throws IOException {
+  public void writeLEDouble(final double d) throws IOException {
     final long l = Double.doubleToLongBits(d);
     writeLELong(l);
   }
 
-  public void writeLEFloat(
-    final float f)
-    throws IOException {
+  public void writeLEFloat(final float f) throws IOException {
     final int i = Float.floatToIntBits(f);
     writeLEInt(i);
   }
@@ -118,9 +106,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#writeLEInt(int)
    */
-  public void writeLEInt(
-    final int i)
-    throws IOException {
+  public void writeLEInt(final int i) throws IOException {
     write(i & 0xFF);
     write((i >>> 8) & 0xFF);
     write((i >>> 16) & 0xFF);
@@ -131,9 +117,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#writeLELong(long)
    */
-  public void writeLELong(
-    final long l)
-    throws IOException {
+  public void writeLELong(final long l) throws IOException {
     write((int)l & 0xFF);
     write((int)(l >>> 8) & 0xFF);
     write((int)(l >>> 16) & 0xFF);
@@ -148,16 +132,12 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#writeLEShort(short)
    */
-  public void writeLEShort(
-    final short s)
-    throws IOException {
+  public void writeLEShort(final short s) throws IOException {
     write(s & 0xFF);
     write((s >>> 8) & 0xFF);
   }
 
-  public void writeShort(
-    final short s)
-    throws IOException {
+  public void writeShort(final short s) throws IOException {
     write((s >>> 8) & 0xFF);
     write(s & 0xFF);
   }

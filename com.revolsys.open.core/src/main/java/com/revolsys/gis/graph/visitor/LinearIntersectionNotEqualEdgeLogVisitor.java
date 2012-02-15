@@ -51,7 +51,8 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
       }
 
       final Filter<DataObject> notEqualLineFilter = new NotFilter<DataObject>(
-        new DataObjectGeometryFilter<LineString>(new EqualFilter<LineString>(line)));
+        new DataObjectGeometryFilter<LineString>(new EqualFilter<LineString>(
+          line)));
 
       final DataObjectGeometryFilter<LineString> linearIntersectionFilter = new DataObjectGeometryFilter<LineString>(
         new LinearIntersectionFilter(line));
@@ -65,9 +66,9 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
       if (!intersectingEdges.isEmpty()) {
         DataObjectLog.error(getClass(), "Overlapping edge", object);
         JtsGeometryUtil.setGeometryProperty(line, PROCESSED, Boolean.TRUE);
-        for (Edge<DataObject> intersectingEdge : intersectingEdges) {
+        for (final Edge<DataObject> intersectingEdge : intersectingEdges) {
           final DataObject intersectingObject = intersectingEdge.getObject();
-          LineString intersectingLine = intersectingObject.getGeometryValue();
+          final LineString intersectingLine = intersectingObject.getGeometryValue();
           if (JtsGeometryUtil.getGeometryProperty(intersectingLine, PROCESSED) != Boolean.TRUE) {
             JtsGeometryUtil.setGeometryProperty(intersectingLine, PROCESSED,
               Boolean.TRUE);

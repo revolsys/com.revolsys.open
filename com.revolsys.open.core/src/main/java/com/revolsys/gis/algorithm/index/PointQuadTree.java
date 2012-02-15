@@ -11,6 +11,14 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   private PointQuadTreeNode<T> root;
 
+  public boolean contains(final Coordinates point) {
+    if (root == null) {
+      return false;
+    } else {
+      return root.contains(point);
+    }
+  }
+
   public List<T> findWithin(final Envelope envelope) {
     final List<T> results = new ArrayList<T>();
     if (root != null) {
@@ -19,7 +27,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
-  public List<T> findWithinDistance(final Coordinates point,
+  public List<T> findWithinDistance(
+    final Coordinates point,
     final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
@@ -30,14 +39,6 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
       root.findWithin(results, x, y, maxDistance, envelope);
     }
     return results;
-  }
-
-  public boolean contains(Coordinates point) {
-    if (root == null) {
-      return false;
-    } else {
-      return root.contains(point);
-    }
   }
 
   public void put(final Coordinates point, final T value) {

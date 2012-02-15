@@ -132,7 +132,8 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   private <V> V getAttributeHeader(
-    final Map<String, List<?>> attributeProperties, final String attributeType,
+    final Map<String, List<?>> attributeProperties,
+    final String attributeType,
     final int i) {
     final List<?> values = attributeProperties.get(attributeType);
     if (values == null) {
@@ -309,7 +310,9 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   @SuppressWarnings("unchecked")
-  private Object parseValue(final DataType type, final String text,
+  private Object parseValue(
+    final DataType type,
+    final String text,
     final String[] record) throws IOException {
     if (type.equals(DataTypes.MAP)) {
       return readMap();

@@ -18,8 +18,7 @@ public class MBeanConnector {
     }
   }
 
-  public void connect(
-    final String connectionUrl) {
+  public void connect(final String connectionUrl) {
     jmxConnector = JmxUtil.getJmxConnector(connectionUrl);
     connection = JmxUtil.getMbeanServerConnection(jmxConnector);
   }
@@ -32,13 +31,11 @@ public class MBeanConnector {
     return jmxConnector;
   }
 
-  public void setConnection(
-    final MBeanServerConnection connection) {
+  public void setConnection(final MBeanServerConnection connection) {
     this.connection = connection;
   }
 
-  public void setJmxConnector(
-    final JMXConnector jmxConnector) {
+  public void setJmxConnector(final JMXConnector jmxConnector) {
     this.jmxConnector = jmxConnector;
   }
 

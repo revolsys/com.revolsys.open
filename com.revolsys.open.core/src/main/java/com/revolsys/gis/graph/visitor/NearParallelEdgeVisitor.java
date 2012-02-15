@@ -15,9 +15,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   private final double maxDistance;
 
-  public NearParallelEdgeVisitor(
-    final LineString line,
-    final double maxDistance) {
+  public NearParallelEdgeVisitor(final LineString line, final double maxDistance) {
     this.line = line;
     this.maxDistance = maxDistance;
   }
@@ -29,8 +27,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
     return envelope;
   }
 
-  private boolean isAlmostParallel(
-    final LineString matchLine) {
+  private boolean isAlmostParallel(final LineString matchLine) {
     if (line.getEnvelopeInternal().distance(matchLine.getEnvelopeInternal()) > maxDistance) {
       return false;
     }
@@ -63,8 +60,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
   }
 
   @Override
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final LineString matchLine = edge.getLine();
     if (isAlmostParallel(matchLine)) {
       return super.visit(edge);

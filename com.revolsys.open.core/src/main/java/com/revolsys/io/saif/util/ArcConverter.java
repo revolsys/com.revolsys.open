@@ -21,20 +21,17 @@ public class ArcConverter implements OsnConverter {
 
   private String geometryType = "Arc";
 
-  public ArcConverter(
-    final GeometryFactory geometryFactory) {
+  public ArcConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public ArcConverter(
-    final GeometryFactory geometryFactory,
+  public ArcConverter(final GeometryFactory geometryFactory,
     final String geometryType) {
     this.geometryFactory = geometryFactory;
     this.geometryType = geometryType;
   }
 
-  public Object read(
-    final OsnIterator iterator) {
+  public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put("type", geometryType);
 
@@ -89,9 +86,7 @@ public class ArcConverter implements OsnConverter {
     values.put(attributeName, value);
   }
 
-  public void write(
-    final OsnSerializer serializer,
-    final Object object)
+  public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     final boolean writeAttributes = true;
     write(serializer, object, writeAttributes);
@@ -100,16 +95,15 @@ public class ArcConverter implements OsnConverter {
   protected void write(
     final OsnSerializer serializer,
     final Object object,
-    final boolean writeAttributes)
-    throws IOException {
+    final boolean writeAttributes) throws IOException {
     if (object instanceof LineString) {
       final LineString line = (LineString)object;
       serializer.startObject(geometryType);
 
       serializer.attributeName("pointList");
       serializer.startCollection("List");
-      CoordinatesList points = CoordinatesListUtil.get(line);
-      int numAxis = points.getNumAxis();
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final int numAxis = points.getNumAxis();
       for (int i = 0; i < points.size(); i++) {
         serializer.startObject("Point");
         serializer.attributeName("coords");
@@ -146,8 +140,7 @@ public class ArcConverter implements OsnConverter {
   protected void writeAttribute(
     final OsnSerializer serializer,
     final Map<String, Object> values,
-    final String name)
-    throws IOException {
+    final String name) throws IOException {
     final Object value = values.get(name);
     if (value != null) {
       serializer.endLine();
@@ -157,16 +150,14 @@ public class ArcConverter implements OsnConverter {
 
   protected void writeAttributes(
     final OsnSerializer serializer,
-    final Map<String, Object> values)
-    throws IOException {
+    final Map<String, Object> values) throws IOException {
     writeEnumAttribute(serializer, values, "qualifier");
   }
 
   protected void writeEnumAttribute(
     final OsnSerializer serializer,
     final Map<String, Object> values,
-    final String name)
-    throws IOException {
+    final String name) throws IOException {
     final String value = (String)values.get(name);
     if (value != null) {
       serializer.endLine();

@@ -31,45 +31,48 @@ public class Element implements Cloneable {
 
   private Decorator decorator;
 
+  @Override
+  public Element clone() {
+    try {
+      return (Element)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
+  }
+
   public ElementContainer getContainer() {
     return container;
-  }
-
-  public void setContainer(
-    final ElementContainer container) {
-    this.container = container;
-  }
-
-  public Form getForm() {
-    return container.getForm();
   }
 
   public Decorator getDecorator() {
     return decorator;
   }
 
-  public final void serialize(
-    final Writer out) {
+  public Form getForm() {
+    return container.getForm();
+  }
+
+  public void initialize(final HttpServletRequest request) {
+  }
+
+  public void serialize(final OutputStream outputStream) {
+    serialize(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")));
+  }
+
+  public final void serialize(final Writer out) {
     serialize(out, true);
   }
 
-  public void initialize(
-    final HttpServletRequest request) {
-  }
+  public final void serialize(final Writer out, final boolean useNamespaces) {
 
-  public final void serialize(
-    final Writer out,
-    final boolean useNamespaces) {
-
-    XmlWriter xmlOut = new XmlWriter(out, useNamespaces);
+    final XmlWriter xmlOut = new XmlWriter(out, useNamespaces);
     xmlOut.flush();
     serialize(xmlOut);
 
     xmlOut.flush();
   }
 
-  public final void serialize(
-    final XmlWriter out) {
+  public final void serialize(final XmlWriter out) {
     if (decorator != null) {
       decorator.serialize(out, this);
     } else {
@@ -77,25 +80,14 @@ public class Element implements Cloneable {
     }
   }
 
-  public void serializeElement(
-    final XmlWriter out) {
+  public void serializeElement(final XmlWriter out) {
   }
 
-  public void setDecorator(
-    final Decorator decorator) {
+  public void setContainer(final ElementContainer container) {
+    this.container = container;
+  }
+
+  public void setDecorator(final Decorator decorator) {
     this.decorator = decorator;
-  }
-
-  public void serialize(
-    OutputStream outputStream) {
-    serialize(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")));
-  }
-
-  public Element clone() {
-    try {
-      return (Element)super.clone();
-    } catch (CloneNotSupportedException e) {
-      return null;
-    }
   }
 }

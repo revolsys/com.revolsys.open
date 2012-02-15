@@ -5,17 +5,16 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class ShortFieldType extends NumberFieldType {
-   public ShortFieldType() {
+  public ShortFieldType() {
     super(DataTypes.SHORT);
   }
 
-  public Object parseValue(
-    String text) {
+  public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
-       return Short.parseShort(text);
+      return Short.parseShort(text);
     } else {
       return null;
     }
-}
+  }
 
 }

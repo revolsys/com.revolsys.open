@@ -44,16 +44,6 @@ public class ActionException extends ServletException {
   }
 
   /**
-   * Construct a new ActionException with an original Exception. This should be
-   * used to propagate the original exception.
-   * 
-   * @param rootCause The original exception that was thrown
-   */
-  public ActionException(final Throwable rootCause) {
-    super(rootCause);
-  }
-
-  /**
    * Construct a new ActionException with an original Exception and the
    * specified message. This should be used to propagate the original exception.
    * 
@@ -62,5 +52,15 @@ public class ActionException extends ServletException {
    */
   public ActionException(final String message, final Throwable rootCause) {
     super(message, rootCause);
+  }
+
+  /**
+   * Construct a new ActionException with an original Exception. This should be
+   * used to propagate the original exception.
+   * 
+   * @param rootCause The original exception that was thrown
+   */
+  public ActionException(final Throwable rootCause) {
+    super(rootCause);
   }
 }

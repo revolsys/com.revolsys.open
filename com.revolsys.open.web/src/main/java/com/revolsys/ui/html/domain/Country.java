@@ -42,74 +42,13 @@ public final class Country implements Serializable {
 
   private static Map<String, Country> countryNameMap = new HashMap<String, Country>();
 
-  private short codeNum;
-
-  private String codeAplha2;
-
-  private String codeAlpha3;
-
-  private String name;
-
-  private String phoneCode;
-
-  private String phoneRegEx;
-
-  private String phoneNationalFormat;
-
-  private String phoneInternationalFormat;
-
-  static {
-    loadCountryCodes();
-  }
-
   /**
-   * Load the list of countries from the
-   * com.revolsys.iaf.core.domain.CountryCodes.txt resource.
+   * Get the list of all countries.
+   * 
+   * @return The list of countries.
    */
-  private static void loadCountryCodes() {
-    if (countries == null) {
-      countries = new ArrayList<Country>();
-      InputStream in = Country.class.getResourceAsStream("CountryCodes.txt");
-      if (in != null) {
-        BufferedReader lineReader = new BufferedReader(
-          new InputStreamReader(in));
-        try {
-          String line = lineReader.readLine();
-          for (line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
-            StringTokenizer columns = new StringTokenizer(line, "\t");
-            String alpha2 = columns.nextToken();
-            String alpha3 = columns.nextToken();
-            short num = Short.parseShort(columns.nextToken());
-            String name = columns.nextToken();
-            String phoneCode = null;
-            if (columns.hasMoreTokens()) {
-              phoneCode = columns.nextToken();
-            }
-            String phoneRegEx = null;
-            if (columns.hasMoreTokens()) {
-              phoneRegEx = columns.nextToken();
-            }
-            String phoneNationalFormat = null;
-            if (columns.hasMoreTokens()) {
-              phoneNationalFormat = columns.nextToken();
-            }
-            String phoneInternationalFormat = null;
-            if (columns.hasMoreTokens()) {
-              phoneInternationalFormat = columns.nextToken();
-            }
-            Country country = new Country(num, alpha2, alpha3, name, phoneCode,
-              phoneRegEx, phoneNationalFormat, phoneInternationalFormat);
-            countries.add(country);
-            countryCodeAlpha2Map.put(country.getCodeAplha2(), country);
-            countryNameMap.put(name.toUpperCase(), country);
-            countryPhoneCodeMap.put(phoneCode, country);
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-
+  public static List<Country> getCountries() {
+    return countries;
   }
 
   /**
@@ -160,8 +99,8 @@ public final class Country implements Serializable {
   public static Country getCountryByPhoneNumber(final String phoneNumber) {
     if (phoneNumber != null && phoneNumber.length() > 0) {
       for (int i = 1; i <= 3; i++) {
-        String phoneCode = phoneNumber.substring(0, i);
-        Country country = countryPhoneCodeMap.get(phoneCode);
+        final String phoneCode = phoneNumber.substring(0, i);
+        final Country country = countryPhoneCodeMap.get(phoneCode);
         if (country != null) {
           return country;
         }
@@ -170,13 +109,75 @@ public final class Country implements Serializable {
     return null;
   }
 
+  private final short codeNum;
+
+  private final String codeAplha2;
+
+  private final String codeAlpha3;
+
+  private final String name;
+
+  private String phoneCode;
+
+  private String phoneRegEx;
+
+  private String phoneNationalFormat;
+
+  private String phoneInternationalFormat;
+
+  static {
+    loadCountryCodes();
+  }
+
   /**
-   * Get the list of all countries.
-   * 
-   * @return The list of countries.
+   * Load the list of countries from the
+   * com.revolsys.iaf.core.domain.CountryCodes.txt resource.
    */
-  public static List<Country> getCountries() {
-    return countries;
+  private static void loadCountryCodes() {
+    if (countries == null) {
+      countries = new ArrayList<Country>();
+      final InputStream in = Country.class.getResourceAsStream("CountryCodes.txt");
+      if (in != null) {
+        final BufferedReader lineReader = new BufferedReader(
+          new InputStreamReader(in));
+        try {
+          String line = lineReader.readLine();
+          for (line = lineReader.readLine(); line != null; line = lineReader.readLine()) {
+            final StringTokenizer columns = new StringTokenizer(line, "\t");
+            final String alpha2 = columns.nextToken();
+            final String alpha3 = columns.nextToken();
+            final short num = Short.parseShort(columns.nextToken());
+            final String name = columns.nextToken();
+            String phoneCode = null;
+            if (columns.hasMoreTokens()) {
+              phoneCode = columns.nextToken();
+            }
+            String phoneRegEx = null;
+            if (columns.hasMoreTokens()) {
+              phoneRegEx = columns.nextToken();
+            }
+            String phoneNationalFormat = null;
+            if (columns.hasMoreTokens()) {
+              phoneNationalFormat = columns.nextToken();
+            }
+            String phoneInternationalFormat = null;
+            if (columns.hasMoreTokens()) {
+              phoneInternationalFormat = columns.nextToken();
+            }
+            final Country country = new Country(num, alpha2, alpha3, name,
+              phoneCode, phoneRegEx, phoneNationalFormat,
+              phoneInternationalFormat);
+            countries.add(country);
+            countryCodeAlpha2Map.put(country.getCodeAplha2(), country);
+            countryNameMap.put(name.toUpperCase(), country);
+            countryPhoneCodeMap.put(phoneCode, country);
+          }
+        } catch (final IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
   }
 
   private Country(final short codeNum, final String codeAplha2,
@@ -257,6 +258,7 @@ public final class Country implements Serializable {
     return phoneRegEx;
   }
 
+  @Override
   public String toString() {
     return name;
   }

@@ -51,8 +51,7 @@ public class PointPairDistance {
   public PointPairDistance() {
   }
 
-  public Coordinate getCoordinate(
-    final int i) {
+  public Coordinate getCoordinate(final int i) {
     return pt[i];
   }
 
@@ -68,9 +67,7 @@ public class PointPairDistance {
     isNull = true;
   }
 
-  public void initialize(
-    final Coordinate p0,
-    final Coordinate p1) {
+  public void initialize(final Coordinate p0, final Coordinate p1) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
     distance = p0.distance(p1);
@@ -94,9 +91,7 @@ public class PointPairDistance {
     isNull = false;
   }
 
-  public void setMaximum(
-    final Coordinate p0,
-    final Coordinate p1) {
+  public void setMaximum(final Coordinate p0, final Coordinate p1) {
     if (isNull) {
       initialize(p0, p1);
       return;
@@ -107,14 +102,11 @@ public class PointPairDistance {
     }
   }
 
-  public void setMaximum(
-    final PointPairDistance ptDist) {
+  public void setMaximum(final PointPairDistance ptDist) {
     setMaximum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMinimum(
-    final Coordinate p0,
-    final Coordinate p1) {
+  public void setMinimum(final Coordinate p0, final Coordinate p1) {
     if (isNull) {
       initialize(p0, p1);
       return;
@@ -125,8 +117,7 @@ public class PointPairDistance {
     }
   }
 
-  public void setMinimum(
-    final PointPairDistance ptDist) {
+  public void setMinimum(final PointPairDistance ptDist) {
     setMinimum(ptDist.pt[0], ptDist.pt[1]);
   }
 }

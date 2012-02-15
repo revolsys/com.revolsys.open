@@ -39,14 +39,11 @@ public class LineSegment3D extends LineSegment {
   public LineSegment3D() {
   }
 
-  public LineSegment3D(
-    final Coordinate p0,
-    final Coordinate p1) {
+  public LineSegment3D(final Coordinate p0, final Coordinate p1) {
     super(p0, p1);
   }
 
-  public LineSegment3D(
-    final LineSegment ls) {
+  public LineSegment3D(final LineSegment ls) {
     super(ls);
   }
 
@@ -56,8 +53,7 @@ public class LineSegment3D extends LineSegment {
    * @param coordinate The Coordinate.
    * @param line The line segment the coordinate is on.
    */
-  public void addElevation(
-    final Coordinate coordinate) {
+  public void addElevation(final Coordinate coordinate) {
     final double z0 = p0.z;
     final double z1 = p1.z;
     if (!Double.isNaN(z0) && !Double.isNaN(z0)) {
@@ -87,8 +83,7 @@ public class LineSegment3D extends LineSegment {
     return new Envelope(p0, p1);
   }
 
-  public Coordinate intersection3D(
-    final LineSegment line) {
+  public Coordinate intersection3D(final LineSegment line) {
     final Coordinate intersection = super.intersection(line);
     if (intersection != null) {
       addElevation(intersection);
@@ -96,8 +91,7 @@ public class LineSegment3D extends LineSegment {
     return intersection;
   }
 
-  public Coordinate pointAlong3D(
-    final double segmentLengthFraction) {
+  public Coordinate pointAlong3D(final double segmentLengthFraction) {
     final Coordinate coord = new Coordinate();
     coord.x = p0.x + segmentLengthFraction * (p1.x - p0.x);
     coord.y = p0.y + segmentLengthFraction * (p1.y - p0.y);

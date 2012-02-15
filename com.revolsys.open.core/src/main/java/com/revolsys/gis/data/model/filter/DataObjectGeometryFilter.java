@@ -24,35 +24,33 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectGeometryFilter<G extends Geometry> implements Filter<DataObject> {
+public class DataObjectGeometryFilter<G extends Geometry> implements
+  Filter<DataObject> {
   private Filter<G> filter;
 
   public DataObjectGeometryFilter() {
   }
 
-  public Filter<G> getFilter() {
-    return filter;
-  }
-
-  public void setFilter(
-    Filter<G> filter) {
-    this.filter = filter;
-  }
-
-  public DataObjectGeometryFilter(
-    final Filter<G> filter) {
+  public DataObjectGeometryFilter(final Filter<G> filter) {
     this.filter = filter;
   }
 
   @SuppressWarnings("unchecked")
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final G geometry = (G)object.getGeometryValue();
     if (filter.accept(geometry)) {
       return true;
     } else {
       return false;
     }
+  }
+
+  public Filter<G> getFilter() {
+    return filter;
+  }
+
+  public void setFilter(final Filter<G> filter) {
+    this.filter = filter;
   }
 
 }

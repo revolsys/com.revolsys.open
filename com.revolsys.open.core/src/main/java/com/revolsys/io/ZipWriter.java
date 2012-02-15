@@ -15,14 +15,12 @@ import java.io.OutputStream;
  */
 public class ZipWriter<T> extends DelegatingWriter<T> {
 
-  private File tempDirectory;
+  private final File tempDirectory;
 
-  private OutputStream out;
+  private final OutputStream out;
 
-  public ZipWriter(
-    File tempDirectory,
-    Writer<T> writer,
-    OutputStream out) {
+  public ZipWriter(final File tempDirectory, final Writer<T> writer,
+    final OutputStream out) {
     super(writer);
     this.tempDirectory = tempDirectory;
     this.out = out;
@@ -35,7 +33,7 @@ public class ZipWriter<T> extends DelegatingWriter<T> {
     } finally {
       try {
         ZipUtil.zipDirectory(tempDirectory, out);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw new RuntimeException("Unable to compress files", e);
       } finally {
         FileUtil.deleteDirectory(tempDirectory);

@@ -34,8 +34,7 @@ public class LocationOfPoint {
 
   private final LineString line;
 
-  public LocationOfPoint(
-    final LineString line) {
+  public LocationOfPoint(final LineString line) {
     this.line = line;
   }
 
@@ -62,8 +61,7 @@ public class LocationOfPoint {
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
-  public LineStringLocation locate(
-    final Coordinate inputPt) {
+  public LineStringLocation locate(final Coordinate inputPt) {
     // return locateAfter(inputPt, null);
     final Coordinate[] pts = line.getCoordinates();
 

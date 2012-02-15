@@ -117,8 +117,10 @@ public final class DataObjectUtil {
     return (T)propertyValue;
   }
 
-  public static Integer getInteger(DataObject object, String attributeName) {
-    Number value = object.getValue(attributeName);
+  public static Integer getInteger(
+    final DataObject object,
+    final String attributeName) {
+    final Number value = object.getValue(attributeName);
     if (value == null) {
       return null;
     } else {

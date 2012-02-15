@@ -40,19 +40,44 @@ public abstract class Field extends Element {
   public Field() {
   }
 
-  public Field(
-    final String name,
-    final boolean required) {
+  public Field(final String name, final boolean required) {
     this.name = name;
     this.required = required;
   }
 
-  public void addValidationError(
-    final String error) {
+  public void addValidationError(final String error) {
     if (!hasValidationErrors()) {
       validationErrors = new ArrayList();
     }
     validationErrors.add(error);
+  }
+
+  /**
+   * @return Returns the initialValue.
+   */
+  public Object getInitialValue() {
+    return initialValue;
+  }
+
+  public <T> T getInitialValue(final HttpServletRequest request) {
+    final T value = (T)getContainer().getInitialValue(this, request);
+    if (value == null) {
+      return (T)initialValue;
+    } else {
+      return value;
+    }
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public List getValidationErrors() {
+    return validationErrors;
+  }
+
+  public <T> T getValue() {
+    return (T)value;
   }
 
   public boolean hasValidationErrors() {
@@ -63,23 +88,7 @@ public abstract class Field extends Element {
     return value != null;
   }
 
-  public <T> T getInitialValue(
-    HttpServletRequest request) {
-    T value = (T)getContainer().getInitialValue(this, request);
-    if (value == null) {
-      return (T)initialValue;
-    } else {
-      return value;
-    }
-  }
-
-  public List getValidationErrors() {
-    return validationErrors;
-  }
-
-  public boolean isRequired() {
-    return required;
-  }
+  public abstract void initialize(Form form, HttpServletRequest request);
 
   /**
    * @return Returns the readOnly.
@@ -88,22 +97,8 @@ public abstract class Field extends Element {
     return readOnly;
   }
 
-  public void setName(
-    String name) {
-    this.name = name;
-  }
-
-  public void setRequired(
-    boolean required) {
-    this.required = required;
-  }
-
-  /**
-   * @param readOnly The readOnly to set.
-   */
-  public final void setReadOnly(
-    final boolean readOnly) {
-    this.readOnly = readOnly;
+  public boolean isRequired() {
+    return required;
   }
 
   public boolean isValid() {
@@ -114,40 +109,33 @@ public abstract class Field extends Element {
     return true;
   }
 
-  public abstract void initialize(
-    Form form,
-    HttpServletRequest request);
-
-  public void postInit(
-    final HttpServletRequest request) {
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setValue(
-    final Object value) {
-    this.value = value;
-  }
-
-  public <T> T getValue() {
-    return (T)value;
-  }
-
-  /**
-   * @return Returns the initialValue.
-   */
-  public Object getInitialValue() {
-    return initialValue;
+  public void postInit(final HttpServletRequest request) {
   }
 
   /**
    * @param initialValue The initialValue to set.
    */
-  public void setInitialValue(
-    Object initialValue) {
+  public void setInitialValue(final Object initialValue) {
     this.initialValue = initialValue;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  /**
+   * @param readOnly The readOnly to set.
+   */
+  public final void setReadOnly(final boolean readOnly) {
+    this.readOnly = readOnly;
+  }
+
+  public void setRequired(final boolean required) {
+    this.required = required;
+  }
+
+  public void setValue(final Object value) {
+    this.value = value;
   }
 
 }

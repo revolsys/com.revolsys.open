@@ -50,37 +50,27 @@ import com.vividsolutions.jts.geom.LineSegment;
  */
 public class VertexHausdorffDistance {
 
-  public static double distance(
-    final Geometry g0,
-    final Geometry g1) {
+  public static double distance(final Geometry g0, final Geometry g1) {
     final VertexHausdorffDistance vhd = new VertexHausdorffDistance(g0, g1);
     return vhd.distance();
   }
 
   private final PointPairDistance ptDist = new PointPairDistance();
 
-  public VertexHausdorffDistance(
-    final Geometry g0,
-    final Geometry g1) {
+  public VertexHausdorffDistance(final Geometry g0, final Geometry g1) {
     compute(g0, g1);
   }
 
-  public VertexHausdorffDistance(
-    final LineSegment seg0,
-    final LineSegment seg1) {
+  public VertexHausdorffDistance(final LineSegment seg0, final LineSegment seg1) {
     compute(seg0, seg1);
   }
 
-  private void compute(
-    final Geometry g0,
-    final Geometry g1) {
+  private void compute(final Geometry g0, final Geometry g1) {
     computeMaxPointDistance(g0, g1, ptDist);
     computeMaxPointDistance(g1, g0, ptDist);
   }
 
-  private void compute(
-    final LineSegment seg0,
-    final LineSegment seg1) {
+  private void compute(final LineSegment seg0, final LineSegment seg1) {
     computeMaxPointDistance(seg0, seg1, ptDist);
     computeMaxPointDistance(seg1, seg0, ptDist);
   }

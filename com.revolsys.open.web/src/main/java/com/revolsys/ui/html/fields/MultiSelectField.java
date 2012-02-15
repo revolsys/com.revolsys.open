@@ -35,17 +35,17 @@ public class MultiSelectField extends Field {
 
   private boolean hasInvalidOptions = false;
 
-  private Map selectedValues = new HashMap();
+  private final Map selectedValues = new HashMap();
 
-  private List options = new ArrayList();
+  private final List options = new ArrayList();
 
-  private Map optionMap = new HashMap();
+  private final Map optionMap = new HashMap();
 
-  private Map optionValueMap = new HashMap();
+  private final Map optionValueMap = new HashMap();
 
   private String onChange;
 
-  private int size = 4;
+  private final int size = 4;
 
   /**
    * @param name
@@ -55,8 +55,11 @@ public class MultiSelectField extends Field {
     super(name, required);
   }
 
-  public void addOption(final String label) {
-    addOption(label, label);
+  public void addOption(
+    final Object value,
+    final Object stringValue,
+    final String label) {
+    addOption(value, stringValue.toString(), label);
   }
 
   public void addOption(final Object value, final String label) {
@@ -67,73 +70,44 @@ public class MultiSelectField extends Field {
     addOption(value, stringValue, label);
   }
 
-  public void addOption(final String value, final String label) {
-    addOption(value, value, label);
-  }
-
-  public void addOption(final Object value, final String stringValue,
+  public void addOption(
+    final Object value,
+    final String stringValue,
     final String label) {
-    FieldValue option = new FieldValue(value, stringValue, label);
+    final FieldValue option = new FieldValue(value, stringValue, label);
     options.add(option);
     optionMap.put(stringValue, option);
     optionValueMap.put(value, option);
   }
 
-  public void addOption(final Object value, final Object stringValue,
-    final String label) {
-    addOption(value, stringValue.toString(), label);
+  public void addOption(final String label) {
+    addOption(label, label);
   }
 
-  public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_MULTIPLE, "multiple");
-    out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(size));
-    if (onChange != null) {
-      out.attribute(HtmlUtil.ATTR_ON_CHANGE, onChange);
-    }
-    serializeOptions(out);
-    out.endTag(HtmlUtil.SELECT);
-
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "fieldActions");
-    String baseUrl = "javascript:setMutliSelectAllSelected('"
-      + getForm().getName() + "','" + getName() + "'";
-    HtmlUtil.serializeA(out, null, baseUrl + ",true)", "select all");
-    HtmlUtil.serializeA(out, null, baseUrl + ",false)", "select none");
-    out.endTag(HtmlUtil.DIV);
+  public void addOption(final String value, final String label) {
+    addOption(value, value, label);
   }
 
-  private void serializeOptions(final XmlWriter out) {
-    for (Iterator optionIter = options.iterator(); optionIter.hasNext();) {
-      FieldValue option = (FieldValue)optionIter.next();
-      out.startTag(HtmlUtil.OPTION);
-      if (selectedValues.containsKey(option.getStringValue())) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
-      }
-      if (!option.getStringValue().equals(option.getLabel())) {
-        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
-      }
-      out.text(option.getLabel());
-      out.endTag(HtmlUtil.OPTION);
-    }
+  @Override
+  public boolean hasValue() {
+    return !selectedValues.isEmpty();
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
-    String[] parameterValues = request.getParameterValues(getName());
+    final String[] parameterValues = request.getParameterValues(getName());
     if (parameterValues == null) {
       setValue(Collections.EMPTY_LIST);
       if (!form.hasTask()) {
-        Object initialValue = getInitialValue(request);
+        final Object initialValue = getInitialValue(request);
         if (initialValue != null) {
           setValue(initialValue);
         }
       }
     } else {
       for (int i = 0; i < parameterValues.length; i++) {
-        String stringValue = parameterValues[i];
-        FieldValue option = (FieldValue)optionMap.get(stringValue);
+        final String stringValue = parameterValues[i];
+        final FieldValue option = (FieldValue)optionMap.get(stringValue);
         if (option != null) {
           selectedValues.put(option.getStringValue(), option.getValue());
         } else {
@@ -143,25 +117,7 @@ public class MultiSelectField extends Field {
     }
   }
 
-  public void setValue(final Object object) {
-    selectedValues.clear();
-    List valueList = (List)object;
-    super.setValue(valueList);
-    if (valueList != null) {
-      for (Iterator values = valueList.iterator(); values.hasNext();) {
-        Object value = (Object)values.next();
-        FieldValue option = (FieldValue)optionValueMap.get(value);
-        if (option != null) {
-          selectedValues.put(option.getStringValue(), option.getValue());
-        }
-      }
-    }
-  }
-
-  public boolean hasValue() {
-    return !selectedValues.isEmpty();
-  }
-
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
@@ -182,7 +138,60 @@ public class MultiSelectField extends Field {
     return valid;
   }
 
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    out.startTag(HtmlUtil.SELECT);
+    out.attribute(HtmlUtil.ATTR_ID, getName());
+    out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.attribute(HtmlUtil.ATTR_MULTIPLE, "multiple");
+    out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(size));
+    if (onChange != null) {
+      out.attribute(HtmlUtil.ATTR_ON_CHANGE, onChange);
+    }
+    serializeOptions(out);
+    out.endTag(HtmlUtil.SELECT);
+
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "fieldActions");
+    final String baseUrl = "javascript:setMutliSelectAllSelected('"
+      + getForm().getName() + "','" + getName() + "'";
+    HtmlUtil.serializeA(out, null, baseUrl + ",true)", "select all");
+    HtmlUtil.serializeA(out, null, baseUrl + ",false)", "select none");
+    out.endTag(HtmlUtil.DIV);
+  }
+
+  private void serializeOptions(final XmlWriter out) {
+    for (final Iterator optionIter = options.iterator(); optionIter.hasNext();) {
+      final FieldValue option = (FieldValue)optionIter.next();
+      out.startTag(HtmlUtil.OPTION);
+      if (selectedValues.containsKey(option.getStringValue())) {
+        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+      }
+      if (!option.getStringValue().equals(option.getLabel())) {
+        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
+      }
+      out.text(option.getLabel());
+      out.endTag(HtmlUtil.OPTION);
+    }
+  }
+
   public void setOnChange(final String onChange) {
     this.onChange = onChange;
+  }
+
+  @Override
+  public void setValue(final Object object) {
+    selectedValues.clear();
+    final List valueList = (List)object;
+    super.setValue(valueList);
+    if (valueList != null) {
+      for (final Iterator values = valueList.iterator(); values.hasNext();) {
+        final Object value = values.next();
+        final FieldValue option = (FieldValue)optionValueMap.get(value);
+        if (option != null) {
+          selectedValues.put(option.getStringValue(), option.getValue());
+        }
+      }
+    }
   }
 }

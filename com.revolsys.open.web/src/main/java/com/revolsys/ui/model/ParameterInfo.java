@@ -28,26 +28,12 @@ public class ParameterInfo {
   }
 
   public ParameterInfo(final String name, final boolean required,
-    final DataType type, final String description,
-    final Object... allowedValues) {
-    this(name, required, type, description, Arrays.asList(allowedValues));
-  }
-
-  public Object getDefaultValue() {
-    return defaultValue;
-  }
-
-  public void setDefaultValue(Object defaultValue) {
-    this.defaultValue = defaultValue;
-  }
-
-  public ParameterInfo(final String name, final boolean required,
     final DataType type, final String description, final List<?> allowedValues) {
     this.name = name;
     this.required = required;
     this.type = type;
     this.description = description;
-    for (Object allowedValue : allowedValues) {
+    for (final Object allowedValue : allowedValues) {
       this.allowedValues.put(allowedValue, allowedValue);
     }
   }
@@ -58,19 +44,29 @@ public class ParameterInfo {
     this.required = required;
     this.type = type;
     this.description = description;
-    for (Entry<?, ?> allowedValue : allowedValues.entrySet()) {
+    for (final Entry<?, ?> allowedValue : allowedValues.entrySet()) {
       final Object key = allowedValue.getKey();
       final Object value = allowedValue.getValue();
       this.allowedValues.put(key, value);
     }
   }
 
-  public void addAllowedValue(Object value, Object text) {
+  public ParameterInfo(final String name, final boolean required,
+    final DataType type, final String description,
+    final Object... allowedValues) {
+    this(name, required, type, description, Arrays.asList(allowedValues));
+  }
+
+  public void addAllowedValue(final Object value, final Object text) {
     this.allowedValues.put(value, text);
   }
 
   public Map<Object, Object> getAllowedValues() {
     return allowedValues;
+  }
+
+  public Object getDefaultValue() {
+    return defaultValue;
   }
 
   public String getDescription() {
@@ -87,6 +83,10 @@ public class ParameterInfo {
 
   public boolean isRequired() {
     return required;
+  }
+
+  public void setDefaultValue(final Object defaultValue) {
+    this.defaultValue = defaultValue;
   }
 
 }

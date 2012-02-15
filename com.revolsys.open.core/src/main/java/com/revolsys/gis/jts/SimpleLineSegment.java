@@ -8,13 +8,11 @@ public class SimpleLineSegment extends AbstractLineSegment {
 
   private final double[] startCoordinates;
 
-  public SimpleLineSegment(
-    final CoordinateSequenceIndexLineSegment segment) {
+  public SimpleLineSegment(final CoordinateSequenceIndexLineSegment segment) {
     this(segment.getStartCoordinates(), segment.getEndCoordinates());
   }
 
-  public SimpleLineSegment(
-    final double[] startCoordinates,
+  public SimpleLineSegment(final double[] startCoordinates,
     final double[] endCoordinates) {
     this.dimension = startCoordinates.length;
     this.startCoordinates = startCoordinates.clone();
@@ -30,8 +28,7 @@ public class SimpleLineSegment extends AbstractLineSegment {
     return endCoordinates.clone();
   }
 
-  public double getEndOrdinate(
-    final int ordinateIndex) {
+  public double getEndOrdinate(final int ordinateIndex) {
     return endCoordinates[ordinateIndex];
   }
 
@@ -40,8 +37,7 @@ public class SimpleLineSegment extends AbstractLineSegment {
     return startCoordinates.clone();
   }
 
-  public double getStartOrdinate(
-    final int ordinateIndex) {
+  public double getStartOrdinate(final int ordinateIndex) {
     return startCoordinates[ordinateIndex];
   }
 }

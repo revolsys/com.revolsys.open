@@ -3,20 +3,20 @@ package com.revolsys.converter.string;
 import org.springframework.util.StringUtils;
 
 public class LongStringConverter implements StringConverter<Long> {
+  public Class<Long> getConvertedClass() {
+    return Long.class;
+  }
+
   public boolean requiresQuotes() {
     return false;
   }
 
-  public String toString(Long value) {
-    return value.toString();
-  }
-
-  public Long toObject(Object value) {
+  public Long toObject(final Object value) {
     if (value instanceof Long) {
-      Long integer = (Long)value;
+      final Long integer = (Long)value;
       return integer;
     } else if (value instanceof Number) {
-      Number number = (Number)value;
+      final Number number = (Number)value;
       return number.longValue();
     } else if (value == null) {
       return null;
@@ -25,7 +25,7 @@ public class LongStringConverter implements StringConverter<Long> {
     }
   }
 
-  public Long toObject(String string) {
+  public Long toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Long.valueOf(string);
     } else {
@@ -33,7 +33,7 @@ public class LongStringConverter implements StringConverter<Long> {
     }
   }
 
-  public Class<Long> getConvertedClass() {
-    return Long.class;
+  public String toString(final Long value) {
+    return value.toString();
   }
 }

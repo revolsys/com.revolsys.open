@@ -16,29 +16,25 @@ import com.revolsys.util.CompareUtil;
  * @author Paul Austin
  */
 public class EqualAttributeCountComparator implements Comparator<DataObject> {
-  private DataObject object;
+  private final DataObject object;
 
-  private boolean invert;
+  private final boolean invert;
 
-  private List<String> attributeNames;
+  private final List<String> attributeNames;
 
-  public EqualAttributeCountComparator(
-    DataObject object) {
+  public EqualAttributeCountComparator(final DataObject object) {
     this(object, false);
   }
 
-  public EqualAttributeCountComparator(
-    DataObject object,
-    boolean invert) {
+  public EqualAttributeCountComparator(final DataObject object,
+    final boolean invert) {
     this.object = object;
     final DataObjectMetaData metaData = object.getMetaData();
     attributeNames = metaData.getAttributeNames();
     this.invert = invert;
   }
 
-  public int compare(
-    final DataObject object1,
-    final DataObject object2) {
+  public int compare(final DataObject object1, final DataObject object2) {
     final int compare;
     if (object1 == null) {
       if (object2 == null) {
@@ -52,15 +48,15 @@ public class EqualAttributeCountComparator implements Comparator<DataObject> {
       int count1 = 0;
       int count2 = 0;
 
-      for (String attributeName : attributeNames) {
-        Object value = object.getValue(attributeName);
+      for (final String attributeName : attributeNames) {
+        final Object value = object.getValue(attributeName);
 
-        Object value1 = object1.getValue(attributeName);
+        final Object value1 = object1.getValue(attributeName);
         if (EqualsRegistry.INSTANCE.equals(value, value1)) {
           count1++;
         }
 
-        Object value2 = object1.getValue(attributeName);
+        final Object value2 = object1.getValue(attributeName);
         if (EqualsRegistry.INSTANCE.equals(value, value2)) {
           count2++;
         }

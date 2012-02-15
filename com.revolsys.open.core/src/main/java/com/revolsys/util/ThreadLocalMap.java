@@ -13,14 +13,12 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
     localMap.clear();
   }
 
-  public boolean containsKey(
-    final Object key) {
+  public boolean containsKey(final Object key) {
     final Map<K, V> localMap = getMap();
     return localMap.containsKey(key);
   }
 
-  public boolean containsValue(
-    final Object value) {
+  public boolean containsValue(final Object value) {
     final Map<K, V> localMap = getMap();
     return localMap.containsValue(value);
   }
@@ -30,8 +28,7 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
     return localMap.entrySet();
   }
 
-  public V get(
-    final Object key) {
+  public V get(final Object key) {
     final Map<K, V> localMap = getMap();
     return localMap.get(key);
   }
@@ -55,21 +52,17 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
     return localMap.keySet();
   }
 
-  public V put(
-    final K key,
-    final V value) {
+  public V put(final K key, final V value) {
     final Map<K, V> localMap = getMap();
     return localMap.put(key, value);
   }
 
-  public void putAll(
-    final Map<? extends K, ? extends V> t) {
+  public void putAll(final Map<? extends K, ? extends V> t) {
     final Map<K, V> localMap = getMap();
     localMap.putAll(t);
   }
 
-  public V remove(
-    final Object key) {
+  public V remove(final Object key) {
     final Map<K, V> localMap = getMap();
     return localMap.remove(key);
   }

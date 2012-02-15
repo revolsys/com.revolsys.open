@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import javax.xml.namespace.QName;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -28,7 +27,7 @@ import com.revolsys.ui.html.HtmlUtil;
 public class XmlTagElement extends Element {
   private String content;
 
-  private QName tag;
+  private final QName tag;
 
   public XmlTagElement(final QName tag) {
     this.tag = tag;
@@ -39,6 +38,7 @@ public class XmlTagElement extends Element {
     this.content = content;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     HtmlUtil.serializeTag(out, tag, content);
   }

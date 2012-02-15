@@ -76,13 +76,6 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private int numRecords;
 
-  public XbaseIterator(final Resource resource,
-    final DataObjectFactory dataObjectFactory) throws IOException {
-    this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
-    this.in = new EndianInputStream(resource.getInputStream());
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
   public XbaseIterator(final QName name, final EndianInput in,
     final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = name;
@@ -91,14 +84,37 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     doInit();
   }
 
-  public XbaseIterator(Resource in, DataObjectFactory dataObjectFactory,
-    Runnable initCallback) throws IOException {
+  public XbaseIterator(final Resource resource,
+    final DataObjectFactory dataObjectFactory) throws IOException {
+    this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
+    this.in = new EndianInputStream(resource.getInputStream());
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public XbaseIterator(final Resource in,
+    final DataObjectFactory dataObjectFactory, final Runnable initCallback)
+    throws IOException {
     this(in, dataObjectFactory);
     this.initCallback = initCallback;
   }
 
+  @Override
   protected void doClose() {
     FileUtil.closeSilent(in);
+  }
+
+  @Override
+  protected void doInit() {
+    try {
+      loadHeader();
+      readMetaData();
+      recordBuffer = new byte[recordSize];
+      if (initCallback != null) {
+        initCallback.run();
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Error initializing file ", e);
+    }
   }
 
   private Boolean getBoolean(final int startIndex) {
@@ -161,6 +177,33 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     return metaData;
   }
 
+  @Override
+  protected DataObject getNext() {
+    try {
+      DataObject object = null;
+      deletedCount = currentDeletedCount;
+      currentDeletedCount = 0;
+      int deleteFlag = ' ';
+      do {
+        deleteFlag = in.read();
+        if (deleteFlag == -1) {
+          throw new NoSuchElementException();
+        } else if (deleteFlag == ' ') {
+          object = loadDataObject();
+        } else if (deleteFlag != 0x1A) {
+          currentDeletedCount++;
+          in.read(recordBuffer);
+        }
+      } while (deleteFlag == '*');
+      if (object == null) {
+        throw new NoSuchElementException();
+      }
+      return object;
+    } catch (final IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
   private BigDecimal getNumber(final int startIndex, final int len) {
     BigDecimal number = null;
     final String numberString = getString(startIndex, len);
@@ -168,6 +211,10 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       number = new BigDecimal(numberString.trim());
     }
     return number;
+  }
+
+  public int getNumRecords() {
+    return numRecords;
   }
 
   private String getString(final int startIndex, final int len) {
@@ -178,7 +225,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     if (in.read(recordBuffer) != recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of file");
     }
-    DataObject object = dataObjectFactory.createDataObject(metaData);
+    final DataObject object = dataObjectFactory.createDataObject(metaData);
     int startIndex = 0;
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       int len = metaData.getAttributeLength(i);
@@ -223,10 +270,6 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     in.skipBytes(20);
   }
 
-  public int getNumRecords() {
-    return numRecords;
-  }
-
   private void readMetaData() throws IOException {
     metaData = new DataObjectMetaDataImpl(name);
     int b = in.read();
@@ -257,48 +300,9 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     }
   }
 
-  protected DataObject getNext() {
-    try {
-      DataObject object = null;
-      deletedCount = currentDeletedCount;
-      currentDeletedCount = 0;
-      int deleteFlag = ' ';
-      do {
-        deleteFlag = in.read();
-        if (deleteFlag == -1) {
-          throw new NoSuchElementException();
-        } else if (deleteFlag == ' ') {
-          object = loadDataObject();
-        } else if (deleteFlag != 0x1A) {
-          currentDeletedCount++;
-          in.read(recordBuffer);
-        }
-      } while (deleteFlag == '*');
-      if (object == null) {
-        throw new NoSuchElementException();
-      }
-      return object;
-    } catch (final IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected void doInit() {
-    try {
-      loadHeader();
-      readMetaData();
-      recordBuffer = new byte[recordSize];
-      if (initCallback != null) {
-        initCallback.run();
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error initializing file ", e);
-    }
   }
 
 }

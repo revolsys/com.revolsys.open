@@ -29,15 +29,13 @@ public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
 
   private final Visitor<Edge<T>> matchVisitor;
 
-  public EdgeIntersectLineVisitor(
-    final LineString line,
+  public EdgeIntersectLineVisitor(final LineString line,
     final Visitor<Edge<T>> matchVisitor) {
     this.line = line;
     this.matchVisitor = matchVisitor;
   }
 
-  public boolean visit(
-    final Edge<T> edge) {
+  public boolean visit(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final IntersectionMatrix relate = this.line.relate(line);
     if (relate.get(0, 0) == Dimension.L) {

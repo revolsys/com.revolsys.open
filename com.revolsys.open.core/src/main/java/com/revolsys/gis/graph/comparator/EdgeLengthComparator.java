@@ -17,14 +17,11 @@ public class EdgeLengthComparator<T> implements Comparator<Edge<T>> {
   public EdgeLengthComparator() {
   }
 
-  public EdgeLengthComparator(
-    final boolean invert) {
+  public EdgeLengthComparator(final boolean invert) {
     this.invert = invert;
   }
 
-  public int compare(
-    final Edge<T> edge1,
-    final Edge<T> edge2) {
+  public int compare(final Edge<T> edge1, final Edge<T> edge2) {
     int compare;
     final double length1 = edge1.getLength();
     final double length2 = edge2.getLength();

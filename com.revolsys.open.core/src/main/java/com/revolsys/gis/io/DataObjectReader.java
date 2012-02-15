@@ -62,9 +62,9 @@ public interface DataObjectReader extends Iterator<DataObject> {
    */
   void close();
 
-  String toString();
-
   DataObject next();
 
   void open();
+
+  String toString();
 }

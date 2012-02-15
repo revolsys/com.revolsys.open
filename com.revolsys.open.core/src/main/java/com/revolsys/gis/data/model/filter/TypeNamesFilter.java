@@ -16,13 +16,11 @@ public class TypeNamesFilter implements Filter<DataObject> {
   public TypeNamesFilter() {
   }
 
-  public TypeNamesFilter(
-    final QName typeName) {
+  public TypeNamesFilter(final QName typeName) {
     typeNames.add(typeName);
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     final QName name = metaData.getName();
     return typeNames.contains(name);
@@ -31,8 +29,7 @@ public class TypeNamesFilter implements Filter<DataObject> {
   /**
    * @param typeNames the typeNames to set
    */
-  public void setTypeNames(
-    final Set<Object> typeNames) {
+  public void setTypeNames(final Set<Object> typeNames) {
     for (final Object name : typeNames) {
       if (name instanceof QName) {
         final QName typeName = (QName)name;

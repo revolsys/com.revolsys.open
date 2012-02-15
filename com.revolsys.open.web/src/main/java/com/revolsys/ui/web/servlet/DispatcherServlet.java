@@ -13,9 +13,8 @@ public class DispatcherServlet extends
 
   @Override
   protected void doService(
-    HttpServletRequest request,
-    HttpServletResponse response)
-    throws Exception {
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws Exception {
     try {
       super.doService(request, response);
       request.removeAttribute(WebUtils.INCLUDE_CONTEXT_PATH_ATTRIBUTE);
@@ -23,7 +22,7 @@ public class DispatcherServlet extends
       request.removeAttribute(WebUtils.INCLUDE_QUERY_STRING_ATTRIBUTE);
       request.removeAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
       request.removeAttribute(WebUtils.INCLUDE_SERVLET_PATH_ATTRIBUTE);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       LOG.error(e.getMessage(), e);
       throw e;
     }

@@ -19,9 +19,7 @@ public class WktCsParser {
 
   private final String value;
 
-  public WktCsParser(
-    final InputStream in)
-    throws IOException {
+  public WktCsParser(final InputStream in) throws IOException {
     final StringBuffer value = new StringBuffer();
     final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     for (String line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -30,8 +28,7 @@ public class WktCsParser {
     this.value = value.toString();
   }
 
-  public WktCsParser(
-    final String value) {
+  public WktCsParser(final String value) {
     this.value = value;
   }
 
@@ -140,8 +137,7 @@ public class WktCsParser {
     }
   }
 
-  private AngularUnit processAngularUnit(
-    final List<Object> values) {
+  private AngularUnit processAngularUnit(final List<Object> values) {
     final String name = (String)values.get(0);
     final Number conversionFactor = (Number)values.get(1);
     Authority authority = null;
@@ -151,22 +147,19 @@ public class WktCsParser {
     return new AngularUnit(name, conversionFactor.doubleValue(), authority);
   }
 
-  private Authority processAuthority(
-    final List<Object> values) {
+  private Authority processAuthority(final List<Object> values) {
     final String name = (String)values.get(0);
     final String code = (String)values.get(1);
     return new Authority(name, code);
   }
 
-  private Axis processAxis(
-    final List<Object> values) {
+  private Axis processAxis(final List<Object> values) {
     final String name = (String)values.get(0);
     final String direction = (String)values.get(1);
     return new Axis(name, direction);
   }
 
-  private Datum processDatum(
-    final List<Object> values) {
+  private Datum processDatum(final List<Object> values) {
     final String name = (String)values.get(0);
     Spheroid spheroid = null;
     Authority authority = null;
@@ -215,8 +208,7 @@ public class WktCsParser {
       primeMeridian, angularUnit, axis, authority);
   }
 
-  private LinearUnit processLinearUnit(
-    final List<Object> values) {
+  private LinearUnit processLinearUnit(final List<Object> values) {
     final String name = (String)values.get(0);
     final Number conversionFactor = (Number)values.get(1);
     Authority authority = null;
@@ -226,8 +218,7 @@ public class WktCsParser {
     return new LinearUnit(name, conversionFactor.doubleValue(), authority);
   }
 
-  private PrimeMeridian processPrimeMeridian(
-    final List<Object> values) {
+  private PrimeMeridian processPrimeMeridian(final List<Object> values) {
     final String name = (String)values.get(0);
     final Number longitude = (Number)values.get(1);
     Authority authority = null;
@@ -283,14 +274,12 @@ public class WktCsParser {
       authority);
   }
 
-  private Projection processProjection(
-    final List<Object> values) {
+  private Projection processProjection(final List<Object> values) {
     final String name = (String)values.get(0);
     return new Projection(name);
   }
 
-  private Spheroid processSpheroid(
-    final List<Object> values) {
+  private Spheroid processSpheroid(final List<Object> values) {
     final String name = (String)values.get(0);
     final Number semiMajorAxis = (Number)values.get(1);
     final Number inverseFlattening = (Number)values.get(2);
@@ -302,8 +291,7 @@ public class WktCsParser {
       inverseFlattening.doubleValue(), authority);
   }
 
-  private ToWgs84 processToWgs84(
-    final List<Object> values) {
+  private ToWgs84 processToWgs84(final List<Object> values) {
     return new ToWgs84(values);
   }
 

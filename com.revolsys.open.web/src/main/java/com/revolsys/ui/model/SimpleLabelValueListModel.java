@@ -25,14 +25,9 @@ import java.util.Map;
  * @version 1.0
  */
 public class SimpleLabelValueListModel implements LabelValueListModel {
-  private List labels = new ArrayList();
+  private final List labels = new ArrayList();
 
-  private Map values = new HashMap();
-
-  public void add(final String label, final String value) {
-    labels.add(label);
-    values.put(label, value);
-  }
+  private final Map values = new HashMap();
 
   public void add(final String label, final Object value) {
     if (value != null) {
@@ -44,16 +39,21 @@ public class SimpleLabelValueListModel implements LabelValueListModel {
     }
   }
 
-  public int getSize() {
-    return labels.size();
+  public void add(final String label, final String value) {
+    labels.add(label);
+    values.put(label, value);
   }
 
   public String getLabel(final int index) {
     return (String)labels.get(index);
   }
 
+  public int getSize() {
+    return labels.size();
+  }
+
   public String getValue(final int index) {
-    String label = getLabel(index);
+    final String label = getLabel(index);
     return (String)values.get(label);
   }
 }

@@ -19,19 +19,20 @@ public class PlaceholderResolvingStringValueResolver implements
   StringValueResolver {
   private static final Logger LOG = LoggerFactory.getLogger(PlaceholderResolvingStringValueResolver.class);
 
-  private Map<String, Object> attributes;
+  private final Map<String, Object> attributes;
 
-  private boolean ignoreUnresolvablePlaceholders;
+  private final boolean ignoreUnresolvablePlaceholders;
 
-  private String nullValue;
+  private final String nullValue;
 
-  private String placeholderPrefix;
+  private final String placeholderPrefix;
 
-  private String placeholderSuffix;
+  private final String placeholderSuffix;
 
-  public PlaceholderResolvingStringValueResolver(String placeholderPrefix,
-    String placeholderSuffix, boolean ignoreUnresolvablePlaceholders,
-    String nullValue, Map<String, Object> attributes) {
+  public PlaceholderResolvingStringValueResolver(
+    final String placeholderPrefix, final String placeholderSuffix,
+    final boolean ignoreUnresolvablePlaceholders, final String nullValue,
+    final Map<String, Object> attributes) {
     super();
     this.placeholderPrefix = placeholderPrefix;
     this.placeholderSuffix = placeholderSuffix;
@@ -40,7 +41,8 @@ public class PlaceholderResolvingStringValueResolver implements
     this.attributes = attributes;
   }
 
-  private int findPlaceholderEndIndex(final CharSequence buf,
+  private int findPlaceholderEndIndex(
+    final CharSequence buf,
     final int startIndex) {
     int index = startIndex + this.placeholderPrefix.length();
     int withinNestedPlaceholder = 0;
@@ -76,18 +78,19 @@ public class PlaceholderResolvingStringValueResolver implements
    * @throws BeanDefinitionStoreException if invalid values are encountered
    * @see #resolvePlaceholder(String, java.util.Properties, int)
    */
-  protected String parseStringValue(final String strVal,
-    final Map<String, Object> attributes, final Set<String> visitedPlaceholders)
-    throws BeanDefinitionStoreException {
+  protected String parseStringValue(
+    final String strVal,
+    final Map<String, Object> attributes,
+    final Set<String> visitedPlaceholders) throws BeanDefinitionStoreException {
 
-    StringBuffer buf = new StringBuffer(strVal);
+    final StringBuffer buf = new StringBuffer(strVal);
 
     int startIndex = strVal.indexOf(placeholderPrefix);
     while (startIndex != -1) {
-      int endIndex = findPlaceholderEndIndex(buf, startIndex);
+      final int endIndex = findPlaceholderEndIndex(buf, startIndex);
       if (endIndex != -1) {
-        String placeholder = buf.substring(startIndex
-          + placeholderPrefix.length(), endIndex);
+        String placeholder = buf.substring(
+          startIndex + placeholderPrefix.length(), endIndex);
         if (!visitedPlaceholders.add(placeholder)) {
           throw new BeanDefinitionStoreException(
             "Circular placeholder reference '" + placeholder
@@ -98,7 +101,7 @@ public class PlaceholderResolvingStringValueResolver implements
         placeholder = parseStringValue(placeholder, attributes,
           visitedPlaceholders);
         // Now obtain the value for the fully resolved key...
-        Object propValue = attributes.get(placeholder);
+        final Object propValue = attributes.get(placeholder);
         if (propValue != null) {
           String propVal = propValue.toString();
           // Recursive invocation, parsing placeholders contained in the
@@ -109,8 +112,8 @@ public class PlaceholderResolvingStringValueResolver implements
           if (LOG.isTraceEnabled()) {
             LOG.trace("Resolved placeholder '" + placeholder + "'");
           }
-          startIndex = buf.indexOf(this.placeholderPrefix, startIndex
-            + propVal.length());
+          startIndex = buf.indexOf(this.placeholderPrefix,
+            startIndex + propVal.length());
         } else if (this.ignoreUnresolvablePlaceholders) {
           // Proceed with unprocessed value.
           startIndex = buf.indexOf(this.placeholderPrefix, endIndex
@@ -128,8 +131,8 @@ public class PlaceholderResolvingStringValueResolver implements
     return buf.toString();
   }
 
-  public String resolveStringValue(String strVal) throws BeansException {
-     String value = parseStringValue(strVal, this.attributes,
+  public String resolveStringValue(final String strVal) throws BeansException {
+    final String value = parseStringValue(strVal, this.attributes,
       new HashSet<String>());
     return (value.equals(nullValue) ? null : value);
   }

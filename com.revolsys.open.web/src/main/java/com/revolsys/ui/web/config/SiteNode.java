@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 public final class SiteNode implements Comparable, Cloneable {
   private static final Logger log = Logger.getLogger(SiteNode.class);
+
   /** The parent node. */
   private SiteNode parent;
 
@@ -21,24 +22,39 @@ public final class SiteNode implements Comparable, Cloneable {
   private SiteNodeController controller;
 
   /** The direct child nodes. */
-  private Collection nodes = new ArrayList();
+  private final Collection nodes = new ArrayList();
 
   /** The map of node names to nodes. */
-  private Map nodeMap = new TreeMap();
+  private final Map nodeMap = new TreeMap();
 
   /** The path to the node. */
   private String path;
 
   /** The map from regular expression to site node. */
-  private Map regexNodes = new HashMap();
+  private final Map regexNodes = new HashMap();
 
   /** The ordered set of site node patterns. */
-  private Set regexPatterns = new LinkedHashSet();
+  private final Set regexPatterns = new LinkedHashSet();
 
   /**
    * Construct a new root SiteNode.
    */
   public SiteNode() {
+  }
+
+  /**
+   * Construct a deep copy of the node. Does not retain the reference to the
+   * parent node.
+   * 
+   * @param node The node to copy.
+   */
+  public SiteNode(final SiteNode node) {
+    this.path = node.path;
+    if (node.hasController()) {
+      this.controller = (SiteNodeController)node.controller.clone();
+    }
+    setNodes(node.getNodes());
+
   }
 
   /**
@@ -60,31 +76,62 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
-   * Construct a deep copy of the node. Does not retain the reference to the
-   * parent node.
+   * Add the node as a child of this node.
    * 
-   * @param node The node to copy.
+   * @param node The node.
    */
-  public SiteNode(final SiteNode node) {
-    this.path = node.path;
-    if (node.hasController()) {
-      this.controller = (SiteNodeController)node.controller.clone();
-    }
-    setNodes(node.getNodes());
-
+  protected void addNode(final SiteNode node) {
+    node.setParent(this);
+    nodeMap.put(node.getPath(), node);
+    nodes.add(node);
   }
 
   /**
-   * Merge the values of the specified node with this node.
+   * Add the path for the parent node and this node to the string buffer.
    * 
-   * @param node The node to merge from.
+   * @param buffer The buffer to add the path to.
    */
-  protected void mergeNode(final SiteNode node) {
-    setNodes(node.getNodes());
-    SiteNodeController controller = node.getController();
-    if (controller != null) {
-      setController(controller);
+  private void addPath(final StringBuffer buffer) {
+    if (hasParent()) {
+      parent.addPath(buffer);
     }
+    if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '/') {
+      buffer.append("/");
+    }
+    if (path != null) {
+      buffer.append(getPath());
+    }
+  }
+
+  /**
+   * Create a deep copy of this node. Does not retain the reference to the
+   * parent node.
+   * 
+   * @return The cloned node.
+   */
+  @Override
+  protected Object clone() {
+    return new SiteNode(this);
+  }
+
+  /**
+   * Compare this node to another node. The comparison is performed on the path.
+   * 
+   * @param o The object to compare.
+   * @return -1 (less than), 0 (equal) or 1 (greater than).
+   */
+  public int compareTo(final Object o) {
+    if (o instanceof SiteNode) {
+      final SiteNode node = (SiteNode)o;
+      if (path == null) {
+        return -1;
+      } else if (node.path == null) {
+        return 1;
+      } else {
+        return path.compareTo(node.path);
+      }
+    }
+    return -1;
   }
 
   /**
@@ -95,14 +142,14 @@ public final class SiteNode implements Comparable, Cloneable {
    */
   public SiteNode findSiteNode(final String path) {
     SiteNode node = null;
-    int slashIndex = path.indexOf('/');
+    final int slashIndex = path.indexOf('/');
     if (slashIndex == 0) {
-      String childPath = path.substring(slashIndex + 1);
+      final String childPath = path.substring(slashIndex + 1);
       node = findSiteNode(childPath);
     } else if (slashIndex != -1) {
-      String childName = path.substring(0, slashIndex);
-      String childPath = path.substring(slashIndex + 1);
-      SiteNode childNode = findSiteNode(childName);
+      final String childName = path.substring(0, slashIndex);
+      final String childPath = path.substring(slashIndex + 1);
+      final SiteNode childNode = findSiteNode(childName);
       if (childNode != null) {
         node = childNode.findSiteNode(childPath);
       }
@@ -110,8 +157,8 @@ public final class SiteNode implements Comparable, Cloneable {
       node = getNode(path);
     }
     if (node == null) {
-      for (Iterator nodeIter = regexPatterns.iterator(); nodeIter.hasNext();) {
-        Pattern pattern = (Pattern)nodeIter.next();
+      for (final Iterator nodeIter = regexPatterns.iterator(); nodeIter.hasNext();) {
+        final Pattern pattern = (Pattern)nodeIter.next();
         if (pattern.matcher(path).matches()) {
           return (SiteNode)regexNodes.get(pattern.pattern());
         }
@@ -132,15 +179,6 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
-   * Check to see if this node has a controller.
-   * 
-   * @return True if the node has a controller.
-   */
-  public boolean hasController() {
-    return controller != null;
-  }
-
-  /**
    * Get the controller for the node specified by the path (see
    * {@link #findSiteNode(String)} for a description how the path is processed.
    * 
@@ -148,7 +186,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * @return The controller.
    */
   public SiteNodeController getController(final String path) {
-    SiteNode pageNode = findSiteNode(path);
+    final SiteNode pageNode = findSiteNode(path);
     if (pageNode != null) {
       return pageNode.getController();
     } else {
@@ -157,45 +195,14 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
-   * Set the controller for this node.
+   * Get the full path to the node, including the path's of all parents.
    * 
-   * @param controller The controller.
+   * @return The path.
    */
-  public void setController(final SiteNodeController controller) {
-    this.controller = controller;
-  }
-
-  /**
-   * Set the controller for the node specified by the path name. If the
-   * controller's node already has a parent node, clone the controller so that
-   * changing the values on the controller on one path does not affect the
-   * other. See {@link #setNode(String, SiteNode)} for details on how the
-   * controller for the node is set.
-   * 
-   * @param path The path.
-   * @param controller The controller.
-   */
-  public void setController(final String path,
-    final SiteNodeController controller) {
-    SiteNode controllerNode = controller.getNode();
-    // If the controller's node already has a parent clone it.
-    if (controllerNode.hasParent()) {
-      SiteNodeController newController = (SiteNodeController)controller.clone();
-      controllerNode = newController.getNode();
-    }
-    setNode(path, controllerNode);
-
-  }
-
-  /**
-   * Add the node as a child of this node.
-   * 
-   * @param node The node.
-   */
-  protected void addNode(final SiteNode node) {
-    node.setParent(this);
-    nodeMap.put(node.getPath(), node);
-    nodes.add(node);
+  public String getFullPath() {
+    final StringBuffer path = new StringBuffer();
+    addPath(path);
+    return path.toString();
   }
 
   /**
@@ -220,6 +227,93 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
+   * @return Returns the parent.
+   */
+  public SiteNode getParent() {
+    return parent;
+  }
+
+  /**
+   * Get the path for the node relative to the parenr node.
+   * 
+   * @return The path.
+   */
+  public String getPath() {
+    if (path != null) {
+      return path;
+    } else if (parent == null) {
+      return null;
+    } else if (controller != null) {
+      return controller.getPath();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Check to see if this node has a controller.
+   * 
+   * @return True if the node has a controller.
+   */
+  public boolean hasController() {
+    return controller != null;
+  }
+
+  /**
+   * Check to see if this node has a parent.
+   * 
+   * @return True if the node has a parent.
+   */
+  public boolean hasParent() {
+    return parent != null;
+  }
+
+  /**
+   * Merge the values of the specified node with this node.
+   * 
+   * @param node The node to merge from.
+   */
+  protected void mergeNode(final SiteNode node) {
+    setNodes(node.getNodes());
+    final SiteNodeController controller = node.getController();
+    if (controller != null) {
+      setController(controller);
+    }
+  }
+
+  /**
+   * Set the controller for this node.
+   * 
+   * @param controller The controller.
+   */
+  public void setController(final SiteNodeController controller) {
+    this.controller = controller;
+  }
+
+  /**
+   * Set the controller for the node specified by the path name. If the
+   * controller's node already has a parent node, clone the controller so that
+   * changing the values on the controller on one path does not affect the
+   * other. See {@link #setNode(String, SiteNode)} for details on how the
+   * controller for the node is set.
+   * 
+   * @param path The path.
+   * @param controller The controller.
+   */
+  public void setController(
+    final String path,
+    final SiteNodeController controller) {
+    SiteNode controllerNode = controller.getNode();
+    // If the controller's node already has a parent clone it.
+    if (controllerNode.hasParent()) {
+      final SiteNodeController newController = (SiteNodeController)controller.clone();
+      controllerNode = newController.getNode();
+    }
+    setNode(path, controllerNode);
+
+  }
+
+  /**
    * Set the node for the specified path. A node will be created for each
    * element in the path if one does not exist. If the last element does not
    * exist the node will be set as the node for that element. If it does exist
@@ -232,14 +326,14 @@ public final class SiteNode implements Comparable, Cloneable {
     if (path != null && path.trim().length() > 0) {
       if (path.startsWith("regex:")) {
         addNode(node);
-        String regex = path.substring(6);
+        final String regex = path.substring(6);
         regexNodes.put(regex, node);
         regexPatterns.add(Pattern.compile(regex));
       } else {
-        String[] names = path.split("/");
+        final String[] names = path.split("/");
         SiteNode currentNode = this;
         for (int i = 0; i < names.length; i++) {
-          String name = names[i].trim();
+          final String name = names[i].trim();
           if (name.length() > 0) {
             SiteNode childNode = currentNode.getNode(name);
             if (childNode == null) {
@@ -283,12 +377,12 @@ public final class SiteNode implements Comparable, Cloneable {
    * @param nodes The site nodes
    */
   public void setNodes(final Collection nodes) {
-    for (Iterator nodeIter = nodes.iterator(); nodeIter.hasNext();) {
+    for (final Iterator nodeIter = nodes.iterator(); nodeIter.hasNext();) {
       Object element = nodeIter.next();
       String path = null;
       boolean clone = false;
       if (element instanceof BeanReference) {
-        BeanReference ref = (BeanReference)element;
+        final BeanReference ref = (BeanReference)element;
         element = ref.getReferencedBean();
         clone = true;
         path = ref.getName();
@@ -316,71 +410,10 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
-   * @return Returns the parent.
-   */
-  public SiteNode getParent() {
-    return parent;
-  }
-
-  /**
-   * Check to see if this node has a parent.
-   * 
-   * @return True if the node has a parent.
-   */
-  public boolean hasParent() {
-    return parent != null;
-  }
-
-  /**
    * @param parent The parent to set.
    */
   public void setParent(final SiteNode parent) {
     this.parent = parent;
-  }
-
-  /**
-   * Add the path for the parent node and this node to the string buffer.
-   * 
-   * @param buffer The buffer to add the path to.
-   */
-  private void addPath(final StringBuffer buffer) {
-    if (hasParent()) {
-      parent.addPath(buffer);
-    }
-    if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '/') {
-      buffer.append("/");
-    }
-    if (path != null) {
-      buffer.append(getPath());
-    }
-  }
-
-  /**
-   * Get the full path to the node, including the path's of all parents.
-   * 
-   * @return The path.
-   */
-  public String getFullPath() {
-    StringBuffer path = new StringBuffer();
-    addPath(path);
-    return path.toString();
-  }
-
-  /**
-   * Get the path for the node relative to the parenr node.
-   * 
-   * @return The path.
-   */
-  public String getPath() {
-    if (path != null) {
-      return path;
-    } else if (parent == null) {
-      return null;
-    } else if (controller != null) {
-      return controller.getPath();
-    } else {
-      return null;
-    }
   }
 
   /**
@@ -391,40 +424,11 @@ public final class SiteNode implements Comparable, Cloneable {
   }
 
   /**
-   * Compare this node to another node. The comparison is performed on the path.
-   * 
-   * @param o The object to compare.
-   * @return -1 (less than), 0 (equal) or 1 (greater than).
-   */
-  public int compareTo(final Object o) {
-    if (o instanceof SiteNode) {
-      SiteNode node = (SiteNode)o;
-      if (path == null) {
-        return -1;
-      } else if (node.path == null) {
-        return 1;
-      } else {
-        return path.compareTo(node.path);
-      }
-    }
-    return -1;
-  }
-
-  /**
-   * Create a deep copy of this node. Does not retain the reference to the
-   * parent node.
-   * 
-   * @return The cloned node.
-   */
-  protected Object clone() {
-    return new SiteNode(this);
-  }
-
-  /**
    * Get the string representation of the node.
    * 
    * @return The string representation.
    */
+  @Override
   public String toString() {
     return getFullPath();
   }

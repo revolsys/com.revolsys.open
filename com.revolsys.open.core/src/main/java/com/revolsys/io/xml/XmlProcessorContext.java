@@ -49,8 +49,7 @@ public interface XmlProcessorContext extends XMLReporter {
    * 
    * @param error The error.
    */
-  void addError(
-    final XmlProcessorError error);
+  void addError(final XmlProcessorError error);
 
   /**
    * Get the value of an attribute.
@@ -58,8 +57,7 @@ public interface XmlProcessorContext extends XMLReporter {
    * @param name The name of the attribute.
    * @return The attribute value.
    */
-  Object getAttribute(
-    final String name);
+  Object getAttribute(final String name);
 
   /**
    * Get the list of {@link XmlProcessorError}s in processing the XML Document.
@@ -76,7 +74,5 @@ public interface XmlProcessorContext extends XMLReporter {
    * @param name The name of the attribute.
    * @param value The value of the attribute.
    */
-  void setAttribute(
-    final String name,
-    final Object value);
+  void setAttribute(final String name, final Object value);
 }

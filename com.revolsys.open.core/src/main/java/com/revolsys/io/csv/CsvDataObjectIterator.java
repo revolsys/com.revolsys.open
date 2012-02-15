@@ -34,7 +34,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   /** The metadata for the data being read by this iterator. */
   private DataObjectMetaData metaData;
 
-  private Resource resource;
+  private final Resource resource;
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
@@ -48,27 +48,9 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  protected void doInit() {
-    try {
-      this.in = new BufferedReader(new InputStreamReader(
-        this.resource.getInputStream(), CsvConstants.CHARACTER_SET));
-      final String[] line = readNextRecord();
-      createMetaData(line);
-    } catch (IOException e) {
-      throw new RuntimeException("Unable to open " + resource, e);
-    }
-  }
-
-  /**
-   * Closes the underlying reader.
-   */
-  protected void doClose() {
-    FileUtil.closeSilent(in);
-  }
-
-  private void createMetaData(String[] fieldNames) throws IOException {
+  private void createMetaData(final String[] fieldNames) throws IOException {
     final List<Attribute> attributes = new ArrayList<Attribute>();
-    for (String name : fieldNames) {
+    for (final String name : fieldNames) {
       final DataType type = DataTypes.STRING;
       attributes.add(new Attribute(name, type, false));
     }
@@ -77,8 +59,42 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
     metaData = new DataObjectMetaDataImpl(typeName, getProperties(), attributes);
   }
 
+  /**
+   * Closes the underlying reader.
+   */
+  @Override
+  protected void doClose() {
+    FileUtil.closeSilent(in);
+  }
+
+  @Override
+  protected void doInit() {
+    try {
+      this.in = new BufferedReader(new InputStreamReader(
+        this.resource.getInputStream(), CsvConstants.CHARACTER_SET));
+      final String[] line = readNextRecord();
+      createMetaData(line);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to open " + resource, e);
+    }
+  }
+
   public DataObjectMetaData getMetaData() {
     return metaData;
+  }
+
+  @Override
+  protected DataObject getNext() {
+    try {
+      final String[] record = readNextRecord();
+      if (record != null && record.length > 0) {
+        return parseDataObject(record);
+      } else {
+        throw new NoSuchElementException();
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   /**
@@ -109,9 +125,9 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       if (i < record.length) {
         value = record[i];
         if (value != null) {
-          DataType dataType = metaData.getAttributeType(i);
-          Object convertedValue = StringConverterRegistry.toObject(dataType,
-            value);
+          final DataType dataType = metaData.getAttributeType(i);
+          final Object convertedValue = StringConverterRegistry.toObject(
+            dataType, value);
           object.setValue(i, convertedValue);
         }
       }
@@ -182,20 +198,6 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
         }
       }
       return fields.toArray(new String[0]);
-    }
-  }
-
-  @Override
-  protected DataObject getNext() {
-    try {
-      final String[] record = readNextRecord();
-      if (record != null && record.length > 0) {
-        return parseDataObject(record);
-      } else {
-        throw new NoSuchElementException();
-      }
-    } catch (final IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
     }
   }
 

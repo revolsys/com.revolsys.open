@@ -23,24 +23,24 @@ import org.apache.log4j.Logger;
 
 public class Argument {
   private static final Logger log = Logger.getLogger(Argument.class);
-  private String name;
 
-  private String defaultValue;
+  private final String name;
 
-  private Class type;
+  private final String defaultValue;
 
-  private boolean required;
+  private final Class type;
+
+  private final boolean required;
 
   private Constructor constructor;
 
-  private boolean inheritable;
+  private final boolean inheritable;
 
   /** The initialization parameters for the argument. */
-  private HashMap parameters = new HashMap();
+  private final HashMap parameters = new HashMap();
 
   public Argument(final String name, final Class type,
-    final String defaultValue, final boolean required,
-    final boolean inheritable) {
+    final String defaultValue, final boolean required, final boolean inheritable) {
     this.name = name;
     this.type = type;
     this.defaultValue = defaultValue;
@@ -51,14 +51,13 @@ public class Argument {
         constructor = type.getConstructor(new Class[] {
           String.class
         });
-      } catch (NoSuchMethodException e) {
+      } catch (final NoSuchMethodException e) {
         throw new IllegalArgumentException(
           type.getName()
             + " must have a constructor that takes a java.lang.String as an argument");
       }
     }
   }
-
 
   public String getDefault() {
     return defaultValue;
@@ -72,12 +71,12 @@ public class Argument {
     return type;
   }
 
-  public boolean isRequired() {
-    return required;
-  }
-
   public boolean isInheritable() {
     return inheritable;
+  }
+
+  public boolean isRequired() {
+    return required;
   }
 
   /**
@@ -99,12 +98,12 @@ public class Argument {
     }
     try {
       return constructor.newInstance(args);
-    } catch (InstantiationException e) {
+    } catch (final InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
-    } catch (IllegalAccessException e) {
+    } catch (final IllegalAccessException e) {
       throw new RuntimeException(e.getMessage(), e);
-    } catch (InvocationTargetException e) {
-      Throwable t = e.getTargetException();
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
       if (t instanceof RuntimeException) {
         throw (RuntimeException)t;
       } else if (t instanceof Error) {

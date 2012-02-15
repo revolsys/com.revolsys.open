@@ -36,8 +36,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
   /**
    * @param writer
    */
-  public StaxXmlWriter(
-    final XmlWriter writer) {
+  public StaxXmlWriter(final XmlWriter writer) {
     this.writer = writer;
   }
 
@@ -51,8 +50,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * 
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void close()
-    throws XMLStreamException {
+  public void close() throws XMLStreamException {
     writer.close();
   }
 
@@ -61,8 +59,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * 
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void flush()
-    throws XMLStreamException {
+  public void flush() throws XMLStreamException {
     writer.flush();
   }
 
@@ -82,9 +79,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @return The prefix.
    * @throws XMLStreamException If there was an exception getting the prefix.
    */
-  public String getPrefix(
-    final String namespaceUri)
-    throws XMLStreamException {
+  public String getPrefix(final String namespaceUri) throws XMLStreamException {
     return writer.getPrefix(namespaceUri);
   }
 
@@ -94,8 +89,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param name The name of the property, may not be null.
    * @return The value of the property.
    */
-  public Object getProperty(
-    final String name) {
+  public Object getProperty(final String name) {
     if (name == null) {
       throw new NullPointerException();
     }
@@ -108,8 +102,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param namespaceUri The XML Namespace URI.
    * @throws XMLStreamException If there was an exception setting the prefix.
    */
-  public void setDefaultNamespace(
-    final String namespaceUri)
+  public void setDefaultNamespace(final String namespaceUri)
     throws XMLStreamException {
   }
 
@@ -119,8 +112,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param namespaceContext The namespace context.
    * @throws XMLStreamException If there was an error setting the context.
    */
-  public void setNamespaceContext(
-    final NamespaceContext namespaceContext)
+  public void setNamespaceContext(final NamespaceContext namespaceContext)
     throws XMLStreamException {
     this.namespaceContext = namespaceContext;
   }
@@ -132,9 +124,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param namespaceUri The XML Namespace URI.
    * @throws XMLStreamException If there was an exception setting the prefix.
    */
-  public void setPrefix(
-    final String prefix,
-    final String namespaceUri)
+  public void setPrefix(final String prefix, final String namespaceUri)
     throws XMLStreamException {
     writer.setPrefix(prefix, namespaceUri);
   }
@@ -146,9 +136,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param value The value of the attribute
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeAttribute(
-    final String name,
-    final String value)
+  public void writeAttribute(final String name, final String value)
     throws XMLStreamException {
     writer.attribute(new QName(name), value);
   }
@@ -164,8 +152,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
   public void writeAttribute(
     final String namespaceUri,
     final String name,
-    final String value)
-    throws XMLStreamException {
+    final String value) throws XMLStreamException {
     writer.attribute(new QName(namespaceUri, name), value);
   }
 
@@ -182,8 +169,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
     final String prefix,
     final String namespaceUri,
     final String name,
-    final String value)
-    throws XMLStreamException {
+    final String value) throws XMLStreamException {
     writer.attribute(new QName(namespaceUri, name, prefix), value);
   }
 
@@ -194,9 +180,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param text The text to wrap in a CDATA section
    * @throws XMLStreamException If there was a problem writing the text
    */
-  public void writeCData(
-    final String text)
-    throws XMLStreamException {
+  public void writeCData(final String text) throws XMLStreamException {
     writer.cdata(text);
   }
 
@@ -212,8 +196,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
   public void writeCharacters(
     final char[] buffer,
     final int offset,
-    final int length)
-    throws XMLStreamException {
+    final int length) throws XMLStreamException {
     writer.text(buffer, offset, length);
   }
 
@@ -223,9 +206,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param text The text to write
    * @throws XMLStreamException If there was a problem writing the text
    */
-  public void writeCharacters(
-    final String text)
-    throws XMLStreamException {
+  public void writeCharacters(final String text) throws XMLStreamException {
     writer.text(text);
   }
 
@@ -235,9 +216,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param comment The comment to write
    * @throws XMLStreamException If there was a problem writing the comment
    */
-  public void writeComment(
-    final String comment)
-    throws XMLStreamException {
+  public void writeComment(final String comment) throws XMLStreamException {
     writer.comment(comment);
   }
 
@@ -247,8 +226,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param namespaceUri The XML Namespace URI.
    * @throws XMLStreamException If there was a problem writing the namespace.
    */
-  public void writeDefaultNamespace(
-    final String namespaceUri)
+  public void writeDefaultNamespace(final String namespaceUri)
     throws XMLStreamException {
     setPrefix("", namespaceUri);
   }
@@ -260,9 +238,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param dtd The DTD to be written
    * @throws XMLStreamException If there was a problem writing the declaration
    */
-  public void writeDTD(
-    final String dtd)
-    throws XMLStreamException {
+  public void writeDTD(final String dtd) throws XMLStreamException {
     writer.docType(dtd);
   }
 
@@ -272,9 +248,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param name The local name of the element.
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeEmptyElement(
-    final String name)
-    throws XMLStreamException {
+  public void writeEmptyElement(final String name) throws XMLStreamException {
     writer.emptyTag(new QName(name));
   }
 
@@ -285,9 +259,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param namespaceUri The XML Namespace URI of the element.
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeEmptyElement(
-    final String namespaceUri,
-    final String name)
+  public void writeEmptyElement(final String namespaceUri, final String name)
     throws XMLStreamException {
     writer.emptyTag(new QName(namespaceUri, name));
   }
@@ -303,8 +275,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
   public void writeEmptyElement(
     final String prefix,
     final String name,
-    final String namespaceUri)
-    throws XMLStreamException {
+    final String namespaceUri) throws XMLStreamException {
     writer.emptyTag(new QName(namespaceUri, name, prefix));
   }
 
@@ -313,8 +284,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * 
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeEndDocument()
-    throws XMLStreamException {
+  public void writeEndDocument() throws XMLStreamException {
     writer.endDocument();
   }
 
@@ -323,8 +293,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * 
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeEndElement()
-    throws XMLStreamException {
+  public void writeEndElement() throws XMLStreamException {
     writer.endTag();
   }
 
@@ -334,9 +303,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param name The name of the entity
    * @throws XMLStreamException If there was a problem writing the entity
    */
-  public void writeEntityRef(
-    final String name)
-    throws XMLStreamException {
+  public void writeEntityRef(final String name) throws XMLStreamException {
     writer.entityRef(name);
   }
 
@@ -347,9 +314,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param namespaceUri The XML Namespace URI.
    * @throws XMLStreamException If there was a problem writing the namespace.
    */
-  public void writeNamespace(
-    final String prefix,
-    final String namespaceUri)
+  public void writeNamespace(final String prefix, final String namespaceUri)
     throws XMLStreamException {
     setPrefix(prefix, namespaceUri);
 
@@ -361,8 +326,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param target The PI Target (must not be xml)
    * @throws XMLStreamException If there was a problem writing the comment
    */
-  public void writeProcessingInstruction(
-    final String target)
+  public void writeProcessingInstruction(final String target)
     throws XMLStreamException {
     writer.processingInstruction(target, null);
   }
@@ -374,9 +338,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param value The value of the processing instruction
    * @throws XMLStreamException If there was a problem writing the comment
    */
-  public void writeProcessingInstruction(
-    final String target,
-    final String value)
+  public void writeProcessingInstruction(final String target, final String value)
     throws XMLStreamException {
     writer.processingInstruction(target, value);
   }
@@ -387,8 +349,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @throws XMLStreamException If there was a problem writing the XML
    *           Declaration.
    */
-  public void writeStartDocument()
-    throws XMLStreamException {
+  public void writeStartDocument() throws XMLStreamException {
     writer.startDocument();
   }
 
@@ -399,8 +360,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @throws XMLStreamException If there was a problem writing the XML
    *           Declaration.
    */
-  public void writeStartDocument(
-    final String encoding)
+  public void writeStartDocument(final String encoding)
     throws XMLStreamException {
     writer.startDocument(encoding);
   }
@@ -413,9 +373,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @throws XMLStreamException If there was a problem writing the XML
    *           Declaration.
    */
-  public void writeStartDocument(
-    final String encoding,
-    final String version)
+  public void writeStartDocument(final String encoding, final String version)
     throws XMLStreamException {
     writer.startDocument(encoding, version);
   }
@@ -426,9 +384,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param name The local name of the element.
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeStartElement(
-    final String name)
-    throws XMLStreamException {
+  public void writeStartElement(final String name) throws XMLStreamException {
     writer.startTag(new QName(name));
   }
 
@@ -439,9 +395,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
    * @param name The local name of the element.
    * @throws XMLStreamException If an exception writing the XML occurs.
    */
-  public void writeStartElement(
-    final String namespaceUri,
-    final String name)
+  public void writeStartElement(final String namespaceUri, final String name)
     throws XMLStreamException {
     writer.startTag(new QName(name));
   }
@@ -457,8 +411,7 @@ public class StaxXmlWriter implements XMLStreamWriter {
   public void writeStartElement(
     final String prefix,
     final String name,
-    final String namespaceUri)
-    throws XMLStreamException {
+    final String namespaceUri) throws XMLStreamException {
     writer.startTag(new QName(namespaceUri, name, prefix));
   }
 

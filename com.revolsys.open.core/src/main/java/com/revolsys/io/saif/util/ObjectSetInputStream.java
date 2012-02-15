@@ -45,9 +45,7 @@ public class ObjectSetInputStream extends InputStream {
 
   private ZipFile zipFile;
 
-  public ObjectSetInputStream(
-    final File directory,
-    final String fileName)
+  public ObjectSetInputStream(final File directory, final String fileName)
     throws IOException {
     this.directory = directory;
     this.fileName = fileName;
@@ -59,9 +57,7 @@ public class ObjectSetInputStream extends InputStream {
     }
   }
 
-  public ObjectSetInputStream(
-    final ZipFile zipFile,
-    final String fileName)
+  public ObjectSetInputStream(final ZipFile zipFile, final String fileName)
     throws IOException {
     this.zipFile = zipFile;
     this.fileName = fileName;
@@ -74,8 +70,7 @@ public class ObjectSetInputStream extends InputStream {
   }
 
   @Override
-  public void close()
-    throws IOException {
+  public void close() throws IOException {
     if (log.isDebugEnabled()) {
       log.debug("Closing object subset '" + fileName + "' from reading");
     }
@@ -84,9 +79,7 @@ public class ObjectSetInputStream extends InputStream {
     }
   }
 
-  private InputStream openFile(
-    final String fileName)
-    throws IOException {
+  private InputStream openFile(final String fileName) throws IOException {
     if (log.isDebugEnabled()) {
       log.debug("Opening object subset '" + fileName + "' for reading");
     }
@@ -104,8 +97,7 @@ public class ObjectSetInputStream extends InputStream {
     return null;
   }
 
-  private boolean openNextFile()
-    throws IOException {
+  private boolean openNextFile() throws IOException {
     close();
     index++;
     final String fileName = ObjectSetUtil.getObjectSubsetName(prefix, index);
@@ -119,8 +111,7 @@ public class ObjectSetInputStream extends InputStream {
   }
 
   @Override
-  public int read()
-    throws IOException {
+  public int read() throws IOException {
     int bytesRead = in.read();
     if (bytesRead == -1) {
       if (!openNextFile()) {
@@ -133,17 +124,12 @@ public class ObjectSetInputStream extends InputStream {
   }
 
   @Override
-  public int read(
-    final byte[] b)
-    throws IOException {
+  public int read(final byte[] b) throws IOException {
     return read(b, 0, b.length);
   }
 
   @Override
-  public int read(
-    final byte[] b,
-    final int off,
-    final int len)
+  public int read(final byte[] b, final int off, final int len)
     throws IOException {
     if (in == null) {
       return -1;

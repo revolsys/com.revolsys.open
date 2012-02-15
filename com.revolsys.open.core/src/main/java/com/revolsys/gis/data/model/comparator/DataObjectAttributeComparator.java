@@ -36,7 +36,9 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
     return 0;
   }
 
-  public int compare(final DataObject object1, final DataObject object2,
+  public int compare(
+    final DataObject object1,
+    final DataObject object2,
     final String attributeName) {
     final Comparable<Object> value1 = DataObjectUtil.getAttributeByPath(
       object1, attributeName);

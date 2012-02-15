@@ -19,7 +19,7 @@ import java.util.Collection;
 
 public class DynamicMenu extends Menu {
 
-  private MenuItemLoader loader;
+  private final MenuItemLoader loader;
 
   public DynamicMenu(final String name, final String title, final String uri,
     final String anchor, final String condition, final MenuItemLoader loader)
@@ -28,10 +28,12 @@ public class DynamicMenu extends Menu {
     this.loader = loader;
   }
 
+  @Override
   public Collection getItems() {
     return loader.getItems();
   }
 
+  @Override
   public String getTitle() {
     String title = loader.getTitle();
     if (title == null) {
@@ -40,6 +42,7 @@ public class DynamicMenu extends Menu {
     return title;
   }
 
+  @Override
   public String getUri() {
     String uri = loader.getUri();
     if (uri == null) {

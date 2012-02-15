@@ -46,21 +46,6 @@ public final class PhoneNumber {
 
   /**
    * Format the phone number using the National format specification defined for
-   * the Locale. If the phone number does not match the specification for that
-   * locale the first few digits of the phone number will be used to lookup a
-   * matching country and formatted using that locale, if that fails the
-   * unformatted phone number will be returned.
-   * 
-   * @param phoneNumber The normalized phone number to format.
-   * @param locale The Locale the phone number should be formatted for.
-   * @return The formatted phone number.
-   */
-  public static String format(final String phoneNumber, final Locale locale) {
-    return format(phoneNumber, Country.getCountry(locale.getCountry()), false);
-  }
-
-  /**
-   * Format the phone number using the National format specification defined for
    * the Country. If the phone number does not match the specification for that
    * country the first few digits of the phone number will be used to lookup a
    * matching country and formatted using that country, if that fails the
@@ -89,7 +74,9 @@ public final class PhoneNumber {
    *          format.
    * @return The formatted phone number.
    */
-  public static String format(final String phoneNumber, final Country country,
+  public static String format(
+    final String phoneNumber,
+    final Country country,
     final boolean international) {
     String formattedNumber = null;
     if (phoneNumber == null) {
@@ -105,7 +92,7 @@ public final class PhoneNumber {
       }
     }
     if (formattedNumber == null) {
-      Country potentialCountry = Country.getCountryByPhoneNumber(phoneNumber);
+      final Country potentialCountry = Country.getCountryByPhoneNumber(phoneNumber);
       if (potentialCountry != null) {
         formattedNumber = format(phoneNumber, potentialCountry.getPhoneRegEx(),
           potentialCountry.getPhoneInternationalFormat());
@@ -119,6 +106,21 @@ public final class PhoneNumber {
   }
 
   /**
+   * Format the phone number using the National format specification defined for
+   * the Locale. If the phone number does not match the specification for that
+   * locale the first few digits of the phone number will be used to lookup a
+   * matching country and formatted using that locale, if that fails the
+   * unformatted phone number will be returned.
+   * 
+   * @param phoneNumber The normalized phone number to format.
+   * @param locale The Locale the phone number should be formatted for.
+   * @return The formatted phone number.
+   */
+  public static String format(final String phoneNumber, final Locale locale) {
+    return format(phoneNumber, Country.getCountry(locale.getCountry()), false);
+  }
+
+  /**
    * Parse a phone number using the regular expression and if it matches the
    * phone number, format it using the specified format otherwise return null.
    * 
@@ -127,34 +129,41 @@ public final class PhoneNumber {
    * @param format The format specification.
    * @return The formatted phone number.
    */
-  public static String format(final String phoneNumber, final String regex,
+  public static String format(
+    final String phoneNumber,
+    final String regex,
     final String format) {
     if (phoneNumber != null && regex != null && format != null) {
-      Pattern pattern = Pattern.compile(regex);
-      Matcher matcher = pattern.matcher(phoneNumber);
+      final Pattern pattern = Pattern.compile(regex);
+      final Matcher matcher = pattern.matcher(phoneNumber);
       if (matcher.matches()) {
-        Map values = new HashMap();
+        final Map values = new HashMap();
         for (int i = 1; i <= matcher.groupCount(); i++) {
           values.put("n" + i, matcher.group(i));
         }
         Expression expression;
         try {
           expression = JexlUtil.createExpression(format);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           throw new IllegalArgumentException(regex
             + " is not a valid regular expression: " + e.getMessage());
         }
-        HashMapContext context = new HashMapContext();
+        final HashMapContext context = new HashMapContext();
         context.setVars(values);
         try {
           return (String)expression.evaluate(context);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           throw new IllegalArgumentException(format
             + " is not a valid format: " + e.getMessage());
         }
       }
     }
     return null;
+  }
+
+  public static boolean isValid(final String phoneNumber) {
+    final String number = normalize(phoneNumber);
+    return Pattern.matches("^\\d+$", number);
   }
 
   /**
@@ -168,11 +177,6 @@ public final class PhoneNumber {
       return phoneNumber.replaceAll("[\\+\\(\\)\\-\\s]+", "");
     }
     return phoneNumber;
-  }
-
-  public static boolean isValid(final String phoneNumber) {
-    String number = normalize(phoneNumber);
-    return Pattern.matches("^\\d+$", number);
   }
 
   /**

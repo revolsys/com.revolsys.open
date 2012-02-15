@@ -14,27 +14,24 @@ public class Base64BinaryFieldType extends AbstractEcsvFieldType {
     super(DataTypes.BASE64_BINARY);
   }
 
-  public void writeValue(
-    PrintWriter out,
-    Object value) {
+  public Object parseValue(final String text) {
+    if (StringUtils.hasLength(text)) {
+      return Base64.decode(text);
+    } else {
+      return null;
+    }
+  }
+
+  public void writeValue(final PrintWriter out, final Object value) {
     if (value != null) {
-      Base64EncodingWriter base64Out = new Base64EncodingWriter(out);
+      final Base64EncodingWriter base64Out = new Base64EncodingWriter(out);
       if (value instanceof byte[]) {
-        byte[] bytes = (byte[])value;
+        final byte[] bytes = (byte[])value;
         base64Out.print(bytes);
       } else {
         base64Out.print(value);
       }
       base64Out.flush();
-    }
-  }
-
-  public Object parseValue(
-    String text) {
-    if (StringUtils.hasLength(text)) {
-      return Base64.decode(text);
-    } else {
-      return null;
     }
   }
 

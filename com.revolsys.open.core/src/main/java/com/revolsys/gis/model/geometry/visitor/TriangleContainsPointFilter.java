@@ -5,13 +5,13 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Triangle;
 
 public class TriangleContainsPointFilter implements Filter<Triangle> {
-  private Coordinates point;
+  private final Coordinates point;
 
-  public TriangleContainsPointFilter(Coordinates point) {
+  public TriangleContainsPointFilter(final Coordinates point) {
     this.point = point;
   }
 
-  public boolean accept(Triangle triangle) {
+  public boolean accept(final Triangle triangle) {
     return triangle.contains(point);
   }
 }

@@ -16,7 +16,7 @@
 package com.revolsys.ui.web.config;
 
 public class Field {
-  private String name;
+  private final String name;
 
   public Field(final String name) {
     this.name = name;

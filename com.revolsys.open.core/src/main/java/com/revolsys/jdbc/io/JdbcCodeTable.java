@@ -53,13 +53,9 @@ public class JdbcCodeTable extends AbstractCodeTable {
   public JdbcCodeTable() {
   }
 
-  public JdbcCodeTable(
-    final String tableName,
-    final String sequenceName,
-    final String idColumn,
-    final boolean capitalizeWords,
-    final boolean loadAll,
-    final String... valueColumns) {
+  public JdbcCodeTable(final String tableName, final String sequenceName,
+    final String idColumn, final boolean capitalizeWords,
+    final boolean loadAll, final String... valueColumns) {
     super(capitalizeWords);
     this.tableName = tableName;
     this.sequenceName = sequenceName;
@@ -68,13 +64,9 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.loadAll = loadAll;
   }
 
-  public JdbcCodeTable(
-    final String tableName,
-    final String sequenceName,
-    final String idColumn,
-    final List<String> columnAliases,
-    final boolean capitalizeWords,
-    final boolean loadAll,
+  public JdbcCodeTable(final String tableName, final String sequenceName,
+    final String idColumn, final List<String> columnAliases,
+    final boolean capitalizeWords, final boolean loadAll,
     final String... valueColumns) {
     super(capitalizeWords);
     this.tableName = tableName;
@@ -85,13 +77,9 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.loadAll = loadAll;
   }
 
-  public JdbcCodeTable(
-    final String tableName,
-    final String sequenceName,
-    final String idColumn,
-    final Map<String, String> auditColumns,
-    final boolean capitalizeWords,
-    final boolean loadAll,
+  public JdbcCodeTable(final String tableName, final String sequenceName,
+    final String idColumn, final Map<String, String> auditColumns,
+    final boolean capitalizeWords, final boolean loadAll,
     final List<String> valueColumns) {
     super(capitalizeWords);
     this.tableName = tableName;
@@ -102,11 +90,8 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.loadAll = loadAll;
   }
 
-  public JdbcCodeTable(
-    final String tableName,
-    final String sequenceName,
-    final String idColumn,
-    final String... valueColumns) {
+  public JdbcCodeTable(final String tableName, final String sequenceName,
+    final String idColumn, final String... valueColumns) {
     this.tableName = tableName;
     this.idColumn = idColumn;
     this.sequenceName = sequenceName;
@@ -121,8 +106,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     return codeTable;
   }
 
-  protected Object createId(
-    final List<Object> values) {
+  protected Object createId(final List<Object> values) {
     try {
       init();
       final Connection connection = JdbcUtils.getConnection(dataSource);
@@ -251,9 +235,9 @@ public class JdbcCodeTable extends AbstractCodeTable {
               for (int i = 0; i < valueColumns.size(); i++) {
                 values.add(rs.getObject(2 + i));
               }
-              addValue(id,values);
+              addValue(id, values);
             }
-           } finally {
+          } finally {
             rs.close();
           }
         } finally {
@@ -269,9 +253,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected Object loadId(
-    final List<Object> values,
-    final boolean createId) {
+  protected Object loadId(final List<Object> values, final boolean createId) {
     init();
     Object id = null;
     if (createId && loadAll) {
@@ -313,8 +295,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected List<Object> loadValues(
-    final Object id) {
+  protected List<Object> loadValues(final Object id) {
     init();
     List<Object> values = null;
     if (loadAll) {
@@ -353,8 +334,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     return values;
   }
 
-  public void setAuditColumns(
-    final boolean useAuditColumns) {
+  public void setAuditColumns(final boolean useAuditColumns) {
     auditColumns = new HashMap<String, String>();
     auditColumns.put("WHO_CREATED", "USER");
     auditColumns.put("WHEN_CREATED", "SYSDATE");
@@ -362,65 +342,54 @@ public class JdbcCodeTable extends AbstractCodeTable {
     auditColumns.put("WHEN_UPDATED", "SYSDATE");
   }
 
-  public void setAuditColumns(
-    final Map<String, String> auditColumns) {
+  public void setAuditColumns(final Map<String, String> auditColumns) {
     this.auditColumns = auditColumns;
   }
 
-  public void setColumnAliases(
-    final List<String> columnAliases) {
+  public void setColumnAliases(final List<String> columnAliases) {
     this.columnAliases = columnAliases;
   }
 
-  public void setDataSource(
-    final DataSource dataSource) {
+  public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
-  public void setDataStore(
-    final JdbcDataObjectStore dataStore) {
+  public void setDataStore(final JdbcDataObjectStore dataStore) {
     this.dataStore = dataStore;
     if (dataStore != null) {
       this.dataSource = dataStore.getDataSource();
     }
   }
 
-  public void setIdColumn(
-    final String idColumn) {
+  public void setIdColumn(final String idColumn) {
     this.idColumn = idColumn;
   }
 
-  public void setLoadAll(
-    final boolean loadAll) {
+  public void setLoadAll(final boolean loadAll) {
     this.loadAll = loadAll;
   }
 
-  public void setSequenceName(
-    final String sequenceName) {
+  public void setSequenceName(final String sequenceName) {
     this.sequenceName = sequenceName;
   }
 
-  public void setTableName(
-    final String tableName) {
+  public void setTableName(final String tableName) {
     this.tableName = tableName;
   }
 
-  public void setValueColumn(
-    final String valueColumn) {
+  public void setValueColumn(final String valueColumn) {
     this.valueColumns.clear();
     this.valueColumns.add(valueColumn);
   }
 
-  public void setValueColumns(
-    final List<String> valueColumns) {
+  public void setValueColumns(final List<String> valueColumns) {
     this.valueColumns.clear();
     for (final String column : valueColumns) {
       this.valueColumns.add(column);
     }
   }
 
-  public void setValueColumns(
-    final String... valueColumns) {
+  public void setValueColumns(final String... valueColumns) {
     this.valueColumns.clear();
     for (final String column : valueColumns) {
       this.valueColumns.add(column);
@@ -433,8 +402,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   }
 
-  public String toString(
-    final List<String> values) {
+  public String toString(final List<String> values) {
     final StringBuffer string = new StringBuffer(values.get(0));
     for (int i = 1; i < values.size(); i++) {
       final String value = values.get(i);

@@ -24,19 +24,23 @@ public class ExecutorServiceFactory {
     }
   }
 
-  public static void setDefaultExecutorService(ExecutorService executorService) {
+  public static final void invokeMethod(
+    final Object object,
+    final String methodName,
+    final Object... args) {
+    final ExecutorService executorService = getExecutorService();
+    final InvokeMethodRunnable task = new InvokeMethodRunnable(object,
+      methodName, args);
+    executorService.execute(task);
+  }
+
+  public static void setDefaultExecutorService(
+    final ExecutorService executorService) {
     ThreadSharedAttributes.setDefaultAttribute(KEY, executorService);
   }
 
-  public static void setThreadExecutorService(ExecutorService executorService) {
+  public static void setThreadExecutorService(
+    final ExecutorService executorService) {
     ThreadSharedAttributes.setAttribute(KEY, executorService);
-  }
-
-  public static final void invokeMethod(final Object object,
-    final String methodName, final Object... args) {
-    ExecutorService executorService = getExecutorService();
-    InvokeMethodRunnable task = new InvokeMethodRunnable(object, methodName,
-      args);
-    executorService.execute(task);
   }
 }

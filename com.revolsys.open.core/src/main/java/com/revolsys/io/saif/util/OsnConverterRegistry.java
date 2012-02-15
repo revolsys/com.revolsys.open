@@ -22,19 +22,6 @@ public class OsnConverterRegistry {
     init(geometryFactory);
   }
 
-  public void init(final GeometryFactory geometryFactory) {
-    addConverter("Date", new DateConverter());
-    addConverter("SpatialObject", new SpatialObjectConverter(this));
-    addConverter("Arc", new ArcConverter(geometryFactory));
-    addConverter("OrientedArc", new OrientedArcConverter(geometryFactory, this));
-    addConverter("ArcDirected", new ArcDirectedConverter(geometryFactory));
-    addConverter("Contour", new ContourConverter(geometryFactory, this));
-    addConverter("Point", new PointConverter(geometryFactory));
-    addConverter("AlignedPoint", new AlignedPointConverter(geometryFactory));
-    addConverter("TextLine", new TextLineConverter(geometryFactory, this));
-    addConverter("TextOnCurve", new TextOnCurveConverter(geometryFactory, this));
-  }
-
   private void addConverter(final String name, final OsnConverter converter) {
     converters.put(QName.valueOf(name), converter);
   }
@@ -49,5 +36,18 @@ public class OsnConverterRegistry {
     } else {
       return converters.get(QName.valueOf(name));
     }
+  }
+
+  public void init(final GeometryFactory geometryFactory) {
+    addConverter("Date", new DateConverter());
+    addConverter("SpatialObject", new SpatialObjectConverter(this));
+    addConverter("Arc", new ArcConverter(geometryFactory));
+    addConverter("OrientedArc", new OrientedArcConverter(geometryFactory, this));
+    addConverter("ArcDirected", new ArcDirectedConverter(geometryFactory));
+    addConverter("Contour", new ContourConverter(geometryFactory, this));
+    addConverter("Point", new PointConverter(geometryFactory));
+    addConverter("AlignedPoint", new AlignedPointConverter(geometryFactory));
+    addConverter("TextLine", new TextLineConverter(geometryFactory, this));
+    addConverter("TextOnCurve", new TextOnCurveConverter(geometryFactory, this));
   }
 }

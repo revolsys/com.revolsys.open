@@ -16,6 +16,11 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
   }
 
   @Override
+  public String getFormattedMapTileName(final String name) {
+    return name.toUpperCase();
+  }
+
+  @Override
   public double getLatitude(final String mapTileName) {
     final Matcher matcher = NAME_PATTERN.matcher(mapTileName);
     if (matcher.matches()) {
@@ -35,6 +40,15 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
 
     latitude += letterRow * NtsConstants.HEIGHT_250000;
     return latitude;
+  }
+
+  public char getLetter(final String sheet) {
+    final char firstChar = sheet.charAt(0);
+    if (firstChar == '0' || firstChar == '1') {
+      return sheet.charAt(3);
+    } else {
+      return sheet.charAt(2);
+    }
   }
 
   @Override
@@ -70,19 +84,5 @@ public class Nts250000RectangularMapGrid extends Nts1000000RectangularMapGrid {
     final int col = (int)Math.floor(xInSheet / NtsConstants.WIDTH_250000) % 4;
 
     return block + GridUtil.getLetter16(row, col);
-  }
-
-  @Override
-  public String getFormattedMapTileName(String name) {
-    return name.toUpperCase();
-  }
-
-  public char getLetter(final String sheet) {
-    char firstChar = sheet.charAt(0);
-    if (firstChar == '0' || firstChar == '1') {
-      return sheet.charAt(3);
-    } else {
-      return sheet.charAt(2);
-    }
   }
 }

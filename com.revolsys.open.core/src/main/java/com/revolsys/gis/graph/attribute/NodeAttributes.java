@@ -35,30 +35,20 @@ public class NodeAttributes {
     }
 
     public static Map<QName, Set<Double>> edgeAnglesByType(final Node<?> node) {
-      Map<QName, Set<Double>> anglesByType = new HashMap<QName, Set<Double>>();
+      final Map<QName, Set<Double>> anglesByType = new HashMap<QName, Set<Double>>();
       for (final Edge<?> edge : node.getInEdges()) {
-        QName typeName = edge.getTypeName();
+        final QName typeName = edge.getTypeName();
         final double toAngle = edge.getToAngle();
         final Set<Double> angles = getAnglesForType(anglesByType, typeName);
         angles.add(toAngle);
       }
       for (final Edge<?> edge : node.getOutEdges()) {
-        QName typeName = edge.getTypeName();
+        final QName typeName = edge.getTypeName();
         final double fromAngle = edge.getFromAngle();
         final Set<Double> angles = getAnglesForType(anglesByType, typeName);
         angles.add(fromAngle);
       }
       return anglesByType;
-    }
-
-    public static Set<Double> getAnglesForType(
-      Map<QName, Set<Double>> anglesByType, QName typeName) {
-      Set<Double> angles = anglesByType.get(typeName);
-      if (angles == null) {
-        angles = new TreeSet<Double>(new NumberComparator<Double>());
-        anglesByType.put(typeName, angles);
-      }
-      return angles;
     }
 
     public static <T> Map<LineString, Map<QName, Set<Edge<T>>>> edgesByLineAndTypeName(
@@ -138,6 +128,17 @@ public class NodeAttributes {
       }
       return typeNames;
     }
+
+    public static Set<Double> getAnglesForType(
+      final Map<QName, Set<Double>> anglesByType,
+      final QName typeName) {
+      Set<Double> angles = anglesByType.get(typeName);
+      if (angles == null) {
+        angles = new TreeSet<Double>(new NumberComparator<Double>());
+        anglesByType.put(typeName, angles);
+      }
+      return angles;
+    }
   }
 
   private static String EDGE_ANGLES = "edgeAngles";
@@ -172,7 +173,8 @@ public class NodeAttributes {
     return getAttribute(node, EDGE_ANGLES_BY_TYPE);
   }
 
-  public static <T> Set<Double> getEdgeAnglesByType(final Node<T> node,
+  public static <T> Set<Double> getEdgeAnglesByType(
+    final Node<T> node,
     final QName typeName) {
     final Map<QName, Set<Double>> anglesByType = getEdgeAnglesByType(node);
     final Set<Double> angles = anglesByType.get(typeName);
@@ -196,7 +198,8 @@ public class NodeAttributes {
     return getAttribute(node, EDGES_BY_TYPE);
   }
 
-  public static <T> List<Edge<T>> getEdgesByType(final Node<T> node,
+  public static <T> List<Edge<T>> getEdgesByType(
+    final Node<T> node,
     final QName typeName) {
     final Map<QName, List<Edge<T>>> edgesByType = getEdgesByType(node);
     final List<Edge<T>> edges = edgesByType.get(typeName);

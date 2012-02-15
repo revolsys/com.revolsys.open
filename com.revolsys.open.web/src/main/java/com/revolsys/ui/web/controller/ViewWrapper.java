@@ -15,48 +15,49 @@ public class ViewWrapper implements Controller {
 
   private String suffix = ".jsp";
 
-  public ModelAndView handleRequest(final HttpServletRequest request,
-    final HttpServletResponse response) throws Exception {
-    String path = request.getPathInfo();
-    if ("/".equals(path)) {
-      path = "/index";
-    }
-    ModelAndView view = new ModelAndView(viewName);
-
-    view.addObject(attributeName, prefix + path + suffix);
-    return view;
-  }
-
   public String getAttributeName() {
     return attributeName;
-  }
-
-  public void setAttributeName(String attributeName) {
-    this.attributeName = attributeName;
-  }
-
-  public String getViewName() {
-    return viewName;
-  }
-
-  public void setViewName(String viewName) {
-    this.viewName = viewName;
   }
 
   public String getPrefix() {
     return prefix;
   }
 
-  public void setPrefix(String prefix) {
-    this.prefix = prefix;
-  }
-
   public String getSuffix() {
     return suffix;
   }
 
-  public void setSuffix(String suffix) {
+  public String getViewName() {
+    return viewName;
+  }
+
+  public ModelAndView handleRequest(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws Exception {
+    String path = request.getPathInfo();
+    if ("/".equals(path)) {
+      path = "/index";
+    }
+    final ModelAndView view = new ModelAndView(viewName);
+
+    view.addObject(attributeName, prefix + path + suffix);
+    return view;
+  }
+
+  public void setAttributeName(final String attributeName) {
+    this.attributeName = attributeName;
+  }
+
+  public void setPrefix(final String prefix) {
+    this.prefix = prefix;
+  }
+
+  public void setSuffix(final String suffix) {
     this.suffix = suffix;
+  }
+
+  public void setViewName(final String viewName) {
+    this.viewName = viewName;
   }
 
 }

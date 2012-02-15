@@ -21,7 +21,7 @@ public class Menu implements Cloneable {
 
   private String anchor;
 
-  private Map<String, Expression> dynamicParameters = new HashMap<String, Expression>();
+  private final Map<String, Expression> dynamicParameters = new HashMap<String, Expression>();
 
   private List<Menu> menus = new ArrayList<Menu>();
 
@@ -31,7 +31,7 @@ public class Menu implements Cloneable {
 
   private Map<String, Object> parameters = new HashMap<String, Object>();
 
-  private Map<String, Object> staticParameters = new HashMap<String, Object>();
+  private final Map<String, Object> staticParameters = new HashMap<String, Object>();
 
   private String title;
 
@@ -42,7 +42,7 @@ public class Menu implements Cloneable {
   private Expression uriExpression;
 
   private boolean visible = true;
-  
+
   private String target;
 
   public Menu() {
@@ -53,15 +53,7 @@ public class Menu implements Cloneable {
     setUri(uri);
   }
 
-  public String getTarget() {
-    return target;
-  }
-
-  public void setTarget(String target) {
-    this.target = target;
-  }
-
-  public Menu(String title, String uri, String onClick) {
+  public Menu(final String title, final String uri, final String onClick) {
     setTitle(title);
     setUri(uri);
     this.onClick = onClick;
@@ -71,16 +63,16 @@ public class Menu implements Cloneable {
     addMenuItems(menu.getMenus());
   }
 
-  public void addMenuItem(final Menu menu) {
-    menus.add(menu);
-  }
-
   public void addMenuItem(final int index, final Menu menu) {
     menus.add(index, menu);
   }
 
+  public void addMenuItem(final Menu menu) {
+    menus.add(menu);
+  }
+
   public void addMenuItem(final String title, final String uri) {
-    Menu menu = new Menu(title, uri);
+    final Menu menu = new Menu(title, uri);
     addMenuItem(menu);
   }
 
@@ -104,7 +96,7 @@ public class Menu implements Cloneable {
       Expression expression = null;
       try {
         expression = JexlUtil.createExpression(value.toString());
-      } catch (Exception e) {
+      } catch (final Exception e) {
         LOG.error("Invalid Jexl Expression '" + value + "': " + e.getMessage(),
           e);
       }
@@ -121,15 +113,16 @@ public class Menu implements Cloneable {
   }
 
   public void addParameters(final Map<String, ? extends Object> parameters) {
-    for (Entry<String, ? extends Object> parameter : parameters.entrySet()) {
-      String name = parameter.getKey();
-      Object value = parameter.getValue();
+    for (final Entry<String, ? extends Object> parameter : parameters.entrySet()) {
+      final String name = parameter.getKey();
+      final Object value = parameter.getValue();
       addParameter(name, value);
     }
   }
 
+  @Override
   public Menu clone() {
-    Menu menu = new Menu();
+    final Menu menu = new Menu();
     menu.setAnchor(anchor);
     menu.addMenuItems(menus);
     menu.setName(name);
@@ -140,6 +133,10 @@ public class Menu implements Cloneable {
     return menu;
   }
 
+  public String getAnchor() {
+    return anchor;
+  }
+
   public String getCssClass() {
     // TODO Auto-generated method stub
     return null;
@@ -147,10 +144,6 @@ public class Menu implements Cloneable {
 
   public String getLink() {
     return getLink(null);
-  }
-
-  public String getAnchor() {
-    return anchor;
   }
 
   public String getLink(final JexlContext context) {
@@ -170,20 +163,20 @@ public class Menu implements Cloneable {
       }
     } else {
       baseUri = Page.getAbsoluteUrl(PathAliasController.getPath(baseUri));
-      
-      Map<String,Object> params;
+
+      Map<String, Object> params;
       if (context != null) {
-        params = new HashMap<String,Object>(staticParameters);
-        for (Entry<String,Expression> param : dynamicParameters.entrySet()) {
-          String key = param.getKey();
-          Expression expression = param.getValue();
-          Object value = JexlUtil.evaluateExpression(context, expression);
+        params = new HashMap<String, Object>(staticParameters);
+        for (final Entry<String, Expression> param : dynamicParameters.entrySet()) {
+          final String key = param.getKey();
+          final Expression expression = param.getValue();
+          final Object value = JexlUtil.evaluateExpression(context, expression);
           params.put(key, value);
         }
       } else {
         params = staticParameters;
       }
-      String link = UrlUtil.getUrl(baseUri, params);
+      final String link = UrlUtil.getUrl(baseUri, params);
       if (anchor == null) {
         return link;
       } else {
@@ -233,6 +226,10 @@ public class Menu implements Cloneable {
     return parameters;
   }
 
+  public String getTarget() {
+    return target;
+  }
+
   /**
    * @return Returns the title.
    */
@@ -276,7 +273,7 @@ public class Menu implements Cloneable {
     this.name = name;
   }
 
-  public void setOnClick(String onClick) {
+  public void setOnClick(final String onClick) {
     this.onClick = onClick;
   }
 
@@ -284,11 +281,15 @@ public class Menu implements Cloneable {
    * @param parameters The parameters to set.
    */
   public void setParameters(final Map parameters) {
-    for (Iterator params = parameters.entrySet().iterator(); params.hasNext();) {
-      Map.Entry entry = (Map.Entry)params.next();
+    for (final Iterator params = parameters.entrySet().iterator(); params.hasNext();) {
+      final Map.Entry entry = (Map.Entry)params.next();
       addParameter(entry.getKey(), entry.getValue());
     }
     this.parameters = parameters;
+  }
+
+  public void setTarget(final String target) {
+    this.target = target;
   }
 
   /**
@@ -299,7 +300,7 @@ public class Menu implements Cloneable {
       this.title = title;
       try {
         titleExpression = JexlUtil.createExpression(this.title);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         LOG.error(
           "Error creating expression '" + this.title + "': " + e.getMessage(),
           e);
@@ -319,7 +320,7 @@ public class Menu implements Cloneable {
       this.uri = uri.replaceAll(" ", "%20");
       try {
         uriExpression = JexlUtil.createExpression(this.uri);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         LOG.error(
           "Error creating expression '" + this.uri + "': " + e.getMessage(), e);
         uriExpression = null;
@@ -334,6 +335,7 @@ public class Menu implements Cloneable {
     this.visible = visible;
   }
 
+  @Override
   public String toString() {
     return title + "[" + uri + "]";
   }

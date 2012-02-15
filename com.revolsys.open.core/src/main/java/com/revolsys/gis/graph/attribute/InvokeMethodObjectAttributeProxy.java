@@ -18,10 +18,8 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
    * @param methodName The name of the method to invoke.
    * @param parameters The parameters to pass to the method.
    */
-  public InvokeMethodObjectAttributeProxy(
-    final Class<?> clazz,
-    final String methodName,
-    final Class<?> parameterClass) {
+  public InvokeMethodObjectAttributeProxy(final Class<?> clazz,
+    final String methodName, final Class<?> parameterClass) {
     try {
       method = clazz.getMethod(methodName, parameterClass);
     } catch (final Throwable e) {
@@ -39,26 +37,24 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
    * @param methodName The name of the method to invoke.
    * @param parameters The parameters to pass to the method.
    */
-  public InvokeMethodObjectAttributeProxy(
-    final Class<?> clazz,
-    final String methodName,
-    final Class<?> parameterClass,
-    Object... parameters) {
+  public InvokeMethodObjectAttributeProxy(final Class<?> clazz,
+    final String methodName, final Class<?> parameterClass,
+    final Object... parameters) {
     try {
-      Class<?>[] parameterClasses = new Class<?>[parameters.length + 1];
+      final Class<?>[] parameterClasses = new Class<?>[parameters.length + 1];
       parameterClasses[0] = parameterClass;
       for (int i = 0; i < parameters.length; i++) {
-        Object parameter = parameters[i];
+        final Object parameter = parameters[i];
         parameterClasses[i + 1] = parameter.getClass();
       }
-      for (Method method : clazz.getMethods()) {
+      for (final Method method : clazz.getMethods()) {
         if (method.getName().equals(methodName)) {
-          Class<?>[] parameterTypes = method.getParameterTypes();
+          final Class<?>[] parameterTypes = method.getParameterTypes();
           if (parameterTypes.length == parameterClasses.length) {
             boolean matched = true;
             for (int i = 0; i < parameterTypes.length; i++) {
-              Class<?> methodParamClass = parameterTypes[i];
-              Class<?> parameterClsss = parameterClasses[i];
+              final Class<?> methodParamClass = parameterTypes[i];
+              final Class<?> parameterClsss = parameterClasses[i];
               if (parameterClsss != null) {
                 // TODO handle primitive types
                 if (!methodParamClass.isAssignableFrom(parameterClsss)) {
@@ -82,25 +78,22 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
     }
   }
 
-  public InvokeMethodObjectAttributeProxy(
-    final Object object,
-    final String methodName,
-    final Class<?> parameterClass) {
+  public InvokeMethodObjectAttributeProxy(final Object object,
+    final String methodName, final Class<?> parameterClass) {
     this(object.getClass(), methodName, parameterClass);
     this.object = object;
   }
 
   @Override
-  public T createValue(
-    final O object) {
+  public T createValue(final O object) {
     try {
       if (parameters == null) {
         return (T)method.invoke(object, object);
       } else {
-        Object[] parameters = new Object[this.parameters.length + 1];
+        final Object[] parameters = new Object[this.parameters.length + 1];
         parameters[0] = object;
         for (int i = 0; i < this.parameters.length; i++) {
-          Object parameter = this.parameters[i];
+          final Object parameter = this.parameters[i];
           parameters[i + 1] = parameter;
         }
         return (T)method.invoke(object, parameters);

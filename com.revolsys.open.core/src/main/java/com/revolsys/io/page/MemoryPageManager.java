@@ -10,15 +10,11 @@ import java.util.TreeSet;
 public class MemoryPageManager implements PageManager {
   int pageSize = 64;
 
-  private List<Page> pages = new ArrayList<Page>();
+  private final List<Page> pages = new ArrayList<Page>();
 
-  private Set<Page> pagesInUse = new HashSet<Page>();
+  private final Set<Page> pagesInUse = new HashSet<Page>();
 
-  private Set<Page> freePages = new TreeSet<Page>();
-
-  public int getPageSize() {
-    return pageSize;
-  }
+  private final Set<Page> freePages = new TreeSet<Page>();
 
   public synchronized Page createPage() {
     Page page;
@@ -34,8 +30,16 @@ public class MemoryPageManager implements PageManager {
     return page;
   }
 
-  public synchronized Page getPage(int index) {
-    Page page = pages.get(index);
+  public Page createTempPage() {
+    return new ByteArrayPage(this, -1, pageSize);
+  }
+
+  public synchronized int getNumPages() {
+    return pages.size() - freePages.size();
+  }
+
+  public synchronized Page getPage(final int index) {
+    final Page page = pages.get(index);
     if (freePages.contains(page)) {
       throw new IllegalArgumentException("Page does not exist " + index);
     } else if (pagesInUse.contains(page)) {
@@ -47,23 +51,19 @@ public class MemoryPageManager implements PageManager {
     }
   }
 
-  public synchronized int getNumPages() {
-    return pages.size() - freePages.size();
+  public int getPageSize() {
+    return pageSize;
   }
 
-  public Page createTempPage() {
-    return new ByteArrayPage(this, -1, pageSize);
+  public synchronized void releasePage(final Page page) {
+    pagesInUse.remove(page);
   }
 
-  public void write(Page page) {
-  }
-
-  public synchronized void removePage(Page page) {
+  public synchronized void removePage(final Page page) {
     freePages.add(page);
     pagesInUse.remove(page);
   }
 
-  public synchronized void releasePage(Page page) {
-    pagesInUse.remove(page);
+  public void write(final Page page) {
   }
 }

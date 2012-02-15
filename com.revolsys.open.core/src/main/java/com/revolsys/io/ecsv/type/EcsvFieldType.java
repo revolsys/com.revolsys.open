@@ -10,11 +10,8 @@ public interface EcsvFieldType {
   DataType getDataType();
 
   QName getTypeName();
-  
-  Object parseValue(
-    String text);
 
-  void writeValue(
-    PrintWriter out,
-    Object value);
+  Object parseValue(String text);
+
+  void writeValue(PrintWriter out, Object value);
 }

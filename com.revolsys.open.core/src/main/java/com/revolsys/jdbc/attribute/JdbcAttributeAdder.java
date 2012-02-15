@@ -17,8 +17,12 @@ public class JdbcAttributeAdder {
     this.dataType = dataType;
   }
 
-  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, final int sqlType, int length, int scale,
+  public Attribute addAttribute(
+    final DataObjectMetaDataImpl metaData,
+    final String name,
+    final int sqlType,
+    final int length,
+    final int scale,
     final boolean required) {
     JdbcAttribute attribute;
     switch (sqlType) {
@@ -57,7 +61,7 @@ public class JdbcAttributeAdder {
         if (scale > 0) {
           attribute = new JdbcBigDecimalAttribute(name, sqlType, length, scale,
             required, null);
-        } else if (length == 131089 || length ==0) {
+        } else if (length == 131089 || length == 0) {
           attribute = new JdbcBigDecimalAttribute(name, sqlType, -1, -1,
             required, null);
         } else {

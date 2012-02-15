@@ -35,12 +35,6 @@ public class JdbcFactory {
   }
 
   public static JdbcDataObjectStore createDataObjectStore(
-    final Map<String, Object> config) {
-    DataSource dataSource = createDataSource(config);
-    return createDataObjectStore(dataSource);
-  }
-
-  public static JdbcDataObjectStore createDataObjectStore(
     final DataSource dataSource) {
     try {
       final Connection connection = JdbcUtils.getConnection(dataSource);
@@ -70,49 +64,57 @@ public class JdbcFactory {
   }
 
   public static JdbcDataObjectStore createDataObjectStore(
-    final String connectionName, final String productName,
+    final Map<String, Object> config) {
+    final DataSource dataSource = createDataSource(config);
+    return createDataObjectStore(dataSource);
+  }
+
+  public static JdbcDataObjectStore createDataObjectStore(
+    final String connectionName,
+    final String productName,
     final Map<String, Object> config) {
     final DataSource dataSource = createDataSource(productName, config);
     if (dataSource == null) {
       return null;
     } else {
-      JdbcDataObjectStore dataObjectStore = createDataObjectStore(dataSource);
+      final JdbcDataObjectStore dataObjectStore = createDataObjectStore(dataSource);
       dataObjectStore.setLabel(connectionName);
       return dataObjectStore;
     }
   }
 
-  public static DataSource createDataSource(final String url,
-    final String username, final String password, Map<String, Object> config) {
-    Map<String, Object> newConfig = new HashMap<String, Object>(config);
-    newConfig.put("url", url);
-    newConfig.put("username", username);
-    newConfig.put("password", password);
-    return createDataSource(newConfig);
-  }
-
-  public static DataSource createDataSource(final String url,
-    final String username, final String password) {
+  public static DataObjectStore createDataObjectStore(
+    final String url,
+    final String username,
+    final String password) {
     final Map<String, Object> config = Collections.emptyMap();
-    return createDataSource(url, username, password, config);
+    return createDataObjectStore(url, username, password, config);
   }
 
-  public static DataObjectStore createDataObjectStore(final String url,
-    final String username, final String password, Map<String, Object> config) {
-    Map<String, Object> newConfig = new HashMap<String, Object>(config);
+  public static DataObjectStore createDataObjectStore(
+    final String url,
+    final String username,
+    final String password,
+    final Map<String, Object> config) {
+    final Map<String, Object> newConfig = new HashMap<String, Object>(config);
     newConfig.put("url", url);
     newConfig.put("username", username);
     newConfig.put("password", password);
     return createDataObjectStore(newConfig);
   }
 
-  public static DataObjectStore createDataObjectStore(final String url,
-    final String username, final String password) {
-    final Map<String, Object> config = Collections.emptyMap();
-    return createDataObjectStore(url, username, password, config);
+  public static DataSource createDataSource(final Map<String, Object> config) {
+    try {
+      final String url = (String)config.get("url");
+      final DataSourceFactory dataSourceFactory = getDataSourceFactory(url);
+      return dataSourceFactory.createDataSource(config);
+    } catch (final SQLException e) {
+      throw new RuntimeException("Unable to create data source", e);
+    }
   }
 
-  public static DataSource createDataSource(final String productName,
+  public static DataSource createDataSource(
+    final String productName,
     final Map<String, Object> config) {
     try {
       final DataSourceFactory dataSourceFactory = dataSourceFactoriesByProductName.get(productName);
@@ -127,23 +129,33 @@ public class JdbcFactory {
     }
   }
 
-  public static DataSource createDataSource(final Map<String, Object> config) {
-    try {
-      final String url = (String)config.get("url");
-      DataSourceFactory dataSourceFactory = getDataSourceFactory(url);
-      return dataSourceFactory.createDataSource(config);
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to create data source", e);
-    }
+  public static DataSource createDataSource(
+    final String url,
+    final String username,
+    final String password) {
+    final Map<String, Object> config = Collections.emptyMap();
+    return createDataSource(url, username, password, config);
+  }
+
+  public static DataSource createDataSource(
+    final String url,
+    final String username,
+    final String password,
+    final Map<String, Object> config) {
+    final Map<String, Object> newConfig = new HashMap<String, Object>(config);
+    newConfig.put("url", url);
+    newConfig.put("username", username);
+    newConfig.put("password", password);
+    return createDataSource(newConfig);
   }
 
   public static DataSourceFactory getDataSourceFactory(final String url) {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (Entry<Pattern, DataSourceFactory> entry : dataSourceFactoryUrlPatterns.entrySet()) {
-        Pattern pattern = entry.getKey();
-        DataSourceFactory dataSourceFactory = entry.getValue();
+      for (final Entry<Pattern, DataSourceFactory> entry : dataSourceFactoryUrlPatterns.entrySet()) {
+        final Pattern pattern = entry.getKey();
+        final DataSourceFactory dataSourceFactory = entry.getValue();
         if (pattern.matcher(url).matches()) {
           return dataSourceFactory;
         }
@@ -153,8 +165,21 @@ public class JdbcFactory {
     }
   }
 
+  public static DataSourceFactory register(
+    final String productName,
+    final DataSourceFactory dataSourceFactory,
+    final List<String> patterns) {
+    dataSourceFactoriesByProductName.put(productName, dataSourceFactory);
+    for (final String regex : patterns) {
+      dataSourceFactoryUrlPatterns.put(Pattern.compile(regex),
+        dataSourceFactory);
+    }
+    return dataSourceFactory;
+  }
+
   @SuppressWarnings("unchecked")
-  public static Class<?> register(final String productName,
+  public static Class<?> register(
+    final String productName,
     final String dataStoreClassName) {
     try {
       final Class<?> clazz = Class.forName(dataStoreClassName);
@@ -166,16 +191,6 @@ public class JdbcFactory {
     } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException("Unable to register " + productName, e);
     }
-  }
-
-  public static DataSourceFactory register(final String productName,
-    DataSourceFactory dataSourceFactory, List<String> patterns) {
-    dataSourceFactoriesByProductName.put(productName, dataSourceFactory);
-    for (String regex : patterns) {
-      dataSourceFactoryUrlPatterns.put(Pattern.compile(regex),
-        dataSourceFactory);
-    }
-    return dataSourceFactory;
   }
 
   private DataObjectFactory dataObjectFactory;

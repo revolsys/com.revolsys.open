@@ -178,6 +178,50 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     return object;
   }
 
+  public static ResultSet getResultSet(
+    final DataObjectMetaData metaData,
+    final PreparedStatement statement,
+    final Query query) throws SQLException {
+    final Map<String, ? extends Object> filter = query.getFilter();
+    int parameterIndex = setPreparedStatementParameters(query, statement);
+    parameterIndex = setPreparedStatementFilterParameters(metaData, statement,
+      parameterIndex, filter);
+
+    return statement.executeQuery();
+  }
+
+  public static String getSql(final Query query) {
+    final QName tableName = query.getTypeName();
+    final String dbTableName = JdbcUtils.getTableName(tableName);
+
+    String sql = query.getSql();
+    final DataObjectMetaData metaData = query.getMetaData();
+    if (sql == null) {
+      if (metaData == null) {
+        throw new IllegalArgumentException("Unknown table name " + tableName);
+      }
+      final List<String> attributeNames = new ArrayList<String>(
+        query.getAttributeNames());
+      final String fromClause = query.getFromClause();
+      final String where = query.getWhereClause();
+      final List<String> orderBy = query.getOrderBy();
+      final Map<String, ? extends Object> filter = query.getFilter();
+      sql = createSql(metaData, "T", fromClause, attributeNames, filter, where,
+        orderBy);
+      query.setSql(sql);
+    } else {
+      if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
+        final StringBuffer newSql = new StringBuffer("SELECT ");
+        addColumnNames(newSql, metaData, dbTableName);
+        newSql.append(" FROM ");
+        newSql.append(sql.substring(14));
+        sql = newSql.toString();
+        query.setSql(sql);
+      }
+    }
+    return sql;
+  }
+
   public static int setPreparedStatementFilterParameters(
     final DataObjectMetaData metaData,
     final PreparedStatement statement,
@@ -340,7 +384,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         query.setMetaData(metaData);
       }
     }
-    String sql = getSql(query);
+    final String sql = getSql(query);
     try {
       statement = connection.prepareStatement(sql);
       statement.setFetchSize(fetchSize);
@@ -379,50 +423,6 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       throw new RuntimeException("Error executing query:" + sql, e);
     }
     return resultSet;
-  }
-
-  public static ResultSet getResultSet(
-    final DataObjectMetaData metaData,
-    PreparedStatement statement,
-    final Query query) throws SQLException {
-    final Map<String, ? extends Object> filter = query.getFilter();
-    int parameterIndex = setPreparedStatementParameters(query, statement);
-    parameterIndex = setPreparedStatementFilterParameters(metaData, statement,
-      parameterIndex, filter);
-
-    return statement.executeQuery();
-  }
-
-  public static String getSql(final Query query) {
-    final QName tableName = query.getTypeName();
-    final String dbTableName = JdbcUtils.getTableName(tableName);
-
-    String sql = query.getSql();
-    DataObjectMetaData metaData = query.getMetaData();
-    if (sql == null) {
-      if (metaData == null) {
-        throw new IllegalArgumentException("Unknown table name " + tableName);
-      }
-      final List<String> attributeNames = new ArrayList<String>(
-        query.getAttributeNames());
-      final String fromClause = query.getFromClause();
-      final String where = query.getWhereClause();
-      final List<String> orderBy = query.getOrderBy();
-      Map<String, ? extends Object> filter = query.getFilter();
-      sql = createSql(metaData, "T", fromClause, attributeNames, filter, where,
-        orderBy);
-      query.setSql(sql);
-    } else {
-      if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
-        final StringBuffer newSql = new StringBuffer("SELECT ");
-        addColumnNames(newSql, metaData, dbTableName);
-        newSql.append(" FROM ");
-        newSql.append(sql.substring(14));
-        sql = newSql.toString();
-        query.setSql(sql);
-      }
-    }
-    return sql;
   }
 
 }

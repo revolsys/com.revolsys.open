@@ -354,7 +354,7 @@ public class OsnIterator implements Iterator<Object> {
     if (bufferIndex == bufferLength) {
       try {
         bufferLength = in.read(buffer);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         return -1;
       }
       if (bufferLength == -1) {
@@ -686,8 +686,8 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public void throwParseError(final String message) {
-    int startIndex = Math.max(bufferIndex - 40, 0);
-    int endIndex = Math.min(80, bufferLength - 1 - startIndex);
+    final int startIndex = Math.max(bufferIndex - 40, 0);
+    final int endIndex = Math.min(80, bufferLength - 1 - startIndex);
     throw new ParseException(toString(), message + " got '"
       + (char)currentCharacter + "' context="
       + new String(buffer, startIndex, endIndex));

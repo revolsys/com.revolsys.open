@@ -21,8 +21,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
     final Envelope env = new Envelope(line.getEnvelopeInternal());
     env.expandBy(maxDistance);
     final NodeQuadTree<T> index = graph.getNodeIndex();
-    final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(
-      line, results);
+    final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(line, results);
     index.visit(env, visitor);
     return results.getList();
   }
@@ -31,16 +30,13 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
 
   private final Visitor<Node<T>> matchVisitor;
 
-  
-  public OnLineNodeVisitor(
-    final LineString line,
+  public OnLineNodeVisitor(final LineString line,
     final Visitor<Node<T>> matchVisitor) {
     this.line = line;
     this.matchVisitor = matchVisitor;
-   }
+  }
 
-  public boolean visit(
-    final Node<T> node) {
+  public boolean visit(final Node<T> node) {
     final Coordinates point = node;
     if (LineStringUtil.isPointOnLine(line, point)) {
       matchVisitor.visit(node);

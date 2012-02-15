@@ -27,7 +27,7 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 public class PageRefMenuItem extends MenuItem {
   private static final Logger log = Logger.getLogger(PageRefMenuItem.class);
 
-  private String pageRef;
+  private final String pageRef;
 
   public PageRefMenuItem(final String title, final String pageRef)
     throws Exception {
@@ -47,14 +47,14 @@ public class PageRefMenuItem extends MenuItem {
   }
 
   private Page getReferencedPage() {
-    WebUiContext context = WebUiContext.get();
-    Page currentPage = context.getPage();
+    final WebUiContext context = WebUiContext.get();
+    final Page currentPage = context.getPage();
     if (currentPage != null) {
       return currentPage.getPage(pageRef);
     } else {
       try {
         return context.getConfig().getPage(pageRef);
-      } catch (PageNotFoundException e) {
+      } catch (final PageNotFoundException e) {
         return null;
       }
 
@@ -62,20 +62,36 @@ public class PageRefMenuItem extends MenuItem {
 
   }
 
+  @Override
+  public String getTitle() {
+    final String title = super.getTitle();
+    if (title != null) {
+      return title;
+    } else {
+      final Page referencedPage = getReferencedPage();
+      if (referencedPage != null) {
+        return referencedPage.getTitle();
+      } else {
+        return "";
+      }
+    }
+  }
+
+  @Override
   public String getUri() {
-    WebUiContext context = WebUiContext.get();
-    Page referencedPage = getReferencedPage();
+    final WebUiContext context = WebUiContext.get();
+    final Page referencedPage = getReferencedPage();
 
     if (referencedPage != null) {
-      Map uriParams = new HashMap();
+      final Map uriParams = new HashMap();
       if (getStaticParameters() != null) {
         uriParams.putAll(getStaticParameters());
       }
-      for (Iterator params = getParameters().entrySet().iterator(); params.hasNext();) {
-        Map.Entry param = (Map.Entry)params.next();
-        Object key = param.getKey();
+      for (final Iterator params = getParameters().entrySet().iterator(); params.hasNext();) {
+        final Map.Entry param = (Map.Entry)params.next();
+        final Object key = param.getKey();
         if (!uriParams.containsKey(key)) {
-          Object value = context.evaluateExpression((Expression)param.getValue());
+          final Object value = context.evaluateExpression((Expression)param.getValue());
           uriParams.put(key, value);
         }
       }
@@ -88,19 +104,5 @@ public class PageRefMenuItem extends MenuItem {
       return null;
     }
 
-  }
-
-  public String getTitle() {
-    String title = super.getTitle();
-    if (title != null) {
-      return title;
-    } else {
-      Page referencedPage = getReferencedPage();
-      if (referencedPage != null) {
-        return referencedPage.getTitle();
-      } else {
-        return "";
-      }
-    }
   }
 }

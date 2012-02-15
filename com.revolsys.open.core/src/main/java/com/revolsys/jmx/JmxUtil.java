@@ -31,8 +31,7 @@ import javax.management.remote.JMXServiceURL;
  */
 public class JmxUtil {
 
-  public static void close(
-    final JMXConnector jmxConnector) {
+  public static void close(final JMXConnector jmxConnector) {
     if (jmxConnector != null) {
       try {
         jmxConnector.close();
@@ -42,8 +41,7 @@ public class JmxUtil {
     }
   }
 
-  public static JMXConnector getJmxConnector(
-    final String connectorString) {
+  public static JMXConnector getJmxConnector(final String connectorString) {
     return getJmxConnector(connectorString, "", "");
   }
 

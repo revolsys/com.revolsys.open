@@ -80,7 +80,7 @@ public class IafConfigXmlConstants {
   private static final QName STYLE_TAG = new QName(NAMESPACE, "Style",
     NS_PREFIX);
 
-  private static final QName IAF_CONFIG_TAG = new QName(NAMESPACE, "rsWebUiConfig",
-    NS_PREFIX);
+  private static final QName IAF_CONFIG_TAG = new QName(NAMESPACE,
+    "rsWebUiConfig", NS_PREFIX);
 
 }

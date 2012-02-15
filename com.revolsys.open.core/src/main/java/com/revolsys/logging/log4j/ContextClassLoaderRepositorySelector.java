@@ -81,8 +81,7 @@ public class ContextClassLoaderRepositorySelector implements RepositorySelector 
    * @param classLoader The classloader to create the hierarchy for.
    * @return The created heirarchy.
    */
-  public static synchronized Hierarchy add(
-    final ClassLoader classLoader) {
+  public static synchronized Hierarchy add(final ClassLoader classLoader) {
     Hierarchy hierarchy = (Hierarchy)repositories.get(classLoader);
     if (hierarchy == null) {
       hierarchy = new Hierarchy(new RootLogger(Level.DEBUG));
@@ -106,8 +105,7 @@ public class ContextClassLoaderRepositorySelector implements RepositorySelector 
    * 
    * @param classLoader The classloader to create the hierarchy for.
    */
-  public static synchronized void remove(
-    final ClassLoader classLoader) {
+  public static synchronized void remove(final ClassLoader classLoader) {
     final Hierarchy hierarchy = (Hierarchy)repositories.remove(classLoader);
     if (hierarchy != null) {
       hierarchy.shutdown();

@@ -15,8 +15,6 @@
  */
 package com.revolsys.ui.html.fields;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -31,33 +29,38 @@ public class HtmlUiBuilderPropertyReadOnlyField extends Field {
    * @param name
    * @param required
    */
-  public HtmlUiBuilderPropertyReadOnlyField(final String name, final boolean required) {
+  public HtmlUiBuilderPropertyReadOnlyField(final String name,
+    final boolean required) {
     super(name, false);
     setReadOnly(true);
   }
 
+  public HtmlUiBuilder getBuilder() {
+    return builder;
+  }
+
+  @Override
   public boolean hasValue() {
     return true;
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     setValue(getInitialValue(request));
   }
 
+  @Override
   public boolean isValid() {
     return true;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     if (getValue() != null) {
-      builder.serialize(out, getValue(), getName(), Locale.getDefault());
+      builder.serialize(out, getValue(), getName());
     } else {
       out.text("-");
     }
-  }
-
-  public HtmlUiBuilder getBuilder() {
-    return builder;
   }
 
   public void setBuilder(final HtmlUiBuilder uiBuilder) {

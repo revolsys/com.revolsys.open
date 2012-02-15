@@ -34,39 +34,31 @@ public class BigDecimalAttributeValidator implements AttributeValueValidator {
   public BigDecimalAttributeValidator() {
   }
 
-  public BigDecimalAttributeValidator(
-    final BigDecimal minValue,
-    final BigDecimal maxValue,
-    final boolean decimal) {
+  public BigDecimalAttributeValidator(final BigDecimal minValue,
+    final BigDecimal maxValue, final boolean decimal) {
     this.minValue = new BigDecimal(String.valueOf(minValue));
     this.maxValue = new BigDecimal(String.valueOf(maxValue));
     this.decimal = decimal;
   }
 
-  public BigDecimalAttributeValidator(
-    final boolean decimal) {
+  public BigDecimalAttributeValidator(final boolean decimal) {
     this.decimal = decimal;
   }
 
-  public BigDecimalAttributeValidator(
-    final double minValue,
+  public BigDecimalAttributeValidator(final double minValue,
     final double maxValue) {
     this.minValue = new BigDecimal(String.valueOf(minValue));
     this.maxValue = new BigDecimal(String.valueOf(maxValue));
     decimal = true;
   }
 
-  public BigDecimalAttributeValidator(
-    final long minValue,
-    final long maxValue) {
+  public BigDecimalAttributeValidator(final long minValue, final long maxValue) {
     this.minValue = new BigDecimal(String.valueOf(minValue));
     this.maxValue = new BigDecimal(String.valueOf(maxValue));
     decimal = false;
   }
 
-  public boolean isValid(
-    final Attribute attributeDefinition,
-    final Object value) {
+  public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value instanceof BigDecimal) {
       final BigDecimal number = (BigDecimal)value;
       if (!decimal && number.scale() > 0) {

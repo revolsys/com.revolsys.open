@@ -10,41 +10,41 @@ import org.springframework.core.io.Resource;
 
 public class MavenUrlStreamHandler extends URLStreamHandler {
 
-  private MavenRepository mavenRepository;
+  private final MavenRepository mavenRepository;
 
-  public MavenUrlStreamHandler(MavenRepository mavenRepository) {
+  public MavenUrlStreamHandler(final MavenRepository mavenRepository) {
     this.mavenRepository = mavenRepository;
   }
 
   @Override
-  protected URLConnection openConnection(URL url) throws IOException {
-    String protocol = url.getProtocol();
+  protected URLConnection openConnection(final URL url) throws IOException {
+    final String protocol = url.getProtocol();
     if (protocol.equals("jar")) {
-      String file = url.getFile();
+      final String file = url.getFile();
       int separator = file.indexOf("!/");
       if (separator == -1) {
         throw new MalformedURLException("no !/ found in url spec:" + file);
       } else {
 
-        String subUrl = file.substring(0, separator++);
+        final String subUrl = file.substring(0, separator++);
         if (subUrl.startsWith("mvn")) {
-          String mavenId = subUrl.substring(4);
-          Resource resource = mavenRepository.getResource(mavenId);
-          URL resourceUrl = resource.getURL();
+          final String mavenId = subUrl.substring(4);
+          final Resource resource = mavenRepository.getResource(mavenId);
+          final URL resourceUrl = resource.getURL();
 
           String entryName = "/";
 
           if (++separator != file.length()) {
-            entryName = file.substring(separator-1, file.length());
+            entryName = file.substring(separator - 1, file.length());
           }
-          String jarUrl = "jar:" + resourceUrl + "!" + entryName;
+          final String jarUrl = "jar:" + resourceUrl + "!" + entryName;
           return new URL(jarUrl).openConnection();
         }
       }
     } else if (protocol.equals("mvn")) {
-      String mavenId = url.getFile();
-      Resource resource = mavenRepository.getResource(mavenId);
-      URL resourceUrl = resource.getURL();
+      final String mavenId = url.getFile();
+      final Resource resource = mavenRepository.getResource(mavenId);
+      final URL resourceUrl = resource.getURL();
       return resourceUrl.openConnection();
     }
     return new URL(url.toString()).openConnection();

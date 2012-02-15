@@ -31,9 +31,7 @@ public class EdgeToAngleComparator<T> implements Comparator<Edge<T>> {
    * @param edge2 The second edge.
    * @see Angle#getTurn(double, double)
    */
-  public int compare(
-    final Edge<T> edge1,
-    final Edge<T> edge2) {
+  public int compare(final Edge<T> edge1, final Edge<T> edge2) {
     final double angle1 = edge1.getToAngle();
     final double angle2 = edge2.getToAngle();
     return Angle.getTurn(angle1, angle2);

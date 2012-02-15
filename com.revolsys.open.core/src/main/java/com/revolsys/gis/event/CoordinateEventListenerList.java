@@ -24,8 +24,7 @@ public class CoordinateEventListenerList extends
       notes));
   }
 
-  public void coordinateEvent(
-    final CoordinateEvent coordinateEvent) {
+  public void coordinateEvent(final CoordinateEvent coordinateEvent) {
     for (final CoordinateEventListener listener : this) {
       listener.coordinateEvent(coordinateEvent);
     }

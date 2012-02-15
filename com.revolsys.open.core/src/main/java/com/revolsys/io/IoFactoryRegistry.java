@@ -70,7 +70,8 @@ public class IoFactoryRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  private void addFactory(final IoFactory factory,
+  private void addFactory(
+    final IoFactory factory,
     final Class<? extends IoFactory> factoryClass) {
     final Class<?>[] interfaces = factoryClass.getInterfaces();
     for (final Class<?> factoryInterface : interfaces) {
@@ -113,19 +114,9 @@ public class IoFactoryRegistry {
     return factories;
   }
 
-  @SuppressWarnings("unchecked")
-  public synchronized <F extends IoFactory> Map<String, F> getFactoriesByFileExtensionMap(
-    final Class<F> factoryClass) {
-    Map<String, IoFactory> factoriesByFileExtension = classFactoriesByFileExtension.get(factoryClass);
-    if (factoriesByFileExtension == null) {
-      factoriesByFileExtension = new TreeMap<String, IoFactory>();
-      classFactoriesByFileExtension.put(factoryClass, factoriesByFileExtension);
-    }
-    return (Map<String, F>)factoriesByFileExtension;
-  }
-
   public <F extends IoFactory> List<F> getFactoriesByFileExtension(
-    final Class<F> factoryClass, final List<String> fileExtensions) {
+    final Class<F> factoryClass,
+    final List<String> fileExtensions) {
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
     final List<F> factories = new ArrayList<F>();
     for (final String fileExtension : fileExtensions) {
@@ -135,6 +126,17 @@ public class IoFactoryRegistry {
       }
     }
     return factories;
+  }
+
+  @SuppressWarnings("unchecked")
+  public synchronized <F extends IoFactory> Map<String, F> getFactoriesByFileExtensionMap(
+    final Class<F> factoryClass) {
+    Map<String, IoFactory> factoriesByFileExtension = classFactoriesByFileExtension.get(factoryClass);
+    if (factoriesByFileExtension == null) {
+      factoriesByFileExtension = new TreeMap<String, IoFactory>();
+      classFactoriesByFileExtension.put(factoryClass, factoriesByFileExtension);
+    }
+    return (Map<String, F>)factoriesByFileExtension;
   }
 
   @SuppressWarnings("unchecked")
@@ -149,31 +151,35 @@ public class IoFactoryRegistry {
   }
 
   public <F extends IoFactory> F getFactoryByFileExtension(
-    final Class<F> factoryClass, final String fileExtension) {
+    final Class<F> factoryClass,
+    final String fileExtension) {
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
     return factoriesByFileExtension.get(fileExtension);
   }
 
   public <F extends IoFactory> F getFactoryByFileName(
-    final Class<F> factoryClass, final String fileName) {
+    final Class<F> factoryClass,
+    final String fileName) {
     final String fileExtension = FileUtil.getFileNameExtension(fileName);
     return getFactoryByFileExtension(factoryClass, fileExtension);
   }
 
   public <F extends IoFactory> F getFactoryByMediaType(
-    final Class<F> factoryClass, final String mediaType) {
+    final Class<F> factoryClass,
+    final String mediaType) {
     final Map<String, F> factoriesByMediaType = getFactoriesByMediaType(factoryClass);
     return factoriesByMediaType.get(mediaType);
   }
 
   public <F extends IoFactory> F getFactoryByResource(
-    final Class<F> factoryClass, final Resource resource) {
+    final Class<F> factoryClass,
+    final Resource resource) {
     String fileName;
     if (resource instanceof UrlResource) {
-      UrlResource urlResoure = (UrlResource)resource;
+      final UrlResource urlResoure = (UrlResource)resource;
       try {
         fileName = urlResoure.getURL().getPath();
-      } catch (IOException e) {
+      } catch (final IOException e) {
         fileName = resource.getFilename();
       }
     } else {

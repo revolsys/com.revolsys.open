@@ -11,8 +11,7 @@ public class FilterListVisitor<T> implements Visitor<T> {
 
   private final List<T> results = new ArrayList<T>();
 
-  public FilterListVisitor(
-    final Filter<T> filter) {
+  public FilterListVisitor(final Filter<T> filter) {
     this.filter = filter;
   }
 
@@ -25,8 +24,7 @@ public class FilterListVisitor<T> implements Visitor<T> {
     return filter.toString();
   }
 
-  public boolean visit(
-    final T item) {
+  public boolean visit(final T item) {
     if (filter.accept(item)) {
       results.add(item);
     }

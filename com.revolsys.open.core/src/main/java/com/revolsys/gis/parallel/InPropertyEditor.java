@@ -8,8 +8,7 @@ import java.beans.PropertyEditor;
 
 public class InPropertyEditor implements PropertyEditor {
 
-  public void addPropertyChangeListener(
-    final PropertyChangeListener listener) {
+  public void addPropertyChangeListener(final PropertyChangeListener listener) {
     // TODO Auto-generated method stub
 
   }
@@ -44,27 +43,22 @@ public class InPropertyEditor implements PropertyEditor {
     return false;
   }
 
-  public void paintValue(
-    final Graphics gfx,
-    final Rectangle box) {
+  public void paintValue(final Graphics gfx, final Rectangle box) {
     // TODO Auto-generated method stub
 
   }
 
-  public void removePropertyChangeListener(
-    final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final PropertyChangeListener listener) {
     // TODO Auto-generated method stub
 
   }
 
-  public void setAsText(
-    final String text) {
+  public void setAsText(final String text) {
     // TODO Auto-generated method stub
 
   }
 
-  public void setValue(
-    final Object value) {
+  public void setValue(final Object value) {
     // TODO Auto-generated method stub
 
   }

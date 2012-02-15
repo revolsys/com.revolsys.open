@@ -23,7 +23,7 @@ import com.revolsys.ui.web.config.WebUiContext;
 public class PageBreadcrumbsView extends ObjectView {
   private String cssClass = "breadcrumbsMenu";
 
-  private WebUiContext context;
+  private final WebUiContext context;
 
   private String pageNode;
 
@@ -32,29 +32,7 @@ public class PageBreadcrumbsView extends ObjectView {
     setObject(context.getPage());
   }
 
-  public void setProperty(final String name, final Object value) {
-    if (value != null) {
-      super.setProperty(name, value.toString());
-      if (name.equals("cssClass")) {
-        cssClass = value.toString();
-      }
-    }
-  }
-
-  public void serializeElement(final XmlWriter out) {
-    Page page = (Page)getObject();
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-
-    out.startTag(HtmlUtil.UL);
-    crumb(out, page, true);
-    out.endTag(HtmlUtil.UL);
-
-    out.endTag(HtmlUtil.DIV);
-  }
-
-  private void crumb(final XmlWriter out, final Page page, final boolean current)
-    {
+  private void crumb(final XmlWriter out, final Page page, final boolean current) {
     if (page == null) {
       out.startTag(HtmlUtil.LI);
       out.startTag(HtmlUtil.A);
@@ -77,6 +55,29 @@ public class PageBreadcrumbsView extends ObjectView {
         out.text(" >");
       }
       out.endTag(HtmlUtil.LI);
+    }
+  }
+
+  @Override
+  public void serializeElement(final XmlWriter out) {
+    final Page page = (Page)getObject();
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+
+    out.startTag(HtmlUtil.UL);
+    crumb(out, page, true);
+    out.endTag(HtmlUtil.UL);
+
+    out.endTag(HtmlUtil.DIV);
+  }
+
+  @Override
+  public void setProperty(final String name, final Object value) {
+    if (value != null) {
+      super.setProperty(name, value.toString());
+      if (name.equals("cssClass")) {
+        cssClass = value.toString();
+      }
     }
   }
 }

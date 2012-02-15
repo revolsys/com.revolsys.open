@@ -83,16 +83,13 @@ public class MaximalNearestSubline {
    * @param a the LineString on which to compute the subline
    * @param b the LineString to compute the subline relative to
    */
-  public MaximalNearestSubline(
-    final LineString a,
-    final LineString b) {
+  public MaximalNearestSubline(final LineString a, final LineString b) {
     this.a = a;
     this.b = b;
     aPtLocator = new LocationOfPoint(a);
   }
 
-  private void expandInterval(
-    final LineStringLocation loc) {
+  private void expandInterval(final LineStringLocation loc) {
     // expand maximal interval if this point is outside it
     if (maxInterval[0] == null || loc.compareTo(maxInterval[0]) < 0) {
       maxInterval[0] = loc;
@@ -102,8 +99,7 @@ public class MaximalNearestSubline {
     }
   }
 
-  private void findNearestOnA(
-    final Coordinate bPt) {
+  private void findNearestOnA(final Coordinate bPt) {
     final LineStringLocation nearestLocationOnA = aPtLocator.locate(bPt);
     expandInterval(nearestLocationOnA);
   }
@@ -146,8 +142,7 @@ public class MaximalNearestSubline {
     return maxInterval;
   }
 
-  private boolean isOutsideInterval(
-    final int ia) {
+  private boolean isOutsideInterval(final int ia) {
     if (ia <= maxInterval[0].getSegmentIndex()) {
       return true;
     }

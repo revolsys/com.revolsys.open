@@ -211,12 +211,34 @@ public final class HtmlUtil {
     out.endTag(B);
   }
 
+  public static void serializeCheckBox(
+    final XmlWriter out,
+    final String name,
+    final String value,
+    final boolean selected,
+    final String onClick) {
+    out.startTag(INPUT);
+    out.attribute(ATTR_ID, name);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, "checkbox");
+    if (selected) {
+      out.attribute(HtmlUtil.ATTR_CHECKED, "checked");
+    }
+    if (value != null) {
+      out.attribute(ATTR_VALUE, value);
+    }
+    if (onClick != null) {
+      out.attribute(ATTR_ON_CLICK, onClick);
+    }
+    out.endTag(INPUT);
+  }
+
   public static void serializeDiv(
     final XmlWriter out,
     final String cssClass,
     final Object content) {
     if (content != null) {
-      String text = content.toString().trim();
+      final String text = content.toString().trim();
       if (text.length() > 0) {
         out.startTag(DIV);
         if (cssClass != null) {
@@ -253,41 +275,6 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializeSubmitInput(
-    final XmlWriter out,
-    final String name,
-    final Object value) {
-    out.startTag(INPUT);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, "submit");
-    if (value != null) {
-      out.attribute(ATTR_VALUE, value);
-    }
-    out.endTag(INPUT);
-  }
-
-  public static void serializeCheckBox(
-    final XmlWriter out,
-    final String name,
-    final String value,
-    final boolean selected,
-    final String onClick) {
-    out.startTag(INPUT);
-    out.attribute(ATTR_ID, name);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, "checkbox");
-    if (selected) {
-      out.attribute(HtmlUtil.ATTR_CHECKED, "checked");
-    }
-    if (value != null) {
-      out.attribute(ATTR_VALUE, value);
-    }
-    if (onClick != null) {
-      out.attribute(ATTR_ON_CLICK, onClick);
-    }
-    out.endTag(INPUT);
-  }
-
   public static void serializePre(final XmlWriter out, final String text) {
     out.startTag(PRE);
     out.text(text);
@@ -306,7 +293,7 @@ public final class HtmlUtil {
     final String cssClass,
     final Object content) {
     if (content != null) {
-      String text = content.toString().trim();
+      final String text = content.toString().trim();
       if (text.length() > 0) {
         out.startTag(SPAN);
         if (cssClass != null) {
@@ -316,6 +303,19 @@ public final class HtmlUtil {
         out.endTag(SPAN);
       }
     }
+  }
+
+  public static void serializeSubmitInput(
+    final XmlWriter out,
+    final String name,
+    final Object value) {
+    out.startTag(INPUT);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, "submit");
+    if (value != null) {
+      out.attribute(ATTR_VALUE, value);
+    }
+    out.endTag(INPUT);
   }
 
   public static void serializeTag(

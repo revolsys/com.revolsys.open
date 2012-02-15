@@ -26,11 +26,11 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
   private class RemoveResult {
     private V oldValue;
 
-    public void clear() {
-    }
-
     public boolean canMerge() {
       return false;
+    }
+
+    public void clear() {
     }
   }
 
@@ -372,7 +372,7 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
   @SuppressWarnings("unchecked")
   @Override
   public V remove(final Object key) {
-    RemoveResult result = remove(rootPageIndex, (K)key);
+    final RemoveResult result = remove(rootPageIndex, (K)key);
     // TODO merge if required
     return result.oldValue;
   }
@@ -400,8 +400,8 @@ public class BPlusTree<K, V> extends AbstractMap<K, V> {
 
     final int numBytes = page.readShort();
     while (page.getOffset() < numBytes) {
-      byte[] keyBytes = keyManager.getBytes(page);
-      byte[] valueBytes = valueManager.getBytes(page);
+      final byte[] keyBytes = keyManager.getBytes(page);
+      final byte[] valueBytes = valueManager.getBytes(page);
       if (result.oldValue == null) {
         final K currentKey = keyManager.getValue(keyBytes);
         final int compare = ((Comparable<K>)currentKey).compareTo(key);

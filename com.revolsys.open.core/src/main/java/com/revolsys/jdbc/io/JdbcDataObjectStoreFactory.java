@@ -17,7 +17,7 @@ public class JdbcDataObjectStoreFactory implements DataObjectStoreFactory {
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    Map<String, Object> connectionProperties) {
+    final Map<String, Object> connectionProperties) {
     return JdbcDataObjectStore.class;
   }
 

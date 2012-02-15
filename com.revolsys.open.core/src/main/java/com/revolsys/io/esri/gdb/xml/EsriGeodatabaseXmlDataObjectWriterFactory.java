@@ -13,14 +13,16 @@ import com.revolsys.io.Writer;
 public class EsriGeodatabaseXmlDataObjectWriterFactory extends
   AbstractDataObjectAndGeometryWriterFactory {
   public EsriGeodatabaseXmlDataObjectWriterFactory() {
-    super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION,true,true);
+    super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(EsriGeodatabaseXmlConstants.MEDIA_TYPE,
       EsriGeodatabaseXmlConstants.FILE_EXTENSION);
     setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));
   }
 
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream,
+  public Writer<DataObject> createDataObjectWriter(
+    final String baseName,
+    final DataObjectMetaData metaData,
+    final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);

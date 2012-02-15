@@ -31,7 +31,7 @@ public class EmailAddressField extends TextField {
   }
 
   @Override
-  public void setTextValue(String value) {
+  public void setTextValue(final String value) {
     super.setTextValue(value);
     if (StringUtils.hasText(value)) {
       if (!UrlUtil.isValidEmail(getInputValue())) {

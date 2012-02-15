@@ -3,9 +3,9 @@ package com.revolsys.parallel.channel.store;
 import com.revolsys.parallel.channel.ChannelDataStore;
 
 /**
- * <H2>Description</H2>
- * The ZeroBuffer class is an implementation of ChannelDataStore which allows
- * one Object to be sent across the Channel at any one time.
+ * <H2>Description</H2> The ZeroBuffer class is an implementation of
+ * ChannelDataStore which allows one Object to be sent across the Channel at any
+ * one time.
  * <P>
  * The getState method will return EMPTY if the Channel does not contain an
  * Object and FULL if it does.
@@ -13,6 +13,21 @@ import com.revolsys.parallel.channel.ChannelDataStore;
  * @author P.D.Austin
  */
 public class BlackHoleBuffer<T> extends ChannelDataStore<T> {
+  /**
+   * Returns a new Object with the same creation parameters as this Object. This
+   * method should be overridden by subclasses to return a new Object that is
+   * the same type as this Object. The new instance should be created by
+   * constructing a new instance with the same parameters as the original.
+   * <I>NOTE: Only the sizes of the data should be cloned not the stored
+   * data.</I>
+   * 
+   * @return The cloned instance of this Object.
+   */
+  @Override
+  protected Object clone() {
+    return this;
+  }
+
   /**
    * Returns the Object from the ZeroBuffer.
    * <P>
@@ -24,8 +39,20 @@ public class BlackHoleBuffer<T> extends ChannelDataStore<T> {
    * 
    * @return The next available Object from the ChannelDataStore
    */
+  @Override
   protected T get() {
     return null;
+  }
+
+  /**
+   * Returns the current state of the ZeroBuffer, should be called to ensure the
+   * Pre-conditions of the other methods are not broken.
+   * 
+   * @return The current state of the ZeroBuffer (EMPTY or FULL)
+   */
+  @Override
+  protected int getState() {
+    return EMPTY;
   }
 
   /**
@@ -39,29 +66,7 @@ public class BlackHoleBuffer<T> extends ChannelDataStore<T> {
    * 
    * @param value The object to put in the ChannelDataStore
    */
-  protected void put(T value) {
-  }
-
-  /**
-   * Returns the current state of the ZeroBuffer, should be called to ensure the
-   * Pre-conditions of the other methods are not broken.
-   * 
-   * @return The current state of the ZeroBuffer (EMPTY or FULL)
-   */
-  protected int getState() {
-    return EMPTY;
-  }
-
-  /**
-   * Returns a new Object with the same creation parameters as this Object. This
-   * method should be overridden by subclasses to return a new Object that is
-   * the same type as this Object. The new instance should be created by
-   * constructing a new instance with the same parameters as the original.
-   * <I>NOTE: Only the sizes of the data should be cloned not the stored data.</I>
-   * 
-   * @return The cloned instance of this Object.
-   */
-  protected Object clone() {
-    return this;
+  @Override
+  protected void put(final T value) {
   }
 }

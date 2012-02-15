@@ -14,8 +14,7 @@ public final class CsvUtil {
    * @param map The Map to convert to CSV
    * @return The CSV string.
    */
-  public static String toCsv(
-    final Map<String, ? extends Object> map) {
+  public static String toCsv(final Map<String, ? extends Object> map) {
     final StringWriter csvString = new StringWriter();
     final CsvMapWriter csvMapWriter = new CsvMapWriter(csvString);
     csvMapWriter.write(map);

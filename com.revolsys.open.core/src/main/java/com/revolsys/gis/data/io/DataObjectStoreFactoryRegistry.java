@@ -29,6 +29,13 @@ public class DataObjectStoreFactoryRegistry {
     return (T)factory.createDataObjectStore(connectionProperties);
   }
 
+  public static Class<?> getDataObjectStoreInterfaceClass(
+    final Map<String, Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final DataObjectStoreFactory factory = getDataSourceFactory(url);
+    return factory.getDataObjectStoreInterfaceClass(connectionProperties);
+  }
+
   public static DataObjectStoreFactory getDataSourceFactory(final String url) {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
@@ -56,7 +63,8 @@ public class DataObjectStoreFactoryRegistry {
   }
 
   public static void setConnectionProperties(
-    final DataObjectStore dataObjectStore, final Map<String, Object> properties) {
+    final DataObjectStore dataObjectStore,
+    final Map<String, Object> properties) {
     final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(
       dataObjectStore);
     for (final Entry<String, Object> property : properties.entrySet()) {
@@ -68,12 +76,6 @@ public class DataObjectStoreFactoryRegistry {
         LOG.error("Unable to set data store property " + name, e);
       }
     }
-  }
-
-  public static Class<?> getDataObjectStoreInterfaceClass(Map<String, Object> connectionProperties) {
-    final String url = (String)connectionProperties.get("url");
-    final DataObjectStoreFactory factory = getDataSourceFactory(url);
-    return factory.getDataObjectStoreInterfaceClass(connectionProperties);
   }
 
 }

@@ -6,10 +6,10 @@ import java.util.Map;
 
 public class Site implements Cloneable {
   /** The list of pages defined as direct children of the site. */
-  private Map pages = new HashMap();
+  private final Map pages = new HashMap();
 
   /** The cache of pages that can be found from the decendents of this site. */
-  private Map pageCache = new HashMap();
+  private final Map pageCache = new HashMap();
 
   private String name;
 
@@ -22,8 +22,9 @@ public class Site implements Cloneable {
     this.name = name;
   }
 
+  @Override
   protected Object clone() throws CloneNotSupportedException {
-    Site site = new Site();
+    final Site site = new Site();
 
     return site;
   }
@@ -51,13 +52,8 @@ public class Site implements Cloneable {
     return name;
   }
 
-  /**
-   * Set the nane of the site.
-   * 
-   * @param name The name of the site.
-   */
-  public void setName(final String name) {
-    this.name = name;
+  public Collection getNodes() {
+    return rootNode.getNodes();
   }
 
   /**
@@ -68,17 +64,22 @@ public class Site implements Cloneable {
   }
 
   /**
-   * @param rootNode The rootNode to set.
+   * Set the nane of the site.
+   * 
+   * @param name The name of the site.
    */
-  public void setRootNode(final SiteNode rootNode) {
-    this.rootNode = rootNode;
-  }
-
-  public Collection getNodes() {
-    return rootNode.getNodes();
+  public void setName(final String name) {
+    this.name = name;
   }
 
   public void setNodes(final Collection nodes) {
     rootNode.setNodes(nodes);
+  }
+
+  /**
+   * @param rootNode The rootNode to set.
+   */
+  public void setRootNode(final SiteNode rootNode) {
+    this.rootNode = rootNode;
   }
 }

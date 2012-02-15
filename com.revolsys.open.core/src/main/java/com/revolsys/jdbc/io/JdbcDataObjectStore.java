@@ -28,7 +28,8 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   String getLabel();
 
-  DataObjectMetaData getMetaData(QName tableName,
+  DataObjectMetaData getMetaData(
+    QName tableName,
     ResultSetMetaData resultSetMetaData);
 
   Object getNextPrimaryKey(DataObjectMetaData metaData);

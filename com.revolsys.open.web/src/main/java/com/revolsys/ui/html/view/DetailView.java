@@ -15,7 +15,6 @@
  */
 package com.revolsys.ui.html.view;
 
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
@@ -23,11 +22,11 @@ import com.revolsys.ui.html.serializer.LabelValueListSerializer;
 public class DetailView extends Element {
   private String cssClass = "detail";
 
-  private LabelValueListSerializer serializer;
+  private final LabelValueListSerializer serializer;
 
   private String title;
 
-  private int numColumns;
+  private final int numColumns;
 
   public DetailView(final LabelValueListSerializer serializer) {
     this(serializer, null, null);
@@ -56,8 +55,9 @@ public class DetailView extends Element {
     this.numColumns = numColumns;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
-    int size = serializer.getSize();
+    final int size = serializer.getSize();
     if (size > 0) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
@@ -74,8 +74,8 @@ public class DetailView extends Element {
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
       out.attribute(HtmlUtil.ATTR_CLASS, "data");
       for (int i = 0; i < size; i++) {
-        boolean firstCol = i % numColumns == 0;
-        boolean lastCol = (i + 1) % numColumns == 0 || i == size - 1;
+        final boolean firstCol = i % numColumns == 0;
+        final boolean lastCol = (i + 1) % numColumns == 0 || i == size - 1;
         String labelCss = "";
         String valueCss = "";
         if (firstCol) {
@@ -99,7 +99,7 @@ public class DetailView extends Element {
           valueCss = " lastCol";
         }
         out.startTag(HtmlUtil.TH);
-        String newLabelCss = serializer.getLabelCss(i);
+        final String newLabelCss = serializer.getLabelCss(i);
         if (newLabelCss != null) {
           labelCss = newLabelCss + labelCss;
         }
@@ -109,7 +109,7 @@ public class DetailView extends Element {
         serializer.serializeLabel(out, i);
         out.endTag(HtmlUtil.TH);
         out.startTag(HtmlUtil.TD);
-        String newValueCss = serializer.getValueCss(i);
+        final String newValueCss = serializer.getValueCss(i);
         if (newValueCss != null) {
           valueCss = newValueCss + valueCss;
         }

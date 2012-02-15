@@ -8,8 +8,7 @@ public class NestedVisitor<T> implements Visitor<T> {
   public NestedVisitor() {
   }
 
-  public NestedVisitor(
-    final Visitor<T> visitor) {
+  public NestedVisitor(final Visitor<T> visitor) {
     this.visitor = visitor;
   }
 
@@ -17,13 +16,11 @@ public class NestedVisitor<T> implements Visitor<T> {
     return visitor;
   }
 
-  public void setVisitor(
-    final Visitor<T> visitor) {
+  public void setVisitor(final Visitor<T> visitor) {
     this.visitor = visitor;
   }
 
-  public boolean visit(
-    final T item) {
+  public boolean visit(final T item) {
     return visitor.visit(item);
   }
 }

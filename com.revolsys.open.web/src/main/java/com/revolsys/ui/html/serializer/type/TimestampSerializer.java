@@ -12,6 +12,6 @@ public class TimestampSerializer extends DateTimeSerializer {
    * Construct a new TimestampSerializer.
    */
   public TimestampSerializer() {
-   setTimeStyle(DateFormat.LONG);
+    setTimeStyle(DateFormat.LONG);
   }
 }

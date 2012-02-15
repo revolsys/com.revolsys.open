@@ -12,16 +12,13 @@ public class Axis implements Serializable {
 
   private final String name;
 
-  public Axis(
-    final String name,
-    final String direction) {
+  public Axis(final String name, final String direction) {
     this.name = name;
     this.direction = direction;
   }
 
   @Override
-  public boolean equals(
-    final Object object) {
+  public boolean equals(final Object object) {
     if (object == null) {
       return false;
     } else if (object == this) {

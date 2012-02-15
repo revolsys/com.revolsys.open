@@ -29,6 +29,59 @@ public class EsriXmlDataObjectMetaDataUtil implements
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
+  private static void addField(
+    final DataObjectMetaDataImpl metaData,
+    final DETable deTable,
+    final String tableName,
+    final Field field,
+    final String fieldName) {
+    final FieldType fieldType = field.getType();
+    final int precision = field.getPrecision();
+    final DataType dataType;
+    if (fieldType == FieldType.esriFieldTypeGeometry
+      && deTable instanceof DEFeatureClass) {
+      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+      final GeometryType shapeType = featureClass.getShapeType();
+      switch (shapeType) {
+        case esriGeometryPoint:
+          dataType = DataTypes.POINT;
+        break;
+        case esriGeometryMultipoint:
+          dataType = DataTypes.MULTI_POINT;
+        break;
+        case esriGeometryPolyline:
+          dataType = DataTypes.MULTI_LINE_STRING;
+        break;
+        case esriGeometryPolygon:
+          dataType = DataTypes.POLYGON;
+        break;
+
+        default:
+          throw new RuntimeException("Unknown geometry type");
+      }
+
+    } else if (precision > 0
+      && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
+      dataType = DataTypes.DECIMAL;
+    } else {
+      dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
+    }
+    final int scale = field.getScale();
+    int length = field.getLength();
+    if (precision != 0) {
+      length = precision;
+    }
+    final Boolean required = !field.isIsNullable()
+      || field.getRequired() == Boolean.TRUE;
+    final Attribute attribute = new Attribute(fieldName, dataType, length,
+      scale, required);
+
+    metaData.addAttribute(attribute);
+    if (fieldName.equals(tableName + "_ID")) {
+      metaData.setIdAttributeName(fieldName);
+    }
+  }
+
   private static Field addField(final DETable table, final Attribute attribute) {
     final String fieldName = attribute.getName();
     final DataType dataType = attribute.getType();
@@ -238,7 +291,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
   public static DataObjectMetaData getMetaData(
     final String schemaName,
     final CodedValueDomain domain,
-    boolean appendIdToName) {
+    final boolean appendIdToName) {
     final String tableName;
     if (appendIdToName) {
       tableName = domain.getName() + "_ID";
@@ -250,7 +303,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
     int length = 0;
-    for (CodedValue codedValue : domain.getCodedValues()) {
+    for (final CodedValue codedValue : domain.getCodedValues()) {
       length = Math.max(length, codedValue.getCode().toString().length());
     }
     metaData.addAttribute(tableName, dataType, length, true);
@@ -296,8 +349,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
         addField(metaData, deTable, tableName, field, fieldName);
       }
     }
-    for (Index index : deTable.getIndexes()) {
-      String indexName = index.getName();
+    for (final Index index : deTable.getIndexes()) {
+      final String indexName = index.getName();
       if (indexName.endsWith("_PK")) {
         final List<Field> indexFields = index.getFields();
         final Field indexField = CollectionUtil.get(indexFields, 0);
@@ -326,65 +379,12 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return metaData;
   }
 
-  private static void addField(
-    final DataObjectMetaDataImpl metaData,
-    final DETable deTable,
-    final String tableName,
-    final Field field,
-    final String fieldName) {
-    final FieldType fieldType = field.getType();
-    int precision = field.getPrecision();
-    final DataType dataType;
-    if (fieldType == FieldType.esriFieldTypeGeometry
-      && deTable instanceof DEFeatureClass) {
-      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
-      final GeometryType shapeType = featureClass.getShapeType();
-      switch (shapeType) {
-        case esriGeometryPoint:
-          dataType = DataTypes.POINT;
-        break;
-        case esriGeometryMultipoint:
-          dataType = DataTypes.MULTI_POINT;
-        break;
-        case esriGeometryPolyline:
-          dataType = DataTypes.MULTI_LINE_STRING;
-        break;
-        case esriGeometryPolygon:
-          dataType = DataTypes.POLYGON;
-        break;
-
-        default:
-          throw new RuntimeException("Unknown geometry type");
-      }
-
-    } else if (precision > 0
-      && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
-      dataType = DataTypes.DECIMAL;
-    } else {
-      dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
-    }
-    final int scale = field.getScale();
-    int length = field.getLength();
-    if (precision != 0) {
-      length = precision;
-    }
-    final Boolean required = !field.isIsNullable()
-      || field.getRequired() == Boolean.TRUE;
-    final Attribute attribute = new Attribute(fieldName, dataType, length,
-      scale, required);
-
-    metaData.addAttribute(attribute);
-    if (fieldName.equals(tableName + "_ID")) {
-      metaData.setIdAttributeName(fieldName);
-    }
-  }
-
   public static List<DataObject> getValues(
-    DataObjectMetaData metaData,
-    CodedValueDomain domain) {
-    List<DataObject> values = new ArrayList<DataObject>();
-    for (CodedValue codedValue : domain.getCodedValues()) {
-      DataObject value = new ArrayDataObject(metaData);
+    final DataObjectMetaData metaData,
+    final CodedValueDomain domain) {
+    final List<DataObject> values = new ArrayList<DataObject>();
+    for (final CodedValue codedValue : domain.getCodedValues()) {
+      final DataObject value = new ArrayDataObject(metaData);
       value.setIdValue(codedValue.getCode());
       value.setValue("DESCRIPTION", codedValue.getName());
       values.add(value);

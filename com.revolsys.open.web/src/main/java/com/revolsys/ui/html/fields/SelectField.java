@@ -38,11 +38,11 @@ public class SelectField extends Field {
 
   private String onChange;
 
-  private Map<String, FieldValue> optionMap = new HashMap<String, FieldValue>();
+  private final Map<String, FieldValue> optionMap = new HashMap<String, FieldValue>();
 
-  private List<FieldValue> options = new ArrayList<FieldValue>();
+  private final List<FieldValue> options = new ArrayList<FieldValue>();
 
-  private Map<Object, FieldValue> optionValueMap = new HashMap<Object, FieldValue>();
+  private final Map<Object, FieldValue> optionValueMap = new HashMap<Object, FieldValue>();
 
   private String stringValue;
 
@@ -66,15 +66,20 @@ public class SelectField extends Field {
     this.stringValue = defaultValue;
   }
 
-  public void addOption(final int index, final Object value,
-    final String stringValue, final String label) {
-    FieldValue option = new FieldValue(value, stringValue, label);
+  public void addOption(
+    final int index,
+    final Object value,
+    final String stringValue,
+    final String label) {
+    final FieldValue option = new FieldValue(value, stringValue, label);
     options.add(index, option);
     optionMap.put(stringValue, option);
     optionValueMap.put(value, option);
   }
 
-  public void addOption(final Object value, final Object stringValue,
+  public void addOption(
+    final Object value,
+    final Object stringValue,
     final String label) {
     addOption(value, stringValue.toString(), label);
   }
@@ -87,9 +92,11 @@ public class SelectField extends Field {
     addOption(value, stringValue, label);
   }
 
-  public void addOption(final Object value, final String stringValue,
+  public void addOption(
+    final Object value,
+    final String stringValue,
     final String label) {
-    FieldValue option = new FieldValue(value, stringValue, label);
+    final FieldValue option = new FieldValue(value, stringValue, label);
     options.add(option);
     optionMap.put(stringValue, option);
     optionValueMap.put(value, option);
@@ -104,15 +111,16 @@ public class SelectField extends Field {
   }
 
   public void addOptions(final Map<Object, String> options) {
-    for (Entry<Object, String> entry : options.entrySet()) {
-      Object key = entry.getKey();
-      String label = (String)entry.getValue();
+    for (final Entry<Object, String> entry : options.entrySet()) {
+      final Object key = entry.getKey();
+      final String label = entry.getValue();
       addOption(key, label);
     }
   }
 
+  @Override
   public SelectField clone() {
-    SelectField field = new SelectField();
+    final SelectField field = new SelectField();
     field.setName(getName());
     field.setDefaultValue(getDefaultValue());
     field.setRequired(isRequired());
@@ -130,17 +138,19 @@ public class SelectField extends Field {
   }
 
   public FieldValue getSelectedOption() {
-    return (FieldValue)optionMap.get(stringValue);
+    return optionMap.get(stringValue);
   }
 
   public String getStringValue() {
     return stringValue;
   }
 
+  @Override
   public boolean hasValue() {
     return stringValue != null && !stringValue.equals("");
   }
 
+  @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     if (!isRequired()) {
       addOption(0, null, null, nullValueLabel);
@@ -152,12 +162,13 @@ public class SelectField extends Field {
     }
   }
 
+  @Override
   public boolean isValid() {
     boolean valid = true;
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      FieldValue option = getSelectedOption();
+      final FieldValue option = getSelectedOption();
       if (option == null) {
         addValidationError("Invalid Value");
         valid = false;
@@ -169,6 +180,7 @@ public class SelectField extends Field {
     return valid;
   }
 
+  @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_ID, getName());
@@ -184,7 +196,7 @@ public class SelectField extends Field {
     if (options.size() == 0) {
       addOption(null, "(None)");
     }
-    for (FieldValue option : options) {
+    for (final FieldValue option : options) {
       out.startTag(HtmlUtil.OPTION);
       if (option.getStringValue().equals(stringValue)) {
         out.attribute(HtmlUtil.ATTR_SELECTED, "true");
@@ -197,11 +209,11 @@ public class SelectField extends Field {
     }
   }
 
-  public void setDefaultValue(String defaultValue) {
+  public void setDefaultValue(final String defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public void setNullValueLabel(String nullValueLabel) {
+  public void setNullValueLabel(final String nullValueLabel) {
     this.nullValueLabel = nullValueLabel;
   }
 
@@ -213,17 +225,18 @@ public class SelectField extends Field {
     options.clear();
     optionMap.clear();
     optionValueMap.clear();
-    for (Entry<Object, String> entry : options.entrySet()) {
-      Object key = entry.getKey();
-      String label = (String)entry.getValue();
+    for (final Entry<Object, String> entry : options.entrySet()) {
+      final Object key = entry.getKey();
+      final String label = entry.getValue();
       addOption(key, label);
     }
   }
 
+  @Override
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      FieldValue option = (FieldValue)optionValueMap.get(value);
+      final FieldValue option = optionValueMap.get(value);
       if (option != null) {
         stringValue = option.getStringValue();
       } else {

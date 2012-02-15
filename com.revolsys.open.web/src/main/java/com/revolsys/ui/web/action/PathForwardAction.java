@@ -15,23 +15,25 @@ import com.revolsys.ui.web.config.Action;
 public class PathForwardAction implements Action {
   private String path;
 
-  public void init(final ServletContext context) throws ServletException {
-  }
-
-  public void process(final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
-    RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
-    Logger.getLogger(PathForwardAction.class).debug(path +'=' + requestDispatcher);
-    if (requestDispatcher != null) {
-      requestDispatcher.forward(request, response);
-    }
-  }
-
   /**
    * @return Returns the path.
    */
   public String getPath() {
     return path;
+  }
+
+  public void init(final ServletContext context) throws ServletException {
+  }
+
+  public void process(
+    final HttpServletRequest request,
+    final HttpServletResponse response) throws IOException, ServletException {
+    final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
+    Logger.getLogger(PathForwardAction.class).debug(
+      path + '=' + requestDispatcher);
+    if (requestDispatcher != null) {
+      requestDispatcher.forward(request, response);
+    }
   }
 
   /**

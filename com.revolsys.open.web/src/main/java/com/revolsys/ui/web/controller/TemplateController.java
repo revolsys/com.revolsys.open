@@ -18,7 +18,7 @@ public class TemplateController extends AbstractController {
 
   private String viewName;
 
-  private UrlPathHelper urlPathHelper = new UrlPathHelper();
+  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   public TemplateController() {
     urlPathHelper.setAlwaysUseFullPath(true);
@@ -38,17 +38,17 @@ public class TemplateController extends AbstractController {
     final HttpServletResponse response) throws Exception {
     String path = urlPathHelper.getOriginatingRequestUri(request);
 
-    String contextPath = urlPathHelper.getOriginatingContextPath(request);
+    final String contextPath = urlPathHelper.getOriginatingContextPath(request);
     path = path.substring(contextPath.length());
-    String pathNoExt = FileUtil.getBaseName(path);
+    final String pathNoExt = FileUtil.getBaseName(path);
 
     String viewName = this.viewName;
     viewName = viewName.replaceAll("\\[PATH\\]", path);
     viewName = viewName.replaceAll("\\[PATH-NO-EXT\\]", pathNoExt);
 
     final ModelAndView view = new ModelAndView(viewName);
-    for (Entry<String, Object> attribute : attributes.entrySet()) {
-      String attributeName = attribute.getKey();
+    for (final Entry<String, Object> attribute : attributes.entrySet()) {
+      final String attributeName = attribute.getKey();
       Object attributeValue = attribute.getValue();
       if (attributeValue instanceof String) {
         attributeValue = ((String)attributeValue).replaceAll("\\[PATH\\]", path);

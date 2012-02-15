@@ -29,7 +29,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
 
   private WktParser wktParser;
 
-  private DataObjectMetaData metaData;
+  private final DataObjectMetaData metaData;
 
   public WktDataObjectIterator(final DataObjectFactory factory,
     final Resource resource) throws IOException {
@@ -71,7 +71,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
   @Override
   protected DataObject getNext() {
     try {
-      String wkt = in.readLine();
+      final String wkt = in.readLine();
       final Geometry geometry = wktParser.parseGeometry(wkt);
       if (geometry == null) {
         throw new NoSuchElementException();

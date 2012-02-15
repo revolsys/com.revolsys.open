@@ -17,12 +17,21 @@ import com.revolsys.io.Reader;
 public class DataObjectDirectoryReader extends
   AbstractDirectoryReader<DataObject> implements DataObjectMetaDataFactory {
 
-  private Map<QName, DataObjectMetaData> typeNameMetaDataMap = new HashMap<QName, DataObjectMetaData>();
+  private final Map<QName, DataObjectMetaData> typeNameMetaDataMap = new HashMap<QName, DataObjectMetaData>();
 
   public DataObjectDirectoryReader() {
   }
 
-  protected Reader<DataObject> createReader(Resource resource) {
+  protected void addMetaData(final DataObjectReader reader) {
+    final DataObjectMetaData metaData = reader.getMetaData();
+    if (metaData != null) {
+      final QName typeName = metaData.getName();
+      typeNameMetaDataMap.put(typeName, metaData);
+    }
+  }
+
+  @Override
+  protected Reader<DataObject> createReader(final Resource resource) {
     final IoFactoryRegistry registry = IoFactoryRegistry.INSTANCE;
     final String filename = resource.getFilename();
     final String extension = FileUtil.getFileNameExtension(filename);
@@ -33,16 +42,8 @@ public class DataObjectDirectoryReader extends
     return reader;
   }
 
-  protected void addMetaData(final DataObjectReader reader) {
-    final DataObjectMetaData metaData = reader.getMetaData();
-    if (metaData != null) {
-      QName typeName = metaData.getName();
-      typeNameMetaDataMap.put(typeName, metaData);
-    }
-  }
-
-  public DataObjectMetaData getMetaData(QName typeName) {
-    DataObjectMetaData metaData = typeNameMetaDataMap.get(typeName);
+  public DataObjectMetaData getMetaData(final QName typeName) {
+    final DataObjectMetaData metaData = typeNameMetaDataMap.get(typeName);
     return metaData;
   }
 

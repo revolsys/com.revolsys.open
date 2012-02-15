@@ -19,7 +19,7 @@ public class AttributesEqualIgnoreCaseFilter implements Filter<DataObject> {
         attributeName);
 
       if (value1 == null) {
-        if (value2 !=null) {
+        if (value2 != null) {
           return false;
         }
       } else if (value2 != null) {
@@ -42,21 +42,18 @@ public class AttributesEqualIgnoreCaseFilter implements Filter<DataObject> {
 
   private final DataObject object;
 
-  public AttributesEqualIgnoreCaseFilter(
-    final DataObject object,
+  public AttributesEqualIgnoreCaseFilter(final DataObject object,
     final Collection<String> attributeNames) {
     this.attributeNames = attributeNames;
     this.object = object;
   }
 
-  public AttributesEqualIgnoreCaseFilter(
-    final DataObject object,
+  public AttributesEqualIgnoreCaseFilter(final DataObject object,
     final String... attributeNames) {
     this(object, Arrays.asList(attributeNames));
   }
 
-  public boolean accept(
-    final DataObject object) {
+  public boolean accept(final DataObject object) {
     return accept(this.object, object, attributeNames);
   }
 

@@ -1,6 +1,5 @@
 package com.revolsys.gis.data.model;
 
-
 public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
   private String propertyName;
 
@@ -9,9 +8,7 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
   public SimpleProperty() {
   }
 
-  public SimpleProperty(
-    final String propertyName,
-    final Object value) {
+  public SimpleProperty(final String propertyName, final Object value) {
     this.propertyName = propertyName;
     this.value = value;
   }
@@ -29,13 +26,11 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
     return (T)value;
   }
 
-  public void setPropertyName(
-    final String propertyName) {
+  public void setPropertyName(final String propertyName) {
     this.propertyName = propertyName;
   }
 
-  public void setValue(
-    final Object value) {
+  public void setValue(final Object value) {
     this.value = value;
   }
 }
