@@ -3,12 +3,12 @@
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.orm.core</artifactId>
   <name>RS ORM Core</name>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.02.16.RELEASE-2</version>
   <packaging>jar</packaging>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.02.16.RELEASE-2</version>
   </parent>
  
   <dependencies>
