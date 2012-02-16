@@ -12,7 +12,15 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
 
   private HtmlUiBuilder<?> uiBuilder;
 
-  public void serialize(XmlWriter out, Object object) {
+  public String getPageName() {
+    return pageName;
+  }
+
+  public HtmlUiBuilder<?> getUiBuilder() {
+    return uiBuilder;
+  }
+
+  public void serialize(final XmlWriter out, final Object object) {
     HtmlUiBuilder<? extends Object> uiBuilder = this.uiBuilder;
     final String[] parts = getName().split("\\.");
     Object currentObject = object;
@@ -34,7 +42,15 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
     uiBuilder.serializeLink(out, pageName, currentObject);
   }
 
-  public void setHtmlUiBuilder(HtmlUiBuilder<?> uiBuilder) {
+  public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
+    this.uiBuilder = uiBuilder;
+  }
+
+  public void setPageName(final String pageName) {
+    this.pageName = pageName;
+  }
+
+  public void setUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     this.uiBuilder = uiBuilder;
   }
 }

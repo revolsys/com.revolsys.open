@@ -1,11 +1,7 @@
 package com.revolsys.logging.log4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ThreadLocalAppenderRunnable implements Runnable {
-  private static final Logger LOG = LoggerFactory.getLogger(ThreadLocalAppenderRunnable.class);
-
   private final ThreadLocalFileAppender appender;
 
   private String logFile;
@@ -31,7 +27,7 @@ public class ThreadLocalAppenderRunnable implements Runnable {
       }
       process.run();
     } catch (Throwable t) {
-      LOG.error("Error running " + process, t);
+      t.printStackTrace();
     }
   }
 

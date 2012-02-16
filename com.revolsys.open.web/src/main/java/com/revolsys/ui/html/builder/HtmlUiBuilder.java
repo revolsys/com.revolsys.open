@@ -1310,7 +1310,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (url == null) {
       serializeNullLabel(out, pageName);
     } else {
-      HtmlUtil.serializeA(out, null, url, pageName);
+      HtmlUtil.serializeA(out, null, url, id);
     }
   }
 

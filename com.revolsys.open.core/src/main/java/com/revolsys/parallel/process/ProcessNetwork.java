@@ -205,7 +205,10 @@ public class ProcessNetwork implements BeanPostProcessor,
       try {
         for (final Thread thread : processesToStop) {
           if (Thread.currentThread() != thread && thread.isAlive()) {
-            thread.stop();
+            try {
+              thread.stop();
+            } catch (Exception e) {
+            }
           }
         }
       } finally {
