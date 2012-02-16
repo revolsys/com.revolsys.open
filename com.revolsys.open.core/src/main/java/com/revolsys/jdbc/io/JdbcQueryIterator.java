@@ -355,7 +355,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   @Override
   protected DataObject getNext() throws NoSuchElementException {
     try {
-      if (resultSet.next()) {
+      if (resultSet != null && resultSet.next()) {
         final DataObject object = getNextObject(dataStore, metaData,
           attributes, dataObjectFactory, resultSet);
         return object;
