@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.web</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.02.16.RELEASE</version>
   <name>RS Web</name>
   <packaging>jar</packaging>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.02.16.RELEASE</version>
   </parent>
 
   <dependencies>
