@@ -1,4 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -72,13 +76,33 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <goals>deploy</goals>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-maven-plugin</artifactId>
+        <version>1.7</version>
+        <configuration>
+          <automatic>true</automatic>
+          <description>Staging Releasing ${releaseVersion}</description>
+          <promoteAutoSelectOverride>true</promoteAutoSelectOverride>
+          <serverAuthId>sonatype-nexus-staging</serverAuthId>
+          <targetRepositoryId>releases</targetRepositoryId>
+          <version>${releaseVersion}</version>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
         <version>2.3.1</version>
         <configuration>
           <createChecksum>true</createChecksum>
         </configuration>
       </plugin>
-<!--      <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.0</version>
@@ -100,7 +124,7 @@
             </plugin>
           </reportPlugins>
         </configuration>
-      </plugin> --> 
+      </plugin>
     </plugins>
   </build>
 
@@ -123,13 +147,13 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-<!--  <distributionManagement>
+  <distributionManagement>
     <site>
       <id>github-site</id>
       <url>gitsite:git@github.com/revolsys/com.revolsys.open.git</url>
     </site>
   </distributionManagement>
- --> 
+
   <properties>
     <org.slf4j.version>1.6.4</org.slf4j.version>
     <org.springframework.version>3.0.7.RELEASE</org.springframework.version>
