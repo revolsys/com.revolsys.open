@@ -4,11 +4,11 @@
   <artifactId>com.revolsys.open.gis.esri.gdb.file</artifactId>
   <packaging>jar</packaging>
   <name>RS ESRI File Geodatabase</name>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.02.16.RELEASE-3</version>
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.02.16.RELEASE-3</version>
   </parent>
 
   <build>

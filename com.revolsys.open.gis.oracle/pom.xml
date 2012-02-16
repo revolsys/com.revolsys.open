@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.gis.oracle</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.02.16.RELEASE-3</version>
   <name>RS Oracle</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.02.16.RELEASE-3</version>
   </parent>
   <dependencies>
     <dependency>
