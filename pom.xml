@@ -58,6 +58,7 @@
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.gis.google.fusiontables</module>
   </modules>
+
   <build>
     <plugins>
       <plugin>
@@ -75,6 +76,13 @@
         <version>2.3.1</version>
         <configuration>
           <createChecksum>true</createChecksum>
+        </configuration>
+      </plugin>
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <goals>install site-deploy</goals>
         </configuration>
       </plugin>
       <plugin>
