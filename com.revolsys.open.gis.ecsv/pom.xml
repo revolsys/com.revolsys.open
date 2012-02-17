@@ -4,7 +4,7 @@
 
 
   <artifactId>com.revolsys.open.gis.ecsv</artifactId>
-  <version>TRUNK-SNAPSHOT
+  <version>2012.02.17.RELEASE
 </version>
   <name>GIS ECSV Tools</name>
   <parent>
@@ -14,7 +14,7 @@
     <artifactId>com.revolsys.open.parent</artifactId>
 
 
-    <version>TRUNK-SNAPSHOT
+    <version>2012.02.17.RELEASE
 </version>
   </parent>
   <dependencies>
