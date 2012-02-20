@@ -25,6 +25,7 @@ import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMap;
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.process.BaseInProcess;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 import com.revolsys.util.JexlUtil;
@@ -49,21 +50,25 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
 
   @Override
   protected void destroy() {
-    while (!tasks.isEmpty()) {
-      try {
-        synchronized (this) {
-          wait(1000);
-          for (final Iterator<Future<?>> taskIter = tasks.iterator(); taskIter.hasNext();) {
-            final Future<?> task = taskIter.next();
-            if (task.isDone()) {
-              taskIter.remove();
+    try {
+      while (!tasks.isEmpty()) {
+        try {
+          synchronized (this) {
+            wait(1000);
+            for (final Iterator<Future<?>> taskIter = tasks.iterator(); taskIter.hasNext();) {
+              final Future<?> task = taskIter.next();
+              if (task.isDone()) {
+                taskIter.remove();
+              }
             }
           }
+        } catch (final InterruptedException e) {
+          throw new RuntimeException(e);
         }
-      } catch (final InterruptedException e) {
       }
+    } finally {
+      executor.shutdown();
     }
-    executor.shutdown();
   }
 
   private void executeScript(final DataObject object) {
@@ -97,6 +102,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
               }
             }
           } catch (final InterruptedException e) {
+            throw new ClosedException(e);
           }
         }
         final Future<?> future = executor.submit(scriptRunner);

@@ -100,10 +100,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
               status = "waiting";
             }
             synchronized (this) {
-              try {
-                wait(waitTime);
-              } catch (final InterruptedException e) {
-              }
+              wait(waitTime);
             }
           }
         }
@@ -114,6 +111,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
           }
         }
       }
+    } catch (final InterruptedException e) {
     } finally {
       try {
         postRun();
@@ -153,13 +151,10 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
     }
   }
 
-  protected void waitOnExecutions() {
+  protected void waitOnExecutions() throws InterruptedException {
     synchronized (executions) {
       status = "waiting on executions";
-      try {
-        executions.wait(waitTime);
-      } catch (final InterruptedException e) {
-      }
+      executions.wait(waitTime);
     }
   }
 

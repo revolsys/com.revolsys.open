@@ -72,26 +72,18 @@ public class QueueOfNamedQueues<T> {
 
   public boolean offer(final String name, final T value) {
     final Integer sequence = this.sequence.getAndIncrement();
-    Queue<Integer> sequenceQueue;
-    synchronized (sequenceQueuesByName) {
-      sequenceQueue = sequenceQueuesByName.get(name);
-      if (sequenceQueue == null) {
-        sequenceQueue = new LinkedList<Integer>();
-        sequenceQueuesByName.put(name, sequenceQueue);
-      }
+    Queue<Integer> sequenceQueue = sequenceQueuesByName.get(name);
+    if (sequenceQueue == null) {
+      sequenceQueue = new LinkedList<Integer>();
+      sequenceQueuesByName.put(name, sequenceQueue);
     }
-    Queue<T> values;
-    synchronized (valuesByName) {
-      values = valuesByName.get(name);
-      if (values == null) {
-        values = new LinkedList<T>();
-        valuesByName.put(name, values);
-      }
+    Queue<T> values = valuesByName.get(name);
+    if (values == null) {
+      values = new LinkedList<T>();
+      valuesByName.put(name, values);
     }
-    synchronized (sequenceQueue) {
-      sequenceQueue.offer(sequence);
-      values.offer(value);
-    }
+    sequenceQueue.offer(sequence);
+    values.offer(value);
     return true;
   }
 

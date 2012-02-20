@@ -171,6 +171,7 @@ public class MultiInputSelector {
           try {
             monitor.wait(Math.min(msecs, maxWait), nsecs);
           } catch (final InterruptedException e) {
+            throw new ClosedException(e);
           }
         }
       }
@@ -190,6 +191,7 @@ public class MultiInputSelector {
               monitor.wait(Math.min(msecs, maxWait), nsecs);
             }
           } catch (final InterruptedException e) {
+            throw new ClosedException(e);
           }
         }
       }

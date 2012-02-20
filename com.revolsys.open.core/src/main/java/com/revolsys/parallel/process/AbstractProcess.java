@@ -41,4 +41,7 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
       return beanName + " (" + className + ")";
     }
   }
+
+  public void stop() {
+  }
 }

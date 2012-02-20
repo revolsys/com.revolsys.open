@@ -2,6 +2,7 @@ package com.revolsys.parallel.process;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -76,10 +77,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
       while (true) {
         synchronized (monitor) {
           if (getActiveCount() >= getMaximumPoolSize()) {
-            try {
-              monitor.wait();
-            } catch (final InterruptedException e) {
-            }
+            monitor.wait();
           }
         }
         final MultiInputSelector selector = new MultiInputSelector();
@@ -90,6 +88,11 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
             execute(runnable);
           }
         } catch (final ClosedException e) {
+          Throwable cause = e.getCause();
+          if (cause instanceof InterruptedException) {
+            InterruptedException interrupedException = (InterruptedException)cause;
+            throw interrupedException;
+          }
           boolean hasOpen = false;
           for (final Channel<Runnable> channel : channels) {
             if (!channel.isClosed()) {
@@ -101,6 +104,8 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
           }
         }
       }
+    } catch (RejectedExecutionException e) {
+    } catch (final InterruptedException e) {
     } catch (final Throwable t) {
       t.printStackTrace();
     } finally {
@@ -133,6 +138,12 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
         final NamedThreadFactory namedThreadFactory = (NamedThreadFactory)threadFactory;
         namedThreadFactory.setParentGroup(processNetwork.getThreadGroup());
       }
+    }
+  }
+
+  public void stop() {
+    synchronized (monitor) {
+      monitor.notifyAll();
     }
   }
 

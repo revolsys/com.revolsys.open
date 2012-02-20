@@ -38,7 +38,9 @@ public class ProcessQueueWorker extends Thread {
           try {
             process.run();
           } catch (final Exception e) {
-            if (!(e instanceof InterruptedException)) {
+            if (e instanceof InterruptedException) {
+              return;
+            } else {
               final Class<? extends Process> processClass = process.getClass();
               final Logger log = Logger.getLogger(processClass);
               log.error(e.getMessage(), e);

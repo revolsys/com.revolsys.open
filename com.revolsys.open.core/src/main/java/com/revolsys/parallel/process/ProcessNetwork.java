@@ -2,8 +2,8 @@ package com.revolsys.parallel.process;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -25,7 +25,7 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   private int count = 0;
 
-  private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
+  private Map<Process, Thread> processes = new HashMap<Process, Thread>();
 
   boolean running = false;
 
@@ -39,8 +39,8 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   public void addProcess(final Process process) {
-    synchronized (processes) {
-      if (!processes.containsKey(process)) {
+    synchronized (sync) {
+      if (processes != null && !processes.containsKey(process)) {
         processes.put(process, null);
         if (running) {
           start(process);
@@ -51,6 +51,7 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   private void finishRunning() {
     running = false;
+    processes = null;
   }
 
   public String getName() {
@@ -58,7 +59,11 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   public Collection<Process> getProcesses() {
-    return processes.keySet();
+    if (processes == null) {
+      return Collections.emptySet();
+    } else {
+      return processes.keySet();
+    }
   }
 
   public ThreadGroup getThreadGroup() {
@@ -101,18 +106,20 @@ public class ProcessNetwork implements BeanPostProcessor,
       final Process process = (Process)bean;
       // Check to see if this was a target bean, if so make sure duplicate
       // threads aren't created
-      for (final Entry<Process, Thread> entry : processes.entrySet()) {
-        final Process otherProcess = entry.getKey();
-        if (otherProcess instanceof TargetBeanProcess) {
-          final TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
-          if (targetProcessBean.isInstanceCreated()) {
-            final Process targetProcess = targetProcessBean.getProcess();
-            if (targetProcess == process) {
-              synchronized (processes) {
-                final Thread thread = entry.getValue();
-                processes.put(targetProcess, thread);
-                processes.remove(otherProcess);
-                return bean;
+      if (processes != null) {
+        for (final Entry<Process, Thread> entry : processes.entrySet()) {
+          final Process otherProcess = entry.getKey();
+          if (otherProcess instanceof TargetBeanProcess) {
+            final TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
+            if (targetProcessBean.isInstanceCreated()) {
+              final Process targetProcess = targetProcessBean.getProcess();
+              if (targetProcess == process) {
+                synchronized (sync) {
+                  final Thread thread = entry.getValue();
+                  processes.put(targetProcess, thread);
+                  processes.remove(otherProcess);
+                  return bean;
+                }
               }
             }
           }
@@ -129,14 +136,20 @@ public class ProcessNetwork implements BeanPostProcessor,
     return bean;
   }
 
+  private final Object sync = new Object();
+
   void removeProcess(final Process process) {
-    synchronized (processes) {
-      process.setProcessNetwork(null);
-      processes.remove(process);
-      count--;
-      if (count == 0) {
-        finishRunning();
-        processes.notify();
+    synchronized (sync) {
+      if (processes != null) {
+        if (process.getProcessNetwork() == this) {
+          process.setProcessNetwork(null);
+        }
+        processes.remove(process);
+        count--;
+        if (count == 0) {
+          finishRunning();
+          sync.notify();
+        }
       }
     }
   }
@@ -156,64 +169,64 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   public void start() {
-    synchronized (processes) {
+    synchronized (sync) {
       running = true;
-      for (final Process process : new ArrayList<Process>(processes.keySet())) {
-        process.setProcessNetwork(this);
-        start(process);
+      if (processes != null) {
+        for (final Process process : new ArrayList<Process>(processes.keySet())) {
+          process.setProcessNetwork(this);
+          start(process);
+        }
       }
     }
   }
 
   private synchronized void start(final Process process) {
-    Thread thread = processes.get(process);
-    if (thread == null) {
-      final Process runProcess;
-      if (process instanceof TargetBeanProcess) {
-        final TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
-        runProcess = targetBeanProcess.getProcess();
-        processes.remove(process);
-      } else {
-        runProcess = process;
-      }
-      final Runnable runnable = new ProcessRunnable(this, runProcess);
-      final String name = runProcess.toString();
-      final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
-        runnable);
-      thread = new Thread(threadGroup, appenderRunnable, name);
-      processes.put(runProcess, thread);
-      if (!thread.isAlive()) {
-        thread.start();
-        count++;
+    if (processes != null) {
+      Thread thread = processes.get(process);
+      if (thread == null) {
+        final Process runProcess;
+        if (process instanceof TargetBeanProcess) {
+          final TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
+          runProcess = targetBeanProcess.getProcess();
+          processes.remove(process);
+        } else {
+          runProcess = process;
+        }
+        final Runnable runnable = new ProcessRunnable(this, runProcess);
+        final String name = runProcess.toString();
+        final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
+          runnable);
+        thread = new Thread(threadGroup, appenderRunnable, name);
+        processes.put(runProcess, thread);
+        if (!thread.isAlive()) {
+          thread.start();
+          count++;
+        }
       }
     }
   }
 
   public void startAndWait() {
-    synchronized (processes) {
+    synchronized (sync) {
       start();
       waitTillFinished();
     }
   }
 
-  @SuppressWarnings("deprecation")
   @PreDestroy
   public void stop() {
-    synchronized (processes) {
-      final List<Thread> processesToStop = new ArrayList<Thread>(
-        processes.values());
-      try {
-        for (final Thread thread : processesToStop) {
-          if (Thread.currentThread() != thread && thread.isAlive()) {
-            try {
-              thread.stop();
-            } catch (Throwable e) {
+    synchronized (sync) {
+      if (processes != null) {
+        try {
+          for (final Thread thread : new ArrayList<Thread>(processes.values())) {
+            if (Thread.currentThread() != thread && thread.isAlive()) {
+              thread.interrupt();
             }
           }
+        } finally {
+          sync.notify();
+          finishRunning();
         }
-      } finally {
-        processes.notify();
-        finishRunning();
       }
     }
   }
@@ -224,14 +237,18 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   public void waitTillFinished() {
-    synchronized (processes) {
-      while (count > 0) {
-        try {
-          processes.wait();
-        } catch (final InterruptedException e) {
+    synchronized (sync) {
+      try {
+        while (count > 0) {
+          try {
+            sync.wait();
+          } catch (final InterruptedException e) {
+            return;
+          }
         }
+      } finally {
+        finishRunning();
       }
-      finishRunning();
     }
   }
 
