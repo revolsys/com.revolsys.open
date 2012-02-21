@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 public class PackedIntegerOutputStream extends ByteArrayOutputStream {
   public PackedIntegerOutputStream(
     final int numCoordinates,
-    final int dimension) {
-    super(numCoordinates * dimension);
+    final int numAxis) {
+    super(numCoordinates * numAxis);
   }
 
   @Override

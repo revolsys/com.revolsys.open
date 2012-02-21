@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -16,11 +17,9 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.jts.CoordinateSequenceUtil;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -80,9 +79,10 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
-    final Geometry geometry;
+  public int setAttributeValueFromResultSet(
+    final ResultSet resultSet,
+    final int columnIndex,
+    final DataObject object) throws SQLException {
 
     final int entity = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
@@ -100,40 +100,19 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final Double mOffset = spatialReference.getMOffset();
 
       final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
-      switch (entity) {
-        case ArcSdeConstants.ST_GEOMETRY_POINT:
-          final CoordinatesList pointCoordinates = PackedCoordinateUtil.getCoordinatesList(
-            numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-            mScale, pointsIn);
-          geometry = geometryFactory.createPoint(pointCoordinates);
-        break;
-        case ArcSdeConstants.ST_GEOMETRY_LINESTRING:
-          final CoordinatesList lineCoordinates = PackedCoordinateUtil.getCoordinatesList(
-            numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-            mScale, pointsIn);
-          geometry = geometryFactory.createLineString(lineCoordinates);
-        break;
-        case ArcSdeConstants.ST_GEOMETRY_POLYGON:
-          final CoordinatesList polygonCoordinates = PackedCoordinateUtil.getCoordinatesList(
-            numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset,
-            mScale, pointsIn);
-          // TODO holes
-          geometry = geometryFactory.createPolygon(
-            geometryFactory.createLinearRing(polygonCoordinates), null);
-        break;
-        // TODO multi geometries
-        default:
-          throw new IllegalArgumentException(
-            "Unknown ST_GEOMETRY entity type: " + entity);
-      }
+      final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
+        geometryFactory, entity, numPoints, xOffset, yOffset, xyScale, zOffset,
+        zScale, mOffset, mScale);
       object.setValue(getIndex(), geometry);
     }
     return columnIndex + 3;
   }
 
   @Override
-  public int setPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Object value) throws SQLException {
+  public int setPreparedStatementValue(
+    final PreparedStatement statement,
+    final int parameterIndex,
+    final Object value) throws SQLException {
     int index = parameterIndex;
 
     if (value instanceof Geometry) {
@@ -162,29 +141,13 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final boolean hasZ = dimension > 2 && zOffset != null && zScale != null;
       final boolean hasM = dimension > 3 && mOffset != null && mScale != null;
 
-      byte[] data;
-      CoordinateSequence coordinates;
+      byte[] data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset,
+        xyScale, hasZ, zOffset, zScale, hasM, mScale, mOffset, geometry);
       if (value instanceof Point) {
-        final Point point = (Point)value;
-        coordinates = point.getCoordinateSequence();
-        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
-          hasZ, zOffset, zScale, hasM, mOffset, mScale, coordinates);
         entityType = ArcSdeConstants.ST_GEOMETRY_POINT;
       } else if (value instanceof LineString) {
-        final LineString line = (LineString)value;
-        coordinates = line.getCoordinateSequence();
-        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
-          hasZ, zOffset, zScale, hasM, mOffset, mScale, coordinates);
         entityType = ArcSdeConstants.ST_GEOMETRY_LINESTRING;
       } else if (value instanceof Polygon) {
-        final Polygon polygon = (Polygon)value;
-        final LineString exteriorRing = polygon.getExteriorRing();
-        coordinates = exteriorRing.getCoordinateSequence();
-        if (!JtsGeometryUtil.isCCW(coordinates)) {
-          coordinates = CoordinateSequenceUtil.reverse(coordinates);
-        }
-        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
-          hasZ, zOffset, zScale, hasM, mOffset, mScale, coordinates);
         entityType = ArcSdeConstants.ST_GEOMETRY_POLYGON;
       } else {
         throw new IllegalArgumentException("Cannot convert: "
@@ -198,7 +161,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       statement.setFloat(index++, (float)maxX);
       statement.setFloat(index++, (float)maxY);
       if (hasZ) {
-        final double[] zRange = JtsGeometryUtil.getZRange(coordinates);
+        final double[] zRange = JtsGeometryUtil.getZRange(geometry);
         double minZ = zRange[0];
         double maxZ = zRange[1];
         if (minZ == Double.MAX_VALUE && maxZ == Double.MIN_VALUE) {
@@ -212,7 +175,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
         statement.setNull(index++, Types.FLOAT);
       }
       if (hasM) {
-        final double[] mRange = JtsGeometryUtil.getMRange(coordinates);
+        final double[] mRange = JtsGeometryUtil.getMRange(geometry);
         double minM = mRange[0];
         double maxM = mRange[1];
         if (minM == Double.MAX_VALUE && maxM == Double.MIN_VALUE) {

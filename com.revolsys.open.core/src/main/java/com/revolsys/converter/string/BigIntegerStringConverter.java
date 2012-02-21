@@ -4,7 +4,12 @@ import java.math.BigInteger;
 
 import org.springframework.util.StringUtils;
 
-public class BigIntegerStringConverter implements StringConverter<BigInteger> {
+public class BigIntegerStringConverter extends
+  AbstractNumberStringConverter<BigInteger> {
+  public BigIntegerStringConverter() {
+    super(INTEGER_FORMAT);
+  }
+
   public Class<BigInteger> getConvertedClass() {
     return BigInteger.class;
   }
@@ -31,9 +36,4 @@ public class BigIntegerStringConverter implements StringConverter<BigInteger> {
       return null;
     }
   }
-
-  public String toString(final BigInteger number) {
-    return number.toString();
-  }
-
 }

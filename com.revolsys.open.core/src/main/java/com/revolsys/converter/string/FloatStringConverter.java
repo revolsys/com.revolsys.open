@@ -2,8 +2,11 @@ package com.revolsys.converter.string;
 
 import org.springframework.util.StringUtils;
 
-public class FloatStringConverter implements StringConverter<Float> {
-  public Class<Float> getConvertedClass() {
+public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
+  public FloatStringConverter() {
+    super(DECIMAL_FORMAT);
+  }
+ public Class<Float> getConvertedClass() {
     return Float.class;
   }
 
@@ -31,9 +34,5 @@ public class FloatStringConverter implements StringConverter<Float> {
     } else {
       return null;
     }
-  }
-
-  public String toString(final Float value) {
-    return value.toString();
   }
 }

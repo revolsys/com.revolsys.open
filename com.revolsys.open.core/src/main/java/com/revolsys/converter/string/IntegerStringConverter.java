@@ -2,7 +2,12 @@ package com.revolsys.converter.string;
 
 import org.springframework.util.StringUtils;
 
-public class IntegerStringConverter implements StringConverter<Integer> {
+public class IntegerStringConverter extends
+  AbstractNumberStringConverter<Integer> {
+  public IntegerStringConverter() {
+    super(INTEGER_FORMAT);
+  }
+
   public Class<Integer> getConvertedClass() {
     return Integer.class;
   }
@@ -33,7 +38,4 @@ public class IntegerStringConverter implements StringConverter<Integer> {
     }
   }
 
-  public String toString(final Integer value) {
-    return value.toString();
-  }
 }

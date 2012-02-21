@@ -2,7 +2,10 @@ package com.revolsys.converter.string;
 
 import org.springframework.util.StringUtils;
 
-public class ShortStringConverter implements StringConverter<Short> {
+public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
+  public ShortStringConverter() {
+    super(INTEGER_FORMAT);
+  }
   public Class<Short> getConvertedClass() {
     return Short.class;
   }
@@ -31,9 +34,5 @@ public class ShortStringConverter implements StringConverter<Short> {
     } else {
       return null;
     }
-  }
-
-  public String toString(final Short value) {
-    return value.toString();
   }
 }

@@ -30,7 +30,17 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
     }
   }
 
-  public String toString(final Boolean value) {
-    return value.toString();
+  public String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Boolean) {
+      return value.toString();
+    } else {
+      if ("true".equalsIgnoreCase(value.toString())) {
+        return "true";
+      } else {
+        return "false";
+      }
+    }
   }
 }

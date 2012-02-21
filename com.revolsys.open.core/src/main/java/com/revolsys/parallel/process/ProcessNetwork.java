@@ -148,7 +148,7 @@ public class ProcessNetwork implements BeanPostProcessor,
         count--;
         if (count == 0) {
           finishRunning();
-          sync.notify();
+          sync.notifyAll();
         }
       }
     }
@@ -224,10 +224,10 @@ public class ProcessNetwork implements BeanPostProcessor,
             }
           }
         } finally {
-          sync.notify();
           finishRunning();
         }
       }
+      sync.notifyAll();
     }
   }
 

@@ -64,6 +64,9 @@ public class PackedIntegerInputStream extends InputStream {
     byte shift = 6;
     while ((b & 0x80) != 0) {
       b = in.read();
+      if (b ==-1 ) {
+        throw new IllegalStateException("Reached end of file");
+      }
       final long byteValue = b & 0x7F;
       final long shiftedValue = byteValue << shift;
       value += shiftedValue;

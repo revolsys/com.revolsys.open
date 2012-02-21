@@ -4,7 +4,12 @@ import java.math.BigDecimal;
 
 import org.springframework.util.StringUtils;
 
-public class BigDecimalStringConverter implements StringConverter<BigDecimal> {
+public class BigDecimalStringConverter extends
+  AbstractNumberStringConverter<BigDecimal> {
+  public BigDecimalStringConverter() {
+    super(DECIMAL_FORMAT);
+  }
+
   public Class<BigDecimal> getConvertedClass() {
     return BigDecimal.class;
   }
@@ -30,10 +35,6 @@ public class BigDecimalStringConverter implements StringConverter<BigDecimal> {
     } else {
       return null;
     }
-  }
-
-  public String toString(final BigDecimal number) {
-    return number.toPlainString();
   }
 
 }

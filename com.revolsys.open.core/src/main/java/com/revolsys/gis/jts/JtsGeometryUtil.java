@@ -826,6 +826,45 @@ public final class JtsGeometryUtil {
     };
   }
 
+  public static void getOrdinateRange(
+    double[] range,
+    final CoordinatesList coordinates,
+    final int ordinateIndex) {
+    double min = range[0];
+    double max = range[1];
+    if (ordinateIndex < coordinates.getDimension()) {
+      for (int i = 0; i < coordinates.size(); i++) {
+        final double value = coordinates.getValue(i, ordinateIndex);
+        if (!Double.isNaN(value)) {
+          min = Math.min(min, value);
+          max = Math.max(max, value);
+        }
+      }
+    }
+    range[0] = min;
+    range[1] = max;
+  }
+
+  public static double[] getZRange(final Geometry geometry) {
+    return getOrdinateRange(geometry, 2);
+  }
+
+  public static double[] getMRange(final Geometry geometry) {
+    return getOrdinateRange(geometry, 3);
+  }
+
+  public static double[] getOrdinateRange(
+    final Geometry geometry,
+    int ordinateIndex) {
+    double[] range = {
+      Double.MAX_VALUE, Double.MIN_VALUE
+    };
+    for (CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
+      getOrdinateRange(range, points, ordinateIndex);
+    }
+    return range;
+  }
+
   public static double[] getZRange(final CoordinateSequence coordinates) {
     return getOrdinateRange(coordinates, 2);
   }

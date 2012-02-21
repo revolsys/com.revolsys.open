@@ -1,6 +1,7 @@
 package com.revolsys.parallel.process;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
@@ -9,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.BeanNameAware;
 
@@ -62,8 +64,18 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
   }
 
   public void postRun() {
-    for (final Channel<Runnable> channel : channels) {
-      channel.readDisconnect();
+    closeChannels();
+  }
+
+  public void closeChannels() {
+    synchronized (monitor) {
+      List<Channel<Runnable>> channels = this.channels;
+      if (channels != null) {
+        for (final Channel<Runnable> channel : channels) {
+          channel.readDisconnect();
+        }
+      }
+      this.channels = null;
     }
   }
 
@@ -74,18 +86,24 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
   public void run() {
     preRun();
     try {
-      while (true) {
+      final MultiInputSelector selector = new MultiInputSelector();
+
+      while (!isShutdown()) {
         synchronized (monitor) {
           if (getActiveCount() >= getMaximumPoolSize()) {
             monitor.wait();
           }
         }
-        final MultiInputSelector selector = new MultiInputSelector();
+        List<Channel<Runnable>> channels = this.channels;
         try {
-          final Channel<Runnable> channel = selector.selectChannelInput(channels);
-          if (channel != null) {
-            final Runnable runnable = channel.read();
-            execute(runnable);
+          if (!isShutdown()) {
+            final Channel<Runnable> channel = selector.selectChannelInput(channels);
+            if (channel != null) {
+              final Runnable runnable = channel.read();
+              if (!isShutdown()) {
+                execute(runnable);
+              }
+            }
           }
         } catch (final ClosedException e) {
           Throwable cause = e.getCause();
@@ -93,14 +111,16 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
             InterruptedException interrupedException = (InterruptedException)cause;
             throw interrupedException;
           }
-          boolean hasOpen = false;
-          for (final Channel<Runnable> channel : channels) {
-            if (!channel.isClosed()) {
-              hasOpen = true;
+          synchronized (monitor) {
+            for (Iterator<Channel<Runnable>> iterator = channels.iterator(); iterator.hasNext();) {
+              Channel<Runnable> channel = iterator.next();
+              if (channel.isClosed()) {
+                iterator.remove();
+              }
             }
-          }
-          if (!hasOpen) {
-            throw e;
+            if (channels.isEmpty()) {
+              return;
+            }
           }
         }
       }
@@ -141,7 +161,11 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     }
   }
 
+  @PreDestroy
   public void stop() {
+    shutdownNow();
+    closeChannels();
+    processNetwork = null;
     synchronized (monitor) {
       monitor.notifyAll();
     }

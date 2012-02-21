@@ -1,7 +1,9 @@
 package com.revolsys.converter.string;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.revolsys.gis.converter.string.GeometryStringConverter;
 import com.revolsys.gis.data.model.types.DataType;
@@ -16,13 +18,13 @@ public class StringConverterRegistry {
 
   public static final StringConverterRegistry INSTANCE = new StringConverterRegistry();
 
-  public static Object toObject(final DataType dataType, final Object value) {
+  public static Object toObject(
+    final Class<Object> valueClass,
+    final Object value) {
     if (value == null) {
       return null;
     } else {
-      @SuppressWarnings("unchecked")
-      final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-      final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(dataTypeClass);
+      final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(valueClass);
       if (converter == null) {
         return value;
       } else {
@@ -31,18 +33,48 @@ public class StringConverterRegistry {
     }
   }
 
-  public static String toString(final DataType dataType, final Object value) {
+  public static Object toObject(final DataType dataType, final Object value) {
+    @SuppressWarnings("unchecked")
+    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
+    return toObject(dataTypeClass, value);
+  }
+
+  public static Object toObject(final Object value) {
     if (value == null) {
       return null;
     } else {
-      @SuppressWarnings("unchecked")
-      final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-      final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(dataTypeClass);
+      final Class<Object> valueClass = (Class<Object>)value.getClass();
+      return toObject(valueClass, value);
+    }
+  }
+
+  public static String toString(
+    final Class<Object> valueClass,
+    final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(valueClass);
       if (converter == null) {
         return value.toString();
       } else {
         return converter.toString(value);
       }
+    }
+  }
+
+  public static String toString(final DataType dataType, final Object value) {
+    @SuppressWarnings("unchecked")
+    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
+    return toString(dataTypeClass, value);
+  }
+
+  public static String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final Class<Object> valueClass = (Class<Object>)value.getClass();
+      return toString(valueClass, value);
     }
   }
 
@@ -67,6 +99,7 @@ public class StringConverterRegistry {
     addConverter(MultiPoint.class, geometryConverter);
     addConverter(MultiLineString.class, geometryConverter);
     addConverter(MultiPolygon.class, geometryConverter);
+    addConverter(new ListStringConverter());
   }
 
   public void addConverter(
@@ -79,9 +112,59 @@ public class StringConverterRegistry {
     addConverter(converter.getConvertedClass(), converter);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
+  private StringConverter get(
+    final Set<Class<?>> interfaces,
+    final Class<?> clazz) {
+    StringConverter converter = null;
+    if (clazz != null) {
+      classConverterMap.get(clazz);
+      if (converter == null) {
+        for (final Class<?> interfaceClass : clazz.getInterfaces()) {
+          interfaces.add(interfaceClass);
+        }
+        final Class<?> superClass = clazz.getSuperclass();
+        converter = get(interfaces, superClass);
+      }
+    }
+    if (converter != null) {
+      classConverterMap.put(clazz, converter);
+    }
+    return converter;
+  }
+
+  @SuppressWarnings({
+    "rawtypes"
+  })
+  private StringConverter get(final Set<Class<?>> interfaces) {
+    StringConverter converter = null;
+    for (final Class<?> interfaceClass : interfaces) {
+      converter = get(interfaces, interfaceClass);
+      if (converter != null) {
+        classConverterMap.put(interfaceClass, converter);
+        return converter;
+      }
+    }
+    return converter;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   public <T> StringConverter<T> getConverter(final Class<T> clazz) {
-    return (StringConverter<T>)classConverterMap.get(clazz);
+
+    StringConverter converter = null;
+    if (clazz != null) {
+      converter = classConverterMap.get(clazz);
+      if (converter == null) {
+        final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
+        converter = get(interfaces, clazz);
+        if (converter == null) {
+          converter = get(interfaces);
+        }
+      }
+    }
+    return (StringConverter<T>)converter;
   }
 
   @SuppressWarnings("unchecked")

@@ -2,7 +2,11 @@ package com.revolsys.converter.string;
 
 import org.springframework.util.StringUtils;
 
-public class LongStringConverter implements StringConverter<Long> {
+public class LongStringConverter extends AbstractNumberStringConverter<Long> {
+  public LongStringConverter() {
+    super(INTEGER_FORMAT);
+  }
+
   public Class<Long> getConvertedClass() {
     return Long.class;
   }
@@ -31,9 +35,5 @@ public class LongStringConverter implements StringConverter<Long> {
     } else {
       return null;
     }
-  }
-
-  public String toString(final Long value) {
-    return value.toString();
   }
 }

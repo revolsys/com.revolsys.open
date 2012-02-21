@@ -31,8 +31,15 @@ public class GeometryStringConverter implements StringConverter<Geometry> {
     return WKT_READER.parseGeometry(string);
   }
 
-  public String toString(final Geometry value) {
-    return WktWriter.toString(value, true);
+  public String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Geometry) {
+      Geometry geometry = (Geometry)value;
+      return WktWriter.toString(geometry, true);
+    } else {
+      return value.toString();
+    }
   }
 
 }

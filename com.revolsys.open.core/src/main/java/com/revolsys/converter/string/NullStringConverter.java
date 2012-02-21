@@ -17,7 +17,7 @@ public class NullStringConverter<T> implements StringConverter<T> {
     return null;
   }
 
-  public String toString(final T number) {
+  public String toString(final Object value) {
     return "null";
   }
 

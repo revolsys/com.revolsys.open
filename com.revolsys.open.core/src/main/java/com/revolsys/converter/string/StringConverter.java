@@ -9,5 +9,5 @@ public interface StringConverter<T> {
 
   T toObject(String string);
 
-  String toString(T value);
+  String toString(Object value);
 }

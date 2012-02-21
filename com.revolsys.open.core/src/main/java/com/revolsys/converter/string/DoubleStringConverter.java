@@ -2,8 +2,12 @@ package com.revolsys.converter.string;
 
 import org.springframework.util.StringUtils;
 
-public class DoubleStringConverter implements StringConverter<Double> {
-  public Class<Double> getConvertedClass() {
+public class DoubleStringConverter extends
+  AbstractNumberStringConverter<Double> {
+  public DoubleStringConverter() {
+    super(DECIMAL_FORMAT);
+  }
+ public Class<Double> getConvertedClass() {
     return Double.class;
   }
 
@@ -31,9 +35,5 @@ public class DoubleStringConverter implements StringConverter<Double> {
     } else {
       return null;
     }
-  }
-
-  public String toString(final Double value) {
-    return value.toString();
   }
 }

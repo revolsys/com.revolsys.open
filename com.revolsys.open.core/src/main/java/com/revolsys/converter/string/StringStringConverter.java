@@ -21,8 +21,12 @@ public class StringStringConverter implements StringConverter<String> {
     return string;
   }
 
-  public String toString(final String string) {
-    return string;
+  public String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
 }

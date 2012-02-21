@@ -2,7 +2,11 @@ package com.revolsys.converter.string;
 
 import org.springframework.util.StringUtils;
 
-public class ByteStringConverter implements StringConverter<Byte> {
+public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
+  public ByteStringConverter() {
+    super(INTEGER_FORMAT);
+  }
+
   public Class<Byte> getConvertedClass() {
     return Byte.class;
   }
@@ -31,9 +35,5 @@ public class ByteStringConverter implements StringConverter<Byte> {
     } else {
       return null;
     }
-  }
-
-  public String toString(final Byte value) {
-    return value.toString();
   }
 }
