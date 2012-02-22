@@ -127,9 +127,9 @@ public class PackedCoordinateUtil {
       for (int i = 0; i < numPoints; i++) {
         x = readOordinate(in, points, j, 0, x, xyScale);
         y = readOordinate(in, points, j, 1, y, xyScale);
-        if (j > 0 && i < numPoints-1) {
+        if (j > 0 && i < numPoints - 1) {
           if (points.equal(0, points, j)) {
-            pointsList.add(points.subList(0, j+1));
+            pointsList.add(points.subList(0, j + 1));
             j = 0;
           } else {
             j++;
@@ -532,13 +532,13 @@ public class PackedCoordinateUtil {
     final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
     for (int i = 0; i < pointsList.size(); i++) {
       CoordinatesList points = pointsList.get(0);
-      final boolean reverse = false;
+      boolean reverse = false;
       if (i == 0) {
         if (!JtsGeometryUtil.isCCW(points)) {
-          points = points.reverse();
+          reverse = true;
         }
       } else if (JtsGeometryUtil.isCCW(points)) {
-        points = points.reverse();
+        reverse = true;
       }
       if (reverse) {
         points = points.reverse();
