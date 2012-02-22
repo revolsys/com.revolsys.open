@@ -118,7 +118,6 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
       geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);
-      final int numPoints = geometry.getNumPoints();
 
       final int sdeSrid = spatialReference.getEsriSrid();
       final Double xOffset = spatialReference.getXOffset();
@@ -141,8 +140,12 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final boolean hasZ = dimension > 2 && zOffset != null && zScale != null;
       final boolean hasM = dimension > 3 && mOffset != null && mScale != null;
 
+      List<CoordinatesList> pointsList = PackedCoordinateUtil.getPointsList(geometry);
+      final int numPoints = PackedCoordinateUtil.getNumPoints(pointsList);
+
       byte[] data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset,
-        xyScale, hasZ, zOffset, zScale, hasM, mScale, mOffset, geometry);
+        xyScale, hasZ, zOffset, zScale, hasM, mScale, mOffset, pointsList,
+        numPoints);
       if (value instanceof Point) {
         entityType = ArcSdeConstants.ST_GEOMETRY_POINT;
       } else if (value instanceof LineString) {
