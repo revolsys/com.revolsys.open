@@ -531,7 +531,7 @@ public class PackedCoordinateUtil {
   public static List<CoordinatesList> getPointsList(final Polygon polygon) {
     final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
     for (int i = 0; i < pointsList.size(); i++) {
-      CoordinatesList points = pointsList.get(0);
+      CoordinatesList points = pointsList.get(i);
       boolean reverse = false;
       if (i == 0) {
         if (!JtsGeometryUtil.isCCW(points)) {
