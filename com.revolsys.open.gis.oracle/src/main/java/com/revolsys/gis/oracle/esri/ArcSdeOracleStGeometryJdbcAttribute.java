@@ -19,6 +19,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -140,18 +141,29 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final boolean hasZ = dimension > 2 && zOffset != null && zScale != null;
       final boolean hasM = dimension > 3 && mOffset != null && mScale != null;
 
-      List<CoordinatesList> pointsList = PackedCoordinateUtil.getPointsList(geometry);
-      final int numPoints = PackedCoordinateUtil.getNumPoints(pointsList);
+      int numPoints = 0;
+      byte[] data;
 
-      byte[] data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset,
-        xyScale, hasZ, zOffset, zScale, hasM, mScale, mOffset, pointsList,
-        numPoints);
       if (value instanceof Point) {
         entityType = ArcSdeConstants.ST_GEOMETRY_POINT;
+        CoordinatesList points = CoordinatesListUtil.get(geometry);
+        numPoints = points.size();
+
+        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
+          hasZ, zOffset, zScale, hasM, mScale, mOffset, points, numPoints);
       } else if (value instanceof LineString) {
         entityType = ArcSdeConstants.ST_GEOMETRY_LINESTRING;
+        CoordinatesList points = CoordinatesListUtil.get(geometry);
+        numPoints = points.size();
+        data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,
+          hasZ, zOffset, zScale, hasM, mScale, mOffset, points, numPoints);
       } else if (value instanceof Polygon) {
         entityType = ArcSdeConstants.ST_GEOMETRY_POLYGON;
+        List<CoordinatesList> pointsList = PackedCoordinateUtil.getPointsList((Polygon)value);
+        numPoints = PackedCoordinateUtil.getPolygonNumPoints(pointsList);
+        data = PackedCoordinateUtil.getPolygonPackedBytes(xOffset, yOffset,
+          xyScale, hasZ, zOffset, zScale, hasM, mScale, mOffset, pointsList,
+          numPoints);
       } else {
         throw new IllegalArgumentException("Cannot convert: "
           + value.getClass());
