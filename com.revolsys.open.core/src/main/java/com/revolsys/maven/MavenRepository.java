@@ -254,8 +254,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String groupId,
     final String artifactId,
     final String version) {
-    String metaDataPath = CollectionUtil.toString("/",
-      groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
+    String metaDataPath = "/"
+      + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId,
+        version, "maven-metadata.xml");
     Resource metaDataResource = SpringUtil.getResource(root, metaDataPath);
     if (metaDataResource.exists()) {
       return XmlMapIoFactory.toMap(metaDataResource);

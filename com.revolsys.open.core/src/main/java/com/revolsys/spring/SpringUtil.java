@@ -131,7 +131,14 @@ public class SpringUtil {
     final Resource resource,
     final CharSequence childPath) {
     try {
-      return resource.createRelative(childPath.toString());
+      if (resource instanceof FileSystemResource) {
+        FileSystemResource fileResource = (FileSystemResource)resource;
+        File file = fileResource.getFile();
+        File childFile = new File(file, childPath.toString());
+        return new FileSystemResource(childFile);
+      } else {
+        return resource.createRelative(childPath.toString());
+      }
     } catch (final IOException e) {
       throw new IllegalArgumentException("Cannot create resource " + resource
         + childPath, e);
