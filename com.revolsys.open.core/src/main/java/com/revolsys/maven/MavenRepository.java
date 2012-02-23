@@ -34,6 +34,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public static String getPath(
     final String groupId,
     final String artifactId,
+    final String pathVersion,
     final String type,
     final String classifier,
     final String version) {
@@ -43,7 +44,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     path.append('/');
     path.append(artifactId);
     path.append('/');
-    path.append(version);
+    path.append(pathVersion);
     path.append('/');
     path.append(artifactId);
     path.append('-');
@@ -112,7 +113,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
       version = parts[4];
     }
 
-    return getPath(groupId, artifactId, type, classifier, version);
+    return getPath(groupId, artifactId, version, type, classifier, version);
   }
 
   public MavenPom getPom(final Resource resource) {
@@ -184,10 +185,12 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String type,
     final String classifier,
     final String version) {
-    final String path = getPath(groupId, artifactId, type, classifier, version);
+
+    final String path = getPath(groupId, artifactId, version, type, classifier,
+      version);
     final Resource artifactResource = SpringUtil.getResource(root, path);
     if (!artifactResource.exists()) {
-      handleMissingResource(artifactResource, groupId, artifactId, type,
+      return handleMissingResource(artifactResource, groupId, artifactId, type,
         classifier, version);
     }
     return artifactResource;
@@ -207,13 +210,59 @@ public class MavenRepository implements URLStreamHandlerFactory {
     }
   }
 
-  protected void handleMissingResource(
+  protected Resource handleMissingResource(
     final Resource resource,
     final String groupId,
     final String artifactId,
     final String type,
     final String classifier,
     final String version) {
+    if (version.endsWith("-SNAPSHOT")) {
+      Map<String, Object> mavenMetadata = getMavenMetadata(groupId, artifactId,
+        version);
+      String snapshotVersion = getSnapshotVersion(mavenMetadata);
+      if (snapshotVersion != null) {
+        String timestampVersion = version.replaceAll("SNAPSHOT$",
+          snapshotVersion);
+        return getResource(groupId, artifactId, type, classifier,
+          timestampVersion);
+      }
+    }
+    return resource;
+  }
+
+  public String getSnapshotVersion(Map<String, Object> mavenMetadata) {
+    Map<String, Object> versioning = (Map<String, Object>)mavenMetadata.get("versioning");
+    if (versioning != null) {
+      Map<String, Object> snapshot = (Map<String, Object>)versioning.get("snapshot");
+      if (snapshot != null) {
+        String timestamp = (String)snapshot.get("timestamp");
+        if (StringUtils.hasText(timestamp)) {
+          String buildNumber = (String)snapshot.get("buildNumber");
+          if (StringUtils.hasText(timestamp)) {
+            return timestamp + "-" + buildNumber;
+          } else {
+            return timestamp + "-1";
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public Map<String, Object> getMavenMetadata(
+    final String groupId,
+    final String artifactId,
+    final String version) {
+    String metaDataPath = CollectionUtil.toString("/",
+      groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
+    Resource metaDataResource = SpringUtil.getResource(root, metaDataPath);
+    if (metaDataResource.exists()) {
+      return XmlMapIoFactory.toMap(metaDataResource);
+    } else {
+      return Collections.emptyMap();
+    }
+
   }
 
   public void setRoot(final Resource root) {
