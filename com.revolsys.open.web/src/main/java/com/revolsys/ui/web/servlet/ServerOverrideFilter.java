@@ -2,35 +2,30 @@ package com.revolsys.ui.web.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public class ServerOverrideFilter implements Filter {
+public class ServerOverrideFilter extends SavedRequestFilter {
 
   private String serverUrl;
 
   public void destroy() {
   }
 
-  public void doFilter(
-    final ServletRequest req,
-    final ServletResponse response,
-    final FilterChain chain) throws IOException, ServletException {
-    HttpServletRequest request = (HttpServletRequest)req;
-    request = new ServerOverrideHttpServletRequest(serverUrl, request);
-    chain.doFilter(request, response);
+  @Override
+  protected void doFilterInternal(
+    HttpServletRequest request,
+    HttpServletResponse response,
+    FilterChain filterChain) throws ServletException, IOException {
+    HttpServletRequest overrideRequest = new ServerOverrideHttpServletRequest(
+      serverUrl, request);
+    super.doFilterInternal(overrideRequest, response, filterChain);
   }
 
   public String getServerUrl() {
     return serverUrl;
-  }
-
-  public void init(final FilterConfig filterConfig) throws ServletException {
   }
 
   public void setServerUrl(final String serverUrl) {

@@ -48,19 +48,13 @@ public class Page extends Component {
 
   public static String getAbsoluteUrl(final String url) {
     if (url.startsWith("/")) {
-      final HttpServletRequest request = getRequest();
+      final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
       final String serverUrl = HttpRequestUtils.getServerUrl(request);
       final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
       return serverUrl + contextPath + url;
     } else {
       return url;
     }
-  }
-
-  private static HttpServletRequest getRequest() {
-    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-    final HttpServletRequest request = requestAttributes.getRequest();
-    return request;
   }
 
   private final List<Argument> arguments = new ArrayList<Argument>();
@@ -241,7 +235,7 @@ public class Page extends Component {
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
       parameters);
-    final HttpServletRequest request = getRequest();
+    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
     if (request != null) {
       for (final Argument argument : arguments) {
         final String name = argument.getName();
@@ -330,7 +324,7 @@ public class Page extends Component {
 
   public Map<String, Object> getUriTemplateVariables(
     final Map<String, Object> parameters) {
-    final HttpServletRequest request = getRequest();
+    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
     final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
     final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
 

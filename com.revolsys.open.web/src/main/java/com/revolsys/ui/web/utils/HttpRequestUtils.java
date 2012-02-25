@@ -2,13 +2,13 @@ package com.revolsys.ui.web.utils;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 public final class HttpRequestUtils {
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+
+  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
   public static String getFullRequestUrl() {
     return getFullRequestUrl(getHttpServletRequest());
@@ -21,9 +21,16 @@ public final class HttpRequestUtils {
   }
 
   public static HttpServletRequest getHttpServletRequest() {
-    final ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-    final HttpServletRequest request = requestAttributes.getRequest();
+    HttpServletRequest request = REQUEST_LOCAL.get();
     return request;
+  }
+
+  public static void setHttpServletRequest(HttpServletRequest request) {
+    REQUEST_LOCAL.set(request);
+  }
+
+  public static void clearHttpServletRequest() {
+    REQUEST_LOCAL.remove();
   }
 
   public static String getOriginatingRequestUri() {
