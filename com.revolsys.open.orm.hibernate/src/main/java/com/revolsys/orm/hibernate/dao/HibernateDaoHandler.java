@@ -260,7 +260,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
         } else if (methodName.startsWith("load")) {
           return load(args[0]);
         } else if (methodName.startsWith("delete")) {
-          return update(method, methodName, args);
+          return delete(method, methodName, args);
         } else if (methodName.startsWith("update")) {
           return update(method, methodName, args);
         } else {
@@ -571,6 +571,14 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
   }
 
   public Object update(
+    final Method method,
+    final String queryName,
+    final Object[] args) {
+    Query query = getQuery(method, queryName, args);
+    return (Integer)query.executeUpdate();
+  }
+
+  public Object delete(
     final Method method,
     final String queryName,
     final Object[] args) {

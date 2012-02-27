@@ -42,7 +42,7 @@ public class MethodSecurityExpressionRoot extends SecurityExpressionRoot {
 
   private Set<String> roles;
 
-  MethodSecurityExpressionRoot(final Authentication a) {
+  public MethodSecurityExpressionRoot(final Authentication a) {
     super(a);
   }
 
