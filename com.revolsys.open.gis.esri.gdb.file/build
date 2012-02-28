@@ -2,9 +2,42 @@
 # /usr/lib/libfgdblinuxrtl.so
 #/usr/lib/libFileGDBAPI.so
 
+ARCH=x86
+ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.1/
+OS=linux
+ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.1/include
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:src/main/lib:target/lib
+rm -f src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig/*.java
+
+swig -c++ \
+  -o target/cxx/EsriFileGdb_wrap.cxx \
+  -java \
+  -package com.revolsys.gis.esri.gdb.file.capi.swig \
+  -outdir src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig \
+  -Isrc/main/swig \
+  -I${ESRI_FILE_GBD_INCLUDE}/linux/x86 \
+  src/main/swig/EsriFileGdbAPI.i
+
 mkdir -p target/o
 mkdir -p target/lib
-g++ -fpic -lFileGDBAPI -lfgdblinuxrtl -Isrc/main/include/ -I/usr/lib/jvm/java-6-openjdk/include/ -I$JAVA_HOME/include/ -c src/main/cxx/EsriFileGdb_wrap.cxx -o target/o/EsriFileGdb.o
-g++ -O2 -fpic -shared -lFileGDBAPI -lfgdblinuxrtl target/o/EsriFileGdb.o -o target/lib/libEsriFileGdbJni.so
-cp target/lib/libEsriFileGdbJni.so src/main/lib/native/libEsriFileGdbJni-x86-linux.so
+g++ \
+  -fpic \
+  -lFileGDBAPI \
+  -lfgdblinuxrtl \
+  -I${ESRI_FILE_GBD_INCLUDE}/${OS}/${ARCH} \
+  -I$JAVA_HOME/include/ \
+  -c target/cxx/EsriFileGdb_wrap.cxx \
+  -o target/o/EsriFileGdb.o
+  
+g++ \
+  -O2 \
+  -fpic \
+  -shared \
+  -lFileGDBAPI \
+  -lfgdblinuxrtl \
+  target/o/EsriFileGdb.o \
+  -o target/lib/libEsriFileGdbJni.so
+
+cp target/lib/libEsriFileGdbJni.so src/main/resources/native/libEsriFileGdbJni-$ARCH-$OS.so
 

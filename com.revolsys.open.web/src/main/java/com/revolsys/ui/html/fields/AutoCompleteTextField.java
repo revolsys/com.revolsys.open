@@ -1,7 +1,5 @@
 package com.revolsys.ui.html.fields;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 
@@ -10,9 +8,12 @@ public class AutoCompleteTextField extends TextField {
 
   private String dataUrl;
 
-  private HttpServletRequest request;
-
   public AutoCompleteTextField() {
+  }
+
+  public AutoCompleteTextField(String name,String dataUrl, boolean required) {
+    super(name, required);
+    this.dataUrl = dataUrl;
   }
 
   public String getDataUrl() {
@@ -24,25 +25,31 @@ public class AutoCompleteTextField extends TextField {
   }
 
   @Override
-  public void initialize(final HttpServletRequest request) {
-    this.request = request;
-    super.initialize(request);
-  }
-
-  @Override
   public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
-    String url = dataUrl;
-
-    if (url.startsWith("/")) {
-      url = request.getContextPath() + url;
-    }
-
     out.startTag(HtmlUtil.SCRIPT);
     out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
     out.text("$(document).ready(function() {\n");
-    out.text("  $('#" + getName() + "').autocomplete('" + url + "', {max: "
-      + maxResults + "});\n");
+    out.text("  $('#");
+    out.text(getName());
+    out.text("').autocomplete({\n");
+    out.text("    minLength: 3,\n");
+    out.text("    source: function(request, response) {\n");
+    out.text("      $.ajax({\n");
+    out.text("        url: '");
+    out.text(dataUrl);
+    out.text("',");
+    out.text("        dataType: 'json',");
+    out.text("        data: {");
+    out.text("          maxRows: ");
+    out.text(maxResults);
+    out.text(",\n");
+    out.text("          term: request.term\n");
+    out.text("        },\n");
+    out.text("        success: response\n");
+    out.text("      });\n");
+    out.text("    }\n");
+    out.text("  });\n");
     out.text("});\n");
     out.endTag(HtmlUtil.SCRIPT);
   }

@@ -15,6 +15,8 @@ public interface DataAccessObject<T> {
 
   void flush();
 
+  List<T> list(Map<String, Object> filter, Map<String, Boolean> orderBy);
+
   <V> List<V> list(
     final String propertyName,
     final Map<String, Object> where,

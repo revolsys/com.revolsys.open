@@ -43,7 +43,10 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
     if (htmlUiBuilder == null) {
       return null;
     } else {
-      final Page page = htmlUiBuilder.getPage(pageName);
+      Page page = htmlUiBuilder.getPage(pageName);
+      if (page == null) {
+        page = new Page(null, htmlUiBuilder.getPluralTitle(), pageName, false);
+      }
       return page.getExpandedTitle();
     }
   }

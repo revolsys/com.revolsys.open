@@ -195,23 +195,26 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public void addCollapsibleIframe(
     final ElementContainer container,
     final Class<?> builderClass,
-    final String pageName) {
-    addCollapsibleIframe(container, builderClass.getName(), pageName);
+    final String pageName,
+    final String style) {
+    addCollapsibleIframe(container, builderClass.getName(), pageName, style);
   }
 
   public void addCollapsibleIframe(
     final ElementContainer container,
     final String builderName,
-    final String pageName) {
+    final String pageName,
+    final String style) {
     final HtmlUiBuilder<?> appBuilder = getBuilder(builderName);
     final Page page = appBuilder.getPage(pageName);
     if (page != null) {
       final Map<String, Object> parameters = new HashMap<String, Object>();
       parameters.put("plain", true);
+      parameters.put("htmlCss", "collapsibleBox");
       final String link = page.getFullUrl(parameters);
       final String title = page.getExpandedTitle();
       final Decorator decorator = new CollapsibleBox(title);
-      final IFrame iFrame = new IFrame(link, "autoHeight", decorator);
+      final IFrame iFrame = new IFrame(link, "autoHeight", style, decorator);
       container.add(iFrame);
     }
   }
@@ -435,7 +438,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Page page = getPage(pageName);
     final String title = page.getExpandedTitle();
     request.setAttribute("title", title);
-    request.setAttribute("pageHeading", title);
 
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "list", "Cancel", "_top");
@@ -446,6 +448,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final MenuElement actionMenuElement = new MenuElement(actionMenu,
       "actionMenu");
     final ElementContainer view = new ElementContainer(form, actionMenuElement);
+    view.setDecorator(new CollapsibleBox(title, true));
     return view;
   }
 
@@ -497,7 +500,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
       final String title = page.getExpandedTitle();
       request.setAttribute("title", title);
-      request.setAttribute("pageHeading", title);
 
       final Menu actionMenu = new Menu();
       addMenuItem(actionMenu, prefix, "view", "Cancel", "_top");
@@ -509,6 +511,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         "actionMenu");
       final ElementContainer view = new ElementContainer(form,
         actionMenuElement);
+      view.setDecorator(new CollapsibleBox(title, true));
       return view;
     }
   }
@@ -586,7 +589,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   // return view;
   // }
 
-  public Element createObjectListPage(
+  public ElementContainer createObjectListPage(
     final HttpServletRequest request,
     final List<T> results,
     final String prefix) {
@@ -595,10 +598,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ElementContainer tableView = createTableView(results, serializers,
       null);
     final String title = getPageTitle(pageName);
-    tableView.setDecorator(new CollapsibleBox(title, true));
 
-    final ElementContainer container = new ElementContainer();
-    container.add(tableView);
+    final ElementContainer container = new ElementContainer(tableView);
+    container.setDecorator(new CollapsibleBox(title, true));
 
     setTitleAttribute(request, pageName);
 
@@ -620,11 +622,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String title = getPageTitle(pageName);
 
     final ElementContainer tableContainer = new ElementContainer(tableView);
-    tableContainer.setDecorator(new CollapsibleBox(title, true));
 
     updateObjectListView(request, tableContainer, tableView, pager);
 
     ElementContainer container = new ElementContainer(tableContainer);
+    tableContainer.setDecorator(new CollapsibleBox(title, true));
 
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "add", "Add", "_top");
@@ -646,16 +648,15 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Page page = getPage(pageName);
       List<KeySerializer> serializers = getSerializers(pageName, "view");
       final Element detailView = createDetailView(object, serializers);
-      detailView.setDecorator(new CollapsibleBox("Details", true));
 
       final String title = page.getExpandedTitle();
       request.setAttribute("title", title);
-      request.setAttribute("pageHeading", title);
 
       final Menu actionMenu = new Menu();
       addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
 
       final ElementContainer view = new ElementContainer(detailView);
+      view.setDecorator(new CollapsibleBox(title, true));
       addMenuElement(view, actionMenu);
       return view;
     }
@@ -1038,8 +1039,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         final String pageByName = pageUrls.get(path);
         if (pageByName != null) {
           linkPage = new Page(null, getPluralTitle(), pageByName, false);
-        } else {
-          linkPage = new Page(null, getPluralTitle(), path, false);
         }
       }
     }
@@ -1066,9 +1065,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public String getPageUrl(final String name) {
+  public String getPageUrlOld(final String name) {
     final String url = pageUrls.get(name);
     return url;
+  }
+
+  public String getPageUrl(final String name) {
+    Map<String, Object> parameters = Collections.emptyMap();
+    return getPageUrl(name, parameters);
   }
 
   public String getPageUrl(
@@ -1281,16 +1285,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  protected void serializeLink(
+  public void serializeLink(
     final XmlWriter out,
     final Object object,
     final String key,
-    final String path) {
+    final String pageName) {
     final Object id = getIdValue(object);
     final Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put(idParameterName, id);
-    final String url = getPageUrl(path, parameters);
-    if (url != null) {
+    final String url = getPageUrl(pageName, parameters);
+    if (url == null) {
+      serializeNullLabel(out, pageName);
+    } else {
       out.startTag(HtmlUtil.A);
       out.attribute(HtmlUtil.ATTR_HREF, url);
       out.attribute(HtmlUtil.ATTR_TARGET, "_top");

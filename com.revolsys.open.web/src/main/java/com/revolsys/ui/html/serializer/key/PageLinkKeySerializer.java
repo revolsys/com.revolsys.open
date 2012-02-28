@@ -24,22 +24,24 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
     HtmlUiBuilder<? extends Object> uiBuilder = this.uiBuilder;
     final String[] parts = getName().split("\\.");
     Object currentObject = object;
+    String key = parts[0];
     for (int i = 0; i < parts.length - 1; i++) {
-      final String keyName = parts[i];
-      currentObject = JavaBeanUtil.getValue(currentObject, keyName);
+      currentObject = JavaBeanUtil.getValue(currentObject, key);
       if (currentObject == null) {
-        uiBuilder.serializeNullLabel(out, keyName);
+        uiBuilder.serializeNullLabel(out, key);
         return;
       }
 
       uiBuilder = uiBuilder.getBuilder(currentObject);
       if (uiBuilder == null) {
         final String message = currentObject.getClass().getName()
-          + " does not have a property " + keyName;
+          + " does not have a property " + key;
         out.element(HtmlUtil.B, message);
       }
+      key = parts[i+1];
+      
     }
-    uiBuilder.serializeLink(out, pageName, currentObject);
+    uiBuilder.serializeLink(out, currentObject, key, pageName);
   }
 
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {

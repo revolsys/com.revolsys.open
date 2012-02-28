@@ -25,6 +25,8 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   private boolean singleObject;
 
+  private boolean listRoot;
+
   public JsonMapWriter(final Writer out) {
     this.out = new PrintWriter(out);
   }
@@ -35,9 +37,16 @@ public class JsonMapWriter extends AbstractMapWriter {
   @Override
   public void close() {
     if (out != null) {
+      if (!written) {
+        writeHeader();
+      }
       try {
         if (!singleObject) {
-          out.print("\n]}\n");
+          if (listRoot) {
+            out.print("\n]");
+          } else {
+            out.print("\n]}\n");
+          }
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
@@ -70,9 +79,15 @@ public class JsonMapWriter extends AbstractMapWriter {
       this.out.print(callback);
       this.out.print('(');
     }
+    listRoot = Boolean.TRUE.equals(getProperty(IoConstants.JSON_LIST_ROOT_PROPERTY));
     singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+
     if (!singleObject) {
-      this.out.print("{\"items\": [\n");
+      if (listRoot) {
+        this.out.print("[\n");
+      } else {
+        this.out.print("{\"items\": [\n");
+      }
     }
     written = true;
   }

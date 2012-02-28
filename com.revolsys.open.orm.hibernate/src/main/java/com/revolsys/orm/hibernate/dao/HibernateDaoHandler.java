@@ -60,8 +60,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
   /** The class name of the entities persisted by this Data Access Object. */
   private String objectClassName;
 
-  public HibernateDaoHandler(
-    final Class<?> daoInterface,
+  public HibernateDaoHandler(final Class<?> daoInterface,
     final Class<?> objectClass) {
     this.daoInterface = daoInterface;
     this.objectClass = objectClass;
@@ -93,8 +92,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param object The object to evict.
    * @return null.
    */
-  public Object evict(
-    final Object object) {
+  public Object evict(final Object object) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.evict(object);
     return null;
@@ -161,7 +159,8 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
       arguments = args;
     }
     String fullQueryName = getQueryName(queryName);
-    HibernateCallback<Query> callback = new HibernateNamedQueryCallback(fullQueryName);
+    HibernateCallback<Query> callback = new HibernateNamedQueryCallback(
+      fullQueryName);
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     Query query = hibernateTemplate.execute(callback);
     for (int i = 0; i < arguments.length; i++) {
@@ -184,16 +183,13 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     return query;
   }
 
-  public String getQueryName(
-    final String methodName) {
+  public String getQueryName(final String methodName) {
     String queryName = methodName.replaceFirst(
       "\\A(get|page|findMax|find|iterate|delete|update)", "");
     return objectClassName + "." + queryName;
   }
 
-  private String getQueryParameterName(
-    final Method method,
-    final int index) {
+  private String getQueryParameterName(final Method method, final int index) {
     Annotation[][] parameterAnnotations = method.getParameterAnnotations();
     for (Annotation annotation : parameterAnnotations[index]) {
       if (annotation.annotationType().equals(NamedQueryParameter.class)) {
@@ -207,8 +203,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
   public Object invoke(
     final Object proxy,
     final Method method,
-    final Object[] args)
-    throws Throwable {
+    final Object[] args) throws Throwable {
     SessionFactory sessionFactory = getSessionFactory();
     boolean participate = false;
 
@@ -298,8 +293,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param id The ID of the object to delete.
    * @return The object.
    */
-  public Object load(
-    final Object id) {
+  public Object load(final Object id) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     Object object = hibernateTemplate.get(objectClass, (Serializable)id);
     return object;
@@ -311,8 +305,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param id The ID of the object to delete.
    * @return The object.
    */
-  public Object loadAndLock(
-    final Object id) {
+  public Object loadAndLock(final Object id) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     Object object = hibernateTemplate.get(objectClass, (Serializable)id,
       LockMode.UPGRADE);
@@ -326,8 +319,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param object The object to lock.
    * @return null.
    */
-  public Object lock(
-    final Object object) {
+  public Object lock(final Object object) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.lock(object, LockMode.UPGRADE);
     return null;
@@ -340,9 +332,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final Map<String, Boolean> orderBy) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     return (List<V>)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
-      public Object doInHibernate(
-        Session session)
-        throws HibernateException {
+      public Object doInHibernate(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(objectClass);
         criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
         if (where != null) {
@@ -392,9 +382,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final int limit) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     return (List<V>)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
-      public Object doInHibernate(
-        Session session)
-        throws HibernateException {
+      public Object doInHibernate(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(objectClass);
         criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
         criteria.setMaxResults(limit);
@@ -442,9 +430,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final Map<String, Boolean> orderBy) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     return (ResultPager)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
-      public Object doInHibernate(
-        Session session)
-        throws HibernateException {
+      public Object doInHibernate(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(objectClass);
         if (where != null) {
           for (Entry<String, Object> criterion : where.entrySet()) {
@@ -485,6 +471,53 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     });
   }
 
+  @SuppressWarnings("rawtypes")
+  public List list(
+    final Map<String, Object> where,
+    final Map<String, Boolean> orderBy) {
+    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    return hibernateTemplate.executeWithNativeSession(new HibernateCallback<List>() {
+      public List doInHibernate(Session session) throws HibernateException {
+        Criteria criteria = session.createCriteria(objectClass);
+        if (where != null) {
+          for (Entry<String, Object> criterion : where.entrySet()) {
+            String key = criterion.getKey();
+            Object value = criterion.getValue();
+            if (value == null) {
+              criteria.add(Restrictions.isNull(key));
+            } else if (value instanceof Collection) {
+              Collection<?> collection = (Collection<?>)value;
+              criteria.add(Restrictions.in(key, collection));
+            } else if (value instanceof Object[]) {
+              Object[] array = (Object[])value;
+              criteria.add(Restrictions.in(key, array));
+            } else if (value instanceof Enum) {
+              criteria.add(Restrictions.eq(key, value.toString()));
+            } else {
+              if (value.toString().indexOf("%") == -1) {
+                criteria.add(Restrictions.eq(key, value));
+              } else {
+                criteria.add(Restrictions.ilike(key, value));
+              }
+            }
+          }
+        }
+        if (orderBy != null) {
+          for (Entry<String, Boolean> entry : orderBy.entrySet()) {
+            String propertyName = entry.getKey();
+            Boolean ascending = entry.getValue();
+            if (Boolean.TRUE.equals(ascending)) {
+              criteria.addOrder(Order.asc(propertyName));
+            } else {
+              criteria.addOrder(Order.desc(propertyName));
+            }
+          }
+        }
+        return criteria.list();
+      }
+    });
+  }
+
   public ResultPager page(
     final Method method,
     final String queryName,
@@ -501,8 +534,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param object The object to insert.
    * @return The ID of the object in the persistent storage.
    */
-  public Long persist(
-    final Object object) {
+  public Long persist(final Object object) {
     Long id = (Long)getHibernateTemplate().save(object);
     return id;
   }
@@ -513,8 +545,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param object The object to refresh.
    * @return null.
    */
-  public Object refresh(
-    final Object object) {
+  public Object refresh(final Object object) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.refresh(object);
     return null;
@@ -526,8 +557,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param id The ID of the object to delete.
    * @return null.
    */
-  public Object remove(
-    final Long id) {
+  public Object remove(final Long id) {
     Object object = load(id);
     return remove(object);
   }
@@ -538,8 +568,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param object The object to delete.
    * @return null.
    */
-  public Object remove(
-    final Object object) {
+  public Object remove(final Object object) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.delete(object);
     return null;
@@ -551,8 +580,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param objects The list of objects to delete.
    * @return null.
    */
-  public Object removeAll(
-    final Collection objects) {
+  public Object removeAll(final Collection objects) {
     HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.deleteAll(objects);
     return null;
@@ -564,9 +592,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param property The name of the property to set.
    * @param value The value for the property.
    */
-  public void setProperty(
-    final String property,
-    final Object value) {
+  public void setProperty(final String property, final Object value) {
     JavaBeanUtil.setProperty(this, property, value);
   }
 
@@ -592,8 +618,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @param object The object to update.
    * @return null.
    */
-  public Object update(
-    final Object object) {
+  public Object update(final Object object) {
     getHibernateTemplate().update(object);
     return null;
   }

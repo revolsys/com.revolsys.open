@@ -53,6 +53,7 @@ public class ListOfMapHttpMessageConverter extends
     writer.setProperty(IoConstants.INDENT_PROPERTY, true);
     writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);
     final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    writer.setProperty(IoConstants.JSON_LIST_ROOT_PROPERTY, request.getAttribute(IoConstants.JSON_LIST_ROOT_PROPERTY));
     String callback = request.getParameter("jsonp");
     if (callback == null) {
       callback = request.getParameter("callback");
