@@ -2,13 +2,18 @@
 # /usr/lib/libfgdblinuxrtl.so
 #/usr/lib/libFileGDBAPI.so
 
-ARCH=x86
+ARCH=amd64
 ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.1/
 OS=linux
 ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.1/include
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:src/main/lib:target/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${ESRI_FILE_GBD_HOME}/lib/${OS}/${ARCH}
+echo $LD_LIBRARY_PATH
 rm -f src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig/*.java
+
+mkdir -p target/cxx
+mkdir -p target/o
+mkdir -p src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig/
 
 swig -c++ \
   -o target/cxx/EsriFileGdb_wrap.cxx \
