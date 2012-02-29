@@ -20,33 +20,14 @@ function resizeHeight(iframe) {
   };
 }(jQuery));
 
-$(document).ready(function() {
-  $("div.collapsibleBox > div > div.title").click(function() {
-    var box = $(this).parent().parent();
-    var content = $("> div > div.content", box);
-    content.slideToggle("fast", function() {
-      var container = $("> div", box);
-      if (content.css("display") == "none") {
-        container.removeClass("open");
-        container.addClass("closed");
-      } else {
-        container.removeClass("closed");
-        container.addClass("open");
-       $("iframe.autoHeight", content).iframeAutoHeight();
-      }
-    });
-  });
-  $( "button.delete" ).button({ text:false,icons: {primary:'ui-icon-trash'} });
-  $( "button.delete" ).addClass('ui-state-error');
-  
-  
-  
-  $('button.delete').click(function() {
+function addConfirmButton(selector, icon, title, message) {
+  $(selector).button({ text:false,icons: {primary:'ui-icon-' + icon} });
+  $(selector).click(function() {
     var form = $(this).closest('form');
     $('<div></div>')
-    .html('Are you sure you want to delete this record?')
+    .html(message)
     .dialog({
-      title: 'Confirm Delete',
+      title: 'title',
       buttons: {
         'Cancel': function() {
           $(this).dialog("close");
@@ -64,6 +45,27 @@ $(document).ready(function() {
     });
     return false;
   });
+
+}
+
+$(document).ready(function() {
+  $("div.collapsibleBox > div > div.title").click(function() {
+    var box = $(this).parent().parent();
+    var content = $("> div > div.content", box);
+    content.slideToggle("fast", function() {
+      var container = $("> div", box);
+      if (content.css("display") == "none") {
+        container.removeClass("open");
+        container.addClass("closed");
+      } else {
+        container.removeClass("closed");
+        container.addClass("open");
+       $("iframe.autoHeight", content).iframeAutoHeight();
+      }
+    });
+  });
+  $( "button.delete" ).addClass('ui-state-error');
+  addConfirmButton('button.delete', 'trash', 'Confirm Delete', 'Are you sure you want to delete this record?');
 
 });
 

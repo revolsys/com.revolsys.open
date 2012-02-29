@@ -79,6 +79,11 @@ td p:last-child {
   margin-bottom: 0em;
 }
 
+td.actions form{
+	display: inline;
+	margin-right: 0.5em;
+}
+
 div.body {
   margin: 0px auto 0px auto;
 }

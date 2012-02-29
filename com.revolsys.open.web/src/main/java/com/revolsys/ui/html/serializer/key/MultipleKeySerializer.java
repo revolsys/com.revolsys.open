@@ -1,12 +1,18 @@
 package com.revolsys.ui.html.serializer.key;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.ui.html.builder.HtmlUiBuilder;
+import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 
-public class MultipleKeySerializer extends AbstractKeySerializer {
+public class MultipleKeySerializer extends AbstractKeySerializer implements
+  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private List<KeySerializer> serializers = new ArrayList<KeySerializer>();
+
+  private HtmlUiBuilder<?> uiBuilder;
 
   public MultipleKeySerializer() {
   }
@@ -31,5 +37,17 @@ public class MultipleKeySerializer extends AbstractKeySerializer {
 
   public void setSerializers(List<KeySerializer> serializers) {
     this.serializers = serializers;
+    setHtmlUiBuilder(uiBuilder);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void setHtmlUiBuilder(HtmlUiBuilder<?> uiBuilder) {
+    this.uiBuilder = uiBuilder;
+    for (KeySerializer serializer : serializers) {
+      if (serializer instanceof HtmlUiBuilderAware) {
+        HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
+        builderAware.setHtmlUiBuilder(uiBuilder);
+      }
+    }
   }
 }

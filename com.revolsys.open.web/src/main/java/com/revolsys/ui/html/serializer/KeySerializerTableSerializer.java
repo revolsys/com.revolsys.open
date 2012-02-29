@@ -24,7 +24,8 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   }
 
   public String getBodyCssClass(final int row, final int col) {
-    return null;
+    final KeySerializer serializer = getSerializer(col);
+     return serializer.getName();
   }
 
   public int getBodyRowCount() {

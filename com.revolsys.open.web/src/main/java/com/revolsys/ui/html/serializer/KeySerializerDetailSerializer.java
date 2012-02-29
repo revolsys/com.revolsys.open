@@ -47,7 +47,8 @@ public class KeySerializerDetailSerializer implements LabelValueListSerializer {
   }
 
   public String getValueCss(final int index) {
-    return "detailValue";
+    KeySerializer serializer = serializers.get(index);
+    return "detailValue " + serializer.getName();
   }
 
   public void serializeLabel(final XmlWriter out, final int index) {

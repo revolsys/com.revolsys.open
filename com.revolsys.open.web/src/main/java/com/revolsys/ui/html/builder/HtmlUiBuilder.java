@@ -1041,6 +1041,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           linkPage = new Page(null, getPluralTitle(), pageByName, false);
         }
       }
+    } else {
+      if (!linkPage.canAccess()) {
+        return null;
+      }
     }
     return linkPage;
   }
