@@ -1,0 +1,742 @@
+body {
+  color: black;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  margin: 0px;
+  border: 0px;
+}
+
+h1 {
+  color: #039;
+  font-family: sans-serif;
+  line-height: 1;
+  font-size: 1.6em;
+  margin-bottom: 12px;
+}
+
+h2 {
+  color: #039;
+  font-family: sans-serif;
+  line-height: 1;
+  font-style: italic;
+  font-size: 1.4em;
+  margin-bottom: 12px;
+}
+
+h2.subhead {
+  color: #039;
+  font-family: sans-serif;
+  line-height: 1;
+  font-size: 1.2em;
+  font-weight: normal;
+  color: #999;
+  margin: -9px 0 12px 0;
+}
+
+h3 {
+  color: #039;
+  font-family: sans-serif;
+  line-height: 1;
+  font-size: 1.2em;
+  margin-bottom: 12px;
+}
+
+h4 {
+  color: #039;
+  font-family: sans-serif;
+  line-height: 1;
+  font-size: 1.1em;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+h5 {
+  color: #039;
+  font-family: sans-serif;
+  line-height: 1;
+  font-size: 1em;
+  margin-bottom: 12px;
+}
+
+h6 {
+  font-family: sans-serif;
+  line-height: 1;
+  font-size: 1em;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+th, td {
+  vertical-align: top;
+  overflow-x: auto;
+}
+
+td p:first-child {
+  margin-top: 0em;
+}
+
+td p:last-child {
+  margin-bottom: 0em;
+}
+
+div.body {
+  margin: 0px auto 0px auto;
+}
+
+
+div.bodyContainer {
+  margin: 0em 1em 1em 0em;
+}
+
+div.bodyContent {
+  margin: 0em 0em 0em 14.5em;
+}
+
+div.header {
+  background-color: #a2c8ff;
+  border: 0.2em solid #6699CC;
+  color: #0046a0;
+  padding: 5px 10px 5px 10px;
+  margin-bottom: 0.5em;
+}
+
+div.headerContent {
+}
+
+div.columns {
+  float: left;
+  padding-bottom: 1px;
+  width: 100%;
+}
+
+div.breadcrumbs {
+}
+
+div.breadcrumb {
+  margin-left: 13.5em;
+  padding: 0.1em 0.2em 0.1em 0.2em;
+}
+
+div.breadcrumb ul {
+  font-size: 0.8em;
+  list-style: none;
+  margin: 0em;
+  margin-bottom: 0.3em;
+  padding: 0em;
+}
+
+div.breadcrumb ul li {
+  display: inline;
+  color: #999999;
+  font-size: 0.9em;
+}
+
+div.breadcrumb ul li a {
+  color: #999999;
+  padding-right: 1.5em;
+  background-image: url(../images/crumbs.gif);
+  background-position: top right;
+  background-repeat: no-repeat;
+}
+
+div.breadcrumb ul li a:hover {
+  text-decoration: underline;
+}
+
+div.footerMenu {
+  clear: both;
+  margin-top: 1em;
+  border-top: 0.1em solid #999999;
+  padding: 0.1em 0.2em 0.1em 0.2em;
+  color: #999999;
+  font-size: 0.8em;
+}
+
+div.header div.title {
+  font-size: 2em;
+}
+
+input.submit {
+  background-color: #a2c8ff;
+  border: 0.2em outset #6699CC;
+  color: black;
+  font-weight: bold;
+  margin-right: 0.3em;
+  padding: 0.2em 0.3em 0.2em 0.3em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+input.submit:hover {
+  text-decoration: underline;
+}
+
+div.collapsibleBox > div > div.content > div.actionMenu {
+	margin: 0.2em 0em 0em 0em;
+	border-top: 0.2em solid #6699CC;
+	padding: 0.2em 0.5em 0em 0.5em;
+}
+
+
+div.collapsibleBox div.section {
+  margin: 0.2em 0em 0em 0em;
+  border-top: 0.2em solid #6699CC;
+  padding: 0.2em 0.5em 0em 0.5em;
+}
+
+div.actionMenu {
+  margin-top: 1em;
+}
+
+div.actionMenu ul {
+  margin: 0em;
+  list-style: none outside none;
+  padding: 0em;
+  line-height: 1.5em;
+}
+
+div.actionMenu ul li {
+  display: inline;
+}
+
+div.actionMenu ul li a {
+  background-color: #a2c8ff;
+  border: 0.2em outset #6699CC;
+  color: black;
+  font-weight: bold;
+  margin-right: 0.3em;
+  padding: 0.2em 0.3em 0.2em 0.3em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+div.actionMenu ul li a:hover {
+  text-decoration: underline;
+}
+
+a.button {
+  background-color: #a2c8ff;
+  border: 0.2em outset #6699CC;
+  color: black;
+  font-weight: bold;
+  margin-right: 0.3em;
+  padding: 0.2em 0.3em 0.2em 0.3em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.button:hover {
+  text-decoration: underline;
+}
+
+
+div.form > form > div > div.objectList {
+  border-left-width: 0px;
+  border-right-width: 0px;
+}
+
+div.form > form > div > div.objectList > table.data {
+  border-left-width: 0px;
+  border-right-width: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+html.collapsibleBox {
+  margin: 0px;	
+}
+html.collapsibleBox > body {
+  margin: 0px;  
+}
+
+html.collapsibleBox > body > div.collapsibleBox {
+  border-width: 0px;
+  margin:0px;
+}
+
+html.collapsibleBox > body > div.collapsibleBox > div {
+  border-width: 0px;
+}
+
+html.collapsibleBox > body > div.collapsibleBox > div > div.title {
+  display: none;
+}
+
+div.collapsibleBox > div > div.content > div.objectList {
+  border-width: 0px;
+}
+
+div.collapsibleBox > div > div.content > div.objectList > table.data {
+  border-width: 0px;
+  padding: 0px;
+}
+
+div.objectList {
+  border: 0.1em solid #666666;
+  width: auto;
+}
+
+div.objectList table.data {
+  border: 0.2em solid #6699CC;
+  padding: 0.1em;
+  width: 100%;
+}
+
+div.objectList table.data caption {
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  font-size: 1.1em;
+  text-align: center;
+  font-weight: bold;
+  text-align: left;
+  padding: 0.2em;
+  border: 0.2em solid #6699CC;
+  border-bottom-width: 0em;
+}
+
+div.objectList table.data td,
+div.objectList table.data th {
+  padding: 0.2em 0.3em 0.2em 0.3em;
+}
+
+div.objectList table.data thead {
+  background-color: #a2c8ff;
+}
+
+div.objectList table.data thead th {
+  color: #0046a0;
+  border-right: 0.1em solid white;
+}
+
+div.objectList table.data thead th:last-child {
+  border-right-width: 0em;
+}
+
+div.objectList table.data tbody td {
+  border-right: 0.1em solid #cccccc;
+  border-bottom: 0.1em solid #cccccc;
+}
+
+div.objectList table.data tbody td:last-child {
+   border-right-width: 0em;
+}
+
+div.objectList table.data tbody tr:last-child td {
+   border-bottom-width: 0em;
+}
+
+div.objectList table.data tbody tr.selected td {
+  background-color: #fff7b4;
+}
+div.objectList table.data tbody tr.even td {
+  background-color: #eeeeee;
+  border-right-color: white;
+}
+
+div.objectList table.data tbody.search tr td textarea,
+div.objectList table.data tbody.search tr th input[type="text"],
+div.objectList table.data tbody.search tr td input[type="text"] {
+  height: 1.2em;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+}
+
+div.form > form > div.objectView > table.data {
+  border-width: 0px;
+  padding: 0px;
+}
+
+div.collapsibleBox > div > div.content > div.objectView {
+  border-width: 0px;
+}
+
+div.collapsibleBox > div > div.content > div.objectView > table.data {
+  border-width: 0px;
+  padding: 0px;
+}
+
+div.objectView {
+  border: 0.1em solid #666666;
+  width: auto;
+}
+
+div.objectView table.data {
+  border: 0.2em solid #6699CC;
+  padding: 0.1em;
+  width: 100%;
+}
+
+div.objectView table.data th {
+  background-color: #a2c8ff;
+  border-bottom: 0.1em solid white;
+  padding: 0.3em 0.4em 0.3em 0.4em;
+  text-align: left;
+}
+
+div.objectView table.data td {
+  border-bottom: 0.1em solid #cccccc;
+  padding: 0.3em 0.4em 0.3em 0.4em;
+}
+
+div.objectView table.data tr.even td {
+  background-color: #eeeeee;
+}
+
+div.objectView table.data tr.lastRow th,
+div.objectView table.data tr.lastRow td
+ {
+  border-bottom-width: 0em;
+}
+
+div.pager {
+}
+
+div.pager table {
+  width: 100%;
+}
+
+div.pager td {
+  padding: 0.2em 0.4em;
+  vertical-align: middle;
+}
+
+div.pager td.first,
+div.pager td.previous,
+div.pager td.next,
+div.pager td.last
+{
+  padding: 0em;
+  background-repeat:no-repeat;
+  background-position: center center;
+  width: 1.5em;
+}
+
+div.pager td.first {
+  background-image: url('../images/arrow_first.png');
+}
+
+div.pager td.previous {
+  background-image: url('../images/arrow_left.png');
+}
+
+div.pager td.next {
+  background-image: url('../images/arrow_right.png');
+}
+
+div.pager td.last {
+  background-image: url('../images/arrow_last.png');
+}
+
+div.pager td.first a,
+div.pager td.previous a,
+div.pager td.next a,
+div.pager td.last a
+{
+  display: block;
+  text-decoration: none;
+  overflow: hidden;
+  width: 1.5em;
+}
+
+div.pager td.first a span,
+div.pager td.previous a span,
+div.pager td.next a span,
+div.pager td.last a span {
+  padding-left: 1.5em;
+}
+
+div.pager a img {
+  border-width: 0em;
+}
+
+div.pager span.selected {
+  font-weight: bold;
+}
+
+div.pager td.pages {
+  text-align: center;
+}
+
+div.pager a {
+  color: #999999;
+}
+
+div.sideNav {
+  margin: 0em 1em 1em 1em;
+  border: 0.2em solid #6699CC;
+  padding: 0.1em;
+  float: left;
+  width: 12em;
+}
+
+div.sideMenu {
+  padding: 0em;
+}
+
+div.sideMenu div.title {
+  background-color: #a2c8ff;
+  color: #0046a0;
+  font-size: 1.1em;
+  font-weight: bold;
+  padding: 0.2em 0.3em 0.1em 0.3em;
+}
+
+div.sideMenu div.title a {
+  color: #000000;
+  text-decoration: none;
+}
+
+div.sideMenu ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0.1em;
+}
+
+div.sideMenu ul li:nth-of-type(even) {
+  background-color: #eeeeee;
+}
+
+div.sideMenu ul li {
+  padding: 0.2em 0.3em 0.1em 0.3em;
+}
+
+div.sideMenu ul li a {
+  color: #000000;
+  text-decoration: none;
+}
+
+div.sideMenu ul li a:hover {
+  text-decoration: underline;
+}
+
+input.submit {
+  background-color: #a2c8ff;
+  border: 0.2em outset #6699CC;
+  color: black;
+  font-weight: bold;
+  margin-right: 0.3em;
+  padding: 0.2em 0.3em 0.2em 0.3em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+input.submit:hover {
+  text-decoration: underline;
+}
+
+form dl dt {
+  font-weight: bold;
+}
+
+form dl dd div.fieldDescription {
+  font-size: 0.8em;
+  color: #999999;
+}
+
+
+html.collapsibleBox > body > div.form {
+  border-width: 0px;
+}
+
+html.collapsibleBox > body > div.form > form > div {
+  border-width: 0px;
+}
+
+div.collapsibleBox > div > div.content > div.form {
+  border-width: 0px;
+}
+
+div.collapsibleBox > div > div.content > div.form > form > div {
+  border-width: 0px;
+}
+
+
+div.form {
+  border: 1px solid #666666;
+}
+
+div.form > div {
+  margin: 0px;
+  height: auto;
+  padding: 0px;
+}
+
+div.form > form > div {
+  margin: 0px;
+  height: auto;
+  border: 2px solid #6699CC;
+  padding: 1px;
+}
+
+div.form div.field {
+  margin: 0px;
+  font-size: 11px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  width: 100%;
+  background-color: #a2c8ff;
+}
+
+div.form div.field div.label {
+  width: 14em;
+  height: 100%;
+  float: left;
+  font-weight: bold;
+  text-align: left;
+  margin: 0px;
+  padding-left: 10px;
+  border-top: 1px solid white;
+  padding: 0.2em 0.4em 0.2em 0.4em;
+  text-align: right;
+  vertical-align: top;
+}
+
+div.form div.field div.label label {
+}
+
+div.form div:nth-of-type(1).field > div.label,
+div.form div:nth-of-type(1).field > div.contents {
+  border-top-width: 0px;
+}
+
+div.form div.field div.contents {
+  border-top: 1px solid #cccccc;
+  margin-left: 14.8em;
+  padding: 0.2em 0.4em 0.2em 0.4em;
+  background-color: white;
+}
+
+div.form div:nth-of-type(even).field > div.contents {
+  background-color: #eeeeee;
+}
+
+div.instructions {
+  color: #999999;
+  background-color: white;
+}
+
+div.form div.field div.instructions {
+  clear: both;
+  margin-left: 14.8em;
+  padding: 0.2em 0.4em 0.2em 0.4em;
+  background-color: white;
+}
+
+div.form div:nth-of-type(even).field > div.instructions {
+  background-color: #eeeeee;
+  color: #666666;
+}
+
+div.form div.field div.errors {
+  clear: both;
+  color: red;
+  font-weight: bold;
+  margin-left: 14.8em;
+  padding: 0.2em 0.4em 0.2em 0.4em;
+  background-color: white;
+}
+
+div.form div:nth-of-type(even).field > div.errors {
+  background-color: #eeeeee;
+}
+
+div.form div.field div.fieldActions {
+  margin-bottom: 7px;
+}
+
+div.form div.field div.fieldActions a {
+  color: #666666;
+  font-size: 10px;
+}
+
+div.form div.required {
+  background: url(../images/asterisk.gif) no-repeat 3px 5px;
+  padding-left: 10px;
+}
+
+
+.labelAboveNoPadding {
+  font-weight: bold;
+  padding-left: 1em;
+  padding-top: .3em;
+}
+
+div.collapsibleBox {
+  margin-top: 1em;
+  border: 0.1em solid #666666;
+  width: auto;
+}
+
+div.collapsibleBox > div {
+  border: 0.2em solid #6699CC;
+  padding: 0.1em;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing: border-box;
+}
+
+div.collapsibleBox > div > div.title {
+  padding: 3px 10px 3px 25px;
+  color: white;
+  background-color: #6699CC;
+  font-weight: bold;
+  background-position: 5px 4px;
+  background-repeat: no-repeat;
+  background-image: url(../images/open.png);
+}
+
+div.collapsibleBox > div.open > div.title {
+  background-image: url(../images/close.png);
+}
+
+div.collapsibleBox > div.closed > div.title {
+}
+
+div.collapsibleBox > div > div.content {
+  display: none;
+}
+
+div.collapsibleBox > div.open > div.content {
+  display: block;
+  overflow: auto;
+}
+
+div.collapsibleBox > div > div.content > iframe {
+  margin: 0px;
+  width: 100%;
+  border: 0px;
+  padding: 0px;
+  height: 0px;
+}
+
+div.autocomplete {
+  border:1px solid #808080;
+  background-color:#FFFFFF;
+  width: 15em;
+}
+
+div.autocomplete ul {
+  list-style-type:none;
+  margin:0px;
+  padding:0px;
+}
+
+div.autocomplete ul li.selected {
+  background-color: #ffb;
+}
+
+div.autocomplete ul li {
+  list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+  cursor:pointer;
+}
+
+.ui-button-icon-only {
+	font-size: 0.7em;
+}

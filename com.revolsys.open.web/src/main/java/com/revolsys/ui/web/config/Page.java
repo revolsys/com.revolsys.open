@@ -25,10 +25,10 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.jexl.Expression;
 import org.apache.log4j.Logger;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriTemplate;
 import org.springframework.web.util.UrlPathHelper;
@@ -42,6 +42,8 @@ import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
 public class Page extends Component {
+  private static final SpelExpressionParser PARSER = new SpelExpressionParser();
+
   private static final Logger LOG = Logger.getLogger(Page.class);
 
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
@@ -85,11 +87,32 @@ public class Page extends Component {
 
   private String title = "";
 
-  private Expression titleExpression;
+  private org.apache.commons.jexl.Expression titleExpression;
 
   private UriTemplate uriTemplate;
 
   private StringTemplate titleTemplate;
+
+  private String permission;
+
+  private Expression permissionExpression;
+
+  public void setPermission(String permission) {
+    this.permission = permission;
+    if (StringUtils.hasText(permission)) {
+      this.permissionExpression = PARSER.parseExpression(permission);
+    } else {
+      this.permissionExpression = null;
+    }
+  }
+
+  public String getPermission() {
+    return permission;
+  }
+
+  public Expression getPermissionExpression() {
+    return permissionExpression;
+  }
 
   public Page() {
   }

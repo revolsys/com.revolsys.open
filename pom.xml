@@ -57,6 +57,7 @@
     <module>com.revolsys.open.gis.postgresql</module>
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.gis.google.fusiontables</module>
+    <module>war-overlay</module>
   </modules>
 
   <build>

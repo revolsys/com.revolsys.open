@@ -4,34 +4,30 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.revolsys.open</groupId>
-  <artifactId>com.revolsys.open.gis.ecsv</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
-  <name>GIS ECSV Tools</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
+  <artifactId>war-overlay</artifactId>
+  <packaging>war</packaging>
+  <name>Web Application Overlay</name>
+
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-
-
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>com.revolsys.open.web</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-      </exclusions>
+      <groupId>jstl</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>taglibs</groupId>
+      <artifactId>standard</artifactId>
+      <version>1.1.2</version>
     </dependency>
   </dependencies>
 </project>
