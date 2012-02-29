@@ -41,15 +41,13 @@ public class Form extends ElementContainer {
 
   public static final String GET_METHOD = "get";
 
-  private static final Logger log = Logger.getLogger(Form.class);
-
   public static final String POST_METHOD = "post";
 
   private String action = "";
 
   private String cssClass = "form";
 
-  private final String defaultFormTask;
+  private String defaultFormTask;
 
   private String formTask;
 
@@ -66,6 +64,9 @@ public class Form extends ElementContainer {
   private String title;
 
   private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
+
+  public Form() {
+  }
 
   /**
    * @param name
@@ -218,7 +219,9 @@ public class Form extends ElementContainer {
   @Override
   public void serializeElement(final XmlWriter out) {
     serializeStartTag(out);
-    HtmlUtil.serializeHiddenInput(out, FORM_TASK_PARAM, defaultFormTask);
+    if (defaultFormTask != null) {
+      HtmlUtil.serializeHiddenInput(out, FORM_TASK_PARAM, defaultFormTask);
+    }
     for (final Entry<String, Object> savedParam : savedParameters.entrySet()) {
       final Object value = savedParam.getValue();
       if (value != null) {

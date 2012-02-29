@@ -17,6 +17,8 @@ package com.revolsys.ui.html;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 
 public final class HtmlUtil {
@@ -101,6 +103,9 @@ public final class HtmlUtil {
     HTML_NS_PREFIX);
 
   public static final QName TD = new QName(HTML_NS_URI, "td", HTML_NS_PREFIX);
+
+  public static final QName BUTTON = new QName(HTML_NS_URI, "button",
+    HTML_NS_PREFIX);
 
   public static final QName TEXT_AREA = new QName(HTML_NS_URI, "textarea",
     HTML_NS_PREFIX);
@@ -316,6 +321,23 @@ public final class HtmlUtil {
       out.attribute(ATTR_VALUE, value);
     }
     out.endTag(INPUT);
+  }
+
+  public static void serializeButton(
+    final XmlWriter out,
+    final String name,
+    final String type,
+    final Object value,
+    final String text, String cssClass) {
+    out.startTag(BUTTON);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, type);
+    out.attribute(ATTR_VALUE, value);
+    out.attribute(ATTR_CLASS, cssClass);
+    if (StringUtils.hasText(text)) {
+      out.text(text);
+    }
+    out.endTag(BUTTON);
   }
 
   public static void serializeTag(
