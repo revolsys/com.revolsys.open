@@ -29,18 +29,13 @@ import org.apache.log4j.Logger;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.expression.ExpressionUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriTemplate;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.spring.StringTemplate;
-import com.revolsys.spring.security.MethodSecurityExpressionRoot;
+import com.revolsys.spring.security.SpringExpressionUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
@@ -66,31 +61,7 @@ public class Page extends Component {
     }
   }
 
-  public static Map<String, String> getPathVariables() {
-    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-    final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-    if (pathVariables == null) {
-      return Collections.emptyMap();
-    } else {
-      return pathVariables;
-    }
-  }
 
-  public static EvaluationContext getSecurityEvaluationContext() {
-    final SecurityContext securityContext = SecurityContextHolder.getContext();
-    final Authentication authentication = securityContext.getAuthentication();
-    final MethodSecurityExpressionRoot root = new MethodSecurityExpressionRoot(
-      authentication);
-    final EvaluationContext evaluationContext = new StandardEvaluationContext(
-      root);
-    Map<String, String> pathVariables = getPathVariables();
-    for (Entry<String, String> variable : pathVariables.entrySet()) {
-      String name = variable.getKey();
-      String value = variable.getValue();
-      evaluationContext.setVariable(name, value);
-    }
-    return evaluationContext;
-  }
 
   private final List<Argument> arguments = new ArrayList<Argument>();
 
@@ -207,11 +178,16 @@ public class Page extends Component {
     properties.put(name, value);
   }
 
-  public boolean canAccess() {
+  public boolean canAccess(Map<String, ? extends Object> parameters) {
     if (permissionExpression == null) {
       return true;
     } else {
-      final EvaluationContext securityEvaluationContext = getSecurityEvaluationContext();
+      final EvaluationContext securityEvaluationContext = SpringExpressionUtil.createSecurityEvaluationContext();
+      for (Entry<String, ? extends Object> entry : parameters.entrySet()) {
+        String name = entry.getKey();
+        Object value = entry.getValue();
+        securityEvaluationContext.setVariable(name, value);
+      }
       return ExpressionUtils.evaluateAsBoolean(permissionExpression,
         securityEvaluationContext);
     }
@@ -296,10 +272,14 @@ public class Page extends Component {
         }
       }
     }
-    final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
-    final URI path = uriTemplate.expand(uriTemplateVariables);
-    final String url = UrlUtil.getUrl(path, uriParameters);
-    return getAbsoluteUrl(PathAliasController.getPath(url));
+    if (canAccess(uriParameters)) {
+      final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
+      final URI path = uriTemplate.expand(uriTemplateVariables);
+      final String url = UrlUtil.getUrl(path, uriParameters);
+      return getAbsoluteUrl(PathAliasController.getPath(url));
+    } else {
+      return null;
+    }
   }
 
   public Layout getLayout() {
@@ -382,7 +362,7 @@ public class Page extends Component {
   public Map<String, Object> getUriTemplateVariables(
     final Map<String, Object> parameters) {
     final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-    final Map<String, String> pathVariables = getPathVariables();
+    final Map<String, String> pathVariables = HttpRequestUtils.getPathVariables();
     final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
 
     for (final String name : uriTemplate.getVariableNames()) {

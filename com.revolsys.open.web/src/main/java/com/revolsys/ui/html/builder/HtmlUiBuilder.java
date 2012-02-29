@@ -212,10 +212,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       parameters.put("plain", true);
       parameters.put("htmlCss", "collapsibleBox");
       final String link = page.getFullUrl(parameters);
-      final String title = page.getExpandedTitle();
-      final Decorator decorator = new CollapsibleBox(title);
-      final IFrame iFrame = new IFrame(link, "autoHeight", style, decorator);
-      container.add(iFrame);
+      if (link != null) {
+        final String title = page.getExpandedTitle();
+        final Decorator decorator = new CollapsibleBox(title);
+        final IFrame iFrame = new IFrame(link, "autoHeight", style, decorator);
+        container.add(iFrame);
+      }
     }
   }
 
@@ -267,11 +269,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Map<String, Object> parameters) {
     final Page page = getPage(prefix, pageName);
     if (page != null) {
-      final String addUrl = page.getFullUrl(parameters);
-      final Menu menuItem = new Menu(linkTitle, addUrl);
-      menuItem.setTarget(target);
-      menu.addMenuItem(menuItem);
-      return menuItem;
+      final String url = page.getFullUrl(parameters);
+      if (url != null) {
+        final Menu menuItem = new Menu(linkTitle, url);
+        menuItem.setTarget(target);
+        menu.addMenuItem(menuItem);
+        return menuItem;
+      }
     }
     return null;
   }
@@ -1040,10 +1044,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         if (pageByName != null) {
           linkPage = new Page(null, getPluralTitle(), pageByName, false);
         }
-      }
-    } else {
-      if (!linkPage.canAccess()) {
-        return null;
       }
     }
     return linkPage;

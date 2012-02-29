@@ -105,9 +105,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
     this.beanNames.add(beanName);
     final BeanDefinition bd = factory.getBeanDefinition(beanName);
     final MutablePropertyValues values = bd.getPropertyValues();
-    if (values.contains(propertyName)) {
-      values.addPropertyValue(propertyName, value);
-    }
+      values.add(propertyName, value);
   }
 
   /**

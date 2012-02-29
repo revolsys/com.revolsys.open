@@ -1,7 +1,11 @@
 package com.revolsys.ui.web.utils;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
@@ -23,6 +27,18 @@ public final class HttpRequestUtils {
   public static HttpServletRequest getHttpServletRequest() {
     HttpServletRequest request = REQUEST_LOCAL.get();
     return request;
+  }
+
+  public static Map<String, String> getPathVariables() {
+    final HttpServletRequest request = getHttpServletRequest();
+    if (request != null) {
+      @SuppressWarnings("unchecked")
+      final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+      if (pathVariables != null) {
+        return pathVariables;
+      }
+    }
+    return Collections.emptyMap();
   }
 
   public static void setHttpServletRequest(HttpServletRequest request) {

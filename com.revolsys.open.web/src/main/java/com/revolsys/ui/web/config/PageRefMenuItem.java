@@ -105,4 +105,9 @@ public class PageRefMenuItem extends MenuItem {
     }
 
   }
+  @Override
+  public boolean isVisible() {
+    // TODO Auto-generated method stub
+    return super.isVisible();
+  }
 }

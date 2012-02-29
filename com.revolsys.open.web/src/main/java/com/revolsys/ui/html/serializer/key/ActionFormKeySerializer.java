@@ -38,8 +38,10 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
       parameters.put(parameterName, value);
     }
     if (enabledExpression != null) {
+      StandardEvaluationContext evaluationContext = new StandardEvaluationContext(
+        object);
       if (!ExpressionUtils.evaluateAsBoolean(enabledExpression,
-        new StandardEvaluationContext(object))) {
+        evaluationContext)) {
         return;
       }
     }
@@ -78,6 +80,6 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
   private Expression enabledExpression;
 
   public void setEnabledExpression(String enabledExpression) {
-    this.enabledExpression =new SpelExpressionParser().parseExpression(enabledExpression);
+    this.enabledExpression = new SpelExpressionParser().parseExpression(enabledExpression);
   }
 }

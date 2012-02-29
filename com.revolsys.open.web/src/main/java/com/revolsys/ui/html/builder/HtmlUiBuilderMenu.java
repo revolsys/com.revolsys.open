@@ -37,6 +37,17 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   }
 
   @Override
+  public boolean isVisible() {
+    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
+      beanFactory, typeName);
+    if (htmlUiBuilder == null) {
+      return false;
+    } else {
+      return htmlUiBuilder.getPageUrl(pageName, getParameters()) != null;
+    }
+  }
+
+  @Override
   public String getLinkTitle(final JexlContext context) {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
       beanFactory, typeName);
