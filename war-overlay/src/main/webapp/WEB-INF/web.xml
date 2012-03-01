@@ -53,8 +53,7 @@
   </listener>
 
   <listener>
-    <listener-class>org.springframework.web.util.IntrospectorCleanupListener
-    </listener-class>
+    <listener-class>com.revolsys.ui.web.servlet.listener.ContextCleanupListener</listener-class>
   </listener>
 
   <listener>
