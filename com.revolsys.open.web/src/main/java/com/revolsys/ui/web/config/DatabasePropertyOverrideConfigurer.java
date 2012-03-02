@@ -147,8 +147,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
       }
 
     }
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Property '" + key + "' set to [" + value + "]");
+    if (getLog().isDebugEnabled()) {
+      getLog().debug("Property '" + key + "' set to [" + value + "]");
     }
   }
 
@@ -169,10 +169,10 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
         final String msg = "Could not process key [" + key
           + "] in PropertyOverrideConfigurer";
         if (this.ignoreInvalidKeys) {
-          if (getLogger().isDebugEnabled()) {
-            getLogger().debug(msg, ex);
+          if (getLog().isDebugEnabled()) {
+            getLog().debug(msg, ex);
           } else {
-            getLogger().warn(msg + ": " + ex.getMessage());
+            getLog().warn(msg + ": " + ex.getMessage());
           }
         } else {
           throw new BeanInitializationException(msg, ex);

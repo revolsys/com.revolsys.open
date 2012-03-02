@@ -18,10 +18,6 @@ import com.revolsys.io.Writer;
 
 public class JsonDataObjectIoFactory extends
   AbstractDataObjectAndGeometryWriterFactory {
-
-  /** The factory instance. */
-  public static final JsonDataObjectIoFactory INSTANCE = new JsonDataObjectIoFactory();
-
   public static final DataObject toDataObject(
     final DataObjectMetaData metaData,
     final String string) {

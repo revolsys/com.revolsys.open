@@ -36,7 +36,7 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
 
   protected static DataObjectWriterFactory getDataObjectWriterFactory(
     final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final DataObjectWriterFactory writerFactory = ioFactoryRegistry.getFactoryByResource(
       DataObjectWriterFactory.class, resource);
     return writerFactory;

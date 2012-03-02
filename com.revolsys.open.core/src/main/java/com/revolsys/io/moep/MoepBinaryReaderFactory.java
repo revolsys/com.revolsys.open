@@ -9,19 +9,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 
 public class MoepBinaryReaderFactory extends
   AbstractDataObjectAndGeometryReaderFactory {
-
-  /** The factory instance. */
-  public static final MoepBinaryReaderFactory INSTANCE = new MoepBinaryReaderFactory();
-
-  /**
-   * Get the factory instance.
-   * 
-   * @return The instance.
-   */
-  public static MoepBinaryReaderFactory get() {
-    return INSTANCE;
-  }
-
   public MoepBinaryReaderFactory() {
     super("MOEP (BC Ministry of Environment and Parks)", true);
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");

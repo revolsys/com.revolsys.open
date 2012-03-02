@@ -84,8 +84,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     dataSource = null;
     dataStore = null;
     metaData = null;
+    results = null;
     resultSet = null;
     statement = null;
+    
   }
 
   @Override

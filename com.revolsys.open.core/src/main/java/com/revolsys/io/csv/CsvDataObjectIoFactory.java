@@ -15,9 +15,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.Writer;
 
 public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory {
-  /** The factory instance. */
-  public static final CsvDataObjectIoFactory INSTANCE = new CsvDataObjectIoFactory();
-
   public CsvDataObjectIoFactory() {
     super(CsvConstants.DESCRIPTION, false, true, true);
     addMediaTypeAndFileExtension(CsvConstants.MEDIA_TYPE,

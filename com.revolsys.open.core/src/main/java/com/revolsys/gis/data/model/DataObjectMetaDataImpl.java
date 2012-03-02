@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
@@ -44,13 +45,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectMetaDataImpl implements DataObjectMetaData,
   Comparable<DataObjectMetaData>, Cloneable {
-  private final Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
+  private Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
 
-  private final Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
+  private Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
 
-  private final List<String> attributeNames = new ArrayList<String>();
+  private List<String> attributeNames = new ArrayList<String>();
 
-  private final List<Attribute> attributes = new ArrayList<Attribute>();
+  private List<Attribute> attributes = new ArrayList<Attribute>();
 
   private DataObjectFactory dataObjectFactory = new ArrayDataObjectFactory();
 
@@ -58,18 +59,18 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   private DataObjectStore dataObjectStore;
 
-  private final Map<String, Object> defaultValues = new HashMap<String, Object>();
+  private Map<String, Object> defaultValues = new HashMap<String, Object>();
 
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
 
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
-  private final int instanceId = INSTANCE_IDS.getAndIncrement();
+  private int instanceId = INSTANCE_IDS.getAndIncrement();
 
-  private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
+  private List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
-  private final List<String> geometryAttributeNames = new ArrayList<String>();
+  private List<String> geometryAttributeNames = new ArrayList<String>();
 
   /** The index of the ID attribute. */
   private int idAttributeIndex = -1;
@@ -78,15 +79,36 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   private QName name;
 
   /** The meta data properties of the data type. */
-  private final Map<String, Object> properties = new HashMap<String, Object>();
+  private Map<String, Object> properties = new HashMap<String, Object>();
 
-  private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
+  private Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
   protected DataObjectStoreSchema schema;
 
-  private final List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
+  private List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
 
   private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
+
+  @PreDestroy
+  public void destroy() {
+    METADATA_CACHE.remove(instanceId);
+    attributeIdMap = null;
+    attributeMap = null;
+    attributeNames = null;
+    attributes = null;
+    dataObjectFactory = null;
+    dataObjectMetaDataFactory = null;
+    dataObjectStore = null;
+    defaultValues = null;
+    geometryAttributeIndexes = null;
+    geometryAttributeNames = null;
+    name = null;
+    properties = null;
+    restrictions = null;
+    schema = null;
+    superClasses = null;
+
+  }
 
   public static DataObjectMetaData getMetaData(final int instanceId) {
     return METADATA_CACHE.get(instanceId);
@@ -566,5 +588,12 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   @Override
   public String toString() {
     return name.toString();
+  }
+
+  public static void destroy(
+    DataObjectMetaDataImpl... metaDataList) {
+    for (DataObjectMetaDataImpl metaData : metaDataList) {
+      metaData.destroy();
+    }
   }
 }

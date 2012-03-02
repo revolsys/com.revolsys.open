@@ -28,11 +28,11 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public MapHttpMessageConverter() {
     super(Map.class, Collections.singleton(MediaType.APPLICATION_JSON),
-      IoFactoryRegistry.INSTANCE.getMediaTypes(MapWriterFactory.class));
+      IoFactoryRegistry.getInstance().getMediaTypes(MapWriterFactory.class));
   }
 
   @Override

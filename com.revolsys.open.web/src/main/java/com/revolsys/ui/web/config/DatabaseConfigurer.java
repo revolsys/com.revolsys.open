@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
@@ -36,8 +37,8 @@ import com.revolsys.jdbc.JdbcUtils;
 
 public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   Ordered {
-  /** The logger for the instance. */
-  private final Logger logger = Logger.getLogger(getClass());
+  /** The LOG for the instance. */
+  private static final Logger LOG = Logger.getLogger(DatabaseConfigurer.class);
 
   /**
    * The order value of this object, higher value meaning greater in terms of
@@ -112,12 +113,12 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
   }
 
   /**
-   * Get the logger.
+   * Get the LOG.
    * 
-   * @return The logger.
+   * @return The LOG.
    */
-  protected Logger getLogger() {
-    return logger;
+  protected Logger getLog() {
+    return LOG;
   }
 
   /**
@@ -175,6 +176,14 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
     }
 
     processProperties(beanFactory, properties);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    dataSource = null;
+    keyColumnName = null;
+    tableName = null;
+    valueColumnName = null;
   }
 
   /**

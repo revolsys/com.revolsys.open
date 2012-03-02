@@ -16,10 +16,6 @@ import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory {
-
-  /** The factory instance. */
-  public static final EcsvIoFactory INSTANCE = new EcsvIoFactory();
-
   public static DataObjectMetaData readSchema(final Resource resource) {
     final EcsvDataObjectIterator iterator = new EcsvDataObjectIterator(resource);
     try {

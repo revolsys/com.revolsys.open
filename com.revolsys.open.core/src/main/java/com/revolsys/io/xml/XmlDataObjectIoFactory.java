@@ -11,10 +11,6 @@ import com.revolsys.io.Writer;
 
 public class XmlDataObjectIoFactory extends
   AbstractDataObjectAndGeometryWriterFactory {
-
-  /** The factory instance. */
-  public static final XmlDataObjectIoFactory INSTANCE = new XmlDataObjectIoFactory();
-
   public XmlDataObjectIoFactory() {
     super("XML", true, true);
     addMediaTypeAndFileExtension("text/xml", "xml");

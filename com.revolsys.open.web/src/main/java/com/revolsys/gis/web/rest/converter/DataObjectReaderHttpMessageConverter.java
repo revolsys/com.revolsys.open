@@ -47,12 +47,12 @@ public class DataObjectReaderHttpMessageConverter extends
 
   private GeometryFactory geometryFactory;
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public DataObjectReaderHttpMessageConverter() {
     super(DataObjectReader.class,
-      IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectReaderFactory.class),
-      IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
+      IoFactoryRegistry.getInstance().getMediaTypes(DataObjectReaderFactory.class),
+      IoFactoryRegistry.getInstance().getMediaTypes(DataObjectWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {

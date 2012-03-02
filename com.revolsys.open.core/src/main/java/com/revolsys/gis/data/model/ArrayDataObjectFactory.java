@@ -20,6 +20,8 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.lang.ref.WeakReference;
+
 /**
  * The ArrayDataObjectFactory is an implementation of {@link DataObjectFactory}
  * for creating {@link ArrayDataObject} instances.
@@ -29,7 +31,8 @@ package com.revolsys.gis.data.model;
  */
 public class ArrayDataObjectFactory implements DataObjectFactory {
 
-  private static final ArrayDataObjectFactory INSTANCE = new ArrayDataObjectFactory();
+  private static final WeakReference<ArrayDataObjectFactory> INSTANCE = new WeakReference<ArrayDataObjectFactory>(
+    new ArrayDataObjectFactory());
 
   /**
    * Get the instance of the factory.
@@ -37,7 +40,7 @@ public class ArrayDataObjectFactory implements DataObjectFactory {
    * @return The instance.
    */
   public static ArrayDataObjectFactory getInstance() {
-    return INSTANCE;
+    return INSTANCE.get();
   }
 
   /**

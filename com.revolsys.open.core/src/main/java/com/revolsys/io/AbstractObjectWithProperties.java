@@ -3,8 +3,15 @@ package com.revolsys.io;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
+
 public class AbstractObjectWithProperties implements ObjectWithProperties {
-  private final Map<String, Object> properties = new HashMap<String, Object>();
+  private Map<String, Object> properties = new HashMap<String, Object>();
+
+  @PreDestroy
+  public void close() {
+    properties = null;
+  }
 
   public Map<String, Object> getProperties() {
     return properties;

@@ -291,7 +291,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private PreparedStatement statement;
 
-  private final List<Attribute> attributes = new ArrayList<Attribute>();
+  private List<Attribute> attributes = new ArrayList<Attribute>();
 
   private Query query;
 
@@ -326,14 +326,16 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     if (dataSource != null) {
       JdbcUtils.close(connection);
     }
+    attributes = null;
     connection = null;
     dataObjectFactory = null;
     dataSource = null;
     dataStore = null;
     metaData = null;
+    queries = null;
+    query = null;
     resultSet = null;
     statement = null;
-    query = null;
   }
 
   @Override

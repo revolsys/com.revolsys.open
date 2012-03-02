@@ -1,6 +1,7 @@
 package com.revolsys.io;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -19,11 +20,23 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 public class IoFactoryRegistry {
-  public static final IoFactoryRegistry INSTANCE = new IoFactoryRegistry();
+  private static WeakReference<IoFactoryRegistry> instance = new WeakReference<IoFactoryRegistry>(new IoFactoryRegistry());
 
   private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
-  static {
 
+  public static IoFactoryRegistry getInstance() {
+    return instance.get();
+  }
+
+  private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();
+
+  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByFileExtension = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
+
+  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByMediaType = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
+
+  private final Set<IoFactory> factories = new HashSet<IoFactory>();
+
+  public IoFactoryRegistry() {
     final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
     try {
       final Enumeration<URL> urls = classLoader.getResources("META-INF/com.revolsys.io.IoFactory.properties");
@@ -38,7 +51,7 @@ public class IoFactoryRegistry {
             if (IoFactory.class.isAssignableFrom(factoryClass)) {
               @SuppressWarnings("unchecked")
               final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
-              INSTANCE.addFactory(factory);
+              addFactory(factory);
             } else {
               LOG.error(factoryClassName + " is not a subclass of "
                 + IoFactory.class);
@@ -53,14 +66,6 @@ public class IoFactoryRegistry {
         e);
     }
   }
-
-  private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();
-
-  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByFileExtension = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
-
-  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByMediaType = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
-
-  private final Set<IoFactory> factories = new HashSet<IoFactory>();
 
   public synchronized void addFactory(final IoFactory factory) {
     if (factories.add(factory)) {

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
@@ -34,6 +35,13 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   public DataObjectHtmlUiBuilder(final String typeName, final String title,
     final String pluralTitle) {
     super(typeName, title, pluralTitle);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    super.destroy();
+    dataStore = null;
+    tableName = null;
   }
 
   @Override
@@ -112,6 +120,17 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   public DataObject loadObject(final Object id) {
     final DataObject object = dataStore.load(tableName, id);
     return object;
+  }
+
+  public void deleteObject(final Object id) {
+    final DataObject object = loadObject(id);
+    if (object != null) {
+      Writer<DataObject> writer = dataStore.createWriter();
+      object.setState(DataObjectState.Deleted);
+     
+      writer.write(object);
+      writer.close();
+    }
   }
 
   public void setDataStore(final DataObjectStore dataStore) {

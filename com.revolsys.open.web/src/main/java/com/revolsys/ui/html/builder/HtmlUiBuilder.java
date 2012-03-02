@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -119,7 +120,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private Map<String, String> fieldInstructions = new HashMap<String, String>();
 
-  private final Map<String, Decorator> fieldLabels = new HashMap<String, Decorator>();
+  private Map<String, Decorator> fieldLabels = new HashMap<String, Decorator>();
 
   private Map<String, Element> fields = new HashMap<String, Element>();
 
@@ -134,7 +135,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private Map<String, String> labels = new HashMap<String, String>();
 
-  private final Logger log = Logger.getLogger(getClass());
+  private Logger log = Logger.getLogger(getClass());
 
   private int maxPageSize = 100;
 
@@ -156,7 +157,32 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private boolean usePathVariables = true;
 
-  private final Map<String, List<KeySerializer>> viewSerializers = new HashMap<String, List<KeySerializer>>();
+  private Map<String, List<KeySerializer>> viewSerializers = new HashMap<String, List<KeySerializer>>();
+
+  @PreDestroy
+  public void destroy() {
+    beanFactory = null;
+    builderFactory = null;
+    classSerializers = null;
+    fieldInstructions = null;
+    fieldLabels = null;
+    fields = null;
+    idParameterName = null;
+    idPropertyName = null;
+    keyLists = null;
+    keySerializers = null;
+    labels = null;
+    log = null;
+    messages = null;
+    nullLabels = null;
+    orderBy = null;
+    pagesByName = null;
+    pageUrls = null;
+    pluralTitle = null;
+    title = null;
+    typeName = null;
+    viewSerializers = null;
+  }
 
   public HtmlUiBuilder() {
     final Class<?> clazz = getClass();
@@ -1294,8 +1320,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Object object,
     final String key,
     final String pageName) {
-    final Object id = getIdValue(object);
     final Map<String, Object> parameters = new HashMap<String, Object>();
+     final Object id = getIdValue(object);
     parameters.put(idParameterName, id);
     final String url = getPageUrl(pageName, parameters);
     if (url == null) {

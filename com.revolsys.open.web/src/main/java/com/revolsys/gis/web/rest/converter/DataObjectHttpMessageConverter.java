@@ -29,8 +29,8 @@ public class DataObjectHttpMessageConverter extends
 
   public DataObjectHttpMessageConverter() {
     super(DataObject.class,
-      IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectReaderFactory.class),
-      IoFactoryRegistry.INSTANCE.getMediaTypes(DataObjectWriterFactory.class));
+      IoFactoryRegistry.getInstance().getMediaTypes(DataObjectReaderFactory.class),
+      IoFactoryRegistry.getInstance().getMediaTypes(DataObjectWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {

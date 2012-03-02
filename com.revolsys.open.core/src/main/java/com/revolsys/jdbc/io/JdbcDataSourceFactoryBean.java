@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -23,10 +24,23 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private DataSourceFactory dataSourceFactory;
 
+  @PreDestroy
   public void close() {
-    final DataSource dataSource = dataSourceReference.get();
-    if (dataSource != null) {
-      dataSourceFactory.closeDataSource(dataSource);
+    if (dataSourceReference != null) {
+      try {
+        final DataSource dataSource = dataSourceReference.get();
+        if (dataSource != null) {
+          dataSourceFactory.closeDataSource(dataSource);
+        }
+        dataSourceReference.clear();
+      } finally {
+        config = null;
+        dataSourceFactory = null;
+        dataSourceReference = null;
+        password = null;
+        url = null;
+        username = null;
+      }
     }
   }
 

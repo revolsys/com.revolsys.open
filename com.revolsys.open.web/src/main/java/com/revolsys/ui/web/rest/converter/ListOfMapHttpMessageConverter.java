@@ -24,11 +24,11 @@ public class ListOfMapHttpMessageConverter extends
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public ListOfMapHttpMessageConverter() {
     super(ArrayListOfMap.class, null,
-      IoFactoryRegistry.INSTANCE.getMediaTypes(MapWriterFactory.class));
+      IoFactoryRegistry.getInstance().getMediaTypes(MapWriterFactory.class));
   }
 
   @SuppressWarnings("unchecked")

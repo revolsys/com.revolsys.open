@@ -12,11 +12,9 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
 
   private static final long serialVersionUID = 948765434610427191L;
 
-  public static final DoubleCoordinatesListFactory INSTANCE = new DoubleCoordinatesListFactory();
-
   public static CoordinatesList create(final List<Coordinate> coordinates) {
-    final CoordinatesList coordinatesList = INSTANCE.create(coordinates.size(),
-      3);
+    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+      coordinates.size(), 3);
     for (int i = 0; i < coordinates.size(); i++) {
       final Coordinate coordinate = coordinates.get(i);
       coordinatesList.setCoordinate(i, coordinate);

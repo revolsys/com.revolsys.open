@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractJdbcDataObjectStore extends
   AbstractDataObjectStore implements JdbcDataObjectStore {
-  private final Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
+  private Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
 
   private int batchSize;
 
@@ -64,17 +64,17 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String hints;
 
-  private final Map<QName, String> sequenceTypeSqlMap = new HashMap<QName, String>();
+  private Map<QName, String> sequenceTypeSqlMap = new HashMap<QName, String>();
 
   private String sqlPrefix;
 
   private String sqlSuffix;
 
-  private final List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
+  private List<String> tableTypes = Arrays.asList("VIEW", "TABLE");
 
-  private final Map<String, String> schemaNameMap = new HashMap<String, String>();
+  private Map<String, String> schemaNameMap = new HashMap<String, String>();
 
-  private final Map<QName, String> tableNameMap = new HashMap<QName, String>();
+  private Map<QName, String> tableNameMap = new HashMap<QName, String>();
 
   private CoordinatesPrecisionModel precisionModel;
 
@@ -124,11 +124,31 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   @PreDestroy
   public synchronized void close() {
-    super.close();
-    final JdbcWriter writer = getSharedAttribute("writer");
-    if (writer != null) {
-      setSharedAttribute("writer", null);
-      writer.close();
+    try {
+      super.close();
+      final JdbcWriter writer = getSharedAttribute("writer");
+      if (writer != null) {
+        setSharedAttribute("writer", null);
+        writer.close();
+      }
+      if (connection != null) {
+        if (dataSource != null) {
+          JdbcUtils.close(connection);
+        }
+      }
+    } finally {
+      attributeAdders = null;
+      connection = null;
+      dataSource = null;
+      excludeTablePatterns = null;
+      hints = null;
+      precisionModel = null;
+      schemaNameMap = null;
+      sequenceTypeSqlMap = null;
+      sqlPrefix = null;
+      sqlSuffix = null;
+      tableNameMap = null;
+      tableTypes = null;
     }
   }
 

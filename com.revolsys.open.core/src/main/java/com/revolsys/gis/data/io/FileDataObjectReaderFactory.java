@@ -44,7 +44,7 @@ public class FileDataObjectReaderFactory implements
 
   protected static DataObjectReaderFactory getDataObjectReaderFactory(
     final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
       DataObjectReaderFactory.class, resource);
     return readerFactory;

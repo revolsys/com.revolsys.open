@@ -45,6 +45,9 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
         return;
       }
     }
+    final Object id = uiBuilder.getIdValue(object);
+    parameters.put(uiBuilder.getIdParameterName(), id);
+
     String actionUrl = uiBuilder.getPageUrl(getName(), parameters);
     if (actionUrl != null) {
       out.startTag(HtmlUtil.FORM);

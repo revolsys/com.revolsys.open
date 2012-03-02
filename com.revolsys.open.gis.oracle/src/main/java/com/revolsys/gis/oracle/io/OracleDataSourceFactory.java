@@ -11,7 +11,6 @@ import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
 
@@ -19,8 +18,6 @@ import com.revolsys.jdbc.io.DataSourceFactory;
 
 public class OracleDataSourceFactory implements DataSourceFactory {
   public static final List<String> URL_PATTERNS = Arrays.asList("jdbc:oracle:thin:(?:([^/]+)(?:/([^@]+))?)?@(?://)?([^:]+)(?::([^:]+))[:/](.+)");
-
-  private static final Logger LOG = LoggerFactory.getLogger(OracleDataSourceFactory.class);
 
   public DataSource createDataSource(Map<String, Object> config)
     throws SQLException {
@@ -38,7 +35,8 @@ public class OracleDataSourceFactory implements DataSourceFactory {
       try {
         dataSourceBean.setPropertyValue(name, value);
       } catch (Throwable e) {
-        LOG.error("Unable to set Oracle data source property " + name, e);
+        LoggerFactory.getLogger(OracleDataSourceFactory.class).error(
+          "Unable to set Oracle data source property " + name, e);
       }
     }
     dataSource.setURL(url);
@@ -54,7 +52,8 @@ public class OracleDataSourceFactory implements DataSourceFactory {
       try {
         oracleDataSource.close();
       } catch (SQLException e) {
-        LOG.warn("Unable to close data source", e);
+        LoggerFactory.getLogger(OracleDataSourceFactory.class).warn(
+          "Unable to close data source", e);
       }
     }
   }

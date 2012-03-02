@@ -6,18 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.xml.QNameComparator;
 
 public class DataObjectStoreSchema {
-  private final AbstractDataObjectStore dataObjectStore;
+  private AbstractDataObjectStore dataObjectStore;
 
-  private final Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(
+  private Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(
     new QNameComparator());
 
-  private final String name;
+  private String name;
 
   private Map<QName, Object> properties = new HashMap<QName, Object>();
 
@@ -104,5 +105,20 @@ public class DataObjectStoreSchema {
   @Override
   public String toString() {
     return name;
+  }
+
+  @PreDestroy
+  public void destroy() {
+    if (metaDataCache != null) {
+      for (DataObjectMetaData metaData : metaDataCache.values()) {
+        metaData.destroy();
+      }
+      metaDataCache.clear();
+    }
+    dataObjectStore = null;
+    metaDataCache = null;
+    name = null;
+    properties = null;
+
   }
 }

@@ -10,13 +10,17 @@ public class PrecisionModelUtil {
     } else if (coordinatesPrecisionModel instanceof SimpleCoordinatesPrecisionModel) {
       final SimpleCoordinatesPrecisionModel simpleModel = (SimpleCoordinatesPrecisionModel)coordinatesPrecisionModel;
       final double scaleXY = simpleModel.getScaleXY();
-      if (scaleXY <= 0) {
-        return new PrecisionModel();
-      } else {
-        return new PrecisionModel(scaleXY);
-      }
+      return getPrecisionModel(scaleXY);
     } else {
       return new PrecisionModel();
+    }
+  }
+
+  public static PrecisionModel getPrecisionModel(final double scaleXY) {
+    if (scaleXY <= 0) {
+      return new PrecisionModel();
+    } else {
+      return new PrecisionModel(scaleXY);
     }
   }
 }

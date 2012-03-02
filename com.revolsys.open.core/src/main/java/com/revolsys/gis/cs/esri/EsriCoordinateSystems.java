@@ -1,9 +1,8 @@
 package com.revolsys.gis.cs.esri;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.WeakHashMap;
 
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -13,11 +12,11 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 
 public class EsriCoordinateSystems {
 
-  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<CoordinateSystem, CoordinateSystem>();
+  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new WeakHashMap<CoordinateSystem, CoordinateSystem>();
 
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new WeakHashMap<Integer, CoordinateSystem>();
 
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new WeakHashMap<String, CoordinateSystem>();
 
   static {
     final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser.getGeographicCoordinateSystems(

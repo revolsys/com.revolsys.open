@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,11 +28,10 @@ public class JdbcFactory {
 
   private static Map<Pattern, DataSourceFactory> dataSourceFactoryUrlPatterns = new HashMap<Pattern, DataSourceFactory>();
 
-  public static final DataObjectFactory DEFAULT_DATA_OBJECT_FACTORY = new ArrayDataObjectFactory();
-
   static {
-    new ClassPathXmlApplicationContext(
+    ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext(
       "classpath*:META-INF/com.revolsys.gis.jdbc.sf.xml");
+    applicationContext.close();
   }
 
   public static JdbcDataObjectStore createDataObjectStore(
@@ -193,12 +193,18 @@ public class JdbcFactory {
     }
   }
 
+  public static void clearFactories() {
+    dataObjectStoreClassNames.clear();
+    dataSourceFactoriesByProductName.clear();
+    dataSourceFactoryUrlPatterns.clear();
+  }
+
   private DataObjectFactory dataObjectFactory;
 
   private DataSource dataSource;
 
   public JdbcFactory() {
-    this(DEFAULT_DATA_OBJECT_FACTORY);
+    this(ArrayDataObjectFactory.getInstance());
   }
 
   public JdbcFactory(final DataObjectFactory dataObjectFactory) {
@@ -212,7 +218,7 @@ public class JdbcFactory {
   }
 
   public JdbcFactory(final DataSource dataSource) {
-    this(DEFAULT_DATA_OBJECT_FACTORY);
+    this(ArrayDataObjectFactory.getInstance());
     setDataSource(dataSource);
   }
 
@@ -239,5 +245,11 @@ public class JdbcFactory {
 
   private void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
+  }
+
+  @PreDestroy
+  public void destroy() {
+    dataObjectFactory = null;
+    dataSource = null;
   }
 }

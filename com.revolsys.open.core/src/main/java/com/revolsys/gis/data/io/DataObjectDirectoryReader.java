@@ -32,7 +32,7 @@ public class DataObjectDirectoryReader extends
 
   @Override
   protected Reader<DataObject> createReader(final Resource resource) {
-    final IoFactoryRegistry registry = IoFactoryRegistry.INSTANCE;
+    final IoFactoryRegistry registry = IoFactoryRegistry.getInstance();
     final String filename = resource.getFilename();
     final String extension = FileUtil.getFileNameExtension(filename);
     final DataObjectReaderFactory factory = registry.getFactoryByFileExtension(

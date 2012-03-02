@@ -1,14 +1,15 @@
 package com.revolsys.gis.cs;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
@@ -40,7 +41,7 @@ public class GeometryFactory extends
   CoordinatesPrecisionModel {
   private static final long serialVersionUID = 4328651897279304108L;
 
-  private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
+  private static Map<String, GeometryFactory> factories = new WeakHashMap<String, GeometryFactory>();
 
   /**
    * get a 3d geometry factory with no coordinate system and a floating scale.
@@ -249,20 +250,15 @@ public class GeometryFactory extends
 
   private int numAxis = 2;
 
-  private final WktParser wktParser = new WktParser(this);
+  private WeakReference<WktParser> wktParserReference;
 
-  public GeometryFactory(final CoordinateSystem coordinateSystem,
-    final CoordinatesPrecisionModel coordinatesPrecisionModel) {
-    super(PrecisionModelUtil.getPrecisionModel(coordinatesPrecisionModel),
-      getId(coordinateSystem), new DoubleCoordinatesListFactory());
-    this.coordinateSystem = coordinateSystem;
-    this.coordinatesPrecisionModel = coordinatesPrecisionModel;
-  }
-
-  public GeometryFactory(final int crsId, final int numAxis,
+  private GeometryFactory(final int crsId, final int numAxis,
     final double scaleXY, final double scaleZ) {
-    this(EpsgCoordinateSystems.getCoordinateSystem(crsId),
-      new SimpleCoordinatesPrecisionModel(scaleXY, scaleZ));
+    super(PrecisionModelUtil.getPrecisionModel(scaleXY), crsId,
+      new DoubleCoordinatesListFactory());
+    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
+    this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
+      scaleXY, scaleZ);
     this.numAxis = numAxis;
   }
 
@@ -404,7 +400,18 @@ public class GeometryFactory extends
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T createGeometry(final String wkt) {
-    return (T)wktParser.parseGeometry(wkt);
+
+    WktParser parser;
+    if (wktParserReference == null) {
+      parser = new WktParser(this);
+      wktParserReference = new WeakReference<WktParser>(parser);
+    }
+    parser = wktParserReference.get();
+    if (parser == null) {
+      parser = new WktParser(this);
+      wktParserReference = new WeakReference<WktParser>(parser);
+    }
+    return (T)parser.parseGeometry(wkt);
   }
 
   public GeometryCollection createGeometryCollection(

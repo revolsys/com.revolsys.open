@@ -13,18 +13,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 
 public class GpxReaderFactory extends
   AbstractDataObjectAndGeometryReaderFactory {
-  /** The factory instance. */
-  public static final GpxReaderFactory INSTANCE = new GpxReaderFactory();
-
-  /**
-   * Get the factory instance.
-   * 
-   * @return The instance.
-   */
-  public static GpxReaderFactory get() {
-    return INSTANCE;
-  }
-
   public GpxReaderFactory() {
     super("GPS Exchange Format", false);
     addMediaTypeAndFileExtension(GpxConstants.MEDIA_TYPE,

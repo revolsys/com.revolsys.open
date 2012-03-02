@@ -71,7 +71,7 @@ public class EcsvDataObjectStore extends AbstractDataObjectStore {
 
   private final String password;
 
-  private final EcsvIoFactory ioFactory = EcsvIoFactory.INSTANCE;
+  private final EcsvIoFactory ioFactory = new EcsvIoFactory();
 
   private final URI uri;
 

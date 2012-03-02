@@ -15,7 +15,7 @@ import com.revolsys.io.IoFactoryRegistry;
 public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
   implements GeometryReaderFactory {
   public static GeometryReader geometryReader(final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final GeometryReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
       GeometryReaderFactory.class, resource);
     if (readerFactory == null) {

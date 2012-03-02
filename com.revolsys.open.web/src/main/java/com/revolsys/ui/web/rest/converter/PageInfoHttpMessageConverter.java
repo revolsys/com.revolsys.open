@@ -49,7 +49,7 @@ public class PageInfoHttpMessageConverter extends
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
 

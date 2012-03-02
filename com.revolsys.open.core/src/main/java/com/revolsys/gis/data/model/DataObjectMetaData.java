@@ -199,4 +199,6 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @param name The name.
    */
   void setName(QName name);
+
+  void destroy();
 }

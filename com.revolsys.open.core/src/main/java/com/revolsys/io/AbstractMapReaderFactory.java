@@ -7,7 +7,7 @@ import org.springframework.core.io.Resource;
 public abstract class AbstractMapReaderFactory extends AbstractIoFactory
   implements MapReaderFactory {
   public static MapReaderFactory getMapReaderFactory(final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.INSTANCE;
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final MapReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
       MapReaderFactory.class, resource);
     return readerFactory;
