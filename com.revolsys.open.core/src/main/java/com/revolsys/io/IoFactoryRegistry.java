@@ -20,12 +20,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 public class IoFactoryRegistry {
-  private static WeakReference<IoFactoryRegistry> instance = new WeakReference<IoFactoryRegistry>(new IoFactoryRegistry());
+  private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
   private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
 
   public static IoFactoryRegistry getInstance() {
-    return instance.get();
+    return instance;
   }
 
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();

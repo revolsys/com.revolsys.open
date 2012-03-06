@@ -31,16 +31,23 @@ import java.lang.ref.WeakReference;
  */
 public class ArrayDataObjectFactory implements DataObjectFactory {
 
-  private static final WeakReference<ArrayDataObjectFactory> INSTANCE = new WeakReference<ArrayDataObjectFactory>(
-    new ArrayDataObjectFactory());
+  private static WeakReference<ArrayDataObjectFactory> instance;
 
   /**
    * Get the instance of the factory.
    * 
    * @return The instance.
    */
-  public static ArrayDataObjectFactory getInstance() {
-    return INSTANCE.get();
+  public static synchronized ArrayDataObjectFactory getInstance() {
+    ArrayDataObjectFactory factory = null;
+    if (instance != null) {
+      factory = instance.get();
+    }
+    if (factory == null) {
+      factory = new ArrayDataObjectFactory();
+      instance = new WeakReference<ArrayDataObjectFactory>(factory);
+    }
+    return factory;
   }
 
   /**

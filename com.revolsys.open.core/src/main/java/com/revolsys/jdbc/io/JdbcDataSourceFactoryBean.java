@@ -1,6 +1,5 @@
 package com.revolsys.jdbc.io;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,23 +19,22 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private String password;
 
-  private WeakReference<DataSource> dataSourceReference;
+  private DataSource dataSource;
 
   private DataSourceFactory dataSourceFactory;
 
   @PreDestroy
   public void close() {
-    if (dataSourceReference != null) {
+    if (dataSource != null) {
       try {
-        final DataSource dataSource = dataSourceReference.get();
         if (dataSource != null) {
           dataSourceFactory.closeDataSource(dataSource);
         }
-        dataSourceReference.clear();
+        dataSource = null;
       } finally {
         config = null;
         dataSourceFactory = null;
-        dataSourceReference = null;
+        dataSource = null;
         password = null;
         url = null;
         username = null;
@@ -53,12 +51,11 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
     config.put("url", url);
     config.put("username", username);
     config.put("password", password);
-    if (dataSourceReference == null) {
+    if (dataSource == null) {
       dataSourceFactory = JdbcFactory.getDataSourceFactory(url);
-      final DataSource dataSource = dataSourceFactory.createDataSource(config);
-      dataSourceReference = new WeakReference<DataSource>(dataSource);
+      dataSource = dataSourceFactory.createDataSource(config);
     }
-    return dataSourceReference.get();
+    return dataSource;
   }
 
   public Class<?> getObjectType() {

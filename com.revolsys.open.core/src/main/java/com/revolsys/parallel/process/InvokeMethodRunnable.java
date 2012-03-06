@@ -52,7 +52,12 @@ public class InvokeMethodRunnable implements Runnable {
    */
   public void run() {
     try {
-      MethodUtils.invokeMethod(object, methodName, parameters);
+      if (object instanceof Class<?>) {
+        Class<?> clazz = (Class<?>)object;
+        MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
+      } else {
+        MethodUtils.invokeMethod(object, methodName, parameters);
+      }
     } catch (final Throwable e) {
       ExceptionUtil.throwUncheckedException(e);
     }

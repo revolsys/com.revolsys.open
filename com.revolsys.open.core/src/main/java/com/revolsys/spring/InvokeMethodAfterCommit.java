@@ -1,12 +1,11 @@
-package com.revolsys.orm.core.transaction;
+package com.revolsys.spring;
 
-import java.util.Arrays;
-
-import org.apache.commons.beanutils.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
   public static <V> void invoke(
@@ -24,27 +23,24 @@ public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
 
   private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodAfterCommit.class);
 
-  private final Object[] args;
-
-  private final String methodName;
-
-  private final Object object;
+  private final Runnable runnable;
 
   public InvokeMethodAfterCommit(final Object object, final String methodName,
     final Object... args) {
-    this.object = object;
-    this.methodName = methodName;
-    this.args = args;
+    runnable = new InvokeMethodRunnable(object, methodName, args);
+  }
 
+  public InvokeMethodAfterCommit(final Class<?> clazz, final String methodName,
+    final Object... args) {
+    runnable = new InvokeMethodRunnable(clazz, methodName, args);
   }
 
   @Override
   public void afterCommit() {
     try {
-      MethodUtils.invokeMethod(object, methodName, args);
+      runnable.run();
     } catch (final Throwable e) {
-      LOG.error("Error invoking " + object.getClass() + "." + methodName
-        + Arrays.toString(args));
+      LOG.error("Error invoking " + runnable, e);
     }
   }
 }

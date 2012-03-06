@@ -400,13 +400,10 @@ public class GeometryFactory extends
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T createGeometry(final String wkt) {
-
-    WktParser parser;
-    if (wktParserReference == null) {
-      parser = new WktParser(this);
-      wktParserReference = new WeakReference<WktParser>(parser);
+    WktParser parser = null;
+    if (wktParserReference != null) {
+      parser = wktParserReference.get();
     }
-    parser = wktParserReference.get();
     if (parser == null) {
       parser = new WktParser(this);
       wktParserReference = new WeakReference<WktParser>(parser);
@@ -531,7 +528,7 @@ public class GeometryFactory extends
 
   public Point createPoint(final double... coordinates) {
     final DoubleCoordinates coords = new DoubleCoordinates(numAxis, coordinates);
-    return createPoint(coordinates);
+    return createPoint(coords);
   }
 
   public Point createPoint(final Point point) {

@@ -12,7 +12,7 @@ import com.revolsys.io.IoConstants;
 public class JsonMapWriter extends AbstractMapWriter {
   public static String toString(final Map<String, ? extends Object> values) {
     final StringWriter writer = new StringWriter();
-    final JsonWriter jsonWriter = new JsonWriter(writer);
+    final JsonWriter jsonWriter = new JsonWriter(writer, false);
     jsonWriter.write(values);
     jsonWriter.close();
     return writer.toString();
@@ -27,8 +27,15 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   private boolean listRoot;
 
+  private boolean indent;
+
   public JsonMapWriter(final Writer out) {
+    this(out, true);
+  }
+
+  public JsonMapWriter(final Writer out, boolean indent) {
     this.out = new PrintWriter(out);
+    this.indent = indent;
   }
 
   /**
@@ -42,15 +49,16 @@ public class JsonMapWriter extends AbstractMapWriter {
       }
       try {
         if (!singleObject) {
+          newLine();
           if (listRoot) {
-            out.print("\n]");
+            out.print("]");
           } else {
-            out.print("\n]}\n");
-          }
+            out.print("]}");
+         }
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
-          out.print(");\n");
+          out.print(");");
         }
       } finally {
         FileUtil.closeSilent(out);
@@ -66,27 +74,36 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   public void write(final Map<String, ? extends Object> values) {
     if (written) {
-      out.print(",\n");
+      out.print(",");
+      newLine();
     } else {
       writeHeader();
     }
     JsonWriterUtil.write(out, values);
   }
 
+  private void newLine() {
+    if (indent) {
+      out.print('\n');
+    }
+  }
+
   private void writeHeader() {
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
-      this.out.print(callback);
-      this.out.print('(');
+      out.print(callback);
+      out.print('(');
     }
     listRoot = Boolean.TRUE.equals(getProperty(IoConstants.JSON_LIST_ROOT_PROPERTY));
     singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
 
     if (!singleObject) {
       if (listRoot) {
-        this.out.print("[\n");
+        out.print("[");
+        newLine();
       } else {
-        this.out.print("{\"items\": [\n");
+        out.print("{\"items\": [");
+        newLine();
       }
     }
     written = true;

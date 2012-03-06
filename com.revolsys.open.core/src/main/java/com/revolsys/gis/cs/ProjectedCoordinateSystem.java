@@ -1,6 +1,5 @@
 package com.revolsys.gis.cs;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,7 +26,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private boolean deprecated;
 
-  private final WeakReference<GeographicCoordinateSystem> geographicCoordinateSystem;
+  private final GeographicCoordinateSystem geographicCoordinateSystem;
 
   private final LinearUnit linearUnit;
 
@@ -49,7 +48,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     this.id = id;
     this.name = name;
     this.area = area;
-    this.geographicCoordinateSystem = new WeakReference<GeographicCoordinateSystem>(geographicCoordinateSystem);
+    this.geographicCoordinateSystem = geographicCoordinateSystem;
     this.projection = projection;
     setParameters(parameters);
     this.linearUnit = linearUnit;
@@ -68,7 +67,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     final Authority authority) {
     this.id = id;
     this.name = name;
-    this.geographicCoordinateSystem = new WeakReference<GeographicCoordinateSystem>(geographicCoordinateSystem);
+    this.geographicCoordinateSystem = geographicCoordinateSystem;
     this.projection = projection;
     setParameters(parameters);
     this.linearUnit = linearUnit;
@@ -121,7 +120,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   public BoundingBox getAreaBoundingBox() {
     BoundingBox boundingBox;
-    final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.get().getGeometryFactory();
+    final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.getGeometryFactory();
     if (area == null) {
       boundingBox = new BoundingBox(geographicGeometryFactory, -180, -90, 180,
         90);
@@ -151,7 +150,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public GeographicCoordinateSystem getGeographicCoordinateSystem() {
-    return geographicCoordinateSystem.get();
+    return geographicCoordinateSystem;
   }
 
   public GeometryFactory getGeometryFactory() {

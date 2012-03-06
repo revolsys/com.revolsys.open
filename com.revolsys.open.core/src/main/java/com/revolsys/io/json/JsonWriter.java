@@ -22,11 +22,16 @@ public final class JsonWriter {
   boolean startAttribute;
 
   public JsonWriter(final Writer out) {
+    this(out, true);
+  }
+
+  public JsonWriter(final Writer out, final boolean indent) {
     if (out instanceof PrintWriter) {
       this.out = (PrintWriter)out;
     } else {
       this.out = new PrintWriter(out);
     }
+    this.indent = indent;
   }
 
   public void charSequence(final CharSequence string) {
@@ -66,20 +71,27 @@ public final class JsonWriter {
   }
 
   public void endAttribute() {
-    out.print(",\n");
+    out.print(",");
+    newLine();
     startAttribute = false;
   }
 
   public void endList() {
     depth--;
-    out.print('\n');
+    newLine();
     indent();
     out.print("]");
   }
 
+  public void newLine() {
+    if (indent) {
+      out.print('\n');
+    }
+  }
+
   public void endObject() {
     depth--;
-    out.print('\n');
+    newLine();
     indent();
     out.print("}");
   }
@@ -137,7 +149,8 @@ public final class JsonWriter {
     if (!startAttribute) {
       indent();
     }
-    out.print("[\n");
+    out.print("[");
+    newLine();
     depth++;
     startAttribute = false;
   }
@@ -146,7 +159,8 @@ public final class JsonWriter {
     if (!startAttribute) {
       indent();
     }
-    out.print("{\n");
+    out.print("{");
+    newLine();
     depth++;
     startAttribute = false;
   }
@@ -177,24 +191,25 @@ public final class JsonWriter {
 
   public void write(final Map<String, ? extends Object> values) {
     startObject();
-
-    final Set<String> fields = values.keySet();
-    int i = 0;
-    final int size = fields.size();
-    final Iterator<String> iterator = fields.iterator();
-    while (i < size - 1) {
-      final String key = iterator.next();
-      final Object value = values.get(key);
-      label(key);
-      value(value);
-      endAttribute();
-      i++;
-    }
-    if (iterator.hasNext()) {
-      final String key = iterator.next();
-      final Object value = values.get(key);
-      label(key);
-      value(value);
+    if (values != null) {
+      final Set<String> fields = values.keySet();
+      int i = 0;
+      final int size = fields.size();
+      final Iterator<String> iterator = fields.iterator();
+      while (i < size - 1) {
+        final String key = iterator.next();
+        final Object value = values.get(key);
+        label(key);
+        value(value);
+        endAttribute();
+        i++;
+      }
+      if (iterator.hasNext()) {
+        final String key = iterator.next();
+        final Object value = values.get(key);
+        label(key);
+        value(value);
+      }
     }
     endObject();
   }
