@@ -15,11 +15,14 @@
  */
 package com.revolsys.orm.hibernate.dao;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.Map.Entry;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
+import org.hibernate.LobHelper;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -52,13 +56,13 @@ import com.revolsys.util.JavaBeanUtil;
 public class HibernateDaoHandler extends HibernateDaoSupport implements
   InvocationHandler {
   /** The class definition of the DataAcessObject interface. */
-  private Class<?> daoInterface;
+  private final Class<?> daoInterface;
 
   /** The class definition of the entities persisted by this Data Access Object. */
-  private Class<?> objectClass;
+  private final Class<?> objectClass;
 
   /** The class name of the entities persisted by this Data Access Object. */
-  private String objectClassName;
+  private final String objectClassName;
 
   public HibernateDaoHandler(final Class<?> daoInterface,
     final Class<?> objectClass) {
@@ -73,16 +77,42 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * the persistent storage and any changes to them will not be saved.
    */
   public void clearCache() {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.clear();
+  }
+
+  public Blob createBlob(final byte[] bytes) {
+    final Session session = getSession();
+    final LobHelper lobHelper = session.getLobHelper();
+    return lobHelper.createBlob(bytes);
+  }
+
+  public Blob createBlob(InputStream in, long length) {
+    final Session session = getSession();
+    final LobHelper lobHelper = session.getLobHelper();
+    return lobHelper.createBlob(in, length);
+  }
+
+  public Clob createClob(final String string) {
+    final Session session = getSession();
+    final LobHelper lobHelper = session.getLobHelper();
+    return lobHelper.createClob(string);
   }
 
   public Object createInstance() {
     try {
       return objectClass.newInstance();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       return ExceptionUtil.throwCauseException(e);
     }
+  }
+
+  public Object delete(
+    final Method method,
+    final String queryName,
+    final Object[] args) {
+    final Query query = getQuery(method, queryName, args);
+    return query.executeUpdate();
   }
 
   /**
@@ -93,7 +123,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @return null.
    */
   public Object evict(final Object object) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.evict(object);
     return null;
   }
@@ -103,9 +133,9 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final String queryName,
     final Object[] args) {
     try {
-      Query query = getQuery(method, queryName, args);
+      final Query query = getQuery(method, queryName, args);
       return query.list();
-    } catch (HibernateException e) {
+    } catch (final HibernateException e) {
       throw SessionFactoryUtils.convertHibernateAccessException(e);
     }
   }
@@ -116,10 +146,10 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final int limit,
     final Object[] args) {
     try {
-      Query query = getQuery(method, queryName, args);
+      final Query query = getQuery(method, queryName, args);
       query.setMaxResults(limit);
       return query.list();
-    } catch (HibernateException e) {
+    } catch (final HibernateException e) {
       throw SessionFactoryUtils.convertHibernateAccessException(e);
     }
   }
@@ -136,14 +166,14 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final String queryName,
     final Object[] args) {
     try {
-      Query query = getQuery(method, queryName, args);
-      Iterator resultIter = query.iterate();
+      final Query query = getQuery(method, queryName, args);
+      final Iterator resultIter = query.iterate();
       if (resultIter.hasNext()) {
         return resultIter.next();
       } else {
         return null;
       }
-    } catch (HibernateException e) {
+    } catch (final HibernateException e) {
       throw SessionFactoryUtils.convertHibernateAccessException(e);
     }
   }
@@ -158,14 +188,14 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     } else {
       arguments = args;
     }
-    String fullQueryName = getQueryName(queryName);
-    HibernateCallback<Query> callback = new HibernateNamedQueryCallback(
+    final String fullQueryName = getQueryName(queryName);
+    final HibernateCallback<Query> callback = new HibernateNamedQueryCallback(
       fullQueryName);
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    Query query = hibernateTemplate.execute(callback);
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final Query query = hibernateTemplate.execute(callback);
     for (int i = 0; i < arguments.length; i++) {
-      String name = getQueryParameterName(method, i);
-      Object value = arguments[i];
+      final String name = getQueryParameterName(method, i);
+      final Object value = arguments[i];
       if (name == null) {
         query.setParameter(i, value);
       } else {
@@ -184,16 +214,16 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
   }
 
   public String getQueryName(final String methodName) {
-    String queryName = methodName.replaceFirst(
+    final String queryName = methodName.replaceFirst(
       "\\A(get|page|findMax|find|iterate|delete|update)", "");
     return objectClassName + "." + queryName;
   }
 
   private String getQueryParameterName(final Method method, final int index) {
-    Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-    for (Annotation annotation : parameterAnnotations[index]) {
+    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+    for (final Annotation annotation : parameterAnnotations[index]) {
       if (annotation.annotationType().equals(NamedQueryParameter.class)) {
-        String parameterName = ((NamedQueryParameter)annotation).value();
+        final String parameterName = ((NamedQueryParameter)annotation).value();
         return parameterName;
       }
     }
@@ -204,7 +234,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final Object proxy,
     final Method method,
     final Object[] args) throws Throwable {
-    SessionFactory sessionFactory = getSessionFactory();
+    final SessionFactory sessionFactory = getSessionFactory();
     boolean participate = false;
 
     if (TransactionSynchronizationManager.hasResource(sessionFactory)) {
@@ -212,23 +242,24 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
       participate = true;
     } else {
       logger.debug("Creating Hibernate Session");
-      Session session = SessionFactoryUtils.getSession(sessionFactory, true);
+      final Session session = SessionFactoryUtils.getSession(sessionFactory,
+        true);
       session.setFlushMode(FlushMode.AUTO);
       TransactionSynchronizationManager.bindResource(sessionFactory,
         new SessionHolder(session));
     }
     try {
 
-      String methodName = method.getName();
+      final String methodName = method.getName();
       try {
-        Class<?>[] paramTypes = method.getParameterTypes();
-        Method localMethod = getClass().getMethod(methodName, paramTypes);
+        final Class<?>[] paramTypes = method.getParameterTypes();
+        final Method localMethod = getClass().getMethod(methodName, paramTypes);
         return localMethod.invoke(this, args);
-      } catch (InvocationTargetException e) {
+      } catch (final InvocationTargetException e) {
         throw e.getCause();
-      } catch (SecurityException e) {
+      } catch (final SecurityException e) {
         throw e;
-      } catch (NoSuchMethodException e) {
+      } catch (final NoSuchMethodException e) {
         if (methodName.equals("removeAll")) {
           return removeAll((Collection<Object>)args[0]);
         } else if (methodName.startsWith("remove")) {
@@ -238,9 +269,9 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
             return remove(args[0]);
           }
         } else if (methodName.startsWith("findMax")) {
-          Object[] newArgs = new Object[args.length - 1];
+          final Object[] newArgs = new Object[args.length - 1];
           System.arraycopy(args, 1, newArgs, 0, newArgs.length);
-          int limit = (Integer)args[0];
+          final int limit = (Integer)args[0];
           return findMax(method, methodName, limit, newArgs);
         } else if (methodName.startsWith("find")) {
           return find(method, methodName, args);
@@ -267,7 +298,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
 
     finally {
       if (!participate) {
-        SessionHolder sessionHolder = (SessionHolder)TransactionSynchronizationManager.unbindResource(sessionFactory);
+        final SessionHolder sessionHolder = (SessionHolder)TransactionSynchronizationManager.unbindResource(sessionFactory);
         logger.debug("Closing single Hibernate Session");
         SessionFactoryUtils.closeSession(sessionHolder.getSession());
       }
@@ -280,72 +311,33 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final String queryName,
     final Object[] args) {
     try {
-      Query query = getQuery(method, queryName, args);
+      final Query query = getQuery(method, queryName, args);
       return query.iterate();
-    } catch (HibernateException e) {
+    } catch (final HibernateException e) {
       throw SessionFactoryUtils.convertHibernateAccessException(e);
     }
   }
 
-  /**
-   * Load the object with the ID from persistent storage.
-   * 
-   * @param id The ID of the object to delete.
-   * @return The object.
-   */
-  public Object load(final Object id) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    Object object = hibernateTemplate.get(objectClass, (Serializable)id);
-    return object;
-  }
-
-  /**
-   * Load the object with the ID from persistent storage.
-   * 
-   * @param id The ID of the object to delete.
-   * @return The object.
-   */
-  public Object loadAndLock(final Object id) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    Object object = hibernateTemplate.get(objectClass, (Serializable)id,
-      LockMode.UPGRADE);
-    return object;
-  }
-
-  /**
-   * Create a lock on the object so that no other transactions can modifiy the
-   * object.
-   * 
-   * @param object The object to lock.
-   * @return null.
-   */
-  public Object lock(final Object object) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    hibernateTemplate.lock(object, LockMode.UPGRADE);
-    return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> List<V> list(
-    final String propertyName,
+  @SuppressWarnings("rawtypes")
+  public List list(
     final Map<String, Object> where,
     final Map<String, Boolean> orderBy) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    return (List<V>)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException {
-        Criteria criteria = session.createCriteria(objectClass);
-        criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    return hibernateTemplate.executeWithNativeSession(new HibernateCallback<List>() {
+      public List doInHibernate(final Session session)
+        throws HibernateException {
+        final Criteria criteria = session.createCriteria(objectClass);
         if (where != null) {
-          for (Entry<String, Object> criterion : where.entrySet()) {
-            String key = criterion.getKey();
-            Object value = criterion.getValue();
+          for (final Entry<String, Object> criterion : where.entrySet()) {
+            final String key = criterion.getKey();
+            final Object value = criterion.getValue();
             if (value == null) {
               criteria.add(Restrictions.isNull(key));
             } else if (value instanceof Collection) {
-              Collection<?> collection = (Collection<?>)value;
+              final Collection<?> collection = (Collection<?>)value;
               criteria.add(Restrictions.in(key, collection));
             } else if (value instanceof Object[]) {
-              Object[] array = (Object[])value;
+              final Object[] array = (Object[])value;
               criteria.add(Restrictions.in(key, array));
             } else if (value instanceof Enum) {
               criteria.add(Restrictions.eq(key, value.toString()));
@@ -359,9 +351,59 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
           }
         }
         if (orderBy != null) {
-          for (Entry<String, Boolean> entry : orderBy.entrySet()) {
-            String propertyName = entry.getKey();
-            Boolean ascending = entry.getValue();
+          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+            final String propertyName = entry.getKey();
+            final Boolean ascending = entry.getValue();
+            if (Boolean.TRUE.equals(ascending)) {
+              criteria.addOrder(Order.asc(propertyName));
+            } else {
+              criteria.addOrder(Order.desc(propertyName));
+            }
+          }
+        }
+        return criteria.list();
+      }
+    });
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> List<V> list(
+    final String propertyName,
+    final Map<String, Object> where,
+    final Map<String, Boolean> orderBy) {
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    return (List<V>)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
+      public Object doInHibernate(final Session session)
+        throws HibernateException {
+        final Criteria criteria = session.createCriteria(objectClass);
+        criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
+        if (where != null) {
+          for (final Entry<String, Object> criterion : where.entrySet()) {
+            final String key = criterion.getKey();
+            final Object value = criterion.getValue();
+            if (value == null) {
+              criteria.add(Restrictions.isNull(key));
+            } else if (value instanceof Collection) {
+              final Collection<?> collection = (Collection<?>)value;
+              criteria.add(Restrictions.in(key, collection));
+            } else if (value instanceof Object[]) {
+              final Object[] array = (Object[])value;
+              criteria.add(Restrictions.in(key, array));
+            } else if (value instanceof Enum) {
+              criteria.add(Restrictions.eq(key, value.toString()));
+            } else {
+              if (value.toString().indexOf("%") == -1) {
+                criteria.add(Restrictions.eq(key, value));
+              } else {
+                criteria.add(Restrictions.ilike(key, value));
+              }
+            }
+          }
+        }
+        if (orderBy != null) {
+          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+            final String propertyName = entry.getKey();
+            final Boolean ascending = entry.getValue();
             if (Boolean.TRUE.equals(ascending)) {
               criteria.addOrder(Order.asc(propertyName));
             } else {
@@ -380,23 +422,24 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final Map<String, Object> where,
     final Map<String, Boolean> orderBy,
     final int limit) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     return (List<V>)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException {
-        Criteria criteria = session.createCriteria(objectClass);
+      public Object doInHibernate(final Session session)
+        throws HibernateException {
+        final Criteria criteria = session.createCriteria(objectClass);
         criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
         criteria.setMaxResults(limit);
         if (where != null) {
-          for (Entry<String, Object> criterion : where.entrySet()) {
-            String key = criterion.getKey();
-            Object value = criterion.getValue();
+          for (final Entry<String, Object> criterion : where.entrySet()) {
+            final String key = criterion.getKey();
+            final Object value = criterion.getValue();
             if (value == null) {
               criteria.add(Restrictions.isNull(key));
             } else if (value instanceof Collection) {
-              Collection<?> collection = (Collection<?>)value;
+              final Collection<?> collection = (Collection<?>)value;
               criteria.add(Restrictions.in(key, collection));
             } else if (value instanceof Object[]) {
-              Object[] array = (Object[])value;
+              final Object[] array = (Object[])value;
               criteria.add(Restrictions.in(key, array));
             } else if (value instanceof Enum) {
               criteria.add(Restrictions.eq(key, value.toString()));
@@ -410,9 +453,9 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
           }
         }
         if (orderBy != null) {
-          for (Entry<String, Boolean> entry : orderBy.entrySet()) {
-            String propertyName = entry.getKey();
-            Boolean ascending = entry.getValue();
+          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+            final String propertyName = entry.getKey();
+            final Boolean ascending = entry.getValue();
             if (Boolean.TRUE.equals(ascending)) {
               criteria.addOrder(Order.asc(propertyName));
             } else {
@@ -425,24 +468,63 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     });
   }
 
+  /**
+   * Load the object with the ID from persistent storage.
+   * 
+   * @param id The ID of the object to delete.
+   * @return The object.
+   */
+  public Object load(final Object id) {
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final Object object = hibernateTemplate.get(objectClass, (Serializable)id);
+    return object;
+  }
+
+  /**
+   * Load the object with the ID from persistent storage.
+   * 
+   * @param id The ID of the object to delete.
+   * @return The object.
+   */
+  public Object loadAndLock(final Object id) {
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final Object object = hibernateTemplate.get(objectClass, (Serializable)id,
+      LockMode.UPGRADE);
+    return object;
+  }
+
+  /**
+   * Create a lock on the object so that no other transactions can modifiy the
+   * object.
+   * 
+   * @param object The object to lock.
+   * @return null.
+   */
+  public Object lock(final Object object) {
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    hibernateTemplate.lock(object, LockMode.UPGRADE);
+    return null;
+  }
+
   public ResultPager page(
     final Map<String, Object> where,
     final Map<String, Boolean> orderBy) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     return (ResultPager)hibernateTemplate.executeWithNativeSession(new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException {
-        Criteria criteria = session.createCriteria(objectClass);
+      public Object doInHibernate(final Session session)
+        throws HibernateException {
+        final Criteria criteria = session.createCriteria(objectClass);
         if (where != null) {
-          for (Entry<String, Object> criterion : where.entrySet()) {
-            String key = criterion.getKey();
-            Object value = criterion.getValue();
+          for (final Entry<String, Object> criterion : where.entrySet()) {
+            final String key = criterion.getKey();
+            final Object value = criterion.getValue();
             if (value == null) {
               criteria.add(Restrictions.isNull(key));
             } else if (value instanceof Collection) {
-              Collection<?> collection = (Collection<?>)value;
+              final Collection<?> collection = (Collection<?>)value;
               criteria.add(Restrictions.in(key, collection));
             } else if (value instanceof Object[]) {
-              Object[] array = (Object[])value;
+              final Object[] array = (Object[])value;
               criteria.add(Restrictions.in(key, array));
             } else if (value instanceof Enum) {
               criteria.add(Restrictions.eq(key, value.toString()));
@@ -456,9 +538,9 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
           }
         }
         if (orderBy != null) {
-          for (Entry<String, Boolean> entry : orderBy.entrySet()) {
-            String propertyName = entry.getKey();
-            Boolean ascending = entry.getValue();
+          for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+            final String propertyName = entry.getKey();
+            final Boolean ascending = entry.getValue();
             if (Boolean.TRUE.equals(ascending)) {
               criteria.addOrder(Order.asc(propertyName));
             } else {
@@ -471,58 +553,11 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     });
   }
 
-  @SuppressWarnings("rawtypes")
-  public List list(
-    final Map<String, Object> where,
-    final Map<String, Boolean> orderBy) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
-    return hibernateTemplate.executeWithNativeSession(new HibernateCallback<List>() {
-      public List doInHibernate(Session session) throws HibernateException {
-        Criteria criteria = session.createCriteria(objectClass);
-        if (where != null) {
-          for (Entry<String, Object> criterion : where.entrySet()) {
-            String key = criterion.getKey();
-            Object value = criterion.getValue();
-            if (value == null) {
-              criteria.add(Restrictions.isNull(key));
-            } else if (value instanceof Collection) {
-              Collection<?> collection = (Collection<?>)value;
-              criteria.add(Restrictions.in(key, collection));
-            } else if (value instanceof Object[]) {
-              Object[] array = (Object[])value;
-              criteria.add(Restrictions.in(key, array));
-            } else if (value instanceof Enum) {
-              criteria.add(Restrictions.eq(key, value.toString()));
-            } else {
-              if (value.toString().indexOf("%") == -1) {
-                criteria.add(Restrictions.eq(key, value));
-              } else {
-                criteria.add(Restrictions.ilike(key, value));
-              }
-            }
-          }
-        }
-        if (orderBy != null) {
-          for (Entry<String, Boolean> entry : orderBy.entrySet()) {
-            String propertyName = entry.getKey();
-            Boolean ascending = entry.getValue();
-            if (Boolean.TRUE.equals(ascending)) {
-              criteria.addOrder(Order.asc(propertyName));
-            } else {
-              criteria.addOrder(Order.desc(propertyName));
-            }
-          }
-        }
-        return criteria.list();
-      }
-    });
-  }
-
   public ResultPager page(
     final Method method,
     final String queryName,
     final Object[] args) {
-    Query query = getQuery(method, queryName, args);
+    final Query query = getQuery(method, queryName, args);
     return new HibernateQueryPager(query);
 
   }
@@ -535,7 +570,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @return The ID of the object in the persistent storage.
    */
   public Long persist(final Object object) {
-    Long id = (Long)getHibernateTemplate().save(object);
+    final Long id = (Long)getHibernateTemplate().save(object);
     return id;
   }
 
@@ -546,7 +581,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @return null.
    */
   public Object refresh(final Object object) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.refresh(object);
     return null;
   }
@@ -558,7 +593,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @return null.
    */
   public Object remove(final Long id) {
-    Object object = load(id);
+    final Object object = load(id);
     return remove(object);
   }
 
@@ -569,7 +604,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @return null.
    */
   public Object remove(final Object object) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.delete(object);
     return null;
   }
@@ -581,7 +616,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
    * @return null.
    */
   public Object removeAll(final Collection objects) {
-    HibernateTemplate hibernateTemplate = getHibernateTemplate();
+    final HibernateTemplate hibernateTemplate = getHibernateTemplate();
     hibernateTemplate.deleteAll(objects);
     return null;
   }
@@ -600,16 +635,8 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     final Method method,
     final String queryName,
     final Object[] args) {
-    Query query = getQuery(method, queryName, args);
-    return (Integer)query.executeUpdate();
-  }
-
-  public Object delete(
-    final Method method,
-    final String queryName,
-    final Object[] args) {
-    Query query = getQuery(method, queryName, args);
-    return (Integer)query.executeUpdate();
+    final Query query = getQuery(method, queryName, args);
+    return query.executeUpdate();
   }
 
   /**

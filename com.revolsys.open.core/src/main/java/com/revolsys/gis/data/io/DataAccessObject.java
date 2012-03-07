@@ -1,5 +1,8 @@
 package com.revolsys.gis.data.io;
 
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +11,12 @@ import com.revolsys.collection.ResultPager;
 
 public interface DataAccessObject<T> {
   void clearCache();
+
+  Blob createBlob(byte[] bytes);
+
+  Blob createBlob(InputStream stream, long length);
+
+  Clob createClob(String string);
 
   T createInstance();
 
