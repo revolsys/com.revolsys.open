@@ -173,42 +173,47 @@ public class NamedChannelBundle<T> {
   public T read(final long timeout, final Collection<String> names) {
     synchronized (readMonitor) {
       synchronized (monitor) {
-        if (isClosed()) {
-          throw new ClosedException();
-        }
-        Queue<T> queue = getNextValueQueue(names);
-        if (timeout >= 0) {
-          while (queue == null) {
-            try {
-              if (timeout == 0) {
-                monitor.wait();
-                if (isClosed()) {
-                  throw new ClosedException();
-                }
-              } else {
-                long time = System.currentTimeMillis();
-                monitor.wait(timeout);
-                if (isClosed()) {
-                  throw new ClosedException();
-                }
-                if (time + timeout < System.currentTimeMillis()) {
-                  return null;
-                }
-              }
-            } catch (final InterruptedException e) {
-              close();
-              monitor.notifyAll();
-              throw new ClosedException();
-            }
-            queue = getNextValueQueue(names);
+        try {
+          long maxTime = 0;
+          if (timeout > 0) {
+            maxTime = System.currentTimeMillis() + timeout;
           }
-        }
-        if (queue == null) {
-          return null;
-        } else {
-          final T value = queue.remove();
+          if (isClosed()) {
+            throw new ClosedException();
+          }
+          Queue<T> queue = getNextValueQueue(names);
+          if (timeout == 0) {
+            while (queue == null) {
+              monitor.wait();
+              if (isClosed()) {
+                throw new ClosedException();
+              }
+
+              queue = getNextValueQueue(names);
+            }
+          } else if (timeout > 0) {
+            long waitTime = maxTime - System.currentTimeMillis();
+            while (queue == null && waitTime > 0) {
+              monitor.wait(waitTime);
+              if (isClosed()) {
+                throw new ClosedException();
+              }
+
+              queue = getNextValueQueue(names);
+              waitTime = maxTime - System.currentTimeMillis();
+            }
+          }
+          if (queue == null) {
+            return null;
+          } else {
+            final T value = queue.remove();
+            monitor.notifyAll();
+            return value;
+          }
+        } catch (final InterruptedException e) {
+          close();
           monitor.notifyAll();
-          return value;
+          throw new ClosedException();
         }
       }
     }
