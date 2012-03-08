@@ -142,7 +142,7 @@ public class NamedChannelBundle<T> {
    * @return The object returned from the Channel.
    */
   public T read() {
-    return read(0, Collections.<String>emptyList());
+    return read(0, Collections.<String> emptyList());
   }
 
   public T read(final Collection<String> names) {
@@ -167,7 +167,7 @@ public class NamedChannelBundle<T> {
    * @return The object returned from the Channel.
    */
   public T read(final long timeout) {
-    return read(timeout, Collections.<String>emptyList());
+    return read(timeout, Collections.<String> emptyList());
   }
 
   public T read(final long timeout, final Collection<String> names) {
@@ -180,9 +180,20 @@ public class NamedChannelBundle<T> {
         if (timeout >= 0) {
           while (queue == null) {
             try {
-              monitor.wait(timeout);
-              if (isClosed()) {
-                throw new ClosedException();
+              if (timeout == 0) {
+                monitor.wait();
+                if (isClosed()) {
+                  throw new ClosedException();
+                }
+              } else {
+                long time = System.currentTimeMillis();
+                monitor.wait(timeout);
+                if (isClosed()) {
+                  throw new ClosedException();
+                }
+                if (time + timeout < System.currentTimeMillis()) {
+                  return null;
+                }
               }
             } catch (final InterruptedException e) {
               close();
