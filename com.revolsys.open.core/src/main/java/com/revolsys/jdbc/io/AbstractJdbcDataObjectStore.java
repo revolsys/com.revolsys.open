@@ -78,12 +78,28 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private CoordinatesPrecisionModel precisionModel;
 
+  private JdbcDatabaseFactory databaseFactory;
+
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
 
   public AbstractJdbcDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
+  }
+
+  public AbstractJdbcDataObjectStore(JdbcDatabaseFactory databaseFactory) {
+    this(databaseFactory, new ArrayDataObjectFactory());
+  }
+
+  public AbstractJdbcDataObjectStore(JdbcDatabaseFactory databaseFactory,
+    DataObjectFactory dataObjectFactory) {
+    super(dataObjectFactory);
+    this.databaseFactory = databaseFactory;
+  }
+
+  public AbstractJdbcDataObjectStore(DataSource dataSource) {
+    setDataSource(dataSource);
   }
 
   protected void addAttribute(
@@ -135,6 +151,9 @@ public abstract class AbstractJdbcDataObjectStore extends
         if (dataSource != null) {
           JdbcUtils.close(connection);
         }
+      }
+      if (databaseFactory != null && dataSource != null) {
+        databaseFactory.closeDataSource(dataSource);
       }
     } finally {
       attributeAdders = null;

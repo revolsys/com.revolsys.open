@@ -11,6 +11,9 @@ import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
+import com.ctc.wstx.util.StringUtil;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -130,7 +133,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
     if (metaData == null) {
       return "";
     } else {
-      return metaData.getIdAttributeName();
+      String idAttributeName = metaData.getIdAttributeName();
+      if (StringUtils.hasText(idAttributeName)) {
+        return idAttributeName;
+      } else {
+        return metaData.getAttributeName(0);
+      }
     }
   }
 

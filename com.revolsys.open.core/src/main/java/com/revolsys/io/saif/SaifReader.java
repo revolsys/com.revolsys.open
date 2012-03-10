@@ -41,6 +41,7 @@ import java.util.zip.ZipFile;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
 
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
@@ -371,8 +372,8 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private void loadExportedObjects() throws IOException {
     final boolean setNames = includeTypeNames.isEmpty();
     final OsnReader reader = getOsnReader(
-      new SaifSchemaReader().loadSchema("com/revolsys/io/saif/saifzip.csn"),
-      factory, new QName("exports.dir"));
+      new SaifSchemaReader().loadSchema(new ClassPathResource(
+        "com/revolsys/io/saif/saifzip.csn")), factory, new QName("exports.dir"));
     try {
       final Map<String, QName> names = new TreeMap<String, QName>();
       if (reader.hasNext()) {

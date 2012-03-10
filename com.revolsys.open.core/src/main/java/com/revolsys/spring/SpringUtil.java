@@ -175,29 +175,4 @@ public class SpringUtil {
     return new OutputStreamWriter(stream);
   }
 
-  public static boolean setBeanProperty(
-    final ConfigurableListableBeanFactory factory,
-    final String key,
-    final Object value) {
-    final int index = key.indexOf('.');
-    if (index == -1) {
-      return false;
-    } else {
-      final String beanName = key.substring(0, index);
-      final String propertyName = key.substring(index + 1);
-      if (factory.containsBean(beanName)) {
-        final BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
-        if (beanDefinition.isPrototype()) {
-          AttributesBeanConfigurer.setAttributeValue(factory, beanName,
-            propertyName, value);
-        } else {
-          final Object bean = factory.getBean(beanName);
-          JavaBeanUtil.setProperty(bean, propertyName, value);
-        }
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
 }

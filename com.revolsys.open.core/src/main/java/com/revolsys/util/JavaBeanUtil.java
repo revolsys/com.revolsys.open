@@ -20,6 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -37,6 +39,23 @@ import com.revolsys.gis.data.model.DataObject;
  */
 public final class JavaBeanUtil {
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
+
+  public static boolean isDefinedInClassLoader(
+    final ClassLoader classLoader,
+    final URL resourceUrl) {
+    if (classLoader instanceof URLClassLoader) {
+      String resourceUrlString = resourceUrl.toString();
+      final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;
+      for (final URL url : urlClassLoader.getURLs()) {
+        if (resourceUrlString.contains(url.toString())) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   public static Method getMethod(
     final Class<?> clazz,

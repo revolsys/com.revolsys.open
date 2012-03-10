@@ -73,6 +73,23 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Specification-Title>${project.name}</Specification-Title>
+              <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+              <Specification-Version>${project.version}</Specification-Version>
+              <Implementation-Title>${project.name}</Implementation-Title>
+              <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+              <Implementation-Version>${project.version}</Implementation-Version>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <goals>deploy</goals>

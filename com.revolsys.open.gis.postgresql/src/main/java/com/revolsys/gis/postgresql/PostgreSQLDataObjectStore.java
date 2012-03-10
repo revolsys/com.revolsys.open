@@ -1,6 +1,7 @@
 package com.revolsys.gis.postgresql;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -34,6 +35,18 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
+  }
+
+  public PostgreSQLDataObjectStore(PostgreSQLDatabaseFactory databaseFactory,
+    Map<String, Object> connectionProperties) {
+    super(databaseFactory);
+    DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    setDataSource(dataSource);
+
+  }
+
+  public PostgreSQLDataObjectStore(DataSource dataSource) {
+    super(dataSource);
   }
 
   @Override

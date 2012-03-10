@@ -10,8 +10,6 @@ import javax.servlet.ServletContextListener;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.DisposableBean;
 
-import com.revolsys.jdbc.io.JdbcFactory;
-
 public class ContextCleanupListener implements ServletContextListener {
 
   public void contextInitialized(ServletContextEvent event) {
@@ -20,10 +18,10 @@ public class ContextCleanupListener implements ServletContextListener {
   }
 
   public void contextDestroyed(ServletContextEvent event) {
-    JdbcFactory.clearFactories();
+    ClassLoader contextClassLoader = Thread.currentThread()
+      .getContextClassLoader();
     cleanupAttributes(event.getServletContext());
-    CachedIntrospectionResults.clearClassLoader(Thread.currentThread()
-      .getContextClassLoader());
+    CachedIntrospectionResults.clearClassLoader(contextClassLoader);
     CachedIntrospectionResults.clearClassLoader(CachedIntrospectionResults.class.getClassLoader());
     CachedIntrospectionResults.clearClassLoader(ClassLoader.getSystemClassLoader());
     Introspector.flushCaches();

@@ -37,6 +37,8 @@ import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.core.io.Resource;
+
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -312,13 +314,10 @@ public class SaifSchemaReader {
     return loadSchema(iterator);
   }
 
-  public DataObjectMetaDataFactory loadSchema(final String resource)
+  public DataObjectMetaDataFactory loadSchema(final Resource resource)
     throws IOException {
-    final InputStream in = getClass().getResourceAsStream("/" + resource);
-    if (in == null) {
-      throw new FileNotFoundException(resource);
-    }
-    return loadSchema(new CsnIterator(resource, in));
+    return loadSchema(new CsnIterator(resource.getFilename(),
+      resource.getInputStream()));
 
   }
 
@@ -328,14 +327,11 @@ public class SaifSchemaReader {
     return loadSchema(new CsnIterator(fileName, in));
   }
 
-  public DataObjectMetaDataFactory loadSchemas(final List<String> fileNames)
+  public DataObjectMetaDataFactory loadSchemas(final List<Resource> resources)
     throws IOException {
-    for (final String fileName : fileNames) {
-      final File file = new File(fileName);
-      if (file.exists()) {
-        loadSchema(file);
-      } else {
-        loadSchema(fileName);
+    for (final Resource resource : resources) {
+      if (resource.exists()) {
+        loadSchema(resource);
       }
     }
     return schema;

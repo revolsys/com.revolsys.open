@@ -141,7 +141,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
       }
       beanFactory.addPropertyEditorRegistrar(resourceEditorRegistrar);
       final AttributesBeanConfigurer attributesConfig = new AttributesBeanConfigurer(
-        parameters);
+        applicationContext, parameters);
       applicationContext.addBeanFactoryPostProcessor(attributesConfig);
       for (final String beanName : importBeanNames) {
         registerTargetBeanDefinition(applicationContext, parentBeanFactory,

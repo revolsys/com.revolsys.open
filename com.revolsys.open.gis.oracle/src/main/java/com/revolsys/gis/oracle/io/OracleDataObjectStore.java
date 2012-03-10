@@ -2,6 +2,7 @@ package com.revolsys.gis.oracle.io;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -44,6 +45,17 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
+  }
+
+  public OracleDataObjectStore(OracleDatabaseFactory databaseFactory,
+    Map<String, Object> connectionProperties) {
+    super(databaseFactory);
+    DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    setDataSource(dataSource);
+  }
+
+  public OracleDataObjectStore(DataSource dataSource) {
+    super(dataSource);
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {

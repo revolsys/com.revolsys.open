@@ -1,0 +1,5 @@
+[
+  {
+    "jdbcFactoryClassName" : "com.revolsys.gis.postgresql.PostgreSQLDatabaseFactory"
+  }
+]

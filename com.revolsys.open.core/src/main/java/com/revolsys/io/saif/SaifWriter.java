@@ -40,6 +40,7 @@ import java.util.TreeMap;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -90,7 +91,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   private final Map<QName, String> objectSetNames = new HashMap<QName, String>();
 
-  private List<String> schemaFileNames;
+  private List<Resource> schemaFileNames;
 
   private String schemaResource;
 
@@ -446,18 +447,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           final OutputStream out = new FileOutputStream(new File(tempDirectory,
             "clasdefs.csn"));
           try {
-            for (final String fileName : schemaFileNames) {
-              final File file = new File(fileName);
-              InputStream in;
-              if (file.exists()) {
-                in = new FileInputStream(file);
-              } else {
-                in = getClass().getResourceAsStream("/" + fileName);
-                if (in == null) {
-                  throw new IllegalArgumentException("Schema file '"
-                    + file.getPath() + "' could not be found");
-                }
-              }
+            for (final Resource resource : schemaFileNames) {
+              InputStream in = resource.getInputStream();
               final SaifSchemaReader reader = new SaifSchemaReader();
               setDataObjectMetaDataFactory(reader.loadSchemas(schemaFileNames));
               try {
@@ -575,7 +566,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public void setSchemaFileNames(final List<String> schemaFileNames) {
+  public void setSchemaFileNames(final List<Resource> schemaFileNames) {
     this.schemaFileNames = schemaFileNames;
 
   }

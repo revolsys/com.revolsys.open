@@ -12,7 +12,9 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.util.StringUtils;
 
+import com.ctc.wstx.util.StringUtil;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.jdbc.JdbcUtils;
@@ -114,7 +116,10 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       this.tableName = JdbcUtils.getTableName(metaData.getName());
 
       final List<String> valueAttributeNames = getValueAttributeNames();
-      final String idColumn = metaData.getIdAttributeName();
+      String idColumn = metaData.getIdAttributeName();
+      if (!StringUtils.hasText(idColumn)) {
+        idColumn = metaData.getAttributeName(0);
+      }
       this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
       for (int i = 0; i < valueAttributeNames.size(); i++) {
         final String columnName = valueAttributeNames.get(i);

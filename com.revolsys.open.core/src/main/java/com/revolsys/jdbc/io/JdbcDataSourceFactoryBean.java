@@ -6,10 +6,14 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
+public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource>,
+  ApplicationContextAware {
 
   private Map<String, Object> config = new HashMap<String, Object>();
 
@@ -21,19 +25,26 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private DataSource dataSource;
 
-  private DataSourceFactory dataSourceFactory;
+  private JdbcDatabaseFactory databaseFactory;
+
+  private ApplicationContext applicationContext;
+
+  public void setApplicationContext(ApplicationContext applicationContext)
+    throws BeansException {
+    this.applicationContext = applicationContext;
+  }
 
   @PreDestroy
   public void close() {
     if (dataSource != null) {
       try {
         if (dataSource != null) {
-          dataSourceFactory.closeDataSource(dataSource);
+          databaseFactory.closeDataSource(dataSource);
         }
         dataSource = null;
       } finally {
         config = null;
-        dataSourceFactory = null;
+        databaseFactory = null;
         dataSource = null;
         password = null;
         url = null;
@@ -52,8 +63,9 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource> {
     config.put("username", username);
     config.put("password", password);
     if (dataSource == null) {
-      dataSourceFactory = JdbcFactory.getDataSourceFactory(url);
-      dataSource = dataSourceFactory.createDataSource(config);
+      final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
+      databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
+      dataSource = databaseFactory.createDataSource(config);
     }
     return dataSource;
   }

@@ -96,4 +96,7 @@ public class JndiObjectFactory implements BeanFactoryAware, FactoryBean {
     this.jndiUrl = jndiUrl;
   }
 
+  public void setSavedObject(Object savedObject) {
+    this.savedObject = savedObject;
+  }
 }

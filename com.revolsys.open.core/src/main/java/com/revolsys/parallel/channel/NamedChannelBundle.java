@@ -63,11 +63,10 @@ public class NamedChannelBundle<T> {
     return name;
   }
 
-  public void clear(String name) {
+  public Collection<T> remove(String name) {
     synchronized (monitor) {
       sequenceQueueByName.remove(name);
-      valueQueueByName.remove(name);
-      monitor.notifyAll();
+      return valueQueueByName.remove(name);
     }
   }
 

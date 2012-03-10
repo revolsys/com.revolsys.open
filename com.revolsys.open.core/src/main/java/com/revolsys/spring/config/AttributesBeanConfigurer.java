@@ -12,8 +12,6 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -24,6 +22,8 @@ import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
@@ -37,7 +37,7 @@ import com.revolsys.spring.factory.Parameter;
 import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
 
 public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
-  BeanFactoryAware, BeanNameAware, PriorityOrdered {
+  ApplicationContextAware, BeanNameAware, PriorityOrdered {
 
   public static final String DEFAULT_BEAN_NAME_SEPARATOR = ".";
 
@@ -57,6 +57,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     final String beanName,
     final String property,
     final Object value) {
+    ClassLoader classLoader = factory.getBeanClassLoader();
 
     BeanDefinition bd = factory.getBeanDefinition(beanName);
     while (bd.getOriginatingBeanDefinition() != null) {
@@ -71,7 +72,8 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
         if (typeValue != null) {
           final String typeClassName = typeValue.getValue().toString();
           try {
-            final Class<?> typeClass = Class.forName(typeClassName);
+            final Class<?> typeClass = Class.forName(typeClassName, true,
+              classLoader);
 
             final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
               value, typeClass);
@@ -88,7 +90,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   private final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
-  private BeanFactory beanFactory;
+  private ApplicationContext applicationContext;
 
   private String beanName;
 
@@ -107,7 +109,13 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
   public AttributesBeanConfigurer() {
   }
 
-  public AttributesBeanConfigurer(final Map<String, Object> attributes) {
+  public AttributesBeanConfigurer(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
+
+  public AttributesBeanConfigurer(ApplicationContext applicationContext,
+    final Map<String, Object> attributes) {
+    this.applicationContext = applicationContext;
     if (attributes != null) {
       this.attributes.putAll(attributes);
     }
@@ -157,10 +165,6 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
 
   public Map<String, Object> getAttributes() {
     return attributes;
-  }
-
-  public BeanFactory getBeanFactory() {
-    return beanFactory;
   }
 
   public String getBeanName() {
@@ -258,7 +262,10 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
             if (factory.containsBean(beanName)) {
               BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
               try {
-                final Class<?> beanClass = Class.forName(beanDefinition.getBeanClassName());
+                ClassLoader classLoader = applicationContext.getClassLoader();
+                String beanClassName = beanDefinition.getBeanClassName();
+                final Class<?> beanClass = Class.forName(beanClassName, true,
+                  classLoader);
                 if (Parameter.class.isAssignableFrom(beanClass)) {
                   while (beanDefinition.getOriginatingBeanDefinition() != null) {
                     beanDefinition = beanDefinition.getOriginatingBeanDefinition();
@@ -268,11 +275,16 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
                     value);
                   final PropertyValue typeValue = propertyValues.getPropertyValue("type");
                   if (typeValue != null) {
-                    final String typeClassName = typeValue.getValue()
-                      .toString();
                     try {
-                      final Class<?> typeClass = Class.forName(typeClassName);
-
+                      final Class<?> typeClass;
+                      Object typeValueObject = typeValue.getValue();
+                      if (typeValueObject instanceof Class<?>) {
+                        typeClass = (Class<?>)typeValueObject;
+                      } else {
+                        final String typeClassName = typeValueObject.toString();
+                        typeClass = Class.forName(typeClassName, true,
+                          classLoader);
+                      }
                       final Object convertedValue = new SimpleTypeConverter().convertIfNecessary(
                         value, typeClass);
                       propertyValue = new PropertyValue("value", convertedValue);
@@ -346,7 +358,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
       // Check that we're not parsing our own bean definition,
       // to avoid failing on unresolvable placeholders in properties file
       // locations.
-      if (!(beanNames[i].equals(this.beanName) && beanFactory.equals(this.beanFactory))) {
+      if (!(beanNames[i].equals(this.beanName) && beanFactory.equals(this.applicationContext))) {
         final BeanDefinition bd = beanFactory.getBeanDefinition(beanNames[i]);
         try {
           visitor.visitBeanDefinition(bd);
@@ -376,7 +388,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     // Check that we're not parsing our own bean definition,
     // to avoid failing on unresolvable placeholders in properties file
     // locations.
-    if (!(beanName.equals(this.beanName) && beanFactory.equals(this.beanFactory))) {
+    if (!(beanName.equals(this.beanName) && beanFactory.equals(this.applicationContext))) {
       final BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
       try {
         visitor.visitBeanDefinition(bd);
@@ -398,8 +410,8 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     }
   }
 
-  public void setBeanFactory(final BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
+  public void setApplicationContext(final ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
   }
 
   public void setBeanName(final String beanName) {
@@ -431,7 +443,8 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     final BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
     final String beanClassName = beanDefinition.getBeanClassName();
     try {
-      final Class<?> beanClass = Class.forName(beanClassName);
+      ClassLoader classLoader = applicationContext.getClassLoader();
+      final Class<?> beanClass = Class.forName(beanClassName, true, classLoader);
       if (MapFactoryBean.class.isAssignableFrom(beanClass)) {
         final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
         final PropertyValue sourceMapProperty = propertyValues.getPropertyValue("sourceMap");

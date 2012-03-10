@@ -1,6 +1,7 @@
 package com.revolsys.jdbc;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -150,11 +151,24 @@ public final class JdbcUtils {
     try {
       return dataSource.getConnection();
     } catch (final SQLException e) {
-      throw new RuntimeException(
+      throw new IllegalArgumentException(
         "SQL error getting connection from data source", e);
     } catch (final Throwable e) {
       throw new RuntimeException(
         "Unknown error getting connection from data source ", e);
+    }
+  }
+
+  public static String getProductName(final DataSource dataSource) {
+    final Connection connection = JdbcUtils.getConnection(dataSource);
+    try {
+      final DatabaseMetaData metaData = connection.getMetaData();
+      return metaData.getDatabaseProductName();
+    } catch (SQLException e) {
+      throw new IllegalArgumentException("Unable to get database product name",
+        e);
+    } finally {
+      close(connection);
     }
   }
 
