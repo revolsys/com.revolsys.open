@@ -50,4 +50,8 @@ public class CsvWriter {
     }
     out.println();
   }
+
+  public void flush() {
+    out.flush();
+  }
 }

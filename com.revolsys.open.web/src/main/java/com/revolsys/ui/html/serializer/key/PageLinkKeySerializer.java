@@ -1,5 +1,8 @@
 package com.revolsys.ui.html.serializer.key;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
@@ -9,6 +12,16 @@ import com.revolsys.util.JavaBeanUtil;
 public class PageLinkKeySerializer extends AbstractKeySerializer implements
   HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private String pageName;
+
+  private Map<String, String> parameterKeys = new LinkedHashMap<String, String>();
+
+  public Map<String, String> getParameterKeys() {
+    return parameterKeys;
+  }
+
+  public void setParameterKeys(Map<String, String> parameterKeys) {
+    this.parameterKeys = parameterKeys;
+  }
 
   private HtmlUiBuilder<?> uiBuilder;
 
@@ -37,11 +50,12 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
         final String message = currentObject.getClass().getName()
           + " does not have a property " + key;
         out.element(HtmlUtil.B, message);
+        return;
       }
-      key = parts[i+1];
-      
+      key = parts[i + 1];
+
     }
-    uiBuilder.serializeLink(out, currentObject, key, pageName);
+    uiBuilder.serializeLink(out, currentObject, key, pageName, parameterKeys);
   }
 
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {

@@ -1321,8 +1321,41 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String key,
     final String pageName) {
     final Map<String, Object> parameters = new HashMap<String, Object>();
-     final Object id = getIdValue(object);
+    final Object id = getIdValue(object);
     parameters.put(idParameterName, id);
+    parameters.put(key, JavaBeanUtil.getValue(object, key));
+    final String url = getPageUrl(pageName, parameters);
+    if (url == null) {
+      serializeNullLabel(out, pageName);
+    } else {
+      out.startTag(HtmlUtil.A);
+      out.attribute(HtmlUtil.ATTR_HREF, url);
+      out.attribute(HtmlUtil.ATTR_TARGET, "_top");
+      serialize(out, object, key);
+      out.endTag(HtmlUtil.A);
+    }
+  }
+
+  public void serializeLink(
+    final XmlWriter out,
+    final Object object,
+    final String key,
+    final String pageName,
+    Map<String, String> parameterKeys) {
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+    if (parameterKeys.isEmpty()) {
+      final Object id = getIdValue(object);
+      parameters.put(idParameterName, id);
+    } else {
+      for (Entry<String, String> parameterKey : parameterKeys.entrySet()) {
+        String parameterName = parameterKey.getKey();
+        String keyName = parameterKey.getValue();
+        Object value = JavaBeanUtil.getValue(object, keyName);
+        if (value != null) {
+          parameters.put(parameterName, value);
+        }
+      }
+    }
     final String url = getPageUrl(pageName, parameters);
     if (url == null) {
       serializeNullLabel(out, pageName);

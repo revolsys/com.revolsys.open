@@ -67,6 +67,7 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 
 %template(VectorOfString) std::vector<std::string>;
 %template(VectorOfWString) std::vector<std::wstring>;
+%template(VectorOfFieldDef) std::vector<FileGDBAPI::FieldDef>;
 
 %include "Array.i"
 ARRAY_OUT(float, FloatArray)
@@ -113,6 +114,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 }
 
 %ignore FileGDBAPI::ShapeModifiers;
+%ignore FileGDBAPI::CurveType;
 
 %include "FileGDBCore.h"
 %include "GeodatabaseManagement.h"
@@ -197,6 +199,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 }
 %include "Geodatabase.h"
 
+%ignore FileGDBAPI::Table::GetFields;
 %ignore FileGDBAPI::Table::IsEditable;
 %ignore FileGDBAPI::Table::GetDefinition;
 %ignore FileGDBAPI::Table::GetDocumentation;
@@ -281,6 +284,11 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     checkResult(self->FreeWriteLock());
   }
 
+  std::vector<FileGDBAPI::FieldDef> getFields() {
+    std::vector<FileGDBAPI::FieldDef> value;
+    checkResult(self->GetFields(value));
+    return value;
+  }
 }
 %include "Table.h"
 
@@ -310,6 +318,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Row::SetString;
 %ignore FileGDBAPI::Row::GetXML;
 %ignore FileGDBAPI::Row::SetXML;
+%ignore FileGDBAPI::Row::GetFields;
 %newobject FileGDBAPI::Row::getGeometry;
 %extend FileGDBAPI::Row {
   bool isNull(std::wstring name) {
@@ -429,6 +438,13 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
   void setGeometry(const FileGDBAPI::ShapeBuffer& value) {
     checkResult(self->SetGeometry(value));
   }
+  
+  std::vector<FileGDBAPI::FieldDef> getFields() {
+    std::vector<FileGDBAPI::FieldDef> value;
+    checkResult(self->GetFields(value));
+    return value;
+  }
+  
 }
 
 %include "Row.h"
@@ -475,6 +491,162 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     return type;
   }
 
+}
+
+
+%ignore FileGDBAPI::FieldDef::GetAlias;
+%ignore FileGDBAPI::FieldDef::GetName;
+%ignore FileGDBAPI::FieldDef::GetLength;
+%ignore FileGDBAPI::FieldDef::GetIsNullable;
+%ignore FileGDBAPI::FieldDef::GetType;
+%extend FileGDBAPI::FieldDef {
+  std::wstring getAlias() {
+    std::wstring value;
+    checkResult(self->GetAlias(value));
+    return value;
+  }
+  std::wstring getName() {
+    std::wstring value;
+    checkResult(self->GetName(value));
+    return value;
+  }
+  bool isNullable() {
+    bool result;
+    checkResult(self->GetIsNullable(result));
+    return result;
+  }
+  int getLength() {
+    int result;
+    checkResult(self->GetLength(result));
+    return result;
+  }
+  FileGDBAPI::FieldType getType() {
+    FileGDBAPI::FieldType result;
+    checkResult(self->GetType(result));
+    return result;
+  }
+}
+
+%ignore FileGDBAPI::GeometryDef::GetGeometryType;
+%ignore FileGDBAPI::GeometryDef::GetHasM;
+%ignore FileGDBAPI::GeometryDef::GetHasZ;
+%extend FileGDBAPI::GeometryDef {
+  bool hasM() {
+    bool result;
+    checkResult(self->GetHasM(result));
+    return result;
+  }
+  bool hasZ() {
+    bool result;
+    checkResult(self->GetHasZ(result));
+    return result;
+  }
+  FileGDBAPI::GeometryType getGeometryType() {
+    FileGDBAPI::GeometryType result;
+    checkResult(self->GetGeometryType(result));
+    return result;
+  }
+}
+
+%ignore FileGDBAPI::SpatialReference::GetSpatialReferenceID;
+%ignore FileGDBAPI::SpatialReference::GetSpatialReferenceText;
+%ignore FileGDBAPI::SpatialReference::GetFalseOriginAndUnits;
+%ignore FileGDBAPI::SpatialReference::GetMFalseOriginAndUnits;
+%ignore FileGDBAPI::SpatialReference::GetMTolerance;
+%ignore FileGDBAPI::SpatialReference::GetXYTolerance;
+%ignore FileGDBAPI::SpatialReference::GetZFalseOriginAndUnits;
+%ignore FileGDBAPI::SpatialReference::GetZTolerance;
+%extend FileGDBAPI::SpatialReference {
+  int getId() {
+    int result;
+    checkResult(self->GetSpatialReferenceID(result));
+    return result;
+  }
+  std::wstring getText() {
+    std::wstring value;
+    checkResult(self->GetSpatialReferenceText(value));
+    return value;
+  }
+  double getXFalseOrigin() {
+    double falseX;
+    double falseY;
+    double xyUnits;
+    checkResult(self->GetFalseOriginAndUnits(falseX, falseY, xyUnits));
+    return falseX;
+  }
+  double getYFalseOrigin() {
+    double falseX;
+    double falseY;
+    double xyUnits;
+    checkResult(self->GetFalseOriginAndUnits(falseX, falseY, xyUnits));
+    return falseY;
+  }
+  double getXYUnits() {
+    double falseX;
+    double falseY;
+    double xyUnits;
+    checkResult(self->GetFalseOriginAndUnits(falseX, falseY, xyUnits));
+    return xyUnits;
+  }
+  double getMFalseOrigin() {
+    double falseM;
+    double mUnits;
+    checkResult(self->GetMFalseOriginAndUnits(falseM, mUnits));
+    return falseM;
+  }
+  double getMUnits() {
+    double falseM;
+    double mUnits;
+    checkResult(self->GetMFalseOriginAndUnits(falseM, mUnits));
+    return mUnits;
+  }
+  double getMTolerance() {
+    double result;
+    checkResult(self->GetMTolerance(result));
+    return result;
+  }
+  double getXYTolerance() {
+    double result;
+    checkResult(self->GetXYTolerance(result));
+    return result;
+  }
+  double getXFalseOrigin() {
+    double falseZ;
+    double zUnits;
+    checkResult(self->GetMFalseOriginAndUnits(falseZ, zUnits));
+    return falseZ;
+  }
+  double getXUnits() {
+    double falseZ;
+    double zUnits;
+    checkResult(self->GetMFalseOriginAndUnits(falseZ, zUnits));
+    return zUnits;
+  }
+  double getZTolerance() {
+    double result;
+    checkResult(self->GetZTolerance(result));
+    return result;
+  }
+}
+%ignore FileGDBAPI::IndexDef::GetIsUnique;
+%ignore FileGDBAPI::IndexDef::GetName;
+%ignore FileGDBAPI::IndexDef::GetFields;
+%extend FileGDBAPI::IndexDef {
+  bool isUnique() {
+    bool result;
+    checkResult(self->GetIsUnique(result));
+    return result;
+  }
+  std::wstring getName() {
+    std::wstring result;
+    checkResult(self->GetName(result));
+    return result;
+  }
+  std::wstring getFields() {
+    std::wstring result;
+    checkResult(self->GetFields(result));
+    return result;
+  }
 }
 
 %ignore FileGDBAPI::Guid::ToString;
@@ -538,6 +710,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::MultiPatchShapeBuffer;
 
 %ignore FileGDBAPI::EnumRows::Next;
+%ignore FileGDBAPI::EnumRows::GetFields;
 %newobject FileGDBAPI::EnumRows::next;
 %extend FileGDBAPI::EnumRows {
   FileGDBAPI::Row* next() {
@@ -550,7 +723,19 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
       return NULL;
     }
   }
+
+  std::vector<FileGDBAPI::FieldDef> getFields() {
+    std::vector<FileGDBAPI::FieldDef> value;
+    checkResult(self->GetFields(value));
+    return value;
+  }
 }
+
+%ignore FileGDBAPI::Curve;
+%ignore FileGDBAPI::CircularArcCurve;
+%ignore FileGDBAPI::BezierCurve;
+%ignore FileGDBAPI::EllipticArcCurve;
+
 %include "Util.h"
 
 %include "Raster.h"

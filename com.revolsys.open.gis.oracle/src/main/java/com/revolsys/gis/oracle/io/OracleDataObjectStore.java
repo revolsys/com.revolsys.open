@@ -39,6 +39,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   public OracleDataObjectStore(final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
     setExcludeTablePatterns(".*\\$");
+    setSqlPrefix("BEGIN ");
+    setSqlSuffix(";END;");
   }
 
   public OracleDataObjectStore(final DataObjectFactory dataObjectFactory,
@@ -52,10 +54,14 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     super(databaseFactory);
     DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
+    setSqlPrefix("BEGIN ");
+    setSqlSuffix(";END;");
   }
 
   public OracleDataObjectStore(DataSource dataSource) {
     super(dataSource);
+    setSqlPrefix("BEGIN ");
+    setSqlSuffix(";END;");
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {
@@ -124,8 +130,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         getDataSource());
       addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
       addAttributeAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
-      setSqlPrefix("BEGIN ");
-      setSqlSuffix(";END;");
     }
   }
 
