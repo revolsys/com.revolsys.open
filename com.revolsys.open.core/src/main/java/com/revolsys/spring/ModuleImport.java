@@ -36,6 +36,43 @@ import com.revolsys.spring.config.AttributesBeanConfigurer;
 public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   DisposableBean {
 
+  public static GenericBeanDefinition createTargetBeanDefinition(
+    final BeanDefinitionRegistry beanFactory,
+    final String beanName) {
+    final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+    if (beanDefinition == null) {
+      return null;
+    } else {
+      final boolean singleton = beanDefinition.isSingleton();
+      final GenericBeanDefinition proxyBeanDefinition = new GenericBeanDefinition();
+      proxyBeanDefinition.setBeanClass(TargetBeanFactoryBean.class);
+      final MutablePropertyValues values = new MutablePropertyValues();
+      final String beanClassName = beanDefinition.getBeanClassName();
+      final PropertyValue beanDefinitionProperty = new PropertyValue(
+        "targetBeanDefinition", beanDefinition);
+      beanDefinitionProperty.setConvertedValue(beanDefinition);
+      values.addPropertyValue(beanDefinitionProperty);
+      values.addPropertyValue("targetBeanName", beanName);
+      values.addPropertyValue("targetBeanClass", beanClassName);
+      values.addPropertyValue("targetBeanFactory", beanFactory);
+      values.addPropertyValue("singleton", singleton);
+      proxyBeanDefinition.setPropertyValues(values);
+      return proxyBeanDefinition;
+    }
+  }
+
+  public static void registerTargetBeanDefinition(
+    final BeanDefinitionRegistry registry,
+    final BeanFactory beanFactory,
+    final String beanName,
+    final String alias) {
+    final BeanDefinition beanDefinition = createTargetBeanDefinition(
+      (BeanDefinitionRegistry)beanFactory, beanName);
+    if (beanDefinition != null) {
+      registry.registerBeanDefinition(alias, beanDefinition);
+    }
+  }
+
   private GenericApplicationContext applicationContext;
 
   private Map<String, String> exportBeanAliases = Collections.emptyMap();
@@ -70,31 +107,6 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
 
   protected void beforePostProcessBeanDefinitionRegistry(
     final BeanDefinitionRegistry registry) throws BeansException {
-  }
-
-  protected GenericBeanDefinition createTargetBeanDefinition(
-    final BeanDefinitionRegistry beanFactory,
-    final String beanName) {
-    final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-    if (beanDefinition == null) {
-      return null;
-    } else {
-      final boolean singleton = beanDefinition.isSingleton();
-      final GenericBeanDefinition proxyBeanDefinition = new GenericBeanDefinition();
-      proxyBeanDefinition.setBeanClass(TargetBeanFactoryBean.class);
-      final MutablePropertyValues values = new MutablePropertyValues();
-      final String beanClassName = beanDefinition.getBeanClassName();
-      final PropertyValue beanDefinitionProperty = new PropertyValue(
-        "targetBeanDefinition", beanDefinition);
-      beanDefinitionProperty.setConvertedValue(beanDefinition);
-      values.addPropertyValue(beanDefinitionProperty);
-      values.addPropertyValue("targetBeanName", beanName);
-      values.addPropertyValue("targetBeanClass", beanClassName);
-      values.addPropertyValue("targetBeanFactory", beanFactory);
-      values.addPropertyValue("singleton", singleton);
-      proxyBeanDefinition.setPropertyValues(values);
-      return proxyBeanDefinition;
-    }
   }
 
   public void destroy() throws Exception {
@@ -244,18 +256,6 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     if (beanFactory instanceof BeanDefinitionRegistry) {
       final BeanDefinitionRegistry registry = (BeanDefinitionRegistry)beanFactory;
       postProcessBeanDefinitionRegistry(registry);
-    }
-  }
-
-  protected void registerTargetBeanDefinition(
-    final BeanDefinitionRegistry registry,
-    final BeanFactory beanFactory,
-    final String beanName,
-    final String alias) {
-    final BeanDefinition beanDefinition = createTargetBeanDefinition(
-      (BeanDefinitionRegistry)beanFactory, beanName);
-    if (beanDefinition != null) {
-      registry.registerBeanDefinition(alias, beanDefinition);
     }
   }
 

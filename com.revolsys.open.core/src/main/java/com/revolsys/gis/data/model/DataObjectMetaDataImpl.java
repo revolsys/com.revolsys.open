@@ -273,10 +273,16 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   }
 
   public int compareTo(final DataObjectMetaData other) {
-    if (name == null) {
+    QName otherName = other.getName();
+    if (otherName == name) {
+      return 0;
+    } else if (name == null) {
       return 1;
+    } else if (otherName == null) {
+      return -1;
+    } else {
+      return name.toString().compareTo(otherName.toString());
     }
-    return name.toString().compareTo(other.getName().toString());
   }
 
   public DataObject createDataObject() {
@@ -590,8 +596,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return name.toString();
   }
 
-  public static void destroy(
-    DataObjectMetaDataImpl... metaDataList) {
+  public static void destroy(DataObjectMetaDataImpl... metaDataList) {
     for (DataObjectMetaDataImpl metaData : metaDataList) {
       metaData.destroy();
     }
