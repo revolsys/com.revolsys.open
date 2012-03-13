@@ -201,6 +201,8 @@ public class NamedChannelBundle<T> {
               queue = getNextValueQueue(names);
               waitTime = maxTime - System.currentTimeMillis();
             }
+          } else {
+            queue = getNextValueQueue(names);
           }
           if (queue == null) {
             return null;
