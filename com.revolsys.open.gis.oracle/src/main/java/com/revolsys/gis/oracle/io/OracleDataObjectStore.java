@@ -64,19 +64,37 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     setSqlSuffix(";END;");
   }
 
+  private boolean useSchemaSequencePrefix = true;
+
+  public void setUseSchemaSequencePrefix(boolean useSchemaSequencePrefix) {
+    this.useSchemaSequencePrefix = useSchemaSequencePrefix;
+  }
+
+  public boolean isUseSchemaSequencePrefix() {
+    return useSchemaSequencePrefix;
+  }
+
   public String getSequenceName(final DataObjectMetaData metaData) {
     final QName typeName = metaData.getName();
     final String schema = getDatabaseSchemaName(typeName.getNamespaceURI());
     String shortName = ShortNameProperty.getShortName(metaData);
+    final String sequenceName;
     if (StringUtils.hasText(shortName)) {
-      final String sequenceName = schema + "." + shortName.toLowerCase()
-        + "_SEQ";
-      return sequenceName;
+      if (useSchemaSequencePrefix) {
+        sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
+      } else {
+        sequenceName = shortName.toLowerCase() + "_SEQ";
+      }
     } else {
       final String tableName = getDatabaseTableName(typeName);
-      final String sequenceName = schema + "." + tableName + "_SEQ";
-      return sequenceName;
+      if (useSchemaSequencePrefix) {
+        sequenceName = schema + "." + tableName + "_SEQ";
+      } else {
+        sequenceName = tableName + "_SEQ";
+      }
     }
+    return sequenceName;
+
   }
 
   @Override
