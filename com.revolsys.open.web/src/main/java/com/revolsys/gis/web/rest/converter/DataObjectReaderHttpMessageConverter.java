@@ -50,9 +50,10 @@ public class DataObjectReaderHttpMessageConverter extends
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public DataObjectReaderHttpMessageConverter() {
-    super(DataObjectReader.class,
-      IoFactoryRegistry.getInstance().getMediaTypes(DataObjectReaderFactory.class),
-      IoFactoryRegistry.getInstance().getMediaTypes(DataObjectWriterFactory.class));
+    super(DataObjectReader.class, IoFactoryRegistry.getInstance()
+      .getMediaTypes(DataObjectReaderFactory.class),
+      IoFactoryRegistry.getInstance().getMediaTypes(
+        DataObjectWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -134,9 +135,9 @@ public class DataObjectReaderHttpMessageConverter extends
         throw new IllegalArgumentException("Media type " + actualMediaType
           + " not supported");
       } else {
-
         final DataObjectMetaData metaData = reader.getMetaData();
         final HttpHeaders headers = outputMessage.getHeaders();
+        headers.setContentType(actualMediaType);
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         String baseName = (String)requestAttributes.getAttribute(
           "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);

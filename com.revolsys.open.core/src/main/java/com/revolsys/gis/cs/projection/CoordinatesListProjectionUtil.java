@@ -32,7 +32,11 @@ public class CoordinatesListProjectionUtil {
     final CoordinateSystem toCoordinateSystem) {
     final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
       fromCoordinateSystem, toCoordinateSystem);
-    return perform(coordinates, operation);
+    if (operation == null) {
+      return coordinates;
+    } else {
+      return perform(coordinates, operation);
+    }
   }
 
 }

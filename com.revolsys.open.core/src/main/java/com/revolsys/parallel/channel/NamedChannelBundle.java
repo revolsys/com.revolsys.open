@@ -66,7 +66,9 @@ public class NamedChannelBundle<T> {
   public Collection<T> remove(String name) {
     synchronized (monitor) {
       sequenceQueueByName.remove(name);
-      return valueQueueByName.remove(name);
+      Queue<T> values = valueQueueByName.remove(name);
+      monitor.notifyAll();
+      return values;
     }
   }
 
@@ -256,16 +258,18 @@ public class NamedChannelBundle<T> {
     synchronized (writeMonitor) {
       synchronized (monitor) {
         if (closed) {
+          monitor.notifyAll();
           throw new ClosedException();
+        } else {
+          final Long sequence = this.sequence.getAndIncrement();
+          final Queue<Long> sequenceQueue = getSequenceQueue(name);
+          sequenceQueue.add(sequence);
+
+          final Queue<T> queue = getValueQueue(name);
+          queue.add(value);
+
+          monitor.notifyAll();
         }
-        final Queue<T> queue = getValueQueue(name);
-        queue.add(value);
-
-        final Long sequence = this.sequence.getAndIncrement();
-        final Queue<Long> sequenceQueue = getSequenceQueue(name);
-        sequenceQueue.add(sequence);
-
-        monitor.notifyAll();
       }
     }
   }
