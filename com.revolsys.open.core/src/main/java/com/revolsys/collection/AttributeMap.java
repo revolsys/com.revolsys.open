@@ -44,17 +44,32 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
   }
 
   public void setProperties(final Resource resource) {
+    final Properties properties = new Properties();
     try {
-      final Properties properties = new Properties();
       properties.load(resource.getInputStream());
-      for (final Entry<Object, Object> entry : properties.entrySet()) {
-        final String key = (String)entry.getKey();
-        final Object value = entry.getValue();
-        put(key, value);
-      }
+      setProperties(properties);
     } catch (final Throwable e) {
       LOG.error("Cannot load properties from " + resource, e);
     }
   }
 
+  public void setProperties(final Properties properties) {
+    for (final Entry<Object, Object> entry : properties.entrySet()) {
+      final String key = (String)entry.getKey();
+      final Object value = entry.getValue();
+      put(key, value);
+    }
+  }
+
+  public void setPropertyResources(Resource[] resources) {
+    final Properties properties = new Properties();
+    for (Resource resource : resources) {
+      try {
+        properties.load(resource.getInputStream());
+      } catch (final Throwable e) {
+        LOG.error("Cannot load properties from " + resource, e);
+      }
+    }
+    setProperties(properties);
+  }
 }
