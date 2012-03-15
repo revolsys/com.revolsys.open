@@ -53,7 +53,7 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     }
   }
 
-  public void setProperties(final Properties properties) {
+  private void setProperties(final Properties properties) {
     for (final Entry<Object, Object> entry : properties.entrySet()) {
       final String key = (String)entry.getKey();
       final Object value = entry.getValue();
