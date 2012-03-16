@@ -127,31 +127,31 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
         close(typeDeleteSqlMap, typeDeleteStatementMap,
           typeDeleteBatchCountMap, "Delete");
       } finally {
+        typeInsertSqlMap = null;
+        typeInsertStatementMap = null;
+        typeInsertBatchCountMap = null;
+        typeInsertSequenceSqlMap = null;
+        typeInsertSequenceStatementMap = null;
+        typeInsertSequenceBatchCountMap = null;
+        typeUpdateBatchCountMap = null;
+        typeUpdateSqlMap = null;
+        typeUpdateStatementMap = null;
+        typeDeleteBatchCountMap = null;
+        typeDeleteSqlMap = null;
+        typeDeleteStatementMap = null;
+        dataStore = null;
         if (dataSource != null) {
           try {
             connection.commit();
           } catch (final SQLException e) {
-            LOG.error("Failed to commit data:", e);
+            throw new RuntimeException("Failed to commit data:", e);
           } finally {
             JdbcUtils.close(connection);
+            dataSource = null;
+            connection = null;
           }
         }
       }
-      typeInsertSqlMap = null;
-      typeInsertStatementMap = null;
-      typeInsertBatchCountMap = null;
-      typeInsertSequenceSqlMap = null;
-      typeInsertSequenceStatementMap = null;
-      typeInsertSequenceBatchCountMap = null;
-      typeUpdateBatchCountMap = null;
-      typeUpdateSqlMap = null;
-      typeUpdateStatementMap = null;
-      typeDeleteBatchCountMap = null;
-      typeDeleteSqlMap = null;
-      typeDeleteStatementMap = null;
-      dataSource = null;
-      connection = null;
-      dataStore = null;
     }
   }
 

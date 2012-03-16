@@ -43,6 +43,7 @@ import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.orm.core.SpringDaoFactory;
+import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.decorator.CollapsibleBox;
 import com.revolsys.ui.html.decorator.Decorator;
@@ -222,15 +223,15 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ElementContainer container,
     final Class<?> builderClass,
     final String pageName,
-    final String style) {
-    addCollapsibleIframe(container, builderClass.getName(), pageName, style);
+    final String style, boolean open) {
+    addCollapsibleIframe(container, builderClass.getName(), pageName, style, false);
   }
 
   public void addCollapsibleIframe(
     final ElementContainer container,
     final String builderName,
     final String pageName,
-    final String style) {
+    final String style, boolean open) {
     final HtmlUiBuilder<?> appBuilder = getBuilder(builderName);
     final Page page = appBuilder.getPage(pageName);
     if (page != null) {
@@ -240,7 +241,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final String link = page.getFullUrl(parameters);
       if (link != null) {
         final String title = page.getExpandedTitle();
-        final Decorator decorator = new CollapsibleBox(title);
+        final Decorator decorator = new CollapsibleBox(title, open);
         final IFrame iFrame = new IFrame(link, "autoHeight", style, decorator);
         container.add(iFrame);
       }
@@ -656,7 +657,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     updateObjectListView(request, tableContainer, tableView, pager);
 
     ElementContainer container = new ElementContainer(tableContainer);
-    tableContainer.setDecorator(new CollapsibleBox(title, true));
+    container.setDecorator(new CollapsibleBox(title, true));
 
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "add", "Add", "_top");
@@ -1650,5 +1651,21 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public boolean validateForm(final HtmlUiBuilderObjectForm form) {
     return true;
+  }
+
+  public void referrerRedirect(
+    final HttpServletRequest request,
+    final HttpServletResponse response) {
+    final String url = request.getHeader("Referer");
+    redirect(response, url);
+  }
+
+  public void redirect(final HttpServletResponse response, final String url) {
+    InvokeMethodAfterCommit.invoke(response, "sendRedirect", url);
+  }
+
+  protected void notFound(HttpServletResponse response, String message)
+    throws IOException {
+    response.sendError(HttpServletResponse.SC_NOT_FOUND, message);
   }
 }

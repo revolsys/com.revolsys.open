@@ -3,8 +3,11 @@ package com.revolsys.gis.data.query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -41,11 +44,21 @@ public class Query implements Cloneable {
 
   private Geometry geometry;
 
-  private List<String> orderBy = new ArrayList<String>();
+  private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
 
   private Map<String, ? extends Object> filter;
 
+  private boolean lockResults = false;
+
   public Query() {
+  }
+
+  public void setLockResults(boolean lockResults) {
+    this.lockResults = lockResults;
+  }
+
+  public boolean isLockResults() {
+    return lockResults;
   }
 
   public Query(final DataObjectMetaData metaData) {
@@ -128,7 +141,7 @@ public class Query implements Cloneable {
       clone.parameterAttributes = new ArrayList<Attribute>(parameterAttributes);
       clone.attributeNames = new ArrayList<String>(clone.attributeNames);
       clone.parameters = new ArrayList<Object>(parameters);
-      clone.orderBy = new ArrayList<String>(orderBy);
+      clone.orderBy = new HashMap<String, Boolean>(orderBy);
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new IllegalArgumentException(e.getMessage());
@@ -159,7 +172,7 @@ public class Query implements Cloneable {
     return metaData;
   }
 
-  public List<String> getOrderBy() {
+  public Map<String, Boolean> getOrderBy() {
     return orderBy;
   }
 
@@ -220,7 +233,10 @@ public class Query implements Cloneable {
   }
 
   public void setOrderBy(final List<String> orderBy) {
-    this.orderBy = orderBy;
+    this.orderBy.clear();
+    for (String column : orderBy) {
+      this.orderBy.put(column, Boolean.TRUE);
+    }
   }
 
   public void setOrderBy(final String... orderBy) {
@@ -279,7 +295,19 @@ public class Query implements Cloneable {
       }
       if (!orderBy.isEmpty()) {
         string.append(" ORDER BY ");
-        CollectionUtil.append(string, orderBy, ", ");
+        for (Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+          .iterator(); iterator.hasNext();) {
+          Entry<String, Boolean> entry = iterator.next();
+          String column = entry.getKey();
+          string.append(column);
+          Boolean ascending = entry.getValue();
+          if (!ascending) {
+            string.append(" DESC");
+          }
+          if (iterator.hasNext()) {
+            string.append(", ");
+          }
+        }
       }
     } else {
       string.append(sql);
@@ -289,5 +317,9 @@ public class Query implements Cloneable {
       string.append(parameters);
     }
     return string.toString();
+  }
+
+  public void addOrderBy(String column, boolean ascending) {
+    orderBy.put(column, ascending);
   }
 }

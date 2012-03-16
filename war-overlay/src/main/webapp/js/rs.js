@@ -64,7 +64,6 @@ $(document).ready(function() {
       }
     });
   });
-  $( "button.delete" ).addClass('ui-state-error');
   addConfirmButton('button.delete', 'trash', 'Confirm Delete', 'Are you sure you want to delete this record?');
 
 });

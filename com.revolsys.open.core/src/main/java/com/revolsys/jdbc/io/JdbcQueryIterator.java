@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,10 +81,11 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final DataObjectMetaData metaData,
     final String tablePrefix,
     final String fromClause,
+    boolean lockResults,
     final List<String> attributeNames,
     final Map<String, ? extends Object> filter,
     String where,
-    final List<String> orderBy) {
+    final Map<String, Boolean> orderBy) {
     final QName typeName = metaData.getName();
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
@@ -143,13 +145,22 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     }
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      for (int i = 0; i < orderBy.size(); i++) {
-        if (i > 0) {
+      for (Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+        .iterator(); iterator.hasNext();) {
+        Entry<String, Boolean> entry = iterator.next();
+        String column = entry.getKey();
+        sql.append(column);
+        Boolean ascending = entry.getValue();
+        if (!ascending) {
+          sql.append(" DESC");
+        }
+        if (iterator.hasNext()) {
           sql.append(", ");
         }
-        final String name = orderBy.get(i);
-        sql.append(name);
       }
+    }
+    if (lockResults) {
+      sql.append(" FOR UPDATE");
     }
     return sql.toString();
   }
@@ -204,10 +215,11 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         query.getAttributeNames());
       final String fromClause = query.getFromClause();
       final String where = query.getWhereClause();
-      final List<String> orderBy = query.getOrderBy();
+      final Map<String, Boolean> orderBy = query.getOrderBy();
       final Map<String, ? extends Object> filter = query.getFilter();
-      sql = createSql(metaData, "T", fromClause, attributeNames, filter, where,
-        orderBy);
+      boolean lockResults = query.isLockResults();
+      sql = createSql(metaData, "T", fromClause, lockResults, attributeNames,
+        filter, where, orderBy);
       query.setSql(sql);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {

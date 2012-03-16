@@ -60,6 +60,29 @@ public abstract class AbstractDataObjectStore extends
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  public DataObject lock(final QName typeName, final Object id) {
+    final DataObjectMetaData metaData = getMetaData(typeName);
+    if (metaData == null) {
+      return null;
+    } else {
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (idAttributeName == null) {
+        throw new IllegalArgumentException(typeName
+          + " does not have a primary key");
+      } else {
+        final StringBuffer where = new StringBuffer();
+        where.append(idAttributeName);
+        where.append(" = ?");
+
+        final Query query = new Query(typeName);
+        query.setLockResults(true);
+        query.setWhereClause(where.toString());
+        query.addParameter(id);
+        return queryFirst(query);
+      }
+    }
+  }
+
   public void addCodeTable(final CodeTable codeTable) {
     final String idColumn = codeTable.getIdAttributeName();
     addCodeTable(idColumn, codeTable);

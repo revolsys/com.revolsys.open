@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.view.Element;
+import com.revolsys.ui.html.view.ElementContainer;
 
 public abstract class Field extends Element {
   private String name = "";
@@ -60,11 +61,17 @@ public abstract class Field extends Element {
   }
 
   public <T> T getInitialValue(final HttpServletRequest request) {
-    final T value = (T)getContainer().getInitialValue(this, request);
-    if (value == null) {
+    ElementContainer container = getContainer();
+    if (container == null) {
       return (T)initialValue;
     } else {
-      return value;
+      final T value = (T)container.getInitialValue(this, request);
+
+      if (value == null) {
+        return (T)initialValue;
+      } else {
+        return value;
+      }
     }
   }
 

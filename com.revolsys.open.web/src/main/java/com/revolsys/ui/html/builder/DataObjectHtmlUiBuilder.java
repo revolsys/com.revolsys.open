@@ -44,6 +44,10 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     tableName = null;
   }
 
+  public <H extends HtmlUiBuilder<?>> H getBuilder(QName typeName) {
+    return getBuilder(typeName.toString());
+  }
+
   @Override
   protected DataObject createObject() {
     return dataStore.create(tableName);
@@ -65,10 +69,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return dataStore;
   }
 
-  @Override
-  public ResultPager<DataObject> getResultPager(final Map<String, Object> filter) {
-    final Query query = new Query(tableName);
-    query.setFilter(filter);
+  public ResultPager<DataObject> getResultPager(final Query query) {
     return dataStore.page(query);
   }
 
@@ -127,7 +128,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     if (object != null) {
       Writer<DataObject> writer = dataStore.createWriter();
       object.setState(DataObjectState.Deleted);
-     
+
       writer.write(object);
       writer.close();
     }

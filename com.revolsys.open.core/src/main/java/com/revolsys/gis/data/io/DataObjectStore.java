@@ -91,6 +91,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   DataObject load(QName typeName, Object id);
 
+  DataObject lock(QName typeName, Object id);
+
   ResultPager<DataObject> page(Query query);
 
   Reader<DataObject> query(List<Query> queries);

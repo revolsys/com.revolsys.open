@@ -27,7 +27,6 @@ h2.subhead {
   color: #039;
   font-family: sans-serif;
   line-height: 1;
-  font-size: 1.2em;
   font-weight: normal;
   color: #999;
   margin: -9px 0 12px 0;
@@ -88,7 +87,10 @@ div.body {
   margin: 0px auto 0px auto;
 }
 
-
+div.error {
+	color: red;
+	font-weight: bold;
+}
 div.bodyContainer {
   margin: 0em 1em 1em 0em;
 }
