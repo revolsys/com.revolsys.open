@@ -362,7 +362,7 @@ public class ScriptTool {
       beans.refresh();
       try {
         LOG.info(message.toString());
-        final Object bean = beans.getBean("com.revolsys.parallel.process.ProcessNetwork");
+        final Object bean = beans.getBean("processNetwork");
         final ProcessNetwork pipeline = (ProcessNetwork)bean;
         pipeline.startAndWait();
       } finally {

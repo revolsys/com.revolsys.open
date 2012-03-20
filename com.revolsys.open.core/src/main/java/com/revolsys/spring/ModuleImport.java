@@ -39,10 +39,10 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   public static GenericBeanDefinition createTargetBeanDefinition(
     final BeanDefinitionRegistry beanFactory,
     final String beanName) {
-    final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-    if (beanDefinition == null) {
-      return null;
-    } else {
+
+    if (beanFactory.containsBeanDefinition(beanName)) {
+      BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+
       final boolean singleton = beanDefinition.isSingleton();
       final GenericBeanDefinition proxyBeanDefinition = new GenericBeanDefinition();
       proxyBeanDefinition.setBeanClass(TargetBeanFactoryBean.class);
@@ -58,6 +58,8 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
       values.addPropertyValue("singleton", singleton);
       proxyBeanDefinition.setPropertyValues(values);
       return proxyBeanDefinition;
+    } else {
+      return null;
     }
   }
 
@@ -66,6 +68,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     final BeanFactory beanFactory,
     final String beanName,
     final String alias) {
+    
     final BeanDefinition beanDefinition = createTargetBeanDefinition(
       (BeanDefinitionRegistry)beanFactory, beanName);
     if (beanDefinition != null) {
@@ -109,7 +112,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     final BeanDefinitionRegistry registry) throws BeansException {
   }
 
-  public void destroy() throws Exception {
+  public void destroy() {
     if (applicationContext != null) {
       applicationContext.close();
     }

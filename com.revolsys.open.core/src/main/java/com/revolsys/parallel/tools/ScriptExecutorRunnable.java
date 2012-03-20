@@ -142,7 +142,7 @@ public class ScriptExecutorRunnable implements Runnable {
       }
       applicationContext.refresh();
       try {
-        final Object bean = applicationContext.getBean("com.revolsys.parallel.process.ProcessNetwork");
+        final Object bean = applicationContext.getBean("processNetwork");
         final ProcessNetwork pipeline = (ProcessNetwork)bean;
         pipeline.startAndWait();
       } finally {

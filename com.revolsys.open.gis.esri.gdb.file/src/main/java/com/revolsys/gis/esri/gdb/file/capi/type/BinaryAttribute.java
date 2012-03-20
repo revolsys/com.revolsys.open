@@ -18,7 +18,8 @@ public class BinaryAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
+    return null;
   }
 
 }

@@ -6,7 +6,8 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class ShortAttribute extends AbstractFileGdbAttribute {
   public ShortAttribute(final Field field) {
-    super(field.getName(), DataTypes.SHORT, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+    super(field.getName(), DataTypes.SHORT, field.getRequired() == Boolean.TRUE
+      || !field.isIsNullable());
   }
 
   @Override
@@ -20,7 +21,7 @@ public class ShortAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -29,13 +30,17 @@ public class ShortAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      row.setShort(name, number.shortValue());
+      short shortValue = number.shortValue();
+      row.setShort(name, shortValue);
+      return shortValue;
     } else {
       final String string = value.toString();
-      row.setShort(name, Short.parseShort(string));
+      short shortValue = Short.parseShort(string);
+      row.setShort(name, shortValue);
+      return shortValue;
     }
   }
-
 }

@@ -60,6 +60,33 @@ public class LineStringGraph extends Graph<LineSegment> {
     return new LineSegment(line);
   }
 
+  /**
+   * Get the z-value for the point if it is at a node or on an edge.
+   * 
+   * @param point The point to get the z-value for.
+   * @return The z-value or Double.NaN.
+   */
+  public double getZ(Coordinates point) {
+    Node<LineSegment> node = findNode(point);
+    if (node == null) {
+      double maxDistance = geometryFactory.getScaleXY() / 1000;
+      for (Edge<LineSegment> edge : findEdges(point, maxDistance)) {
+        LineSegment line = edge.getObject();
+        Coordinates lineStart = line.get(0);
+        Coordinates lineEnd = line.get(1);
+        if (LineSegmentUtil.isPointOnLineMiddle(lineStart, lineEnd, point,
+          maxDistance)) {
+          double elevation = LineSegmentUtil.getElevation(lineStart, lineEnd,
+            point);
+          return geometryFactory.makeZPrecise(elevation);
+        }
+      }
+      return Double.NaN;
+    } else {
+      return node.getZ();
+    }
+  }
+
   public LineString getLine() {
     final DoubleListCoordinatesList newPoints = new DoubleListCoordinatesList(
       points.getNumAxis());

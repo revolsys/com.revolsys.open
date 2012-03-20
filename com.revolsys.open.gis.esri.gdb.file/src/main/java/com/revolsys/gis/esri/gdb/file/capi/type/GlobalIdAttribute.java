@@ -24,7 +24,8 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, Object value) {
+  public Object setValue(final Row row, Object value) {
+    return null;
   }
 
   public void setPostInsertValue(DataObject object, Row row) {

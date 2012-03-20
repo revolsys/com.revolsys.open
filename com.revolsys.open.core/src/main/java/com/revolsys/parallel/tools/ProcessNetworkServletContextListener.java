@@ -23,7 +23,7 @@ public class ProcessNetworkServletContextListener implements
   public void contextInitialized(final ServletContextEvent servletContextEvent) {
     final ServletContext servletContext = servletContextEvent.getServletContext();
     final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-    this.processNetwork = (ProcessNetwork)applicationContext.getBean("com.revolsys.parallel.process.ProcessNetwork");
+    this.processNetwork = (ProcessNetwork)applicationContext.getBean("processNetwork");
     processNetwork.start();
   }
 }

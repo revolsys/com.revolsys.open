@@ -6,7 +6,8 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class FloatAttribute extends AbstractFileGdbAttribute {
   public FloatAttribute(final Field field) {
-    super(field.getName(), DataTypes.FLOAT, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+    super(field.getName(), DataTypes.FLOAT, field.getRequired() == Boolean.TRUE
+      || !field.isIsNullable());
   }
 
   @Override
@@ -20,7 +21,7 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -29,12 +30,17 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      row.setFloat(name, number.floatValue());
+      float floatValue = number.floatValue();
+      row.setFloat(name, floatValue);
+      return floatValue;
     } else {
       final String string = value.toString();
-      row.setFloat(name, Float.parseFloat(string));
+      float floatValue = Float.parseFloat(string);
+      row.setFloat(name, floatValue);
+      return floatValue;
     }
   }
 

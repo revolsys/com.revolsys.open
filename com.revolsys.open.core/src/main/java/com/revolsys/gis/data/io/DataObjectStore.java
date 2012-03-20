@@ -112,4 +112,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   void update(DataObject object);
 
   void updateAll(Collection<DataObject> objects);
+
+  void initialize();
 }

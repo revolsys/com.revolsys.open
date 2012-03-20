@@ -7,7 +7,8 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class OidAttribute extends AbstractFileGdbAttribute {
   public OidAttribute(final Field field) {
-    super(field.getName(), DataTypes.INT, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+    super(field.getName(), DataTypes.INT, field.getRequired() == Boolean.TRUE
+      || !field.isIsNullable());
   }
 
   @Override
@@ -21,13 +22,14 @@ public class OidAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
+    return null;
   }
 
   @Override
-  public void setUpdateValue(Row row, Object value) {
+  public Object setUpdateValue(Row row, Object value) {
+    return value;
   }
-  
 
   public void setPostInsertValue(DataObject object, Row row) {
     int oid = row.getOid();

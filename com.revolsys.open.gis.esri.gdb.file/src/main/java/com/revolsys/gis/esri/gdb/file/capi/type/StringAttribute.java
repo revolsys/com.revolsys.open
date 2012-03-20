@@ -21,7 +21,7 @@ public class StringAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -30,9 +30,11 @@ public class StringAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else {
       final String string = value.toString();
       row.setString(name, string);
+      return string;
     }
   }
 }

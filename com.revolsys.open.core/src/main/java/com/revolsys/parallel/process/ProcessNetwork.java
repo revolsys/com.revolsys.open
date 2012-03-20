@@ -42,10 +42,14 @@ public class ProcessNetwork implements BeanPostProcessor,
     synchronized (sync) {
       if (processes != null && !processes.containsKey(process)) {
         processes.put(process, null);
-        if (running) {
-          start(process);
-        }
       }
+    }
+    if (parent == null) {
+      if (running) {
+        start(process);
+      }
+    } else {
+      parent.addProcess(process);
     }
   }
 
@@ -72,8 +76,10 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   @PostConstruct
   public void init() {
-    threadGroup = new ThreadGroup(name);
-    ThreadSharedAttributes.initialiseThreadGroup(threadGroup);
+    if (parent == null) {
+      threadGroup = new ThreadGroup(name);
+      ThreadSharedAttributes.initialiseThreadGroup(threadGroup);
+    }
   }
 
   public boolean isAutoStart() {
@@ -86,46 +92,60 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
+  private ProcessNetwork parent;
+
+  public void setParent(ProcessNetwork parent) {
+    this.parent = parent;
+  }
+
+  public ProcessNetwork getParent() {
+    return parent;
+  }
+
   public Object postProcessAfterInitialization(
     final Object bean,
     final String beanName) throws BeansException {
-    if (bean instanceof TargetBeanFactoryBean) {
-      final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
-      final Class<?> targetClass = targetBean.getObjectType();
-      if (Process.class.isAssignableFrom(targetClass)) {
-        try {
-          final Process process = new TargetBeanProcess(targetBean);
-          addProcess(process);
-        } catch (final Exception e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
+    if (parent == null) {
+      if (bean instanceof TargetBeanFactoryBean) {
+        final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
+        final Class<?> targetClass = targetBean.getObjectType();
+        if (Process.class.isAssignableFrom(targetClass)) {
+          try {
+            final Process process = new TargetBeanProcess(targetBean);
+            addProcess(process);
+          } catch (final Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
 
-      }
-    } else if (bean instanceof Process) {
-      final Process process = (Process)bean;
-      // Check to see if this was a target bean, if so make sure duplicate
-      // threads aren't created
-      if (processes != null) {
-        for (final Entry<Process, Thread> entry : processes.entrySet()) {
-          final Process otherProcess = entry.getKey();
-          if (otherProcess instanceof TargetBeanProcess) {
-            final TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
-            if (targetProcessBean.isInstanceCreated()) {
-              final Process targetProcess = targetProcessBean.getProcess();
-              if (targetProcess == process) {
-                synchronized (sync) {
-                  final Thread thread = entry.getValue();
-                  processes.put(targetProcess, thread);
-                  processes.remove(otherProcess);
-                  return bean;
+        }
+      } else if (bean instanceof Process) {
+        final Process process = (Process)bean;
+        // Check to see if this was a target bean, if so make sure duplicate
+        // threads aren't created
+        if (processes != null) {
+          for (final Entry<Process, Thread> entry : processes.entrySet()) {
+            final Process otherProcess = entry.getKey();
+            if (otherProcess instanceof TargetBeanProcess) {
+              final TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
+              if (targetProcessBean.isInstanceCreated()) {
+                final Process targetProcess = targetProcessBean.getProcess();
+                if (targetProcess == process) {
+                  synchronized (sync) {
+                    final Thread thread = entry.getValue();
+                    processes.put(targetProcess, thread);
+                    processes.remove(otherProcess);
+                    return bean;
+                  }
                 }
               }
             }
           }
         }
+        addProcess(process);
       }
-      addProcess(process);
+    } else {
+      parent.postProcessAfterInitialization(bean, beanName);
     }
     return bean;
   }
@@ -141,15 +161,20 @@ public class ProcessNetwork implements BeanPostProcessor,
   void removeProcess(final Process process) {
     synchronized (sync) {
       if (processes != null) {
+        processes.remove(process);
+        count--;
+      }
+
+      if (parent == null) {
         if (process.getProcessNetwork() == this) {
           process.setProcessNetwork(null);
         }
-        processes.remove(process);
-        count--;
         if (count == 0) {
           finishRunning();
           sync.notifyAll();
         }
+      } else {
+        parent.removeProcess(process);
       }
     }
   }
@@ -169,38 +194,43 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   public void start() {
-    synchronized (sync) {
-      running = true;
-      if (processes != null) {
-        for (final Process process : new ArrayList<Process>(processes.keySet())) {
-          process.setProcessNetwork(this);
-          start(process);
+    if (parent == null) {
+      synchronized (sync) {
+        running = true;
+        if (processes != null) {
+          for (final Process process : new ArrayList<Process>(
+            processes.keySet())) {
+            process.setProcessNetwork(this);
+            start(process);
+          }
         }
       }
     }
   }
 
   private synchronized void start(final Process process) {
-    if (processes != null) {
-      Thread thread = processes.get(process);
-      if (thread == null) {
-        final Process runProcess;
-        if (process instanceof TargetBeanProcess) {
-          final TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
-          runProcess = targetBeanProcess.getProcess();
-          processes.remove(process);
-        } else {
-          runProcess = process;
-        }
-        final Runnable runnable = new ProcessRunnable(this, runProcess);
-        final String name = runProcess.toString();
-        final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
-          runnable);
-        thread = new Thread(threadGroup, appenderRunnable, name);
-        processes.put(runProcess, thread);
-        if (!thread.isAlive()) {
-          thread.start();
-          count++;
+    if (parent == null) {
+      if (processes != null) {
+        Thread thread = processes.get(process);
+        if (thread == null) {
+          final Process runProcess;
+          if (process instanceof TargetBeanProcess) {
+            final TargetBeanProcess targetBeanProcess = (TargetBeanProcess)process;
+            runProcess = targetBeanProcess.getProcess();
+            processes.remove(process);
+          } else {
+            runProcess = process;
+          }
+          final Runnable runnable = new ProcessRunnable(this, runProcess);
+          final String name = runProcess.toString();
+          final Runnable appenderRunnable = new ThreadLocalAppenderRunnable(
+            runnable);
+          thread = new Thread(threadGroup, appenderRunnable, name);
+          processes.put(runProcess, thread);
+          if (!thread.isAlive()) {
+            thread.start();
+            count++;
+          }
         }
       }
     }
@@ -237,18 +267,23 @@ public class ProcessNetwork implements BeanPostProcessor,
   }
 
   public void waitTillFinished() {
-    synchronized (sync) {
-      try {
-        while (count > 0) {
-          try {
-            sync.wait();
-          } catch (final InterruptedException e) {
-            return;
+    if (parent == null) {
+
+      synchronized (sync) {
+        try {
+          while (count > 0) {
+            try {
+              sync.wait();
+            } catch (final InterruptedException e) {
+              return;
+            }
           }
+        } finally {
+          finishRunning();
         }
-      } finally {
-        finishRunning();
       }
+    } else {
+      parent.waitTillFinished();
     }
   }
 

@@ -37,6 +37,11 @@ public class LineStringRelate {
   private final Coordinates toPoint2;
 
   public LineStringRelate(final LineString line1, final LineString line2) {
+    this(line1, line2, 1);
+  }
+
+  public LineStringRelate(final LineString line1, final LineString line2,
+    final double tolerance) {
     this.line1 = line1;
     this.line2 = line2;
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line1);
@@ -45,10 +50,10 @@ public class LineStringRelate {
 
     final Map<Coordinates, Coordinates> movedNodes = new HashMap<Coordinates, Coordinates>();
     final InvokeMethodVisitor<Node<LineSegment>> moveNodesVisitor1 = new InvokeMethodVisitor<Node<LineSegment>>(
-      graph2, "movePointsWithinTolerance", movedNodes, 1);
+      graph2, "movePointsWithinTolerance", movedNodes, tolerance);
     graph1.visitNodes(moveNodesVisitor1);
     final InvokeMethodVisitor<Node<LineSegment>> moveNodesVisitor2 = new InvokeMethodVisitor<Node<LineSegment>>(
-      graph1, "movePointsWithinTolerance", movedNodes, 1);
+      graph1, "movePointsWithinTolerance", movedNodes, tolerance);
     graph2.visitNodes(moveNodesVisitor2);
 
     final int i = 0;

@@ -76,8 +76,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private Map<QName, String> tableNameMap = new HashMap<QName, String>();
 
-  private CoordinatesPrecisionModel precisionModel;
-
   private JdbcDatabaseFactory databaseFactory;
 
   public AbstractJdbcDataObjectStore() {
@@ -161,7 +159,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       dataSource = null;
       excludeTablePatterns = null;
       hints = null;
-      precisionModel = null;
       schemaNameMap = null;
       sequenceTypeSqlMap = null;
       sqlPrefix = null;
@@ -342,10 +339,6 @@ public abstract class AbstractJdbcDataObjectStore extends
       throw new IllegalArgumentException("Unable to load metadata for "
         + typeName);
     }
-  }
-
-  public CoordinatesPrecisionModel getPrecisionModel() {
-    return precisionModel;
   }
 
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
@@ -678,10 +671,6 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public void setHints(final String hints) {
     this.hints = hints;
-  }
-
-  public void setPrecisionModel(final CoordinatesPrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {

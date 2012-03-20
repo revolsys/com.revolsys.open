@@ -29,7 +29,7 @@ ${TARGET_OBJ}: target/cxx/EsriFileGdb_wrap.cxx
 
 ${TARGET_LIB}: target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
 	${CXX} \
-		-arch ${ARCH} \
+		${LDFLAGS} \
 		-O2 \
 		-fpic \
 		-shared \

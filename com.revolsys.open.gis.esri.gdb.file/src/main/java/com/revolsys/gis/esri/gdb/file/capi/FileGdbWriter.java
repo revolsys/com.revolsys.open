@@ -1,6 +1,8 @@
 package com.revolsys.gis.esri.gdb.file.capi;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -122,9 +124,11 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     Table table = tables.get(typeName);
     if (table == null) {
       table = dataObjectStore.getTable(typeName);
-      tables.put(typeName, table);
-      table.setWriteLock();
-      table.setLoadOnlyMode(true);
+      if (table != null) {
+        tables.put(typeName, table);
+        table.setWriteLock();
+        table.setLoadOnlyMode(true);
+      }
     }
     return table;
   }
@@ -143,17 +147,20 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   }
 
   private void insert(final DataObject object) {
-    final QName typeName = object.getMetaData().getName();
+    DataObjectMetaData sourceMetaData = object.getMetaData();
+    final DataObjectMetaData metaData = dataObjectStore.getMetaData(sourceMetaData);
+    final QName typeName = sourceMetaData.getName();
     final Table table = getTable(typeName);
-    final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
     try {
       final Row row = table.createRowObject();
       try {
+        List<Object> values = new ArrayList<Object>();
         for (final Attribute attribute : metaData.getAttributes()) {
           final String name = attribute.getName();
           final Object value = object.getValue(name);
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          esriAttribute.setInsertValue(row, value);
+          Object esriValue = esriAttribute.setInsertValue(row, value);
+          values.add(esriValue);
         }
         table.insertRow(row);
         for (final Attribute attribute : metaData.getAttributes()) {
@@ -176,12 +183,13 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   }
 
   private void update(final DataObject object) {
-    final QName typeName = object.getMetaData().getName();
+    DataObjectMetaData sourceMetaData = object.getMetaData();
+    final DataObjectMetaData metaData = dataObjectStore.getMetaData(sourceMetaData);
+    final QName typeName = sourceMetaData.getName();
     final Table table = getTable(typeName);
     final Row row = getRow(table, object);
     try {
       try {
-        final DataObjectMetaData metaData = dataObjectStore.getMetaData(typeName);
         for (final Attribute attribute : metaData.getAttributes()) {
           final String name = attribute.getName();
           final Object value = object.getValue(name);

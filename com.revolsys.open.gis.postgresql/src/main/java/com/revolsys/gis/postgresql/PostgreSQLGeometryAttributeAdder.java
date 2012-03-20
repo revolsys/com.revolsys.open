@@ -11,13 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.JdbcConstants;
@@ -50,8 +48,12 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, final int sqlType, final int length, final int scale,
+  public Attribute addAttribute(
+    final DataObjectMetaDataImpl metaData,
+    final String name,
+    final int sqlType,
+    final int length,
+    final int scale,
     final boolean required) {
     final QName typeName = metaData.getName();
     String owner = dataStore.getDatabaseSchemaName(typeName.getNamespaceURI());
@@ -77,13 +79,13 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      CoordinatesPrecisionModel precisionModel = dataStore.getPrecisionModel();
+      GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
       final GeometryFactory geometryFactory;
-      if (precisionModel == null) {
+      if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.getFactory(srid, numAxis, 0, 0);
       } else {
         geometryFactory = GeometryFactory.getFactory(srid, numAxis,
-          precisionModel.getScaleXY(), 0);
+          storeGeometryFactory.getScaleXY(), 0);
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,
         dataType, length, scale, required, null, srid, numAxis, geometryFactory);

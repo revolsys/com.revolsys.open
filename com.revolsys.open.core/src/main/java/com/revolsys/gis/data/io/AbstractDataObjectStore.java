@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
@@ -20,6 +21,7 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -52,12 +54,26 @@ public abstract class AbstractDataObjectStore extends
 
   private StatisticsMap statistics = new StatisticsMap();
 
+  private GeometryFactory geometryFactory;
+
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
 
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+
+  @PostConstruct
+  public void initialize() {
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
+  public void setGeometryFactory(GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   public DataObject lock(final QName typeName, final Object id) {
@@ -145,18 +161,19 @@ public abstract class AbstractDataObjectStore extends
         statistics.disconnect();
       }
       if (schemaMap != null) {
-        for (DataObjectStoreSchema schema: schemaMap.values()) {
+        for (DataObjectStoreSchema schema : schemaMap.values()) {
           schema.destroy();
         }
         schemaMap.clear();
       }
-     } finally {
+    } finally {
       codeTableColumNames = null;
       columnToTableMap = null;
       commonMetaDataProperties = null;
       dataObjectFactory = null;
+      geometryFactory = null;
       label = null;
-     
+
       schemaMap = null;
       statistics = null;
       typeMetaDataProperties = null;

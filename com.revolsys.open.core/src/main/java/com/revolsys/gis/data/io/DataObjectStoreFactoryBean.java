@@ -20,6 +20,7 @@ public class DataObjectStoreFactoryBean implements FactoryBean<DataObjectStore> 
   public DataObjectStore getObject() throws Exception {
     final DataObjectStore dataObjectStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
     JavaBeanUtil.setProperties(dataObjectStore, properties);
+    dataObjectStore.initialize();
     return dataObjectStore;
   }
 
@@ -43,4 +44,7 @@ public class DataObjectStoreFactoryBean implements FactoryBean<DataObjectStore> 
     this.properties = properties;
   }
 
+  public void setUrl(final String url) {
+    config.put("url", url);
+  }
 }

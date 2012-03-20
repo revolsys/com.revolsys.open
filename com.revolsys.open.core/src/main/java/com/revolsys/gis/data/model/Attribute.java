@@ -389,4 +389,8 @@ public class Attribute implements Cloneable {
     }
     return string.toString();
   }
+
+  public void setRequired(boolean required) {
+    this.required = required;
+  }
 }

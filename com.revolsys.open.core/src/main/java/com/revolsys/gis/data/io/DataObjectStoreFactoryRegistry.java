@@ -29,6 +29,14 @@ public class DataObjectStoreFactoryRegistry {
     return (T)factory.createDataObjectStore(connectionProperties);
   }
 
+  public static <T extends DataObjectStore> T createDataObjectStore(
+    final String url) {
+    final DataObjectStoreFactory factory = getDataSourceFactory(url);
+    Map<String, Object> connectionProperties = new HashMap<String, Object>();
+    connectionProperties.put("url", url);
+    return (T)factory.createDataObjectStore(connectionProperties);
+  }
+
   public static Class<?> getDataObjectStoreInterfaceClass(
     final Map<String, Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");

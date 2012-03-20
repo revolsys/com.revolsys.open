@@ -37,9 +37,13 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     addReadWriteMethods("MultiPatch");
   }
 
-  private static void addMethod(final String action,
-    final Map<String, Method> methodMap, final String geometryType,
-    final boolean hasZ, final boolean hasM, final Class<?>... parameterTypes) {
+  private static void addMethod(
+    final String action,
+    final Map<String, Method> methodMap,
+    final String geometryType,
+    final boolean hasZ,
+    final boolean hasM,
+    final Class<?>... parameterTypes) {
     final String geometryTypeKey = "esriGeometry" + geometryType + hasZ + hasM;
     String methodName = action + geometryType;
     if (hasZ) {
@@ -54,8 +58,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   private static void addReadWriteMethods(final String geometryType) {
-    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false, false,
-      GeometryFactory.class, EndianInput.class);
+    addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false,
+      false, GeometryFactory.class, EndianInput.class);
     addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, true, false,
       GeometryFactory.class, EndianInput.class);
     addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, false, true,
@@ -63,14 +67,14 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     addMethod("read", GEOMETRY_TYPE_READ_METHOD_MAP, geometryType, true, true,
       GeometryFactory.class, EndianInput.class);
 
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false, false,
-      EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true, false,
-      EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false, true,
-      EndianOutput.class, Geometry.class);
-    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true, true,
-      EndianOutput.class, Geometry.class);
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false,
+      false, EndianOutput.class, Geometry.class);
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true,
+      false, EndianOutput.class, Geometry.class);
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, false,
+      true, EndianOutput.class, Geometry.class);
+    addMethod("write", GEOMETRY_TYPE_WRITE_METHOD_MAP, geometryType, true,
+      true, EndianOutput.class, Geometry.class);
   }
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory();
@@ -144,7 +148,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -153,6 +157,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       final Geometry projectedGeometry = ProjectionFactory.convert(geometry,
@@ -170,6 +175,9 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         shape.set(i, b);
       }
       row.setGeometry(shape);
+      return new Object[] {
+        shape, bytes
+      };
     } else {
       throw new IllegalArgumentException("Expecting a " + Geometry.class
         + " not a " + value.getClass() + "=" + value);

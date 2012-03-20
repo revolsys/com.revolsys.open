@@ -17,7 +17,8 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   private static final Object LOCK = new Object();
 
   public DateAttribute(final Field field) {
-    super(field.getName(), DataTypes.DATE, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+    super(field.getName(), DataTypes.DATE, field.getRequired() == Boolean.TRUE
+      || !field.isIsNullable());
   }
 
   @Override
@@ -35,7 +36,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -44,6 +45,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else if (value instanceof Date) {
       Date date = (Date)value;
       if (date.before(MIN_DATE)) {
@@ -57,6 +59,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
         synchronized (LOCK) {
           row.setDate(name, time);
         }
+        return time;
       }
     } else {
       throw new IllegalArgumentException("Expecting a java,util.Date not "

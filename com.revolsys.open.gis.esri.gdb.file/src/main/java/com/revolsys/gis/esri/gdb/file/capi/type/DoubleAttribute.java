@@ -20,7 +20,7 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -29,12 +29,17 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      row.setDouble(name, number.doubleValue());
+      double doubleValue = number.doubleValue();
+      row.setDouble(name, doubleValue);
+      return doubleValue;
     } else {
       final String string = value.toString();
-      row.setDouble(name, Double.parseDouble(string));
+      double doubleValue = Double.parseDouble(string);
+      row.setDouble(name, doubleValue);
+      return doubleValue;
     }
   }
 

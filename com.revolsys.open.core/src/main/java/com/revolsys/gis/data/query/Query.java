@@ -232,15 +232,15 @@ public class Query implements Cloneable {
     this.metaData = metaData;
   }
 
-  public void setOrderBy(final List<String> orderBy) {
+  public void setOrderByColumns(final List<String> orderBy) {
     this.orderBy.clear();
     for (String column : orderBy) {
       this.orderBy.put(column, Boolean.TRUE);
     }
   }
 
-  public void setOrderBy(final String... orderBy) {
-    setOrderBy(Arrays.asList(orderBy));
+  public void setOrderByColumns(final String... orderBy) {
+    setOrderByColumns(Arrays.asList(orderBy));
   }
 
   public void setParameters(final List<Object> parameters) {

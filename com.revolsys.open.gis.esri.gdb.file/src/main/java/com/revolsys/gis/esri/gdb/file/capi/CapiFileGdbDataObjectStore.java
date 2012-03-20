@@ -77,7 +77,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     + ".CatalogPath";
 
   private static void addFieldTypeAttributeConstructor(
-    final FieldType fieldType, final Class<? extends Attribute> attributeClass) {
+    final FieldType fieldType,
+    final Class<? extends Attribute> attributeClass) {
     try {
       final Constructor<? extends Attribute> constructor = attributeClass.getConstructor(Field.class);
       ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
@@ -111,7 +112,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private String fileName;
 
-  private boolean createMissingGeodatabase = false;
+  private boolean createMissingGeodatabase = true;
 
   private boolean createMissingTables;
 
@@ -231,7 +232,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   // TODO add bounding box
   @Override
-  protected AbstractIterator<DataObject> createIterator(final Query query,
+  protected AbstractIterator<DataObject> createIterator(
+    final Query query,
     final Map<String, Object> properties) {
     QName typeName = query.getTypeName();
     DataObjectMetaData metaData = query.getMetaData();
@@ -301,7 +303,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public void createSchema(final String schemaName,
+  public void createSchema(
+    final String schemaName,
     final GeometryFactory geometryFactory) {
     final SpatialReference spatialReference = getSpatialReference(geometryFactory);
     final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
@@ -426,8 +429,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public DataObjectMetaData getMetaData(final String schemaName,
-    final String path, final String tableDefinition) {
+  public DataObjectMetaData getMetaData(
+    final String schemaName,
+    final String path,
+    final String tableDefinition) {
     try {
       final XmlProcessor parser = new EsriGdbXmlParser();
       final DETable deTable = parser.process(tableDefinition);
@@ -487,8 +492,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  private DataObjectMetaData getMetaData(final String schemaName,
-    final String path, final Table table) {
+  private DataObjectMetaData getMetaData(
+    final String schemaName,
+    final String path,
+    final Table table) {
     final String tableDefinition;
     synchronized (Table.class) {
       tableDefinition = table.getDefinition();
@@ -497,12 +504,16 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   protected Table getTable(final QName typeName) {
-    final String schemaName = typeName.getNamespaceURI();
-    final String path = "\\\\" + schemaName + "\\" + typeName.getLocalPart();
-    try {
-      return geodatabase.openTable(path);
-    } catch (final RuntimeException e) {
-      throw new RuntimeException("Unable to open table " + typeName, e);
+    if (getMetaData(typeName) == null) {
+      return null;
+    } else {
+      final String schemaName = typeName.getNamespaceURI();
+      final String path = "\\\\" + schemaName + "\\" + typeName.getLocalPart();
+      try {
+        return geodatabase.openTable(path);
+      } catch (final RuntimeException e) {
+        throw new RuntimeException("Unable to open table " + typeName, e);
+      }
     }
   }
 
@@ -641,8 +652,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public void loadSchemaDataObjectMetaData(
-    final Map<QName, DataObjectMetaData> metaDataMap, final String schemaName,
-    final String path, final String datasetType) {
+    final Map<QName, DataObjectMetaData> metaDataMap,
+    final String schemaName,
+    final String path,
+    final String datasetType) {
     try {
       final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
         path, datasetType);
@@ -678,7 +691,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return reader;
   }
 
-  public Reader<DataObject> query(final QName typeName,
+  public Reader<DataObject> query(
+    final QName typeName,
     final BoundingBox boundingBox) {
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
       typeName, boundingBox);

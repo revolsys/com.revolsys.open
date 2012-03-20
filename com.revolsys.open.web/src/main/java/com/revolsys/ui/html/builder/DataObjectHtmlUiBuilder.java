@@ -57,9 +57,9 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     final Query query = new Query(tableName);
     String idPropertyName = getIdPropertyName();
     if (orderBy.length > 0) {
-      query.setOrderBy(orderBy);
+      query.setOrderByColumns(orderBy);
     } else if (StringUtils.hasText(idPropertyName)) {
-      query.setOrderBy(idPropertyName);
+      query.setOrderByColumns(idPropertyName);
     }
     final Reader<DataObject> reader = dataStore.query(query);
     return reader.read();

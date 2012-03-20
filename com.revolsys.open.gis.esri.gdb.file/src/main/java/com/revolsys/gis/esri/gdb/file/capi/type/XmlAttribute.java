@@ -22,7 +22,7 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setValue(final Row row, final Object value) {
+  public Object setValue(final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -31,9 +31,11 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
       } else {
         row.setNull(name);
       }
+      return null;
     } else {
       final String string = value.toString();
       row.setXML(name, string);
+      return string;
     }
   }
 
