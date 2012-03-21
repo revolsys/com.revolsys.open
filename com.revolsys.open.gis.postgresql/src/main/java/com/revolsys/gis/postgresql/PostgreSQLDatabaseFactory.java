@@ -72,7 +72,7 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
         try {
           dataSourceBean.setPropertyValue(name, value);
         } catch (final Throwable t) {
-          LOG.error("Unable to set data source property " + name + " = "
+          LOG.debug("Unable to set data source property " + name + " = "
             + value + " for " + url, t);
         }
       }
