@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -78,9 +79,11 @@ import com.revolsys.ui.html.view.TableView;
 import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
+import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
+import com.revolsys.util.UrlUtil;
 
 @ResponseStatus(reason = "Access Denied", value = HttpStatus.FORBIDDEN)
 public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
@@ -223,15 +226,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ElementContainer container,
     final Class<?> builderClass,
     final String pageName,
-    final String style, boolean open) {
-    addCollapsibleIframe(container, builderClass.getName(), pageName, style, false);
+    final String style,
+    boolean open) {
+    addCollapsibleIframe(container, builderClass.getName(), pageName, style,
+      false);
   }
 
   public void addCollapsibleIframe(
     final ElementContainer container,
     final String builderName,
     final String pageName,
-    final String style, boolean open) {
+    final String style,
+    boolean open) {
     final HtmlUiBuilder<?> appBuilder = getBuilder(builderName);
     final Page page = appBuilder.getPage(pageName);
     if (page != null) {
@@ -428,7 +434,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final HttpServletRequest request,
     final HttpServletResponse response,
     final Map<String, Object> defaultValues,
-    final String prefix) throws IOException, ServletException {
+    final String prefix,
+    String preInsertMethod) throws IOException, ServletException {
     final T object = createObject();
 
     JavaBeanUtil.setProperties(object, defaultValues);
@@ -451,7 +458,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     if (form.isPosted() && form.isMainFormTask()) {
       if (form.isValid()) {
-        if (preInsert(form, object)) {
+        if ((Boolean)JavaBeanUtil.invokeMethod(this, preInsertMethod, form,
+          object)) {
           insertObject(object);
           parameters.put("message", "Saved");
           final Object id = JavaBeanUtil.getValue(object, getIdPropertyName());
@@ -802,7 +810,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @param objectClass<?> The object class.
    * @return The builder.
    */
-  public <V> DataAccessObject<V> getDao(final Class<?> objectClass) {
+  public <V> DataAccessObject<V> getDao(final Class<V> objectClass) {
     if (beanFactory != null) {
       return SpringDaoFactory.get(beanFactory, objectClass);
     } else {
@@ -1192,17 +1200,17 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     throw new UnsupportedOperationException();
   }
 
-  protected void postInsert(final T object) {
+  public void postInsert(final T object) {
   }
 
-  protected void postUpdate(final T object) {
+  public void postUpdate(final T object) {
   }
 
-  protected boolean preInsert(final Form form, final T object) {
+  public boolean preInsert(final Form form, final T object) {
     return true;
   }
 
-  protected boolean preUpdate(final Form form, final T object) {
+  public boolean preUpdate(final Form form, final T object) {
     return true;
   }
 
@@ -1660,8 +1668,27 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     redirect(response, url);
   }
 
-  public void redirect(final HttpServletResponse response, final String url) {
+  public void redirect(final HttpServletResponse response, String url) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    for (String parameterName : Arrays.asList("plain", "htmlCss")) {
+      String value = request.getParameter(parameterName);
+      if (StringUtils.hasText(value)) {
+        parameters.put(parameterName, value);
+      }
+    }
+    url = UrlUtil.getUrl(url, parameters);
     InvokeMethodAfterCommit.invoke(response, "sendRedirect", url);
+  }
+
+  public void redirectPage(
+    final HttpServletResponse response,
+    final String pageName) {
+    String url = getPageUrl(pageName);
+    if (url == null) {
+      url = "..";
+    }
+    redirect(response, url);
   }
 
   protected void notFound(HttpServletResponse response, String message)

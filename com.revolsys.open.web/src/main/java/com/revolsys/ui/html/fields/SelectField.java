@@ -23,15 +23,11 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
 
 public class SelectField extends Field {
-  private static final Logger log = Logger.getLogger(SelectField.class);
-
   private String defaultValue;
 
   private String nullValueLabel = "(None)";
@@ -126,6 +122,12 @@ public class SelectField extends Field {
     field.setRequired(isRequired());
     field.setReadOnly(isReadOnly());
     field.setNullValueLabel(getNullValueLabel());
+    for (FieldValue fieldValue : options) {
+      Object value = fieldValue.getValue();
+      String stringValue = fieldValue.getStringValue();
+      String label = fieldValue.getLabel();
+      field.addOption(value, stringValue, label);
+    }
     return field;
   }
 
@@ -222,9 +224,9 @@ public class SelectField extends Field {
   }
 
   public void setOptions(final Map<Object, String> options) {
-    options.clear();
-    optionMap.clear();
-    optionValueMap.clear();
+    this.options.clear();
+    this.optionMap.clear();
+    this.optionValueMap.clear();
     for (final Entry<Object, String> entry : options.entrySet()) {
       final Object key = entry.getKey();
       final String label = entry.getValue();

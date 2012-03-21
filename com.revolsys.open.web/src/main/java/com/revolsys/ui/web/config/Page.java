@@ -61,8 +61,6 @@ public class Page extends Component {
     }
   }
 
-
-
   private final List<Argument> arguments = new ArrayList<Argument>();
 
   private final Map<String, Argument> argumentsMap = new HashMap<String, Argument>();
@@ -182,14 +180,19 @@ public class Page extends Component {
     if (permissionExpression == null) {
       return true;
     } else {
-      final EvaluationContext securityEvaluationContext = SpringExpressionUtil.createSecurityEvaluationContext();
-      for (Entry<String, ? extends Object> entry : parameters.entrySet()) {
-        String name = entry.getKey();
-        Object value = entry.getValue();
-        securityEvaluationContext.setVariable(name, value);
+      try {
+        final EvaluationContext securityEvaluationContext = SpringExpressionUtil.createSecurityEvaluationContext();
+        for (Entry<String, ? extends Object> entry : parameters.entrySet()) {
+          String name = entry.getKey();
+          Object value = entry.getValue();
+          securityEvaluationContext.setVariable(name, value);
+        }
+        return ExpressionUtils.evaluateAsBoolean(permissionExpression,
+          securityEvaluationContext);
+      } catch (Throwable t) {
+        LOG.error("Unable to evaluate " + permission, t);
+        return false;
       }
-      return ExpressionUtils.evaluateAsBoolean(permissionExpression,
-        securityEvaluationContext);
     }
   }
 

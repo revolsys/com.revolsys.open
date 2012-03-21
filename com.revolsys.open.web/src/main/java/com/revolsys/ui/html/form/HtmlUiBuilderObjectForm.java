@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
+import com.revolsys.ui.html.fields.HiddenField;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.SetObject;
 import com.revolsys.util.JavaBeanUtil;
@@ -56,6 +57,8 @@ public class HtmlUiBuilderObjectForm extends Form {
     this.builder = uiBuilder;
     this.typeLabel = uiBuilder.getTitle();
     this.fieldKeys = fieldKeys;
+    add(new HiddenField("htmlCss", false));
+    add(new HiddenField("plain", false));
   }
 
   @Override

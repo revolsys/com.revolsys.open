@@ -25,6 +25,7 @@ import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +143,31 @@ public final class JavaBeanUtil {
     try {
       final T object = constructor.newInstance(args);
       return object;
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException(t.getMessage(), t);
+      }
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T invokeMethod(
+    Object object,
+    String methodName,
+    Object... args) {
+    try {
+      return (T)MethodUtils.invokeMethod(object, methodName, args);
     } catch (final RuntimeException e) {
       throw e;
     } catch (final Error e) {

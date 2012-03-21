@@ -29,6 +29,10 @@ public final class HttpRequestUtils {
     return request;
   }
 
+  public static String getPathVariable(String name) {
+    return getPathVariables().get(name);
+  }
+
   public static Map<String, String> getPathVariables() {
     final HttpServletRequest request = getHttpServletRequest();
     if (request != null) {
