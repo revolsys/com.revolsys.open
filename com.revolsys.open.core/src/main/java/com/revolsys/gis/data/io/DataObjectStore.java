@@ -2,6 +2,7 @@ package com.revolsys.gis.data.io;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -51,6 +52,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   CodeTable getCodeTable(QName typeName);
 
   CodeTable getCodeTableByColumn(String columnName);
+
+  Map<String, CodeTable> getCodeTableByColumnMap();
 
   DataObjectFactory getDataObjectFactory();
 

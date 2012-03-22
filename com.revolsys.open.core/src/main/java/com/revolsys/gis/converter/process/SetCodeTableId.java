@@ -9,6 +9,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
 public class SetCodeTableId extends
@@ -33,24 +34,20 @@ public class SetCodeTableId extends
       final Converter<DataObject, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
-        final DataObjectStore dataObjectStore = target.getMetaData()
-          .getDataObjectStore();
-        if (dataObjectStore != null) {
-          String codeTableValueName = null;
-          final int dotIndex = codeTableAttributeName.indexOf(".");
-          if (dotIndex != -1) {
-            codeTableValueName = codeTableAttributeName.substring(dotIndex + 1);
-            codeTableAttributeName = codeTableAttributeName.substring(0,
-              dotIndex);
-          }
-          final CodeTable targetCodeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
-          if (targetCodeTable != null) {
-            if (codeTableValueName == null) {
-              sourceValue = targetCodeTable.getId(sourceValue);
-            } else {
-              sourceValue = targetCodeTable.getId(Collections.singletonMap(
-                codeTableValueName, sourceValue));
-            }
+        DataObjectMetaData targetMetaData = target.getMetaData();
+        String codeTableValueName = null;
+        final int dotIndex = codeTableAttributeName.indexOf(".");
+        if (dotIndex != -1) {
+          codeTableValueName = codeTableAttributeName.substring(dotIndex + 1);
+          codeTableAttributeName = codeTableAttributeName.substring(0, dotIndex);
+        }
+        final CodeTable targetCodeTable = targetMetaData.getCodeTableByColumn(codeTableAttributeName);
+        if (targetCodeTable != null) {
+          if (codeTableValueName == null) {
+            sourceValue = targetCodeTable.getId(sourceValue);
+          } else {
+            sourceValue = targetCodeTable.getId(Collections.singletonMap(
+              codeTableValueName, sourceValue));
           }
         }
       }

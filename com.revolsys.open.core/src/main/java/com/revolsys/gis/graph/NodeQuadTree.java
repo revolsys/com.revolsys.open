@@ -22,10 +22,14 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   public Envelope getEnvelope(final Node<T> node) {
-    final double x = node.getX();
-    final double y = node.getY();
-    final Envelope envelope = new Envelope(x, x, y, y);
-    return envelope;
+    if (node == null) {
+      return new Envelope();
+    }else {
+      final double x = node.getX();
+      final double y = node.getY();
+      final Envelope envelope = new Envelope(x, x, y, y);
+      return envelope;
+    }
   }
 
   public int getId(final Node<T> object) {

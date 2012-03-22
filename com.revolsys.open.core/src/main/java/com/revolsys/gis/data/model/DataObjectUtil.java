@@ -65,7 +65,6 @@ public final class DataObjectUtil {
     final DataObject object,
     final String path) {
     final DataObjectMetaData metaData = object.getMetaData();
-    final DataObjectStore dataStore = metaData.getDataObjectStore();
 
     final String[] propertyPath = path.split("\\.");
     Object propertyValue = object;
@@ -79,11 +78,9 @@ public final class DataObjectUtil {
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            if (dataStore != null) {
-              final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
-              if (codeTable != null) {
-                propertyValue = codeTable.getMap(propertyValue);
-              }
+            final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+            if (codeTable != null) {
+              propertyValue = codeTable.getMap(propertyValue);
             }
           }
         } else {
@@ -99,11 +96,9 @@ public final class DataObjectUtil {
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          if (dataStore != null) {
-            final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
-            if (codeTable != null) {
-              propertyValue = codeTable.getMap(propertyValue);
-            }
+          final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+          if (codeTable != null) {
+            propertyValue = codeTable.getMap(propertyValue);
           }
         }
       } else {

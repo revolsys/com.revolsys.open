@@ -26,21 +26,7 @@ public class SetValues extends
       final String name = entry.getKey();
       final Object value = entry.getValue();
       if (value != null) {
-        final DataObjectMetaData targetMetaData = target.getMetaData();
-        final DataObjectStore targetDataObjectStore = targetMetaData.getDataObjectStore();
-        if (targetDataObjectStore == null) {
-          target.setValue(name, value);
-        } else {
-          final CodeTable codeTable = targetDataObjectStore.getCodeTableByColumn(name);
-          if (codeTable == null) {
-            target.setValue(name, value);
-          } else if (value instanceof Number) {
-            target.setValue(name, value);
-          } else {
-            final Object codeId = codeTable.getId(value);
-            target.setValue(name, codeId);
-          }
-        }
+        target.setValueByPath(name, value);
       }
     }
   }

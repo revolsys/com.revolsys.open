@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -88,6 +89,20 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   private List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
 
   private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
+
+  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
+
+  public CodeTable getCodeTableByColumn(String column) {
+    CodeTable codeTable = codeTableByColumnMap.get(column);
+    if (codeTable == null && dataObjectStore != null) {
+      codeTable = dataObjectStore.getCodeTableByColumn(column);
+    }
+    return codeTable;
+  }
+
+  public void addColumnCodeTable(String column, CodeTable codeTable) {
+    codeTableByColumnMap.put(column, codeTable);
+  }
 
   @PreDestroy
   public void destroy() {
@@ -600,5 +615,10 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     for (DataObjectMetaDataImpl metaData : metaDataList) {
       metaData.destroy();
     }
+  }
+
+  public void setCodeTableByColumnMap(
+    Map<String, CodeTable> codeTableByColumnMap) {
+    this.codeTableByColumnMap = codeTableByColumnMap;
   }
 }

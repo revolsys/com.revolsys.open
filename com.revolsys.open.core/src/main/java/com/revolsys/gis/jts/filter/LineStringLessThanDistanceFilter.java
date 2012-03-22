@@ -21,11 +21,23 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
+
+  public static Filter<DataObject> getFilter(
+    DataObject object,
+    double maxDistance) {
+    LineString line = object.getGeometryValue();
+    LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(line,
+      maxDistance);
+    return new DataObjectGeometryFilter<LineString>(lineFilter);
+  }
+  
   private Envelope envelope;
 
   /** The geometry to compare the data objects to to. */

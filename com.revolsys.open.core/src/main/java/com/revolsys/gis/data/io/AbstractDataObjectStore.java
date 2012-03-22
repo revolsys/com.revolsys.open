@@ -56,6 +56,10 @@ public abstract class AbstractDataObjectStore extends
 
   private GeometryFactory geometryFactory;
 
+  public Map<String, CodeTable> getCodeTableByColumnMap() {
+    return new HashMap<String, CodeTable>(columnToTableMap);
+  }
+
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }

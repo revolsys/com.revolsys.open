@@ -51,8 +51,7 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
       return true;
     } else {
       final DataObjectMetaData metaData = object.getMetaData();
-      final JdbcDataObjectStore dataObjectStore = (JdbcDataObjectStore)metaData.getDataObjectStore();
-      final CodeTable codeTable = dataObjectStore.getCodeTableByColumn(attributeName);
+      final CodeTable codeTable = metaData.getCodeTableByColumn(attributeName);
       if (codeTable != null) {
         final Object codeValue = codeTable.getValue((Number)propertyValue);
         if (values.contains(codeValue)) {

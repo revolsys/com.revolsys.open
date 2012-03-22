@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ObjectWithProperties;
 
@@ -46,6 +47,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   Attribute getAttribute(CharSequence name);
 
   Attribute getAttribute(int index);
+
+  CodeTable getCodeTableByColumn(String column);
 
   /**
    * Get the number of attributes supported by the type.

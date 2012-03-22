@@ -41,7 +41,6 @@ import javax.xml.namespace.QName;
 import org.apache.log4j.Logger;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -252,7 +251,6 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   @SuppressWarnings("unchecked")
   public <T> T getValueByPath(final CharSequence path) {
-    final DataObjectStore dataStore = metaData.getDataObjectStore();
     final String[] propertyPath = path.toString().split("\\.");
     Object propertyValue = this;
     for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
@@ -265,11 +263,9 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            if (dataStore != null) {
-              final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
-              if (codeTable != null) {
-                propertyValue = codeTable.getMap(propertyValue);
-              }
+            final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+            if (codeTable != null) {
+              propertyValue = codeTable.getMap(propertyValue);
             }
           }
         } else {
@@ -285,11 +281,9 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          if (dataStore != null) {
-            final CodeTable codeTable = dataStore.getCodeTableByColumn(propertyName);
-            if (codeTable != null) {
-              propertyValue = codeTable.getMap(propertyValue);
-            }
+          final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+          if (codeTable != null) {
+            propertyValue = codeTable.getMap(propertyValue);
           }
         }
       } else {
@@ -456,48 +450,38 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   }
 
   public void setValueByPath(final CharSequence path, final Object value) {
-    final DataObjectStore dataObjectStore = metaData.getDataObjectStore();
-
     final String name = path.toString();
     final int dotIndex = name.indexOf(".");
-    if (dataObjectStore == null) {
+    String codeTableAttributeName;
+    String codeTableValueName = null;
+    if (dotIndex == -1) {
+      codeTableAttributeName = name;
+    } else {
+      codeTableAttributeName = name.substring(0, dotIndex);
+      codeTableValueName = name.substring(dotIndex + 1);
+    }
+    final CodeTable codeTable = metaData.getCodeTableByColumn(codeTableAttributeName);
+    if (codeTable == null) {
       if (dotIndex != -1) {
         throw new IllegalArgumentException("Cannot get code table for "
           + metaData.getName() + "." + name);
       }
       setValue(name, value);
+    } else if (value == null || !StringUtils.hasText(value.toString())) {
+      setValue(codeTableAttributeName, null);
     } else {
-      String codeTableAttributeName;
-      String codeTableValueName = null;
-      if (dotIndex == -1) {
-        codeTableAttributeName = name;
+      Object targetValue;
+      if (codeTableValueName == null) {
+        targetValue = codeTable.getId(value);
       } else {
-        codeTableAttributeName = name.substring(0, dotIndex);
-        codeTableValueName = name.substring(dotIndex + 1);
+        targetValue = codeTable.getId(Collections.singletonMap(
+          codeTableValueName, value));
       }
-      final CodeTable codeTable = dataObjectStore.getCodeTableByColumn(codeTableAttributeName);
-      if (codeTable == null) {
-        if (dotIndex != -1) {
-          throw new IllegalArgumentException("Cannot get code table for "
-            + metaData.getName() + "." + name);
-        }
-        setValue(name, value);
-      } else if (value == null || !StringUtils.hasText(value.toString())) {
-        setValue(codeTableAttributeName, null);
+      if (targetValue == null) {
+        throw new IllegalArgumentException("Cannot get code table for "
+          + metaData.getName() + "." + name + "=" + value);
       } else {
-        Object targetValue;
-        if (codeTableValueName == null) {
-          targetValue = codeTable.getId(value);
-        } else {
-          targetValue = codeTable.getId(Collections.singletonMap(
-            codeTableValueName, value));
-        }
-        if (targetValue == null) {
-          throw new IllegalArgumentException("Cannot get code table for "
-            + metaData.getName() + "." + name + "=" + value);
-        } else {
-          setValue(codeTableAttributeName, targetValue);
-        }
+        setValue(codeTableAttributeName, targetValue);
       }
     }
   }

@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -44,8 +43,7 @@ public class CopyValues extends
       }
       if (value != null) {
         final DataObjectMetaData targetMetaData = target.getMetaData();
-        final DataObjectStore targetDataObjectStore = targetMetaData.getDataObjectStore();
-        final CodeTable codeTable = targetDataObjectStore.getCodeTableByColumn(targetName);
+        final CodeTable codeTable = targetMetaData.getCodeTableByColumn(targetName);
         if (codeTable == null) {
           target.setValue(targetName, value);
         } else {
