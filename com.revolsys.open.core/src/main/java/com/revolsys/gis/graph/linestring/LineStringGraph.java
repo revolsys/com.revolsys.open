@@ -47,7 +47,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public LineStringGraph(final GeometryFactory geometryFactory,
     final LineString line) {
     setGeometryFactory(geometryFactory);
-    setLineString(LineStringUtil.cleanShortSegments(line));
+    setLineString(line);
   }
 
   public LineStringGraph(final LineString lineString) {

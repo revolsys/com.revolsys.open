@@ -73,10 +73,14 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   public void visit(final Envelope envelope, final Visitor<T> visitor) {
-    root.visit(envelope, visitor);
+    if (root != null) {
+      root.visit(envelope, visitor);
+    }
   }
 
   public void visit(final Visitor<T> visitor) {
-    root.visit(visitor);
+    if (root != null) {
+      root.visit(visitor);
+    }
   }
 }

@@ -27,6 +27,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
@@ -307,6 +308,8 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private Query query;
 
+  private Statistics statistics;
+
   public JdbcQueryIterator(final JdbcDataObjectStore dataStore,
     final Query query, final Map<String, Object> properties) {
     super();
@@ -328,7 +331,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     this.dataObjectFactory = dataStore.getDataObjectFactory();
     this.dataStore = dataStore;
     this.query = query;
-
+    this.statistics = (Statistics)properties.get(Statistics.class.getName());
   }
 
   @Override
@@ -372,6 +375,9 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       if (resultSet != null && resultSet.next()) {
         final DataObject object = getNextObject(dataStore, metaData,
           attributes, dataObjectFactory, resultSet);
+        if (statistics != null) {
+          statistics.add(object);
+        }
         return object;
       } else {
         close();

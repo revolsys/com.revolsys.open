@@ -15,6 +15,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.io.Statistics;
 
 public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
   implements DataObjectReader {
@@ -28,6 +29,8 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
   private List<QName> typeNames;
 
   private String whereClause;
+
+  private Statistics statistics;
 
   public DataObjectStoreQueryReader() {
     setIterator(new DataStoreMultipleQueryIterator(this));
@@ -69,6 +72,18 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     queries = null;
     typeNames = null;
     whereClause = null;
+    if (statistics != null) {
+      statistics.disconnect();
+    }
+    statistics = null;
+  }
+
+  public void setStatistics(Statistics statistics) {
+    this.statistics = statistics;
+    if (statistics != null) {
+      statistics.connect();
+    }
+    setProperty(Statistics.class.getName(), statistics);
   }
 
   protected AbstractIterator<DataObject> createQueryIterator(final int i) {

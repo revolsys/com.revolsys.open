@@ -685,19 +685,24 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final String pageName = getName(prefix, "view");
 
       final Page page = getPage(pageName);
-      List<KeySerializer> serializers = getSerializers(pageName, "view");
-      final Element detailView = createDetailView(object, serializers);
+      if (page == null) {
+        log.error("Page not found " + pageName);
+        throw new NoSuchRequestHandlingMethodException(request);
+      } else {
+        List<KeySerializer> serializers = getSerializers(pageName, "view");
+        final Element detailView = createDetailView(object, serializers);
 
-      final String title = page.getExpandedTitle();
-      request.setAttribute("title", title);
+        final String title = page.getExpandedTitle();
+        request.setAttribute("title", title);
 
-      final Menu actionMenu = new Menu();
-      addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
+        final Menu actionMenu = new Menu();
+        addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
 
-      final ElementContainer view = new ElementContainer(detailView);
-      view.setDecorator(new CollapsibleBox(title, true));
-      addMenuElement(view, actionMenu);
-      return view;
+        final ElementContainer view = new ElementContainer(detailView);
+        view.setDecorator(new CollapsibleBox(title, true));
+        addMenuElement(view, actionMenu);
+        return view;
+      }
     }
   }
 
@@ -1247,7 +1252,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         for (int i = 0; i < parts.length - 1; i++) {
           final String keyName = parts[i];
           try {
-            currentObject = JavaBeanUtil.getValue(currentObject, keyName);
+            currentObject = getProperty(currentObject, keyName);
             if (currentObject == null) {
               serializeNullLabel(out, keyName);
               return;
@@ -1266,7 +1271,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         if (path == null) {
           if (uiBuilder == this) {
             try {
-              final Object value = JavaBeanUtil.getValue(currentObject, lastKey);
+              final Object value = getProperty(currentObject, lastKey);
               if (value == null) {
                 serializeNullLabel(out, lastKey);
                 return;
@@ -1332,7 +1337,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Map<String, Object> parameters = new HashMap<String, Object>();
     final Object id = getIdValue(object);
     parameters.put(idParameterName, id);
-    parameters.put(key, JavaBeanUtil.getValue(object, key));
+    parameters.put(key, getProperty(object, key));
     final String url = getPageUrl(pageName, parameters);
     if (url == null) {
       serializeNullLabel(out, pageName);
@@ -1359,7 +1364,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       for (Entry<String, String> parameterKey : parameterKeys.entrySet()) {
         String parameterName = parameterKey.getKey();
         String keyName = parameterKey.getValue();
-        Object value = JavaBeanUtil.getValue(object, keyName);
+        Object value = getProperty(object, keyName);
         if (value != null) {
           parameters.put(parameterName, value);
         }
@@ -1375,6 +1380,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       serialize(out, object, key);
       out.endTag(HtmlUtil.A);
     }
+  }
+
+  public Object getProperty(final Object object, String keyName) {
+    return JavaBeanUtil.getValue(object, keyName);
   }
 
   public void serializeLink(
