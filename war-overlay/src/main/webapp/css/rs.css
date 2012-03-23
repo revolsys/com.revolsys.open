@@ -281,15 +281,16 @@ div.collapsibleBox > div > div.content > div.objectList > table.data {
 div.objectList {
   border: 0.1em solid #666666;
   width: auto;
+  background-color: #ffffff;
 }
 
-div.objectList table.data {
+div.objectList > table.data {
   border: 0.2em solid #6699CC;
   padding: 0.1em;
   width: 100%;
 }
 
-div.objectList table.data caption {
+div.objectList > table.data > caption {
   box-sizing: border-box;
   -webkit-box-sizing:border-box;
   -moz-box-sizing: border-box;
@@ -302,48 +303,48 @@ div.objectList table.data caption {
   border-bottom-width: 0em;
 }
 
-div.objectList table.data td,
-div.objectList table.data th {
+div.objectList > table.data td,
+div.objectList > table.data th {
   padding: 0.2em 0.3em 0.2em 0.3em;
 }
 
-div.objectList table.data thead {
+div.objectList > table.data > thead {
   background-color: #a2c8ff;
 }
 
-div.objectList table.data thead th {
+div.objectList > table.data > thead > th {
   color: #0046a0;
   border-right: 0.1em solid white;
 }
 
-div.objectList table.data thead th:last-child {
+div.objectList > table.data > thead > tr > th:last-child {
   border-right-width: 0em;
 }
 
-div.objectList table.data tbody td {
+div.objectList > table.data > tbody > td {
   border-right: 0.1em solid #cccccc;
   border-bottom: 0.1em solid #cccccc;
 }
 
-div.objectList table.data tbody td:last-child {
+div.objectList > table.data > tbody > tr > td:last-child {
    border-right-width: 0em;
 }
 
-div.objectList table.data tbody tr:last-child td {
+div.objectList > table.data > tbody > tr:last-child > td {
    border-bottom-width: 0em;
 }
 
-div.objectList table.data tbody tr.selected td {
+div.objectList > table.data > tbody > tr.selected > td {
   background-color: #fff7b4;
 }
-div.objectList table.data tbody tr.even td {
+div.objectList > table.data > tbody > tr.even > td {
   background-color: #eeeeee;
   border-right-color: white;
 }
 
-div.objectList table.data tbody.search tr td textarea,
-div.objectList table.data tbody.search tr th input[type="text"],
-div.objectList table.data tbody.search tr td input[type="text"] {
+div.objectList > table.data > tbody.search tr td textarea,
+div.objectList > table.data > tbody.search tr th input[type="text"],
+div.objectList > table.data > tbody.search tr td input[type="text"] {
   height: 1.2em;
   width: 100%;
   box-sizing: border-box;
@@ -370,30 +371,30 @@ div.objectView {
   width: auto;
 }
 
-div.objectView table.data {
+div.objectView > table.data {
   border: 0.2em solid #6699CC;
   padding: 0.1em;
   width: 100%;
 }
 
-div.objectView table.data th {
+div.objectView > table.data > tbody > tr > th {
   background-color: #a2c8ff;
   border-bottom: 0.1em solid white;
   padding: 0.3em 0.4em 0.3em 0.4em;
   text-align: left;
 }
 
-div.objectView table.data td {
+div.objectView > table.data > tbody > tr > td {
   border-bottom: 0.1em solid #cccccc;
   padding: 0.3em 0.4em 0.3em 0.4em;
 }
 
-div.objectView table.data tr.even td {
+div.objectView > table.data > tbody > tr.even > td {
   background-color: #eeeeee;
 }
 
-div.objectView table.data tr.lastRow th,
-div.objectView table.data tr.lastRow td
+div.objectView > table.data > tbody > tr.lastRow > th,
+div.objectView > table.data > tbody > tr.lastRow > td
  {
   border-bottom-width: 0em;
 }

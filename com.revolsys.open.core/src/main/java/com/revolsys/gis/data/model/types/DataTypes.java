@@ -133,6 +133,13 @@ public final class DataTypes {
         }
       }
     }
+    register(Boolean.TYPE, BOOLEAN);
+    register(Byte.TYPE, BYTE);
+    register(Short.TYPE, SHORT);
+    register(Integer.TYPE, INT);
+    register(Long.TYPE, LONG);
+    register(Float.TYPE, FLOAT);
+    register(Double.TYPE, DOUBLE);
   }
 
   public static DataType getType(final Class<?> clazz) {
@@ -164,6 +171,10 @@ public final class DataTypes {
     final QName typeName = type.getName();
     NAME_TYPE_MAP.put(typeName, type);
     final Class<?> typeClass = type.getJavaClass();
+    register(typeClass, type);
+  }
+
+  public static void register(final Class<?> typeClass, final DataType type) {
     final String typeClassName = typeClass.getName();
     CLASS_TYPE_MAP.put(typeClassName, type);
   }

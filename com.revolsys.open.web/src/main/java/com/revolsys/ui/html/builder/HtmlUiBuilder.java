@@ -499,15 +499,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (object == null) {
       throw new NoSuchRequestHandlingMethodException(request);
     } else {
-      // if (!canEditObject(request, object)) {
-      // response.sendError(HttpServletResponse.SC_FORBIDDEN,
-      // "No permission to edit " + getTypeName() + " #" + getId());
-      // return null;
-      // }
-      final Map<String, Object> parameters = new HashMap<String, Object>();
-      final Object id = JavaBeanUtil.getValue(object, getIdPropertyName());
-      parameters.put(getIdParameterName(), id);
-
       final Set<String> parameterNamesToSave = new HashSet<String>();
       parameterNamesToSave.add(getIdParameterName());
 
@@ -523,7 +514,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         if (form.isValid() && preUpdate(form, object)) {
           updateObject(object);
           postUpdate(object);
-          parameters.put("message", "Saved");
+
+          final Map<String, Object> parameters = new HashMap<String, Object>();
+          final Object id = JavaBeanUtil.getValue(object, getIdPropertyName());
+          parameters.put(getIdParameterName(), id);
 
           final String url = getPageUrl(viewName, parameters);
           response.sendRedirect(url);
@@ -1372,7 +1366,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
     final String url = getPageUrl(pageName, parameters);
     if (url == null) {
-      serializeNullLabel(out, pageName);
+      serialize(out, object, key);
     } else {
       out.startTag(HtmlUtil.A);
       out.attribute(HtmlUtil.ATTR_HREF, url);

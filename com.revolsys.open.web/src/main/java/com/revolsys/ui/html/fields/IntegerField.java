@@ -23,6 +23,10 @@ public class IntegerField extends TextField {
 
   private int maximumValue = Integer.MAX_VALUE;
 
+  public IntegerField() {
+    setSize(10);
+  }
+
   public IntegerField(final String name, final boolean required) {
     super(name, 10, required);
   }

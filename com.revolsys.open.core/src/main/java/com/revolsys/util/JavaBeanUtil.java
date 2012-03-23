@@ -15,6 +15,7 @@
  */
 package com.revolsys.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,6 +30,7 @@ import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import com.revolsys.gis.data.model.DataObject;
 
@@ -40,23 +42,6 @@ import com.revolsys.gis.data.model.DataObject;
  */
 public final class JavaBeanUtil {
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
-
-  public static boolean isDefinedInClassLoader(
-    final ClassLoader classLoader,
-    final URL resourceUrl) {
-    if (classLoader instanceof URLClassLoader) {
-      String resourceUrlString = resourceUrl.toString();
-      final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;
-      for (final URL url : urlClassLoader.getURLs()) {
-        if (resourceUrlString.contains(url.toString())) {
-          return true;
-        }
-      }
-      return false;
-    } else {
-      return true;
-    }
-  }
 
   public static Method getMethod(
     final Class<?> clazz,
@@ -137,37 +122,28 @@ public final class JavaBeanUtil {
       + expectedRawClass.getName() + " with 1 generic class parameter");
   }
 
+  public static Object getValue(final Object object, final String key) {
+    if (object instanceof DataObject) {
+      final DataObject dataObject = (DataObject)object;
+      return dataObject.getValueByPath(key);
+    } else if (object instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, ?> map = (Map<String, ?>)object;
+      return map.get(key);
+    } else if (object instanceof Annotation) {
+      final Annotation annotation = (Annotation)object;
+      return AnnotationUtils.getValue(annotation, key);
+    } else {
+      return getProperty(object, key);
+    }
+  }
+
   public static <T> T invokeConstructor(
     final Constructor<? extends T> constructor,
     final Object... args) {
     try {
       final T object = constructor.newInstance(args);
       return object;
-    } catch (final RuntimeException e) {
-      throw e;
-    } catch (final Error e) {
-      throw e;
-    } catch (final InvocationTargetException e) {
-      final Throwable t = e.getTargetException();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      } else if (t instanceof Error) {
-        throw (Error)t;
-      } else {
-        throw new RuntimeException(t.getMessage(), t);
-      }
-    } catch (final Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> T invokeMethod(
-    Object object,
-    String methodName,
-    Object... args) {
-    try {
-      return (T)MethodUtils.invokeMethod(object, methodName, args);
     } catch (final RuntimeException e) {
       throw e;
     } catch (final Error e) {
@@ -209,6 +185,48 @@ public final class JavaBeanUtil {
       }
     } catch (final Exception e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T invokeMethod(
+    final Object object,
+    final String methodName,
+    final Object... args) {
+    try {
+      return (T)MethodUtils.invokeMethod(object, methodName, args);
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Error e) {
+      throw e;
+    } catch (final InvocationTargetException e) {
+      final Throwable t = e.getTargetException();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      } else if (t instanceof Error) {
+        throw (Error)t;
+      } else {
+        throw new RuntimeException(t.getMessage(), t);
+      }
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static boolean isDefinedInClassLoader(
+    final ClassLoader classLoader,
+    final URL resourceUrl) {
+    if (classLoader instanceof URLClassLoader) {
+      final String resourceUrlString = resourceUrl.toString();
+      final URLClassLoader urlClassLoader = (URLClassLoader)classLoader;
+      for (final URL url : urlClassLoader.getURLs()) {
+        if (resourceUrlString.contains(url.toString())) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return true;
     }
   }
 
@@ -265,19 +283,6 @@ public final class JavaBeanUtil {
    * Construct a new JavaBeanUtil.
    */
   private JavaBeanUtil() {
-  }
-
-  public static Object getValue(final Object object, final String key) {
-    if (object instanceof DataObject) {
-      final DataObject dataObject = (DataObject)object;
-      return dataObject.getValueByPath(key);
-    } else if (object instanceof Map) {
-      @SuppressWarnings("unchecked")
-      final Map<String, ?> map = (Map<String, ?>)object;
-      return map.get(key);
-    } else {
-      return getProperty(object, key);
-    }
   }
 
 }

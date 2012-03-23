@@ -14,6 +14,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.io.Statistics;
+import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
@@ -37,6 +39,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
     final QName typeName,
     String whereClause,
     final BoundingBox boundingBox);
+
+  StatisticsMap getStatistics();
 
   DataObjectReader createReader(
     QName typeName,

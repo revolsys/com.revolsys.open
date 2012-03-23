@@ -1,6 +1,7 @@
 package com.revolsys.ui.web.utils;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,12 +38,19 @@ public final class HttpRequestUtils {
     final HttpServletRequest request = getHttpServletRequest();
     if (request != null) {
       @SuppressWarnings("unchecked")
-      final Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-      if (pathVariables != null) {
-        return pathVariables;
+      Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+      if (pathVariables == null) {
+        pathVariables = new HashMap<String, String>();
+        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
+          pathVariables);
       }
+      return pathVariables;
     }
-    return Collections.emptyMap();
+    return new HashMap<String, String>();
+  }
+
+  public static void setPathVariable(String name, String value) {
+    getPathVariables().put(name, value);
   }
 
   public static void setHttpServletRequest(HttpServletRequest request) {

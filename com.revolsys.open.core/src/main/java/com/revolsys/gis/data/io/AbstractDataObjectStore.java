@@ -157,6 +157,10 @@ public abstract class AbstractDataObjectStore extends
     statistics.add(statisticName, typeName, count);
   }
 
+  public StatisticsMap getStatistics() {
+    return statistics;
+  }
+
   @PreDestroy
   public void close() {
     try {

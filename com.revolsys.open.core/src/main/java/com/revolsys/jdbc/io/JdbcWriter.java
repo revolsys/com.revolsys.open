@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
@@ -18,6 +19,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.GlobalIdProperty;
+import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -83,21 +85,19 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private Map<QName, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<QName, PreparedStatement>();
 
-  public JdbcWriter(final Connection connection,
-    final JdbcDataObjectStore dataStore) {
-    this.dataStore = dataStore;
-    if (connection == null) {
-      setConnection(dataStore.getConnection());
-      setDataSource(dataStore.getDataSource());
-    } else {
-      setConnection(connection);
-    }
-  }
+  private StatisticsMap statistics;
 
   public JdbcWriter(final JdbcDataObjectStore dataStore) {
+    this(dataStore, dataStore.getStatistics());
+  }
+
+  public JdbcWriter(final JdbcDataObjectStore dataStore,
+    StatisticsMap statistics) {
     this.dataStore = dataStore;
+    this.statistics = statistics;
     setConnection(dataStore.getConnection());
     setDataSource(dataStore.getDataSource());
+    statistics.connect();
   }
 
   private void addSqlColumEqualsPlaceholder(
@@ -113,7 +113,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     attribute.addInsertStatementPlaceHolder(sqlBuffer, false);
   }
 
-  @Override
+  @PreDestroy
   public synchronized void close() {
     if (dataStore != null) {
       try {
@@ -126,6 +126,10 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
           typeUpdateBatchCountMap, "Update");
         close(typeDeleteSqlMap, typeDeleteStatementMap,
           typeDeleteBatchCountMap, "Delete");
+        if (statistics != null) {
+          statistics.disconnect();
+          statistics = null;
+        }
       } finally {
         typeInsertSqlMap = null;
         typeInsertStatementMap = null;
@@ -562,7 +566,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
       typeCountMap.put(typeName, typeCount);
       statement.executeBatch();
-      dataStore.addStatistic(statisticName, typeName, batchCount);
+      statistics.add(statisticName, typeName, batchCount);
     } catch (final BatchUpdateException be) {
       LOG.error(be.getNextException() + " " + sql);
       throw be;
