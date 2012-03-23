@@ -321,7 +321,7 @@ div.objectList > table.data > thead > tr > th:last-child {
   border-right-width: 0em;
 }
 
-div.objectList > table.data > tbody > td {
+div.objectList > table.data > tbody > tr > td {
   border-right: 0.1em solid #cccccc;
   border-bottom: 0.1em solid #cccccc;
 }
