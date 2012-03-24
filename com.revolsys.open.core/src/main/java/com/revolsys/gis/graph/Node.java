@@ -550,5 +550,4 @@ public class Node<T> extends AbstractCoordinates {
       }
     }
   }
-
 }
