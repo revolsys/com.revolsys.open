@@ -373,6 +373,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return false;
   }
 
+  public CoordinatesList subList(final int index) {
+    return subList(index, size() - index);
+  }
+
   public CoordinatesList subList(final int index, final int count) {
     return subList(count, index, count);
   }

@@ -1,6 +1,8 @@
-package com.revolsys.gis.model.coordinates;
+package com.revolsys.gis.model.coordinates.comparator;
 
 import java.util.Comparator;
+
+import com.revolsys.gis.model.coordinates.Coordinates;
 
 public class CoordinatesDistanceComparator implements Comparator<Coordinates> {
 

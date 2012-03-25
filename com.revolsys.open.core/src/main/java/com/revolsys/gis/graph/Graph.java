@@ -39,17 +39,17 @@ import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.graph.event.NodeEventListenerList;
 import com.revolsys.gis.graph.filter.IsPointOnLineEdgeFilter;
 import com.revolsys.gis.graph.visitor.DeleteEdgeVisitor;
-import com.revolsys.gis.graph.visitor.EdgeWithinDistanceVisitor;
+import com.revolsys.gis.graph.visitor.EdgeWithinDistance;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Envelope;
@@ -187,7 +187,7 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> findEdges(final Coordinates point, final double distance) {
-    return EdgeWithinDistanceVisitor.edgesWithinDistance(this, point, distance);
+    return EdgeWithinDistance.edgesWithinDistance(this, point, distance);
   }
 
   public List<Edge<T>> findEdges(final EdgeVisitor<T> visitor) {

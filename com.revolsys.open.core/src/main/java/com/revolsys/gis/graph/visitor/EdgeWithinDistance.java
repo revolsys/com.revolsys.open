@@ -3,6 +3,7 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.NestedVisitor;
@@ -14,7 +15,8 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
+public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
+  Filter<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithiDistance(
     final Graph<T> graph,
     final Geometry geometry,
@@ -23,7 +25,7 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
     final Envelope env = new Envelope(geometry.getEnvelopeInternal());
     env.expandBy(maxDistance);
     graph.getEdgeIndex().query(env,
-      new EdgeWithinDistanceVisitor<T>(geometry, maxDistance, results));
+      new EdgeWithinDistance<T>(geometry, maxDistance, results));
     return results.getList();
   }
 
@@ -52,14 +54,13 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
 
   private final double maxDistance;
 
-  public EdgeWithinDistanceVisitor(final Geometry geometry,
-    final double maxDistance) {
+  public EdgeWithinDistance(final Geometry geometry, final double maxDistance) {
     this.geometry = geometry;
     this.maxDistance = maxDistance;
   }
 
-  public EdgeWithinDistanceVisitor(final Geometry geometry,
-    final double maxDistance, final Visitor<Edge<T>> matchVisitor) {
+  public EdgeWithinDistance(final Geometry geometry, final double maxDistance,
+    final Visitor<Edge<T>> matchVisitor) {
     super(matchVisitor);
     this.geometry = geometry;
     this.maxDistance = maxDistance;
@@ -67,12 +68,19 @@ public class EdgeWithinDistanceVisitor<T> extends NestedVisitor<Edge<T>> {
 
   @Override
   public boolean visit(final Edge<T> edge) {
-    final LineString line = edge.getLine();
-    final double distance = line.distance(geometry);
-    if (distance <= maxDistance) {
+    if (accept(edge)) {
       super.visit(edge);
     }
     return true;
   }
 
+  public boolean accept(Edge<T> edge) {
+    final LineString line = edge.getLine();
+    final double distance = line.distance(geometry);
+    if (distance <= maxDistance) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

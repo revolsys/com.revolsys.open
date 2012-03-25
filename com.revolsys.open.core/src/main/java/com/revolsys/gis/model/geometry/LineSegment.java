@@ -1,5 +1,8 @@
 package com.revolsys.gis.model.geometry;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
@@ -13,6 +16,7 @@ import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -209,8 +213,10 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public Coordinates intersection(final LineSegment lineSegment2) {
-    return LineSegmentUtil.intersection(coordinates1, coordinates2,
+    Coordinates intersection = LineSegmentUtil.intersection(coordinates1, coordinates2,
       lineSegment2.coordinates1, lineSegment2.coordinates2);
+     geometryFactory.makePrecise(intersection);
+     return intersection;
   }
 
   public boolean intersects(final BoundingBox boundingBox) {

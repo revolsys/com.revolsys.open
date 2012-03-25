@@ -1,5 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;

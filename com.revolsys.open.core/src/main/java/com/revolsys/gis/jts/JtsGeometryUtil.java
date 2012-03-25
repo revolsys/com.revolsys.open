@@ -300,67 +300,6 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static Geometry difference2DZ(
-    final LineString line,
-    final Geometry geometry) {
-    final Geometry difference = line.difference(geometry);
-    if (difference instanceof LineString) {
-      final LineString lineDiff = (LineString)difference;
-      final Coordinate c0 = lineDiff.getCoordinateN(0);
-      if (Double.isNaN(c0.z)) {
-        addElevation(c0, line);
-      }
-      final Coordinate cN = lineDiff.getCoordinateN(lineDiff.getNumPoints() - 1);
-      if (Double.isNaN(cN.z)) {
-        addElevation(cN, line);
-      }
-
-    }
-    difference.setUserData(line.getUserData());
-    return difference;
-  }
-
-  public static double distance(
-    final Coordinate coordinate,
-    final Geometry geometry) {
-    final GeometryFactory factory = GeometryFactory.getFactory(geometry);
-    final Point point = factory.createPoint(coordinate);
-    return point.distance(geometry);
-  }
-
-  public static double distance(
-    final Coordinate coordinate,
-    final LineString line) {
-    return distance(coordinate, line, 0.0);
-  }
-
-  public static double distance(
-    final Coordinate coordinate,
-    final LineString line,
-    final double tolerance) {
-    final CoordinateSequence coordinates = line.getCoordinateSequence();
-    double minDistance = Double.MAX_VALUE;
-    final double x = coordinate.x;
-    final double y = coordinate.y;
-    double x1 = coordinates.getOrdinate(0, 0);
-    double y1 = coordinates.getOrdinate(0, 1);
-    for (int i = 1; i < coordinates.size(); i++) {
-      final double x2 = coordinates.getOrdinate(i, 0);
-      final double y2 = coordinates.getOrdinate(i, 1);
-      final double distance = LineSegmentUtil.distance(x1, y1, x2, y2, x, y);
-      if (distance < minDistance) {
-        if (distance <= tolerance) {
-          return tolerance;
-        } else {
-          minDistance = distance;
-        }
-      }
-      x1 = x2;
-      y1 = y2;
-    }
-    return minDistance;
-  }
-
   public static boolean equalsExact3D(
     final Geometry geometry1,
     final Geometry geometry2) {
@@ -1257,8 +1196,8 @@ public final class JtsGeometryUtil {
   public static Polygon reversePolygon(final Polygon polygon) {
     final GeometryFactory factory = GeometryFactory.getFactory(polygon);
     final LineString exteriorRing = polygon.getExteriorRing();
-    final CoordinateSequence oldCoordinates = exteriorRing.getCoordinateSequence();
-    final CoordinatesList newCoordinates = CoordinateSequenceUtil.reverse(oldCoordinates);
+    final CoordinatesList oldCoordinates = CoordinatesListUtil.get(exteriorRing);
+    final CoordinatesList newCoordinates = oldCoordinates.reverse();
     final LinearRing shell = factory.createLinearRing(newCoordinates);
     return factory.createPolygon(shell, null);
   }
@@ -1294,65 +1233,6 @@ public final class JtsGeometryUtil {
     final Map<Object, Object> map = (Map<Object, Object>)userData;
     map.put(name.toString(), value);
 
-  }
-
-  public static List<LineString> split(
-    final LineString line,
-    final int segmentIndex,
-    final Coordinate coordinate) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    final boolean containsCoordinate = coordinate.equals(line.getCoordinateN(segmentIndex));
-    final CoordinateSequence coords = line.getCoordinateSequence();
-    final int dimension = coords.getDimension();
-    int coords1Size;
-    int coords2Size = coords.size() - segmentIndex;
-    if (containsCoordinate) {
-      coords1Size = segmentIndex + 1;
-      coords2Size = coords.size() - segmentIndex;
-    } else {
-      coords1Size = segmentIndex + 2;
-      coords2Size = coords.size() - segmentIndex;
-    }
-    final CoordinateSequence coords1 = new DoubleCoordinatesList(coords1Size,
-      dimension);
-    CoordinateSequenceUtil.copy(coords, 0, coords1, 0, segmentIndex + 1);
-
-    final CoordinateSequence coords2 = new DoubleCoordinatesList(coords2Size,
-      dimension);
-    if (!containsCoordinate) {
-      setCoordinate(coords1, coords1Size - 1, coordinate);
-      setCoordinate(coords2, 0, coordinate);
-      if (coords1.getDimension() > 2) {
-        final Coordinate previousCoord = coords1.getCoordinate(segmentIndex);
-        final Coordinate nextCoord = coords.getCoordinate(segmentIndex + 1);
-        final double z = getElevation(coordinate, previousCoord, nextCoord);
-        coords1.setOrdinate(coords1Size - 1, 2, z);
-        coords2.setOrdinate(0, 2, z);
-      }
-
-      CoordinateSequenceUtil.copy(coords, segmentIndex + 1, coords2, 1,
-        coords2.size() - 1);
-    } else {
-      CoordinateSequenceUtil.copy(coords, segmentIndex, coords2, 0,
-        coords2.size());
-    }
-
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-
-    if (coords1Size > 1) {
-      final LineString line1 = geometryFactory.createLineString(coords1);
-      if (line1.getLength() > 0) {
-        lines.add(line1);
-      }
-    }
-
-    if (coords2Size > 1) {
-      final LineString line2 = geometryFactory.createLineString(coords2);
-      if (line2.getLength() > 0) {
-        lines.add(line2);
-      }
-    }
-    return lines;
   }
 
   public static List<Geometry> splitWhereCross(

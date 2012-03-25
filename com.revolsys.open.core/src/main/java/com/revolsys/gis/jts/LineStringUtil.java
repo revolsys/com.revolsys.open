@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -18,6 +19,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -51,6 +53,96 @@ public final class LineStringUtil {
     final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
     CoordinatesListUtil.addElevation(precisionModel, coordinate, coordinates);
 
+  }
+
+  public static List<LineString> split(
+    GeometryFactory geometryFactory,
+    final LineString line,
+    LineSegmentIndex index,
+    double tolerance) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Coordinates firstCoordinate = points.get(0);
+    final int lastIndex = points.size() - 1;
+    final Coordinates lastCoordinate = points.get(lastIndex);
+    int startIndex = 0;
+    final List<LineString> newLines = new ArrayList<LineString>();
+    Coordinates startCoordinate = null;
+    Coordinates c0 = points.get(0);
+    for (int i = 1; i < points.size(); i++) {
+      final Coordinates c1 = points.get(i);
+
+      final List<Coordinates> intersections = index.queryIntersections(c0, c1);
+      if (!intersections.isEmpty()) {
+        if (intersections.size() > 1) {
+          Collections.sort(intersections, new CoordinatesDistanceComparator(c0));
+        }
+        for (final Coordinates intersection : intersections) {
+          if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
+            if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
+            } else if (i == lastIndex
+              && intersection.distance(lastCoordinate) < tolerance) {
+            } else {
+              final double d0 = intersection.distance(c0);
+              final double d1 = intersection.distance(c1);
+              if (d0 <= tolerance) {
+                if (d1 > tolerance) {
+                  addLineString(geometryFactory, points, startCoordinate,
+                    startIndex, i - 1, null, newLines);
+                  startIndex = i - 1;
+                  startCoordinate = null;
+                } else {
+                  geometryFactory.makePrecise(intersection);
+                  addLineString(geometryFactory, points, startCoordinate,
+                    startIndex, i - 1, intersection, newLines);
+                  startIndex = i + 1;
+                  startCoordinate = intersection;
+                  c0 = intersection;
+                }
+              } else if (d1 <= tolerance) {
+                addLineString(geometryFactory, points, startCoordinate,
+                  startIndex, i, null, newLines);
+                startIndex = i;
+                startCoordinate = null;
+              } else {
+                geometryFactory.makePrecise(intersection);
+                addLineString(geometryFactory, points, startCoordinate,
+                  startIndex, i - 1, intersection, newLines);
+                startIndex = i;
+                startCoordinate = intersection;
+                c0 = intersection;
+              }
+            }
+          }
+        }
+      }
+      c0 = c1;
+    }
+    if (newLines.isEmpty()) {
+      newLines.add(line);
+    } else {
+      addLineString(geometryFactory, points, startCoordinate, startIndex,
+        lastIndex, null, newLines);
+    }
+    return newLines;
+  }
+
+  public static void addLineString(
+    final GeometryFactory geometryFactory,
+    final CoordinatesList points,
+    final Coordinates startPoint,
+    final int startIndex,
+    final int endIndex,
+    final Coordinates endPoint,
+    final List<LineString> lines) {
+    int length = endIndex - startIndex + 1;
+    CoordinatesList newPoints = CoordinatesListUtil.subList(points, startPoint,
+      startIndex, length, endPoint);
+    if (newPoints.size() > 1) {
+      final LineString newLine = geometryFactory.createLineString(newPoints);
+      if (newLine.getLength() > 0) {
+        lines.add(newLine);
+      }
+    }
   }
 
   public static LineString cleanShortSegments(final LineString line) {
@@ -322,10 +414,9 @@ public final class LineStringUtil {
     if (line1 == line2) {
       return true;
     } else {
-      final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
-      final CoordinateSequence coordinates2 = line2.getCoordinateSequence();
-      return CoordinateSequenceUtil.equalsExact(coordinates1, coordinates2,
-        dimension);
+      final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
+      final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
+      return coordinates1.equals(coordinates2, dimension);
     }
   }
 
@@ -360,10 +451,13 @@ public final class LineStringUtil {
     if (line1 == line2) {
       return true;
     } else {
-      final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
-      final CoordinateSequence coordinates2 = line2.getCoordinateSequence();
-      return CoordinateSequenceUtil.equalsIgnoreDirection(coordinates1,
-        coordinates2, dimension);
+      final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
+      final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
+      if (coordinates1.equals(coordinates2, dimension)) {
+        return true;
+      } else {
+        return coordinates1.reverse().equals(coordinates2, dimension);
+      }
     }
   }
 
@@ -812,8 +906,8 @@ public final class LineStringUtil {
     if (line == null) {
       return false;
     } else {
-      final CoordinateSequence coordinates = line.getCoordinateSequence();
-      return CoordinateSequenceUtil.isCCW(coordinates);
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      return CoordinatesListUtil.isCCW(points);
     }
   }
 
@@ -1131,23 +1225,6 @@ public final class LineStringUtil {
 
   public static LineString subLineString(
     final LineString line,
-    final Coordinate fromCoordinate,
-    final int fromIndex,
-    final int length,
-    final Coordinate toCoordinate) {
-    final CoordinateSequence coords = line.getCoordinateSequence();
-    final CoordinateSequence newCoords = CoordinateSequenceUtil.subSequence(
-      coords, fromCoordinate, fromIndex, length, toCoordinate);
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
-    final LineString newLine = factory.createLineString(newCoords);
-    final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(line);
-    newLine.setUserData(userData);
-    return newLine;
-
-  }
-
-  public static LineString subLineString(
-    final LineString line,
     final Coordinates fromPoint,
     final int fromIndex,
     final int length,
@@ -1166,13 +1243,6 @@ public final class LineStringUtil {
 
   public static LineString subLineString(final LineString line, final int length) {
     return subLineString(line, (Coordinates)null, 0, length, null);
-  }
-
-  public static LineString subLineString(
-    final LineString line,
-    final int length,
-    final Coordinate coordinate) {
-    return subLineString(line, null, 0, length, coordinate);
   }
 
   public static LineString subLineString(

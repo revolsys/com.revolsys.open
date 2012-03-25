@@ -1,24 +1,16 @@
 package com.revolsys.gis.parallel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.jts.CoordinateDistanceComparator;
-import com.revolsys.gis.jts.CoordinateSequenceUtil;
-import com.revolsys.gis.jts.LineSegment3D;
-import com.revolsys.gis.jts.LineSegmentIndex;
-import com.revolsys.gis.model.coordinates.list.CoordinatesList;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -40,23 +32,6 @@ public class SplitGeometryProcess extends
   private double tolerance = 2.0;
 
   private GeometryFactory geometryFactory;
-
-  private void createLineString(
-    final LineString line,
-    final CoordinateSequence coordinates,
-    final Coordinate startCoordinate,
-    final int startIndex,
-    final int endIndex,
-    final Coordinate endCoordinate,
-    final List<LineString> lines) {
-    final CoordinateSequence newCoordinates = CoordinateSequenceUtil.subSequence(
-      coordinates, startCoordinate, startIndex, endIndex - startIndex + 1,
-      endCoordinate);
-    if (newCoordinates.size() > 1) {
-      final LineString newLine = geometryFactory.createLineString(newCoordinates);
-      lines.add(newLine);
-    }
-  }
 
   protected DataObject createSplitObject(
     final DataObject object,
@@ -99,20 +74,6 @@ public class SplitGeometryProcess extends
     return tolerance;
   }
 
-  private boolean isWithinDistanceOfBoundary(final Coordinate nextCoordinate) {
-    final Envelope envelope = new Envelope(nextCoordinate);
-    envelope.expandBy(1);
-    @SuppressWarnings("unchecked")
-    final List<LineSegment3D> lines = index.query(envelope);
-    for (final LineSegment3D line : lines) {
-      if (line.distance(nextCoordinate) <= 1) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   @Override
   protected void postRun(
     final Channel<DataObject> in,
@@ -137,6 +98,27 @@ public class SplitGeometryProcess extends
     }
   }
 
+  protected List<DataObject> split(DataObject object, LineString line) {
+    List<DataObject> newObjects = new ArrayList<DataObject>();
+    List<LineString> newLines = LineStringUtil.split(geometryFactory, line,
+      index, tolerance);
+    if (newLines.size() == 1) {
+      LineString newLine = newLines.get(0);
+      if (newLine == line) {
+        newObjects.add(object);
+      } else {
+        DataObject newObject = createSplitObject(object, newLine);
+        newObjects.add(newObject);
+      }
+    } else {
+      for (final LineString newLine : newLines) {
+        DataObject newObject = createSplitObject(object, newLine);
+        newObjects.add(newObject);
+      }
+    }
+    return newObjects;
+  }
+
   @Override
   protected void process(
     final Channel<DataObject> in,
@@ -146,7 +128,7 @@ public class SplitGeometryProcess extends
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       if (line.isWithinDistance(this.geometry, 0)) {
-        final List<DataObject> newObjects = split(object, line);
+        List<DataObject> newObjects = split(object, line);
         for (final DataObject newObject : newObjects) {
           out.write(newObject);
         }
@@ -200,88 +182,4 @@ public class SplitGeometryProcess extends
     this.tolerance = tolerance;
   }
 
-  protected List<DataObject> split(
-    final DataObject object,
-    final LineString line) {
-    final PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
-    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
-    final Coordinate firstCoordinate = coordinates.getCoordinate(0);
-    final int lastIndex = coordinates.size() - 1;
-    final Coordinate lastCoordinate = coordinates.getCoordinate(lastIndex);
-    int startIndex = 0;
-    final List<LineString> newLines = new ArrayList<LineString>();
-    Coordinate startCoordinate = null;
-    Coordinate c0 = coordinates.getCoordinate(0);
-    for (int i = 1; i < coordinates.size(); i++) {
-      final Coordinate c1 = coordinates.getCoordinate(i);
-
-      final List<Coordinate> intersections = index.queryIntersections(c0, c1);
-      if (!intersections.isEmpty()) {
-        if (intersections.size() > 1) {
-          Collections.sort(intersections, new CoordinateDistanceComparator(c0));
-        }
-        int j = 0;
-        for (final Coordinate intersection : intersections) {
-          if (!(isWithinDistanceOfBoundary(c0) && isWithinDistanceOfBoundary(c1))) {
-            if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
-            } else if (i == lastIndex
-              && intersection.distance(lastCoordinate) < tolerance) {
-            } else {
-              final double d0 = intersection.distance(c0);
-              final double d1 = intersection.distance(c1);
-              if (d0 <= tolerance) {
-                if (d1 > tolerance) {
-                  createLineString(line, coordinates, startCoordinate,
-                    startIndex, i - 1, null, newLines);
-                  startIndex = i - 1;
-                  startCoordinate = null;
-                } else {
-                  precisionModel.makePrecise(intersection);
-                  if (elevationPrecisionModel != null) {
-                    intersection.z = elevationPrecisionModel.makePrecise(intersection.z);
-                  }
-                  createLineString(line, coordinates, startCoordinate,
-                    startIndex, i - 1, intersection, newLines);
-                  startIndex = i + 1;
-                  startCoordinate = intersection;
-                  c0 = intersection;
-                }
-              } else if (d1 <= tolerance) {
-                createLineString(line, coordinates, startCoordinate,
-                  startIndex, i, null, newLines);
-                startIndex = i;
-                startCoordinate = null;
-              } else {
-                precisionModel.makePrecise(intersection);
-                if (elevationPrecisionModel != null) {
-                  intersection.z = elevationPrecisionModel.makePrecise(intersection.z);
-                }
-                createLineString(line, coordinates, startCoordinate,
-                  startIndex, i - 1, intersection, newLines);
-                startIndex = i;
-                startCoordinate = intersection;
-                c0 = intersection;
-              }
-            }
-          }
-          j++;
-        }
-      }
-      c0 = c1;
-    }
-    final List<DataObject> newObjects = new ArrayList<DataObject>();
-    if (newLines.isEmpty()) {
-      newObjects.add(object);
-    } else {
-      createLineString(line, coordinates, startCoordinate, startIndex,
-        lastIndex, null, newLines);
-      for (final LineString newLine : newLines) {
-        if (newLine.getLength() > 0) {
-          final DataObject newObject = createSplitObject(object, newLine);
-          newObjects.add(newObject);
-        }
-      }
-    }
-    return newObjects;
-  }
 }

@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.vividsolutions.jts.geom.LineString;
 
 public class CoordinatesListIndexLineSegmentIterator implements
   Iterator<LineSegment>, Iterable<LineSegment> {
@@ -23,6 +24,11 @@ public class CoordinatesListIndexLineSegmentIterator implements
     final CoordinatesList points) {
     this.factory = factory;
     this.points = points;
+  }
+
+  public CoordinatesListIndexLineSegmentIterator(LineString line) {
+    this.factory = GeometryFactory.getFactory(line);
+    this.points = CoordinatesListUtil.get(line);
   }
 
   public boolean hasNext() {

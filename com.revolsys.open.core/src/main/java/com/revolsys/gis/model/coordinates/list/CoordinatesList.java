@@ -85,4 +85,6 @@ public interface CoordinatesList extends CoordinateSequence,
     int sourceIndex,
     int targetIndex,
     int count);
+
+  CoordinatesList subList(int index);
 }
