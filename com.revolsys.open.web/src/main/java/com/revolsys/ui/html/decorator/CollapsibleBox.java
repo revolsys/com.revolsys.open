@@ -48,6 +48,9 @@ public class CollapsibleBox implements Decorator {
 
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "content");
+    if (open) {
+      out.attribute(HtmlUtil.ATTR_STYLE, "display: block");
+    }
     element.serializeElement(out);
     out.endTag(HtmlUtil.DIV);
 

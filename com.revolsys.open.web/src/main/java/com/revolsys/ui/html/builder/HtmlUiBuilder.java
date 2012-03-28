@@ -229,7 +229,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String style,
     boolean open) {
     addCollapsibleIframe(container, builderClass.getName(), pageName, style,
-      false);
+      open);
   }
 
   public void addCollapsibleIframe(
