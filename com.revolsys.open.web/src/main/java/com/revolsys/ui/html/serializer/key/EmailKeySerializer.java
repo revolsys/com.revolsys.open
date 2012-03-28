@@ -10,6 +10,8 @@ import com.revolsys.util.JavaBeanUtil;
  * @author Paul Austin
  */
 public class EmailKeySerializer extends AbstractKeySerializer {
+  public EmailKeySerializer() {
+  }
 
   public EmailKeySerializer(final String name) {
     super(name);

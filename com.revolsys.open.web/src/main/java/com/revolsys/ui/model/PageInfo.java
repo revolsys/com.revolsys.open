@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.springframework.http.MediaType;
 
+import com.revolsys.ui.html.view.Element;
+
 public class PageInfo extends AbstractDocumentedObject {
 
   private Map<String, PageInfo> pages = new LinkedHashMap<String, PageInfo>();
@@ -24,6 +26,8 @@ public class PageInfo extends AbstractDocumentedObject {
   private String url;
 
   private Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+
+  private Element pagesElement;
 
   public PageInfo() {
   }
@@ -87,6 +91,14 @@ public class PageInfo extends AbstractDocumentedObject {
 
   public Map<String, PageInfo> getPages() {
     return pages;
+  }
+
+  public Element getPagesElement() {
+    return pagesElement;
+  }
+
+  public void setPagesElement(Element pagesElement) {
+    this.pagesElement = pagesElement;
   }
 
   public Collection<ParameterInfo> getParameters() {

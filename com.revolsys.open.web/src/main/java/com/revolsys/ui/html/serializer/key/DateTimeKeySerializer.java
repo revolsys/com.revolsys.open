@@ -12,6 +12,9 @@ public class DateTimeKeySerializer extends DateKeySerializer {
   /** The date format style. */
   private int timeStyle = DateFormat.SHORT;
 
+  public DateTimeKeySerializer() {
+  }
+
   public DateTimeKeySerializer(final String name) {
     super(name);
   }

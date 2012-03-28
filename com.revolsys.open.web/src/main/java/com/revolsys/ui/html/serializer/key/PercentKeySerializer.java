@@ -15,6 +15,9 @@ public class PercentKeySerializer extends AbstractKeySerializer {
   /** The scale to display the percent as. */
   private int scale = MathUtil.PERCENT_SCALE - 2;
 
+  public PercentKeySerializer() {
+  }
+
   public PercentKeySerializer(final String name) {
     super(name);
   }

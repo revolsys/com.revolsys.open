@@ -16,6 +16,9 @@ public class DateKeySerializer extends AbstractKeySerializer {
   /** The date format style. */
   private int dateStyle = DateFormat.DEFAULT;
 
+  public DateKeySerializer() {
+  }
+
   public DateKeySerializer(final String name) {
     super(name);
   }

@@ -6,9 +6,12 @@ import com.revolsys.ui.html.view.Element;
 
 public class CollapsibleBox implements Decorator {
 
-  private final String title;
+  private String title;
 
   private boolean open;
+
+  public CollapsibleBox() {
+  }
 
   public CollapsibleBox(final String title) {
     this.title = title;
@@ -17,6 +20,14 @@ public class CollapsibleBox implements Decorator {
   public CollapsibleBox(final String title, final boolean open) {
     this.title = title;
     this.open = open;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public boolean isOpen() {
+    return open;
   }
 
   public void serialize(final XmlWriter out, final Element element) {
@@ -42,6 +53,14 @@ public class CollapsibleBox implements Decorator {
 
     out.endTag(HtmlUtil.DIV);
     out.endTag(HtmlUtil.DIV);
+  }
+
+  public void setOpen(final boolean open) {
+    this.open = open;
+  }
+
+  public void setTitle(final String title) {
+    this.title = title;
   }
 
 }

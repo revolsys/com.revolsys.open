@@ -10,6 +10,8 @@ import com.revolsys.util.JavaBeanUtil;
  * @author Paul Austin
  */
 public class PhoneNumberKeySerializer extends AbstractKeySerializer {
+  public PhoneNumberKeySerializer() {
+  }
 
   public PhoneNumberKeySerializer(final String name) {
     super(name);

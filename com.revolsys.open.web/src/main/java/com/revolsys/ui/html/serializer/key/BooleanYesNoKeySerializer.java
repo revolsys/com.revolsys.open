@@ -9,6 +9,8 @@ import com.revolsys.util.JavaBeanUtil;
  * @author Paul Austin
  */
 public class BooleanYesNoKeySerializer extends AbstractKeySerializer {
+  public BooleanYesNoKeySerializer() {
+  }
 
   /**
    * Construct a new BooleanYesNoKeySerializer.

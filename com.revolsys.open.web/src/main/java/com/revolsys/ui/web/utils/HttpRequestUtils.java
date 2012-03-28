@@ -34,6 +34,15 @@ public final class HttpRequestUtils {
     return getPathVariables().get(name);
   }
 
+  public static <T> T getRequestAttribute(String name) {
+    final HttpServletRequest request = getHttpServletRequest();
+    if (request == null) {
+      return null;
+    } else {
+      return (T)request.getAttribute(name);
+    }
+  }
+
   public static Map<String, String> getPathVariables() {
     final HttpServletRequest request = getHttpServletRequest();
     if (request != null) {

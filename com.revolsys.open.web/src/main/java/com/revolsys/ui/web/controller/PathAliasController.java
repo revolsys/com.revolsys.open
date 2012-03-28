@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMeth
 import org.springframework.web.util.WebUtils;
 
 public class PathAliasController implements Controller {
-  private static final String PATH_PREFIX = PathAliasController.class.getName()
+  public static final String PATH_PREFIX = PathAliasController.class.getName()
     + ".originalPrefix";
 
   public static boolean forward(

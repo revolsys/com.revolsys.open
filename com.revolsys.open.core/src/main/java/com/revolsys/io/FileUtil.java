@@ -34,6 +34,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -86,6 +87,27 @@ public final class FileUtil {
         in.close();
       } catch (final IOException e) {
         LOG.error(e.getMessage(), e);
+      }
+    }
+  }
+
+  public static void deleteFilesOlderThan(File directory, Date date) {
+    long time = date.getTime();
+    deleteFilesOlderThan(directory, time);
+  }
+
+  public static void deleteFilesOlderThan(File directory, long age) {
+    if (directory.exists() && directory.isDirectory()) {
+      for (File file : directory.listFiles()) {
+        if (file.isDirectory()) {
+          deleteFilesOlderThan(file, age);
+        } else if (file.isFile()) {
+          if (file.lastModified() < age) {
+            if (!file.delete()) {
+              LOG.error("Unable to delete file: " + file);
+            }
+          }
+        }
       }
     }
   }

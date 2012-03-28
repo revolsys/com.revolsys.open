@@ -12,6 +12,8 @@ import com.revolsys.util.MathUtil;
  * @author Paul Austin
  */
 public class MoneyKeySerializer extends AbstractKeySerializer {
+  public MoneyKeySerializer() {
+  }
 
   /**
    * Construct a new MoneyKeySerializer.

@@ -17,6 +17,9 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
   /** The date format style. */
   private String dateFormat = "dd-MMM-yyyy";
 
+  public DateFormatKeySerializer() {
+  }
+
   /**
    * Construct a new DateFormatKeySerializer.
    */

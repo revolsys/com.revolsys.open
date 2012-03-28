@@ -10,6 +10,8 @@ import com.revolsys.util.JavaBeanUtil;
  * @author Paul Austin
  */
 public class UrlKeySerializer extends AbstractKeySerializer {
+  public UrlKeySerializer() {
+  }
 
   public UrlKeySerializer(final String name) {
     super(name);

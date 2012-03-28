@@ -34,6 +34,7 @@ import com.revolsys.io.NamedLinkedHashMap;
 import com.revolsys.io.xml.XmlConstants;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.wadl.WadlConstants;
+import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;
 import com.revolsys.ui.model.ParameterInfo;
@@ -188,7 +189,10 @@ public class PageInfoHttpMessageConverter extends
     }
 
     final Map<String, PageInfo> pages = pageInfo.getPages();
-    if (!pages.isEmpty()) {
+    Element pagesElement = pageInfo.getPagesElement();
+    if (pagesElement != null) {
+      pagesElement.serialize(writer);
+    } else if (!pages.isEmpty()) {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "resources");
       writer.element(HtmlUtil.H2, "Resources");
@@ -256,7 +260,7 @@ public class PageInfoHttpMessageConverter extends
     writer.startTag(HtmlUtil.DT);
     writer.startTag(HtmlUtil.LABEL);
 
-    writer.attribute(HtmlUtil.ATTR_FOR, parameter);
+    writer.attribute(HtmlUtil.ATTR_FOR, parameterName);
     writer.text(CaseConverter.toCapitalizedWords(parameterName));
     writer.endTag(HtmlUtil.LABEL);
     writer.endTag(HtmlUtil.DT);
