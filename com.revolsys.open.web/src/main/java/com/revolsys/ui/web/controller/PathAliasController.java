@@ -18,9 +18,15 @@ import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 import org.springframework.web.util.WebUtils;
 
+import com.revolsys.ui.web.utils.HttpRequestUtils;
+
 public class PathAliasController implements Controller {
   public static final String PATH_PREFIX = PathAliasController.class.getName()
     + ".originalPrefix";
+
+  public static String getAlias() {
+    return (String)HttpRequestUtils.getRequestAttribute(PATH_PREFIX);
+  }
 
   public static boolean forward(
     final HttpServletRequest request,

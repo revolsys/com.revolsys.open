@@ -10,7 +10,7 @@ public interface Kml22Constants {
 
   String MEDIA_TYPE = "application/vnd.google-earth.kml+xml";
 
-  String FORMAT_DESCRIPTION = "Google Earth";
+  String FORMAT_DESCRIPTION = "KML";
 
   CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
 
