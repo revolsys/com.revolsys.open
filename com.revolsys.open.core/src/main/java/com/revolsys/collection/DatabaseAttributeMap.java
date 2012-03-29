@@ -3,6 +3,8 @@ package com.revolsys.collection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -17,7 +19,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class DatabaseAttributeMap extends AttributeMap {
-  private static final long serialVersionUID = -480759020648966354L;
 
   private DataSource dataSource;
 
@@ -96,6 +97,7 @@ public class DatabaseAttributeMap extends AttributeMap {
       try {
         final ResultSet resultSet = statement.executeQuery();
         try {
+          Map<String, Object> attributes = new LinkedHashMap<String, Object>();
           while (resultSet.next()) {
             final String property = resultSet.getString(1);
             final String valueString = resultSet.getString(2);
@@ -112,8 +114,9 @@ public class DatabaseAttributeMap extends AttributeMap {
                 value = converter.toObject(valueString);
               }
             }
-            put(property, value);
+            attributes.put(property, value);
           }
+
         } finally {
           JdbcUtils.close(resultSet);
         }

@@ -321,22 +321,28 @@ div.objectList > table.data > thead > tr > th:last-child {
   border-right-width: 0em;
 }
 
+div.objectList > table.data > tbody > tr > th,
 div.objectList > table.data > tbody > tr > td {
   border-right: 0.1em solid #cccccc;
   border-bottom: 0.1em solid #cccccc;
 }
 
+div.objectList > table.data > tbody > tr > th:last-child 
 div.objectList > table.data > tbody > tr > td:last-child {
    border-right-width: 0em;
 }
 
+div.objectList > table.data > tbody > tr:last-child > th,
 div.objectList > table.data > tbody > tr:last-child > td {
    border-bottom-width: 0em;
 }
 
+div.objectList > table.data > tbody > tr.selected > th,
 div.objectList > table.data > tbody > tr.selected > td {
   background-color: #fff7b4;
 }
+
+div.objectList > table.data > tbody > tr.even > th,
 div.objectList > table.data > tbody > tr.even > td {
   background-color: #eeeeee;
   border-right-color: white;

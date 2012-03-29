@@ -129,7 +129,7 @@ public class AttributesBeanConfigurer implements BeanFactoryPostProcessor,
     final String beanName,
     final String beanClassName) {
     if (beanClassName != null) {
-      if (beanClassName.equals(AttributeMap.class.getName())) {
+      if (beanClassName.equals(AttributeMap.class.getName()) || beanName.endsWith("-AttributeMap")) {
         processPlaceholderAttributes(beanFactory, beanName, attributes);
         final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
         processPlaceholderAttributes(beanFactory, otherAttributes);
