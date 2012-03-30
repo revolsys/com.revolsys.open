@@ -213,10 +213,10 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public Coordinates intersection(final LineSegment lineSegment2) {
-    Coordinates intersection = LineSegmentUtil.intersection(coordinates1, coordinates2,
-      lineSegment2.coordinates1, lineSegment2.coordinates2);
-     geometryFactory.makePrecise(intersection);
-     return intersection;
+    Coordinates intersection = LineSegmentUtil.intersection(coordinates1,
+      coordinates2, lineSegment2.coordinates1, lineSegment2.coordinates2);
+    geometryFactory.makePrecise(intersection);
+    return intersection;
   }
 
   public boolean intersects(final BoundingBox boundingBox) {

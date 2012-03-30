@@ -1,5 +1,6 @@
 package com.revolsys.jdbc;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -395,7 +396,12 @@ public final class JdbcUtils {
     try {
       for (int i = 0; i < parameters.length; i++) {
         final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
+        if (parameter instanceof BigInteger) {
+          BigInteger bigInt = (BigInteger)parameter;
+          statement.setLong(i + 1, bigInt.longValue());
+        } else {
+          statement.setObject(i + 1, parameter);
+        }
       }
       final ResultSet resultSet = statement.executeQuery();
       try {

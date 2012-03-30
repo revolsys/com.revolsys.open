@@ -1650,8 +1650,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (pager.getNumResults() > 0) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> parameters = request.getParameterMap();
-        final ResultPagerView pagerView = new ResultPagerView(pager,
-          request.getRequestURI(), parameters);
+        String baseUrl = HttpRequestUtils.getFullRequestUrl(request);
+        final ResultPagerView pagerView = new ResultPagerView(pager, baseUrl,
+          parameters);
         listContainer.add(0, pagerView);
         listContainer.add(pagerView);
       }

@@ -15,7 +15,7 @@ import com.revolsys.util.JavaBeanUtil;
 public class DateFormatKeySerializer extends AbstractKeySerializer {
 
   /** The date format style. */
-  private String dateFormat = "dd-MMM-yyyy";
+  private String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
   public DateFormatKeySerializer() {
   }

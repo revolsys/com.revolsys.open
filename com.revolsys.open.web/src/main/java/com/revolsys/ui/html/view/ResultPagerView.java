@@ -38,7 +38,7 @@ public class ResultPagerView extends Element {
   }
 
   /**
-   * Serialize a link to the specified page numberm title and contents.
+   * Serialize a link to the specified page number title and contents.
    * 
    * @param out The XML Writer.
    * @param pageNumber The page number.
