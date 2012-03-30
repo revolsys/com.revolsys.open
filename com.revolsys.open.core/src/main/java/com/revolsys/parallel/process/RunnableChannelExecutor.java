@@ -3,8 +3,8 @@ package com.revolsys.parallel.process;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +30,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
   private ProcessNetwork processNetwork;
 
   public RunnableChannelExecutor() {
-    super(0, 100, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(true),
+    super(0, 100, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
       new NamedThreadFactory());
   }
 
