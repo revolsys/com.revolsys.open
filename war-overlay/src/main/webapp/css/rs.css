@@ -67,7 +67,7 @@ h6 {
 
 th, td {
   vertical-align: top;
-  overflow-x: auto;
+  word-wrap: break-word;
 }
 
 td p:first-child {

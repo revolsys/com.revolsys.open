@@ -404,19 +404,19 @@ public final class LineStringUtil {
    * 
    * @param line1 The first line.
    * @param line2 The second line.
-   * @param dimension The dimension.
+   * @param numAxis The dimension.
    * @return True if the coordinates match.
    */
   public static boolean equalsExact(
     final LineString line1,
     final LineString line2,
-    final int dimension) {
+    final int numAxis) {
     if (line1 == line2) {
       return true;
     } else {
       final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
       final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
-      return coordinates1.equals(coordinates2, dimension);
+      return coordinates1.equals(coordinates2, numAxis);
     }
   }
 

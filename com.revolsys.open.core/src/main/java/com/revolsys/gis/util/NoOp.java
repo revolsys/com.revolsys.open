@@ -6,24 +6,13 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class NoOp {
-
-  public static void equals(
-    final Coordinate point,
-    final double x,
-    final double y) {
-    final Coordinate coordinate2 = new Coordinate(x, y);
-    if (point.equals2D(coordinate2)) {
-      noOp();
-    }
-  }
-
   public static void equals(
     final Coordinates coordinates1End,
     final double... coordinates) {
@@ -50,8 +39,11 @@ public class NoOp {
     final Geometry geometry,
     final double x,
     final double y) {
-    final Coordinate coordinate1 = geometry.getCoordinate();
-    equals(coordinate1, x, y);
+    CoordinatesList points = CoordinatesListUtil.get(geometry);
+    DoubleCoordinates point = new DoubleCoordinates(x, y);
+    if (points.equal(0, point, 2)) {
+      NoOp.noOp();
+    }
   }
 
   public static boolean equals(

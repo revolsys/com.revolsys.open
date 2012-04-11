@@ -91,13 +91,16 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     final int index,
     final Coordinates point,
     final int numAxis) {
-    if (getNumAxis() < numAxis) {
-      return false;
-    } else if (point.getNumAxis() < numAxis) {
-      return false;
+    int maxAxis = Math.max(getNumAxis(), point.getNumAxis());
+    if (maxAxis > numAxis) {
+      maxAxis = numAxis;
     }
-    if (index < size()) {
-      for (int j = 0; j < numAxis; j++) {
+    if (getNumAxis() < maxAxis) {
+      return false;
+    } else if (point.getNumAxis() < maxAxis) {
+      return false;
+    } else if (index < size()) {
+      for (int j = 0; j < maxAxis; j++) {
         final double value1 = getValue(index, j);
         final double value2 = point.getValue(j);
         if (Double.compare(value1, value2) != 0) {
@@ -174,22 +177,26 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
-  public boolean equals(final CoordinatesList coordinatesList, final int numAxis) {
-    if (numAxis <= getNumAxis() && numAxis <= coordinatesList.getNumAxis()) {
-      if (size() == coordinatesList.size()) {
-        for (int i = 0; i < size(); i++) {
-          for (int j = 0; j < numAxis; j++) {
-            final double value1 = getValue(i, j);
-            final double value2 = coordinatesList.getValue(i, j);
-            if (Double.compare(value1, value2) != 0) {
-              return false;
-            }
+  public boolean equals(final CoordinatesList points, final int numAxis) {
+    double maxAxis = Math.max(getNumAxis(), points.getNumAxis());
+    if (maxAxis > numAxis) {
+      maxAxis = numAxis;
+    }
+    if (getNumAxis() < maxAxis) {
+      return false;
+    } else if (points.getNumAxis() < maxAxis) {
+      return false;
+    } else if (size() == points.size()) {
+      for (int i = 0; i < size(); i++) {
+        for (int j = 0; j < numAxis; j++) {
+          final double value1 = getValue(i, j);
+          final double value2 = points.getValue(i, j);
+          if (Double.compare(value1, value2) != 0) {
+            return false;
           }
         }
-        return true;
-      } else {
-        return false;
       }
+      return true;
     } else {
       return false;
     }
