@@ -70,6 +70,7 @@ public abstract class AbstractDataObjectStore extends
 
   @PostConstruct
   public void initialize() {
+    statistics.connect();
   }
 
   public GeometryFactory getGeometryFactory() {

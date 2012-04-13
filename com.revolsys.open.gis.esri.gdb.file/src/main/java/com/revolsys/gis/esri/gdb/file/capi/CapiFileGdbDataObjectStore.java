@@ -104,7 +104,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
-  private String defaultSchema;
+  private String defaultSchema = "";
 
   private static final Logger LOG = LoggerFactory.getLogger(CapiFileGdbDataObjectStore.class);
 
@@ -114,7 +114,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private boolean createMissingGeodatabase = true;
 
-  private boolean createMissingTables;
+  private boolean createMissingTables = true;
 
   private static final Map<FieldType, Constructor<? extends Attribute>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends Attribute>>();
 
@@ -247,7 +247,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       typeName = metaData.getName();
     }
-    final String where = query.getWhereClause();
+    String where = query.getWhereClause();
+    if (where == null) {
+      where = "";
+    }
     final List<Object> parameters = query.getParameters();
     final StringBuffer whereClause = new StringBuffer();
     if (parameters.isEmpty()) {
@@ -532,6 +535,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @PostConstruct
   public void initialize() {
+    super.initialize();
     final File file = new File(fileName);
     if (file.exists() && new File(fileName, "gdb").exists()) {
       if (file.isDirectory()) {

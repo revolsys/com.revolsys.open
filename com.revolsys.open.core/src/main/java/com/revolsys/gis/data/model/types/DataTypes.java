@@ -158,6 +158,15 @@ public final class DataTypes {
     }
   }
 
+  public static DataType getType(final Object object) {
+    if (object == null) {
+      return null;
+    } else {
+      final Class<?> clazz = object.getClass();
+      return getType(clazz);
+    }
+  }
+
   public static DataType getType(final QName typeName) {
     final DataType type = NAME_TYPE_MAP.get(typeName);
     if (type == null) {
@@ -167,16 +176,16 @@ public final class DataTypes {
     }
   }
 
+  public static void register(final Class<?> typeClass, final DataType type) {
+    final String typeClassName = typeClass.getName();
+    CLASS_TYPE_MAP.put(typeClassName, type);
+  }
+
   public static void register(final DataType type) {
     final QName typeName = type.getName();
     NAME_TYPE_MAP.put(typeName, type);
     final Class<?> typeClass = type.getJavaClass();
     register(typeClass, type);
-  }
-
-  public static void register(final Class<?> typeClass, final DataType type) {
-    final String typeClassName = typeClass.getName();
-    CLASS_TYPE_MAP.put(typeClassName, type);
   }
 
   private DataTypes() {

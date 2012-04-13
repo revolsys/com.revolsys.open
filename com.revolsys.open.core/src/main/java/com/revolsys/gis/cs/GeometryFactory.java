@@ -519,6 +519,21 @@ public class GeometryFactory extends
     }
   }
 
+  public Point createPoint() {
+    DoubleCoordinatesList points = new DoubleCoordinatesList(0, getNumAxis());
+    return createPoint(points);
+  }
+
+  public LineString createLineString() {
+    DoubleCoordinatesList points = new DoubleCoordinatesList(0, getNumAxis());
+    return createLineString(points);
+  }
+
+  public Polygon createPolygon() {
+    DoubleCoordinatesList points = new DoubleCoordinatesList(0, getNumAxis());
+    return createPolygon(points);
+  }
+
   public Point createPoint(final CoordinatesList points) {
     if (points != null) {
       points.makePrecise(coordinatesPrecisionModel);

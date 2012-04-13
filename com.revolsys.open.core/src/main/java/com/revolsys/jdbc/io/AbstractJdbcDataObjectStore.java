@@ -398,9 +398,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     return writer;
   }
 
-  @PostConstruct
-  public void initialize() {
-  }
 
   @Override
   public void insert(final DataObject object) {

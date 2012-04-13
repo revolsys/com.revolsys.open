@@ -3,6 +3,7 @@ package com.revolsys.jdbc.io;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
@@ -37,18 +38,21 @@ public class JdbcDataObjectStoreFactoryBean implements
     return dataSource;
   }
 
+  private JdbcDataObjectStore dataObjectStore;
+
   public JdbcDataObjectStore getObject() throws Exception {
-    JdbcDataObjectStore dataObjectStore;
-    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
-    if (dataSource == null) {
-      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
-      dataObjectStore = databaseFactory.createDataObjectStore(config);
-    } else {
-      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(dataSource);
-      dataObjectStore = databaseFactory.createDataObjectStore(dataSource);
+    if (dataObjectStore == null) {
+      final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
+      if (dataSource == null) {
+        final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
+        dataObjectStore = databaseFactory.createDataObjectStore(config);
+      } else {
+        final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(dataSource);
+        dataObjectStore = databaseFactory.createDataObjectStore(dataSource);
+      }
+      JavaBeanUtil.setProperties(dataObjectStore, properties);
+      dataObjectStore.initialize();
     }
-    JavaBeanUtil.setProperties(dataObjectStore, properties);
-    dataObjectStore.initialize();
     return dataObjectStore;
   }
 
@@ -74,6 +78,14 @@ public class JdbcDataObjectStoreFactoryBean implements
 
   public void setProperties(final Map<String, Object> properties) {
     this.properties = properties;
+  }
+
+  @PreDestroy
+  public void destroy() {
+    if (dataObjectStore != null) {
+      dataObjectStore.close();
+      dataObjectStore = null;
+    }
   }
 
 }

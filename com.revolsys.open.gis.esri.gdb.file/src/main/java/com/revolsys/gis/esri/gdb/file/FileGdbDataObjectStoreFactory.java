@@ -15,7 +15,7 @@ import com.revolsys.gis.esri.gdb.file.capi.CapiFileGdbDataObjectStore;
 
 public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
-  private static final List<String> URL_PATTERNS = Arrays.asList("file:///.*.gdb");
+  private static final List<String> URL_PATTERNS = Arrays.asList("file:/(//)?.*.gdb/?");
 
   public static FileGdbDataObjectStore create(final File file) {
     FileGdbDataObjectStore dataObjectStore;

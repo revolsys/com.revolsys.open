@@ -176,7 +176,7 @@ public final class ShapefileGeometryUtil {
     final double y = in.readLEDouble();
     final double z = 0;
     final double m = in.readLEDouble();
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(2, x, y, z,
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(4, x, y, z,
       m);
     return geometryFactory.createPoint(points);
   }
@@ -197,7 +197,7 @@ public final class ShapefileGeometryUtil {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
     final double z = in.readLEDouble();
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(2, x, y, z);
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(3, x, y, z);
     return geometryFactory.createPoint(points);
   }
 
@@ -208,7 +208,7 @@ public final class ShapefileGeometryUtil {
     final double y = in.readLEDouble();
     final double z = in.readLEDouble();
     final double m = in.readLEDouble();
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(2, x, y, z,
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(4, x, y, z,
       m);
     return geometryFactory.createPoint(points);
   }
@@ -311,7 +311,7 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 2;
+    final int numAxis = 4;
     if (numParts == 1) {
       in.readLEInt();
       final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
@@ -347,7 +347,7 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 2;
+    final int numAxis = 3;
     if (numParts == 1) {
       in.readLEInt();
       final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
@@ -383,7 +383,7 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 2;
+    final int numAxis = 4;
     if (numParts == 1) {
       in.readLEInt();
       final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);

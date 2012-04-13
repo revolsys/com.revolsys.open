@@ -1,10 +1,7 @@
 package com.revolsys.io.wkt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.springframework.util.StringUtils;
 
@@ -23,34 +20,12 @@ public class WktParser {
 
   private final GeometryFactory geometryFactory;
 
-  private final Map<GeometryFactory, Map<Integer, GeometryFactory>> geometryFactories = new WeakHashMap<GeometryFactory, Map<Integer, GeometryFactory>>();
-
   public WktParser() {
     this(GeometryFactory.getFactory());
   }
 
   public WktParser(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-  }
-
-  private GeometryFactory getGeometryFactory(
-    final GeometryFactory geometryFactory,
-    final int numAxis) {
-    synchronized (geometryFactories) {
-      Map<Integer, GeometryFactory> axisToGeometryFactoryMap = geometryFactories.get(geometryFactory);
-      if (axisToGeometryFactoryMap == null) {
-        axisToGeometryFactoryMap = new HashMap<Integer, GeometryFactory>();
-        geometryFactories.put(geometryFactory, axisToGeometryFactoryMap);
-      }
-      GeometryFactory axisGeometryFactory = axisToGeometryFactoryMap.get(numAxis);
-      if (axisGeometryFactory == null) {
-        axisGeometryFactory = GeometryFactory.getFactory(
-          geometryFactory.getSRID(), numAxis, geometryFactory.getScaleXY(),
-          geometryFactory.getScaleZ());
-        axisToGeometryFactoryMap.put(numAxis, axisGeometryFactory);
-      }
-      return axisGeometryFactory;
-    }
   }
 
   private int getNumAxis(final StringBuffer text) {
@@ -105,11 +80,12 @@ public class WktParser {
   private CoordinatesList parseCoordinates(
     final StringBuffer text,
     final int numAxis) {
+    int geometryFactoryNumAxis = geometryFactory.getNumAxis();
     char c = text.charAt(0);
     if (c == '(') {
       text.delete(0, 1);
       final List<Double> coordinates = new ArrayList<Double>();
-      int i = 0;
+      int axisNum = 0;
       boolean finished = false;
       while (!finished) {
         final Double number = parseDouble(text);
@@ -122,14 +98,20 @@ public class WktParser {
               "Expecting end of coordinates ')' not" + text);
           }
         } else if (c == ',' || c == ')') {
-          i++;
-          final int coordinateCount = i % numAxis;
-          if (coordinateCount == 0) {
-            coordinates.add(number);
+          if (axisNum < numAxis) {
+            if (axisNum < geometryFactoryNumAxis) {
+              coordinates.add(number);
+            }
+            axisNum++;
+            while (axisNum < geometryFactoryNumAxis) {
+              coordinates.add(Double.NaN);
+              axisNum++;
+            }
+            axisNum = 0;
           } else {
             throw new IllegalArgumentException(
-              "Not enough coordinates, vertex must have " + numAxis
-                + " coordinates not " + coordinateCount);
+              "Too many coordinates, vertex must have " + numAxis
+                + " coordinates not " + (axisNum + 1));
           }
           if (c == ')') {
             finished = true;
@@ -137,19 +119,21 @@ public class WktParser {
             text.delete(0, 1);
           }
         } else {
-          i++;
-          final int coordinateCount = i % numAxis;
-          if (coordinateCount == 0) {
+          if (axisNum < numAxis) {
+            if (axisNum < geometryFactoryNumAxis) {
+              coordinates.add(number);
+            }
+            axisNum++;
+          } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + numAxis
-                + " coordinates not " + coordinateCount);
-          } else {
-            coordinates.add(number);
+                + " coordinates not " + (axisNum + 1));
+
           }
         }
       }
       text.delete(0, 1);
-      return new DoubleCoordinatesList(numAxis, coordinates);
+      return new DoubleCoordinatesList(geometryFactoryNumAxis, coordinates);
     } else {
       throw new IllegalArgumentException(
         "Expecting start of coordinates '(' not: " + text);
@@ -189,17 +173,17 @@ public class WktParser {
         hasText(text, ";");
       }
       if (hasText(text, "POINT")) {
-        geometry = parsePoint(geometryFactory, text);
+        geometry = parsePoint(text);
       } else if (hasText(text, "LINESTRING")) {
-        geometry = parseLineString(geometryFactory, text);
+        geometry = parseLineString(text);
       } else if (hasText(text, "POLYGON")) {
-        geometry = parsePolygon(geometryFactory, text);
+        geometry = parsePolygon(text);
       } else if (hasText(text, "MULTIPOINT")) {
-        geometry = parseMultiPoint(geometryFactory, text);
+        geometry = parseMultiPoint(text);
       } else if (hasText(text, "MULTILINESTRING")) {
-        geometry = parseMultiLineString(geometryFactory, text);
+        geometry = parseMultiLineString(text);
       } else if (hasText(text, "MULTIPOLYGON")) {
-        geometry = parseMultiPolygon(geometryFactory, text);
+        geometry = parseMultiPolygon(text);
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
@@ -231,25 +215,17 @@ public class WktParser {
     }
   }
 
-  private LineString parseLineString(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text) {
+  private LineString parseLineString(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
-
-    final CoordinatesList points;
     if (isEmpty(text)) {
-      points = new DoubleCoordinatesList(0, numAxis);
+      return geometryFactory.createLineString();
     } else {
-      points = parseCoordinates(text, numAxis);
+      CoordinatesList points = parseCoordinates(text, numAxis);
+      return geometryFactory.createLineString(points);
     }
-    final GeometryFactory axisGeometryFactory = getGeometryFactory(
-      geometryFactory, numAxis);
-    return axisGeometryFactory.createLineString(points);
   }
 
-  private MultiLineString parseMultiLineString(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text) {
+  private MultiLineString parseMultiLineString(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<CoordinatesList> lines;
@@ -258,14 +234,10 @@ public class WktParser {
     } else {
       lines = parseParts(text, numAxis);
     }
-    final GeometryFactory axisGeometryFactory = getGeometryFactory(
-      geometryFactory, numAxis);
-    return axisGeometryFactory.createMultiLineString(lines);
+    return geometryFactory.createMultiLineString(lines);
   }
 
-  private MultiPoint parseMultiPoint(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text) {
+  private MultiPoint parseMultiPoint(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<CoordinatesList> pointsList;
@@ -274,14 +246,10 @@ public class WktParser {
     } else {
       pointsList = parseParts(text, numAxis);
     }
-    final GeometryFactory axisGeometryFactory = getGeometryFactory(
-      geometryFactory, numAxis);
-    return axisGeometryFactory.createMultiPoint(pointsList);
+    return geometryFactory.createMultiPoint(pointsList);
   }
 
-  private MultiPolygon parseMultiPolygon(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text) {
+  private MultiPolygon parseMultiPolygon(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<List<CoordinatesList>> polygons;
@@ -290,9 +258,7 @@ public class WktParser {
     } else {
       polygons = parsePartsList(text, numAxis);
     }
-    final GeometryFactory axisGeometryFactory = getGeometryFactory(
-      geometryFactory, numAxis);
-    return axisGeometryFactory.createMultiPolygon(polygons);
+    return geometryFactory.createMultiPolygon(polygons);
   }
 
   private List<CoordinatesList> parseParts(
@@ -351,27 +317,20 @@ public class WktParser {
     return partsList;
   }
 
-  private Point parsePoint(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text) {
+  private Point parsePoint(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
-    final CoordinatesList points;
     if (isEmpty(text)) {
-      points = new DoubleCoordinatesList(0, numAxis);
+      return geometryFactory.createPoint();
     } else {
-      points = parseCoordinates(text, numAxis);
+      CoordinatesList points = parseCoordinates(text, numAxis);
       if (points.size() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }
+      return geometryFactory.createPoint(points);
     }
-    final GeometryFactory axisGeometryFactory = getGeometryFactory(
-      geometryFactory, numAxis);
-    return axisGeometryFactory.createPoint(points);
   }
 
-  private Polygon parsePolygon(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text) {
+  private Polygon parsePolygon(final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<CoordinatesList> parts;
@@ -380,9 +339,7 @@ public class WktParser {
     } else {
       parts = parseParts(text, numAxis);
     }
-    final GeometryFactory axisGeometryFactory = getGeometryFactory(
-      geometryFactory, numAxis);
-    return axisGeometryFactory.createPolygon(parts);
+    return geometryFactory.createPolygon(parts);
   }
 
   private void skipWhitespace(final StringBuffer text) {

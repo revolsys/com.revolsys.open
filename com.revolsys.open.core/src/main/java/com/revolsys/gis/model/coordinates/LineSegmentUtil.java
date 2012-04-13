@@ -3,6 +3,8 @@ package com.revolsys.gis.model.coordinates;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.ListUtil;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
@@ -238,13 +240,13 @@ public class LineSegmentUtil {
     final Coordinates line2End) {
     final double line1x1 = line1Start.getX();
     final double line1y1 = line1Start.getY();
-    final double line1y2 = line1End.getY();
     final double line1x2 = line1End.getX();
+    final double line1y2 = line1End.getY();
 
     final double line2x1 = line2Start.getX();
     final double line2y1 = line2Start.getY();
-    final double line2y2 = line2End.getY();
     final double line2x2 = line2End.getX();
+    final double line2y2 = line2End.getY();
 
     return intersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2);
@@ -361,15 +363,68 @@ public class LineSegmentUtil {
     final double line2y1,
     final double line2x2,
     final double line2y2) {
-    final double x = det(det(line1x1, line1y1, line1x2, line1y2), line1x1
-      - line1x2, det(line2x1, line2y1, line2x2, line2y2), line2x1 - line2x2)
-      / det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2, line2y1
-        - line2y2);
-    final double y = det(det(line1x1, line1y1, line1x2, line1y2), line1y1
-      - line1y2, det(line2x1, line2y1, line2x2, line2y2), line2y1 - line2y2)
-      / det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2, line2y1
-        - line2y2);
-    return new DoubleCoordinates(x, y);
+
+    if (BoundingBox.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
+      line2y1, line2x2, line2y2)) {
+
+      int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1, line1x2,
+        line1y2, line2x1, line2y1);
+      int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1, line1x2,
+        line1y2, line2x2, line2y2);
+
+      if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
+        return null;
+      } else {
+
+        int Qp1 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
+          line2x2, line2y2, line1x1, line1y1);
+        int Qp2 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
+          line2x2, line2y2, line1x2, line1y2);
+
+        if ((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0)) {
+          return null;
+        }
+
+        boolean collinear = Pq1 == 0 && Pq2 == 0 && Qp1 == 0 && Qp2 == 0;
+        if (collinear) {
+          return null;
+        } else {
+          if (Pq1 == 0 || Pq2 == 0 || Qp1 == 0 || Qp2 == 0) {
+            if ((line1x1 == line2x1 && line1y1 == line2y1)
+              || (line1x1 == line2x2 && line1y1 == line2y2)) {
+              return new DoubleCoordinates(line1x1, line1y1);
+            } else if ((line1x2 == line2x1 && line1y2 == line2y1)
+              || (line1x2 == line2x2 && line1y2 == line2y2)) {
+              return new DoubleCoordinates(line1x2, line1y2);
+            } else if (Pq1 == 0) {
+              return new DoubleCoordinates(line1x1, line1y1);
+            } else if (Pq2 == 0) {
+              return new DoubleCoordinates(line1x2, line1y2);
+            } else if (Qp1 == 0) {
+              return new DoubleCoordinates(line2x1, line2y1);
+            } else if (Qp2 == 0) {
+              return new DoubleCoordinates(line2x2, line2y2);
+            } else {
+              return null;
+            }
+          } else {
+            final double x = det(det(line1x1, line1y1, line1x2, line1y2),
+              line1x1 - line1x2, det(line2x1, line2y1, line2x2, line2y2),
+              line2x1 - line2x2)
+              / det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2,
+                line2y1 - line2y2);
+            final double y = det(det(line1x1, line1y1, line1x2, line1y2),
+              line1y1 - line1y2, det(line2x1, line2y1, line2x2, line2y2),
+              line2y1 - line2y2)
+              / det(line1x1 - line1x2, line1y1 - line1y2, line2x1 - line2x2,
+                line2y1 - line2y2);
+            return new DoubleCoordinates(x, y);
+          }
+        }
+      }
+    } else {
+      return null;
+    }
   }
 
   public static boolean isPointOnLine(

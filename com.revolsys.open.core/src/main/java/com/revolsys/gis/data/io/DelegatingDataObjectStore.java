@@ -34,6 +34,7 @@ public class DelegatingDataObjectStore implements InvocationHandler {
       label, config);
     final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
       handler);
+    proxyStore.initialize();
     return proxyStore;
   }
 

@@ -24,12 +24,49 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Paul Austin
  */
 public class BoundingBox extends Envelope {
+
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;
 
   public static BoundingBox getBoundingBox(final Geometry geometry) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     return new BoundingBox(geometryFactory, geometry.getEnvelopeInternal());
+  }
+
+  public static boolean intersects(
+    double p1X,
+    double p1Y,
+    double p2X,
+    double p2Y,
+    double q1X,
+    double q1Y,
+    double q2X,
+    double q2Y) {
+    double minp = Math.min(p1X, p2X);
+    double maxq = Math.max(q1X, q2X);
+    if (minp > maxq) {
+      return false;
+    } else {
+      double minq = Math.min(q1X, q2X);
+      double maxp = Math.max(p1X, p2X);
+      if (maxp < minq) {
+        return false;
+      } else {
+        minp = Math.min(p1Y, p2Y);
+        maxq = Math.max(q1Y, q2Y);
+        if (minp > maxq) {
+          return false;
+        } else {
+          minq = Math.min(q1Y, q2Y);
+          maxp = Math.max(p1Y, p2Y);
+          if (maxp < minq) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      }
+    }
   }
 
   public static BoundingBox parse(final String bbox) {

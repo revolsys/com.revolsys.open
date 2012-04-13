@@ -40,8 +40,6 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   Reader<DataObject> query(QName typeName, Geometry geometry, String condition);
 
-  void setDataObjectFactory(DataObjectFactory featureDataObjectFactory);
-
   void setDataSource(DataSource dataSource);
 
   void setLabel(String label);

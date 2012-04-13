@@ -3,6 +3,8 @@ package com.revolsys.gis.data.io;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.FactoryBean;
 
 import com.revolsys.util.JavaBeanUtil;
@@ -13,14 +15,18 @@ public class DataObjectStoreFactoryBean implements FactoryBean<DataObjectStore> 
 
   private Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
+  private DataObjectStore dataObjectStore;
+
   public Map<String, Object> getConfig() {
     return config;
   }
 
   public DataObjectStore getObject() throws Exception {
-    final DataObjectStore dataObjectStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
-    JavaBeanUtil.setProperties(dataObjectStore, properties);
-    dataObjectStore.initialize();
+    if (dataObjectStore == null) {
+      dataObjectStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
+      JavaBeanUtil.setProperties(dataObjectStore, properties);
+      dataObjectStore.initialize();
+    }
     return dataObjectStore;
   }
 
@@ -46,5 +52,13 @@ public class DataObjectStoreFactoryBean implements FactoryBean<DataObjectStore> 
 
   public void setUrl(final String url) {
     config.put("url", url);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    if (dataObjectStore != null) {
+      dataObjectStore.close();
+      dataObjectStore = null;
+    }
   }
 }

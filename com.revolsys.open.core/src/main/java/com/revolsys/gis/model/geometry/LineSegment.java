@@ -215,7 +215,9 @@ public class LineSegment extends AbstractCoordinatesList {
   public Coordinates intersection(final LineSegment lineSegment2) {
     Coordinates intersection = LineSegmentUtil.intersection(coordinates1,
       coordinates2, lineSegment2.coordinates1, lineSegment2.coordinates2);
-    geometryFactory.makePrecise(intersection);
+    if (intersection != null) {
+      geometryFactory.makePrecise(intersection);
+    }
     return intersection;
   }
 

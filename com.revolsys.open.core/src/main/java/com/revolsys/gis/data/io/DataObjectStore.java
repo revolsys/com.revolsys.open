@@ -63,6 +63,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   String getLabel();
 
+  void setDataObjectFactory(DataObjectFactory featureDataObjectFactory);
+
   /**
    * Get the meta data for the specified type.
    * 
