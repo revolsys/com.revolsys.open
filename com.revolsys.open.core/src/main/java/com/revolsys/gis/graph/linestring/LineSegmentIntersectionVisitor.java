@@ -1,14 +1,15 @@
-package com.revolsys.gis.algorithm.index.visitor;
+package com.revolsys.gis.graph.linestring;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.revolsys.gis.graph.Edge;
+import com.revolsys.gis.graph.visitor.AbstractEdgeListenerVisitor;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.geom.CoordinateList;
-import com.vividsolutions.jts.index.ItemVisitor;
 
-public class LineSegmentIntersectionVisitor implements ItemVisitor {
+public class LineSegmentIntersectionVisitor extends
+  AbstractEdgeListenerVisitor<LineSegment> {
 
   private final Set<CoordinatesList> intersections = new LinkedHashSet<CoordinatesList>();
 
@@ -22,14 +23,14 @@ public class LineSegmentIntersectionVisitor implements ItemVisitor {
     return intersections;
   }
 
-  public void visitItem(final Object item) {
-    final LineSegment segment = (LineSegment)item;
-    if (segment.getEnvelope().intersects(querySeg.getEnvelope())) {
-      final CoordinatesList intersection = querySeg.getIntersection(segment);
+  public boolean visit(Edge<LineSegment> edge) {
+    LineSegment lineSegment = edge.getObject();
+    if (lineSegment.getEnvelope().intersects(querySeg.getEnvelope())) {
+      final CoordinatesList intersection = querySeg.getIntersection(lineSegment);
       if (intersection != null) {
         intersections.add(intersection);
       }
     }
-
+    return true;
   }
 }

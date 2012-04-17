@@ -9,6 +9,8 @@ import java.util.Map;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.ShapeBuffer;
@@ -29,7 +31,18 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
 
   private static final Map<String, Method> GEOMETRY_TYPE_WRITE_METHOD_MAP = new LinkedHashMap<String, Method>();
 
+  private static final Map<GeometryType, DataType> GEOMETRY_TYPE_DATA_TYPE_MAP = new LinkedHashMap<GeometryType, DataType>();
+
   static {
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint,
+      DataTypes.POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint,
+      DataTypes.MULTI_POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline,
+      DataTypes.MULTI_LINE_STRING);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon,
+      DataTypes.MULTI_POLYGON);
+
     addReadWriteMethods("Point");
     addReadWriteMethods("Polygon");
     addReadWriteMethods("Polyline");
@@ -97,6 +110,9 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(
           "Field definition does not include a spatial reference");
       } else {
+        final GeometryType geometryType = geometryDef.getGeometryType();
+        final DataType dataType = GEOMETRY_TYPE_DATA_TYPE_MAP.get(geometryType);
+        setType(dataType);
         this.geometryFactory = spatialReference.getGeometryFactory();
         if (geometryFactory == null) {
           throw new IllegalArgumentException(
@@ -105,21 +121,21 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         }
 
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+        final boolean hasZ = geometryDef.isHasZ();
+        final boolean hasM = geometryDef.isHasM();
+        final String geometryTypeKey = geometryType.toString() + hasZ + hasM;
+        readMethod = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey);
+        if (readMethod == null) {
+          throw new IllegalArgumentException(
+            "No read method for geometry type " + geometryTypeKey);
+        }
+        writeMethod = GEOMETRY_TYPE_WRITE_METHOD_MAP.get(geometryTypeKey);
+        if (writeMethod == null) {
+          throw new IllegalArgumentException(
+            "No write method for geometry type " + geometryTypeKey);
+        }
       }
-      final GeometryType geometryType = geometryDef.getGeometryType();
-      final boolean hasZ = geometryDef.isHasZ();
-      final boolean hasM = geometryDef.isHasM();
-      final String geometryTypeKey = geometryType.toString() + hasZ + hasM;
-      readMethod = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey);
-      if (readMethod == null) {
-        throw new IllegalArgumentException("No read method for geometry type "
-          + geometryTypeKey);
-      }
-      writeMethod = GEOMETRY_TYPE_WRITE_METHOD_MAP.get(geometryTypeKey);
-      if (writeMethod == null) {
-        throw new IllegalArgumentException("No write method for geometry type "
-          + geometryTypeKey);
-      }
+
     }
   }
 
@@ -148,7 +164,10 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Row row, final Object value) {
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {

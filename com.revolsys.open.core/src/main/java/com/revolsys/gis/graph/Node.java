@@ -44,11 +44,11 @@ public class Node<T> extends AbstractCoordinates {
     return edges.indexOf(edge);
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(
+  public static <T> Set<Edge<T>> getEdgesBetween(
     final Node<T> node0,
     final Node<T> node1) {
     if (node1 == null) {
-      return Collections.emptyList();
+      return Collections.emptySet();
     }
     final Set<Edge<T>> commonEdges = new HashSet<Edge<T>>();
     if (node0 == node1) {

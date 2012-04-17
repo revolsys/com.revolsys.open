@@ -12,6 +12,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
@@ -123,4 +124,6 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
   void updateAll(Collection<DataObject> objects);
 
   void initialize();
+
+  DataObjectMetaData getMetaData(DataObjectMetaData metaData);
 }

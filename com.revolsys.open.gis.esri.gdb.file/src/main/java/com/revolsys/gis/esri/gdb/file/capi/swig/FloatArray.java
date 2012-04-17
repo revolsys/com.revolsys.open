@@ -9,20 +9,21 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class FloatArray {
-  private long swigCPtr;
-  protected boolean swigCMemOwn;
-
-  public FloatArray(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  public static long getCPtr(FloatArray obj) {
+  public static long getCPtr(final FloatArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void finalize() {
-    delete();
+  private long swigCPtr;
+
+  protected boolean swigCMemOwn;
+
+  public FloatArray() {
+    this(EsriFileGdbJNI.new_FloatArray(), true);
+  }
+
+  public FloatArray(final long cPtr, final boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
   }
 
   public synchronized void delete() {
@@ -35,15 +36,16 @@ public class FloatArray {
     }
   }
 
-  public FloatArray() {
-    this(EsriFileGdbJNI.new_FloatArray(), true);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public float get(int i) {
+  public float get(final int i) {
     return EsriFileGdbJNI.FloatArray_get(swigCPtr, this, i);
   }
 
-  public void set(int i, float value) {
+  public void set(final int i, final float value) {
     EsriFileGdbJNI.FloatArray_set(swigCPtr, this, i, value);
   }
 

@@ -38,6 +38,21 @@ public class BoundingBox extends Envelope {
     double p1Y,
     double p2X,
     double p2Y,
+    double qX,
+    double qY) {
+    if (((qX >= (p1X < p2X ? p1X : p2X)) && (qX <= (p1X > p2X ? p1X : p2X)))
+      && ((qY >= (p1Y < p2Y ? p1Y : p2Y)) && (qY <= (p1Y > p2Y ? p1Y : p2Y)))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public static boolean intersects(
+    double p1X,
+    double p1Y,
+    double p2X,
+    double p2Y,
     double q1X,
     double q1Y,
     double q2X,

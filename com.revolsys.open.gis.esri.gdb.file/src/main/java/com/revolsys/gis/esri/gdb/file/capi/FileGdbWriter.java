@@ -21,6 +21,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
+import com.revolsys.gis.esri.gdb.file.capi.type.OidAttribute;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 
@@ -147,20 +148,27 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   }
 
   private void insert(final DataObject object) {
-    DataObjectMetaData sourceMetaData = object.getMetaData();
+    final DataObjectMetaData sourceMetaData = object.getMetaData();
     final DataObjectMetaData metaData = dataObjectStore.getMetaData(sourceMetaData);
     final QName typeName = sourceMetaData.getName();
     final Table table = getTable(typeName);
     try {
       final Row row = table.createRowObject();
       try {
-        List<Object> values = new ArrayList<Object>();
+        final List<Object> values = new ArrayList<Object>();
         for (final Attribute attribute : metaData.getAttributes()) {
           final String name = attribute.getName();
           final Object value = object.getValue(name);
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          Object esriValue = esriAttribute.setInsertValue(row, value);
-          values.add(esriValue);
+          if (attribute.isRequired() && value == null
+            && !(attribute instanceof OidAttribute)) {
+            throw new IllegalArgumentException("Atribute " + typeName + "."
+              + name + " is required");
+          } else {
+            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+            final Object esriValue = esriAttribute.setInsertValue(object, row,
+              value);
+            values.add(esriValue);
+          }
         }
         table.insertRow(row);
         for (final Attribute attribute : metaData.getAttributes()) {
@@ -183,7 +191,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   }
 
   private void update(final DataObject object) {
-    DataObjectMetaData sourceMetaData = object.getMetaData();
+    final DataObjectMetaData sourceMetaData = object.getMetaData();
     final DataObjectMetaData metaData = dataObjectStore.getMetaData(sourceMetaData);
     final QName typeName = sourceMetaData.getName();
     final Table table = getTable(typeName);
@@ -194,7 +202,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
           final String name = attribute.getName();
           final Object value = object.getValue(name);
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          esriAttribute.setUpdateValue(row, value);
+          esriAttribute.setUpdateValue(object, row, value);
         }
         table.updateRow(row);
       } finally {

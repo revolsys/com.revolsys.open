@@ -1,13 +1,16 @@
-INTERFACE     = ..\swig\EsriFileGdbAPI.i
-WRAPFILE      = ..\cxx\EsriFileGdb_wrap.cxx
+WRAPFILE      = target\cxx\EsriFileGdb_wrap.cxx
 
+ESRI_FILE_GBD_HOME=C:\Apps\EsriFileGdb-1.2
+ESRI_FILE_GBD_INCLUDE=C:\Apps\EsriFileGdb-1.2\include
+ESRI_FILE_GBD_LIB=C:\Apps\EsriFileGdb-1.2\lib\winnt\x86
 TOOLS         = C:\Program Files\Microsoft Visual Studio 10.0\VC
 WIN_SDK				= C:\Program Files\Microsoft SDKs\Windows\v7.0a
-TARGET        = ..\lib\native\EsriFileGdbJni-x86-winnt.dll
 CC            = "$(TOOLS)\bin\cl.exe"
 LINK          = "$(TOOLS)\bin\link.exe"
-INCLUDE32     = -I$(TOOLS)\include
+INCLUDE32     = "-I$(TOOLS)\include"
 MACHINE       = IX86
+OS						= winnt
+ARCH					= x86
 
 # C Library needed to build a DLL
 
@@ -35,17 +38,29 @@ LIBS      = $(DLLIBC) $(WINLIB)
 !ENDIF
 
 JAVA_INCLUDE    = "-I$(JAVA_HOME)\include" "-I$(JAVA_HOME)\include\win32"
-ESRI_INCLUDE    = -I..\include
 
-all: EsriFileGdbJni-x86-winnt.dll
+CFG=Debug
 
-EsriFileGdbJni-x86-winnt.dll: EsriFileGdb_wrap.obj
-	set LIB=$(TOOLS)\lib;$(WIN_SDK)\lib
-	$(LINK) $(LINKFLAGS) -out:EsriFileGdbJni-x86-winnt.dll $(LIBS) EsriFileGdb_wrap.obj
-	copy EsriFileGdbJni-x86-winnt.dll $(TARGET)
+TARGET_OBJ=target\o\EsriFileGdbJni-$(ARCH)-$(OS).obj
+TARGET_LIB=src\main\resources\native\EsriFileGdbJni-$(ARCH)-$(OS).dll
 
-EsriFileGdb_wrap.obj: ..\cxx\EsriFileGdb_wrap.cxx
-  $(CC) $(CFLAGS) $(JAVA_INCLUDE) $(ESRI_INCLUDE) $(WRAPFILE)
-
+all: clean $(TARGET_LIB)
+	
 clean:
-  del EsriFileGdb* 
+	del /q target\o
+  del /q $(TARGET_OBJ) $(TARGET_LIB)
+	
+init:
+	mkdir /p target\cxx
+	mkdir /p target\o
+
+target/cxx/EsriFileGdb_wrap.cxx:
+
+$(TARGET_OBJ): $(WRAPFILE)
+  $(CC) $(CFLAGS) $(JAVA_INCLUDE) $(INCLUDE32) -I$(ESRI_FILE_GBD_INCLUDE) $(WRAPFILE) /Fo$(TARGET_OBJ)
+	
+
+$(TARGET_LIB): $(TARGET_OBJ)
+	set LIB=$(TOOLS)\lib;$(WIN_SDK)\lib;$(ESRI_FILE_GBD_LIB)
+	$(LINK) $(LINKFLAGS) -out:$(TARGET_LIB) $(LIBS) $(TARGET_OBJ)
+

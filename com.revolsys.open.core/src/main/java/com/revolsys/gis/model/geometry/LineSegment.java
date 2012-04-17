@@ -1,13 +1,9 @@
 package com.revolsys.gis.model.geometry;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -16,7 +12,6 @@ import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -119,9 +114,10 @@ public class LineSegment extends AbstractCoordinatesList {
     for (int i = 0; i < 4; i++) {
       final Coordinates ringC1 = points.get(i);
       final Coordinates ringC2 = points.get(i);
-      final Coordinates currentIntersection = LineSegmentUtil.intersection(
+      final CoordinatesList currentIntersections = LineSegmentUtil.getIntersection(
         coordinates1, coordinates2, ringC1, ringC2);
-      if (!Double.isNaN(currentIntersection.getX())) {
+      if (currentIntersections.size() == 1) {
+        Coordinates currentIntersection = currentIntersections.get(0);
         if (intersection == null) {
           intersection = currentIntersection;
         } else if (coordinates1.distance(currentIntersection) < coordinates1.distance(intersection)) {
@@ -176,7 +172,7 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
-  public LineSegment intersection(BoundingBox boundingBox) {
+  public LineSegment getIntersection(BoundingBox boundingBox) {
     boundingBox = boundingBox.convert(geometryFactory);
     final boolean contains1 = boundingBox.contains(coordinates1);
     final boolean contains2 = boundingBox.contains(coordinates2);
@@ -205,19 +201,17 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
-  public List<Coordinates> intersection(
+  public CoordinatesList getIntersection(
     final CoordinatesPrecisionModel precisionModel,
     final LineSegment lineSegment2) {
-    return LineSegmentUtil.intersection(precisionModel, coordinates1,
+    return LineSegmentUtil.getIntersection(precisionModel, coordinates1,
       coordinates2, lineSegment2.coordinates1, lineSegment2.coordinates2);
   }
 
-  public Coordinates intersection(final LineSegment lineSegment2) {
-    Coordinates intersection = LineSegmentUtil.intersection(coordinates1,
-      coordinates2, lineSegment2.coordinates1, lineSegment2.coordinates2);
-    if (intersection != null) {
-      geometryFactory.makePrecise(intersection);
-    }
+  public CoordinatesList getIntersection(final LineSegment lineSegment2) {
+    CoordinatesList intersection = LineSegmentUtil.getIntersection(
+      geometryFactory, coordinates1, coordinates2, lineSegment2.coordinates1,
+      lineSegment2.coordinates2);
     return intersection;
   }
 
@@ -274,6 +268,11 @@ public class LineSegment extends AbstractCoordinatesList {
     } else {
       return getLine().toString();
     }
+  }
+
+  public boolean isPointOnLineMiddle(Coordinates point, double maxDistance) {
+    return LineSegmentUtil.isPointOnLineMiddle(coordinates1, coordinates2,
+      point, maxDistance);
   }
 
 }

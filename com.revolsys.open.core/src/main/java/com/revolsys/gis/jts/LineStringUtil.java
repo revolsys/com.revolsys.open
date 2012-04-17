@@ -71,8 +71,13 @@ public final class LineStringUtil {
     for (int i = 1; i < points.size(); i++) {
       final Coordinates c1 = points.get(i);
 
-      final List<Coordinates> intersections = index.queryIntersections(c0, c1);
-      if (!intersections.isEmpty()) {
+      final List<CoordinatesList> intersectionPoints = index.queryIntersections(
+        c0, c1);
+      List<Coordinates> intersections = new ArrayList<Coordinates>();
+      for (CoordinatesList coordinatesList : intersectionPoints) {
+        intersections.addAll(coordinatesList.getList());
+      }
+      if (intersections.size() > 0) {
         if (intersections.size() > 1) {
           Collections.sort(intersections, new CoordinatesDistanceComparator(c0));
         }
@@ -818,25 +823,26 @@ public final class LineStringUtil {
     final LineString line) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesPrecisionModel precisionModel = factory.getCoordinatesPrecisionModel();
-    final List<List<Coordinates>> intersections = new ArrayList<List<Coordinates>>();
+    final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>();
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Iterator<Coordinates> iterator = points.iterator();
     Coordinates previousPoint = iterator.next();
     while (iterator.hasNext()) {
       final Coordinates nextPoint = iterator.next();
-      final List<Coordinates> intersectionPoints = LineSegmentUtil.intersection(
+      final CoordinatesList intersectionPoints = LineSegmentUtil.getIntersection(
         precisionModel, lineStart, lineEnd, previousPoint, nextPoint);
-      if (!intersectionPoints.isEmpty()) {
+      if (intersectionPoints.size() > 0) {
         if (intersectionPoints.size() == 1 && !intersections.isEmpty()) {
           final Coordinates point = intersectionPoints.get(0);
-          final List<Coordinates> lastIntersection = intersections.get(intersections.size() - 1);
+          final CoordinatesList lastIntersection = intersections.get(intersections.size() - 1);
           if (!lastIntersection.contains(point)) {
             intersections.add(intersectionPoints);
+
           }
         } else if (intersectionPoints.size() == 2 && !intersections.isEmpty()) {
           final Coordinates start = intersectionPoints.get(0);
           final Coordinates end = intersectionPoints.get(1);
-          final List<Coordinates> lastIntersection = intersections.get(intersections.size() - 1);
+          CoordinatesList lastIntersection = intersections.get(intersections.size() - 1);
           if (lastIntersection.size() == 1) {
             final Coordinates point = lastIntersection.get(0);
             if (start.equals2d(point) || end.equals2d(point)) {
@@ -848,9 +854,13 @@ public final class LineStringUtil {
             final Coordinates lastStart = lastIntersection.get(0);
             final Coordinates lastEnd = lastIntersection.get(lastIntersection.size() - 1);
             if (start.equals2d(lastEnd)) {
-              lastIntersection.add(end);
+              lastIntersection = CoordinatesListUtil.subList(
+                intersectionPoints, null, 0, lastIntersection.size(), end);
+              intersections.set(intersections.size() - 1, lastIntersection);
             } else if (end.equals2d(lastStart)) {
-              lastIntersection.add(0, start);
+              lastIntersection = CoordinatesListUtil.subList(
+                intersectionPoints, start, 0, lastIntersection.size(), null);
+              intersections.set(intersections.size() - 1, lastIntersection);
             } else {
               intersections.add(intersectionPoints);
             }
@@ -865,7 +875,7 @@ public final class LineStringUtil {
     if (intersections.isEmpty()) {
       return null;
     } else if (intersections.size() == 1) {
-      final List<Coordinates> intersectionPoints = intersections.get(0);
+      final CoordinatesList intersectionPoints = intersections.get(0);
       if (intersectionPoints.size() == 1) {
         final Coordinates point = intersectionPoints.get(0);
         return factory.createPoint(point);
@@ -874,7 +884,7 @@ public final class LineStringUtil {
       }
     } else {
       final Collection<Geometry> geometries = new ArrayList<Geometry>();
-      for (final List<Coordinates> intersection : intersections) {
+      for (final CoordinatesList intersection : intersections) {
         if (intersection.size() == 1) {
           final Coordinates point = intersection.get(0);
           geometries.add(factory.createPoint(point));

@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.coordinates.list;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -87,4 +88,8 @@ public interface CoordinatesList extends CoordinateSequence,
     int count);
 
   CoordinatesList subList(int index);
+
+  boolean contains(Coordinates point);
+
+  List<Coordinates> getList();
 }

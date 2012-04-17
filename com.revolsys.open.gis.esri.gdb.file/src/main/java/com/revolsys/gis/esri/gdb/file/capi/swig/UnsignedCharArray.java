@@ -9,20 +9,21 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class UnsignedCharArray {
-  private long swigCPtr;
-  protected boolean swigCMemOwn;
-
-  public UnsignedCharArray(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  public static long getCPtr(UnsignedCharArray obj) {
+  public static long getCPtr(final UnsignedCharArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void finalize() {
-    delete();
+  private long swigCPtr;
+
+  protected boolean swigCMemOwn;
+
+  public UnsignedCharArray() {
+    this(EsriFileGdbJNI.new_UnsignedCharArray(), true);
+  }
+
+  public UnsignedCharArray(final long cPtr, final boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
   }
 
   public synchronized void delete() {
@@ -35,15 +36,16 @@ public class UnsignedCharArray {
     }
   }
 
-  public UnsignedCharArray() {
-    this(EsriFileGdbJNI.new_UnsignedCharArray(), true);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public short get(int i) {
+  public short get(final int i) {
     return EsriFileGdbJNI.UnsignedCharArray_get(swigCPtr, this, i);
   }
 
-  public void set(int i, short value) {
+  public void set(final int i, final short value) {
     EsriFileGdbJNI.UnsignedCharArray_set(swigCPtr, this, i, value);
   }
 

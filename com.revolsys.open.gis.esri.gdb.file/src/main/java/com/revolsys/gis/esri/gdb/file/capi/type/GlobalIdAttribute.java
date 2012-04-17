@@ -19,20 +19,24 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
 
   @Override
   public Object getValue(final Row row) {
-      final Guid guid = row.getGlobalId();
-      return guid.toString();
+    final Guid guid = row.getGlobalId();
+    return guid.toString();
   }
 
   @Override
-  public Object setValue(final Row row, Object value) {
-    return null;
+  public void setPostInsertValue(final DataObject object, final Row row) {
+    final Guid guid = row.getGlobalId();
+    final String name = getName();
+    final String string = guid.toString();
+    object.setValue(name, string);
   }
 
-  public void setPostInsertValue(DataObject object, Row row) {
-    Guid guid = row.getGlobalId();
-    String name = getName();
-    String string = guid.toString();
-    object.setValue(name, string);
+  @Override
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
+    return null;
   }
 
 }

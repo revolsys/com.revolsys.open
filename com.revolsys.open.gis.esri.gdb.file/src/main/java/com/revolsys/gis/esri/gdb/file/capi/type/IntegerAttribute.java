@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
@@ -21,7 +22,10 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Row row, final Object value) {
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -33,12 +37,12 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
       return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      int intValue = number.intValue();
+      final int intValue = number.intValue();
       row.setInteger(name, intValue);
       return intValue;
     } else {
       final String string = value.toString();
-      int intValue = Integer.parseInt(string);
+      final int intValue = Integer.parseInt(string);
       row.setInteger(name, intValue);
       return intValue;
     }

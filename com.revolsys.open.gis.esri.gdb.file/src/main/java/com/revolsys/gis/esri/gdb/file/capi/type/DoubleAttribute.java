@@ -1,12 +1,14 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class DoubleAttribute extends AbstractFileGdbAttribute {
   public DoubleAttribute(final Field field) {
-    super(field.getName(), DataTypes.DOUBLE, field.getRequired() == Boolean.TRUE || !field.isIsNullable());
+    super(field.getName(), DataTypes.DOUBLE,
+      field.getRequired() == Boolean.TRUE || !field.isIsNullable());
   }
 
   @Override
@@ -20,7 +22,10 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Row row, final Object value) {
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -32,12 +37,12 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
       return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      double doubleValue = number.doubleValue();
+      final double doubleValue = number.doubleValue();
       row.setDouble(name, doubleValue);
       return doubleValue;
     } else {
       final String string = value.toString();
-      double doubleValue = Double.parseDouble(string);
+      final double doubleValue = Double.parseDouble(string);
       row.setDouble(name, doubleValue);
       return doubleValue;
     }

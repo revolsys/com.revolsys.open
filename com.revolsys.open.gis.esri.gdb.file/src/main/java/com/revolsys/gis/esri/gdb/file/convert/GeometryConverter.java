@@ -9,7 +9,7 @@ public class GeometryConverter {
     final double ymin = envelope.getMinY();
     final double xmax = envelope.getMaxX();
     final double ymax = envelope.getMaxY();
-    return new com.revolsys.gis.esri.gdb.file.capi.swig.Envelope(xmin, xmax, ymin,
-      ymax);
+    return new com.revolsys.gis.esri.gdb.file.capi.swig.Envelope(xmin, xmax,
+      ymin, ymax);
   }
 }

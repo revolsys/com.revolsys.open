@@ -19,17 +19,13 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
 
-  private String name;
+  private final String name;
 
   public FileGdbDomainCodeTable(final Geodatabase geodatabase,
     final CodedValueDomain domain) {
     this.geodatabase = geodatabase;
     this.domain = domain;
     this.name = domain.getDomainName();
-  }
-
-  public String getName() {
-    return name;
   }
 
   @Override
@@ -61,6 +57,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
     return domain;
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T getId(final Map<String, ? extends Object> values) {
     final Object id = domain.getId(values);
     if (id == null) {
@@ -69,6 +66,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
     return (T)id;
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T getId(final Object... values) {
     final Object id = domain.getId(values);
     if (id == null) {
@@ -83,6 +81,10 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   public Map<String, ? extends Object> getMap(final Object id) {
     return domain.getMap(id);
+  }
+
+  public String getName() {
+    return name;
   }
 
   @SuppressWarnings("unchecked")

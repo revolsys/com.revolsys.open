@@ -1,6 +1,8 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
@@ -11,6 +13,23 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList,
   Cloneable {
+
+  public boolean contains(Coordinates point) {
+    for (int i = 0; i < size(); i++) {
+      if (equal(i, point, 2)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public List<Coordinates> getList() {
+    List<Coordinates> points = new ArrayList<Coordinates>();
+    for (Coordinates point : this) {
+      points.add(point);
+    }
+    return points;
+  }
 
   /**
    * 

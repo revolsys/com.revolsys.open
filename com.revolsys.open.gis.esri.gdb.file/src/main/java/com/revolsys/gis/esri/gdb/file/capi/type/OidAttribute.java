@@ -22,19 +22,26 @@ public class OidAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Row row, final Object value) {
-    return null;
+  public void setPostInsertValue(final DataObject object, final Row row) {
+    final int oid = row.getOid();
+    final String name = getName();
+    object.setValue(name, oid);
   }
 
   @Override
-  public Object setUpdateValue(Row row, Object value) {
+  public Object setUpdateValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
     return value;
   }
 
-  public void setPostInsertValue(DataObject object, Row row) {
-    int oid = row.getOid();
-    String name = getName();
-    object.setValue(name, oid);
+  @Override
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
+    return null;
   }
 
 }

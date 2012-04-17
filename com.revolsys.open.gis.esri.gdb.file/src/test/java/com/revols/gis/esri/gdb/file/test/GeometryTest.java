@@ -18,15 +18,50 @@ import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryTest {
-  public static void main(String[] args) {
+  public static void createTestFile(
+    final GeometryFactory geometryFactory,
+    final String wkt) {
+    final Geometry geometry = geometryFactory.createGeometry(wkt);
 
-    for (GeometryFactory geometryFactory : new GeometryFactory[] {
+    final DataType geometryDataType = DataTypes.getType(geometry);
+
+    String name = geometryDataType.getName().getLocalPart();
+    if (geometryFactory.hasZ()) {
+      name += "Z";
+    }
+    final File file = new File("target/test-data/" + name + ".gdb");
+    FileUtil.deleteDirectory(file);
+    final QName typeName = new QName(name);
+
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
+    metaData.addAttribute("ID", DataTypes.INT, true);
+    final Attribute geometryAttribute = metaData.addAttribute("Geometry",
+      geometryDataType, true);
+    geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+      geometryFactory);
+    metaData.setIdAttributeName("ID");
+
+    final FileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(file);
+    dataStore.initialize();
+    final DataObject object = new ArrayDataObject(metaData);
+    object.setIdValue(1);
+    object.setGeometryValue(geometry);
+
+    dataStore.insert(object);
+
+    dataStore.close();
+  }
+
+  public static void main(final String[] args) {
+
+    for (final GeometryFactory geometryFactory : new GeometryFactory[] {
       GeometryFactory.getFactory(3005, 1000.0),
       GeometryFactory.getFactory(3005, 1000.0, 1.0)
     }) {
       createTestFile(geometryFactory, "POINT(1185093.8356 385662.9221)");
-      createTestFile(geometryFactory,
-        "LINESTRING(1185093.8353 385662.9221,1185103.8353 385682.9221)");
+      createTestFile(
+        geometryFactory,
+        "LINESTRINGZ(844395.448 1343937.441 1201.0,844304.98 1344019.53 1202.0,844299.206 1344024.791 1203.0,844245.375 1344075.229 1203.0,844206.127 1344116.019 1204.0,844205.172 1344117.062 1204.0)");
       createTestFile(
         geometryFactory,
         "POLYGON((1185074.5212745096 385696.922,1185127.0702941176 385696.6082745098,1185126.442843137 385650.490627451,1185074.5212745096 385651.4318039216,1185074.5212745096 385696.922))");
@@ -40,37 +75,5 @@ public class GeometryTest {
       // geometryFactory2d,
       // "MULTIPOLYGON(((1184983.391980392 385713.479937255,1184960.8696725487 385694.7912137255,1184977.162405882 385667.9561235294,1185007.3518823527 385664.6017372549,1185011.1854666665 385713.9591352942,1184983.391980392 385713.479937255)),((1184917.26265098 385712.52154117654,1184907.1994921565 385670.3521137255,1184958.4736823526 385669.8729156863,1184935.9513745094 385689.9992333334,1184958.9528803919 385713.00073921576,1184917.26265098 385712.52154117654)))");
     }
-  }
-
-  public static void createTestFile(GeometryFactory geometryFactory, String wkt) {
-    Geometry geometry = geometryFactory.createGeometry(wkt);
-
-    DataType geometryDataType = DataTypes.getType(geometry);
-
-    String name = geometryDataType.getName().getLocalPart();
-    if (geometryFactory.hasZ()) {
-      name += "Z";
-    }
-    File file = new File("target/test-data/" + name + ".gdb");
-    FileUtil.deleteDirectory(file);
-    QName typeName = new QName(name);
-
-    DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
-    metaData.addAttribute("ID", DataTypes.INT, true);
-    Attribute geometryAttribute = metaData.addAttribute("Geometry",
-      geometryDataType, true);
-    geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
-      geometryFactory);
-    metaData.setIdAttributeName("ID");
-
-    FileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(file);
-    dataStore.initialize();
-    DataObject object = new ArrayDataObject(metaData);
-    object.setIdValue(1);
-    object.setGeometryValue(geometry);
-
-    dataStore.insert(object);
-
-    dataStore.close();
   }
 }

@@ -58,6 +58,7 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<DataObject> {
 
   @Override
   public String toString() {
-    return "Reader " + dataStore.getLabel() + " " + typeNames + " " + boundingBox;
+    return "Reader " + dataStore.getLabel() + " " + typeNames + " "
+      + boundingBox;
   }
 }

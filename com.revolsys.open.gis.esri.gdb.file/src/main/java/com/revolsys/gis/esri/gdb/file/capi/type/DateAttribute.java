@@ -2,6 +2,8 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import java.util.Date;
 
+import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
@@ -23,7 +25,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
 
   @Override
   public Object getValue(final Row row) {
-    String name = getName();
+    final String name = getName();
     if (row.isNull(name)) {
       return null;
     } else {
@@ -36,8 +38,11 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Row row, final Object value) {
-    String name = getName();
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
+    final String name = getName();
     if (value == null) {
       if (isRequired()) {
         throw new IllegalArgumentException(name
@@ -49,22 +54,32 @@ public class DateAttribute extends AbstractFileGdbAttribute {
     } else if (value instanceof Date) {
       Date date = (Date)value;
       if (date.before(MIN_DATE)) {
-        throw new IllegalArgumentException(name + "=" + date + " is before "
-          + MIN_DATE + " which is not supported by ESRI File Geodatabases");
-      } else if (date.after(MAX_DATE)) {
-        throw new IllegalArgumentException(name + "=" + date + " is after "
-          + MAX_DATE + " which is not supported by ESRI File Geodatabases");
-      } else {
-        long time = date.getTime() / 1000;
-        synchronized (LOCK) {
-          row.setDate(name, time);
+        DataObjectLog.warn(getClass(), name + "=" + date + " is before "
+          + MIN_DATE + " which is not supported by ESRI File Geodatabases",
+          object);
+        if (isRequired()) {
+          date = MIN_DATE;
+        } else {
+          date = null;
         }
-        return time;
+      } else if (date.after(MAX_DATE)) {
+        DataObjectLog.warn(getClass(), name + "=" + date + " is after "
+          + MAX_DATE + " which is not supported by ESRI File Geodatabases",
+          object);
+        if (isRequired()) {
+          date = MAX_DATE;
+        } else {
+          date = null;
+        }
       }
+      final long time = date.getTime() / 1000;
+      synchronized (LOCK) {
+        row.setDate(name, time);
+      }
+      return time;
     } else {
       throw new IllegalArgumentException("Expecting a java,util.Date not "
         + value.getClass() + " " + value);
     }
   }
-
 }

@@ -9,20 +9,29 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class ByteArray {
+  public static long getCPtr(final ByteArray obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
+
   private long swigCPtr;
+
   protected boolean swigCMemOwn;
 
-  public ByteArray(long cPtr, boolean cMemoryOwn) {
+  public ByteArray() {
+    this(EsriFileGdbJNI.new_ByteArray__SWIG_1(), true);
+  }
+
+  public ByteArray(final long length) {
+    this(EsriFileGdbJNI.new_ByteArray__SWIG_0(length), true);
+  }
+
+  public ByteArray(final long cPtr, final boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public static long getCPtr(ByteArray obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-  protected void finalize() {
-    delete();
+  public boolean Allocate(final long length) {
+    return EsriFileGdbJNI.ByteArray_Allocate(swigCPtr, this, length);
   }
 
   public synchronized void delete() {
@@ -35,40 +44,33 @@ public class ByteArray {
     }
   }
 
-  public boolean Allocate(long length) {
-    return EsriFileGdbJNI.ByteArray_Allocate(swigCPtr, this, length);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public ByteArray(long length) {
-    this(EsriFileGdbJNI.new_ByteArray__SWIG_0(length), true);
-  }
-
-  public ByteArray() {
-    this(EsriFileGdbJNI.new_ByteArray__SWIG_1(), true);
-  }
-
-  public void setAllocatedLength(long value) {
-    EsriFileGdbJNI.ByteArray_allocatedLength_set(swigCPtr, this, value);
+  public short get(final int i) {
+    return EsriFileGdbJNI.ByteArray_get(swigCPtr, this, i);
   }
 
   public long getAllocatedLength() {
     return EsriFileGdbJNI.ByteArray_allocatedLength_get(swigCPtr, this);
   }
 
-  public void setInUseLength(long value) {
-    EsriFileGdbJNI.ByteArray_inUseLength_set(swigCPtr, this, value);
-  }
-
   public long getInUseLength() {
     return EsriFileGdbJNI.ByteArray_inUseLength_get(swigCPtr, this);
   }
 
-  public short get(int i) {
-    return EsriFileGdbJNI.ByteArray_get(swigCPtr, this, i);
+  public void set(final int i, final short c) {
+    EsriFileGdbJNI.ByteArray_set(swigCPtr, this, i, c);
   }
 
-  public void set(int i, short c) {
-    EsriFileGdbJNI.ByteArray_set(swigCPtr, this, i, c);
+  public void setAllocatedLength(final long value) {
+    EsriFileGdbJNI.ByteArray_allocatedLength_set(swigCPtr, this, value);
+  }
+
+  public void setInUseLength(final long value) {
+    EsriFileGdbJNI.ByteArray_inUseLength_set(swigCPtr, this, value);
   }
 
 }

@@ -478,12 +478,13 @@ public class TriangulatedIrregularNetwork {
       }
       LineSegment segment = new LineSegment(closestCorner, coordinate).extend(
         0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
-      final Coordinates intersectCoordinates = oppositeEdge.intersection(segment);
-      if (intersectCoordinates != null) {
-        final double z = oppositeEdge.getElevation(intersectCoordinates);
+      final CoordinatesList intersectCoordinates = oppositeEdge.getIntersection(segment);
+      if (intersectCoordinates.size() > 0) {
+        Coordinates intersectPoint = intersectCoordinates.get(0);
+        final double z = oppositeEdge.getElevation(intersectPoint);
         if (!Double.isNaN(z)) {
-          final double x = intersectCoordinates.getX();
-          final double y = intersectCoordinates.getY();
+          final double x = intersectPoint.getX();
+          final double y = intersectPoint.getY();
           final Coordinates end = new DoubleCoordinates(x, y, z);
           segment = new LineSegment(t0, end);
           return segment.getElevation(coordinate);
@@ -611,7 +612,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertEdge(LineSegment breakline) {
-    breakline = breakline.intersection(boundingBox);
+    breakline = breakline.getIntersection(boundingBox);
     if (!breakline.isEmpty()) {
       final List<Triangle> triangles = getTriangles(breakline);
       for (final Triangle triangle : triangles) {

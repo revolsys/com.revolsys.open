@@ -6,6 +6,7 @@ import java.util.List;
 import com.revolsys.gis.algorithm.index.visitor.LineSegmentIntersectionVisitor;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Envelope;
@@ -51,18 +52,18 @@ public class LineSegmentIndex extends Quadtree {
     }
   }
 
-  public List<Coordinates> queryIntersections(
+  public List<CoordinatesList> queryIntersections(
     final Coordinates c0,
     final Coordinates c1) {
     return queryIntersections(new LineSegment(c0, c1));
   }
 
-  public List<Coordinates> queryIntersections(final LineSegment querySeg) {
+  public List<CoordinatesList> queryIntersections(final LineSegment querySeg) {
     final Envelope env = querySeg.getEnvelope();
     final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(
       querySeg);
     query(env, visitor);
-    final List<Coordinates> intersections = new ArrayList<Coordinates>(
+    final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>(
       visitor.getIntersections());
     return intersections;
   }

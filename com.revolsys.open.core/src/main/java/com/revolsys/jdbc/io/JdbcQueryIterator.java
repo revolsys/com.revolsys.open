@@ -359,7 +359,11 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   }
 
   protected String getErrorMessage() {
-    return queries.get(currentQueryIndex).getSql();
+    if (queries == null) {
+      return null;
+    } else {
+      return queries.get(currentQueryIndex).getSql();
+    }
   }
 
   public DataObjectMetaData getMetaData() {

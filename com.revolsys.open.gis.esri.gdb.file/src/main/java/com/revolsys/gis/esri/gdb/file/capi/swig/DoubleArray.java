@@ -9,20 +9,21 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class DoubleArray {
-  private long swigCPtr;
-  protected boolean swigCMemOwn;
-
-  public DoubleArray(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  public static long getCPtr(DoubleArray obj) {
+  public static long getCPtr(final DoubleArray obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void finalize() {
-    delete();
+  private long swigCPtr;
+
+  protected boolean swigCMemOwn;
+
+  public DoubleArray() {
+    this(EsriFileGdbJNI.new_DoubleArray(), true);
+  }
+
+  public DoubleArray(final long cPtr, final boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
   }
 
   public synchronized void delete() {
@@ -35,15 +36,16 @@ public class DoubleArray {
     }
   }
 
-  public DoubleArray() {
-    this(EsriFileGdbJNI.new_DoubleArray(), true);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public double get(int i) {
+  public double get(final int i) {
     return EsriFileGdbJNI.DoubleArray_get(swigCPtr, this, i);
   }
 
-  public void set(int i, double value) {
+  public void set(final int i, final double value) {
     EsriFileGdbJNI.DoubleArray_set(swigCPtr, this, i, value);
   }
 

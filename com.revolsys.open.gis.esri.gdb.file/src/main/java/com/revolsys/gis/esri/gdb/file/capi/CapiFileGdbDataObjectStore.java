@@ -533,6 +533,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return writer;
   }
 
+  @Override
   @PostConstruct
   public void initialize() {
     super.initialize();

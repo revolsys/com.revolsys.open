@@ -9,20 +9,21 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class FieldInfo {
-  private long swigCPtr;
-  protected boolean swigCMemOwn;
-
-  public FieldInfo(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  public static long getCPtr(FieldInfo obj) {
+  public static long getCPtr(final FieldInfo obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void finalize() {
-    delete();
+  private long swigCPtr;
+
+  protected boolean swigCMemOwn;
+
+  public FieldInfo() {
+    this(EsriFileGdbJNI.new_FieldInfo(), true);
+  }
+
+  public FieldInfo(final long cPtr, final boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
   }
 
   public synchronized void delete() {
@@ -35,28 +36,30 @@ public class FieldInfo {
     }
   }
 
-  public FieldInfo() {
-    this(EsriFileGdbJNI.new_FieldInfo(), true);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
   public int getFieldCount() {
     return EsriFileGdbJNI.FieldInfo_getFieldCount(swigCPtr, this);
   }
 
-  public String getFieldName(int i) {
-    return EsriFileGdbJNI.FieldInfo_getFieldName(swigCPtr, this, i);
-  }
-
-  public int getFieldLength(int i) {
+  public int getFieldLength(final int i) {
     return EsriFileGdbJNI.FieldInfo_getFieldLength(swigCPtr, this, i);
   }
 
-  public boolean isNullable(int i) {
-    return EsriFileGdbJNI.FieldInfo_isNullable(swigCPtr, this, i);
+  public String getFieldName(final int i) {
+    return EsriFileGdbJNI.FieldInfo_getFieldName(swigCPtr, this, i);
   }
 
-  public FieldType getFieldType(int i) {
-    return FieldType.swigToEnum(EsriFileGdbJNI.FieldInfo_getFieldType(swigCPtr, this, i));
+  public FieldType getFieldType(final int i) {
+    return FieldType.swigToEnum(EsriFileGdbJNI.FieldInfo_getFieldType(swigCPtr,
+      this, i));
+  }
+
+  public boolean isNullable(final int i) {
+    return EsriFileGdbJNI.FieldInfo_isNullable(swigCPtr, this, i);
   }
 
 }

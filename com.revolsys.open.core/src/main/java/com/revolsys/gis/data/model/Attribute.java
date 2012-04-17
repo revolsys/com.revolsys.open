@@ -66,6 +66,10 @@ public class Attribute implements Cloneable {
   public Attribute() {
   }
 
+  public void setType(DataType type) {
+    this.type = type;
+  }
+
   public Attribute(final Attribute attribute) {
     this.name = attribute.getName();
     this.description = attribute.getDescription();

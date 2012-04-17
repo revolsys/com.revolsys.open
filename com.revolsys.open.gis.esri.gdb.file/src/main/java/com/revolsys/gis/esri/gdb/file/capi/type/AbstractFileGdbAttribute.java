@@ -19,17 +19,23 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
 
   public abstract Object getValue(Row row);
 
-  public abstract Object setValue(Row row, Object value);
-
-  public Object setInsertValue(Row row, Object value) {
-    return setValue(row, value);
+  public Object setInsertValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
+    return setValue(object, row, value);
   }
 
-  public Object setUpdateValue(Row row, Object value) {
-    return setValue(row, value);
+  public void setPostInsertValue(final DataObject object, final Row row) {
   }
 
-  public void setPostInsertValue(DataObject object, Row row) {
+  public Object setUpdateValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
+    return setValue(object, row, value);
   }
+
+  public abstract Object setValue(DataObject object, Row row, Object value);
 
 }

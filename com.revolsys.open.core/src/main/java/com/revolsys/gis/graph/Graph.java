@@ -1122,6 +1122,11 @@ public class Graph<T> {
     visitEdges(null, comparator, visitor);
   }
 
+  public void visitEdges(final Visitor<Edge<T>> visitor, Envelope envelope) {
+    EdgeQuadTree<T> edgeIndex = getEdgeIndex();
+    edgeIndex.query(envelope, visitor);
+  }
+
   public void visitEdges(
     final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator,

@@ -5,6 +5,8 @@
 ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.2/
 ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.2/include
 
+CFG=Debug
+
 include ${ESRI_FILE_GBD_INCLUDE}/make.include
 TARGET_OBJ=target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
 TARGET_LIB=src/main/resources/native/libEsriFileGdbJni-${ARCH}-${OS}.${SLIBEXT}

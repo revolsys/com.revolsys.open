@@ -20,7 +20,7 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
 
   private Method method;
 
-  public InvokeMethodVisitor(final Class clazz, final String methodName,
+  public InvokeMethodVisitor(final Class<?> clazz, final String methodName,
     final Object... parameters) {
     this.object = clazz;
     this.methodName = methodName;
@@ -40,16 +40,17 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
     final Object... parameters) {
     this.object = object;
     this.methodName = methodName;
+    this.parameters = new Object[parameters.length + 1];
+    System.arraycopy(parameters, 0, this.parameters, 0, parameters.length);
     for (final Method method : object.getClass().getMethods()) {
-      if (method.getName().equals(methodName)) {
+      if (method.getName().equals(methodName)
+        && method.getParameterTypes().length == this.parameters.length) {
         this.method = method;
       }
     }
     if (this.method == null) {
       throw new IllegalArgumentException("Method does not exist");
     }
-    this.parameters = new Object[parameters.length + 1];
-    System.arraycopy(parameters, 0, this.parameters, 0, parameters.length);
   }
 
   @Override

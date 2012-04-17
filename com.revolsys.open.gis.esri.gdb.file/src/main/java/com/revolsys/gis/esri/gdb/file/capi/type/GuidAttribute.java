@@ -2,6 +2,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import java.util.WeakHashMap;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -10,7 +11,16 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 public class GuidAttribute extends AbstractFileGdbAttribute {
   private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();
 
-  public static Guid getGuid(String guidString) {
+  public static void addGuid(final Guid guid) {
+    synchronized (GUID_CACHE) {
+      final String guidString = guid.toString();
+      if (!GUID_CACHE.containsKey(guidString)) {
+        GUID_CACHE.put(guidString, guid);
+      }
+    }
+  }
+
+  public static Guid getGuid(final String guidString) {
     synchronized (GUID_CACHE) {
       Guid guid = GUID_CACHE.get(guidString);
       if (guid == null) {
@@ -19,15 +29,6 @@ public class GuidAttribute extends AbstractFileGdbAttribute {
         GUID_CACHE.put(guidString, guid);
       }
       return guid;
-    }
-  }
-
-  public static void addGuid(Guid guid) {
-    synchronized (GUID_CACHE) {
-      String guidString = guid.toString();
-      if (!GUID_CACHE.containsKey(guidString)) {
-        GUID_CACHE.put(guidString, guid);
-      }
     }
   }
 
@@ -54,7 +55,10 @@ public class GuidAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Row row, final Object value) {
+  public Object setValue(
+    final DataObject object,
+    final Row row,
+    final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {

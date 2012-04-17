@@ -2,7 +2,6 @@ package com.revolsys.gis.model.geometry;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import com.revolsys.gis.cs.GeometryFactory;
@@ -10,6 +9,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
@@ -63,9 +63,11 @@ public class Triangle extends AbstractCoordinatesList {
     final Coordinates line1End,
     final Coordinates line2Start,
     final Coordinates line2End) {
-    final List<Coordinates> intersections = LineSegmentUtil.intersection(
+    final CoordinatesList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
-    coordinates.addAll(intersections);
+    for (Coordinates point : intersections) {
+      coordinates.add(point);
+    }
   }
 
   /**

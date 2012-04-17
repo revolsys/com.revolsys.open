@@ -4,7 +4,6 @@
 
 ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.2/
 ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.2/include
-
 ifndef OS
 	OS := $(shell uname)
 endif

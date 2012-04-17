@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
@@ -59,6 +58,14 @@ public class CoordinatesUtil {
     final double x2 = point2.getX();
     final double y2 = point2.getY();
     return MathUtil.distance(x1, y1, x2, y2);
+  }
+
+  public static boolean equals(
+    final double x1,
+    final double y1,
+    final double x2,
+    final double y2) {
+    return x1 == x2 && y1 == y2;
   }
 
   public static Coordinates get(final Coordinate coordinate) {
