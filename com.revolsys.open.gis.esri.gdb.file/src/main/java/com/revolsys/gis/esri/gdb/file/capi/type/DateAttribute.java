@@ -60,7 +60,8 @@ public class DateAttribute extends AbstractFileGdbAttribute {
         if (isRequired()) {
           date = MIN_DATE;
         } else {
-          date = null;
+          row.setNull(name);
+          return null;
         }
       } else if (date.after(MAX_DATE)) {
         DataObjectLog.warn(getClass(), name + "=" + date + " is after "
@@ -69,7 +70,8 @@ public class DateAttribute extends AbstractFileGdbAttribute {
         if (isRequired()) {
           date = MAX_DATE;
         } else {
-          date = null;
+          row.setNull(name);
+          return null;
         }
       }
       final long time = date.getTime() / 1000;

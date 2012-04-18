@@ -24,7 +24,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
   }
 
   public FileGdbDataObjectStore createDataObjectStore(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(
       connectionProperties);
     final String url = (String)properties.remove("url");
@@ -42,7 +42,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
   }
 

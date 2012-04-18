@@ -18,12 +18,12 @@ public interface JdbcDatabaseFactory extends DataObjectStoreFactory {
   
   void closeDataSource(DataSource dataSource);
 
-  DataSource createDataSource(Map<String, Object> connectionProperties);
+  DataSource createDataSource(Map<String, ? extends Object> connectionProperties);
 
-  JdbcDataObjectStore createDataObjectStore(Map<String, Object> connectionProperties);
+  JdbcDataObjectStore createDataObjectStore(Map<String, ? extends Object> connectionProperties);
 
   Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    Map<String, Object> connectionProperties);
+    Map<String, ? extends Object> connectionProperties);
 
   JdbcDataObjectStore createDataObjectStore(DataSource dataSource);
 }

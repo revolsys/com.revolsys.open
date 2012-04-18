@@ -33,7 +33,7 @@ public class JdbcFactoryRegistry {
   }
 
   public static JdbcDatabaseFactory databaseFactory(
-    final Map<String, Object> config) {
+    final Map<String, ? extends Object> config) {
     final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory();
     return jdbcFactoryRegistry.getDatabaseFactory(config);
   }
@@ -98,7 +98,7 @@ public class JdbcFactoryRegistry {
     return getDatabaseFactory(productName);
   }
 
-  public JdbcDatabaseFactory getDatabaseFactory(final Map<String, Object> config) {
+  public JdbcDatabaseFactory getDatabaseFactory(final Map<String, ? extends Object> config) {
     final String url = (String)config.get("url");
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");

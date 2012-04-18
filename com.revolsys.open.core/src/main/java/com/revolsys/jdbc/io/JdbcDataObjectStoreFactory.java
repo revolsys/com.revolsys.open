@@ -12,13 +12,13 @@ public class JdbcDataObjectStoreFactory implements DataObjectStoreFactory {
   private static final List<String> URL_PATTERNS = Arrays.asList("jdbc:.*");
 
   public JdbcDataObjectStore createDataObjectStore(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     JdbcDatabaseFactory databaseFactory = JdbcFactoryRegistry.databaseFactory(connectionProperties);
     return databaseFactory.createDataObjectStore(connectionProperties);
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return JdbcDataObjectStore.class;
   }
 

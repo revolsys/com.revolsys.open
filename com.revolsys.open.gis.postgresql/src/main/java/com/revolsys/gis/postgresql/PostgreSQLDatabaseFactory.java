@@ -46,11 +46,11 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   public JdbcDataObjectStore createDataObjectStore(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return new PostgreSQLDataObjectStore(this, connectionProperties);
   }
 
-  public DataSource createDataSource(final Map<String, Object> config) {
+  public DataSource createDataSource(final Map<String, ? extends Object> config) {
     final Map<String, Object> newConfig = new HashMap<String, Object>(config);
     final String url = (String)newConfig.remove("url");
     final String username = (String)newConfig.remove("username");
@@ -93,7 +93,7 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return JdbcDataObjectStore.class;
   }
 

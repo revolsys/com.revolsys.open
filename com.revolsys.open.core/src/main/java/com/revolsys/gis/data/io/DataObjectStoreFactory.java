@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataObjectStoreFactory {
-  DataObjectStore createDataObjectStore(Map<String, Object> connectionProperties);
+  DataObjectStore createDataObjectStore(Map<String, ? extends Object> connectionProperties);
 
   Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    Map<String, Object> connectionProperties);
+    Map<String, ? extends Object> connectionProperties);
 
   List<String> getUrlPatterns();
 }

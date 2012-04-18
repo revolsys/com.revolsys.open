@@ -46,7 +46,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   public JdbcDataObjectStore createDataObjectStore(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return new OracleDataObjectStore(this, connectionProperties);
   }
 
@@ -55,7 +55,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
     return new OracleDataObjectStore(dataSource);
   }
   
-  public DataSource createDataSource(final Map<String, Object> config) {
+  public DataSource createDataSource(final Map<String, ? extends Object> config) {
     try {
       final Map<String, Object> newConfig = new HashMap<String, Object>(config);
       final String url = (String)newConfig.remove("url");
@@ -88,7 +88,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    final Map<String, Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return JdbcDataObjectStore.class;
   }
 

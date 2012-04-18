@@ -476,7 +476,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public void remove() {
-    graph.remove(this);
+    if (graph != null) {
+      graph.remove(this);
+    }
   }
 
   void removeInternal() {

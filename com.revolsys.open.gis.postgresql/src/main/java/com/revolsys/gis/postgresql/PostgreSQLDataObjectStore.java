@@ -38,7 +38,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public PostgreSQLDataObjectStore(PostgreSQLDatabaseFactory databaseFactory,
-    Map<String, Object> connectionProperties) {
+    Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
     DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
