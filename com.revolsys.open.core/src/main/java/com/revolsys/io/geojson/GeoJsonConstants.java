@@ -23,6 +23,8 @@ public interface GeoJsonConstants {
 
   String GEOMETRY = "geometry";
 
+  String GEOMETRIES = "geometries";
+
   String GEOMETRY_COLLECTION = "GeometryCollection";
 
   String LINE_STRING = "LineString";

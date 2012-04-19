@@ -24,13 +24,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   implements GeoJsonConstants {
 
-  /** The current geometry. */
-  private Geometry currentGeometry;
-
   private GeometryFactory geometryFactory;
-
-  /** Flag indicating if there are more records to be read. */
-  private boolean hasNext = false;
 
   private final JsonParser in;
 
@@ -94,6 +88,28 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
       return new DoubleCoordinatesList(dimension, values);
+    } else {
+      throw new IllegalStateException("Exepecting start array, not: "
+        + in.getEvent());
+    }
+  }
+
+  private List<Geometry> readGeometryList() {
+    if (in.getEvent() == EventType.startArray || in.hasNext()
+      && in.next() == EventType.startArray) {
+      EventType event = in.next();
+      final List<Geometry> geometries = new ArrayList<Geometry>();
+      if (event != EventType.endArray) {
+        do {
+          Geometry geometry = getNext();
+          geometries.add(geometry);
+          event = in.next();
+        } while (event == EventType.comma);
+      }
+      if (event != EventType.endArray) {
+        throw new IllegalStateException("Exepecting end array, not: " + event);
+      }
+      return geometries;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
         + in.getEvent());
@@ -220,7 +236,19 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Geometry readGeometryCollection() {
-    return null;
+    List<Geometry> geometries = new ArrayList<Geometry>();
+    GeometryFactory factory = geometryFactory;
+    do {
+      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      if (GEOMETRIES.equals(attributeName)) {
+        geometries = readGeometryList();
+      } else if (CRS.equals(attributeName)) {
+        factory = readCoordinateSystem();
+      }
+    } while (in.getEvent() != EventType.endObject
+      && in.getEvent() != EventType.endDocument);
+
+    return factory.createGeometry(geometries);
   }
 
   private LineString readLineString() {
@@ -289,22 +317,6 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     }
     return factory.createMultiPolygon(polygons);
-  }
-
-  private void readNextGeometry() {
-    String geometryType = null;
-    do {
-      do {
-        JsonParserUtil.skipToAttribute(in, TYPE);
-        if (in.getEvent() == EventType.endDocument) {
-          currentGeometry = null;
-          hasNext = false;
-          return;
-        }
-      } while (in.getEvent() != EventType.colon);
-      geometryType = JsonParserUtil.getString(in);
-    } while (!GEOMETRY_TYPE_NAMES.contains(geometryType));
-    currentGeometry = readGeometry();
   }
 
   private Point readPoint() {
