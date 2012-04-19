@@ -27,7 +27,7 @@ public class LineSegmentIntersectionVisitor extends
     LineSegment lineSegment = edge.getObject();
     if (lineSegment.getEnvelope().intersects(querySeg.getEnvelope())) {
       final CoordinatesList intersection = querySeg.getIntersection(lineSegment);
-      if (intersection != null) {
+      if (intersection != null && intersection.size() > 0) {
         intersections.add(intersection);
       }
     }

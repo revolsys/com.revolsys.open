@@ -145,7 +145,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     newPoints.add(startNode);
     newPoints.add(nextNode);
     edge1.remove();
-    while (nextNode != null && !nextNode.isRemoved() && !nextNode.equals2d(startNode)) {
+    while (nextNode != null && !nextNode.isRemoved()
+      && !nextNode.equals2d(startNode)) {
       final List<Edge<LineSegment>> outEdges = nextNode.getOutEdges();
       outEdges.removeAll(processedEdges);
       if (outEdges.isEmpty()) {
@@ -328,7 +329,13 @@ public class LineStringGraph extends Graph<LineSegment> {
       } else if (fromNode.getDegree() == 2 * numDuplicates
         || toNode.getDegree() == 2 * numDuplicates) {
         // If only on node only contain the edges, remove all edges (spike)
+        if (fromNode.equals(fromPoint)) {
+          fromPoint = new DoubleCoordinates(toNode);
+        } else if (toNode.equals(fromPoint)) {
+          fromPoint = new DoubleCoordinates(fromNode);
+        }
         Edge.remove(edges);
+
       } else {
         // Remove all but the first edge
         edges.remove(edge);

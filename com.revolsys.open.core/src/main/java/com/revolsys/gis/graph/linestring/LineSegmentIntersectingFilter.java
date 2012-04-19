@@ -17,7 +17,7 @@ public class LineSegmentIntersectingFilter implements Filter<LineSegment> {
       return false;
     } else {
       final CoordinatesList intersection = this.line.getIntersection(line);
-      return intersection != null;
+      return intersection != null && intersection.size() > 0;
     }
   }
 }
