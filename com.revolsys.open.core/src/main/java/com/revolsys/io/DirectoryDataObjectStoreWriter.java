@@ -8,6 +8,11 @@ public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
 
   private AbstractDirectoryDataObjectStore dataStore;
 
+  public DirectoryDataObjectStoreWriter(
+    AbstractDirectoryDataObjectStore dataStore) {
+    this.dataStore = dataStore;
+  }
+
   public void write(DataObject object) {
     if (object != null) {
       try {

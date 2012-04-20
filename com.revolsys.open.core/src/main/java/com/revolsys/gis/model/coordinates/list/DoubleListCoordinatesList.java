@@ -65,6 +65,12 @@ public class DoubleListCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
+  public void addAll(final CoordinatesList points) {
+    for (final Coordinates point : new InPlaceIterator(points)) {
+      add(point);
+    }
+  }
+
   public void clear() {
     coordinates.clear();
   }

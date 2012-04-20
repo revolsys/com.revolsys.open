@@ -6,7 +6,7 @@ import com.revolsys.io.AbstractDirectoryDataObjectStore;
 
 public class CsvDataObjectStore extends AbstractDirectoryDataObjectStore {
   public CsvDataObjectStore() {
-    setFileExtension("shp");
+    setFileExtension("csv");
   }
 
   public CsvDataObjectStore(File directory) {

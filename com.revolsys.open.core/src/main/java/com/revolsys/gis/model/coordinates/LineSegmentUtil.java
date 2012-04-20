@@ -7,7 +7,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
-import com.revolsys.util.ListUtil;
+import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 
@@ -28,6 +28,21 @@ public class LineSegmentUtil {
     final double c,
     final double d) {
     return a * d - b * c;
+  }
+
+  public static CoordinatesList toCoordinatesList(
+    int numAxis,
+    List<LineSegment> lineSegments) {
+    CoordinatesList points = new DoubleCoordinatesList(lineSegments.size() + 1,
+      numAxis);
+
+    for (int i = 0; i < lineSegments.size(); i++) {
+      LineSegment lineSegment = lineSegments.get(i);
+      points.setPoint(i, lineSegment.get(0));
+    }
+    LineSegment lineSegment = lineSegments.get(lineSegments.size() - 1);
+    points.setPoint(lineSegments.size(), lineSegment.get(1));
+    return points;
   }
 
   /**

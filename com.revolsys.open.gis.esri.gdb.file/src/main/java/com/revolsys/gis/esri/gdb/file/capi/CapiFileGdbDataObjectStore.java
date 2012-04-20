@@ -112,7 +112,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private String fileName;
 
-  private boolean createMissingGeodatabase = true;
+  private boolean createMissingDataStore = true;
 
   private boolean createMissingTables = true;
 
@@ -545,7 +545,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         throw new IllegalArgumentException(
           "ESRI File Geodatabase must be a directory");
       }
-    } else if (createMissingGeodatabase) {
+    } else if (createMissingDataStore) {
       if (template == null) {
         geodatabase = EsriFileGdb.createGeodatabase(fileName);
       } else if (template.exists()) {
@@ -596,8 +596,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     getWriter().write(object);
   }
 
-  public boolean isCreateMissingGeodatabase() {
-    return createMissingGeodatabase;
+  public boolean isCreateMissingDataStore() {
+    return createMissingDataStore;
   }
 
   public boolean isCreateMissingTables() {
@@ -711,8 +711,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return query(typeName, boundingBox);
   }
 
-  public void setCreateMissingGeodatabase(final boolean createMissingGeodatabase) {
-    this.createMissingGeodatabase = createMissingGeodatabase;
+  public void setCreateMissingDataStore(final boolean createMissingDataStore) {
+    this.createMissingDataStore = createMissingDataStore;
   }
 
   public void setCreateMissingTables(final boolean createMissingTables) {

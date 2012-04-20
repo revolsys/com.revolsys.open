@@ -11,7 +11,7 @@ public interface FileGdbDataObjectStore extends DataObjectStore {
 
   void initialize();
 
-  void setCreateMissingGeodatabase(boolean createMissingGeodatabase);
+  void setCreateMissingDataStore(boolean createMissingDataStore);
 
   void setCreateMissingTables(boolean createMissingTables);
 

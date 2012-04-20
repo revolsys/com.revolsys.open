@@ -33,7 +33,7 @@ public class FeatureDatasetTest {
       datasetName));
     try {
       dataStore.setCreateMissingTables(true);
-      dataStore.setCreateMissingGeodatabase(true);
+      dataStore.setCreateMissingDataStore(true);
       dataStore.initialize();
       dataStore.setDefaultSchema("test");
       Assert.assertEquals("Initial Schema Size", 1, dataStore.getSchemas()

@@ -165,7 +165,6 @@ public class ResultPagerView extends Element {
         pageLinkSpan(out, numPages, "Last Page", ">>");
         out.endTag(HtmlUtil.TD);
       }
-
     }
 
     out.endTag(HtmlUtil.TR);
