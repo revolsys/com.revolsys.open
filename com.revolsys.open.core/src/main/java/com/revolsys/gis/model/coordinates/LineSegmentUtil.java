@@ -709,4 +709,61 @@ public class LineSegmentUtil {
       return segFrac;
     }
   }
+
+  public static double distance(
+    Coordinates line1From,
+    Coordinates line1To,
+    Coordinates line2From,
+    Coordinates line2To) {
+    if (line1From.equals(line1To)) {
+      return distance(line1From, line2From, line2To);
+    } else if (line2From.equals(line2To)) {
+      return distance(line2To, line1From, line1To);
+    } else {
+      double line1FromX = line1From.getX();
+      double line1FromY = line1From.getY();
+
+      double line1ToX = line1To.getX();
+      double line1ToY = line1To.getY();
+
+      double line2FromX = line2From.getX();
+      double line2FromY = line2From.getY();
+
+      double line2ToX = line2To.getX();
+      double line2ToY = line2To.getY();
+
+      double r_top = (line1FromY - line2FromY) * (line2ToX - line2FromX)
+        - (line1FromX - line2FromX) * (line2ToY - line2FromY);
+      double r_bot = (line1ToX - line1FromX) * (line2ToY - line2FromY)
+        - (line1ToY - line1FromY) * (line2ToX - line2FromX);
+
+      double s_top = (line1FromY - line2FromY) * (line1ToX - line1FromX)
+        - (line1FromX - line2FromX) * (line1ToY - line1FromY);
+      double s_bot = (line1ToX - line1FromX) * (line2ToY - line2FromY)
+        - (line1ToY - line1FromY) * (line2ToX - line2FromX);
+
+      if ((r_bot == 0) || (s_bot == 0)) {
+        return Math.min(
+          distance(line1From, line2From, line2To),
+          Math.min(
+            distance(line1To, line2From, line2To),
+            Math.min(distance(line2From, line1From, line1To),
+              distance(line2To, line1From, line1To))));
+      } else {
+        double s = s_top / s_bot;
+        double r = r_top / r_bot;
+
+        if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
+          return Math.min(
+            distance(line1From, line2From, line2To),
+            Math.min(
+              distance(line1To, line2From, line2To),
+              Math.min(distance(line2From, line1From, line1To),
+                distance(line2To, line1From, line1To))));
+        } else {
+          return 0.0;
+        }
+      }
+    }
+  }
 }

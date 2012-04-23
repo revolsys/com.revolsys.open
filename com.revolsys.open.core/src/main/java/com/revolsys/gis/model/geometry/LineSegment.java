@@ -275,4 +275,9 @@ public class LineSegment extends AbstractCoordinatesList {
       point, maxDistance);
   }
 
+  public double distance(LineSegment lineSegment) {
+    return LineSegmentUtil.distance(coordinates1, coordinates2,
+      lineSegment.coordinates1, lineSegment.coordinates2);
+  }
+
 }

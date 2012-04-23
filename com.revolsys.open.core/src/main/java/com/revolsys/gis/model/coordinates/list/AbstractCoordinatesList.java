@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -29,6 +30,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
       points.add(point);
     }
     return points;
+  }
+
+  public BoundingBox getBoundingBox() {
+    BoundingBox boundingBox = new BoundingBox();
+    for (Coordinates point : this) {
+      boundingBox.expandToInclude(point);
+    }
+    return boundingBox;
   }
 
   /**

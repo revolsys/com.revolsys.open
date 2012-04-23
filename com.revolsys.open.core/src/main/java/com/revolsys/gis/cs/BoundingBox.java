@@ -579,5 +579,4 @@ public class BoundingBox extends Envelope {
         + getMinY() + " " + getMaxX() + "," + getMaxY() + ")";
     }
   }
-
 }
