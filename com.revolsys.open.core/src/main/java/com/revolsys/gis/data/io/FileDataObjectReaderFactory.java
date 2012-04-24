@@ -2,8 +2,8 @@ package com.revolsys.gis.data.io;
 
 import java.io.File;
 
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -11,8 +11,8 @@ import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
-public class FileDataObjectReaderFactory implements
-  FactoryBean<DataObjectReader> {
+public class FileDataObjectReaderFactory extends
+  AbstractFactoryBean<DataObjectReader> {
 
   public static DataObjectReader dataObjectReader(final File file) {
     final Resource resource = new FileSystemResource(file);
@@ -54,24 +54,30 @@ public class FileDataObjectReaderFactory implements
 
   private Resource resource;
 
+  @Override
+  public DataObjectReader createInstance() throws Exception {
+    return AbstractDataObjectReaderFactory.dataObjectReader(resource, factory);
+  }
+
+  @Override
+  protected void destroyInstance(final DataObjectReader reader)
+    throws Exception {
+    reader.close();
+    factory = null;
+    resource = null;
+  }
+
   public DataObjectFactory getFactory() {
     return factory;
   }
 
-  public DataObjectReader getObject() throws Exception {
-    return AbstractDataObjectReaderFactory.dataObjectReader(resource, factory);
-  }
-
+  @Override
   public Class<?> getObjectType() {
     return DataObjectReader.class;
   }
 
   public Resource getResource() {
     return resource;
-  }
-
-  public boolean isSingleton() {
-    return true;
   }
 
   public void setFactory(final DataObjectFactory factory) {

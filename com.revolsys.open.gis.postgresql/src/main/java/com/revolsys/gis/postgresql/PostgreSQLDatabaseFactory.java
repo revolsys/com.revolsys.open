@@ -14,11 +14,11 @@ import javax.sql.DataSource;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.DirectFieldAccessor;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.util.JavaBeanUtil;
 
 public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLDatabaseFactory.class);
@@ -64,13 +64,11 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
       final String databaseName = urlMatcher.group(3);
 
       final PGPoolingDataSource dataSource = new PGPoolingDataSource();
-      final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(
-        dataSource);
       for (final Entry<String, Object> property : newConfig.entrySet()) {
         final String name = property.getKey();
         final Object value = property.getValue();
         try {
-          dataSourceBean.setPropertyValue(name, value);
+          JavaBeanUtil.setProperty(dataSource, name, value);
         } catch (final Throwable t) {
           LOG.debug("Unable to set data source property " + name + " = "
             + value + " for " + url, t);

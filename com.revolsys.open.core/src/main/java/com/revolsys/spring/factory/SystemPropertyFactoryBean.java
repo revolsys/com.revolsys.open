@@ -1,8 +1,8 @@
 package com.revolsys.spring.factory;
 
-import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class SystemPropertyFactoryBean implements FactoryBean<String> {
+public class SystemPropertyFactoryBean extends AbstractFactoryBean<String> {
   private String name;
 
   private String defaultValue;
@@ -15,7 +15,14 @@ public class SystemPropertyFactoryBean implements FactoryBean<String> {
     return name;
   }
 
-  public String getObject() throws Exception {
+  @Override
+  protected void destroyInstance(String instance) throws Exception {
+    name = null;
+    defaultValue = null;
+  }
+
+  @Override
+  protected String createInstance() throws Exception {
     final String propertyValue = System.getProperty(name);
     if (propertyValue == null) {
       return defaultValue;

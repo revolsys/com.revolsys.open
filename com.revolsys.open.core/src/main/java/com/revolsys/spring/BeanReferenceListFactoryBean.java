@@ -5,22 +5,20 @@ import java.util.List;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class BeanReferenceListFactoryBean<T> implements FactoryBean<List<T>>,
-  BeanFactoryAware {
+public class BeanReferenceListFactoryBean<T> extends
+  AbstractFactoryBean<List<T>> {
 
   private List<String> beanNames = new ArrayList<String>();
-
-  private BeanFactory beanFactory;
 
   public List<String> getBeanNames() {
     return beanNames;
   }
 
-  @SuppressWarnings("unchecked")
-  public List<T> getObject() throws Exception {
+  @Override
+  protected List<T> createInstance() throws Exception {
+    BeanFactory beanFactory = getBeanFactory();
     final List<T> beans = new ArrayList<T>();
     for (int i = 0; i < beanNames.size(); i++) {
       final String beanName = beanNames.get(i);
@@ -36,11 +34,6 @@ public class BeanReferenceListFactoryBean<T> implements FactoryBean<List<T>>,
 
   public boolean isSingleton() {
     return false;
-  }
-
-  public void setBeanFactory(final BeanFactory beanFactory)
-    throws BeansException {
-    this.beanFactory = beanFactory;
   }
 
   public void setBeanNames(final List<String> beanNames) {

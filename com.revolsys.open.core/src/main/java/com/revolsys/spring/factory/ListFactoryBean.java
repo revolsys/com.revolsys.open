@@ -3,10 +3,11 @@ package com.revolsys.spring.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.GenericCollectionTypeResolver;
+
+import com.revolsys.util.ExceptionUtil;
 
 @SuppressWarnings("rawtypes")
 public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
@@ -23,7 +24,11 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
     }
     List result = null;
     if (this.targetListClass != null) {
-      result = BeanUtils.instantiateClass(this.targetListClass);
+      try {
+        result = this.targetListClass.newInstance();
+      } catch (Exception e) {
+        ExceptionUtil.throwUncheckedException(e);
+      }
     } else {
       result = new ArrayList();
     }

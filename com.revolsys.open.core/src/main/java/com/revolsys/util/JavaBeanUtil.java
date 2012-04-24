@@ -249,7 +249,7 @@ public final class JavaBeanUtil {
   }
 
   /**
-   * Set the value of the named propery on the object. Any exceptions are
+   * Set the value of the named property on the object. Any exceptions are
    * wrapped as runtime exceptions.
    * 
    * @param object The object.

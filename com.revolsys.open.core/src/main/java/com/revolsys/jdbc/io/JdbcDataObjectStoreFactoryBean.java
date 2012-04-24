@@ -3,19 +3,17 @@ package com.revolsys.jdbc.io;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.util.JavaBeanUtil;
 
-public class JdbcDataObjectStoreFactoryBean implements
-  FactoryBean<DataObjectStore>, ApplicationContextAware {
+public class JdbcDataObjectStoreFactoryBean extends
+  AbstractFactoryBean<JdbcDataObjectStore> implements ApplicationContextAware {
 
   private Map<String, Object> config = new LinkedHashMap<String, Object>();
 
@@ -25,9 +23,30 @@ public class JdbcDataObjectStoreFactoryBean implements
 
   private ApplicationContext applicationContext;
 
-  public void setApplicationContext(ApplicationContext applicationContext)
-    throws BeansException {
-    this.applicationContext = applicationContext;
+  @Override
+  protected JdbcDataObjectStore createInstance() throws Exception {
+    JdbcDataObjectStore dataObjectStore;
+    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
+    if (dataSource == null) {
+      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
+      dataObjectStore = databaseFactory.createDataObjectStore(config);
+    } else {
+      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(dataSource);
+      dataObjectStore = databaseFactory.createDataObjectStore(dataSource);
+    }
+    JavaBeanUtil.setProperties(dataObjectStore, properties);
+    dataObjectStore.initialize();
+    return dataObjectStore;
+  }
+
+  @Override
+  protected void destroyInstance(final JdbcDataObjectStore dataObjectStore)
+    throws Exception {
+    dataObjectStore.close();
+    config = null;
+    dataSource = null;
+    properties = null;
+    applicationContext = null;
   }
 
   public Map<String, Object> getConfig() {
@@ -38,24 +57,7 @@ public class JdbcDataObjectStoreFactoryBean implements
     return dataSource;
   }
 
-  private JdbcDataObjectStore dataObjectStore;
-
-  public JdbcDataObjectStore getObject() throws Exception {
-    if (dataObjectStore == null) {
-      final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
-      if (dataSource == null) {
-        final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
-        dataObjectStore = databaseFactory.createDataObjectStore(config);
-      } else {
-        final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(dataSource);
-        dataObjectStore = databaseFactory.createDataObjectStore(dataSource);
-      }
-      JavaBeanUtil.setProperties(dataObjectStore, properties);
-      dataObjectStore.initialize();
-    }
-    return dataObjectStore;
-  }
-
+  @Override
   public Class<?> getObjectType() {
     return JdbcDataObjectStore.class;
   }
@@ -64,8 +66,9 @@ public class JdbcDataObjectStoreFactoryBean implements
     return properties;
   }
 
-  public boolean isSingleton() {
-    return true;
+  public void setApplicationContext(final ApplicationContext applicationContext)
+    throws BeansException {
+    this.applicationContext = applicationContext;
   }
 
   public void setConfig(final Map<String, Object> config) {
@@ -79,13 +82,4 @@ public class JdbcDataObjectStoreFactoryBean implements
   public void setProperties(final Map<String, Object> properties) {
     this.properties = properties;
   }
-
-  @PreDestroy
-  public void destroy() {
-    if (dataObjectStore != null) {
-      dataObjectStore.close();
-      dataObjectStore = null;
-    }
-  }
-
 }

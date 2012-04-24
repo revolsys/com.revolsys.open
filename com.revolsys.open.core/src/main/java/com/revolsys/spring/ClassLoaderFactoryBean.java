@@ -6,13 +6,13 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.filter.DirectoryFilenameFilter;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
-public class ClassLoaderFactoryBean implements FactoryBean<ClassLoader> {
+public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
 
   private static final ExtensionFilenameFilter JAR_FILTER = new ExtensionFilenameFilter(
     "jar", "zip");
@@ -50,28 +50,22 @@ public class ClassLoaderFactoryBean implements FactoryBean<ClassLoader> {
     return createClassLoader(parentClassLoader, urls);
   }
 
-  private ClassLoader classLoader;
-
   private Collection<URL> urls = new LinkedHashSet<URL>();
 
   private final Collection<URL> mergedUrls = new LinkedHashSet<URL>();
 
   private Collection<File> libDirectories = new LinkedHashSet<File>();
 
-  public ClassLoader getClassLoader() {
-    return classLoader;
-  }
-
   public Collection<File> getLibDirectories() {
     return libDirectories;
   }
 
-  public ClassLoader getObject() throws Exception {
-    if (classLoader == null) {
-      final Class<? extends ClassLoaderFactoryBean> clazz = getClass();
-      final ClassLoader parentClassLoader = clazz.getClassLoader();
-      classLoader = createClassLoader(parentClassLoader, mergedUrls);
-    }
+  @Override
+  protected ClassLoader createInstance() throws Exception {
+    final Class<? extends ClassLoaderFactoryBean> clazz = getClass();
+    final ClassLoader parentClassLoader = clazz.getClassLoader();
+    URLClassLoader classLoader = createClassLoader(parentClassLoader,
+      mergedUrls);
     return classLoader;
   }
 
@@ -81,14 +75,6 @@ public class ClassLoaderFactoryBean implements FactoryBean<ClassLoader> {
 
   public Collection<URL> getUrls() {
     return urls;
-  }
-
-  public boolean isSingleton() {
-    return true;
-  }
-
-  public void setClassLoader(final ClassLoader classLoader) {
-    this.classLoader = classLoader;
   }
 
   public void setLibDirectories(final Collection<File> libDirectories) {

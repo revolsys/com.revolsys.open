@@ -3,17 +3,16 @@ package com.revolsys.jdbc.io;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource>,
-  ApplicationContextAware {
+public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
+  implements ApplicationContextAware {
 
   private Map<String, Object> config = new HashMap<String, Object>();
 
@@ -22,8 +21,6 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource>,
   private String username;
 
   private String password;
-
-  private DataSource dataSource;
 
   private JdbcDatabaseFactory databaseFactory;
 
@@ -34,22 +31,17 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource>,
     this.applicationContext = applicationContext;
   }
 
-  @PreDestroy
-  public void close() {
-    if (dataSource != null) {
-      try {
-        if (dataSource != null) {
-          databaseFactory.closeDataSource(dataSource);
-        }
-        dataSource = null;
-      } finally {
-        config = null;
-        databaseFactory = null;
-        dataSource = null;
-        password = null;
-        url = null;
-        username = null;
-      }
+  @Override
+  protected void destroyInstance(DataSource dataSource) throws Exception {
+    try {
+      databaseFactory.closeDataSource(dataSource);
+    } finally {
+      config = null;
+      databaseFactory = null;
+      password = null;
+      url = null;
+      username = null;
+      applicationContext = null;
     }
   }
 
@@ -57,16 +49,15 @@ public class JdbcDataSourceFactoryBean implements FactoryBean<DataSource>,
     return config;
   }
 
-  public DataSource getObject() throws Exception {
+  @Override
+  protected DataSource createInstance() throws Exception {
     final Map<String, Object> config = new HashMap<String, Object>(this.config);
     config.put("url", url);
     config.put("username", username);
     config.put("password", password);
-    if (dataSource == null) {
-      final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
-      databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
-      dataSource = databaseFactory.createDataSource(config);
-    }
+    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
+    databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
+    DataSource dataSource = databaseFactory.createDataSource(config);
     return dataSource;
   }
 
