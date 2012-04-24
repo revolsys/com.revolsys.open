@@ -13,7 +13,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 public class JdbcFloatAttribute extends JdbcAttribute {
   public JdbcFloatAttribute(final String name, final int sqlType,
     final int length, final boolean required,
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     super(name, DataTypes.FLOAT, sqlType, length, 0, required, properties);
   }
 

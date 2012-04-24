@@ -17,6 +17,7 @@ import com.revolsys.gis.data.io.DataObjectStoreFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.DirectoryDataObjectStore;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
@@ -50,7 +51,7 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
     String url = (String)connectionProperties.get("url");
     Resource resource = SpringUtil.getResource(url);
     File directory = SpringUtil.getFile(resource);
-    return new CsvDataObjectStore(directory);
+    return new DirectoryDataObjectStore(directory, "csv");
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(

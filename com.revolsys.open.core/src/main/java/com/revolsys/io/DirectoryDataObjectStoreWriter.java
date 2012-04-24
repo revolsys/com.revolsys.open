@@ -6,10 +6,10 @@ import com.revolsys.gis.data.model.DataObject;
 
 public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
 
-  private AbstractDirectoryDataObjectStore dataStore;
+  private DirectoryDataObjectStore dataStore;
 
   public DirectoryDataObjectStoreWriter(
-    AbstractDirectoryDataObjectStore dataStore) {
+    DirectoryDataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
 

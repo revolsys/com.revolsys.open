@@ -42,10 +42,21 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectMetaDataImpl implements DataObjectMetaData,
-  Comparable<DataObjectMetaData>, Cloneable {
+public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
+  implements DataObjectMetaData, Comparable<DataObjectMetaData>, Cloneable {
+  public static void destroy(final DataObjectMetaDataImpl... metaDataList) {
+    for (final DataObjectMetaDataImpl metaData : metaDataList) {
+      metaData.destroy();
+    }
+  }
+
+  public static DataObjectMetaData getMetaData(final int instanceId) {
+    return METADATA_CACHE.get(instanceId);
+  }
+
   private Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
 
   private Map<String, Attribute> attributeMap = new HashMap<String, Attribute>();
@@ -67,7 +78,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
-  private int instanceId = INSTANCE_IDS.getAndIncrement();
+  private final int instanceId = INSTANCE_IDS.getAndIncrement();
 
   private List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
@@ -79,9 +90,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   /** The name of the data type. */
   private QName name;
 
-  /** The meta data properties of the data type. */
-  private Map<String, Object> properties = new HashMap<String, Object>();
-
   private Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
   protected DataObjectStoreSchema schema;
@@ -91,43 +99,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
 
   private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
-
-  public CodeTable getCodeTableByColumn(String column) {
-    CodeTable codeTable = codeTableByColumnMap.get(column);
-    if (codeTable == null && dataObjectStore != null) {
-      codeTable = dataObjectStore.getCodeTableByColumn(column);
-    }
-    return codeTable;
-  }
-
-  public void addColumnCodeTable(String column, CodeTable codeTable) {
-    codeTableByColumnMap.put(column, codeTable);
-  }
-
-  @PreDestroy
-  public void destroy() {
-    METADATA_CACHE.remove(instanceId);
-    attributeIdMap = null;
-    attributeMap = null;
-    attributeNames = null;
-    attributes = null;
-    dataObjectFactory = null;
-    dataObjectMetaDataFactory = null;
-    dataObjectStore = null;
-    defaultValues = null;
-    geometryAttributeIndexes = null;
-    geometryAttributeNames = null;
-    name = null;
-    properties = null;
-    restrictions = null;
-    schema = null;
-    superClasses = null;
-
-  }
-
-  public static DataObjectMetaData getMetaData(final int instanceId) {
-    return METADATA_CACHE.get(instanceId);
-  }
 
   public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
     this(metaData.getName(), metaData.getProperties(), metaData.getAttributes());
@@ -243,6 +214,10 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return attribute;
   }
 
+  public void addColumnCodeTable(final String column, final CodeTable codeTable) {
+    codeTableByColumnMap.put(column, codeTable);
+  }
+
   public void addDefaultValue(
     final String attributeName,
     final Object defaultValue) {
@@ -264,7 +239,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   @Override
   public DataObjectMetaDataImpl clone() {
     final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(name,
-      properties, attributes);
+      getProperties(), attributes);
     clone.setIdAttributeIndex(idAttributeIndex);
     clone.setProperties(getProperties());
     return clone;
@@ -278,17 +253,16 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
           DataObjectMetaDataProperty metaDataProperty = (DataObjectMetaDataProperty)property;
           metaDataProperty = metaDataProperty.clone();
           metaDataProperty.setMetaData(this);
-          this.properties.put(propertyName, metaDataProperty);
+          setProperty(propertyName, metaDataProperty);
         } else {
-          this.properties.put(propertyName, property);
+          setProperty(propertyName, property);
         }
       }
-      this.properties.putAll(properties);
     }
   }
 
   public int compareTo(final DataObjectMetaData other) {
-    QName otherName = other.getName();
+    final QName otherName = other.getName();
     if (otherName == name) {
       return 0;
     } else if (name == null) {
@@ -310,6 +284,26 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     } else {
       dataObjectStore.delete(dataObject);
     }
+  }
+
+  @PreDestroy
+  public void destroy() {
+    super.close();
+    METADATA_CACHE.remove(instanceId);
+    attributeIdMap = null;
+    attributeMap = null;
+    attributeNames = null;
+    attributes = null;
+    dataObjectFactory = null;
+    dataObjectMetaDataFactory = null;
+    dataObjectStore = null;
+    defaultValues = null;
+    geometryAttributeIndexes = null;
+    geometryAttributeNames = null;
+    name = null;
+    restrictions = null;
+    schema = null;
+    superClasses = null;
   }
 
   @Override
@@ -391,6 +385,14 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
   public DataType getAttributeType(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getType();
+  }
+
+  public CodeTable getCodeTableByColumn(final String column) {
+    CodeTable codeTable = codeTableByColumnMap.get(column);
+    if (codeTable == null && dataObjectStore != null) {
+      codeTable = dataObjectStore.getCodeTableByColumn(column);
+    }
+    return codeTable;
   }
 
   public DataObjectFactory getDataObjectFactory() {
@@ -475,15 +477,6 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     return name;
   }
 
-  public Map<String, Object> getProperties() {
-    return properties;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> V getProperty(final String name) {
-    return (V)properties.get(name);
-  }
-
   public Map<String, Collection<Object>> getRestrictions() {
     return restrictions;
   }
@@ -544,6 +537,11 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     }
   }
 
+  public void setCodeTableByColumnMap(
+    final Map<String, CodeTable> codeTableByColumnMap) {
+    this.codeTableByColumnMap = codeTableByColumnMap;
+  }
+
   public void setDataObjectMetaDataFactory(
     final DataObjectMetaDataFactory dataObjectMetaDataFactory) {
     this.dataObjectMetaDataFactory = dataObjectMetaDataFactory;
@@ -585,6 +583,7 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
     this.name = name;
   }
 
+  @Override
   public void setProperties(final Map<String, Object> properties) {
     if (properties != null) {
       for (final Entry<String, Object> entry : properties.entrySet()) {
@@ -602,23 +601,8 @@ public class DataObjectMetaDataImpl implements DataObjectMetaData,
 
   }
 
-  public void setProperty(final String name, final Object value) {
-    properties.put(name, value);
-  }
-
   @Override
   public String toString() {
     return name.toString();
-  }
-
-  public static void destroy(DataObjectMetaDataImpl... metaDataList) {
-    for (DataObjectMetaDataImpl metaData : metaDataList) {
-      metaData.destroy();
-    }
-  }
-
-  public void setCodeTableByColumnMap(
-    Map<String, CodeTable> codeTableByColumnMap) {
-    this.codeTableByColumnMap = codeTableByColumnMap;
   }
 }

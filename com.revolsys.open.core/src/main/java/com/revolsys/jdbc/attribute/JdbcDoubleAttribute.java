@@ -13,7 +13,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 public class JdbcDoubleAttribute extends JdbcAttribute {
   public JdbcDoubleAttribute(final String name, final int sqlType,
     final int length, final boolean required,
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     super(name, DataTypes.DOUBLE, sqlType, length, 0, required, properties);
   }
 

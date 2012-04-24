@@ -17,13 +17,16 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
     return properties;
   }
 
+  @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
     return (C)getProperties().get(name);
   }
 
   public void setProperties(final Map<String, Object> properties) {
     this.properties.clear();
-    this.properties.putAll(properties);
+    if (properties != null) {
+      this.properties.putAll(properties);
+    }
   }
 
   public void setProperty(final String name, final Object value) {

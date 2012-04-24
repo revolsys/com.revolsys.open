@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.postgis.Geometry;
 import org.postgis.LineString;
 import org.postgis.LinearRing;
@@ -40,7 +38,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   public PostgreSQLGeometryJdbcAttribute(final String name, final DataType type,
     final int length, final int scale, final boolean required,
-    final Map<QName, Object> properties, final int srid, final int numAxis, final GeometryFactory geometryFactory) {
+    final Map<String, Object> properties, final int srid, final int numAxis, final GeometryFactory geometryFactory) {
     super(name, type, -1, length, scale, required, properties);
     this.srid = srid;
      this.geometryFactory = geometryFactory;

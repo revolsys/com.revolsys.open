@@ -13,7 +13,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcDateAttribute extends JdbcAttribute {
   public JdbcDateAttribute(final String name, final int sqlType,
-    final boolean required, final Map<QName, Object> properties) {
+    final boolean required, final Map<String, Object> properties) {
     super(name, DataTypes.DATE, sqlType, 0, 0, required, properties);
   }
 

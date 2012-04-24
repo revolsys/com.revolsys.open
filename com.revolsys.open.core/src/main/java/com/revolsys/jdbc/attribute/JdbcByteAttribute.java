@@ -5,15 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcByteAttribute extends JdbcAttribute {
   public JdbcByteAttribute(final String name, final int sqlType,
     final int length, final boolean required,
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     super(name, DataTypes.BYTE, sqlType, length, 0, required, properties);
   }
 

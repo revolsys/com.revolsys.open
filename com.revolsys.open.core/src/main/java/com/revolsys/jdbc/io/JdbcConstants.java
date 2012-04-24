@@ -1,14 +1,9 @@
 package com.revolsys.jdbc.io;
 
-import javax.xml.namespace.QName;
-
 public interface JdbcConstants {
-  QName FUNCTION_INTERSECTS = new QName(
-    "http://gis.revolsys.com/jdbc/function", "intersects");
+  String FUNCTION_INTERSECTS = "http://gis.revolsys.com/jdbc/function/intersects";
 
-  QName FUNCTION_BUFFER = new QName("http://gis.revolsys.com/jdbc/function",
-    "buffer");
+  String FUNCTION_BUFFER = "http://gis.revolsys.com/jdbc/function/buffer";
 
-  QName FUNCTION_EQUAL = new QName("http://gis.revolsys.com/jdbc/function",
-    "equals");
+  String FUNCTION_EQUAL = "http://gis.revolsys.com/jdbc/function/equals";
 }

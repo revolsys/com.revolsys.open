@@ -54,7 +54,7 @@ public class JsonMapWriter extends AbstractMapWriter {
             out.print("]");
           } else {
             out.print("]}");
-         }
+          }
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
@@ -107,5 +107,13 @@ public class JsonMapWriter extends AbstractMapWriter {
       }
     }
     written = true;
+  }
+
+  public void setListRoot(boolean listRoot) {
+    this.listRoot = listRoot;
+  }
+
+  public boolean isListRoot() {
+    return listRoot;
   }
 }

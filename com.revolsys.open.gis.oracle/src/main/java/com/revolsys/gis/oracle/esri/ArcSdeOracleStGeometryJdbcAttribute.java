@@ -46,7 +46,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
   public ArcSdeOracleStGeometryJdbcAttribute(final String name,
     final DataType type, final int length, final int scale,
-    final boolean required, final Map<QName, Object> properties,
+    final boolean required, final Map<String, Object> properties,
     final SpatialReference spatialReference, final int dimension) {
     super(name, type, -1, length, scale, required, properties);
     this.spatialReference = spatialReference;

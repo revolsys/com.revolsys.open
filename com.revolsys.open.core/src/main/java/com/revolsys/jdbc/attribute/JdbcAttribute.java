@@ -5,8 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
@@ -19,7 +17,7 @@ public class JdbcAttribute extends Attribute {
 
   public JdbcAttribute(final String name, final DataType type,
     final int sqlType, final int length, final int scale,
-    final boolean required, final Map<QName, Object> properties) {
+    final boolean required, final Map<String, Object> properties) {
     super(name, type, length, scale, required, properties);
     this.sqlType = sqlType;
   }

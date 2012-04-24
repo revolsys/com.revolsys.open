@@ -22,7 +22,7 @@ import com.revolsys.io.filter.DirectoryFilenameFilter;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class AbstractDirectoryDataObjectStore extends AbstractDataObjectStore {
+public class DirectoryDataObjectStore extends AbstractDataObjectStore {
 
   private boolean createMissingTables = true;
 
@@ -35,6 +35,11 @@ public class AbstractDirectoryDataObjectStore extends AbstractDataObjectStore {
   private Writer<DataObject> writer;
 
   private boolean createMissingDataStore = true;
+
+  public DirectoryDataObjectStore(File directory, String fileExtension) {
+    this.directory = directory;
+    this.fileExtension = fileExtension;
+  }
 
   @Override
   public void close() {
@@ -49,6 +54,7 @@ public class AbstractDirectoryDataObjectStore extends AbstractDataObjectStore {
       writer.close();
       writer = null;
     }
+    super.close();
   }
 
   public Writer<DataObject> createWriter() {
@@ -117,6 +123,7 @@ public class AbstractDirectoryDataObjectStore extends AbstractDataObjectStore {
         + getFileExtension());
       final Resource resource = new FileSystemResource(file);
       writer = AbstractDataObjectIoFactory.dataObjectWriter(metaData, resource);
+      writers.put(typeName, writer);
     }
     writer.write(object);
     addStatistic("Insert", object);

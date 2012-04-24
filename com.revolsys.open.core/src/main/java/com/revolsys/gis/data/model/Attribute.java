@@ -20,14 +20,12 @@
  */
 package com.revolsys.gis.data.model;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.io.AbstractObjectWithProperties;
 
 /**
  * The Attribute class defines the name, type and other properties about each
@@ -37,7 +35,8 @@ import com.revolsys.gis.data.model.types.DataType;
  * @see DataObject
  * @see DataObjectMetaData
  */
-public class Attribute implements Cloneable {
+public class Attribute extends AbstractObjectWithProperties implements
+  Cloneable {
   /** The description of the attribute. */
   private String description;
 
@@ -48,9 +47,6 @@ public class Attribute implements Cloneable {
 
   /** The name of the attribute. */
   private String name;
-
-  /** The meta data properties about the attribute. */
-  private final Map<QName, Object> properties = new HashMap<QName, Object>();
 
   /** The flag indicating if a value is required for the attribute. */
   private boolean required;
@@ -77,11 +73,8 @@ public class Attribute implements Cloneable {
     this.required = attribute.isRequired();
     this.length = attribute.getLength();
     this.scale = attribute.getScale();
-    final Map<QName, Object> properties = attribute.getProperties();
-    if (properties != null) {
-      this.properties.putAll(properties);
-    }
-
+    final Map<String, Object> properties = attribute.getProperties();
+    setProperties(properties);
   }
 
   public Attribute(final int index) {
@@ -112,7 +105,7 @@ public class Attribute implements Cloneable {
    * @param properties The meta data properties about the attribute.
    */
   public Attribute(final String name, final DataType type,
-    final boolean required, final Map<QName, Object> properties) {
+    final boolean required, final Map<String, Object> properties) {
     this(name, type, 0, 0, required, properties);
   }
 
@@ -147,7 +140,7 @@ public class Attribute implements Cloneable {
    * @param properties The meta data properties about the attribute.
    */
   public Attribute(final String name, final DataType type, final int length,
-    final boolean required, final Map<QName, Object> properties) {
+    final boolean required, final Map<String, Object> properties) {
     this(name, type, length, 0, required, properties);
   }
 
@@ -183,7 +176,7 @@ public class Attribute implements Cloneable {
    */
   public Attribute(final String name, final DataType type,
     final Integer length, final Integer scale, final Boolean required,
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     this(name, type, length, scale, required, null, properties);
 
   }
@@ -230,7 +223,7 @@ public class Attribute implements Cloneable {
    */
   public Attribute(final String name, final DataType type,
     final Integer length, final Integer scale, final Boolean required,
-    final String description, final Map<QName, Object> properties) {
+    final String description, final Map<String, Object> properties) {
     this.name = name;
     this.description = description;
     this.type = type;
@@ -244,10 +237,7 @@ public class Attribute implements Cloneable {
       this.scale = scale;
     }
     this.description = description;
-    if (properties != null) {
-      this.properties.putAll(properties);
-    }
-
+    setProperties(properties);
   }
 
   public void addAllowedValue(final Object value, final Object text) {
@@ -269,7 +259,6 @@ public class Attribute implements Cloneable {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public Map<?, ?> getAllowedValues() {
     return allowedValues;
   }
@@ -299,27 +288,6 @@ public class Attribute implements Cloneable {
    */
   public String getName() {
     return name;
-  }
-
-  /**
-   * Get all meta data properties about the attribute.
-   * 
-   * @return The properties.
-   */
-  public Map<QName, Object> getProperties() {
-    return properties;
-  }
-
-  /**
-   * Get the named meta data property about the attribute.
-   * 
-   * @param <T> The type to cast the value to.
-   * @param name The name of the property.
-   * @return The property value.
-   */
-  @SuppressWarnings("unchecked")
-  public <V> V getProperty(final QName name) {
-    return (V)properties.get(name);
   }
 
   /**
@@ -371,10 +339,6 @@ public class Attribute implements Cloneable {
 
   void setIndex(final int index) {
     this.index = index;
-  }
-
-  public void setProperty(final QName name, final Object value) {
-    properties.put(name, value);
   }
 
   @Override

@@ -41,7 +41,7 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
       final int length = attribute.getLength();
       final int scale = attribute.getScale();
       final boolean required = attribute.isRequired();
-      final Map<QName, Object> properties = attribute.getProperties();
+      final Map<String, Object> properties = attribute.getProperties();
       return new ArcSdeObjectIdJdbcAttribute(name, type, length, scale,
         required, properties, schemaName, registrationId);
     } catch (final IllegalArgumentException e) {
@@ -67,7 +67,7 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
     final int length,
     final int scale,
     final boolean required,
-    final Map<QName, Object> properties,
+    final Map<String, Object> properties,
     final String schemaName,
     final long registrationId) {
     super(name, type, -1, length, scale, required, properties);

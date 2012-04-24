@@ -5,14 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 
 public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
   public JdbcBigDecimalAttribute(final String name, final int sqlType,
     final int length, final int scale, final boolean required,
-    final Map<QName, Object> properties) {
+    final Map<String, Object> properties) {
     super(name, sqlType, length, scale, required, properties);
   }
 
