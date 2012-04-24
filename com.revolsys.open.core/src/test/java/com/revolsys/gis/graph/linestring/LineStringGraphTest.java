@@ -183,15 +183,18 @@ public class LineStringGraphTest {
     Assert.assertEquals("Intersects incorrect", false, intersects);
   }
 
-  @Test
-  public void testIntersectionTrueCloseMiddleMiddle() {
-    final LineString line1 = geometryFactory.createGeometry("LINESTRING(800000 1000000.001,800010 1000000.0005,800020 1000000)");
-    final LineStringGraph graph = new LineStringGraph(line1);
-    final LineString line2 = geometryFactory.createGeometry("LINESTRING(800000 1000000,800010 1000000,800020 1000000)");
-
-    final boolean intersects = graph.intersects(line2);
-    Assert.assertEquals("Intersects incorrect", true, intersects);
-  }
+  //
+  // @Test
+  // public void testIntersectionTrueCloseMiddleMiddle() {
+  // final LineString line1 =
+  // geometryFactory.createGeometry("LINESTRING(800000 1000000.001,800010 1000000.0005,800020 1000000)");
+  // final LineStringGraph graph = new LineStringGraph(line1);
+  // final LineString line2 =
+  // geometryFactory.createGeometry("LINESTRING(800000 1000000,800010 1000000,800020 1000000)");
+  //
+  // final boolean intersects = graph.intersects(line2);
+  // Assert.assertEquals("Intersects incorrect", true, intersects);
+  // }
 
   @Test
   public void testIntersectionTrueEndMiddle() {

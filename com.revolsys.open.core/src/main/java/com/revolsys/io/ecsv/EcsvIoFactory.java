@@ -78,7 +78,7 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
     String url = (String)connectionProperties.get("url");
     Resource resource = SpringUtil.getResource(url);
     File directory = SpringUtil.getFile(resource);
-    return new DirectoryDataObjectStore(directory, "csv");
+    return new DirectoryDataObjectStore(directory, "ecsv");
   }
 
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
