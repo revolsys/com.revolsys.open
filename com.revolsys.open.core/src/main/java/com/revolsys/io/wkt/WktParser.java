@@ -78,9 +78,10 @@ public class WktParser {
   }
 
   private CoordinatesList parseCoordinates(
+    final GeometryFactory geometryFactory,
     final StringBuffer text,
     final int numAxis) {
-    int geometryFactoryNumAxis = geometryFactory.getNumAxis();
+    final int geometryFactoryNumAxis = geometryFactory.getNumAxis();
     char c = text.charAt(0);
     if (c == '(') {
       text.delete(0, 1);
@@ -163,31 +164,39 @@ public class WktParser {
   public <T extends Geometry> T parseGeometry(final String value) {
     if (StringUtils.hasLength(value)) {
       GeometryFactory geometryFactory = this.geometryFactory;
+      final int numAxis = geometryFactory.getNumAxis();
+      final double scaleXY = geometryFactory.getScaleXY();
+      final double scaleZ = geometryFactory.getScaleZ();
       Geometry geometry;
       final StringBuffer text = new StringBuffer(value);
       if (hasText(text, "SRID=")) {
         final Integer srid = parseInteger(text);
         if (srid != null && srid != this.geometryFactory.getSRID()) {
-          geometryFactory = GeometryFactory.getFactory(srid, 3);
+          geometryFactory = GeometryFactory.getFactory(srid, numAxis);
         }
         hasText(text, ";");
       }
       if (hasText(text, "POINT")) {
-        geometry = parsePoint(text);
+        geometry = parsePoint(geometryFactory, text);
       } else if (hasText(text, "LINESTRING")) {
-        geometry = parseLineString(text);
+        geometry = parseLineString(geometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
-        geometry = parsePolygon(text);
+        geometry = parsePolygon(geometryFactory, text);
       } else if (hasText(text, "MULTIPOINT")) {
-        geometry = parseMultiPoint(text);
+        geometry = parseMultiPoint(geometryFactory, text);
       } else if (hasText(text, "MULTILINESTRING")) {
-        geometry = parseMultiLineString(text);
+        geometry = parseMultiLineString(geometryFactory, text);
       } else if (hasText(text, "MULTIPOLYGON")) {
-        geometry = parseMultiPolygon(text);
+        geometry = parseMultiPolygon(geometryFactory, text);
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
-      if (geometryFactory == this.geometryFactory) {
+      if (this.geometryFactory.getSRID() == 0) {
+        final int srid = geometry.getSRID();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+        return (T)geometryFactory.createGeometry(geometry);
+      } else if (geometryFactory == this.geometryFactory) {
         return (T)geometry;
       } else {
         return (T)this.geometryFactory.createGeometry(geometry);
@@ -215,17 +224,22 @@ public class WktParser {
     }
   }
 
-  private LineString parseLineString(final StringBuffer text) {
+  private LineString parseLineString(
+    final GeometryFactory geometryFactory,
+    final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (isEmpty(text)) {
       return geometryFactory.createLineString();
     } else {
-      CoordinatesList points = parseCoordinates(text, numAxis);
+      final CoordinatesList points = parseCoordinates(geometryFactory, text,
+        numAxis);
       return geometryFactory.createLineString(points);
     }
   }
 
-  private MultiLineString parseMultiLineString(final StringBuffer text) {
+  private MultiLineString parseMultiLineString(
+    final GeometryFactory geometryFactory,
+    final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<CoordinatesList> lines;
@@ -237,7 +251,9 @@ public class WktParser {
     return geometryFactory.createMultiLineString(lines);
   }
 
-  private MultiPoint parseMultiPoint(final StringBuffer text) {
+  private MultiPoint parseMultiPoint(
+    final GeometryFactory geometryFactory,
+    final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<CoordinatesList> pointsList;
@@ -249,7 +265,9 @@ public class WktParser {
     return geometryFactory.createMultiPoint(pointsList);
   }
 
-  private MultiPolygon parseMultiPolygon(final StringBuffer text) {
+  private MultiPolygon parseMultiPolygon(
+    final GeometryFactory geometryFactory,
+    final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<List<CoordinatesList>> polygons;
@@ -270,7 +288,8 @@ public class WktParser {
       case '(':
         do {
           text.delete(0, 1);
-          final CoordinatesList coordinates = parseCoordinates(text, numAxis);
+          final CoordinatesList coordinates = parseCoordinates(geometryFactory,
+            text, numAxis);
           parts.add(coordinates);
         } while (text.charAt(0) == ',');
         if (text.charAt(0) == ')') {
@@ -317,12 +336,15 @@ public class WktParser {
     return partsList;
   }
 
-  private Point parsePoint(final StringBuffer text) {
+  private Point parsePoint(
+    final GeometryFactory geometryFactory,
+    final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (isEmpty(text)) {
       return geometryFactory.createPoint();
     } else {
-      CoordinatesList points = parseCoordinates(text, numAxis);
+      final CoordinatesList points = parseCoordinates(geometryFactory, text,
+        numAxis);
       if (points.size() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }
@@ -330,7 +352,9 @@ public class WktParser {
     }
   }
 
-  private Polygon parsePolygon(final StringBuffer text) {
+  private Polygon parsePolygon(
+    final GeometryFactory geometryFactory,
+    final StringBuffer text) {
     final int numAxis = getNumAxis(text);
 
     final List<CoordinatesList> parts;
