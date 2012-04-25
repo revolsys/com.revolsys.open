@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
@@ -41,7 +41,11 @@ public class GeometryFactory extends
   CoordinatesPrecisionModel {
   private static final long serialVersionUID = 4328651897279304108L;
 
-  private static Map<String, GeometryFactory> factories = new WeakHashMap<String, GeometryFactory>();
+  private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
+
+  public static void clear() {
+    factories.clear();
+  }
 
   /**
    * get a 3d geometry factory with no coordinate system and a floating scale.

@@ -1,7 +1,6 @@
 package com.revolsys.io;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -25,7 +24,16 @@ public class IoFactoryRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
 
   public static IoFactoryRegistry getInstance() {
-    return instance;
+    synchronized (IoFactoryRegistry.class) {
+      if (instance == null) {
+        instance = new IoFactoryRegistry();
+      }
+      return instance;
+    }
+  }
+
+  public static void clearInstance() {
+    instance = null;
   }
 
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();

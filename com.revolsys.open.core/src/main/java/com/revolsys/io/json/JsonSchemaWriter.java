@@ -78,7 +78,8 @@ public class JsonSchemaWriter {
       final Collection<?> collection = (Collection<?>)value;
       value = toJsonList(collection);
     } else {
-      StringConverter<?> converter = StringConverterRegistry.INSTANCE.getConverter(value);
+      StringConverter<?> converter = StringConverterRegistry.getInstance()
+        .getConverter(value);
       if (converter != null) {
         jsonValue = converter.toString(value);
       }

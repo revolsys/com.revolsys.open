@@ -10,8 +10,6 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 public final class HttpRequestUtils {
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-
   private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
   public static String getFullRequestUrl() {
@@ -71,7 +69,7 @@ public final class HttpRequestUtils {
 
   public static String getOriginatingRequestUri() {
     final HttpServletRequest request = getHttpServletRequest();
-    final String originatingRequestUri = URL_PATH_HELPER.getOriginatingRequestUri(request);
+    final String originatingRequestUri = new UrlPathHelper().getOriginatingRequestUri(request);
     return originatingRequestUri;
   }
 

@@ -44,17 +44,13 @@ import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
 public class Page extends Component {
-  private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-
   private static final Logger LOG = Logger.getLogger(Page.class);
-
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
   public static String getAbsoluteUrl(final String url) {
     if (url.startsWith("/")) {
       final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
       final String serverUrl = HttpRequestUtils.getServerUrl(request);
-      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
+      final String contextPath = new UrlPathHelper().getOriginatingContextPath(request);
       return serverUrl + contextPath + url;
     } else {
       return url;
@@ -234,7 +230,7 @@ public class Page extends Component {
     return path;
   }
 
-  public List getArguments() {
+  public List<Argument> getArguments() {
     return arguments;
   }
 
@@ -439,7 +435,8 @@ public class Page extends Component {
   public void setPermission(final String permission) {
     this.permission = permission;
     if (StringUtils.hasText(permission)) {
-      this.permissionExpression = PARSER.parseExpression(permission);
+      SpelExpressionParser parser = new SpelExpressionParser();
+      this.permissionExpression = parser.parseExpression(permission);
     } else {
       this.permissionExpression = null;
     }

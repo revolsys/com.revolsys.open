@@ -1,6 +1,7 @@
 package com.revolsys.jdbc.io;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class JdbcFactoryRegistry {
 
   private static final Logger LOG = LoggerFactory.getLogger(JdbcFactoryRegistry.class);
 
-  private static Map<ApplicationContext, JdbcFactoryRegistry> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, JdbcFactoryRegistry>();
+  private static Map<ApplicationContext, WeakReference<JdbcFactoryRegistry>> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, WeakReference<JdbcFactoryRegistry>>();
 
   public static JdbcDatabaseFactory databaseFactory(final DataSource dataSource) {
     final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory();
@@ -44,28 +45,40 @@ public class JdbcFactoryRegistry {
   }
 
   public synchronized static JdbcFactoryRegistry getFactory() {
-    if (instance == null) {
-      instance = new JdbcFactoryRegistry();
-      try {
-        ClassLoader classLoader = JdbcFactoryRegistry.class.getClassLoader();
-        final Enumeration<URL> resources = classLoader.getResources("META-INF/com.revolsys.gis.jdbc.json");
-        while (resources.hasMoreElements()) {
-          final URL resourceUrl = resources.nextElement();
-          final UrlResource resource = new UrlResource(resourceUrl);
-          instance.loadFactories(classLoader, resource);
+    synchronized (JdbcFactoryRegistry.class) {
+      if (instance == null) {
+        instance = new JdbcFactoryRegistry();
+        try {
+          ClassLoader classLoader = JdbcFactoryRegistry.class.getClassLoader();
+          final Enumeration<URL> resources = classLoader.getResources("META-INF/com.revolsys.gis.jdbc.json");
+          while (resources.hasMoreElements()) {
+            final URL resourceUrl = resources.nextElement();
+            final UrlResource resource = new UrlResource(resourceUrl);
+            instance.loadFactories(classLoader, resource);
+          }
+        } catch (final Throwable e) {
+          LOG.error("Unable to initialized JdbcFactoryRegistry for", e);
         }
-      } catch (final Throwable e) {
-        LOG.error("Unable to initialized JdbcFactoryRegistry for", e);
-      }
 
+      }
+      return instance;
     }
-    return instance;
+  }
+
+  public static void clearInstance() {
+    instance = null;
   }
 
   public static JdbcFactoryRegistry getFactory(
     final ApplicationContext applicationContext) {
     synchronized (factoriesByApplicationContext) {
-      JdbcFactoryRegistry jdbcFactoryRegistry = factoriesByApplicationContext.get(applicationContext);
+      WeakReference<JdbcFactoryRegistry> reference = factoriesByApplicationContext.get(applicationContext);
+      JdbcFactoryRegistry jdbcFactoryRegistry;
+      if (reference == null) {
+        jdbcFactoryRegistry = null;
+      } else {
+        jdbcFactoryRegistry = reference.get();
+      }
       if (jdbcFactoryRegistry == null) {
         jdbcFactoryRegistry = new JdbcFactoryRegistry();
         try {
@@ -77,7 +90,7 @@ public class JdbcFactoryRegistry {
           LOG.error("Unable to load JdbcFactoryRegistry json files", e);
         }
         factoriesByApplicationContext.put(applicationContext,
-          jdbcFactoryRegistry);
+          new WeakReference<JdbcFactoryRegistry>(jdbcFactoryRegistry));
       }
       return jdbcFactoryRegistry;
     }
@@ -98,7 +111,8 @@ public class JdbcFactoryRegistry {
     return getDatabaseFactory(productName);
   }
 
-  public JdbcDatabaseFactory getDatabaseFactory(final Map<String, ? extends Object> config) {
+  public JdbcDatabaseFactory getDatabaseFactory(
+    final Map<String, ? extends Object> config) {
     final String url = (String)config.get("url");
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
@@ -131,7 +145,8 @@ public class JdbcFactoryRegistry {
         final String jdbcFactoryClassName = (String)factoryDefinition.get("jdbcFactoryClassName");
         if (StringUtils.hasText(jdbcFactoryClassName)) {
           @SuppressWarnings("unchecked")
-          final Class<JdbcDatabaseFactory> factoryClass = (Class<JdbcDatabaseFactory>)Class.forName(jdbcFactoryClassName, true, classLoader);
+          final Class<JdbcDatabaseFactory> factoryClass = (Class<JdbcDatabaseFactory>)Class.forName(
+            jdbcFactoryClassName, true, classLoader);
           final JdbcDatabaseFactory factory = factoryClass.newInstance();
           for (final String productName : factory.getProductNames()) {
             databaseFactoriesByProductName.put(productName, factory);

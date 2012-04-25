@@ -116,7 +116,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
               Object value = valueString;
               if (dataType != null) {
                 final Class<?> dataTypeClass = dataType.getJavaClass();
-                final StringConverter<?> converter = StringConverterRegistry.INSTANCE.getConverter(dataTypeClass);
+                final StringConverter<?> converter = StringConverterRegistry.getInstance().getConverter(dataTypeClass);
                 if (converter != null) {
                   value = converter.toObject(valueString);
                 }

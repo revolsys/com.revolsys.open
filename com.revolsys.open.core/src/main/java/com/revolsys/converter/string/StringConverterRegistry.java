@@ -16,7 +16,18 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class StringConverterRegistry {
 
-  public static final StringConverterRegistry INSTANCE = new StringConverterRegistry();
+  public static StringConverterRegistry instance = new StringConverterRegistry();
+
+  public static void clearInstance() {
+    instance = null;
+  }
+
+  public synchronized static StringConverterRegistry getInstance() {
+    if (instance == null) {
+      instance = new StringConverterRegistry();
+    }
+    return instance;
+  }
 
   public static Object toObject(
     final Class<Object> valueClass,
@@ -24,7 +35,8 @@ public class StringConverterRegistry {
     if (value == null) {
       return null;
     } else {
-      final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(valueClass);
+      final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+        .getConverter(valueClass);
       if (converter == null) {
         return value;
       } else {
@@ -54,7 +66,8 @@ public class StringConverterRegistry {
     if (value == null) {
       return null;
     } else {
-      final StringConverter<Object> converter = StringConverterRegistry.INSTANCE.getConverter(valueClass);
+      final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+        .getConverter(valueClass);
       if (converter == null) {
         return value.toString();
       } else {
@@ -112,6 +125,21 @@ public class StringConverterRegistry {
     addConverter(converter.getConvertedClass(), converter);
   }
 
+  @SuppressWarnings({
+    "rawtypes"
+  })
+  private StringConverter get(final Set<Class<?>> interfaces) {
+    StringConverter converter = null;
+    for (final Class<?> interfaceClass : interfaces) {
+      converter = get(interfaces, interfaceClass);
+      if (converter != null) {
+        classConverterMap.put(interfaceClass, converter);
+        return converter;
+      }
+    }
+    return converter;
+  }
+
   @SuppressWarnings("rawtypes")
   private StringConverter get(
     final Set<Class<?>> interfaces,
@@ -134,21 +162,6 @@ public class StringConverterRegistry {
   }
 
   @SuppressWarnings({
-    "rawtypes"
-  })
-  private StringConverter get(final Set<Class<?>> interfaces) {
-    StringConverter converter = null;
-    for (final Class<?> interfaceClass : interfaces) {
-      converter = get(interfaces, interfaceClass);
-      if (converter != null) {
-        classConverterMap.put(interfaceClass, converter);
-        return converter;
-      }
-    }
-    return converter;
-  }
-
-  @SuppressWarnings({
     "unchecked", "rawtypes"
   })
   public <T> StringConverter<T> getConverter(final Class<T> clazz) {
@@ -164,7 +177,7 @@ public class StringConverterRegistry {
         }
       }
     }
-    return (StringConverter<T>)converter;
+    return converter;
   }
 
   @SuppressWarnings("unchecked")

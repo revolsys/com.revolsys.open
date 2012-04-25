@@ -38,29 +38,18 @@ public final class EpsgCoordinateSystems {
 
   private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<String, CoordinateSystem>();
 
-  static {
-    try {
-      Map<Integer, LinearUnit> linearUnits = new HashMap<Integer, LinearUnit>();
-      Map<Integer, AngularUnit> angularUnits = new HashMap<Integer, AngularUnit>();
-      loadUnits(linearUnits, angularUnits);
-      Map<Integer, Area> areas = loadAreas();
-      Map<Integer, String> coordinateAxisNames = loadCoordinateAxisNames();
-      Map<Integer, List<Axis>> coordinateAxises = loadCoordinateAxises(
-        linearUnits, angularUnits, coordinateAxisNames);
-      Map<Datum, PrimeMeridian> datumPrimeMeridians = new HashMap<Datum, PrimeMeridian>();
-      Map<Integer, Datum> datums = loadDatums(datumPrimeMeridians);
-      loadGeographicCoordinateSystems(areas, datums, angularUnits,
-        coordinateAxises, datumPrimeMeridians);
-      loadProjectedCoordinateSystems(areas, coordinateAxises, linearUnits);
-      coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
-        coordinateSystemsByCoordinateSystem.values()));
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
+  private static boolean initialized = false;
+
+  public static void clear() {
+    coordinateSystems = null;
+    coordinateSystemsByCoordinateSystem.clear();
+    coordinateSystemsById.clear();
+    coordinateSystemsByName.clear();
   }
 
   public static CoordinateSystem getCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
+    initialize();
     final CoordinateSystem coordinateSystem2 = coordinateSystemsByCoordinateSystem.get(coordinateSystem);
     if (coordinateSystem2 == null) {
       return coordinateSystem;
@@ -74,15 +63,18 @@ public final class EpsgCoordinateSystems {
   }
 
   public static CoordinateSystem getCoordinateSystem(final int crsId) {
+    initialize();
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return coordinateSystem;
   }
 
   public static CoordinateSystem getCoordinateSystem(final String name) {
+    initialize();
     return coordinateSystemsByName.get(name);
   }
 
   public static Set<CoordinateSystem> getCoordinateSystems() {
+    initialize();
     return coordinateSystems;
   }
 
@@ -109,6 +101,7 @@ public final class EpsgCoordinateSystems {
   }
 
   public static Map<Integer, CoordinateSystem> getCoordinateSystemsById() {
+    initialize();
     return new TreeMap<Integer, CoordinateSystem>(coordinateSystemsById);
   }
 
@@ -155,8 +148,32 @@ public final class EpsgCoordinateSystems {
     return new String(string);
   }
 
+  public synchronized static void initialize() {
+    if (!initialized) {
+      try {
+        final Map<Integer, LinearUnit> linearUnits = new HashMap<Integer, LinearUnit>();
+        final Map<Integer, AngularUnit> angularUnits = new HashMap<Integer, AngularUnit>();
+        loadUnits(linearUnits, angularUnits);
+        final Map<Integer, Area> areas = loadAreas();
+        final Map<Integer, String> coordinateAxisNames = loadCoordinateAxisNames();
+        final Map<Integer, List<Axis>> coordinateAxises = loadCoordinateAxises(
+          linearUnits, angularUnits, coordinateAxisNames);
+        final Map<Datum, PrimeMeridian> datumPrimeMeridians = new HashMap<Datum, PrimeMeridian>();
+        final Map<Integer, Datum> datums = loadDatums(datumPrimeMeridians);
+        loadGeographicCoordinateSystems(areas, datums, angularUnits,
+          coordinateAxises, datumPrimeMeridians);
+        loadProjectedCoordinateSystems(areas, coordinateAxises, linearUnits);
+        coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
+          coordinateSystemsByCoordinateSystem.values()));
+        initialized = true;
+      } catch (final Throwable t) {
+        t.printStackTrace();
+      }
+    }
+  }
+
   private static Map<Integer, Area> loadAreas() {
-    Map<Integer, Area> areas = new HashMap<Integer, Area>();
+    final Map<Integer, Area> areas = new HashMap<Integer, Area>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/area.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -189,10 +206,10 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, List<Axis>> loadCoordinateAxises(
-    Map<Integer, LinearUnit> linearUnits,
-    Map<Integer, AngularUnit> angularUnits,
-    Map<Integer, String> coordinateAxisNames) {
-    Map<Integer, List<Axis>> coordinateAxises = new HashMap<Integer, List<Axis>>();
+    final Map<Integer, LinearUnit> linearUnits,
+    final Map<Integer, AngularUnit> angularUnits,
+    final Map<Integer, String> coordinateAxisNames) {
+    final Map<Integer, List<Axis>> coordinateAxises = new HashMap<Integer, List<Axis>>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordinateaxis.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -234,7 +251,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, String> loadCoordinateAxisNames() {
-    Map<Integer, String> coordinateAxisNames = new HashMap<Integer, String>();
+    final Map<Integer, String> coordinateAxisNames = new HashMap<Integer, String>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordinateaxisname.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -256,7 +273,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, String> loadCoordinateOperationMethodNames() {
-    Map<Integer, String> coordinateOperationMethodNames = new HashMap<Integer, String>();
+    final Map<Integer, String> coordinateOperationMethodNames = new HashMap<Integer, String>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordoperationmethod.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -279,7 +296,7 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, String> loadCoordinateOperationParamNames() {
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordoperationparam.txt";
-    Map<Integer, String> names = new HashMap<Integer, String>();
+    final Map<Integer, String> names = new HashMap<Integer, String>();
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
     if (in != null) {
       try {
@@ -300,8 +317,8 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, Map<String, Object>> loadCoordinateOperationParamValues(
-    Map<Integer, String> coordinateOperationParamNames) {
-    Map<Integer, Map<String, Object>> coordinateOperationParamValues = new HashMap<Integer, Map<String, Object>>();
+    final Map<Integer, String> coordinateOperationParamNames) {
+    final Map<Integer, Map<String, Object>> coordinateOperationParamValues = new HashMap<Integer, Map<String, Object>>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordoperationparamvalue.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -334,7 +351,7 @@ public final class EpsgCoordinateSystems {
 
   private static Map<Integer, Integer> loadCoordinateOperations() {
 
-    Map<Integer, Integer> coordinateOperationMethods = new HashMap<Integer, Integer>();
+    final Map<Integer, Integer> coordinateOperationMethods = new HashMap<Integer, Integer>();
 
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordoperation.txt";
 
@@ -359,14 +376,14 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, Datum> loadDatums(
-    Map<Datum, PrimeMeridian> datumPrimeMeridians) {
-    Map<Integer, Datum> datums = new HashMap<Integer, Datum>();
+    final Map<Datum, PrimeMeridian> datumPrimeMeridians) {
+    final Map<Integer, Datum> datums = new HashMap<Integer, Datum>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/datum.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
     if (in != null) {
-      Map<Integer, Spheroid> spheroids = loadSpheroids();
-      Map<Integer, PrimeMeridian> primeMeridians = loadPrimeMeridians();
+      final Map<Integer, Spheroid> spheroids = loadSpheroids();
+      final Map<Integer, PrimeMeridian> primeMeridians = loadPrimeMeridians();
 
       try {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -398,11 +415,11 @@ public final class EpsgCoordinateSystems {
   }
 
   private static void loadGeographicCoordinateSystems(
-    Map<Integer, Area> areas,
-    Map<Integer, Datum> datums,
-    Map<Integer, AngularUnit> angularCoordinateSystemUnits,
-    Map<Integer, List<Axis>> coordinateAxises,
-    Map<Datum, PrimeMeridian> datumPrimeMeridians) {
+    final Map<Integer, Area> areas,
+    final Map<Integer, Datum> datums,
+    final Map<Integer, AngularUnit> angularCoordinateSystemUnits,
+    final Map<Integer, List<Axis>> coordinateAxises,
+    final Map<Datum, PrimeMeridian> datumPrimeMeridians) {
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordinatesystem.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -446,7 +463,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, PrimeMeridian> loadPrimeMeridians() {
-    Map<Integer, PrimeMeridian> primeMeridians = new HashMap<Integer, PrimeMeridian>();
+    final Map<Integer, PrimeMeridian> primeMeridians = new HashMap<Integer, PrimeMeridian>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/primemeridian.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -478,17 +495,17 @@ public final class EpsgCoordinateSystems {
   }
 
   private static void loadProjectedCoordinateSystems(
-    Map<Integer, Area> areas,
-    Map<Integer, List<Axis>> coordinateAxises,
-    Map<Integer, LinearUnit> linearCoordinateSystemUnits) {
+    final Map<Integer, Area> areas,
+    final Map<Integer, List<Axis>> coordinateAxises,
+    final Map<Integer, LinearUnit> linearCoordinateSystemUnits) {
     final String resourceName = "/com/revolsys/gis/cs/epsg/coordinatesystem.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
     if (in != null) {
-      Map<Integer, String> coordinateOperationMethodNames = loadCoordinateOperationMethodNames();
-      Map<Integer, String> coordinateOperationParamNames = loadCoordinateOperationParamNames();
-      Map<Integer, Map<String, Object>> coordinateOperationParamValues = loadCoordinateOperationParamValues(coordinateOperationParamNames);
-      Map<Integer, Integer> coordinateOperationMethods = loadCoordinateOperations();
+      final Map<Integer, String> coordinateOperationMethodNames = loadCoordinateOperationMethodNames();
+      final Map<Integer, String> coordinateOperationParamNames = loadCoordinateOperationParamNames();
+      final Map<Integer, Map<String, Object>> coordinateOperationParamValues = loadCoordinateOperationParamValues(coordinateOperationParamNames);
+      final Map<Integer, Integer> coordinateOperationMethods = loadCoordinateOperations();
       try {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(
           in));
@@ -514,7 +531,8 @@ public final class EpsgCoordinateSystems {
               final Map<String, Object> parameters = coordinateOperationParamValues.get(projectionConvCode);
               final Integer methodCode = coordinateOperationMethods.get(projectionConvCode);
               final String methodName = coordinateOperationMethodNames.get(methodCode);
-              Authority projectionAuthority = new Authority("EPSG", methodCode);
+              final Authority projectionAuthority = new Authority("EPSG",
+                methodCode);
               final Projection projection = new Projection(methodName,
                 projectionAuthority);
               final Area area = areas.get(areaCode);
@@ -535,7 +553,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, Spheroid> loadSpheroids() {
-    Map<Integer, Spheroid> spheroids = new HashMap<Integer, Spheroid>();
+    final Map<Integer, Spheroid> spheroids = new HashMap<Integer, Spheroid>();
     final String resourceName = "/com/revolsys/gis/cs/epsg/spheroid.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);
@@ -575,8 +593,8 @@ public final class EpsgCoordinateSystems {
   }
 
   private static void loadUnits(
-    Map<Integer, LinearUnit> linearUnits,
-    Map<Integer, AngularUnit> angularUnits) {
+    final Map<Integer, LinearUnit> linearUnits,
+    final Map<Integer, AngularUnit> angularUnits) {
     final String resourceName = "/com/revolsys/gis/cs/epsg/unit.txt";
 
     final InputStream in = EpsgCoordinateSystems.class.getResourceAsStream(resourceName);

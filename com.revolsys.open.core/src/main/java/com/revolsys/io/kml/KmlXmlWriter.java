@@ -123,7 +123,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         endTag();
       } else {
         final Geometry geoGraphicsGeom = GeometryProjectionUtil.perform(
-          geometry, Kml22Constants.COORDINATE_SYSTEM);
+          geometry, Kml22Constants.COORDINATE_SYSTEM_ID);
         if (geoGraphicsGeom instanceof Point) {
           final Point point = (Point)geoGraphicsGeom;
           writePoint(point);

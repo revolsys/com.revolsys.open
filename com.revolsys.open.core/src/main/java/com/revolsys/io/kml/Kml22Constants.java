@@ -12,7 +12,7 @@ public interface Kml22Constants {
 
   String FORMAT_DESCRIPTION = "KML";
 
-  CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
+  int COORDINATE_SYSTEM_ID = 4326;
 
   String KML_NS_URI = "http://www.opengis.net/kml/2.2";
 
