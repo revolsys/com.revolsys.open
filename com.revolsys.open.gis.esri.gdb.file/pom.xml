@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>2012.04.24b.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <artifactId>com.revolsys.open.gis.esri.gdb.file</artifactId>
   <packaging>jar</packaging>
