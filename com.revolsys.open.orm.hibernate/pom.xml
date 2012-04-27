@@ -3,12 +3,12 @@
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.orm.hibernate</artifactId>
   <name>RS ORM Hibernate</name>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.04.27.RELEASE</version>
   <packaging>jar</packaging>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.04.27.RELEASE</version>
   </parent>
   <dependencies>
     <dependency>
