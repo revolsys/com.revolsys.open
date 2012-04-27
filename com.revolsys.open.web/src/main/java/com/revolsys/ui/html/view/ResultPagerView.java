@@ -15,7 +15,7 @@ import com.revolsys.util.UrlUtil;
  */
 public class ResultPagerView extends Element {
   /** The result pager. */
-  private final ResultPager pager;
+  private final ResultPager<?> pager;
 
   /** The base URL. */
   private final String baseUrl;
@@ -30,7 +30,7 @@ public class ResultPagerView extends Element {
    * @param newBaseUrl The base URL.
    * @param newParameters The parameters to include in the URLs.
    */
-  public ResultPagerView(final ResultPager resultPager,
+  public ResultPagerView(final ResultPager<?> resultPager,
     final String newBaseUrl, final Map<String, Object> newParameters) {
     this.pager = resultPager;
     this.baseUrl = newBaseUrl;
@@ -57,29 +57,6 @@ public class ResultPagerView extends Element {
     out.attribute(HtmlUtil.ATTR_HREF, url);
     out.attribute(HtmlUtil.ATTR_TITLE, title);
     out.text(contents);
-    out.endTag(HtmlUtil.A);
-  }
-
-  /**
-   * Serialize a link to the specified page numberm title and contents.
-   * 
-   * @param out The XML Writer.
-   * @param pageNumber The page number.
-   * @param title The title of the link.
-   * @param contents The contents of the link.
-   * @throws IOException If there was an exception serializing.
-   */
-  private void pageLinkSpan(
-    final XmlWriter out,
-    final int pageNumber,
-    final String title,
-    final String contents) {
-    parameters.put("page", String.valueOf(pageNumber));
-    final String url = UrlUtil.getUrl(baseUrl, parameters);
-    out.startTag(HtmlUtil.A);
-    out.attribute(HtmlUtil.ATTR_HREF, url);
-    out.attribute(HtmlUtil.ATTR_TITLE, title);
-    out.element(HtmlUtil.SPAN, contents);
     out.endTag(HtmlUtil.A);
   }
 
@@ -115,17 +92,27 @@ public class ResultPagerView extends Element {
 
     if (numPages > 1) {
 
-      if (!pager.isFirstPage()) {
+      if (pager.isFirstPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "first");
-        pageLinkSpan(out, 1, "First Page", "<<");
+        out.entityRef("nbsp");
+        out.endTag(HtmlUtil.TD);
+      } else {
+        out.startTag(HtmlUtil.TD);
+        out.attribute(HtmlUtil.ATTR_CLASS, "first");
+        pageLink(out, 1, "First Page", "<<");
         out.endTag(HtmlUtil.TD);
       }
 
       if (pager.hasPreviousPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "previous");
-        pageLinkSpan(out, pager.getPreviousPageNumber(), "Previous Page", "<");
+        pageLink(out, pager.getPreviousPageNumber(), "Previous Page", "<");
+        out.endTag(HtmlUtil.TD);
+      } else {
+        out.startTag(HtmlUtil.TD);
+        out.attribute(HtmlUtil.ATTR_CLASS, "previous");
+        out.entityRef("nbsp");
         out.endTag(HtmlUtil.TD);
       }
 
@@ -155,14 +142,24 @@ public class ResultPagerView extends Element {
       if (pager.hasNextPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "next");
-        pageLinkSpan(out, pager.getNextPageNumber(), "Next Page", ">");
+        pageLink(out, pager.getNextPageNumber(), "Next Page", ">");
+        out.endTag(HtmlUtil.TD);
+      } else {
+        out.startTag(HtmlUtil.TD);
+        out.attribute(HtmlUtil.ATTR_CLASS, "next");
+        out.entityRef("nbsp");
         out.endTag(HtmlUtil.TD);
       }
 
-      if (!pager.isLastPage()) {
+      if (pager.isLastPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "last");
-        pageLinkSpan(out, numPages, "Last Page", ">>");
+        out.entityRef("nbsp");
+        out.endTag(HtmlUtil.TD);
+      } else {
+        out.startTag(HtmlUtil.TD);
+        out.attribute(HtmlUtil.ATTR_CLASS, "last");
+        pageLink(out, numPages, "Last Page", ">>");
         out.endTag(HtmlUtil.TD);
       }
     }

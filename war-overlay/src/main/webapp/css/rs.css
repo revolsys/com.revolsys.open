@@ -71,11 +71,11 @@ th, td {
 }
 
 td p:first-child {
-  margin-top: 0em;
+  margin-top: 0px;
 }
 
 td p:last-child {
-  margin-bottom: 0em;
+  margin-bottom: 0px;
 }
 
 td.actions form{
@@ -92,16 +92,16 @@ div.error {
 	font-weight: bold;
 }
 div.bodyContainer {
-  margin: 0em 1em 1em 0em;
+  margin: 0px 10px 10px 0px;
 }
 
 div.bodyContent {
-  margin: 0em 0em 0em 14.5em;
+  margin: 0px 0px 0px 14.5em;
 }
 
 div.header {
   background-color: #a2c8ff;
-  border: 0.2em solid #6699CC;
+  border: 2px solid #6699CC;
   color: #0046a0;
   padding: 5px 10px 5px 10px;
   margin-bottom: 0.5em;
@@ -121,15 +121,15 @@ div.breadcrumbs {
 
 div.breadcrumb {
   margin-left: 13.5em;
-  padding: 0.1em 0.2em 0.1em 0.2em;
+  padding: 1px 2px 1px 2px;
 }
 
 div.breadcrumb ul {
   font-size: 0.8em;
   list-style: none;
-  margin: 0em;
-  margin-bottom: 0.3em;
-  padding: 0em;
+  margin: 0px;
+  margin-bottom: 3px;
+  padding: 0px;
 }
 
 div.breadcrumb ul li {
@@ -153,8 +153,8 @@ div.breadcrumb ul li a:hover {
 div.footerMenu {
   clear: both;
   margin-top: 1em;
-  border-top: 0.1em solid #999999;
-  padding: 0.1em 0.2em 0.1em 0.2em;
+  border-top: 1px solid #999999;
+  padding: 1px 2px 1px 2px;
   color: #999999;
   font-size: 0.8em;
 }
@@ -165,11 +165,11 @@ div.header div.title {
 
 input.submit {
   background-color: #a2c8ff;
-  border: 0.2em outset #6699CC;
+  border: 2px outset #6699CC;
   color: black;
   font-weight: bold;
-  margin-right: 0.3em;
-  padding: 0.2em 0.3em 0.2em 0.3em;
+  margin-right: 3px;
+  padding: 2px 3px 2px 3px;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -179,16 +179,16 @@ input.submit:hover {
 }
 
 div.collapsibleBox > div > div.content > div.actionMenu {
-	margin: 0.2em 0em 0em 0em;
-	border-top: 0.2em solid #6699CC;
-	padding: 0.2em 0.5em 0em 0.5em;
+	margin: 2px 0px 0px 0px;
+	border-top: 2px solid #6699CC;
+	padding: 2px 5px 0px 5px;
 }
 
 
 div.collapsibleBox div.section {
-  margin: 0.2em 0em 0em 0em;
-  border-top: 0.2em solid #6699CC;
-  padding: 0.2em 0.5em 0em 0.5em;
+  margin: 2px 0px 0px 0px;
+  border-top: 2px solid #6699CC;
+  padding: 2px 5px 0px 5px;
 }
 
 div.actionMenu {
@@ -196,9 +196,9 @@ div.actionMenu {
 }
 
 div.actionMenu ul {
-  margin: 0em;
+  margin: 0px;
   list-style: none outside none;
-  padding: 0em;
+  padding: 0px;
   line-height: 1.5em;
 }
 
@@ -208,11 +208,11 @@ div.actionMenu ul li {
 
 div.actionMenu ul li a {
   background-color: #a2c8ff;
-  border: 0.2em outset #6699CC;
+  border: 2px outset #6699CC;
   color: black;
   font-weight: bold;
-  margin-right: 0.3em;
-  padding: 0.2em 0.3em 0.2em 0.3em;
+  margin-right: 3px;
+  padding: 2px 3px 2px 3px;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -223,11 +223,11 @@ div.actionMenu ul li a:hover {
 
 a.button {
   background-color: #a2c8ff;
-  border: 0.2em outset #6699CC;
+  border: 2px outset #6699CC;
   color: black;
   font-weight: bold;
-  margin-right: 0.3em;
-  padding: 0.2em 0.3em 0.2em 0.3em;
+  margin-right: 3px;
+  padding: 2px 3px 2px 3px;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -279,14 +279,14 @@ div.collapsibleBox > div > div.content > div.objectList > table.data {
 }
 
 div.objectList {
-  border: 0.1em solid #666666;
+  border: 1px solid #666666;
   width: auto;
   background-color: #ffffff;
 }
 
 div.objectList > table.data {
-  border: 0.2em solid #6699CC;
-  padding: 0.1em;
+  border: 2px solid #6699CC;
+  padding: 1px;
   width: 100%;
 }
 
@@ -298,14 +298,14 @@ div.objectList > table.data > caption {
   text-align: center;
   font-weight: bold;
   text-align: left;
-  padding: 0.2em;
-  border: 0.2em solid #6699CC;
-  border-bottom-width: 0em;
+  padding: 2px;
+  border: 2px solid #6699CC;
+  border-bottom-width: 0px;
 }
 
 div.objectList > table.data td,
 div.objectList > table.data th {
-  padding: 0.2em 0.3em 0.2em 0.3em;
+  padding: 2px 3px 2px 3px;
 }
 
 div.objectList > table.data > thead {
@@ -314,27 +314,27 @@ div.objectList > table.data > thead {
 
 div.objectList > table.data > thead > th {
   color: #0046a0;
-  border-right: 0.1em solid white;
+  border-right: 1px solid white;
 }
 
 div.objectList > table.data > thead > tr > th:last-child {
-  border-right-width: 0em;
+  border-right-width: 0px;
 }
 
 div.objectList > table.data > tbody > tr > th,
 div.objectList > table.data > tbody > tr > td {
-  border-right: 0.1em solid #cccccc;
-  border-bottom: 0.1em solid #cccccc;
+  border-right: 1px solid #cccccc;
+  border-bottom: 1px solid #cccccc;
 }
 
 div.objectList > table.data > tbody > tr > th:last-child 
 div.objectList > table.data > tbody > tr > td:last-child {
-   border-right-width: 0em;
+   border-right-width: 0px;
 }
 
 div.objectList > table.data > tbody > tr:last-child > th,
 div.objectList > table.data > tbody > tr:last-child > td {
-   border-bottom-width: 0em;
+   border-bottom-width: 0px;
 }
 
 div.objectList > table.data > tbody > tr.selected > th,
@@ -373,26 +373,26 @@ div.collapsibleBox > div > div.content > div.objectView > table.data {
 }
 
 div.objectView {
-  border: 0.1em solid #666666;
+  border: 1px solid #666666;
   width: auto;
 }
 
 div.objectView > table.data {
-  border: 0.2em solid #6699CC;
-  padding: 0.1em;
+  border: 2px solid #6699CC;
+  padding: 1px;
   width: 100%;
 }
 
 div.objectView > table.data > tbody > tr > th {
   background-color: #a2c8ff;
-  border-bottom: 0.1em solid white;
-  padding: 0.3em 0.4em 0.3em 0.4em;
+  border-bottom: 1px solid white;
+  padding: 3px 4px 3px 4px;
   text-align: left;
 }
 
 div.objectView > table.data > tbody > tr > td {
-  border-bottom: 0.1em solid #cccccc;
-  padding: 0.3em 0.4em 0.3em 0.4em;
+  border-bottom: 1px solid #cccccc;
+  padding: 3px 4px 3px 4px;
 }
 
 div.objectView > table.data > tbody > tr.even > td {
@@ -402,7 +402,7 @@ div.objectView > table.data > tbody > tr.even > td {
 div.objectView > table.data > tbody > tr.lastRow > th,
 div.objectView > table.data > tbody > tr.lastRow > td
  {
-  border-bottom-width: 0em;
+  border-bottom-width: 0px;
 }
 
 div.pager {
@@ -413,7 +413,7 @@ div.pager table {
 }
 
 div.pager td {
-  padding: 0.2em 0.4em;
+  padding: 2px 4px;
   vertical-align: middle;
 }
 
@@ -422,26 +422,10 @@ div.pager td.previous,
 div.pager td.next,
 div.pager td.last
 {
-  padding: 0em;
+  padding: 0px;
   background-repeat:no-repeat;
   background-position: center center;
-  width: 1.5em;
-}
-
-div.pager td.first {
-  background-image: url('../images/arrow_first.png');
-}
-
-div.pager td.previous {
-  background-image: url('../images/arrow_left.png');
-}
-
-div.pager td.next {
-  background-image: url('../images/arrow_right.png');
-}
-
-div.pager td.last {
-  background-image: url('../images/arrow_last.png');
+  width: 2.2em;
 }
 
 div.pager td.first a,
@@ -452,18 +436,6 @@ div.pager td.last a
   display: block;
   text-decoration: none;
   overflow: hidden;
-  width: 1.5em;
-}
-
-div.pager td.first a span,
-div.pager td.previous a span,
-div.pager td.next a span,
-div.pager td.last a span {
-  padding-left: 1.5em;
-}
-
-div.pager a img {
-  border-width: 0em;
 }
 
 div.pager span.selected {
@@ -472,6 +444,7 @@ div.pager span.selected {
 
 div.pager td.pages {
   text-align: center;
+  min-width: 15em;
 }
 
 div.pager a {
@@ -479,15 +452,15 @@ div.pager a {
 }
 
 div.sideNav {
-  margin: 0em 1em 1em 1em;
-  border: 0.2em solid #6699CC;
-  padding: 0.1em;
+  margin: 0px 1em 1em 1em;
+  border: 2px solid #6699CC;
+  padding: 1px;
   float: left;
   width: 12em;
 }
 
 div.sideMenu {
-  padding: 0em;
+  padding: 0px;
 }
 
 div.sideMenu div.title {
@@ -495,7 +468,7 @@ div.sideMenu div.title {
   color: #0046a0;
   font-size: 1.1em;
   font-weight: bold;
-  padding: 0.2em 0.3em 0.1em 0.3em;
+  padding: 2px 3px 1px 3px;
 }
 
 div.sideMenu div.title a {
@@ -506,7 +479,7 @@ div.sideMenu div.title a {
 div.sideMenu ul {
   list-style: none;
   margin: 0px;
-  padding: 0.1em;
+  padding: 1px;
 }
 
 div.sideMenu ul li:nth-of-type(even) {
@@ -514,7 +487,7 @@ div.sideMenu ul li:nth-of-type(even) {
 }
 
 div.sideMenu ul li {
-  padding: 0.2em 0.3em 0.1em 0.3em;
+  padding: 2px 3px 1px 3px;
 }
 
 div.sideMenu ul li a {
@@ -528,11 +501,11 @@ div.sideMenu ul li a:hover {
 
 input.submit {
   background-color: #a2c8ff;
-  border: 0.2em outset #6699CC;
+  border: 2px outset #6699CC;
   color: black;
   font-weight: bold;
-  margin-right: 0.3em;
-  padding: 0.2em 0.3em 0.2em 0.3em;
+  margin-right: 3px;
+  padding: 2px 3px 2px 3px;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -603,7 +576,7 @@ div.form div.field div.label {
   margin: 0px;
   padding-left: 10px;
   border-top: 1px solid white;
-  padding: 0.2em 0.4em 0.2em 0.4em;
+  padding: 2px 4px 2px 4px;
   text-align: right;
   vertical-align: top;
 }
@@ -619,7 +592,7 @@ div.form div:nth-of-type(1).field > div.contents {
 div.form div.field div.contents {
   border-top: 1px solid #cccccc;
   margin-left: 14.8em;
-  padding: 0.2em 0.4em 0.2em 0.4em;
+  padding: 2px 4px 2px 4px;
   background-color: white;
 }
 
@@ -635,7 +608,7 @@ div.instructions {
 div.form div.field div.instructions {
   clear: both;
   margin-left: 14.8em;
-  padding: 0.2em 0.4em 0.2em 0.4em;
+  padding: 2px 4px 2px 4px;
   background-color: white;
 }
 
@@ -649,7 +622,7 @@ div.form div.field div.errors {
   color: red;
   font-weight: bold;
   margin-left: 14.8em;
-  padding: 0.2em 0.4em 0.2em 0.4em;
+  padding: 2px 4px 2px 4px;
   background-color: white;
 }
 
@@ -675,18 +648,18 @@ div.form div.required {
 .labelAboveNoPadding {
   font-weight: bold;
   padding-left: 1em;
-  padding-top: .3em;
+  padding-top: 3px;
 }
 
 div.collapsibleBox {
   margin-top: 1em;
-  border: 0.1em solid #666666;
+  border: 1px solid #666666;
   width: auto;
 }
 
 div.collapsibleBox > div {
-  border: 0.2em solid #6699CC;
-  padding: 0.1em;
+  border: 2px solid #6699CC;
+  padding: 1px;
   width: 100%;
   box-sizing: border-box;
   -webkit-box-sizing:border-box;
