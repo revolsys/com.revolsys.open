@@ -9,21 +9,20 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class Raster {
-  public static long getCPtr(final Raster obj) {
+  private long swigCPtr;
+  protected boolean swigCMemOwn;
+
+  public Raster(long cPtr, boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
+  }
+
+  public static long getCPtr(Raster obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
-  protected boolean swigCMemOwn;
-
-  public Raster() {
-    this(EsriFileGdbJNI.new_Raster(), true);
-  }
-
-  public Raster(final long cPtr, final boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+  protected void finalize() {
+    delete();
   }
 
   public synchronized void delete() {
@@ -36,9 +35,8 @@ public class Raster {
     }
   }
 
-  @Override
-  protected void finalize() {
-    delete();
+  public Raster() {
+    this(EsriFileGdbJNI.new_Raster(), true);
   }
 
 }

@@ -17,19 +17,29 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigUtils;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
-import com.revolsys.util.JavaBeanUtil;
 
 public class SpringUtil {
 
   public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
+
+  public static void close(
+    final ConfigurableApplicationContext applicationContext) {
+    if (applicationContext != null) {
+      if (applicationContext.isActive()) {
+        applicationContext.close();
+      }
+    }
+  }
 
   public static void copy(final Resource source, final Resource target) {
     final InputStream in = getInputStream(source);
@@ -51,6 +61,26 @@ public class SpringUtil {
     } finally {
       FileUtil.closeSilent(in);
     }
+  }
+
+  public static GenericApplicationContext getApplicationContext(
+    final ClassLoader classLoader,
+    final Resource... resources) {
+    final GenericApplicationContext applicationContext = new GenericApplicationContext();
+    applicationContext.setClassLoader(classLoader);
+
+    AnnotationConfigUtils.registerAnnotationConfigProcessors(
+      applicationContext, null);
+    final AttributesBeanConfigurer attributesConfig = new AttributesBeanConfigurer(
+      applicationContext);
+    applicationContext.addBeanFactoryPostProcessor(attributesConfig);
+
+    final XmlBeanDefinitionReader beanReader = new XmlBeanDefinitionReader(
+      applicationContext);
+    beanReader.setBeanClassLoader(classLoader);
+    beanReader.loadBeanDefinitions(resources);
+    applicationContext.refresh();
+    return applicationContext;
   }
 
   public static BufferedReader getBufferedReader(final Resource resource) {
@@ -132,9 +162,9 @@ public class SpringUtil {
     final CharSequence childPath) {
     try {
       if (resource instanceof FileSystemResource) {
-        FileSystemResource fileResource = (FileSystemResource)resource;
-        File file = fileResource.getFile();
-        File childFile = new File(file, childPath.toString());
+        final FileSystemResource fileResource = (FileSystemResource)resource;
+        final File file = fileResource.getFile();
+        final File childFile = new File(file, childPath.toString());
         return new FileSystemResource(childFile);
       } else {
         return resource.createRelative(childPath.toString());

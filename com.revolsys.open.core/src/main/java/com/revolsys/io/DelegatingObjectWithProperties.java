@@ -45,4 +45,13 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     }
   }
 
+  
+  public void setProperties(Map<String, Object> properties) {
+    if (object == null) {
+      this.properties.clear();
+      this.properties.putAll(properties);
+    } else {
+      object.setProperties(properties);
+    }
+ }
 }

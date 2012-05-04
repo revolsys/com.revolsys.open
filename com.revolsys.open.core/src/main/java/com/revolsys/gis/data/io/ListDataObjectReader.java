@@ -26,6 +26,7 @@ public class ListDataObjectReader extends AbstractReader<DataObject> implements
     this.objects = objects;
   }
 
+  @Override
   public void close() {
     metaData = null;
     objects = null;

@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import oracle.sql.ARRAY;
 import oracle.sql.Datum;
@@ -24,6 +23,7 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.JdbcConstants;
@@ -89,7 +89,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
 
-  public OracleSdoGeometryAttributeAdder(final DataSource dataSource) {
+  private OracleDataObjectStore dataStore;
+
+  public OracleSdoGeometryAttributeAdder(OracleDataObjectStore dataStore,
+    final DataSource dataSource) {
+    this.dataStore = dataStore;
     this.dataSource = dataSource;
   }
 
@@ -121,38 +125,38 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     final int length,
     final int scale,
     final boolean required) {
-    final QName typeName = metaData.getName();
+    final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
     final DataObjectStoreSchema schema = metaData.getSchema();
-    int srid = getIntegerColumnProperty(schema, typeName, columnName,
+    int srid = getIntegerColumnProperty(schema, typePath, columnName,
       OracleSdoGeometryJdbcAttribute.SRID_PROPERTY);
     if (srid == -1) {
       srid = 0;
     }
-    int dimension = getIntegerColumnProperty(schema, typeName, columnName,
+    int dimension = getIntegerColumnProperty(schema, typePath, columnName,
       OracleSdoGeometryJdbcAttribute.COORDINATE_DIMENSION_PROPERTY);
     if (dimension == -1) {
       dimension = 2;
     }
-    final double precision = getDoubleColumnProperty(schema, typeName,
+    final double precision = getDoubleColumnProperty(schema, typePath,
       columnName, OracleSdoGeometryJdbcAttribute.COORDINATE_PRECISION_PROPERTY);
 
     final double geometryScale = 1 / precision;
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
       dimension, geometryScale, 0);
     DataType dataType = DataTypes.GEOMETRY;
-    final String schemaName = typeName.getNamespaceURI();
-    final String tableName = typeName.getLocalPart();
+    final String schemaName = JdbcUtils.getSchemaName(typePath).toUpperCase();
+    final String tableName = JdbcUtils.getTableName(typePath).toUpperCase();
     String sql = "SELECT GEOMETRY_TYPE FROM ALL_GEOMETRY_COLUMNS WHERE F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
     try {
       int geometryType = JdbcUtils.selectInt(dataSource, sql, schemaName,
         tableName, columnName);
       dataType = ID_TO_DATA_TYPE.get(geometryType);
     } catch (IllegalArgumentException e) {
-      LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typeName + "."
+      LOG.error("No ALL_GEOMETRY_COLUMNS metadata for " + typePath + "."
         + columnName);
     } catch (RuntimeException e) {
-      LOG.error("Unable to get geometry type for " + typeName + "."
+      LOG.error("Unable to get geometry type for " + typePath + "."
         + columnName, e);
     }
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
@@ -172,11 +176,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private Object getColumnProperty(
     final DataObjectStoreSchema schema,
-    final QName typeName,
+    final String typePath,
     final String columnName,
     final String propertyName) {
-    final Map<QName, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
-    final Map<String, Map<String, Object>> columnsProperties = columnProperties.get(typeName);
+    final Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
+    final Map<String, Map<String, Object>> columnsProperties = columnProperties.get(typePath);
     if (columnsProperties != null) {
       final Map<String, Object> properties = columnsProperties.get(columnName);
       if (properties != null) {
@@ -189,10 +193,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private double getDoubleColumnProperty(
     final DataObjectStoreSchema schema,
-    final QName typeName,
+    final String typePath,
     final String columnName,
     final String propertyName) {
-    final Object value = getColumnProperty(schema, typeName, columnName,
+    final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
     if (value instanceof Number) {
       final Number number = (Number)value;
@@ -204,10 +208,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private int getIntegerColumnProperty(
     final DataObjectStoreSchema schema,
-    final QName typeName,
+    final String typePath,
     final String columnName,
     final String propertyName) {
-    final Object value = getColumnProperty(schema, typeName, columnName,
+    final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
     if (value instanceof Number) {
       final Number number = (Number)value;
@@ -219,16 +223,16 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   @Override
   public void initialize(final DataObjectStoreSchema schema) {
-    Map<QName, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
+    Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
     if (columnProperties == null) {
-      columnProperties = new HashMap<QName, Map<String, Map<String, Object>>>();
+      columnProperties = new HashMap<String, Map<String, Map<String, Object>>>();
       schema.setProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY,
         columnProperties);
 
       try {
         final Connection connection = JdbcUtils.getConnection(dataSource);
         try {
-          final String schemaName = schema.getName().toUpperCase();
+          final String schemaName = dataStore.getDatabaseSchemaName(schema);
           final String sridSql = "select TABLE_NAME, COLUMN_NAME, SRID, DIMINFO from ALL_SDO_GEOM_METADATA where OWNER = ?";
           final PreparedStatement statement = connection.prepareStatement(sridSql);
           try {
@@ -274,17 +278,17 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   private void setColumnProperty(
-    final Map<QName, Map<String, Map<String, Object>>> esriColumnProperties,
+    final Map<String, Map<String, Map<String, Object>>> esriColumnProperties,
     final String schemaName,
     final String tableName,
     final String columnName,
     final String propertyName,
     final Object propertyValue) {
-    final QName typeName = new QName(schemaName, tableName);
-    Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typeName);
+    final String typePath = PathUtil.getPath(schemaName, tableName);
+    Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typePath);
     if (typeColumnMap == null) {
       typeColumnMap = new HashMap<String, Map<String, Object>>();
-      esriColumnProperties.put(typeName, typeColumnMap);
+      esriColumnProperties.put(typePath, typeColumnMap);
     }
     Map<String, Object> columnProperties = typeColumnMap.get(columnName);
     if (columnProperties == null) {

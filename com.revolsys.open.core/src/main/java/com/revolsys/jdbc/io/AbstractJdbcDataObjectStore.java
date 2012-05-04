@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -41,7 +39,7 @@ import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -64,7 +62,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private String hints;
 
-  private Map<QName, String> sequenceTypeSqlMap = new HashMap<QName, String>();
+  private Map<String, String> sequenceTypeSqlMap = new HashMap<String, String>();
 
   private String sqlPrefix;
 
@@ -74,7 +72,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private Map<String, String> schemaNameMap = new HashMap<String, String>();
 
-  private Map<QName, String> tableNameMap = new HashMap<QName, String>();
+  private Map<String, String> tableNameMap = new HashMap<String, String>();
 
   private JdbcDatabaseFactory databaseFactory;
 
@@ -86,18 +84,18 @@ public abstract class AbstractJdbcDataObjectStore extends
     super(dataObjectFactory);
   }
 
-  public AbstractJdbcDataObjectStore(JdbcDatabaseFactory databaseFactory) {
+  public AbstractJdbcDataObjectStore(final DataSource dataSource) {
+    setDataSource(dataSource);
+  }
+
+  public AbstractJdbcDataObjectStore(final JdbcDatabaseFactory databaseFactory) {
     this(databaseFactory, new ArrayDataObjectFactory());
   }
 
-  public AbstractJdbcDataObjectStore(JdbcDatabaseFactory databaseFactory,
-    DataObjectFactory dataObjectFactory) {
+  public AbstractJdbcDataObjectStore(final JdbcDatabaseFactory databaseFactory,
+    final DataObjectFactory dataObjectFactory) {
     super(dataObjectFactory);
     this.databaseFactory = databaseFactory;
-  }
-
-  public AbstractJdbcDataObjectStore(DataSource dataSource) {
-    setDataSource(dataSource);
   }
 
   protected void addAttribute(
@@ -180,8 +178,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public Object createPrimaryIdValue(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public Object createPrimaryIdValue(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(metaData);
     if (globalIdProperty != null) {
       return UUID.randomUUID().toString();
@@ -207,27 +205,27 @@ public abstract class AbstractJdbcDataObjectStore extends
     return createReader(metaData, query, Arrays.asList(parameters));
   }
 
-  @Override
-  public DataObjectReader createReader(
-    final QName typeName,
-    final String query,
-    final List<Object> parameters) {
-    final DataObjectStoreQueryReader reader = createReader();
-    reader.addQuery(typeName, query, parameters);
-    return reader;
-  }
-
-  protected DataObjectReader createReader(
-    final QName typeName,
-    final String whereClause,
-    final Object... parameters) {
-    return createReader(typeName, whereClause, Arrays.asList(parameters));
-  }
-
   protected DataObjectStoreQueryReader createReader(final Query query) {
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
+  }
+
+  @Override
+  public DataObjectReader createReader(
+    final String typePath,
+    final String query,
+    final List<Object> parameters) {
+    final DataObjectStoreQueryReader reader = createReader();
+    reader.addQuery(typePath, query, parameters);
+    return reader;
+  }
+
+  protected DataObjectReader createReader(
+    final String typePath,
+    final String whereClause,
+    final Object... parameters) {
+    return createReader(typePath, whereClause, Arrays.asList(parameters));
   }
 
   public JdbcWriter createWriter() {
@@ -262,8 +260,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     final String schemaName,
     final String tableName,
     final String columnName) {
-    final QName typeName = new QName(schemaName, tableName);
-    final DataObjectMetaData metaData = getMetaData(typeName);
+    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
     } else {
@@ -276,8 +274,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     return batchSize;
   }
 
-  public List<String> getColumnNames(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public List<String> getColumnNames(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     return metaData.getAttributeNames();
   }
 
@@ -285,12 +283,17 @@ public abstract class AbstractJdbcDataObjectStore extends
     return connection;
   }
 
-  public String getDatabaseSchemaName(final String schemaName) {
-    return schemaNameMap.get(schemaName);
+  public String getDatabaseSchemaName(final DataObjectStoreSchema schema) {
+    String schemaPath = schema.getPath();
+    return getDatabaseSchemaName(schemaPath);
   }
 
-  public String getDatabaseTableName(final QName typeName) {
-    return tableNameMap.get(typeName);
+  public String getDatabaseSchemaName(final String schemaPath) {
+    return schemaNameMap.get(schemaPath);
+  }
+
+  public String getDatabaseTableName(final String typePath) {
+    return tableNameMap.get(typePath);
   }
 
   public DataSource getDataSource() {
@@ -315,14 +318,14 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public DataObjectMetaData getMetaData(
-    final QName typeName,
+    final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
-      final String schemaName = typeName.getNamespaceURI();
+      final String schemaName = PathUtil.getPath(typePath);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
-        getSchema(schemaName), typeName);
+        getSchema(schemaName), typePath);
 
-      final String tableName = typeName.getLocalPart();
+      final String tableName = PathUtil.getName(typePath);
       final String idColumnName = loadIdColumnName(schemaName, tableName);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
         final String name = resultSetMetaData.getColumnName(i).toUpperCase();
@@ -337,14 +340,14 @@ public abstract class AbstractJdbcDataObjectStore extends
       return metaData;
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for "
-        + typeName);
+        + typePath);
     }
   }
 
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String tableName = JdbcUtils.getTableName(typeName);
-    String sql = sequenceTypeSqlMap.get(typeName);
+    final String typePath = metaData.getPath();
+    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    String sql = sequenceTypeSqlMap.get(typePath);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
       sqlBuffer.append("insert ");
@@ -376,7 +379,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
       sqlBuffer.append(")");
       sql = sqlBuffer.toString();
-      sequenceTypeSqlMap.put(typeName, sql);
+      sequenceTypeSqlMap.put(typePath, sql);
     }
     return sql;
   }
@@ -398,7 +401,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     return writer;
   }
 
-
   @Override
   public void insert(final DataObject object) {
     try {
@@ -419,8 +421,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public boolean isEditable(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public boolean isEditable(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     return metaData.getIdAttributeIndex() != -1;
   }
 
@@ -457,8 +459,8 @@ public abstract class AbstractJdbcDataObjectStore extends
   @Override
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    final Map<QName, DataObjectMetaData> metaDataMap) {
-    final String schemaName = schema.getName();
+    final Map<String, DataObjectMetaData> metaDataMap) {
+    final String schemaName = schema.getPath();
     final String dbSchemaName = getDatabaseSchemaName(schemaName);
     for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
       attributeAdder.initialize(schema);
@@ -469,7 +471,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
       final ResultSet tablesRs = databaseMetaData.getTables(null, dbSchemaName,
         "%", null);
-      final Map<QName, String> idColumnNames = new HashMap<QName, String>();
+      final Map<String, String> idColumnNames = new HashMap<String, String>();
       try {
         while (tablesRs.next()) {
           final String dbTableName = tablesRs.getString("TABLE_NAME");
@@ -482,14 +484,14 @@ public abstract class AbstractJdbcDataObjectStore extends
             }
           }
           if (!excluded) {
-            final QName typeName = new QName(schemaName, tableName);
-            tableNameMap.put(typeName, dbTableName);
+            final String typePath = PathUtil.getPath(schemaName, tableName);
+            tableNameMap.put(typePath, dbTableName);
             final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
-              this, schema, typeName);
-            metaDataMap.put(typeName, metaData);
+              this, schema, typePath);
+            metaDataMap.put(typePath, metaData);
             final String idColumnName = loadIdColumnName(dbSchemaName,
               dbTableName);
-            idColumnNames.put(typeName, idColumnName);
+            idColumnNames.put(typePath, idColumnName);
 
           }
         }
@@ -503,8 +505,8 @@ public abstract class AbstractJdbcDataObjectStore extends
         while (columnsRs.next()) {
           final String tableName = columnsRs.getString("TABLE_NAME")
             .toUpperCase();
-          final QName typeName = new QName(schemaName, tableName);
-          final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)metaDataMap.get(typeName);
+          final String typePath = PathUtil.getPath(schemaName, tableName);
+          final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)metaDataMap.get(typePath);
           if (metaData != null) {
             final String name = columnsRs.getString("COLUMN_NAME")
               .toUpperCase();
@@ -517,7 +519,7 @@ public abstract class AbstractJdbcDataObjectStore extends
             }
             final boolean required = !columnsRs.getString("IS_NULLABLE")
               .equals("YES");
-            if (name.equalsIgnoreCase(idColumnNames.get(typeName))) {
+            if (name.equalsIgnoreCase(idColumnNames.get(typePath))) {
               metaData.setIdAttributeIndex(metaData.getAttributeCount());
             }
             addAttribute(metaData, name, dataType, sqlType, length, scale,
@@ -554,7 +556,7 @@ public abstract class AbstractJdbcDataObjectStore extends
         try {
           while (schemaRs.next()) {
             final String dbSchemaName = schemaRs.getString("TABLE_SCHEM");
-            final String schemaName = dbSchemaName.toUpperCase();
+            final String schemaName = "/" + dbSchemaName.toUpperCase();
             schemaNameMap.put(schemaName, dbSchemaName);
             final DataObjectStoreSchema schema = new DataObjectStoreSchema(
               this, schemaName);
@@ -581,10 +583,10 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public Reader<DataObject> query(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public Reader<DataObject> query(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
-      throw new IllegalArgumentException("Unknown type " + typeName);
+      throw new IllegalArgumentException("Unknown type " + typePath);
     } else {
       final Query query = new Query(metaData);
       final DataObjectStoreQueryReader reader = createReader(query);
@@ -593,24 +595,24 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public DataObjectStoreQueryReader query(
-    final QName typeName,
+    final String typePath,
     final BoundingBox boundingBox) {
 
-    final Query query = createBoundingBoxQuery(new Query(typeName), boundingBox);
+    final Query query = createBoundingBoxQuery(new Query(typePath), boundingBox);
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(query);
     return reader;
   }
 
-  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
-    return query(typeName, geometry, null);
+  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
+    return query(typePath, geometry, null);
   }
 
   public Reader<DataObject> query(
-    final QName typeName,
+    final String typePath,
     Geometry geometry,
     final String whereClause) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+    final DataObjectMetaData metaData = getMetaData(typePath);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
     geometry = ProjectionFactory.convert(geometry, geometryFactory);

@@ -1,13 +1,13 @@
 "ecsvVersion","string","1.0.0.DRAFT1"
 "typeDefinition","Map",{
-"name","QName","{http://open.revolsys.com/test}DataTypeTest"
+"name","String","{http://open.revolsys.com/test}DataTypeTest"
 "geometryFactory","GeometryFactory",(4326,0,0)
 "attributeProperties","Map",{
 "attributeName","List<string>",(
-"anyURI","boolean","byte","date","dateTime","decimal","double","float","int","integer","long","QName","short","string","Geometry"
+"anyURI","boolean","byte","date","dateTime","decimal","double","float","int","integer","long","String","short","string","Geometry"
 )
-"attributeType","List<QName>",(
-"anyURI","boolean","byte","date","dateTime","decimal","double","float","int","integer","long","QName","short","string","Geometry"
+"attributeType","List<String>",(
+"anyURI","boolean","byte","date","dateTime","decimal","double","float","int","integer","long","String","short","string","Geometry"
 )
 "attributeLength","List<int>",(
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

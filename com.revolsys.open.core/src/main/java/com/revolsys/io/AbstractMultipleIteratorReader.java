@@ -16,6 +16,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   private boolean loadNext = true;
 
+  @Override
   @PreDestroy
   public void close() {
     if (iterator != null) {

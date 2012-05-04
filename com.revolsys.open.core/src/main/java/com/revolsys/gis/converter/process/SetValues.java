@@ -4,10 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.codes.CodeTable;
 
 public class SetValues extends
   AbstractSourceToTargetProcess<DataObject, DataObject> {

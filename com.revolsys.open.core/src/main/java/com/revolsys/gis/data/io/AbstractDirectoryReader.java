@@ -87,6 +87,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   /**
    * Close the reader.
    */
+  @Override
   public void close() {
     if (currentReader != null) {
       currentReader.close();

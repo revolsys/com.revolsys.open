@@ -26,6 +26,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
     this.in = in;
   }
 
+  @Override
   public void close() {
     FileUtil.closeSilent(in);
   }

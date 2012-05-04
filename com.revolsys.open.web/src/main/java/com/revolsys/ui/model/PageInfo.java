@@ -97,10 +97,6 @@ public class PageInfo extends AbstractDocumentedObject {
     return pagesElement;
   }
 
-  public void setPagesElement(Element pagesElement) {
-    this.pagesElement = pagesElement;
-  }
-
   public Collection<ParameterInfo> getParameters() {
     return parameters.values();
   }
@@ -144,6 +140,10 @@ public class PageInfo extends AbstractDocumentedObject {
 
   public void setPages(final Map<String, PageInfo> pages) {
     this.pages = pages;
+  }
+
+  public void setPagesElement(final Element pagesElement) {
+    this.pagesElement = pagesElement;
   }
 
   public void setParameters(final Map<String, ParameterInfo> parameters) {

@@ -19,14 +19,6 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
   public MapTableKeySerializer() {
   }
 
-  public void setKeyLabel(String keyLabel) {
-    this.keyLabel = keyLabel;
-  }
-
-  public void setValueLabel(String valueLabel) {
-    this.valueLabel = valueLabel;
-  }
-
   /**
    * Serialize the value to the XML writer.
    * 
@@ -38,7 +30,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
     if (property == null) {
       out.text("-");
     } else if (property instanceof Map) {
-      Map<Object, Object> map = (Map)property;
+      final Map<Object, Object> map = (Map)property;
       if (map.isEmpty()) {
         out.text("-");
       } else {
@@ -68,9 +60,9 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
         out.startTag(HtmlUtil.TBODY);
         boolean odd = true;
         boolean first = true;
-        for (Iterator<Entry<Object, Object>> entries = map.entrySet()
+        for (final Iterator<Entry<Object, Object>> entries = map.entrySet()
           .iterator(); entries.hasNext();) {
-          Entry<Object, Object> entry = entries.next();
+          final Entry<Object, Object> entry = entries.next();
           out.startTag(HtmlUtil.TR);
           String cssClass = "";
           if (first) {
@@ -87,7 +79,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
           }
           out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
           odd = !odd;
-          Object key = entry.getKey();
+          final Object key = entry.getKey();
           String keyText = "-";
           if (key != null) {
             keyText = key.toString();
@@ -100,7 +92,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
           out.text(keyText);
           out.endTag(HtmlUtil.TD);
 
-          Object value = entry.getValue();
+          final Object value = entry.getValue();
           String valueText = "-";
           if (value != null) {
             valueText = value.toString();
@@ -122,5 +114,13 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
     } else {
       out.text(property.toString());
     }
+  }
+
+  public void setKeyLabel(final String keyLabel) {
+    this.keyLabel = keyLabel;
+  }
+
+  public void setValueLabel(final String valueLabel) {
+    this.valueLabel = valueLabel;
   }
 }

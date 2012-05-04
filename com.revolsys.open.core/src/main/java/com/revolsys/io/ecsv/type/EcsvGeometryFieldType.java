@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeometryFactory;
@@ -33,14 +31,13 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
 
   private final GeometryFactory geometryFactory;
 
-  private final QName typeName;
+  private final String typeName;
 
   public EcsvGeometryFieldType(final DataType dataType,
     final GeometryFactory geometryFactory) {
     super(dataType);
     this.geometryFactory = geometryFactory;
-    this.typeName = new QName(_NS_URI, dataType.getName().getLocalPart(),
-      _NS_PREFIX);
+    this.typeName = dataType.getName();
   }
 
   private int getDimension(final Geometry geometry) {
@@ -84,7 +81,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
   }
 
   @Override
-  public QName getTypeName() {
+  public String getTypeName() {
     return typeName;
   }
 

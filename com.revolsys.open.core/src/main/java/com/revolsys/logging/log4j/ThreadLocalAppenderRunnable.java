@@ -1,6 +1,5 @@
 package com.revolsys.logging.log4j;
 
-
 public class ThreadLocalAppenderRunnable implements Runnable {
   private final ThreadLocalFileAppender appender;
 
@@ -26,7 +25,7 @@ public class ThreadLocalAppenderRunnable implements Runnable {
         }
       }
       process.run();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     }
   }

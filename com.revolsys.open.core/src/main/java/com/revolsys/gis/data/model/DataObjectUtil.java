@@ -23,9 +23,6 @@ package com.revolsys.gis.data.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -35,8 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public final class DataObjectUtil {
 
   public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
-    new QName("http://open.revolsys.com/", "Feature", "rso"), new Attribute(
-      "geometry", DataTypes.GEOMETRY, true));
+    "Feature", new Attribute("geometry", DataTypes.GEOMETRY, true));
 
   /**
    * Create a copy of the data object replacing the geometry with the new
@@ -120,6 +116,28 @@ public final class DataObjectUtil {
       return null;
     } else {
       return value.intValue();
+    }
+  }
+
+  public static Double getDouble(
+    final DataObject object,
+    final String attributeName) {
+    final Number value = object.getValue(attributeName);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
+  public static Double getDouble(
+    final DataObject object,
+    final int attributeIndex) {
+    final Number value = object.getValue(attributeIndex);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
     }
   }
 

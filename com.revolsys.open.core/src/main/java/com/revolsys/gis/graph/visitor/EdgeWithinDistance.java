@@ -66,15 +66,7 @@ public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
     this.maxDistance = maxDistance;
   }
 
-  @Override
-  public boolean visit(final Edge<T> edge) {
-    if (accept(edge)) {
-      super.visit(edge);
-    }
-    return true;
-  }
-
-  public boolean accept(Edge<T> edge) {
+  public boolean accept(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final double distance = line.distance(geometry);
     if (distance <= maxDistance) {
@@ -82,5 +74,13 @@ public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
     } else {
       return false;
     }
+  }
+
+  @Override
+  public boolean visit(final Edge<T> edge) {
+    if (accept(edge)) {
+      super.visit(edge);
+    }
+    return true;
   }
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.JdbcConstants;
@@ -39,10 +39,10 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  private PostgreSQLDataObjectStore dataStore;
+  private final PostgreSQLDataObjectStore dataStore;
 
-  public PostgreSQLGeometryAttributeAdder(PostgreSQLDataObjectStore dataStore,
-    final DataSource dataSource) {
+  public PostgreSQLGeometryAttributeAdder(
+    final PostgreSQLDataObjectStore dataStore, final DataSource dataSource) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;
   }
@@ -55,12 +55,12 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
     final int length,
     final int scale,
     final boolean required) {
-    final QName typeName = metaData.getName();
-    String owner = dataStore.getDatabaseSchemaName(typeName.getNamespaceURI());
+    final String typePath = metaData.getPath();
+    String owner = dataStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
     if (owner.equals("")) {
       owner = "public";
     }
-    final String tableName = dataStore.getDatabaseTableName(typeName);
+    final String tableName = dataStore.getDatabaseTableName(typePath);
     final String columnName = name.toLowerCase();
     try {
       int srid = 0;
@@ -73,13 +73,13 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
         numAxis = (Integer)values.get("coord_dimension");
-      } catch (IllegalArgumentException e) {
-        LOG.warn("Cannot get geometry column metadata for " + typeName + "."
+      } catch (final IllegalArgumentException e) {
+        LOG.warn("Cannot get geometry column metadata for " + typePath + "."
           + columnName);
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
+      final GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
       final GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.getFactory(srid, numAxis, 0, 0);

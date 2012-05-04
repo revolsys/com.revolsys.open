@@ -83,12 +83,6 @@ public final class JsonWriter {
     out.print("]");
   }
 
-  public void newLine() {
-    if (indent) {
-      out.print('\n');
-    }
-  }
-
   public void endObject() {
     depth--;
     newLine();
@@ -131,6 +125,12 @@ public final class JsonWriter {
       value(value);
     }
     endList();
+  }
+
+  public void newLine() {
+    if (indent) {
+      out.print('\n');
+    }
   }
 
   public void print(final char value) {

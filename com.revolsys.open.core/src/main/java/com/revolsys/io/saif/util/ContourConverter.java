@@ -4,21 +4,19 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class ContourConverter extends ArcConverter {
-  private static final String GEOMETRY_CLASS = "Contour";
+  private static final String GEOMETRY_CLASS = "/Contour";
 
   private final OsnConverterRegistry converters;
 
   public ContourConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
-    super(geometryFactory, "Arc");
+    super(geometryFactory, "/Arc");
     this.converters = converters;
   }
 
@@ -31,7 +29,7 @@ public class ContourConverter extends ArcConverter {
     String attributeName = iterator.nextAttributeName();
     while (attributeName != null) {
       if (attributeName.equals("arc")) {
-        final QName objectName = iterator.nextObjectName();
+        final String objectName = iterator.nextObjectName();
         final OsnConverter osnConverter = converters.getConverter(objectName);
         if (osnConverter == null) {
           iterator.throwParseError("No Geometry Converter for " + objectName);

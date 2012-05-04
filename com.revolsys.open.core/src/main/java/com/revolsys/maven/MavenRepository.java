@@ -99,6 +99,22 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return urlHandler;
   }
 
+  public Map<String, Object> getMavenMetadata(
+    final String groupId,
+    final String artifactId,
+    final String version) {
+    final String metaDataPath = "/"
+      + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId,
+        version, "maven-metadata.xml");
+    final Resource metaDataResource = SpringUtil.getResource(root, metaDataPath);
+    if (metaDataResource.exists()) {
+      return XmlMapIoFactory.toMap(metaDataResource);
+    } else {
+      return Collections.emptyMap();
+    }
+
+  }
+
   public String getPath(final String id) {
     final String[] parts = id.split(":");
     final String groupId = parts[0];
@@ -200,6 +216,25 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return root;
   }
 
+  public String getSnapshotVersion(final Map<String, Object> mavenMetadata) {
+    final Map<String, Object> versioning = (Map<String, Object>)mavenMetadata.get("versioning");
+    if (versioning != null) {
+      final Map<String, Object> snapshot = (Map<String, Object>)versioning.get("snapshot");
+      if (snapshot != null) {
+        final String timestamp = (String)snapshot.get("timestamp");
+        if (StringUtils.hasText(timestamp)) {
+          final String buildNumber = (String)snapshot.get("buildNumber");
+          if (StringUtils.hasText(timestamp)) {
+            return timestamp + "-" + buildNumber;
+          } else {
+            return timestamp + "-1";
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   public URL getURL(final String id) {
     final String path = id.replace(':', '/');
     try {
@@ -218,52 +253,17 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String classifier,
     final String version) {
     if (version.endsWith("-SNAPSHOT")) {
-      Map<String, Object> mavenMetadata = getMavenMetadata(groupId, artifactId,
-        version);
-      String snapshotVersion = getSnapshotVersion(mavenMetadata);
+      final Map<String, Object> mavenMetadata = getMavenMetadata(groupId,
+        artifactId, version);
+      final String snapshotVersion = getSnapshotVersion(mavenMetadata);
       if (snapshotVersion != null) {
-        String timestampVersion = version.replaceAll("SNAPSHOT$",
+        final String timestampVersion = version.replaceAll("SNAPSHOT$",
           snapshotVersion);
         return getResource(groupId, artifactId, type, classifier,
           timestampVersion);
       }
     }
     return resource;
-  }
-
-  public String getSnapshotVersion(Map<String, Object> mavenMetadata) {
-    Map<String, Object> versioning = (Map<String, Object>)mavenMetadata.get("versioning");
-    if (versioning != null) {
-      Map<String, Object> snapshot = (Map<String, Object>)versioning.get("snapshot");
-      if (snapshot != null) {
-        String timestamp = (String)snapshot.get("timestamp");
-        if (StringUtils.hasText(timestamp)) {
-          String buildNumber = (String)snapshot.get("buildNumber");
-          if (StringUtils.hasText(timestamp)) {
-            return timestamp + "-" + buildNumber;
-          } else {
-            return timestamp + "-1";
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  public Map<String, Object> getMavenMetadata(
-    final String groupId,
-    final String artifactId,
-    final String version) {
-    String metaDataPath = "/"
-      + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId,
-        version, "maven-metadata.xml");
-    Resource metaDataResource = SpringUtil.getResource(root, metaDataPath);
-    if (metaDataResource.exists()) {
-      return XmlMapIoFactory.toMap(metaDataResource);
-    } else {
-      return Collections.emptyMap();
-    }
-
   }
 
   public void setRoot(final Resource root) {

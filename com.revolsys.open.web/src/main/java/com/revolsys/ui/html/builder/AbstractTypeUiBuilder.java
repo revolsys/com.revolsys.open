@@ -8,8 +8,8 @@ import com.revolsys.ui.html.fields.TextField;
 import com.revolsys.ui.html.view.Element;
 
 public class AbstractTypeUiBuilder extends HtmlUiBuilder {
-  public AbstractTypeUiBuilder(final String typeName, final String typeLabel) {
-    super(typeName, typeLabel);
+  public AbstractTypeUiBuilder(final String typePath, final String typeLabel) {
+    super(typePath, typeLabel);
   }
 
   @Override

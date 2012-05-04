@@ -61,7 +61,7 @@ public abstract class Field extends Element {
   }
 
   public <T> T getInitialValue(final HttpServletRequest request) {
-    ElementContainer container = getContainer();
+    final ElementContainer container = getContainer();
     if (container == null) {
       return (T)initialValue;
     } else {

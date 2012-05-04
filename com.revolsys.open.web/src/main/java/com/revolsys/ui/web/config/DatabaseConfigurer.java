@@ -103,6 +103,14 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
     return originalValue;
   }
 
+  @PreDestroy
+  public void destroy() {
+    dataSource = null;
+    keyColumnName = null;
+    tableName = null;
+    valueColumnName = null;
+  }
+
   /**
    * Get the name of the column containing property keys.
    * 
@@ -176,14 +184,6 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
     }
 
     processProperties(beanFactory, properties);
-  }
-
-  @PreDestroy
-  public void destroy() {
-    dataSource = null;
-    keyColumnName = null;
-    tableName = null;
-    valueColumnName = null;
   }
 
   /**

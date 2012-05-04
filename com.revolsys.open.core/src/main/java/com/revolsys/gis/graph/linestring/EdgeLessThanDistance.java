@@ -16,16 +16,6 @@ import com.vividsolutions.jts.geom.Envelope;
 public class EdgeLessThanDistance extends NestedVisitor<Edge<LineSegment>>
   implements Filter<Edge<LineSegment>> {
   public static List<Edge<LineSegment>> getEdges(
-    final LineStringGraph graph,
-    final Coordinates fromPoint,
-    final Coordinates toPoint,
-    final double maxDistance) {
-    final LineSegment lineSegment = new LineSegment(fromPoint, toPoint);
-    return getEdges(graph, lineSegment, maxDistance);
-
-  }
-
-  public static List<Edge<LineSegment>> getEdges(
     final Graph<LineSegment> graph,
     final LineSegment lineSegment,
     final double maxDistance) {
@@ -36,6 +26,16 @@ public class EdgeLessThanDistance extends NestedVisitor<Edge<LineSegment>>
     edgeIndex.query(envelope, new EdgeLessThanDistance(lineSegment,
       maxDistance, results));
     return results.getList();
+  }
+
+  public static List<Edge<LineSegment>> getEdges(
+    final LineStringGraph graph,
+    final Coordinates fromPoint,
+    final Coordinates toPoint,
+    final double maxDistance) {
+    final LineSegment lineSegment = new LineSegment(fromPoint, toPoint);
+    return getEdges(graph, lineSegment, maxDistance);
+
   }
 
   private final LineSegment lineSegment;

@@ -7,8 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.namespace.QName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
@@ -30,9 +28,9 @@ public class DataObjectConverterProcess extends
 
   private Converter<DataObject, DataObject> defaultConverter;
 
-  private Map<QName, Collection<FilterDataObjectConverter>> typeFilterConverterMap = new LinkedHashMap<QName, Collection<FilterDataObjectConverter>>();
+  private Map<String, Collection<FilterDataObjectConverter>> typeFilterConverterMap = new LinkedHashMap<String, Collection<FilterDataObjectConverter>>();
 
-  private Map<QName, Converter<DataObject, DataObject>> typeConverterMap = new HashMap<QName, Converter<DataObject, DataObject>>();
+  private Map<String, Converter<DataObject, DataObject>> typeConverterMap = new HashMap<String, Converter<DataObject, DataObject>>();
 
   private DataObjectMetaDataFactory targetMetaDataFactory;
 
@@ -41,19 +39,19 @@ public class DataObjectConverterProcess extends
   private Statistics statistics = new Statistics("Converted");
 
   public void addTypeConverter(
-    final QName typeName,
+    final String typePath,
     final Converter<DataObject, DataObject> converter) {
-    typeConverterMap.put(typeName, converter);
+    typeConverterMap.put(typePath, converter);
   }
 
   public void addTypeFilterConverter(
-    final QName typeName,
+    final String typePath,
     final FilterDataObjectConverter filterConverter) {
 
-    Collection<FilterDataObjectConverter> converters = typeFilterConverterMap.get(typeName);
+    Collection<FilterDataObjectConverter> converters = typeFilterConverterMap.get(typePath);
     if (converters == null) {
       converters = new ArrayList<FilterDataObjectConverter>();
-      typeFilterConverterMap.put(typeName, converters);
+      typeFilterConverterMap.put(typePath, converters);
     }
     converters.add(filterConverter);
   }
@@ -61,7 +59,7 @@ public class DataObjectConverterProcess extends
   protected DataObject convert(final DataObject source) {
     int matchCount = 0;
     final DataObjectMetaData sourceMetaData = source.getMetaData();
-    final QName sourceTypeName = sourceMetaData.getName();
+    final String sourceTypeName = sourceMetaData.getPath();
     final Collection<FilterDataObjectConverter> converters = typeFilterConverterMap.get(sourceTypeName);
     DataObject target = null;
     if (converters != null && !converters.isEmpty()) {
@@ -112,7 +110,7 @@ public class DataObjectConverterProcess extends
     return defaultConverter;
   }
 
-  public Map<QName, Collection<FilterDataObjectConverter>> getFilterTypeConverterMap() {
+  public Map<String, Collection<FilterDataObjectConverter>> getFilterTypeConverterMap() {
     return typeFilterConverterMap;
   }
 
@@ -124,7 +122,7 @@ public class DataObjectConverterProcess extends
     return targetMetaDataFactory;
   }
 
-  public Map<QName, Converter<DataObject, DataObject>> getTypeConverterMap() {
+  public Map<String, Converter<DataObject, DataObject>> getTypeConverterMap() {
     return typeConverterMap;
   }
 
@@ -144,19 +142,19 @@ public class DataObjectConverterProcess extends
     if (simpleMapping != null) {
       for (final Entry<Object, Map<String, Object>> entry : simpleMapping.entrySet()) {
         final Object key = entry.getKey();
-        QName sourceTypeName;
-        if (key instanceof QName) {
-          sourceTypeName = (QName)key;
+        String sourceTypeName;
+        if (key instanceof String) {
+          sourceTypeName = (String)key;
         } else {
-          sourceTypeName = QName.valueOf(key.toString());
+          sourceTypeName = String.valueOf(key.toString());
         }
         final Map<String, Object> map = entry.getValue();
-        final Object targetName = map.get("typeName");
-        QName targetTypeName;
-        if (key instanceof QName) {
-          targetTypeName = (QName)targetName;
+        final Object targetName = map.get("typePath");
+        String targetTypeName;
+        if (key instanceof String) {
+          targetTypeName = (String)targetName;
         } else {
-          targetTypeName = QName.valueOf(targetName.toString());
+          targetTypeName = String.valueOf(targetName.toString());
         }
         @SuppressWarnings("unchecked")
         final Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
@@ -204,12 +202,12 @@ public class DataObjectConverterProcess extends
   }
 
   public void setTypeConverterMap(
-    final Map<QName, Converter<DataObject, DataObject>> typeConverterMap) {
+    final Map<String, Converter<DataObject, DataObject>> typeConverterMap) {
     this.typeConverterMap = typeConverterMap;
   }
 
   public void setTypeFilterConverterMap(
-    final Map<QName, Collection<FilterDataObjectConverter>> typeConverterMap) {
+    final Map<String, Collection<FilterDataObjectConverter>> typeConverterMap) {
     this.typeFilterConverterMap = typeConverterMap;
   }
 }

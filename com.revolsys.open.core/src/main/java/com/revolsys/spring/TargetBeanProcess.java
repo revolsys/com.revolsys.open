@@ -51,7 +51,6 @@ public class TargetBeanProcess implements Process {
     this.processNetwork = processNetwork;
   }
 
-
   @Override
   public String toString() {
     if (bean == null) {

@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.util.Map.Entry;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -59,7 +57,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
 
   @Override
   public String toString() {
-    return metaData.getName().toString();
+    return metaData.getPath().toString();
   }
 
   public void write(final DataObject object) {
@@ -143,7 +141,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
   }
 
   private void writeDataStart(final DataObjectMetaData metaData) {
-    writeMultiLineListStart(RECORDS, metaData.getName(), MULTI_LINE_LIST_START);
+    writeMultiLineListStart(RECORDS, metaData.getPath(), MULTI_LINE_LIST_START);
   }
 
   private void writeField(final DataType dataType, final Object value) {
@@ -198,33 +196,26 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     final String propertyName,
     final DataType dataType,
     final String collectionStart) {
-    final QName typeName = dataType.getName();
-    writeMultiLineListStart(propertyName, typeName, collectionStart);
+    final String name = dataType.getName();
+    writeMultiLineListStart(propertyName, name, collectionStart);
   }
 
   private void writeMultiLineListStart(
     final String propertyName,
-    final QName typeName,
+    final String path,
     final String collectionStart) {
-    final String type = LIST_TYPE + TYPE_PARAMETER_START + typeName
+    final String type = LIST_TYPE + TYPE_PARAMETER_START + path
       + TYPE_PARAMETER_END;
     writeMultiLineStart(propertyName, type, collectionStart);
   }
 
   private void writeMultiLineStart(
     final String propertyName,
-    final QName typeName,
-    final String collectionStart) {
-    writeMultiLineStart(propertyName, typeName.toString(), collectionStart);
-  }
-
-  private void writeMultiLineStart(
-    final String propertyName,
-    final String typeName,
+    final String typePath,
     final String collectionStart) {
     StringFieldType.writeQuotedString(out, propertyName);
     out.print(FIELD_SEPARATOR);
-    StringFieldType.writeQuotedString(out, typeName);
+    StringFieldType.writeQuotedString(out, typePath);
     out.print(FIELD_SEPARATOR);
     out.print(collectionStart);
     newLine();
@@ -237,7 +228,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
       if (fieldType == null) {
         fieldType = new StringFieldType();
       }
-      final QName type = fieldType.getTypeName();
+      final String type = fieldType.getTypeName();
       StringFieldType.writeQuotedString(out, name);
       out.write(FIELD_SEPARATOR);
       writeField(DataTypes.QNAME, type);
@@ -249,7 +240,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private void writeProperty(
     final String name,
-    final QName type,
+    final String type,
     final Object value) {
     if (value != null) {
       StringFieldType.writeQuotedString(out, name);
@@ -270,7 +261,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
 
     writeMapStart(TYPE_DEFINITION);
 
-    writeProperty(EcsvProperties.NAME, metaData.getName());
+    writeProperty(EcsvProperties.NAME, metaData.getPath());
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);

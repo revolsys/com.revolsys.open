@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.context.HashMapContext;
@@ -41,9 +39,9 @@ public class CreateObjectsWithinDistanceOfGeometry extends
 
   private Map<DataObjectMetaData, Map<DataObjectMetaData, PreparedGeometry>> metaDataGeometryMap = new HashMap<DataObjectMetaData, Map<DataObjectMetaData, PreparedGeometry>>();
 
-  private String typeNameTemplate;
+  private String typePathTemplate;
 
-  private Expression typeNameTemplateExpression;
+  private Expression typePathTemplateExpression;
 
   private boolean writeOriginal;
 
@@ -93,12 +91,11 @@ public class CreateObjectsWithinDistanceOfGeometry extends
           final Map<String, Object> vars = new HashMap<String, Object>(
             attributes);
           vars.putAll(new DataObjectMap(object));
-          vars.put("typeName", metaData.getName());
+          vars.put("typePath", metaData.getPath());
           context.setVars(vars);
-          final Object typeName = JexlUtil.evaluateExpression(context,
-            typeNameTemplateExpression);
-          final QName newName = QName.valueOf(typeName.toString());
-          newMetaData = new DataObjectMetaDataImpl(newName,
+          final String typePath = (String)JexlUtil.evaluateExpression(context,
+            typePathTemplateExpression);
+          newMetaData = new DataObjectMetaDataImpl(typePath,
             metaData.getAttributes());
           if (distance > 0) {
             final BufferOp buffer = new BufferOp(geometry,
@@ -117,7 +114,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
   }
 
   public String getTypeNameTemplate() {
-    return typeNameTemplate;
+    return typePathTemplate;
   }
 
   private void initializeGeometries(final Channel<DataObject> geometryIn) {
@@ -177,15 +174,15 @@ public class CreateObjectsWithinDistanceOfGeometry extends
     this.geometryObjects = geometryObjects;
   }
 
-  public void setTypeNameTemplate(final String typeNameTemplate) {
-    this.typeNameTemplate = typeNameTemplate;
+  public void setTypeNameTemplate(final String typePathTemplate) {
+    this.typePathTemplate = typePathTemplate;
     try {
-      typeNameTemplateExpression = JexlUtil.createExpression(typeNameTemplate,
+      typePathTemplateExpression = JexlUtil.createExpression(typePathTemplate,
         "%\\{([^\\}]+)\\}");
     } catch (final Exception e) {
       throw new IllegalArgumentException((new StringBuilder()).append(
         "Invalid type name template: ")
-        .append(typeNameTemplate)
+        .append(typePathTemplate)
         .toString(), e);
     }
   }

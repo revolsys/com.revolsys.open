@@ -31,6 +31,10 @@ public class CsvWriter {
     FileUtil.closeSilent(out);
   }
 
+  public void flush() {
+    out.flush();
+  }
+
   public void write(final List<? extends Object> values) {
     write(values.toArray());
   }
@@ -49,9 +53,5 @@ public class CsvWriter {
       }
     }
     out.println();
-  }
-
-  public void flush() {
-    out.flush();
   }
 }

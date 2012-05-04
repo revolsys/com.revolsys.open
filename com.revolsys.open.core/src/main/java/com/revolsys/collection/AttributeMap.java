@@ -43,6 +43,14 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     putAll(attributes);
   }
 
+  private void setProperties(final Properties properties) {
+    for (final Entry<Object, Object> entry : properties.entrySet()) {
+      final String key = (String)entry.getKey();
+      final Object value = entry.getValue();
+      put(key, value);
+    }
+  }
+
   public void setProperties(final Resource resource) {
     final Properties properties = new Properties();
     try {
@@ -53,17 +61,9 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     }
   }
 
-  private void setProperties(final Properties properties) {
-    for (final Entry<Object, Object> entry : properties.entrySet()) {
-      final String key = (String)entry.getKey();
-      final Object value = entry.getValue();
-      put(key, value);
-    }
-  }
-
-  public void setPropertyResources(Resource[] resources) {
+  public void setPropertyResources(final Resource[] resources) {
     final Properties properties = new Properties();
-    for (Resource resource : resources) {
+    for (final Resource resource : resources) {
       try {
         properties.load(resource.getInputStream());
       } catch (final Throwable e) {

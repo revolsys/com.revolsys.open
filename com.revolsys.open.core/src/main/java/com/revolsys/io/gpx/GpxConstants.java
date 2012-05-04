@@ -25,7 +25,7 @@ public final class GpxConstants {
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 
   public static final DataObjectMetaDataImpl GPX_TYPE = new DataObjectMetaDataImpl(
-    new QName(GPX_NS_URI, "gpx"));
+    "gpx");
 
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");
 

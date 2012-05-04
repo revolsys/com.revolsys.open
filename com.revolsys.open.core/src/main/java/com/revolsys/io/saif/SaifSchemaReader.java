@@ -21,7 +21,6 @@
 package com.revolsys.io.saif;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -34,8 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
 
@@ -56,39 +53,38 @@ import com.revolsys.io.saif.util.CsnIterator;
 
 public class SaifSchemaReader {
 
-  private static final Map<QName, DataType> nameTypeMap = new HashMap<QName, DataType>();
+  private static final Map<String, DataType> nameTypeMap = new HashMap<String, DataType>();
 
-  private static final QName SPATIAL_OBJECT = new QName("SpatialObject");
+  private static final String SPATIAL_OBJECT = "/SpatialObject";
 
-  private static final QName TEXT_OR_SYMBOL_OBJECT = new QName(
-    "TextOrSymbolObject");
+  private static final String TEXT_OR_SYMBOL_OBJECT = "/TextOrSymbolObject";
 
   static {
-    addType("Boolean", DataTypes.BOOLEAN);
-    addType("Numeric", DataTypes.DECIMAL);
-    addType("Integer", DataTypes.INTEGER);
-    addType("Integer8", DataTypes.BYTE);
-    addType("Integer16", DataTypes.SHORT);
-    addType("Integer32", DataTypes.INT);
-    addType("Integer64", DataTypes.LONG);
-    addType("Integer8Unsigned", DataTypes.INTEGER);
-    addType("Integer16Unsigned", DataTypes.INTEGER);
-    addType("Integer32Unsigned", DataTypes.INTEGER);
-    addType("Integer64Unsigned", DataTypes.INTEGER);
-    addType("Real", DataTypes.DECIMAL);
-    addType("Real32", DataTypes.FLOAT);
-    addType("Real64", DataTypes.DOUBLE);
-    addType("Real80", DataTypes.DECIMAL);
-    addType("List", DataTypes.LIST);
-    addType("Set", DataTypes.SET);
-    addType("AggregateType", new SimpleDataType("AggregateType", Object.class));
-    addType("PrimitiveType", new SimpleDataType("PrimitiveType", Object.class));
-    addType("Enumeration", new SimpleDataType("Enumeration", Object.class));
+    addType("/Boolean", DataTypes.BOOLEAN);
+    addType("/Numeric", DataTypes.DECIMAL);
+    addType("/Integer", DataTypes.INTEGER);
+    addType("/Integer8", DataTypes.BYTE);
+    addType("/Integer16", DataTypes.SHORT);
+    addType("/Integer32", DataTypes.INT);
+    addType("/Integer64", DataTypes.LONG);
+    addType("/Integer8Unsigned", DataTypes.INTEGER);
+    addType("/Integer16Unsigned", DataTypes.INTEGER);
+    addType("/Integer32Unsigned", DataTypes.INTEGER);
+    addType("/Integer64Unsigned", DataTypes.INTEGER);
+    addType("/Real", DataTypes.DECIMAL);
+    addType("/Real32", DataTypes.FLOAT);
+    addType("/Real64", DataTypes.DOUBLE);
+    addType("/Real80", DataTypes.DECIMAL);
+    addType("/List", DataTypes.LIST);
+    addType("/Set", DataTypes.SET);
+    addType("/AggregateType", new SimpleDataType("AggregateType", Object.class));
+    addType("/PrimitiveType", new SimpleDataType("PrimitiveType", Object.class));
+    addType("/Enumeration", new SimpleDataType("Enumeration", Object.class));
 
   }
 
-  private static void addType(final String typeName, final DataType dataType) {
-    nameTypeMap.put(QName.valueOf(typeName), dataType);
+  private static void addType(final String typePath, final DataType dataType) {
+    nameTypeMap.put(String.valueOf(typePath), dataType);
   }
 
   private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
@@ -101,7 +97,7 @@ public class SaifSchemaReader {
 
   private void addExportedObjects() {
     final DataObjectMetaDataImpl exportedObjectHandle = new DataObjectMetaDataImpl(
-      new QName("ExportedObjectHandle"));
+      "ExportedObjectHandle");
     schema.addMetaData(exportedObjectHandle);
     exportedObjectHandle.addAttribute("referenceID", DataTypes.STRING, true);
     exportedObjectHandle.addAttribute("type", DataTypes.STRING, true);
@@ -150,23 +146,23 @@ public class SaifSchemaReader {
           final String attributeName = iterator.getStringValue();
           switch (iterator.next()) {
             case CsnIterator.ATTRIBUTE_TYPE:
-              final QName typeName = iterator.getQNameValue();
-              DataType dataType = nameTypeMap.get(typeName);
-              if (typeName.equals(SPATIAL_OBJECT)
-                || typeName.equals(TEXT_OR_SYMBOL_OBJECT)) {
+              final String typePath = iterator.getPathValue();
+              DataType dataType = nameTypeMap.get(typePath);
+              if (typePath.equals(SPATIAL_OBJECT)
+                || typePath.equals(TEXT_OR_SYMBOL_OBJECT)) {
                 dataType = DataTypes.GEOMETRY;
                 currentClass.setGeometryAttributeIndex(currentClass.getAttributeCount());
               } else if (dataType == null) {
-                dataType = new SimpleDataType(typeName, DataObject.class);
+                dataType = new SimpleDataType(typePath, DataObject.class);
               }
 
               currentClass.addAttribute(attributeName, dataType, required);
 
             break;
             case CsnIterator.COLLECTION_ATTRIBUTE:
-              final QName collectionType = iterator.getQNameValue();
+              final String collectionType = iterator.getPathValue();
               if (iterator.next() == CsnIterator.CLASS_NAME) {
-                final QName contentTypeName = iterator.getQNameValue();
+                final String contentTypeName = iterator.getPathValue();
                 final DataType collectionDataType = nameTypeMap.get(collectionType);
                 DataType contentDataType = nameTypeMap.get(contentTypeName);
                 if (contentDataType == null) {
@@ -233,8 +229,8 @@ public class SaifSchemaReader {
     while (iterator.next() != CsnIterator.END_DEFINITION) {
       switch (iterator.getEventType()) {
         case CsnIterator.CLASS_NAME:
-          final QName superClassName = iterator.getQNameValue();
-          if (superClassName.equals(new QName("Enumeration"))) {
+          final String superClassName = iterator.getPathValue();
+          if (superClassName.equals("/Enumeration")) {
             final DataType enumeration = processEnumeration(iterator);
             nameTypeMap.put(enumeration.getName(), enumeration);
             return enumeration;
@@ -289,8 +285,8 @@ public class SaifSchemaReader {
     if (schema == null) {
       schema = new DataObjectMetaDataFactoryImpl();
 
-      schema.addMetaData(new DataObjectMetaDataImpl(new QName("AggregateType")));
-      schema.addMetaData(new DataObjectMetaDataImpl(new QName("PrimitiveType")));
+      schema.addMetaData(new DataObjectMetaDataImpl("/AggregateType"));
+      schema.addMetaData(new DataObjectMetaDataImpl("/PrimitiveType"));
 
       addExportedObjects();
     }
@@ -339,14 +335,14 @@ public class SaifSchemaReader {
 
   private DataType processEnumeration(final CsnIterator iterator)
     throws IOException {
-    QName name = null;
+    String name = null;
     final Set<String> allowedValues = new TreeSet<String>();
     while (iterator.getNextEventType() == CsnIterator.COMPONENT_NAME) {
       iterator.next();
       final String componentName = iterator.getStringValue();
       if (componentName.equals("subclass")) {
         if (iterator.next() == CsnIterator.CLASS_NAME) {
-          name = iterator.getQNameValue();
+          name = iterator.getPathValue();
         } else {
           throw new IllegalArgumentException(
             "Expecting an enumeration class name");
@@ -373,19 +369,19 @@ public class SaifSchemaReader {
       iterator.next();
       String attributeName = iterator.getStringValue();
       boolean hasMore = true;
-      final List<QName> typeNames = new ArrayList<QName>();
+      final List<String> typePaths = new ArrayList<String>();
       final List<Object> values = new ArrayList<Object>();
       while (hasMore) {
         switch (iterator.getNextEventType()) {
           case CsnIterator.CLASS_NAME:
             iterator.next();
-            final QName typeName = iterator.getQNameValue();
-            typeNames.add(typeName);
+            final String typePath = iterator.getPathValue();
+            typePaths.add(typePath);
           break;
           case CsnIterator.FORCE_TYPE:
             iterator.next();
             if (iterator.next() == CsnIterator.CLASS_NAME) {
-              typeNames.add(iterator.getQNameValue());
+              typePaths.add(iterator.getPathValue());
             } else {
               throw new IllegalStateException("Expecting a class name");
             }
@@ -393,7 +389,7 @@ public class SaifSchemaReader {
           case CsnIterator.EXCLUDE_TYPE:
             iterator.next();
             if (iterator.next() == CsnIterator.CLASS_NAME) {
-              typeNames.add(iterator.getQNameValue());
+              typePaths.add(iterator.getPathValue());
             } else {
               throw new IllegalStateException("Expecting a class name");
             }
@@ -413,9 +409,9 @@ public class SaifSchemaReader {
       if (dotIndex == -1) {
         final Attribute attribute = type.getAttribute(attributeName);
         if (attribute != null) {
-          if (!typeNames.isEmpty()) {
+          if (!typePaths.isEmpty()) {
             attribute.setProperty(AttributeProperties.ALLOWED_TYPE_NAMES,
-              typeNames);
+              typePaths);
           }
           if (!values.isEmpty()) {
             attribute.setProperty(AttributeProperties.ALLOWED_VALUES, values);
@@ -426,14 +422,14 @@ public class SaifSchemaReader {
         final String subKey = attributeName.substring(dotIndex + 1);
         final Attribute attribute = type.getAttribute(key);
         if (attribute != null) {
-          if (!typeNames.isEmpty()) {
-            Map<String, List<QName>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
+          if (!typePaths.isEmpty()) {
+            Map<String, List<String>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
             if (allowedValues == null) {
-              allowedValues = new HashMap<String, List<QName>>();
+              allowedValues = new HashMap<String, List<String>>();
               attribute.setProperty(
                 AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES, allowedValues);
             }
-            allowedValues.put(subKey, typeNames);
+            allowedValues.put(subKey, typePaths);
           }
           if (!values.isEmpty()) {
             Map<String, List<Object>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_VALUES);
@@ -465,7 +461,7 @@ public class SaifSchemaReader {
   public void subclass(final DataObjectMetaData type, final CsnIterator iterator)
     throws IOException {
     if (iterator.next() == CsnIterator.CLASS_NAME) {
-      final QName className = iterator.getQNameValue();
+      final String className = iterator.getPathValue();
       currentClass = new DataObjectMetaDataImpl(className);
       for (final DataObjectMetaData superClassDef : currentSuperClasses) {
         addSuperClass(currentClass, superClassDef);

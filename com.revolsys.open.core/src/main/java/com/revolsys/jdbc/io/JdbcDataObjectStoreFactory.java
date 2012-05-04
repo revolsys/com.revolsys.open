@@ -13,7 +13,7 @@ public class JdbcDataObjectStoreFactory implements DataObjectStoreFactory {
 
   public JdbcDataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
-    JdbcDatabaseFactory databaseFactory = JdbcFactoryRegistry.databaseFactory(connectionProperties);
+    final JdbcDatabaseFactory databaseFactory = JdbcFactoryRegistry.databaseFactory(connectionProperties);
     return databaseFactory.createDataObjectStore(connectionProperties);
   }
 

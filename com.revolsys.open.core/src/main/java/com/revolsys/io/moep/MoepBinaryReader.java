@@ -56,6 +56,7 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
     }
   }
 
+  @Override
   public void close() {
     iterator.close();
   }

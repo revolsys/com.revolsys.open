@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
-import javax.xml.namespace.QName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +21,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlConstants;
@@ -157,8 +156,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.startTag(DATA_ELEMENT);
     out.attribute(XsiConstants.TYPE, dataElementType);
 
-    final QName typeName = metaData.getName();
-    final String localName = typeName.getLocalPart();
+    final String path = metaData.getPath();
+    final String localName = PathUtil.getName(path);
     out.element(CATALOG_PATH, "/FC=" + localName);
     out.element(NAME, localName);
     out.element(METADATA_RETRIEVED, true);
@@ -401,7 +400,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.startTag(DATASET_DATA);
     out.attribute(XsiConstants.TYPE, DATASET_DATA_TABLE_DATA);
 
-    out.element(DATASET_NAME, metaData.getName().getLocalPart());
+    out.element(DATASET_NAME, metaData.getTypeName());
     out.element(DATASET_TYPE, datasetType);
 
     out.startTag(DATA);

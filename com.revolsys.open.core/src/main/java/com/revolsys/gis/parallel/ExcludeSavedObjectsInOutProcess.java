@@ -34,7 +34,7 @@ public class ExcludeSavedObjectsInOutProcess extends
       return null;
     } else {
       final DataObjectMetaData metaData = object.getMetaData();
-      return metaData.getName() + "." + id;
+      return metaData.getPath() + "." + id;
     }
   }
 

@@ -11,7 +11,8 @@ public class WebSecurityExpressionRoot extends SecurityExpressionRoot {
   /** Allows direct access to the request object */
   public final HttpServletRequest request;
 
-  public WebSecurityExpressionRoot(Authentication a, FilterInvocation fi) {
+  public WebSecurityExpressionRoot(final Authentication a,
+    final FilterInvocation fi) {
     super(a);
     // this.filterInvocation = fi;
     this.request = fi.getRequest();
@@ -26,7 +27,7 @@ public class WebSecurityExpressionRoot extends SecurityExpressionRoot {
    * @return true if the IP address of the current request is in the required
    *         range.
    */
-  public boolean hasIpAddress(String ipAddress) {
+  public boolean hasIpAddress(final String ipAddress) {
     return (new IpAddressMatcher(ipAddress).matches(request));
   }
 

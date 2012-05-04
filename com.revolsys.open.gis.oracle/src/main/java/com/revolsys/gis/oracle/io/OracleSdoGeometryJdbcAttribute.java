@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.spatial.geometry.JGeometry;
 import oracle.sql.ARRAY;
@@ -40,8 +38,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public static final String COORDINATE_PRECISION_PROPERTY = "coordinatePrecision";
 
-  public static final QName SCHEMA_PROPERTY = new QName(
-    OracleSdoGeometryJdbcAttribute.class.getName());
+  public static final String SCHEMA_PROPERTY = OracleSdoGeometryJdbcAttribute.class.getName();
 
   public static final String SRID_PROPERTY = "srid";
 

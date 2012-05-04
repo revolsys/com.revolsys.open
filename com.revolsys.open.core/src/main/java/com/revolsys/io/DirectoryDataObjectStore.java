@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.xml.namespace.QName;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -26,7 +25,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
 
   private boolean createMissingTables = true;
 
-  private Map<QName, Writer<DataObject>> writers = new HashMap<QName, Writer<DataObject>>();
+  private Map<String, Writer<DataObject>> writers = new HashMap<String, Writer<DataObject>>();
 
   private File directory;
 
@@ -36,7 +35,8 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
 
   private boolean createMissingDataStore = true;
 
-  public DirectoryDataObjectStore(File directory, String fileExtension) {
+  public DirectoryDataObjectStore(final File directory,
+    final String fileExtension) {
     this.directory = directory;
     this.fileExtension = fileExtension;
   }
@@ -73,8 +73,8 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
   public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
     final DataObjectMetaData metaData = super.getMetaData(objectMetaData);
     if (metaData == null && createMissingTables) {
-      final QName typeName = objectMetaData.getName();
-      final String schemaName = typeName.getNamespaceURI();
+      final String typePath = objectMetaData.getPath();
+      final String schemaName = PathUtil.getPath(typePath);
       DataObjectStoreSchema schema = getSchema(schemaName);
       if (schema == null && createMissingTables) {
         schema = new DataObjectStoreSchema(this, schemaName);
@@ -85,7 +85,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
         schemaDirectory.mkdirs();
       }
       final DataObjectMetaDataImpl newMetaData = new DataObjectMetaDataImpl(
-        this, schema, typeName);
+        this, schema, typePath);
       for (final Attribute attribute : objectMetaData.getAttributes()) {
         final Attribute newAttribute = new Attribute(attribute);
         newMetaData.addAttribute(newAttribute);
@@ -114,16 +114,20 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
   @Override
   public synchronized void insert(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
-    final QName typeName = metaData.getName();
-    Writer<DataObject> writer = writers.get(typeName);
+    final String typePath = metaData.getPath();
+    Writer<DataObject> writer = writers.get(typePath);
     if (writer == null) {
-      final File subDirectory = new File(getDirectory(),
-        typeName.getNamespaceURI());
-      final File file = new File(subDirectory, typeName.getLocalPart() + "."
+      final String schemaName = PathUtil.getPath(typePath);
+      final File subDirectory = new File(getDirectory(), schemaName);
+      final File file = new File(subDirectory, metaData.getTypeName() + "."
         + getFileExtension());
       final Resource resource = new FileSystemResource(file);
       writer = AbstractDataObjectIoFactory.dataObjectWriter(metaData, resource);
-      writers.put(typeName, writer);
+      if (writer instanceof ObjectWithProperties) {
+        ObjectWithProperties properties = (ObjectWithProperties)writer;
+        properties.setProperties(getProperties());
+      }
+      writers.put(typePath, writer);
     }
     writer.write(object);
     addStatistic("Insert", object);
@@ -146,8 +150,8 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
   @Override
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    final Map<QName, DataObjectMetaData> metaDataMap) {
-    final String schemaName = schema.getName();
+    final Map<String, DataObjectMetaData> metaDataMap) {
+    final String schemaName = schema.getPath();
     final File subDirectory = new File(directory, schemaName);
     final File[] files = subDirectory.listFiles(new ExtensionFilenameFilter(
       fileExtension));
@@ -155,8 +159,8 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
       for (final File file : files) {
         final DataObjectMetaData metaData = loadMetaData(schemaName, file);
         if (metaData != null) {
-          final QName typeName = metaData.getName();
-          metaDataMap.put(typeName, metaData);
+          final String typePath = metaData.getPath();
+          metaDataMap.put(typePath, metaData);
         }
       }
     }
@@ -174,12 +178,12 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
   }
 
   public Reader<DataObject> query(
-    final QName typeName,
+    final String typePath,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
-  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
+  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
     throw new UnsupportedOperationException();
   }
 

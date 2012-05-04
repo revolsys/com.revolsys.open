@@ -31,31 +31,34 @@ import org.springframework.orm.hibernate3.support.OpenSessionInViewFilter;
  */
 public class HibernateSessionFilter extends OpenSessionInViewFilter {
   /**
-   * Get the session from the session factory with a flush mode of AUTO.
-   * 
-   * @param sessionFactory The factory used to create the session.
-   * @return The session.
-   */
-  protected Session getSession(final SessionFactory sessionFactory) {
-    Session session = super.getSession(sessionFactory);
-    session.setFlushMode(FlushMode.AUTO);
-    return session;
-  }
-
-  /**
    * Close and flush the session after the request.
    * 
    * @param session The session to close.
    * @param sessionFactory The sesstion factory for the session.
    */
-  protected void closeSession(final Session session,
+  @Override
+  protected void closeSession(
+    final Session session,
     final SessionFactory sessionFactory) {
     try {
       session.flush();
-    } catch (HibernateException e) {
+    } catch (final HibernateException e) {
       throw new CleanupFailureDataAccessException(e.getMessage(), e);
     } finally {
       super.closeSession(session, sessionFactory);
     }
+  }
+
+  /**
+   * Get the session from the session factory with a flush mode of AUTO.
+   * 
+   * @param sessionFactory The factory used to create the session.
+   * @return The session.
+   */
+  @Override
+  protected Session getSession(final SessionFactory sessionFactory) {
+    final Session session = super.getSession(sessionFactory);
+    session.setFlushMode(FlushMode.AUTO);
+    return session;
   }
 }

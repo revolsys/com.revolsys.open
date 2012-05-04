@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -53,19 +52,6 @@ public class StatisticsMap {
     statistics.add(type, count);
   }
 
-  public void add(final String statisticName, final QName typeName) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(typeName);
-  }
-
-  public void add(
-    final String statisticName,
-    final QName typeName,
-    final long count) {
-    final Statistics statistics = getStatistics(statisticName);
-    statistics.add(typeName, count);
-  }
-
   public synchronized void add(final String name, final Statistics statistics) {
     statisticsMap.put(name, statistics);
     statistics.connect();
@@ -78,10 +64,10 @@ public class StatisticsMap {
 
   public void add(
     final String statisticName,
-    final String name,
+    final String path,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
-    statistics.add(name, count);
+    statistics.add(path, count);
   }
 
   @PostConstruct

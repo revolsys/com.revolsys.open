@@ -39,9 +39,9 @@ public class GeometryHttpMessageConverter extends
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public GeometryHttpMessageConverter() {
-    super(Geometry.class,
-      IoFactoryRegistry.getInstance().getMediaTypes(GeometryReaderFactory.class),
-      IoFactoryRegistry.getInstance().getMediaTypes(GeometryWriterFactory.class));
+    super(Geometry.class, IoFactoryRegistry.getInstance().getMediaTypes(
+      GeometryReaderFactory.class), IoFactoryRegistry.getInstance()
+      .getMediaTypes(GeometryWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {

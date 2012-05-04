@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
-import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.index.ItemVisitor;
 
 public class LineSegmentIntersectionVisitor implements ItemVisitor {

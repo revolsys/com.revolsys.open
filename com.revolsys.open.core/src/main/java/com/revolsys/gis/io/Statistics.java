@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
@@ -49,23 +48,13 @@ public class Statistics {
   }
 
   public void add(final DataObjectMetaData type) {
-    final QName typeName = type.getName();
-    add(typeName);
+    final String path = type.getPath();
+    add(path);
   }
 
   public void add(final DataObjectMetaData type, final long count) {
-    final QName typeName = type.getName();
-    add(typeName, count);
-  }
-
-  public void add(final QName typeName) {
-    final String name = typeName.toString();
-    add(name);
-  }
-
-  public void add(final QName typeName, final long count) {
-    final String name = typeName.toString();
-    add(name, count);
+    final String path = type.getPath();
+    add(path, count);
   }
 
   public void add(final String name) {

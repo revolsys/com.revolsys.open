@@ -18,6 +18,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
 
   private T object;
 
+  @Override
   @PreDestroy
   public final void close() {
     hasNext = false;

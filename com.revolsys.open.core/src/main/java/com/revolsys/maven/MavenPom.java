@@ -17,8 +17,8 @@ import org.springframework.util.StringUtils;
 import com.revolsys.util.CollectionUtil;
 
 public class MavenPom extends LinkedHashMap<String, Object> {
-  public static String getGroupAndArtifactId(String id) {
-    String[] parts = id.split(":");
+  public static String getGroupAndArtifactId(final String id) {
+    final String[] parts = id.split(":");
     if (parts.length < 2) {
       return id;
     } else {

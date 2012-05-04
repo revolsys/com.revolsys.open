@@ -29,6 +29,7 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
     this.reader = reader;
   }
 
+  @Override
   public void close() {
     reader.close();
   }

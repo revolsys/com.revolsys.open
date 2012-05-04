@@ -1,7 +1,5 @@
 package com.revolsys.gis.parallel;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.collection.ArrayUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -67,7 +65,7 @@ public abstract class AbstractMergeProcess extends
 
   private DataObjectMetaData addSavedObjects(
     final DataObjectMetaData currentType,
-    final QName currentTypeName,
+    final String currentTypeName,
     final Channel<DataObject> out,
     final boolean[] guard,
     final DataObject[] objects) {
@@ -93,9 +91,9 @@ public abstract class AbstractMergeProcess extends
       }
     } else {
       final DataObjectMetaData sourceType = sourceObject.getMetaData();
-      final QName sourceTypeName = sourceType.getName();
+      final String sourceTypeName = sourceType.getPath();
       final DataObjectMetaData otherType = otherObject.getMetaData();
-      final QName otherTypeName = otherType.getName();
+      final String otherTypeName = otherType.getPath();
       if (sourceTypeName.equals(currentTypeName)) {
         addSourceObject(sourceObject);
         objects[SOURCE_INDEX] = null;
@@ -188,14 +186,14 @@ public abstract class AbstractMergeProcess extends
     setUp();
     try {
       DataObjectMetaData currentType = null;
-      QName currentTypeName = null;
+      String currentTypeName = null;
       final Channel<DataObject>[] channels = ArrayUtil.create(in, otherIn);
 
       final boolean[] guard = new boolean[] {
         true, true
       };
       final DataObject[] objects = new DataObject[2];
-      final QName[] typeNames = new QName[2];
+      final String[] typePaths = new String[2];
       for (int i = 0; i < 2; i++) {
         try {
           final Channel<DataObject> channel = channels[i];
@@ -210,7 +208,7 @@ public abstract class AbstractMergeProcess extends
             } while (!accept);
             if (accept) {
               objects[i] = object;
-              typeNames[i] = objects[i].getMetaData().getName();
+              typePaths[i] = objects[i].getMetaData().getPath();
             }
 
           }
@@ -219,14 +217,14 @@ public abstract class AbstractMergeProcess extends
         }
       }
       final DataObject otherObject = objects[OTHER_INDEX];
-      if (typeNames[SOURCE_INDEX] != null) {
+      if (typePaths[SOURCE_INDEX] != null) {
         final DataObject sourceObject = objects[SOURCE_INDEX];
-        if (typeNames[OTHER_INDEX] != null) {
-          final int nameCompare = typeNames[SOURCE_INDEX].toString().compareTo(
-            typeNames[OTHER_INDEX].toString());
+        if (typePaths[OTHER_INDEX] != null) {
+          final int nameCompare = typePaths[SOURCE_INDEX].toString().compareTo(
+            typePaths[OTHER_INDEX].toString());
           if (nameCompare <= 0) {
             currentType = sourceObject.getMetaData();
-            currentTypeName = typeNames[SOURCE_INDEX];
+            currentTypeName = typePaths[SOURCE_INDEX];
             addSourceObject(sourceObject);
             objects[SOURCE_INDEX] = null;
             if (nameCompare != 0) {
@@ -235,7 +233,7 @@ public abstract class AbstractMergeProcess extends
           }
           if (nameCompare >= 0) {
             currentType = otherObject.getMetaData();
-            currentTypeName = typeNames[OTHER_INDEX];
+            currentTypeName = typePaths[OTHER_INDEX];
             addOtherObject(otherObject);
             objects[OTHER_INDEX] = null;
             if (nameCompare != 0) {
@@ -244,14 +242,14 @@ public abstract class AbstractMergeProcess extends
           }
         } else {
           currentType = sourceObject.getMetaData();
-          currentTypeName = typeNames[SOURCE_INDEX];
+          currentTypeName = typePaths[SOURCE_INDEX];
           if (otherObject != null) {
             addSourceObject(otherObject);
           }
         }
       } else {
         currentType = otherObject.getMetaData();
-        currentTypeName = typeNames[OTHER_INDEX];
+        currentTypeName = typePaths[OTHER_INDEX];
         if (otherObject != null) {
           addOtherObject(otherObject);
         }
@@ -266,9 +264,9 @@ public abstract class AbstractMergeProcess extends
             final DataObject object = channels[channelIndex].read();
             if (acceptObject(object)) {
               final DataObjectMetaData type = object.getMetaData();
-              final QName typeName = type.getName();
-              if (currentTypeName == null || typeName.equals(currentTypeName)) {
-                currentTypeName = typeName;
+              final String typePath = type.getPath();
+              if (currentTypeName == null || typePath.equals(currentTypeName)) {
+                currentTypeName = typePath;
                 currentType = type;
 
                 if (channelIndex == SOURCE_INDEX) {
@@ -283,7 +281,7 @@ public abstract class AbstractMergeProcess extends
                 currentType = addSavedObjects(currentType, currentTypeName,
                   out, guard, objects);
                 if (currentType != null) {
-                  currentTypeName = currentType.getName();
+                  currentTypeName = currentType.getPath();
                 }
               }
             }

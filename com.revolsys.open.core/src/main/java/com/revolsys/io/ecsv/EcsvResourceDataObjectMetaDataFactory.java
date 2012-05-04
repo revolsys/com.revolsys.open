@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.xml.namespace.QName;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +19,7 @@ public class EcsvResourceDataObjectMetaDataFactory extends
   AbstractObjectWithProperties implements ApplicationContextAware,
   DataObjectMetaDataFactory {
 
-  private final Map<QName, DataObjectMetaData> metaDataMap = new HashMap<QName, DataObjectMetaData>();
+  private final Map<String, DataObjectMetaData> metaDataMap = new HashMap<String, DataObjectMetaData>();
 
   private String locationPattern;
 
@@ -30,8 +29,8 @@ public class EcsvResourceDataObjectMetaDataFactory extends
     return locationPattern;
   }
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    return metaDataMap.get(typeName);
+  public DataObjectMetaData getMetaData(final String typePath) {
+    return metaDataMap.get(typePath);
   }
 
   @PostConstruct
@@ -39,7 +38,7 @@ public class EcsvResourceDataObjectMetaDataFactory extends
     try {
       for (final Resource resource : applicationContext.getResources(locationPattern)) {
         final DataObjectMetaData metaData = EcsvIoFactory.readSchema(resource);
-        final QName name = metaData.getName();
+        final String name = metaData.getPath();
         metaDataMap.put(name, metaData);
       }
     } catch (final IOException e) {

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.postgresql.geometric.PGbox;
 import org.springframework.util.StringUtils;
@@ -17,6 +16,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
@@ -37,40 +37,52 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     setDataSource(dataSource);
   }
 
-  public PostgreSQLDataObjectStore(PostgreSQLDatabaseFactory databaseFactory,
-    Map<String, ? extends Object> connectionProperties) {
+  public PostgreSQLDataObjectStore(final DataSource dataSource) {
+    super(dataSource);
+  }
+
+  public PostgreSQLDataObjectStore(
+    final PostgreSQLDatabaseFactory databaseFactory,
+    final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
-    DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
 
   }
 
-  public PostgreSQLDataObjectStore(DataSource dataSource) {
-    super(dataSource);
+  @Override
+  public Query createBoundingBoxQuery(
+    final Query query,
+    final BoundingBox boundingBox) {
+    final Query boundingBoxQuery = query.clone();
+    final String typePath = boundingBoxQuery.getTypeName();
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      throw new IllegalArgumentException("Unable to  find table " + typePath);
+    } else {
+      final double x1 = boundingBox.getMinX();
+      final double y1 = boundingBox.getMinY();
+      final double x2 = boundingBox.getMaxX();
+      final double y2 = boundingBox.getMaxY();
+      String whereClause = boundingBoxQuery.getWhereClause();
+      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      if (StringUtils.hasText(whereClause)) {
+        whereClause = "(" + whereClause + ") AND " + geometryAttributeName
+          + " && ?";
+      } else {
+        whereClause = geometryAttributeName + " && ?";
+      }
+      boundingBoxQuery.setWhereClause(whereClause);
+      final PGbox box = new PGbox(x1, y1, x2, y2);
+      boundingBoxQuery.addParameter(box);
+      return boundingBoxQuery;
+    }
   }
 
   @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     final String sequenceName = getSequenceName(metaData);
     return "nextval('" + sequenceName + "')";
-  }
-
-  public String getSequenceName(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String schema = getDatabaseSchemaName(typeName.getNamespaceURI());
-    String shortName = ShortNameProperty.getShortName(metaData);
-    if (StringUtils.hasText(shortName)) {
-      final String sequenceName = schema + "." + shortName.toLowerCase()
-        + "_seq";
-      return sequenceName;
-    } else {
-      final String tableName = getDatabaseTableName(typeName);
-      final String idAttributeName = metaData.getIdAttributeName()
-        .toLowerCase();
-      final String sequenceName = schema + "." + tableName + "_"
-        + idAttributeName + "_seq";
-      return sequenceName;
-    }
   }
 
   public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
@@ -91,6 +103,24 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
         sequenceName);
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Cannot create ID for " + sequenceName);
+    }
+  }
+
+  public String getSequenceName(final DataObjectMetaData metaData) {
+    final String typePath = metaData.getPath();
+    final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
+    final String shortName = ShortNameProperty.getShortName(metaData);
+    if (StringUtils.hasText(shortName)) {
+      final String sequenceName = schema + "." + shortName.toLowerCase()
+        + "_seq";
+      return sequenceName;
+    } else {
+      final String tableName = getDatabaseTableName(typePath);
+      final String idAttributeName = metaData.getIdAttributeName()
+        .toLowerCase();
+      final String sequenceName = schema + "." + tableName + "_"
+        + idAttributeName + "_seq";
+      return sequenceName;
     }
   }
 
@@ -138,33 +168,5 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttributeAdder geometryAttributeAdder = new PostgreSQLGeometryAttributeAdder(
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
-  }
-
-  public Query createBoundingBoxQuery(
-    final Query query,
-    final BoundingBox boundingBox) {
-    Query boundingBoxQuery = query.clone();
-    final QName typeName = boundingBoxQuery.getTypeName();
-    DataObjectMetaData metaData = getMetaData(typeName);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Unable to  find table " + typeName);
-    } else {
-      final double x1 = boundingBox.getMinX();
-      final double y1 = boundingBox.getMinY();
-      final double x2 = boundingBox.getMaxX();
-      final double y2 = boundingBox.getMaxY();
-      String whereClause = boundingBoxQuery.getWhereClause();
-      final String geometryAttributeName = metaData.getGeometryAttributeName();
-      if (StringUtils.hasText(whereClause)) {
-        whereClause = "(" + whereClause + ") AND " + geometryAttributeName
-          + " && ?";
-      } else {
-        whereClause = geometryAttributeName + " && ?";
-      }
-      boundingBoxQuery.setWhereClause(whereClause);
-      final PGbox box = new PGbox(x1, y1, x2, y2);
-      boundingBoxQuery.addParameter(box);
-      return boundingBoxQuery;
-    }
   }
 }

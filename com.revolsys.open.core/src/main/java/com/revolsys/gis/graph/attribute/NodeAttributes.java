@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.NumberComparator;
@@ -34,33 +32,33 @@ public class NodeAttributes {
       return angles;
     }
 
-    public static Map<QName, Set<Double>> edgeAnglesByType(final Node<?> node) {
-      final Map<QName, Set<Double>> anglesByType = new HashMap<QName, Set<Double>>();
+    public static Map<String, Set<Double>> edgeAnglesByType(final Node<?> node) {
+      final Map<String, Set<Double>> anglesByType = new HashMap<String, Set<Double>>();
       for (final Edge<?> edge : node.getInEdges()) {
-        final QName typeName = edge.getTypeName();
+        final String typePath = edge.getTypeName();
         final double toAngle = edge.getToAngle();
-        final Set<Double> angles = getAnglesForType(anglesByType, typeName);
+        final Set<Double> angles = getAnglesForType(anglesByType, typePath);
         angles.add(toAngle);
       }
       for (final Edge<?> edge : node.getOutEdges()) {
-        final QName typeName = edge.getTypeName();
+        final String typePath = edge.getTypeName();
         final double fromAngle = edge.getFromAngle();
-        final Set<Double> angles = getAnglesForType(anglesByType, typeName);
+        final Set<Double> angles = getAnglesForType(anglesByType, typePath);
         angles.add(fromAngle);
       }
       return anglesByType;
     }
 
-    public static <T> Map<LineString, Map<QName, Set<Edge<T>>>> edgesByLineAndTypeName(
+    public static <T> Map<LineString, Map<String, Set<Edge<T>>>> edgesByLineAndTypeName(
       final Node<T> node) {
       final List<Edge<T>> edges = node.getEdges();
-      final Map<LineString, Map<QName, Set<Edge<T>>>> lineEdgeMap = new HashMap<LineString, Map<QName, Set<Edge<T>>>>();
+      final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap = new HashMap<LineString, Map<String, Set<Edge<T>>>>();
       for (final Edge<T> edge : new HashSet<Edge<T>>(edges)) {
         LineString line = edge.getLine();
-        Map<QName, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap,
+        Map<String, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap,
           line);
         if (edgesByType == null) {
-          edgesByType = new HashMap<QName, Set<Edge<T>>>();
+          edgesByType = new HashMap<String, Set<Edge<T>>>();
           if (!edge.isForwards(node)) {
             line = LineStringUtil.reverse(line);
           }
@@ -69,32 +67,32 @@ public class NodeAttributes {
         Set<Edge<T>> typeEdges = edgesByType.get(edge.getTypeName());
         if (typeEdges == null) {
           typeEdges = new HashSet<Edge<T>>();
-          final QName typeName = edge.getTypeName();
-          edgesByType.put(typeName, typeEdges);
+          final String typePath = edge.getTypeName();
+          edgesByType.put(typePath, typeEdges);
         }
         typeEdges.add(edge);
       }
       return lineEdgeMap;
     }
 
-    public static <T> Map<QName, List<Edge<T>>> edgesByType(final Node<T> node) {
-      final Map<QName, List<Edge<T>>> edgesByType = new HashMap<QName, List<Edge<T>>>();
+    public static <T> Map<String, List<Edge<T>>> edgesByType(final Node<T> node) {
+      final Map<String, List<Edge<T>>> edgesByType = new HashMap<String, List<Edge<T>>>();
       for (final Edge<T> edge : node.getEdges()) {
-        final QName typeName = edge.getTypeName();
-        List<Edge<T>> typeEdges = edgesByType.get(typeName);
+        final String typePath = edge.getTypeName();
+        List<Edge<T>> typeEdges = edgesByType.get(typePath);
         if (typeEdges == null) {
           typeEdges = new ArrayList<Edge<T>>();
-          edgesByType.put(typeName, typeEdges);
+          edgesByType.put(typePath, typeEdges);
         }
         typeEdges.add(edge);
       }
       return edgesByType;
     }
 
-    private static <T> Map<QName, Set<Edge<T>>> edgesByTypeForLine(
-      final Map<LineString, Map<QName, Set<Edge<T>>>> lineEdgeMap,
+    private static <T> Map<String, Set<Edge<T>>> edgesByTypeForLine(
+      final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap,
       final LineString line) {
-      for (final Entry<LineString, Map<QName, Set<Edge<T>>>> entry : lineEdgeMap.entrySet()) {
+      for (final Entry<LineString, Map<String, Set<Edge<T>>>> entry : lineEdgeMap.entrySet()) {
         final LineString keyLine = entry.getKey();
         if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
           return entry.getValue();
@@ -103,16 +101,16 @@ public class NodeAttributes {
       return null;
     }
 
-    public static <T> Map<QName, Map<LineString, Set<Edge<T>>>> edgesByTypeNameAndLine(
+    public static <T> Map<String, Map<LineString, Set<Edge<T>>>> edgesByTypeNameAndLine(
       final Node<T> node) {
       final List<Edge<T>> edges = node.getEdges();
-      final Map<QName, Map<LineString, Set<Edge<T>>>> typeLineEdgeMap = new HashMap<QName, Map<LineString, Set<Edge<T>>>>();
+      final Map<String, Map<LineString, Set<Edge<T>>>> typeLineEdgeMap = new HashMap<String, Map<LineString, Set<Edge<T>>>>();
       for (final Edge<T> edge : new HashSet<Edge<T>>(edges)) {
-        final QName typeName = edge.getTypeName();
-        Map<LineString, Set<Edge<T>>> lineEdgeMap = typeLineEdgeMap.get(typeName);
+        final String typePath = edge.getTypeName();
+        Map<LineString, Set<Edge<T>>> lineEdgeMap = typeLineEdgeMap.get(typePath);
         if (lineEdgeMap == null) {
           lineEdgeMap = new HashMap<LineString, Set<Edge<T>>>();
-          typeLineEdgeMap.put(typeName, lineEdgeMap);
+          typeLineEdgeMap.put(typePath, lineEdgeMap);
         }
 
         Edge.addEdgeToEdgesByLine(node, lineEdgeMap, edge);
@@ -120,22 +118,22 @@ public class NodeAttributes {
       return typeLineEdgeMap;
     }
 
-    public static Set<QName> edgeTypeNames(final Node<?> node) {
-      final Set<QName> typeNames = new HashSet<QName>();
+    public static Set<String> edgeTypeNames(final Node<?> node) {
+      final Set<String> typePaths = new HashSet<String>();
       for (final Edge<?> edge : node.getEdges()) {
-        final QName typeName = edge.getTypeName();
-        typeNames.add(typeName);
+        final String typePath = edge.getTypeName();
+        typePaths.add(typePath);
       }
-      return typeNames;
+      return typePaths;
     }
 
     public static Set<Double> getAnglesForType(
-      final Map<QName, Set<Double>> anglesByType,
-      final QName typeName) {
-      Set<Double> angles = anglesByType.get(typeName);
+      final Map<String, Set<Double>> anglesByType,
+      final String typePath) {
+      Set<Double> angles = anglesByType.get(typePath);
       if (angles == null) {
         angles = new TreeSet<Double>(new NumberComparator<Double>());
-        anglesByType.put(typeName, angles);
+        anglesByType.put(typePath, angles);
       }
       return angles;
     }
@@ -169,15 +167,15 @@ public class NodeAttributes {
     return getAttribute(node, EDGE_ANGLES);
   }
 
-  public static Map<QName, Set<Double>> getEdgeAnglesByType(final Node<?> node) {
+  public static Map<String, Set<Double>> getEdgeAnglesByType(final Node<?> node) {
     return getAttribute(node, EDGE_ANGLES_BY_TYPE);
   }
 
   public static <T> Set<Double> getEdgeAnglesByType(
     final Node<T> node,
-    final QName typeName) {
-    final Map<QName, Set<Double>> anglesByType = getEdgeAnglesByType(node);
-    final Set<Double> angles = anglesByType.get(typeName);
+    final String typePath) {
+    final Map<String, Set<Double>> anglesByType = getEdgeAnglesByType(node);
+    final Set<Double> angles = anglesByType.get(typePath);
     return angles;
   }
 
@@ -189,32 +187,32 @@ public class NodeAttributes {
    * @param node The node.
    * @return The map.
    */
-  public static <T> Map<LineString, Map<QName, Set<Edge<T>>>> getEdgesByLineAndTypeName(
+  public static <T> Map<LineString, Map<String, Set<Edge<T>>>> getEdgesByLineAndTypeName(
     final Node<T> node) {
     return getAttribute(node, EDGES_BY_LINE_AND_TYPE_NAME);
   }
 
-  public static <T> Map<QName, List<Edge<T>>> getEdgesByType(final Node<T> node) {
+  public static <T> Map<String, List<Edge<T>>> getEdgesByType(final Node<T> node) {
     return getAttribute(node, EDGES_BY_TYPE);
   }
 
   public static <T> List<Edge<T>> getEdgesByType(
     final Node<T> node,
-    final QName typeName) {
-    final Map<QName, List<Edge<T>>> edgesByType = getEdgesByType(node);
-    final List<Edge<T>> edges = edgesByType.get(typeName);
+    final String typePath) {
+    final Map<String, List<Edge<T>>> edgesByType = getEdgesByType(node);
+    final List<Edge<T>> edges = edgesByType.get(typePath);
     if (edges != null) {
       return new ArrayList<Edge<T>>(edges);
     }
     return Collections.emptyList();
   }
 
-  public static <T> Map<QName, Map<LineString, Set<Edge<T>>>> getEdgesByTypeNameAndLine(
+  public static <T> Map<String, Map<LineString, Set<Edge<T>>>> getEdgesByTypeNameAndLine(
     final Node<T> node) {
     return getAttribute(node, EDGES_BY_TYPE_NAME_AND_LINE);
   }
 
-  public static Set<QName> getEdgeTypeNames(final Node<? extends Object> node) {
+  public static Set<String> getEdgeTypeNames(final Node<? extends Object> node) {
     return getAttribute(node, EDGE_TYPE_NAMES);
   }
 

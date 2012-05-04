@@ -62,10 +62,6 @@ public class Attribute extends AbstractObjectWithProperties implements
   public Attribute() {
   }
 
-  public void setType(DataType type) {
-    this.type = type;
-  }
-
   public Attribute(final Attribute attribute) {
     this.name = attribute.getName();
     this.description = attribute.getDescription();
@@ -341,6 +337,14 @@ public class Attribute extends AbstractObjectWithProperties implements
     this.index = index;
   }
 
+  public void setRequired(final boolean required) {
+    this.required = required;
+  }
+
+  public void setType(final DataType type) {
+    this.type = type;
+  }
+
   @Override
   public String toString() {
     final StringBuffer string = new StringBuffer(name);
@@ -356,9 +360,5 @@ public class Attribute extends AbstractObjectWithProperties implements
       string.append(')');
     }
     return string.toString();
-  }
-
-  public void setRequired(boolean required) {
-    this.required = required;
   }
 }

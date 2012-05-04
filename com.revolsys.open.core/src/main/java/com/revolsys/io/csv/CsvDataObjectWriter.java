@@ -67,7 +67,8 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
 
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-        final StringConverter<Object> converter = StringConverterRegistry.getInstance().getConverter(dataTypeClass);
+        final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+          .getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {

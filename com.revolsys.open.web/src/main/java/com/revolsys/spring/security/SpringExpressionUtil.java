@@ -13,10 +13,10 @@ import com.revolsys.ui.web.utils.HttpRequestUtils;
 
 public class SpringExpressionUtil {
 
-  public static EvaluationContext createEvaluationContext(Object object) {
+  public static EvaluationContext createEvaluationContext(final Object object) {
     final EvaluationContext evaluationContext = new StandardEvaluationContext(
       object);
-    Map<String, String> pathVariables = HttpRequestUtils.getPathVariables();
+    final Map<String, String> pathVariables = HttpRequestUtils.getPathVariables();
     setVariables(evaluationContext, pathVariables);
     return evaluationContext;
   }
@@ -32,10 +32,10 @@ public class SpringExpressionUtil {
 
   public static void setVariables(
     final EvaluationContext evaluationContext,
-    Map<String, String> variables) {
-    for (Entry<String, String> variable : variables.entrySet()) {
-      String name = variable.getKey();
-      String value = variable.getValue();
+    final Map<String, String> variables) {
+    for (final Entry<String, String> variable : variables.entrySet()) {
+      final String name = variable.getKey();
+      final String value = variable.getValue();
       evaluationContext.setVariable(name, value);
     }
   }

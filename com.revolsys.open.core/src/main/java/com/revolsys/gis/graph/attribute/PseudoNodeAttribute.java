@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.Edge;
@@ -25,14 +23,14 @@ public class PseudoNodeAttribute {
 
   private final List<EdgePair<DataObject>> reversedEdgePairs = new ArrayList<EdgePair<DataObject>>();
 
-  private final QName typeName;
+  private final String typePath;
 
-  public PseudoNodeAttribute(final Node<DataObject> node, final QName typeName,
-    final Collection<String> equalExcludeAttributes) {
-    this.typeName = typeName;
+  public PseudoNodeAttribute(final Node<DataObject> node,
+    final String typePath, final Collection<String> equalExcludeAttributes) {
+    this.typePath = typePath;
     this.equalExcludeAttributes.addAll(equalExcludeAttributes);
-    final Map<QName, Map<LineString, Set<Edge<DataObject>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
-    final Map<LineString, Set<Edge<DataObject>>> edgesByLine = edgesByTypeNameAndLine.get(typeName);
+    final Map<String, Map<LineString, Set<Edge<DataObject>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
+    final Map<LineString, Set<Edge<DataObject>>> edgesByLine = edgesByTypeNameAndLine.get(typePath);
     init(node, edgesByLine);
   }
 
@@ -58,8 +56,8 @@ public class PseudoNodeAttribute {
     return reversedEdgePairs;
   }
 
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeName() {
+    return typePath;
   }
 
   private void init(

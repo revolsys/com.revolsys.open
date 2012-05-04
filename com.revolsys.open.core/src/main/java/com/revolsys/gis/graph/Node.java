@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
@@ -67,13 +65,13 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   public static <T> Collection<Edge<T>> getEdgesBetween(
-    final QName typeName,
+    final String typePath,
     final Node<T> node0,
     final Node<T> node1) {
     final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
     for (final Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
       final Edge<T> edge = edgeIter.next();
-      if (!edge.getTypeName().equals(typeName)) {
+      if (!edge.getTypeName().equals(typePath)) {
         edgeIter.remove();
       }
     }
@@ -89,7 +87,7 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   public static <T> boolean hasEdgesBetween(
-    final QName typeName,
+    final String typePath,
     final Node<T> node0,
     final Node<T> node1) {
     if (node1 == null) {
@@ -97,7 +95,7 @@ public class Node<T> extends AbstractCoordinates {
     }
     if (node0 == node1) {
       for (final Edge<T> edge : node0.getEdges()) {
-        if (edge.getTypeName().equals(typeName)) {
+        if (edge.getTypeName().equals(typePath)) {
           if (edge.getFromNode() == edge.getToNode()) {
             return true;
           }
@@ -105,14 +103,14 @@ public class Node<T> extends AbstractCoordinates {
       }
     } else {
       for (final Edge<T> edge : node0.getEdges()) {
-        if (edge.getTypeName().equals(typeName)) {
+        if (edge.getTypeName().equals(typePath)) {
           if (edge.hasNode(node1)) {
             return true;
           }
         }
       }
       for (final Edge<T> edge : node1.getEdges()) {
-        if (edge.getTypeName().equals(typeName)) {
+        if (edge.getTypeName().equals(typePath)) {
           if (edge.hasNode(node0)) {
             return true;
           }
@@ -175,10 +173,10 @@ public class Node<T> extends AbstractCoordinates {
     return this.x == x && this.y == y;
   }
 
-  public Coordinates get3dCoordinates(final QName typeName) {
+  public Coordinates get3dCoordinates(final String typePath) {
     if (!isRemoved()) {
 
-      final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typeName);
+      final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typePath);
       if (!edges.isEmpty()) {
         Coordinates coordinates = null;
         for (final Edge<T> edge : edges) {

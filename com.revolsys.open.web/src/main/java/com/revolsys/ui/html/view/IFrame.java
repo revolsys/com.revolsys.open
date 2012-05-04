@@ -8,7 +8,8 @@ public class IFrame extends Element {
   private final String src;
 
   private String cssClass;
-private String style;
+
+  private String style;
 
   public IFrame(final String src) {
     this.src = src;

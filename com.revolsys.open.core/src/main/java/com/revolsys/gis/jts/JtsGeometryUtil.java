@@ -15,7 +15,6 @@ import java.util.TreeMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -746,6 +745,10 @@ public final class JtsGeometryUtil {
     return getOrdinateRange(coordinates, 3);
   }
 
+  public static double[] getMRange(final Geometry geometry) {
+    return getOrdinateRange(geometry, 3);
+  }
+
   public static double[] getOrdinateRange(
     final CoordinateSequence coordinates,
     final int ordinateIndex) {
@@ -766,7 +769,7 @@ public final class JtsGeometryUtil {
   }
 
   public static void getOrdinateRange(
-    double[] range,
+    final double[] range,
     final CoordinatesList coordinates,
     final int ordinateIndex) {
     double min = range[0];
@@ -784,21 +787,13 @@ public final class JtsGeometryUtil {
     range[1] = max;
   }
 
-  public static double[] getZRange(final Geometry geometry) {
-    return getOrdinateRange(geometry, 2);
-  }
-
-  public static double[] getMRange(final Geometry geometry) {
-    return getOrdinateRange(geometry, 3);
-  }
-
   public static double[] getOrdinateRange(
     final Geometry geometry,
-    int ordinateIndex) {
-    double[] range = {
+    final int ordinateIndex) {
+    final double[] range = {
       Double.MAX_VALUE, Double.MIN_VALUE
     };
-    for (CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
+    for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
       getOrdinateRange(range, points, ordinateIndex);
     }
     return range;
@@ -806,6 +801,10 @@ public final class JtsGeometryUtil {
 
   public static double[] getZRange(final CoordinateSequence coordinates) {
     return getOrdinateRange(coordinates, 2);
+  }
+
+  public static double[] getZRange(final Geometry geometry) {
+    return getOrdinateRange(geometry, 2);
   }
 
   /**

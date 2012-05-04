@@ -65,7 +65,7 @@ public class Triangle extends AbstractCoordinatesList {
     final Coordinates line2End) {
     final CoordinatesList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
-    for (Coordinates point : intersections) {
+    for (final Coordinates point : intersections) {
       coordinates.add(point);
     }
   }
@@ -76,6 +76,7 @@ public class Triangle extends AbstractCoordinatesList {
    * @param coordinate The coordinate.
    * @return True if the coordinate lies inside or on the edge of the Triangle.
    */
+  @Override
   public boolean contains(final Coordinates coordinate) {
     final int triangleOrientation = CoordinatesUtil.orientationIndex(getP0(),
       getP1(), getP2());

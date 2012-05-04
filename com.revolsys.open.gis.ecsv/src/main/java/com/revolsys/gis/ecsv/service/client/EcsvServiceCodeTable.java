@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.io.Reader;
@@ -15,7 +13,7 @@ public class EcsvServiceCodeTable extends AbstractCodeTable {
 
   private String idColumn;
 
-  private QName typeName;
+  private String typePath;
 
   private List<String> valueNames;
 
@@ -23,9 +21,9 @@ public class EcsvServiceCodeTable extends AbstractCodeTable {
   }
 
   public EcsvServiceCodeTable(final EcsvDataObjectStore client,
-    final QName typeName, final String idColumnName, final String... valueNames) {
+    final String path, final String idColumnName, final String... valueNames) {
     this.client = client;
-    this.typeName = typeName;
+    this.typePath = typePath;
     this.idColumn = idColumnName;
     this.valueNames = Arrays.asList(valueNames);
   }
@@ -52,7 +50,7 @@ public class EcsvServiceCodeTable extends AbstractCodeTable {
   }
 
   private void loadValues() {
-    final Reader<? extends DataObject> reader = client.query(typeName);
+    final Reader<? extends DataObject> reader = client.query(typePath);
     for (final DataObject code : reader) {
       final Number id = (Number)code.getValue(idColumn);
       final List<Object> values = new ArrayList<Object>();

@@ -39,7 +39,7 @@ public class NumberAttribute extends FusionTablesAttribute {
       } else {
         return new BigDecimal(string);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       return string;
     }
   }

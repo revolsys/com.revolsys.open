@@ -93,7 +93,7 @@ public class DataObjectEquals implements Equals<DataObject> {
     if (object1 != null && object2 != null) {
       final DataObjectMetaData metaData1 = object1.getMetaData();
       final DataObjectMetaData metaData2 = object2.getMetaData();
-      if (metaData1.getName().equals(metaData2.getName())) {
+      if (metaData1.getPath().equals(metaData2.getPath())) {
         if (metaData1.getAttributeCount() == metaData2.getAttributeCount()) {
           final int idIndex = metaData1.getIdAttributeIndex();
           final int geometryIndex = metaData1.getGeometryAttributeIndex();

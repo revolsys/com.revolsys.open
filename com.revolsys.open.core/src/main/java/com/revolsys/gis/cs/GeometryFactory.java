@@ -438,6 +438,12 @@ public class GeometryFactory extends
     return createLinearRing(newPoints);
   }
 
+  public LineString createLineString() {
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
+      getNumAxis());
+    return createLineString(points);
+  }
+
   public LineString createLineString(final Coordinates... points) {
     final List<Coordinates> p = Arrays.asList(points);
     return createLineString(p);
@@ -510,6 +516,12 @@ public class GeometryFactory extends
     return toMultiPolygon(this, polygons);
   }
 
+  public Point createPoint() {
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
+      getNumAxis());
+    return createPoint(points);
+  }
+
   public Point createPoint(final Coordinates point) {
     if (point == null) {
       return createPoint((Coordinate)null);
@@ -521,21 +533,6 @@ public class GeometryFactory extends
       coordinatesList.makePrecise(coordinatesPrecisionModel);
       return super.createPoint(coordinatesList);
     }
-  }
-
-  public Point createPoint() {
-    DoubleCoordinatesList points = new DoubleCoordinatesList(0, getNumAxis());
-    return createPoint(points);
-  }
-
-  public LineString createLineString() {
-    DoubleCoordinatesList points = new DoubleCoordinatesList(0, getNumAxis());
-    return createLineString(points);
-  }
-
-  public Polygon createPolygon() {
-    DoubleCoordinatesList points = new DoubleCoordinatesList(0, getNumAxis());
-    return createPolygon(points);
   }
 
   public Point createPoint(final CoordinatesList points) {
@@ -555,6 +552,12 @@ public class GeometryFactory extends
     final CoordinatesList newPoints = createCoordinatesList(points);
     return createPoint(newPoints);
 
+  }
+
+  public Polygon createPolygon() {
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
+      getNumAxis());
+    return createPolygon(points);
   }
 
   public Polygon createPolygon(final CoordinatesList... rings) {

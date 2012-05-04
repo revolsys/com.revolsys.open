@@ -58,7 +58,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    */
   public HibernateCriteriaPager(final Criteria criteria) {
     this.criteria = criteria;
-    ScrollableResults scrollableResults = criteria.scroll();
+    final ScrollableResults scrollableResults = criteria.scroll();
     scrollableResults.last();
     this.numResults = scrollableResults.getRowNumber() + 1;
   }
@@ -77,44 +77,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
     setPageNumber(pageNumber);
   }
 
-  /**
-   * Get the number of pages.
-   * 
-   * @return The number of pages.
-   */
-  public int getNumPages() {
-    return numPages + 1;
-  }
-
-  /**
-   * Get the list of objects in the current page.
-   * 
-   * @return The list of objects in the current page.
-   */
-  public List<T> getList() {
-    if (results == null) {
-      throw new IllegalStateException(
-        "The page number must be set using setPageNumber");
-    }
-    return results;
-  }
-
-  /**
-   * Get the total number of results returned.
-   * 
-   * @return The total number of results returned.
-   */
-  public int getNumResults() {
-    return numResults;
-  }
-
-  /**
-   * Get the index of the first object in the current page.
-   * 
-   * @return The index of the first object in the current page.
-   */
-  public int getStartIndex() {
-    return (pageNumber * pageSize) + 1;
+  public void close() {
   }
 
   /**
@@ -131,12 +94,43 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
   }
 
   /**
+   * Get the list of objects in the current page.
+   * 
+   * @return The list of objects in the current page.
+   */
+  public List<T> getList() {
+    if (results == null) {
+      throw new IllegalStateException(
+        "The page number must be set using setPageNumber");
+    }
+    return results;
+  }
+
+  /**
    * Get the page number of the next page.
    * 
    * @return Thepage number of the next page.
    */
   public int getNextPageNumber() {
     return pageNumber + 2;
+  }
+
+  /**
+   * Get the number of pages.
+   * 
+   * @return The number of pages.
+   */
+  public int getNumPages() {
+    return numPages + 1;
+  }
+
+  /**
+   * Get the total number of results returned.
+   * 
+   * @return The total number of results returned.
+   */
+  public int getNumResults() {
+    return numResults;
   }
 
   /**
@@ -164,6 +158,15 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    */
   public int getPreviousPageNumber() {
     return pageNumber;
+  }
+
+  /**
+   * Get the index of the first object in the current page.
+   * 
+   * @return The index of the first object in the current page.
+   */
+  public int getStartIndex() {
+    return (pageNumber * pageSize) + 1;
   }
 
   /**
@@ -238,12 +241,9 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
         criteria.setFirstResult(pageNumber * pageSize);
         criteria.setMaxResults(pageSize);
         this.results = criteria.list();
-      } catch (HibernateException e) {
+      } catch (final HibernateException e) {
         throw SessionFactoryUtils.convertHibernateAccessException(e);
       }
     }
-  }
-
-  public void close() {
   }
 }

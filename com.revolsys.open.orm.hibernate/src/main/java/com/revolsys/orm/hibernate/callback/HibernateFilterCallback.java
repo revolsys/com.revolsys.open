@@ -32,10 +32,10 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 public class HibernateFilterCallback implements HibernateCallback {
   /** The collection to filter. */
-  private Collection collection;
+  private final Collection collection;
 
   /** The filter to apply to the collection. */
-  private String filter;
+  private final String filter;
 
   /**
    * Construct a new HibernateFilterCallback.

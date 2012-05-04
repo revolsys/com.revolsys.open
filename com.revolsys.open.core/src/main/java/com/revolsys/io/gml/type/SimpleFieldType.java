@@ -6,7 +6,7 @@ import com.revolsys.io.xml.XmlWriter;
 public class SimpleFieldType extends AbstractGmlFieldType {
 
   public SimpleFieldType(final DataType dataType) {
-    super(dataType, "xs:" + dataType.getName().getLocalPart());
+    super(dataType, "xs:" + dataType.getName());
   }
 
   @Override

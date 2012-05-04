@@ -8,11 +8,13 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
+  private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodAfterCommit.class);
+
   public static <V> void invoke(
     final Object object,
     final String methodName,
     final Object... args) {
-    InvokeMethodAfterCommit synchronization = new InvokeMethodAfterCommit(
+    final InvokeMethodAfterCommit synchronization = new InvokeMethodAfterCommit(
       object, methodName, args);
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       TransactionSynchronizationManager.registerSynchronization(synchronization);
@@ -21,18 +23,16 @@ public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
     }
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodAfterCommit.class);
-
   private final Runnable runnable;
-
-  public InvokeMethodAfterCommit(final Object object, final String methodName,
-    final Object... args) {
-    runnable = new InvokeMethodRunnable(object, methodName, args);
-  }
 
   public InvokeMethodAfterCommit(final Class<?> clazz, final String methodName,
     final Object... args) {
     runnable = new InvokeMethodRunnable(clazz, methodName, args);
+  }
+
+  public InvokeMethodAfterCommit(final Object object, final String methodName,
+    final Object... args) {
+    runnable = new InvokeMethodRunnable(object, methodName, args);
   }
 
   @Override

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -17,7 +15,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class PointConverter implements OsnConverter {
-  private String geometryClass = "Point";
+  private String geometryClass = "/Point";
 
   private final GeometryFactory geometryFactory;
 
@@ -44,8 +42,8 @@ public class PointConverter implements OsnConverter {
     while (attributeName != null) {
       if (attributeName.equals("coords")) {
         Coordinates coordinate = null;
-        final QName coordTypeName = iterator.nextObjectName();
-        if (coordTypeName.equals(new QName("Coord3D"))) {
+        final String coordTypeName = iterator.nextObjectName();
+        if (coordTypeName.equals("/Coord3D")) {
           final double x = iterator.nextDoubleAttribute("c1");
           final double y = iterator.nextDoubleAttribute("c2");
           double z = iterator.nextDoubleAttribute("c3");
@@ -53,7 +51,7 @@ public class PointConverter implements OsnConverter {
             z = 0;
           }
           coordinate = new DoubleCoordinates(x, y, z);
-        } else if (coordTypeName.equals(new QName("Coord2D"))) {
+        } else if (coordTypeName.equals("/Coord2D")) {
           final double x = iterator.nextDoubleAttribute("c1");
           final double y = iterator.nextDoubleAttribute("c2");
           coordinate = new DoubleCoordinates(x, y);
@@ -94,11 +92,11 @@ public class PointConverter implements OsnConverter {
       serializer.startObject(geometryClass);
       serializer.attributeName("coords");
       if (numAxis == 2) {
-        serializer.startObject("Coord2D");
+        serializer.startObject("/Coord2D");
         serializer.attribute("c1", x, true);
         serializer.attribute("c2", y, false);
       } else {
-        serializer.startObject("Coord3D");
+        serializer.startObject("/Coord3D");
         serializer.attribute("c1", x, true);
         serializer.attribute("c2", y, true);
         if (Double.isNaN(z)) {

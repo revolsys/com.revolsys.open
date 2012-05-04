@@ -163,31 +163,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private Map<String, List<KeySerializer>> viewSerializers = new HashMap<String, List<KeySerializer>>();
 
-  @PreDestroy
-  public void destroy() {
-    beanFactory = null;
-    builderFactory = null;
-    classSerializers = null;
-    fieldInstructions = null;
-    fieldLabels = null;
-    fields = null;
-    idParameterName = null;
-    idPropertyName = null;
-    keyLists = null;
-    keySerializers = null;
-    labels = null;
-    log = null;
-    messages = null;
-    nullLabels = null;
-    orderBy = null;
-    pagesByName = null;
-    pageUrls = null;
-    pluralTitle = null;
-    title = null;
-    typeName = null;
-    viewSerializers = null;
-  }
-
   public HtmlUiBuilder() {
     final Class<?> clazz = getClass();
     final Method[] methods = clazz.getMethods();
@@ -227,7 +202,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Class<?> builderClass,
     final String pageName,
     final String style,
-    boolean open) {
+    final boolean open) {
     addCollapsibleIframe(container, builderClass.getName(), pageName, style,
       open);
   }
@@ -237,7 +212,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String builderName,
     final String pageName,
     final String style,
-    boolean open) {
+    final boolean open) {
     final HtmlUiBuilder<?> appBuilder = getBuilder(builderName);
     final Page page = appBuilder.getPage(pageName);
     if (page != null) {
@@ -338,10 +313,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public ElementContainer createDetailView(
     final Object object,
     final List<KeySerializer> serializers) {
-    KeySerializerDetailSerializer model = new KeySerializerDetailSerializer(
+    final KeySerializerDetailSerializer model = new KeySerializerDetailSerializer(
       serializers);
     model.setObject(object);
-    DetailView detailView = new DetailView(model, "objectView " + typeName);
+    final DetailView detailView = new DetailView(model, "objectView "
+      + typeName);
     return new ElementContainer(detailView);
   }
 
@@ -435,7 +411,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final HttpServletResponse response,
     final Map<String, Object> defaultValues,
     final String prefix,
-    String preInsertMethod) throws IOException, ServletException {
+    final String preInsertMethod) throws IOException, ServletException {
     final T object = createObject();
 
     JavaBeanUtil.setProperties(object, defaultValues);
@@ -549,6 +525,28 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
+  public ElementContainer createObjectListPage(
+    final HttpServletRequest request,
+    final List<T> results,
+    final String prefix) {
+    final String pageName = getName(prefix, "list");
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+    final ElementContainer tableView = createTableView(results, serializers,
+      null);
+    final String title = getPageTitle(pageName);
+
+    final ElementContainer container = new ElementContainer(tableView);
+    container.setDecorator(new CollapsibleBox(title, true));
+
+    setTitleAttribute(request, pageName);
+
+    final Menu actionMenu = new Menu();
+    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    addMenuElement(container, actionMenu);
+
+    return container;
+  }
+
   // public ElementContainer createObjectListPage(
   // final HttpServletRequest request,
   // final HttpServletResponse response,
@@ -622,28 +620,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   // return view;
   // }
 
-  public ElementContainer createObjectListPage(
-    final HttpServletRequest request,
-    final List<T> results,
-    final String prefix) {
-    final String pageName = getName(prefix, "list");
-    List<KeySerializer> serializers = getSerializers(pageName, "list");
-    final ElementContainer tableView = createTableView(results, serializers,
-      null);
-    final String title = getPageTitle(pageName);
-
-    final ElementContainer container = new ElementContainer(tableView);
-    container.setDecorator(new CollapsibleBox(title, true));
-
-    setTitleAttribute(request, pageName);
-
-    final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
-    addMenuElement(container, actionMenu);
-
-    return container;
-  }
-
   public Element createObjectListPage(
     final HttpServletRequest request,
     final ResultPager<T> pager,
@@ -658,7 +634,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     updateObjectListView(request, tableContainer, tableView, pager);
 
-    ElementContainer container = new ElementContainer(tableContainer);
+    final ElementContainer container = new ElementContainer(tableContainer);
     container.setDecorator(new CollapsibleBox(title, true));
 
     final Menu actionMenu = new Menu();
@@ -683,7 +659,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         log.error("Page not found " + pageName);
         throw new NoSuchRequestHandlingMethodException(request);
       } else {
-        List<KeySerializer> serializers = getSerializers(pageName, "view");
+        final List<KeySerializer> serializers = getSerializers(pageName, "view");
         final Element detailView = createDetailView(object, serializers);
 
         final String title = page.getExpandedTitle();
@@ -704,7 +680,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Collection<?> rows,
     final List<KeySerializer> serializers,
     final String noRecordsMessage) {
-    RowsTableSerializer model = new KeySerializerTableSerializer(serializers);
+    final RowsTableSerializer model = new KeySerializerTableSerializer(
+      serializers);
     model.setRows(rows);
     final TableView tableView = new TableView(model, "objectList " + typeName,
       null, noRecordsMessage);
@@ -719,7 +696,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String viewName,
     final String noRecordsMessage) {
     final List<String> keys = getKeyList(viewName);
-    RowsTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
+    final RowsTableSerializer model = new HtmlUiBuilderCollectionTableSerializer(
       this, keys);
     model.setRows(rows);
     final TableView tableView = new TableView(model, cssClass + " " + typeName,
@@ -734,6 +711,31 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String noRecordsMessage) {
     return createTableView(results, "objectList", null, keyListName,
       noRecordsMessage);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    beanFactory = null;
+    builderFactory = null;
+    classSerializers = null;
+    fieldInstructions = null;
+    fieldLabels = null;
+    fields = null;
+    idParameterName = null;
+    idPropertyName = null;
+    keyLists = null;
+    keySerializers = null;
+    labels = null;
+    log = null;
+    messages = null;
+    nullLabels = null;
+    orderBy = null;
+    pagesByName = null;
+    pageUrls = null;
+    pluralTitle = null;
+    title = null;
+    typeName = null;
+    viewSerializers = null;
   }
 
   /**
@@ -1103,13 +1105,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public String getPageUrlOld(final String name) {
-    final String url = pageUrls.get(name);
-    return url;
-  }
-
   public String getPageUrl(final String name) {
-    Map<String, Object> parameters = Collections.emptyMap();
+    final Map<String, Object> parameters = Collections.emptyMap();
     return getPageUrl(name, parameters);
   }
 
@@ -1125,6 +1122,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
+  public String getPageUrlOld(final String name) {
+    final String url = pageUrls.get(name);
+    return url;
+  }
+
   public Map<String, String> getPageUrls() {
     return pageUrls;
   }
@@ -1133,14 +1135,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return pluralTitle;
   }
 
+  public Object getProperty(final Object object, final String keyName) {
+    return JavaBeanUtil.getValue(object, keyName);
+  }
+
   public ResultPager<T> getResultPager(final Map<String, Object> filter) {
     throw new UnsupportedOperationException();
   }
 
   protected List<KeySerializer> getSerializers(final String viewName) {
-    List<KeySerializer> serializers = viewSerializers.get(viewName);
+    final List<KeySerializer> serializers = viewSerializers.get(viewName);
     if (serializers == null) {
-      List<String> elements = getKeyList(viewName);
+      final List<String> elements = getKeyList(viewName);
       if (elements != null) {
         setView(viewName, elements);
       }
@@ -1199,6 +1205,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     throw new UnsupportedOperationException();
   }
 
+  protected void notFound(
+    final HttpServletResponse response,
+    final String message) throws IOException {
+    response.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+  }
+
   public void postInsert(final T object) {
   }
 
@@ -1211,6 +1223,36 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public boolean preUpdate(final Form form, final T object) {
     return true;
+  }
+
+  public void redirect(final HttpServletResponse response, String url) {
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
+      final String value = request.getParameter(parameterName);
+      if (StringUtils.hasText(value)) {
+        parameters.put(parameterName, value);
+      }
+    }
+    url = UrlUtil.getUrl(url, parameters);
+    InvokeMethodAfterCommit.invoke(response, "sendRedirect", url);
+  }
+
+  public void redirectPage(
+    final HttpServletResponse response,
+    final String pageName) {
+    String url = getPageUrl(pageName);
+    if (url == null) {
+      url = "..";
+    }
+    redirect(response, url);
+  }
+
+  public void referrerRedirect(
+    final HttpServletRequest request,
+    final HttpServletResponse response) {
+    final String url = request.getHeader("Referer");
+    redirect(response, url);
   }
 
   /**
@@ -1349,16 +1391,16 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Object object,
     final String key,
     final String pageName,
-    Map<String, String> parameterKeys) {
+    final Map<String, String> parameterKeys) {
     final Map<String, Object> parameters = new HashMap<String, Object>();
     if (parameterKeys.isEmpty()) {
       final Object id = getIdValue(object);
       parameters.put(idParameterName, id);
     } else {
-      for (Entry<String, String> parameterKey : parameterKeys.entrySet()) {
-        String parameterName = parameterKey.getKey();
-        String keyName = parameterKey.getValue();
-        Object value = getProperty(object, keyName);
+      for (final Entry<String, String> parameterKey : parameterKeys.entrySet()) {
+        final String parameterName = parameterKey.getKey();
+        final String keyName = parameterKey.getValue();
+        final Object value = getProperty(object, keyName);
         if (value != null) {
           parameters.put(parameterName, value);
         }
@@ -1374,10 +1416,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       serialize(out, object, key);
       out.endTag(HtmlUtil.A);
     }
-  }
-
-  public Object getProperty(final Object object, String keyName) {
-    return JavaBeanUtil.getValue(object, keyName);
   }
 
   public void serializeLink(
@@ -1543,7 +1581,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void setSerializers(final Collection<KeySerializer> keySerializers) {
-    for (KeySerializer serializer : keySerializers) {
+    for (final KeySerializer serializer : keySerializers) {
       addKeySerializer(serializer);
     }
   }
@@ -1586,16 +1624,16 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  protected void setView(final String name, List<?> elements) {
-    List<KeySerializer> serializers = new ArrayList<KeySerializer>();
+  protected void setView(final String name, final List<?> elements) {
+    final List<KeySerializer> serializers = new ArrayList<KeySerializer>();
     this.viewSerializers.put(name, serializers);
-    for (Object element : elements) {
+    for (final Object element : elements) {
       if (element != null) {
         KeySerializer serializer = null;
         if (element instanceof KeySerializer) {
           serializer = (KeySerializer)element;
         } else {
-          String key = element.toString();
+          final String key = element.toString();
           serializer = keySerializers.get(key);
           if (serializer == null) {
             serializer = new BuilderSerializer(key, this);
@@ -1603,7 +1641,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
         if (serializer instanceof HtmlUiBuilderAware) {
           @SuppressWarnings("unchecked")
-          HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
+          final HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
           builderAware.setHtmlUiBuilder(this);
         }
         serializers.add(serializer);
@@ -1614,7 +1652,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public void setViews(final Map<String, List<?>> views) {
     for (final Entry<String, List<?>> view : views.entrySet()) {
       final String name = view.getKey();
-      List<?> elements = view.getValue();
+      final List<?> elements = view.getValue();
       setView(name, elements);
     }
   }
@@ -1650,7 +1688,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (pager.getNumResults() > 0) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> parameters = request.getParameterMap();
-        String baseUrl = HttpRequestUtils.getFullRequestUrl(request);
+        final String baseUrl = HttpRequestUtils.getFullRequestUrl(request);
         final ResultPagerView pagerView = new ResultPagerView(pager, baseUrl,
           parameters);
         listContainer.add(0, pagerView);
@@ -1663,40 +1701,5 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public boolean validateForm(final HtmlUiBuilderObjectForm form) {
     return true;
-  }
-
-  public void referrerRedirect(
-    final HttpServletRequest request,
-    final HttpServletResponse response) {
-    final String url = request.getHeader("Referer");
-    redirect(response, url);
-  }
-
-  public void redirect(final HttpServletResponse response, String url) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-    for (String parameterName : Arrays.asList("plain", "htmlCss")) {
-      String value = request.getParameter(parameterName);
-      if (StringUtils.hasText(value)) {
-        parameters.put(parameterName, value);
-      }
-    }
-    url = UrlUtil.getUrl(url, parameters);
-    InvokeMethodAfterCommit.invoke(response, "sendRedirect", url);
-  }
-
-  public void redirectPage(
-    final HttpServletResponse response,
-    final String pageName) {
-    String url = getPageUrl(pageName);
-    if (url == null) {
-      url = "..";
-    }
-    redirect(response, url);
-  }
-
-  protected void notFound(HttpServletResponse response, String message)
-    throws IOException {
-    response.sendError(HttpServletResponse.SC_NOT_FOUND, message);
   }
 }

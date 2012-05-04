@@ -26,7 +26,7 @@ public class CoordinatesListIndexLineSegmentIterator implements
     this.points = points;
   }
 
-  public CoordinatesListIndexLineSegmentIterator(LineString line) {
+  public CoordinatesListIndexLineSegmentIterator(final LineString line) {
     this.factory = GeometryFactory.getFactory(line);
     this.points = CoordinatesListUtil.get(line);
   }

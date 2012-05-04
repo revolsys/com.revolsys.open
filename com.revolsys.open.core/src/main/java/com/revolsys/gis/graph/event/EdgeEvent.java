@@ -2,8 +2,6 @@ package com.revolsys.gis.graph.event;
 
 import java.util.EventObject;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.graph.Edge;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -27,19 +25,19 @@ public class EdgeEvent<T> extends EventObject {
 
   private String ruleName;
 
-  private final QName typeName;
+  private final String typePath;
 
   public EdgeEvent(final Edge<T> edge) {
     super(edge);
     this.line = edge.getLine();
-    this.typeName = edge.getTypeName();
+    this.typePath = edge.getTypeName();
   }
 
   public EdgeEvent(final Edge<T> edge, final String ruleName,
     final String action) {
     super(edge);
     this.line = edge.getLine();
-    this.typeName = edge.getTypeName();
+    this.typePath = edge.getTypeName();
     this.ruleName = ruleName;
     this.action = action;
   }
@@ -48,7 +46,7 @@ public class EdgeEvent<T> extends EventObject {
     final String action, final String notes) {
     super(edge);
     this.line = edge.getLine();
-    this.typeName = edge.getTypeName();
+    this.typePath = edge.getTypeName();
     this.ruleName = ruleName;
     this.action = action;
     this.notes = notes;
@@ -83,8 +81,8 @@ public class EdgeEvent<T> extends EventObject {
     return (Edge<T>)super.getSource();
   }
 
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeName() {
+    return typePath;
   }
 
 }

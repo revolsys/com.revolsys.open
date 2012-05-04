@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 public interface CreationAudit {
   String getCreatedBy();
 
-  void setCreatedBy(String createdBy);
-
   Timestamp getCreationTimestamp();
+
+  void setCreatedBy(String createdBy);
 }

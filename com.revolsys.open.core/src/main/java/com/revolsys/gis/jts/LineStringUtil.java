@@ -55,82 +55,6 @@ public final class LineStringUtil {
 
   }
 
-  public static List<LineString> split(
-    GeometryFactory geometryFactory,
-    final LineString line,
-    LineSegmentIndex index,
-    double tolerance) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    final Coordinates firstCoordinate = points.get(0);
-    final int lastIndex = points.size() - 1;
-    final Coordinates lastCoordinate = points.get(lastIndex);
-    int startIndex = 0;
-    final List<LineString> newLines = new ArrayList<LineString>();
-    Coordinates startCoordinate = null;
-    Coordinates c0 = points.get(0);
-    for (int i = 1; i < points.size(); i++) {
-      final Coordinates c1 = points.get(i);
-
-      final List<CoordinatesList> intersectionPoints = index.queryIntersections(
-        c0, c1);
-      List<Coordinates> intersections = new ArrayList<Coordinates>();
-      for (CoordinatesList coordinatesList : intersectionPoints) {
-        intersections.addAll(coordinatesList.getList());
-      }
-      if (intersections.size() > 0) {
-        if (intersections.size() > 1) {
-          Collections.sort(intersections, new CoordinatesDistanceComparator(c0));
-        }
-        for (final Coordinates intersection : intersections) {
-          if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
-            if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
-            } else if (i == lastIndex
-              && intersection.distance(lastCoordinate) < tolerance) {
-            } else {
-              final double d0 = intersection.distance(c0);
-              final double d1 = intersection.distance(c1);
-              if (d0 <= tolerance) {
-                if (d1 > tolerance) {
-                  addLineString(geometryFactory, points, startCoordinate,
-                    startIndex, i - 1, null, newLines);
-                  startIndex = i - 1;
-                  startCoordinate = null;
-                } else {
-                  geometryFactory.makePrecise(intersection);
-                  addLineString(geometryFactory, points, startCoordinate,
-                    startIndex, i - 1, intersection, newLines);
-                  startIndex = i + 1;
-                  startCoordinate = intersection;
-                  c0 = intersection;
-                }
-              } else if (d1 <= tolerance) {
-                addLineString(geometryFactory, points, startCoordinate,
-                  startIndex, i, null, newLines);
-                startIndex = i;
-                startCoordinate = null;
-              } else {
-                geometryFactory.makePrecise(intersection);
-                addLineString(geometryFactory, points, startCoordinate,
-                  startIndex, i - 1, intersection, newLines);
-                startIndex = i;
-                startCoordinate = intersection;
-                c0 = intersection;
-              }
-            }
-          }
-        }
-      }
-      c0 = c1;
-    }
-    if (newLines.isEmpty()) {
-      newLines.add(line);
-    } else {
-      addLineString(geometryFactory, points, startCoordinate, startIndex,
-        lastIndex, null, newLines);
-    }
-    return newLines;
-  }
-
   public static void addLineString(
     final GeometryFactory geometryFactory,
     final CoordinatesList points,
@@ -139,9 +63,9 @@ public final class LineStringUtil {
     final int endIndex,
     final Coordinates endPoint,
     final List<LineString> lines) {
-    int length = endIndex - startIndex + 1;
-    CoordinatesList newPoints = CoordinatesListUtil.subList(points, startPoint,
-      startIndex, length, endPoint);
+    final int length = endIndex - startIndex + 1;
+    final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
+      startPoint, startIndex, length, endPoint);
     if (newPoints.size() > 1) {
       final LineString newLine = geometryFactory.createLineString(newPoints);
       if (newLine.getLength() > 0) {
@@ -1115,6 +1039,82 @@ public final class LineStringUtil {
     final LineString newLine = factory.createLineString(reverseCoordinates);
     JtsGeometryUtil.copyUserData(line, newLine);
     return newLine;
+  }
+
+  public static List<LineString> split(
+    final GeometryFactory geometryFactory,
+    final LineString line,
+    final LineSegmentIndex index,
+    final double tolerance) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final Coordinates firstCoordinate = points.get(0);
+    final int lastIndex = points.size() - 1;
+    final Coordinates lastCoordinate = points.get(lastIndex);
+    int startIndex = 0;
+    final List<LineString> newLines = new ArrayList<LineString>();
+    Coordinates startCoordinate = null;
+    Coordinates c0 = points.get(0);
+    for (int i = 1; i < points.size(); i++) {
+      final Coordinates c1 = points.get(i);
+
+      final List<CoordinatesList> intersectionPoints = index.queryIntersections(
+        c0, c1);
+      final List<Coordinates> intersections = new ArrayList<Coordinates>();
+      for (final CoordinatesList coordinatesList : intersectionPoints) {
+        intersections.addAll(coordinatesList.getList());
+      }
+      if (intersections.size() > 0) {
+        if (intersections.size() > 1) {
+          Collections.sort(intersections, new CoordinatesDistanceComparator(c0));
+        }
+        for (final Coordinates intersection : intersections) {
+          if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
+            if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
+            } else if (i == lastIndex
+              && intersection.distance(lastCoordinate) < tolerance) {
+            } else {
+              final double d0 = intersection.distance(c0);
+              final double d1 = intersection.distance(c1);
+              if (d0 <= tolerance) {
+                if (d1 > tolerance) {
+                  addLineString(geometryFactory, points, startCoordinate,
+                    startIndex, i - 1, null, newLines);
+                  startIndex = i - 1;
+                  startCoordinate = null;
+                } else {
+                  geometryFactory.makePrecise(intersection);
+                  addLineString(geometryFactory, points, startCoordinate,
+                    startIndex, i - 1, intersection, newLines);
+                  startIndex = i + 1;
+                  startCoordinate = intersection;
+                  c0 = intersection;
+                }
+              } else if (d1 <= tolerance) {
+                addLineString(geometryFactory, points, startCoordinate,
+                  startIndex, i, null, newLines);
+                startIndex = i;
+                startCoordinate = null;
+              } else {
+                geometryFactory.makePrecise(intersection);
+                addLineString(geometryFactory, points, startCoordinate,
+                  startIndex, i - 1, intersection, newLines);
+                startIndex = i;
+                startCoordinate = intersection;
+                c0 = intersection;
+              }
+            }
+          }
+        }
+      }
+      c0 = c1;
+    }
+    if (newLines.isEmpty()) {
+      newLines.add(line);
+    } else {
+      addLineString(geometryFactory, points, startCoordinate, startIndex,
+        lastIndex, null, newLines);
+    }
+    return newLines;
   }
 
   public static List<LineString> split(

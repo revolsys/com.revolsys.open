@@ -3,6 +3,7 @@
 %{
 
 #include <stdexcept>
+#include <iostream>
 #include <sstream>
 #include "time.h"
 #include "FileGDBAPI.h"
@@ -16,6 +17,7 @@ std::string wstring2string(std::wstring wstr) {
   
 fgdbError checkResult(fgdbError error) {
   if (error) {
+     std::cout << error << std::endl;
      std::wstring errorString;
      FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString);
      std::stringstream message;
@@ -70,9 +72,6 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %template(VectorOfFieldDef) std::vector<FileGDBAPI::FieldDef>;
 
 %include "Array.i"
-ARRAY_OUT(float, FloatArray)
-ARRAY_OUT(int, IntArray)
-ARRAY_OUT(double, DoubleArray)
 ARRAY_OUT(unsigned char, UnsignedCharArray)
 
 %define linux
@@ -300,6 +299,8 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Row::SetDouble;
 %ignore FileGDBAPI::Row::GetFloat;
 %ignore FileGDBAPI::Row::SetFloat;
+%ignore FileGDBAPI::Row::GetBinary;
+%ignore FileGDBAPI::Row::SetBinary;
 %ignore FileGDBAPI::Row::GetGeometry;
 %ignore FileGDBAPI::Row::SetGeometry;
 %ignore FileGDBAPI::Row::GetGUID;
@@ -658,16 +659,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
   }
 }
 
-%ignore FileGDBAPI::ByteArray::byteArray;
-%extend FileGDBAPI::ByteArray {
-  unsigned char get(int i) {
-    return $self->byteArray[i];
-  }
-
-  void set(int i, unsigned char c) {
-    $self->byteArray[i] = c;
-  }
-}
+%ignore FileGDBAPI::ByteArray;
 
 %ignore FileGDBAPI::ShapeBuffer::shapeBuffer;
 %ignore FileGDBAPI::ShapeBuffer::GetShapeType;

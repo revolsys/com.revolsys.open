@@ -2,8 +2,6 @@ package com.revolsys.gis.graph;
 
 import java.util.Collection;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -60,14 +58,14 @@ public class DataObjectGraph extends Graph<DataObject> {
    * @return The type name.
    */
   @Override
-  public QName getTypeName(final Edge<DataObject> edge) {
+  public String getTypeName(final Edge<DataObject> edge) {
     final DataObject object = edge.getObject();
     if (object == null) {
       return null;
     } else {
       final DataObjectMetaData metaData = object.getMetaData();
-      final QName typeName = metaData.getName();
-      return typeName;
+      final String typePath = metaData.getPath();
+      return typePath;
     }
   }
 

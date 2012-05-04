@@ -146,6 +146,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
+  @Override
   public void close() {
     FileUtil.closeSilent(in);
   }

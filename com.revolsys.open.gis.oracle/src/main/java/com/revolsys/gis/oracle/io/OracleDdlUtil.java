@@ -2,25 +2,19 @@ package com.revolsys.gis.oracle.io;
 
 import java.io.PrintWriter;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.jdbc.JdbcUtils;
 
 public class OracleDdlUtil {
 
   public static void createTable(PrintWriter out, DataObjectMetaData metaData) {
-    QName typeName = metaData.getName();
+    String typePath = metaData.getPath();
     out.println();
     out.print("CREATE TABLE ");
-    String schemaName = typeName.getNamespaceURI();
-    String tableName = typeName.getLocalPart();
-    if (schemaName.length() > 0) {
-      out.print(schemaName);
-      out.print('.');
-    }
+    String tableName = JdbcUtils.getQualifiedTableName(typePath);
     out.print(tableName);
     out.println(" (");
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
@@ -38,23 +32,23 @@ public class OracleDdlUtil {
       DataType dataType = attribute.getType();
       if (dataType == DataTypes.BOOLEAN) {
         out.print("NUMBER(1)");
-      } else  if (dataType == DataTypes.BYTE) {
+      } else if (dataType == DataTypes.BYTE) {
         out.print("NUMBER(3)");
-      } else  if (dataType == DataTypes.SHORT) {
+      } else if (dataType == DataTypes.SHORT) {
         out.print("NUMBER(5)");
-      } else  if (dataType == DataTypes.INT) {
+      } else if (dataType == DataTypes.INT) {
         out.print("NUMBER(9)");
-      } else  if (dataType == DataTypes.LONG) {
+      } else if (dataType == DataTypes.LONG) {
         out.print("NUMBER(19)");
-      } else  if (dataType == DataTypes.FLOAT) {
+      } else if (dataType == DataTypes.FLOAT) {
         out.print("NUMBER");
-      } else  if (dataType == DataTypes.DOUBLE) {
+      } else if (dataType == DataTypes.DOUBLE) {
         out.print("NUMBER");
-      } else  if (dataType == DataTypes.STRING) {
+      } else if (dataType == DataTypes.STRING) {
         out.print("VARCHAR2(");
         out.print(attribute.getLength());
         out.print(")");
-      } else  if (dataType == DataTypes.GEOMETRY) {
+      } else if (dataType == DataTypes.GEOMETRY) {
         out.print("MDSYS.SDO_GEOMETRY");
       }
       if (attribute.isRequired()) {

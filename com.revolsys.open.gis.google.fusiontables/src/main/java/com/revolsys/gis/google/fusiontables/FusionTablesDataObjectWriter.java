@@ -3,8 +3,6 @@ package com.revolsys.gis.google.fusiontables;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.xml.namespace.QName;
-
 import com.google.api.client.http.HttpResponse;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -13,7 +11,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 
 public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
- 
+
   private final FusionTablesDataObjectStore dataStore;
 
   private Statistics deleteStatistics;
@@ -47,27 +45,29 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
 
   private void delete(final DataObject object) throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
+    final String typePath = objectType.getPath();
     final StringBuffer sqlBuffer = new StringBuffer();
 
     sqlBuffer.append("DELETE  FROM ");
-    sqlBuffer.append(dataStore.getTableId(typeName));
+    sqlBuffer.append(dataStore.getTableId(typePath));
     sqlBuffer.append(" WHERE rowid = ");
     final Object rowId = object.getValue("rowid");
     FusionTablesDataObjectStore.appendString(sqlBuffer, rowId.toString());
     final String sql = sqlBuffer.toString();
 
-    execute(typeName, sql, getDeleteStatistics());
+    execute(typePath, sql, getDeleteStatistics());
 
   }
 
-  private void execute(final QName typeName, final String sql,
+  private void execute(
+    final String typePath,
+    final String sql,
     final Statistics statistics) {
-    statistics.add(typeName.toString(), 1);
-    HttpResponse response = dataStore.executePostQuery(sql);
+    statistics.add(typePath.toString(), 1);
+    final HttpResponse response = dataStore.executePostQuery(sql);
     try {
       response.ignore();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -77,8 +77,8 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
 
   }
 
-  private DataObjectMetaData getDataObjectMetaData(final QName typeName) {
-    QName localTypeName = dataStore.getTypeName(typeName);
+  private DataObjectMetaData getDataObjectMetaData(final String typePath) {
+    final String localTypeName = dataStore.getTypeName(typePath);
     final DataObjectMetaData metaData = dataStore.getMetaData(localTypeName);
     return metaData;
   }
@@ -125,13 +125,13 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
 
   private void insert(final DataObject object) throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
-    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    final String typePath = objectType.getPath();
+    final DataObjectMetaData metaData = getDataObjectMetaData(typePath);
 
     final StringBuffer sql = new StringBuffer();
     sql.append("INSERT ");
     sql.append(" INTO ");
-    final String tableId = dataStore.getTableId(typeName);
+    final String tableId = dataStore.getTableId(typePath);
     sql.append(tableId);
     sql.append(" (");
 
@@ -153,16 +153,16 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
       attribute.appendValue(sql, value);
     }
     sql.append(")");
-    execute(typeName, sql.toString(), getInsertStatistics());
+    execute(typePath, sql.toString(), getInsertStatistics());
   }
 
   private void update(final DataObject object) throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
-    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    final String typePath = objectType.getPath();
+    final DataObjectMetaData metaData = getDataObjectMetaData(typePath);
     final StringBuffer sql = new StringBuffer();
     sql.append("UPDATE ");
-    final String tableId = dataStore.getTableId(typeName);
+    final String tableId = dataStore.getTableId(typePath);
     sql.append(tableId);
     sql.append(" SET ");
     for (int i = 1; i < metaData.getAttributeCount(); i++) {
@@ -171,17 +171,17 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
       }
       final FusionTablesAttribute attribute = (FusionTablesAttribute)metaData.getAttribute(i);
       final String attributeName = attribute.getName();
-      Object value = object.getValue(attributeName);
+      final Object value = object.getValue(attributeName);
       FusionTablesDataObjectStore.appendString(sql, attributeName);
       sql.append(" = ");
       attribute.appendValue(sql, value);
     }
     sql.append(" WHERE rowid = ");
     final FusionTablesAttribute rowidAttribute = (FusionTablesAttribute)metaData.getAttribute("rowid");
-    Object rowId = object.getValue("rowid");
+    final Object rowId = object.getValue("rowid");
     rowidAttribute.appendValue(sql, rowId);
 
-    execute(typeName, sql.toString(), getUpdateStatistics());
+    execute(typePath, sql.toString(), getUpdateStatistics());
   }
 
   public synchronized void write(final DataObject object) {
@@ -194,7 +194,7 @@ public class FusionTablesDataObjectWriter extends AbstractWriter<DataObject> {
           update(object);
         break;
         case Persisted:
-          // No action required
+        // No action required
         break;
         case Deleted:
           delete(object);

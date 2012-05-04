@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
@@ -26,7 +25,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
 
   private BoundingBox boundingBox;
 
-  private List<QName> typeNames;
+  private List<String> typePaths;
 
   private String whereClause;
 
@@ -41,26 +40,26 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     setDataStore(dataStore);
   }
 
-  public void addQuery(final QName typeName, final String query) {
-    addQuery(new Query(typeName, query));
-  }
-
-  public void addQuery(
-    final QName typeName,
-    final String query,
-    final List<Object> parameters) {
-    addQuery(new Query(typeName, query, parameters));
-  }
-
-  public void addQuery(
-    final QName typeName,
-    final String query,
-    final Object... parameters) {
-    addQuery(typeName, query, Arrays.asList(parameters));
-  }
-
   public void addQuery(final Query query) {
     queries.add(query);
+  }
+
+  public void addQuery(final String typePath, final String query) {
+    addQuery(new Query(typePath, query));
+  }
+
+  public void addQuery(
+    final String path,
+    final String query,
+    final List<Object> parameters) {
+    addQuery(new Query(path, query, parameters));
+  }
+
+  public void addQuery(
+    final String path,
+    final String query,
+    final Object... parameters) {
+    addQuery(path, query, Arrays.asList(parameters));
   }
 
   @Override
@@ -70,20 +69,12 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     boundingBox = null;
     dataStore = null;
     queries = null;
-    typeNames = null;
+    typePaths = null;
     whereClause = null;
     if (statistics != null) {
       statistics.disconnect();
     }
     statistics = null;
-  }
-
-  public void setStatistics(Statistics statistics) {
-    this.statistics = statistics;
-    if (statistics != null) {
-      statistics.connect();
-    }
-    setProperty(Statistics.class.getName(), statistics);
   }
 
   protected AbstractIterator<DataObject> createQueryIterator(final int i) {
@@ -120,8 +111,8 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
 
   @Override
   public void open() {
-    if (typeNames != null) {
-      for (final QName tableName : typeNames) {
+    if (typePaths != null) {
+      for (final String tableName : typePaths) {
         final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
         if (metaData != null) {
           Query query;
@@ -157,11 +148,19 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     }
   }
 
+  public void setStatistics(final Statistics statistics) {
+    this.statistics = statistics;
+    if (statistics != null) {
+      statistics.connect();
+    }
+    setProperty(Statistics.class.getName(), statistics);
+  }
+
   /**
-   * @param typeNames the typeNames to set
+   * @param typePaths the typePaths to set
    */
-  public void setTypeNames(final List<QName> typeNames) {
-    this.typeNames = typeNames;
+  public void setTypeNames(final List<String> typePaths) {
+    this.typePaths = typePaths;
 
   }
 

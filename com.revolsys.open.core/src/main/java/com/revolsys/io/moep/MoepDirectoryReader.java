@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -58,8 +56,8 @@ public class MoepDirectoryReader extends DataObjectDirectoryReader implements
   }
 
   @Override
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    if (typeName.equals(MoepConstants.TYPE_NAME)) {
+  public DataObjectMetaData getMetaData(final String typePath) {
+    if (typePath.equals(MoepConstants.TYPE_NAME)) {
       return MoepConstants.META_DATA;
     } else {
       return null;

@@ -28,6 +28,10 @@ public class JdbcFactoryRegistry {
 
   private static Map<ApplicationContext, WeakReference<JdbcFactoryRegistry>> factoriesByApplicationContext = new WeakHashMap<ApplicationContext, WeakReference<JdbcFactoryRegistry>>();
 
+  public static void clearInstance() {
+    instance = null;
+  }
+
   public static JdbcDatabaseFactory databaseFactory(final DataSource dataSource) {
     final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory();
     return jdbcFactoryRegistry.getDatabaseFactory(dataSource);
@@ -49,7 +53,7 @@ public class JdbcFactoryRegistry {
       if (instance == null) {
         instance = new JdbcFactoryRegistry();
         try {
-          ClassLoader classLoader = JdbcFactoryRegistry.class.getClassLoader();
+          final ClassLoader classLoader = JdbcFactoryRegistry.class.getClassLoader();
           final Enumeration<URL> resources = classLoader.getResources("META-INF/com.revolsys.gis.jdbc.json");
           while (resources.hasMoreElements()) {
             final URL resourceUrl = resources.nextElement();
@@ -65,14 +69,10 @@ public class JdbcFactoryRegistry {
     }
   }
 
-  public static void clearInstance() {
-    instance = null;
-  }
-
   public static JdbcFactoryRegistry getFactory(
     final ApplicationContext applicationContext) {
     synchronized (factoriesByApplicationContext) {
-      WeakReference<JdbcFactoryRegistry> reference = factoriesByApplicationContext.get(applicationContext);
+      final WeakReference<JdbcFactoryRegistry> reference = factoriesByApplicationContext.get(applicationContext);
       JdbcFactoryRegistry jdbcFactoryRegistry;
       if (reference == null) {
         jdbcFactoryRegistry = null;
@@ -82,7 +82,7 @@ public class JdbcFactoryRegistry {
       if (jdbcFactoryRegistry == null) {
         jdbcFactoryRegistry = new JdbcFactoryRegistry();
         try {
-          ClassLoader classLoader = applicationContext.getClassLoader();
+          final ClassLoader classLoader = applicationContext.getClassLoader();
           for (final Resource resource : applicationContext.getResources("classpath*:META-INF/com.revolsys.gis.jdbc.json")) {
             jdbcFactoryRegistry.loadFactories(classLoader, resource);
           }

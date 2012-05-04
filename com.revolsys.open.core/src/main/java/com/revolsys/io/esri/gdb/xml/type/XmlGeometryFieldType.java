@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   public XmlGeometryFieldType(final FieldType esriFieldType,
     final DataType dataType) {
-    super(dataType, "xs:" + dataType.getName().getLocalPart(), esriFieldType);
+    super(dataType, "xs:" + dataType.getName(), esriFieldType);
   }
 
   @Override

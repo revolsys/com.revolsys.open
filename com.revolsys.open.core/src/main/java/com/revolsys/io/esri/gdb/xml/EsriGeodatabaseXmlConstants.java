@@ -413,7 +413,7 @@ public interface EsriGeodatabaseXmlConstants {
   QName SUBTYPE_FIELD_NAME = new QName(_NAMESPACE_URI, "SubtypeFieldName",
     _NAMESPACE_PREFIX);
 
-  QName SUBTYPE_NAME = new QName(_NAMESPACE_URI, "SubtypeName",
+  QName SUBTYPE_NAME = new QName(_NAMESPACE_URI, "SubtypePath",
     _NAMESPACE_PREFIX);
 
   QName SUBTYPES = new QName(_NAMESPACE_URI, "Subtypes", _NAMESPACE_PREFIX);

@@ -35,6 +35,10 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   private String name = "processNetwork";
 
+  private ProcessNetwork parent;
+
+  private final Object sync = new Object();
+
   public ProcessNetwork() {
   }
 
@@ -60,6 +64,10 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   public String getName() {
     return name;
+  }
+
+  public ProcessNetwork getParent() {
+    return parent;
   }
 
   public Collection<Process> getProcesses() {
@@ -90,16 +98,6 @@ public class ProcessNetwork implements BeanPostProcessor,
     if (autoStart) {
       start();
     }
-  }
-
-  private ProcessNetwork parent;
-
-  public void setParent(ProcessNetwork parent) {
-    this.parent = parent;
-  }
-
-  public ProcessNetwork getParent() {
-    return parent;
   }
 
   public Object postProcessAfterInitialization(
@@ -156,8 +154,6 @@ public class ProcessNetwork implements BeanPostProcessor,
     return bean;
   }
 
-  private final Object sync = new Object();
-
   void removeProcess(final Process process) {
     synchronized (sync) {
       if (processes != null) {
@@ -185,6 +181,10 @@ public class ProcessNetwork implements BeanPostProcessor,
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public void setParent(final ProcessNetwork parent) {
+    this.parent = parent;
   }
 
   public void setProcesses(final Collection<Process> processes) {

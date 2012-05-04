@@ -7,15 +7,15 @@ public class NbspElement extends Element {
   public static final NbspElement INSTANCE = new NbspElement();
 
   @Override
-  public void setContainer(ElementContainer container) {
-  }
-
-  @Override
-  public void setDecorator(Decorator decorator) {
-  }
-
-  @Override
-  public void serializeElement(XmlWriter out) {
+  public void serializeElement(final XmlWriter out) {
     out.entityRef("nbsp");
+  }
+
+  @Override
+  public void setContainer(final ElementContainer container) {
+  }
+
+  @Override
+  public void setDecorator(final Decorator decorator) {
   }
 }

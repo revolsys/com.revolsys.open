@@ -8,7 +8,6 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,18 +53,18 @@ public class ItersectsNodeEdgeCleanupVisitor extends
   }
 
   private boolean moveEndUndershoots(
-    final QName typeName,
+    final String typePath,
     final Node<DataObject> node1,
     final Node<DataObject> node2) {
     boolean matched = false;
     if (!node2.hasEdgeTo(node1)) {
       final Set<Double> angles1 = NodeAttributes.getEdgeAnglesByType(node2,
-        typeName);
+        typePath);
       final Set<Double> angles2 = NodeAttributes.getEdgeAnglesByType(node1,
-        typeName);
+        typePath);
       if (angles1.size() == 1 && angles2.size() == 1) {
 
-        matched = node1.getGraph().moveNodesToMidpoint(typeName, node2, node1);
+        matched = node1.getGraph().moveNodesToMidpoint(typePath, node2, node1);
       }
     }
     return matched;
@@ -76,7 +75,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends
   }
 
   public boolean visit(final Edge<DataObject> edge) {
-    final QName typeName = edge.getTypeName();
+    final String typePath = edge.getTypeName();
     final Node<DataObject> fromNode = edge.getFromNode();
     final Node<DataObject> toNode = edge.getToNode();
 
@@ -85,7 +84,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends
     for (final Iterator<Node<DataObject>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
       final Node<DataObject> node = nodeIter.next();
       final List<Edge<DataObject>> edges = NodeAttributes.getEdgesByType(node,
-        typeName);
+        typePath);
       if (edges.isEmpty()) {
         nodeIter.remove();
       }
@@ -110,12 +109,12 @@ public class ItersectsNodeEdgeCleanupVisitor extends
       if (nodes.size() == 1) {
         final Node<DataObject> node = nodes.get(0);
         if (node.distance(fromNode) <= 10) {
-          moveEndUndershoots(typeName, fromNode, node);
+          moveEndUndershoots(typePath, fromNode, node);
         } else if (node.distance(toNode) <= 10) {
-          moveEndUndershoots(typeName, toNode, node);
+          moveEndUndershoots(typePath, toNode, node);
         } else {
           graph.splitEdge(edge, nodes);
-          splitStatistics.add(typeName);
+          splitStatistics.add(typePath);
         }
       } else {
         graph.splitEdge(edge, nodes);

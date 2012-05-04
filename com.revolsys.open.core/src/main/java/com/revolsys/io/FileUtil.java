@@ -91,27 +91,6 @@ public final class FileUtil {
     }
   }
 
-  public static void deleteFilesOlderThan(File directory, Date date) {
-    long time = date.getTime();
-    deleteFilesOlderThan(directory, time);
-  }
-
-  public static void deleteFilesOlderThan(File directory, long age) {
-    if (directory.exists() && directory.isDirectory()) {
-      for (File file : directory.listFiles()) {
-        if (file.isDirectory()) {
-          deleteFilesOlderThan(file, age);
-        } else if (file.isFile()) {
-          if (file.lastModified() < age) {
-            if (!file.delete()) {
-              LOG.error("Unable to delete file: " + file);
-            }
-          }
-        }
-      }
-    }
-  }
-
   /**
    * Close the output stream without throwing an I/O exception if the close
    * failed. The error will be logged instead.
@@ -510,6 +489,27 @@ public final class FileUtil {
     for (int i = 0; i < files.length; i++) {
       final File file = files[i];
       file.delete();
+    }
+  }
+
+  public static void deleteFilesOlderThan(final File directory, final Date date) {
+    final long time = date.getTime();
+    deleteFilesOlderThan(directory, time);
+  }
+
+  public static void deleteFilesOlderThan(final File directory, final long age) {
+    if (directory.exists() && directory.isDirectory()) {
+      for (final File file : directory.listFiles()) {
+        if (file.isDirectory()) {
+          deleteFilesOlderThan(file, age);
+        } else if (file.isFile()) {
+          if (file.lastModified() < age) {
+            if (!file.delete()) {
+              LOG.error("Unable to delete file: " + file);
+            }
+          }
+        }
+      }
     }
   }
 

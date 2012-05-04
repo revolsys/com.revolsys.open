@@ -8,7 +8,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 public class ArcDirectedConverter extends ArcConverter {
 
   public ArcDirectedConverter(final GeometryFactory geometryFactory) {
-    super(geometryFactory, "ArcDirected");
+    super(geometryFactory, "/ArcDirected");
   }
 
   @Override

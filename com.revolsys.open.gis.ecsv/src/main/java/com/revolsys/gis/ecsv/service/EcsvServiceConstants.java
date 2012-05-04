@@ -1,7 +1,5 @@
 package com.revolsys.gis.ecsv.service;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -12,8 +10,7 @@ public final class EcsvServiceConstants {
 
   public static final String NS_URI = "http://ns.ecsv.org/ws";
 
-  public static final QName NAMESPACE_LIST = new QName(NS_URI, "namespaceList",
-    NS_PREFIX);
+  public static final String NAMESPACE_LIST = "namespaceList";
 
   public static final DataObjectMetaData NAMESPACE_LIST_METADATA;
 
@@ -21,11 +18,11 @@ public final class EcsvServiceConstants {
 
   public static final String PATH_ATTR = "path";
 
-  public static final QName TYPE_LIST = new QName(NS_URI, "typeList", NS_PREFIX);
+  public static final String TYPE_LIST = "typeList";
 
   public static final DataObjectMetaData TYPE_LIST_METADATA;
 
-  public static final String TYPE_NAME_ATTR = "typeName";
+  public static final String TYPE_NAME_ATTR = "typePath";
 
   static {
     final DataObjectMetaDataImpl namespaceListMetaData = new DataObjectMetaDataImpl(

@@ -2,8 +2,6 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.NotFilter;
@@ -36,14 +34,14 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
     final DataObject object = edge.getObject();
     final LineString line = edge.getLine();
     if (JtsGeometryUtil.getGeometryProperty(line, PROCESSED) != Boolean.TRUE) {
-      final QName typeName = edge.getTypeName();
+      final String typePath = edge.getTypeName();
 
       final Graph<DataObject> graph = edge.getGraph();
 
       final AndFilter<Edge<DataObject>> attributeAndGeometryFilter = new AndFilter<Edge<DataObject>>();
 
       attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<DataObject>(
-        typeName));
+        typePath));
 
       final Filter<Edge<DataObject>> filter = getFilter();
       if (filter != null) {

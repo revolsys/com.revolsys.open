@@ -23,22 +23,18 @@ import org.springframework.security.web.access.expression.WebSecurityExpressionH
 public class DefaultWebSecurityExpressionHandler implements
   WebSecurityExpressionHandler {
 
-  private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
+  private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
-  private ExpressionParser expressionParser = new SpelExpressionParser();
+  private final ExpressionParser expressionParser = new SpelExpressionParser();
 
   private RoleHierarchy roleHierarchy;
 
-  public ExpressionParser getExpressionParser() {
-    return expressionParser;
-  }
-
   public EvaluationContext createEvaluationContext(
-    Authentication authentication,
-    FilterInvocation fi) {
-    StandardEvaluationContext ctx = new StandardEvaluationContext();
-    SecurityExpressionRoot root = new WebSecurityExpressionRoot(authentication,
-      fi);
+    final Authentication authentication,
+    final FilterInvocation fi) {
+    final StandardEvaluationContext ctx = new StandardEvaluationContext();
+    final SecurityExpressionRoot root = new WebSecurityExpressionRoot(
+      authentication, fi);
     root.setTrustResolver(trustResolver);
     root.setRoleHierarchy(roleHierarchy);
     ctx.setRootObject(root);
@@ -46,7 +42,11 @@ public class DefaultWebSecurityExpressionHandler implements
     return ctx;
   }
 
-  public void setRoleHierarchy(RoleHierarchy roleHierarchy) {
+  public ExpressionParser getExpressionParser() {
+    return expressionParser;
+  }
+
+  public void setRoleHierarchy(final RoleHierarchy roleHierarchy) {
     this.roleHierarchy = roleHierarchy;
   }
 }

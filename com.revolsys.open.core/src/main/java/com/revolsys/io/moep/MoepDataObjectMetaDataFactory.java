@@ -3,22 +3,20 @@ package com.revolsys.io.moep;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.io.AbstractObjectWithProperties;
 
 public class MoepDataObjectMetaDataFactory extends AbstractObjectWithProperties
   implements DataObjectMetaDataFactory {
-  private static final Map<QName, DataObjectMetaData> META_DATA_CACHE = new HashMap<QName, DataObjectMetaData>();
+  private static final Map<String, DataObjectMetaData> META_DATA_CACHE = new HashMap<String, DataObjectMetaData>();
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
+  public DataObjectMetaData getMetaData(final String typePath) {
     synchronized (META_DATA_CACHE) {
-      DataObjectMetaData metaData = META_DATA_CACHE.get(typeName);
+      DataObjectMetaData metaData = META_DATA_CACHE.get(typePath);
       if (metaData == null) {
-        metaData = MoepConstants.createMetaData(typeName);
-        META_DATA_CACHE.put(typeName, metaData);
+        metaData = MoepConstants.createMetaData(typePath);
+        META_DATA_CACHE.put(typePath, metaData);
       }
       return metaData;
     }

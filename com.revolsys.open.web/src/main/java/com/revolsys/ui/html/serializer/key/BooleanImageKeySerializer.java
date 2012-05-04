@@ -13,7 +13,7 @@ public class BooleanImageKeySerializer extends AbstractKeySerializer {
     super(name);
   }
 
-  public BooleanImageKeySerializer(String name, String label) {
+  public BooleanImageKeySerializer(final String name, final String label) {
     super(name, label);
   }
 

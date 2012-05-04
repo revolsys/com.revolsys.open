@@ -309,6 +309,10 @@ public class BeanConfigurrer implements BeanFactoryPostProcessor,
     this.applicationContext = applicationContext;
   }
 
+  protected void setAttribute(final String name, final Object value) {
+    attributes.put(name, value);
+  }
+
   public void setAttributes(final Map<String, ? extends Object> attributes) {
     this.attributes.clear();
     if (attributes != null) {
@@ -377,10 +381,6 @@ public class BeanConfigurrer implements BeanFactoryPostProcessor,
 
   public void setOrder(final int order) {
     this.order = order;
-  }
-
-  protected void setAttribute(String name, Object value) {
-    attributes.put(name, value);
   }
 
 }

@@ -15,15 +15,15 @@ import com.revolsys.io.esri.gdb.xml.model.EsriGdbXmlSerializer;
 public class FileGdbDomainCodeTable implements CodeTable {
   private final CodedValueDomain domain;
 
-  private final Geodatabase geodatabase;
-
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
 
   private final String name;
 
-  public FileGdbDomainCodeTable(final Geodatabase geodatabase,
+  private CapiFileGdbDataObjectStore dataStore;
+
+  public FileGdbDomainCodeTable(final CapiFileGdbDataObjectStore dataStore,
     final CodedValueDomain domain) {
-    this.geodatabase = geodatabase;
+    this.dataStore = dataStore;
     this.domain = domain;
     this.name = domain.getDomainName();
   }
@@ -38,17 +38,22 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   private Object createValue(final String name) {
-    final Object id = domain.addCodedValue(name);
-    final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
-    geodatabase.alterDomain(domainDefinition);
-    LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
-    return id;
+    synchronized (dataStore) {
+      final Object id = domain.addCodedValue(name);
+      final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
+      Geodatabase geodatabase = dataStore.getGeodatabase();
+      geodatabase.alterDomain(domainDefinition);
+      LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
+      return id;
+    }
   }
 
+  @Override
   public List<String> getAttributeAliases() {
     return domain.getAttributeAliases();
   }
 
+  @Override
   public Map<Object, List<Object>> getCodes() {
     return domain.getCodes();
   }
@@ -57,6 +62,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
     return domain;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getId(final Map<String, ? extends Object> values) {
     final Object id = domain.getId(values);
@@ -66,6 +72,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
     return (T)id;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getId(final Object... values) {
     final Object id = domain.getId(values);
@@ -75,27 +82,33 @@ public class FileGdbDomainCodeTable implements CodeTable {
     return (T)id;
   }
 
+  @Override
   public String getIdAttributeName() {
     return domain.getIdAttributeName();
   }
 
+  @Override
   public Map<String, ? extends Object> getMap(final Object id) {
     return domain.getMap(id);
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     return (V)domain.getValue(id);
   }
 
+  @Override
   public List<String> getValueAttributeNames() {
     return domain.getValueAttributeNames();
   }
 
+  @Override
   public List<Object> getValues(final Object id) {
     return domain.getValues(id);
   }

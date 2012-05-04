@@ -8,25 +8,26 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineEqualWithinDistance implements Filter<LineString> {
 
   public static Filter<DataObject> getFilter(
-    DataObject object,
-    double maxDistance) {
-    LineString line = object.getGeometryValue();
-    LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(line,
-      maxDistance);
+    final DataObject object,
+    final double maxDistance) {
+    final LineString line = object.getGeometryValue();
+    final LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(
+      line, maxDistance);
     return new DataObjectGeometryFilter<LineString>(lineFilter);
   }
 
-  private double maxDistance;
+  private final double maxDistance;
 
-  private LineString line;
+  private final LineString line;
 
-  public LineEqualWithinDistance(LineString line, double maxDistance) {
+  public LineEqualWithinDistance(final LineString line, final double maxDistance) {
     this.line = line;
     this.maxDistance = maxDistance;
   }
 
-  public boolean accept(LineString line2) {
-    LineStringRelate relate = new LineStringRelate(line, line2, maxDistance);
+  public boolean accept(final LineString line2) {
+    final LineStringRelate relate = new LineStringRelate(line, line2,
+      maxDistance);
     return relate.isEqual();
   }
 }

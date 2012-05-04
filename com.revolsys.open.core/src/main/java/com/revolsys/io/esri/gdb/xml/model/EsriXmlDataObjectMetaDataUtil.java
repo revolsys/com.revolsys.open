@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
@@ -15,6 +13,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
@@ -193,14 +192,10 @@ public class EsriXmlDataObjectMetaDataUtil implements
   public static DETable createDETable(
     final DataObjectMetaData metaData,
     final SpatialReference spatialReference) {
-    final QName typeName = metaData.getName();
-    final String schemaName = typeName.getNamespaceURI();
-    String schemaPath;
-    if (schemaName.length() == 0) {
-      schemaPath = "";
-    } else {
-      schemaPath = "\\" + schemaName;
-    }
+    final String typePath = metaData.getPath();
+    final String schemaPath = PathUtil.getPath(typePath)
+      .replaceAll("/", "\\\\");
+
     return createDETable(schemaPath, metaData, spatialReference);
   }
 
@@ -214,6 +209,10 @@ public class EsriXmlDataObjectMetaDataUtil implements
     DataType geometryDataType = null;
     GeometryType shapeType = null;
     if (geometryAttribute != null) {
+      if (spatialReference == null) {
+        throw new IllegalArgumentException(
+          "A Geometry Factory with a coordinate system must be specified.");
+      }
       geometryDataType = geometryAttribute.getType();
       if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
@@ -236,8 +235,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
       }
     }
 
-    final QName typeName = metaData.getName();
-    final String name = typeName.getLocalPart();
+    final String path = metaData.getPath();
+    final String name = PathUtil.getName(path);
     if (hasGeometry) {
       final DEFeatureClass featureClass = new DEFeatureClass();
       table = featureClass;
@@ -298,8 +297,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
     } else {
       tableName = domain.getName();
     }
-    final QName typeName = new QName(schemaName, tableName);
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
+    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
     int length = 0;
@@ -331,8 +330,8 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final DETable deTable,
     final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
-    final QName typeName = new QName(schemaName, tableName);
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
+    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {
       ignoreFieldNames.add(deTable.getOIDFieldName());

@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +116,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
 
   @SuppressWarnings("unchecked")
   public boolean visit(final Edge<DataObject> edge) {
-    final QName typeName = edge.getTypeName();
+    final String typePath = edge.getTypeName();
 
     final Graph<DataObject> graph = edge.getGraph();
     final LineString line = edge.getLine();
@@ -125,7 +124,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     final AndFilter<Edge<DataObject>> attributeAndGeometryFilter = new AndFilter<Edge<DataObject>>();
 
     attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<DataObject>(
-      typeName));
+      typePath));
 
     final Filter<Edge<DataObject>> filter = getFilter();
     if (filter != null) {
@@ -159,7 +158,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
               final Node<DataObject> fromNode1 = edge.getFromNode();
               final Node<DataObject> fromNode2 = edge2.getFromNode();
               if (fromNode1.distance(fromNode2) < 2) {
-                graph.moveNodesToMidpoint(typeName, fromNode1, fromNode2);
+                graph.moveNodesToMidpoint(typePath, fromNode1, fromNode2);
                 return true;
               }
             }
@@ -169,7 +168,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
               final Node<DataObject> toNode1 = edge.getToNode();
               final Node<DataObject> toNode2 = edge2.getToNode();
               if (toNode1.distance(toNode2) < 2) {
-                graph.moveNodesToMidpoint(typeName, toNode1, toNode2);
+                graph.moveNodesToMidpoint(typePath, toNode1, toNode2);
                 return true;
               }
             }

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.xml.namespace.QName;
-
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
@@ -46,7 +44,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
   /** The metadata for the data being read by this iterator. */
   private DataObjectMetaData metaData;
 
-  private final Map<QName, DataObjectMetaData> metaDataMap = new HashMap<QName, DataObjectMetaData>();
+  private final Map<String, DataObjectMetaData> metaDataMap = new HashMap<String, DataObjectMetaData>();
 
   /**
    * The current record number.
@@ -72,7 +70,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   private void addMetaData(final Map<String, Object> map) {
-    final QName typeName = (QName)map.get(NAME);
+    final String typePath = (String)map.get(NAME);
     final List<Attribute> attributes = new ArrayList<Attribute>();
     final Map<String, List<?>> attributeProperties = (Map<String, List<?>>)map.get(ATTRIBUTE_PROPERTIES);
     if (attributeProperties != null) {
@@ -80,7 +78,7 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
       if (names != null) {
         for (int i = 0; i < names.size(); i++) {
           final String name = (String)names.get(i);
-          final QName attributeTypeName = getAttributeHeader(
+          final String attributeTypeName = getAttributeHeader(
             attributeProperties, EcsvProperties.ATTRIBUTE_TYPE, i);
           final Integer attributeLength = getAttributeHeader(
             attributeProperties, EcsvProperties.ATTRIBUTE_LENGTH, i);
@@ -101,8 +99,8 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
       }
     }
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
-      typeName, getProperties(), attributes);
-    metaDataMap.put(typeName, metaData);
+      typePath, getProperties(), attributes);
+    metaDataMap.put(typePath, metaData);
   }
 
   /**
@@ -173,11 +171,10 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     return nextLine;
   }
 
-  private QName getTypeNameParameter(String type) {
+  private String getTypeNameParameter(String type) {
     type = type.substring(type.indexOf(TYPE_PARAMETER_START) + 1,
       type.indexOf(TYPE_PARAMETER_END));
-    final QName typeName = QName.valueOf(type);
-    return typeName;
+    return type;
   }
 
   private boolean isBlockEnd(final String[] record, final String endCharacter) {
@@ -326,17 +323,16 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     final String type = record[1];
     final String text = record[2];
     if (type.startsWith("List<")) {
-      final QName typeName = QName.valueOf(type.substring(5, type.indexOf(">")));
-      final DataType dataType = DataTypes.getType(typeName);
+      final String typePath = type.substring(5, type.indexOf(">"));
+      final DataType dataType = DataTypes.getType(typePath);
       if (text.equals(COLLECTION_START)) {
         return parseCommaList(dataType, record);
       } else {
-        // return parseMultiLineList(typeName, record);
+        // return parseMultiLineList(typePath, record);
         return null;
       }
     } else {
-      final QName typeName = QName.valueOf(type);
-      final DataType dataType = DataTypes.getType(typeName);
+      final DataType dataType = DataTypes.getType(type);
       final Object value = parseValue(dataType, text, record);
       return value;
     }
@@ -348,11 +344,11 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
       if (record.length >= 3) {
         final String name = record[0];
         if (name.equals(RECORDS)) {
-          final QName typeName = getTypeNameParameter(record[1]);
-          metaData = metaDataMap.get(typeName);
+          final String typePath = getTypeNameParameter(record[1]);
+          metaData = metaDataMap.get(typePath);
           if (metaData == null) {
             throw new IllegalArgumentException("No typeDefinition for "
-              + typeName);
+              + typePath);
           }
           return;
         } else if (name.equals(TYPE_DEFINITION)) {
@@ -418,10 +414,10 @@ public class EcsvDataObjectIterator extends AbstractIterator<DataObject>
     // line = readNextRecord()) {
     // final List<String> attributeHeaderTypeNames =
     // getProperty(EcsvProperties.ATTRIBUTE_HEADER_TYPES);
-    // final List<QName> attributeHeaderTypes = parseListValue(
+    // final List<String> attributeHeaderTypes = parseListValue(
     // attributeHeaderTypeNames, DataTypes.QNAME);
     // if (headerIndex < attributeHeaderTypes.size()) {
-    // final QName headerType = attributeHeaderTypes.get(headerIndex);
+    // final String headerType = attributeHeaderTypes.get(headerIndex);
     // attributeHeaderValues.put(headerType, Arrays.asList(line));
     // headerIndex++;
     // }

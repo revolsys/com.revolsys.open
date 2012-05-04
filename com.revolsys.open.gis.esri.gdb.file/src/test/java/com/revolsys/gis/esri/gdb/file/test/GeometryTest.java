@@ -1,8 +1,6 @@
-package com.revols.gis.esri.gdb.file.test;
+package com.revolsys.gis.esri.gdb.file.test;
 
 import java.io.File;
-
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
@@ -25,15 +23,14 @@ public class GeometryTest {
 
     final DataType geometryDataType = DataTypes.getType(geometry);
 
-    String name = geometryDataType.getName().getLocalPart();
+    String name = "/" +geometryDataType.getName();
     if (geometryFactory.hasZ()) {
       name += "Z";
     }
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);
-    final QName typeName = new QName(name);
 
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typeName);
+    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
     metaData.addAttribute("ID", DataTypes.INT, true);
     final Attribute geometryAttribute = metaData.addAttribute("Geometry",
       geometryDataType, true);

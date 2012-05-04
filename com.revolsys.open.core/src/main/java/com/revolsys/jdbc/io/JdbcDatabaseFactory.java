@@ -10,20 +10,21 @@ import com.revolsys.gis.data.io.DataObjectStoreFactory;
 
 public interface JdbcDatabaseFactory extends DataObjectStoreFactory {
 
-  List<String> getProductNames();
-
-  List<String> getUrlPatterns();
-
   boolean canHandleUrl(String url);
-  
+
   void closeDataSource(DataSource dataSource);
 
-  DataSource createDataSource(Map<String, ? extends Object> connectionProperties);
+  JdbcDataObjectStore createDataObjectStore(DataSource dataSource);
 
-  JdbcDataObjectStore createDataObjectStore(Map<String, ? extends Object> connectionProperties);
+  JdbcDataObjectStore createDataObjectStore(
+    Map<String, ? extends Object> connectionProperties);
+
+  DataSource createDataSource(Map<String, ? extends Object> connectionProperties);
 
   Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     Map<String, ? extends Object> connectionProperties);
 
-  JdbcDataObjectStore createDataObjectStore(DataSource dataSource);
+  List<String> getProductNames();
+
+  List<String> getUrlPatterns();
 }

@@ -91,7 +91,7 @@ public class GpxIterator implements DataObjectIterator {
 
   private String schemaName = GpxConstants.GPX_NS_URI;
 
-  private QName typeName;
+  private String typePath;
 
   private String baseName;
 
@@ -108,18 +108,18 @@ public class GpxIterator implements DataObjectIterator {
   }
 
   public GpxIterator(final Reader in,
-    final DataObjectFactory dataObjectFactory, final QName typeName) {
+    final DataObjectFactory dataObjectFactory, final String path) {
     this(createXmlReader(in));
     this.dataObjectFactory = dataObjectFactory;
-    this.typeName = typeName;
+    this.typePath = typePath;
   }
 
   public GpxIterator(final Resource resource,
-    final DataObjectFactory dataObjectFactory, final QName typeName)
+    final DataObjectFactory dataObjectFactory, final String path)
     throws IOException {
     this(createXmlReader(new InputStreamReader(resource.getInputStream())));
     this.dataObjectFactory = dataObjectFactory;
-    this.typeName = typeName;
+    this.typePath = typePath;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
@@ -164,8 +164,8 @@ public class GpxIterator implements DataObjectIterator {
     try {
       do {
         currentDataObject = parseDataObject();
-      } while (currentDataObject != null && typeName != null
-        && !currentDataObject.getMetaData().getName().equals(typeName));
+      } while (currentDataObject != null && typePath != null
+        && !currentDataObject.getMetaData().getPath().equals(typePath));
       loadNextObject = false;
       if (currentDataObject == null) {
         close();

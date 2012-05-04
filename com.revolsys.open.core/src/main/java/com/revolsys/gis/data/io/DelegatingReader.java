@@ -19,6 +19,7 @@ public class DelegatingReader<T> extends AbstractReader<T> {
     this.reader = reader;
   }
 
+  @Override
   public final void close() {
     try {
       if (reader != null) {

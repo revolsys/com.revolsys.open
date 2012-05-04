@@ -19,39 +19,17 @@ import com.revolsys.jdbc.io.JdbcFactoryRegistry;
 
 public class ContextCleanupListener implements ServletContextListener {
 
-  public void contextInitialized(ServletContextEvent event) {
-    CachedIntrospectionResults.acceptClassLoader(Thread.currentThread()
-      .getContextClassLoader());
-  }
-
-  public void contextDestroyed(ServletContextEvent event) {
-    ClassLoader contextClassLoader = Thread.currentThread()
-      .getContextClassLoader();
-    IoFactoryRegistry.clearInstance();
-    JdbcFactoryRegistry.clearInstance();
-    StringConverterRegistry.clearInstance();
-    GeometryFactory.clear();
-    EpsgCoordinateSystems.clear();
-    cleanupAttributes(event.getServletContext());
-    
-    CachedIntrospectionResults.clearClassLoader(contextClassLoader);
-    CachedIntrospectionResults.clearClassLoader(CachedIntrospectionResults.class.getClassLoader());
-    CachedIntrospectionResults.clearClassLoader(ClassLoader.getSystemClassLoader());
-    ClearCachedIntrospectionResults.clearCache();
-    Introspector.flushCaches();
-  }
-
-  static void cleanupAttributes(ServletContext servletContext) {
+  static void cleanupAttributes(final ServletContext servletContext) {
     @SuppressWarnings("rawtypes")
-    Enumeration attrNames = servletContext.getAttributeNames();
+    final Enumeration attrNames = servletContext.getAttributeNames();
     while (attrNames.hasMoreElements()) {
-      String attrName = (String)attrNames.nextElement();
+      final String attrName = (String)attrNames.nextElement();
       if (attrName.startsWith("org.springframework.")) {
-        Object attrValue = servletContext.getAttribute(attrName);
+        final Object attrValue = servletContext.getAttribute(attrName);
         if (attrValue instanceof DisposableBean) {
           try {
             ((DisposableBean)attrValue).destroy();
-          } catch (Throwable e) {
+          } catch (final Throwable e) {
             System.err.println("Couldn't invoke destroy method of attribute with name '"
               + attrName + "'");
           }
@@ -60,5 +38,27 @@ public class ContextCleanupListener implements ServletContextListener {
         }
       }
     }
+  }
+
+  public void contextDestroyed(final ServletContextEvent event) {
+    final ClassLoader contextClassLoader = Thread.currentThread()
+      .getContextClassLoader();
+    IoFactoryRegistry.clearInstance();
+    JdbcFactoryRegistry.clearInstance();
+    StringConverterRegistry.clearInstance();
+    GeometryFactory.clear();
+    EpsgCoordinateSystems.clear();
+    cleanupAttributes(event.getServletContext());
+
+    CachedIntrospectionResults.clearClassLoader(contextClassLoader);
+    CachedIntrospectionResults.clearClassLoader(CachedIntrospectionResults.class.getClassLoader());
+    CachedIntrospectionResults.clearClassLoader(ClassLoader.getSystemClassLoader());
+    ClearCachedIntrospectionResults.clearCache();
+    Introspector.flushCaches();
+  }
+
+  public void contextInitialized(final ServletContextEvent event) {
+    CachedIntrospectionResults.acceptClassLoader(Thread.currentThread()
+      .getContextClassLoader());
   }
 }

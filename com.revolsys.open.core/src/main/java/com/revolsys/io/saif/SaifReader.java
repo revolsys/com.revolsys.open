@@ -38,8 +38,6 @@ import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.xml.namespace.QName;
-
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 
@@ -49,8 +47,10 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.io.DataObjectReader;
+import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.saif.util.QNameCache;
+import com.revolsys.io.PathUtil;
+import com.revolsys.io.saif.util.PathCache;
 
 /**
  * <p>
@@ -60,7 +60,8 @@ import com.revolsys.io.saif.util.QNameCache;
  * @author Paul Austin
  * @see SaifWriter
  */
-public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
+public class SaifReader extends AbstractObjectWithProperties implements
+  DataObjectReader, DataObjectMetaDataFactory {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
@@ -71,7 +72,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private DataObjectMetaDataFactory declaredMetaDataFactory;
 
   /** List of type names to exclude from reading. */
-  private final Set<QName> excludeTypeNames = new LinkedHashSet<QName>();
+  private final Set<String> excludeTypeNames = new LinkedHashSet<String>();
 
   /** The list of exported objects. */
   private DataObject exportedObjects;
@@ -82,7 +83,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private File file;
 
   /** Mapping between file names and type names. */
-  private final Map<String, QName> fileNameTypeNameMap = new HashMap<String, QName>();
+  private final Map<String, String> fileNameTypeNameMap = new HashMap<String, String>();
 
   /** The global metatdata for the archive. */
   private DataObject globalMetadata;
@@ -94,7 +95,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private DataObject importedObjects;
 
   /** List of type names to include for reading. */
-  private final Set<QName> includeTypeNames = new LinkedHashSet<QName>();
+  private final Set<String> includeTypeNames = new LinkedHashSet<String>();
 
   /** The list of internally referenced objects. */
   private DataObject internallyReferencedObjects;
@@ -108,21 +109,18 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   /** The iterator for the current object set. */
   private OsnReader osnReader;
 
-  /** The meta data properties of the data type. */
-  private final Map<String, Object> properties = new HashMap<String, Object>();
-
   /** The directory the SAIF archive is extracted to. */
   private File saifArchiveDirectory;
 
   private int srid = 26910;
 
   /** Mapping between type names and file names. */
-  private final Map<QName, String> typeNameFileNameMap = new HashMap<QName, String>();
+  private final Map<String, String> typePathFileNameMap = new HashMap<String, String>();
 
   /** The iterator of object subsets for the archive. */
-  private Iterator<QName> typeNameIterator;
+  private Iterator<String> typePathIterator;
 
-  private List<QName> typeNames;
+  private List<String> typePaths;
 
   /** The zip file. */
   private ZipFile zipFile;
@@ -208,8 +206,8 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     return file;
   }
 
-  private String getFileName(final QName typeName) {
-    return typeNameFileNameMap.get(typeName);
+  private String getFileName(final String typePath) {
+    return typePathFileNameMap.get(typePath);
   }
 
   /**
@@ -272,8 +270,8 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     return internallyReferencedObjects;
   }
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    return metaDataFactory.getMetaData(typeName);
+  public DataObjectMetaData getMetaData(final String typePath) {
+    return metaDataFactory.getMetaData(typePath);
   }
 
   /**
@@ -288,10 +286,10 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private <D extends DataObject> OsnReader getOsnReader(
     final DataObjectMetaDataFactory metaDataFactory,
     final DataObjectFactory factory,
-    final QName className) throws IOException {
-    String fileName = typeNameFileNameMap.get(className);
+    final String className) throws IOException {
+    String fileName = typePathFileNameMap.get(className);
     if (fileName == null) {
-      fileName = className.getLocalPart();
+      fileName = PathUtil.getName(className);
     }
     OsnReader reader;
     if (zipFile != null) {
@@ -305,43 +303,34 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   }
 
   public <D extends DataObject> OsnReader getOsnReader(
-    final QName className,
+    final String className,
     final DataObjectFactory factory) throws IOException {
     final DataObjectMetaDataFactory metaDataFactory = this.metaDataFactory;
     return getOsnReader(metaDataFactory, factory, className);
 
   }
 
-  public Map<String, Object> getProperties() {
-    return properties;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> V getProperty(final String name) {
-    return (V)properties.get(name);
-  }
-
   public int getSrid() {
     return srid;
   }
 
-  private QName getTypeName(final String fileName) {
+  private String getTypeName(final String fileName) {
     return fileNameTypeNameMap.get(fileName);
   }
 
   /**
-   * @return the typeNameObjectSetMap
+   * @return the typePathObjectSetMap
    */
-  public Map<QName, String> getTypeNameFileNameMap() {
-    return typeNameFileNameMap;
+  public Map<String, String> getTypeNameFileNameMap() {
+    return typePathFileNameMap;
   }
 
-  public List<QName> getTypeNames() {
-    return typeNames;
+  public List<String> getTypeNames() {
+    return typePaths;
   }
 
-  private boolean hasData(final QName typeName) {
-    final String fileName = getFileName(typeName);
+  private boolean hasData(final String typePath) {
+    final String fileName = getFileName(typePath);
     if (fileName == null) {
       return false;
     } else if (zipFile != null) {
@@ -371,39 +360,40 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   @SuppressWarnings("unchecked")
   private void loadExportedObjects() throws IOException {
     final boolean setNames = includeTypeNames.isEmpty();
-    final OsnReader reader = getOsnReader(
-      new SaifSchemaReader().loadSchema(new ClassPathResource(
-        "com/revolsys/io/saif/saifzip.csn")), factory, new QName("exports.dir"));
+    ClassPathResource resource = new ClassPathResource(
+      "com/revolsys/io/saif/saifzip.csn");
+    DataObjectMetaDataFactory schema = new SaifSchemaReader().loadSchema(resource);
+    final OsnReader reader = getOsnReader(schema, factory, "/exports.dir");
     try {
-      final Map<String, QName> names = new TreeMap<String, QName>();
+      final Map<String, String> names = new TreeMap<String, String>();
       if (reader.hasNext()) {
         exportedObjects = reader.next();
         final Set<DataObject> handles = ((Set<DataObject>)exportedObjects.getValue("handles"));
         for (final DataObject exportedObject : handles) {
           final String fileName = (String)exportedObject.getValue("objectSubset");
           if (fileName != null && !fileName.equals("globmeta.osn")) {
-            QName typeName = getTypeName(fileName);
-            if (typeName == null) {
+            String typePath = getTypeName(fileName);
+            if (typePath == null) {
               final String name = (String)exportedObject.getValue("type");
-              typeName = QNameCache.getName(name);
+              typePath = PathCache.getName(name);
               if (!fileNameTypeNameMap.containsKey(fileName)) {
-                fileNameTypeNameMap.put(fileName, typeName);
-                typeNameFileNameMap.put(typeName, fileName);
+                fileNameTypeNameMap.put(fileName, typePath);
+                typePathFileNameMap.put(typePath, fileName);
               }
             }
 
             if (setNames && !fileName.equals("metdat00.osn")
               && !fileName.equals("refsys00.osn")) {
-              names.put(typeName.toString(), typeName);
+              names.put(typePath.toString(), typePath);
             }
           }
         }
         if (setNames) {
-          typeNames = new ArrayList<QName>(names.values());
+          typePaths = new ArrayList<String>(names.values());
         } else {
-          typeNames = new ArrayList<QName>(includeTypeNames);
+          typePaths = new ArrayList<String>(includeTypeNames);
         }
-        typeNames.removeAll(excludeTypeNames);
+        typePaths.removeAll(excludeTypeNames);
       }
     } finally {
       reader.close();
@@ -416,7 +406,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * @throws IOException If there was an I/O error.
    */
   private void loadGlobalMetadata() throws IOException {
-    final OsnReader reader = getOsnReader(new QName("globmeta.osn"), factory);
+    final OsnReader reader = getOsnReader("/globmeta.osn", factory);
     try {
       if (reader.hasNext()) {
         globalMetadata = osnReader.next();
@@ -432,7 +422,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * @throws IOException If there was an I/O error.
    */
   private void loadImportedObjects() throws IOException {
-    final OsnReader reader = getOsnReader(new QName("imports.dir"), factory);
+    final OsnReader reader = getOsnReader("/imports.dir", factory);
     try {
       if (reader.hasNext()) {
         importedObjects = osnReader.next();
@@ -448,7 +438,7 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    * @throws IOException If there was an I/O error.
    */
   private void loadInternallyReferencedObjects() throws IOException {
-    final OsnReader reader = getOsnReader(new QName("internal.dir"), factory);
+    final OsnReader reader = getOsnReader("/internal.dir", factory);
     try {
       if (reader.hasNext()) {
         internallyReferencedObjects = osnReader.next();
@@ -513,12 +503,12 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   }
 
   private void loadSrid() throws IOException {
-    final OsnReader reader = getOsnReader(new QName("refsys00.osn"), factory);
+    final OsnReader reader = getOsnReader("/refsys00.osn", factory);
     try {
       if (reader.hasNext()) {
         final DataObject spatialReferencing = reader.next();
         final DataObject coordinateSystem = spatialReferencing.getValue("coordSystem");
-        if (coordinateSystem.getMetaData().getName().equals(new QName("UTM"))) {
+        if (coordinateSystem.getMetaData().getPath().equals("/UTM")) {
           final Number srid = coordinateSystem.getValue("zone");
           setSrid(26900 + srid.intValue());
         }
@@ -576,20 +566,20 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   private boolean openNextObjectSet() {
     try {
       closeCurrentReader();
-      if (typeNameIterator == null) {
-        typeNameIterator = typeNames.iterator();
+      if (typePathIterator == null) {
+        typePathIterator = typePaths.iterator();
       }
-      if (typeNameIterator.hasNext()) {
+      if (typePathIterator.hasNext()) {
         do {
-          final QName typeName = typeNameIterator.next();
-          if (hasData(typeName)) {
-            osnReader = getOsnReader(typeName, factory);
+          final String typePath = typePathIterator.next();
+          if (hasData(typePath)) {
+            osnReader = getOsnReader(typePath, factory);
             osnReader.setFactory(factory);
             if (osnReader.hasNext()) {
               return true;
             }
           }
-        } while (typeNameIterator.hasNext());
+        } while (typePathIterator.hasNext());
       }
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
@@ -599,9 +589,9 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
   }
 
   protected DataObject readObject(
-    final String fileName,
+    final String className,
     final DataObjectFactory factory) throws IOException {
-    final OsnReader reader = getOsnReader(new QName(fileName), factory);
+    final OsnReader reader = getOsnReader(className, factory);
     try {
       final DataObject object = reader.next();
       return object;
@@ -635,8 +625,8 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    */
   public void setExcludeTypeNames(final Collection<String> excludeTypeNames) {
     this.excludeTypeNames.clear();
-    for (final String typeName : excludeTypeNames) {
-      this.excludeTypeNames.add(QName.valueOf(typeName));
+    for (final String typePath : excludeTypeNames) {
+      this.excludeTypeNames.add(String.valueOf(typePath));
     }
   }
 
@@ -656,8 +646,8 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
    */
   public void setIncludeTypeNames(final Collection<String> includeTypeNames) {
     this.includeTypeNames.clear();
-    for (final String typeName : includeTypeNames) {
-      this.includeTypeNames.add(QName.valueOf(typeName));
+    for (final String typePath : includeTypeNames) {
+      this.includeTypeNames.add(String.valueOf(typePath));
     }
   }
 
@@ -674,33 +664,32 @@ public class SaifReader implements DataObjectReader, DataObjectMetaDataFactory {
     }
   }
 
-  public void setProperty(final String name, final Object value) {
-    properties.put(name, value);
-  }
-
   public void setSrid(final int srid) {
     this.srid = srid;
   }
 
   /**
-   * @param typeNameObjectSetMap the typeNameObjectSetMap to set
+   * @param typePathObjectSetMap the typePathObjectSetMap to set
    */
   public void setTypeNameFileNameMap(
-    final Map<String, String> typeNameObjectSetMap) {
-    typeNameFileNameMap.clear();
+    final Map<String, String> typePathObjectSetMap) {
+    typePathFileNameMap.clear();
     fileNameTypeNameMap.clear();
-    for (final Entry<String, String> entry : typeNameObjectSetMap.entrySet()) {
+    for (final Entry<String, String> entry : typePathObjectSetMap.entrySet()) {
       final String key = entry.getKey();
       final String value = entry.getValue();
-      final QName name = QName.valueOf(key);
-      typeNameFileNameMap.put(name, value);
-      fileNameTypeNameMap.put(value, name);
+      typePathFileNameMap.put(key, value);
+      fileNameTypeNameMap.put(value, key);
     }
   }
 
   @Override
   public String toString() {
     return file.getAbsolutePath();
+  }
+
+  public OsnReader getOsnReader(String className) throws IOException {
+    return getOsnReader(className, factory);
   }
 
 }

@@ -22,9 +22,6 @@ import com.revolsys.gis.data.io.DataAccessObject;
 
 public class SpringDaoFactory implements BeanFactoryAware,
   DataAccessObjectFactory {
-  /** The springframework bean factory used to get the Data Access Objects. */
-  private BeanFactory beanFactory;
-
   /**
    * Get the {@link DataAccessObject} from the bean factory. The Data Access
    * Object will be loaded from the bean objectClass.name+"-dao".
@@ -58,7 +55,7 @@ public class SpringDaoFactory implements BeanFactoryAware,
   public static <T extends DataAccessObject<?>> T get(
     final BeanFactory factory,
     final String objectClassName) {
-    Object bean = factory.getBean(objectClassName + "-dao");
+    final Object bean = factory.getBean(objectClassName + "-dao");
     return (T)get(bean);
   }
 
@@ -75,10 +72,9 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * @return The DataAccessObject instance.
    */
   @SuppressWarnings("unchecked")
-  private static <T extends DataAccessObject<?>> T get(
-    final Object bean) {
+  private static <T extends DataAccessObject<?>> T get(final Object bean) {
     if (bean instanceof DaoProxyFactory) {
-      DaoProxyFactory proxyFactory = (DaoProxyFactory)bean;
+      final DaoProxyFactory proxyFactory = (DaoProxyFactory)bean;
       return (T)proxyFactory.createDataAccessObject(null);
     } else if (bean instanceof DataAccessObject<?>) {
       return (T)bean;
@@ -86,6 +82,9 @@ public class SpringDaoFactory implements BeanFactoryAware,
     throw new IllegalArgumentException(bean.getClass().getName()
       + " is not a valid data access object");
   }
+
+  /** The springframework bean factory used to get the Data Access Objects. */
+  private BeanFactory beanFactory;
 
   /**
    * Construct a new SpringDaoFactory.
@@ -99,19 +98,7 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * @param beanFactory The springframework bean factory used to get the Data
    *          Access Objects.
    */
-  public SpringDaoFactory(
-    final BeanFactory beanFactory) {
-    this.beanFactory = beanFactory;
-  }
-
-  /**
-   * Set the springframework bean factory used to get the Data Access Objects.
-   * 
-   * @param beanFactory The springframework bean factory used to get the Data
-   *          Access Objects.
-   */
-  public void setBeanFactory(
-    final BeanFactory beanFactory) {
+  public SpringDaoFactory(final BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
@@ -125,8 +112,7 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * @return The Data Access Object instance.
    */
   @SuppressWarnings("unchecked")
-  public <T extends DataAccessObject<?>> T get(
-    final Class<?> objectClass) {
+  public <T extends DataAccessObject<?>> T get(final Class<?> objectClass) {
     return (T)get(beanFactory, objectClass.getName());
   }
 
@@ -140,8 +126,17 @@ public class SpringDaoFactory implements BeanFactoryAware,
    * @return The Data Access Object instance.
    */
   @SuppressWarnings("unchecked")
-  public <T extends DataAccessObject<?>> T get(
-    final String objectClassName) {
+  public <T extends DataAccessObject<?>> T get(final String objectClassName) {
     return (T)get(beanFactory, objectClassName);
+  }
+
+  /**
+   * Set the springframework bean factory used to get the Data Access Objects.
+   * 
+   * @param beanFactory The springframework bean factory used to get the Data
+   *          Access Objects.
+   */
+  public void setBeanFactory(final BeanFactory beanFactory) {
+    this.beanFactory = beanFactory;
   }
 }

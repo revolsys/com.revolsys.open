@@ -1,7 +1,5 @@
 package com.revolsys.io.saif.util;
 
-import javax.xml.namespace.QName;
-
 public class SpatialObjectConverter implements OsnConverter {
   private final OsnConverterRegistry converters;
 
@@ -14,7 +12,7 @@ public class SpatialObjectConverter implements OsnConverter {
     if (!name.equals("geometry")) {
       iterator.throwParseError("No geometry attribute");
     }
-    final QName objectName = iterator.nextObjectName();
+    final String objectName = iterator.nextObjectName();
     final OsnConverter osnConverter = converters.getConverter(objectName);
     if (osnConverter == null) {
       iterator.throwParseError("No Geometry Converter for " + objectName);

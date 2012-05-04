@@ -23,7 +23,7 @@ public class DispatcherServlet extends
       request.removeAttribute(WebUtils.INCLUDE_QUERY_STRING_ATTRIBUTE);
       request.removeAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
       request.removeAttribute(WebUtils.INCLUDE_SERVLET_PATH_ATTRIBUTE);
-    } catch (AccessDeniedException e) {
+    } catch (final AccessDeniedException e) {
       throw e;
     } catch (final Exception e) {
       LOG.error(e.getMessage(), e);

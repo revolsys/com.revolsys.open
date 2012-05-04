@@ -173,7 +173,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     classTypeNameMap.put(Integer.class, XmlConstants.XS_INT);
     classTypeNameMap.put(Float.class, XmlConstants.XS_FLOAT);
     classTypeNameMap.put(Double.class, XmlConstants.XS_DOUBLE);
-    classTypeNameMap.put(Double.class, XmlConstants.XS_STRING);
+    classTypeNameMap.put(String.class, XmlConstants.XS_STRING);
 
     xsiTypeTypeNames.add(CODE);
   }

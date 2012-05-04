@@ -31,7 +31,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 public class HibernateQueryCallback implements HibernateCallback {
   /** The HQL query. */
-  private String query;
+  private final String query;
 
   /**
    * Construct a new HibernateQueryCallback.

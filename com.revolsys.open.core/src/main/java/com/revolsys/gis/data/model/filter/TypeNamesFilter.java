@@ -3,41 +3,34 @@ package com.revolsys.gis.data.model.filter;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 
 public class TypeNamesFilter implements Filter<DataObject> {
 
-  private final Set<QName> typeNames = new HashSet<QName>();
+  private final Set<String> typePaths = new HashSet<String>();
 
   public TypeNamesFilter() {
   }
 
-  public TypeNamesFilter(final QName typeName) {
-    typeNames.add(typeName);
+  public TypeNamesFilter(final String typePath) {
+    typePaths.add(typePath);
   }
 
   public boolean accept(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
-    final QName name = metaData.getName();
-    return typeNames.contains(name);
+    final String typePath = metaData.getPath();
+    return typePaths.contains(typePath);
   }
 
   /**
-   * @param typeNames the typeNames to set
+   * @param typePaths the typePaths to set
    */
-  public void setTypeNames(final Set<Object> typeNames) {
-    for (final Object name : typeNames) {
-      if (name instanceof QName) {
-        final QName typeName = (QName)name;
-        this.typeNames.add(typeName);
-      } else if (name != null) {
-        final QName typeName = QName.valueOf(name.toString());
-        this.typeNames.add(typeName);
-      }
+  public void setTypeNames(final Set<Object> typePaths) {
+    for (final Object name : typePaths) {
+      final String typePath = name.toString();
+      this.typePaths.add(typePath);
     }
   }
 
@@ -46,10 +39,10 @@ public class TypeNamesFilter implements Filter<DataObject> {
    */
   @Override
   public String toString() {
-    if (typeNames.size() == 1) {
-      return "typeName=" + typeNames.iterator().next();
+    if (typePaths.size() == 1) {
+      return "typePath=" + typePaths.iterator().next();
     } else {
-      return "typeName in " + typeNames;
+      return "typePath in " + typePaths;
     }
   }
 

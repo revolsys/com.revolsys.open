@@ -29,8 +29,6 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.zip.ZipFile;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.parser.ParseException;
 
 public class OsnIterator implements Iterator<Object> {
@@ -372,10 +370,10 @@ public class OsnIterator implements Iterator<Object> {
     return currentCharacter;
   }
 
-  public QName getQNameValue() {
+  public String getPathValue() {
     final String name = getStringValue();
     if (name != null) {
-      return QNameCache.getName(name);
+      return PathCache.getName(name);
     } else {
       return null;
     }
@@ -501,7 +499,7 @@ public class OsnIterator implements Iterator<Object> {
     return getIntegerValue();
   }
 
-  public QName nextObjectName() {
+  public String nextObjectName() {
     Object currentEventType = getEventType();
     if (currentEventType != OsnIterator.START_DEFINITION) {
       if (currentEventType == END_OBJECT) {
@@ -515,7 +513,7 @@ public class OsnIterator implements Iterator<Object> {
         }
       }
     }
-    return getQNameValue();
+    return getPathValue();
   }
 
   public String nextStringAttribute(final String name) {

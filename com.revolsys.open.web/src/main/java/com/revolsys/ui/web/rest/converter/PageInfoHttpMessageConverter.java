@@ -189,7 +189,7 @@ public class PageInfoHttpMessageConverter extends
     }
 
     final Map<String, PageInfo> pages = pageInfo.getPages();
-    Element pagesElement = pageInfo.getPagesElement();
+    final Element pagesElement = pageInfo.getPagesElement();
     if (pagesElement != null) {
       pagesElement.serialize(writer);
     } else if (!pages.isEmpty()) {

@@ -122,10 +122,10 @@ public class SelectField extends Field {
     field.setRequired(isRequired());
     field.setReadOnly(isReadOnly());
     field.setNullValueLabel(getNullValueLabel());
-    for (FieldValue fieldValue : options) {
-      Object value = fieldValue.getValue();
-      String stringValue = fieldValue.getStringValue();
-      String label = fieldValue.getLabel();
+    for (final FieldValue fieldValue : options) {
+      final Object value = fieldValue.getValue();
+      final String stringValue = fieldValue.getStringValue();
+      final String label = fieldValue.getLabel();
       field.addOption(value, stringValue, label);
     }
     return field;

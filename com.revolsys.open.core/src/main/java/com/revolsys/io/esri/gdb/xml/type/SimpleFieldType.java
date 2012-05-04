@@ -17,7 +17,7 @@ public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
   public SimpleFieldType(final FieldType esriFieldType,
     final DataType dataType, final boolean usePrecision, final int fixedLength) {
-    super(dataType, "xs:" + dataType.getName().getLocalPart(), esriFieldType);
+    super(dataType, "xs:" + dataType.getName(), esriFieldType);
     this.usePrecision = usePrecision;
     this.fixedLength = fixedLength;
   }

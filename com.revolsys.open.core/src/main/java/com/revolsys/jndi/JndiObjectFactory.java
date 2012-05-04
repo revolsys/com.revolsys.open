@@ -19,19 +19,11 @@ public class JndiObjectFactory extends AbstractFactoryBean<Object> {
 
   private String jndiUrl;
 
-  public String getBeanName() {
-    return beanName;
-  }
-
-  public String getJndiUrl() {
-    return jndiUrl;
-  }
-
   @Override
   protected Object createInstance() throws Exception {
     final Hashtable<Object, Object> initialEnvironment = new Hashtable<Object, Object>();
     final String initialFactory = System.getProperty(Context.INITIAL_CONTEXT_FACTORY);
-    BeanFactory beanFactory = getBeanFactory();
+    final BeanFactory beanFactory = getBeanFactory();
     if (initialFactory != null) {
       initialEnvironment.put(Context.INITIAL_CONTEXT_FACTORY, initialFactory);
     }
@@ -72,6 +64,15 @@ public class JndiObjectFactory extends AbstractFactoryBean<Object> {
     return null;
   }
 
+  public String getBeanName() {
+    return beanName;
+  }
+
+  public String getJndiUrl() {
+    return jndiUrl;
+  }
+
+  @Override
   public Class<?> getObjectType() {
     return null;
   }

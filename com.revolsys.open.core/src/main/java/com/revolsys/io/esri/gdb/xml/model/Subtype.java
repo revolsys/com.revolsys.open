@@ -3,7 +3,7 @@ package com.revolsys.io.esri.gdb.xml.model;
 import java.util.List;
 
 public class Subtype {
-  private String subtypeName;
+  private String subtypePath;
 
   private int subtypeCode;
 
@@ -17,8 +17,8 @@ public class Subtype {
     return subtypeCode;
   }
 
-  public String getSubtypeName() {
-    return subtypeName;
+  public String getSubtypePath() {
+    return subtypePath;
   }
 
   public void setFieldInfos(final List<SubtypeFieldInfo> fieldInfos) {
@@ -29,8 +29,8 @@ public class Subtype {
     this.subtypeCode = subtypeCode;
   }
 
-  public void setSubtypeName(final String subtypeName) {
-    this.subtypeName = subtypeName;
+  public void setSubtypePath(final String subtypePath) {
+    this.subtypePath = subtypePath;
   }
 
 }

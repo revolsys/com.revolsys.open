@@ -2,8 +2,6 @@ package com.revolsys.gis.data.model.comparator;
 
 import java.util.Comparator;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 
@@ -12,12 +10,12 @@ public class DataObjectTypeNameComparator implements Comparator<DataObject> {
     final DataObject object1,
     final DataObject object2) {
     final DataObjectMetaData metaData1 = object1.getMetaData();
-    final QName typeName1 = metaData1.getName();
-    final String name1 = typeName1.toString();
+    final String typePath1 = metaData1.getPath();
+    final String name1 = typePath1.toString();
 
     final DataObjectMetaData metaData2 = object2.getMetaData();
-    final QName typeName2 = metaData2.getName();
-    final String name2 = typeName2.toString();
+    final String typePath2 = metaData2.getPath();
+    final String name2 = typePath2.toString();
 
     return name1.compareTo(name2);
   }

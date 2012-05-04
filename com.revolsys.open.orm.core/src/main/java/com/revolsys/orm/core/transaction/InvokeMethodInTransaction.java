@@ -7,13 +7,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class InvokeMethodInTransaction {
   private static final Object[] EMPTY_ARGS = new Object[0];
 
-  private boolean throwExceptions;
+  private final boolean throwExceptions;
 
   private int propagationBehavior = -1;
 
-  private boolean rollback;
+  private final boolean rollback;
 
-  private PlatformTransactionManager transactionManager;
+  private final PlatformTransactionManager transactionManager;
 
   public InvokeMethodInTransaction(final BeanFactory beanFactory) {
     this(beanFactory, true);
@@ -94,16 +94,19 @@ public class InvokeMethodInTransaction {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T execute(final Object object, final String methodName,
+  public <T> T execute(
+    final Object object,
+    final String methodName,
     final Object... args) {
     try {
-      TransactionTemplate template = new TransactionTemplate(transactionManager);
+      final TransactionTemplate template = new TransactionTemplate(
+        transactionManager);
       if (propagationBehavior > -1) {
         template.setPropagationBehavior(propagationBehavior);
       }
       return (T)template.execute(new InvokeMethodTransactionCallback(object,
         methodName, rollback, args));
-    } catch (RuntimeException e) {
+    } catch (final RuntimeException e) {
       if (throwExceptions) {
         throw e;
       } else {

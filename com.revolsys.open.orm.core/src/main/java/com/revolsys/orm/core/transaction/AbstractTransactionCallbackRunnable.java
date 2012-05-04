@@ -11,6 +11,7 @@ public abstract class AbstractTransactionCallbackRunnable extends
    * 
    */
   private static final long serialVersionUID = -2139776082029553417L;
+
   private final PlatformTransactionManager transactionManager;
 
   public AbstractTransactionCallbackRunnable(

@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.BoundingBox;
 
 public class DataObjectStoreCache {
@@ -21,7 +19,7 @@ public class DataObjectStoreCache {
 
   private final Map<BoundingBox, DataStoreQueryTask> loadTasks = new LinkedHashMap<BoundingBox, DataStoreQueryTask>();
 
-  private QName typeName;
+  private String typePath;
 
   public DataObjectStoreCache(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
@@ -30,7 +28,7 @@ public class DataObjectStoreCache {
   private void addBoundingBox(final BoundingBox boundingBox) {
     synchronized (loadTasks) {
       if (!loadTasks.containsKey(boundingBox)) {
-        loadTasks.put(boundingBox, new DataStoreQueryTask(dataStore, typeName,
+        loadTasks.put(boundingBox, new DataStoreQueryTask(dataStore, typePath,
           boundingBox));
       }
     }

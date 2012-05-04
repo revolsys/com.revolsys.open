@@ -4,12 +4,10 @@ import java.sql.Connection;
 import java.sql.ResultSetMetaData;
 
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.Reader;
 import com.vividsolutions.jts.geom.Geometry;
@@ -29,16 +27,16 @@ public interface JdbcDataObjectStore extends DataObjectStore {
   String getLabel();
 
   DataObjectMetaData getMetaData(
-    QName tableName,
+    String tableName,
     ResultSetMetaData resultSetMetaData);
 
   Object getNextPrimaryKey(DataObjectMetaData metaData);
 
-  Object getNextPrimaryKey(String typeName);
+  Object getNextPrimaryKey(String typePath);
 
   void initialize();
 
-  Reader<DataObject> query(QName typeName, Geometry geometry, String condition);
+  Reader<DataObject> query(String path, Geometry geometry, String condition);
 
   void setDataSource(DataSource dataSource);
 

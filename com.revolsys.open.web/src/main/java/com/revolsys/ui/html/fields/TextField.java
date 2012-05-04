@@ -60,14 +60,6 @@ public class TextField extends Field {
     this.maxLength = maxLength;
   }
 
-  public void setMaxLength(int maxLength) {
-    this.maxLength = maxLength;
-  }
-
-  public void setMinLength(int minLength) {
-    this.minLength = minLength;
-  }
-
   public TextField(final String name, final int size, final int minLength,
     final int maxLength, final String defaultValue, final boolean required) {
     this(name, size, maxLength, defaultValue, required);
@@ -188,6 +180,14 @@ public class TextField extends Field {
 
   protected void setInputValue(final String inputValue) {
     this.inputValue = inputValue;
+  }
+
+  public void setMaxLength(final int maxLength) {
+    this.maxLength = maxLength;
+  }
+
+  public void setMinLength(final int minLength) {
+    this.minLength = minLength;
   }
 
   public void setSize(final int size) {

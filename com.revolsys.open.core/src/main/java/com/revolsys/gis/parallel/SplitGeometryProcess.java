@@ -98,27 +98,6 @@ public class SplitGeometryProcess extends
     }
   }
 
-  protected List<DataObject> split(DataObject object, LineString line) {
-    List<DataObject> newObjects = new ArrayList<DataObject>();
-    List<LineString> newLines = LineStringUtil.split(geometryFactory, line,
-      index, tolerance);
-    if (newLines.size() == 1) {
-      LineString newLine = newLines.get(0);
-      if (newLine == line) {
-        newObjects.add(object);
-      } else {
-        DataObject newObject = createSplitObject(object, newLine);
-        newObjects.add(newObject);
-      }
-    } else {
-      for (final LineString newLine : newLines) {
-        DataObject newObject = createSplitObject(object, newLine);
-        newObjects.add(newObject);
-      }
-    }
-    return newObjects;
-  }
-
   @Override
   protected void process(
     final Channel<DataObject> in,
@@ -128,7 +107,7 @@ public class SplitGeometryProcess extends
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       if (line.isWithinDistance(this.geometry, 0)) {
-        List<DataObject> newObjects = split(object, line);
+        final List<DataObject> newObjects = split(object, line);
         for (final DataObject newObject : newObjects) {
           out.write(newObject);
         }
@@ -180,6 +159,29 @@ public class SplitGeometryProcess extends
 
   public void setTolerance(final double tolerance) {
     this.tolerance = tolerance;
+  }
+
+  protected List<DataObject> split(
+    final DataObject object,
+    final LineString line) {
+    final List<DataObject> newObjects = new ArrayList<DataObject>();
+    final List<LineString> newLines = LineStringUtil.split(geometryFactory,
+      line, index, tolerance);
+    if (newLines.size() == 1) {
+      final LineString newLine = newLines.get(0);
+      if (newLine == line) {
+        newObjects.add(object);
+      } else {
+        final DataObject newObject = createSplitObject(object, newLine);
+        newObjects.add(newObject);
+      }
+    } else {
+      for (final LineString newLine : newLines) {
+        final DataObject newObject = createSplitObject(object, newLine);
+        newObjects.add(newObject);
+      }
+    }
+    return newObjects;
   }
 
 }

@@ -119,17 +119,17 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public List<LineString> getLines() {
     removeDuplicateEdges();
-    EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
+    final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
       "INDEX");
-    List<LineString> lines = new ArrayList<LineString>();
-    int numAxis = geometryFactory.getNumAxis();
+    final List<LineString> lines = new ArrayList<LineString>();
+    final int numAxis = geometryFactory.getNumAxis();
     DoubleListCoordinatesList points = new DoubleListCoordinatesList(numAxis);
     Node<LineSegment> previousNode = null;
-    for (Edge<LineSegment> edge : getEdges(comparator)) {
-      LineSegment lineSegment = edge.getObject();
+    for (final Edge<LineSegment> edge : getEdges(comparator)) {
+      final LineSegment lineSegment = edge.getObject();
       if (lineSegment.getLength() > 0) {
-        Node<LineSegment> fromNode = edge.getFromNode();
-        Node<LineSegment> toNode = edge.getToNode();
+        final Node<LineSegment> fromNode = edge.getFromNode();
+        final Node<LineSegment> toNode = edge.getToNode();
         if (previousNode == null) {
           points.addAll(lineSegment);
         } else if (fromNode == previousNode) {
@@ -138,16 +138,16 @@ public class LineStringGraph extends Graph<LineSegment> {
           }
         } else {
           if (points.size() > 1) {
-            LineString line = geometryFactory.createLineString(points);
+            final LineString line = geometryFactory.createLineString(points);
             lines.add(line);
           }
           points = new DoubleListCoordinatesList(numAxis);
           points.addAll(lineSegment);
         }
         if (points.size() > 1) {
-          int toDegree = toNode.getDegree();
+          final int toDegree = toNode.getDegree();
           if (toDegree != 2) {
-            LineString line = geometryFactory.createLineString(points);
+            final LineString line = geometryFactory.createLineString(points);
             lines.add(line);
             points = new DoubleListCoordinatesList(numAxis);
             points.add(toNode);
@@ -157,7 +157,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       }
     }
     if (points.size() > 1) {
-      LineString line = geometryFactory.createLineString(points);
+      final LineString line = geometryFactory.createLineString(points);
       lines.add(line);
     }
     return lines;
@@ -265,6 +265,85 @@ public class LineStringGraph extends Graph<LineSegment> {
     return false;
   }
 
+  public boolean intersects(final LineString line) {
+    final Envelope envelope = new Envelope(line.getEnvelopeInternal());
+    final double scaleXY = geometryFactory.getScaleXY();
+    double maxDistance = 0;
+    if (scaleXY > 0) {
+      maxDistance = 1 / scaleXY;
+    }
+    envelope.expandBy(maxDistance);
+    if (envelope.intersects(this.envelope)) {
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final int numPoints = points.size();
+      final Coordinates fromPoint = points.get(0);
+      final Coordinates toPoint = points.get(numPoints - 1);
+
+      Coordinates previousPoint = fromPoint;
+      for (int i = 1; i < numPoints; i++) {
+        final Coordinates nextPoint = points.get(i);
+        final LineSegment line1 = new LineSegment(previousPoint, nextPoint);
+        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
+          this, line1, maxDistance);
+        for (final Edge<LineSegment> edge2 : edges) {
+          final LineSegment line2 = edge2.getObject();
+          final CoordinatesList intersections = line1.getIntersection(line2);
+          final int numIntersections = intersections.size();
+          for (int j = 0; j < numIntersections; j++) {
+            final Coordinates intersection = intersections.get(j);
+            if (intersection.equals(fromPoint) || intersection.equals(toPoint)) {
+              // Point intersection, make sure it's not at the start
+              final Node<LineSegment> node = findNode(intersection);
+              final int degree = node.getDegree();
+              if (node.equals2d(this.fromPoint)) {
+                if (degree > 2) {
+                  // Intersection not at the start/end of the other line, taking
+                  // into account loops
+                  return true;
+                }
+              } else if (degree > 1) {
+                // Intersection not at the start/end of the other line
+                return true;
+              }
+            } else {
+              // Intersection not at the start/end of the line
+              return true;
+            }
+          }
+          for (final Coordinates point : line1) {
+            if (line2.distance(point) < maxDistance) {
+
+              if (point.equals(fromPoint) || point.equals(toPoint)) {
+                // Point intersection, make sure it's not at the start
+                for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor.getNodes(
+                  this, point, maxDistance)) {
+                  final int degree = node.getDegree();
+                  if (node.equals2d(this.fromPoint)) {
+                    if (degree > 2) {
+                      // Intersection not at the start/end of the other line,
+                      // taking
+                      // into account loops
+                      return true;
+                    }
+                  } else if (degree > 1) {
+                    // Intersection not at the start/end of the other line
+                    return true;
+                  }
+                }
+              } else {
+                // Intersection not at the start/end of the line
+                return true;
+              }
+            }
+          }
+
+        }
+        previousPoint = nextPoint;
+      }
+    }
+    return false;
+  }
+
   public boolean isSimple() {
     for (final Node<LineSegment> node : nodes()) {
       if (node.getDegree() > 2) {
@@ -304,7 +383,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   private void removeDuplicateEdges() {
     final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(
       this, "removeDuplicateEdges");
-    Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
+    final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
       INDEX);
     visitEdges(comparator, visitor);
   }
@@ -322,7 +401,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     final Node<LineSegment> toNode = edge.getToNode();
 
     final Collection<Edge<LineSegment>> edges = fromNode.getEdgesTo(toNode);
-    int numDuplicates = edges.size();
+    final int numDuplicates = edges.size();
     if (numDuplicates > 1) {
       edges.remove(edge);
       Edge.remove(edges);
@@ -337,17 +416,17 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public void setIndex(
     final Edge<LineSegment> edge,
-    final List<Edge<LineSegment>> splitEdges) {
-    for (final Edge<LineSegment> splitEdge : splitEdges) {
-      setIndex(edge, splitEdge);
-    }
+    final Edge<LineSegment> newEdge) {
+    final Integer index = edge.getAttribute(INDEX);
+    newEdge.setAttribute(INDEX, index);
   }
 
   public void setIndex(
     final Edge<LineSegment> edge,
-    final Edge<LineSegment> newEdge) {
-    final Integer index = edge.getAttribute(INDEX);
-    newEdge.setAttribute(INDEX, index);
+    final List<Edge<LineSegment>> splitEdges) {
+    for (final Edge<LineSegment> splitEdge : splitEdges) {
+      setIndex(edge, splitEdge);
+    }
   }
 
   private void setLineString(final LineString lineString) {
@@ -369,7 +448,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public void splitCrossingEdges() {
-    Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
+    final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
       INDEX);
     final Visitor<Edge<LineSegment>> visitor = new InvokeMethodVisitor<Edge<LineSegment>>(
       this, "splitCrossingEdges");
@@ -401,85 +480,6 @@ public class LineStringGraph extends Graph<LineSegment> {
       }
     }
     return true;
-  }
-
-  public boolean intersects(LineString line) {
-    Envelope envelope = new Envelope(line.getEnvelopeInternal());
-    double scaleXY = geometryFactory.getScaleXY();
-    double maxDistance = 0;
-    if (scaleXY > 0) {
-      maxDistance = 1 / scaleXY;
-    }
-    envelope.expandBy(maxDistance);
-    if (envelope.intersects(this.envelope)) {
-      CoordinatesList points = CoordinatesListUtil.get(line);
-      int numPoints = points.size();
-      Coordinates fromPoint = points.get(0);
-      Coordinates toPoint = points.get(numPoints - 1);
-
-      Coordinates previousPoint = fromPoint;
-      for (int i = 1; i < numPoints; i++) {
-        Coordinates nextPoint = points.get(i);
-        LineSegment line1 = new LineSegment(previousPoint, nextPoint);
-        List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(this,
-          line1, maxDistance);
-        for (Edge<LineSegment> edge2 : edges) {
-          LineSegment line2 = edge2.getObject();
-          CoordinatesList intersections = line1.getIntersection(line2);
-          int numIntersections = intersections.size();
-          for (int j = 0; j < numIntersections; j++) {
-            Coordinates intersection = intersections.get(j);
-            if (intersection.equals(fromPoint) || intersection.equals(toPoint)) {
-              // Point intersection, make sure it's not at the start
-              Node<LineSegment> node = findNode(intersection);
-              int degree = node.getDegree();
-              if (node.equals2d(this.fromPoint)) {
-                if (degree > 2) {
-                  // Intersection not at the start/end of the other line, taking
-                  // into account loops
-                  return true;
-                }
-              } else if (degree > 1) {
-                // Intersection not at the start/end of the other line
-                return true;
-              }
-            } else {
-              // Intersection not at the start/end of the line
-              return true;
-            }
-          }
-          for (Coordinates point : line1) {
-            if (line2.distance(point) < maxDistance) {
-
-              if (point.equals(fromPoint) || point.equals(toPoint)) {
-                // Point intersection, make sure it's not at the start
-                for (Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor.getNodes(
-                  this, point, maxDistance)) {
-                  int degree = node.getDegree();
-                  if (node.equals2d(this.fromPoint)) {
-                    if (degree > 2) {
-                      // Intersection not at the start/end of the other line,
-                      // taking
-                      // into account loops
-                      return true;
-                    }
-                  } else if (degree > 1) {
-                    // Intersection not at the start/end of the other line
-                    return true;
-                  }
-                }
-              } else {
-                // Intersection not at the start/end of the line
-                return true;
-              }
-            }
-          }
-
-        }
-        previousPoint = nextPoint;
-      }
-    }
-    return false;
   }
 
   @Override

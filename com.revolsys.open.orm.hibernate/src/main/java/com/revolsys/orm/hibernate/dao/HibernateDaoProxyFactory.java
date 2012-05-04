@@ -33,20 +33,20 @@ public class HibernateDaoProxyFactory implements DaoProxyFactory {
   public <T> DataAccessObject<T> createDataAccessObject(
     final String daoInterfaceClassName) {
 
-    Class<?> daoInterface = getDaoInterface(daoInterfaceClassName);
+    final Class<?> daoInterface = getDaoInterface(daoInterfaceClassName);
 
-    DomainClass domainClassAnnotation = (DomainClass)daoInterface.getAnnotation(DomainClass.class);
-    Class<?> domainClass = domainClassAnnotation.value();
+    final DomainClass domainClassAnnotation = daoInterface.getAnnotation(DomainClass.class);
+    final Class<?> domainClass = domainClassAnnotation.value();
 
-    HibernateDaoHandler handler = new HibernateDaoHandler(daoInterface,
+    final HibernateDaoHandler handler = new HibernateDaoHandler(daoInterface,
       domainClass);
     handler.setSessionFactory(sessionFactory);
 
-    ClassLoader classLoader = domainClass.getClassLoader();
-    Class<?>[] params = new Class<?>[] {
+    final ClassLoader classLoader = domainClass.getClassLoader();
+    final Class<?>[] params = new Class<?>[] {
       daoInterface
     };
-    DataAccessObject<T> dataAccessObject = (DataAccessObject<T>)Proxy.newProxyInstance(
+    final DataAccessObject<T> dataAccessObject = (DataAccessObject<T>)Proxy.newProxyInstance(
       classLoader, params, handler);
     return dataAccessObject;
   }
@@ -61,9 +61,9 @@ public class HibernateDaoProxyFactory implements DaoProxyFactory {
    */
   private Class<?> getDaoInterface(final String daoInterfaceName) {
     try {
-      Class<?> daoInterface = Class.forName(daoInterfaceName);
+      final Class<?> daoInterface = Class.forName(daoInterfaceName);
       return daoInterface;
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException("DaoClass " + daoInterfaceName
         + " could not be found");
     }
@@ -73,7 +73,7 @@ public class HibernateDaoProxyFactory implements DaoProxyFactory {
     return sessionFactory;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
+  public void setSessionFactory(final SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
 

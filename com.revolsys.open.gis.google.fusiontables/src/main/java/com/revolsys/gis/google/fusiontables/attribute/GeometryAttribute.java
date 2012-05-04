@@ -48,7 +48,7 @@ public class GeometryAttribute extends FusionTablesAttribute {
         } else {
           return null;
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
         return string;
       }
     }

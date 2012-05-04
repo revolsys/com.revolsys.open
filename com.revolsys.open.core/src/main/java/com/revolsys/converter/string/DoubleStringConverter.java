@@ -7,7 +7,8 @@ public class DoubleStringConverter extends
   public DoubleStringConverter() {
     super(DECIMAL_FORMAT);
   }
- public Class<Double> getConvertedClass() {
+
+  public Class<Double> getConvertedClass() {
     return Double.class;
   }
 

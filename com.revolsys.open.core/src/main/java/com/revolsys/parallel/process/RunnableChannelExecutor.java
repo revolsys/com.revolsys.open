@@ -41,6 +41,18 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     }
   }
 
+  public void closeChannels() {
+    synchronized (monitor) {
+      final List<Channel<Runnable>> channels = this.channels;
+      if (channels != null) {
+        for (final Channel<Runnable> channel : channels) {
+          channel.readDisconnect();
+        }
+      }
+      this.channels = null;
+    }
+  }
+
   public String getBeanName() {
     return beanName;
   }
@@ -67,18 +79,6 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     closeChannels();
   }
 
-  public void closeChannels() {
-    synchronized (monitor) {
-      List<Channel<Runnable>> channels = this.channels;
-      if (channels != null) {
-        for (final Channel<Runnable> channel : channels) {
-          channel.readDisconnect();
-        }
-      }
-      this.channels = null;
-    }
-  }
-
   protected void preRun() {
 
   }
@@ -94,7 +94,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
             monitor.wait();
           }
         }
-        List<Channel<Runnable>> channels = this.channels;
+        final List<Channel<Runnable>> channels = this.channels;
         try {
           if (!isShutdown()) {
             final Channel<Runnable> channel = selector.selectChannelInput(channels);
@@ -106,14 +106,14 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
             }
           }
         } catch (final ClosedException e) {
-          Throwable cause = e.getCause();
+          final Throwable cause = e.getCause();
           if (cause instanceof InterruptedException) {
-            InterruptedException interrupedException = (InterruptedException)cause;
+            final InterruptedException interrupedException = (InterruptedException)cause;
             throw interrupedException;
           }
           synchronized (monitor) {
-            for (Iterator<Channel<Runnable>> iterator = channels.iterator(); iterator.hasNext();) {
-              Channel<Runnable> channel = iterator.next();
+            for (final Iterator<Channel<Runnable>> iterator = channels.iterator(); iterator.hasNext();) {
+              final Channel<Runnable> channel = iterator.next();
               if (channel.isClosed()) {
                 iterator.remove();
               }
@@ -124,7 +124,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
           }
         }
       }
-    } catch (RejectedExecutionException e) {
+    } catch (final RejectedExecutionException e) {
     } catch (final InterruptedException e) {
     } catch (final Throwable t) {
       t.printStackTrace();

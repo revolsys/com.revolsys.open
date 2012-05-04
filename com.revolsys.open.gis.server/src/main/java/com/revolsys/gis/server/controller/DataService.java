@@ -41,15 +41,15 @@ public class DataService {
     }
   }
 
-  @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}/types/{typeName}")
+  @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}/types/{typePath}")
   @ResponseBody
   public DataObjectMetaData getType(
     @PathVariable("dataStoreName")
     final String dataStoreName,
     @PathVariable("schemaName")
     final String schemaName,
-    @PathVariable("typeName")
-    final String typeName) {
+    @PathVariable("typePath")
+    final String typePath) {
     final DataObjectStore dataStore = dataStores.getDataObjectStore(dataStoreName);
     if (dataStore == null) {
       return null;
@@ -58,20 +58,20 @@ public class DataService {
       if (schema == null) {
         return null;
       } else {
-        return schema.getMetaData(new QName(schemaName, typeName));
+        return schema.getMetaData(new QName(schemaName, typePath));
       }
     }
   }
 
-  @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}/types/{typeName}/records")
+  @RequestMapping("/dataStores/{dataStoreName}/schemas/{schemaName}/types/{typePath}/records")
   @ResponseBody
   public Reader<DataObject> getRecords(
     @PathVariable("dataStoreName")
     final String dataStoreName,
     @PathVariable("schemaName")
     final String schemaName,
-    @PathVariable("typeName")
-    final String typeName) {
+    @PathVariable("typePath")
+    final String typePath) {
     final DataObjectStore dataStore = dataStores.getDataObjectStore(dataStoreName);
     if (dataStore == null) {
       return null;
@@ -80,7 +80,7 @@ public class DataService {
       if (schema == null) {
         return null;
       } else {
-        final QName name = new QName(schemaName, typeName);
+        final QName name = new QName(schemaName, typePath);
         final DataObjectMetaData metaData = schema.getMetaData(name);
         if (metaData == null) {
           return null;

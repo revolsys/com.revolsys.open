@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
@@ -16,7 +15,7 @@ import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
 
-  private QName typeName;
+  private String typeName;
 
   private DataObjectMetaDataFactory metaDataFactory;
 
@@ -57,7 +56,7 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
     return metaDataFactory;
   }
 
-  public QName getTypeName() {
+  public String getTypeName() {
     return typeName;
   }
 
@@ -110,7 +109,7 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
     this.metaDataFactory = metaDataFactory;
   }
 
-  public void setTypeName(final QName typeName) {
+  public void setTypeName(final String typeName) {
     this.typeName = typeName;
   }
 

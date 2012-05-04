@@ -22,7 +22,7 @@ public class NamedChannelBundle<T> {
   private Map<String, Queue<Long>> sequenceQueueByName = new HashMap<String, Queue<Long>>();
 
   /** The monitor reads must synchronize on */
-  private Object monitor = new Object();
+  private final Object monitor = new Object();
 
   /** The name of the channel. */
   private String name;
@@ -34,13 +34,13 @@ public class NamedChannelBundle<T> {
   private int numWriters = 0;
 
   /** The monitor reads must synchronize on */
-  private Object readMonitor = new Object();
+  private final Object readMonitor = new Object();
 
   /** Flag indicating if the channel is closed for writing. */
   private boolean writeClosed;
 
   /** The monitor writes must synchronize on */
-  private Object writeMonitor = new Object();
+  private final Object writeMonitor = new Object();
 
   public NamedChannelBundle() {
   }
@@ -61,15 +61,6 @@ public class NamedChannelBundle<T> {
 
   public String getName() {
     return name;
-  }
-
-  public Collection<T> remove(String name) {
-    synchronized (monitor) {
-      sequenceQueueByName.remove(name);
-      Queue<T> values = valueQueueByName.remove(name);
-      monitor.notifyAll();
-      return values;
-    }
   }
 
   private Queue<T> getNextValueQueue(Collection<String> names) {
@@ -120,7 +111,7 @@ public class NamedChannelBundle<T> {
       if (writeClosed) {
         boolean empty = true;
         synchronized (monitor) {
-          for (Queue<T> queue : valueQueueByName.values()) {
+          for (final Queue<T> queue : valueQueueByName.values()) {
             if (!queue.isEmpty()) {
               empty = false;
             }
@@ -148,14 +139,6 @@ public class NamedChannelBundle<T> {
 
   public T read(final Collection<String> names) {
     return read(0, names);
-  }
-
-  public T read(final String... names) {
-    return read(0, Arrays.asList(names));
-  }
-
-  public T read(final long timeout, final String... names) {
-    return read(timeout, Arrays.asList(names));
   }
 
   /**
@@ -222,6 +205,14 @@ public class NamedChannelBundle<T> {
     }
   }
 
+  public T read(final long timeout, final String... names) {
+    return read(timeout, Arrays.asList(names));
+  }
+
+  public T read(final String... names) {
+    return read(0, Arrays.asList(names));
+  }
+
   public void readConnect() {
     synchronized (monitor) {
       if (isClosed()) {
@@ -243,6 +234,15 @@ public class NamedChannelBundle<T> {
         }
       }
 
+    }
+  }
+
+  public Collection<T> remove(final String name) {
+    synchronized (monitor) {
+      sequenceQueueByName.remove(name);
+      final Queue<T> values = valueQueueByName.remove(name);
+      monitor.notifyAll();
+      return values;
     }
   }
 

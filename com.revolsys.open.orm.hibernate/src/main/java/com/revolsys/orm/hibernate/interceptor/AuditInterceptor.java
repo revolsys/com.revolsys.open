@@ -14,6 +14,23 @@ public class AuditInterceptor extends EmptyInterceptor {
   private static final long serialVersionUID = -6427254413872090516L;
 
   /**
+   * Get the userName for the current thread or "unknown" if a userName was not
+   * set.
+   * 
+   * @return The userName.
+   */
+  public static String getUserName() {
+    final SecurityContext context = SecurityContextHolder.getContext();
+    final Authentication authetication = context.getAuthentication();
+    if (authetication == null) {
+      return "unknown";
+    } else {
+      return authetication.getName();
+    }
+
+  }
+
+  /**
    * Called before an object is updated. The modifiedBy property will be set to
    * the user name for the current thread (@link #setUserName(String)} and the
    * modificationTimestamp properties will be set to the current time.
@@ -26,10 +43,15 @@ public class AuditInterceptor extends EmptyInterceptor {
    * @param types The types of the properties.
    * @return True if the object was changed.
    */
-  public boolean onFlushDirty(final Object entity, final Serializable id,
-    final Object[] currentState, final Object[] previousState,
-    final String[] propertyNames, final Type[] types) {
-    String userName = getUserName();
+  @Override
+  public boolean onFlushDirty(
+    final Object entity,
+    final Serializable id,
+    final Object[] currentState,
+    final Object[] previousState,
+    final String[] propertyNames,
+    final Type[] types) {
+    final String userName = getUserName();
     boolean changed = false;
     for (int i = 0; i < propertyNames.length; i++) {
       if ("modifiedBy".equals(propertyNames[i])) {
@@ -55,11 +77,16 @@ public class AuditInterceptor extends EmptyInterceptor {
    * @param types The types of the properties.
    * @return True if the object was changed.
    */
-  public boolean onSave(final Object entity, final Serializable id,
-    final Object[] state, final String[] propertyNames, final Type[] types) {
+  @Override
+  public boolean onSave(
+    final Object entity,
+    final Serializable id,
+    final Object[] state,
+    final String[] propertyNames,
+    final Type[] types) {
     boolean changed = false;
-    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    String userName = getUserName();
+    final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    final String userName = getUserName();
     for (int i = 0; i < propertyNames.length; i++) {
       if ("createdBy".equals(propertyNames[i])) {
         state[i] = userName;
@@ -76,22 +103,5 @@ public class AuditInterceptor extends EmptyInterceptor {
       }
     }
     return changed;
-  }
-
-  /**
-   * Get the userName for the current thread or "unknown" if a userName was not
-   * set.
-   * 
-   * @return The userName.
-   */
-  public static String getUserName() {
-    SecurityContext context = SecurityContextHolder.getContext();
-    Authentication authetication = context.getAuthentication();
-    if (authetication == null) {
-      return "unknown";
-    } else {
-      return authetication.getName();
-    }
-
   }
 }

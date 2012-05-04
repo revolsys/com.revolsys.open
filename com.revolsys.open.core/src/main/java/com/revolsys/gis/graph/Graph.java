@@ -16,8 +16,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.collection.IntHashMap;
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.ComparatorProxy;
@@ -566,13 +564,13 @@ public class Graph<T> {
    * @param edge The edge.
    * @return The type name.
    */
-  public QName getTypeName(final Edge<T> edge) {
+  public String getTypeName(final Edge<T> edge) {
     final Object object = edge.getObject();
     if (object == null) {
       return null;
     } else {
       final String className = edge.getClass().getName();
-      return new QName(className);
+      return className;
     }
   }
 
@@ -649,14 +647,14 @@ public class Graph<T> {
   }
 
   public void moveNode(
-    final QName typeName,
+    final String typePath,
     final Node<DataObject> fromNode,
     final Node<DataObject> toNode,
     final Coordinates newPoint) {
     if (!fromNode.isRemoved() && !toNode.isRemoved()) {
       if (!fromNode.equals(toNode)) {
         final List<Edge<DataObject>> edges = NodeAttributes.getEdgesByType(
-          fromNode, typeName);
+          fromNode, typePath);
 
         for (final Edge<DataObject> edge : edges) {
           if (!edge.isRemoved()) {
@@ -678,11 +676,11 @@ public class Graph<T> {
   }
 
   public boolean moveNodesToMidpoint(
-    final QName typeName,
+    final String typePath,
     final Node<DataObject> node1,
     final Node<DataObject> node2) {
-    final Coordinates point1 = node1.get3dCoordinates(typeName);
-    final Coordinates point2 = node2.get3dCoordinates(typeName);
+    final Coordinates point1 = node1.get3dCoordinates(typePath);
+    final Coordinates point2 = node2.get3dCoordinates(typePath);
 
     final Graph<DataObject> graph = node1.getGraph();
     final Coordinates midPoint = LineSegmentUtil.midPoint(
@@ -698,15 +696,15 @@ public class Graph<T> {
       newPoint.setZ(z1);
     }
     final Node<DataObject> newNode = graph.getNode(midPoint);
-    if (!Node.hasEdgesBetween(typeName, node1, newNode)
-      && !Node.hasEdgesBetween(typeName, node2, newNode)) {
+    if (!Node.hasEdgesBetween(typePath, node1, newNode)
+      && !Node.hasEdgesBetween(typePath, node2, newNode)) {
       if (node1.equals2d(newNode)) {
-        moveNode(typeName, node2, node1, newPoint);
+        moveNode(typePath, node2, node1, newPoint);
       } else if (node2.equals2d(newNode)) {
-        moveNode(typeName, node1, node2, newPoint);
+        moveNode(typePath, node1, node2, newPoint);
       } else {
-        moveNode(typeName, node1, newNode, newPoint);
-        moveNode(typeName, node2, newNode, newPoint);
+        moveNode(typePath, node1, newNode, newPoint);
+        moveNode(typePath, node2, newNode, newPoint);
       }
       return true;
     } else {
@@ -984,17 +982,17 @@ public class Graph<T> {
           if (splitNodes != null) {
             for (final Coordinates splitPoint : splitNodes) {
               final Node<T> node = getNode(splitPoint);
-              final QName typeName = edge.getTypeName();
+              final String typePath = edge.getTypeName();
               Coordinates point = splitPoint;
               double splitPointZ = splitPoint.getZ();
               if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
                 if (splitPoint instanceof Node<?>) {
                   final Node<?> splitNode = (Node<?>)splitPoint;
-                  point = splitNode.get3dCoordinates(typeName);
+                  point = splitNode.get3dCoordinates(typePath);
                   splitPointZ = point.getZ();
                 }
                 if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
-                  point = node.get3dCoordinates(typeName);
+                  point = node.get3dCoordinates(typePath);
                 }
                 if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
                   final Coordinates p1 = points.get(index);
@@ -1122,11 +1120,6 @@ public class Graph<T> {
     visitEdges(null, comparator, visitor);
   }
 
-  public void visitEdges(final Visitor<Edge<T>> visitor, Envelope envelope) {
-    EdgeQuadTree<T> edgeIndex = getEdgeIndex();
-    edgeIndex.query(envelope, visitor);
-  }
-
   public void visitEdges(
     final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator,
@@ -1184,6 +1177,11 @@ public class Graph<T> {
       comparator = ((ComparatorProxy<Edge<T>>)visitor).getComparator();
     }
     visitEdges(filter, comparator, visitor);
+  }
+
+  public void visitEdges(final Visitor<Edge<T>> visitor, final Envelope envelope) {
+    final EdgeQuadTree<T> edgeIndex = getEdgeIndex();
+    edgeIndex.query(envelope, visitor);
   }
 
   public void visitNodes(

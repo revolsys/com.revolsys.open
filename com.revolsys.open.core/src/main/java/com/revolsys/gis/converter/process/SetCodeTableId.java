@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -34,7 +33,7 @@ public class SetCodeTableId extends
       final Converter<DataObject, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
-        DataObjectMetaData targetMetaData = target.getMetaData();
+        final DataObjectMetaData targetMetaData = target.getMetaData();
         String codeTableValueName = null;
         final int dotIndex = codeTableAttributeName.indexOf(".");
         if (dotIndex != -1) {

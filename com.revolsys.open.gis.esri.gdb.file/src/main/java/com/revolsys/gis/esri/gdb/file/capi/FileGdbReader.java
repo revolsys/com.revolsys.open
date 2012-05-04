@@ -3,8 +3,6 @@ package com.revolsys.gis.esri.gdb.file.capi;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
@@ -12,7 +10,7 @@ import com.revolsys.io.AbstractMultipleIteratorReader;
 
 public class FileGdbReader extends AbstractMultipleIteratorReader<DataObject> {
 
-  private List<QName> typeNames = new ArrayList<QName>();
+  private List<String> typePaths = new ArrayList<String>();
 
   private final CapiFileGdbDataObjectStore dataStore;
 
@@ -30,10 +28,10 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<DataObject> {
 
   @Override
   protected AbstractIterator<DataObject> getNextIterator() {
-    if (index < typeNames.size()) {
-      final QName typeName = typeNames.get(index);
+    if (index < typePaths.size()) {
+      final String typePath = typePaths.get(index);
       final FileGdbQueryIterator iterator = new FileGdbQueryIterator(dataStore,
-        typeName);
+        typePath);
       if (boundingBox != null) {
         iterator.setBoundingBox(boundingBox);
       }
@@ -44,21 +42,21 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<DataObject> {
     }
   }
 
-  public List<QName> getTypeNames() {
-    return typeNames;
+  public List<String> getTypeNames() {
+    return typePaths;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
 
-  public void setTypeNames(final List<QName> typeNames) {
-    this.typeNames = typeNames;
+  public void setTypeNames(final List<String> typePaths) {
+    this.typePaths = typePaths;
   }
 
   @Override
   public String toString() {
-    return "Reader " + dataStore.getLabel() + " " + typeNames + " "
+    return "Reader " + dataStore.getLabel() + " " + typePaths + " "
       + boundingBox;
   }
 }

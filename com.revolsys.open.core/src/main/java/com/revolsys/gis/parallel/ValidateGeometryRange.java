@@ -145,7 +145,7 @@ public class ValidateGeometryRange extends
     final DataObject object) {
     // TODO Auto-generated method stub
     final Geometry geometry = object.getGeometryValue();
-    isValid(object.getMetaData().getName().toString(), geometry);
+    isValid(object.getMetaData().getPath().toString(), geometry);
     out.write(object);
   }
 

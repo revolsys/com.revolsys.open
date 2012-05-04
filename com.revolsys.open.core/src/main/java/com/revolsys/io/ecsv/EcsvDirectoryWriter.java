@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
@@ -17,6 +16,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -74,8 +74,8 @@ public class EcsvDirectoryWriter extends AbstractWriter<DataObject> {
 
   private File getDirectory(final DataObjectMetaData metaData) {
     if (useNamespaceAsSubDirectory) {
-      final QName typeName = metaData.getName();
-      final String schemaName = typeName.getNamespaceURI();
+      final String path = metaData.getPath();
+      final String schemaName = PathUtil.getPath(path);
       if (StringUtils.hasText(schemaName)) {
         final File childDirectory = new File(directory, schemaName);
         if (!childDirectory.mkdirs()) {
@@ -91,7 +91,7 @@ public class EcsvDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   private String getFileName(final DataObjectMetaData metaData) {
-    return metaData.getName().getLocalPart();
+    return metaData.getTypeName();
   }
 
   private Writer<DataObject> getWriter(final DataObject object) {
@@ -123,8 +123,7 @@ public class EcsvDirectoryWriter extends AbstractWriter<DataObject> {
   public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
-    statistics = new Statistics("Write ECSV "
-      + baseDirectory.getAbsolutePath());
+    statistics = new Statistics("Write ECSV " + baseDirectory.getAbsolutePath());
     statistics.connect();
   }
 

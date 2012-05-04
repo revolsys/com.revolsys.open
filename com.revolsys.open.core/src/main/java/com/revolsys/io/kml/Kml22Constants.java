@@ -2,9 +2,6 @@ package com.revolsys.io.kml;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-
 public interface Kml22Constants {
   String FILE_EXTENSION = "kml";
 

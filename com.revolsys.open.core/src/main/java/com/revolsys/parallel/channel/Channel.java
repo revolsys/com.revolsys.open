@@ -210,9 +210,9 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
               throw new ClosedException();
             }
           } catch (final InterruptedException e) {
-           close();
-           monitor.notifyAll();
-           throw new ClosedException(e);
+            close();
+            monitor.notifyAll();
+            throw new ClosedException(e);
           }
         }
       }

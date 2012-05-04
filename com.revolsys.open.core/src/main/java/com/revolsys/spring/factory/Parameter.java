@@ -10,13 +10,9 @@ public class Parameter implements FactoryBean<Object> {
 
   public static void registerBeanDefinition(
     final BeanDefinitionRegistry registry,
-    final String beanName,
-    Object value) {
-    final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-    beanDefinition.setBeanClass(Parameter.class);
-    final MutablePropertyValues values = beanDefinition.getPropertyValues();
-    values.add("value", value);
-    registry.registerBeanDefinition(beanName, beanDefinition);
+    final BeanFactory beanFactory,
+    final String beanName) {
+    registerBeanDefinition(registry, beanFactory, beanName, beanName);
   }
 
   public static void registerBeanDefinition(
@@ -25,16 +21,20 @@ public class Parameter implements FactoryBean<Object> {
     final String beanName,
     final String alias) {
     if (beanFactory.containsBean(beanName)) {
-      Object value = beanFactory.getBean(beanName);
+      final Object value = beanFactory.getBean(beanName);
       registerBeanDefinition(registry, alias, value);
     }
   }
 
   public static void registerBeanDefinition(
     final BeanDefinitionRegistry registry,
-    final BeanFactory beanFactory,
-    final String beanName) {
-    registerBeanDefinition(registry, beanFactory, beanName, beanName);
+    final String beanName,
+    final Object value) {
+    final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+    beanDefinition.setBeanClass(Parameter.class);
+    final MutablePropertyValues values = beanDefinition.getPropertyValues();
+    values.add("value", value);
+    registry.registerBeanDefinition(beanName, beanDefinition);
   }
 
   private Class<?> type;
@@ -44,7 +44,7 @@ public class Parameter implements FactoryBean<Object> {
   public Parameter() {
   }
 
-  public Parameter(Object value) {
+  public Parameter(final Object value) {
     this.value = value;
   }
 

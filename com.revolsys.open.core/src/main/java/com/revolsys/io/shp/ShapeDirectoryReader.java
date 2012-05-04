@@ -42,7 +42,7 @@ import com.revolsys.gis.data.io.DataObjectReader;
  */
 public class ShapeDirectoryReader extends DataObjectDirectoryReader {
   public ShapeDirectoryReader() {
-    setFileExtensions("shp");
+    setFileExtensions(ShapefileConstants.FILE_EXTENSION);
   }
 
   /**

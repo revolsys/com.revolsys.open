@@ -56,19 +56,20 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
 
   private Collection<File> libDirectories = new LinkedHashSet<File>();
 
+  @Override
+  protected ClassLoader createInstance() throws Exception {
+    final Class<? extends ClassLoaderFactoryBean> clazz = getClass();
+    final ClassLoader parentClassLoader = clazz.getClassLoader();
+    final URLClassLoader classLoader = createClassLoader(parentClassLoader,
+      mergedUrls);
+    return classLoader;
+  }
+
   public Collection<File> getLibDirectories() {
     return libDirectories;
   }
 
   @Override
-  protected ClassLoader createInstance() throws Exception {
-    final Class<? extends ClassLoaderFactoryBean> clazz = getClass();
-    final ClassLoader parentClassLoader = clazz.getClassLoader();
-    URLClassLoader classLoader = createClassLoader(parentClassLoader,
-      mergedUrls);
-    return classLoader;
-  }
-
   public Class<ClassLoader> getObjectType() {
     return ClassLoader.class;
   }

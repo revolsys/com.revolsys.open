@@ -15,6 +15,7 @@ public class ListReader<T> extends AbstractReader<T> {
     this.values = values;
   }
 
+  @Override
   public void close() {
     values = null;
   }

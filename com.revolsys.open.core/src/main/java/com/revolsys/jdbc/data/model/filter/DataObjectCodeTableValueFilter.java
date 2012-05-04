@@ -9,7 +9,6 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
 
 /**
  * Filter DataObjects by the value of the attributeName.

@@ -480,7 +480,7 @@ public class TriangulatedIrregularNetwork {
         0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
       final CoordinatesList intersectCoordinates = oppositeEdge.getIntersection(segment);
       if (intersectCoordinates.size() > 0) {
-        Coordinates intersectPoint = intersectCoordinates.get(0);
+        final Coordinates intersectPoint = intersectCoordinates.get(0);
         final double z = oppositeEdge.getElevation(intersectPoint);
         if (!Double.isNaN(z)) {
           final double x = intersectPoint.getX();

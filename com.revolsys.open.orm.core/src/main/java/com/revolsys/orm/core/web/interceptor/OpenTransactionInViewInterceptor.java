@@ -37,9 +37,8 @@ public class OpenTransactionInViewInterceptor extends
 
   public void afterCompletion(
     final WebRequest request,
-    final Exception exception)
-    throws Exception {
-    Integer level = (Integer)request.getAttribute(LEVEL,
+    final Exception exception) throws Exception {
+    final Integer level = (Integer)request.getAttribute(LEVEL,
       RequestAttributes.SCOPE_REQUEST);
     if (level == null || level == 0) {
       final TransactionStatus status = (TransactionStatus)request.getAttribute(
@@ -68,15 +67,12 @@ public class OpenTransactionInViewInterceptor extends
     return transactionManager;
   }
 
-  public void postHandle(
-    final WebRequest request,
-    final ModelMap model)
+  public void postHandle(final WebRequest request, final ModelMap model)
     throws DataAccessException {
 
   }
 
-  public void preHandle(
-    final WebRequest request) {
+  public void preHandle(final WebRequest request) {
     Integer level = (Integer)request.getAttribute(LEVEL,
       RequestAttributes.SCOPE_REQUEST);
     if (level == null) {
@@ -91,8 +87,7 @@ public class OpenTransactionInViewInterceptor extends
 
   private void rollbackOnException(
     final TransactionStatus status,
-    final Throwable exception)
-    throws TransactionException {
+    final Throwable exception) throws TransactionException {
     LOG.debug("Initiating transaction rollback on application exception",
       exception);
     try {

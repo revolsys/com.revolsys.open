@@ -1,34 +1,12 @@
-/*
- * $URL: https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk/src/main/java/com/revolsys/gis/data/model/DataObject.java $
- * $Author: paul.austin@revolsys.com $
- * $Date: 2008-12-24 09:59:17 -0800 (Wed, 24 Dec 2008) $
- * $Revision: 1451 $
-
- * Copyright 2004-2007 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.revolsys.gis.data.model;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.vividsolutions.jts.geom.Geometry;
 
-public interface DataObject extends Map<String, Object> {
+public interface DataObject extends Map<String, Object>, Comparable<DataObject> {
   /**
    * Create a clone of the data object.
    * 
@@ -52,6 +30,8 @@ public interface DataObject extends Map<String, Object> {
    */
   <T extends Geometry> T getGeometryValue();
 
+  boolean isModified();
+
   /**
    * Get the value of the unique identifier attribute.
    * 
@@ -68,7 +48,7 @@ public interface DataObject extends Map<String, Object> {
 
   DataObjectState getState();
 
-  QName getTypeName();
+  String getTypeName();
 
   /**
    * Get the value of the attribute with the specified name.

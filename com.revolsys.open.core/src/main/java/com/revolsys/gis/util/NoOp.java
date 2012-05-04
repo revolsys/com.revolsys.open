@@ -1,7 +1,5 @@
 package com.revolsys.gis.util;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.graph.Edge;
@@ -39,8 +37,8 @@ public class NoOp {
     final Geometry geometry,
     final double x,
     final double y) {
-    CoordinatesList points = CoordinatesListUtil.get(geometry);
-    DoubleCoordinates point = new DoubleCoordinates(x, y);
+    final CoordinatesList points = CoordinatesListUtil.get(geometry);
+    final DoubleCoordinates point = new DoubleCoordinates(x, y);
     if (points.equal(0, point, 2)) {
       NoOp.noOp();
     }
@@ -107,14 +105,14 @@ public class NoOp {
   public static void noOp() {
   }
 
-  public static void typeName(final DataObject object, final QName typeName) {
-    final QName typeName2 = object.getMetaData().getName();
-    equals(typeName2, typeName);
+  public static void typePath(final DataObject object, final String typePath) {
+    final String typePath2 = object.getMetaData().getPath();
+    equals(typePath2, typePath);
   }
 
-  public static void typeName(final Edge<?> edge, final QName typeName) {
-    final QName typeName2 = edge.getTypeName();
-    equals(typeName2, typeName);
+  public static void typePath(final Edge<?> edge, final String typePath) {
+    final String typePath2 = edge.getTypeName();
+    equals(typePath2, typePath);
   }
 
   public static void zeroLegthLine(final LineString line) {

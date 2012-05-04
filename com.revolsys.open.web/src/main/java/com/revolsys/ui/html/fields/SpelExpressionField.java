@@ -33,7 +33,7 @@ public class SpelExpressionField extends TextField {
     if (StringUtils.hasLength(value)) {
       try {
         PARSER.parseExpression(value);
-      } catch (ParseException e) {
+      } catch (final ParseException e) {
         throw new IllegalArgumentException(e.getMessage());
       }
     } else {

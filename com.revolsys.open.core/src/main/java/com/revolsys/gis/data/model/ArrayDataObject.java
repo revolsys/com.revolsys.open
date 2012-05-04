@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.apache.log4j.Logger;
 import org.springframework.util.StringUtils;
 
@@ -112,6 +110,44 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return newObject;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public int compareTo(DataObject other) {
+    if (this == other) {
+      return 0;
+    } else {
+      int metaDataCompare = getMetaData().compareTo(other.getMetaData());
+      if (metaDataCompare == 0) {
+        Object id1 = getIdValue();
+        Object id2 = other.getIdValue();
+        if (id1 instanceof Comparable<?>) {
+          int idCompare = ((Comparable<Object>)id1).compareTo(id2);
+          if (idCompare != 0) {
+            return idCompare;
+          }
+        }
+        Geometry geometry1 = getGeometryValue();
+        Geometry geometry2 = other.getGeometryValue();
+        if (geometry1 != null && geometry2 != null) {
+          final int geometryComparison = geometry1.compareTo(geometry2);
+          if (geometryComparison != 0) {
+            return geometryComparison;
+          }
+        }
+        Integer hash1 = hashCode();
+        int hash2 = other.hashCode();
+        int hashCompare = hash1.compareTo(hash2);
+        if (hashCompare != 0) {
+          return hashCompare;
+        }
+        return -1;
+      } else {
+        return metaDataCompare;
+      }
+    }
+
+  }
+
   /**
    * Clone the value if it has a clone method.
    * 
@@ -168,6 +204,16 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return this == o;
   }
 
+  public boolean isModified() {
+    if (getState() == DataObjectState.New) {
+      return true;
+    } else if (getState() == DataObjectState.Modified) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Get the factory which created the instance.
    * 
@@ -212,8 +258,8 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return state;
   }
 
-  public QName getTypeName() {
-    return getMetaData().getName();
+  public String getTypeName() {
+    return getMetaData().getPath();
   }
 
   /**
@@ -228,7 +274,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
       final int index = metaData.getAttributeIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
-      LOG.warn("Attribute " + metaData.getName() + "." + name
+      LOG.warn("Attribute " + metaData.getPath() + "." + name
         + " does not exist");
       return null;
     }
@@ -402,9 +448,9 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
           final DataType attributeType = metaData.getAttributeType(key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == DataObject.class) {
-              final QName typeName = attributeType.getName();
+              final String typePath = attributeType.getName();
               final DataObjectMetaDataFactory metaDataFactory = metaData.getDataObjectMetaDataFactory();
-              final DataObjectMetaData subMetaData = metaDataFactory.getMetaData(typeName);
+              final DataObjectMetaData subMetaData = metaDataFactory.getMetaData(typePath);
               final DataObjectFactory dataObjectFactory = subMetaData.getDataObjectFactory();
               final DataObject subObject = dataObjectFactory.createDataObject(subMetaData);
               subObject.setValue(subKey, value);
@@ -464,7 +510,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     if (codeTable == null) {
       if (dotIndex != -1) {
         throw new IllegalArgumentException("Cannot get code table for "
-          + metaData.getName() + "." + name);
+          + metaData.getPath() + "." + name);
       }
       setValue(name, value);
     } else if (value == null || !StringUtils.hasText(value.toString())) {
@@ -479,7 +525,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
       }
       if (targetValue == null) {
         throw new IllegalArgumentException("Cannot get code table for "
-          + metaData.getName() + "." + name + "=" + value);
+          + metaData.getPath() + "." + name + "=" + value);
       } else {
         setValue(codeTableAttributeName, targetValue);
       }
@@ -510,7 +556,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   @Override
   public String toString() {
     final StringBuffer s = new StringBuffer();
-    s.append(metaData.getName()).append("(\n");
+    s.append(metaData.getPath()).append("(\n");
     for (int i = 0; i < attributes.length; i++) {
       final Object value = getValue(i);
       if (value != null) {

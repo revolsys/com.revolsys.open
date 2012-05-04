@@ -23,8 +23,8 @@ public class LineSegmentIntersectionVisitor extends
     return intersections;
   }
 
-  public boolean visit(Edge<LineSegment> edge) {
-    LineSegment lineSegment = edge.getObject();
+  public boolean visit(final Edge<LineSegment> edge) {
+    final LineSegment lineSegment = edge.getObject();
     if (lineSegment.getEnvelope().intersects(querySeg.getEnvelope())) {
       final CoordinatesList intersection = querySeg.getIntersection(lineSegment);
       if (intersection != null && intersection.size() > 0) {

@@ -8,15 +8,22 @@ public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
 
   private DirectoryDataObjectStore dataStore;
 
-  public DirectoryDataObjectStoreWriter(
-    DirectoryDataObjectStore dataStore) {
+  public DirectoryDataObjectStoreWriter(final DirectoryDataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
 
-  public void write(DataObject object) {
+  @PreDestroy
+  @Override
+  public void close() {
+    super.close();
+    dataStore = null;
+  }
+
+  public void write(final DataObject object) {
     if (object != null) {
       try {
-        boolean currentDataStore = object.getMetaData().getDataObjectStore() == dataStore;
+        final boolean currentDataStore = object.getMetaData()
+          .getDataObjectStore() == dataStore;
         switch (object.getState()) {
           case New:
             dataStore.insert(object);
@@ -47,12 +54,5 @@ public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
         throw new RuntimeException("Unable to write", e);
       }
     }
-  }
-
-  @PreDestroy
-  @Override
-  public void close() {
-    super.close();
-    dataStore = null;
   }
 }

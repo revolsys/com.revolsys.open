@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -30,7 +28,7 @@ public class TextLineConverter implements OsnConverter {
     String attributeName = iterator.nextAttributeName();
     while (attributeName != null) {
       if (attributeName.equals("position")) {
-        final QName objectName = iterator.nextObjectName();
+        final String objectName = iterator.nextObjectName();
         final OsnConverter osnConverter = converters.getConverter(objectName);
         if (osnConverter == null) {
           iterator.throwParseError("No Geometry Converter for " + objectName);
@@ -59,9 +57,9 @@ public class TextLineConverter implements OsnConverter {
     throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
-      serializer.startObject("TextLine");
+      serializer.startObject("/TextLine");
       serializer.attributeName("position");
-      final OsnConverter osnConverter = converters.getConverter("Point");
+      final OsnConverter osnConverter = converters.getConverter("/Point");
       osnConverter.write(serializer, point);
       serializer.endAttribute();
 

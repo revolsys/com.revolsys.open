@@ -1,23 +1,3 @@
-/*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/xbase/io/XbaseFileWriter.java $
- * $Author:paul.austin@revolsys.com $
- * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
- * $Revision:265 $
-
- * Copyright 2004-2005 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.revolsys.io.xbase;
 
 import java.io.IOException;
@@ -29,7 +9,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
@@ -62,6 +44,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private boolean initialized;
 
+  private Map<String, String> shortNames = new HashMap<String, String>();
+
   public XbaseDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
     this.metaData = metaData;
@@ -69,61 +53,89 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   protected int addDbaseField(
-    final String name,
+    final String fullName,
     final DataType dataType,
     final Class<?> typeJavaClass,
     final int length,
     final int scale) {
-
     FieldDefinition field = null;
     if (dataType == DataTypes.DECIMAL) {
       if (length > 18) {
         throw new IllegalArgumentException("Length  must be less < 18 for "
-          + name);
+          + fullName);
       }
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length,
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, length,
         scale);
     } else if (typeJavaClass == String.class) {
       if (length > 254 || length <= 0) {
-        field = new FieldDefinition(name, FieldDefinition.CHARACTER_TYPE, 254);
+        field = addFieldDefinition(fullName, FieldDefinition.CHARACTER_TYPE,
+          254);
       } else {
-        field = new FieldDefinition(name, FieldDefinition.CHARACTER_TYPE,
+        field = addFieldDefinition(fullName, FieldDefinition.CHARACTER_TYPE,
           length);
       }
     } else if (typeJavaClass == Boolean.class) {
-      field = new FieldDefinition(name, FieldDefinition.LOGICAL_TYPE, 1);
+      field = addFieldDefinition(fullName, FieldDefinition.LOGICAL_TYPE, 1);
     } else if (typeJavaClass == Date.class) {
-      field = new FieldDefinition(name, FieldDefinition.DATE_TYPE, 8);
+      field = addFieldDefinition(fullName, FieldDefinition.DATE_TYPE, 8);
     } else if (typeJavaClass == BigDecimal.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, length,
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, length,
         scale);
     } else if (typeJavaClass == BigInteger.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Float.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Double.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
     } else if (typeJavaClass == Byte.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 3);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 3);
     } else if (typeJavaClass == Short.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 5);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 5);
     } else if (typeJavaClass == Integer.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 10);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 10);
     } else if (typeJavaClass == Long.class) {
-      field = new FieldDefinition(name, FieldDefinition.NUMBER_TYPE, 18);
+      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
     } else {
       log.warn("Writing " + typeJavaClass + " is not supported");
-      field = new FieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
+      field = addFieldDefinition(fullName, FieldDefinition.OBJECT_TYPE, 0);
     }
-    addField(field);
     return field.getLength();
   }
 
-  protected void addField(final FieldDefinition field) {
-    fieldNames.add(field.getName());
-    fields.add(field);
+  protected FieldDefinition addFieldDefinition(
+    final String fullName,
+    final char type,
+    final int length) {
+    return addFieldDefinition(fullName, type, length, 0);
   }
 
+  protected FieldDefinition addFieldDefinition(
+    final String fullName,
+    final char type,
+    final int length,
+    final int decimalPlaces) {
+    String name = shortNames.get(fullName);
+    if (name == null) {
+      name = fullName.toUpperCase();
+    }
+    if (name.length() > 10) {
+      name = name.substring(0, 10);
+    }
+    int i = 1;
+    while (fieldNames.contains(name)) {
+      final String suffix = String.valueOf(i);
+      name = name.substring(0, name.length() - suffix.length()) + i;
+      i++;
+    }
+
+    final FieldDefinition field = new FieldDefinition(name, fullName, type,
+      length, decimalPlaces);
+    fieldNames.add(name);
+    fields.add(field);
+    return field;
+  }
+
+  @SuppressWarnings("deprecation")
   @Override
   public void close() {
     try {
@@ -158,6 +170,10 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return metaData;
   }
 
+  public Map<String, String> getShortNames() {
+    return shortNames;
+  }
+
   protected boolean hasField(final String name) {
     return fieldNames.contains(name);
   }
@@ -166,6 +182,10 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     if (!initialized) {
       initialized = true;
       if (!(resource instanceof NonExistingResource)) {
+        Map<String, String> shortNames = getProperty("shortNames");
+        if (shortNames != null) {
+          this.shortNames = shortNames;
+        }
         this.out = new ResourceEndianOutput(resource);
         writeHeader();
       }
@@ -177,6 +197,10 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   protected void preFirstWrite(final DataObject object) throws IOException {
+  }
+
+  public void setShortNames(final Map<String, String> shortNames) {
+    this.shortNames = shortNames;
   }
 
   public void setUseZeroForNull(final boolean useZeroForNull) {
@@ -199,8 +223,9 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
       }
       for (final FieldDefinition field : fields) {
         if (!writeField(object, field)) {
-          log.warn("Unable to write attribute '" + field.getName()
-            + "' with value " + object.getValue(field.getName()));
+          final String attributeName = field.getFullName();
+          log.warn("Unable to write attribute '" + attributeName
+            + "' with value " + object.getValue(attributeName));
         }
       }
       numRecords++;
@@ -215,7 +240,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     if (out == null) {
       return true;
     } else {
-      final Object value = object.getValue(field.getName());
+      final String attributeName = field.getFullName();
+      final Object value = object.getValue(attributeName);
       final int fieldLength = field.getLength();
       switch (field.getType()) {
         case FieldDefinition.NUMBER_TYPE:
@@ -243,8 +269,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             }
             numString = numberFormat.format(number);
           } else {
-            throw new IllegalArgumentException("Not a number "
-              + field.getName() + "=" + value);
+            throw new IllegalArgumentException("Not a number " + attributeName
+              + "=" + value);
           }
           if (numString.length() > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
@@ -318,6 +344,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void writeHeader() throws IOException {
     if (out != null) {
       int recordLength = 1;
@@ -360,7 +387,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
       int offset = 1;
       for (final FieldDefinition field : fields) {
         if (field.getDataType() != DataTypes.OBJECT) {
-          String name = field.getName().toUpperCase();
+          String name = field.getName();
           if (name.length() > 10) {
             name = name.substring(0, 10);
           }

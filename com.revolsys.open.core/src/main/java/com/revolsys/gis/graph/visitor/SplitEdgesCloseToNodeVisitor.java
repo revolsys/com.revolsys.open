@@ -3,8 +3,6 @@ package com.revolsys.gis.graph.visitor;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -61,10 +59,10 @@ public class SplitEdgesCloseToNodeVisitor<T> extends
       graph, node, maxDistance);
     for (final Edge<T> edge : closeEdges) {
       final T object = edge.getObject();
-      final QName typeName = graph.getTypeName(edge);
+      final String typePath = graph.getTypeName(edge);
       final List<Edge<T>> splitEdges = graph.splitEdge(edge, node);
       if (splitEdges.size() > 1) {
-        nodeEvent(node, typeName, ruleName, "Fixed", null);
+        nodeEvent(node, typePath, ruleName, "Fixed", null);
         if (splitObjects != null) {
           splitObjects.add(object);
         }

@@ -27,13 +27,13 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   private boolean listRoot;
 
-  private boolean indent;
+  private final boolean indent;
 
   public JsonMapWriter(final Writer out) {
     this(out, true);
   }
 
-  public JsonMapWriter(final Writer out, boolean indent) {
+  public JsonMapWriter(final Writer out, final boolean indent) {
     this.out = new PrintWriter(out);
     this.indent = indent;
   }
@@ -72,6 +72,20 @@ public class JsonMapWriter extends AbstractMapWriter {
     out.flush();
   }
 
+  public boolean isListRoot() {
+    return listRoot;
+  }
+
+  private void newLine() {
+    if (indent) {
+      out.print('\n');
+    }
+  }
+
+  public void setListRoot(final boolean listRoot) {
+    this.listRoot = listRoot;
+  }
+
   public void write(final Map<String, ? extends Object> values) {
     if (written) {
       out.print(",");
@@ -80,12 +94,6 @@ public class JsonMapWriter extends AbstractMapWriter {
       writeHeader();
     }
     JsonWriterUtil.write(out, values);
-  }
-
-  private void newLine() {
-    if (indent) {
-      out.print('\n');
-    }
   }
 
   private void writeHeader() {
@@ -107,13 +115,5 @@ public class JsonMapWriter extends AbstractMapWriter {
       }
     }
     written = true;
-  }
-
-  public void setListRoot(boolean listRoot) {
-    this.listRoot = listRoot;
-  }
-
-  public boolean isListRoot() {
-    return listRoot;
   }
 }

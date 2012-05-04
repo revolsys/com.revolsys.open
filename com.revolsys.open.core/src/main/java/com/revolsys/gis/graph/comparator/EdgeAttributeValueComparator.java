@@ -36,8 +36,8 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
       } else {
         int compare = object1.compareTo(object2);
         if (compare == 0) {
-          Integer id1 = edge1.getId();
-          Integer id2 = edge2.getId();
+          final Integer id1 = edge1.getId();
+          final Integer id2 = edge2.getId();
           compare = id1.compareTo(id2);
         }
         return compare;
@@ -49,7 +49,7 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
     return attributeName;
   }
 
-  public void setAttributeName(String propertyName) {
+  public void setAttributeName(final String propertyName) {
     this.attributeName = propertyName;
   }
 

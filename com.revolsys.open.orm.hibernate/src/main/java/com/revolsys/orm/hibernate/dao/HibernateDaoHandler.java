@@ -87,7 +87,7 @@ public class HibernateDaoHandler extends HibernateDaoSupport implements
     return lobHelper.createBlob(bytes);
   }
 
-  public Blob createBlob(InputStream in, long length) {
+  public Blob createBlob(final InputStream in, final long length) {
     final Session session = getSession();
     final LobHelper lobHelper = session.getLobHelper();
     return lobHelper.createBlob(in, length);

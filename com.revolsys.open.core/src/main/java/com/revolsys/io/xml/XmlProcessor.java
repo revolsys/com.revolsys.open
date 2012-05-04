@@ -193,7 +193,7 @@ public abstract class XmlProcessor {
 
   private Map<String, Class<?>> tagNameClassMap = new HashMap<String, Class<?>>();
 
-  private final Map<QName, Converter> typeNameConverterMap = new HashMap<QName, Converter>();
+  private final Map<QName, Converter> typePathConverterMap = new HashMap<QName, Converter>();
 
   /**
    * Construct a new XmlProcessor for the XML Namespace URI.
@@ -202,8 +202,8 @@ public abstract class XmlProcessor {
    */
   protected XmlProcessor(final String namespaceUri) {
     this.namespaceUri = namespaceUri;
-    typeNameConverterMap.put(XmlConstants.XS_SHORT, new ShortConverter());
-    typeNameConverterMap.put(XmlConstants.XS_INT, new IntegerConverter());
+    typePathConverterMap.put(XmlConstants.XS_SHORT, new ShortConverter());
+    typePathConverterMap.put(XmlConstants.XS_INT, new IntegerConverter());
     methodCache = getMethodCache(getClass());
   }
 
@@ -369,7 +369,7 @@ public abstract class XmlProcessor {
       }
     } else {
       final String xsiLocalName = xsiName.getLocalPart();
-      final Converter converter = typeNameConverterMap.get(xsiName);
+      final Converter converter = typePathConverterMap.get(xsiName);
       if (converter != null) {
         final String text = StaxUtils.getElementText(parser);
         return (T)converter.convert(null, text);

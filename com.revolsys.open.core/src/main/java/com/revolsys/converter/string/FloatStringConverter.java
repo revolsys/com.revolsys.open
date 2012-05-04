@@ -6,7 +6,8 @@ public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
   public FloatStringConverter() {
     super(DECIMAL_FORMAT);
   }
- public Class<Float> getConvertedClass() {
+
+  public Class<Float> getConvertedClass() {
     return Float.class;
   }
 

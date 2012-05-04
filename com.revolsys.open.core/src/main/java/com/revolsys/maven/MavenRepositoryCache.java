@@ -43,60 +43,6 @@ public class MavenRepositoryCache extends MavenRepository {
     this(null, repositoryUrls);
   }
 
-  public List<MavenRepository> getRepositories() {
-    return repositories;
-  }
-
-  @Override
-  protected Resource handleMissingResource(
-    final Resource resource,
-    final String groupId,
-    final String artifactId,
-    final String type,
-    final String classifier,
-    final String version) {
-    if (version.endsWith("-SNAPSHOT")) {
-      TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
-
-      for (final MavenRepository repository : repositories) {
-        Map<String, Object> mavenMetadata = repository.getMavenMetadata(
-          groupId, artifactId, version);
-        String snapshotVersion = getSnapshotVersion(mavenMetadata);
-        if (snapshotVersion != null) {
-          String timestampVersion = version.replaceAll("SNAPSHOT$",
-            snapshotVersion);
-          versionsByRepository.put(timestampVersion, repository);
-        }
-      }
-      if (!versionsByRepository.isEmpty()) {
-        Entry<String, MavenRepository> entry = versionsByRepository.lastEntry();
-        String timestampVersion = entry.getKey();
-
-        final String path = getPath(groupId, artifactId, version, type,
-          classifier, timestampVersion);
-        final Resource cachedResource = SpringUtil.getResource(getRoot(), path);
-        if (cachedResource.exists()) {
-          return cachedResource;
-        } else {
-
-          MavenRepository repository = entry.getValue();
-          if (copyRepositoryResource(cachedResource, repository, path)) {
-            return cachedResource;
-          }
-        }
-
-      }
-    }
-    final String path = getPath(groupId, artifactId, version, type, classifier,
-      version);
-    for (final MavenRepository repository : repositories) {
-      if (copyRepositoryResource(resource, repository, path)) {
-        return resource;
-      }
-    }
-    return resource;
-  }
-
   public boolean copyRepositoryResource(
     final Resource resource,
     final MavenRepository repository,
@@ -114,6 +60,60 @@ public class MavenRepositoryCache extends MavenRepository {
     return false;
   }
 
+  public List<MavenRepository> getRepositories() {
+    return repositories;
+  }
+
+  @Override
+  protected Resource handleMissingResource(
+    final Resource resource,
+    final String groupId,
+    final String artifactId,
+    final String type,
+    final String classifier,
+    final String version) {
+    if (version.endsWith("-SNAPSHOT")) {
+      final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
+
+      for (final MavenRepository repository : repositories) {
+        final Map<String, Object> mavenMetadata = repository.getMavenMetadata(
+          groupId, artifactId, version);
+        final String snapshotVersion = getSnapshotVersion(mavenMetadata);
+        if (snapshotVersion != null) {
+          final String timestampVersion = version.replaceAll("SNAPSHOT$",
+            snapshotVersion);
+          versionsByRepository.put(timestampVersion, repository);
+        }
+      }
+      if (!versionsByRepository.isEmpty()) {
+        final Entry<String, MavenRepository> entry = versionsByRepository.lastEntry();
+        final String timestampVersion = entry.getKey();
+
+        final String path = getPath(groupId, artifactId, version, type,
+          classifier, timestampVersion);
+        final Resource cachedResource = SpringUtil.getResource(getRoot(), path);
+        if (cachedResource.exists()) {
+          return cachedResource;
+        } else {
+
+          final MavenRepository repository = entry.getValue();
+          if (copyRepositoryResource(cachedResource, repository, path)) {
+            return cachedResource;
+          }
+        }
+
+      }
+    }
+    final String path = getPath(groupId, artifactId, version, type, classifier,
+      version);
+    for (final MavenRepository repository : repositories) {
+      if (copyRepositoryResource(resource, repository, path)) {
+        return resource;
+      }
+    }
+    return resource;
+  }
+
   public void setRepositories(final List<MavenRepository> repositories) {
     this.repositories = repositories;
   }
@@ -125,10 +125,10 @@ public class MavenRepositoryCache extends MavenRepository {
   }
 
   @Override
-  public void setRoot(Resource root) {
+  public void setRoot(final Resource root) {
     if (root != null) {
       try {
-        File file = root.getFile();
+        final File file = root.getFile();
         if (!file.exists()) {
           if (!file.mkdirs()) {
             throw new IllegalArgumentException(
@@ -138,9 +138,9 @@ public class MavenRepositoryCache extends MavenRepository {
           throw new IllegalArgumentException(
             "Maven cache is not a directory directory " + file);
         }
-        FileSystemResource fileResource = new FileSystemResource(file);
+        final FileSystemResource fileResource = new FileSystemResource(file);
         super.setRoot(fileResource);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw new IllegalArgumentException(
           "Maven cache must resolve to a local directory " + root);
       }

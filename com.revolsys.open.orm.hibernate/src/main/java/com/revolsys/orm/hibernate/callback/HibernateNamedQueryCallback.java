@@ -32,7 +32,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 public class HibernateNamedQueryCallback implements HibernateCallback<Query> {
   /** The name of the query. */
-  private String queryName;
+  private final String queryName;
 
   /**
    * Construct a new HibernateNamedQueryCallback.

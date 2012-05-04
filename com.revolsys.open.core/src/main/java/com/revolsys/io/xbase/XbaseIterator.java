@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
@@ -66,7 +64,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private DataObjectMetaDataImpl metaData;
 
-  private final QName name;
+  private final String name;
 
   private byte[] recordBuffer;
 
@@ -76,17 +74,9 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private int numRecords;
 
-  public XbaseIterator(final QName name, final EndianInput in,
-    final DataObjectFactory dataObjectFactory) throws IOException {
-    this.name = name;
-    this.in = in;
-    this.dataObjectFactory = dataObjectFactory;
-    doInit();
-  }
-
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
-    this.name = QName.valueOf(FileUtil.getBaseName(resource.getFilename()));
+    this.name = FileUtil.getBaseName(resource.getFilename());
     this.in = new EndianInputStream(resource.getInputStream());
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -96,6 +86,14 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     throws IOException {
     this(in, dataObjectFactory);
     this.initCallback = initCallback;
+  }
+
+  public XbaseIterator(final String name, final EndianInput in,
+    final DataObjectFactory dataObjectFactory) throws IOException {
+    this.name = name;
+    this.in = in;
+    this.dataObjectFactory = dataObjectFactory;
+    doInit();
   }
 
   @Override
@@ -161,7 +159,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
      * String memoIndexString = new String(record, startIndex, len).trim(); if
      * (memoIndexString.length() != 0) { int memoIndex =
      * Integer.parseInt(memoIndexString.trim()); if (memoIn == null) { File
-     * memoFile = new File(file.getParentFile(), typeName + ".dbt"); if
+     * memoFile = new File(file.getParentFile(), typePath + ".dbt"); if
      * (memoFile.exists()) { if (log.isInfoEnabled()) { log.info("Opening memo
      * file: " + memoFile); } memoIn = new RandomAccessFile(memoFile, "r"); }
      * else { return null; } } memoIn.seek(memoIndex 512); StringBuffer memo =
@@ -271,7 +269,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   private void readMetaData() throws IOException {
-    metaData = new DataObjectMetaDataImpl(name);
+    metaData = new DataObjectMetaDataImpl("/" + name);
     int b = in.read();
     while (b != 0x0D) {
       final StringBuffer fieldName = new StringBuffer();

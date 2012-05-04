@@ -4,24 +4,21 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class CollectionFieldType extends AbstractEcsvFieldType {
 
-  private final QName typeName;
+  private final String typePath;
 
   public CollectionFieldType(final DataType dataType) {
     super(dataType);
-    this.typeName = new QName(_NS_URI, dataType.getName().getLocalPart(),
-      _NS_PREFIX);
+    this.typePath = dataType.getName();
   }
 
   @Override
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeName() {
+    return typePath;
   }
 
   public Object parseValue(final String text) {

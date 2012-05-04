@@ -41,7 +41,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     final String beanName) {
 
     if (beanFactory.containsBeanDefinition(beanName)) {
-      BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+      final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
 
       final boolean singleton = beanDefinition.isSingleton();
       final GenericBeanDefinition proxyBeanDefinition = new GenericBeanDefinition();
@@ -68,7 +68,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     final BeanFactory beanFactory,
     final String beanName,
     final String alias) {
-    
+
     final BeanDefinition beanDefinition = createTargetBeanDefinition(
       (BeanDefinitionRegistry)beanFactory, beanName);
     if (beanDefinition != null) {

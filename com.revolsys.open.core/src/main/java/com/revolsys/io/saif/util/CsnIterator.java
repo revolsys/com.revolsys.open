@@ -35,8 +35,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import javax.xml.namespace.QName;
-
 public class CsnIterator {
   public static final int ATTRIBUTE_NAME = 7;
 
@@ -282,9 +280,9 @@ public class CsnIterator {
     return nextEventType;
   }
 
-  public QName getQNameValue() {
+  public String getPathValue() {
     final String name = getStringValue();
-    return QNameCache.getName(name);
+    return PathCache.getName(name);
   }
 
   public String getStringValue() {

@@ -64,6 +64,14 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
     return new DataObjectIteratorReader(iterator);
   }
 
+  public DataObjectStore createDataObjectStore(
+    final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final Resource resource = SpringUtil.getResource(url);
+    final File directory = SpringUtil.getFile(resource);
+    return new DirectoryDataObjectStore(directory, EcsvConstants.FILE_EXTENSION);
+  }
+
   public Writer<DataObject> createDataObjectWriter(
     final String baseName,
     final DataObjectMetaData metaData,
@@ -73,21 +81,12 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
       outputStream, charset));
   }
 
-  public DataObjectStore createDataObjectStore(
-    Map<String, ? extends Object> connectionProperties) {
-    String url = (String)connectionProperties.get("url");
-    Resource resource = SpringUtil.getResource(url);
-    File directory = SpringUtil.getFile(resource);
-    return new DirectoryDataObjectStore(directory, "ecsv");
-  }
-
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
-    Map<String, ? extends Object> connectionProperties) {
+    final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
   }
 
   public List<String> getUrlPatterns() {
-    // TODO Auto-generated method stub
     return null;
   }
 }

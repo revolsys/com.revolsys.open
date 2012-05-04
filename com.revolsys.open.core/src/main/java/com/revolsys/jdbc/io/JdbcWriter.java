@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
@@ -26,16 +25,6 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class JdbcWriter extends AbstractWriter<DataObject> {
   private static final Logger LOG = Logger.getLogger(JdbcWriter.class);
-
-  public static String getTableName(final QName tableName) {
-    final String namespaceURI = tableName.getNamespaceURI();
-    final String localPart = tableName.getLocalPart();
-    if (namespaceURI != "") {
-      return namespaceURI + "." + localPart;
-    } else {
-      return localPart;
-    }
-  }
 
   private int batchSize = 1;
 
@@ -59,31 +48,31 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private String sqlSuffix;
 
-  private final Map<QName, Integer> typeCountMap = new LinkedHashMap<QName, Integer>();
+  private final Map<String, Integer> typeCountMap = new LinkedHashMap<String, Integer>();
 
-  private Map<QName, Integer> typeDeleteBatchCountMap = new LinkedHashMap<QName, Integer>();
+  private Map<String, Integer> typeDeleteBatchCountMap = new LinkedHashMap<String, Integer>();
 
-  private Map<QName, String> typeDeleteSqlMap = new LinkedHashMap<QName, String>();
+  private Map<String, String> typeDeleteSqlMap = new LinkedHashMap<String, String>();
 
-  private Map<QName, PreparedStatement> typeDeleteStatementMap = new LinkedHashMap<QName, PreparedStatement>();
+  private Map<String, PreparedStatement> typeDeleteStatementMap = new LinkedHashMap<String, PreparedStatement>();
 
-  private Map<QName, Integer> typeInsertBatchCountMap = new LinkedHashMap<QName, Integer>();
+  private Map<String, Integer> typeInsertBatchCountMap = new LinkedHashMap<String, Integer>();
 
-  private Map<QName, Integer> typeInsertSequenceBatchCountMap = new LinkedHashMap<QName, Integer>();
+  private Map<String, Integer> typeInsertSequenceBatchCountMap = new LinkedHashMap<String, Integer>();
 
-  private Map<QName, String> typeInsertSequenceSqlMap = new LinkedHashMap<QName, String>();
+  private Map<String, String> typeInsertSequenceSqlMap = new LinkedHashMap<String, String>();
 
-  private Map<QName, PreparedStatement> typeInsertSequenceStatementMap = new LinkedHashMap<QName, PreparedStatement>();
+  private Map<String, PreparedStatement> typeInsertSequenceStatementMap = new LinkedHashMap<String, PreparedStatement>();
 
-  private Map<QName, String> typeInsertSqlMap = new LinkedHashMap<QName, String>();
+  private Map<String, String> typeInsertSqlMap = new LinkedHashMap<String, String>();
 
-  private Map<QName, PreparedStatement> typeInsertStatementMap = new LinkedHashMap<QName, PreparedStatement>();
+  private Map<String, PreparedStatement> typeInsertStatementMap = new LinkedHashMap<String, PreparedStatement>();
 
-  private Map<QName, Integer> typeUpdateBatchCountMap = new LinkedHashMap<QName, Integer>();
+  private Map<String, Integer> typeUpdateBatchCountMap = new LinkedHashMap<String, Integer>();
 
-  private Map<QName, String> typeUpdateSqlMap = new LinkedHashMap<QName, String>();
+  private Map<String, String> typeUpdateSqlMap = new LinkedHashMap<String, String>();
 
-  private Map<QName, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<QName, PreparedStatement>();
+  private Map<String, PreparedStatement> typeUpdateStatementMap = new LinkedHashMap<String, PreparedStatement>();
 
   private StatisticsMap statistics;
 
@@ -92,7 +81,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   }
 
   public JdbcWriter(final JdbcDataObjectStore dataStore,
-    StatisticsMap statistics) {
+    final StatisticsMap statistics) {
     this.dataStore = dataStore;
     this.statistics = statistics;
     setConnection(dataStore.getConnection());
@@ -113,6 +102,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     attribute.addInsertStatementPlaceHolder(sqlBuffer, false);
   }
 
+  @Override
   @PreDestroy
   public synchronized void close() {
     if (dataStore != null) {
@@ -160,16 +150,16 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   }
 
   private void close(
-    final Map<QName, String> sqlMap,
-    final Map<QName, PreparedStatement> statementMap,
-    final Map<QName, Integer> batchCountMap,
+    final Map<String, String> sqlMap,
+    final Map<String, PreparedStatement> statementMap,
+    final Map<String, Integer> batchCountMap,
     final String statisticName) {
-    for (final Entry<QName, PreparedStatement> entry : statementMap.entrySet()) {
-      final QName typeName = entry.getKey();
+    for (final Entry<String, PreparedStatement> entry : statementMap.entrySet()) {
+      final String typePath = entry.getKey();
       final PreparedStatement statement = entry.getValue();
-      final String sql = sqlMap.get(typeName);
+      final String sql = sqlMap.get(typePath);
       try {
-        processCurrentBatch(typeName, sql, statement, batchCountMap,
+        processCurrentBatch(typePath, sql, statement, batchCountMap,
           statisticName);
       } catch (final SQLException e) {
         LOG.error("Unable to process batch: " + sql, e);
@@ -185,15 +175,15 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private void delete(final DataObject object) throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
-    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    final String typePath = objectType.getPath();
+    final DataObjectMetaData metaData = getDataObjectMetaData(typePath);
     flushIfRequired(metaData);
-    PreparedStatement statement = typeDeleteStatementMap.get(typeName);
+    PreparedStatement statement = typeDeleteStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getDeleteSql(metaData);
       try {
         statement = connection.prepareStatement(sql);
-        typeDeleteStatementMap.put(typeName, statement);
+        typeDeleteStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -203,18 +193,18 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
       parameterIndex, object);
     statement.addBatch();
-    Integer batchCount = typeDeleteBatchCountMap.get(typeName);
+    Integer batchCount = typeDeleteBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeDeleteBatchCountMap.put(typeName, 1);
+      typeDeleteBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeDeleteBatchCountMap.put(typeName, batchCount);
+      typeDeleteBatchCountMap.put(typePath, batchCount);
     }
     // TODO this locks code tables which prevents insert
     // if (batchCount >= batchSize) {
     // final String sql = getDeleteSql(metaData);
-    // processCurrentBatch(typeName, sql, statement, typeDeleteBatchCountMap,
+    // processCurrentBatch(typePath, sql, statement, typeDeleteBatchCountMap,
     // getDeleteStatistics());
     // }
   }
@@ -232,16 +222,16 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   }
 
   private void flush(
-    final Map<QName, String> sqlMap,
-    final Map<QName, PreparedStatement> statementMap,
-    final Map<QName, Integer> batchCountMap,
+    final Map<String, String> sqlMap,
+    final Map<String, PreparedStatement> statementMap,
+    final Map<String, Integer> batchCountMap,
     final String statisticName) {
-    for (final Entry<QName, PreparedStatement> entry : statementMap.entrySet()) {
-      final QName typeName = entry.getKey();
+    for (final Entry<String, PreparedStatement> entry : statementMap.entrySet()) {
+      final String typePath = entry.getKey();
       final PreparedStatement statement = entry.getValue();
-      final String sql = sqlMap.get(typeName);
+      final String sql = sqlMap.get(typePath);
       try {
-        processCurrentBatch(typeName, sql, statement, batchCountMap,
+        processCurrentBatch(typePath, sql, statement, batchCountMap,
           statisticName);
       } catch (final SQLException e) {
         LOG.error("Unable to process batch: " + sql, e);
@@ -260,8 +250,8 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     return batchSize;
   }
 
-  private DataObjectMetaData getDataObjectMetaData(final QName typeName) {
-    final DataObjectMetaData metaData = dataStore.getMetaData(typeName);
+  private DataObjectMetaData getDataObjectMetaData(final String typePath) {
+    final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
     return metaData;
   }
 
@@ -270,9 +260,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   }
 
   private String getDeleteSql(final DataObjectMetaData type) {
-    final QName typeName = type.getName();
-    final String tableName = getTableName(typeName);
-    String sql = typeDeleteSqlMap.get(typeName);
+    final String typePath = type.getPath();
+    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    String sql = typeDeleteSqlMap.get(typePath);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
       if (sqlPrefix != null) {
@@ -294,7 +284,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
       sql = sqlBuffer.toString();
 
-      typeDeleteSqlMap.put(typeName, sql);
+      typeDeleteSqlMap.put(typePath, sql);
     }
     return sql;
   }
@@ -313,13 +303,13 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   private String getInsertSql(
     final DataObjectMetaData type,
     final boolean generatePrimaryKey) {
-    final QName typeName = type.getName();
-    final String tableName = getTableName(typeName);
+    final String typePath = type.getPath();
+    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     String sql;
     if (generatePrimaryKey) {
-      sql = typeInsertSequenceSqlMap.get(typeName);
+      sql = typeInsertSequenceSqlMap.get(typePath);
     } else {
-      sql = typeInsertSqlMap.get(typeName);
+      sql = typeInsertSqlMap.get(typePath);
     }
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
@@ -375,9 +365,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
       sql = sqlBuffer.toString();
       if (generatePrimaryKey) {
-        typeInsertSequenceSqlMap.put(typeName, sql);
+        typeInsertSequenceSqlMap.put(typePath, sql);
       } else {
-        typeInsertSqlMap.put(typeName, sql);
+        typeInsertSqlMap.put(typePath, sql);
       }
     }
     return sql;
@@ -396,9 +386,9 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   }
 
   private String getUpdateSql(final DataObjectMetaData type) {
-    final QName typeName = type.getName();
-    final String tableName = getTableName(typeName);
-    String sql = typeUpdateSqlMap.get(typeName);
+    final String typePath = type.getPath();
+    final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+    String sql = typeUpdateSqlMap.get(typePath);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
       if (sqlPrefix != null) {
@@ -433,15 +423,15 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
       sql = sqlBuffer.toString();
 
-      typeUpdateSqlMap.put(typeName, sql);
+      typeUpdateSqlMap.put(typePath, sql);
     }
     return sql;
   }
 
   private void insert(final DataObject object) throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
-    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    final String typePath = objectType.getPath();
+    final DataObjectMetaData metaData = getDataObjectMetaData(typePath);
     flushIfRequired(metaData);
     final String idAttributeName = metaData.getIdAttributeName();
     final boolean hasId = idAttributeName != null;
@@ -458,22 +448,22 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       && object.getValue(idAttributeName) != null;
 
     if (!hasId || hasIdValue) {
-      insert(object, typeName, metaData);
+      insert(object, typePath, metaData);
     } else {
-      insertSequence(object, typeName, metaData);
+      insertSequence(object, typePath, metaData);
     }
   }
 
   private void insert(
     final DataObject object,
-    final QName typeName,
+    final String typePath,
     final DataObjectMetaData metaData) throws SQLException {
-    PreparedStatement statement = typeInsertStatementMap.get(typeName);
+    PreparedStatement statement = typeInsertStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getInsertSql(metaData, false);
       try {
         statement = connection.prepareStatement(sql);
-        typeInsertStatementMap.put(typeName, statement);
+        typeInsertStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -485,31 +475,31 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
         parameterIndex, object);
     }
     statement.addBatch();
-    Integer batchCount = typeInsertBatchCountMap.get(typeName);
+    Integer batchCount = typeInsertBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeInsertBatchCountMap.put(typeName, 1);
+      typeInsertBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeInsertBatchCountMap.put(typeName, batchCount);
+      typeInsertBatchCountMap.put(typePath, batchCount);
     }
     if (batchCount >= batchSize) {
       final String sql = getInsertSql(metaData, false);
-      processCurrentBatch(typeName, sql, statement, typeInsertBatchCountMap,
+      processCurrentBatch(typePath, sql, statement, typeInsertBatchCountMap,
         "Insert");
     }
   }
 
   private void insertSequence(
     final DataObject object,
-    final QName typeName,
+    final String typePath,
     final DataObjectMetaData metaData) throws SQLException {
-    PreparedStatement statement = typeInsertSequenceStatementMap.get(typeName);
+    PreparedStatement statement = typeInsertSequenceStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getInsertSql(metaData, true);
       try {
         statement = connection.prepareStatement(sql);
-        typeInsertSequenceStatementMap.put(typeName, statement);
+        typeInsertSequenceStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -524,17 +514,17 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       }
     }
     statement.addBatch();
-    Integer batchCount = typeInsertSequenceBatchCountMap.get(typeName);
+    Integer batchCount = typeInsertSequenceBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeInsertSequenceBatchCountMap.put(typeName, 1);
+      typeInsertSequenceBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeInsertSequenceBatchCountMap.put(typeName, batchCount);
+      typeInsertSequenceBatchCountMap.put(typePath, batchCount);
     }
     if (batchCount >= batchSize) {
       final String sql = getInsertSql(metaData, true);
-      processCurrentBatch(typeName, sql, statement,
+      processCurrentBatch(typePath, sql, statement,
         typeInsertSequenceBatchCountMap, "Insert");
     }
   }
@@ -548,25 +538,25 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
   }
 
   private void processCurrentBatch(
-    final QName typeName,
+    final String typePath,
     final String sql,
     final PreparedStatement statement,
-    final Map<QName, Integer> batchCountMap,
+    final Map<String, Integer> batchCountMap,
     final String statisticName) throws SQLException {
-    Integer batchCount = batchCountMap.get(typeName);
+    Integer batchCount = batchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 0;
     }
     try {
-      Integer typeCount = typeCountMap.get(typeName);
+      Integer typeCount = typeCountMap.get(typePath);
       if (typeCount == null) {
         typeCount = batchCount;
       } else {
         typeCount += batchCount;
       }
-      typeCountMap.put(typeName, typeCount);
+      typeCountMap.put(typePath, typeCount);
       statement.executeBatch();
-      statistics.add(statisticName, typeName, batchCount);
+      statistics.add(statisticName, typePath, batchCount);
     } catch (final BatchUpdateException be) {
       LOG.error(be.getNextException() + " " + sql);
       throw be;
@@ -577,7 +567,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
       LOG.error(sql, e);
       throw e;
     } finally {
-      batchCountMap.put(typeName, 0);
+      batchCountMap.put(typePath, 0);
     }
   }
 
@@ -633,15 +623,15 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   private void update(final DataObject object) throws SQLException {
     final DataObjectMetaData objectType = object.getMetaData();
-    final QName typeName = objectType.getName();
-    final DataObjectMetaData metaData = getDataObjectMetaData(typeName);
+    final String typePath = objectType.getPath();
+    final DataObjectMetaData metaData = getDataObjectMetaData(typePath);
     flushIfRequired(metaData);
-    PreparedStatement statement = typeUpdateStatementMap.get(typeName);
+    PreparedStatement statement = typeUpdateStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getUpdateSql(metaData);
       try {
         statement = connection.prepareStatement(sql);
-        typeUpdateStatementMap.put(typeName, statement);
+        typeUpdateStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -658,17 +648,17 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
       parameterIndex, object);
     statement.addBatch();
-    Integer batchCount = typeUpdateBatchCountMap.get(typeName);
+    Integer batchCount = typeUpdateBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeUpdateBatchCountMap.put(typeName, 1);
+      typeUpdateBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeUpdateBatchCountMap.put(typeName, batchCount);
+      typeUpdateBatchCountMap.put(typePath, batchCount);
     }
     if (batchCount >= batchSize) {
       final String sql = getUpdateSql(metaData);
-      processCurrentBatch(typeName, sql, statement, typeUpdateBatchCountMap,
+      processCurrentBatch(typePath, sql, statement, typeUpdateBatchCountMap,
         "Update");
     }
   }

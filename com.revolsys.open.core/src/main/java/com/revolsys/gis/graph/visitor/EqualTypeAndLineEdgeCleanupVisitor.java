@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
@@ -224,14 +223,14 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public boolean visit(final Edge<DataObject> edge) {
     if (edge.getAttribute(EDGE_PROCESSED) == null) {
-      final QName typeName = edge.getTypeName();
+      final String typePath = edge.getTypeName();
       final Graph<DataObject> graph = edge.getGraph();
       final LineString line = edge.getLine();
 
       final AndFilter<Edge<DataObject>> attributeAndGeometryFilter = new AndFilter<Edge<DataObject>>();
 
       attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<DataObject>(
-        typeName));
+        typePath));
 
       final Filter<Edge<DataObject>> filter = getFilter();
       if (filter != null) {

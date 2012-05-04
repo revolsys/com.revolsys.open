@@ -25,6 +25,19 @@ public class LineSegmentIndex extends Quadtree {
     }
   }
 
+  public void insert(final LineSegment lineSegment) {
+    final Envelope envelope = lineSegment.getEnvelope();
+    insert(envelope, lineSegment);
+  }
+
+  public void insert(final LineString line) {
+    final CoordinatesListIndexLineSegmentIterator segments = new CoordinatesListIndexLineSegmentIterator(
+      line);
+    for (final LineSegment lineSegment : segments) {
+      insert(lineSegment);
+    }
+  }
+
   public boolean isWithinDistance(final Coordinates point) {
     final Envelope envelope = new BoundingBox(point);
     envelope.expandBy(1);
@@ -37,19 +50,6 @@ public class LineSegmentIndex extends Quadtree {
     }
 
     return false;
-  }
-
-  public void insert(final LineSegment lineSegment) {
-    final Envelope envelope = lineSegment.getEnvelope();
-    insert(envelope, lineSegment);
-  }
-
-  public void insert(final LineString line) {
-    final CoordinatesListIndexLineSegmentIterator segments = new CoordinatesListIndexLineSegmentIterator(
-      line);
-    for (final LineSegment lineSegment : segments) {
-      insert(lineSegment);
-    }
   }
 
   public List<CoordinatesList> queryIntersections(

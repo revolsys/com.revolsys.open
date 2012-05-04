@@ -11,14 +11,14 @@ import com.revolsys.ui.web.config.Page;
 public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   private BeanFactory beanFactory;
 
-  private String typeName;
+  private String typePath;
 
   private String pageName;
 
   @Override
   public String getLink(final JexlContext context) {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typeName);
+      beanFactory, typePath);
     if (htmlUiBuilder == null) {
       return null;
     } else {
@@ -37,20 +37,9 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   }
 
   @Override
-  public boolean isVisible() {
-    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typeName);
-    if (htmlUiBuilder == null) {
-      return false;
-    } else {
-      return htmlUiBuilder.getPageUrl(pageName, getParameters()) != null;
-    }
-  }
-
-  @Override
   public String getLinkTitle(final JexlContext context) {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typeName);
+      beanFactory, typePath);
     if (htmlUiBuilder == null) {
       return null;
     } else {
@@ -67,7 +56,18 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   }
 
   public String getTypeName() {
-    return typeName;
+    return typePath;
+  }
+
+  @Override
+  public boolean isVisible() {
+    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
+      beanFactory, typePath);
+    if (htmlUiBuilder == null) {
+      return false;
+    } else {
+      return htmlUiBuilder.getPageUrl(pageName, getParameters()) != null;
+    }
   }
 
   public void setBeanFactory(final BeanFactory beanFactory)
@@ -79,7 +79,7 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
     this.pageName = pageName;
   }
 
-  public void setTypeName(final String typeName) {
-    this.typeName = typeName;
+  public void setTypeName(final String typePath) {
+    this.typePath = typePath;
   }
 }

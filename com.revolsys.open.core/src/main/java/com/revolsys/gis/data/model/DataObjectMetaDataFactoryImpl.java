@@ -20,39 +20,23 @@
  */
 package com.revolsys.gis.data.model;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
+import com.revolsys.io.AbstractObjectWithProperties;
 
-public class DataObjectMetaDataFactoryImpl implements DataObjectMetaDataFactory {
-  /** The meta data properties of the data type. */
-  private final Map<String, Object> properties = new HashMap<String, Object>();
+public class DataObjectMetaDataFactoryImpl extends AbstractObjectWithProperties
+  implements DataObjectMetaDataFactory {
 
-  private final Map<QName, DataObjectMetaData> types = new LinkedHashMap<QName, DataObjectMetaData>();
+  private final Map<String, DataObjectMetaData> types = new LinkedHashMap<String, DataObjectMetaData>();
 
   public void addMetaData(final DataObjectMetaData type) {
     if (type != null) {
-      types.put(type.getName(), type);
+      types.put(type.getPath(), type);
     }
   }
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    return types.get(typeName);
+  public DataObjectMetaData getMetaData(final String path) {
+    return types.get(path);
   }
-
-  public Map<String, Object> getProperties() {
-    return properties;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> V getProperty(final String name) {
-    return (V)properties.get(name);
-  }
-
-  public void setProperty(final String name, final Object value) {
-    properties.put(name, value);
-  }
-
 }

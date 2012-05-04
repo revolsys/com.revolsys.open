@@ -23,6 +23,10 @@ public class IoFactoryRegistry {
 
   private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
 
+  public static void clearInstance() {
+    instance = null;
+  }
+
   public static IoFactoryRegistry getInstance() {
     synchronized (IoFactoryRegistry.class) {
       if (instance == null) {
@@ -30,10 +34,6 @@ public class IoFactoryRegistry {
       }
       return instance;
     }
-  }
-
-  public static void clearInstance() {
-    instance = null;
   }
 
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();

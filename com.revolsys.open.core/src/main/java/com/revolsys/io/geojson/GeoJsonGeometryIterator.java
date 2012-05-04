@@ -94,28 +94,6 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
-  private List<Geometry> readGeometryList() {
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.next();
-      final List<Geometry> geometries = new ArrayList<Geometry>();
-      if (event != EventType.endArray) {
-        do {
-          Geometry geometry = getNext();
-          geometries.add(geometry);
-          event = in.next();
-        } while (event == EventType.comma);
-      }
-      if (event != EventType.endArray) {
-        throw new IllegalStateException("Exepecting end array, not: " + event);
-      }
-      return geometries;
-    } else {
-      throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
-    }
-  }
-
   /**
    * Read one points coordinates and add them to the list of coordinate values.
    * 
@@ -249,6 +227,28 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       && in.getEvent() != EventType.endDocument);
 
     return factory.createGeometry(geometries);
+  }
+
+  private List<Geometry> readGeometryList() {
+    if (in.getEvent() == EventType.startArray || in.hasNext()
+      && in.next() == EventType.startArray) {
+      EventType event = in.next();
+      final List<Geometry> geometries = new ArrayList<Geometry>();
+      if (event != EventType.endArray) {
+        do {
+          final Geometry geometry = getNext();
+          geometries.add(geometry);
+          event = in.next();
+        } while (event == EventType.comma);
+      }
+      if (event != EventType.endArray) {
+        throw new IllegalStateException("Exepecting end array, not: " + event);
+      }
+      return geometries;
+    } else {
+      throw new IllegalStateException("Exepecting start array, not: "
+        + in.getEvent());
+    }
   }
 
   private LineString readLineString() {

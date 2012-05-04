@@ -3,8 +3,6 @@ package com.revolsys.gis.oracle.io;
 import java.io.PrintWriter;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -16,6 +14,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.PathUtil;
+import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -126,28 +126,28 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String schema = typeName.getNamespaceURI().toUpperCase();
+    final String typePath = metaData.getPath();
     ShortNameProperty shortNameProperty = ShortNameProperty.getProperty(metaData);
     String shortName = null;
     if (shortNameProperty != null) {
       shortName = shortNameProperty.getShortName();
     }
     if (StringUtils.hasText(shortName) && shortNameProperty.isUseForSequence()) {
-      final String sequenceName = schema + "." + shortName.toUpperCase()
+      final String schema = JdbcUtils.getSchemaName(typePath);
+        final String sequenceName = schema + "." + shortName.toUpperCase()
         + "_SEQ";
       return sequenceName;
     } else {
-      final String tableName = typeName.getLocalPart().toUpperCase();
-      return schema + "." + tableName + "_SEQ";
+      final String tableName = JdbcUtils.getQualifiedTableName(typePath).toUpperCase();
+      return  tableName + "_SEQ";
     }
   }
 
   public void writeGeometryMetaData(final DataObjectMetaData metaData) {
     PrintWriter out = getOut();
-    QName typeName = metaData.getName();
-    String schemaName = typeName.getNamespaceURI();
-    final String tableName = typeName.getLocalPart();
+    String typePath = metaData.getPath();
+   String schemaName = JdbcUtils.getSchemaName(typePath);
+    final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
@@ -194,12 +194,12 @@ public class OracleDdlWriter extends JdbcDdlWriter {
 
   public void writeAddGeometryColumn(final DataObjectMetaData metaData) {
     PrintWriter out = getOut();
-    QName typeName = metaData.getName();
-    String schemaName = typeName.getNamespaceURI();
+    String typePath = metaData.getPath();
+    String schemaName = JdbcUtils.getSchemaName(typePath);
     if (schemaName.length() == 0) {
       schemaName = "public";
     }
-    final String tableName = typeName.getLocalPart();
+    final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
@@ -237,13 +237,13 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAlterTableOwner(final QName typeName, final String owner) {
+  public void writeAlterTableOwner(final String typePath, final String owner) {
     PrintWriter out = getOut();
     out.print("ALTER ");
     final String objectType = "TABLE";
     out.print(objectType);
     out.print(" ");
-    writeTableName(typeName);
+    writeTableName(typePath);
     out.print(" OWNER TO ");
     out.print(owner);
     out.println(";");

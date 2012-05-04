@@ -33,7 +33,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +42,12 @@ import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.PathUtil;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.util.AssertionFailedException;
 
 public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
-  implements DataObjectMetaData, Comparable<DataObjectMetaData>, Cloneable {
+  implements DataObjectMetaData, Cloneable {
   public static void destroy(final DataObjectMetaDataImpl... metaDataList) {
     for (final DataObjectMetaDataImpl metaData : metaDataList) {
       metaData.destroy();
@@ -87,8 +88,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   /** The index of the ID attribute. */
   private int idAttributeIndex = -1;
 
-  /** The name of the data type. */
-  private QName name;
+  /** The path of the data type. */
+  private String path;
 
   private Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
@@ -100,8 +101,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
 
+  public DataObjectMetaDataImpl() {
+  }
+
   public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
-    this(metaData.getName(), metaData.getProperties(), metaData.getAttributes());
+    this(metaData.getPath(), metaData.getProperties(), metaData.getAttributes());
     setIdAttributeIndex(metaData.getIdAttributeIndex());
     METADATA_CACHE.put(instanceId, this);
   }
@@ -116,36 +120,37 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
-    final DataObjectStoreSchema schema, final QName typeName) {
-    this(typeName);
+    final DataObjectStoreSchema schema, final String typePath) {
+    this(typePath);
     this.dataObjectStore = dataObjectStore;
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
     METADATA_CACHE.put(instanceId, this);
   }
 
-  public DataObjectMetaDataImpl(final QName name) {
-    this.name = name;
+  public DataObjectMetaDataImpl(final String name) {
+    this.path = name;
     METADATA_CACHE.put(instanceId, this);
   }
 
-  public DataObjectMetaDataImpl(final QName name, final Attribute... attributes) {
+  public DataObjectMetaDataImpl(final String name,
+    final Attribute... attributes) {
     this(name, null, attributes);
   }
 
-  public DataObjectMetaDataImpl(final QName name,
+  public DataObjectMetaDataImpl(final String name,
     final List<Attribute> attributes) {
     this(name, null, attributes);
   }
 
-  public DataObjectMetaDataImpl(final QName name,
+  public DataObjectMetaDataImpl(final String name,
     final Map<String, Object> properties, final Attribute... attributes) {
     this(name, properties, Arrays.asList(attributes));
   }
 
-  public DataObjectMetaDataImpl(final QName name,
+  public DataObjectMetaDataImpl(final String name,
     final Map<String, Object> properties, final List<Attribute> attributes) {
-    this.name = name;
+    this.path = name;
     for (final Attribute attribute : attributes) {
       addAttribute(attribute.clone());
     }
@@ -238,7 +243,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public DataObjectMetaDataImpl clone() {
-    final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(name,
+    final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(path,
       getProperties(), attributes);
     clone.setIdAttributeIndex(idAttributeIndex);
     clone.setProperties(getProperties());
@@ -262,15 +267,15 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   public int compareTo(final DataObjectMetaData other) {
-    final QName otherName = other.getName();
-    if (otherName == name) {
+    final String otherPath = other.getPath();
+    if (otherPath == path) {
       return 0;
-    } else if (name == null) {
+    } else if (path == null) {
       return 1;
-    } else if (otherName == null) {
+    } else if (otherPath == null) {
       return -1;
     } else {
-      return name.toString().compareTo(otherName.toString());
+      return path.compareTo(otherPath);
     }
   }
 
@@ -300,7 +305,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     defaultValues = null;
     geometryAttributeIndexes = null;
     geometryAttributeNames = null;
-    name = null;
+    path = null;
     restrictions = null;
     schema = null;
     superClasses = null;
@@ -473,8 +478,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return instanceId;
   }
 
-  public QName getName() {
-    return name;
+  public String getPath() {
+    return path;
   }
 
   public Map<String, Collection<Object>> getRestrictions() {
@@ -485,6 +490,10 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return schema;
   }
 
+  public String getTypeName() {
+    return PathUtil.getName(path);
+  }
+
   public boolean hasAttribute(final CharSequence name) {
     final String lowerName = name.toString().toLowerCase();
     return attributeMap.containsKey(lowerName);
@@ -492,7 +501,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    if (path == null) {
+      return super.hashCode();
+    } else {
+      return path.hashCode();
+    }
   }
 
   public boolean isAttributeRequired(final int i) {
@@ -579,8 +592,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     setIdAttributeIndex(id);
   }
 
-  public void setName(final QName name) {
-    this.name = name;
+  public void setName(final String path) {
+    this.path = path;
   }
 
   @Override
@@ -603,6 +616,15 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public String toString() {
-    return name.toString();
+    return path.toString();
+  }
+
+  /**
+   * Adds an attribute with the given case-sensitive name.
+   * 
+   * @throws AssertionFailedException if a second Geometry is being added
+   */
+  public void addAttribute(final String attributeName, final DataType type) {
+    addAttribute(attributeName, type, false);
   }
 }

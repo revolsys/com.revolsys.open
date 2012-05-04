@@ -64,19 +64,27 @@ public class FieldDefinition {
 
   private final String name;
 
+  private final String fullName;
+
+  public String getFullName() {
+    return fullName;
+  }
+
   private DecimalFormat numberFormat;
 
   private final char type;
 
   private PrecisionModel precisionModel;
 
-  public FieldDefinition(final String name, final char type, final int length) {
-    this(name, type, length, 0);
+  public FieldDefinition(final String name, final String fullName,
+    final char type, final int length) {
+    this(name, fullName, type, length, 0);
   }
 
-  public FieldDefinition(final String name, final char type, final int length,
-    final int decimalPlaces) {
+  public FieldDefinition(final String name, final String fullName,
+    final char type, final int length, final int decimalPlaces) {
     this.name = name;
+    this.fullName = fullName;
     this.type = type;
     this.dataType = DATA_TYPES.get(type);
     this.length = length;

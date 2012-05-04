@@ -11,12 +11,12 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
@@ -49,6 +49,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.ShortAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.StringAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlAttribute;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
@@ -92,7 +93,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   public static SpatialReference getSpatialReference(
     final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
+    if (geometryFactory == null || geometryFactory.getSRID() == 0) {
       return null;
     } else {
       final String wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getSRID());
@@ -104,7 +105,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
-  private String defaultSchema = "";
+  private String defaultSchema = "/";
 
   private static final Logger LOG = LoggerFactory.getLogger(CapiFileGdbDataObjectStore.class);
 
@@ -161,7 +162,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     this.fileName = fileName;
   }
 
-  public void addChildSchema(final String path) {
+  public synchronized void addChildSchema(final String path) {
     final VectorOfWString childDatasets = geodatabase.getChildDatasets(path,
       "Feature Dataset");
     for (int i = 0; i < childDatasets.size(); i++) {
@@ -170,8 +171,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  @Override
+  public synchronized void addCodeTable(final CodeTable codeTable) {
+    super.addCodeTable(codeTable);
+    if (codeTable instanceof Domain) {
+      final Domain domain = (Domain)codeTable;
+      createDomain(domain);
+    }
+  }
+
   private void addFeatureDatasetSchema(final String path) {
-    final String schemaName = path.substring(1);
+    final String schemaName = path.replaceAll("\\\\", "/");
     final DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
       schemaName);
     addSchema(schema);
@@ -190,7 +200,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   @PreDestroy
-  public void close() {
+  public synchronized void close() {
     try {
       if (geodatabase != null) {
         EsriFileGdb.CloseGeodatabase(geodatabase);
@@ -200,7 +210,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  protected void closeTable(final Table table) {
+  protected synchronized void closeTable(final Table table) {
     try {
       geodatabase.CloseTable(table);
     } catch (final Throwable e) {
@@ -208,15 +218,18 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public void createDomain(final Domain domain) {
-    final String domainDef = EsriGdbXmlSerializer.toString(domain);
-    try {
-      geodatabase.createDomain(domainDef);
-    } catch (final Exception e) {
-      LOG.debug(domainDef);
-      LOG.error("Unable to create domain", e);
+  public synchronized void createDomain(final Domain domain) {
+    final String domainName = domain.getDomainName();
+    if (!domainColumNames.containsKey(domainName)) {
+      final String domainDef = EsriGdbXmlSerializer.toString(domain);
+      try {
+        geodatabase.createDomain(domainDef);
+      } catch (final Exception e) {
+        LOG.debug(domainDef);
+        LOG.error("Unable to create domain", e);
+      }
+      loadDomain(domain.getDomainName());
     }
-    loadDomain(domain.getDomainName());
   }
 
   // @Override
@@ -232,20 +245,20 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   // TODO add bounding box
   @Override
-  protected AbstractIterator<DataObject> createIterator(
+  protected synchronized AbstractIterator<DataObject> createIterator(
     final Query query,
     final Map<String, Object> properties) {
-    QName typeName = query.getTypeName();
+    String typePath = query.getTypeName();
     DataObjectMetaData metaData = query.getMetaData();
     if (metaData == null) {
-      typeName = query.getTypeName();
-      metaData = getMetaData(typeName);
+      typePath = query.getTypeName();
+      metaData = getMetaData(typePath);
       if (metaData == null) {
         throw new IllegalArgumentException("Type name does not exist "
-          + typeName);
+          + typePath);
       }
     } else {
-      typeName = metaData.getName();
+      typePath = metaData.getPath();
     }
     String where = query.getWhereClause();
     if (where == null) {
@@ -282,9 +295,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
       matcher.appendTail(whereClause);
     }
-
+    BoundingBox boundingBox = query.getBoundingBox();
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typeName, whereClause.toString());
+      typePath, whereClause.toString(), boundingBox);
     return iterator;
   }
 
@@ -306,7 +319,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public void createSchema(
+  public synchronized void createSchema(
     final String schemaName,
     final GeometryFactory geometryFactory) {
     final SpatialReference spatialReference = getSpatialReference(geometryFactory);
@@ -337,7 +350,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return createTable(deTable);
   }
 
-  public DataObjectMetaData createTable(final DETable deTable) {
+  public synchronized DataObjectMetaData createTable(final DETable deTable) {
     String schemaPath = deTable.getParentCatalogPath();
     String schemaName = schemaPath.substring(1);
     final DataObjectStoreSchema schema = getSchema(schemaName);
@@ -384,12 +397,13 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public Writer<DataObject> createWriter() {
+  @Override
+  public synchronized Writer<DataObject> createWriter() {
     return new FileGdbWriter(this);
   }
 
   @Override
-  public void delete(final DataObject object) {
+  public synchronized void delete(final DataObject object) {
     if (object.getState() == DataObjectState.Persisted
       || object.getState() == DataObjectState.Modified) {
       object.setState(DataObjectState.Deleted);
@@ -398,31 +412,33 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public void deleteGeodatabase() {
+  @Override
+  public synchronized void deleteGeodatabase() {
     close();
     if (new File(fileName).exists()) {
       EsriFileGdb.DeleteGeodatabase(fileName);
     }
   }
 
-  public String getDefaultSchema() {
+  public synchronized String getDefaultSchema() {
     return defaultSchema;
   }
 
-  public Map<String, List<String>> getDomainColumNames() {
+  public synchronized Map<String, List<String>> getDomainColumNames() {
     return domainColumNames;
   }
 
-  public String getFileName() {
+  public synchronized String getFileName() {
     return fileName;
   }
 
-  protected Geodatabase getGeodatabase() {
+  protected synchronized Geodatabase getGeodatabase() {
     return geodatabase;
   }
 
   @Override
-  public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
+  public synchronized DataObjectMetaData getMetaData(
+    final DataObjectMetaData objectMetaData) {
     synchronized (geodatabase) {
       DataObjectMetaData metaData = super.getMetaData(objectMetaData);
       if (createMissingTables && metaData == null) {
@@ -432,7 +448,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public DataObjectMetaData getMetaData(
+  public synchronized DataObjectMetaData getMetaData(
     final String schemaName,
     final String path,
     final String tableDefinition) {
@@ -440,10 +456,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       final XmlProcessor parser = new EsriGdbXmlParser();
       final DETable deTable = parser.process(tableDefinition);
       final String tableName = deTable.getName();
-      final QName typeName = new QName(schemaName, tableName);
+      final String typePath = PathUtil.getPath(schemaName, tableName);
       final DataObjectStoreSchema schema = getSchema(schemaName);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
-        schema, typeName);
+        schema, typePath);
       for (final Field field : deTable.getFields()) {
         final String fieldName = field.getName();
         final FieldType type = field.getType();
@@ -459,7 +475,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           } catch (final Throwable e) {
             LOG.error(tableDefinition);
             throw new RuntimeException("Error creating attribute for "
-              + typeName + "." + field.getName() + " : " + field.getType(), e);
+              + typePath + "." + field.getName() + " : " + field.getType(), e);
           }
           if (fieldName.equals(tableName + "_ID")) {
             metaData.setIdAttributeName(fieldName);
@@ -486,6 +502,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         }
       }
       addMetaDataProperties(metaData);
+      if (metaData.getIdAttributeIndex() == -1) {
+        metaData.setIdAttributeName("OBJECTID");
+      }
+
       return metaData;
     } catch (final RuntimeException e) {
       if (LOG.isDebugEnabled()) {
@@ -506,21 +526,20 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return getMetaData(schemaName, path, tableDefinition);
   }
 
-  protected Table getTable(final QName typeName) {
-    if (getMetaData(typeName) == null) {
+  protected synchronized Table getTable(final String typePath) {
+    if (getMetaData(typePath) == null) {
       return null;
     } else {
-      final String schemaName = typeName.getNamespaceURI();
-      final String path = "\\\\" + schemaName + "\\" + typeName.getLocalPart();
+      final String path = typePath.replaceAll("/", "\\\\");
       try {
         return geodatabase.openTable(path);
       } catch (final RuntimeException e) {
-        throw new RuntimeException("Unable to open table " + typeName, e);
+        throw new RuntimeException("Unable to open table " + typePath, e);
       }
     }
   }
 
-  public Resource getTemplate() {
+  public synchronized Resource getTemplate() {
     return template;
   }
 
@@ -535,7 +554,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   @Override
   @PostConstruct
-  public void initialize() {
+  public synchronized void initialize() {
     super.initialize();
     final File file = new File(fileName);
     if (file.exists() && new File(fileName, "gdb").exists()) {
@@ -592,26 +611,26 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public void insert(final DataObject object) {
+  public synchronized void insert(final DataObject object) {
     getWriter().write(object);
   }
 
-  public boolean isCreateMissingDataStore() {
+  public synchronized boolean isCreateMissingDataStore() {
     return createMissingDataStore;
   }
 
-  public boolean isCreateMissingTables() {
+  public synchronized boolean isCreateMissingTables() {
     return createMissingTables;
   }
 
   @Override
-  public DataObject load(final QName typeName, final Object id) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public synchronized DataObject load(final String typePath, final Object id) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
-      throw new IllegalArgumentException("Unknown type " + typeName);
+      throw new IllegalArgumentException("Unknown type " + typePath);
     } else {
       final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-        typeName, metaData.getIdAttributeName() + " = " + id);
+        typePath, metaData.getIdAttributeName() + " = " + id);
       try {
         if (iterator.hasNext()) {
           return iterator.next();
@@ -624,14 +643,14 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  protected void loadDomain(final String domainName) {
+  protected synchronized void loadDomain(final String domainName) {
     final String domainDef = geodatabase.getDomainDefinition(domainName);
     final Domain domain = EsriGdbXmlParser.parse(domainDef);
     if (domain instanceof CodedValueDomain) {
       final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
-      final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(
-        geodatabase, codedValueDomain);
-      addCodeTable(codeTable);
+      final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(this,
+        codedValueDomain);
+      super.addCodeTable(codeTable);
       final List<String> columnNames = domainColumNames.get(domainName);
       if (columnNames != null) {
         for (final String columnName : columnNames) {
@@ -642,22 +661,22 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  protected void loadSchemaDataObjectMetaData(
+  protected synchronized void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    final Map<QName, DataObjectMetaData> metaDataMap) {
-    final String schemaName = schema.getName();
+    final Map<String, DataObjectMetaData> metaDataMap) {
+    final String schemaName = schema.getPath();
     if (schemaName.equals(defaultSchema)) {
       loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\",
         "Feature Class");
       loadSchemaDataObjectMetaData(metaDataMap, schemaName, "\\", "Table");
     }
-    final String path = "\\" + schemaName;
+    final String path = schemaName.replaceAll("/", "\\\\");
     loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Feature Class");
     loadSchemaDataObjectMetaData(metaDataMap, schemaName, path, "Table");
   }
 
-  public void loadSchemaDataObjectMetaData(
-    final Map<QName, DataObjectMetaData> metaDataMap,
+  public synchronized void loadSchemaDataObjectMetaData(
+    final Map<String, DataObjectMetaData> metaDataMap,
     final String schemaName,
     final String path,
     final String datasetType) {
@@ -678,66 +697,80 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
-    if (defaultSchema != null) {
-      addSchema(new DataObjectStoreSchema(this, defaultSchema));
-    } else {
-      addSchema(new DataObjectStoreSchema(this, ""));
-    }
+  protected synchronized void loadSchemas(
+    final Map<String, DataObjectStoreSchema> schemaMap) {
+    addSchema(new DataObjectStoreSchema(this, defaultSchema));
     addChildSchema("\\");
   }
 
   @Override
-  public Reader<DataObject> query(final QName typeName) {
+  public synchronized Reader<DataObject> query(final String typePath) {
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typeName);
+      typePath);
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
   }
 
-  public Reader<DataObject> query(
-    final QName typeName,
+  @Override
+  public synchronized Reader<DataObject> query(
+    final String typePath,
     final BoundingBox boundingBox) {
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typeName, boundingBox);
+      typePath, boundingBox);
     final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
       iterator);
     return reader;
   }
 
-  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
+  @Override
+  public synchronized Reader<DataObject> query(
+    final String typePath,
+    final Geometry geometry) {
     final BoundingBox boundingBox = new BoundingBox(geometry);
-    return query(typeName, boundingBox);
+    return query(typePath, boundingBox);
   }
 
-  public void setCreateMissingDataStore(final boolean createMissingDataStore) {
+  @Override
+  public synchronized void setCreateMissingDataStore(
+    final boolean createMissingDataStore) {
     this.createMissingDataStore = createMissingDataStore;
   }
 
-  public void setCreateMissingTables(final boolean createMissingTables) {
+  @Override
+  public synchronized void setCreateMissingTables(
+    final boolean createMissingTables) {
     this.createMissingTables = createMissingTables;
   }
 
-  public void setDefaultSchema(final String defaultSchema) {
-    this.defaultSchema = defaultSchema;
+  @Override
+  public synchronized void setDefaultSchema(final String defaultSchema) {
+    if (StringUtils.hasText(defaultSchema)) {
+      if (!defaultSchema.startsWith("/")) {
+        this.defaultSchema = "/" + defaultSchema;
+      } else {
+        this.defaultSchema = defaultSchema;
+      }
+    } else {
+      this.defaultSchema = "/";
+    }
   }
 
-  public void setDomainColumNames(
+  public synchronized void setDomainColumNames(
     final Map<String, List<String>> domainColumNames) {
     this.domainColumNames = domainColumNames;
   }
 
-  public void setFileName(final String fileName) {
+  public synchronized void setFileName(final String fileName) {
     this.fileName = fileName;
   }
 
-  public void setTemplate(final Resource template) {
+  public synchronized void setTemplate(final Resource template) {
     this.template = template;
   }
 
   @Override
-  public void update(final DataObject object) {
+  public synchronized void update(final DataObject object) {
     getWriter().write(object);
   }
 }

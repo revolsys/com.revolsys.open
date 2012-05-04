@@ -5,13 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
@@ -21,9 +20,9 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   public static ArcSdeObjectIdJdbcAttribute getInstance(
     final JdbcAttribute attribute,
     final Connection connection,
-    final QName name) {
-    return getInstance(attribute, connection, name.getNamespaceURI(),
-      name.getLocalPart());
+    final String typePath) {
+    return getInstance(attribute, connection, JdbcUtils.getSchemaName(typePath),
+      PathUtil.getName(typePath));
   }
 
   public static ArcSdeObjectIdJdbcAttribute getInstance(

@@ -22,32 +22,22 @@ public class OpenTransactionInViewFilter extends OncePerRequestFilter {
 
   private String transactionManagerBeanName = DEFAULT_TRANSACTION_MANAGER_BEAN_NAME;
 
-  public void setTransactionManagerBeanName(
-    String transactionManagerBeanName) {
-    this.transactionManagerBeanName = transactionManagerBeanName;
-  }
-
-  protected String getTransactionManagerBeanName() {
-    return this.transactionManagerBeanName;
-  }
-
+  @Override
   protected void doFilterInternal(
     final HttpServletRequest request,
     final HttpServletResponse response,
-    final FilterChain filterChain)
-    throws ServletException,
-    IOException {
-    PlatformTransactionManager transactionManager = lookupTransactionManager(request);
+    final FilterChain filterChain) throws ServletException, IOException {
+    final PlatformTransactionManager transactionManager = lookupTransactionManager(request);
 
-    TransactionTemplate template = new TransactionTemplate(transactionManager);
-    Exception exception = (Exception)template.execute(new TransactionCallback<Object>() {
-      public Object doInTransaction(
-        TransactionStatus status) {
+    final TransactionTemplate template = new TransactionTemplate(
+      transactionManager);
+    final Exception exception = (Exception)template.execute(new TransactionCallback<Object>() {
+      public Object doInTransaction(final TransactionStatus status) {
         try {
           filterChain.doFilter(request, response);
-        } catch (IOException e) {
+        } catch (final IOException e) {
           throw new RuntimeException(e);
-        } catch (ServletException e) {
+        } catch (final ServletException e) {
           throw new RuntimeException(e);
         }
         return null;
@@ -62,9 +52,8 @@ public class OpenTransactionInViewFilter extends OncePerRequestFilter {
     }
   }
 
-  protected PlatformTransactionManager lookupTransactionManager(
-    HttpServletRequest request) {
-    return lookupTransactionManager();
+  protected String getTransactionManagerBeanName() {
+    return this.transactionManagerBeanName;
   }
 
   protected PlatformTransactionManager lookupTransactionManager() {
@@ -72,10 +61,20 @@ public class OpenTransactionInViewFilter extends OncePerRequestFilter {
       logger.debug("Using TransactionManager '"
         + getTransactionManagerBeanName() + "' for OpenTransactionInViewFilter");
     }
-    ServletContext servletContext = getServletContext();
-    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-    return (PlatformTransactionManager)wac.getBean(
-      getTransactionManagerBeanName(), PlatformTransactionManager.class);
+    final ServletContext servletContext = getServletContext();
+    final WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    return wac.getBean(getTransactionManagerBeanName(),
+      PlatformTransactionManager.class);
+  }
+
+  protected PlatformTransactionManager lookupTransactionManager(
+    final HttpServletRequest request) {
+    return lookupTransactionManager();
+  }
+
+  public void setTransactionManagerBeanName(
+    final String transactionManagerBeanName) {
+    this.transactionManagerBeanName = transactionManagerBeanName;
   }
 
 }

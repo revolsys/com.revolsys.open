@@ -28,9 +28,9 @@ public class DataObjectStoreSchemaMapProxy extends
     if (schema == null) {
       schema = map.get(key);
       if (schema != null) {
-        final String name = schema.getName();
-        schema = new DataObjectStoreSchemaProxy(dataObjectStore, name, schema);
-        super.put(name, schema);
+        final String path = schema.getPath();
+        schema = new DataObjectStoreSchemaProxy(dataObjectStore, path, schema);
+        super.put(path, schema);
       }
     }
     return schema;

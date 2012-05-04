@@ -7,20 +7,6 @@ public class SystemPropertyFactoryBean extends AbstractFactoryBean<String> {
 
   private String defaultValue;
 
-  public String getDefaultValue() {
-    return defaultValue;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  protected void destroyInstance(String instance) throws Exception {
-    name = null;
-    defaultValue = null;
-  }
-
   @Override
   protected String createInstance() throws Exception {
     final String propertyValue = System.getProperty(name);
@@ -31,10 +17,26 @@ public class SystemPropertyFactoryBean extends AbstractFactoryBean<String> {
     }
   }
 
+  @Override
+  protected void destroyInstance(final String instance) throws Exception {
+    name = null;
+    defaultValue = null;
+  }
+
+  public String getDefaultValue() {
+    return defaultValue;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  @Override
   public Class<?> getObjectType() {
     return String.class;
   }
 
+  @Override
   public boolean isSingleton() {
     return true;
   }

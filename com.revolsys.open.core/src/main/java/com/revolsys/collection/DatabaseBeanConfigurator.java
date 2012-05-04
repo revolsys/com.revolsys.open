@@ -3,11 +3,8 @@ package com.revolsys.collection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -24,7 +21,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
 
   private DataSource dataSource;
 
-  private QName tableName;
+  private String tableName;
 
   private String propertyColumnName;
 
@@ -42,60 +39,36 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
     return dataSource;
   }
 
-  public void setDataSource(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  public QName getTableName() {
-    return tableName;
-  }
-
-  public void setTableName(QName tableName) {
-    this.tableName = tableName;
-  }
-
   public String getPropertyColumnName() {
     return propertyColumnName;
   }
 
-  public void setPropertyColumnName(String propertyColumnName) {
-    this.propertyColumnName = propertyColumnName;
-  }
-
-  public String getValueColumnName() {
-    return valueColumnName;
-  }
-
-  public void setValueColumnName(String valueColumnName) {
-    this.valueColumnName = valueColumnName;
+  public String getTableName() {
+    return tableName;
   }
 
   public String getTypeColumnName() {
     return typeColumnName;
   }
 
-  public void setTypeColumnName(String typeColumnName) {
-    this.typeColumnName = typeColumnName;
+  public String getValueColumnName() {
+    return valueColumnName;
   }
 
   public String getWhereClause() {
     return whereClause;
   }
 
-  public void setWhereClause(String whereClause) {
-    this.whereClause = whereClause;
-  }
-
   @Override
-  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
-    throws BeansException {
+  public void postProcessBeanFactory(
+    final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     try {
       final boolean hasTypeColumnName = StringUtils.hasText(typeColumnName);
       String sql = "SELECT " + propertyColumnName + ", " + valueColumnName;
       if (hasTypeColumnName) {
         sql += ", " + typeColumnName;
       }
-      sql += " FROM " + JdbcUtils.getTableName(tableName);
+      sql += " FROM " + JdbcUtils.getQualifiedTableName(tableName);
       if (StringUtils.hasText(whereClause)) {
         sql += " WHERE " + whereClause;
       }
@@ -108,15 +81,16 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
             while (resultSet.next()) {
               final String property = resultSet.getString(1);
               final String valueString = resultSet.getString(2);
-              String typeName = "string";
+              String typePath = "string";
               if (hasTypeColumnName) {
-                typeName = resultSet.getString(3);
+                typePath = resultSet.getString(3);
               }
-              final DataType dataType = DataTypes.getType(QName.valueOf(typeName));
+              final DataType dataType = DataTypes.getType(typePath);
               Object value = valueString;
               if (dataType != null) {
                 final Class<?> dataTypeClass = dataType.getJavaClass();
-                final StringConverter<?> converter = StringConverterRegistry.getInstance().getConverter(dataTypeClass);
+                final StringConverter<?> converter = StringConverterRegistry.getInstance()
+                  .getConverter(dataTypeClass);
                 if (converter != null) {
                   value = converter.toObject(valueString);
                 }
@@ -133,10 +107,34 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
       } finally {
         JdbcUtils.close(connection);
       }
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       LOG.error("Unable to load configuration from database ", e);
     } finally {
       super.postProcessBeanFactory(beanFactory);
     }
+  }
+
+  public void setDataSource(final DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  public void setPropertyColumnName(final String propertyColumnName) {
+    this.propertyColumnName = propertyColumnName;
+  }
+
+  public void setTableName(final String tableName) {
+    this.tableName = tableName;
+  }
+
+  public void setTypeColumnName(final String typeColumnName) {
+    this.typeColumnName = typeColumnName;
+  }
+
+  public void setValueColumnName(final String valueColumnName) {
+    this.valueColumnName = valueColumnName;
+  }
+
+  public void setWhereClause(final String whereClause) {
+    this.whereClause = whereClause;
   }
 }

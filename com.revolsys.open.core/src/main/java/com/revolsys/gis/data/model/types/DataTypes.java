@@ -99,7 +99,7 @@ public final class DataTypes {
   public static final DataType MULTI_POLYGON = new SimpleDataType(
     "MultiPolygon", MultiPolygon.class);
 
-  static final Map<QName, DataType> NAME_TYPE_MAP = new HashMap<QName, DataType>();
+  static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<String, DataType>();
 
   public static final DataType POINT = new SimpleDataType("Point", Point.class);
 
@@ -167,8 +167,8 @@ public final class DataTypes {
     }
   }
 
-  public static DataType getType(final QName typeName) {
-    final DataType type = NAME_TYPE_MAP.get(typeName);
+  public static DataType getType(final String name) {
+    final DataType type = NAME_TYPE_MAP.get(name);
     if (type == null) {
       return OBJECT;
     } else {
@@ -182,8 +182,8 @@ public final class DataTypes {
   }
 
   public static void register(final DataType type) {
-    final QName typeName = type.getName();
-    NAME_TYPE_MAP.put(typeName, type);
+    final String name = type.getName();
+    NAME_TYPE_MAP.put(name, type);
     final Class<?> typeClass = type.getJavaClass();
     register(typeClass, type);
   }

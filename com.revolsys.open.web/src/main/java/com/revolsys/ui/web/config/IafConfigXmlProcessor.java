@@ -145,17 +145,17 @@ public class IafConfigXmlProcessor extends XmlProcessor {
   public Argument processArgument(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
-    final String typeName = parser.getAttributeValue(null, "type");
+    final String typePath = parser.getAttributeValue(null, "type");
     final String defaultValue = parser.getAttributeValue(null, "default");
     Class type = null;
-    if (typeName != null) {
-      type = (Class)standardTypes.get(typeName);
+    if (typePath != null) {
+      type = (Class)standardTypes.get(typePath);
       if (type == null) {
         try {
-          type = Class.forName(typeName);
+          type = Class.forName(typePath);
         } catch (final ClassNotFoundException e) {
           log.error(e);
-          throw new RuntimeException("Type " + typeName + "could not be found",
+          throw new RuntimeException("Type " + typePath + "could not be found",
             e);
         }
       }
@@ -171,17 +171,17 @@ public class IafConfigXmlProcessor extends XmlProcessor {
   public Attribute processAttribute(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
-    final String typeName = parser.getAttributeValue(null, "type");
+    final String typePath = parser.getAttributeValue(null, "type");
     final String value = parser.getAttributeValue(null, "value");
     Class type = null;
-    if (typeName != null) {
-      type = (Class)standardTypes.get(typeName);
+    if (typePath != null) {
+      type = (Class)standardTypes.get(typePath);
       if (type == null) {
         try {
-          type = Class.forName(typeName);
+          type = Class.forName(typePath);
         } catch (final ClassNotFoundException e) {
           log.error(e);
-          throw new RuntimeException("Type " + typeName + "could not be found",
+          throw new RuntimeException("Type " + typePath + "could not be found",
             e);
         }
       }

@@ -2,8 +2,6 @@ package com.revolsys.gis.graph.event;
 
 import java.util.LinkedHashSet;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.graph.Node;
 
 public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
@@ -16,12 +14,12 @@ public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
 
   public void nodeEvent(
     final Node<T> node,
-    final QName typeName,
+    final String typePath,
     final String ruleName,
     final String action,
     final String notes) {
     if (!isEmpty()) {
-      nodeEvent(new NodeEvent<T>(node, typeName, ruleName, action, notes));
+      nodeEvent(new NodeEvent<T>(node, typePath, ruleName, action, notes));
     }
   }
 

@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,7 +36,7 @@ public class TextOnCurveConverter implements OsnConverter {
     while (attributeName != null) {
       if (attributeName.equals("characters")) {
         while (iterator.next() != OsnIterator.END_LIST) {
-          final QName objectName = iterator.nextObjectName();
+          final String objectName = iterator.nextObjectName();
           final OsnConverter osnConverter = converters.getConverter(objectName);
           if (osnConverter == null) {
             iterator.throwParseError("No Geometry Converter for " + objectName);
@@ -65,10 +63,10 @@ public class TextOnCurveConverter implements OsnConverter {
     throws IOException {
     if (object instanceof MultiPoint) {
       final MultiPoint multiPoint = (MultiPoint)object;
-      serializer.startObject("TextOnCurve");
+      serializer.startObject("/TextOnCurve");
       serializer.attributeName("characters");
-      serializer.startCollection("List");
-      final OsnConverter osnConverter = converters.getConverter("TextLine");
+      serializer.startCollection("/List");
+      final OsnConverter osnConverter = converters.getConverter("/TextLine");
       for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
         final Point point = (Point)multiPoint.getGeometryN(i);
         osnConverter.write(serializer, point);

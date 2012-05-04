@@ -30,14 +30,14 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   public static Filter<DataObject> getFilter(
-    DataObject object,
-    double maxDistance) {
-    LineString line = object.getGeometryValue();
-    LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(line,
-      maxDistance);
+    final DataObject object,
+    final double maxDistance) {
+    final LineString line = object.getGeometryValue();
+    final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(
+      line, maxDistance);
     return new DataObjectGeometryFilter<LineString>(lineFilter);
   }
-  
+
   private Envelope envelope;
 
   /** The geometry to compare the data objects to to. */

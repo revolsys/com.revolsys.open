@@ -8,18 +8,18 @@ import javax.persistence.PreUpdate;
 import org.apache.commons.beanutils.BeanUtils;
 
 public class AuditEntityListener {
-  private String userId = "test";
+  private final String userId = "test";
 
   @PrePersist
   public void prePersist(final Object bean) {
     try {
-      BeanUtils.setProperty(bean, "creationTimestamp", new Timestamp(
-        System.currentTimeMillis()));
-    } catch (Exception e) {
+      BeanUtils.setProperty(bean, "creationTimestamp",
+        new Timestamp(System.currentTimeMillis()));
+    } catch (final Exception e) {
     }
     try {
       BeanUtils.setProperty(bean, "createdBy", userId);
-    } catch (Exception e) {
+    } catch (final Exception e) {
     }
     preUpdate(bean);
   }
@@ -27,13 +27,13 @@ public class AuditEntityListener {
   @PreUpdate
   public void preUpdate(final Object bean) {
     try {
-      BeanUtils.setProperty(bean, "modificationTimestamp", new Timestamp(
-        System.currentTimeMillis()));
-    } catch (Exception e) {
+      BeanUtils.setProperty(bean, "modificationTimestamp",
+        new Timestamp(System.currentTimeMillis()));
+    } catch (final Exception e) {
     }
     try {
       BeanUtils.setProperty(bean, "modifiedBy", userId);
-    } catch (Exception e) {
+    } catch (final Exception e) {
     }
   }
 }

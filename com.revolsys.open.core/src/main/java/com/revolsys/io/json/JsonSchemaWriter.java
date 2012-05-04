@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.springframework.core.io.Resource;
 
@@ -78,7 +77,7 @@ public class JsonSchemaWriter {
       final Collection<?> collection = (Collection<?>)value;
       value = toJsonList(collection);
     } else {
-      StringConverter<?> converter = StringConverterRegistry.getInstance()
+      final StringConverter<?> converter = StringConverterRegistry.getInstance()
         .getConverter(value);
       if (converter != null) {
         jsonValue = converter.toString(value);
@@ -89,7 +88,7 @@ public class JsonSchemaWriter {
 
   public void write(final DataObjectMetaData metaData) {
     final Map<String, Object> metaDataMap = new LinkedHashMap<String, Object>();
-    metaDataMap.put("name", metaData.getName());
+    metaDataMap.put("name", metaData.getPath());
 
     final List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
     metaDataMap.put("fields", fields);
@@ -98,7 +97,7 @@ public class JsonSchemaWriter {
       final String name = attribute.getName();
       field.put("name", name);
       final DataType dataType = attribute.getType();
-      final QName dataTypeName = dataType.getName();
+      final String dataTypeName = dataType.getName();
       field.put("type", dataTypeName);
       final int length = attribute.getLength();
       if (length > 0) {

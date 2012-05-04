@@ -15,31 +15,6 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractCoordinatesList implements CoordinatesList,
   Cloneable {
 
-  public boolean contains(Coordinates point) {
-    for (int i = 0; i < size(); i++) {
-      if (equal(i, point, 2)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public List<Coordinates> getList() {
-    List<Coordinates> points = new ArrayList<Coordinates>();
-    for (Coordinates point : this) {
-      points.add(point);
-    }
-    return points;
-  }
-
-  public BoundingBox getBoundingBox() {
-    BoundingBox boundingBox = new BoundingBox();
-    for (Coordinates point : this) {
-      boundingBox.expandToInclude(point);
-    }
-    return boundingBox;
-  }
-
   /**
    * 
    */
@@ -63,6 +38,15 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public boolean contains(final Coordinates point) {
+    for (int i = 0; i < size(); i++) {
+      if (equal(i, point, 2)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void copy(
@@ -253,6 +237,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return new CoordinatesListCoordinates(this, i);
   }
 
+  public BoundingBox getBoundingBox() {
+    final BoundingBox boundingBox = new BoundingBox();
+    for (final Coordinates point : this) {
+      boundingBox.expandToInclude(point);
+    }
+    return boundingBox;
+  }
+
   public Coordinate getCoordinate(final int i) {
     final Coordinate coordinate = new Coordinate();
     getCoordinate(i, coordinate);
@@ -291,6 +283,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Deprecated
   public int getDimension() {
     return getNumAxis();
+  }
+
+  public List<Coordinates> getList() {
+    final List<Coordinates> points = new ArrayList<Coordinates>();
+    for (final Coordinates point : this) {
+      points.add(point);
+    }
+    return points;
   }
 
   public double getM(final int index) {

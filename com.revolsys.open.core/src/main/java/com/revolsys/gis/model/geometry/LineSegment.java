@@ -3,7 +3,6 @@ package com.revolsys.gis.model.geometry;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
-import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -79,6 +78,7 @@ public class LineSegment extends AbstractCoordinatesList {
     return new LineSegment(geometryFactory, coordinates1, coordinates2);
   }
 
+  @Override
   public boolean contains(final Coordinates coordinate) {
     if (get(0).equals(coordinate)) {
       return true;
@@ -91,6 +91,11 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public double distance(final Coordinates p) {
     return LineSegmentUtil.distance(coordinates1, coordinates2, p);
+  }
+
+  public double distance(final LineSegment lineSegment) {
+    return LineSegmentUtil.distance(coordinates1, coordinates2,
+      lineSegment.coordinates1, lineSegment.coordinates2);
   }
 
   public LineSegment extend(final double startDistance, final double endDistance) {
@@ -117,7 +122,7 @@ public class LineSegment extends AbstractCoordinatesList {
       final CoordinatesList currentIntersections = LineSegmentUtil.getIntersection(
         coordinates1, coordinates2, ringC1, ringC2);
       if (currentIntersections.size() == 1) {
-        Coordinates currentIntersection = currentIntersections.get(0);
+        final Coordinates currentIntersection = currentIntersections.get(0);
         if (intersection == null) {
           intersection = currentIntersection;
         } else if (coordinates1.distance(currentIntersection) < coordinates1.distance(intersection)) {
@@ -138,38 +143,6 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
-  }
-
-  /**
-   * Computes the length of the line segment.
-   * 
-   * @return the length of the line segment
-   */
-  public double getLength() {
-    return coordinates1.distance(coordinates2);
-  }
-
-  public LineString getLine() {
-    if (line == null) {
-      line = geometryFactory.createLineString(this);
-    }
-    return line;
-  }
-
-  public byte getNumAxis() {
-    return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
-  }
-
-  public double getValue(final int index, final int axisIndex) {
-    switch (index) {
-      case 0:
-        return coordinates1.getValue(axisIndex);
-      case 1:
-        return coordinates2.getValue(axisIndex);
-
-      default:
-        return 0;
-    }
   }
 
   public LineSegment getIntersection(BoundingBox boundingBox) {
@@ -209,10 +182,42 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public CoordinatesList getIntersection(final LineSegment lineSegment2) {
-    CoordinatesList intersection = LineSegmentUtil.getIntersection(
+    final CoordinatesList intersection = LineSegmentUtil.getIntersection(
       geometryFactory, coordinates1, coordinates2, lineSegment2.coordinates1,
       lineSegment2.coordinates2);
     return intersection;
+  }
+
+  /**
+   * Computes the length of the line segment.
+   * 
+   * @return the length of the line segment
+   */
+  public double getLength() {
+    return coordinates1.distance(coordinates2);
+  }
+
+  public LineString getLine() {
+    if (line == null) {
+      line = geometryFactory.createLineString(this);
+    }
+    return line;
+  }
+
+  public byte getNumAxis() {
+    return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
+  }
+
+  public double getValue(final int index, final int axisIndex) {
+    switch (index) {
+      case 0:
+        return coordinates1.getValue(axisIndex);
+      case 1:
+        return coordinates2.getValue(axisIndex);
+
+      default:
+        return 0;
+    }
   }
 
   public boolean intersects(final BoundingBox boundingBox) {
@@ -226,6 +231,13 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public boolean isEmpty() {
     return coordinates1 == null || coordinates2 == null;
+  }
+
+  public boolean isPointOnLineMiddle(
+    final Coordinates point,
+    final double maxDistance) {
+    return LineSegmentUtil.isPointOnLineMiddle(coordinates1, coordinates2,
+      point, maxDistance);
   }
 
   public Coordinates project(final Coordinates p) {
@@ -268,16 +280,6 @@ public class LineSegment extends AbstractCoordinatesList {
     } else {
       return getLine().toString();
     }
-  }
-
-  public boolean isPointOnLineMiddle(Coordinates point, double maxDistance) {
-    return LineSegmentUtil.isPointOnLineMiddle(coordinates1, coordinates2,
-      point, maxDistance);
-  }
-
-  public double distance(LineSegment lineSegment) {
-    return LineSegmentUtil.distance(coordinates1, coordinates2,
-      lineSegment.coordinates1, lineSegment.coordinates2);
   }
 
 }

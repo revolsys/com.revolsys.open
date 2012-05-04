@@ -1,7 +1,5 @@
 package com.revolsys.gis.data.io;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 
@@ -16,28 +14,28 @@ public class DataObjectStoreSchemaProxy extends DataObjectStoreSchema {
   }
 
   @Override
-  public synchronized DataObjectMetaData findMetaData(final QName typeName) {
-    DataObjectMetaData metaData = super.findMetaData(typeName);
+  public synchronized DataObjectMetaData findMetaData(final String typePath) {
+    DataObjectMetaData metaData = super.findMetaData(typePath);
     if (metaData == null) {
-      metaData = schema.findMetaData(typeName);
+      metaData = schema.findMetaData(typePath);
       if (metaData != null) {
         metaData = new DataObjectMetaDataImpl(getDataObjectStore(), this,
           metaData);
-        addMetaData(typeName, metaData);
+        addMetaData(typePath, metaData);
       }
     }
     return metaData;
   }
 
   @Override
-  public synchronized DataObjectMetaData getMetaData(final QName typeName) {
-    DataObjectMetaData metaData = findMetaData(typeName);
+  public synchronized DataObjectMetaData getMetaData(final String typePath) {
+    DataObjectMetaData metaData = findMetaData(typePath);
     if (metaData == null) {
-      metaData = schema.getMetaData(typeName);
+      metaData = schema.getMetaData(typePath);
       if (metaData != null) {
         metaData = new DataObjectMetaDataImpl(getDataObjectStore(), this,
           metaData);
-        addMetaData(typeName, metaData);
+        addMetaData(typePath, metaData);
       }
     }
     return metaData;

@@ -15,10 +15,10 @@ public class SavedRequestFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    FilterChain filterChain) throws ServletException, IOException {
-    HttpServletRequest savedRequest = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final FilterChain filterChain) throws ServletException, IOException {
+    final HttpServletRequest savedRequest = HttpRequestUtils.getHttpServletRequest();
     try {
       HttpRequestUtils.setHttpServletRequest(request);
       filterChain.doFilter(request, response);

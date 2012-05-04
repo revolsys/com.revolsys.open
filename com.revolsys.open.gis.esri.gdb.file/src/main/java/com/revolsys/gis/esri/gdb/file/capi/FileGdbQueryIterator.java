@@ -2,8 +2,6 @@ package com.revolsys.gis.esri.gdb.file.capi;
 
 import java.util.NoSuchElementException;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -37,44 +35,44 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   private EnumRows rows;
 
-  private final QName typeName;
+  private final String typePath;
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final QName typeName) {
-    this(dataStore, typeName, "*", "", null);
+    final String typePath) {
+    this(dataStore, typePath, "*", "", null);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final QName typeName, final BoundingBox boundingBox) {
-    this(dataStore, typeName, "*", "", boundingBox);
+    final String typePath, final BoundingBox boundingBox) {
+    this(dataStore, typePath, "*", "", boundingBox);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final QName typeName, final String whereClause) {
-    this(dataStore, typeName, "*", whereClause, null);
+    final String typePath, final String whereClause) {
+    this(dataStore, typePath, "*", whereClause, null);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final QName typeName, final String whereClause,
+    final String typePath, final String whereClause,
     final BoundingBox boundingBox) {
-    this(dataStore, typeName, "*", whereClause, boundingBox);
+    this(dataStore, typePath, "*", whereClause, boundingBox);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final QName typeName, final String fields, final String whereClause) {
-    this(dataStore, typeName, fields, whereClause, null);
+    final String typePath, final String fields, final String whereClause) {
+    this(dataStore, typePath, fields, whereClause, null);
   }
 
   FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
-    final QName typeName, final String fields, final String whereClause,
+    final String typePath, final String fields, final String whereClause,
     final BoundingBox boundingBox) {
     this.dataStore = dataStore;
-    this.typeName = typeName;
-    this.metaData = dataStore.getMetaData(typeName);
+    this.typePath = typePath;
+    this.metaData = dataStore.getMetaData(typePath);
     if (metaData == null) {
-      throw new IllegalArgumentException("Unknown type " + typeName);
+      throw new IllegalArgumentException("Unknown type " + typePath);
     }
-    this.table = dataStore.getTable(typeName);
+    this.table = dataStore.getTable(typePath);
     this.fields = fields;
     this.whereClause = whereClause;
     setBoundingBox(boundingBox);
@@ -83,35 +81,41 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   @Override
   protected void doClose() {
-    try {
-      if (rows != null) {
+    if (dataStore != null) {
+      synchronized (dataStore) {
         try {
-          rows.Close();
-        } catch (final NullPointerException e) {
+          if (rows != null) {
+            try {
+              rows.Close();
+            } catch (final NullPointerException e) {
+            }
+            rows = null;
+          }
+          if (table != null) {
+            dataStore.closeTable(table);
+            table = null;
+          }
+          dataStore = null;
+          metaData = null;
+          fields = null;
+          whereClause = null;
+          boundingBox = null;
+        } catch (final Throwable t) {
+          t.printStackTrace();
         }
-        rows = null;
       }
-      if (table != null) {
-        dataStore.closeTable(table);
-        table = null;
-      }
-      dataStore = null;
-      metaData = null;
-      fields = null;
-      whereClause = null;
-      boundingBox = null;
-    } catch (final Throwable t) {
-      t.printStackTrace();
     }
   }
 
   @Override
   protected void doInit() {
-    if (boundingBox == null) {
-      rows = table.search(fields, whereClause, true);
-    } else {
-      final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope boundingBox = GeometryConverter.toEsri(this.boundingBox);
-      rows = table.search(fields, whereClause, boundingBox, true);
+    synchronized (dataStore) {
+      if (boundingBox == null) {
+        rows = table.search(fields, whereClause, true);
+      } else {
+        final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope boundingBox = GeometryConverter.toEsri(this.boundingBox);
+        rows = table.search(fields, whereClause, boundingBox, true);
+      }
     }
   }
 
@@ -124,22 +128,24 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   @Override
   protected DataObject getNext() throws NoSuchElementException {
-    final Row row = rows.next();
-    if (row == null) {
-      throw new NoSuchElementException();
-    } else {
-      try {
-        final DataObject object = dataObjectFactory.createDataObject(metaData);
-        for (final Attribute attribute : metaData.getAttributes()) {
-          final String name = attribute.getName();
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          final Object value = esriAttribute.getValue(row);
-          object.setValue(name, value);
+    synchronized (dataStore) {
+      final Row row = rows.next();
+      if (row == null) {
+        throw new NoSuchElementException();
+      } else {
+        try {
+          final DataObject object = dataObjectFactory.createDataObject(metaData);
+          for (final Attribute attribute : metaData.getAttributes()) {
+            final String name = attribute.getName();
+            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+            final Object value = esriAttribute.getValue(row);
+            object.setValue(name, value);
+          }
+          object.setState(DataObjectState.Persisted);
+          return object;
+        } finally {
+          row.delete();
         }
-        object.setState(DataObjectState.Persisted);
-        return object;
-      } finally {
-        row.delete();
       }
     }
   }
@@ -163,7 +169,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   @Override
   public String toString() {
-    return typeName.toString();
+    return typePath.toString();
   }
 
 }

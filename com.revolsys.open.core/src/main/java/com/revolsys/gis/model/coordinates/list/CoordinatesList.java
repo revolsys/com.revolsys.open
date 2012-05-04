@@ -11,6 +11,8 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 
 public interface CoordinatesList extends CoordinateSequence,
   Iterable<Coordinates>, Serializable {
+  boolean contains(Coordinates point);
+
   void copy(
     int sourceIndex,
     CoordinatesList target,
@@ -38,7 +40,11 @@ public interface CoordinatesList extends CoordinateSequence,
 
   Coordinates get(int i);
 
+  BoundingBox getBoundingBox();
+
   double[] getCoordinates();
+
+  List<Coordinates> getList();
 
   double getM(int index);
 
@@ -78,6 +84,8 @@ public interface CoordinatesList extends CoordinateSequence,
 
   boolean startsWith(CoordinatesList coordinatesList, int numAxis);
 
+  CoordinatesList subList(int index);
+
   CoordinatesList subList(int index, int count);
 
   CoordinatesList subList(int length, int index, int count);
@@ -87,12 +95,4 @@ public interface CoordinatesList extends CoordinateSequence,
     int sourceIndex,
     int targetIndex,
     int count);
-
-  CoordinatesList subList(int index);
-
-  boolean contains(Coordinates point);
-
-  List<Coordinates> getList();
-
-  BoundingBox getBoundingBox();
 }

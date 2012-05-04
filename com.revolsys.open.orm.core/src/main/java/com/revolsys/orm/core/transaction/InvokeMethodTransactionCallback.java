@@ -6,20 +6,16 @@ import org.springframework.transaction.support.TransactionCallback;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodTransactionCallback implements TransactionCallback<Object> {
+public class InvokeMethodTransactionCallback implements
+  TransactionCallback<Object> {
 
-  private Object[] args;
+  private final Object[] args;
 
-  private String methodName;
+  private final String methodName;
 
-  private Object object;
+  private final Object object;
 
-  private boolean rollback;
-
-  public InvokeMethodTransactionCallback(final Object object,
-    final String methodName, final Object... args) {
-    this(object, methodName, true, args);
-  }
+  private final boolean rollback;
 
   /**
    * @param object
@@ -35,14 +31,19 @@ public class InvokeMethodTransactionCallback implements TransactionCallback<Obje
     this.rollback = rollback;
   }
 
+  public InvokeMethodTransactionCallback(final Object object,
+    final String methodName, final Object... args) {
+    this(object, methodName, true, args);
+  }
+
   public Object doInTransaction(final TransactionStatus transaction) {
     try {
-      Object result = MethodUtils.invokeMethod(object, methodName, args);
+      final Object result = MethodUtils.invokeMethod(object, methodName, args);
       if (rollback) {
         transaction.setRollbackOnly();
       }
       return result;
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       transaction.setRollbackOnly();
       return ExceptionUtil.throwUncheckedException(e);
     }

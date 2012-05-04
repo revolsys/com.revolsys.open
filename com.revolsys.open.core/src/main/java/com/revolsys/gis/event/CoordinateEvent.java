@@ -2,8 +2,6 @@ package com.revolsys.gis.event;
 
 import java.util.EventObject;
 
-import javax.xml.namespace.QName;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class CoordinateEvent extends EventObject {
@@ -26,19 +24,10 @@ public class CoordinateEvent extends EventObject {
 
   private String ruleName;
 
-  private QName typeName;
+  private String typePath;
 
   public CoordinateEvent(final Coordinate coordinate) {
     super(coordinate);
-  }
-
-  public CoordinateEvent(final Coordinate coordinate, final QName typeName,
-    final String ruleName, final String action, final String notes) {
-    super(coordinate);
-    this.typeName = typeName;
-    this.ruleName = ruleName;
-    this.action = action;
-    this.notes = notes;
   }
 
   public CoordinateEvent(final Coordinate coordinate, final String ruleName,
@@ -46,6 +35,15 @@ public class CoordinateEvent extends EventObject {
     super(coordinate);
     this.ruleName = ruleName;
     this.action = action;
+  }
+
+  public CoordinateEvent(final Coordinate coordinate, final String path,
+    final String ruleName, final String action, final String notes) {
+    super(coordinate);
+    this.typePath = typePath;
+    this.ruleName = ruleName;
+    this.action = action;
+    this.notes = notes;
   }
 
   public String getAction() {
@@ -64,8 +62,8 @@ public class CoordinateEvent extends EventObject {
     return ruleName;
   }
 
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeName() {
+    return typePath;
   }
 
 }

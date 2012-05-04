@@ -12,6 +12,10 @@ import org.springframework.web.util.WebUtils;
 public final class HttpRequestUtils {
   private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
+  public static void clearHttpServletRequest() {
+    REQUEST_LOCAL.remove();
+  }
+
   public static String getFullRequestUrl() {
     return getFullRequestUrl(getHttpServletRequest());
   }
@@ -23,21 +27,18 @@ public final class HttpRequestUtils {
   }
 
   public static HttpServletRequest getHttpServletRequest() {
-    HttpServletRequest request = REQUEST_LOCAL.get();
+    final HttpServletRequest request = REQUEST_LOCAL.get();
     return request;
   }
 
-  public static String getPathVariable(String name) {
-    return getPathVariables().get(name);
+  public static String getOriginatingRequestUri() {
+    final HttpServletRequest request = getHttpServletRequest();
+    final String originatingRequestUri = new UrlPathHelper().getOriginatingRequestUri(request);
+    return originatingRequestUri;
   }
 
-  public static <T> T getRequestAttribute(String name) {
-    final HttpServletRequest request = getHttpServletRequest();
-    if (request == null) {
-      return null;
-    } else {
-      return (T)request.getAttribute(name);
-    }
+  public static String getPathVariable(final String name) {
+    return getPathVariables().get(name);
   }
 
   public static Map<String, String> getPathVariables() {
@@ -55,22 +56,13 @@ public final class HttpRequestUtils {
     return new HashMap<String, String>();
   }
 
-  public static void setPathVariable(String name, String value) {
-    getPathVariables().put(name, value);
-  }
-
-  public static void setHttpServletRequest(HttpServletRequest request) {
-    REQUEST_LOCAL.set(request);
-  }
-
-  public static void clearHttpServletRequest() {
-    REQUEST_LOCAL.remove();
-  }
-
-  public static String getOriginatingRequestUri() {
+  public static <T> T getRequestAttribute(final String name) {
     final HttpServletRequest request = getHttpServletRequest();
-    final String originatingRequestUri = new UrlPathHelper().getOriginatingRequestUri(request);
-    return originatingRequestUri;
+    if (request == null) {
+      return null;
+    } else {
+      return (T)request.getAttribute(name);
+    }
   }
 
   public static String getRequestBaseFileName() {
@@ -109,6 +101,14 @@ public final class HttpRequestUtils {
     }
     return url.toString();
 
+  }
+
+  public static void setHttpServletRequest(final HttpServletRequest request) {
+    REQUEST_LOCAL.set(request);
+  }
+
+  public static void setPathVariable(final String name, final String value) {
+    getPathVariables().put(name, value);
   }
 
   private HttpRequestUtils() {

@@ -9,17 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.util.StringUtils;
 
-import com.ctc.wstx.util.StringUtil;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 
 public class CodeTableProperty extends AbstractCodeTable implements
@@ -48,7 +46,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   private List<String> valueAttributeNames = new ArrayList<String>(
     Arrays.asList("VALUE"));
 
-  private QName typeName;
+  private String typePath;
 
   public CodeTableProperty() {
   }
@@ -83,9 +81,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   protected synchronized Object createId(final List<Object> values) {
     // TODO prevent duplicates from other threads/processes
-    final DataObject code = dataStore.create(typeName);
+    final DataObject code = dataStore.create(typePath);
     final DataObjectMetaData metaData = code.getMetaData();
-    Object id = dataStore.createPrimaryIdValue(typeName);
+    Object id = dataStore.createPrimaryIdValue(typePath);
     if (id == null) {
       final Attribute idAttribute = metaData.getIdAttribute();
       if (idAttribute != null) {
@@ -121,6 +119,17 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return attributeAliases;
   }
 
+  @Override
+  public Map<Object, List<Object>> getCodes() {
+    final Map<Object, List<Object>> codes = super.getCodes();
+    if (codes.isEmpty() && isLoadAll()) {
+      loadAll();
+      return super.getCodes();
+    } else {
+      return codes;
+    }
+  }
+
   public String getCreationTimestampAttributeName() {
     return creationTimestampAttributeName;
   }
@@ -133,7 +142,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     if (metaData == null) {
       return "";
     } else {
-      String idAttributeName = metaData.getIdAttributeName();
+      final String idAttributeName = metaData.getIdAttributeName();
       if (StringUtils.hasText(idAttributeName)) {
         return idAttributeName;
       } else {
@@ -170,8 +179,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return PROPERTY_NAME;
   }
 
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeName() {
+    return typePath;
   }
 
   @Override
@@ -184,7 +193,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
-    final Reader<DataObject> allCodes = dataStore.query(typeName);
+    final Reader<DataObject> allCodes = dataStore.query(typePath);
     addValues(allCodes);
   }
 
@@ -216,7 +225,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
           i++;
         }
       }
-      final Query query = new Query(typeName);
+      final Query query = new Query(typePath);
       query.setWhereClause(where.toString());
       query.setParameters(queryValues);
       final Reader<DataObject> reader = dataStore.query(query);
@@ -241,7 +250,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       loadAll();
       values = getValueById(id);
     } else {
-      final DataObject code = dataStore.load(typeName, id);
+      final DataObject code = dataStore.load(typePath, id);
       if (code != null) {
         addValue(code);
         values = getValueById(id);
@@ -271,10 +280,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
       this.metaData = metaData;
       if (metaData == null) {
         this.dataStore = null;
-        this.typeName = null;
+        this.typePath = null;
       } else {
-        this.typeName = metaData.getName();
-        setName(typeName.getLocalPart());
+        this.typePath = metaData.getPath();
+        setName(PathUtil.getName(typePath));
         this.dataStore = this.metaData.getDataObjectStore();
         metaData.setProperty(getPropertyName(), this);
         dataStore.addCodeTable(this);
@@ -307,7 +316,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   @Override
   public String toString() {
-    return typeName + " " + getIdAttributeName() + " " + valueAttributeNames;
+    return typePath + " " + getIdAttributeName() + " " + valueAttributeNames;
 
   }
 

@@ -28,13 +28,13 @@ public class Button extends Field {
   private String type;
 
   private String cssClass;
-  
+
   public Button(final String name) {
     this(name, false, "submit", name, name, null);
   }
 
-  public Button(final String name, final boolean required, String type,
-    final Object value, String text, String cssClass) {
+  public Button(final String name, final boolean required, final String type,
+    final Object value, final String text, final String cssClass) {
     super(name, required);
     setValue(value);
     this.type = type;
@@ -53,7 +53,7 @@ public class Button extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeButton(out, getName(), type, getValue(), text,cssClass);
+    HtmlUtil.serializeButton(out, getName(), type, getValue(), text, cssClass);
   }
 
 }

@@ -14,7 +14,8 @@ public interface IoConstants {
 
   String JSONP_PROPERTY = "java:" + IoConstants.class.getName() + ".jsonp";
 
-  String JSON_LIST_ROOT_PROPERTY = "java:" + IoConstants.class.getName() + ".jsonListRoot";
+  String JSON_LIST_ROOT_PROPERTY = "java:" + IoConstants.class.getName()
+    + ".jsonListRoot";
 
   String SINGLE_OBJECT_PROPERTY = "java:" + IoConstants.class.getName()
     + ".singleObject";

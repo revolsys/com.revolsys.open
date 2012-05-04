@@ -15,24 +15,23 @@ public class IterableToList<T> extends AbstractFactoryBean<List<T>> {
     this.iterable = iterable;
   }
 
-  public Iterable<T> getIterable() {
-    return iterable;
-  }
-
   @Override
   protected List<T> createInstance() throws Exception {
-    List<T>list = new ArrayList<T>();
+    final List<T> list = new ArrayList<T>();
     for (final T value : iterable) {
       list.add(value);
     }
     return list;
   }
-  
 
+  public Iterable<T> getIterable() {
+    return iterable;
+  }
+
+  @Override
   public Class<?> getObjectType() {
     return List.class;
   }
-
 
   public void setIterable(final Iterable<T> iterable) {
     this.iterable = iterable;

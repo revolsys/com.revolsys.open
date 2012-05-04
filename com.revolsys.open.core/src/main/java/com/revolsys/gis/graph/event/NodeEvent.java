@@ -2,8 +2,6 @@ package com.revolsys.gis.graph.event;
 
 import java.util.EventObject;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.graph.Node;
 
 public class NodeEvent<T> extends EventObject {
@@ -24,19 +22,10 @@ public class NodeEvent<T> extends EventObject {
 
   private String ruleName;
 
-  private QName typeName;
+  private String typePath;
 
   public NodeEvent(final Node<T> node) {
     super(node);
-  }
-
-  public NodeEvent(final Node<T> node, final QName typeName,
-    final String ruleName, final String action, final String notes) {
-    super(node);
-    this.typeName = typeName;
-    this.ruleName = ruleName;
-    this.action = action;
-    this.notes = notes;
   }
 
   public NodeEvent(final Node<T> node, final String ruleName,
@@ -44,6 +33,15 @@ public class NodeEvent<T> extends EventObject {
     super(node);
     this.ruleName = ruleName;
     this.action = action;
+  }
+
+  public NodeEvent(final Node<T> node, final String typePath,
+    final String ruleName, final String action, final String notes) {
+    super(node);
+    this.typePath = typePath;
+    this.ruleName = ruleName;
+    this.action = action;
+    this.notes = notes;
   }
 
   public String getAction() {
@@ -62,8 +60,8 @@ public class NodeEvent<T> extends EventObject {
     return ruleName;
   }
 
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeName() {
+    return typePath;
   }
 
 }

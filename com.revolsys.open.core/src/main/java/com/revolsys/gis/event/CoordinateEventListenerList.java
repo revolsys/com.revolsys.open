@@ -2,8 +2,6 @@ package com.revolsys.gis.event;
 
 import java.util.LinkedHashSet;
 
-import javax.xml.namespace.QName;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class CoordinateEventListenerList extends
@@ -16,11 +14,11 @@ public class CoordinateEventListenerList extends
 
   public void coordinateEvent(
     final Coordinate coordinate,
-    final QName typeName,
+    final String typePath,
     final String ruleName,
     final String action,
     final String notes) {
-    coordinateEvent(new CoordinateEvent(coordinate, typeName, ruleName, action,
+    coordinateEvent(new CoordinateEvent(coordinate, typePath, ruleName, action,
       notes));
   }
 

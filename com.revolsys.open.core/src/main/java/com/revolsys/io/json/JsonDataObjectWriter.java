@@ -183,7 +183,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
 
   @Override
   public String toString() {
-    return metaData.getName().toString();
+    return metaData.getPath().toString();
   }
 
   @SuppressWarnings("unchecked")

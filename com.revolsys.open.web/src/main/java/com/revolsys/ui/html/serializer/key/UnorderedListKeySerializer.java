@@ -27,12 +27,12 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
     if (value == null) {
       out.text("-");
     } else if (value instanceof List) {
-      List<?> list = (List<?>)value;
+      final List<?> list = (List<?>)value;
       if (list.isEmpty()) {
         out.text("-");
       } else {
         out.startTag(HtmlUtil.UL);
-        for (Object item : list) {
+        for (final Object item : list) {
           String text;
           if (item == null) {
             text = "-";

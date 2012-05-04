@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
@@ -55,8 +53,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       attributes.add(new Attribute(name, type, false));
     }
     final String filename = FileUtil.getBaseName(resource.getFilename());
-    final QName typeName = QName.valueOf(filename);
-    metaData = new DataObjectMetaDataImpl(typeName, getProperties(), attributes);
+    metaData = new DataObjectMetaDataImpl(filename, getProperties(), attributes);
   }
 
   /**

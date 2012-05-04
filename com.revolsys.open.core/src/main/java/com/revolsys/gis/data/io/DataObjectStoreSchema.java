@@ -7,39 +7,51 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.io.xml.QNameComparator;
 
 public class DataObjectStoreSchema {
   private AbstractDataObjectStore dataObjectStore;
 
-  private Map<QName, DataObjectMetaData> metaDataCache = new TreeMap<QName, DataObjectMetaData>(
-    new QNameComparator());
+  private Map<String, DataObjectMetaData> metaDataCache = new TreeMap<String, DataObjectMetaData>();
 
-  private String name;
+  private String path;
 
-  private Map<QName, Object> properties = new HashMap<QName, Object>();
+  private Map<String, Object> properties = new HashMap<String, Object>();
 
   public DataObjectStoreSchema(final AbstractDataObjectStore dataObjectStore,
-    final String name) {
+    final String path) {
     this.dataObjectStore = dataObjectStore;
-    this.name = name;
+    this.path = path;
   }
 
   public void addMetaData(final DataObjectMetaData metaData) {
-    addMetaData(metaData.getName(), metaData);
+    addMetaData(metaData.getPath(), metaData);
   }
 
   protected void addMetaData(
-    final QName typeName,
+    final String typePath,
     final DataObjectMetaData metaData) {
-    metaDataCache.put(typeName, metaData);
+    metaDataCache.put(typePath, metaData);
   }
 
-  public synchronized DataObjectMetaData findMetaData(final QName typeName) {
-    final DataObjectMetaData metaData = metaDataCache.get(typeName);
+  @PreDestroy
+  public void destroy() {
+    if (metaDataCache != null) {
+      for (final DataObjectMetaData metaData : metaDataCache.values()) {
+        metaData.destroy();
+      }
+      metaDataCache.clear();
+    }
+    dataObjectStore = null;
+    metaDataCache = null;
+    path = null;
+    properties = null;
+
+  }
+
+  public synchronized DataObjectMetaData findMetaData(final String typePath) {
+    final DataObjectMetaData metaData = metaDataCache.get(typePath);
     return metaData;
   }
 
@@ -47,40 +59,40 @@ public class DataObjectStoreSchema {
     return dataObjectStore;
   }
 
-  public synchronized DataObjectMetaData getMetaData(final QName typeName) {
-    if (typeName.getNamespaceURI().equals(name)) {
+  public synchronized DataObjectMetaData getMetaData(final String typePath) {
+    if (typePath.startsWith(path + "/") || path.equals("/")) {
       if (metaDataCache.isEmpty()) {
         refreshMetaData();
       }
-      final DataObjectMetaData metaData = metaDataCache.get(typeName);
+      final DataObjectMetaData metaData = metaDataCache.get(typePath);
       return metaData;
     } else {
       return null;
     }
   }
 
-  protected Map<QName, DataObjectMetaData> getMetaDataCache() {
+  protected Map<String, DataObjectMetaData> getMetaDataCache() {
     return metaDataCache;
   }
 
-  public String getName() {
-    return name;
+  public String getPath() {
+    return path;
   }
 
-  public Map<QName, Object> getProperties() {
+  public Map<String, Object> getProperties() {
     return properties;
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends Object> V getProperty(final QName name) {
+  public <V extends Object> V getProperty(final String name) {
     return (V)properties.get(name);
   }
 
-  public List<QName> getTypeNames() {
+  public List<String> getTypeNames() {
     if (metaDataCache.isEmpty()) {
       refreshMetaData();
     }
-    return new ArrayList<QName>(metaDataCache.keySet());
+    return new ArrayList<String>(metaDataCache.keySet());
   }
 
   public List<DataObjectMetaData> getTypes() {
@@ -94,31 +106,16 @@ public class DataObjectStoreSchema {
     dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
   }
 
-  public void setProperties(final Map<QName, Object> properties) {
+  public void setProperties(final Map<String, Object> properties) {
     this.properties = properties;
   }
 
-  public void setProperty(final QName name, final Object value) {
+  public void setProperty(final String name, final Object value) {
     properties.put(name, value);
   }
 
   @Override
   public String toString() {
-    return name;
-  }
-
-  @PreDestroy
-  public void destroy() {
-    if (metaDataCache != null) {
-      for (DataObjectMetaData metaData : metaDataCache.values()) {
-        metaData.destroy();
-      }
-      metaDataCache.clear();
-    }
-    dataObjectStore = null;
-    metaDataCache = null;
-    name = null;
-    properties = null;
-
+    return path;
   }
 }

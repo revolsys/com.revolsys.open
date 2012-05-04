@@ -1,7 +1,5 @@
 package com.revolsys.io.ecsv.type;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ecsv.EcsvConstants;
 
@@ -18,7 +16,7 @@ public abstract class AbstractEcsvFieldType implements EcsvFieldType,
     return dataType;
   }
 
-  public QName getTypeName() {
+  public String getTypeName() {
     return dataType.getName();
   }
 }

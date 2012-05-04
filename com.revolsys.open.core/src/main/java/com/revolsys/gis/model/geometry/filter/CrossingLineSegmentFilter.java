@@ -6,19 +6,19 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 
 public class CrossingLineSegmentFilter implements Filter<LineSegment> {
-  private LineSegment line;
+  private final LineSegment line;
 
-  public CrossingLineSegmentFilter(LineSegment line) {
+  public CrossingLineSegmentFilter(final LineSegment line) {
     this.line = line;
   }
 
-  public boolean accept(LineSegment line) {
+  public boolean accept(final LineSegment line) {
     if (this.line == line) {
       return false;
     } else {
-      CoordinatesList intersections = this.line.getIntersection(line);
+      final CoordinatesList intersections = this.line.getIntersection(line);
       if (intersections.size() == 1) {
-        Coordinates intersection = intersections.get(0);
+        final Coordinates intersection = intersections.get(0);
         if (this.line.contains(intersection)) {
           return false;
         } else {

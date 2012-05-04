@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -157,15 +155,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * @param edges The list of edges.
    * @return The map of type name to list of edges.
    */
-  public static <T> Map<QName, List<Edge<T>>> getTypeNameEdgesMap(
+  public static <T> Map<String, List<Edge<T>>> getTypeNameEdgesMap(
     final List<Edge<T>> edges) {
-    final Map<QName, List<Edge<T>>> edgesByTypeName = new HashMap<QName, List<Edge<T>>>();
+    final Map<String, List<Edge<T>>> edgesByTypeName = new HashMap<String, List<Edge<T>>>();
     for (final Edge<T> edge : edges) {
-      final QName typeName = edge.getTypeName();
-      List<Edge<T>> typeEdges = edgesByTypeName.get(typeName);
+      final String typePath = edge.getTypeName();
+      List<Edge<T>> typeEdges = edgesByTypeName.get(typePath);
       if (typeEdges == null) {
         typeEdges = new ArrayList<Edge<T>>();
-        edgesByTypeName.put(typeName, typeEdges);
+        edgesByTypeName.put(typePath, typeEdges);
       }
       typeEdges.add(edge);
     }
@@ -408,7 +406,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return graph.getNode(toNodeId);
   }
 
-  public QName getTypeName() {
+  public String getTypeName() {
     return graph.getTypeName(this);
   }
 

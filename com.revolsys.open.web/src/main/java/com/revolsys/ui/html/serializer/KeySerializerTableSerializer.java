@@ -25,7 +25,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
 
   public String getBodyCssClass(final int row, final int col) {
     final KeySerializer serializer = getSerializer(col);
-     return serializer.getName();
+    return serializer.getName();
   }
 
   public int getBodyRowCount() {
@@ -56,6 +56,10 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   public KeySerializer getSerializer(final int col) {
     final KeySerializer serializer = serializers.get(col);
     return serializer;
+  }
+
+  public List<KeySerializer> getSerializers() {
+    return serializers;
   }
 
   public void serializeBodyCell(
@@ -92,9 +96,5 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
       this.rows.addAll(rows);
     }
     this.rowCount = this.rows.size();
-  }
-
-  public List<KeySerializer> getSerializers() {
-    return serializers;
   }
 }

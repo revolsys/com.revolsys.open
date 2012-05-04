@@ -6,6 +6,7 @@ public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
   public ShortStringConverter() {
     super(INTEGER_FORMAT);
   }
+
   public Class<Short> getConvertedClass() {
     return Short.class;
   }

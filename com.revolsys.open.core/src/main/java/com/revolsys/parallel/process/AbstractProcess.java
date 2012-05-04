@@ -32,6 +32,9 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
     }
   }
 
+  public void stop() {
+  }
+
   @Override
   public String toString() {
     final String className = getClass().getName();
@@ -40,8 +43,5 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
     } else {
       return beanName + " (" + className + ")";
     }
-  }
-
-  public void stop() {
   }
 }

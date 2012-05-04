@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.io.xml.XmlWriter;

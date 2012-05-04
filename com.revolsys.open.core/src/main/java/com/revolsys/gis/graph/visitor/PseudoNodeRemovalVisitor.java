@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
@@ -111,9 +110,9 @@ public class PseudoNodeRemovalVisitor extends
   }
 
   private void processPseudoNodes(final Node<DataObject> node) {
-    for (final QName typeName : NodeAttributes.getEdgeTypeNames(node)) {
+    for (final String typePath : NodeAttributes.getEdgeTypeNames(node)) {
       final PseudoNodeAttribute pseudoNodeAttribute = new PseudoNodeAttribute(
-        node, typeName, equalExcludeAttributes);
+        node, typePath, equalExcludeAttributes);
       processPseudoNodesForType(node, pseudoNodeAttribute);
     }
   }

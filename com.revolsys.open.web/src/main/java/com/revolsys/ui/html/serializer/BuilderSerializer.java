@@ -26,12 +26,6 @@ public class BuilderSerializer extends AbstractKeySerializer implements
     this.builder = builder;
   }
 
-  public void setHtmlUiBuilder(HtmlUiBuilder<?> uiBuilder) {
-    if (this.builder != null) {
-      this.builder = uiBuilder;
-    }
-  }
-
   /**
    * Serialize the value to the XML writer.
    * 
@@ -41,5 +35,11 @@ public class BuilderSerializer extends AbstractKeySerializer implements
    */
   public void serialize(final XmlWriter out, final Object value) {
     builder.serialize(out, value, getName());
+  }
+
+  public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
+    if (this.builder != null) {
+      this.builder = uiBuilder;
+    }
   }
 }

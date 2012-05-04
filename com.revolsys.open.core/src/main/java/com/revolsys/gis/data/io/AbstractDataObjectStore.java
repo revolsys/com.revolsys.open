@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
@@ -33,6 +32,7 @@ import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 
 public abstract class AbstractDataObjectStore extends
@@ -50,15 +50,11 @@ public abstract class AbstractDataObjectStore extends
 
   private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
 
-  private Map<QName, Map<String, Object>> typeMetaDataProperties = new HashMap<QName, Map<String, Object>>();
+  private Map<String, Map<String, Object>> typeMetaDataProperties = new HashMap<String, Map<String, Object>>();
 
   private StatisticsMap statistics = new StatisticsMap();
 
   private GeometryFactory geometryFactory;
-
-  public Map<String, CodeTable> getCodeTableByColumnMap() {
-    return new HashMap<String, CodeTable>(columnToTableMap);
-  }
 
   public AbstractDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -66,42 +62,6 @@ public abstract class AbstractDataObjectStore extends
 
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
-  }
-
-  @PostConstruct
-  public void initialize() {
-    statistics.connect();
-  }
-
-  public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
-  }
-
-  public void setGeometryFactory(GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
-  public DataObject lock(final QName typeName, final Object id) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
-    if (metaData == null) {
-      return null;
-    } else {
-      final String idAttributeName = metaData.getIdAttributeName();
-      if (idAttributeName == null) {
-        throw new IllegalArgumentException(typeName
-          + " does not have a primary key");
-      } else {
-        final StringBuffer where = new StringBuffer();
-        where.append(idAttributeName);
-        where.append(" = ?");
-
-        final Query query = new Query(typeName);
-        query.setLockResults(true);
-        query.setWhereClause(where.toString());
-        query.addParameter(id);
-        return queryFirst(query);
-      }
-    }
   }
 
   public void addCodeTable(final CodeTable codeTable) {
@@ -127,24 +87,24 @@ public abstract class AbstractDataObjectStore extends
   }
 
   protected void addMetaData(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String schemaName = typeName.getNamespaceURI();
+    final String typePath = metaData.getPath();
+    final String schemaName = PathUtil.getPath(typePath);
     final DataObjectStoreSchema schema = getSchema(schemaName);
     schema.addMetaData(metaData);
   }
 
   protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
-    final QName typeName = metaData.getName();
+    final String typePath = metaData.getPath();
     for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
       final DataObjectMetaDataProperty clonedProperty = property.clone();
       clonedProperty.setMetaData(metaData);
     }
-    final Map<String, Object> properties = typeMetaDataProperties.get(typeName);
+    final Map<String, Object> properties = typeMetaDataProperties.get(typePath);
     metaData.setProperties(properties);
   }
 
   protected void addSchema(final DataObjectStoreSchema schema) {
-    schemaMap.put(schema.getName(), schema);
+    schemaMap.put(schema.getPath(), schema);
   }
 
   public void addStatistic(final String statisticName, final DataObject object) {
@@ -153,15 +113,12 @@ public abstract class AbstractDataObjectStore extends
 
   public void addStatistic(
     final String statisticName,
-    final QName typeName,
+    final String typePath,
     final int count) {
-    statistics.add(statisticName, typeName, count);
+    statistics.add(statisticName, typePath, count);
   }
 
-  public StatisticsMap getStatistics() {
-    return statistics;
-  }
-
+  @Override
   @PreDestroy
   public void close() {
     try {
@@ -170,7 +127,7 @@ public abstract class AbstractDataObjectStore extends
         statistics.disconnect();
       }
       if (schemaMap != null) {
-        for (DataObjectStoreSchema schema : schemaMap.values()) {
+        for (final DataObjectStoreSchema schema : schemaMap.values()) {
           schema.destroy();
         }
         schemaMap.clear();
@@ -198,8 +155,8 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public DataObject create(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public DataObject create(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
     } else {
@@ -219,12 +176,12 @@ public abstract class AbstractDataObjectStore extends
     throw new UnsupportedOperationException();
   }
 
-  public Object createPrimaryIdValue(final QName typeName) {
+  public Object createPrimaryIdValue(final String typePath) {
     return null;
   }
 
   public Query createQuery(
-    final QName typeName,
+    final String typePath,
     final String whereClause,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
@@ -237,7 +194,7 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public DataObjectReader createReader(
-    final QName typeName,
+    final String typePath,
     final String query,
     final List<Object> parameters) {
     throw new UnsupportedOperationException();
@@ -253,18 +210,18 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  protected DataObjectMetaData findMetaData(final QName typeName) {
-    final String schemaName = typeName.getNamespaceURI();
+  protected DataObjectMetaData findMetaData(final String typePath) {
+    final String schemaName = PathUtil.getPath(typePath);
     final DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
       return null;
     } else {
-      return schema.findMetaData(typeName);
+      return schema.findMetaData(typePath);
     }
   }
 
-  public CodeTable getCodeTable(final QName typeName) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public CodeTable getCodeTable(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
     } else {
@@ -279,6 +236,10 @@ public abstract class AbstractDataObjectStore extends
 
   }
 
+  public Map<String, CodeTable> getCodeTableByColumnMap() {
+    return new HashMap<String, CodeTable>(columnToTableMap);
+  }
+
   public Map<String, List<String>> getCodeTableColumNames() {
     return codeTableColumNames;
   }
@@ -287,38 +248,37 @@ public abstract class AbstractDataObjectStore extends
     return this.dataObjectFactory;
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
   public String getLabel() {
     return label;
   }
 
   public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
-    final QName typeName = objectMetaData.getName();
-    final DataObjectMetaData metaData = getMetaData(typeName);
+    final String typePath = objectMetaData.getPath();
+    final DataObjectMetaData metaData = getMetaData(typePath);
     return metaData;
   }
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    final String schemaName = typeName.getNamespaceURI();
+  public DataObjectMetaData getMetaData(final String typePath) {
+    final String schemaName = PathUtil.getPath(typePath);
     final DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
       return null;
     } else {
-      return schema.getMetaData(typeName);
+      return schema.getMetaData(typePath);
     }
   }
 
-  public QName getQName(final Object name) {
-    if (name instanceof QName) {
-      return (QName)name;
-    } else {
-      return QName.valueOf(name.toString());
-    }
-  }
-
-  public DataObjectStoreSchema getSchema(final String schemaName) {
+  public DataObjectStoreSchema getSchema(String schemaName) {
     synchronized (schemaMap) {
       if (schemaMap.isEmpty()) {
         loadSchemas(schemaMap);
+      }
+      if (!schemaName.startsWith("/")) {
+        schemaName = "/" + schemaName;
       }
       return schemaMap.get(schemaName);
     }
@@ -353,17 +313,34 @@ public abstract class AbstractDataObjectStore extends
     return sharedAttributes;
   }
 
-  public List<QName> getTypeNames(final String schemaName) {
+  public StatisticsMap getStatistics() {
+    return statistics;
+  }
+
+  public String getString(final Object name) {
+    if (name instanceof String) {
+      return (String)name;
+    } else {
+      return String.valueOf(name.toString());
+    }
+  }
+
+  public List<String> getTypeNames(final String schemaName) {
     final DataObjectStoreSchema schema = getSchema(schemaName);
     return schema.getTypeNames();
   }
 
   public List<DataObjectMetaData> getTypes(final String namespace) {
     final List<DataObjectMetaData> types = new ArrayList<DataObjectMetaData>();
-    for (final QName typeName : getTypeNames(namespace)) {
-      types.add(getMetaData(typeName));
+    for (final String typePath : getTypeNames(namespace)) {
+      types.add(getMetaData(typePath));
     }
     return types;
+  }
+
+  @PostConstruct
+  public void initialize() {
+    statistics.connect();
   }
 
   public void insert(final DataObject dataObject) {
@@ -376,25 +353,25 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public boolean isEditable(final QName typeName) {
+  public boolean isEditable(final String typePath) {
     return false;
   }
 
-  public DataObject load(final QName typeName, final Object id) {
-    final DataObjectMetaData metaData = getMetaData(typeName);
+  public DataObject load(final String typePath, final Object id) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
     } else {
       final String idAttributeName = metaData.getIdAttributeName();
       if (idAttributeName == null) {
-        throw new IllegalArgumentException(typeName
+        throw new IllegalArgumentException(typePath
           + " does not have a primary key");
       } else {
         final StringBuffer where = new StringBuffer();
         where.append(idAttributeName);
         where.append(" = ?");
 
-        final Query query = new Query(typeName);
+        final Query query = new Query(typePath);
         query.setWhereClause(where.toString());
         query.addParameter(id);
         return queryFirst(query);
@@ -404,10 +381,33 @@ public abstract class AbstractDataObjectStore extends
 
   protected abstract void loadSchemaDataObjectMetaData(
     DataObjectStoreSchema schema,
-    Map<QName, DataObjectMetaData> metaDataMap);
+    Map<String, DataObjectMetaData> metaDataMap);
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
+
+  public DataObject lock(final String typePath, final Object id) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      return null;
+    } else {
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (idAttributeName == null) {
+        throw new IllegalArgumentException(typePath
+          + " does not have a primary key");
+      } else {
+        final StringBuffer where = new StringBuffer();
+        where.append(idAttributeName);
+        where.append(" = ?");
+
+        final Query query = new Query(typePath);
+        query.setLockResults(true);
+        query.setWhereClause(where.toString());
+        query.addParameter(id);
+        return queryFirst(query);
+      }
+    }
+  }
 
   public ResultPager<DataObject> page(final Query query) {
     final Reader<DataObject> results = query(query);
@@ -421,13 +421,13 @@ public abstract class AbstractDataObjectStore extends
     return reader;
   }
 
-  public Reader<DataObject> query(final QName typeName) {
-    final Query query = new Query(typeName);
-    return query(query);
-  }
-
   public Reader<DataObject> query(final Query... queries) {
     return query(Arrays.asList(queries));
+  }
+
+  public Reader<DataObject> query(final String typePath) {
+    final Query query = new Query(typePath);
+    return query(query);
   }
 
   public DataObject queryFirst(final Query query) {
@@ -466,6 +466,10 @@ public abstract class AbstractDataObjectStore extends
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public void setLabel(final String label) {
     this.label = label;
     statistics.setPrefix(label);
@@ -481,13 +485,13 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public void setTypeMetaDataProperties(
-    final Map<Object, List<DataObjectMetaDataProperty>> typeMetaProperties) {
-    for (final Entry<Object, List<DataObjectMetaDataProperty>> typeProperties : typeMetaProperties.entrySet()) {
-      final QName typeName = getQName(typeProperties.getKey());
-      Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typeName);
+    final Map<String, List<DataObjectMetaDataProperty>> typeMetaProperties) {
+    for (final Entry<String, List<DataObjectMetaDataProperty>> typeProperties : typeMetaProperties.entrySet()) {
+      final String typePath = typeProperties.getKey();
+      Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typePath);
       if (currentProperties == null) {
         currentProperties = new HashMap<String, Object>();
-        this.typeMetaDataProperties.put(typeName, currentProperties);
+        this.typeMetaDataProperties.put(typePath, currentProperties);
       }
       final List<DataObjectMetaDataProperty> properties = typeProperties.getValue();
       for (final DataObjectMetaDataProperty property : properties) {

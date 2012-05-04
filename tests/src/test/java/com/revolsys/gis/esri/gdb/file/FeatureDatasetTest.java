@@ -19,8 +19,8 @@ public class FeatureDatasetTest {
 
   @Test
   public void testCreateGeodatabase() throws Exception {
-    final QName typeName = new QName("test", "Point");
-    DataObjectMetaDataImpl newMetaData = new DataObjectMetaDataImpl(typeName);
+    final String path = new QName("test", "Point");
+    DataObjectMetaDataImpl newMetaData = new DataObjectMetaDataImpl(typePath);
     newMetaData.addAttribute("id", DataTypes.INT, false);
     newMetaData.addAttribute("name", DataTypes.STRING, 255, false);
     newMetaData.addAttribute("geometry", DataTypes.POINT, true);
@@ -46,7 +46,7 @@ public class FeatureDatasetTest {
       object.setValue("name", "Paul Austin");
       object.setGeometryValue(geometryFactory.createPoint(-122, 150));
       dataStore.insert(object);
-      for (DataObject object2 : dataStore.query(typeName)) {
+      for (DataObject object2 : dataStore.query(typePath)) {
         System.out.println(object2);
       }
       dataStore.close();

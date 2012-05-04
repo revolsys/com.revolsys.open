@@ -3,8 +3,6 @@ package com.revolsys.gis.graph.filter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Edge;
 
@@ -17,24 +15,24 @@ import com.revolsys.gis.graph.Edge;
  */
 public class EdgeTypeNameFilter<T> implements Filter<Edge<T>> {
   /** The list of type names to accept. */
-  private final Collection<QName> typeNames;
+  private final Collection<String> typePaths;
 
   /**
    * Construct a new EdgeTypeNameFilter.
    * 
-   * @param typeNames The list of type names to accept.
+   * @param typePaths The list of type names to accept.
    */
-  public EdgeTypeNameFilter(final Collection<QName> typeNames) {
-    this.typeNames = typeNames;
+  public EdgeTypeNameFilter(final Collection<String> typePaths) {
+    this.typePaths = typePaths;
   }
 
   /**
    * Construct a new EdgeTypeNameFilter.
    * 
-   * @param typeNames The list of type names to accept.
+   * @param typePaths The list of type names to accept.
    */
-  public EdgeTypeNameFilter(final QName... typeNames) {
-    this(Arrays.asList(typeNames));
+  public EdgeTypeNameFilter(final String... typePaths) {
+    this(Arrays.asList(typePaths));
   }
 
   /**
@@ -45,7 +43,7 @@ public class EdgeTypeNameFilter<T> implements Filter<Edge<T>> {
    * @return True if the edge has one of the type names, false otherwise.
    */
   public boolean accept(final Edge<T> edge) {
-    final QName typeName = edge.getTypeName();
-    return typeNames.contains(typeName);
+    final String typePath = edge.getTypeName();
+    return typePaths.contains(typePath);
   }
 }

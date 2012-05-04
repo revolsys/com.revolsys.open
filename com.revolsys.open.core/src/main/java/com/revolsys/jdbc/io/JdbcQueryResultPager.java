@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.model.DataObject;
@@ -87,7 +86,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     results = null;
     resultSet = null;
     statement = null;
-    
+
   }
 
   @Override
@@ -204,7 +203,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   }
 
   protected void init(final Query query) {
-    final QName tableName = query.getTypeName();
+    final String tableName = query.getTypeName();
     metaData = query.getMetaData();
     if (metaData == null) {
       metaData = dataStore.getMetaData(tableName);

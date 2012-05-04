@@ -13,8 +13,8 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
   @SuppressWarnings("unchecked")
   public static <T extends HtmlUiBuilder> T get(
     final BeanFactory factory,
-    final String typeName) {
-    final String beanName = typeName + "-htmlbuilder";
+    final String typePath) {
+    final String beanName = typePath + "-htmlbuilder";
     if (factory.containsBean(beanName)) {
       return (T)factory.getBean(beanName);
     } else {

@@ -6,15 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.io.json.JsonParserUtil;
-import com.revolsys.io.wkt.WktWriter;
-import com.vividsolutions.jts.geom.Geometry;
 
 public class ListStringConverter implements StringConverter<List<String>> {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
   public Class<List<String>> getConvertedClass() {
-    Class clazz = List.class;
+    final Class clazz = List.class;
     return clazz;
   }
 
@@ -29,10 +27,10 @@ public class ListStringConverter implements StringConverter<List<String>> {
     if (value == null) {
       return null;
     } else if (value instanceof Collection) {
-      Collection<Object> collection = (Collection)value;
-      List<String> list = new ArrayList<String>();
-      for (Object object : collection) {
-        String stringValue = StringConverterRegistry.toString(object);
+      final Collection<Object> collection = (Collection)value;
+      final List<String> list = new ArrayList<String>();
+      for (final Object object : collection) {
+        final String stringValue = StringConverterRegistry.toString(object);
         list.add(stringValue);
       }
       return list;
@@ -43,7 +41,7 @@ public class ListStringConverter implements StringConverter<List<String>> {
 
   @SuppressWarnings("unchecked")
   public List<String> toObject(final String string) {
-    Object value = JsonParserUtil.read(string);
+    final Object value = JsonParserUtil.read(string);
     if (value instanceof List) {
       return (List<String>)value;
     } else {
@@ -55,11 +53,11 @@ public class ListStringConverter implements StringConverter<List<String>> {
     if (value == null) {
       return null;
     } else if (value instanceof List) {
-      List<?> list = (List<?>)value;
-      StringBuffer string = new StringBuffer("[");
-      for (Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
-        Object object = iterator.next();
-        String stringValue = StringConverterRegistry.toString(object);
+      final List<?> list = (List<?>)value;
+      final StringBuffer string = new StringBuffer("[");
+      for (final Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
+        final Object object = iterator.next();
+        final String stringValue = StringConverterRegistry.toString(object);
         string.append(stringValue);
         if (iterator.hasNext()) {
           string.append(", ");

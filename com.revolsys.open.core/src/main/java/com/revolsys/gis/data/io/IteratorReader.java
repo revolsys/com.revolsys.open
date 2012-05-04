@@ -23,6 +23,7 @@ public class IteratorReader<T> extends AbstractReader<T> {
     }
   }
 
+  @Override
   public void close() {
     try {
       if (iterator instanceof AbstractIterator) {

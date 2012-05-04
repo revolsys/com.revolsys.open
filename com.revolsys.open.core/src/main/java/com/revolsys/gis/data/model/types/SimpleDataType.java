@@ -1,19 +1,12 @@
 package com.revolsys.gis.data.model.types;
 
-import javax.xml.namespace.QName;
-
 public class SimpleDataType implements DataType {
   private final Class<?> javaClass;
 
-  private final QName name;
-
-  public SimpleDataType(final QName name, final Class<?> javaClass) {
-    this.name = name;
-    this.javaClass = javaClass;
-  }
+  private final String name;
 
   public SimpleDataType(final String name, final Class<?> javaClass) {
-    this.name = QName.valueOf(name);
+    this.name = name;
     this.javaClass = javaClass;
   }
 
@@ -21,7 +14,7 @@ public class SimpleDataType implements DataType {
     return javaClass;
   }
 
-  public QName getName() {
+  public String getName() {
     return name;
   }
 

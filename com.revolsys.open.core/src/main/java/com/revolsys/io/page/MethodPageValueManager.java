@@ -175,17 +175,17 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
 
   private Method getBytesMethod;
 
-  private String typeName;
+  private String typePath;
 
   protected MethodPageValueManager() {
   }
 
-  protected MethodPageValueManager(final String typeName) {
-    this(typeName, "getValue" + typeName + "Bytes", "get" + typeName + "Value",
-      "get" + typeName + "Bytes");
+  protected MethodPageValueManager(final String typePath) {
+    this(typePath, "getValue" + typePath + "Bytes", "get" + typePath + "Value",
+      "get" + typePath + "Bytes");
   }
 
-  protected MethodPageValueManager(final String typeName,
+  protected MethodPageValueManager(final String typePath,
     final String byteArrayWriteMethodName,
     final String byteArrayReadMethodName, final String pageReadMethodName) {
     for (final Method method : getClass().getMethods()) {
@@ -199,7 +199,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
         getBytesMethod = method;
       }
     }
-    this.typeName = typeName;
+    this.typePath = typePath;
 
   }
 
@@ -226,6 +226,6 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
 
   @Override
   public String toString() {
-    return typeName;
+    return typePath;
   }
 }

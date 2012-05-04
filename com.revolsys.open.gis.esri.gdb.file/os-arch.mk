@@ -5,7 +5,7 @@
 ESRI_FILE_GBD_HOME=/opt/EsriFileGdb-1.2/
 ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb-1.2/include
 
-CFG=Debug
+CFG=Release
 
 include ${ESRI_FILE_GBD_INCLUDE}/make.include
 TARGET_OBJ=target/o/libEsriFileGdbJni-${ARCH}-${OS}.o

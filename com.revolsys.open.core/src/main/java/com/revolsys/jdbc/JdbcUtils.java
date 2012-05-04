@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.springframework.util.StringUtils;
+
+import com.revolsys.io.PathUtil;
 
 public final class JdbcUtils {
   private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
@@ -165,7 +167,7 @@ public final class JdbcUtils {
     try {
       final DatabaseMetaData metaData = connection.getMetaData();
       return metaData.getDatabaseProductName();
-    } catch (SQLException e) {
+    } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to get database product name",
         e);
     } finally {
@@ -173,17 +175,26 @@ public final class JdbcUtils {
     }
   }
 
-  public static String getTableName(final QName typeName) {
-    if (typeName == null) {
-      return null;
+  public static String getSchemaName(final String typePath) {
+    if (StringUtils.hasText(typePath)) {
+      final String path = PathUtil.getPath(typePath);
+      return path.replaceAll("(^/|/$)", "");
     } else {
-      final String namespaceURI = typeName.getNamespaceURI();
-      final String localPart = typeName.getLocalPart();
-      if (namespaceURI == "") {
-        return localPart;
-      } else {
-        return namespaceURI + "." + localPart;
-      }
+      return "";
+    }
+  }
+
+  public static String getTableName(final String typePath) {
+    final String tableName = PathUtil.getName(typePath);
+    return tableName;
+  }
+
+  public static String getQualifiedTableName(final String typePath) {
+    if (StringUtils.hasText(typePath)) {
+      final String tableName = typePath.replaceAll("^/+", "");
+      return tableName.replaceAll("/", ".");
+    } else {
+      return null;
     }
   }
 
@@ -397,7 +408,7 @@ public final class JdbcUtils {
       for (int i = 0; i < parameters.length; i++) {
         final Object parameter = parameters[i];
         if (parameter instanceof BigInteger) {
-          BigInteger bigInt = (BigInteger)parameter;
+          final BigInteger bigInt = (BigInteger)parameter;
           statement.setLong(i + 1, bigInt.longValue());
         } else {
           statement.setObject(i + 1, parameter);

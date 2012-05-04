@@ -44,7 +44,7 @@ public class WktDataObjectWriter extends AbstractWriter<DataObject> {
 
   @Override
   public String toString() {
-    return metaData.getName().toString();
+    return metaData.getPath().toString();
   }
 
   public void write(final DataObject object) {

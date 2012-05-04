@@ -53,7 +53,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     if (writer == null) {
       try {
 
-        final File file = new File(directory, metaData.getName().toString()
+        final File file = new File(directory, metaData.getPath().toString()
           + ".csv");
         writer = new CsvDataObjectWriter(metaData, new FileWriter(file));
         final Geometry geometry = object.getGeometryValue();

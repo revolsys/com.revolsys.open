@@ -25,8 +25,8 @@ public class EcsvMultipleWriter extends AbstractMultipleWriter {
   protected Writer<DataObject> createWriter(final DataObjectMetaData metaData) {
     try {
       EcsvDataObjectWriter writer;
-      final File file = new File(directory, metaData.getName().getLocalPart()
-        + "." + EcsvConstants.FILE_EXTENSION);
+      final File file = new File(directory, metaData.getTypeName() + "."
+        + EcsvConstants.FILE_EXTENSION);
       final FileOutputStream out = new FileOutputStream(file);
       writer = new EcsvDataObjectWriter(metaData, new OutputStreamWriter(out,
         EcsvConstants.CHARACTER_SET));

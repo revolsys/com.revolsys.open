@@ -3,7 +3,6 @@ package com.revolsys.gis.converter.process;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;

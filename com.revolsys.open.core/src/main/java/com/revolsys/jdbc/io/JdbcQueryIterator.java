@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
@@ -82,12 +81,12 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final DataObjectMetaData metaData,
     final String tablePrefix,
     final String fromClause,
-    boolean lockResults,
+    final boolean lockResults,
     final List<String> attributeNames,
     final Map<String, ? extends Object> filter,
     String where,
     final Map<String, Boolean> orderBy) {
-    final QName typeName = metaData.getName();
+    final String typePath = metaData.getPath();
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
     boolean hasColumns = false;
@@ -100,7 +99,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     if (StringUtils.hasText(fromClause)) {
       sql.append(fromClause);
     } else {
-      final String tableName = JdbcUtils.getTableName(typeName);
+      final String tableName = JdbcUtils.getQualifiedTableName(typePath);
       sql.append(tableName);
       sql.append(" ");
       sql.append(tablePrefix);
@@ -146,12 +145,12 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     }
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      for (Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+      for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
         .iterator(); iterator.hasNext();) {
-        Entry<String, Boolean> entry = iterator.next();
-        String column = entry.getKey();
+        final Entry<String, Boolean> entry = iterator.next();
+        final String column = entry.getKey();
         sql.append(column);
-        Boolean ascending = entry.getValue();
+        final Boolean ascending = entry.getValue();
         if (!ascending) {
           sql.append(" DESC");
         }
@@ -203,8 +202,8 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   }
 
   public static String getSql(final Query query) {
-    final QName tableName = query.getTypeName();
-    final String dbTableName = JdbcUtils.getTableName(tableName);
+    final String tableName = query.getTypeName();
+    final String dbTableName = JdbcUtils.getQualifiedTableName(tableName);
 
     String sql = query.getSql();
     final DataObjectMetaData metaData = query.getMetaData();
@@ -218,7 +217,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       final String where = query.getWhereClause();
       final Map<String, Boolean> orderBy = query.getOrderBy();
       final Map<String, ? extends Object> filter = query.getFilter();
-      boolean lockResults = query.isLockResults();
+      final boolean lockResults = query.isLockResults();
       sql = createSql(metaData, "T", fromClause, lockResults, attributeNames,
         filter, where, orderBy);
       query.setSql(sql);
@@ -308,7 +307,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private Query query;
 
-  private Statistics statistics;
+  private final Statistics statistics;
 
   public JdbcQueryIterator(final JdbcDataObjectStore dataStore,
     final Query query, final Map<String, Object> properties) {
@@ -400,7 +399,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   }
 
   protected ResultSet getResultSet(final Query query) {
-    final QName tableName = query.getTypeName();
+    final String tableName = query.getTypeName();
     metaData = query.getMetaData();
     if (metaData == null) {
       if (tableName != null) {
@@ -436,10 +435,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         }
       }
 
-      final QName typeName = query.getTypeNameAlias();
-      if (typeName != null) {
+      final String typePath = query.getTypeNameAlias();
+      if (typePath != null) {
         final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).clone();
-        newMetaData.setName(typeName);
+        newMetaData.setName(typePath);
         this.metaData = newMetaData;
       }
     } catch (final SQLException e) {

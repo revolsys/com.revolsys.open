@@ -2,8 +2,6 @@ package com.revolsys.io.ecsv;
 
 import java.nio.charset.Charset;
 
-import javax.xml.namespace.QName;
-
 public interface EcsvConstants extends EcsvProperties {
   String _NS_PREFIX = "";
 
@@ -25,12 +23,11 @@ public interface EcsvConstants extends EcsvProperties {
 
   String FILE_EXTENSION = "ecsv";
 
-  QName GEOMETRY_FACTORY_TYPE = new QName(_NS_URI, "GeometryFactory",
-    _NS_PREFIX);
+  String GEOMETRY_FACTORY_TYPE = "GeometryFactory";
 
-  QName LIST_TYPE = new QName(_NS_URI, "List", _NS_PREFIX);
+  String LIST_TYPE = "List";
 
-  QName MAP_TYPE = new QName(_NS_URI, "Map", _NS_PREFIX);
+  String MAP_TYPE = "Map";
 
   String MAP_END = "}";
 

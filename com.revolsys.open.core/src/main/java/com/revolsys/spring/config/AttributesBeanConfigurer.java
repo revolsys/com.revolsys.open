@@ -22,11 +22,11 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
     this(null, null);
   }
 
-  public AttributesBeanConfigurer(ApplicationContext applicationContext) {
+  public AttributesBeanConfigurer(final ApplicationContext applicationContext) {
     super(applicationContext, null);
   }
 
-  public AttributesBeanConfigurer(ApplicationContext applicationContext,
+  public AttributesBeanConfigurer(final ApplicationContext applicationContext,
     final Map<String, Object> attributes) {
     super(applicationContext, attributes);
     setOrder(LOWEST_PRECEDENCE - 1000);
@@ -62,13 +62,14 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
     }
   }
 
+  @Override
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     final Map<String, Object> allAttributes = new LinkedHashMap<String, Object>();
     final Map<String, Object> threadAttributes = ThreadSharedAttributes.getAttributes();
     allAttributes.putAll(threadAttributes);
     processPlaceholderAttributes(beanFactory, threadAttributes);
-    Map<String, Object> attributes = getAttributes();
+    final Map<String, Object> attributes = getAttributes();
     processPlaceholderAttributes(beanFactory, attributes);
     for (final Entry<String, Object> entry : attributes.entrySet()) {
       final String key = entry.getKey();
@@ -78,8 +79,8 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
       }
     }
 
-    String configBeanName = getBeanName();
-    for (String beanName : beanFactory.getBeanDefinitionNames()) {
+    final String configBeanName = getBeanName();
+    for (final String beanName : beanFactory.getBeanDefinitionNames()) {
       // Check that we're not parsing our own bean definition,
       // to avoid failing on non-resolvable place-holders in properties file
       // locations.

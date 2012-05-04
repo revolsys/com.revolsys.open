@@ -7,7 +7,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 
 public class AlignedPointConverter extends PointConverter {
   public AlignedPointConverter(final GeometryFactory geometryFactory) {
-    super(geometryFactory, "AlignedPoint");
+    super(geometryFactory, "/AlignedPoint");
   }
 
   /**

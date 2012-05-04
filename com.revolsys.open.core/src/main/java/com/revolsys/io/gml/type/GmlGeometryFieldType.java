@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GmlGeometryFieldType extends AbstractGmlFieldType {
   public GmlGeometryFieldType(final DataType dataType) {
-    super(dataType, "xs:" + dataType.getName().getLocalPart());
+    super(dataType, "xs:" + dataType.getName());
   }
 
   private void coordinates(final XmlWriter out, final CoordinatesList points) {

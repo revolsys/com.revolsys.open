@@ -100,7 +100,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     final int length,
     final int scale) {
     if (Geometry.class.isAssignableFrom(typeJavaClass)) {
-      addField(new FieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0));
+      addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
       return 0;
     } else {
       return super.addDbaseField(name, dataType, typeJavaClass, length, scale);
@@ -189,8 +189,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         writeHeader(this.out);
 
         if (!hasField(geometryPropertyName)) {
-          addField(new FieldDefinition(geometryPropertyName,
-            FieldDefinition.OBJECT_TYPE, 0));
+          addFieldDefinition(geometryPropertyName, FieldDefinition.OBJECT_TYPE,
+            0);
         }
 
         final Resource indexResource = SpringUtil.getResourceWithExtension(
@@ -261,7 +261,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   protected boolean writeField(
     final DataObject object,
     final FieldDefinition field) throws IOException {
-    if (field.getName() == geometryPropertyName) {
+    if (field.getFullName().equals(geometryPropertyName)) {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
       geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);

@@ -10,8 +10,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -31,8 +29,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
 
   public static final String COORDINATE_DIMENSION_PROPERTY = "coordinateDimension";
 
-  public static final QName ESRI_SCHEMA_PROPERTY = new QName(
-    ArcSdeOracleStGeometryJdbcAttribute.class.getName());
+  public static final String ESRI_SCHEMA_PROPERTY = ArcSdeOracleStGeometryJdbcAttribute.class.getName();
 
   public static final String ESRI_SRID_PROPERTY = "esriSrid";
 

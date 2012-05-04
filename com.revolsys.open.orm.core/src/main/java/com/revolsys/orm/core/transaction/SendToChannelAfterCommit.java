@@ -7,9 +7,9 @@ import com.revolsys.parallel.channel.Channel;
 
 public class SendToChannelAfterCommit<T> extends
   TransactionSynchronizationAdapter {
-  public static <V> void send(Channel<V> channel, V value) {
+  public static <V> void send(final Channel<V> channel, final V value) {
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
-      SendToChannelAfterCommit<V> synchronization = new SendToChannelAfterCommit<V>(
+      final SendToChannelAfterCommit<V> synchronization = new SendToChannelAfterCommit<V>(
         channel, value);
       TransactionSynchronizationManager.registerSynchronization(synchronization);
     } else {
@@ -17,11 +17,11 @@ public class SendToChannelAfterCommit<T> extends
     }
   }
 
-  private Channel<T> channel;
+  private final Channel<T> channel;
 
-  private T object;
+  private final T object;
 
-  public SendToChannelAfterCommit(Channel<T> channel, T object) {
+  public SendToChannelAfterCommit(final Channel<T> channel, final T object) {
     this.channel = channel;
     this.object = object;
   }

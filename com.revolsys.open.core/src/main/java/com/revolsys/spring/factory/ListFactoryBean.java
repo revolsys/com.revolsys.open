@@ -26,7 +26,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
     if (this.targetListClass != null) {
       try {
         result = this.targetListClass.newInstance();
-      } catch (Exception e) {
+      } catch (final Exception e) {
         ExceptionUtil.throwUncheckedException(e);
       }
     } else {

@@ -23,19 +23,13 @@ package com.revolsys.gis.data.model;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ObjectWithProperties;
 
-public interface DataObjectMetaData extends ObjectWithProperties {
-
-  /** The namespaceUri for standard properties. */
-  String NS_URI = "http://revolsys.com/gis";
-
+public interface DataObjectMetaData extends ObjectWithProperties, Comparable<DataObjectMetaData> {
   void addDefaultValue(String attributeName, Object defaultValue);
 
   DataObjectMetaData clone();
@@ -44,11 +38,11 @@ public interface DataObjectMetaData extends ObjectWithProperties {
 
   void delete(DataObject dataObject);
 
+  void destroy();
+
   Attribute getAttribute(CharSequence name);
 
   Attribute getAttribute(int index);
-
-  CodeTable getCodeTableByColumn(String column);
 
   /**
    * Get the number of attributes supported by the type.
@@ -108,6 +102,8 @@ public interface DataObjectMetaData extends ObjectWithProperties {
    * @return The attribute type name.
    */
   DataType getAttributeType(int index);
+
+  CodeTable getCodeTableByColumn(String column);
 
   DataObjectFactory getDataObjectFactory();
 
@@ -170,12 +166,14 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   int getInstanceId();
 
   /**
-   * Get the name of the object type. Names are described using a {@link QName}
-   * consisting of a namespaceUri and a name.
+   * Get the name of the object type. Names are described using a path (e.g.
+   * /SCHEMA/TABLE).
    * 
    * @return The name.
    */
-  QName getName();
+  String getPath();
+
+  String getTypeName();
 
   /**
    * Check to see if the type has the specified attribute name.
@@ -196,12 +194,10 @@ public interface DataObjectMetaData extends ObjectWithProperties {
   boolean isInstanceOf(DataObjectMetaData classDefinition);
 
   /**
-   * Set the name of the object type. Names are described using a {@link QName}
-   * consisting of a namespaceUri and a name.
+   * Set the name of the object type. Names are described using a (e.g.
+   * /SCHEMA/TABLE).
    * 
    * @param name The name.
    */
-  void setName(QName name);
-
-  void destroy();
+  void setName(String name);
 }

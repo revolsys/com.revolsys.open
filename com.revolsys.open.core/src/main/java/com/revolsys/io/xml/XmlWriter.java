@@ -789,8 +789,8 @@ public class XmlWriter extends Writer {
     this.namespaceAliasMap.put(namespaceUri, alias);
   }
 
-  public void setPrefix(final QName typeName) {
-    setPrefix(typeName.getPrefix(), typeName.getNamespaceURI());
+  public void setPrefix(final QName typePath) {
+    setPrefix(typePath.getPrefix(), typePath.getNamespaceURI());
   }
 
   /**

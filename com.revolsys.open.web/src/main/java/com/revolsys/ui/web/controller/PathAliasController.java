@@ -24,10 +24,6 @@ public class PathAliasController implements Controller {
   public static final String PATH_PREFIX = PathAliasController.class.getName()
     + ".originalPrefix";
 
-  public static String getAlias() {
-    return (String)HttpRequestUtils.getRequestAttribute(PATH_PREFIX);
-  }
-
   public static boolean forward(
     final HttpServletRequest request,
     final HttpServletResponse response,
@@ -67,6 +63,10 @@ public class PathAliasController implements Controller {
         forwardPath);
     }
     return true;
+  }
+
+  public static String getAlias() {
+    return (String)HttpRequestUtils.getRequestAttribute(PATH_PREFIX);
   }
 
   public static String getOriginalPrefix() {

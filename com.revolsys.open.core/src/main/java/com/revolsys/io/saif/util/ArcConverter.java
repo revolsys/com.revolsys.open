@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -19,7 +17,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class ArcConverter implements OsnConverter {
   private final GeometryFactory geometryFactory;
 
-  private String geometryType = "Arc";
+  private String geometryType = "/Arc";
 
   public ArcConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
@@ -41,21 +39,21 @@ public class ArcConverter implements OsnConverter {
       if (attributeName.equals("pointList")) {
         final List<Coordinates> coordinates = new ArrayList<Coordinates>();
         while (iterator.next() != OsnIterator.END_LIST) {
-          final QName pointName = iterator.nextObjectName();
-          if (!pointName.equals(new QName("Point"))) {
+          final String pointName = iterator.nextObjectName();
+          if (!pointName.equals("/Point")) {
             iterator.throwParseError("Expecting Point object");
           }
           final String coordsName = iterator.nextAttributeName();
           if (!coordsName.equals("coords")) {
             iterator.throwParseError("Expecting coords attribute");
           }
-          final QName coordTypeName = iterator.nextObjectName();
-          if (coordTypeName.equals(new QName("Coord3D"))) {
+          final String coordTypeName = iterator.nextObjectName();
+          if (coordTypeName.equals("/Coord3D")) {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
             final double z = iterator.nextDoubleAttribute("c3");
             coordinates.add(new DoubleCoordinates(x, y, z));
-          } else if (coordTypeName.equals(new QName("Coord2D"))) {
+          } else if (coordTypeName.equals("/Coord2D")) {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
             coordinates.add(new DoubleCoordinates(x, y));
@@ -101,21 +99,21 @@ public class ArcConverter implements OsnConverter {
       serializer.startObject(geometryType);
 
       serializer.attributeName("pointList");
-      serializer.startCollection("List");
+      serializer.startCollection("/List");
       final CoordinatesList points = CoordinatesListUtil.get(line);
       final int numAxis = points.getNumAxis();
       for (int i = 0; i < points.size(); i++) {
-        serializer.startObject("Point");
+        serializer.startObject("/Point");
         serializer.attributeName("coords");
         final double x = points.getX(i);
         final double y = points.getY(i);
         final double z = points.getZ(i);
         if (numAxis == 2) {
-          serializer.startObject("Coord2D");
+          serializer.startObject("/Coord2D");
           serializer.attribute("c1", x, true);
           serializer.attribute("c2", y, false);
         } else {
-          serializer.startObject("Coord3D");
+          serializer.startObject("/Coord3D");
           serializer.attribute("c1", x, true);
           serializer.attribute("c2", y, true);
           if (Double.isNaN(z)) {

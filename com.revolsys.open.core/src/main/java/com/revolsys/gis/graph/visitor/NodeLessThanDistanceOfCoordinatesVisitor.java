@@ -15,15 +15,15 @@ import com.vividsolutions.jts.geom.Envelope;
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
   Visitor<Node<T>> {
   public static <T> List<Node<T>> getNodes(
-    Graph<T> graph,
-    Coordinates point,
-    double maxDistance) {
+    final Graph<T> graph,
+    final Coordinates point,
+    final double maxDistance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
       point, maxDistance, results);
     final Envelope envelope = new BoundingBox(point);
     envelope.expandBy(maxDistance);
-    NodeQuadTree<T> nodeIndex = graph.getNodeIndex();
+    final NodeQuadTree<T> nodeIndex = graph.getNodeIndex();
     nodeIndex.visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);

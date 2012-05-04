@@ -26,13 +26,20 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
 
   private ApplicationContext applicationContext;
 
-  public void setApplicationContext(ApplicationContext applicationContext)
-    throws BeansException {
-    this.applicationContext = applicationContext;
+  @Override
+  protected DataSource createInstance() throws Exception {
+    final Map<String, Object> config = new HashMap<String, Object>(this.config);
+    config.put("url", url);
+    config.put("username", username);
+    config.put("password", password);
+    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
+    databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
+    final DataSource dataSource = databaseFactory.createDataSource(config);
+    return dataSource;
   }
 
   @Override
-  protected void destroyInstance(DataSource dataSource) throws Exception {
+  protected void destroyInstance(final DataSource dataSource) throws Exception {
     try {
       databaseFactory.closeDataSource(dataSource);
     } finally {
@@ -50,17 +57,6 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
   }
 
   @Override
-  protected DataSource createInstance() throws Exception {
-    final Map<String, Object> config = new HashMap<String, Object>(this.config);
-    config.put("url", url);
-    config.put("username", username);
-    config.put("password", password);
-    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
-    databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
-    DataSource dataSource = databaseFactory.createDataSource(config);
-    return dataSource;
-  }
-
   public Class<?> getObjectType() {
     return DataSource.class;
   }
@@ -77,8 +73,14 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
     return username;
   }
 
+  @Override
   public boolean isSingleton() {
     return true;
+  }
+
+  public void setApplicationContext(final ApplicationContext applicationContext)
+    throws BeansException {
+    this.applicationContext = applicationContext;
   }
 
   public void setConfig(final Map<String, Object> config) {

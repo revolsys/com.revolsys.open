@@ -4,8 +4,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
@@ -41,7 +39,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private DataObjectMetaData metaData;
 
-  private final QName name;
+  private final String name;
 
   private final Resource resource;
 
@@ -51,7 +49,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     final DataObjectFactory factory) throws IOException {
     this.dataObjectFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
-    name = QName.valueOf(baseName);
+    name = baseName;
     this.in = new EndianInputStream(resource.getInputStream());
     this.resource = resource;
   }
@@ -67,7 +65,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   @Override
   protected synchronized void doInit() {
     try {
-      final Resource xbaseResource = this.resource.createRelative(name.getLocalPart()
+      final Resource xbaseResource = this.resource.createRelative(name
         + ".dbf");
       if (xbaseResource.exists()) {
         xbaseIterator = new XbaseIterator(xbaseResource,
@@ -75,7 +73,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
             "updateMetaData"));
       }
       GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-      final Resource projResource = this.resource.createRelative(name.getLocalPart()
+      final Resource projResource = this.resource.createRelative(name
         + ".prj");
       if (projResource.exists()) {
         try {

@@ -79,7 +79,7 @@ public class SimpleDataObjectConveter implements
 
   @Override
   public String toString() {
-    return dataObjectMetaData.getName() + "\n  "
+    return dataObjectMetaData.getPath() + "\n  "
       + CollectionUtil.toString("\n  ", processors);
   }
 }

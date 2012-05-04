@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
@@ -24,6 +23,7 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.oracle.esri.ArcSdeObjectIdJdbcAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeOracleStGeometryJdbcAttribute;
 import com.revolsys.gis.oracle.esri.StGeometryAttributeAdder;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
@@ -75,8 +75,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {
-    final QName typeName = metaData.getName();
-    final String schema = getDatabaseSchemaName(typeName.getNamespaceURI());
+    final String typePath = metaData.getPath();
+    final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
     String shortName = ShortNameProperty.getShortName(metaData);
     final String sequenceName;
     if (StringUtils.hasText(shortName)) {
@@ -86,7 +86,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         sequenceName = shortName.toLowerCase() + "_SEQ";
       }
     } else {
-      final String tableName = getDatabaseTableName(typeName);
+      final String tableName = getDatabaseTableName(typePath);
       if (useSchemaSequencePrefix) {
         sequenceName = schema + "." + tableName + "_SEQ";
       } else {
@@ -139,12 +139,12 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       addAttributeAdder("DATE", attributeAdder);
       addAttributeAdder("TIMESTAMP", attributeAdder);
 
-      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(
+      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(this,
         getDataSource(), getConnection());
       addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
       addAttributeAdder("SDE.ST_GEOMETRY", stGeometryAttributeAdder);
 
-      final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(
+      final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(this,
         getDataSource());
       addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
       addAttributeAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
@@ -161,7 +161,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         final Connection connection = getDbConnection();
         try {
           final Attribute newObjectIdAttribute = ArcSdeObjectIdJdbcAttribute.getInstance(
-            objectIdAttribute, connection, metaData.getName());
+            objectIdAttribute, connection, metaData.getPath());
           if (newObjectIdAttribute != null) {
             metaData.replaceAttribute(objectIdAttribute, newObjectIdAttribute);
           }
@@ -177,10 +177,10 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     final Query query,
     final BoundingBox boundingBox) {
     Query boundingBoxQuery = query.clone();
-    final QName typeName = boundingBoxQuery.getTypeName();
-    final DataObjectMetaData metaData = getMetaData(typeName);
+    final String typePath = boundingBoxQuery.getTypeName();
+    final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
-      throw new IllegalArgumentException("Unable to  find table " + typeName);
+      throw new IllegalArgumentException("Unable to  find table " + typePath);
     } else {
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
       final String geometryColumnName = geometryAttribute.getName();

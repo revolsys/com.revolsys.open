@@ -172,20 +172,20 @@ public class Page extends Component {
     properties.put(name, value);
   }
 
-  public boolean canAccess(Map<String, ? extends Object> parameters) {
+  public boolean canAccess(final Map<String, ? extends Object> parameters) {
     if (permissionExpression == null) {
       return true;
     } else {
       try {
         final EvaluationContext securityEvaluationContext = SpringExpressionUtil.createSecurityEvaluationContext();
-        for (Entry<String, ? extends Object> entry : parameters.entrySet()) {
-          String name = entry.getKey();
-          Object value = entry.getValue();
+        for (final Entry<String, ? extends Object> entry : parameters.entrySet()) {
+          final String name = entry.getKey();
+          final Object value = entry.getValue();
           securityEvaluationContext.setVariable(name, value);
         }
         return ExpressionUtils.evaluateAsBoolean(permissionExpression,
           securityEvaluationContext);
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         LOG.error("Unable to evaluate " + permission, t);
         return false;
       }
@@ -435,7 +435,7 @@ public class Page extends Component {
   public void setPermission(final String permission) {
     this.permission = permission;
     if (StringUtils.hasText(permission)) {
-      SpelExpressionParser parser = new SpelExpressionParser();
+      final SpelExpressionParser parser = new SpelExpressionParser();
       this.permissionExpression = parser.parseExpression(permission);
     } else {
       this.permissionExpression = null;

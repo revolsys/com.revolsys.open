@@ -3,13 +3,12 @@ package com.revolsys.gis.data.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 
 public class DataObjectLog {
@@ -36,7 +35,7 @@ public class DataObjectLog {
     } else if (dataObjectLog == null) {
       final DataObjectMetaData metaData = object.getMetaData();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\t" + metaData.getName() + object.getIdValue());
+      log.error(message + "\t" + metaData.getPath() + object.getIdValue());
     } else {
       dataObjectLog.error(message, object);
     }
@@ -58,7 +57,7 @@ public class DataObjectLog {
     } else if (dataObjectLog == null) {
       final DataObjectMetaData metaData = object.getMetaData();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\t" + metaData.getName() + object.getIdValue());
+      log.info(message + "\t" + metaData.getPath() + object.getIdValue());
     } else {
       dataObjectLog.info(message, object);
     }
@@ -75,7 +74,7 @@ public class DataObjectLog {
     } else if (dataObjectLog == null) {
       final DataObjectMetaData metaData = object.getMetaData();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + metaData.getName() + object.getIdValue());
+      log.warn(message + "\t" + metaData.getPath() + object.getIdValue());
     } else {
       dataObjectLog.warn(message, object);
     }
@@ -105,16 +104,16 @@ public class DataObjectLog {
   private DataObjectMetaData getLogMetaData(final DataObjectMetaData metaData) {
     DataObjectMetaDataImpl logMetaData = logMetaDataMap.get(metaData);
     if (logMetaData == null) {
-      final QName typeName = metaData.getName();
-      final String namespaceURI = typeName.getNamespaceURI();
-      final String tableName = typeName.getLocalPart();
+      final String path = metaData.getPath();
+      final String parentPath = PathUtil.getPath(path);
+      final String tableName = PathUtil.getName(path);
       final String logTableName;
       if (tableName.toUpperCase().equals(tableName)) {
         logTableName = tableName + "_LOG";
       } else {
         logTableName = tableName + "_log";
       }
-      final QName logTypeName = new QName(namespaceURI, logTableName);
+      final String logTypeName = PathUtil.getPath(parentPath , logTableName);
       logMetaData = new DataObjectMetaDataImpl(logTypeName);
       logMetaData.addAttribute("LOGMESSAGE", DataTypes.STRING, 255, true);
       logMetaData.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);

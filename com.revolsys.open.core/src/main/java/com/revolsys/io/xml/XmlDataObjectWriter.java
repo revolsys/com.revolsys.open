@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataProperties;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
@@ -117,14 +118,19 @@ public class XmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   @Override
   public String toString() {
-    return metaData.getName().toString();
+    return metaData.getPath().toString();
   }
 
   public void write(final DataObject object) {
     if (!opened) {
       writeHeader();
     }
-    out.startTag(object.getTypeName());
+    QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    if (qualifiedName == null) {
+      qualifiedName = new QName(metaData.getTypeName());
+    }
+
+    out.startTag(qualifiedName);
 
     final int attributeCount = metaData.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {

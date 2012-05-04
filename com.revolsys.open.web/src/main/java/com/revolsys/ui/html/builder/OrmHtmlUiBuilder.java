@@ -42,6 +42,16 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
     return dataAccessObject;
   }
 
+  public List<T> getList(final Map<String, Object> filter) {
+    return getList(filter, getOrderBy());
+  }
+
+  public List<T> getList(
+    final Map<String, Object> filter,
+    final Map<String, Boolean> orderBy) {
+    return dataAccessObject.list(filter, orderBy);
+  }
+
   public Class<T> getObjectClass() {
     return objectClass;
   }
@@ -55,16 +65,6 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
     final Map<String, Object> filter,
     final Map<String, Boolean> orderBy) {
     return dataAccessObject.page(filter, orderBy);
-  }
-
-  public List<T> getList(final Map<String, Object> filter) {
-    return getList(filter, getOrderBy());
-  }
-
-  public List<T> getList(
-    final Map<String, Object> filter,
-    final Map<String, Boolean> orderBy) {
-    return dataAccessObject.list(filter, orderBy);
   }
 
   @Override

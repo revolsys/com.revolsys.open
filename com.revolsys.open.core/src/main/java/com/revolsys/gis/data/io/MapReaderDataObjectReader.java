@@ -30,6 +30,7 @@ public class MapReaderDataObjectReader extends AbstractReader<DataObject>
     this.mapReader = mapReader;
   }
 
+  @Override
   public void close() {
     mapReader.close();
   }

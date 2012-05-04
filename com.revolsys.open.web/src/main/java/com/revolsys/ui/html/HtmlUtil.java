@@ -216,6 +216,24 @@ public final class HtmlUtil {
     out.endTag(B);
   }
 
+  public static void serializeButton(
+    final XmlWriter out,
+    final String name,
+    final String type,
+    final Object value,
+    final String text,
+    final String cssClass) {
+    out.startTag(BUTTON);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, type);
+    out.attribute(ATTR_VALUE, value);
+    out.attribute(ATTR_CLASS, cssClass);
+    if (StringUtils.hasText(text)) {
+      out.text(text);
+    }
+    out.endTag(BUTTON);
+  }
+
   public static void serializeCheckBox(
     final XmlWriter out,
     final String name,
@@ -321,23 +339,6 @@ public final class HtmlUtil {
       out.attribute(ATTR_VALUE, value);
     }
     out.endTag(INPUT);
-  }
-
-  public static void serializeButton(
-    final XmlWriter out,
-    final String name,
-    final String type,
-    final Object value,
-    final String text, String cssClass) {
-    out.startTag(BUTTON);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, type);
-    out.attribute(ATTR_VALUE, value);
-    out.attribute(ATTR_CLASS, cssClass);
-    if (StringUtils.hasText(text)) {
-      out.text(text);
-    }
-    out.endTag(BUTTON);
   }
 
   public static void serializeTag(

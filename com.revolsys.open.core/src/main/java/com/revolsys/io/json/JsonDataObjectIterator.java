@@ -70,7 +70,8 @@ public class JsonDataObjectIterator extends AbstractIterator<DataObject>
           if (dataTypeClass.isAssignableFrom(value.getClass())) {
             object.setValue(name, value);
           } else {
-            final StringConverter<Object> converter = StringConverterRegistry.getInstance().getConverter(dataTypeClass);
+            final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+              .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {

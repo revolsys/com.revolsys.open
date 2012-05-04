@@ -47,14 +47,14 @@ public class KeySerializerDetailSerializer implements LabelValueListSerializer {
   }
 
   public String getValueCss(final int index) {
-    KeySerializer serializer = serializers.get(index);
+    final KeySerializer serializer = serializers.get(index);
     return "detailValue " + serializer.getName();
   }
 
   public void serializeLabel(final XmlWriter out, final int index) {
     if (index < getSize()) {
-      KeySerializer serializer = serializers.get(index);
-      String label = serializer.getLabel();
+      final KeySerializer serializer = serializers.get(index);
+      final String label = serializer.getLabel();
       out.text(label);
     } else {
       out.entityRef("nbsp");
@@ -63,7 +63,7 @@ public class KeySerializerDetailSerializer implements LabelValueListSerializer {
 
   public void serializeValue(final XmlWriter out, final int index) {
     if (index < getSize()) {
-      KeySerializer serializer = serializers.get(index);
+      final KeySerializer serializer = serializers.get(index);
       serializer.serialize(out, object);
     } else {
       out.entityRef("nbsp");

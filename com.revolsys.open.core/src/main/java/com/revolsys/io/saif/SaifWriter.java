@@ -21,7 +21,6 @@
 package com.revolsys.io.saif;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,8 +36,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
-
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
@@ -47,11 +44,11 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.saif.util.ObjectSetUtil;
 import com.revolsys.io.saif.util.OsnConverterRegistry;
 import com.revolsys.io.saif.util.OsnSerializer;
-import com.revolsys.io.xml.QNameComparator;
 
 /**
  * <p>
@@ -62,13 +59,13 @@ import com.revolsys.io.xml.QNameComparator;
  * @see SaifReader
  */
 public class SaifWriter extends AbstractWriter<DataObject> {
-  private static final QName GLOBAL_METADATA = new QName("GlobalMetadata");
+  private static final String GLOBAL_METADATA = "/GlobalMetadata";
 
   private static final Logger log = Logger.getLogger(SaifWriter.class);
 
   private DataObjectMetaData annotatedSpatialDataSetType;
 
-  private final Map<QName, String> compositeTypeNames = new HashMap<QName, String>();
+  private final Map<String, String> compositeTypeNames = new HashMap<String, String>();
 
   protected OsnConverterRegistry converters = new OsnConverterRegistry();
 
@@ -76,8 +73,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   private final Set<String> exportedTypes = new LinkedHashSet<String>();
 
-  private final Map<QName, Map<String, Object>> exports = new TreeMap<QName, Map<String, Object>>(
-    new QNameComparator());
+  private final Map<String, Map<String, Object>> exports = new TreeMap<String, Map<String, Object>>();
 
   private File file;
 
@@ -87,15 +83,15 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   private int maxSubsetSize = Integer.MAX_VALUE;
 
-  private final Map<QName, String> objectIdentifiers = new HashMap<QName, String>();
+  private final Map<String, String> objectIdentifiers = new HashMap<String, String>();
 
-  private final Map<QName, String> objectSetNames = new HashMap<QName, String>();
+  private final Map<String, String> objectSetNames = new HashMap<String, String>();
 
   private List<Resource> schemaFileNames;
 
   private String schemaResource;
 
-  private final Map<QName, OsnSerializer> serializers = new HashMap<QName, OsnSerializer>();
+  private final Map<String, OsnSerializer> serializers = new HashMap<String, OsnSerializer>();
 
   private DataObjectMetaData spatialDataSetType;
 
@@ -120,19 +116,19 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   }
 
   public void addCompositeTypeName(
-    final String typeName,
+    final String typePath,
     final String compositeTypeName) {
-    compositeTypeNames.put(QName.valueOf(typeName), compositeTypeName);
+    compositeTypeNames.put(String.valueOf(typePath), compositeTypeName);
   }
 
   protected void addExport(
-    final QName typeName,
-    final QName compositeType,
+    final String typePath,
+    final String compositeType,
     final String objectSubset) {
-    if (!exports.containsKey(typeName)) {
+    if (!exports.containsKey(typePath)) {
       final Map<String, Object> export = new HashMap<String, Object>();
-      exports.put(typeName, export);
-      final String referenceId = getObjectIdentifier(typeName);
+      exports.put(typePath, export);
+      final String referenceId = getObjectIdentifier(typePath);
       export.put("referenceId", referenceId);
       export.put("compositeType", compositeType);
       export.put("objectSubset", objectSubset);
@@ -147,8 +143,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           log.info("Closing SAIF archive '" + file.getCanonicalPath() + "'");
         }
         createExports();
-        createMissingDirObject("InternallyReferencedObjects", "internal.dir");
-        createMissingDirObject("ImportedObjects", "imports.dir");
+        createMissingDirObject("/InternallyReferencedObjects", "internal.dir");
+        createMissingDirObject("/ImportedObjects", "imports.dir");
         createMissingGlobalMetadata();
         if (log.isInfoEnabled()) {
           log.info("  Closing serializers");
@@ -191,19 +187,19 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   private void createExports() throws IOException {
     final File exportsFile = new File(tempDirectory, "exports.dir");
-    final OsnSerializer exportsSerializer = createSerializer(new QName(
-      "ExportedObject"), exportsFile, Long.MAX_VALUE);
-    exportsSerializer.startObject("ExportedObjects");
+    final OsnSerializer exportsSerializer = createSerializer(
+      "/ExportedObject", exportsFile, Long.MAX_VALUE);
+    exportsSerializer.startObject("/ExportedObjects");
     exportsSerializer.attributeName("handles");
-    exportsSerializer.startCollection("Set");
+    exportsSerializer.startCollection("/Set");
     writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
       "globmeta.osn");
     for (final Map<String, Object> export : exports.values()) {
-      final QName compositeType = (QName)export.get("compositeType");
+      final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
-      String compositeTypeName = compositeType.getLocalPart();
-      final String compositeNamespace = compositeType.getNamespaceURI();
+      String compositeTypeName = PathUtil.getName(compositeType);
+      final String compositeNamespace = PathUtil.getPath(compositeType);
       if (compositeNamespace != "") {
         compositeTypeName += "::" + compositeNamespace;
       }
@@ -214,13 +210,13 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   }
 
   private void createMissingDirObject(
-    final String typeName,
+    final String typePath,
     final String fileName) throws IOException {
-    if (!serializers.containsKey(typeName)) {
+    if (!serializers.containsKey(typePath)) {
       final File file = new File(tempDirectory, fileName);
       final PrintStream out = new PrintStream(new FileOutputStream(file));
       try {
-        out.print(typeName);
+        out.print(typePath);
         out.print("(handles:Set{})");
       } finally {
         out.close();
@@ -235,11 +231,11 @@ public class SaifWriter extends AbstractWriter<DataObject> {
         final File metaFile = new File(tempDirectory, "globmeta.osn");
         final OsnSerializer serializer = createSerializer(GLOBAL_METADATA,
           metaFile, Long.MAX_VALUE);
-        serializer.startObject("GlobalMetadata");
+        serializer.startObject("/GlobalMetadata");
         serializer.attribute("objectIdentifier", "GlobalMetadata", true);
 
         serializer.attributeName("creationTime");
-        serializer.startObject("TimeStamp");
+        serializer.startObject("/TimeStamp");
         final Date creationTimestamp = new Date(System.currentTimeMillis());
         serializer.attribute("year", new BigDecimal(
           creationTimestamp.getYear() + 1900), true);
@@ -256,7 +252,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
         serializer.endObject();
 
         serializer.attributeName("saifProfile");
-        serializer.startObject("Profile");
+        serializer.startObject("/Profile");
         serializer.attribute("authority", "Government of British Columbia",
           true);
         serializer.attribute("idName", "SAIFLite", true);
@@ -268,10 +264,10 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           "SAIF Toolkit Version 1.4.0 (May 05, 1997)", true);
 
         serializer.attributeName("userProfile");
-        serializer.startObject("UserProfile");
+        serializer.startObject("/UserProfile");
 
         serializer.attributeName("coordDefs");
-        serializer.startObject("LocationalDefinitions");
+        serializer.startObject("/LocationalDefinitions");
         serializer.attributeEnum("c1", "real32", true);
         serializer.attributeEnum("c2", "real32", true);
         serializer.attributeEnum("c3", "real32", true);
@@ -289,10 +285,10 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   }
 
   protected OsnSerializer createSerializer(
-    final QName typeName,
+    final String typePath,
     final File file,
     final long maxSize) throws IOException {
-    final OsnSerializer serializer = new OsnSerializer(typeName, file, maxSize,
+    final OsnSerializer serializer = new OsnSerializer(typePath, file, maxSize,
       converters);
     serializer.setIndentEnabled(indentEnabled);
     return serializer;
@@ -302,12 +298,12 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   public void flush() {
   }
 
-  private DataObjectMetaData getCompositeType(final QName typeName) {
-    String compositeTypeName = compositeTypeNames.get(typeName);
+  private DataObjectMetaData getCompositeType(final String typePath) {
+    String compositeTypeName = compositeTypeNames.get(typePath);
     if (compositeTypeName == null) {
-      compositeTypeName = typeName + "Composite";
+      compositeTypeName = typePath + "Composite";
     }
-    final DataObjectMetaData compisteType = dataObjectMetaDataFactory.getMetaData(QName.valueOf(compositeTypeName));
+    final DataObjectMetaData compisteType = dataObjectMetaDataFactory.getMetaData(String.valueOf(compositeTypeName));
     return compisteType;
   }
 
@@ -319,11 +315,11 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return maxSubsetSize;
   }
 
-  public String getObjectIdentifier(final QName typeName) {
-    String objectIdentifier = objectIdentifiers.get(typeName);
+  public String getObjectIdentifier(final String typePath) {
+    String objectIdentifier = objectIdentifiers.get(typePath);
     if (objectIdentifier == null) {
-      objectIdentifier = typeName.getLocalPart();
-      objectIdentifiers.put(typeName, objectIdentifier);
+      objectIdentifier = PathUtil.getName(typePath);
+      objectIdentifiers.put(typePath, objectIdentifier);
     }
     return objectIdentifier;
   }
@@ -331,7 +327,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   /**
    * @return the objectIdentifiers
    */
-  public Map<QName, String> getObjectIdentifiers() {
+  public Map<String, String> getObjectIdentifiers() {
     return objectIdentifiers;
   }
 
@@ -340,26 +336,26 @@ public class SaifWriter extends AbstractWriter<DataObject> {
    * specified type name. The null value will be returned if a object set name
    * has not been set for that type name.
    * 
-   * @param typeName The type name.
+   * @param typePath The type name.
    * @return The object set name for the type name.
    */
-  public String getObjectSetName(final QName typeName) {
-    return objectSetNames.get(typeName);
+  public String getObjectSetName(final String typePath) {
+    return objectSetNames.get(typePath);
   }
 
-  public Map<QName, String> getObjectSetNames() {
+  public Map<String, String> getObjectSetNames() {
     return objectSetNames;
   }
 
-  private String getObjectSubsetName(final QName typeName) {
-    String objectSubsetName = getObjectSetName(typeName);
+  private String getObjectSubsetName(final String typePath) {
+    String objectSubsetName = getObjectSetName(typePath);
     if (objectSubsetName == null) {
-      objectSubsetName = typeName.getLocalPart();
+      objectSubsetName = PathUtil.getName(typePath);
       if (objectSubsetName.length() > 6) {
         objectSubsetName = objectSubsetName.substring(0, 6);
       }
       objectSubsetName += "00.osn";
-      objectSetNames.put(typeName, objectSubsetName);
+      objectSetNames.put(typePath, objectSubsetName);
     }
     return objectSubsetName;
   }
@@ -368,59 +364,59 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     return schemaResource;
   }
 
-  private OsnSerializer getSerializer(final QName typeName) throws IOException {
-    OsnSerializer serializer = serializers.get(typeName);
+  private OsnSerializer getSerializer(final String typePath) throws IOException {
+    OsnSerializer serializer = serializers.get(typePath);
     if (serializer == null) {
       initialize();
       try {
-        final DataObjectMetaData compositeType = getCompositeType(typeName);
+        final DataObjectMetaData compositeType = getCompositeType(typePath);
         if (compositeType != null) {
-          final String objectSubsetName = getObjectSubsetName(typeName);
+          final String objectSubsetName = getObjectSubsetName(typePath);
           if (maxSubsetSize != Long.MAX_VALUE) {
             FileUtil.deleteFiles(tempDirectory,
               ObjectSetUtil.getObjectSubsetPrefix(objectSubsetName) + "...osn");
-            serializer = createSerializer(typeName, new File(tempDirectory,
+            serializer = createSerializer(typePath, new File(tempDirectory,
               objectSubsetName), maxSubsetSize);
           } else {
-            serializer = createSerializer(typeName, new File(tempDirectory,
+            serializer = createSerializer(typePath, new File(tempDirectory,
               objectSubsetName), Long.MAX_VALUE);
           }
           if (compositeType.isInstanceOf(annotatedSpatialDataSetType)) {
-            serializer.startObject(compositeType.getName());
+            serializer.startObject(compositeType.getPath());
             serializer.attributeName("objectIdentifier");
-            final String objectIdentifier = getObjectIdentifier(typeName);
+            final String objectIdentifier = getObjectIdentifier(typePath);
             serializer.attributeValue(objectIdentifier);
             serializer.endLine();
             serializer.serializeIndent();
             serializer.attributeName("annotationComponents");
-            serializer.startCollection("Set");
+            serializer.startCollection("/Set");
           } else if (compositeType.isInstanceOf(spatialDataSetType)) {
-            serializer.startObject(compositeType.getName());
+            serializer.startObject(compositeType.getPath());
             serializer.attributeName("objectIdentifier");
-            final String objectIdentifier = getObjectIdentifier(typeName);
+            final String objectIdentifier = getObjectIdentifier(typePath);
             serializer.attributeValue(objectIdentifier);
             serializer.endLine();
             serializer.serializeIndent();
             serializer.attributeName("geoComponents");
-            serializer.startCollection("Set");
+            serializer.startCollection("/Set");
           }
-          addExport(typeName, compositeType.getName(), objectSubsetName);
-          serializers.put(typeName, serializer);
-        } else if (typeName.equals("ImportedObjects")) {
-          serializer = createSerializer(new QName("ImportedObject"), new File(
+          addExport(typePath, compositeType.getPath(), objectSubsetName);
+          serializers.put(typePath, serializer);
+        } else if (typePath.equals("/ImportedObjects")) {
+          serializer = createSerializer("/ImportedObject", new File(
             tempDirectory, "imports.dir"), Long.MAX_VALUE);
-          serializers.put(typeName, serializer);
-        } else if (typeName.getLocalPart().endsWith(
+          serializers.put(typePath, serializer);
+        } else if (PathUtil.getName(typePath).endsWith(
           "InternallyReferencedObjects")) {
           serializer = createSerializer(
-            new QName("InternallyReferencedObject"), new File(tempDirectory,
+            "/InternallyReferencedObject", new File(tempDirectory,
               "internal.dir"), Long.MAX_VALUE);
-          serializers.put(typeName, serializer);
-        } else if (typeName.getLocalPart().endsWith("GlobalMetadata")) {
+          serializers.put(typePath, serializer);
+        } else if (PathUtil.getName(typePath).endsWith("GlobalMetadata")) {
           serializer = createSerializer(GLOBAL_METADATA, new File(
             tempDirectory, "globmeta.osn"), Long.MAX_VALUE);
-          addExport(typeName, typeName, "globmeta.osn");
-          serializers.put(typeName, serializer);
+          addExport(typePath, typePath, "globmeta.osn");
+          serializers.put(typePath, serializer);
         }
       } catch (final IOException e) {
         log.error("Unable to create serializer: " + e.getMessage(), e);
@@ -448,7 +444,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
             "clasdefs.csn"));
           try {
             for (final Resource resource : schemaFileNames) {
-              InputStream in = resource.getInputStream();
+              final InputStream in = resource.getInputStream();
               final SaifSchemaReader reader = new SaifSchemaReader();
               setDataObjectMetaDataFactory(reader.loadSchemas(schemaFileNames));
               try {
@@ -483,9 +479,9 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     final DataObjectMetaDataFactory schema) {
     this.dataObjectMetaDataFactory = schema;
     if (schema != null) {
-      spatialDataSetType = schema.getMetaData(new QName("SpatialDataSet"));
-      annotatedSpatialDataSetType = schema.getMetaData(new QName(
-        "AnnotatedSpatialDataSet"));
+      spatialDataSetType = schema.getMetaData("/SpatialDataSet");
+      annotatedSpatialDataSetType = schema.getMetaData(
+        "/AnnotatedSpatialDataSet");
     }
   }
 
@@ -535,7 +531,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     for (final Entry<String, String> entry : objectIdentifiers.entrySet()) {
       final String key = entry.getKey();
       final String value = entry.getValue();
-      final QName qName = QName.valueOf(key);
+      final String qName = String.valueOf(key);
       this.objectIdentifiers.put(qName, value);
     }
   }
@@ -551,11 +547,11 @@ public class SaifWriter extends AbstractWriter<DataObject> {
    * starting at 00 with the .osn suffix (e.g. BreakLines would be
    * breakl00.osn).
    * 
-   * @param typeName The type name
+   * @param typePath The type name
    * @param subSetName The sub set name for the type name.
    */
-  public void setObjectSetName(final String typeName, final String subSetName) {
-    objectSetNames.put(QName.valueOf(typeName), subSetName);
+  public void setObjectSetName(final String typePath, final String subSetName) {
+    objectSetNames.put(typePath, subSetName);
   }
 
   public void setObjectSetNames(final Map<String, String> objectSetNames) {
@@ -590,14 +586,14 @@ public class SaifWriter extends AbstractWriter<DataObject> {
   public void write(final DataObject object) {
     try {
       final DataObjectMetaData type = object.getMetaData();
-      final OsnSerializer serializer = getSerializer(type.getName());
+      final OsnSerializer serializer = getSerializer(type.getPath());
       if (serializer != null) {
         serializer.serializeDataObject(object);
         if (indentEnabled) {
           serializer.endLine();
         }
       } else {
-        log.error("No serializer for type '" + type.getName() + "'");
+        log.error("No serializer for type '" + type.getPath() + "'");
       }
     } catch (final IOException e) {
       log.error(e.getMessage(), e);

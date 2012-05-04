@@ -3,8 +3,6 @@ package com.revolsys.gis.data.io;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Reader;
@@ -18,12 +16,12 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   private List<DataObject> objects;
 
-  private final QName typeName;
+  private final String path;
 
-  public DataStoreQueryTask(final DataObjectStore dataStore,
-    final QName typeName, final BoundingBox boundingBox) {
+  public DataStoreQueryTask(final DataObjectStore dataStore, final String path,
+    final BoundingBox boundingBox) {
     this.dataStore = dataStore;
-    this.typeName = typeName;
+    this.path = path;
     this.boundingBox = boundingBox;
   }
 
@@ -38,7 +36,7 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   public void run() {
     objects = new ArrayList<DataObject>();
-    final Reader<DataObject> reader = dataStore.query(typeName, boundingBox);
+    final Reader<DataObject> reader = dataStore.query(path, boundingBox);
     try {
       for (final DataObject object : reader) {
         try {

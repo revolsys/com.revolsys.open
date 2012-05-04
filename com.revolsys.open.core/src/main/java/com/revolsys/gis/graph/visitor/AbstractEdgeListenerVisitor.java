@@ -1,7 +1,5 @@
 package com.revolsys.gis.graph.visitor;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
@@ -43,10 +41,10 @@ public abstract class AbstractEdgeListenerVisitor<T> extends
 
   public void nodeEvent(
     final Node<T> node,
-    final QName typeName,
+    final String typePath,
     final String ruleName,
     final String action,
     final String notes) {
-    nodeListeners.nodeEvent(node, typeName, ruleName, action, notes);
+    nodeListeners.nodeEvent(node, typePath, ruleName, action, notes);
   }
 }

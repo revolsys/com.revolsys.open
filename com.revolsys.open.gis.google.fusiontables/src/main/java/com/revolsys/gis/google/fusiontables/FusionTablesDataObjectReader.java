@@ -34,6 +34,7 @@ public class FusionTablesDataObjectReader extends AbstractReader<DataObject>
     this.mapReader = AbstractMapReaderFactory.mapReader(resource);
   }
 
+  @Override
   public void close() {
     mapReader.close();
   }

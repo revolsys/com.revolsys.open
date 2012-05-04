@@ -34,6 +34,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.io.PathUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
@@ -52,7 +53,7 @@ public class AddDefaultValuesProcess extends
   private void addDefaultValues(
     final Map<String, Object> defaultValues,
     final DataObjectMetaData type) {
-    if (type.getName().getNamespaceURI().equals(schemaName)) {
+    if (PathUtil.getPath(type.getPath()).equals(schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
   }
@@ -99,7 +100,7 @@ public class AddDefaultValuesProcess extends
 
     boolean process = true;
     if (schemaName != null) {
-      if (!type.getName().getNamespaceURI().equals(schemaName)) {
+      if (!PathUtil.getPath(type.getPath()).equals(schemaName)) {
         process = false;
       }
     }

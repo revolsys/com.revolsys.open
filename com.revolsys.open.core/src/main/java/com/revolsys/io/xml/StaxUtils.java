@@ -71,9 +71,9 @@ public final class StaxUtils {
 
   public static String getAttribute(
     final XMLStreamReader parser,
-    final QName typeName) {
-    final String value = parser.getAttributeValue(typeName.getNamespaceURI(),
-      typeName.getLocalPart());
+    final QName typePath) {
+    final String value = parser.getAttributeValue(typePath.getNamespaceURI(),
+      typePath.getLocalPart());
     return value;
   }
 

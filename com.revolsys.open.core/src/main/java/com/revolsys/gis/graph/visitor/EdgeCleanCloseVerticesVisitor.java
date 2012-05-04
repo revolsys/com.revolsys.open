@@ -2,8 +2,6 @@ package com.revolsys.gis.graph.visitor;
 
 import java.util.LinkedHashSet;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.event.CoordinateEventListenerList;
@@ -82,7 +80,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
    * @return true If further edges should be processed.
    */
   public boolean visit(final Edge<T> edge) {
-    final QName typeName = edge.getTypeName();
+    final String typePath = edge.getTypeName();
     final LineString lineString = edge.getLine();
     final CoordinateSequence coordinates = lineString.getCoordinateSequence();
     final int numCoordinates = coordinates.size();
@@ -116,7 +114,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
           if (fixed) {
             coordinateListeners.coordinateEvent(
               new Coordinate(x2, y2),
-              typeName,
+              typePath,
               "Short Segment",
               "Fixed",
               distance + " " + Math.toDegrees(previousAngle) + " "
@@ -124,7 +122,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
           } else {
             coordinateListeners.coordinateEvent(
               new Coordinate(x2, y2),
-              typeName,
+              typePath,
               "Short Segment",
               "Review",
               distance + " " + Math.toDegrees(previousAngle) + " "

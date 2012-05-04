@@ -33,19 +33,19 @@ public class JpaDaoProxyFactory implements DaoProxyFactory {
   public <T> DataAccessObject<T> createDataAccessObject(
     final String daoInterfaceClassName) {
 
-    Class<?> daoInterface = getDaoInterface(daoInterfaceClassName);
+    final Class<?> daoInterface = getDaoInterface(daoInterfaceClassName);
 
-    DomainClass domainClassAnnotation = (DomainClass)daoInterface.getAnnotation(DomainClass.class);
-    Class<?> domainClass = domainClassAnnotation.value();
+    final DomainClass domainClassAnnotation = daoInterface.getAnnotation(DomainClass.class);
+    final Class<?> domainClass = domainClassAnnotation.value();
 
-    JpaDaoHandler handler = new JpaDaoHandler(daoInterface, domainClass);
+    final JpaDaoHandler handler = new JpaDaoHandler(daoInterface, domainClass);
     handler.setEntityManagerFactory(entityManagerFactory);
 
-    ClassLoader classLoader = domainClass.getClassLoader();
-    Class<?>[] params = new Class<?>[] {
+    final ClassLoader classLoader = domainClass.getClassLoader();
+    final Class<?>[] params = new Class<?>[] {
       daoInterface
     };
-    DataAccessObject<T> dataAccessObject = (DataAccessObject<T>)Proxy.newProxyInstance(
+    final DataAccessObject<T> dataAccessObject = (DataAccessObject<T>)Proxy.newProxyInstance(
       classLoader, params, handler);
     return dataAccessObject;
   }
@@ -60,9 +60,9 @@ public class JpaDaoProxyFactory implements DaoProxyFactory {
    */
   private Class<?> getDaoInterface(final String daoInterfaceName) {
     try {
-      Class<?> daoInterface = Class.forName(daoInterfaceName);
+      final Class<?> daoInterface = Class.forName(daoInterfaceName);
       return daoInterface;
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException("DaoClass " + daoInterfaceName
         + " could not be found");
     }
@@ -72,7 +72,8 @@ public class JpaDaoProxyFactory implements DaoProxyFactory {
     return entityManagerFactory;
   }
 
-  public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
+  public void setEntityManagerFactory(
+    final EntityManagerFactory entityManagerFactory) {
     this.entityManagerFactory = entityManagerFactory;
   }
 }

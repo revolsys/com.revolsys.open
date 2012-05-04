@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
-import javax.xml.namespace.QName;
 
 import org.springframework.util.StringUtils;
 
@@ -23,29 +22,18 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   private DataObjectStore dataStore;
 
-  private QName tableName;
+  private String tableName;
 
   public DataObjectHtmlUiBuilder() {
   }
 
-  public DataObjectHtmlUiBuilder(final String typeName, final String title) {
-    super(typeName, title);
+  public DataObjectHtmlUiBuilder(final String typePath, final String title) {
+    super(typePath, title);
   }
 
-  public DataObjectHtmlUiBuilder(final String typeName, final String title,
+  public DataObjectHtmlUiBuilder(final String typePath, final String title,
     final String pluralTitle) {
-    super(typeName, title, pluralTitle);
-  }
-
-  @PreDestroy
-  public void destroy() {
-    super.destroy();
-    dataStore = null;
-    tableName = null;
-  }
-
-  public <H extends HtmlUiBuilder<?>> H getBuilder(QName typeName) {
-    return getBuilder(typeName.toString());
+    super(typePath, title, pluralTitle);
   }
 
   @Override
@@ -53,9 +41,28 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return dataStore.create(tableName);
   }
 
+  public void deleteObject(final Object id) {
+    final DataObject object = loadObject(id);
+    if (object != null) {
+      final Writer<DataObject> writer = dataStore.createWriter();
+      object.setState(DataObjectState.Deleted);
+
+      writer.write(object);
+      writer.close();
+    }
+  }
+
+  @Override
+  @PreDestroy
+  public void destroy() {
+    super.destroy();
+    dataStore = null;
+    tableName = null;
+  }
+
   public List<DataObject> getAllObjects(final String... orderBy) {
     final Query query = new Query(tableName);
-    String idPropertyName = getIdPropertyName();
+    final String idPropertyName = getIdPropertyName();
     if (orderBy.length > 0) {
       query.setOrderByColumns(orderBy);
     } else if (StringUtils.hasText(idPropertyName)) {
@@ -73,7 +80,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return dataStore.page(query);
   }
 
-  public QName getTableName() {
+  public String getTableName() {
     return tableName;
   }
 
@@ -123,22 +130,11 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return object;
   }
 
-  public void deleteObject(final Object id) {
-    final DataObject object = loadObject(id);
-    if (object != null) {
-      Writer<DataObject> writer = dataStore.createWriter();
-      object.setState(DataObjectState.Deleted);
-
-      writer.write(object);
-      writer.close();
-    }
-  }
-
   public void setDataStore(final DataObjectStore dataStore) {
     this.dataStore = dataStore;
   }
 
-  public void setTableName(final QName tableName) {
+  public void setTableName(final String tableName) {
     this.tableName = tableName;
   }
 

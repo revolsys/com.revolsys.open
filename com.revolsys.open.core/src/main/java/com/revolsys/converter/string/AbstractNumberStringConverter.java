@@ -12,9 +12,9 @@ public abstract class AbstractNumberStringConverter<T> implements
   public static final NumberFormat DECIMAL_FORMAT = new DecimalFormat(
     "0.##########################");
 
-  private NumberFormat format;
+  private final NumberFormat format;
 
-  public AbstractNumberStringConverter(NumberFormat format) {
+  public AbstractNumberStringConverter(final NumberFormat format) {
     super();
     this.format = format;
   }
@@ -23,10 +23,10 @@ public abstract class AbstractNumberStringConverter<T> implements
     if (value == null) {
       return null;
     } else if (value instanceof BigDecimal) {
-      BigDecimal number = (BigDecimal)value;
+      final BigDecimal number = (BigDecimal)value;
       return number.toPlainString();
     } else if (value instanceof Number) {
-      Number number = (Number)value;
+      final Number number = (Number)value;
       return format.format(number);
     } else {
       return value.toString();

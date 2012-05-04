@@ -18,11 +18,11 @@ package com.revolsys.orm.core;
 import java.sql.Timestamp;
 
 public interface ModificationAudit {
-  String getModifiedBy();
-
-  void setModifiedBy(String modifiedBy);
-
   Timestamp getModificationTimestamp();
 
+  String getModifiedBy();
+
   void setModificationTimestamp(Timestamp modificationTimestamp);
+
+  void setModifiedBy(String modifiedBy);
 }

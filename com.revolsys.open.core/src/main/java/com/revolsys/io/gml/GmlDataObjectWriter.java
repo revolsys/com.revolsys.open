@@ -10,9 +10,11 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataProperties;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.gml.type.GmlFieldType;
 import com.revolsys.io.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlWriter;
@@ -100,9 +102,12 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     }
     out.startTag(FEATURE_MEMBER);
     final DataObjectMetaData metaData = object.getMetaData();
-    final QName typeName = metaData.getName();
-    final String namespaceUri = typeName.getNamespaceURI();
-    out.startTag(typeName);
+    QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    if (qualifiedName == null) {
+      qualifiedName = new QName(metaData.getTypeName());
+    }
+    final String namespaceUri = qualifiedName.getNamespaceURI();
+    out.startTag(qualifiedName);
 
     for (final Attribute attribute : metaData.getAttributes()) {
       final String attributeName = attribute.getName();
@@ -116,7 +121,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
       out.endTag();
     }
 
-    out.endTag(typeName);
+    out.endTag(qualifiedName);
     out.endTag(FEATURE_MEMBER);
   }
 

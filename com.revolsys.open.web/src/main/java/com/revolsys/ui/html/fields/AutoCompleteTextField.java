@@ -11,7 +11,8 @@ public class AutoCompleteTextField extends TextField {
   public AutoCompleteTextField() {
   }
 
-  public AutoCompleteTextField(String name,String dataUrl, boolean required) {
+  public AutoCompleteTextField(final String name, final String dataUrl,
+    final boolean required) {
     super(name, required);
     this.dataUrl = dataUrl;
   }

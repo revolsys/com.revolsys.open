@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataObjectStoreFactory {
-  DataObjectStore createDataObjectStore(Map<String, ? extends Object> connectionProperties);
+  DataObjectStore createDataObjectStore(
+    Map<String, ? extends Object> connectionProperties);
 
   Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     Map<String, ? extends Object> connectionProperties);

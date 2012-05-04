@@ -3,8 +3,6 @@ package com.revolsys.io.moep;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -57,7 +55,7 @@ public final class MoepConstants {
 
   public static final String TEXT = "TEXT";
 
-  public static final QName TYPE_NAME = new QName("MOEP", "Feature");
+  public static final String TYPE_NAME = "/MOEP/Feature";
 
   public static final String FONT_WEIGHT = "FONTWEIGHT";
 
@@ -69,8 +67,8 @@ public final class MoepConstants {
     META_DATA = createMetaData(TYPE_NAME);
   }
 
-  public static DataObjectMetaDataImpl createMetaData(final QName typeName) {
-    final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(typeName);
+  public static DataObjectMetaDataImpl createMetaData(final String typePath) {
+    final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(typePath);
     type.addAttribute(FEATURE_CODE, DataTypes.STRING, 10, true);
     type.addAttribute(MAPSHEET_NAME, DataTypes.STRING, 7, false);
     type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, 20, true);

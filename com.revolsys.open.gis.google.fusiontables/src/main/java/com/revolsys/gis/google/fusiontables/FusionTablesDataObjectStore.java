@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
-import javax.xml.namespace.QName;
 
 import com.google.api.client.googleapis.GoogleHeaders;
 import com.google.api.client.googleapis.GoogleTransport;
@@ -47,6 +46,7 @@ import com.revolsys.gis.google.fusiontables.attribute.GeometryAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.NumberAttribute;
 import com.revolsys.gis.google.fusiontables.attribute.StringAttribute;
 import com.revolsys.io.AbstractMapReaderFactory;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.InputStreamResource;
 import com.vividsolutions.jts.geom.Geometry;
@@ -66,24 +66,10 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
 
   private static final String SERVICE_URL = "http://www.google.com/fusiontables/api/query";
 
-  public static void appendString(final StringBuffer buffer, final String string) {
-    if (string == null) {
-    } else {
+  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
-      buffer.append('\'');
-      for (int i = 0; i < string.length(); i++) {
-        final char c = string.charAt(i);
-        if (c == '\'') {
-          buffer.append("\\'");
-        } else {
-          buffer.append(c);
-        }
-      }
-      buffer.append('\'');
-    }
-  }
-
-  public static void addColumnNames(final StringBuffer sql,
+  public static void addColumnNames(
+    final StringBuffer sql,
     final DataObjectMetaData metaData) {
     final List<String> attributeNames = metaData.getAttributeNames();
     for (int i = 0; i < attributeNames.size(); i++) {
@@ -106,15 +92,51 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  private String username ;
+  public static void appendString(final StringBuffer buffer, final Object value) {
 
-  private String password ;
+    if (value == null) {
+      buffer.append("''");
+    } else {
+      final Class<?> valueClass = value.getClass();
+      if (Geometry.class.isAssignableFrom(valueClass)) {
+        GeometryAttribute.appendString(buffer, value);
+      } else if (Number.class.isAssignableFrom(valueClass)) {
+        NumberAttribute.appendString(buffer, value);
+      } else if (Date.class.isAssignableFrom(valueClass)) {
+        DateTimeAttribute.appendString(buffer, value);
+      } else {
+        StringAttribute.appendString(buffer, value);
+      }
+    }
 
-  private final Map<QName, String> typeLoadSql = new HashMap<QName, String>();
+  }
 
-  private final Map<String, QName> tableIdTypeNameMap = new HashMap<String, QName>();
+  public static void appendString(final StringBuffer buffer, final String string) {
+    if (string == null) {
+    } else {
 
-  private final Map<QName, String> typeNameTableIdMap = new HashMap<QName, String>();
+      buffer.append('\'');
+      for (int i = 0; i < string.length(); i++) {
+        final char c = string.charAt(i);
+        if (c == '\'') {
+          buffer.append("\\'");
+        } else {
+          buffer.append(c);
+        }
+      }
+      buffer.append('\'');
+    }
+  }
+
+  private String username;
+
+  private String password;
+
+  private final Map<String, String> typeLoadSql = new HashMap<String, String>();
+
+  private final Map<String, String> tableIdTypeNameMap = new HashMap<String, String>();
+
+  private final Map<String, String> typePathTableIdMap = new HashMap<String, String>();
 
   private String label;
 
@@ -123,7 +145,8 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   }
 
   private DataObjectReader createDataObjectReader(
-    final DataObjectMetaData metaData, final String sql) {
+    final DataObjectMetaData metaData,
+    final String sql) {
     try {
       final HttpResponse response = executeQuery(sql);
       final InputStream in = response.getContent();
@@ -135,11 +158,19 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
+  @Override
+  protected AbstractIterator<DataObject> createIterator(
+    final Query query,
+    final Map<String, Object> properties) {
+    // TODO Auto-generated method stub
+    return super.createIterator(query, properties);
+  }
+
   private Reader<Map<String, Object>> createMapReader(final String sql) {
     try {
       final HttpResponse response = executeQuery(sql);
       final InputStream in = response.getContent();
-      InputStreamResource resource = new InputStreamResource("in.csv", in);
+      final InputStreamResource resource = new InputStreamResource("in.csv", in);
       final Reader<Map<String, Object>> reader = AbstractMapReaderFactory.mapReader(resource);
       return reader;
     } catch (final IOException e) {
@@ -149,7 +180,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
 
   public void createTable(final DataObjectMetaData metaData) {
     final StringBuffer sql = new StringBuffer("CREATE TABLE ");
-    sql.append(metaData.getName().getLocalPart());
+    sql.append(metaData.getTypeName());
     sql.append(" (");
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {
@@ -175,25 +206,6 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     refreshMetaData("");
   }
 
-  public static void appendString(final StringBuffer buffer, final Object value) {
-
-    if (value == null) {
-      buffer.append("''");
-    } else {
-      Class<?> valueClass = value.getClass();
-      if (Geometry.class.isAssignableFrom(valueClass)) {
-        GeometryAttribute.appendString(buffer, value);
-      } else if (Number.class.isAssignableFrom(valueClass)) {
-        NumberAttribute.appendString(buffer, value);
-      } else if (Date.class.isAssignableFrom(valueClass)) {
-        DateTimeAttribute.appendString(buffer, value);
-      } else {
-        StringAttribute.appendString(buffer, value);
-      }
-    }
-
-  }
-
   public FusionTablesDataObjectWriter createWriter() {
     final FusionTablesDataObjectWriter writer = new FusionTablesDataObjectWriter(
       this);
@@ -206,6 +218,37 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
       || object.getState() == DataObjectState.Modified) {
       object.setState(DataObjectState.Deleted);
       getWriter().write(object);
+    }
+  }
+
+  protected HttpResponse executePostQuery(final CharSequence sql) {
+    try {
+      final HttpTransport transport = GoogleTransport.create();
+      final GoogleHeaders headers = (GoogleHeaders)transport.defaultHeaders;
+      headers.setApplicationName("fusiontables");
+      headers.gdataVersion = "2";
+
+      final ClientLogin authenticator = new ClientLogin();
+      authenticator.authTokenType = "fusiontables";
+      authenticator.username = username;
+      authenticator.password = password;
+      authenticator.authenticate().setAuthorizationHeader(transport);
+      final HttpRequest request = transport.buildPostRequest();
+      final GenericUrl url = new GenericUrl(SERVICE_URL);
+      request.url = url;
+
+      final Map<String, Object> data = new LinkedHashMap<String, Object>();
+      data.put("sql", sql);
+
+      final UrlEncodedContent content = new UrlEncodedContent();
+      content.data = data;
+      request.content = content;
+      final HttpResponse response = request.execute();
+      return response;
+    } catch (final UnsupportedEncodingException e) {
+      throw new RuntimeException("Unable to encode query " + sql, e);
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to invoke query " + sql, e);
     }
   }
 
@@ -235,40 +278,10 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  protected HttpResponse executePostQuery(final CharSequence sql) {
-    try {
-      final HttpTransport transport = GoogleTransport.create();
-      final GoogleHeaders headers = (GoogleHeaders)transport.defaultHeaders;
-      headers.setApplicationName("fusiontables");
-      headers.gdataVersion = "2";
-
-      final ClientLogin authenticator = new ClientLogin();
-      authenticator.authTokenType = "fusiontables";
-      authenticator.username = username;
-      authenticator.password = password;
-      authenticator.authenticate().setAuthorizationHeader(transport);
-      final HttpRequest request = transport.buildPostRequest();
-      final GenericUrl url = new GenericUrl(SERVICE_URL);
-      request.url = url;
-
-      Map<String, Object> data = new LinkedHashMap<String, Object>();
-      data.put("sql", sql);
-
-      UrlEncodedContent content = new UrlEncodedContent();
-      content.data = data;
-      request.content = content;
-      final HttpResponse response = request.execute();
-      return response;
-    } catch (final UnsupportedEncodingException e) {
-      throw new RuntimeException("Unable to encode query " + sql, e);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to invoke query " + sql, e);
-    }
-  }
-
   private List<Attribute> getAttributes(final String tableId) {
     final List<Attribute> attributes = new ArrayList<Attribute>();
-    final Reader<Map<String, Object>> reader = createMapReader("DESCRIBE " + tableId);
+    final Reader<Map<String, Object>> reader = createMapReader("DESCRIBE "
+      + tableId);
     attributes.add(new NumberAttribute("rowid"));
     for (final Map<String, Object> map : reader) {
       final String name = (String)map.get("name");
@@ -294,22 +307,22 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return attributes;
   }
 
-  protected String getLoadSql(final QName typeName) {
-    String sql = typeLoadSql.get(typeName);
+  protected String getLoadSql(final String typePath) {
+    String sql = typeLoadSql.get(typePath);
     if (sql == null) {
-      final DataObjectMetaData metaData = getMetaData(typeName);
+      final DataObjectMetaData metaData = getMetaData(typePath);
       if (metaData == null) {
         return null;
       } else {
         if (metaData.getIdAttributeIndex() == -1) {
-          throw new IllegalArgumentException(typeName
+          throw new IllegalArgumentException(typePath
             + " does not have a primary key");
         }
 
         final String idAttributeName = metaData.getIdAttributeName();
 
         final StringBuffer sqlBuffer = new StringBuffer();
-        final String tableId = getTableId(typeName);
+        final String tableId = getTableId(typePath);
         sqlBuffer.append("SELECT ");
         addColumnNames(sqlBuffer, metaData);
         sqlBuffer.append(" FROM " + tableId);
@@ -319,7 +332,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
         sqlBuffer.append(" = ");
 
         sql = sqlBuffer.toString();
-        typeLoadSql.put(typeName, sql);
+        typeLoadSql.put(typePath, sql);
       }
     }
     return sql;
@@ -329,20 +342,18 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     return password;
   }
 
-  protected QName getTypeName(final QName typeName) {
-    QName localTypeName = new QName(typeName.getLocalPart());
-    return localTypeName;
+  public String getTableId(final String typePath) {
+    return typePathTableIdMap.get(getTypeName(typePath));
   }
 
-  public String getTableId(final QName typeName) {
-    return typeNameTableIdMap.get(getTypeName(typeName));
+  protected String getTypeName(final String path) {
+    final String localTypeName = PathUtil.getName(path);
+    return localTypeName;
   }
 
   public String getUsername() {
     return username;
   }
-
-  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
   public synchronized FusionTablesDataObjectWriter getWriter() {
     FusionTablesDataObjectWriter writer = getSharedAttribute("writer");
@@ -363,12 +374,12 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public DataObject load(final QName typeName, final Object id) {
-    final String sql = getLoadSql(typeName);
+  public DataObject load(final String typePath, final Object id) {
+    final String sql = getLoadSql(typePath);
     if (sql == null) {
       return null;
     } else {
-      final DataObjectMetaData metaData = getMetaData(typeName);
+      final DataObjectMetaData metaData = getMetaData(typePath);
       final DataObjectReader reader = createDataObjectReader(metaData, sql
         + "'" + id.toString().replaceAll("'", "''") + "'");
       try {
@@ -388,25 +399,25 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
   @Override
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    final Map<QName, DataObjectMetaData> metaDataMap) {
-    final List<QName> typeNames = new ArrayList<QName>();
-    final String namespace = schema.getName();
+    final Map<String, DataObjectMetaData> metaDataMap) {
+    final List<String> typePaths = new ArrayList<String>();
+    final String namespace = schema.getPath();
     final Reader<Map<String, Object>> reader = createMapReader("SHOW TABLES");
     for (final Map<String, Object> map : reader) {
       final String tableId = (String)map.get("table id");
       final String tableName = (String)map.get("name");
-      final QName typeName = new QName(namespace, tableName);
-      tableIdTypeNameMap.put(tableId, typeName);
-      typeNameTableIdMap.put(typeName, tableId);
-      typeNames.add(typeName);
+      final String typePath = PathUtil.getPath(namespace, tableName);
+      tableIdTypeNameMap.put(tableId, typePath);
+      typePathTableIdMap.put(typePath, tableId);
+      typePaths.add(typePath);
     }
-    for (final QName typeName : typeNames) {
-      final String tableId = getTableId(typeName);
+    for (final String typePath : typePaths) {
+      final String tableId = getTableId(typePath);
       final List<Attribute> attributes = getAttributes(tableId);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
-        typeName, attributes);
+        typePath, attributes);
       metaData.setIdAttributeName("rowid");
-      metaDataMap.put(typeName, metaData);
+      metaDataMap.put(typePath, metaData);
     }
   }
 
@@ -415,39 +426,33 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     schemaMap.put("", new DataObjectStoreSchema(this, ""));
   }
 
-  public Reader<DataObject> query(final QName typeName,
+  public Reader<DataObject> query(
+    final String typePath,
     final BoundingBox boundingBox) {
-    BoundingBox envelope = boundingBox.convert(GeometryFactory.getFactory(4326));
-    final DataObjectMetaData metaData = getMetaData(typeName);
+    final BoundingBox envelope = boundingBox.convert(GeometryFactory.getFactory(4326));
+    final DataObjectMetaData metaData = getMetaData(typePath);
     final String where = "ST_INTERSECTS(" + metaData.getGeometryAttributeName()
       + ", RECTANGLE(LATLNG(" + envelope.getMinY() + "," + envelope.getMinX()
       + "), LATLNG(" + envelope.getMaxY() + "," + envelope.getMaxX() + ")))";
-    Query query = new Query(typeName);
+    final Query query = new Query(typePath);
     query.setWhereClause(where);
     return query(query);
   }
 
-  public Reader<DataObject> query(final QName typeName, final Geometry geometry) {
+  public Reader<DataObject> query(final String typePath, final Geometry geometry) {
     final Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
       4326);
-    return query(typeName, new BoundingBox(projectedGeometry));
+    return query(typePath, new BoundingBox(projectedGeometry));
   }
 
-  @Override
-  protected AbstractIterator<DataObject> createIterator(Query query,
-    Map<String, Object> properties) {
-    // TODO Auto-generated method stub
-    return super.createIterator(query, properties);
-  }
-
-  // public Reader<DataObject> query(QName typeName, String where,
+  // public Reader<DataObject> query(String path, String where,
   // Object... arguments) {
-  // final DataObjectMetaData metaData = getMetaData(typeName);
+  // final DataObjectMetaData metaData = getMetaData(typePath);
   // final StringBuffer sql = new StringBuffer();
   // sql.append("SELECT ");
   // addColumnNames(sql, metaData);
   // sql.append(" FROM ");
-  // final String tableId = getTableId(typeName);
+  // final String tableId = getTableId(typePath);
   // sql.append(tableId);
   // if (where == null) {
   // if (arguments.length > 0) {

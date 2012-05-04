@@ -10,8 +10,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.zip.ZipFile;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -65,7 +63,7 @@ public class OsnReader implements DataObjectReader {
    * Get an attribute definition from the iterator.
    * 
    * @param dataObject
-   * @param typeName TODO
+   * @param typePath TODO
    * @param iterator The OsnIterator.
    * @return The attribute definition.
    * @throws IOException If an I/O error occurs.
@@ -90,12 +88,12 @@ public class OsnReader implements DataObjectReader {
   }
 
   private Object getDataObject() {
-    final QName typeName = osnIterator.getQNameValue();
-    final OsnConverter converter = converters.getConverter(typeName);
+    final String typePath = osnIterator.getPathValue();
+    final OsnConverter converter = converters.getConverter(typePath);
     if (converter != null) {
       return converter.read(osnIterator);
     } else {
-      final DataObjectMetaData type = metaDataFactory.getMetaData(typeName);
+      final DataObjectMetaData type = metaDataFactory.getMetaData(typePath);
       final DataObject dataObject = factory.createDataObject(type);
       while (osnIterator.next() != OsnIterator.END_OBJECT) {
         addAttribute(dataObject);
@@ -238,10 +236,9 @@ public class OsnReader implements DataObjectReader {
    */
   private boolean skipToFirstDataObject() throws IOException {
     if (osnIterator.next() == OsnIterator.START_DEFINITION) {
-      final QName typeName = osnIterator.getQNameValue();
-      final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)metaDataFactory.getMetaData(typeName);
-      final DataObjectMetaData spatialDataSetType = metaDataFactory.getMetaData(new QName(
-        "SpatialDataSet"));
+      final String typePath = osnIterator.getPathValue();
+      final DataObjectMetaDataImpl type = (DataObjectMetaDataImpl)metaDataFactory.getMetaData(typePath);
+      final DataObjectMetaData spatialDataSetType = metaDataFactory.getMetaData("/SpatialDataSet");
       if (type != null && type.isInstanceOf(spatialDataSetType)) {
         final String oiName = osnIterator.nextAttributeName();
 

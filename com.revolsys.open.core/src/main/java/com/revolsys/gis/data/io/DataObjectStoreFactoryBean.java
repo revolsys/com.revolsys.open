@@ -14,18 +14,27 @@ public class DataObjectStoreFactoryBean extends
 
   private Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
-  public Map<String, Object> getConfig() {
-    return config;
-  }
-
   @Override
   protected DataObjectStore createInstance() throws Exception {
-    DataObjectStore dataObjectStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
+    final DataObjectStore dataObjectStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
     JavaBeanUtil.setProperties(dataObjectStore, properties);
     dataObjectStore.initialize();
     return dataObjectStore;
   }
 
+  @Override
+  protected void destroyInstance(final DataObjectStore dataObjectStore)
+    throws Exception {
+    dataObjectStore.close();
+    properties = null;
+    config = null;
+  }
+
+  public Map<String, Object> getConfig() {
+    return config;
+  }
+
+  @Override
   public Class<?> getObjectType() {
     return DataObjectStore.class;
   }
@@ -44,13 +53,5 @@ public class DataObjectStoreFactoryBean extends
 
   public void setUrl(final String url) {
     config.put("url", url);
-  }
-
-  @Override
-  protected void destroyInstance(DataObjectStore dataObjectStore)
-    throws Exception {
-    dataObjectStore.close();
-    properties = null;
-    config = null;
   }
 }

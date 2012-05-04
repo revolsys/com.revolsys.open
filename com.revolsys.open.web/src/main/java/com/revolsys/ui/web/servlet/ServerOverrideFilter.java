@@ -11,15 +11,16 @@ public class ServerOverrideFilter extends SavedRequestFilter {
 
   private String serverUrl;
 
+  @Override
   public void destroy() {
   }
 
   @Override
   protected void doFilterInternal(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    FilterChain filterChain) throws ServletException, IOException {
-    HttpServletRequest overrideRequest = new ServerOverrideHttpServletRequest(
+    final HttpServletRequest request,
+    final HttpServletResponse response,
+    final FilterChain filterChain) throws ServletException, IOException {
+    final HttpServletRequest overrideRequest = new ServerOverrideHttpServletRequest(
       serverUrl, request);
     super.doFilterInternal(overrideRequest, response, filterChain);
   }

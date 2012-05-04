@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -32,9 +30,9 @@ public class Query implements Cloneable {
 
   private String sql;
 
-  private QName typeName;
+  private String typeName;
 
-  private QName typeNameAlias;
+  private String typePathAlias;
 
   private String whereClause;
 
@@ -53,60 +51,56 @@ public class Query implements Cloneable {
   public Query() {
   }
 
-  public void setLockResults(boolean lockResults) {
-    this.lockResults = lockResults;
-  }
-
-  public boolean isLockResults() {
-    return lockResults;
-  }
-
   public Query(final DataObjectMetaData metaData) {
-    this(metaData.getName());
+    this(metaData.getPath());
     this.metaData = metaData;
   }
 
   public Query(final DataObjectMetaData metaData, final String sql) {
-    this(metaData.getName(), sql);
+    this(metaData.getPath(), sql);
     this.metaData = metaData;
   }
 
   public Query(final DataObjectMetaData metaData, final String sql,
     final List<Object> parameters) {
-    this(metaData.getName(), sql, parameters);
+    this(metaData.getPath(), sql, parameters);
     this.metaData = metaData;
   }
 
   public Query(final DataObjectMetaData metaData, final String sql,
     final Object... parameters) {
-    this(metaData.getName(), sql, Arrays.asList(parameters));
+    this(metaData.getPath(), sql, Arrays.asList(parameters));
     this.metaData = metaData;
   }
 
-  public Query(final DataObjectStore dataStore, final QName typeName) {
-    this(dataStore.getMetaData(typeName));
+  public Query(final DataObjectStore dataStore, final String path) {
+    this(dataStore.getMetaData(path));
   }
 
-  public Query(final QName typeName) {
-    this(typeName, null, Collections.emptyList());
+  public Query(final String typePath) {
+    this(typePath, null, Collections.emptyList());
   }
 
-  public Query(final QName typeName, final String query) {
-    this(typeName, query, Collections.emptyList());
+  public Query(final String typePath, final String query) {
+    this(typePath, query, Collections.emptyList());
   }
 
-  public Query(final QName typeName, final String query,
+  public Query(final String typePath, final String query,
     final List<Object> parameters) {
-    this.typeName = typeName;
+    this.typeName = typePath;
     this.sql = query;
     if (parameters != null) {
       this.parameters.addAll(parameters);
     }
   }
 
-  public Query(final QName typeName, final String query,
+  public Query(final String typePath, final String query,
     final Object... parameters) {
-    this(typeName, query, Arrays.asList(parameters));
+    this(typePath, query, Arrays.asList(parameters));
+  }
+
+  public void addOrderBy(final String column, final boolean ascending) {
+    orderBy.put(column, ascending);
   }
 
   public void addParameter(final Object value) {
@@ -192,16 +186,20 @@ public class Query implements Cloneable {
     return sql;
   }
 
-  public QName getTypeName() {
-    return typeName;
+  public String getTypeNameAlias() {
+    return typePathAlias;
   }
 
-  public QName getTypeNameAlias() {
-    return typeNameAlias;
+  public String getTypeName() {
+    return typeName;
   }
 
   public String getWhereClause() {
     return whereClause;
+  }
+
+  public boolean isLockResults() {
+    return lockResults;
   }
 
   public void setAttributeNames(final List<String> attributeNames) {
@@ -228,13 +226,17 @@ public class Query implements Cloneable {
     this.geometry = geometry;
   }
 
+  public void setLockResults(final boolean lockResults) {
+    this.lockResults = lockResults;
+  }
+
   public void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
   }
 
   public void setOrderByColumns(final List<String> orderBy) {
     this.orderBy.clear();
-    for (String column : orderBy) {
+    for (final String column : orderBy) {
       this.orderBy.put(column, Boolean.TRUE);
     }
   }
@@ -257,12 +259,12 @@ public class Query implements Cloneable {
     this.sql = sql;
   }
 
-  public void setTypeName(final QName typeName) {
-    this.typeName = typeName;
+  public void setTypeNameAlias(final String typePathAlias) {
+    this.typePathAlias = typePathAlias;
   }
 
-  public void setTypeNameAlias(final QName typeNameAlias) {
-    this.typeNameAlias = typeNameAlias;
+  public void setTypeName(final String typeName) {
+    this.typeName = typeName;
   }
 
   public void setWhereClause(final String whereClause) {
@@ -282,9 +284,9 @@ public class Query implements Cloneable {
       string.append(" FROM ");
       if (fromClause == null) {
         if (typeName != null) {
-          string.append(JdbcUtils.getTableName(typeName));
+          string.append(JdbcUtils.getQualifiedTableName(typeName));
         } else if (metaData != null) {
-          string.append(JdbcUtils.getTableName(metaData.getName()));
+          string.append(JdbcUtils.getQualifiedTableName(metaData.getPath()));
         }
       } else {
         string.append(fromClause);
@@ -295,12 +297,12 @@ public class Query implements Cloneable {
       }
       if (!orderBy.isEmpty()) {
         string.append(" ORDER BY ");
-        for (Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+        for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
           .iterator(); iterator.hasNext();) {
-          Entry<String, Boolean> entry = iterator.next();
-          String column = entry.getKey();
+          final Entry<String, Boolean> entry = iterator.next();
+          final String column = entry.getKey();
           string.append(column);
-          Boolean ascending = entry.getValue();
+          final Boolean ascending = entry.getValue();
           if (!ascending) {
             string.append(" DESC");
           }
@@ -317,9 +319,5 @@ public class Query implements Cloneable {
       string.append(parameters);
     }
     return string.toString();
-  }
-
-  public void addOrderBy(String column, boolean ascending) {
-    orderBy.put(column, ascending);
   }
 }

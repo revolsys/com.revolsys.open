@@ -34,12 +34,12 @@ public class BoundingBox extends Envelope {
   }
 
   public static boolean intersects(
-    double p1X,
-    double p1Y,
-    double p2X,
-    double p2Y,
-    double qX,
-    double qY) {
+    final double p1X,
+    final double p1Y,
+    final double p2X,
+    final double p2Y,
+    final double qX,
+    final double qY) {
     if (((qX >= (p1X < p2X ? p1X : p2X)) && (qX <= (p1X > p2X ? p1X : p2X)))
       && ((qY >= (p1Y < p2Y ? p1Y : p2Y)) && (qY <= (p1Y > p2Y ? p1Y : p2Y)))) {
       return true;
@@ -49,14 +49,14 @@ public class BoundingBox extends Envelope {
   }
 
   public static boolean intersects(
-    double p1X,
-    double p1Y,
-    double p2X,
-    double p2Y,
-    double q1X,
-    double q1Y,
-    double q2X,
-    double q2Y) {
+    final double p1X,
+    final double p1Y,
+    final double p2X,
+    final double p2Y,
+    final double q1X,
+    final double q1Y,
+    final double q2X,
+    final double q2Y) {
     double minp = Math.min(p1X, p2X);
     double maxq = Math.max(q1X, q2X);
     if (minp > maxq) {

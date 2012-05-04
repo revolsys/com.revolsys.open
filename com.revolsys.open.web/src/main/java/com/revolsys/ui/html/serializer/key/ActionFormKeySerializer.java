@@ -31,20 +31,30 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
 
   private HtmlUiBuilder<?> uiBuilder;
 
+  private Expression enabledExpression;
+
+  public Map<String, String> getParameterNameMap() {
+    return parameterNameMap;
+  }
+
+  public List<String> getParameterNames() {
+    return parameterNames;
+  }
+
   public void serialize(final XmlWriter out, final Object object) {
     try {
-      Map<String, Object> parameters = new HashMap<String, Object>();
-      for (String name : parameterNames) {
-        Object value = JavaBeanUtil.getValue(object, name);
+      final Map<String, Object> parameters = new HashMap<String, Object>();
+      for (final String name : parameterNames) {
+        final Object value = JavaBeanUtil.getValue(object, name);
         parameters.put(name, value);
       }
-      for (Entry<String, String> entry : parameterNameMap.entrySet()) {
-        String parameterName = entry.getKey();
-        Object value = JavaBeanUtil.getValue(object, entry.getValue());
+      for (final Entry<String, String> entry : parameterNameMap.entrySet()) {
+        final String parameterName = entry.getKey();
+        final Object value = JavaBeanUtil.getValue(object, entry.getValue());
         parameters.put(parameterName, value);
       }
       if (enabledExpression != null) {
-        StandardEvaluationContext evaluationContext = new StandardEvaluationContext(
+        final StandardEvaluationContext evaluationContext = new StandardEvaluationContext(
           object);
         if (!ExpressionUtils.evaluateAsBoolean(enabledExpression,
           evaluationContext)) {
@@ -54,14 +64,14 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
       final Object id = uiBuilder.getIdValue(object);
       parameters.put(uiBuilder.getIdParameterName(), id);
 
-      String actionUrl = uiBuilder.getPageUrl(getName(), parameters);
+      final String actionUrl = uiBuilder.getPageUrl(getName(), parameters);
       if (actionUrl != null) {
         out.startTag(HtmlUtil.FORM);
         out.attribute(HtmlUtil.ATTR_ACTION, actionUrl);
         out.attribute(HtmlUtil.ATTR_METHOD, "post");
-        String lowerLabel = getLabel().toLowerCase();
-        HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-        for (String parameterName : Arrays.asList("plain", "htmlCss")) {
+        final String lowerLabel = getLabel().toLowerCase();
+        final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+        for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
           HtmlUtil.serializeHiddenInput(out, parameterName,
             request.getParameter(parameterName));
         }
@@ -69,34 +79,24 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
           getLabel(), lowerLabel);
         out.endTag(HtmlUtil.FORM);
       }
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       LoggerFactory.getLogger(getClass()).error("Unable to serialize", t);
     }
+  }
+
+  public void setEnabledExpression(final String enabledExpression) {
+    this.enabledExpression = new SpelExpressionParser().parseExpression(enabledExpression);
   }
 
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     this.uiBuilder = uiBuilder;
   }
 
-  public List<String> getParameterNames() {
-    return parameterNames;
-  }
-
-  public void setParameterNames(List<String> parameterNames) {
-    this.parameterNames = parameterNames;
-  }
-
-  public Map<String, String> getParameterNameMap() {
-    return parameterNameMap;
-  }
-
-  public void setParameterNameMap(Map<String, String> parameterNameMap) {
+  public void setParameterNameMap(final Map<String, String> parameterNameMap) {
     this.parameterNameMap = parameterNameMap;
   }
 
-  private Expression enabledExpression;
-
-  public void setEnabledExpression(String enabledExpression) {
-    this.enabledExpression = new SpelExpressionParser().parseExpression(enabledExpression);
+  public void setParameterNames(final List<String> parameterNames) {
+    this.parameterNames = parameterNames;
   }
 }

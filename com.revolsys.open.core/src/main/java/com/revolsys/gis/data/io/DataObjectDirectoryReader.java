@@ -3,8 +3,6 @@ package com.revolsys.gis.data.io;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.data.model.DataObject;
@@ -17,7 +15,7 @@ import com.revolsys.io.Reader;
 public class DataObjectDirectoryReader extends
   AbstractDirectoryReader<DataObject> implements DataObjectMetaDataFactory {
 
-  private final Map<QName, DataObjectMetaData> typeNameMetaDataMap = new HashMap<QName, DataObjectMetaData>();
+  private final Map<String, DataObjectMetaData> typePathMetaDataMap = new HashMap<String, DataObjectMetaData>();
 
   public DataObjectDirectoryReader() {
   }
@@ -25,8 +23,8 @@ public class DataObjectDirectoryReader extends
   protected void addMetaData(final DataObjectReader reader) {
     final DataObjectMetaData metaData = reader.getMetaData();
     if (metaData != null) {
-      final QName typeName = metaData.getName();
-      typeNameMetaDataMap.put(typeName, metaData);
+      final String path = metaData.getPath();
+      typePathMetaDataMap.put(path, metaData);
     }
   }
 
@@ -42,8 +40,8 @@ public class DataObjectDirectoryReader extends
     return reader;
   }
 
-  public DataObjectMetaData getMetaData(final QName typeName) {
-    final DataObjectMetaData metaData = typeNameMetaDataMap.get(typeName);
+  public DataObjectMetaData getMetaData(final String path) {
+    final DataObjectMetaData metaData = typePathMetaDataMap.get(path);
     return metaData;
   }
 

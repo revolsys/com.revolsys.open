@@ -55,7 +55,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
 
       }
       uiBuilder.serializeLink(out, currentObject, key, pageName, parameterKeys);
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       Logger.getLogger(getClass()).error("Unable to serialize " + pageName, e);
     }
   }

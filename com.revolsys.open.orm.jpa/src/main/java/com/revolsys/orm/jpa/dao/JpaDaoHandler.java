@@ -15,7 +15,6 @@
  */
 package com.revolsys.orm.jpa.dao;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -40,13 +39,13 @@ import com.revolsys.orm.core.NamedQueryParameter;
 
 public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
   /** The class definition of the DataAcessObject interface. */
-  private Class<?> daoInterface;
+  private final Class<?> daoInterface;
 
   /** The class definition of the entities persisted by this Data Access Object. */
-  private Class<?> objectClass;
+  private final Class<?> objectClass;
 
   /** The class name of the entities persisted by this Data Access Object. */
-  private String objectClassName;
+  private final String objectClassName;
 
   public JpaDaoHandler(final Class<?> daoInterface, final Class<?> objectClass) {
     this.daoInterface = daoInterface;
@@ -60,9 +59,9 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * the persistent storage and any changes to them will not be saved.
    */
   public void clearCache() {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager entityManager)
+      public Object doInJpa(final EntityManager entityManager)
         throws PersistenceException {
         entityManager.clear();
         return null;
@@ -70,15 +69,34 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
     });
   }
 
+  public Object delete(final String queryName, final Object[] args) {
+    final JpaTemplate jpaTemplate = getJpaTemplate();
+    return jpaTemplate.execute(new JpaCallback() {
+      public Object doInJpa(final EntityManager em) throws PersistenceException {
+        final Query query = em.createNamedQuery(objectClassName + "."
+          + queryName);
+        for (int i = 0; i < args.length; i++) {
+          final Object arg = args[i];
+          query.setParameter(i + 1, arg);
+        }
+        try {
+          return query.executeUpdate();
+        } catch (final NoResultException e) {
+          return null;
+        }
+      };
+    });
+  }
+
   public Object evict(final Object object) {
 
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     return jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager entityManager)
+      public Object doInJpa(final EntityManager entityManager)
         throws PersistenceException {
-        Object delegate = entityManager.getDelegate();
+        final Object delegate = entityManager.getDelegate();
         if (delegate instanceof Session) {
-          Session session = (Session)delegate;
+          final Session session = (Session)delegate;
           session.evict(object);
         }
         return null;
@@ -88,80 +106,33 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
 
   @SuppressWarnings("unchecked")
   public List<Object> find(final String queryName, final Object... args) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     return jpaTemplate.findByNamedQuery(
       objectClass.getName() + "." + queryName, args);
-  }
-
-  @SuppressWarnings("unchecked")
-  public Iterator<Object> iterate(final Method method, final String queryName,
-    final Object... args) {
-    final String fullQueryName = objectClass.getName() + "." + queryName;
-    JpaTemplate jpaTemplate = getJpaTemplate();
-    return (Iterator<Object>)jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager entityManager)
-        throws PersistenceException {
-        Object delegate = entityManager.getDelegate();
-        if (delegate instanceof Session) {
-          Session session = (Session)delegate;
-          org.hibernate.Query query = session.getNamedQuery(fullQueryName);
-          Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-          int paramIndex = 0;
-          for (int i = 0; i < args.length; i++) {
-            Object value = args[i];
-            boolean found = false;
-            for (Annotation annotation : parameterAnnotations[i]) {
-              if (annotation.annotationType().equals(NamedQueryParameter.class)) {
-                String parameterName = ((NamedQueryParameter)annotation).value();
-                if (value instanceof Collection) {
-                  query.setParameterList(parameterName, (Collection)value);
-                } else if (value instanceof Object[]) {
-                  query.setParameterList(parameterName, (Object[])value);
-                } else {
-                  query.setParameter(parameterName, value);
-                }
-                found = true;
-              }
-
-            }
-
-            if (!found) {
-              query.setParameter(paramIndex++, value);
-            }
-          }
-          return query.iterate();
-        } else {
-          Query queryObject = entityManager.createNamedQuery(queryName);
-          for (int i = 0; i < args.length; i++) {
-            queryObject.setParameter(i + 1, args[i]);
-          }
-          return queryObject.getResultList().iterator();
-        }
-      }
-    });
   }
 
   /**
    * Flush all changes to the persistent storage.
    */
   public void flush() {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     jpaTemplate.flush();
   }
 
   public Object get(final String queryName, final Object[] args) {
 
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     return jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager em) throws PersistenceException {
-        Query query = em.createNamedQuery(objectClassName + "." + queryName);
+      public Object doInJpa(final EntityManager em) throws PersistenceException {
+        final Query query = em.createNamedQuery(objectClassName + "."
+          + queryName);
         for (int i = 0; i < args.length; i++) {
-          Object arg = args[i];
+          final Object arg = args[i];
           query.setParameter(i + 1, arg);
         }
         try {
           return query.getSingleResult();
-        } catch (NoResultException e) {
+        } catch (final NoResultException e) {
           return null;
         }
       };
@@ -169,23 +140,26 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
   }
 
   public String getQueryName(final String methodName) {
-    String queryName = methodName.replaceFirst("\\A(get|page|find|iterate)", "");
+    final String queryName = methodName.replaceFirst(
+      "\\A(get|page|find|iterate)", "");
     return objectClassName + "." + queryName;
   }
 
   @SuppressWarnings("unchecked")
-  public Object invoke(final Object proxy, final Method method,
+  public Object invoke(
+    final Object proxy,
+    final Method method,
     final Object[] args) throws Throwable {
-    String methodName = method.getName();
+    final String methodName = method.getName();
     try {
-      Class<?>[] paramTypes = method.getParameterTypes();
-      Method localMethod = getClass().getMethod(methodName, paramTypes);
+      final Class<?>[] paramTypes = method.getParameterTypes();
+      final Method localMethod = getClass().getMethod(methodName, paramTypes);
       return localMethod.invoke(this, args);
-    } catch (InvocationTargetException e) {
+    } catch (final InvocationTargetException e) {
       throw e.getCause();
-    } catch (SecurityException e) {
+    } catch (final SecurityException e) {
       throw e;
-    } catch (NoSuchMethodException e) {
+    } catch (final NoSuchMethodException e) {
       if (methodName.equals("removeAll")) {
         return removeAll((Collection<Object>)args[0]);
       } else if (methodName.startsWith("remove")) {
@@ -216,6 +190,56 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
 
   }
 
+  @SuppressWarnings("unchecked")
+  public Iterator<Object> iterate(
+    final Method method,
+    final String queryName,
+    final Object... args) {
+    final String fullQueryName = objectClass.getName() + "." + queryName;
+    final JpaTemplate jpaTemplate = getJpaTemplate();
+    return (Iterator<Object>)jpaTemplate.execute(new JpaCallback() {
+      public Object doInJpa(final EntityManager entityManager)
+        throws PersistenceException {
+        final Object delegate = entityManager.getDelegate();
+        if (delegate instanceof Session) {
+          final Session session = (Session)delegate;
+          final org.hibernate.Query query = session.getNamedQuery(fullQueryName);
+          final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+          int paramIndex = 0;
+          for (int i = 0; i < args.length; i++) {
+            final Object value = args[i];
+            boolean found = false;
+            for (final Annotation annotation : parameterAnnotations[i]) {
+              if (annotation.annotationType().equals(NamedQueryParameter.class)) {
+                final String parameterName = ((NamedQueryParameter)annotation).value();
+                if (value instanceof Collection) {
+                  query.setParameterList(parameterName, (Collection)value);
+                } else if (value instanceof Object[]) {
+                  query.setParameterList(parameterName, (Object[])value);
+                } else {
+                  query.setParameter(parameterName, value);
+                }
+                found = true;
+              }
+
+            }
+
+            if (!found) {
+              query.setParameter(paramIndex++, value);
+            }
+          }
+          return query.iterate();
+        } else {
+          final Query queryObject = entityManager.createNamedQuery(queryName);
+          for (int i = 0; i < args.length; i++) {
+            queryObject.setParameter(i + 1, args[i]);
+          }
+          return queryObject.getResultList().iterator();
+        }
+      }
+    });
+  }
+
   /**
    * Load the object with the ID from persistent storage.
    * 
@@ -223,8 +247,8 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * @return The object.
    */
   public Object load(final Object id) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
-    Object object = jpaTemplate.find(objectClass, (Serializable)id);
+    final JpaTemplate jpaTemplate = getJpaTemplate();
+    final Object object = jpaTemplate.find(objectClass, id);
     return object;
   }
 
@@ -236,8 +260,8 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * @throws ObjectNotFoundException If the object was not found.
    */
   public Object loadAndLock(final Object id) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
-    Object object = jpaTemplate.find(objectClass, (Serializable)id);
+    final JpaTemplate jpaTemplate = getJpaTemplate();
+    final Object object = jpaTemplate.find(objectClass, id);
     lockAndRefresh(object);
     return object;
   }
@@ -252,9 +276,9 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    *           found.
    */
   public Object lock(final Object object) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     return jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager entityManager)
+      public Object doInJpa(final EntityManager entityManager)
         throws PersistenceException {
         entityManager.lock(object, LockModeType.WRITE);
         return null;
@@ -279,7 +303,7 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
   }
 
   public Object merge(final Object object) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     jpaTemplate.merge(object);
     return null;
   }
@@ -292,7 +316,7 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * @return The ID of the object in the persistent storage.
    */
   public Object persist(final Object object) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     jpaTemplate.persist(object);
     return null;
   }
@@ -316,7 +340,7 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * @throws ObjectNotFoundException If the object was not found.
    */
   public Object remove(final Long id) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     jpaTemplate.remove(load(id));
     return null;
 
@@ -329,7 +353,7 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * @return null.
    */
   public Object remove(final Object object) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     jpaTemplate.remove(object);
     return null;
   }
@@ -341,43 +365,34 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
    * @return null.
    */
   public Object removeAll(final Collection<Object> objects) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
-    for (Object object : objects) {
+    final JpaTemplate jpaTemplate = getJpaTemplate();
+    for (final Object object : objects) {
       jpaTemplate.remove(object);
     }
     return null;
   }
 
-  /**
-   * Save the values of an updated object in the persistent storage.
-   * 
-   * @param object The object to update.
-   * @return null.
-   */
-  public Object update(final Object object) {
-    getJpaTemplate().merge(object);
-    return null;
-  }
-
-  public Object update(final Method method, final String queryName,
+  public Object update(
+    final Method method,
+    final String queryName,
     final Object[] args) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
+    final JpaTemplate jpaTemplate = getJpaTemplate();
     return jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager entityManager)
+      public Object doInJpa(final EntityManager entityManager)
         throws PersistenceException {
-        String fullQueryName = objectClassName + "." + queryName;
-        Object delegate = entityManager.getDelegate();
+        final String fullQueryName = objectClassName + "." + queryName;
+        final Object delegate = entityManager.getDelegate();
         if (delegate instanceof Session) {
-          Session session = (Session)delegate;
-          org.hibernate.Query query = session.getNamedQuery(fullQueryName);
-          Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+          final Session session = (Session)delegate;
+          final org.hibernate.Query query = session.getNamedQuery(fullQueryName);
+          final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
           int paramIndex = 0;
           for (int i = 0; i < args.length; i++) {
-            Object value = args[i];
+            final Object value = args[i];
             boolean found = false;
-            for (Annotation annotation : parameterAnnotations[i]) {
+            for (final Annotation annotation : parameterAnnotations[i]) {
               if (annotation.annotationType().equals(NamedQueryParameter.class)) {
-                String parameterName = ((NamedQueryParameter)annotation).value();
+                final String parameterName = ((NamedQueryParameter)annotation).value();
                 if (value instanceof Collection) {
                   query.setParameterList(parameterName, (Collection)value);
                 } else if (value instanceof Object[]) {
@@ -394,16 +409,16 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
               query.setParameter(paramIndex++, value);
             }
           }
-          return (Integer)query.executeUpdate();
+          return query.executeUpdate();
         } else {
-          Query query = entityManager.createNamedQuery(fullQueryName);
+          final Query query = entityManager.createNamedQuery(fullQueryName);
           for (int i = 0; i < args.length; i++) {
-            Object arg = args[i];
+            final Object arg = args[i];
             query.setParameter(i + 1, arg);
           }
           try {
-            return (Integer)query.executeUpdate();
-          } catch (NoResultException e) {
+            return query.executeUpdate();
+          } catch (final NoResultException e) {
             return null;
           }
         }
@@ -412,21 +427,14 @@ public class JpaDaoHandler extends JpaDaoSupport implements InvocationHandler {
     });
   }
 
-  public Object delete(final String queryName, final Object[] args) {
-    JpaTemplate jpaTemplate = getJpaTemplate();
-    return jpaTemplate.execute(new JpaCallback() {
-      public Object doInJpa(EntityManager em) throws PersistenceException {
-        Query query = em.createNamedQuery(objectClassName + "." + queryName);
-        for (int i = 0; i < args.length; i++) {
-          Object arg = args[i];
-          query.setParameter(i + 1, arg);
-        }
-        try {
-          return (Integer)query.executeUpdate();
-        } catch (NoResultException e) {
-          return null;
-        }
-      };
-    });
+  /**
+   * Save the values of an updated object in the persistent storage.
+   * 
+   * @param object The object to update.
+   * @return null.
+   */
+  public Object update(final Object object) {
+    getJpaTemplate().merge(object);
+    return null;
   }
 }

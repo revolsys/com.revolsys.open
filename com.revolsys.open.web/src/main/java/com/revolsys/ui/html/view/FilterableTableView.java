@@ -39,15 +39,15 @@ public class FilterableTableView extends ElementContainer {
   private Map<String, Element> searchFields;
 
   public FilterableTableView(final KeySerializerTableSerializer model,
-    final String cssClass) {
+    final Map<String, Element> searchFields, final String cssClass) {
     this.model = model;
+    this.searchFields = searchFields;
     this.cssClass = cssClass;
   }
 
   public FilterableTableView(final KeySerializerTableSerializer model,
-    final Map<String, Element> searchFields, final String cssClass) {
+    final String cssClass) {
     this.model = model;
-    this.searchFields = searchFields;
     this.cssClass = cssClass;
   }
 
@@ -64,8 +64,8 @@ public class FilterableTableView extends ElementContainer {
       final ElementContainer searchContainer = new ElementContainer(
         new TableBodyLayout("search", model.getColumnCount()));
       add(searchContainer);
-      for (KeySerializer serializer : model.getSerializers()) {
-        String name = serializer.getName();
+      for (final KeySerializer serializer : model.getSerializers()) {
+        final String name = serializer.getName();
         Element element = searchFields.get(name);
         if (element == null) {
           element = NbspElement.INSTANCE;

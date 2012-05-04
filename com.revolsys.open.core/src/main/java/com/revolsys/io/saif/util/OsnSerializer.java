@@ -35,8 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,13 +52,13 @@ public class OsnSerializer {
 
   private static final String COLLECTION_SCOPE = "collection";
 
-  private static final QName DATE = new QName("Date");
+  private static final String DATE = "/Date";
 
   private static final String DOCUMENT_SCOPE = "document";
 
   private static final Logger LOG = LoggerFactory.getLogger(OsnSerializer.class);
 
-  private static final QName SPATIAL_OBJECT = new QName("SpatialObject");
+  private static final String SPATIAL_OBJECT = "/SpatialObject";
 
   private final OsnConverterRegistry converters;
 
@@ -86,12 +84,11 @@ public class OsnSerializer {
 
   private int size = 0;
 
-  private final QName typeName;
+  private final String path;
 
-  public OsnSerializer(final QName typeName, final File file,
-    final long maxSize, final OsnConverterRegistry converters)
-    throws IOException {
-    this.typeName = typeName;
+  public OsnSerializer(final String path, final File file, final long maxSize,
+    final OsnConverterRegistry converters) throws IOException {
+    this.path = path;
     this.file = file;
     this.maxSize = maxSize;
     this.converters = converters;
@@ -156,7 +153,7 @@ public class OsnSerializer {
         }
         this.scope.removeLast();
       } else if (scope != DOCUMENT_SCOPE
-        && (scope instanceof DataObject || scope instanceof String || scope instanceof QName)) {
+        && (scope instanceof DataObject || scope instanceof String )) {
         endObject();
       } else {
         if (indentEnabled) {
@@ -279,12 +276,12 @@ public class OsnSerializer {
     if (converter == null) {
       if (geometry instanceof Point) {
         if (converter == null) {
-          converter = converters.getConverter("Point");
+          converter = converters.getConverter("/Point");
         }
 
       } else if (geometry instanceof LineString) {
         if (converter == null) {
-          converter = converters.getConverter("Arc");
+          converter = converters.getConverter("/Arc");
         }
       }
     }
@@ -292,11 +289,11 @@ public class OsnSerializer {
   }
 
   public void serialize(final List<Object> list) throws IOException {
-    serializeCollection("List", list);
+    serializeCollection("/List", list);
   }
 
   public void serialize(final Set<Object> set) throws IOException {
-    serializeCollection("Set", set);
+    serializeCollection("/Set", set);
   }
 
   public void serialize(final String string) throws IOException {
@@ -342,14 +339,13 @@ public class OsnSerializer {
         if (!endElement) {
           if (i < attributeCount - 1) {
             endLine();
-          } else if (type.getName().getLocalPart().equals("Coord3D")) {
+          } else if (type.getTypeName().equals("/Coord3D")) {
             for (final Iterator<Object> scopes = scope.iterator(); scopes.hasNext();) {
               final Object parent = scopes.next();
               if (parent instanceof DataObject) {
                 final DataObject parentObject = (DataObject)parent;
                 if (parentObject.getMetaData()
-                  .getName()
-                  .getLocalPart()
+                  .getTypeName()
                   .equals("TextOnCurve")) {
                   endLine();
                 }
@@ -392,8 +388,8 @@ public class OsnSerializer {
 
   public void serializeStartObject(final DataObject object) throws IOException {
     final DataObjectMetaData type = object.getMetaData();
-    final QName typeName = type.getName();
-    startObject(typeName);
+    final String path = type.getPath();
+    startObject(path);
   }
 
   @SuppressWarnings("unchecked")
@@ -438,37 +434,24 @@ public class OsnSerializer {
     scope.addLast(COLLECTION_SCOPE);
   }
 
-  public void startObject(final QName typeName) throws IOException {
+  public void startObject(final String path) throws IOException {
     endElement = false;
-    String name = typeName.getLocalPart();
 
-    final String namespaceUri = typeName.getNamespaceURI();
-    if (namespaceUri != "") {
-      name += "::" + namespaceUri;
-    }
+    String name = path.replaceAll("^/+", "");
+    name = name.replaceAll("/+$", "");
+    name = name.replaceAll("/", "::");
     write(name);
     write('(');
     if (indentEnabled) {
       endLine();
     }
     increaseIndent();
-    scope.addLast(typeName);
-  }
-
-  public void startObject(final String typeName) throws IOException {
-    endElement = false;
-    write(typeName);
-    write('(');
-    if (indentEnabled) {
-      endLine();
-    }
-    increaseIndent();
-    scope.addLast(typeName);
+    scope.addLast(path);
   }
 
   @Override
   public String toString() {
-    return typeName.toString();
+    return path.toString();
   }
 
   public void write(final byte[] b) throws IOException {
