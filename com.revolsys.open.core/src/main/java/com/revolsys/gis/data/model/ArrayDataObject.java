@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,6 +40,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -146,44 +145,6 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
       }
     }
 
-  }
-
-  /**
-   * Clone the value if it has a clone method.
-   * 
-   * @param value The value to clone.
-   * @return The cloned value.
-   */
-  private Object clone(final Object value) {
-    if (value instanceof Cloneable) {
-      try {
-        final Class<? extends Object> valueClass = value.getClass();
-        final Method method = valueClass.getMethod("clone", new Class[0]);
-        if (method != null) {
-          return method.invoke(value, new Object[0]);
-        }
-      } catch (final IllegalArgumentException e) {
-        throw e;
-      } catch (final InvocationTargetException e) {
-
-        final Throwable cause = e.getCause();
-        if (cause instanceof RuntimeException) {
-          final RuntimeException re = (RuntimeException)cause;
-          throw re;
-        } else if (cause instanceof Error) {
-          final Error ee = (Error)cause;
-          throw ee;
-        } else {
-          throw new RuntimeException(cause.getMessage(), cause);
-        }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
-
-    }
-    return value;
   }
 
   public void delete() {
@@ -534,8 +495,19 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   public void setValues(final DataObject object) {
     for (final String name : this.metaData.getAttributeNames()) {
-      final Object value = clone(object.getValue(name));
+      final Object value = DataObjectUtil.clone(object.getValue(name));
       setValue(name, value);
+    }
+  }
+
+  public void setValues(DataObject object, Collection<String> attributesNames) {
+    for (String attributeName : attributesNames) {
+      Object oldValue = getValue(attributeName);
+      Object newValue = object.getValue(attributeName);
+      if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
+        newValue = DataObjectUtil.clone(newValue);
+        setValue(attributeName, newValue);
+      }
     }
   }
 

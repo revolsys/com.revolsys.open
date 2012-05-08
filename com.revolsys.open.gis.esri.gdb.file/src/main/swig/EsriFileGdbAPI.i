@@ -3,7 +3,6 @@
 %{
 
 #include <stdexcept>
-#include <iostream>
 #include <sstream>
 #include "time.h"
 #include "FileGDBAPI.h"
@@ -17,7 +16,6 @@ std::string wstring2string(std::wstring wstr) {
   
 fgdbError checkResult(fgdbError error) {
   if (error) {
-     std::cout << error << std::endl;
      std::wstring errorString;
      FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString);
      std::stringstream message;
@@ -66,6 +64,8 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %include "OutParam.i"
 %include "OutArrayParam.i"
 %javaconst(1);
+
+%apply unsigned char *OUTPUT {byte *output};
 
 %template(VectorOfString) std::vector<std::string>;
 %template(VectorOfWString) std::vector<std::wstring>;
@@ -661,9 +661,32 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 
 %ignore FileGDBAPI::ByteArray;
 
+%{
+  struct byte_array {
+    byte* bytes;
+    size_t length;
+  };
+%}
+
+%typemap(out) byte_array {
+  jbyteArray buffer = JCALL1(NewByteArray, jenv, $1.length);
+  jbyte* bytes = (jbyte*)$1.bytes;
+  JCALL4(SetByteArrayRegion, jenv, buffer, 0, $1.length, bytes);
+  $result = buffer;
+}
+%typemap(jtype) byte_array "byte[]"
+%typemap(jstype) byte_array "byte[]"
+%typemap(jni) byte_array "jbyteArray"
+%typemap(javaout) byte_array {
+  return $jnicall;
+}
+
+
+%ignore byte_array;
 %ignore FileGDBAPI::ShapeBuffer::shapeBuffer;
 %ignore FileGDBAPI::ShapeBuffer::GetShapeType;
 %ignore FileGDBAPI::ShapeBuffer::GetGeometryType;
+%apply (char *STRING, size_t LENGTH)   { (char *byteArray, size_t length) };
 %extend FileGDBAPI::ShapeBuffer {
   unsigned char get(int i) {
     return $self->shapeBuffer[i];
@@ -675,6 +698,24 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
  
   byte* getShapeBuffer() {
     return $self->shapeBuffer;
+  }
+  
+  ShapeBuffer(char* byteArray, size_t length) {
+    FileGDBAPI::ShapeBuffer* shape = new FileGDBAPI::ShapeBuffer(length);
+    for (int i = 0; i < length; i++) {
+      char c = byteArray[i];
+      shape->shapeBuffer[i] = (byte)c;
+    }
+    shape->inUseLength = length;
+    return shape;
+  }
+
+  byte_array getBuffer() {
+    byte_array buffer;
+    buffer.bytes = $self->shapeBuffer;
+    buffer.length = $self->inUseLength;
+    
+    return buffer;
   }
   
   FileGDBAPI::ShapeType getShapeType() {

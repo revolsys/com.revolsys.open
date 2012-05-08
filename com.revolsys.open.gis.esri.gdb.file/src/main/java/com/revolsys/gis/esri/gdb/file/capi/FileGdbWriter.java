@@ -120,8 +120,8 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
         dataStore.addStatistic("Insert", object);
       }
     } catch (final IllegalArgumentException e) {
-      LOG.error(
-        "Unable to insert row " + e.getMessage() + "\n" + object.toString(), e);
+      throw new RuntimeException("Unable to insert row " + e.getMessage()
+        + "\n" + object.toString(), e);
     } catch (final RuntimeException e) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Unable to insert row \n:" + object.toString());
@@ -137,7 +137,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final Table table = getTable(typePath);
     final Row row = getRow(table, object);
     try {
-      List<Object> esriValues = new ArrayList<Object>();
+      final List<Object> esriValues = new ArrayList<Object>();
       try {
         for (final Attribute attribute : metaData.getAttributes()) {
           final String name = attribute.getName();

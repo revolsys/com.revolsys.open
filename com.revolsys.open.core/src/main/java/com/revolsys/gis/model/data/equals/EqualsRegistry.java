@@ -2,8 +2,10 @@ package com.revolsys.gis.model.data.equals;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,10 @@ public class EqualsRegistry implements Equals<Object> {
     register(Integer.class, new NumberEquals());
     register(Short.class, new NumberEquals());
     register(Geometry.class, new Geometry3DExactEquals());
-    register(Map.class, new MapEquals());
+    register(Date.class, new DateEquals());
+    register(java.sql.Date.class, new DateEquals());
+    register(Timestamp.class, new DateEquals());
+     register(Map.class, new MapEquals());
     register(List.class, new ListEquals());
     register(DataObject.class, new DataObjectEquals());
   }

@@ -20,6 +20,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DataObjectStore extends DataObjectMetaDataFactory {
   void addCodeTable(CodeTable codeTable);
 
+  void addCodeTables(Collection<CodeTable> codeTables);
+
   void addStatistic(String name, DataObject object);
 
   void addStatistic(String name, String typePath, int count);

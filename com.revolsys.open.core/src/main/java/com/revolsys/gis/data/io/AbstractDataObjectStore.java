@@ -80,6 +80,13 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
+  public void addCodeTables(Collection<CodeTable> codeTables) {
+    for (CodeTable codeTable : codeTables) {
+      addCodeTable(codeTable);
+    }
+  }
+
   public void addCodeTable(final String columnName, final CodeTable codeTable) {
     if (columnName != null && !columnName.equalsIgnoreCase("ID")) {
       this.columnToTableMap.put(columnName, codeTable);

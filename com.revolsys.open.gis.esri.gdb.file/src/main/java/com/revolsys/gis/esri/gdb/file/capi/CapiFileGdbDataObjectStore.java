@@ -295,7 +295,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
       matcher.appendTail(whereClause);
     }
-    BoundingBox boundingBox = query.getBoundingBox();
+    final BoundingBox boundingBox = query.getBoundingBox();
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
       typePath, whereClause.toString(), boundingBox);
     return iterator;
@@ -347,10 +347,16 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
     final DETable deTable = EsriXmlDataObjectMetaDataUtil.getDETable(
       objectMetaData, spatialReference);
-    return createTable(deTable);
+    final DataObjectMetaDataImpl tableMetaData = createTable(deTable);
+    final String idAttributeName = objectMetaData.getIdAttributeName();
+    if (idAttributeName != null) {
+      tableMetaData.setIdAttributeName(idAttributeName);
+    }
+    return tableMetaData;
   }
 
-  public synchronized DataObjectMetaData createTable(final DETable deTable) {
+  protected synchronized DataObjectMetaDataImpl createTable(
+    final DETable deTable) {
     String schemaPath = deTable.getParentCatalogPath();
     String schemaName = schemaPath.substring(1);
     final DataObjectStoreSchema schema = getSchema(schemaName);
@@ -388,8 +394,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         + deTable.getCatalogPath(), t);
     }
     try {
-      final DataObjectMetaData metaData = getMetaData(schemaName, schemaPath,
-        table);
+      final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
+        schemaPath, table);
       addMetaData(metaData);
       return metaData;
     } finally {
@@ -448,7 +454,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public synchronized DataObjectMetaData getMetaData(
+  public synchronized DataObjectMetaDataImpl getMetaData(
     final String schemaName,
     final String path,
     final String tableDefinition) {
@@ -476,9 +482,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
             LOG.error(tableDefinition);
             throw new RuntimeException("Error creating attribute for "
               + typePath + "." + field.getName() + " : " + field.getType(), e);
-          }
-          if (fieldName.equals(tableName + "_ID")) {
-            metaData.setIdAttributeName(fieldName);
           }
         } else {
           LOG.error("Unsupported field type " + fieldName + ":" + type);
@@ -515,7 +518,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  private DataObjectMetaData getMetaData(
+  private DataObjectMetaDataImpl getMetaData(
     final String schemaName,
     final String path,
     final Table table) {

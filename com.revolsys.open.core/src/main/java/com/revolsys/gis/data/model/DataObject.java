@@ -3,6 +3,7 @@ package com.revolsys.gis.data.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -134,4 +135,6 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    * @param values The values to set.
    */
   void setValues(Map<String, ? extends Object> values);
+
+  void setValues(DataObject object, Collection<String> attributeNames);
 }

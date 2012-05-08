@@ -9,20 +9,61 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class ShapeBuffer {
+  public static long getCPtr(final ShapeBuffer obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
+
+  public static boolean HasCurves(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasCurves(shapeType.swigValue());
+  }
+
+  public static boolean HasIDs(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasIDs(shapeType.swigValue());
+  }
+
+  public static boolean HasMaterials(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasMaterials(shapeType.swigValue());
+  }
+
+  public static boolean HasMs(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasMs(shapeType.swigValue());
+  }
+
+  public static boolean HasNormals(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasNormals(shapeType.swigValue());
+  }
+
+  public static boolean HasTextures(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasTextures(shapeType.swigValue());
+  }
+
+  public static boolean HasZs(final ShapeType shapeType) {
+    return EsriFileGdbJNI.ShapeBuffer_HasZs(shapeType.swigValue());
+  }
+
   private long swigCPtr;
+
   protected boolean swigCMemOwn;
 
-  public ShapeBuffer(long cPtr, boolean cMemoryOwn) {
+  public ShapeBuffer() {
+    this(EsriFileGdbJNI.new_ShapeBuffer__SWIG_1(), true);
+  }
+
+  public ShapeBuffer(final byte[] byteArray) {
+    this(EsriFileGdbJNI.new_ShapeBuffer__SWIG_2(byteArray), true);
+  }
+
+  public ShapeBuffer(final long length) {
+    this(EsriFileGdbJNI.new_ShapeBuffer__SWIG_0(length), true);
+  }
+
+  public ShapeBuffer(final long cPtr, final boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public static long getCPtr(ShapeBuffer obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-  protected void finalize() {
-    delete();
+  public boolean Allocate(final long length) {
+    return EsriFileGdbJNI.ShapeBuffer_Allocate(swigCPtr, this, length);
   }
 
   public synchronized void delete() {
@@ -35,88 +76,60 @@ public class ShapeBuffer {
     }
   }
 
-  public boolean Allocate(long length) {
-    return EsriFileGdbJNI.ShapeBuffer_Allocate(swigCPtr, this, length);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public ShapeBuffer(long length) {
-    this(EsriFileGdbJNI.new_ShapeBuffer__SWIG_0(length), true);
-  }
-
-  public ShapeBuffer() {
-    this(EsriFileGdbJNI.new_ShapeBuffer__SWIG_1(), true);
-  }
-
-  public void setAllocatedLength(long value) {
-    EsriFileGdbJNI.ShapeBuffer_allocatedLength_set(swigCPtr, this, value);
+  public short get(final int i) {
+    return EsriFileGdbJNI.ShapeBuffer_get(swigCPtr, this, i);
   }
 
   public long getAllocatedLength() {
     return EsriFileGdbJNI.ShapeBuffer_allocatedLength_get(swigCPtr, this);
   }
 
-  public void setInUseLength(long value) {
-    EsriFileGdbJNI.ShapeBuffer_inUseLength_set(swigCPtr, this, value);
+  public byte[] getBuffer() {
+    return EsriFileGdbJNI.ShapeBuffer_getBuffer(swigCPtr, this);
+  }
+
+  public GeometryType getGeometryType() {
+    return GeometryType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getGeometryType(
+      swigCPtr, this));
   }
 
   public long getInUseLength() {
     return EsriFileGdbJNI.ShapeBuffer_inUseLength_get(swigCPtr, this);
   }
 
+  public UnsignedCharArray getShapeBuffer() {
+    return new UnsignedCharArray(EsriFileGdbJNI.ShapeBuffer_getShapeBuffer(
+      swigCPtr, this), false);
+  }
+
+  public ShapeType getShapeType() {
+    return ShapeType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getShapeType(
+      swigCPtr, this));
+  }
+
   public boolean IsEmpty() {
     return EsriFileGdbJNI.ShapeBuffer_IsEmpty(swigCPtr, this);
+  }
+
+  public void set(final int i, final short c) {
+    EsriFileGdbJNI.ShapeBuffer_set(swigCPtr, this, i, c);
+  }
+
+  public void setAllocatedLength(final long value) {
+    EsriFileGdbJNI.ShapeBuffer_allocatedLength_set(swigCPtr, this, value);
   }
 
   public void SetEmpty() {
     EsriFileGdbJNI.ShapeBuffer_SetEmpty(swigCPtr, this);
   }
 
-  public static boolean HasZs(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasZs(shapeType.swigValue());
-  }
-
-  public static boolean HasMs(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasMs(shapeType.swigValue());
-  }
-
-  public static boolean HasIDs(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasIDs(shapeType.swigValue());
-  }
-
-  public static boolean HasCurves(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasCurves(shapeType.swigValue());
-  }
-
-  public static boolean HasNormals(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasNormals(shapeType.swigValue());
-  }
-
-  public static boolean HasTextures(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasTextures(shapeType.swigValue());
-  }
-
-  public static boolean HasMaterials(ShapeType shapeType) {
-    return EsriFileGdbJNI.ShapeBuffer_HasMaterials(shapeType.swigValue());
-  }
-
-  public short get(int i) {
-    return EsriFileGdbJNI.ShapeBuffer_get(swigCPtr, this, i);
-  }
-
-  public void set(int i, short c) {
-    EsriFileGdbJNI.ShapeBuffer_set(swigCPtr, this, i, c);
-  }
-
-  public UnsignedCharArray getShapeBuffer() {
-  return new UnsignedCharArray(EsriFileGdbJNI.ShapeBuffer_getShapeBuffer(swigCPtr, this), false);
-}
-
-  public ShapeType getShapeType() {
-    return ShapeType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getShapeType(swigCPtr, this));
-  }
-
-  public GeometryType getGeometryType() {
-    return GeometryType.swigToEnum(EsriFileGdbJNI.ShapeBuffer_getGeometryType(swigCPtr, this));
+  public void setInUseLength(final long value) {
+    EsriFileGdbJNI.ShapeBuffer_inUseLength_set(swigCPtr, this, value);
   }
 
 }

@@ -20,12 +20,18 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -33,6 +39,24 @@ public final class DataObjectUtil {
 
   public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
     "Feature", new Attribute("geometry", DataTypes.GEOMETRY, true));
+
+  public static void setValues(
+    DataObject target,
+    DataObject source,
+    Collection<String> attributesNames,
+    Collection<String> ignoreAttributeNames) {
+    for (String attributeName : attributesNames) {
+      if (!ignoreAttributeNames.contains(attributeName)) {
+        Object oldValue = target.getValue(attributeName);
+        Object newValue = source.getValue(attributeName);
+        if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
+          newValue = DataObjectUtil.clone(newValue);
+          target.setValue(attributeName, newValue);
+        }
+      }
+    }
+  }
+
 
   /**
    * Create a copy of the data object replacing the geometry with the new
@@ -108,28 +132,6 @@ public final class DataObjectUtil {
     return (T)propertyValue;
   }
 
-  public static Integer getInteger(
-    final DataObject object,
-    final String attributeName) {
-    final Number value = object.getValue(attributeName);
-    if (value == null) {
-      return null;
-    } else {
-      return value.intValue();
-    }
-  }
-
-  public static Double getDouble(
-    final DataObject object,
-    final String attributeName) {
-    final Number value = object.getValue(attributeName);
-    if (value == null) {
-      return null;
-    } else {
-      return value.doubleValue();
-    }
-  }
-
   public static Double getDouble(
     final DataObject object,
     final int attributeIndex) {
@@ -141,6 +143,76 @@ public final class DataObjectUtil {
     }
   }
 
+  public static Double getDouble(
+    final DataObject object,
+    final String attributeName) {
+    final Number value = object.getValue(attributeName);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
+  public static Integer getInteger(
+    final DataObject object,
+    final String attributeName) {
+    final Number value = object.getValue(attributeName);
+    if (value == null) {
+      return null;
+    } else {
+      return value.intValue();
+    }
+  }
+
+  public static Long getLong(final DataObject object, final String attributeName) {
+    final Number value = object.getValue(attributeName);
+    if (value == null) {
+      return null;
+    } else {
+      return value.longValue();
+    }
+  }
+
   private DataObjectUtil() {
   }
+
+  /**
+   * Clone the value if it has a clone method.
+   * 
+   * @param value The value to clone.
+   * @return The cloned value.
+   */
+  public static Object clone(final Object value) {
+    if (value instanceof Cloneable) {
+      try {
+        final Class<? extends Object> valueClass = value.getClass();
+        final Method method = valueClass.getMethod("clone", new Class[0]);
+        if (method != null) {
+          return method.invoke(value, new Object[0]);
+        }
+      } catch (final IllegalArgumentException e) {
+        throw e;
+      } catch (final InvocationTargetException e) {
+
+        final Throwable cause = e.getCause();
+        if (cause instanceof RuntimeException) {
+          final RuntimeException re = (RuntimeException)cause;
+          throw re;
+        } else if (cause instanceof Error) {
+          final Error ee = (Error)cause;
+          throw ee;
+        } else {
+          throw new RuntimeException(cause.getMessage(), cause);
+        }
+      } catch (final RuntimeException e) {
+        throw e;
+      } catch (final Exception e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+
+    }
+    return value;
+  }
+
 }

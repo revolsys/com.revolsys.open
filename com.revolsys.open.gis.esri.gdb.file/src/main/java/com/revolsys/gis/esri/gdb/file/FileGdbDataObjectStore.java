@@ -7,8 +7,10 @@ public interface FileGdbDataObjectStore extends DataObjectStore {
 
   void deleteGeodatabase();
 
+  @Override
   DataObjectMetaData getMetaData(DataObjectMetaData metaData);
 
+  @Override
   void initialize();
 
   void setCreateMissingDataStore(boolean createMissingDataStore);

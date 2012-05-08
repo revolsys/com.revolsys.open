@@ -23,6 +23,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
     return dataObjectStore;
   }
 
+  @Override
   public FileGdbDataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(
@@ -41,11 +42,13 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
     }
   }
 
+  @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
   }
 
+  @Override
   public List<String> getUrlPatterns() {
     return URL_PATTERNS;
   }

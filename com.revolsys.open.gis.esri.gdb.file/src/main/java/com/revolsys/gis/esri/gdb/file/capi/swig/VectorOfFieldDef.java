@@ -9,20 +9,37 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class VectorOfFieldDef {
+  public static long getCPtr(final VectorOfFieldDef obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
+
   private long swigCPtr;
+
   protected boolean swigCMemOwn;
 
-  public VectorOfFieldDef(long cPtr, boolean cMemoryOwn) {
+  public VectorOfFieldDef() {
+    this(EsriFileGdbJNI.new_VectorOfFieldDef__SWIG_0(), true);
+  }
+
+  public VectorOfFieldDef(final long n) {
+    this(EsriFileGdbJNI.new_VectorOfFieldDef__SWIG_1(n), true);
+  }
+
+  public VectorOfFieldDef(final long cPtr, final boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public static long getCPtr(VectorOfFieldDef obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
+  public void add(final FieldDef x) {
+    EsriFileGdbJNI.VectorOfFieldDef_add(swigCPtr, this, FieldDef.getCPtr(x), x);
   }
 
-  protected void finalize() {
-    delete();
+  public long capacity() {
+    return EsriFileGdbJNI.VectorOfFieldDef_capacity(swigCPtr, this);
+  }
+
+  public void clear() {
+    EsriFileGdbJNI.VectorOfFieldDef_clear(swigCPtr, this);
   }
 
   public synchronized void delete() {
@@ -35,44 +52,31 @@ public class VectorOfFieldDef {
     }
   }
 
-  public VectorOfFieldDef() {
-    this(EsriFileGdbJNI.new_VectorOfFieldDef__SWIG_0(), true);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
-  public VectorOfFieldDef(long n) {
-    this(EsriFileGdbJNI.new_VectorOfFieldDef__SWIG_1(n), true);
-  }
-
-  public long size() {
-    return EsriFileGdbJNI.VectorOfFieldDef_size(swigCPtr, this);
-  }
-
-  public long capacity() {
-    return EsriFileGdbJNI.VectorOfFieldDef_capacity(swigCPtr, this);
-  }
-
-  public void reserve(long n) {
-    EsriFileGdbJNI.VectorOfFieldDef_reserve(swigCPtr, this, n);
+  public FieldDef get(final int i) {
+    return new FieldDef(EsriFileGdbJNI.VectorOfFieldDef_get(swigCPtr, this, i),
+      false);
   }
 
   public boolean isEmpty() {
     return EsriFileGdbJNI.VectorOfFieldDef_isEmpty(swigCPtr, this);
   }
 
-  public void clear() {
-    EsriFileGdbJNI.VectorOfFieldDef_clear(swigCPtr, this);
+  public void reserve(final long n) {
+    EsriFileGdbJNI.VectorOfFieldDef_reserve(swigCPtr, this, n);
   }
 
-  public void add(FieldDef x) {
-    EsriFileGdbJNI.VectorOfFieldDef_add(swigCPtr, this, FieldDef.getCPtr(x), x);
+  public void set(final int i, final FieldDef val) {
+    EsriFileGdbJNI.VectorOfFieldDef_set(swigCPtr, this, i,
+      FieldDef.getCPtr(val), val);
   }
 
-  public FieldDef get(int i) {
-    return new FieldDef(EsriFileGdbJNI.VectorOfFieldDef_get(swigCPtr, this, i), false);
-  }
-
-  public void set(int i, FieldDef val) {
-    EsriFileGdbJNI.VectorOfFieldDef_set(swigCPtr, this, i, FieldDef.getCPtr(val), val);
+  public long size() {
+    return EsriFileGdbJNI.VectorOfFieldDef_size(swigCPtr, this);
   }
 
 }

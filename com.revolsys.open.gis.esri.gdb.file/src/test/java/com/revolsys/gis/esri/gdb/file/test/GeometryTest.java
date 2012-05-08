@@ -12,6 +12,11 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -23,14 +28,21 @@ public class GeometryTest {
 
     final DataType geometryDataType = DataTypes.getType(geometry);
 
-    String name = "/" +geometryDataType.getName();
+    String name = "/" + geometryDataType.getName();
     if (geometryFactory.hasZ()) {
       name += "Z";
+      for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
+        for (final Coordinates point : new InPlaceIterator(points)) {
+          if (Double.isNaN(point.getZ())) {
+            point.setZ(0);
+          }
+        }
+      }
     }
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);
 
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
+    DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
     metaData.addAttribute("ID", DataTypes.INT, true);
     final Attribute geometryAttribute = metaData.addAttribute("Geometry",
       geometryDataType, true);
@@ -40,12 +52,19 @@ public class GeometryTest {
 
     final FileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(file);
     dataStore.initialize();
+    metaData = (DataObjectMetaDataImpl)dataStore.getMetaData(metaData);
     final DataObject object = new ArrayDataObject(metaData);
     object.setIdValue(1);
     object.setGeometryValue(geometry);
 
     dataStore.insert(object);
 
+    final DataObject object2 = dataStore.load(name, 1);
+    if (!EqualsRegistry.INSTANCE.equals(object, object2)) {
+      System.out.println("Not Equal");
+      System.out.println(object);
+      System.out.println(object2);
+    }
     dataStore.close();
   }
 

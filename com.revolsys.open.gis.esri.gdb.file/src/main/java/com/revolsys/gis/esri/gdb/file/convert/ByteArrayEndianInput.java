@@ -17,16 +17,19 @@ public class ByteArrayEndianInput implements EndianInput {
     this.array = array;
   }
 
+  @Override
   public void close() throws IOException {
     array = null;
   }
 
+  @Override
   public int read() throws IOException {
     final int b = array.get(index);
     index++;
     return b;
   }
 
+  @Override
   public final int read(final byte b[]) throws IOException {
     return read(b, 0, b.length);
   }
@@ -64,6 +67,7 @@ public class ByteArrayEndianInput implements EndianInput {
     return i;
   }
 
+  @Override
   public final double readDouble() throws IOException {
     return Double.longBitsToDouble(readLong());
   }
@@ -91,6 +95,7 @@ public class ByteArrayEndianInput implements EndianInput {
     }
   }
 
+  @Override
   public final int readInt() throws IOException {
     final int ch1 = read();
     final int ch2 = read();
@@ -102,11 +107,13 @@ public class ByteArrayEndianInput implements EndianInput {
     return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
   }
 
+  @Override
   public double readLEDouble() throws IOException {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
   }
 
+  @Override
   public int readLEInt() throws IOException {
     final int b1 = read();
     final int b2 = read();
@@ -120,6 +127,7 @@ public class ByteArrayEndianInput implements EndianInput {
     return value;
   }
 
+  @Override
   public long readLELong() throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
@@ -128,6 +136,7 @@ public class ByteArrayEndianInput implements EndianInput {
     return value;
   }
 
+  @Override
   public short readLEShort() throws IOException {
     final int b1 = read();
     final int b2 = read();
@@ -138,6 +147,7 @@ public class ByteArrayEndianInput implements EndianInput {
     return (short)value;
   }
 
+  @Override
   public final long readLong() throws IOException {
     readFully(readBuffer, 0, 8);
     return (((long)readBuffer[0] << 56) + ((long)(readBuffer[1] & 255) << 48)
@@ -147,6 +157,7 @@ public class ByteArrayEndianInput implements EndianInput {
       + ((readBuffer[6] & 255) << 8) + ((readBuffer[7] & 255) << 0));
   }
 
+  @Override
   public final short readShort() throws IOException {
     final int ch1 = read();
     final int ch2 = read();
@@ -156,6 +167,7 @@ public class ByteArrayEndianInput implements EndianInput {
     return (short)((ch1 << 8) + (ch2 << 0));
   }
 
+  @Override
   public int skipBytes(final int i) throws IOException {
     this.index += i;
     return i;

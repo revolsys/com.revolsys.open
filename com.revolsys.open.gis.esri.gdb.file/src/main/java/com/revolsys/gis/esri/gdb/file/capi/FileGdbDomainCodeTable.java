@@ -19,7 +19,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private final String name;
 
-  private CapiFileGdbDataObjectStore dataStore;
+  private final CapiFileGdbDataObjectStore dataStore;
 
   public FileGdbDomainCodeTable(final CapiFileGdbDataObjectStore dataStore,
     final CodedValueDomain domain) {
@@ -41,7 +41,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
     synchronized (dataStore) {
       final Object id = domain.addCodedValue(name);
       final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
-      Geodatabase geodatabase = dataStore.getGeodatabase();
+      final Geodatabase geodatabase = dataStore.getGeodatabase();
       geodatabase.alterDomain(domainDefinition);
       LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
       return id;

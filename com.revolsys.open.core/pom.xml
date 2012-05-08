@@ -143,13 +143,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>jsr250-api</artifactId>
-      <version>1.0</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
       <version>1.12</version>

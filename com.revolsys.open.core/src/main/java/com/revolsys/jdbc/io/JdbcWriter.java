@@ -14,9 +14,11 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractWriter;
@@ -665,21 +667,30 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
 
   public synchronized void write(final DataObject object) {
     try {
-      switch (object.getState()) {
-        case New:
+      DataObjectMetaData metaData = object.getMetaData();
+      DataObjectStore dataStore = metaData.getDataObjectStore();
+      DataObjectState state = object.getState();
+      if (dataStore != this.dataStore) {
+        if (state != DataObjectState.Deleted) {
           insert(object);
-        break;
-        case Modified:
-          update(object);
-        break;
-        case Persisted:
-        // No action required
-        break;
-        case Deleted:
-          delete(object);
-        break;
-        default:
-          throw new IllegalStateException("State not known");
+        }
+      } else {
+        switch (state) {
+          case New:
+            insert(object);
+          break;
+          case Modified:
+            update(object);
+          break;
+          case Persisted:
+          // No action required
+          break;
+          case Deleted:
+            delete(object);
+          break;
+          default:
+            throw new IllegalStateException("State not known");
+        }
       }
     } catch (final RuntimeException e) {
       throw e;

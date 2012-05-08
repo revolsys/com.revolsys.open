@@ -315,8 +315,35 @@ public final class JtsGeometryUtil {
       final MultiPoint multiPoint1 = (MultiPoint)geometry1;
       final MultiPoint multiPoint2 = (MultiPoint)geometry2;
       return equalsExact3D(multiPoint1, multiPoint2);
+    } else if ((geometry1 instanceof Polygon) && (geometry2 instanceof Polygon)) {
+      final Polygon polygon1 = (Polygon)geometry1;
+      final Polygon polygon2 = (Polygon)geometry2;
+      return equalsExact3D(polygon1, polygon2);
+    } else {
+      return false;
     }
-    return false;
+  }
+
+  public static boolean equalsExact3D(
+    final Polygon polygon1,
+    final Polygon polygon2) {
+    if (polygon1.getNumInteriorRing() == polygon2.getNumInteriorRing()) {
+      LineString exterior1 = polygon1.getExteriorRing();
+      LineString exterior2 = polygon2.getExteriorRing();
+      if (equalsExact3D(exterior1, exterior2)) {
+        for (int i = 0; i < polygon1.getNumInteriorRing(); i++) {
+          if (!equalsExact3D(polygon1.getInteriorRingN(i),
+            polygon2.getInteriorRingN(i))) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   public static boolean equalsExact3D(
