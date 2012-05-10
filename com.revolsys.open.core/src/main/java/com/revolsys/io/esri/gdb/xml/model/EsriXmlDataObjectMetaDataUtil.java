@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
@@ -127,7 +129,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
 
   private static void addObjectIdField(final DETable table) {
     final Field field = new Field();
-    field.setName("OBJECTID");
+    field.setName(table.getOIDFieldName());
     field.setType(FieldType.esriFieldTypeOID);
     field.setIsNullable(false);
     field.setLength(4);
@@ -253,10 +255,14 @@ public class EsriXmlDataObjectMetaDataUtil implements
       table = new DETable();
     }
 
+    String oidFieldName = metaData.getProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME);
+    if (!StringUtils.hasText(oidFieldName)) {
+      oidFieldName = "OBJECTID";
+    }
     table.setCatalogPath(schemaPath + "\\" + name);
     table.setName(name);
     table.setHasOID(true);
-    table.setOIDFieldName("OBJECTID");
+    table.setOIDFieldName(oidFieldName);
 
     addObjectIdField(table);
     final Attribute idAttribute = metaData.getIdAttribute();
@@ -265,7 +271,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
         addGeometryField(shapeType, table, attribute);
       } else {
         final String attributeName = attribute.getName();
-        if (!attributeName.equals("OBJECTID")) {
+        if (!attributeName.equals(oidFieldName)) {
           final Field field = addField(table, attribute);
           if (idAttribute == attribute) {
             table.addIndex(field, true, attributeName + "_PK");

@@ -506,7 +506,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
       addMetaDataProperties(metaData);
       if (metaData.getIdAttributeIndex() == -1) {
-        metaData.setIdAttributeName("OBJECTID");
+        metaData.setIdAttributeName(deTable.getOIDFieldName());
       }
 
       return metaData;
