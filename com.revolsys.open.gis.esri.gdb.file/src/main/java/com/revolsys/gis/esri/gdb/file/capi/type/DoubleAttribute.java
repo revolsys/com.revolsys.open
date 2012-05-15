@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
@@ -42,9 +44,17 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
       return doubleValue;
     } else {
       final String string = value.toString();
-      final double doubleValue = Double.parseDouble(string);
-      row.setDouble(name, doubleValue);
-      return doubleValue;
+      if (StringUtils.hasText(string)) {
+        final double doubleValue = Double.parseDouble(string);
+        row.setDouble(name, doubleValue);
+        return doubleValue;
+      } else if (isRequired()) {
+        throw new IllegalArgumentException(name
+          + " is required and cannot be null");
+      } else {
+        row.setNull(name);
+        return null;
+      }
     }
   }
 
