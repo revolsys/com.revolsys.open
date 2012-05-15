@@ -46,6 +46,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
   private List<String> valueAttributeNames = new ArrayList<String>(
     Arrays.asList("VALUE"));
 
+  private List<String> orderBy = new ArrayList<String>();
+
+  public void setOrderBy(List<String> orderBy) {
+    this.orderBy = orderBy;
+  }
+
   private String typePath;
 
   public CodeTableProperty() {
@@ -193,7 +199,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
-    final Reader<DataObject> allCodes = dataStore.query(typePath);
+    Query query = new Query(typePath);
+    for (String order : orderBy) {
+      query.addOrderBy(order, true);
+    }
+    final Reader<DataObject> allCodes = dataStore.query(query);
     addValues(allCodes);
   }
 

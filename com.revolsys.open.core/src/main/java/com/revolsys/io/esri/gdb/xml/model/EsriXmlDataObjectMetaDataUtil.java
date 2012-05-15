@@ -303,7 +303,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     } else {
       tableName = domain.getName();
     }
-    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final String typePath = PathUtil.toPath(schemaName, tableName);
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
@@ -336,7 +336,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final DETable deTable,
     final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
-    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final String typePath = PathUtil.toPath(schemaName, tableName);
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {

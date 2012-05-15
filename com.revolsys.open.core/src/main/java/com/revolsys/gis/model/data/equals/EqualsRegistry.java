@@ -37,7 +37,7 @@ public class EqualsRegistry implements Equals<Object> {
     register(Date.class, new DateEquals());
     register(java.sql.Date.class, new DateEquals());
     register(Timestamp.class, new DateEquals());
-     register(Map.class, new MapEquals());
+    register(Map.class, new MapEquals());
     register(List.class, new ListEquals());
     register(DataObject.class, new DataObjectEquals());
   }
@@ -55,9 +55,10 @@ public class EqualsRegistry implements Equals<Object> {
       if (object2 == null) {
         return true;
       } else {
-        final Equals<Object> equals = getEquals(object2.getClass());
-        return equals.equals(object2, object1, exclude);
+        return false;
       }
+    } else if (object2 == null) {
+      return false;
     } else {
       try {
         final Equals<Object> equals = getEquals(object1.getClass());

@@ -212,7 +212,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     final String columnName,
     final String propertyName,
     final Object propertyValue) {
-    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final String typePath = PathUtil.toPath(schemaName, tableName);
     Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typePath);
     if (typeColumnMap == null) {
       typeColumnMap = new HashMap<String, Map<String, Object>>();

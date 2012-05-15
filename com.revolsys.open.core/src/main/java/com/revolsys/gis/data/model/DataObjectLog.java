@@ -113,7 +113,7 @@ public class DataObjectLog {
       } else {
         logTableName = tableName + "_log";
       }
-      final String logTypeName = PathUtil.getPath(parentPath , logTableName);
+      final String logTypeName = PathUtil.toPath(parentPath , logTableName);
       logMetaData = new DataObjectMetaDataImpl(logTypeName);
       logMetaData.addAttribute("LOGMESSAGE", DataTypes.STRING, 255, true);
       logMetaData.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);

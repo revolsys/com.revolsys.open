@@ -406,7 +406,7 @@ public class FusionTablesDataObjectStore extends AbstractDataObjectStore {
     for (final Map<String, Object> map : reader) {
       final String tableId = (String)map.get("table id");
       final String tableName = (String)map.get("name");
-      final String typePath = PathUtil.getPath(namespace, tableName);
+      final String typePath = PathUtil.toPath(namespace, tableName);
       tableIdTypeNameMap.put(tableId, typePath);
       typePathTableIdMap.put(typePath, tableId);
       typePaths.add(typePath);

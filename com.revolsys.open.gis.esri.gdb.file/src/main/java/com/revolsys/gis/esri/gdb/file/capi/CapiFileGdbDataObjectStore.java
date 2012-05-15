@@ -462,7 +462,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       final XmlProcessor parser = new EsriGdbXmlParser();
       final DETable deTable = parser.process(tableDefinition);
       final String tableName = deTable.getName();
-      final String typePath = PathUtil.getPath(schemaName, tableName);
+      final String typePath = PathUtil.toPath(schemaName, tableName);
       final DataObjectStoreSchema schema = getSchema(schemaName);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
         schema, typePath);

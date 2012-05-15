@@ -22,6 +22,16 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
     return (C)getProperties().get(name);
   }
 
+  @SuppressWarnings("unchecked")
+  public <C> C getProperty(final String name, C defaultValue) {
+    C value = (C)getProperties().get(name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   public void setProperties(final Map<String, Object> properties) {
     this.properties.clear();
     if (properties != null) {

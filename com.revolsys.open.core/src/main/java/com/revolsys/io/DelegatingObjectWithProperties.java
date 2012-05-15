@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DelegatingObjectWithProperties implements ObjectWithProperties {
-  private Map<String, Object> properties;
+  private Map<String, Object> properties = new HashMap<String, Object>();
 
   private ObjectWithProperties object;
+
+  public DelegatingObjectWithProperties() {
+  }
 
   public DelegatingObjectWithProperties(final Object object) {
     if (object instanceof ObjectWithProperties) {
       this.object = (ObjectWithProperties)object;
-    } else {
-      properties = new HashMap<String, Object>();
     }
   }
 
@@ -21,37 +22,54 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     object = null;
   }
 
+  public ObjectWithProperties getObject() {
+    return object;
+  }
+
+  @Override
   public final Map<String, Object> getProperties() {
-    if (object == null) {
+    if (getObject() == null) {
       return properties;
     } else {
-      return object.getProperties();
+      return getObject().getProperties();
     }
   }
 
+  @Override
   public <C> C getProperty(final String name) {
-    if (object == null) {
+    if (getObject() == null) {
       return (C)properties.get(name);
     } else {
-      return (C)object.getProperty(name);
+      return (C)getObject().getProperty(name);
     }
   }
 
-  public final void setProperty(final String name, final Object value) {
-    if (object == null) {
-      properties.put(name, value);
+  @Override
+  public <C> C getProperty(final String name, final C defaultValue) {
+    final C value = (C)getProperty(name);
+    if (value == null) {
+      return defaultValue;
     } else {
-      object.setProperty(name, value);
+      return value;
     }
   }
 
-  
-  public void setProperties(Map<String, Object> properties) {
-    if (object == null) {
+  @Override
+  public void setProperties(final Map<String, Object> properties) {
+    if (getObject() == null) {
       this.properties.clear();
       this.properties.putAll(properties);
     } else {
-      object.setProperties(properties);
+      getObject().setProperties(properties);
     }
- }
+  }
+
+  @Override
+  public final void setProperty(final String name, final Object value) {
+    if (getObject() == null) {
+      properties.put(name, value);
+    } else {
+      getObject().setProperty(name, value);
+    }
+  }
 }

@@ -56,11 +56,13 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final String typePath = objectMetaData.getPath();
     final Table table = getTable(typePath);
     final Row row = getRow(table, object);
-    try {
-      table.deleteRow(row);
-    } finally {
-      row.delete();
-      dataStore.addStatistic("Delete", object);
+    if (row != null) {
+      try {
+        table.deleteRow(row);
+      } finally {
+        row.delete();
+        dataStore.addStatistic("Delete", object);
+      }
     }
   }
 

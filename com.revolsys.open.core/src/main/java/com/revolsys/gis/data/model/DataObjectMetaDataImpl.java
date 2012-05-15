@@ -313,7 +313,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public boolean equals(final Object other) {
-    return compareTo((DataObjectMetaData)other) == 0;
+    return other == this;
   }
 
   public Attribute getAttribute(final CharSequence name) {

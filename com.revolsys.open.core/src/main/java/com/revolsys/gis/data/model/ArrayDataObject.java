@@ -84,14 +84,13 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    */
   public ArrayDataObject(final DataObjectMetaData metaData) {
     this.metaData = metaData;
-    attributes = new Object[metaData.getAttributeCount()];
+    int attributeCount = metaData.getAttributeCount();
+    attributes = new Object[attributeCount];
   }
 
   public ArrayDataObject(final DataObjectMetaData metaData,
     final DataObject object) {
-    this.metaData = metaData;
-    final int attributeCount = metaData.getAttributeCount();
-    attributes = new Object[attributeCount];
+    this(metaData);
     setValues(object);
   }
 
@@ -441,8 +440,11 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    */
   public void setValue(final int index, final Object value) {
     if (index >= 0) {
-      updateState();
-      attributes[index] = value;
+      Object oldValue = attributes[index];
+      if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
+        updateState();
+        attributes[index] = value;
+      }
     }
   }
 

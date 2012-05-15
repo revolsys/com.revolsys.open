@@ -9,7 +9,11 @@ public class GlobalIdProperty extends AbstractDataObjectMetaDataProperty {
   }
 
   public static GlobalIdProperty getProperty(final DataObjectMetaData metaData) {
-    return metaData.getProperty(PROPERTY_NAME);
+    if (metaData == null) {
+      return null;
+    } else {
+      return metaData.getProperty(PROPERTY_NAME);
+    }
   }
 
   private String attributeName;

@@ -183,7 +183,7 @@ public abstract class AbstractDataObjectStore extends
     throw new UnsupportedOperationException();
   }
 
-  public Object createPrimaryIdValue(final String typePath) {
+  public <T> T createPrimaryIdValue(final String typePath) {
     return null;
   }
 

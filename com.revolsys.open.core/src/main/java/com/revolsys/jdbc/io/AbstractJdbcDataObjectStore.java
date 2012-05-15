@@ -178,14 +178,14 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public Object createPrimaryIdValue(final String typePath) {
+  public <T> T createPrimaryIdValue(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(metaData);
-    if (globalIdProperty != null) {
-      return UUID.randomUUID().toString();
+    if (globalIdProperty == null) {
+      return (T)getNextPrimaryKey(metaData);
     } else {
-      return getNextPrimaryKey(metaData);
-    }
+      return (T)UUID.randomUUID().toString();
+        }
   }
 
   protected DataObjectStoreQueryReader createReader(
@@ -260,7 +260,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final String schemaName,
     final String tableName,
     final String columnName) {
-    final String typePath = PathUtil.getPath(schemaName, tableName);
+    final String typePath = PathUtil.toPath(schemaName, tableName);
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
       return null;
@@ -484,7 +484,7 @@ public abstract class AbstractJdbcDataObjectStore extends
             }
           }
           if (!excluded) {
-            final String typePath = PathUtil.getPath(schemaName, tableName);
+            final String typePath = PathUtil.toPath(schemaName, tableName);
             tableNameMap.put(typePath, dbTableName);
             final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
               this, schema, typePath);
@@ -505,7 +505,7 @@ public abstract class AbstractJdbcDataObjectStore extends
         while (columnsRs.next()) {
           final String tableName = columnsRs.getString("TABLE_NAME")
             .toUpperCase();
-          final String typePath = PathUtil.getPath(schemaName, tableName);
+          final String typePath = PathUtil.toPath(schemaName, tableName);
           final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)metaDataMap.get(typePath);
           if (metaData != null) {
             final String name = columnsRs.getString("COLUMN_NAME")

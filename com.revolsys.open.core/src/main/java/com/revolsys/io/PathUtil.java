@@ -1,6 +1,6 @@
 package com.revolsys.io;
 
-import javax.xml.namespace.QName;
+import org.springframework.util.StringUtils;
 
 public final class PathUtil {
 
@@ -30,19 +30,20 @@ public final class PathUtil {
     }
   }
 
-  public static String getPath(final String parent, final String name) {
-    if (parent.startsWith("/")) {
-      if (parent.endsWith("/")) {
-        return parent + name;
-      } else {
-        return parent + "/" + name;
-      }
+  public static String toPath(final String... parts) {
+    if (parts.length == 0) {
+      return "/";
     } else {
-      if (parent.endsWith("/")) {
-        return "/" + parent + name;
-      } else {
-        return "/" + parent + "/" + name;
+      StringBuffer path = new StringBuffer();
+      for (String part : parts) {
+        part = part.replaceAll("^/*", "");
+        part = part.replaceAll("/*", "");
+        if (StringUtils.hasText(part)) {
+          path.append('/');
+          path.append(part);
+        }
       }
+      return path.toString();
     }
   }
 

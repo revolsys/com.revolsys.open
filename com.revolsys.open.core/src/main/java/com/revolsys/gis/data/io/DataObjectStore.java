@@ -32,7 +32,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   DataObject create(String typePath);
 
-  Object createPrimaryIdValue(String typePath);
+  <T> T createPrimaryIdValue(String typePath);
 
   Query createQuery(
     final String typePath,
