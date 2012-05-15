@@ -22,7 +22,7 @@ public final class EcsvServiceConstants {
 
   public static final DataObjectMetaData TYPE_LIST_METADATA;
 
-  public static final String TYPE_NAME_ATTR = "typePath";
+  public static final String TYPE_NAME_ATTR = "typeName";
 
   static {
     final DataObjectMetaDataImpl namespaceListMetaData = new DataObjectMetaDataImpl(
