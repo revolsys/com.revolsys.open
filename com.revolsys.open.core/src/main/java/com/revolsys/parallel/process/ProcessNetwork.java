@@ -249,7 +249,8 @@ public class ProcessNetwork implements BeanPostProcessor,
       if (processes != null) {
         try {
           for (final Thread thread : new ArrayList<Thread>(processes.values())) {
-            if (Thread.currentThread() != thread && thread.isAlive()) {
+            if (thread != null && Thread.currentThread() != thread
+              && thread.isAlive()) {
               thread.interrupt();
             }
           }

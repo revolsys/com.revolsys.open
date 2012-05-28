@@ -39,9 +39,19 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private final XmlWriter out;
 
+  private QName qualifiedName;
+
+  private String namespaceUri;
+
   public GmlDataObjectWriter(final DataObjectMetaData metaData, final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
+    qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    if (qualifiedName == null) {
+      qualifiedName = new QName(metaData.getTypeName());
+    }
+    namespaceUri = qualifiedName.getNamespaceURI();
+    this.out.setPrefix(qualifiedName);
   }
 
   private void box(
@@ -103,10 +113,6 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     out.startTag(FEATURE_MEMBER);
     final DataObjectMetaData metaData = object.getMetaData();
     QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
-    if (qualifiedName == null) {
-      qualifiedName = new QName(metaData.getTypeName());
-    }
-    final String namespaceUri = qualifiedName.getNamespaceURI();
     out.startTag(qualifiedName);
 
     for (final Attribute attribute : metaData.getAttributes()) {

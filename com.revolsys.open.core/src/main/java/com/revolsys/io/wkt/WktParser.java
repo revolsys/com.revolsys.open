@@ -160,8 +160,14 @@ public class WktParser {
 
   }
 
-  @SuppressWarnings("unchecked")
   public <T extends Geometry> T parseGeometry(final String value) {
+    return parseGeometry(value, true);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T parseGeometry(
+    final String value,
+    boolean useNumAxisFromGeometryFactory) {
     if (StringUtils.hasLength(value)) {
       GeometryFactory geometryFactory = this.geometryFactory;
       final int numAxis = geometryFactory.getNumAxis();
@@ -177,17 +183,23 @@ public class WktParser {
         hasText(text, ";");
       }
       if (hasText(text, "POINT")) {
-        geometry = parsePoint(geometryFactory, text);
+        geometry = parsePoint(geometryFactory, useNumAxisFromGeometryFactory,
+          text);
       } else if (hasText(text, "LINESTRING")) {
-        geometry = parseLineString(geometryFactory, text);
+        geometry = parseLineString(geometryFactory,
+          useNumAxisFromGeometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
-        geometry = parsePolygon(geometryFactory, text);
+        geometry = parsePolygon(geometryFactory, useNumAxisFromGeometryFactory,
+          text);
       } else if (hasText(text, "MULTIPOINT")) {
-        geometry = parseMultiPoint(geometryFactory, text);
+        geometry = parseMultiPoint(geometryFactory,
+          useNumAxisFromGeometryFactory, text);
       } else if (hasText(text, "MULTILINESTRING")) {
-        geometry = parseMultiLineString(geometryFactory, text);
+        geometry = parseMultiLineString(geometryFactory,
+          useNumAxisFromGeometryFactory, text);
       } else if (hasText(text, "MULTIPOLYGON")) {
-        geometry = parseMultiPolygon(geometryFactory, text);
+        geometry = parseMultiPolygon(geometryFactory,
+          useNumAxisFromGeometryFactory, text);
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
@@ -225,9 +237,19 @@ public class WktParser {
   }
 
   private LineString parseLineString(
-    final GeometryFactory geometryFactory,
+    GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory,
     final StringBuffer text) {
     final int numAxis = getNumAxis(text);
+    if (!useNumAxisFromGeometryFactory) {
+      if (numAxis != geometryFactory.getNumAxis()) {
+        int srid = geometryFactory.getSRID();
+        double scaleXY = geometryFactory.getScaleXY();
+        double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+      }
+    }
     if (isEmpty(text)) {
       return geometryFactory.createLineString();
     } else {
@@ -238,10 +260,19 @@ public class WktParser {
   }
 
   private MultiLineString parseMultiLineString(
-    final GeometryFactory geometryFactory,
+    GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory,
     final StringBuffer text) {
     final int numAxis = getNumAxis(text);
-
+    if (!useNumAxisFromGeometryFactory) {
+      if (numAxis != geometryFactory.getNumAxis()) {
+        int srid = geometryFactory.getSRID();
+        double scaleXY = geometryFactory.getScaleXY();
+        double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+      }
+    }
     final List<CoordinatesList> lines;
     if (isEmpty(text)) {
       lines = new ArrayList<CoordinatesList>();
@@ -252,9 +283,19 @@ public class WktParser {
   }
 
   private MultiPoint parseMultiPoint(
-    final GeometryFactory geometryFactory,
+    GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory,
     final StringBuffer text) {
     final int numAxis = getNumAxis(text);
+    if (!useNumAxisFromGeometryFactory) {
+      if (numAxis != geometryFactory.getNumAxis()) {
+        int srid = geometryFactory.getSRID();
+        double scaleXY = geometryFactory.getScaleXY();
+        double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+      }
+    }
 
     final List<CoordinatesList> pointsList;
     if (isEmpty(text)) {
@@ -266,9 +307,19 @@ public class WktParser {
   }
 
   private MultiPolygon parseMultiPolygon(
-    final GeometryFactory geometryFactory,
+    GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory,
     final StringBuffer text) {
     final int numAxis = getNumAxis(text);
+    if (!useNumAxisFromGeometryFactory) {
+      if (numAxis != geometryFactory.getNumAxis()) {
+        int srid = geometryFactory.getSRID();
+        double scaleXY = geometryFactory.getScaleXY();
+        double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+      }
+    }
 
     final List<List<CoordinatesList>> polygons;
     if (isEmpty(text)) {
@@ -337,9 +388,19 @@ public class WktParser {
   }
 
   private Point parsePoint(
-    final GeometryFactory geometryFactory,
+    GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory,
     final StringBuffer text) {
     final int numAxis = getNumAxis(text);
+    if (!useNumAxisFromGeometryFactory) {
+      if (numAxis != geometryFactory.getNumAxis()) {
+        int srid = geometryFactory.getSRID();
+        double scaleXY = geometryFactory.getScaleXY();
+        double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+      }
+    }
     if (isEmpty(text)) {
       return geometryFactory.createPoint();
     } else {
@@ -353,9 +414,19 @@ public class WktParser {
   }
 
   private Polygon parsePolygon(
-    final GeometryFactory geometryFactory,
+    GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory,
     final StringBuffer text) {
     final int numAxis = getNumAxis(text);
+    if (!useNumAxisFromGeometryFactory) {
+      if (numAxis != geometryFactory.getNumAxis()) {
+        int srid = geometryFactory.getSRID();
+        double scaleXY = geometryFactory.getScaleXY();
+        double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          scaleZ);
+      }
+    }
 
     final List<CoordinatesList> parts;
     if (isEmpty(text)) {

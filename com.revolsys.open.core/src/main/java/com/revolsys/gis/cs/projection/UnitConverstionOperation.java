@@ -13,6 +13,8 @@ public class UnitConverstionOperation implements CoordinatesOperation {
 
   private final Unit<?> targetUnit;
 
+  private int numAxis = 0;
+
   public UnitConverstionOperation(final Unit<?> sourceUnit,
     final Unit<?> targetUnit) {
     this.sourceUnit = sourceUnit;
@@ -24,12 +26,29 @@ public class UnitConverstionOperation implements CoordinatesOperation {
     }
   }
 
+  public UnitConverstionOperation(final Unit<?> sourceUnit,
+    final Unit<?> targetUnit, int numAxis) {
+    this.sourceUnit = sourceUnit;
+    this.targetUnit = targetUnit;
+    this.numAxis = numAxis;
+    try {
+      converter = sourceUnit.getConverterToAny(targetUnit);
+    } catch (final ConversionException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
   public void perform(final Coordinates from, final Coordinates to) {
-    final int dimension = Math.min(from.getNumAxis(), to.getNumAxis());
-    for (int i = 0; i < dimension; i++) {
+    final int numAxis = Math.min(from.getNumAxis(), to.getNumAxis());
+
+    for (int i = 0; i < numAxis; i++) {
       final double value = from.getValue(i);
-      final double convertedValue = converter.convert(value);
-      to.setValue(i, convertedValue);
+      if (i < this.numAxis) {
+        final double convertedValue = converter.convert(value);
+        to.setValue(i, convertedValue);
+      } else {
+        to.setValue(i, value);
+      }
     }
 
   }

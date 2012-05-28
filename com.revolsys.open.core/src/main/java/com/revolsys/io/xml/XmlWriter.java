@@ -1270,8 +1270,10 @@ public class XmlWriter extends Writer {
    */
   private void writeName(final QName qName) {
     if (useNamespaces) {
+      final String namespaceUri = qName.getNamespaceURI();
+      String prefix = namespacePrefixMap.get(namespaceUri);
       final QName prefixedQName = getQNameWithPrefix(qName);
-      final String prefix = prefixedQName.getPrefix();
+      prefix = prefixedQName.getPrefix();
       if (prefix.length() != 0) {
         out.write(prefix);
         out.write(':');

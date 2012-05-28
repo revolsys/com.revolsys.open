@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -126,6 +128,7 @@ public class DataObjectReaderHttpMessageConverter extends
       Charset charset = actualMediaType.getCharSet();
       if (charset == null) {
         charset = DEFAULT_CHARSET;
+        actualMediaType = new MediaType(actualMediaType, Collections.singletonMap("charset", charset.name()));
       }
       final String mediaTypeString = actualMediaType.getType() + "/"
         + actualMediaType.getSubtype();

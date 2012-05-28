@@ -254,8 +254,6 @@ public class GeometryFactory extends
 
   private int numAxis = 2;
 
-  private WeakReference<WktParser> wktParserReference;
-
   private GeometryFactory(final int crsId, final int numAxis,
     final double scaleXY, final double scaleZ) {
     super(PrecisionModelUtil.getPrecisionModel(scaleXY), crsId,
@@ -404,15 +402,16 @@ public class GeometryFactory extends
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T createGeometry(final String wkt) {
-    WktParser parser = null;
-    if (wktParserReference != null) {
-      parser = wktParserReference.get();
-    }
-    if (parser == null) {
-      parser = new WktParser(this);
-      wktParserReference = new WeakReference<WktParser>(parser);
-    }
+    WktParser parser = new WktParser(this);
     return (T)parser.parseGeometry(wkt);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T createGeometry(
+    final String wkt,
+    boolean useNumAxisFromGeometryFactory) {
+    WktParser parser = new WktParser(this);
+    return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
   }
 
   public GeometryCollection createGeometryCollection(

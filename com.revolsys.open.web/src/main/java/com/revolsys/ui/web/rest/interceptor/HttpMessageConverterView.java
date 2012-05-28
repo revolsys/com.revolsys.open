@@ -1,6 +1,7 @@
 package com.revolsys.ui.web.rest.interceptor;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -70,7 +71,12 @@ public class HttpMessageConverterView extends AbstractView {
         .contains(mediaType)) {
       render(response);
     } else {
-      response.setContentType(mediaType.toString());
+      Charset charSet = mediaType.getCharSet();
+      if (charSet == null) {
+        response.setContentType(mediaType.toString() + "; charset=UTF-8");
+      } else {
+        response.setContentType(mediaType.toString());
+      }
       final HttpMessageConverterView savedView = getMessageConverterView();
       requestAttributes.setAttribute(NAME, this,
         RequestAttributes.SCOPE_REQUEST);

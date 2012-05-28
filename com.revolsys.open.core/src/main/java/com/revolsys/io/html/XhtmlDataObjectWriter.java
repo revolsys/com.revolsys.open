@@ -5,8 +5,11 @@ import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import com.revolsys.converter.string.StringConverter;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -87,12 +90,12 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
         out.element(HtmlUtil.TH,
           CaseConverter.toCapitalizedWords(key.toString()));
         out.startTag(HtmlUtil.TD);
-        if (value instanceof URI) {
+        if (value == null) {
+          out.text("-");
+        } else if (value instanceof URI) {
           HtmlUtil.serializeA(out, null, value, value);
-        } else if (value instanceof Number) {
-          out.text(NUMBER_FORMAT.format(value));
         } else {
-          out.text(value);
+          writeValue(key, value);
         }
         out.endTag(HtmlUtil.TD);
         out.endTag(HtmlUtil.TR);
@@ -102,17 +105,33 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
       for (final String key : metaData.getAttributeNames()) {
         final Object value = object.getValue(key);
         out.startTag(HtmlUtil.TD);
+        if (value == null) {
+          out.text("-");
+        }
         if (value instanceof URI) {
           HtmlUtil.serializeA(out, null, value, value);
-        } else if (value instanceof Number) {
-          out.text(NUMBER_FORMAT.format(value));
         } else {
-          out.text(value);
+          writeValue(key, value);
         }
         out.endTag(HtmlUtil.TD);
       }
       out.endTag(HtmlUtil.TR);
 
+    }
+  }
+
+  public void writeValue(final String name, final Object value) {
+    final DataType dataType = metaData.getAttributeType(name);
+
+    @SuppressWarnings("unchecked")
+    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
+    final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+      .getConverter(dataTypeClass);
+    if (converter == null) {
+      out.text(value);
+    } else {
+      final String stringValue = converter.toString(value);
+      out.text(stringValue);
     }
   }
 

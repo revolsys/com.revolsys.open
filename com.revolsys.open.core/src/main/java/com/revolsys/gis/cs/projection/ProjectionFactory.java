@@ -86,13 +86,14 @@ public final class ProjectionFactory {
           // TODO Datum shift
           final Unit<Angle> angularUnit2 = gcs2.getUnit();
           if (!angularUnit1.equals(angularUnit2)) {
-            return new UnitConverstionOperation(angularUnit1, angularUnit2);
+            return new UnitConverstionOperation(angularUnit1, angularUnit2, 2);
           } else {
             return null;
           }
         } else {
           if (!angularUnit1.equals(SI.RADIAN)) {
-            operations.add(new UnitConverstionOperation(angularUnit1, SI.RADIAN));
+            operations.add(new UnitConverstionOperation(angularUnit1,
+              SI.RADIAN, 2));
           }
         }
       } else {
@@ -112,7 +113,8 @@ public final class ProjectionFactory {
         final GeographicCoordinateSystem gcs2 = (GeographicCoordinateSystem)cs2;
         final Unit<Angle> angularUnit2 = gcs2.getUnit();
         if (!angularUnit2.equals(SI.RADIAN)) {
-          operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2));
+          operations.add(new UnitConverstionOperation(SI.RADIAN, angularUnit2,
+            2));
         }
       }
       switch (operations.size()) {
@@ -297,7 +299,7 @@ public final class ProjectionFactory {
         return operation;
       } else {
         return new ChainedCoordinatesOperation(operation,
-          new UnitConverstionOperation(SI.RADIAN, angularUnit));
+          new UnitConverstionOperation(SI.RADIAN, angularUnit, 2));
       }
     } else {
       return new CopyOperation();
