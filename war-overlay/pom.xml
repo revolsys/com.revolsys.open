@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.05.28.RELEASE</version>
   </parent>
   <artifactId>war-overlay</artifactId>
   <packaging>war</packaging>
