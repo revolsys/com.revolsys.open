@@ -75,6 +75,9 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       } else if (object instanceof com.vividsolutions.jts.geom.Point) {
         final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
         geometry = toPgPoint(point);
+      } else if (object instanceof com.vividsolutions.jts.geom.MultiPoint) {
+        final com.vividsolutions.jts.geom.MultiPoint point = (com.vividsolutions.jts.geom.MultiPoint)object;
+        geometry = toPgMultiPoint(point);
       } else if (object instanceof com.vividsolutions.jts.geom.LineString) {
         final com.vividsolutions.jts.geom.LineString lineString = (com.vividsolutions.jts.geom.LineString)object;
         geometry = toPgLineString(lineString);
@@ -84,6 +87,9 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       } else if (object instanceof com.vividsolutions.jts.geom.Polygon) {
         final com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)object;
         geometry = toPgPolygon(polygon);
+      } else if (object instanceof com.vividsolutions.jts.geom.MultiPolygon) {
+        final com.vividsolutions.jts.geom.MultiPolygon polygon = (com.vividsolutions.jts.geom.MultiPolygon)object;
+        geometry = toPgMultiPolygon(polygon);
       } else {
         return object;
       }

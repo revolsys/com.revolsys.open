@@ -23,6 +23,8 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
+  private boolean useSchemaSequencePrefix;
+
   public PostgreSQLDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -86,13 +88,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
-    final String shortName = ShortNameProperty.getShortName(metaData);
-    String sequenceName;
-    if (shortName == null) {
-      sequenceName = getSequenceName(metaData);
-    } else {
-      sequenceName = shortName + "_SEQ";
-    }
+    String sequenceName = getSequenceName(metaData);
     return getNextPrimaryKey(sequenceName);
   }
 
@@ -106,22 +102,38 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
+  public void setUseSchemaSequencePrefix(boolean useSchemaSequencePrefix) {
+    this.useSchemaSequencePrefix = useSchemaSequencePrefix;
+  }
+
+  public boolean isUseSchemaSequencePrefix() {
+    return useSchemaSequencePrefix;
+  }
+
   public String getSequenceName(final DataObjectMetaData metaData) {
     final String typePath = metaData.getPath();
     final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
-    final String shortName = ShortNameProperty.getShortName(metaData);
+    String shortName = ShortNameProperty.getShortName(metaData);
+    final String sequenceName;
     if (StringUtils.hasText(shortName)) {
-      final String sequenceName = schema + "." + shortName.toLowerCase()
-        + "_seq";
-      return sequenceName;
+      if (useSchemaSequencePrefix) {
+        sequenceName = schema + "." + shortName.toLowerCase() + "_seq";
+      } else {
+        sequenceName = shortName.toLowerCase() + "_seq";
+      }
     } else {
       final String tableName = getDatabaseTableName(typePath);
       final String idAttributeName = metaData.getIdAttributeName()
         .toLowerCase();
-      final String sequenceName = schema + "." + tableName + "_"
-        + idAttributeName + "_seq";
-      return sequenceName;
+      if (useSchemaSequencePrefix) {
+        sequenceName = schema + "." + tableName + "_" + idAttributeName
+          + "_seq";
+      } else {
+        sequenceName = tableName + "_" + idAttributeName + "_seq";
+      }
     }
+    return sequenceName;
+
   }
 
   @Override

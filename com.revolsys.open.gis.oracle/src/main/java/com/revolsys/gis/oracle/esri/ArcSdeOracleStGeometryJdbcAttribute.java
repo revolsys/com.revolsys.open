@@ -10,6 +10,7 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -126,7 +127,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
       final Double mScale = spatialReference.getMScale();
       final Double mOffset = spatialReference.getMOffset();
 
-      final Envelope envelope = geometry.getEnvelopeInternal();
+      final BoundingBox envelope = BoundingBox.getBoundingBox(geometry);
       final double minX = envelope.getMinX();
       final double minY = envelope.getMinY();
       final double maxX = envelope.getMaxX();

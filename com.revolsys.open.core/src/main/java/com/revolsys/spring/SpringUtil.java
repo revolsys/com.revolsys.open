@@ -97,15 +97,18 @@ public class SpringUtil {
     }
   }
 
-  public static File getFileOrCreateTempFile(final Resource resource)
-    throws IOException {
-    if (resource instanceof FileSystemResource) {
-      return resource.getFile();
-    } else {
-      final String filename = resource.getFilename();
-      final String baseName = FileUtil.getBaseName(filename);
-      final String fileExtension = FileUtil.getFileNameExtension(filename);
-      return File.createTempFile(baseName, fileExtension);
+  public static File getFileOrCreateTempFile(final Resource resource) {
+    try {
+      if (resource instanceof FileSystemResource) {
+        return resource.getFile();
+      } else {
+        final String filename = resource.getFilename();
+        final String baseName = FileUtil.getBaseName(filename);
+        final String fileExtension = FileUtil.getFileNameExtension(filename);
+        return File.createTempFile(baseName, fileExtension);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to get file for " + resource, e);
     }
   }
 

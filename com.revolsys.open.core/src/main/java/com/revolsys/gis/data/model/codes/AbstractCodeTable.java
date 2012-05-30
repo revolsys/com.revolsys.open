@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.revolsys.util.CaseConverter;
 
 public abstract class AbstractCodeTable implements CodeTable, Cloneable {

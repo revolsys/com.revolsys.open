@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectEqualsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
@@ -171,5 +172,10 @@ public class DataObjectQuadTree extends Quadtree {
     for (final DataObject object : objects) {
       remove(object);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<DataObject> queryEnvelope(BoundingBox envelope) {
+    return query(envelope);
   }
 }

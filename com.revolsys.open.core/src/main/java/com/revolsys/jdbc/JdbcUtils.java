@@ -201,7 +201,7 @@ public final class JdbcUtils {
   public static void lockTable(
     final Connection connection,
     final String tableName) throws SQLException {
-    final String sql = "LOCK TABLE " + tableName + " IN EXCLUSIVE MODE";
+    final String sql = "LOCK TABLE " + tableName +" IN SHARE MODE" ;
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       statement.execute();

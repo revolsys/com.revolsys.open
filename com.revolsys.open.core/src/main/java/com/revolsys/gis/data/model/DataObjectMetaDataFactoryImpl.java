@@ -20,6 +20,7 @@
  */
 package com.revolsys.gis.data.model;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,5 +39,9 @@ public class DataObjectMetaDataFactoryImpl extends AbstractObjectWithProperties
 
   public DataObjectMetaData getMetaData(final String path) {
     return types.get(path);
+  }
+
+  public Collection<DataObjectMetaData> getTypes() {
+    return types.values();
   }
 }

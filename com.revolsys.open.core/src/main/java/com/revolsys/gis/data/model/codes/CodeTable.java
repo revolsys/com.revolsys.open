@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface CodeTable extends Cloneable {
-  CodeTable clone();
-
   List<String> getAttributeAliases();
 
   Map<Object, List<Object>> getCodes();

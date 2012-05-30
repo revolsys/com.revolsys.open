@@ -9,6 +9,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
+import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 
 public class LineSegmentUtil {
@@ -409,6 +410,7 @@ public class LineSegmentUtil {
       if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
         return new DoubleCoordinatesList(2);
       } else {
+        
         final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
           line2x2, line2y2, line1x1, line1y1);
         final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
@@ -432,13 +434,13 @@ public class LineSegmentUtil {
               || CoordinatesUtil.equals(line1x2, line1y2, line2x2, line2y2)) {
               return new DoubleCoordinatesList(2, line1x2, line1y2);
             } else if (Pq1 == 0) {
-              return new DoubleCoordinatesList(2, line1x1, line1y1);
-            } else if (Pq2 == 0) {
-              return new DoubleCoordinatesList(2, line1x2, line1y2);
-            } else if (Qp1 == 0) {
               return new DoubleCoordinatesList(2, line2x1, line2y1);
-            } else if (Qp2 == 0) {
+            } else if (Pq2 == 0) {
               return new DoubleCoordinatesList(2, line2x2, line2y2);
+            } else if (Qp1 == 0) {
+              return new DoubleCoordinatesList(2, line1x1, line1y1);
+            } else if (Qp2 == 0) {
+              return new DoubleCoordinatesList(2, line1x2, line1y2);
             } else {
               return new DoubleCoordinatesList(2);
             }

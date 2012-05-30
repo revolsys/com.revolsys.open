@@ -92,6 +92,10 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));
+      attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
+        "st_buffer(", ")"));
+      attribute.setProperty(JdbcConstants.FUNCTION_EQUAL, new SqlFunction(
+        "st_equals(", ")"));
       attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         geometryFactory);
       return attribute;

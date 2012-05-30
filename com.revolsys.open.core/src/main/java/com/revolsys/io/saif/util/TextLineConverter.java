@@ -22,7 +22,7 @@ public class TextLineConverter implements OsnConverter {
 
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put(TYPE, "TextLine");
+    values.put(TYPE, "/TextLine");
     Geometry geometry = null;
 
     String attributeName = iterator.nextAttributeName();

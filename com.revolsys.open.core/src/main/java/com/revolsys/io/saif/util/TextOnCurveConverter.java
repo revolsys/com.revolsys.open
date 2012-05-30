@@ -28,7 +28,7 @@ public class TextOnCurveConverter implements OsnConverter {
 
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put(TYPE, "TextOnCurve");
+    values.put(TYPE, "/TextOnCurve");
     Geometry geometry = null;
     final List<Point> points = new ArrayList<Point>();
 

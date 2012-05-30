@@ -42,7 +42,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     }
   }
 
-  protected static DataObjectReaderFactory getDataObjectReaderFactory(
+  public static DataObjectReaderFactory getDataObjectReaderFactory(
     final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(

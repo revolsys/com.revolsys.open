@@ -1,6 +1,8 @@
 package com.revolsys.gis.graph;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
@@ -86,5 +88,13 @@ public class DataObjectGraph extends Graph<DataObject> {
       }
     }
     return false;
+  }
+
+  public List<Edge<DataObject>> splitEdges(Coordinates point, double distance) {
+    List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
+    for (Edge<DataObject> edge : findEdges(point, distance)) {
+      edges.addAll(edge.split(point));
+    }
+    return edges;
   }
 }

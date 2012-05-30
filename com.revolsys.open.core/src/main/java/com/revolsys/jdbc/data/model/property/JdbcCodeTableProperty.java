@@ -3,6 +3,7 @@ package com.revolsys.jdbc.data.model.property;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +23,6 @@ import com.revolsys.jdbc.io.JdbcDataObjectStore;
 public class JdbcCodeTableProperty extends CodeTableProperty {
   private static final Logger LOG = Logger.getLogger(JdbcCodeTableProperty.class);
 
-  private Map<String, String> auditColumns = Collections.emptyMap();
-
   private DataSource dataSource;
 
   private JdbcDataObjectStore dataStore;
@@ -31,6 +30,8 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   private String insertSql;
 
   private String tableName;
+
+  private boolean useAuditColumns;
 
   @Override
   public JdbcCodeTableProperty clone() {
@@ -42,9 +43,9 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     try {
       final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
-        JdbcUtils.lockTable(connection, tableName);
         Object id = loadId(values, false);
-        if (id == null) {
+        boolean retry = true;
+        while (id == null) {
           final PreparedStatement statement = connection.prepareStatement(insertSql);
           try {
             id = dataStore.getNextPrimaryKey(getMetaData());
@@ -55,22 +56,22 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
             }
             if (statement.executeUpdate() > 0) {
               return id;
+            }
+          } catch (final SQLException e) {
+            if (retry) {
+              retry = false;
+              id = loadId(values, false);
             } else {
-              return null;
+              throw new RuntimeException(tableName
+                + ": Unable to create ID for  " + values, e);
             }
           } finally {
             JdbcUtils.close(statement);
           }
-        } else {
-          return id;
         }
+        return id;
 
       } finally {
-        try {
-          connection.commit();
-        } catch (final SQLException e) {
-          LOG.error(e.getMessage(), e);
-        }
         JdbcUtils.close(connection);
       }
 
@@ -79,10 +80,6 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         + values, e);
     }
 
-  }
-
-  public Map<String, String> getAuditColumns() {
-    return auditColumns;
   }
 
   public DataSource getDataSource() {
@@ -94,16 +91,8 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     return dataStore;
   }
 
-  public void setAuditColumns(final boolean useAuditColumns) {
-    auditColumns = new HashMap<String, String>();
-    auditColumns.put("WHO_CREATED", "USER");
-    auditColumns.put("WHEN_CREATED", "SYSDATE");
-    auditColumns.put("WHO_UPDATED", "USER");
-    auditColumns.put("WHEN_UPDATED", "SYSDATE");
-  }
-
-  public void setAuditColumns(final Map<String, String> auditColumns) {
-    this.auditColumns = auditColumns;
+  public void setUseAuditColumns(final boolean useAuditColumns) {
+    this.useAuditColumns = useAuditColumns;
   }
 
   @Override
@@ -124,15 +113,19 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         final String columnName = valueAttributeNames.get(i);
         this.insertSql += ", " + columnName;
       }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getKey();
+      if (useAuditColumns) {
+        insertSql += ", WHO_CREATED, WHEN_CREATED, WHO_UPDATED, WHEN_UPDATED";
       }
       insertSql += ") VALUES (?";
       for (int i = 0; i < valueAttributeNames.size(); i++) {
         insertSql += ", ?";
       }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getValue();
+      if (useAuditColumns) {
+        if (dataStore.getClass().getName().equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
+          insertSql += ", USER, SYSDATE, USER, SYSDATE";
+        } else {
+          insertSql += ", current_user, current_timestamp, current_user, current_timestamp";
+        }
       }
       insertSql += ")";
     }

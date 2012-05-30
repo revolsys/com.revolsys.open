@@ -624,7 +624,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
    * 
    * @throws AssertionFailedException if a second Geometry is being added
    */
-  public void addAttribute(final String attributeName, final DataType type) {
-    addAttribute(attributeName, type, false);
+  public Attribute addAttribute(final String attributeName, final DataType type) {
+   return addAttribute(attributeName, type, false);
   }
 }

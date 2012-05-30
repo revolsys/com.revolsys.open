@@ -65,7 +65,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "text",
       object.getValue(MoepConstants.TEXT));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "textType",
-      "TextLine");
+      "/TextLine");
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "fontName",
       object.getValue(MoepConstants.FONT_NAME));
     JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),

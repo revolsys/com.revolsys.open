@@ -40,17 +40,23 @@ import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
+import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
+import com.revolsys.gis.data.model.DataObjectMetaDataFactoryImpl;
 import com.revolsys.gis.io.DataObjectReader;
-import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.saif.util.PathCache;
+import com.revolsys.spring.SpringUtil;
 
 /**
  * <p>
@@ -60,8 +66,9 @@ import com.revolsys.io.saif.util.PathCache;
  * @author Paul Austin
  * @see SaifWriter
  */
-public class SaifReader extends AbstractObjectWithProperties implements
-  DataObjectReader, DataObjectMetaDataFactory {
+public class SaifReader extends AbstractReader<DataObject> implements
+  DataObjectReader, DataObjectMetaDataFactory,
+  com.revolsys.gis.data.io.DataObjectReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
@@ -137,6 +144,10 @@ public class SaifReader extends AbstractObjectWithProperties implements
    */
   public SaifReader(final File file) {
     setFile(file);
+  }
+
+  public SaifReader(final Resource resource) {
+    setFile(SpringUtil.getFileOrCreateTempFile(resource));
   }
 
   /**
@@ -538,25 +549,40 @@ public class SaifReader extends AbstractObjectWithProperties implements
    * directory.
    */
   public void open() {
-    try {
-      if (log.isDebugEnabled()) {
-        log.debug("Opening SAIF archive '" + file.getCanonicalPath() + "'");
+    if (!opened) {
+      opened = true;
+      try {
+        if (log.isDebugEnabled()) {
+          log.debug("Opening SAIF archive '" + file.getCanonicalPath() + "'");
+        }
+        if (file.isDirectory()) {
+          saifArchiveDirectory = file;
+        } else {
+          zipFile = new ZipFile(file);
+        }
+        if (log.isDebugEnabled()) {
+          log.debug("  Finished opening archive");
+        }
+        loadSchema();
+        loadExportedObjects();
+        loadSrid();
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+          srid, 1.0, 1.0);
+
+        for (DataObjectMetaData metaData : ((DataObjectMetaDataFactoryImpl)this.metaDataFactory).getTypes()) {
+          Attribute geometryAttribute = metaData.getGeometryAttribute();
+          if (geometryAttribute != null) {
+            geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+              geometryFactory);
+          }
+        }
+      } catch (final IOException e) {
+        throw new RuntimeException(e.getMessage(), e);
       }
-      if (file.isDirectory()) {
-        saifArchiveDirectory = file;
-      } else {
-        zipFile = new ZipFile(file);
-      }
-      if (log.isDebugEnabled()) {
-        log.debug("  Finished opening archive");
-      }
-      loadSchema();
-      loadExportedObjects();
-      loadSrid();
-    } catch (final IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
     }
   }
+
+  private boolean opened = false;
 
   /**
    * Open the iterator for the next object set.
@@ -662,6 +688,7 @@ public class SaifReader extends AbstractObjectWithProperties implements
     } else {
       this.metaDataFactory = declaredMetaDataFactory;
     }
+
   }
 
   public void setSrid(final int srid) {
@@ -692,4 +719,15 @@ public class SaifReader extends AbstractObjectWithProperties implements
     return getOsnReader(className, factory);
   }
 
+  @Override
+  public Iterator<DataObject> iterator() {
+    open();
+    return this;
+  }
+
+  @Override
+  public DataObjectMetaData getMetaData() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }
