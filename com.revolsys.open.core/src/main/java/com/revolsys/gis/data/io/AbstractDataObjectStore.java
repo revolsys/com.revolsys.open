@@ -3,6 +3,7 @@ package com.revolsys.gis.data.io;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -334,7 +335,11 @@ public abstract class AbstractDataObjectStore extends
 
   public List<String> getTypeNames(final String schemaName) {
     final DataObjectStoreSchema schema = getSchema(schemaName);
-    return schema.getTypeNames();
+    if (schema ==null) {
+      return Collections.emptyList();
+    } else {
+      return schema.getTypeNames();
+    }
   }
 
   public List<DataObjectMetaData> getTypes(final String namespace) {

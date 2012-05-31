@@ -39,7 +39,9 @@ public final class MathUtil {
   public static final int BYTES_IN_LONG = 8;
 
   public static final int BYTES_IN_SHORT = 2;
-
+  public static double avg(final double a, final double b) {
+    return (a + b) / 2d;
+  }
   /** The number of cents in a dollar. */
   public static final BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
 

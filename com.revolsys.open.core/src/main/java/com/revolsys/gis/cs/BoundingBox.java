@@ -10,12 +10,14 @@ import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
@@ -578,5 +580,24 @@ public class BoundingBox extends Envelope {
       return "SRID=" + geometryFactory.getSRID() + ";BBOX(" + getMinX() + ","
         + getMinY() + " " + getMaxX() + "," + getMaxY() + ")";
     }
+  }
+
+  public void expandToInclude(Geometry geometry) {
+    BoundingBox box = getBoundingBox(geometry);
+    expandToInclude(box);
+  }
+
+  public boolean contains(Point point) {
+    Point projectedPoint = (Point)geometryFactory.createGeometry(point);
+    Coordinates coordinates = CoordinatesUtil.get(projectedPoint);
+    return contains(coordinates);
+  }
+
+  public void move(double xDisplacement, double yDisplacement) {
+    minX = getMinX() + xDisplacement;
+    maxX = getMaxX() + xDisplacement;
+    minY = getMinY() + yDisplacement;
+    maxY = getMaxY() + yDisplacement;
+    initIfNotNull();
   }
 }

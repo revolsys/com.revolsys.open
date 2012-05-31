@@ -1,5 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.util.MathUtil;
@@ -8,6 +9,7 @@ import com.vividsolutions.jts.algorithm.NotRepresentableException;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class CoordinatesUtil {
 
@@ -22,6 +24,80 @@ public class CoordinatesUtil {
     final double x3 = p3.getX();
     final double y3 = p3.getY();
     return MathUtil.angle(x1, y1, x2, y2, x3, y3);
+  }
+
+  public static Coordinate toCoordinate(Coordinates point) {
+    return new Coordinate(point.getX(), point.getY(), point.getZ());
+  }
+
+  public static Coordinates average(final Coordinates c1, final Coordinates c2) {
+    int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
+    Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      double value1 = c1.getValue(i);
+      double value2 = c2.getValue(i);
+      double value = MathUtil.avg(value1, value2);
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
+  public static Coordinates subtract(final Coordinates c1, final Coordinates c2) {
+    int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
+    Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      double value1 = c1.getValue(i);
+      double value2 = c2.getValue(i);
+      double value = value1 - value2;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
+  public static Point add(final Point c1, final Point c2) {
+    GeometryFactory factory = GeometryFactory.getFactory(c1);
+    Point p2 = (Point)factory.createGeometry(c2);
+    return factory.createPoint(add(get(c1), get(p2)));
+  }
+
+  public static Point subtract(final Point c1, final Point c2) {
+    GeometryFactory factory = GeometryFactory.getFactory(c1);
+    Point p2 = (Point)factory.createGeometry(c2);
+    return factory.createPoint(subtract(get(c1), get(p2)));
+  }
+
+  public static Coordinates add(final Coordinates c1, final Coordinates c2) {
+    int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
+    Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      double value1 = c1.getValue(i);
+      double value2 = c2.getValue(i);
+      double value = value1 + value2;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
+  public static Coordinates divide(final Coordinates c1, final double d) {
+    int numAxis = c1.getNumAxis();
+    Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      double value1 = c1.getValue(i);
+      double value = value1 / d;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
+  public static Coordinates multiply(final double d, final Coordinates c1) {
+    int numAxis = c1.getNumAxis();
+    Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      double value1 = c1.getValue(i);
+      double value = value1 * d;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
   }
 
   public static Coordinates circumcentre(

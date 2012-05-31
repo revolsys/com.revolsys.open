@@ -23,6 +23,7 @@ import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
@@ -65,6 +66,24 @@ public class CoordinatesListUtil {
       previousCoordinate.next();
     }
 
+  }
+
+  public static List<Coordinates> get(Point... points) {
+    List<Coordinates> coordinatesList = new ArrayList<Coordinates>();
+    for (Point point : points) {
+      Coordinates coordinates = CoordinatesUtil.get(point);
+      coordinatesList.add(coordinates);
+    }
+    return coordinatesList;
+  }
+
+  public static List<Coordinates> get(List<Point> points) {
+    List<Coordinates> coordinatesList = new ArrayList<Coordinates>();
+    for (Point point : points) {
+      Coordinates coordinates = CoordinatesUtil.get(point);
+      coordinatesList.add(coordinates);
+    }
+    return coordinatesList;
   }
 
   public static double angle(

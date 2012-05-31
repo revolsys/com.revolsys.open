@@ -15,6 +15,7 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
@@ -39,9 +40,9 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class GeometryFactory extends
   com.vividsolutions.jts.geom.GeometryFactory implements
   CoordinatesPrecisionModel {
-  private static final long serialVersionUID = 4328651897279304108L;
-
   private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
+
+  private static final long serialVersionUID = 4328651897279304108L;
 
   public static void clear() {
     factories.clear();
@@ -426,6 +427,7 @@ public class GeometryFactory extends
     return super.createLinearRing(points);
   }
 
+
   public LinearRing createLinearRing(final double... coordinates) {
     final CoordinatesList points = createCoordinatesList(coordinates);
     return createLinearRing(points);
@@ -487,6 +489,32 @@ public class GeometryFactory extends
       }
       return createLineString(coordinatesList);
     }
+  }
+
+  public LinearRing createLinearRing(final List<Coordinates> points) {
+    if (points == null || points.isEmpty()) {
+      return createLinearRing((CoordinateSequence)null);
+    } else {
+      CoordinatesList coordinatesList;
+      final int numPoints = points.size();
+      if (numPoints == 0) {
+        coordinatesList = null;
+      } else {
+        final Coordinates point0 = points.get(0);
+        final byte numAxis = point0.getNumAxis();
+
+        coordinatesList = new DoubleCoordinatesList(numPoints, numAxis);
+        for (int i = 0; i < numPoints; i++) {
+          final Coordinates point = points.get(i);
+          coordinatesList.setPoint(i, point);
+        }
+      }
+      return createLinearRing(coordinatesList);
+    }
+  }
+  public LineString createLineString(Point... points) {
+    List<Coordinates> coordinatesList = CoordinatesListUtil.get(points);
+    return createLineString(coordinatesList);
   }
 
   @Override
@@ -680,4 +708,5 @@ public class GeometryFactory extends
       }
     }
   }
+
 }

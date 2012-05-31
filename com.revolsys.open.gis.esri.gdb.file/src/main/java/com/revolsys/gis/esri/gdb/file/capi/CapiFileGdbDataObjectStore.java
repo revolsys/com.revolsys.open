@@ -342,6 +342,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private DataObjectMetaData createTable(final DataObjectMetaData objectMetaData) {
+    
     final GeometryFactory geometryFactory = objectMetaData.getGeometryFactory();
     final SpatialReference spatialReference = getSpatialReference(geometryFactory);
 
@@ -358,7 +359,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   protected synchronized DataObjectMetaDataImpl createTable(
     final DETable deTable) {
     String schemaPath = deTable.getParentCatalogPath();
-    String schemaName = schemaPath.substring(1);
+    String schemaName = schemaPath.replaceAll("\\\\", "/");
     final DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
       if (schemaName.equals(defaultSchema)) {

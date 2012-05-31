@@ -10,6 +10,7 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
@@ -37,6 +38,20 @@ public class LineSegment extends AbstractCoordinatesList {
         }
       }
       previousCoordinate = coordinate;
+    }
+  }
+
+  public Coordinates closestPoint(Coordinates p) {
+    double factor = projectionFactor(p);
+    if (factor > 0 && factor < 1) {
+      return project(p);
+    }
+    double dist0 = coordinates1.distance(p);
+    double dist1 = coordinates2.distance(p);
+    if (dist0 < dist1) {
+      return coordinates1;
+    } else {
+      return coordinates2;
     }
   }
 
