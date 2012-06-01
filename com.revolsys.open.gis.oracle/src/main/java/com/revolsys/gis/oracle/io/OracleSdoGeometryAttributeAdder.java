@@ -48,7 +48,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINT", 4);
     addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRING", 5);
     addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGON", 6);
-    addGeometryType(null, "GEOMCOLLECTION", 7);
+    addGeometryType(DataTypes.GEOMETRY_COLLECTION, "GEOMCOLLECTION", 7);
     addGeometryType(null, "CURVE", 13);
     addGeometryType(null, "SURFACE", 14);
     addGeometryType(null, "POLYHEDRALSURFACE", 15);
@@ -59,7 +59,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINTZ", 1004);
     addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRINGZ", 1005);
     addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGONZ", 1006);
-    addGeometryType(null, "GEOMCOLLECTIONZ", 1007);
+    addGeometryType(DataTypes.GEOMETRY_COLLECTION, "GEOMCOLLECTIONZ", 1007);
     addGeometryType(null, "CURVEZ", 1013);
     addGeometryType(null, "SURFACEZ", 1014);
     addGeometryType(null, "POLYHEDRALSURFACEZ", 1015);
@@ -70,7 +70,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINTM", 2004);
     addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRINGM", 2005);
     addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGONM", 2006);
-    addGeometryType(null, "GEOMCOLLECTIONM", 2007);
+    addGeometryType(DataTypes.GEOMETRY_COLLECTION, "GEOMCOLLECTIONM", 2007);
     addGeometryType(null, "CURVEM", 2013);
     addGeometryType(null, "SURFACEM", 2014);
     addGeometryType(null, "POLYHEDRALSURFACEM", 2015);
@@ -81,7 +81,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     addGeometryType(DataTypes.MULTI_POINT, "MULTIPOINTZM", 3004);
     addGeometryType(DataTypes.MULTI_LINE_STRING, "MULTILINESTRINGZM", 3005);
     addGeometryType(DataTypes.MULTI_POLYGON, "MULTIPOLYGONZM", 3006);
-    addGeometryType(null, "GEOMCOLLECTIONZM", 3007);
+    addGeometryType(DataTypes.GEOMETRY_COLLECTION, "GEOMCOLLECTIONZM", 3007);
     addGeometryType(null, "CURVEZM", 3013);
     addGeometryType(null, "SURFACEZM", 3014);
     addGeometryType(null, "POLYHEDRALSURFACEZM", 3015);

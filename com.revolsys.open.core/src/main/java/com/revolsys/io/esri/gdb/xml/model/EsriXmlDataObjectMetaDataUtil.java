@@ -230,7 +230,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
         } else if (geometryDataType.equals(DataTypes.POLYGON)) {
           shapeType = GeometryType.esriGeometryPolygon;
         } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
-          shapeType = GeometryType.esriGeometryMultiPatch;
+          shapeType = GeometryType.esriGeometryPolygon;
         } else {
           throw new IllegalArgumentException("Unable to detect geometry type");
         }
@@ -246,7 +246,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       featureClass.setShapeFieldName(geometryAttribute.getName());
       final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       featureClass.setSpatialReference(spatialReference);
-      featureClass.setHasZ(geometryFactory.hasM());
+      featureClass.setHasM(geometryFactory.hasM());
       featureClass.setHasZ(geometryFactory.hasZ());
       final EnvelopeN envelope = new EnvelopeN(spatialReference);
       featureClass.setExtent(envelope);

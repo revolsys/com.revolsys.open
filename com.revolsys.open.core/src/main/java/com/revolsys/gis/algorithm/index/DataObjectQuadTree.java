@@ -29,8 +29,10 @@ public class DataObjectQuadTree extends Quadtree {
 
   public void insert(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    final Envelope envelope = geometry.getEnvelopeInternal();
-    insert(envelope, object);
+    if (geometry != null) {
+      final Envelope envelope = geometry.getEnvelopeInternal();
+      insert(envelope, object);
+    }
   }
 
   public void insert(final List<DataObject> objects) {

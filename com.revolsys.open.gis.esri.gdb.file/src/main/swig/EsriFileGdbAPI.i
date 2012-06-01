@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
 #include "time.h"
 #include "FileGDBAPI.h"
 
@@ -20,6 +21,7 @@ fgdbError checkResult(fgdbError error) {
      FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString);
      std::stringstream message;
      message << error << "\t" << wstring2string(errorString);
+     FileGDBAPI::ErrorInfo::ClearErrors();
      throw std::runtime_error(message.str());
   }
   return error;
@@ -27,17 +29,7 @@ fgdbError checkResult(fgdbError error) {
 
 void handleRuntimeError(JNIEnv *jenv, const std::runtime_error e) {
   std::stringstream message;
-  message << e.what();
-  int count;
-  FileGDBAPI::ErrorInfo::GetErrorRecordCount(count);
-  for (int i = 0; i < count; i++) {
-    int num;
-    std::wstring description;
-    FileGDBAPI::ErrorInfo::GetErrorRecord(i, num, description);
-    message << "\n" << num << "\t" << wstring2string(description);
-    FileGDBAPI::ErrorInfo::ClearErrors();
-    
-  }
+  message << e.what() ;
   jclass clazz = jenv->FindClass("java/lang/RuntimeException");
   jenv->ThrowNew(clazz, message.str().c_str());
 }

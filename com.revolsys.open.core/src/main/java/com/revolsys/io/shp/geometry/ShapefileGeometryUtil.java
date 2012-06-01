@@ -22,7 +22,20 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public final class ShapefileGeometryUtil {
-  public static List<CoordinatesList> createCoordinatesLists(
+
+  public static final ShapefileGeometryUtil INSTANCE = new ShapefileGeometryUtil();
+
+  private boolean clockwise = false;
+
+  public ShapefileGeometryUtil() {
+
+  }
+
+  public ShapefileGeometryUtil(final boolean clockwise) {
+    this.clockwise = clockwise;
+  }
+
+  public List<CoordinatesList> createCoordinatesLists(
     final int[] partIndex,
     final int numAxis) {
     final List<CoordinatesList> parts = new ArrayList<CoordinatesList>(
@@ -36,7 +49,7 @@ public final class ShapefileGeometryUtil {
     return parts;
   }
 
-  public static void readCoordinates(
+  public void readCoordinates(
     final EndianInput in,
     final CoordinatesList points,
     final int ordinate) throws IOException {
@@ -44,7 +57,7 @@ public final class ShapefileGeometryUtil {
     readCoordinates(in, points, size, ordinate);
   }
 
-  public static void readCoordinates(
+  public void readCoordinates(
     final EndianInput in,
     final CoordinatesList points,
     final int size,
@@ -55,7 +68,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void readCoordinates(
+  public void readCoordinates(
     final EndianInput in,
     final int[] partIndex,
     final List<CoordinatesList> coordinateLists,
@@ -67,7 +80,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static int[] readIntArray(final EndianInput in, final int count)
+  public int[] readIntArray(final EndianInput in, final int count)
     throws IOException {
     final int[] values = new int[count];
     for (int i = 0; i < count; i++) {
@@ -77,31 +90,31 @@ public final class ShapefileGeometryUtil {
     return values;
   }
 
-  public static MultiPoint readMultiPatch(
+  public MultiPoint readMultiPatch(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     return null;
   }
 
-  public static MultiPoint readMultiPatchM(
+  public MultiPoint readMultiPatchM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     return null;
   }
 
-  public static MultiPoint readMultiPatchZ(
+  public MultiPoint readMultiPatchZ(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     return null;
   }
 
-  public static MultiPoint readMultiPatchZM(
+  public MultiPoint readMultiPatchZM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     return null;
   }
 
-  public static MultiPoint readMultipoint(
+  public MultiPoint readMultipoint(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -110,42 +123,42 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createMultiPoint(points);
   }
 
-  public static MultiPoint readMultipointM(
+  public MultiPoint readMultipointM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
     final CoordinatesList points = readXYCoordinates(in, numPoints, 4);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    ShapefileGeometryUtil.readCoordinates(in, points, 3);
+    readCoordinates(in, points, 3);
     return geometryFactory.createMultiPoint(points);
   }
 
-  public static MultiPoint readMultipointZ(
+  public MultiPoint readMultipointZ(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
     final CoordinatesList points = readXYCoordinates(in, numPoints, 3);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    ShapefileGeometryUtil.readCoordinates(in, points, 2);
+    readCoordinates(in, points, 2);
     return geometryFactory.createMultiPoint(points);
   }
 
-  public static MultiPoint readMultipointZM(
+  public MultiPoint readMultipointZM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
     final CoordinatesList points = readXYCoordinates(in, numPoints, 4);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    ShapefileGeometryUtil.readCoordinates(in, points, 2);
+    readCoordinates(in, points, 2);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    ShapefileGeometryUtil.readCoordinates(in, points, 3);
+    readCoordinates(in, points, 3);
     return geometryFactory.createMultiPoint(points);
   }
 
-  public static int[] readPartIndex(
+  public int[] readPartIndex(
     final EndianInput in,
     final int numParts,
     final int numPoints) throws IOException {
@@ -162,14 +175,14 @@ public final class ShapefileGeometryUtil {
     return partIndex;
   }
 
-  public static Point readPoint(
+  public Point readPoint(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final CoordinatesList points = readXYCoordinates(in, 1, 2);
     return geometryFactory.createPoint(points);
   }
 
-  public static Point readPointM(
+  public Point readPointM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
@@ -181,7 +194,7 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createPoint(points);
   }
 
-  public static void readPoints(
+  public void readPoints(
     final EndianInput in,
     final int[] partIndex,
     final List<CoordinatesList> coordinateLists) throws IOException {
@@ -191,7 +204,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static Point readPointZ(
+  public Point readPointZ(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
@@ -201,7 +214,7 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createPoint(points);
   }
 
-  public static Point readPointZM(
+  public Point readPointZM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
@@ -213,7 +226,7 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.createPoint(points);
   }
 
-  public static Polygon readPolygon(
+  public Geometry readPolygon(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -224,57 +237,83 @@ public final class ShapefileGeometryUtil {
     final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 2);
 
     readPoints(in, partIndex, parts);
-    return geometryFactory.createPolygon(parts);
+
+    return createGeometryFromParts(geometryFactory, parts);
 
   }
 
-  public static Polygon readPolygonM(
+  public Geometry createGeometryFromParts(
+    final GeometryFactory geometryFactory,
+    final List<CoordinatesList> parts) {
+    List<Polygon> polygons = new ArrayList<Polygon>();
+    List<CoordinatesList> currentParts = new ArrayList<CoordinatesList>();
+    for (CoordinatesList ring : parts) {
+      boolean ringClockwise = !CoordinatesListUtil.isCCW(ring);
+      if (ringClockwise == clockwise) {
+        if (!currentParts.isEmpty()) {
+          Polygon polygon = geometryFactory.createPolygon(currentParts);
+          polygons.add(polygon);
+          currentParts.clear();
+        }
+      }
+      currentParts.add(ring);
+    }
+    if (!currentParts.isEmpty()) {
+      Polygon polygon = geometryFactory.createPolygon(currentParts);
+      polygons.add(polygon);
+    }
+    if (polygons.size() == 1) {
+      return polygons.get(0);
+    } else {
+      return geometryFactory.createMultiPolygon(polygons);
+    }
+  }
+
+  public Geometry readPolygonM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int[] partIndex = ShapefileGeometryUtil.readPartIndex(in, numParts,
-      numPoints);
+    final int[] partIndex = readPartIndex(in, numParts, numPoints);
 
     final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 4);
     readPoints(in, partIndex, parts);
     readCoordinates(in, partIndex, parts, 3);
-    return geometryFactory.createPolygon(parts);
+    return createGeometryFromParts(geometryFactory, parts);
+
   }
 
-  public static Polygon readPolygonZ(
+  public Geometry readPolygonZ(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int[] partIndex = ShapefileGeometryUtil.readPartIndex(in, numParts,
-      numPoints);
+    final int[] partIndex = readPartIndex(in, numParts, numPoints);
 
     final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 3);
     readPoints(in, partIndex, parts);
     readCoordinates(in, partIndex, parts, 2);
-    return geometryFactory.createPolygon(parts);
+    return createGeometryFromParts(geometryFactory, parts);
   }
 
-  public static Polygon readPolygonZM(
+  public Geometry readPolygonZM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int[] partIndex = ShapefileGeometryUtil.readPartIndex(in, numParts,
-      numPoints);
+    final int[] partIndex = readPartIndex(in, numParts, numPoints);
 
     final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 4);
     readPoints(in, partIndex, parts);
     readCoordinates(in, partIndex, parts, 2);
     readCoordinates(in, partIndex, parts, 3);
-    return geometryFactory.createPolygon(parts);
+    return createGeometryFromParts(geometryFactory, parts);
   }
 
-  public static Geometry readPolyline(
+  public Geometry readPolyline(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -305,7 +344,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static Geometry readPolylineM(
+  public Geometry readPolylineM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -341,7 +380,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static Geometry readPolylineZ(
+  public Geometry readPolylineZ(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -377,7 +416,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static Geometry readPolylineZM(
+  public Geometry readPolylineZM(
     final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -420,7 +459,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void readXYCoordinates(
+  public void readXYCoordinates(
     final EndianInput in,
     final CoordinatesList points) throws IOException {
     for (int j = 0; j < points.size(); j++) {
@@ -431,7 +470,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static CoordinatesList readXYCoordinates(
+  public CoordinatesList readXYCoordinates(
     final EndianInput in,
     final int numPoints,
     final int numAxis) throws IOException {
@@ -440,16 +479,15 @@ public final class ShapefileGeometryUtil {
     return points;
   }
 
-  public static void writeEnvelope(
-    final EndianOutput out,
-    final Envelope envelope) throws IOException {
+  public void writeEnvelope(final EndianOutput out, final Envelope envelope)
+    throws IOException {
     out.writeLEDouble(envelope.getMinX());
     out.writeLEDouble(envelope.getMinY());
     out.writeLEDouble(envelope.getMaxX());
     out.writeLEDouble(envelope.getMaxY());
   }
 
-  public static void writeMCoordinates(
+  public void writeMCoordinates(
     final EndianOutput out,
     final CoordinatesList coordinates) throws IOException {
     if (coordinates.getNumAxis() >= 4) {
@@ -468,9 +506,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeMCoordinates(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMCoordinates(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMCoordinatesRange(out, geometry);
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
       final Geometry subGeometry = geometry.getGeometryN(n);
@@ -479,7 +516,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeMCoordinates(
+  public void writeMCoordinates(
     final EndianOutput out,
     final List<CoordinatesList> pointsList) throws IOException {
     writeMCoordinatesRange(out, pointsList);
@@ -488,7 +525,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeMCoordinatesRange(
+  public void writeMCoordinatesRange(
     final EndianOutput out,
     final Geometry geometry) throws IOException {
     double minM = Double.MAX_VALUE;
@@ -515,7 +552,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeMCoordinatesRange(
+  public void writeMCoordinatesRange(
     final EndianOutput out,
     final List<CoordinatesList> pointsList) throws IOException {
     double minM = Double.MAX_VALUE;
@@ -539,33 +576,28 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeMultiPatch(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultiPatch(final EndianOutput out, final Geometry geometry)
+    throws IOException {
   }
 
-  public static void writeMultiPatchM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultiPatchM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
   }
 
-  public static void writeMultiPatchZ(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultiPatchZ(final EndianOutput out, final Geometry geometry)
+    throws IOException {
   }
 
-  public static void writeMultiPatchZM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultiPatchZM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
   }
 
-  public static void writeMultipoint(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultipoint(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMultipoint(out, geometry, ShapefileConstants.POLYLINE_SHAPE);
   }
 
-  private static void writeMultipoint(
+  private void writeMultipoint(
     final EndianOutput out,
     final Geometry geometry,
     final int shapeType) throws IOException {
@@ -573,7 +605,7 @@ public final class ShapefileGeometryUtil {
       final int numPoints = geometry.getNumPoints();
       final Envelope envelope = geometry.getEnvelopeInternal();
       out.writeLEInt(shapeType);
-      ShapefileGeometryUtil.writeEnvelope(out, envelope);
+      writeEnvelope(out, envelope);
       out.writeLEInt(numPoints);
       writeXYCoordinates(out, geometry);
     } else {
@@ -582,29 +614,26 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeMultipointM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultipointM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMultipoint(out, geometry, ShapefileConstants.MULTI_POINT_M_SHAPE);
     writeMCoordinates(out, geometry);
   }
 
-  public static void writeMultipointZ(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultipointZ(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMultipoint(out, geometry, ShapefileConstants.MULTI_POINT_Z_SHAPE);
     writeZCoordinates(out, geometry);
   }
 
-  public static void writeMultipointZM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeMultipointZM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeMultipoint(out, geometry, ShapefileConstants.MULTI_POINT_ZM_SHAPE);
     writeZCoordinates(out, geometry);
     writeMCoordinates(out, geometry);
   }
 
-  public static void writePoint(final EndianOutput out, final Geometry geometry)
+  public void writePoint(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
@@ -618,7 +647,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writePointM(final EndianOutput out, final Geometry geometry)
+  public void writePointM(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
@@ -633,7 +662,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writePointZ(final EndianOutput out, final Geometry geometry)
+  public void writePointZ(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
@@ -648,9 +677,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writePointZM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePointZM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       final CoordinatesList points = CoordinatesListUtil.get(point);
@@ -665,97 +693,95 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writePolygon(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolygon(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writePolygon(out, geometry, ShapefileConstants.POLYGON_SHAPE);
   }
 
-  private static List<CoordinatesList> writePolygon(
+  private List<CoordinatesList> writePolygon(
     final EndianOutput out,
     final Geometry geometry,
     final int shapeType) throws IOException {
-    if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
 
-      int numPoints = 0;
+    int numPoints = 0;
 
-      final int numHoles = polygon.getNumInteriorRing();
-
-      final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
-      final LineString exterior = polygon.getExteriorRing();
-      CoordinatesList exteroirPoints = CoordinatesListUtil.get(exterior);
-      if (JtsGeometryUtil.isCCW(exteroirPoints)) {
-        exteroirPoints = exteroirPoints.reverse();
-      }
-      rings.add(exteroirPoints);
-      numPoints += exteroirPoints.size();
-      for (int i = 0; i < numHoles; i++) {
-        final LineString interior = polygon.getInteriorRingN(i);
-        CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
-        if (!JtsGeometryUtil.isCCW(interiorCoords)) {
-          interiorCoords = interiorCoords.reverse();
+    final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
+    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      Geometry part = geometry.getGeometryN(i);
+      if (part instanceof Polygon) {
+        final Polygon polygon = (Polygon)part;
+        final LineString exterior = polygon.getExteriorRing();
+        CoordinatesList exteroirPoints = CoordinatesListUtil.get(exterior);
+        boolean exteriorClockwise = !JtsGeometryUtil.isCCW(exteroirPoints);
+        if (exteriorClockwise != clockwise) {
+          exteroirPoints = exteroirPoints.reverse();
         }
-        rings.add(interiorCoords);
-        numPoints += interiorCoords.size();
+        rings.add(exteroirPoints);
+        numPoints += exteroirPoints.size();
+        final int numHoles = polygon.getNumInteriorRing();
+        for (int j = 0; j < numHoles; j++) {
+          final LineString interior = polygon.getInteriorRingN(j);
+          CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
+          boolean interiorClockwise = JtsGeometryUtil.isCCW(interiorCoords);
+          if (interiorClockwise == clockwise) {
+            interiorCoords = interiorCoords.reverse();
+          }
+          rings.add(interiorCoords);
+          numPoints += interiorCoords.size();
+        }
+      } else {
+        throw new IllegalArgumentException("Expecting " + Polygon.class
+          + " geometry got " + part.getClass());
       }
-
-      final int numParts = 1 + numHoles;
-
-      out.writeLEInt(shapeType);
-      final Envelope envelope = polygon.getEnvelopeInternal();
-      writeEnvelope(out, envelope);
-      out.writeLEInt(numParts);
-      out.writeLEInt(numPoints);
-
-      int partIndex = 0;
-      for (final CoordinatesList ring : rings) {
-        out.writeLEInt(partIndex);
-        partIndex += ring.size();
-      }
-
-      for (final CoordinatesList ring : rings) {
-        writeXYCoordinates(out, ring);
-      }
-      return rings;
-    } else {
-      throw new IllegalArgumentException("Expecting " + Polygon.class
-        + " geometry got " + geometry.getClass());
     }
+    final int numParts = rings.size();
+
+    out.writeLEInt(shapeType);
+    final Envelope envelope = geometry.getEnvelopeInternal();
+    writeEnvelope(out, envelope);
+    out.writeLEInt(numParts);
+    out.writeLEInt(numPoints);
+
+    int partIndex = 0;
+    for (final CoordinatesList ring : rings) {
+      out.writeLEInt(partIndex);
+      partIndex += ring.size();
+    }
+
+    for (final CoordinatesList ring : rings) {
+      writeXYCoordinates(out, ring);
+    }
+    return rings;
   }
 
-  public static void writePolygonM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolygonM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     final List<CoordinatesList> rings = writePolygon(out, geometry,
       ShapefileConstants.POLYGON_M_SHAPE);
     writeMCoordinates(out, rings);
   }
 
-  public static void writePolygonZ(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolygonZ(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     final List<CoordinatesList> rings = writePolygon(out, geometry,
       ShapefileConstants.POLYGON_Z_SHAPE);
     writeZCoordinates(out, rings);
   }
 
-  public static void writePolygonZM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolygonZM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     final List<CoordinatesList> rings = writePolygon(out, geometry,
       ShapefileConstants.POLYGON_ZM_SHAPE);
     writeZCoordinates(out, rings);
     writeMCoordinates(out, rings);
   }
 
-  public static void writePolyline(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolyline(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writePolyline(out, geometry, ShapefileConstants.POLYLINE_SHAPE);
   }
 
-  private static void writePolyline(
+  private void writePolyline(
     final EndianOutput out,
     final Geometry geometry,
     final int shapeType) throws IOException {
@@ -764,7 +790,7 @@ public final class ShapefileGeometryUtil {
       final int numGeometries = geometry.getNumGeometries();
       final Envelope envelope = geometry.getEnvelopeInternal();
       out.writeLEInt(shapeType);
-      ShapefileGeometryUtil.writeEnvelope(out, envelope);
+      writeEnvelope(out, envelope);
       out.writeLEInt(numGeometries);
       out.writeLEInt(numCoordinates);
       writePolylinePartIndexes(out, geometry);
@@ -776,14 +802,13 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writePolylineM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolylineM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writePolyline(out, geometry, ShapefileConstants.POLYLINE_M_SHAPE);
     writeMCoordinates(out, geometry);
   }
 
-  public static void writePolylinePartIndexes(
+  public void writePolylinePartIndexes(
     final EndianOutput out,
     final Geometry geometry) throws IOException {
     int partIndex = 0;
@@ -794,22 +819,20 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writePolylineZ(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolylineZ(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writePolyline(out, geometry, ShapefileConstants.POLYLINE_Z_SHAPE);
     writeZCoordinates(out, geometry);
   }
 
-  public static void writePolylineZM(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writePolylineZM(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writePolyline(out, geometry, ShapefileConstants.POLYLINE_ZM_SHAPE);
     writeZCoordinates(out, geometry);
     writeMCoordinates(out, geometry);
   }
 
-  public static void writeXYCoordinates(
+  public void writeXYCoordinates(
     final EndianOutput out,
     final CoordinatesList coordinates) throws IOException {
     for (int i = 0; i < coordinates.size(); i++) {
@@ -818,9 +841,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeXYCoordinates(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeXYCoordinates(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final Geometry subGeometry = geometry.getGeometryN(i);
       final CoordinatesList points = CoordinatesListUtil.get(subGeometry);
@@ -828,7 +850,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeZCoordinates(
+  public void writeZCoordinates(
     final EndianOutput out,
     final CoordinatesList coordinates) throws IOException {
     if (coordinates.getNumAxis() >= 3) {
@@ -847,9 +869,8 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeZCoordinates(
-    final EndianOutput out,
-    final Geometry geometry) throws IOException {
+  public void writeZCoordinates(final EndianOutput out, final Geometry geometry)
+    throws IOException {
     writeZCoordinatesRange(out, geometry);
     for (int n = 0; n < geometry.getNumGeometries(); n++) {
       final Geometry subGeometry = geometry.getGeometryN(n);
@@ -858,7 +879,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeZCoordinates(
+  public void writeZCoordinates(
     final EndianOutput out,
     final List<CoordinatesList> pointsList) throws IOException {
     writeZCoordinatesRange(out, pointsList);
@@ -867,7 +888,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeZCoordinatesRange(
+  public void writeZCoordinatesRange(
     final EndianOutput out,
     final Geometry geometry) throws IOException {
     double minZ = Double.MAX_VALUE;
@@ -894,7 +915,7 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public static void writeZCoordinatesRange(
+  public void writeZCoordinatesRange(
     final EndianOutput out,
     final List<CoordinatesList> pointsList) throws IOException {
     double minZ = Double.MAX_VALUE;
@@ -909,16 +930,13 @@ public final class ShapefileGeometryUtil {
         maxZ = Math.max(z, maxZ);
       }
     }
-    if (minZ == Double.MAX_VALUE && maxZ == Double.MIN_VALUE) {
+    if (minZ == Double.MAX_VALUE || maxZ == Double.MIN_VALUE) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {
       out.writeLEDouble(minZ);
       out.writeLEDouble(maxZ);
     }
-  }
-
-  private ShapefileGeometryUtil() {
   }
 
 }

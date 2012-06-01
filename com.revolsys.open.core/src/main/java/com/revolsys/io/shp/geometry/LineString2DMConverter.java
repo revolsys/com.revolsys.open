@@ -89,7 +89,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
         * MathUtil.BYTES_IN_DOUBLE) / 2;
       out.writeInt(recordLength);
       out.writeLEInt(getShapeType());
-      ShapefileGeometryUtil.writeEnvelope(out, envelope);
+      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, envelope);
       out.writeLEInt(1);
       out.writeLEInt(coordinates.size());
       out.writeLEInt(0);

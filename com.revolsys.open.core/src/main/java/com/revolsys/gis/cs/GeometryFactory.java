@@ -513,7 +513,7 @@ public class GeometryFactory extends
     }
   }
   public LineString createLineString(Point... points) {
-    List<Coordinates> coordinatesList = CoordinatesListUtil.get(points);
+    CoordinatesList coordinatesList = CoordinatesListUtil.get(points);
     return createLineString(coordinatesList);
   }
 

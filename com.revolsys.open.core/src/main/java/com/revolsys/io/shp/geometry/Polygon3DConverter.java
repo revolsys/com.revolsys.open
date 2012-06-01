@@ -40,7 +40,7 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int[] partIndex = ShapefileGeometryUtil.readPartIndex(in, numParts,
+    final int[] partIndex = ShapefileGeometryUtil.INSTANCE.readPartIndex(in, numParts,
       numPoints);
 
     byte dimension = 3;
@@ -48,13 +48,13 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
       dimension = 4;
     }
 
-    final List<CoordinatesList> parts = ShapefileGeometryUtil.createCoordinatesLists(
+    final List<CoordinatesList> parts = ShapefileGeometryUtil.INSTANCE.createCoordinatesLists(
       partIndex, dimension);
 
-    ShapefileGeometryUtil.readPoints(in, partIndex, parts);
-    ShapefileGeometryUtil.readCoordinates(in, partIndex, parts, 2);
+    ShapefileGeometryUtil.INSTANCE.readPoints(in, partIndex, parts);
+    ShapefileGeometryUtil.INSTANCE.readCoordinates(in, partIndex, parts, 2);
     if (dimension == 4) {
-      ShapefileGeometryUtil.readCoordinates(in, partIndex, parts, 3);
+      ShapefileGeometryUtil.INSTANCE.readCoordinates(in, partIndex, parts, 3);
     }
     return geometryFactory.createPolygon(parts);
   }
@@ -104,7 +104,7 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
 
       out.writeInt(recordLength / 2);
       out.writeLEInt(getShapeType());
-      ShapefileGeometryUtil.writeEnvelope(out, polygon.getEnvelopeInternal());
+      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, polygon.getEnvelopeInternal());
       out.writeLEInt(numParts);
       out.writeLEInt(numPoints);
 
@@ -115,13 +115,13 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
       }
 
       for (final CoordinatesList ring : rings) {
-        ShapefileGeometryUtil.writeXYCoordinates(out, ring);
+        ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, ring);
       }
 
       out.writeLEDouble(minZ);
       out.writeLEDouble(maxZ);
       for (final CoordinatesList ring : rings) {
-        ShapefileGeometryUtil.writeZCoordinates(out, ring);
+        ShapefileGeometryUtil.INSTANCE.writeZCoordinates(out, ring);
       }
     } else {
       throw new IllegalArgumentException("Expecting " + Polygon.class

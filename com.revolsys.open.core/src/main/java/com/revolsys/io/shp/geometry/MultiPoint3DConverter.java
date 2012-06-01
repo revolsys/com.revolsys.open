@@ -38,10 +38,10 @@ public class MultiPoint3DConverter implements ShapefileGeometryConverter {
     // TODO check for 4 dimension
     final CoordinatesList coordinates = new DoubleCoordinatesList(numPoints,
       dimension);
-    ShapefileGeometryUtil.readXYCoordinates(in, coordinates);
-    ShapefileGeometryUtil.readCoordinates(in, coordinates, 2);
+    ShapefileGeometryUtil.INSTANCE.readXYCoordinates(in, coordinates);
+    ShapefileGeometryUtil.INSTANCE.readCoordinates(in, coordinates, 2);
     if (dimension == 4) {
-      ShapefileGeometryUtil.readCoordinates(in, coordinates, 3);
+      ShapefileGeometryUtil.INSTANCE.readCoordinates(in, coordinates, 3);
     }
     return geometryFactory.createMultiPoint(coordinates);
   }

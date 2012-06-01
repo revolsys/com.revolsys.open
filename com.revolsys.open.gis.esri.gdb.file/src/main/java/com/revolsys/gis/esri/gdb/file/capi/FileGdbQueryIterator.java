@@ -88,8 +88,10 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
             try {
               rows.Close();
             } catch (final NullPointerException e) {
+            } finally {
+              rows.delete();
+              rows = null;
             }
-            rows = null;
           }
           if (table != null) {
             dataStore.closeTable(table);

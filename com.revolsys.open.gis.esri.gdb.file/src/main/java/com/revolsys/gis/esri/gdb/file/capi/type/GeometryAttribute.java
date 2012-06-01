@@ -51,6 +51,9 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     addReadWriteMethods("MultiPatch");
   }
 
+  private static ShapefileGeometryUtil geometryUtil = new ShapefileGeometryUtil(
+    true);
+
   private static void addMethod(
     final String action,
     final Map<String, Method> methodMap,
@@ -159,7 +162,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           return null;
         } else {
           final Geometry geometry = JavaBeanUtil.invokeMethod(readMethod,
-            ShapefileGeometryUtil.class, geometryFactory, in);
+            geometryUtil, geometryFactory, in);
           return geometry;
         }
       } catch (final IOException e) {
@@ -188,7 +191,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         geometryFactory);
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       final EndianOutput out = new EndianOutputStream(byteOut);
-      JavaBeanUtil.invokeMethod(writeMethod, ShapefileGeometryUtil.class, out,
+      JavaBeanUtil.invokeMethod(writeMethod, geometryUtil, out,
         projectedGeometry);
       final byte[] bytes = byteOut.toByteArray();
       final ShapeBuffer shape = new ShapeBuffer(bytes);

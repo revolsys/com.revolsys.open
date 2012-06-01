@@ -110,6 +110,12 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       case 3:
         value = toPolygon(resultSet, columnIndex, numAxis);
       break;
+      case 5:
+        value = toMultiPoint(resultSet, columnIndex, numAxis);
+      break;
+      case 6:
+        value = toMultiLineString(resultSet, columnIndex, numAxis);
+      break;
       case 7:
         value = toMultiPolygon(resultSet, columnIndex, numAxis);
       break;
@@ -502,7 +508,6 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
     LinearRing exteriorRing = null;
     List<LinearRing> interiorRings = null;
-    int numInteriorRings = 0;
 
     for (int i = 0; i < elemInfo.length; i += 3) {
       final long offset = elemInfo[i];
@@ -553,5 +558,54 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
 
     return geometryFactory.createMultiPolygon(polygons);
+  }
+
+  private MultiLineString toMultiLineString(
+    final ResultSet resultSet,
+    final int columnIndex,
+    final int numAxis) throws SQLException {
+    List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+
+    final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
+    final long[] elemInfo = elemInfoArray.getLongArray();
+    final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
+
+    for (int i = 0; i < elemInfo.length; i += 3) {
+      final long offset = elemInfo[i];
+      final long type = elemInfo[i + 1];
+      final long interpretation = elemInfo[i + 2];
+      int length;
+      if (i + 3 < elemInfo.length) {
+        final long nextOffset = elemInfo[i + 3];
+        length = (int)(nextOffset - offset) + 1;
+      } else {
+        length = (int)(coordinatesArray.length() - offset) + 1;
+      }
+      if (interpretation == 1) {
+        final double[] ordinates = coordinatesArray.getDoubleArray(offset,
+          length);
+        final CoordinatesList points = new DoubleCoordinatesList(numAxis,
+          ordinates);
+        pointsList.add(points);
+      } else {
+        throw new IllegalArgumentException("Unsupported geometry type " + type
+          + " interpretation " + interpretation);
+      }
+    }
+
+    return geometryFactory.createMultiLineString(pointsList);
+  }
+
+  private MultiPoint toMultiPoint(
+    final ResultSet resultSet,
+    final int columnIndex,
+    final int numAxis) throws SQLException {
+    final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
+
+    final double[] coordinates = coordinatesArray.getDoubleArray();
+    final CoordinatesList coordinatesList = new DoubleCoordinatesList(numAxis,
+      coordinates);
+
+    return geometryFactory.createMultiPoint(coordinatesList);
   }
 }

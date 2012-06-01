@@ -83,12 +83,12 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
       writePolyLineHeader(out, geometry);
       final LineString line = (LineString)geometry;
       out.writeLEInt(0);
-      ShapefileGeometryUtil.writeXYCoordinates(out, line);
+      ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, line);
     } else if (geometry instanceof MultiLineString) {
       final MultiLineString multiLine = (MultiLineString)geometry;
       writePolyLineHeader(out, multiLine);
-      ShapefileGeometryUtil.writePolylinePartIndexes(out, multiLine);
-      ShapefileGeometryUtil.writeXYCoordinates(out, multiLine);
+      ShapefileGeometryUtil.INSTANCE.writePolylinePartIndexes(out, multiLine);
+      ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, multiLine);
     } else {
       throw new IllegalArgumentException("Expecting " + LineString.class
         + " geometry got " + geometry.getClass());
@@ -105,7 +105,7 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
       * MathUtil.BYTES_IN_DOUBLE) / 2;
     out.writeInt(recordLength);
     out.writeLEInt(getShapeType());
-    ShapefileGeometryUtil.writeEnvelope(out, envelope);
+    ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, envelope);
     out.writeLEInt(numGeometries);
     out.writeLEInt(numCoordinates);
   }

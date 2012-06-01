@@ -36,7 +36,7 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
 
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
-    return ShapefileGeometryUtil.readPolylineM(geometryFactory, in);
+    return ShapefileGeometryUtil.INSTANCE.readPolylineM(geometryFactory, in);
   }
 
   public void write(final EndianOutput out, final Geometry geometry)
@@ -70,7 +70,7 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
 
       out.writeInt(recordLength / 2);
       out.writeLEInt(getShapeType());
-      ShapefileGeometryUtil.writeEnvelope(out, polygon.getEnvelopeInternal());
+      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, polygon.getEnvelopeInternal());
       out.writeLEInt(numParts);
       out.writeLEInt(numPoints);
 
@@ -81,7 +81,7 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
       }
 
       for (final CoordinatesList ring : rings) {
-        ShapefileGeometryUtil.writeXYCoordinates(out, ring);
+        ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, ring);
       }
       double minZ = Double.MAX_VALUE;
       double maxZ = Double.MIN_VALUE;

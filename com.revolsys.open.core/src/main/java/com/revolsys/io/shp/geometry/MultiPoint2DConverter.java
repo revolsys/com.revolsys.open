@@ -29,7 +29,7 @@ public class MultiPoint2DConverter implements ShapefileGeometryConverter {
 
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
-    return ShapefileGeometryUtil.readMultipoint(geometryFactory, in);
+    return ShapefileGeometryUtil.INSTANCE.readMultipoint(geometryFactory, in);
   }
 
   public void write(final EndianOutput out, final Geometry geometry)

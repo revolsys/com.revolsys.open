@@ -95,14 +95,14 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
       final LineString line = (LineString)geometry;
       writePolyLineZHeader(out, geometry);
       out.writeLEInt(0);
-      ShapefileGeometryUtil.writeXYCoordinates(out, line);
-      ShapefileGeometryUtil.writeZCoordinates(out, line);
+      ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, line);
+      ShapefileGeometryUtil.INSTANCE.writeZCoordinates(out, line);
     } else if (geometry instanceof MultiLineString) {
       final MultiLineString multiLine = (MultiLineString)geometry;
       writePolyLineZHeader(out, multiLine);
-      ShapefileGeometryUtil.writePolylinePartIndexes(out, multiLine);
-      ShapefileGeometryUtil.writeXYCoordinates(out, multiLine);
-      ShapefileGeometryUtil.writeZCoordinates(out, multiLine);
+      ShapefileGeometryUtil.INSTANCE.writePolylinePartIndexes(out, multiLine);
+      ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, multiLine);
+      ShapefileGeometryUtil.INSTANCE.writeZCoordinates(out, multiLine);
     } else {
       throw new IllegalArgumentException("Expecting " + LineString.class
         + " geometry got " + geometry.getClass());
@@ -119,7 +119,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     out.writeInt(recordLength);
     out.writeLEInt(ShapefileConstants.POLYLINE_ZM_SHAPE);
     final Envelope envelope = geometry.getEnvelopeInternal();
-    ShapefileGeometryUtil.writeEnvelope(out, envelope);
+    ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, envelope);
     out.writeLEInt(numGeometries);
     out.writeLEInt(numCoordinates);
   }

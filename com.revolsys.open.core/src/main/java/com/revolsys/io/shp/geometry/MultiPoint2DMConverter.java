@@ -35,8 +35,8 @@ public class MultiPoint2DMConverter implements ShapefileGeometryConverter {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
     final CoordinatesList coordinates = new DoubleCoordinatesList(numPoints, 4);
-    ShapefileGeometryUtil.readXYCoordinates(in, coordinates);
-    ShapefileGeometryUtil.readCoordinates(in, coordinates, 3);
+    ShapefileGeometryUtil.INSTANCE.readXYCoordinates(in, coordinates);
+    ShapefileGeometryUtil.INSTANCE.readCoordinates(in, coordinates, 3);
     return geometryFactory.createMultiPoint(coordinates);
   }
 

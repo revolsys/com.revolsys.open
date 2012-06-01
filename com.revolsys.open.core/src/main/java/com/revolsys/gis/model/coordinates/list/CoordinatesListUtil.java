@@ -68,22 +68,26 @@ public class CoordinatesListUtil {
 
   }
 
-  public static List<Coordinates> get(Point... points) {
-    List<Coordinates> coordinatesList = new ArrayList<Coordinates>();
-    for (Point point : points) {
-      Coordinates coordinates = CoordinatesUtil.get(point);
-      coordinatesList.add(coordinates);
-    }
-    return coordinatesList;
+  public static CoordinatesList get(Point... points) {
+    return get(Arrays.asList(points));
   }
 
-  public static List<Coordinates> get(List<Point> points) {
-    List<Coordinates> coordinatesList = new ArrayList<Coordinates>();
-    for (Point point : points) {
-      Coordinates coordinates = CoordinatesUtil.get(point);
-      coordinatesList.add(coordinates);
+  public static CoordinatesList get(List<Point> points) {
+    int size = points.size();
+    if (size == 0) {
+      return new DoubleCoordinatesList(0, 3);
+    } else {
+      byte numAxis = CoordinatesUtil.get(points.get(0)).getNumAxis();
+      DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(size,
+        numAxis);
+      int i = 0;
+      for (Point point : points) {
+        Coordinates coordinates = CoordinatesUtil.get(point);
+        coordinatesList.setPoint(i, coordinates);
+        i++;
+      }
+      return coordinatesList;
     }
-    return coordinatesList;
   }
 
   public static double angle(

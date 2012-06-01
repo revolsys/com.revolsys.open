@@ -62,15 +62,15 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
     } else {
       dimension = 2;
     }
-    final int[] partIndex = ShapefileGeometryUtil.readPartIndex(in, numParts,
+    final int[] partIndex = ShapefileGeometryUtil.INSTANCE.readPartIndex(in, numParts,
       numPoints);
-    final int[] partTypes = ShapefileGeometryUtil.readIntArray(in, numParts);
+    final int[] partTypes = ShapefileGeometryUtil.INSTANCE.readIntArray(in, numParts);
 
-    final List<CoordinatesList> parts = ShapefileGeometryUtil.createCoordinatesLists(
+    final List<CoordinatesList> parts = ShapefileGeometryUtil.INSTANCE.createCoordinatesLists(
       partIndex, dimension);
-    ShapefileGeometryUtil.readPoints(in, partIndex, parts);
+    ShapefileGeometryUtil.INSTANCE.readPoints(in, partIndex, parts);
     if (dimension > 2) {
-      ShapefileGeometryUtil.readCoordinates(in, partIndex, parts, 2);
+      ShapefileGeometryUtil.INSTANCE.readCoordinates(in, partIndex, parts, 2);
     }
     List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int i = 0; i < numParts; i++) {
@@ -139,7 +139,7 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
 
       out.writeInt(recordLength / 2);
       out.writeLEInt(getShapeType());
-      ShapefileGeometryUtil.writeEnvelope(out,
+      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out,
         multiPolygon.getEnvelopeInternal());
       out.writeLEInt(numParts);
       out.writeLEInt(numPoints);
@@ -151,10 +151,10 @@ public class MultiPolygonConverter implements ShapefileGeometryConverter {
       }
 
       for (final CoordinatesList points : partPoints) {
-        ShapefileGeometryUtil.writeXYCoordinates(out, points);
+        ShapefileGeometryUtil.INSTANCE.writeXYCoordinates(out, points);
       }
       if (hasZ) {
-        ShapefileGeometryUtil.writeZCoordinates(out, partPoints);
+        ShapefileGeometryUtil.INSTANCE.writeZCoordinates(out, partPoints);
       }
     } else {
       throw new IllegalArgumentException("Expecting " + MultiPolygon.class

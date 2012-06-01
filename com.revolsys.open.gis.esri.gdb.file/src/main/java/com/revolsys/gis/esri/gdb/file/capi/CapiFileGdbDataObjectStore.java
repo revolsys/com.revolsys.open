@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,6 +103,35 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       return spatialReference;
     }
   }
+
+  public synchronized <T> T createPrimaryIdValue(final String typePath) {
+    DataObjectMetaData metaData = getMetaData(typePath);
+    String idAttributeName = metaData.getIdAttributeName();
+    if (idAttributeName == null) {
+      return null;
+    } else if (!idAttributeName.equals("OBJECTID")) {
+      AtomicLong idGenerator = idGenerators.get(typePath);
+      if (idGenerator == null) {
+        long maxId = 0;
+        for (DataObject object : query(typePath)) {
+          Object id = object.getIdValue();
+          if (id instanceof Number) {
+            Number number = (Number)id;
+            if (number.longValue() > maxId) {
+              maxId = number.longValue();
+            }
+          }
+        }
+        idGenerator = new AtomicLong(maxId);
+        idGenerators.put(typePath, idGenerator);
+      }
+      return (T)((Object)(idGenerator.incrementAndGet()));
+    } else {
+      return null;
+    }
+  }
+
+  private Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
@@ -201,11 +231,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   @PreDestroy
   public synchronized void close() {
-    try {
-      if (geodatabase != null) {
-        EsriFileGdb.CloseGeodatabase(geodatabase);
-      }
-    } finally {
+    if (geodatabase != null) {
+      geodatabase.delete();
       geodatabase = null;
     }
   }
@@ -342,7 +369,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private DataObjectMetaData createTable(final DataObjectMetaData objectMetaData) {
-    
+
     final GeometryFactory geometryFactory = objectMetaData.getGeometryFactory();
     final SpatialReference spatialReference = getSpatialReference(geometryFactory);
 

@@ -9,6 +9,8 @@ import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 
 public class SpatialReference {
 
+  private static final double FLOATING_SCALE = 11258999068426.238;
+
   public static SpatialReference get(
     final GeometryFactory geometryFactory,
     final String wkt) {
@@ -106,7 +108,7 @@ public class SpatialReference {
           yOrigin = areaBoundingBox.getMinY();
           xYScale = geometryFactory.getScaleXY();
           if (xYScale == 0) {
-            xYScale = 1.1258999068426238E13;
+            xYScale = FLOATING_SCALE;
           }
           zOrigin = -100000;
           zScale = geometryFactory.getScaleZ();
@@ -115,9 +117,9 @@ public class SpatialReference {
           }
           mOrigin = -100000;
           mScale = 1000;
-          xYTolerance = 1.0 / xYScale * 2.0;
-          zTolerance = 1.0 / zScale * 2.0;
-          mTolerance = 1.0 / mScale * 2.0;
+          xYTolerance = 1.0 / xYScale;
+          zTolerance = 1.0 / zScale;
+          mTolerance = 1.0 / mScale;
           highPrecision = true;
           wkid = coordinateSystem.getId();
         }
@@ -139,7 +141,7 @@ public class SpatialReference {
     if (geometryFactory == null) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
-        if (xYScale == 1.1258999068426238E13) {
+        if (xYScale == FLOATING_SCALE) {
           geometryFactory = GeometryFactory.getFactory(
             coordinateSystem.getId(), 0, zScale);
         } else {

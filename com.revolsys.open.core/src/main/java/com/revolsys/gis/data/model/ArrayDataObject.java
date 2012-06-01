@@ -500,6 +500,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
       final Object value = DataObjectUtil.clone(object.getValue(name));
       setValue(name, value);
     }
+    setGeometryValue((Geometry)DataObjectUtil.clone(object.getGeometryValue()));
   }
 
   public void setValues(DataObject object, Collection<String> attributesNames) {
