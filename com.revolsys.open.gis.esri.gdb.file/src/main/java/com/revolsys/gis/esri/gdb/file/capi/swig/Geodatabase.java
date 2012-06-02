@@ -30,9 +30,9 @@ public class Geodatabase {
     EsriFileGdbJNI.Geodatabase_alterDomain(swigCPtr, this, domainDefinition);
   }
 
-  public int CloseTable(final Table table) {
-    return EsriFileGdbJNI.Geodatabase_CloseTable(swigCPtr, this,
-      Table.getCPtr(table), table);
+  public void closeTable(final Table table) {
+    EsriFileGdbJNI.Geodatabase_closeTable(swigCPtr, this, Table.getCPtr(table),
+      table);
   }
 
   public void createDomain(final String domainDefinition) {
@@ -151,6 +151,10 @@ public class Geodatabase {
     return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path,
       relType, datasetType, VectorOfWString.getCPtr(relatedDatasets),
       relatedDatasets);
+  }
+
+  public String getTableDefinition(final String path) {
+    return EsriFileGdbJNI.Geodatabase_getTableDefinition(swigCPtr, this, path);
   }
 
   public int Move(final String path, final String newParentPath) {

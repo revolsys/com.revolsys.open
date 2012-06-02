@@ -63,9 +63,8 @@ public class Row {
     return EsriFileGdbJNI.Row_getFloat(swigCPtr, this, name);
   }
 
-  public ShapeBuffer getGeometry() {
-    final long cPtr = EsriFileGdbJNI.Row_getGeometry(swigCPtr, this);
-    return (cPtr == 0) ? null : new ShapeBuffer(cPtr, true);
+  public byte[] getGeometry() {
+    return EsriFileGdbJNI.Row_getGeometry(swigCPtr, this);
   }
 
   public Guid getGlobalId() {
@@ -112,9 +111,8 @@ public class Row {
     EsriFileGdbJNI.Row_setFloat(swigCPtr, this, name, value);
   }
 
-  public void setGeometry(final ShapeBuffer value) {
-    EsriFileGdbJNI.Row_setGeometry(swigCPtr, this, ShapeBuffer.getCPtr(value),
-      value);
+  public void setGeometry(final byte[] byteArray) {
+    EsriFileGdbJNI.Row_setGeometry(swigCPtr, this, byteArray);
   }
 
   public void setGuid(final String name, final Guid value) {

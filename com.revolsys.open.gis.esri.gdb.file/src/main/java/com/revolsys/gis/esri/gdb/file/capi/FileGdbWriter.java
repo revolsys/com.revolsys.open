@@ -55,22 +55,21 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final DataObjectMetaData objectMetaData = object.getMetaData();
     final String typePath = objectMetaData.getPath();
     final Table table = getTable(typePath);
-    final Row row = getRow(table, object);
-    if (row != null) {
-      try {
-        table.deleteRow(row);
-      } finally {
-        row.delete();
-        dataStore.addStatistic("Delete", object);
+    final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
+      + object.getValue("OBJECTID"), false);
+    try {
+      final Row row = rows.next();
+      if (row != null) {
+        try {
+          table.deleteRow(row);
+        } finally {
+          row.delete();
+          dataStore.addStatistic("Delete", object);
+        }
       }
+    } finally {
+      dataStore.closeEnumRows(rows);
     }
-  }
-
-  private Row getRow(final Table table, final DataObject object) {
-    final EnumRows rows = table.search("OBJECTID",
-      "OBJECTID=" + object.getValue("OBJECTID"), false);
-    final Row row = rows.next();
-    return row;
   }
 
   private Table getTable(final String typePath) {
@@ -137,29 +136,38 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     final DataObjectMetaData metaData = dataStore.getMetaData(sourceMetaData);
     final String typePath = sourceMetaData.getPath();
     final Table table = getTable(typePath);
-    final Row row = getRow(table, object);
+    final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
+      + object.getValue("OBJECTID"), false);
     try {
-      final List<Object> esriValues = new ArrayList<Object>();
+      final Row row = rows.next();
+
       try {
-        for (final Attribute attribute : metaData.getAttributes()) {
-          final String name = attribute.getName();
-          final Object value = object.getValue(name);
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          esriValues.add(esriAttribute.setUpdateValue(object, row, value));
+        final List<Object> esriValues = new ArrayList<Object>();
+        try {
+          for (final Attribute attribute : metaData.getAttributes()) {
+            final String name = attribute.getName();
+            final Object value = object.getValue(name);
+            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+            esriValues.add(esriAttribute.setUpdateValue(object, row, value));
+          }
+          table.updateRow(row);
+        } finally {
+          dataStore.addStatistic("Update", object);
         }
-        table.updateRow(row);
+      } catch (final IllegalArgumentException e) {
+        LOG.error(
+          "Unable to insert row " + e.getMessage() + "\n" + object.toString(),
+          e);
+      } catch (final RuntimeException e) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Unable to insert row \n:" + object.toString());
+        }
+        throw new RuntimeException("Unable to update row", e);
       } finally {
         row.delete();
-        dataStore.addStatistic("Update", object);
       }
-    } catch (final IllegalArgumentException e) {
-      LOG.error(
-        "Unable to insert row " + e.getMessage() + "\n" + object.toString(), e);
-    } catch (final RuntimeException e) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Unable to insert row \n:" + object.toString());
-      }
-      throw new RuntimeException("Unable to update row", e);
+    } finally {
+      dataStore.closeEnumRows(rows);
     }
   }
 

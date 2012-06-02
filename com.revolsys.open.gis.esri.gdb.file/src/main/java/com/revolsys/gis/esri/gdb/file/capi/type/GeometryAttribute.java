@@ -14,7 +14,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.gis.esri.gdb.file.capi.swig.ShapeBuffer;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.EndianOutputStream;
@@ -149,11 +148,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     if (row.isNull(name)) {
       return null;
     } else {
-      final ShapeBuffer shapeBuffer = row.getGeometry();
-      // final EndianInput in = new ByteArrayEndianInput(
-      // shapeBuffer.getShapeBuffer());
-
-      final byte[] buffer = shapeBuffer.getBuffer();
+      final byte[] buffer = row.getGeometry();
       final ByteArrayInputStream byteIn = new ByteArrayInputStream(buffer);
       final EndianInput in = new EndianInputStream(byteIn);
       try {
@@ -194,18 +189,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       JavaBeanUtil.invokeMethod(writeMethod, geometryUtil, out,
         projectedGeometry);
       final byte[] bytes = byteOut.toByteArray();
-      final ShapeBuffer shape = new ShapeBuffer(bytes);
-      // final ShapeBuffer shape = new ShapeBuffer(bytes.length);
-      // shape.setAllocatedLength(bytes.length);
-      // shape.setInUseLength(bytes.length);
-      // for (int i = 0; i < bytes.length; i++) {
-      // final byte b = bytes[i];
-      // shape.set(i, b);
-      // }
-      row.setGeometry(shape);
-      return new Object[] {
-        shape, bytes
-      };
+      row.setGeometry(bytes);
+      return bytes;
     } else {
       throw new IllegalArgumentException("Expecting a " + Geometry.class
         + " not a " + value.getClass() + "=" + value);

@@ -58,13 +58,37 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %javaconst(1);
 
 %apply unsigned char *OUTPUT {byte *output};
+%apply (char *STRING, size_t LENGTH)   { (char *byteArray, size_t length) };
+
+
+%{
+  struct byte_array {
+    byte* bytes;
+    size_t length;
+  };
+%}
+
+%typemap(out) byte_array {
+  jbyteArray buffer = JCALL1(NewByteArray, jenv, $1.length);
+  jbyte* bytes = (jbyte*)$1.bytes;
+  JCALL4(SetByteArrayRegion, jenv, buffer, 0, $1.length, bytes);
+  $result = buffer;
+}
+%typemap(jtype) byte_array "byte[]"
+%typemap(jstype) byte_array "byte[]"
+%typemap(jni) byte_array "jbyteArray"
+%typemap(javaout) byte_array {
+  return $jnicall;
+}
+
+
+%ignore byte_array;
 
 %template(VectorOfString) std::vector<std::string>;
 %template(VectorOfWString) std::vector<std::wstring>;
 %template(VectorOfFieldDef) std::vector<FileGDBAPI::FieldDef>;
 
 %include "Array.i"
-ARRAY_OUT(unsigned char, UnsignedCharArray)
 
 %define linux
 %enddef
@@ -118,6 +142,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 %ignore FileGDBAPI::Geodatabase::GetDatasetDocumentation;
 %ignore FileGDBAPI::Geodatabase::GetQueryName;
 %ignore FileGDBAPI::Geodatabase::OpenTable;
+%ignore FileGDBAPI::Geodatabase::CloseTable;
 %ignore FileGDBAPI::Geodatabase::CreateTable;
 %ignore FileGDBAPI::Geodatabase::CreateDomain;
 %ignore FileGDBAPI::Geodatabase::AlterDomain;
@@ -181,6 +206,18 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     FileGDBAPI::Table* value = new FileGDBAPI::Table();
     checkResult(self->OpenTable(path, *value));
     return value;
+  }
+  void closeTable(FileGDBAPI::Table& table) {
+    checkResult(self->CloseTable(table));
+  }
+  std::string getTableDefinition(const std::wstring& path) {
+    FileGDBAPI::Table table;
+    checkResult(self->OpenTable(path, table));
+    std::string tableDefinition;
+    checkResult(table.GetDefinition(tableDefinition));
+    checkResult(self->OpenTable(path, table));
+    
+    return tableDefinition;
   }
   FileGDBAPI::Table* createTable(const std::string& tableDefinition, const std::wstring& parent) {
     FileGDBAPI::Table* value = new FileGDBAPI::Table();
@@ -422,16 +459,27 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
     checkResult(self->SetXML(name, value));
   }
 
-  FileGDBAPI::ShapeBuffer* getGeometry() {
-    FileGDBAPI::ShapeBuffer* geometry = new FileGDBAPI::ShapeBuffer();
-    checkResult(self->GetGeometry(*geometry));
-     return geometry;
+  byte_array getGeometry() {
+    FileGDBAPI::ShapeBuffer geometry;
+    checkResult(self->GetGeometry(geometry));
+    byte_array buffer;
+    buffer.bytes = geometry.shapeBuffer;
+    buffer.length = geometry.inUseLength;
+    
+    return buffer;
   }
-  
-  void setGeometry(const FileGDBAPI::ShapeBuffer& value) {
-    checkResult(self->SetGeometry(value));
+   
+  void setGeometry(char* byteArray, size_t length) {
+    FileGDBAPI::ShapeBuffer shape;
+    shape.Allocate(length);
+    for (int i = 0; i < length; i++) {
+      char c = byteArray[i];
+      shape.shapeBuffer[i] = (byte)c;
+    }
+    shape.inUseLength = length;
+    checkResult(self->SetGeometry(shape));
   }
-  
+   
   std::vector<FileGDBAPI::FieldDef> getFields() {
     std::vector<FileGDBAPI::FieldDef> value;
     checkResult(self->GetFields(value));
@@ -652,76 +700,7 @@ ARRAY_OUT(unsigned char, UnsignedCharArray)
 }
 
 %ignore FileGDBAPI::ByteArray;
-
-%{
-  struct byte_array {
-    byte* bytes;
-    size_t length;
-  };
-%}
-
-%typemap(out) byte_array {
-  jbyteArray buffer = JCALL1(NewByteArray, jenv, $1.length);
-  jbyte* bytes = (jbyte*)$1.bytes;
-  JCALL4(SetByteArrayRegion, jenv, buffer, 0, $1.length, bytes);
-  $result = buffer;
-}
-%typemap(jtype) byte_array "byte[]"
-%typemap(jstype) byte_array "byte[]"
-%typemap(jni) byte_array "jbyteArray"
-%typemap(javaout) byte_array {
-  return $jnicall;
-}
-
-
-%ignore byte_array;
-%ignore FileGDBAPI::ShapeBuffer::shapeBuffer;
-%ignore FileGDBAPI::ShapeBuffer::GetShapeType;
-%ignore FileGDBAPI::ShapeBuffer::GetGeometryType;
-%apply (char *STRING, size_t LENGTH)   { (char *byteArray, size_t length) };
-%extend FileGDBAPI::ShapeBuffer {
-  unsigned char get(int i) {
-    return $self->shapeBuffer[i];
-  }
-
-  void set(int i, unsigned char c) {
-    $self->shapeBuffer[i] = c;
-  }
- 
-  byte* getShapeBuffer() {
-    return $self->shapeBuffer;
-  }
-  
-  ShapeBuffer(char* byteArray, size_t length) {
-    FileGDBAPI::ShapeBuffer* shape = new FileGDBAPI::ShapeBuffer(length);
-    for (int i = 0; i < length; i++) {
-      char c = byteArray[i];
-      shape->shapeBuffer[i] = (byte)c;
-    }
-    shape->inUseLength = length;
-    return shape;
-  }
-
-  byte_array getBuffer() {
-    byte_array buffer;
-    buffer.bytes = $self->shapeBuffer;
-    buffer.length = $self->inUseLength;
-    
-    return buffer;
-  }
-  
-  FileGDBAPI::ShapeType getShapeType() {
-    FileGDBAPI::ShapeType value;
-    checkResult(self->GetShapeType(value));
-    return value;
-  }
-  
-  FileGDBAPI::GeometryType getGeometryType() {
-    FileGDBAPI::GeometryType value;
-    checkResult(self->GetGeometryType(value));
-    return value;
-  }
-}
+%ignore FileGDBAPI::ShapeBuffer;
 
 %ignore FileGDBAPI::EnumSpatialReferenceInfo;
 %ignore FileGDBAPI::SpatialReferenceInfo;

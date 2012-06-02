@@ -82,29 +82,20 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   @Override
   protected void doClose() {
     if (dataStore != null) {
-      synchronized (dataStore) {
-        try {
-          if (rows != null) {
-            try {
-              rows.Close();
-            } catch (final NullPointerException e) {
-            } finally {
-              rows.delete();
-              rows = null;
-            }
-          }
-          if (table != null) {
-            dataStore.closeTable(table);
-            table = null;
-          }
-          dataStore = null;
-          metaData = null;
-          fields = null;
-          whereClause = null;
-          boundingBox = null;
-        } catch (final Throwable t) {
-          t.printStackTrace();
+      try {
+        dataStore.closeEnumRows(rows);
+        rows = null;
+        if (table != null) {
+          dataStore.closeTable(table);
+          table = null;
         }
+        dataStore = null;
+        metaData = null;
+        fields = null;
+        whereClause = null;
+        boundingBox = null;
+      } catch (final Throwable t) {
+        t.printStackTrace();
       }
     }
   }
@@ -113,10 +104,10 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   protected void doInit() {
     synchronized (dataStore) {
       if (boundingBox == null) {
-        rows = table.search(fields, whereClause, true);
+        rows = dataStore.search(table, fields, whereClause, true);
       } else {
         final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope boundingBox = GeometryConverter.toEsri(this.boundingBox);
-        rows = table.search(fields, whereClause, boundingBox, true);
+        rows = dataStore.search(table, fields, whereClause, boundingBox, true);
       }
     }
   }

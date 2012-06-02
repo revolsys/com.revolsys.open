@@ -49,13 +49,9 @@ public class EsriFileGdbJNI {
 
   public final static native void delete_Row(long jarg1);
 
-  public final static native void delete_ShapeBuffer(long jarg1);
-
   public final static native void delete_SpatialReference(long jarg1);
 
   public final static native void delete_Table(long jarg1);
-
-  public final static native void delete_UnsignedCharArray(long jarg1);
 
   public final static native void delete_VectorOfFieldDef(long jarg1);
 
@@ -219,7 +215,7 @@ public class EsriFileGdbJNI {
     Geodatabase jarg1_,
     String jarg2);
 
-  public final static native int Geodatabase_CloseTable(
+  public final static native void Geodatabase_closeTable(
     long jarg1,
     Geodatabase jarg1_,
     long jarg2,
@@ -329,6 +325,11 @@ public class EsriFileGdbJNI {
     String jarg4,
     long jarg5,
     VectorOfWString jarg5_);
+
+  public final static native String Geodatabase_getTableDefinition(
+    long jarg1,
+    Geodatabase jarg1_,
+    String jarg2);
 
   public final static native int Geodatabase_Move(
     long jarg1,
@@ -472,17 +473,9 @@ public class EsriFileGdbJNI {
 
   public final static native long new_Row();
 
-  public final static native long new_ShapeBuffer__SWIG_0(long jarg1);
-
-  public final static native long new_ShapeBuffer__SWIG_1();
-
-  public final static native long new_ShapeBuffer__SWIG_2(byte[] jarg1);
-
   public final static native long new_SpatialReference();
 
   public final static native long new_Table();
-
-  public final static native long new_UnsignedCharArray();
 
   public final static native long new_VectorOfFieldDef__SWIG_0();
 
@@ -526,7 +519,7 @@ public class EsriFileGdbJNI {
     Row jarg1_,
     String jarg2);
 
-  public final static native long Row_getGeometry(long jarg1, Row jarg1_);
+  public final static native byte[] Row_getGeometry(long jarg1, Row jarg1_);
 
   public final static native long Row_getGlobalId(long jarg1, Row jarg1_);
 
@@ -583,8 +576,7 @@ public class EsriFileGdbJNI {
   public final static native void Row_setGeometry(
     long jarg1,
     Row jarg1_,
-    long jarg2,
-    ShapeBuffer jarg2_);
+    byte[] jarg2);
 
   public final static native void Row_setGuid(
     long jarg1,
@@ -621,78 +613,6 @@ public class EsriFileGdbJNI {
     Row jarg1_,
     String jarg2,
     String jarg3);
-
-  public final static native boolean ShapeBuffer_Allocate(
-    long jarg1,
-    ShapeBuffer jarg1_,
-    long jarg2);
-
-  public final static native long ShapeBuffer_allocatedLength_get(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native void ShapeBuffer_allocatedLength_set(
-    long jarg1,
-    ShapeBuffer jarg1_,
-    long jarg2);
-
-  public final static native short ShapeBuffer_get(
-    long jarg1,
-    ShapeBuffer jarg1_,
-    int jarg2);
-
-  public final static native byte[] ShapeBuffer_getBuffer(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native int ShapeBuffer_getGeometryType(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native long ShapeBuffer_getShapeBuffer(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native int ShapeBuffer_getShapeType(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native boolean ShapeBuffer_HasCurves(int jarg1);
-
-  public final static native boolean ShapeBuffer_HasIDs(int jarg1);
-
-  public final static native boolean ShapeBuffer_HasMaterials(int jarg1);
-
-  public final static native boolean ShapeBuffer_HasMs(int jarg1);
-
-  public final static native boolean ShapeBuffer_HasNormals(int jarg1);
-
-  public final static native boolean ShapeBuffer_HasTextures(int jarg1);
-
-  public final static native boolean ShapeBuffer_HasZs(int jarg1);
-
-  public final static native long ShapeBuffer_inUseLength_get(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native void ShapeBuffer_inUseLength_set(
-    long jarg1,
-    ShapeBuffer jarg1_,
-    long jarg2);
-
-  public final static native boolean ShapeBuffer_IsEmpty(
-    long jarg1,
-    ShapeBuffer jarg1_);
-
-  public final static native void ShapeBuffer_set(
-    long jarg1,
-    ShapeBuffer jarg1_,
-    int jarg2,
-    short jarg3);
-
-  public final static native void ShapeBuffer_SetEmpty(
-    long jarg1,
-    ShapeBuffer jarg1_);
 
   public final static native int SpatialReference_getId(
     long jarg1,
@@ -926,17 +846,6 @@ public class EsriFileGdbJNI {
     Table jarg1_,
     long jarg2,
     Row jarg2_);
-
-  public final static native short UnsignedCharArray_get(
-    long jarg1,
-    UnsignedCharArray jarg1_,
-    int jarg2);
-
-  public final static native void UnsignedCharArray_set(
-    long jarg1,
-    UnsignedCharArray jarg1_,
-    int jarg2,
-    short jarg3);
 
   public final static native void VectorOfFieldDef_add(
     long jarg1,

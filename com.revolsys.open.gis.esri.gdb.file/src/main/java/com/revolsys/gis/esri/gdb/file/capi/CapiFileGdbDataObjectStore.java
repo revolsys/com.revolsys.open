@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,8 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
+import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
+import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Geodatabase;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
@@ -104,34 +108,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public synchronized <T> T createPrimaryIdValue(final String typePath) {
-    DataObjectMetaData metaData = getMetaData(typePath);
-    String idAttributeName = metaData.getIdAttributeName();
-    if (idAttributeName == null) {
-      return null;
-    } else if (!idAttributeName.equals("OBJECTID")) {
-      AtomicLong idGenerator = idGenerators.get(typePath);
-      if (idGenerator == null) {
-        long maxId = 0;
-        for (DataObject object : query(typePath)) {
-          Object id = object.getIdValue();
-          if (id instanceof Number) {
-            Number number = (Number)id;
-            if (number.longValue() > maxId) {
-              maxId = number.longValue();
-            }
-          }
-        }
-        idGenerator = new AtomicLong(maxId);
-        idGenerators.put(typePath, idGenerator);
-      }
-      return (T)((Object)(idGenerator.incrementAndGet()));
-    } else {
-      return null;
-    }
-  }
-
-  private Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
+  private final Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
@@ -181,6 +158,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private Resource template;
 
+  private final Set<Table> tablesToClose = new HashSet<Table>();
+
+  private final Set<EnumRows> enumRowsToClose = new HashSet<EnumRows>();
+
   public CapiFileGdbDataObjectStore() {
   }
 
@@ -219,27 +200,57 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private void addTableMetaData(final String schemaName, final String path) {
-    final Table table = geodatabase.openTable(path);
-    try {
-      final DataObjectMetaData metaData = getMetaData(schemaName, path, table);
-      addMetaData(metaData);
-    } finally {
-      geodatabase.CloseTable(table);
-    }
+    final String tableDefinition = geodatabase.getTableDefinition(path);
+    final DataObjectMetaData metaData = getMetaData(schemaName, path,
+      tableDefinition);
+    addMetaData(metaData);
   }
 
   @Override
   @PreDestroy
   public synchronized void close() {
+    for (final EnumRows rows : enumRowsToClose) {
+      closeEnumRows(rows);
+    }
+    for (final Table table : tablesToClose) {
+      closeTable(table);
+    }
     if (geodatabase != null) {
       geodatabase.delete();
       geodatabase = null;
     }
   }
 
+  public void closeEnumRows(EnumRows rows) {
+    if (rows != null) {
+      if (enumRowsToClose.remove(rows)) {
+        try {
+          rows.Close();
+        } catch (final NullPointerException e) {
+        } finally {
+          rows.delete();
+          rows = null;
+        }
+      }
+    }
+  }
+
+  // @Override
+  // protected AbstractIterator<DataObject> createIterator(final Query query,
+  // final Map<String, Object> properties) {
+  // return new JdbcQueryIterator(this, query, properties);
+  // }
+  //
+  //
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
+
   protected synchronized void closeTable(final Table table) {
     try {
-      geodatabase.CloseTable(table);
+      tablesToClose.remove(table);
+      geodatabase.closeTable(table);
+      table.delete();
     } catch (final Throwable e) {
       LOG.error("Unable to close table", e);
     }
@@ -258,17 +269,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       loadDomain(domain.getDomainName());
     }
   }
-
-  // @Override
-  // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
-  // return new JdbcQueryIterator(this, query, properties);
-  // }
-  //
-  //
-  // public FileGdbReader createReader() {
-  // return new FileGdbReader(this);
-  // }
 
   // TODO add bounding box
   @Override
@@ -326,6 +326,35 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
       typePath, whereClause.toString(), boundingBox);
     return iterator;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public synchronized <T> T createPrimaryIdValue(final String typePath) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    final String idAttributeName = metaData.getIdAttributeName();
+    if (idAttributeName == null) {
+      return null;
+    } else if (!idAttributeName.equals("OBJECTID")) {
+      AtomicLong idGenerator = idGenerators.get(typePath);
+      if (idGenerator == null) {
+        long maxId = 0;
+        for (final DataObject object : query(typePath)) {
+          final Object id = object.getIdValue();
+          if (id instanceof Number) {
+            final Number number = (Number)id;
+            if (number.longValue() > maxId) {
+              maxId = number.longValue();
+            }
+          }
+        }
+        idGenerator = new AtomicLong(maxId);
+        idGenerators.put(typePath, idGenerator);
+      }
+      return (T)((Object)(idGenerator.incrementAndGet()));
+    } else {
+      return null;
+    }
   }
 
   private void createSchema(final DETable table) {
@@ -414,6 +443,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final Table table;
     try {
       table = geodatabase.createTable(tableDefinition, schemaPath);
+      tablesToClose.add(table);
     } catch (final Throwable t) {
       if (LOG.isDebugEnabled()) {
         LOG.debug(tableDefinition);
@@ -427,7 +457,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       addMetaData(metaData);
       return metaData;
     } finally {
-      geodatabase.CloseTable(table);
+      closeTable(table);
     }
   }
 
@@ -563,7 +593,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       final String path = typePath.replaceAll("/", "\\\\");
       try {
-        return geodatabase.openTable(path);
+        final Table table = geodatabase.openTable(path);
+        tablesToClose.add(table);
+        return table;
       } catch (final RuntimeException e) {
         throw new RuntimeException("Unable to open table " + typePath, e);
       }
@@ -760,6 +792,28 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final Geometry geometry) {
     final BoundingBox boundingBox = new BoundingBox(geometry);
     return query(typePath, boundingBox);
+  }
+
+  public EnumRows search(
+    final Table table,
+    final String fields,
+    final String whereClause,
+    final boolean recycling) {
+    final EnumRows rows = table.search(fields, whereClause, recycling);
+    enumRowsToClose.add(rows);
+    return rows;
+  }
+
+  public EnumRows search(
+    final Table table,
+    final String fields,
+    final String whereClause,
+    final Envelope boundingBox,
+    final boolean recycling) {
+    final EnumRows rows = table.search(fields, whereClause, boundingBox,
+      recycling);
+    enumRowsToClose.add(rows);
+    return rows;
   }
 
   @Override
