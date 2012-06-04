@@ -136,7 +136,7 @@ public abstract class AbstractDataObjectStore extends
       }
       if (schemaMap != null) {
         for (final DataObjectStoreSchema schema : schemaMap.values()) {
-          schema.destroy();
+          schema.close();
         }
         schemaMap.clear();
       }
@@ -296,6 +296,10 @@ public abstract class AbstractDataObjectStore extends
     return schemaMap;
   }
 
+  protected void refreshSchema() {
+    schemaMap.clear();
+  }
+
   public List<DataObjectStoreSchema> getSchemas() {
     synchronized (schemaMap) {
       if (schemaMap.isEmpty()) {
@@ -335,7 +339,7 @@ public abstract class AbstractDataObjectStore extends
 
   public List<String> getTypeNames(final String schemaName) {
     final DataObjectStoreSchema schema = getSchema(schemaName);
-    if (schema ==null) {
+    if (schema == null) {
       return Collections.emptyList();
     } else {
       return schema.getTypeNames();

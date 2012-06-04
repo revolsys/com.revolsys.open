@@ -3,6 +3,7 @@ package com.revolsys.gis.esri.gdb.file.capi;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -191,12 +192,14 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  private void addFeatureDatasetSchema(final String path) {
+  private DataObjectStoreSchema addFeatureDatasetSchema(final String path) {
     final String schemaName = path.replaceAll("\\\\", "/");
     final DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
       schemaName);
+    schema.setProperty(CATALOG_PATH_PROPERTY, path);
     addSchema(schema);
     addChildSchema(path);
+    return schema;
   }
 
   private void addTableMetaData(final String schemaName, final String path) {
@@ -209,10 +212,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   @PreDestroy
   public synchronized void close() {
-    for (final EnumRows rows : enumRowsToClose) {
+    for (final EnumRows rows : new ArrayList<EnumRows>(enumRowsToClose)) {
       closeEnumRows(rows);
     }
-    for (final Table table : tablesToClose) {
+    for (final Table table : new ArrayList<Table>(tablesToClose)) {
       closeTable(table);
     }
     if (geodatabase != null) {
@@ -249,8 +252,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   protected synchronized void closeTable(final Table table) {
     try {
       tablesToClose.remove(table);
-      geodatabase.closeTable(table);
-      table.delete();
+      if (geodatabase != null) {
+        geodatabase.closeTable(table);
+        table.delete();
+      }
     } catch (final Throwable e) {
       LOG.error("Unable to close table", e);
     }
@@ -332,32 +337,37 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   public synchronized <T> T createPrimaryIdValue(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
-    final String idAttributeName = metaData.getIdAttributeName();
-    if (idAttributeName == null) {
+    if (metaData == null) {
       return null;
-    } else if (!idAttributeName.equals("OBJECTID")) {
-      AtomicLong idGenerator = idGenerators.get(typePath);
-      if (idGenerator == null) {
-        long maxId = 0;
-        for (final DataObject object : query(typePath)) {
-          final Object id = object.getIdValue();
-          if (id instanceof Number) {
-            final Number number = (Number)id;
-            if (number.longValue() > maxId) {
-              maxId = number.longValue();
+    } else {
+      final String idAttributeName = metaData.getIdAttributeName();
+      if (idAttributeName == null) {
+        return null;
+      } else if (!idAttributeName.equals("OBJECTID")) {
+        AtomicLong idGenerator = idGenerators.get(typePath);
+        if (idGenerator == null) {
+          long maxId = 0;
+          for (final DataObject object : query(typePath)) {
+            final Object id = object.getIdValue();
+            if (id instanceof Number) {
+              final Number number = (Number)id;
+              if (number.longValue() > maxId) {
+                maxId = number.longValue();
+              }
             }
           }
+          idGenerator = new AtomicLong(maxId);
+          idGenerators.put(typePath, idGenerator);
         }
-        idGenerator = new AtomicLong(maxId);
-        idGenerators.put(typePath, idGenerator);
+        return (T)((Object)(idGenerator.incrementAndGet()));
+      } else {
+        return null;
       }
-      return (T)((Object)(idGenerator.incrementAndGet()));
-    } else {
-      return null;
     }
   }
 
-  private void createSchema(final DETable table) {
+  private DataObjectStoreSchema createSchema(final DETable table) {
+    String catalogPath = table.getParentCatalogPath();
     final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
     for (final DEFeatureDataset dataset : datasets) {
       final String path = dataset.getCatalogPath();
@@ -373,6 +383,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           t);
       }
     }
+    return getSchema(catalogPath.replaceAll("\\\\", "/"));
   }
 
   public synchronized void createSchema(
@@ -416,18 +427,26 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final DETable deTable) {
     String schemaPath = deTable.getParentCatalogPath();
     String schemaName = schemaPath.replaceAll("\\\\", "/");
-    final DataObjectStoreSchema schema = getSchema(schemaName);
+    DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
-      if (schemaName.equals(defaultSchema)) {
-        addSchema(new DataObjectStoreSchema(this, schemaName));
+      if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
+        schema = createSchema(deTable);
       } else {
+        schema = new DataObjectStoreSchema(this, schemaName);
+        addSchema(schema);
+      }
+    } else if (schema.getProperty(CATALOG_PATH_PROPERTY) == null) {
+      if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
         createSchema(deTable);
       }
     }
     if (schemaName.equals(defaultSchema)) {
-      schemaPath = "\\";
-      // @TODO clone
-      deTable.setCatalogPath("\\" + deTable.getName());
+      if (!(deTable instanceof DEFeatureClass)) {
+        schemaPath = "\\";
+        // @TODO clone
+        deTable.setCatalogPath("\\" + deTable.getName());
+
+      }
     } else if (schemaName.equals("")) {
       schemaName = defaultSchema;
     }
@@ -615,61 +634,66 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return writer;
   }
 
+  private boolean initialized;
+
   @Override
   @PostConstruct
   public synchronized void initialize() {
-    super.initialize();
-    final File file = new File(fileName);
-    if (file.exists() && new File(fileName, "gdb").exists()) {
-      if (file.isDirectory()) {
-        geodatabase = EsriFileGdb.openGeodatabase(fileName);
-      } else {
-        throw new IllegalArgumentException(
-          "ESRI File Geodatabase must be a directory");
-      }
-    } else if (createMissingDataStore) {
-      if (template == null) {
-        geodatabase = EsriFileGdb.createGeodatabase(fileName);
-      } else if (template.exists()) {
-        if (template instanceof FileSystemResource) {
-          final FileSystemResource fileResource = (FileSystemResource)template;
-          final File templateFile = fileResource.getFile();
-          if (templateFile.isDirectory()) {
-            try {
-              FileUtil.copy(templateFile, file);
-            } catch (final IOException e) {
-              throw new IllegalArgumentException(
-                "Unable to copy template ESRI geodatabase " + template, e);
-            }
-            geodatabase = EsriFileGdb.openGeodatabase(fileName);
-          }
+    if (!initialized) {
+      initialized = true;
+      super.initialize();
+      final File file = new File(fileName);
+      if (file.exists() && new File(fileName, "gdb").exists()) {
+        if (file.isDirectory()) {
+          geodatabase = EsriFileGdb.openGeodatabase(fileName);
+        } else {
+          throw new IllegalArgumentException(
+            "ESRI File Geodatabase must be a directory");
         }
-        if (geodatabase == null) {
+      } else if (createMissingDataStore) {
+        if (template == null) {
           geodatabase = EsriFileGdb.createGeodatabase(fileName);
-          final Workspace workspace = EsriGdbXmlParser.parse(template);
-          final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
-          for (final Domain domain : workspaceDefinition.getDomains()) {
-            createDomain(domain);
-          }
-          for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
-            if (dataElement instanceof DETable) {
-              final DETable table = (DETable)dataElement;
-              createTable(table);
+        } else if (template.exists()) {
+          if (template instanceof FileSystemResource) {
+            final FileSystemResource fileResource = (FileSystemResource)template;
+            final File templateFile = fileResource.getFile();
+            if (templateFile.isDirectory()) {
+              try {
+                FileUtil.copy(templateFile, file);
+              } catch (final IOException e) {
+                throw new IllegalArgumentException(
+                  "Unable to copy template ESRI geodatabase " + template, e);
+              }
+              geodatabase = EsriFileGdb.openGeodatabase(fileName);
             }
           }
+          if (geodatabase == null) {
+            geodatabase = EsriFileGdb.createGeodatabase(fileName);
+            final Workspace workspace = EsriGdbXmlParser.parse(template);
+            final WorkspaceDefinition workspaceDefinition = workspace.getWorkspaceDefinition();
+            for (final Domain domain : workspaceDefinition.getDomains()) {
+              createDomain(domain);
+            }
+            for (final DataElement dataElement : workspaceDefinition.getDatasetDefinitions()) {
+              if (dataElement instanceof DETable) {
+                final DETable table = (DETable)dataElement;
+                createTable(table);
+              }
+            }
+          }
+        } else {
+          throw new IllegalArgumentException("Template does not exist "
+            + template);
         }
       } else {
-        throw new IllegalArgumentException("Template does not exist "
-          + template);
+        throw new IllegalArgumentException("ESRI file geodatbase not found "
+          + fileName);
       }
-    } else {
-      throw new IllegalArgumentException("ESRI file geodatbase not found "
-        + fileName);
-    }
-    final VectorOfWString domainNames = geodatabase.getDomains();
-    for (int i = 0; i < domainNames.size(); i++) {
-      final String domainName = domainNames.get(i);
-      loadDomain(domainName);
+      final VectorOfWString domainNames = geodatabase.getDomains();
+      for (int i = 0; i < domainNames.size(); i++) {
+        final String domainName = domainNames.get(i);
+        loadDomain(domainName);
+      }
     }
   }
 
@@ -839,6 +863,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       this.defaultSchema = "/";
     }
+    refreshSchema();
   }
 
   public synchronized void setDomainColumNames(

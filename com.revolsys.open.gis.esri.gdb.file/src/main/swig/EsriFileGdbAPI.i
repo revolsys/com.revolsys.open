@@ -72,6 +72,7 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
   jbyteArray buffer = JCALL1(NewByteArray, jenv, $1.length);
   jbyte* bytes = (jbyte*)$1.bytes;
   JCALL4(SetByteArrayRegion, jenv, buffer, 0, $1.length, bytes);
+  delete $1.bytes;
   $result = buffer;
 }
 %typemap(jtype) byte_array "byte[]"
@@ -349,7 +350,6 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %ignore FileGDBAPI::Row::GetXML;
 %ignore FileGDBAPI::Row::SetXML;
 %ignore FileGDBAPI::Row::GetFields;
-%newobject FileGDBAPI::Row::getGeometry;
 %extend FileGDBAPI::Row {
   bool isNull(std::wstring name) {
     bool value;
@@ -462,8 +462,10 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
   byte_array getGeometry() {
     FileGDBAPI::ShapeBuffer geometry;
     checkResult(self->GetGeometry(geometry));
+    
     byte_array buffer;
-    buffer.bytes = geometry.shapeBuffer;
+    buffer.bytes = new byte[geometry.inUseLength];
+    memcpy(buffer.bytes, geometry.shapeBuffer, geometry.inUseLength);
     buffer.length = geometry.inUseLength;
     
     return buffer;

@@ -9,6 +9,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
+import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -93,7 +94,10 @@ public class DataObjectGraph extends Graph<DataObject> {
   public List<Edge<DataObject>> splitEdges(Coordinates point, double distance) {
     List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
     for (Edge<DataObject> edge : findEdges(point, distance)) {
-      edges.addAll(edge.split(point));
+      LineString line = edge.getLine();
+      List<Edge<DataObject>> splitEdges = edge.split(point);
+      DirectionalAttributes.edgeSplitAttributes(line, point, splitEdges);
+      edges.addAll(splitEdges);
     }
     return edges;
   }

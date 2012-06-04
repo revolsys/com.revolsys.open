@@ -1261,4 +1261,14 @@ public final class LineStringUtil {
     final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
   }
+
+  public static boolean isFirstPoint(LineString line, Coordinates point) {
+    Coordinates fromPoint = getFromPoint(line);
+    return fromPoint.equals(point);
+  }
+
+  public static boolean isToPoint(LineString line, Coordinates point) {
+    Coordinates toPoint = getToPoint(line);
+    return toPoint.equals(point);
+  }
 }

@@ -427,7 +427,6 @@ public class GeometryFactory extends
     return super.createLinearRing(points);
   }
 
-
   public LinearRing createLinearRing(final double... coordinates) {
     final CoordinatesList points = createCoordinatesList(coordinates);
     return createLinearRing(points);
@@ -512,6 +511,7 @@ public class GeometryFactory extends
       return createLinearRing(coordinatesList);
     }
   }
+
   public LineString createLineString(Point... points) {
     CoordinatesList coordinatesList = CoordinatesListUtil.get(points);
     return createLineString(coordinatesList);
@@ -699,13 +699,29 @@ public class GeometryFactory extends
     if (coordinateSystem == null) {
       return "Unknown coordinate system";
     } else {
-      if (coordinatesPrecisionModel.isFloating()) {
-        return coordinateSystem.getName() + " (" + coordinateSystem.getId()
-          + ")";
+      StringBuffer string = new StringBuffer(coordinateSystem.getName());
+      int srid = coordinateSystem.getId();
+      string.append(", srid=");
+      string.append(srid);
+      string.append(", numAxis=");
+      string.append(numAxis);
+      double scaleXY = coordinatesPrecisionModel.getScaleXY();
+      string.append(", scaleXy=");
+      if (scaleXY <= 0) {
+        string.append("floating");
       } else {
-        return coordinateSystem.getName() + " (" + coordinateSystem.getId()
-          + ") " + coordinatesPrecisionModel;
+        string.append(scaleXY);
       }
+      if (hasZ()) {
+        double scaleZ = coordinatesPrecisionModel.getScaleZ();
+        string.append(", scaleZ=");
+        if (scaleZ <= 0) {
+          string.append("floating");
+        } else {
+          string.append(scaleZ);
+        }
+      }
+      return string.toString();
     }
   }
 

@@ -9,29 +9,26 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public enum GeometryType {
-  geometryNull(0), geometryPoint(1), geometryMultipoint(2), geometryPolyline(3), geometryPolygon(
-    4), geometryMultiPatch(9);
+  geometryNull(0),
+  geometryPoint(1),
+  geometryMultipoint(2),
+  geometryPolyline(3),
+  geometryPolygon(4),
+  geometryMultiPatch(9);
 
-  private static class SwigNext {
-    private static int next = 0;
+  public final int swigValue() {
+    return swigValue;
   }
 
-  public static GeometryType swigToEnum(final int swigValue) {
-    final GeometryType[] swigValues = GeometryType.class.getEnumConstants();
-    if (swigValue < swigValues.length && swigValue >= 0
-      && swigValues[swigValue].swigValue == swigValue) {
+  public static GeometryType swigToEnum(int swigValue) {
+    GeometryType[] swigValues = GeometryType.class.getEnumConstants();
+    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
       return swigValues[swigValue];
-    }
-    for (final GeometryType swigEnum : swigValues) {
-      if (swigEnum.swigValue == swigValue) {
+    for (GeometryType swigEnum : swigValues)
+      if (swigEnum.swigValue == swigValue)
         return swigEnum;
-      }
-    }
-    throw new IllegalArgumentException("No enum " + GeometryType.class
-      + " with value " + swigValue);
+    throw new IllegalArgumentException("No enum " + GeometryType.class + " with value " + swigValue);
   }
-
-  private final int swigValue;
 
   @SuppressWarnings("unused")
   private GeometryType() {
@@ -39,18 +36,21 @@ public enum GeometryType {
   }
 
   @SuppressWarnings("unused")
-  private GeometryType(final GeometryType swigEnum) {
-    this.swigValue = swigEnum.swigValue;
-    SwigNext.next = this.swigValue + 1;
+  private GeometryType(int swigValue) {
+    this.swigValue = swigValue;
+    SwigNext.next = swigValue+1;
   }
 
   @SuppressWarnings("unused")
-  private GeometryType(final int swigValue) {
-    this.swigValue = swigValue;
-    SwigNext.next = swigValue + 1;
+  private GeometryType(GeometryType swigEnum) {
+    this.swigValue = swigEnum.swigValue;
+    SwigNext.next = this.swigValue+1;
   }
 
-  public final int swigValue() {
-    return swigValue;
+  private final int swigValue;
+
+  private static class SwigNext {
+    private static int next = 0;
   }
 }
+

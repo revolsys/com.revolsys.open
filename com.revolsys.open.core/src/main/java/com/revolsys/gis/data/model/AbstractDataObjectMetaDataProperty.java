@@ -5,9 +5,10 @@ public abstract class AbstractDataObjectMetaDataProperty implements
   private DataObjectMetaData metaData;
 
   @Override
-  public DataObjectMetaDataProperty clone() {
+  public AbstractDataObjectMetaDataProperty clone() {
     try {
-      final DataObjectMetaDataProperty clone = (DataObjectMetaDataProperty)super.clone();
+      final AbstractDataObjectMetaDataProperty clone = (AbstractDataObjectMetaDataProperty)super.clone();
+      clone.metaData = null;
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);

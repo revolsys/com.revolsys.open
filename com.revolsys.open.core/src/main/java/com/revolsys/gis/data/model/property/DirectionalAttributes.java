@@ -20,6 +20,7 @@ import com.revolsys.gis.data.model.AbstractDataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
+import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -50,6 +51,18 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final Set<String> equalExcludeAttributes) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.canMerge(point, object1, object2, equalExcludeAttributes);
+  }
+
+  public static void edgeSplitAttributes(
+    final LineString line,
+     final Coordinates point,
+    final List<Edge<DataObject>> edges) {
+    if (!edges.isEmpty()) {
+      final Edge<DataObject> firstEdge = edges.get(0);
+      final DataObject object = firstEdge.getObject();
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(object);
+      property.setEdgeSplitAttributes(line,point, edges);
+    }
   }
 
   public static boolean equalsObjects(
@@ -414,6 +427,18 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
+  public void clearEndAttributes(final DataObject object) {
+    for (final String attributeName : endAttributeNames) {
+      object.setValue(attributeName, null);
+    }
+  }
+
+  public void clearStartAttributes(final DataObject object) {
+    for (final String attributeName : startAttributeNames) {
+      object.setValue(attributeName, null);
+    }
+  }
+
   public boolean equals(
     final DataObject object1,
     final DataObject object2,
@@ -771,6 +796,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
+  @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
   }
@@ -860,6 +886,15 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
+  public void setEdgeSplitAttributes(
+    LineString line, final Coordinates point,
+    final List<Edge<DataObject>> edges) {
+    for (final Edge<DataObject> edge : edges) {
+      final DataObject object = edge.getObject();
+      setSplitAttributes(line,point, object);
+    }
+  }
+
   public void setEndAndSideAttributeNamePairs(
     final List<List<String>> endAndSideAttributePairs) {
     for (final List<String> endAndSideAttributePair : endAndSideAttributePairs) {
@@ -910,6 +945,21 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       final String from = pair.getKey();
       final String to = pair.getValue();
       addSideAttributePair(from, to);
+    }
+  }
+
+  public void setSplitAttributes(
+    LineString line, final Coordinates point,
+    final DataObject object) {
+    final LineString newLine = object.getGeometryValue();
+    final boolean firstPoint = LineStringUtil.isFirstPoint(newLine, point);
+    final boolean toPoint = LineStringUtil.isToPoint(newLine, point);
+    if (firstPoint) {
+      if (!toPoint) {
+        clearStartAttributes(object);
+      }
+    } else if (toPoint) {
+      clearEndAttributes(object);
     }
   }
 

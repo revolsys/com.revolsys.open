@@ -1,7 +1,6 @@
 package com.revolsys.gis.data.io;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -9,15 +8,14 @@ import java.util.TreeMap;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.io.AbstractObjectWithProperties;
 
-public class DataObjectStoreSchema {
+public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   private AbstractDataObjectStore dataObjectStore;
 
   private Map<String, DataObjectMetaData> metaDataCache = new TreeMap<String, DataObjectMetaData>();
 
   private String path;
-
-  private Map<String, Object> properties = new HashMap<String, Object>();
 
   public DataObjectStoreSchema(final AbstractDataObjectStore dataObjectStore,
     final String path) {
@@ -36,7 +34,7 @@ public class DataObjectStoreSchema {
   }
 
   @PreDestroy
-  public void destroy() {
+  public void close() {
     if (metaDataCache != null) {
       for (final DataObjectMetaData metaData : metaDataCache.values()) {
         metaData.destroy();
@@ -46,8 +44,7 @@ public class DataObjectStoreSchema {
     dataObjectStore = null;
     metaDataCache = null;
     path = null;
-    properties = null;
-
+    super.close();
   }
 
   public synchronized DataObjectMetaData findMetaData(final String typePath) {
@@ -79,15 +76,6 @@ public class DataObjectStoreSchema {
     return path;
   }
 
-  public Map<String, Object> getProperties() {
-    return properties;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends Object> V getProperty(final String name) {
-    return (V)properties.get(name);
-  }
-
   public List<String> getTypeNames() {
     if (metaDataCache.isEmpty()) {
       refreshMetaData();
@@ -102,16 +90,8 @@ public class DataObjectStoreSchema {
     return new ArrayList<DataObjectMetaData>(metaDataCache.values());
   }
 
-  protected void refreshMetaData() {
+  public void refreshMetaData() {
     dataObjectStore.loadSchemaDataObjectMetaData(this, metaDataCache);
-  }
-
-  public void setProperties(final Map<String, Object> properties) {
-    this.properties = properties;
-  }
-
-  public void setProperty(final String name, final Object value) {
-    properties.put(name, value);
   }
 
   @Override
