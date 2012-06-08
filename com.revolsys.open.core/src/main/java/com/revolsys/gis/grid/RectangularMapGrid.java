@@ -20,6 +20,8 @@ public interface RectangularMapGrid {
     final String mapTileName,
     final CoordinateSystem coordinateSystem);
 
+  GeometryFactory getGeometryFactory();
+
   Polygon getPolygon(
     final String mapTileName,
     final GeometryFactory geometryFactory);

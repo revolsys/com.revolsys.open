@@ -464,7 +464,11 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     String codeTableAttributeName;
     String codeTableValueName = null;
     if (dotIndex == -1) {
-      codeTableAttributeName = name;
+      if (name.equals(getMetaData().getIdAttributeName())) {
+        codeTableAttributeName = null;
+      } else {
+        codeTableAttributeName = name;
+      }
     } else {
       codeTableAttributeName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);

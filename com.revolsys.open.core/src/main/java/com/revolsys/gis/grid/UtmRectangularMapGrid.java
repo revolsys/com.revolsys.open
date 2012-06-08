@@ -23,7 +23,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public static final double MIN_LON = -180;
 
-  public static GeometryFactory getGeometryFactory() {
+  public  GeometryFactory getGeometryFactory() {
     return GEOMETRY_FACTORY;
   }
 

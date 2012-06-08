@@ -1,0 +1,34 @@
+package com.revolsys.swing.menu;
+
+import javax.swing.Action;
+import javax.swing.JMenu;
+
+@SuppressWarnings("serial")
+public class I18nMenu extends JMenu {
+  private CharSequence label;
+
+  public I18nMenu() {
+  }
+
+  public I18nMenu(final Action action) {
+    super(action);
+  }
+
+  public I18nMenu(final CharSequence label) {
+    this.label = label;
+  }
+
+  public I18nMenu(final CharSequence label, final boolean tearOff) {
+    super(label.toString(), tearOff);
+    this.label = label;
+  }
+
+  @Override
+  public String getText() {
+    if (label == null) {
+      return super.getText();
+    } else {
+      return label.toString();
+    }
+  }
+}

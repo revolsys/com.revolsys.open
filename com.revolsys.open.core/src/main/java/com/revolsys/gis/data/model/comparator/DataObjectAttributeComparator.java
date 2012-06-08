@@ -25,6 +25,12 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
     this(Arrays.asList(attributeNames));
   }
 
+  public DataObjectAttributeComparator(boolean sortAsceding,
+    final String... attributeNames) {
+    this(Arrays.asList(attributeNames));
+    this.invert = !sortAsceding;
+  }
+
   public int compare(final DataObject object1, final DataObject object2) {
     for (final String attributeName : attributeNames) {
       final int compare = compare(object1, object2, attributeName);

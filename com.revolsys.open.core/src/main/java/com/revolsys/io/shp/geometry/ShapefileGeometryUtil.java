@@ -601,7 +601,7 @@ public final class ShapefileGeometryUtil {
     final EndianOutput out,
     final Geometry geometry,
     final int shapeType) throws IOException {
-    if (geometry instanceof MultiPoint) {
+    if (geometry instanceof MultiPoint || geometry instanceof Point) {
       final int numPoints = geometry.getNumPoints();
       final Envelope envelope = geometry.getEnvelopeInternal();
       out.writeLEInt(shapeType);
