@@ -271,6 +271,10 @@ public class BoundingBox extends Envelope {
     this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
+  public BoundingBox(GeometryFactory geometryFactory, Coordinates point) {
+    this(geometryFactory, point.getX(), point.getY());
+  }
+
   public boolean contains(final Coordinates coordinate) {
     final double x = coordinate.getX();
     final double y = coordinate.getY();

@@ -67,7 +67,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       String type = "GEOMETRY";
       int numAxis = 3;
       try {
-        final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where F_TABLE_SCHEMA = ? AND F_TABLE_NAME = ? AND F_GEOMETRY_COLUMN = ?";
+        final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
         final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
           owner, tableName, columnName);
         srid = (Integer)values.get("srid");

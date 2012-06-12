@@ -25,7 +25,7 @@ public final class ShapefileGeometryUtil {
 
   public static final ShapefileGeometryUtil INSTANCE = new ShapefileGeometryUtil();
 
-  private boolean clockwise = false;
+  private boolean clockwise = true;
 
   public ShapefileGeometryUtil() {
 

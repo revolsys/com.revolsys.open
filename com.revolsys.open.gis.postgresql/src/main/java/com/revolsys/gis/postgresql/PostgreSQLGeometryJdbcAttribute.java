@@ -260,7 +260,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final Point[] pgPoints = toPgPoints(points);
     final LineString pgLineString = new LineString(pgPoints);
-    pgLineString.setSrid(lineString.getSRID());
+    int srid = lineString.getSRID();
+    pgLineString.setSrid(srid);
     return pgLineString;
   }
 
