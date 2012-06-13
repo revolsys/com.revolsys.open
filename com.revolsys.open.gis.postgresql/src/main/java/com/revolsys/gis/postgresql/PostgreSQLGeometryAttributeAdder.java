@@ -85,7 +85,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
         geometryFactory = GeometryFactory.getFactory(srid, numAxis, 0, 0);
       } else {
         geometryFactory = GeometryFactory.getFactory(srid, numAxis,
-          storeGeometryFactory.getScaleXY(), 0);
+          storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,
         dataType, length, scale, required, null, srid, numAxis, geometryFactory);

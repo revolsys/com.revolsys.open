@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.util.StringUtils;
@@ -110,6 +111,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
   }
 
   @Override
+  @PostConstruct
   public void open() {
     if (typePaths != null) {
       for (final String tableName : typePaths) {

@@ -472,7 +472,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
     try {
       final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
-        schemaPath, table);
+        schemaPath, tableDefinition);
       addMetaData(metaData);
       return metaData;
     } finally {
@@ -593,17 +593,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
       throw e;
     }
-  }
-
-  private DataObjectMetaDataImpl getMetaData(
-    final String schemaName,
-    final String path,
-    final Table table) {
-    final String tableDefinition;
-    synchronized (Table.class) {
-      tableDefinition = table.getDefinition();
-    }
-    return getMetaData(schemaName, path, tableDefinition);
   }
 
   protected synchronized Table getTable(final String typePath) {
@@ -790,14 +779,14 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     addChildSchema("\\");
   }
 
-  @Override
-  public synchronized Reader<DataObject> query(final String typePath) {
-    final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath);
-    final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
-      iterator);
-    return reader;
-  }
+  // @Override
+  // public synchronized Reader<DataObject> query(final String typePath) {
+  // final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
+  // typePath);
+  // final IteratorReader<DataObject> reader = new IteratorReader<DataObject>(
+  // iterator);
+  // return reader;
+  // }
 
   @Override
   public synchronized Reader<DataObject> query(

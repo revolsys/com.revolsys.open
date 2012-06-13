@@ -441,9 +441,18 @@ public abstract class AbstractDataObjectStore extends
     return query(Arrays.asList(queries));
   }
 
-  public Reader<DataObject> query(final String typePath) {
-    final Query query = new Query(typePath);
-    return query(query);
+  public Reader<DataObject> query(final String path) {
+    DataObjectStoreSchema schema = getSchema(path);
+    if (schema == null) {
+      final Query query = new Query(path);
+      return query(query);
+    } else {
+      List<Query> queries = new ArrayList<Query>();
+      for (String typeName : schema.getTypeNames()) {
+        queries.add(new Query(typeName));
+      }
+      return query(queries);
+    }
   }
 
   public DataObject queryFirst(final Query query) {

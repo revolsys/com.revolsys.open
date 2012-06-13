@@ -582,17 +582,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectMetaDataImpl metaData) {
   }
 
-  @Override
-  public Reader<DataObject> query(final String typePath) {
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    if (metaData == null) {
-      throw new IllegalArgumentException("Unknown type " + typePath);
-    } else {
-      final Query query = new Query(metaData);
-      final DataObjectStoreQueryReader reader = createReader(query);
-      return reader;
-    }
-  }
 
   public DataObjectStoreQueryReader query(
     final String typePath,

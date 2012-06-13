@@ -11,11 +11,14 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class NoOp {
-  public static void equals(
+  public static boolean equals(
     final Coordinates coordinates1End,
     final double... coordinates) {
     if (coordinates1End.equals(coordinates)) {
       noOp();
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -33,7 +36,7 @@ public class NoOp {
     equals(object.getGeometryValue(), x, y);
   }
 
-  public static void equals(
+  public static boolean equals(
     final Geometry geometry,
     final double x,
     final double y) {
@@ -41,6 +44,9 @@ public class NoOp {
     final DoubleCoordinates point = new DoubleCoordinates(x, y);
     if (points.equal(0, point, 2)) {
       NoOp.noOp();
+      return true;
+    } else {
+      return false;
     }
   }
 

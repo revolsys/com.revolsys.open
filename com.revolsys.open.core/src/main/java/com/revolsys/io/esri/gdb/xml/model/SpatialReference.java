@@ -62,38 +62,6 @@ public class SpatialReference {
   public SpatialReference() {
   }
 
-  protected SpatialReference(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-    if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem.getId());
-        if (esriCoordinateSystem != null) {
-          final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
-          wkt = EsriCsWktWriter.toWkt(esriCoordinateSystem);
-          xOrigin = areaBoundingBox.getMinX();
-          yOrigin = areaBoundingBox.getMinY();
-          xYScale = geometryFactory.getScaleXY();
-          if (xYScale == 0) {
-            xYScale = 1.1258999068426238E13;
-          }
-          zOrigin = -100000;
-          zScale = geometryFactory.getScaleZ();
-          if (zScale == 0) {
-            zScale = 1000;
-          }
-          mOrigin = -100000;
-          mScale = 1000;
-          xYTolerance = 1.0 / xYScale * 2.0;
-          zTolerance = 1.0 / zScale * 2.0;
-          mTolerance = 1.0 / mScale * 2.0;
-          highPrecision = true;
-          wkid = coordinateSystem.getId();
-        }
-      }
-    }
-  }
-
   protected SpatialReference(final GeometryFactory geometryFactory,
     final String wkt) {
     this.geometryFactory = geometryFactory;
@@ -108,7 +76,11 @@ public class SpatialReference {
           yOrigin = areaBoundingBox.getMinY();
           xYScale = geometryFactory.getScaleXY();
           if (xYScale == 0) {
-            xYScale = FLOATING_SCALE;
+            if (this instanceof ProjectedCoordinateSystem) {
+              xYScale = 1000;
+            } else {
+              xYScale = 1000000;
+            }
           }
           zOrigin = -100000;
           zScale = geometryFactory.getScaleZ();
