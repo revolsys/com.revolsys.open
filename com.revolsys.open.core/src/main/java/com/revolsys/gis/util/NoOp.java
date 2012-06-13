@@ -43,7 +43,7 @@ public class NoOp {
     final CoordinatesList points = CoordinatesListUtil.get(geometry);
     final DoubleCoordinates point = new DoubleCoordinates(x, y);
     if (points.equal(0, point, 2)) {
-      NoOp.noOp();
+      noOp();
       return true;
     } else {
       return false;

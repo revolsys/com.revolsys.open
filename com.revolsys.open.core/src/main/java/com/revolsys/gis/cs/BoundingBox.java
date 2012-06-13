@@ -51,6 +51,38 @@ public class BoundingBox extends Envelope {
   }
 
   public static boolean intersects(
+    final Coordinates line1Start,
+    final Coordinates line1End,
+    final Coordinates line2Start,
+    final Coordinates line2End) {
+    final double line1x1 = line1Start.getX();
+    final double line1y1 = line1Start.getY();
+    final double line1x2 = line1End.getX();
+    final double line1y2 = line1End.getY();
+
+    final double line2x1 = line2Start.getX();
+    final double line2y1 = line2Start.getY();
+    final double line2x2 = line2End.getX();
+    final double line2y2 = line2End.getY();
+    return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2);
+  }
+
+  public static boolean intersects(
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point) {
+    final double x1 = lineStart.getX();
+    final double y1 = lineStart.getY();
+    final double x2 = lineEnd.getX();
+    final double y2 = lineEnd.getY();
+
+    final double x = point.getX();
+    final double y = point.getY();
+    return intersects(x1, y1, x2, y2, x, y);
+  }
+
+  public static boolean intersects(
     final double p1X,
     final double p1Y,
     final double p2X,

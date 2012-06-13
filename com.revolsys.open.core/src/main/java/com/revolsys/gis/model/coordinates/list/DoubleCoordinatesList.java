@@ -16,7 +16,11 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   private final byte numAxis;
 
-  public DoubleCoordinatesList(final byte numAxis, final Coordinates... points) {
+  public DoubleCoordinatesList(final int numAxis) {
+    this(0, numAxis);
+  }
+
+  public DoubleCoordinatesList(final int numAxis, final Coordinates... points) {
     this(points.length, numAxis);
     for (int i = 0; i < points.length; i++) {
       final Coordinates point = points[i];

@@ -9,7 +9,6 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 
 public class LineSegmentUtil {
@@ -23,71 +22,66 @@ public class LineSegmentUtil {
     precisionModel.makePrecise(point);
   }
 
-  /**
-   * Return the point or line intersection between two line segments.
-   * 
-   * @param line1x1
-   * @param line1y1
-   * @param line1x2
-   * @param line1y2
-   * @param line2x1
-   * @param line2y1
-   * @param line2x2
-   * @param line2y2
-   * @return
-   */
   private static CoordinatesList computeCollinearIntersection(
-    final double line1x1,
-    final double line1y1,
-    final double line1x2,
-    final double line1y2,
-    final double line2x1,
-    final double line2y1,
-    final double line2x2,
-    final double line2y2) {
-    final boolean p1q1p2 = BoundingBox.intersects(line1x1, line1y1, line1x2,
-      line1y2, line2x1, line2y1);
-    final boolean p1q2p2 = BoundingBox.intersects(line1x1, line1y1, line1x2,
-      line1y2, line2x2, line2y2);
-    final boolean q1p1q2 = BoundingBox.intersects(line2x1, line2y1, line2x2,
-      line2y2, line1x1, line1y1);
-    final boolean q1p2q2 = BoundingBox.intersects(line2x1, line2y1, line2x2,
-      line2y2, line1x2, line1y2);
+    final int numAxis,
+    final Coordinates line1Start,
+    final Coordinates line1End,
+    final Coordinates line2Start,
+    final Coordinates line2End) {
+    final boolean line2StartIntersectsLine1 = BoundingBox.intersects(
+      line1Start, line1End, line2Start);
+    final boolean line2EndIntersectsLine1 = BoundingBox.intersects(line1Start,
+      line1End, line2End);
+    final boolean line1StartIntersectsLine2 = BoundingBox.intersects(
+      line2Start, line2End, line1Start);
+    final boolean line1EndIntersectsLine2 = BoundingBox.intersects(line2Start,
+      line2End, line1End);
 
-    if (p1q1p2 && p1q2p2) {
-      return new DoubleCoordinatesList(2, line2x1, line2y1, line2x2, line2y2);
-    } else if (q1p1q2 && q1p2q2) {
-      return new DoubleCoordinatesList(2, line1x1, line1y1, line1x2, line1y2);
-    } else if (p1q1p2 && q1p1q2) {
-      if (CoordinatesUtil.equals(line2x1, line2y1, line1x1, line1y1) && !p1q2p2
-        && !q1p2q2) {
-        return new DoubleCoordinatesList(2, line2x1, line2y1);
+    Coordinates line2StartWithElevation = getElevation(numAxis, line1Start,
+      line1End, line2Start);
+    Coordinates line2EndWithElevation = getElevation(numAxis, line1Start,
+      line1End, line2End);
+
+    if (line2StartIntersectsLine1 && line2EndIntersectsLine1) {
+      return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
+        line2EndWithElevation);
+    } else if (line1StartIntersectsLine2 && line1EndIntersectsLine2) {
+      return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
+        line1End);
+    } else if (line2StartIntersectsLine1 && line1StartIntersectsLine2) {
+      if (line2StartWithElevation.equals2d(line1Start)
+        && !line2EndIntersectsLine1 && !line1EndIntersectsLine2) {
+        return new DoubleCoordinatesList(numAxis, line2StartWithElevation);
       } else {
-        return new DoubleCoordinatesList(2, line2x1, line2y1, line1x1, line1y1);
+        return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
+          line1Start);
       }
-    } else if (p1q1p2 && q1p2q2) {
-      if (CoordinatesUtil.equals(line2x1, line2y1, line1x2, line1y2) && !p1q2p2
-        && !q1p1q2) {
-        return new DoubleCoordinatesList(2, line2x1, line2y1);
+    } else if (line2StartIntersectsLine1 && line1EndIntersectsLine2) {
+      if (line2StartWithElevation.equals2d(line1End)
+        && !line2EndIntersectsLine1 && !line1StartIntersectsLine2) {
+        return new DoubleCoordinatesList(numAxis, line2StartWithElevation);
       } else {
-        return new DoubleCoordinatesList(2, line2x1, line2y1, line1x2, line1y2);
+        return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
+          line1End);
       }
-    } else if (p1q2p2 && q1p1q2) {
-      if (CoordinatesUtil.equals(line2x2, line2y2, line1x1, line1y1) && !p1q1p2
-        && !q1p2q2) {
-        return new DoubleCoordinatesList(2, line2x2, line2y2);
+    } else if (line2EndIntersectsLine1 && line1StartIntersectsLine2) {
+      if (line2EndWithElevation.equals2d(line1Start)
+        && !line2StartIntersectsLine1 && !line1EndIntersectsLine2) {
+        return new DoubleCoordinatesList(numAxis, line2EndWithElevation);
       } else {
-        return new DoubleCoordinatesList(2, line2x2, line2y2, line1x1, line1y1);
+        return new DoubleCoordinatesList(numAxis, line2EndWithElevation,
+          line1Start);
       }
-    } else if (p1q2p2 && q1p2q2) {
-      if (CoordinatesUtil.equals(line2x2, line2y2, line1x2, line1y2) && !p1q1p2
-        && !q1p1q2) {
-        return new DoubleCoordinatesList(2, line2x2, line2y2);
+    } else if (line2EndIntersectsLine1 && line1EndIntersectsLine2) {
+      if (line2EndWithElevation.equals2d(line1End)
+        && !line2StartIntersectsLine1 && !line1StartIntersectsLine2) {
+        return new DoubleCoordinatesList(numAxis, line2EndWithElevation);
       } else {
-        return new DoubleCoordinatesList(2, line2x2, line2y2, line1x2, line1y2);
+        return new DoubleCoordinatesList(numAxis, line2EndWithElevation,
+          line1End);
       }
     } else {
-      return new DoubleCoordinatesList(2);
+      return new DoubleCoordinatesList(numAxis);
     }
   }
 
@@ -342,11 +336,30 @@ public class LineSegmentUtil {
     return z;
   }
 
+  public static Coordinates getElevation(
+    int numAxis,
+    final Coordinates lineStart,
+    final Coordinates lineEnd,
+    final Coordinates point) {
+    DoubleCoordinates newPoint = new DoubleCoordinates(point, numAxis);
+    if (numAxis > 2) {
+      final double fraction = point.distance(lineStart)
+        / lineStart.distance(lineEnd);
+      double z1 = lineStart.getZ();
+      double z2 = lineEnd.getZ();
+      final double z = z1 + (z2 - z1) * (fraction);
+      newPoint.setZ(z);
+    }
+    return newPoint;
+  }
+
   public static CoordinatesList getIntersection(
     final Coordinates line1Start,
     final Coordinates line1End,
     final Coordinates line2Start,
     final Coordinates line2End) {
+    final int numAxis = Math.max(line1Start.getNumAxis(), line1End.getNumAxis());
+
     final double line1x1 = line1Start.getX();
     final double line1y1 = line1Start.getY();
     final double line1x2 = line1End.getX();
@@ -357,8 +370,74 @@ public class LineSegmentUtil {
     final double line2x2 = line2End.getX();
     final double line2y2 = line2End.getY();
 
-    return getIntersection(line1x1, line1y1, line1x2, line1y2, line2x1,
-      line2y1, line2x2, line2y2);
+    if (line1Start.equals(line2Start) || line1Start.equals(line2End)) {
+      return new DoubleCoordinatesList(numAxis, line1Start);
+    } else if (line1End.equals(line2Start) || line1End.equals(line2End)) {
+      return new DoubleCoordinatesList(numAxis, line1End);
+    } else if (BoundingBox.intersects(line1Start, line1End, line2Start,
+      line2End)) {
+
+      final int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
+        line1x2, line1y2, line2x1, line2y1);
+      final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
+        line1x2, line1y2, line2x2, line2y2);
+
+      if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
+        return new DoubleCoordinatesList(numAxis);
+      } else {
+
+        final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
+          line2x2, line2y2, line1x1, line1y1);
+        final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
+          line2x2, line2y2, line1x2, line1y2);
+
+        if ((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0)) {
+          return new DoubleCoordinatesList(numAxis);
+        }
+
+        final boolean collinear = Pq1 == 0 && Pq2 == 0 && Qp1 == 0 && Qp2 == 0;
+        if (collinear) {
+          return LineSegmentUtil.computeCollinearIntersection(numAxis,
+            line1Start, line1End, line2Start, line2End);
+        } else {
+          if (Pq1 == 0 || Pq2 == 0 || Qp1 == 0 || Qp2 == 0) {
+            if (Pq1 == 0) {
+              Coordinates intersection = getElevation(numAxis, line1Start,
+                line1End, line2Start);
+              return new DoubleCoordinatesList(numAxis, intersection);
+            } else if (Pq2 == 0) {
+              Coordinates intersection = getElevation(numAxis, line1Start,
+                line1End, line2End);
+              return new DoubleCoordinatesList(numAxis, intersection);
+            } else if (Qp1 == 0) {
+              return new DoubleCoordinatesList(numAxis, line1Start);
+            } else if (Qp2 == 0) {
+              return new DoubleCoordinatesList(numAxis, line1End);
+            } else {
+              return new DoubleCoordinatesList(numAxis);
+            }
+          } else {
+            double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
+              line1y1, line1x2, line1y2);
+            double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
+              line2y1, line2x2, line2y2);
+            final double x = LineSegmentUtil.det(detLine1StartLine1End, line1x1
+              - line1x2, detLine2StartLine2End, line2x1 - line2x2)
+              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
+                line2x1 - line2x2, line2y1 - line2y2);
+            final double y = LineSegmentUtil.det(detLine1StartLine1End, line1y1
+              - line1y2, detLine2StartLine2End, line2y1 - line2y2)
+              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
+                line2x1 - line2x2, line2y1 - line2y2);
+            Coordinates intersection = getElevation(numAxis, line1Start,
+              line1End, new DoubleCoordinates(x, y));
+            return new DoubleCoordinatesList(numAxis, intersection);
+          }
+        }
+      }
+    } else {
+      return new DoubleCoordinatesList(numAxis);
+    }
   }
 
   /**
@@ -388,84 +467,6 @@ public class LineSegmentUtil {
 
     }
     return intersections;
-  }
-
-  public static CoordinatesList getIntersection(
-    final double line1x1,
-    final double line1y1,
-    final double line1x2,
-    final double line1y2,
-    final double line2x1,
-    final double line2y1,
-    final double line2x2,
-    final double line2y2) {
-    if (BoundingBox.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
-      line2y1, line2x2, line2y2)) {
-
-      final int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
-        line1x2, line1y2, line2x1, line2y1);
-      final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
-        line1x2, line1y2, line2x2, line2y2);
-
-      if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
-        return new DoubleCoordinatesList(2);
-      } else {
-        
-        final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
-          line2x2, line2y2, line1x1, line1y1);
-        final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
-          line2x2, line2y2, line1x2, line1y2);
-
-        if ((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0)) {
-          return new DoubleCoordinatesList(2);
-        }
-
-        final boolean collinear = Pq1 == 0 && Pq2 == 0 && Qp1 == 0 && Qp2 == 0;
-        if (collinear) {
-          return LineSegmentUtil.computeCollinearIntersection(line1x1, line1y1,
-            line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
-        } else {
-          if (Pq1 == 0 || Pq2 == 0 || Qp1 == 0 || Qp2 == 0) {
-            if (CoordinatesUtil.equals(line1x1, line1y1, line2x1, line2y1)
-              || CoordinatesUtil.equals(line1x1, line1y1, line2x2, line2y2)) {
-              return new DoubleCoordinatesList(2, line1x1, line1y1);
-            } else if (CoordinatesUtil.equals(line1x2, line1y2, line2x1,
-              line2y1)
-              || CoordinatesUtil.equals(line1x2, line1y2, line2x2, line2y2)) {
-              return new DoubleCoordinatesList(2, line1x2, line1y2);
-            } else if (Pq1 == 0) {
-              return new DoubleCoordinatesList(2, line2x1, line2y1);
-            } else if (Pq2 == 0) {
-              return new DoubleCoordinatesList(2, line2x2, line2y2);
-            } else if (Qp1 == 0) {
-              return new DoubleCoordinatesList(2, line1x1, line1y1);
-            } else if (Qp2 == 0) {
-              return new DoubleCoordinatesList(2, line1x2, line1y2);
-            } else {
-              return new DoubleCoordinatesList(2);
-            }
-          } else {
-            final double x = LineSegmentUtil.det(
-              LineSegmentUtil.det(line1x1, line1y1, line1x2, line1y2), line1x1
-                - line1x2,
-              LineSegmentUtil.det(line2x1, line2y1, line2x2, line2y2), line2x1
-                - line2x2)
-              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
-                line2x1 - line2x2, line2y1 - line2y2);
-            final double y = LineSegmentUtil.det(
-              LineSegmentUtil.det(line1x1, line1y1, line1x2, line1y2), line1y1
-                - line1y2,
-              LineSegmentUtil.det(line2x1, line2y1, line2x2, line2y2), line2y1
-                - line2y2)
-              / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
-                line2x1 - line2x2, line2y1 - line2y2);
-            return new DoubleCoordinatesList(2, x, y);
-          }
-        }
-      }
-    } else {
-      return new DoubleCoordinatesList(2);
-    }
   }
 
   public static PointLineProjection getPointLineProjection(
