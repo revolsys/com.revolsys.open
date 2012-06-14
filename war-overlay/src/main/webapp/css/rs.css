@@ -602,7 +602,10 @@ div.form div:nth-of-type(even).field > div.contents {
 
 div.instructions {
   color: #999999;
-  background-color: white;
+}
+
+div.invalid {
+  background-color: pink;
 }
 
 div.form div.field div.instructions {
