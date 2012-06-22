@@ -108,9 +108,11 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final String sheet,
     final int east,
     final int north) {
-    final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
-      * getTileHeight());
-    final double lat = getLatitude(sheet) + north * getTileHeight();
+    double sourceLon = getLongitude(sheet);
+    double sourceLat = getLatitude(sheet);
+    final double lon = precisionModel.makePrecise(sourceLon + east
+      * getTileWidth());
+    final double lat = sourceLat + north * getTileHeight();
     return getMapTileName(lon, lat);
   }
 

@@ -185,7 +185,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       return (T)getNextPrimaryKey(metaData);
     } else {
       return (T)UUID.randomUUID().toString();
-        }
+    }
   }
 
   protected DataObjectStoreQueryReader createReader(
@@ -284,8 +284,12 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public String getDatabaseSchemaName(final DataObjectStoreSchema schema) {
-    String schemaPath = schema.getPath();
-    return getDatabaseSchemaName(schemaPath);
+    if (schema == null) {
+      return null;
+    } else {
+      String schemaPath = schema.getPath();
+      return getDatabaseSchemaName(schemaPath);
+    }
   }
 
   public String getDatabaseSchemaName(final String schemaPath) {
@@ -322,11 +326,13 @@ public abstract class AbstractJdbcDataObjectStore extends
     final ResultSetMetaData resultSetMetaData) {
     try {
       final String schemaName = PathUtil.getPath(typePath);
+      DataObjectStoreSchema schema = getSchema(schemaName);
+      String dbSchema = getDatabaseSchemaName(schema);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
-        getSchema(schemaName), typePath);
+        schema, typePath);
 
-      final String tableName = PathUtil.getName(typePath);
-      final String idColumnName = loadIdColumnName(schemaName, tableName);
+      final String tableName = getDatabaseTableName(typePath);
+      final String idColumnName = loadIdColumnName(dbSchema, tableName);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
         final String name = resultSetMetaData.getColumnName(i).toUpperCase();
         if (name.equals(idColumnName)) {
@@ -581,7 +587,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   protected void postCreateDataObjectMetaData(
     final DataObjectMetaDataImpl metaData) {
   }
-
 
   public DataObjectStoreQueryReader query(
     final String typePath,

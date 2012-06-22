@@ -57,7 +57,6 @@ public final class DataObjectUtil {
     }
   }
 
-
   /**
    * Create a copy of the data object replacing the geometry with the new
    * geometry. If the existing geometry on the object has user data it will be
@@ -157,11 +156,15 @@ public final class DataObjectUtil {
   public static Integer getInteger(
     final DataObject object,
     final String attributeName) {
-    final Number value = object.getValue(attributeName);
-    if (value == null) {
+    if (object == null) {
       return null;
     } else {
-      return value.intValue();
+      final Number value = object.getValue(attributeName);
+      if (value == null) {
+        return null;
+      } else {
+        return value.intValue();
+      }
     }
   }
 

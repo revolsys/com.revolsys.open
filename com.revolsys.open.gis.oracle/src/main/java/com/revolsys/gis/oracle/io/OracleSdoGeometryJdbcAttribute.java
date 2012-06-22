@@ -18,6 +18,8 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -321,22 +323,29 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return null;
   }
 
-  private JGeometry toJGeometry(final MultiPoint points, final int dimension) {
-    final Object[] pointArrary = new Object[points.getNumGeometries()];
-    for (int i = 0; i < points.getNumGeometries(); i++) {
-      final Point point = (Point)points.getGeometryN(i);
-      final CoordinatesList coordinatesList = CoordinatesListUtil.get(point);
-      final double[] coordinates = coordinatesList.getCoordinates();
-      if (dimension == 3) {
-        final double z = coordinates[2];
-        if (Double.isNaN(z)) {
-          coordinates[2] = 0;
+  private JGeometry toJGeometry(final MultiPoint multiPoint, final int numAxis) {
+    int numPoints = multiPoint.getNumGeometries();
+    final double[] points = new double[numPoints * numAxis];
+    int k = 0;
+    for (int i = 0; i < numPoints; i++) {
+      final Point point = (Point)multiPoint.getGeometryN(i);
+      final Coordinates coordinates = CoordinatesUtil.get(point);
+      for (int j = 0; j < numAxis; j++) {
+        double value = coordinates.getValue(j);
+        if (Double.isNaN(value)) {
+          points[k] = 0;
+        } else {
+          points[k] = value;
         }
       }
-      pointArrary[i] = coordinates;
+      k++;
     }
     final int srid = geometryFactory.getSRID();
-    return JGeometry.createMultiPoint(pointArrary, dimension, srid);
+    int[] elemInfo = new int[] {
+      1, 1, numPoints
+    };
+    return new JGeometry(numAxis * 1000 + JGeometry.GTYPE_MULTIPOINT, srid,
+      elemInfo, points);
   }
 
   private JGeometry toJGeometry(

@@ -1,6 +1,5 @@
 package com.revolsys.gis.cs;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +14,6 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
@@ -383,9 +381,32 @@ public class GeometryFactory extends
 
   public Geometry createGeometry(final List<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
-      return createGeometryCollection((Geometry[])null);
+      return createEmptyGeometryCollection();
     } else if (geometries.size() == 1) {
       return geometries.get(0);
+    } else {
+      final Set<Class<?>> classes = getGeometryClassSet(geometries);
+      if (classes.equals(Collections.singleton(Point.class))) {
+        return createMultiPoint(geometries);
+      } else if (classes.equals(Collections.singleton(LineString.class))) {
+        return createMultiLineString(geometries);
+      } else if (classes.equals(Collections.singleton(Polygon.class))) {
+        return createMultiPolygon(geometries);
+      } else {
+        final Geometry[] geometryArray = com.vividsolutions.jts.geom.GeometryFactory.toGeometryArray(geometries);
+        return createGeometryCollection(geometryArray);
+      }
+    }
+  }
+
+  protected GeometryCollection createEmptyGeometryCollection() {
+    return new GeometryCollection(null, this);
+  }
+
+  public GeometryCollection createGeometryCollection(
+    final List<? extends Geometry> geometries) {
+    if (geometries == null || geometries.size() == 0) {
+      return createEmptyGeometryCollection();
     } else {
       final Set<Class<?>> classes = getGeometryClassSet(geometries);
       if (classes.equals(Collections.singleton(Point.class))) {
@@ -413,13 +434,6 @@ public class GeometryFactory extends
     boolean useNumAxisFromGeometryFactory) {
     WktParser parser = new WktParser(this);
     return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
-  }
-
-  public GeometryCollection createGeometryCollection(
-    final List<Geometry> geometries) {
-    final Geometry[] array = new Geometry[geometries.size()];
-    geometries.toArray(array);
-    return createGeometryCollection(array);
   }
 
   public LinearRing createLinearRing(final CoordinatesList points) {

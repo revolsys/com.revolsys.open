@@ -281,14 +281,18 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public DataObjectStoreSchema getSchema(String schemaName) {
-    synchronized (schemaMap) {
-      if (schemaMap.isEmpty()) {
-        loadSchemas(schemaMap);
+    if (schemaName == null) {
+      return null;
+    } else {
+      synchronized (schemaMap) {
+        if (schemaMap.isEmpty()) {
+          loadSchemas(schemaMap);
+        }
+        if (!schemaName.startsWith("/")) {
+          schemaName = "/" + schemaName;
+        }
+        return schemaMap.get(schemaName);
       }
-      if (!schemaName.startsWith("/")) {
-        schemaName = "/" + schemaName;
-      }
-      return schemaMap.get(schemaName);
     }
   }
 
