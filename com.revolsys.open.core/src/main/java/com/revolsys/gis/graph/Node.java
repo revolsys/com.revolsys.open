@@ -45,11 +45,10 @@ public class Node<T> extends AbstractCoordinates {
   public static <T> Set<Edge<T>> getEdgesBetween(
     final Node<T> node0,
     final Node<T> node1) {
-    if (node1 == null) {
-      return Collections.emptySet();
-    }
     final Set<Edge<T>> commonEdges = new HashSet<Edge<T>>();
-    if (node0 == node1) {
+    if (node1 == null) {
+      return commonEdges;
+    } else if (node0 == node1) {
       for (final Edge<T> edge : node0.getEdges()) {
         if (edge.getFromNode() == edge.getToNode()) {
           commonEdges.add(edge);
@@ -291,7 +290,7 @@ public class Node<T> extends AbstractCoordinates {
     return edges;
   }
 
-  public Collection<Edge<T>> getEdgesTo(final Node<T> node) {
+  public Set<Edge<T>> getEdgesTo(final Node<T> node) {
     return getEdgesBetween(this, node);
   }
 

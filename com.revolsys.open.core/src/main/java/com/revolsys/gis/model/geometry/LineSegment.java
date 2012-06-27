@@ -30,8 +30,9 @@ public class LineSegment extends AbstractCoordinatesList {
     Coordinates previousCoordinate = coords.get(0);
     for (int i = 1; i < coords.size(); i++) {
       final Coordinates coordinate = coords.get(i);
-      final LineSegment segment = new LineSegment(
-        GeometryFactory.getFactory(line), previousCoordinate, coordinate);
+      GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+      final LineSegment segment = new LineSegment(geometryFactory,
+        previousCoordinate, coordinate);
       if (segment.getLength() > 0) {
         if (!visitor.visit(segment)) {
           return;
@@ -60,8 +61,6 @@ public class LineSegment extends AbstractCoordinatesList {
   private Coordinates coordinates2;
 
   private GeometryFactory geometryFactory;
-
-  private LineString line;
 
   public LineSegment() {
   }
@@ -213,10 +212,7 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public LineString getLine() {
-    if (line == null) {
-      line = geometryFactory.createLineString(this);
-    }
-    return line;
+    return geometryFactory.createLineString(this);
   }
 
   public byte getNumAxis() {

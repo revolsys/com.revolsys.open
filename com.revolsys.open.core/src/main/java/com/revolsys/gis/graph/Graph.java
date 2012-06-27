@@ -472,6 +472,12 @@ public class Graph<T> {
     return nodeIndex;
   }
 
+  public List<Node<T>> getNodes() {
+    final ArrayList<Node<T>> targetNodes = new ArrayList<Node<T>>();
+    copyNodes(targetNodes);
+    return targetNodes;
+  }
+
   public List<Node<T>> getNodes(final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodesByCoordinates();
     if (comparator != null) {
@@ -1130,6 +1136,7 @@ public class Graph<T> {
       Collections.sort(edges, comparator);
     }
     final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
+      @Override
       public void edgeEvent(final EdgeEvent<T> edgeEvent) {
         final Edge<T> edge = edgeEvent.getEdge();
         final String action = edgeEvent.getAction();
@@ -1141,7 +1148,9 @@ public class Graph<T> {
             Collections.sort(edges, comparator);
           }
         } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
-          edges.remove(edge);
+          if (comparator != null) {
+            edges.remove(edge);
+          }
         }
       }
     };
@@ -1195,6 +1204,7 @@ public class Graph<T> {
     }
 
     final NodeEventListener<T> listener = new NodeEventListener<T>() {
+      @Override
       public void nodeEvent(final NodeEvent<T> nodeEvent) {
         final Node<T> node = nodeEvent.getNode();
         final String action = nodeEvent.getAction();

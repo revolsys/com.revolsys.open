@@ -7,6 +7,68 @@ import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.algorithm.Angle;
 
+/**
+ * <h1>Albers Equal Area</h1>
+ * <p>
+ * (EPSG dataset coordinate operation method code 9822)
+ * </p>
+ * <p>
+ * To derive the projected coordinates of a point, geodetic latitude (φ) is
+ * converted to authalic latitude (ß). The formulas to convert geodetic latitude
+ * and longitude (φ, λ) to Easting (E) and Northing (N) are:
+ * </p>
+ * 
+ * <pre>
+ * Easting (E) = EF + (ρ sin θ)
+ * Northing(N) = NF +ρO –(ρ cosθ)
+ * </pre>
+ * <p>
+ * where
+ * </p>
+ * 
+ * <pre>
+ * θ =n (λ–λO)
+ * ρ =[a (C–nα)0.5]/n ρO =[a (C–nαO)0.5]/n
+ * </pre>
+ * <p>
+ * and
+ * </p>
+ * 
+ * <pre>
+ * C = m12 + (n α1)
+ * n =(m12 –m22)/(α2 –α1)
+ * m1 = cos φ1 / (1 – e2sin2φ1)0.5
+ * m2 = cos φ2 / (1 – e2sin2φ2)0.5
+ * α = (1 – e2) {[sinφ / (1 – e2sin2φ)] – [1/(2e)] ln [(1 – esinφ) / (1 + esinφ)]}
+ * αO = (1 – e2) {[sinφO / (1 – e2sin2φO)] – [1/(2e)] ln [(1 – e sinφO) / (1 + e sinφO)]}
+ * α1 = (1 – e2) {[sinφ1 / (1 – e2sin2φ1)] – [1/(2e)] ln [(1 – e sinφ1) / (1 + e sinφ1)]}
+ * α2 = (1 – e2) {[sinφ2 / (1 – e2sin2φ2)] – [1/(2e)] ln [(1 – e sinφ2) / (1 + e sinφ2)]}
+ * </pre>
+ * <p>
+ * The reverse formulas to derive the geodetic latitude and longitude of a point
+ * from its Easting and Northing values are: φ = ß' + (e2/3 + 31e4/180 +
+ * 517e6/5040) sin 2ß'] + [(23e4/360 + 251e6/3780) sin 4ß'] + [(761e6/45360) sin
+ * 6ß']
+ * </p>
+ * 
+ * <pre>
+ * λ = λO + (θ / n)
+ * </pre>
+ * <p>
+ * where
+ * </p>
+ * 
+ * <pre>
+ * ß'= asin(α'/{1–[(1–e2)/(2 e)] ln[(1–e)/(1+e)] α'= [C–(ρ2 n2 /a2)]/n
+ * ρ= {(E–EF)2 +[ρO –(N–NF)]2 }0.5
+ * θ= atan[(E–EF)/[ρO –(N–NF)]
+ * </pre>
+ * <p>
+ * and C, n and ρO are as in the forward equations.
+ * </p>
+ * 
+ * @author paustin
+ */
 public class AlbersConicEqualArea implements CoordinatesProjection {
   /** Constant c = sq(m(phi1) + n * q(phi1) */
   private final double c;

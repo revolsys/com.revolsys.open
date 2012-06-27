@@ -61,6 +61,8 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
         JsonParserUtil.skipToAttribute(in, TYPE);
         if (in.getEvent() == EventType.endDocument) {
           throw new NoSuchElementException();
+        } else if (in.getEvent() == EventType.unknown) {
+          throw new RuntimeException("Document is not a valid GeoJson document");
         }
       } while (in.getEvent() != EventType.colon);
       type = JsonParserUtil.getString(in);

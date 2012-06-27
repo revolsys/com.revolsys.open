@@ -337,8 +337,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         } else {
           points[k] = value;
         }
+        k++;
       }
-      k++;
     }
     final int srid = geometryFactory.getSRID();
     int[] elemInfo = new int[] {

@@ -78,7 +78,10 @@ public class PageInfoHttpMessageConverter extends
       "resource");
     pageMap.put("resourceUri", url);
     pageMap.put("title", pageInfo.getTitle());
-    pageMap.put("description", pageInfo.getDescription());
+    String description = pageInfo.getDescription();
+    if (StringUtils.hasText(description)) {
+      pageMap.put("description", description);
+    }
     for (final Entry<String, Object> attribute : pageInfo.getAttributes()
       .entrySet()) {
       final String key = attribute.getKey();
@@ -195,7 +198,6 @@ public class PageInfoHttpMessageConverter extends
     } else if (!pages.isEmpty()) {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "resources");
-      writer.element(HtmlUtil.H2, "Resources");
       writer.startTag(HtmlUtil.DL);
       for (final Entry<String, PageInfo> childPage : pages.entrySet()) {
         final String childPath = childPage.getKey();
@@ -209,11 +211,6 @@ public class PageInfoHttpMessageConverter extends
           childUri = url + childPath;
         }
 
-        // Reference childReference = reference.clone();
-        // childReference.setQuery(null);
-        // for (String childPathElement : childPath.split("/")) {
-        // childReference.addSegment(childPathElement);
-        // }
         writer.startTag(HtmlUtil.DT);
         final String childTitle = childPageInfo.getTitle();
         HtmlUtil.serializeA(writer, null, childUri, childTitle);

@@ -181,6 +181,8 @@ public final class JsonParserUtil {
             return;
           }
         }
+      } else if (eventType == EventType.unknown) {
+        return;
       }
     }
   }

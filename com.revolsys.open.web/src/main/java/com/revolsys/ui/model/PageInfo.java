@@ -52,6 +52,10 @@ public class PageInfo extends AbstractDocumentedObject {
     this.methods.addAll(Arrays.asList(methods));
   }
 
+  public PageInfo(String title) {
+    setTitle(title);
+  }
+
   public void addInputContentType(final MediaType mediaType) {
     inputContentTypes.add(mediaType);
   }
