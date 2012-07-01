@@ -48,10 +48,10 @@ public class AttributeValuesFilter implements Filter<DataObject> {
    * @param attributeName The attribute name.
    * @param values The array of values.
    */
-  public AttributeValuesFilter(final String attributeName,
-    final boolean allowNulls, final Object... values) {
-    this(attributeName, allowNulls, Arrays.asList(values));
-  }
+	public AttributeValuesFilter(final String attributeName,
+			final boolean allowNulls, final Object... values) {
+		this(attributeName, allowNulls, Arrays.asList(values));
+	}
 
   /**
    * Construct a new AttributeValuesFilter.
@@ -65,16 +65,6 @@ public class AttributeValuesFilter implements Filter<DataObject> {
     this.values = values;
   }
 
-  /**
-   * Construct a new AttributeValuesFilter.
-   * 
-   * @param attributeName The attribute name.
-   * @param values The array of values.
-   */
-  public AttributeValuesFilter(final String attributeName,
-    final Object... values) {
-    this(attributeName, Arrays.asList(values));
-  }
 
   /**
    * Match the attributeName on the data object with the required value.

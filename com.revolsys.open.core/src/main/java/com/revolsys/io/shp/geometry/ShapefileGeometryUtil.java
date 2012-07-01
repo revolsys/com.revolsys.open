@@ -856,10 +856,10 @@ public final class ShapefileGeometryUtil {
     if (coordinates.getNumAxis() >= 3) {
       for (int i = 0; i < coordinates.size(); i++) {
         final double z = coordinates.getZ(i);
-        if (!Double.isNaN(z)) {
-          out.writeLEDouble(z);
-        } else {
+        if (Double.isNaN(z)) {
           out.writeLEDouble(0);
+        } else {
+          out.writeLEDouble(z);
         }
       }
     } else {

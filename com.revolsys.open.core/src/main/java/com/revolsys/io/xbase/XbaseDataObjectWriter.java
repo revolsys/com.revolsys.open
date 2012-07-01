@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -52,12 +53,8 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     this.resource = resource;
   }
 
-  protected int addDbaseField(
-    final String fullName,
-    final DataType dataType,
-    final Class<?> typeJavaClass,
-    final int length,
-    final int scale) {
+  protected int addDbaseField(final String fullName, final DataType dataType,
+    final Class<?> typeJavaClass, final int length, final int scale) {
     FieldDefinition field = null;
     if (dataType == DataTypes.DECIMAL) {
       if (length > 18) {
@@ -102,18 +99,13 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return field.getLength();
   }
 
-  protected FieldDefinition addFieldDefinition(
-    final String fullName,
-    final char type,
-    final int length) {
+  protected FieldDefinition addFieldDefinition(final String fullName,
+    final char type, final int length) {
     return addFieldDefinition(fullName, type, length, 0);
   }
 
-  protected FieldDefinition addFieldDefinition(
-    final String fullName,
-    final char type,
-    final int length,
-    final int decimalPlaces) {
+  protected FieldDefinition addFieldDefinition(final String fullName,
+    final char type, final int length, final int decimalPlaces) {
     String name = shortNames.get(fullName);
     if (name == null) {
       name = fullName.toUpperCase();
@@ -147,6 +139,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           out.write(now.getYear());
           out.write(now.getMonth() + 1);
           out.write(now.getDate());
+
           out.writeLEInt(numRecords);
         } finally {
           try {
@@ -175,7 +168,11 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   protected boolean hasField(final String name) {
-    return fieldNames.contains(name);
+    if (StringUtils.hasText(name)) {
+      return fieldNames.contains(name.toUpperCase());
+    } else {
+      return false;
+    }
   }
 
   protected void init() throws IOException {
@@ -234,8 +231,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected boolean writeField(
-    final DataObject object,
+  protected boolean writeField(final DataObject object,
     final FieldDefinition field) throws IOException {
     if (out == null) {
       return true;

@@ -18,28 +18,26 @@ public class InvokeMethodActionListener implements ActionListener {
 
   private final boolean invokeLater;
 
-  public InvokeMethodActionListener(final Class<?> clazz,
-    final String methodName, final boolean invokeLater,
-    final Object... parameters) {
+  public InvokeMethodActionListener(final boolean invokeLater,
+    final Class<?> clazz, final String methodName, final Object... parameters) {
     runnable = new InvokeMethodRunnable(clazz, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
   public InvokeMethodActionListener(final Class<?> clazz,
     final String methodName, final Object... parameters) {
-    this(clazz, methodName, false, parameters);
+    this(false, clazz, methodName, parameters);
   }
 
-  public InvokeMethodActionListener(final Object object,
-    final String methodName, final boolean invokeLater,
-    final Object... parameters) {
+  public InvokeMethodActionListener(final boolean invokeLater,
+    final Object object, final String methodName, final Object... parameters) {
     runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
   }
 
   public InvokeMethodActionListener(final Object object,
     final String methodName, final Object... parameters) {
-    this(object, methodName, false, parameters);
+    this(false, object, methodName, parameters);
   }
 
   @Override

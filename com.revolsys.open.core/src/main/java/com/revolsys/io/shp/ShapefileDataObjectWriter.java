@@ -230,7 +230,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         shapeType = geometryConverter.getShapeType();
       }
       out.seek(24);
-      out.writeInt((int)(out.length() / 2));
+      int sizeInShorts = (int)(out.length() / 2);
+      out.writeInt(sizeInShorts);
       out.seek(32);
       out.writeLEInt(shapeType);
       out.writeLEDouble(envelope.getMinX());
@@ -278,8 +279,10 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         recordNumber++;
         if (indexOut != null) {
           final long recordLength = out.getFilePointer() - recordIndex;
-          indexOut.writeInt((int)(recordIndex / MathUtil.BYTES_IN_SHORT));
-          indexOut.writeInt((int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4);
+          int offsetShort = (int)(recordIndex / MathUtil.BYTES_IN_SHORT);
+          indexOut.writeInt(offsetShort);
+          int lengthShort = (int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4;
+          indexOut.writeInt(lengthShort);
         }
       }
       return true;
@@ -290,7 +293,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private void writeHeader(final EndianOutput out) throws IOException {
     out.writeInt(ShapefileConstants.FILE_CODE);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) { // Unused
       out.writeInt(0);
     }
     out.writeInt(0); // File length updated on close

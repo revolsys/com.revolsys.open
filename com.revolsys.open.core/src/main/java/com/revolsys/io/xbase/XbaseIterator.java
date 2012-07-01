@@ -255,14 +255,15 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
    * 
    * @throws IOException If an I/O error occurs.
    */
+  @SuppressWarnings("unused")
   private void loadHeader() throws IOException {
-    in.read();
+    final int version = in.read();
     final int y = in.read();
     final int m = in.read();
     final int d = in.read();
     // properties.put(new QName("date"), new Date(y, m - 1, d));
     numRecords = in.readLEInt();
-    in.readLEShort();
+    final short headerSize = in.readLEShort();
 
     this.recordSize = (short)(in.readLEShort() - 1);
     in.skipBytes(20);
