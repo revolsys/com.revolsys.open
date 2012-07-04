@@ -44,6 +44,10 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return property.canMerge(point, object1, object2, excludes);
   }
 
+  public static boolean hasProperty(DataObject object) {
+    DataObjectMetaData metaData = object.getMetaData();
+    return metaData.getProperty(PROPERTY_NAME) != null;
+  }
   public static boolean canMergeObjects(
     final Coordinates point,
     final DataObject object1,

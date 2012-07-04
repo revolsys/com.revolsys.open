@@ -82,6 +82,15 @@ public class ResourceEndianOutput implements EndianOutput {
     out.writeBytes(s);
   }
 
+  public void write(final byte[] bytes, int offset, int length)
+    throws IOException {
+    out.write(bytes, offset, length);
+  }
+
+  public void write(final byte[] bytes) throws IOException {
+    out.write(bytes);
+  }
+
   public void writeDouble(final double d) throws IOException {
     out.writeDouble(d);
   }

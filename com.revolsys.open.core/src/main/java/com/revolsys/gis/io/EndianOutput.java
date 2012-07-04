@@ -100,4 +100,8 @@ public interface EndianOutput {
    * @throws IOException If an I/O error occurs.
    */
   void writeShort(short s) throws IOException;
+
+  void write(byte[] bytes, int offset, int length) throws IOException;
+
+  void write(byte[] bytes) throws IOException;
 }

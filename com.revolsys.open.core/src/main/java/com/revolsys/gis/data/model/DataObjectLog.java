@@ -135,7 +135,7 @@ public class DataObjectLog {
     log("INFO", message, object);
   }
 
-  public void log(
+  private void log(
     final String logLevel,
     final Object message,
     final DataObject object) {
@@ -144,7 +144,9 @@ public class DataObjectLog {
       final DataObject logObject = new ArrayDataObject(logMetaData, object);
       logObject.setValue("LOGMESSAGE", message);
       logObject.setValue("LOGLEVEL", logLevel);
-      writer.write(logObject);
+      synchronized (writer) {
+        writer.write(logObject);
+      }
     }
   }
 

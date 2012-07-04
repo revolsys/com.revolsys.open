@@ -25,7 +25,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private boolean useZeroForNull = true;
 
-  private Map<DataObjectMetaData, Writer<DataObject>> writers = new HashMap<DataObjectMetaData, Writer<DataObject>>();
+  private Map<String, Writer<DataObject>> writers = new HashMap<String, Writer<DataObject>>();
 
   private boolean useNamespaceAsSubDirectory;
 
@@ -96,7 +96,8 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private Writer<DataObject> getWriter(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
-    Writer<DataObject> writer = writers.get(metaData);
+    String path = metaData.getPath();
+    Writer<DataObject> writer = writers.get(path);
     if (writer == null) {
       final File directory = getDirectory(metaData);
       final File file = new File(directory, getFileName(metaData) + ".shp");
@@ -107,7 +108,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
         setProperty(IoConstants.GEOMETRY_FACTORY,
           GeometryFactory.getFactory(geometry));
       }
-      writers.put(metaData, writer);
+      writers.put(path, writer);
     }
     return writer;
   }

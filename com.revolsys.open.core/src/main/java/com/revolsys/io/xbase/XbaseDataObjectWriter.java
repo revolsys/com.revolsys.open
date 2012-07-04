@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -268,12 +269,13 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             throw new IllegalArgumentException("Not a number " + attributeName
               + "=" + value);
           }
-          if (numString.length() > fieldLength) {
+          int numLength = numString.length();
+          if (numLength > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
               out.write('9');
             }
           } else {
-            for (int i = numString.length(); i < fieldLength; i++) {
+            for (int i = numLength; i < fieldLength; i++) {
               out.write(' ');
             }
             out.writeBytes(numString);
@@ -284,10 +286,17 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             floatString = value.toString();
           }
-          for (int i = floatString.length(); i < fieldLength; i++) {
-            out.write(' ');
+          int floatLength = floatString.length();
+          if (floatLength > fieldLength) {
+            for (int i = 0; i < fieldLength; i++) {
+              out.write('9');
+            }
+          } else {
+            for (int i = floatLength; i < fieldLength; i++) {
+              out.write(' ');
+            }
+            out.writeBytes(floatString);
           }
-          out.writeBytes(floatString);
           return true;
 
         case FieldDefinition.CHARACTER_TYPE:
@@ -295,11 +304,12 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             string = value.toString();
           }
-          if (string.length() > fieldLength) {
-            out.writeBytes(string.substring(0, fieldLength));
+          byte[] bytes = string.getBytes(Charset.forName("ISO-8859-1"));
+          if (bytes.length >= fieldLength) {
+            out.write(bytes, 0, fieldLength);
           } else {
-            out.writeBytes(string);
-            for (int i = string.length(); i < fieldLength; i++) {
+            out.write(bytes);
+            for (int i = bytes.length; i < fieldLength; i++) {
               out.write(' ');
             }
           }
