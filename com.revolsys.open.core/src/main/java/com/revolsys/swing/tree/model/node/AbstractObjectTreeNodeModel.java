@@ -12,6 +12,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import com.revolsys.beans.ClassUtil;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
+
 public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD extends Object>
   implements ObjectTreeNodeModel<NODE, CHILD> {
   private JPopupMenu menu = new JPopupMenu();
@@ -29,6 +35,15 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   private MouseListener mouseListener;
 
   private boolean leaf;
+
+  private ObjectTreeModel objectTreeModel;
+
+  public AbstractObjectTreeNodeModel() {
+  }
+
+  public AbstractObjectTreeNodeModel(ObjectTreeModel objectTreeModel) {
+    this.objectTreeModel = objectTreeModel;
+  }
 
   @Override
   public int addChild(final NODE node, final CHILD child) {
@@ -91,16 +106,24 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public ObjectTreeNodeModel<?, ?> getObjectTreeNodeModel(final Class<?> clazz) {
+    Set<Class<?>> classes = ClassUtil.getSuperClassesAndInterfaces(clazz);
+
     for (final ObjectTreeNodeModel<?, ?> objectTreeNodeModel : objectTreeNodeModels) {
-      if (objectTreeNodeModel.getSupportedClasses().contains(clazz)) {
+      Set<Class<?>> supportedClasses = objectTreeNodeModel.getSupportedClasses();
+      if (CollectionUtils.containsAny(supportedClasses, classes)) {
         return objectTreeNodeModel;
       }
     }
-    final Class<?> superClass = clazz.getSuperclass();
-    if (superClass != null) {
-      return getObjectTreeNodeModel(superClass);
+    return null;
+  }
+
+  @Override
+  public String convertValueToText(NODE node, boolean selected,
+    boolean expanded, boolean leaf, int row, boolean hasFocus) {
+    if (node == null) {
+      return "";
     } else {
-      return null;
+      return node.toString();
     }
   }
 
@@ -161,6 +184,15 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   protected void setMouseListener(final MouseListener mouseListener) {
     this.mouseListener = mouseListener;
+  }
+
+  public ObjectTreeModel getObjectTreeModel() {
+    return objectTreeModel;
+  }
+
+  @Override
+  public void setObjectTreeModel(ObjectTreeModel objectTreeModel) {
+    this.objectTreeModel = objectTreeModel;
   }
 
   protected void setObjectTreeNodeModels(

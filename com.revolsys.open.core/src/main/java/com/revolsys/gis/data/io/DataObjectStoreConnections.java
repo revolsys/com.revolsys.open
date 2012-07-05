@@ -53,7 +53,7 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
     for (final Entry<String, String> param : config.entrySet()) {
       preferences.put(param.getKey(), param.getValue());
     }
-    propertyChangeSupport.firePropertyChange(connectionName, null, preferences);
+    propertyChangeSupport.firePropertyChange("connectionName", null, connectionName);
 
   }
 

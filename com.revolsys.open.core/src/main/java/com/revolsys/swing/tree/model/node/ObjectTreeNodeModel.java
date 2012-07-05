@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.TreeCellRenderer;
 
+import com.revolsys.swing.tree.model.ObjectTreeModel;
+
 public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> {
   int addChild(final NODE node, final CHILD child);
 
@@ -39,4 +41,9 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
   boolean isLeaf(final NODE node);
 
   boolean removeChild(final NODE node, final CHILD child);
+
+  void setObjectTreeModel(ObjectTreeModel objectTreeModel);
+
+  String convertValueToText(NODE node, boolean selected, boolean expanded,
+    boolean leaf, int row, boolean hasFocus);
 }

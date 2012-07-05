@@ -3,6 +3,8 @@ package com.revolsys.swing.tree.model.node;
 import java.util.AbstractList;
 import java.util.List;
 
+import com.revolsys.swing.tree.model.ObjectTreeModel;
+
 public class ListObjectTreeNodeModel extends
   AbstractObjectTreeNodeModel<List, Object> {
   public ListObjectTreeNodeModel() {
@@ -13,6 +15,11 @@ public class ListObjectTreeNodeModel extends
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     setSupportedClasses(AbstractList.class);
     addObjectTreeNodeModels(objectTreeNodeModels);
+  }
+
+  public ListObjectTreeNodeModel(ObjectTreeModel model) {
+    super(model);
+    setSupportedClasses(AbstractList.class);
   }
 
   @Override

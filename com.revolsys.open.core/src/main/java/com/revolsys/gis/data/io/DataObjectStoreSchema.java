@@ -9,6 +9,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.PathUtil;
 
 public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   private AbstractDataObjectStore dataObjectStore;
@@ -97,5 +98,10 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   @Override
   public String toString() {
     return path;
+  }
+
+  public String getName() {
+    String path = getPath();
+    return PathUtil.getName(path);
   }
 }

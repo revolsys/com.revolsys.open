@@ -41,14 +41,13 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
   private boolean menuEnabled = true;
 
   public ObjectTree(final ObjectTreeModel model) {
-    super(model);
     this.model = model;
-
+    setModel(model);
     final Object root = model.getRoot();
     if (root instanceof PropertyChangeSupportProxy) {
       PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
       propProxy.getPropertyChangeSupport().addPropertyChangeListener(this);
-      
+
     }
     final ObjectTreeNodeModel<Object, Object> rootModel = model.getNodeModel(root);
     final TreePath rootPath = new TreePath(root);
@@ -171,10 +170,8 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
       }
 
       @Override
-      protected void exportDone(
-        final JComponent c,
-        final Transferable transferable,
-        final int action) {
+      protected void exportDone(final JComponent c,
+        final Transferable transferable, final int action) {
         try {
           final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
           if (data instanceof TreePathListTransferable) {
@@ -261,8 +258,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
         return false;
       }
 
-      private boolean isDropSupported(
-        final TreePath treePath,
+      private boolean isDropSupported(final TreePath treePath,
         final Set<Class<?>> supportedClasses) {
         final Object value = treePath.getLastPathComponent();
         final Class<?> valueClass = value.getClass();
@@ -306,6 +302,25 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
 
   public void setMenuEnabled(final boolean menuEnabled) {
     this.menuEnabled = menuEnabled;
+  }
+
+  @Override
+  public String convertValueToText(Object value, boolean selected,
+    boolean expanded, boolean leaf, int row, boolean hasFocus) {
+    if (model != null) {
+      if (value != null) {
+        TreePath path = model.getPath(value);
+        if (path != null) {
+          ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+          if (nodeModel != null) {
+            return nodeModel.convertValueToText(value, selected, expanded,
+              leaf, row, hasFocus);
+          }
+        }
+      }
+    }
+    return super.convertValueToText(value, selected, expanded, leaf, row,
+      hasFocus);
   }
 
   @SuppressWarnings("unchecked")
