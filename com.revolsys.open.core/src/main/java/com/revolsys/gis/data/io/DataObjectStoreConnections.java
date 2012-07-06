@@ -39,7 +39,7 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
 
   public DataObjectStoreConnections(final Preferences root,
     final String preferencesPath) {
-    dataStoresPrefereneces = root.node("com/revolsys/data/store");
+    dataStoresPrefereneces = root.node(preferencesPath);
   }
 
   public DataObjectStoreConnections(final String preferencesPath) {
