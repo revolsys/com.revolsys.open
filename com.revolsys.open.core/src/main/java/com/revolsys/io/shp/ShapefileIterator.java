@@ -45,6 +45,8 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private XbaseIterator xbaseIterator;
 
+  private int shapeType;
+
   public ShapefileIterator(final Resource resource,
     final DataObjectFactory factory) throws IOException {
     this.dataObjectFactory = factory;
@@ -65,43 +67,52 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   @Override
   protected synchronized void doInit() {
     try {
-      final Resource xbaseResource = this.resource.createRelative(name
-        + ".dbf");
+      final Resource xbaseResource = this.resource.createRelative(name + ".dbf");
       if (xbaseResource.exists()) {
         xbaseIterator = new XbaseIterator(xbaseResource,
           this.dataObjectFactory, new InvokeMethodRunnable(this,
             "updateMetaData"));
       }
+      loadHeader();
+      int numAxis = 3;
+      int srid = 0;
+      if (shapeType < 10) {
+        numAxis = 2;
+      } else if (shapeType < 20) {
+        numAxis = 3;
+      } else if (shapeType < 30) {
+        numAxis = 4;
+      } else {
+        numAxis = 4;
+      }
       GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-      final Resource projResource = this.resource.createRelative(name
-        + ".prj");
+      final Resource projResource = this.resource.createRelative(name + ".prj");
       if (projResource.exists()) {
         try {
           CoordinateSystem coordinateSystem = new WktCsParser(
             projResource.getInputStream()).parse();
           coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
-          final int crsId = EsriCoordinateSystems.getCrsId(coordinateSystem);
-          if (crsId != 0) {
-            coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
-          }
+          srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
           setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
-          geometryFactory = GeometryFactory.getFactory(coordinateSystem);
         } catch (final Exception e) {
           e.printStackTrace();
         }
       }
       if (geometryFactory == null) {
-        geometryFactory = GeometryFactory.getFactory(4326);
+        if (srid < 1) {
+          srid = 4326;
+        }
+        geometryFactory = GeometryFactory.getFactory(srid, numAxis);
       }
       geometryReader = new JtsGeometryConverter(geometryFactory);
 
-      loadHeader();
       if (xbaseIterator != null) {
         xbaseIterator.hasNext();
       }
       if (metaData == null) {
-        metaData = DataObjectUtil.GEOMETRY_META_DATA;
+        metaData = new DataObjectMetaDataImpl(DataObjectUtil.GEOMETRY_META_DATA);
       }
+      metaData.setGeometryFactory(geometryFactory);
     } catch (final IOException e) {
       throw new RuntimeException("Error initializing file " + resource, e);
     }
@@ -152,7 +163,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     in.skipBytes(20);
     final int fileLength = in.readInt();
     final int version = in.readLEInt();
-    final int shapeType = in.readLEInt();
+    shapeType = in.readLEInt();
     final double minX = in.readLEDouble();
     final double minY = in.readLEDouble();
     final double maxX = in.readLEDouble();

@@ -29,7 +29,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
 
   private final ClassRegistry<ObjectTreeNodeModel<Object, Object>> classNodeModels = new ClassRegistry<ObjectTreeNodeModel<Object, Object>>();
 
-  private final TreeModelSupport eventHandler = new TreeModelSupport();
+  private final TreeEventSupport eventHandler = new TreeEventSupport();
 
   private Object root;
 
@@ -74,7 +74,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       }, new Object[] {
         newValue
       });
-      eventHandler.fireTreeNodesInserted(e);
+      eventHandler.treeNodesInserted(e);
     }
   }
 
@@ -86,7 +86,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       }, new Object[] {
         newValue
       });
-      eventHandler.fireTreeNodesRemoved(e);
+      eventHandler.treeNodesRemoved(e);
     }
   }
 
@@ -267,7 +267,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     final TreeModelEvent event = new TreeModelEvent(node, path);
     final ObjectTreeNodeModel<Object, Object> nodeModel = getNodeModel(path);
     setObjectPathMap(path, node, nodeModel);
-    eventHandler.fireTreeStructureChanged(event);
+    eventHandler.treeStructureChanged(event);
   }
 
   protected void setObjectPathMap(final TreePath path, final Object node,
@@ -285,7 +285,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     if (root != this.root) {
       this.root = root;
       final TreeModelEvent e = new TreeModelEvent(root, new TreePath(root));
-      eventHandler.fireTreeStructureChanged(e);
+      eventHandler.treeStructureChanged(e);
     }
   }
 

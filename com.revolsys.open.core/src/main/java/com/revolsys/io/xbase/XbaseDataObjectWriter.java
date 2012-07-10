@@ -398,7 +398,14 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             name = name.substring(0, 10);
           }
           final int length = field.getLength();
-          final int decimalPlaces = field.getDecimalPlaces();
+           int decimalPlaces = field.getDecimalPlaces();
+          if (decimalPlaces < 0) {
+            decimalPlaces = 0;
+          } else if (decimalPlaces > 15) {
+            decimalPlaces = Math.min(length, 15);
+          } else if (decimalPlaces > length) {
+            decimalPlaces = Math.min(length, 15);
+          }
           out.writeBytes(name);
           final int numPad = 11 - name.length();
           for (int i = 0; i < numPad; i++) {

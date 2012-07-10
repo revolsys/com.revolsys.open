@@ -52,12 +52,17 @@ public class InvokeMethodCallable<T> implements Callable<T> {
   /**
    * Execute the method.
    */
+  @SuppressWarnings("unchecked")
   public T call() throws Exception {
     try {
-      return (T)MethodUtils.invokeMethod(object, methodName, parameters);
+      if (object instanceof Class<?>) {
+        final Class<?> clazz = (Class<?>)object;
+        return (T)MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
+      } else {
+        return (T)MethodUtils.invokeMethod(object, methodName, parameters);
+      }
     } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
-      return null;
+      return (T)ExceptionUtil.throwUncheckedException(e);
     }
   }
 

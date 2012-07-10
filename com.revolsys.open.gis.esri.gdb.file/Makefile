@@ -12,17 +12,17 @@ all: clean swig libs
 	
 clean:
 	rm -rf target/o
-	rm -rf target/cxx
+	rm -rf src/main/cxx
 	
 init:
-	mkdir -p target/cxx
+	mkdir -p src/main/cxx
 	mkdir -p target/o
 
 swig: init src/main/swig/EsriFileGdbAPI.i
 	mkdir -p src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig/
 	rm -f src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig/*.java
 	swig -c++ \
-		-o target/cxx/EsriFileGdb_wrap.cxx \
+		-o src/main/cxx/EsriFileGdb_wrap.cxx \
 		-java \
 		-package com.revolsys.gis.esri.gdb.file.capi.swig \
 		-outdir src/main/java/com/revolsys/gis/esri/gdb/file/capi/swig \

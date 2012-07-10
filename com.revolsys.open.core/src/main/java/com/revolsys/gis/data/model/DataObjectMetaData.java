@@ -29,7 +29,8 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.ObjectWithProperties;
 
-public interface DataObjectMetaData extends ObjectWithProperties, Comparable<DataObjectMetaData> {
+public interface DataObjectMetaData extends ObjectWithProperties,
+  Comparable<DataObjectMetaData> {
   void addDefaultValue(String attributeName, Object defaultValue);
 
   DataObjectMetaData clone();
@@ -192,6 +193,8 @@ public interface DataObjectMetaData extends ObjectWithProperties, Comparable<Dat
   boolean isAttributeRequired(int index);
 
   boolean isInstanceOf(DataObjectMetaData classDefinition);
+
+  void setGeometryFactory(GeometryFactory geometryFactory);
 
   /**
    * Set the name of the object type. Names are described using a (e.g.

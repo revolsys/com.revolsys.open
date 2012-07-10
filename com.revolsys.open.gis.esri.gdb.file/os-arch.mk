@@ -16,16 +16,16 @@ all: clean ${TARGET_LIB}
 clean:
 	rm -f ${TARGET_OBJ} ${TARGET_LIB}
 
-target/cxx/EsriFileGdb_wrap.cxx:
+src/main/cxx/EsriFileGdb_wrap.cxx:
 
-${TARGET_OBJ}: target/cxx/EsriFileGdb_wrap.cxx
+${TARGET_OBJ}: src/main/cxx/EsriFileGdb_wrap.cxx
 	mkdir -p target/o
 	${CXX} \
 		${CXXFLAGS} \
 		-I${ESRI_FILE_GBD_INCLUDE} \
 		-I$JAVA_HOME/include/ \
 		-I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers/ \
-		-c target/cxx/EsriFileGdb_wrap.cxx \
+		-c src/main/cxx/EsriFileGdb_wrap.cxx \
 		-o ${TARGET_OBJ}
 	
 

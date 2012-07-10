@@ -15,6 +15,10 @@
  */
 package com.revolsys.util;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -43,9 +47,7 @@ import com.revolsys.gis.data.model.DataObject;
 public final class JavaBeanUtil {
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
-  public static Method getMethod(
-    final Class<?> clazz,
-    final String name,
+  public static Method getMethod(final Class<?> clazz, final String name,
     final Class<?>... parameterTypes) {
     try {
       final Method method = clazz.getMethod(name, parameterTypes);
@@ -53,6 +55,50 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  public static PropertyDescriptor getPropertyDescriptor(
+    final Class<?> beanClass, final String name) {
+    try {
+      final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
+      final PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
+      for (int i = 0; i < props.length; i++) {
+        final PropertyDescriptor property = props[i];
+        if (name.equals(property.getName())) {
+          return property;
+        }
+      }
+    } catch (final IntrospectionException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public static Method getReadMethod(final Class<?> beanClass, final String name) {
+    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
+    if (descriptor != null) {
+      return descriptor.getReadMethod();
+    } else {
+      return null;
+    }
+  }
+
+  public static Method getReadMethod(final Object object, final String name) {
+    return getReadMethod(object.getClass(), name);
+  }
+
+  public static Method getWriteMethod(final Class<?> beanClass,
+    final String name) {
+    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
+    if (descriptor != null) {
+      return descriptor.getWriteMethod();
+    } else {
+      return null;
+    }
+  }
+
+  public static Method getWriteMethod(final Object object, final String name) {
+    return getWriteMethod(object.getClass(), name);
   }
 
   /**
@@ -96,8 +142,7 @@ public final class JavaBeanUtil {
     return propertyName;
   }
 
-  public static Class<?> getTypeParameterClass(
-    final Method method,
+  public static Class<?> getTypeParameterClass(final Method method,
     final Class<?> expectedRawClass) {
     final Type resultListReturnType = method.getGenericReturnType();
     if (resultListReturnType instanceof ParameterizedType) {
@@ -139,8 +184,7 @@ public final class JavaBeanUtil {
   }
 
   public static <T> T invokeConstructor(
-    final Constructor<? extends T> constructor,
-    final Object... args) {
+    final Constructor<? extends T> constructor, final Object... args) {
     try {
       final T object = constructor.newInstance(args);
       return object;
@@ -162,9 +206,7 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static <T> T invokeMethod(
-    final Method method,
-    final Object object,
+  public static <T> T invokeMethod(final Method method, final Object object,
     final Object... args) {
     try {
       @SuppressWarnings("unchecked")
@@ -189,10 +231,8 @@ public final class JavaBeanUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T invokeMethod(
-    final Object object,
-    final String methodName,
-    final Object... args) {
+  public static <T> T invokeMethod(final Object object,
+    final String methodName, final Object... args) {
     try {
       return (T)MethodUtils.invokeMethod(object, methodName, args);
     } catch (final RuntimeException e) {
@@ -213,8 +253,7 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static boolean isDefinedInClassLoader(
-    final ClassLoader classLoader,
+  public static boolean isDefinedInClassLoader(final ClassLoader classLoader,
     final URL resourceUrl) {
     if (classLoader instanceof URLClassLoader) {
       final String resourceUrlString = resourceUrl.toString();
@@ -230,8 +269,7 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static void setProperties(
-    final Object object,
+  public static void setProperties(final Object object,
     final Map<String, Object> properties) {
     for (final Entry<String, Object> property : properties.entrySet()) {
       final String propertyName = property.getKey();
@@ -256,10 +294,8 @@ public final class JavaBeanUtil {
    * @param propertyName The name of the property.
    * @param value The property value.
    */
-  public static void setProperty(
-    final Object object,
-    final String propertyName,
-    final Object value) {
+  public static void setProperty(final Object object,
+    final String propertyName, final Object value) {
     try {
       PropertyUtils.setProperty(object, propertyName, value);
     } catch (final IllegalAccessException e) {

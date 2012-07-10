@@ -86,37 +86,54 @@ public class ClasspathNativeLibraryUtil {
         final String ext = getLibraryExtension();
         final String arch = getArch();
         final String operatingSystemName = getOperatingSystemName();
-        final String fileName = prefix + name + "-" + arch + "-"
-          + operatingSystemName + "." + ext;
-        final String libraryName = "/native/" + fileName;
-        final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
-        if (url == null) {
-          try {
-            System.loadLibrary(name);
-          } catch (final Throwable e) {
-            LOG.error("Unable to load shared library " + libraryName, e);
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-            throw new RuntimeException("Unable to load shared library "
-              + fileName, e);
-          }
-        } else {
-          try {
-            final File directory = FileUtil.createTempDirectory("jni", "name");
-            final File file = new File(directory, fileName);
-            file.deleteOnExit();
-            FileUtil.copy(url.openStream(), file);
-            System.load(file.getCanonicalPath());
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-          } catch (final Throwable e) {
-            LOG.error("Unable to load shared library from classpath "
-              + libraryName, e);
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-            throw new RuntimeException("Unable to load shared library "
-              + fileName, e);
-          }
-        }
+        loadLibrary(prefix, name, arch, operatingSystemName, ext);
       } else if (!loaded) {
         throw new RuntimeException("Unable to load shared library " + name);
+      }
+    }
+  }
+
+  private static void loadLibrary(final String prefix, final String name,
+    final String arch, final String operatingSystemName, final String ext) {
+    final String fileName = prefix + name + "-" + arch + "-"
+      + operatingSystemName + "." + ext;
+    final String libraryName = "/native/" + fileName;
+    final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
+    if (url == null) {
+      try {
+        System.loadLibrary(name);
+      } catch (final Throwable e) {
+        if (arch.equals("x86_64")) {
+          try {
+            loadLibrary(prefix, libraryName, "x86", operatingSystemName, ext);
+          } catch (RuntimeException t) {
+            LOG.error("Unable to load shared library " + libraryName, t);
+            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+            throw new RuntimeException("Unable to load shared library "
+              + fileName, t);
+
+          }
+        } else {
+          LOG.error("Unable to load shared library " + libraryName, e);
+          LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+          throw new RuntimeException("Unable to load shared library "
+            + fileName, e);
+        }
+      }
+    } else {
+      try {
+        final File directory = FileUtil.createTempDirectory("jni", "name");
+        final File file = new File(directory, fileName);
+        file.deleteOnExit();
+        FileUtil.copy(url.openStream(), file);
+        System.load(file.getCanonicalPath());
+        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+      } catch (final Throwable e) {
+        LOG.error(
+          "Unable to load shared library from classpath " + libraryName, e);
+        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+        throw new RuntimeException("Unable to load shared library " + fileName,
+          e);
       }
     }
   }
