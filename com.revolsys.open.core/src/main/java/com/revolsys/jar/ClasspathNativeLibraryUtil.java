@@ -100,21 +100,13 @@ public class ClasspathNativeLibraryUtil {
     final String libraryName = "/native/" + fileName;
     final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
     if (url == null) {
-      try {
-        System.loadLibrary(name);
-      } catch (final Throwable e) {
-        if (arch.equals("x86_64")) {
-          try {
-            loadLibrary(prefix, libraryName, "x86", operatingSystemName, ext);
-          } catch (RuntimeException t) {
-            LOG.error("Unable to load shared library " + libraryName, t);
-            LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-            throw new RuntimeException("Unable to load shared library "
-              + fileName, t);
-
-          }
-        } else {
-          LOG.error("Unable to load shared library " + libraryName, e);
+      if (arch.equals("x86_64")) {
+        loadLibrary(prefix, libraryName, "x86", operatingSystemName, ext);
+      } else {
+        try {
+          System.loadLibrary(name);
+        } catch (final Throwable e) {
+          LOG.error("Unable to load shared library " + libraryName +" " + fileName, e);
           LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
           throw new RuntimeException("Unable to load shared library "
             + fileName, e);
@@ -130,7 +122,7 @@ public class ClasspathNativeLibraryUtil {
         LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
       } catch (final Throwable e) {
         LOG.error(
-          "Unable to load shared library from classpath " + libraryName, e);
+          "Unable to load shared library from classpath " + libraryName +" " + fileName, e);
         LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
         throw new RuntimeException("Unable to load shared library " + fileName,
           e);

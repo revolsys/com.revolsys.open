@@ -53,13 +53,9 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   private static ShapefileGeometryUtil geometryUtil = new ShapefileGeometryUtil(
     true);
 
-  private static void addMethod(
-    final String action,
-    final Map<String, Method> methodMap,
-    final String geometryType,
-    final boolean hasZ,
-    final boolean hasM,
-    final Class<?>... parameterTypes) {
+  private static void addMethod(final String action,
+    final Map<String, Method> methodMap, final String geometryType,
+    final boolean hasZ, final boolean hasM, final Class<?>... parameterTypes) {
     final String geometryTypeKey = "esriGeometry" + geometryType + hasZ + hasM;
     String methodName = action + geometryType;
     if (hasZ) {
@@ -167,9 +163,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(
-    final DataObject object,
-    final Row row,
+  public Object setValue(final DataObject object, final Row row,
     final Object value) {
     final String name = getName();
     if (value == null) {

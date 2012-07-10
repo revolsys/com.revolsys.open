@@ -21,8 +21,7 @@ import com.revolsys.io.FileUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryTest {
-  public static void createTestFile(
-    final GeometryFactory geometryFactory,
+  public static void createTestFile(final GeometryFactory geometryFactory,
     final String wkt) {
     final Geometry geometry = geometryFactory.createGeometry(wkt);
 

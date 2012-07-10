@@ -24,9 +24,7 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(
-    final DataObject object,
-    final Row row,
+  public Object setValue(final DataObject object, final Row row,
     final Object value) {
     final String name = getName();
     if (value == null) {

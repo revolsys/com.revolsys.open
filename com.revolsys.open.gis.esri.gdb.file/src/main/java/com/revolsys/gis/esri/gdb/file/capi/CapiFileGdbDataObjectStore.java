@@ -84,8 +84,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     + ".CatalogPath";
 
   private static void addFieldTypeAttributeConstructor(
-    final FieldType fieldType,
-    final Class<? extends Attribute> attributeClass) {
+    final FieldType fieldType, final Class<? extends Attribute> attributeClass) {
     try {
       final Constructor<? extends Attribute> constructor = attributeClass.getConstructor(Field.class);
       ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
@@ -163,6 +162,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   private final Set<EnumRows> enumRowsToClose = new HashSet<EnumRows>();
 
+  private boolean initialized;
+
   public CapiFileGdbDataObjectStore() {
   }
 
@@ -224,6 +225,17 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
+  // @Override
+  // protected AbstractIterator<DataObject> createIterator(final Query query,
+  // final Map<String, Object> properties) {
+  // return new JdbcQueryIterator(this, query, properties);
+  // }
+  //
+  //
+  // public FileGdbReader createReader() {
+  // return new FileGdbReader(this);
+  // }
+
   public void closeEnumRows(EnumRows rows) {
     if (rows != null) {
       if (enumRowsToClose.remove(rows)) {
@@ -237,17 +249,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       }
     }
   }
-
-  // @Override
-  // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
-  // return new JdbcQueryIterator(this, query, properties);
-  // }
-  //
-  //
-  // public FileGdbReader createReader() {
-  // return new FileGdbReader(this);
-  // }
 
   protected synchronized void closeTable(final Table table) {
     try {
@@ -278,8 +279,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // TODO add bounding box
   @Override
   protected synchronized AbstractIterator<DataObject> createIterator(
-    final Query query,
-    final Map<String, Object> properties) {
+    final Query query, final Map<String, Object> properties) {
     String typePath = query.getTypeName();
     DataObjectMetaData metaData = query.getMetaData();
     if (metaData == null) {
@@ -367,7 +367,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   private DataObjectStoreSchema createSchema(final DETable table) {
-    String catalogPath = table.getParentCatalogPath();
+    final String catalogPath = table.getParentCatalogPath();
     final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(table);
     for (final DEFeatureDataset dataset : datasets) {
       final String path = dataset.getCatalogPath();
@@ -386,8 +386,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     return getSchema(catalogPath.replaceAll("\\\\", "/"));
   }
 
-  public synchronized void createSchema(
-    final String schemaName,
+  public synchronized void createSchema(final String schemaName,
     final GeometryFactory geometryFactory) {
     final SpatialReference spatialReference = getSpatialReference(geometryFactory);
     final List<DEFeatureDataset> datasets = EsriXmlDataObjectMetaDataUtil.createDEFeatureDatasets(
@@ -532,9 +531,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public synchronized DataObjectMetaDataImpl getMetaData(
-    final String schemaName,
-    final String path,
-    final String tableDefinition) {
+    final String schemaName, final String path, final String tableDefinition) {
     try {
       final XmlProcessor parser = new EsriGdbXmlParser();
       final DETable deTable = parser.process(tableDefinition);
@@ -622,8 +619,6 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
     return writer;
   }
-
-  private boolean initialized;
 
   @Override
   @PostConstruct
@@ -752,10 +747,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public synchronized void loadSchemaDataObjectMetaData(
-    final Map<String, DataObjectMetaData> metaDataMap,
-    final String schemaName,
-    final String path,
-    final String datasetType) {
+    final Map<String, DataObjectMetaData> metaDataMap, final String schemaName,
+    final String path, final String datasetType) {
     try {
       final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
         path, datasetType);
@@ -789,8 +782,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   // }
 
   @Override
-  public synchronized Reader<DataObject> query(
-    final String typePath,
+  public synchronized Reader<DataObject> query(final String typePath,
     final BoundingBox boundingBox) {
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
       typePath, boundingBox);
@@ -800,28 +792,21 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public synchronized Reader<DataObject> query(
-    final String typePath,
+  public synchronized Reader<DataObject> query(final String typePath,
     final Geometry geometry) {
     final BoundingBox boundingBox = new BoundingBox(geometry);
     return query(typePath, boundingBox);
   }
 
-  public EnumRows search(
-    final Table table,
-    final String fields,
-    final String whereClause,
-    final boolean recycling) {
+  public EnumRows search(final Table table, final String fields,
+    final String whereClause, final boolean recycling) {
     final EnumRows rows = table.search(fields, whereClause, recycling);
     enumRowsToClose.add(rows);
     return rows;
   }
 
-  public EnumRows search(
-    final Table table,
-    final String fields,
-    final String whereClause,
-    final Envelope boundingBox,
+  public EnumRows search(final Table table, final String fields,
+    final String whereClause, final Envelope boundingBox,
     final boolean recycling) {
     final EnumRows rows = table.search(fields, whereClause, boundingBox,
       recycling);

@@ -19,9 +19,7 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
 
   public abstract Object getValue(Row row);
 
-  public Object setInsertValue(
-    final DataObject object,
-    final Row row,
+  public Object setInsertValue(final DataObject object, final Row row,
     final Object value) {
     return setValue(object, row, value);
   }
@@ -29,9 +27,7 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
   public void setPostInsertValue(final DataObject object, final Row row) {
   }
 
-  public Object setUpdateValue(
-    final DataObject object,
-    final Row row,
+  public Object setUpdateValue(final DataObject object, final Row row,
     final Object value) {
     return setValue(object, row, value);
   }

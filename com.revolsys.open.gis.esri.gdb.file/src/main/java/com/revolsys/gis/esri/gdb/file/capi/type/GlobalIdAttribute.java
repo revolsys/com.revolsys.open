@@ -32,9 +32,7 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(
-    final DataObject object,
-    final Row row,
+  public Object setValue(final DataObject object, final Row row,
     final Object value) {
     return null;
   }

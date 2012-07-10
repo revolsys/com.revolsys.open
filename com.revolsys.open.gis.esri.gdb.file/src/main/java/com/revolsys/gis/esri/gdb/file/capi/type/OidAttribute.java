@@ -29,17 +29,13 @@ public class OidAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setUpdateValue(
-    final DataObject object,
-    final Row row,
+  public Object setUpdateValue(final DataObject object, final Row row,
     final Object value) {
     return value;
   }
 
   @Override
-  public Object setValue(
-    final DataObject object,
-    final Row row,
+  public Object setValue(final DataObject object, final Row row,
     final Object value) {
     return null;
   }
