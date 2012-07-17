@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.util.UrlUtil;
+
 public class Catalog extends ArcGisResponse {
 
   private String name;
 
   public Catalog(String serviceUrl) {
-    super(serviceUrl);
-    name = "";
+    serviceUrl = serviceUrl.replaceAll("/+$", "");
+    if (serviceUrl.endsWith("services")) {
+      setServiceUrl(serviceUrl);
+      name = "";
+    } else {
+      String parentUrl = UrlUtil.getParent(serviceUrl);
+      Catalog parent = new Catalog(parentUrl);
+      String name = UrlUtil.getFileName(serviceUrl);
+      init(parent, name);
+    }
   }
 
   private Catalog(Catalog catalog, String name) {
@@ -48,8 +58,17 @@ public class Catalog extends ArcGisResponse {
         for (Map<String, Object> serviceDescription : serviceDescriptions) {
           String name = (String)serviceDescription.get("name");
           String type = (String)serviceDescription.get("type");
-          Service folder = new Service(this, name, type);
-          services.add(folder);
+          Service service;
+          try {
+            Class<Service> serviceClass = (Class<Service>)getClass().forName(
+              "com.revolsys.io.esri.map.rest." + type);
+            service = serviceClass.newInstance();
+            service.setCatalog(this);
+            service.setServiceName(name);
+          } catch (Throwable t) {
+            service = new Service(this, name, type);
+          }
+          services.add(service);
         }
       }
     }

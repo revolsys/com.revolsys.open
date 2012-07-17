@@ -86,6 +86,6 @@ public class WmsConnectionManager {
 
   @Override
   public String toString() {
-    return "Web Map Service (WMS) Connections";
+    return "Web MapService Service (WMS) Connections";
   }
 }

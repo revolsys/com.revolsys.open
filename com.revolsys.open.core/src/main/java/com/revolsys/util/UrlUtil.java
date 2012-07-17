@@ -117,6 +117,10 @@ public final class UrlUtil {
 
   public static String getParentString(final URL url) {
     final String urlString = url.toString();
+    return getParent(urlString);
+  }
+
+  public static String getParent(final String urlString) {
     final int index = urlString.lastIndexOf('/');
     if (index != -1) {
       final String parentPath = urlString.substring(0, index);
@@ -134,8 +138,7 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(
-    final Object baseUrl,
+  public static String getUrl(final Object baseUrl,
     final Map<String, ? extends Object> parameters) {
     return getUrl(baseUrl.toString(), parameters);
   }
@@ -156,8 +159,7 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(
-    final String baseUrl,
+  public static String getUrl(final String baseUrl,
     final Map<String, ? extends Object> parameters) {
     final StringBuffer query = new StringBuffer();
     if (parameters != null) {
@@ -228,8 +230,7 @@ public final class UrlUtil {
     return params;
   }
 
-  public static void parseMatrixParams(
-    final String matrixParams,
+  public static void parseMatrixParams(final String matrixParams,
     final Map<String, String> params) {
     for (final String param : matrixParams.split(";")) {
       final String[] paramParts = param.split("=");

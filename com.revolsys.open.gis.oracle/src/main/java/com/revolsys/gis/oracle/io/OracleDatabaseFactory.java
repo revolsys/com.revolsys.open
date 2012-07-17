@@ -119,14 +119,14 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
     }
   }
 
-  // public DataSource createDataSource(final Map<String, ? extends Object>
+  // public DataSource createDataSource(final MapService<String, ? extends Object>
   // config) {
   // try {
   // UniversalConnectionPoolManager poolManager =
   // UniversalConnectionPoolManagerImpl.getUniversalConnectionPoolManager();
   // poolManager.setJmxEnabled(false);
   //
-  // final Map<String, Object> newConfig = new HashMap<String, Object>(config);
+  // final MapService<String, Object> newConfig = new HashMap<String, Object>(config);
   // final String url = (String)newConfig.remove("url");
   // final String username = (String)newConfig.remove("username");
   // final String password = (String)newConfig.remove("password");

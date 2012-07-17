@@ -39,7 +39,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
   private static final Pattern SIMPLE_PROPERTY_PATTERN = Pattern.compile("(\\w+)\\.(\\w+)");
 
   /**
-   * The pattern for setting the value for a key in a Map property of a bean
+   * The pattern for setting the value for a key in a MapService property of a bean
    * (e.g. bean.property[key]).
    */
   private static final Pattern MAP_PROPERTY_VALUE_PATTERN = Pattern.compile("(\\w+)\\.(\\w+)\\[([a-z]\\w*)\\]");
@@ -80,7 +80,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
         map.put(mapKey, value);
       } else {
         throw new BeanInitializationException("Bean property [" + beanName
-          + "." + propertyName + "] is not a Map");
+          + "." + propertyName + "] is not a MapService");
       }
     } else {
       final Map map = new HashMap();

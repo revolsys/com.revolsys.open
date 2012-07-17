@@ -88,7 +88,7 @@ public final class DataTypes {
 
   public static final DataType LONG = new SimpleDataType("long", Long.class);
 
-  public static final DataType MAP = new SimpleDataType("Map", Map.class);
+  public static final DataType MAP = new SimpleDataType("MapService", Map.class);
 
   public static final DataType MULTI_LINE_STRING = new SimpleDataType(
     "MultiLineString", MultiLineString.class);

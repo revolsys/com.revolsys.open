@@ -550,7 +550,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   // public ElementContainer createObjectListPage(
   // final HttpServletRequest request,
   // final HttpServletResponse response,
-  // final Map<String, Object> filter) throws IOException {
+  // final MapService<String, Object> filter) throws IOException {
   // final String prefix = null;
   // final String pageName = "list";
   //
@@ -564,7 +564,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   // searchForm.add(listContainer);
   // searchForm.initialize(request);
   //
-  // final Map<String, Object> whereClause = new LinkedHashMap<String,
+  // final MapService<String, Object> whereClause = new LinkedHashMap<String,
   // Object>();
   // if (searchForm.isValid()) {
   // final Field idField = searchForm.getField("idLink");
@@ -970,7 +970,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * get the label for the key.
    * </p>
    * <ol>
-   * <li>An explict label defined in {@link #setLabels(Map)}</li>
+   * <li>An explict label defined in {@link #setLabels(MapService)}</li>
    * <li>The label for the propetry name portion of a sub key (e.g. For the key
    * "organization.name" the property name portion is "organization", so the
    * label would be the label for the key "organization").</li>

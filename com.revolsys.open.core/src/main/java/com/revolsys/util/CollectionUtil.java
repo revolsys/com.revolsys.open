@@ -12,16 +12,33 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public final class CollectionUtil {
-  public static void append(
-    final StringBuffer string,
+  public static void append(final StringBuffer string,
     final Collection<? extends Object> values) {
     append(string, values, ",");
   }
 
-  public static void append(
-    final StringBuffer string,
-    final Collection<? extends Object> values,
-    final String separator) {
+  public static Integer getIntValue(Map<String, ? extends Object> map,
+    String name) {
+    final Number value = (Number)map.get(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.intValue();
+    }
+  }
+
+  public static Double getDoubleValue(Map<String, ? extends Object> map,
+    String name) {
+    final Number value = (Number)map.get(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
+  public static void append(final StringBuffer string,
+    final Collection<? extends Object> values, final String separator) {
     boolean first = true;
     for (final Object value : values) {
       if (value != null) {
@@ -35,8 +52,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static <T1, T2> Map<T1, T2> createMap(
-    final List<T1> sourceValues,
+  public static <T1, T2> Map<T1, T2> createMap(final List<T1> sourceValues,
     final List<T2> targetValues) {
     final Map<T1, T2> map = new HashMap<T1, T2>();
     for (int i = 0; i < sourceValues.size() && i < targetValues.size(); i++) {
@@ -68,9 +84,7 @@ public final class CollectionUtil {
    * @param defaultValue The default value.
    * @return The value.
    */
-  public static <T> T get(
-    final Map<?, ?> map,
-    final Object key,
+  public static <T> T get(final Map<?, ?> map, final Object key,
     final T defaultValue) {
     if (map == null) {
       return defaultValue;
@@ -85,8 +99,7 @@ public final class CollectionUtil {
     }
   }
 
-  public static final String replaceProperties(
-    final CharSequence string,
+  public static final String replaceProperties(final CharSequence string,
     final Map<String, Object> properties) {
     if (string == null) {
       return null;
@@ -194,8 +207,7 @@ public final class CollectionUtil {
    * @param values The values.
    * @return The string.
    */
-  public static String toString(
-    final String separator,
+  public static String toString(final String separator,
     final Collection<? extends Object> values) {
     if (values == null) {
       return null;

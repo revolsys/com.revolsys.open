@@ -227,7 +227,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
   // @Override
   // protected AbstractIterator<DataObject> createIterator(final Query query,
-  // final Map<String, Object> properties) {
+  // final MapService<String, Object> properties) {
   // return new JdbcQueryIterator(this, query, properties);
   // }
   //

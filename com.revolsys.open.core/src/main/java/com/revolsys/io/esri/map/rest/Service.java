@@ -8,10 +8,23 @@ public class Service extends ArcGisResponse {
 
   private String serviceType;
 
-  protected Service(Catalog catalog, String serviceName, String serviceType) {
+  public Service() {
+  }
+
+  protected Service(final Catalog catalog, final String serviceName,
+    final String serviceType) {
     super(catalog, serviceName + "/" + serviceType);
     this.serviceName = serviceName;
     this.serviceType = serviceType;
+  }
+
+  public Service(String serviceType) {
+    this.serviceType = serviceType;
+  }
+
+  public String getServiceDescription() {
+    final String serviceDescription = getValue("serviceDescription");
+    return StringUtils.trimWhitespace(serviceDescription);
   }
 
   public String getServiceName() {
@@ -22,9 +35,9 @@ public class Service extends ArcGisResponse {
     return serviceType;
   }
 
-  public String getServiceDescription() {
-    String serviceDescription = getValue("serviceDescription");
-    return StringUtils.trimWhitespace(serviceDescription);
+  public void setServiceName(final String serviceName) {
+    this.serviceName = serviceName;
+    setName(serviceName + "/MapServer");
   }
 
 }

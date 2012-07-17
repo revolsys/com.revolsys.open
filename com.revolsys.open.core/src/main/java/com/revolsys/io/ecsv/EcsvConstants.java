@@ -27,7 +27,7 @@ public interface EcsvConstants extends EcsvProperties {
 
   String LIST_TYPE = "List";
 
-  String MAP_TYPE = "Map";
+  String MAP_TYPE = "MapService";
 
   String MAP_END = "}";
 
