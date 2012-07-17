@@ -1,6 +1,6 @@
 function resizeHeight(iframe) {
   var body = $(iframe, window.top.document).contents().find('body');
-  var newHeight = body[0].scrollHeight;
+  var newHeight = body[0].scrollHeight + 10;
 
   if (iframe.style.height != newHeight + 'px') {
     iframe.style.height = newHeight + 'px';

@@ -33,6 +33,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+
 /**
  * <p>
  * The XmlWriter class is a subclass of {@link Writer} that provides additional
@@ -300,7 +302,8 @@ public class XmlWriter extends Writer {
    */
   public void attribute(final QName attribute, final Object value) {
     if (value != null) {
-      attribute(attribute, value.toString());
+      String string = StringConverterRegistry.toString(value);
+      attribute(attribute, string);
     }
   }
 
@@ -496,9 +499,7 @@ public class XmlWriter extends Writer {
    * @param systemId The system id.
    * @throws IOException If there was a problem writing the declaration.
    */
-  public void docType(
-    final String name,
-    final String publicId,
+  public void docType(final String name, final String publicId,
     final String systemId) {
     checkWriteDocType();
     out.write("<!DOCTYPE ");
@@ -871,9 +872,7 @@ public class XmlWriter extends Writer {
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(
-    final String encoding,
-    final String version,
+  public void startDocument(final String encoding, final String version,
     final Boolean standalone) {
     checkWriteXmlDeclaration();
     if (version == null) {
@@ -1105,9 +1104,7 @@ public class XmlWriter extends Writer {
        * @param length The number of characters to write.
        * @throws IOException If an I/O exception occurs.
        */
-  protected void writeAttributeContent(
-    final char[] buffer,
-    final int offset,
+  protected void writeAttributeContent(final char[] buffer, final int offset,
     final int length) {
     final int lastIndex = offset + length;
     int index = offset;
@@ -1179,9 +1176,7 @@ public class XmlWriter extends Writer {
        * @param length The number of characters to write.
        * @throws IOException If an I/O exception occurs.
        */
-  protected void writeElementContent(
-    final char[] buffer,
-    final int offest,
+  protected void writeElementContent(final char[] buffer, final int offest,
     final int length) {
     int index = offest;
     final int lastIndex = index + length;
@@ -1283,8 +1278,7 @@ public class XmlWriter extends Writer {
     out.write(name);
   }
 
-  public void writeNamespaceAttribute(
-    final String namespaceUri,
+  public void writeNamespaceAttribute(final String namespaceUri,
     final String prefix) {
     if (prefix.length() == 0) {
       out.write(" xmlns");

@@ -9,6 +9,19 @@ public class DocInfo {
 
   private String description;
 
+  private boolean html = false;
+
+  public void setHtml(boolean html) {
+    this.html = html;
+  }
+
+  public boolean isHtml() {
+    return html;
+  }
+
+  public DocInfo() {
+  }
+
   public DocInfo(final DocInfo docInfo) {
     this.locale = docInfo.getLocale();
     this.title = docInfo.getTitle();

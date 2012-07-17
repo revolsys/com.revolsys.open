@@ -121,10 +121,6 @@ public class PageInfo extends AbstractDocumentedObject {
     this.attributes = attributes;
   }
 
-  @Override
-  public void setDescription(final String description) {
-    super.setDescription(description);
-  }
 
   public void setInputContentTypes(final List<MediaType> inputContentTypes) {
     this.inputContentTypes = inputContentTypes;

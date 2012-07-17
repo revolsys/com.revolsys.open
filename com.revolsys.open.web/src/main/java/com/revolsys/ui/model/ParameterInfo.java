@@ -39,6 +39,21 @@ public class ParameterInfo {
   }
 
   public ParameterInfo(final String name, final boolean required,
+    final DataType type, final String description, final Object defaultValue,
+    final Map<?, ?> allowedValues) {
+    this.name = name;
+    this.required = required;
+    this.type = type;
+    this.description = description;
+    this.defaultValue = defaultValue;
+    for (final Entry<?, ?> allowedValue : allowedValues.entrySet()) {
+      final Object key = allowedValue.getKey();
+      final Object value = allowedValue.getValue();
+      this.allowedValues.put(key, value);
+    }
+  }
+
+  public ParameterInfo(final String name, final boolean required,
     final DataType type, final String description, final Map<?, ?> allowedValues) {
     this.name = name;
     this.required = required;
@@ -49,12 +64,6 @@ public class ParameterInfo {
       final Object value = allowedValue.getValue();
       this.allowedValues.put(key, value);
     }
-  }
-
-  public ParameterInfo(final String name, final boolean required,
-    final DataType type, final String description,
-    final Object... allowedValues) {
-    this(name, required, type, description, Arrays.asList(allowedValues));
   }
 
   public void addAllowedValue(final Object value, final Object text) {
@@ -84,9 +93,4 @@ public class ParameterInfo {
   public boolean isRequired() {
     return required;
   }
-
-  public void setDefaultValue(final Object defaultValue) {
-    this.defaultValue = defaultValue;
-  }
-
 }

@@ -59,6 +59,8 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
 
+  private Object defaultValue;
+
   public Attribute() {
   }
 
@@ -259,6 +261,10 @@ public class Attribute extends AbstractObjectWithProperties implements
     return allowedValues;
   }
 
+  public <T> T getDefaultValue() {
+    return (T)defaultValue;
+  }
+
   public String getDescription() {
     return description;
   }
@@ -331,6 +337,10 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   public void setAllowedValues(final Map<?, ?> allowedValues) {
     this.allowedValues.putAll(allowedValues);
+  }
+
+  public void setDefaultValue(final Object defaultValue) {
+    this.defaultValue = defaultValue;
   }
 
   void setIndex(final int index) {

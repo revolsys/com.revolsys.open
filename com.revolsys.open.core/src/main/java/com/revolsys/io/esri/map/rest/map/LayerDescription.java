@@ -10,7 +10,7 @@ public class LayerDescription extends AbstractMapWrapper {
   public LayerDescription() {
   }
 
-  public boolean getDefaultVisibility() {
+  public Boolean getDefaultVisibility() {
     return getValue("defaultVisibility");
   }
 

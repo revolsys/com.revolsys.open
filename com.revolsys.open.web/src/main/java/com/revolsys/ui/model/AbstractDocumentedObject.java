@@ -40,6 +40,15 @@ public class AbstractDocumentedObject {
     }
   }
 
+  public DocInfo getDefaultDocumentation() {
+    final DocInfo docInfo = documentationByLocale.get(null);
+    if (docInfo == null) {
+      return new DocInfo();
+    } else {
+      return docInfo;
+    }
+  }
+
   public Collection<DocInfo> getDocumentation() {
     return documentationByLocale.values();
   }
@@ -62,7 +71,7 @@ public class AbstractDocumentedObject {
     }
   }
 
-  protected void setDescription(final String description) {
+  public void setDescription(final String description) {
     DocInfo docInfo = documentationByLocale.get(null);
     if (docInfo == null) {
       docInfo = new DocInfo(null, description);
@@ -70,6 +79,16 @@ public class AbstractDocumentedObject {
     } else {
       docInfo.setDescription(description);
     }
+  }
+
+  public void setHtmlDescription(final String description) {
+    DocInfo docInfo = documentationByLocale.get(null);
+    if (docInfo == null) {
+      docInfo = new DocInfo();
+      addDocumentation(docInfo);
+    }
+    docInfo.setDescription(description);
+    docInfo.setHtml(true);
   }
 
   protected void setTitle(final String title) {
