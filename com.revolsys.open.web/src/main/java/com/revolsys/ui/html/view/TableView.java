@@ -24,11 +24,13 @@ import com.revolsys.ui.html.serializer.TableSerializer;
 public class TableView extends Element {
   private String cssClass = "table";
 
+  private String id;
+
   private final TableSerializer model;
 
-  private String title;
-
   private String noRecordsMessgae = "No records found";
+
+  private String title;
 
   public TableView(final TableSerializer model) {
     this.model = model;
@@ -56,6 +58,10 @@ public class TableView extends Element {
     }
   }
 
+  public String getId() {
+    return id;
+  }
+
   /**
    * @return Returns the noRecordsMessgae.
    */
@@ -66,8 +72,8 @@ public class TableView extends Element {
   @Override
   public void serializeElement(final XmlWriter out) {
     final int rowCount = model.getBodyRowCount();
-    final int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_ID, id);
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     if (title != null && title.length() > 0) {
       out.startTag(HtmlUtil.DIV);
@@ -75,7 +81,7 @@ public class TableView extends Element {
       out.text(title);
       out.endTag(HtmlUtil.DIV);
     }
-    if (rowCount > 0) {
+    if (rowCount > 0 || !StringUtils.hasText(noRecordsMessgae)) {
       out.startTag(HtmlUtil.TABLE);
       out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
@@ -105,9 +111,7 @@ public class TableView extends Element {
     }
   }
 
-  protected void serializeFooterRow(
-    final XmlWriter out,
-    final int row,
+  protected void serializeFooterRow(final XmlWriter out, final int row,
     final int rowCount) {
     final int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
@@ -165,9 +169,7 @@ public class TableView extends Element {
     out.endTag(HtmlUtil.THEAD);
   }
 
-  protected void serializeRow(
-    final XmlWriter out,
-    final int row,
+  protected void serializeRow(final XmlWriter out, final int row,
     final int rowCount) {
     final int colCount = model.getColumnCount();
     out.startTag(HtmlUtil.TR);
@@ -211,11 +213,19 @@ public class TableView extends Element {
     out.endTag(HtmlUtil.TBODY);
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
   /**
    * @param noRecordsMessgae The noRecordsMessgae to set.
    */
   public void setNoRecordsMessgae(final String noRecordsMessgae) {
     this.noRecordsMessgae = noRecordsMessgae;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
 }

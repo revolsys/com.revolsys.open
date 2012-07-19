@@ -1,8 +1,12 @@
 package com.revolsys.ui.html.serializer.key;
 
+import java.io.StringWriter;
+
+import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 
-public abstract class AbstractKeySerializer implements KeySerializer {
+public abstract class AbstractKeySerializer extends AbstractObjectWithProperties implements KeySerializer {
   private String name;
 
   private String label;
@@ -37,5 +41,16 @@ public abstract class AbstractKeySerializer implements KeySerializer {
     if (label == null && name != null) {
       label = CaseConverter.toCapitalizedWords(name);
     }
+  }
+
+  @Override
+  public String toString(Object object) {
+    StringWriter out = new StringWriter();
+    XmlWriter xmlOut = new XmlWriter(out);
+    serialize(xmlOut, object);
+    xmlOut.flush();
+    xmlOut.close();
+    return out.toString();
+
   }
 }

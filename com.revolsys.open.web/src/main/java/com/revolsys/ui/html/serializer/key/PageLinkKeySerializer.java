@@ -60,6 +60,10 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
     }
   }
 
+  public void serializeValue(final XmlWriter out) {
+    out.text(getLabel());
+  }
+
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     this.uiBuilder = uiBuilder;
   }

@@ -135,6 +135,7 @@ public class PageInfoHttpMessageConverter extends
         url = HttpRequestUtils.getServerUrl() + url;
       }
 
+      boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
       final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
       if (extension != null) {
         url = url.replaceAll(extension + "/?$", "/");
@@ -147,10 +148,9 @@ public class PageInfoHttpMessageConverter extends
         writeWadl(out, url, pageInfo);
       } else if (MediaType.TEXT_HTML.equals(mediaType)
         || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
-        writeHtml(out, url, pageInfo);
+        writeHtml(out, url, pageInfo, showTitle);
       } else if (TEXT_URI_LIST.equals(mediaType)) {
         writeUriList(out, url, pageInfo);
-        // return getUriListRepresentation();
       } else {
         writeResourceList(mediaType, charset, out, url, pageInfo);
       }
@@ -170,19 +170,24 @@ public class PageInfoHttpMessageConverter extends
 
   @SuppressWarnings("unchecked")
   private void writeHtml(final OutputStream out, final String url,
-    final PageInfo pageInfo) {
+    final PageInfo pageInfo, boolean showTitle) {
     final XmlWriter writer = new XmlWriter(out);
     writer.startTag(HtmlUtil.DIV);
-    writer.element(HtmlUtil.H1, pageInfo.getTitle());
-    DocInfo docInfo = pageInfo.getDefaultDocumentation();
-    if (docInfo != null) {
-      final String description = docInfo.getDescription();
-      if (description != null) {
-        if (docInfo.isHtml()) {
-          writer.write(description);
-        } else {
-          writer.element(HtmlUtil.P, description);
+    if (showTitle) {
+      writer.element(HtmlUtil.H1, pageInfo.getTitle());
+      DocInfo docInfo = pageInfo.getDefaultDocumentation();
+      if (docInfo != null) {
+        writer.startTag(HtmlUtil.DIV);
+        writer.attribute(HtmlUtil.ATTR_STYLE, "margin-bottom: 1em");
+        final String description = docInfo.getDescription();
+        if (description != null) {
+          if (docInfo.isHtml()) {
+            writer.write(description);
+          } else {
+            writer.element(HtmlUtil.P, description);
+          }
         }
+        writer.endTag(HtmlUtil.DIV);
       }
     }
     final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
@@ -348,6 +353,7 @@ public class PageInfoHttpMessageConverter extends
       if (hasParameters) {
         writer.startTag(HtmlUtil.FORM);
         writer.attribute(HtmlUtil.ATTR_ACTION, url);
+        writer.attribute(HtmlUtil.ATTR_TARGET, "_top");
         if (method.equals("post")) {
           boolean isFormData = false;
           for (final MediaType mediaType : pageInfo.getInputContentTypes()) {

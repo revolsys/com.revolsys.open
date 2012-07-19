@@ -37,8 +37,7 @@ public class DivLayout implements ElementContainerLayout {
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     }
-    for (final Iterator elements = container.getElements().iterator(); elements.hasNext();) {
-      final Element element = (Element)elements.next();
+    for (final Element element: container.getElements()) {
       out.startTag(HtmlUtil.DIV);
       element.serialize(out);
       out.endTag(HtmlUtil.DIV);

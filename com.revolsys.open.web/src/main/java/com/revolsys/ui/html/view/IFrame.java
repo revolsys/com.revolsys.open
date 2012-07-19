@@ -20,6 +20,11 @@ public class IFrame extends Element {
     setDecorator(decorator);
   }
 
+  public IFrame(final String src, final String cssClass) {
+    this.src = src;
+    this.cssClass = cssClass;
+  }
+
   public IFrame(final String src, final String cssClass,
     final Decorator decorator) {
     this.src = src;

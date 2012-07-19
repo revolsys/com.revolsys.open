@@ -15,6 +15,7 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.expression.ExpressionUtils;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
@@ -25,13 +26,29 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class ActionFormKeySerializer extends AbstractKeySerializer implements
   HtmlUiBuilderAware<HtmlUiBuilder<?>> {
-  private List<String> parameterNames = new ArrayList<String>();
+  private String cssClass;
+
+  private Expression enabledExpression;
 
   private Map<String, String> parameterNameMap = new LinkedHashMap<String, String>();
 
+  private List<String> parameterNames = new ArrayList<String>();
+
   private HtmlUiBuilder<?> uiBuilder;
 
-  private Expression enabledExpression;
+  private String target;
+
+  public String getTarget() {
+    return target;
+  }
+
+  public void setTarget(String target) {
+    this.target = target;
+  }
+
+  public String getCssClass() {
+    return cssClass;
+  }
 
   public Map<String, String> getParameterNameMap() {
     return parameterNameMap;
@@ -41,6 +58,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
     return parameterNames;
   }
 
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     try {
       final Map<String, Object> parameters = new HashMap<String, Object>();
@@ -69,14 +87,20 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
         out.startTag(HtmlUtil.FORM);
         out.attribute(HtmlUtil.ATTR_ACTION, actionUrl);
         out.attribute(HtmlUtil.ATTR_METHOD, "post");
+        out.attribute(HtmlUtil.ATTR_TARGET, getTarget());
         final String lowerLabel = getLabel().toLowerCase();
         final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
         for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
           HtmlUtil.serializeHiddenInput(out, parameterName,
             request.getParameter(parameterName));
         }
+        String cssClass = getCssClass();
+        if (!StringUtils.hasText(cssClass)) {
+          cssClass = lowerLabel;
+        }
+
         HtmlUtil.serializeButton(out, lowerLabel, "submit", getLabel(),
-          getLabel(), lowerLabel);
+          getLabel(), cssClass);
         out.endTag(HtmlUtil.FORM);
       }
     } catch (final Throwable t) {
@@ -84,10 +108,15 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
     }
   }
 
+  public void setCssClass(final String cssClass) {
+    this.cssClass = cssClass;
+  }
+
   public void setEnabledExpression(final String enabledExpression) {
     this.enabledExpression = new SpelExpressionParser().parseExpression(enabledExpression);
   }
 
+  @Override
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     this.uiBuilder = uiBuilder;
   }

@@ -2,6 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.io.IOException;
 
+import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.xml.XmlWriter;
 
 /**
@@ -10,7 +11,7 @@ import com.revolsys.io.xml.XmlWriter;
  * 
  * @author Paul Austin
  */
-public interface KeySerializer {
+public interface KeySerializer extends ObjectWithProperties {
   String getLabel();
 
   String getName();
@@ -23,4 +24,6 @@ public interface KeySerializer {
    * @throws IOException If there was an I/O error serializing the value.
    */
   void serialize(XmlWriter out, Object object);
+
+  String toString(Object object);
 }
