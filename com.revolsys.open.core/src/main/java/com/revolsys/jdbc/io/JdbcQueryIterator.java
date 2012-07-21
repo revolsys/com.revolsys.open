@@ -143,6 +143,15 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       sql.append(" WHERE ");
       sql.append(where);
     }
+    addOrderBy(sql, orderBy);
+    if (lockResults) {
+      sql.append(" FOR UPDATE");
+    }
+    return sql.toString();
+  }
+
+  private static void addOrderBy(final StringBuffer sql,
+    final Map<String, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
       for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
@@ -159,10 +168,6 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         }
       }
     }
-    if (lockResults) {
-      sql.append(" FOR UPDATE");
-    }
-    return sql.toString();
   }
 
   public static DataObject getNextObject(
@@ -206,7 +211,8 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final String dbTableName = JdbcUtils.getQualifiedTableName(tableName);
 
     String sql = query.getSql();
-    final DataObjectMetaData metaData = query.getMetaData();
+    final Map<String, Boolean> orderBy = query.getOrderBy();
+     final DataObjectMetaData metaData = query.getMetaData();
     if (sql == null) {
       if (metaData == null) {
         throw new IllegalArgumentException("Unknown table name " + tableName);
@@ -215,7 +221,6 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         query.getAttributeNames());
       final String fromClause = query.getFromClause();
       final String where = query.getWhereClause();
-      final Map<String, Boolean> orderBy = query.getOrderBy();
       final Map<String, ? extends Object> filter = query.getFilter();
       final boolean lockResults = query.isLockResults();
       sql = createSql(metaData, "T", fromClause, lockResults, attributeNames,
@@ -229,6 +234,11 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
         newSql.append(sql.substring(14));
         sql = newSql.toString();
         query.setSql(sql);
+      }
+      if (!orderBy.isEmpty()) {
+        StringBuffer buffer = new StringBuffer(sql);
+        addOrderBy(buffer, orderBy);
+        sql = buffer.toString();
       }
     }
     return sql;

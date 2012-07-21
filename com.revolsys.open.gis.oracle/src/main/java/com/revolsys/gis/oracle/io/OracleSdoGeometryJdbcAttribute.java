@@ -95,10 +95,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final DataObject object) throws SQLException {
+  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final DataObject object) throws SQLException {
     Geometry value;
     final int geometryType = resultSet.getInt(columnIndex);
     final int numAxis = geometryType / 1000;
@@ -130,10 +128,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setInsertPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final DataObject object) throws SQLException {
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final DataObject object) throws SQLException {
     final String name = getName();
     final Object value = object.getValue(name);
     if (value == null) {
@@ -151,10 +147,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
     if (value == null) {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
@@ -193,8 +187,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   //
   // }
 
-  public double[] toClockwiseCoordinatesArray(
-    final LineString ring,
+  public double[] toClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(ring);
     if (!CoordinatesListUtil.isCCW(coordinates)) {
@@ -204,8 +197,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private double[] toCoordinateArray(
-    final CoordinateSequence sequence,
+  private double[] toCoordinateArray(final CoordinateSequence sequence,
     final int dimension) {
     int geometryDimension = sequence.getDimension();
     if (Double.isNaN(sequence.getOrdinate(0, 2))) {
@@ -239,8 +231,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return coordinates;
   }
 
-  private double[][] toCoordinateArrays(
-    final Polygon polygon,
+  private double[][] toCoordinateArrays(final Polygon polygon,
     final int dimension) {
     final int numInteriorRing = polygon.getNumInteriorRing();
     final double[][] ordinateArrays = new double[1 + numInteriorRing][];
@@ -256,8 +247,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return ordinateArrays;
   }
 
-  public double[] toCounterClockwiseCoordinatesArray(
-    final LineString ring,
+  public double[] toCounterClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(ring);
     if (CoordinatesListUtil.isCCW(coordinates)) {
@@ -267,9 +257,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private STRUCT toJdbc(
-    final Connection connection,
-    final Object object,
+  private STRUCT toJdbc(final Connection connection, final Object object,
     final int dimension) throws SQLException {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
@@ -317,10 +305,17 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return JGeometry.createLinearLineString(ordinates, dimension, srid);
   }
 
-  private JGeometry toJGeometry(
-    final MultiLineString multiLineString,
+  private JGeometry toJGeometry(final MultiLineString multiLineString,
     final int dimension) {
-    return null;
+    final int srid = geometryFactory.getSRID();
+    int numGeometries = multiLineString.getNumGeometries();
+    Object[] parts = new Object[numGeometries];
+    for (int i = 0; i < numGeometries; i++) {
+      LineString line = (LineString)multiLineString.getGeometryN(i);
+      final double[] ordinates = toCoordinateArray(line, dimension);
+      parts[i] = ordinates;
+    }
+    return JGeometry.createLinearMultiLineString(parts, dimension, srid);
   }
 
   private JGeometry toJGeometry(final MultiPoint multiPoint, final int numAxis) {
@@ -348,8 +343,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       elemInfo, points);
   }
 
-  private JGeometry toJGeometry(
-    final MultiPolygon multiPolygon,
+  private JGeometry toJGeometry(final MultiPolygon multiPolygon,
     final int dimension) {
     if (multiPolygon.getNumGeometries() == 1) {
       return toJGeometry((Polygon)multiPolygon.getGeometryN(0), dimension);
@@ -417,10 +411,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return JGeometry.createLinearPolygon(oridinateArrays, dimension, srid);
   }
 
-  private LineString toLineString(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final int numAxis) throws SQLException {
+  private LineString toLineString(final ResultSet resultSet,
+    final int columnIndex, final int numAxis) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
     final double[] coordinates = coordinatesArray.getDoubleArray();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(numAxis,
@@ -428,9 +420,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return geometryFactory.createLineString(coordinatesList);
   }
 
-  private Point toPoint(
-    final ResultSet resultSet,
-    final int columnIndex,
+  private Point toPoint(final ResultSet resultSet, final int columnIndex,
     final int numAxis) throws SQLException {
     final CoordinatesList coordinatesList;
     final double x = resultSet.getDouble(columnIndex + 1);
@@ -444,9 +434,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return geometryFactory.createPoint(coordinatesList);
   }
 
-  private Polygon toPolygon(
-    final ResultSet resultSet,
-    final int columnIndex,
+  private Polygon toPolygon(final ResultSet resultSet, final int columnIndex,
     final int numAxis) throws SQLException {
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
     final long[] elemInfo = elemInfoArray.getLongArray();
@@ -505,10 +493,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return polygon;
   }
 
-  private MultiPolygon toMultiPolygon(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final int numAxis) throws SQLException {
+  private MultiPolygon toMultiPolygon(final ResultSet resultSet,
+    final int columnIndex, final int numAxis) throws SQLException {
     List<Polygon> polygons = new ArrayList<Polygon>();
 
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
@@ -569,10 +555,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return geometryFactory.createMultiPolygon(polygons);
   }
 
-  private MultiLineString toMultiLineString(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final int numAxis) throws SQLException {
+  private MultiLineString toMultiLineString(final ResultSet resultSet,
+    final int columnIndex, final int numAxis) throws SQLException {
     List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
 
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
@@ -605,10 +589,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     return geometryFactory.createMultiLineString(pointsList);
   }
 
-  private MultiPoint toMultiPoint(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final int numAxis) throws SQLException {
+  private MultiPoint toMultiPoint(final ResultSet resultSet,
+    final int columnIndex, final int numAxis) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
     final double[] coordinates = coordinatesArray.getDoubleArray();

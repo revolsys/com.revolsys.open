@@ -610,33 +610,35 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Boolean> getDataTableSortOrder(
     final HttpServletRequest request) {
-    String sColumns = request.getParameter("sColumns");
-    String[] columnNames = sColumns.split(",");
     Map<String, Boolean> sortOrder = new LinkedHashMap<String, Boolean>();
-    String iSortingCols = request.getParameter("iSortingCols");
-    int numSortColumns = Integer.parseInt(iSortingCols);
-    for (int i = 0; i < numSortColumns; i++) {
-      int sortColumn;
-      try {
-        String sSortCol = request.getParameter("iSortCol_" + i);
-        sortColumn = Integer.valueOf(sSortCol);
-      } catch (Throwable t) {
-        sortColumn = 0;
+    String sColumns = request.getParameter("sColumns");
+    if (sColumns != null) {
+      String[] columnNames = sColumns.split(",");
+      String iSortingCols = request.getParameter("iSortingCols");
+      int numSortColumns = Integer.parseInt(iSortingCols);
+      for (int i = 0; i < numSortColumns; i++) {
+        int sortColumn;
+        try {
+          String sSortCol = request.getParameter("iSortCol_" + i);
+          sortColumn = Integer.valueOf(sSortCol);
+        } catch (Throwable t) {
+          sortColumn = 0;
+        }
+        String columnName;
+        if (sortColumn < columnNames.length) {
+          columnName = columnNames[sortColumn];
+        } else {
+          columnName = columnNames[0];
+        }
+        String sSortDir = request.getParameter("sSortDir_" + i);
+        Boolean sortDir = "asc".equalsIgnoreCase(sSortDir);
+        sortOrder.put(columnName, sortDir);
       }
-      String columnName;
-      if (sortColumn < columnNames.length) {
-        columnName = columnNames[sortColumn];
-      } else {
-        columnName = columnNames[0];
-      }
-      String sSortDir = request.getParameter("sSortDir_" + i);
-      Boolean sortDir = "asc".equalsIgnoreCase(sSortDir);
-      sortOrder.put(columnName, sortDir);
     }
     return sortOrder;
   }
 
-  public Element createDataTable(final HttpServletRequest request,
+  public ElementContainer createDataTable(final HttpServletRequest request,
     final String prefix, int dataHeightPixels,
     Map<String, ? extends Object> parameters) {
     final String pageName = getName(prefix, "list");
@@ -644,7 +646,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final RowsTableSerializer model = new KeySerializerTableSerializer(
       serializers);
     final String title = getPageTitle(pageName);
-    TableView tableView = new TableView(model);
+    request.setAttribute("title", title);
+     TableView tableView = new TableView(model);
     tableView.setId(pageName);
     tableView.setNoRecordsMessgae(null);
 
@@ -654,6 +657,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     tableParams.put("bProcessing", true);
     tableParams.put("bServerSide", true);
     tableParams.put("sAjaxSource", pageUrl + "/ajax.json");
+    tableParams.put("bAutoWidth", false);
     tableParams.put("bScrollInfinite", true);
     tableParams.put("bScrollCollapse", true);
     tableParams.put("sScrollY", dataHeightPixels + "px");
@@ -665,7 +669,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     for (KeySerializer serializer : serializers) {
       Map<String, Object> columnDef = new LinkedHashMap<String, Object>();
       columnDef.put("aTargets", Arrays.asList(i));
-      columnDef.put("sName", serializer.getName());
+      columnDef.put("sName", serializer.getKey());
       columnDef.put("sTitle", serializer.getLabel());
 
       Boolean sortable = serializer.getProperty("sortable");
@@ -674,13 +678,17 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
 
       Boolean searchable = serializer.getProperty("searchable");
-      if (sortable != null) {
+      if (searchable != null) {
         columnDef.put("bSearchable", searchable);
       }
 
       Boolean visible = serializer.getProperty("visible");
       if (visible != null) {
         columnDef.put("bVisible", visible);
+      }
+      String width = serializer.getProperty("width");
+      if (width != null) {
+        columnDef.put("sWidth", width);
       }
 
       columnDefs.add(columnDef);
@@ -690,11 +698,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       tableParams.put("aoColumnDefs", columnDefs);
     }
     Script script = new Script();
+    String jsonMap = JsonMapWriter.toString(tableParams);
+    jsonMap = jsonMap.substring(0, jsonMap.length() -1) +",\"fnCreatedRow\": function( nRow, aData, iDataIndex ) {refreshButtons(nRow);}}";
     script.setContent("$(document).ready(function() {\n" + "$('#" + pageName
-      + " table').dataTable(" + JsonMapWriter.toString(tableParams) + ")});");
-    ElementContainer view = new ElementContainer(tableView, script);
-    view.setDecorator(new CollapsibleBox(title, true));
-    return view;
+      + " table').dataTable(" + jsonMap + "\n );});");
+    ElementContainer container = new ElementContainer(tableView, script);
+    container.setDecorator(new CollapsibleBox(title, true));
+
+    final Menu actionMenu = new Menu();
+    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    addMenuElement(container, actionMenu);
+
+    return container;
   }
 
   public Map<String, Object> createDataTableMap(

@@ -34,11 +34,15 @@ public class BuilderSerializer extends AbstractKeySerializer implements
    * @throws IOException If there was an I/O error serializing the value.
    */
   public void serialize(final XmlWriter out, final Object value) {
-    builder.serialize(out, value, getName());
+    if (builder == null) {
+      out.text("-");
+    } else {
+      builder.serialize(out, value, getName());
+    }
   }
 
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
-    if (this.builder != null) {
+    if (uiBuilder != null) {
       this.builder = uiBuilder;
     }
   }

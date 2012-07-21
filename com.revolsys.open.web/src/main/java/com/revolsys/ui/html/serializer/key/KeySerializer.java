@@ -16,6 +16,8 @@ public interface KeySerializer extends ObjectWithProperties {
 
   String getName();
 
+  String getKey();
+
   /**
    * Serialize the value to the XML writer.
    * 

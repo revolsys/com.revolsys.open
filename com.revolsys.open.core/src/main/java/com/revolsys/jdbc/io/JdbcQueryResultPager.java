@@ -277,7 +277,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   private void updateResults() {
     results = new ArrayList<DataObject>();
     try {
-      if (pageNumber != -1) {
+      if (pageNumber != -1 && resultSet != null) {
         if (resultSet.absolute(pageNumber * pageSize + 1)) {
           int i = 0;
           do {

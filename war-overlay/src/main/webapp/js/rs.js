@@ -19,14 +19,14 @@ function resizeHeight(iframe) {
   };
 }(jQuery));
 
-function addConfirmButton(selector, icon, title, message) {
-  $(selector).button({
+function addConfirmButton(root, selector, icon, title, message) {
+  $(selector, root).button({
     text : false,
     icons : {
       primary : 'ui-icon-' + icon
     }
   });
-  $(selector).click(function() {
+  $(selector, root).click(function() {
     var form = $(this).closest('form');
     $('<div></div>').html(message).dialog({
       title : 'title',
@@ -49,60 +49,70 @@ function addConfirmButton(selector, icon, title, message) {
   });
 
 }
+function refreshButtons(root) {
+  addConfirmButton(
+    root,
+    'button.delete',
+    'trash',
+    'Confirm Delete',
+    'Are you sure you want to delete this record?');
+  $('div.actionMenu a', root).button();
+  $('.button', root).button();
 
-$(document).ready(
-  function() {
-    $('div.collapsibleBox').each(function() {
-      var active;
-      if ($(this).hasClass('closed')) {
-        active = false;
-      } else {
-        active = 0;
-      }
-      $(this).accordion({
-        icons : {
-          header : "ui-icon-triangle-1-e",
-          headerSelected : "ui-icon-triangle-1-s"
-        },
-        collapsible : true,
-        active : active,
-        autoHeight : false,
-        change : function(event, ui) {
-          $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
-        }
-      });
-    });
-    addConfirmButton(
-      'button.delete',
-      'trash',
-      'Confirm Delete',
-      'Are you sure you want to delete this record?');
-    $('div.jqueryTabs').tabs({
-      show : function(event, ui) {
-        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-      }
-    });
-    $('div.actionMenu a').button();
-    $('.button').button();
-
-    $('button').each(function() {
-      var button = $(this);
-      var classes = button.attr('class');
+  $(':button', root).each(function() {
+    var button = $(this);
+    var classes = button.attr('class');
+    var icon = undefined;
+    if (classes != undefined) {
       $(classes.split(/\s+/)).each(function() {
         var cssClass = this;
         if (cssClass.indexOf("ui-auto-button-") == 0) {
-          var icon = cssClass.substring("ui-auto-button-".length);
-          button.button({
-            icons : {
-              primary : "ui-icon-" + icon
-            },
-            text : false
-          });
+          icon = cssClass.substring("ui-auto-button-".length);
         }
       });
-    });
-    $('div.objectList > table').dataTable({
-      bJQueryUI : true,
-      sPaginationType : "full_numbers"
+    }
+    if (icon != undefined) {
+      button.button({
+        icons : {
+          primary : "ui-icon-" + icon
+        },
+        text : false
+      });
+    } else {
+      button.button();
+    }
+  });
+}
+$(document).ready(function() {
+  refreshButtons($(document));
+  $('div.collapsibleBox').each(function() {
+    var active;
+    if ($(this).hasClass('closed')) {
+      active = false;
+    } else {
+      active = 0;
+    }
+    $(this).accordion({
+      icons : {
+        header : "ui-icon-triangle-1-e",
+        headerSelected : "ui-icon-triangle-1-s"
+      },
+      collapsible : true,
+      active : active,
+      autoHeight : false,
+      change : function(event, ui) {
+        $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
+      }
     });
   });
+  $('div.jqueryTabs').tabs({
+    show : function(event, ui) {
+      $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+    }
+  });
+  $('div.objectList table').dataTable({
+    "bJQueryUI" : true,
+    "bPaginate" : false,
+    "bSort" : false
+  });
+});

@@ -212,83 +212,7 @@ div.form > form > div > div.objectList > table.data {
   padding-left: 0px;
   padding-right: 0px;
 }
-/*
-div.objectList {
-  border: 1px solid #666666;
-  width: auto;
-  background-color: #ffffff;
-}
 
-div.objectList > table.data {
-  border: 2px solid #6699CC;
-  padding: 1px;
-  width: 100%;
-}
-
-div.objectList > table.data > caption {
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  font-size: 1.1em;
-  text-align: center;
-  font-weight: bold;
-  text-align: left;
-  padding: 2px;
-  border: 2px solid #6699CC;
-  border-bottom-width: 0px;
-}
-
-div.objectList > table.data td,div.objectList > table.data th {
-  padding: 2px 3px 2px 3px;
-}
-
-div.objectList > table.data > thead {
-  background-color: #a2c8ff;
-}
-
-div.objectList > table.data > thead > th {
-  color: #0046a0;
-  border-right: 1px solid white;
-}
-
-div.objectList > table.data > thead > tr > th:last-child {
-  border-right-width: 0px;
-}
-
-div.objectList > table.data > tbody > tr > th,div.objectList > table.data > tbody > tr > td {
-  border-right: 1px solid #cccccc;
-  border-bottom: 1px solid #cccccc;
-}
-
-div.objectList > table.data > tbody > tr > th:last-child 
-div.objectList > table.data > tbody > tr > td:last-child {
-  border-right-width: 0px;
-}
-
-div.objectList > table.data > tbody > tr:last-child > th,div.objectList > table.data > tbody > tr:last-child > td
-  {
-  border-bottom-width: 0px;
-}
-
-div.objectList > table.data > tbody > tr.selected > th,div.objectList > table.data > tbody > tr.selected > td
-  {
-  background-color: #fff7b4;
-}
-
-div.objectList > table.data > tbody > tr.even > th,div.objectList > table.data > tbody > tr.even > td {
-  background-color: #eeeeee;
-  border-right-color: white;
-}
-
-div.objectList > table.data > tbody.search tr td textarea,div.objectList > table.data > tbody.search tr th input[type="text"],div.objectList > table.data > tbody.search tr td input[type="text"]
-  {
-  height: 1.2em;
-  width: 100%;
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-}
-*/
 div.table div.title {
   color: #039;
   font-family: sans-serif;
@@ -590,17 +514,24 @@ div.autocomplete ul li {
   cursor: pointer;
 }
 
-button.ui-button-icon-only span.ui-button-text {
-  padding: 0.1em;
+button.ui-button-icon-only {
+  height: 1.8em;
+  width: 1.8em;
 }
 
 .ui-button span.ui-button-text {
   line-height: 1.2em;
 }
 
+input.ui-button,
 .ui-button-text-only span.ui-button-text {
   line-height: 1.2em;
   padding: 0.2em 0.4em;
+}
+
+table.dataTable thead th,
+table.dataTable tbody td {
+  padding: 0.2em 0.4em 0.2em 0.4em;  
 }
 
 div.ui-accordion {
@@ -614,7 +545,7 @@ div.ui-accordion div.section {
 }
 
 div.ui-accordion > div.ui-accordion-content {
-  padding: 0.5em;
+  padding: 0.3em;
 }
 
 div.ui-accordion > div.ui-accordion-content > div.form {

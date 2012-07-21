@@ -34,7 +34,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
   public void serialize(final XmlWriter out, final Object object) {
     try {
       HtmlUiBuilder<? extends Object> uiBuilder = this.uiBuilder;
-      final String[] parts = getName().split("\\.");
+      final String[] parts = getKey().split("\\.");
       Object currentObject = object;
       String key = parts[0];
       for (int i = 0; i < parts.length - 1; i++) {

@@ -2,14 +2,19 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.io.StringWriter;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 
-public abstract class AbstractKeySerializer extends AbstractObjectWithProperties implements KeySerializer {
+public abstract class AbstractKeySerializer extends
+  AbstractObjectWithProperties implements KeySerializer {
   private String name;
 
   private String label;
+
+  private String key;
 
   public AbstractKeySerializer() {
   }
@@ -24,8 +29,19 @@ public abstract class AbstractKeySerializer extends AbstractObjectWithProperties
   }
 
   public String getLabel() {
-
     return label;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getKey() {
+    if (StringUtils.hasText(key)) {
+      return key;
+    } else {
+      return name;
+    }
   }
 
   public String getName() {

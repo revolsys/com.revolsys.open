@@ -20,11 +20,23 @@ import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class Query implements Cloneable {
-  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
-
   private List<String> attributeNames = Collections.emptyList();
 
+  private BoundingBox boundingBox;
+
+  private Map<String, ? extends Object> filter;
+
+  private String fromClause;
+
+  private Geometry geometry;
+
+  private boolean lockResults = false;
+
   private DataObjectMetaData metaData;
+
+  private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
+
+  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
 
   private List<Object> parameters = new ArrayList<Object>();
 
@@ -35,18 +47,6 @@ public class Query implements Cloneable {
   private String typePathAlias;
 
   private String whereClause;
-
-  private String fromClause;
-
-  private BoundingBox boundingBox;
-
-  private Geometry geometry;
-
-  private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
-
-  private Map<String, ? extends Object> filter;
-
-  private boolean lockResults = false;
 
   public Query() {
   }
@@ -186,12 +186,12 @@ public class Query implements Cloneable {
     return sql;
   }
 
-  public String getTypeNameAlias() {
-    return typePathAlias;
-  }
-
   public String getTypeName() {
     return typeName;
+  }
+
+  public String getTypeNameAlias() {
+    return typePathAlias;
   }
 
   public String getWhereClause() {
@@ -234,6 +234,10 @@ public class Query implements Cloneable {
     this.metaData = metaData;
   }
 
+  public void setOrderBy(Map<String, Boolean> orderBy) {
+    this.orderBy = orderBy;
+  }
+
   public void setOrderByColumns(final List<String> orderBy) {
     this.orderBy.clear();
     for (final String column : orderBy) {
@@ -259,12 +263,12 @@ public class Query implements Cloneable {
     this.sql = sql;
   }
 
-  public void setTypeNameAlias(final String typePathAlias) {
-    this.typePathAlias = typePathAlias;
-  }
-
   public void setTypeName(final String typeName) {
     this.typeName = typeName;
+  }
+
+  public void setTypeNameAlias(final String typePathAlias) {
+    this.typePathAlias = typePathAlias;
   }
 
   public void setWhereClause(final String whereClause) {
