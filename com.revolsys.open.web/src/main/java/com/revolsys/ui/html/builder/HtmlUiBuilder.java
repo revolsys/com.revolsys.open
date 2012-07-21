@@ -647,7 +647,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       serializers);
     final String title = getPageTitle(pageName);
     request.setAttribute("title", title);
-     TableView tableView = new TableView(model);
+     TableView tableView = new TableView( model, getTypeName());
     tableView.setId(pageName);
     tableView.setNoRecordsMessgae(null);
 
