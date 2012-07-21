@@ -48,9 +48,7 @@
 
   <modules>
     <module>com.revolsys.open.core</module>
-    <module>com.revolsys.open.orm.core</module>
-    <module>com.revolsys.open.orm.hibernate</module>
-    <module>com.revolsys.open.orm.jpa</module>
+    <module>com.revolsys.open.orm</module>
     <module>com.revolsys.open.web</module>
     <module>com.revolsys.open.gis.ecsv</module>
     <module>com.revolsys.open.gis.oracle</module>
