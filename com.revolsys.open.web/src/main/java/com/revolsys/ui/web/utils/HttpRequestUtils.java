@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
@@ -109,6 +110,27 @@ public final class HttpRequestUtils {
 
   public static void setPathVariable(final String name, final String value) {
     getPathVariables().put(name, value);
+  }
+
+  public static int getIntegerParameter(HttpServletRequest request,
+    String paramName) {
+    String value = request.getParameter(paramName);
+    if (StringUtils.hasText(value)) {
+      try {
+        return Integer.parseInt(value);
+      } catch (NumberFormatException e) {
+      }
+    }
+    return 0;
+  }
+
+  public static boolean getBooleanParameter(HttpServletRequest request,
+    String paramName) {
+    String value = request.getParameter(paramName);
+    if (StringUtils.hasText(value)) {
+      return Boolean.parseBoolean(value);
+    }
+    return false;
   }
 
   private HttpRequestUtils() {

@@ -1,11 +1,14 @@
 package com.revolsys.ui.html.builder;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.util.StringUtils;
 
@@ -17,6 +20,8 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.ui.html.serializer.key.KeySerializer;
+import com.revolsys.ui.web.utils.HttpRequestUtils;
 
 public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
@@ -97,8 +102,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     }
   }
 
-  protected boolean isPropertyUnique(
-    final DataObject object,
+  protected boolean isPropertyUnique(final DataObject object,
     final String attributeName) {
     final Query query = new Query(tableName);
     final String value = object.getValue(attributeName);
@@ -145,6 +149,54 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
       writer.write(object);
     } finally {
       writer.close();
+    }
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName) {
+    Map<String, Object> parameters = Collections.emptyMap();
+    return createDataTableHandler(request, pageName, parameters);
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName, Map<String, Object> parameters) {
+    String search = request.getParameter("sSearch");
+    if (search == null) {
+      return createDataTable(request, pageName, 400, parameters);
+    } else {
+      final Query query = new Query(getTableName());
+      if (StringUtils.hasText(search)) {
+        List<KeySerializer> serializers = getSerializers(pageName, "list");
+        StringBuffer whereClause = new StringBuffer();
+        int numSortColumns = HttpRequestUtils.getIntegerParameter(request,
+          "iColumns");
+        for (int i = 0; i < numSortColumns; i++) {
+          if (HttpRequestUtils.getBooleanParameter(request, "bSearchable_" + i)) {
+            if (whereClause.length() > 0) {
+              whereClause.append(" OR ");
+            }
+            KeySerializer serializer = serializers.get(i);
+            String columnName = serializer.getKey();
+            whereClause.append(columnName);
+            whereClause.append(" LIKE ?");
+            query.addParameter("%" + search + "%");
+          }
+          if (whereClause.length() > 0) {
+            query.setWhereClause(whereClause.toString());
+          }
+        }
+      }
+
+      final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
+      query.setOrderBy(orderBy);
+
+      final ResultPager<DataObject> pager = getResultPager(query);
+      try {
+        return createDataTableMap(request, pager, pageName);
+      } finally {
+        pager.close();
+      }
+
     }
   }
 

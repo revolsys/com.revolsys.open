@@ -639,24 +639,24 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public ElementContainer createDataTable(final HttpServletRequest request,
-    final String prefix, int dataHeightPixels,
+    final String pageName, int dataHeightPixels,
     Map<String, ? extends Object> parameters) {
-    final String pageName = getName(prefix, "list");
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
     final RowsTableSerializer model = new KeySerializerTableSerializer(
       serializers);
     final String title = getPageTitle(pageName);
     request.setAttribute("title", title);
-     TableView tableView = new TableView( model, getTypeName());
-    tableView.setId(pageName);
+    String typeName = getTypeName();
+    TableView tableView = new TableView(model, typeName);
+    tableView.setId(typeName);
     tableView.setNoRecordsMessgae(null);
 
-    String pageUrl = HttpRequestUtils.getFullRequestUrl();
+    String pageUrl = getPageUrl(pageName).replaceAll("/+$", ".json");
     Map<String, Object> tableParams = new LinkedHashMap<String, Object>();
     tableParams.put("bJQueryUI", true);
     tableParams.put("bProcessing", true);
     tableParams.put("bServerSide", true);
-    tableParams.put("sAjaxSource", pageUrl + "/ajax.json");
+    tableParams.put("sAjaxSource", pageUrl);
     tableParams.put("bAutoWidth", false);
     tableParams.put("bScrollInfinite", true);
     tableParams.put("bScrollCollapse", true);
@@ -699,14 +699,15 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
     Script script = new Script();
     String jsonMap = JsonMapWriter.toString(tableParams);
-    jsonMap = jsonMap.substring(0, jsonMap.length() -1) +",\"fnCreatedRow\": function( nRow, aData, iDataIndex ) {refreshButtons(nRow);}}";
-    script.setContent("$(document).ready(function() {\n" + "$('#" + pageName
+    jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
+      + ",\"fnCreatedRow\": function( nRow, aData, iDataIndex ) {refreshButtons(nRow);}}";
+    script.setContent("$(document).ready(function() {\n" + "$('#" + typeName
       + " table').dataTable(" + jsonMap + "\n );});");
     ElementContainer container = new ElementContainer(tableView, script);
     container.setDecorator(new CollapsibleBox(title, true));
 
     final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    addMenuItem(actionMenu, pageName, "add", "Add", "_top");
     addMenuElement(container, actionMenu);
 
     return container;
@@ -714,30 +715,26 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Object> createDataTableMap(
     final HttpServletRequest request, final ResultPager<T> pager,
-    final String prefix) {
+    final String pageName) {
     try {
       int numRecords = pager.getNumResults();
-      int pageSize;
-      try {
-        String displayLength = request.getParameter("iDisplayLength");
-        pageSize = Integer.parseInt(displayLength);
-        if (pageSize < 0) {
-          pageSize = numRecords;
-        }
-      } catch (final Throwable t) {
+      int pageSize = HttpRequestUtils.getIntegerParameter(request,
+        "iDisplayLength");
+      if (pageSize < 0) {
+        pageSize = numRecords;
+      } else if (pageSize == 0) {
         pageSize = defaultPageSize;
       }
       pager.setPageSize(pageSize);
 
-      try {
-        final String displayStart = request.getParameter("iDisplayStart");
-        int recordNumber = Integer.parseInt(displayStart);
-        pager.setPageNumber((int)Math.ceil(recordNumber / (double)pageSize));
-      } catch (final Throwable t) {
-        pager.setPageNumber(1);
+      int recordNumber = HttpRequestUtils.getIntegerParameter(request,
+        "iDisplayStart");
+      int pageNumber = (int)Math.ceil(recordNumber / (double)pageSize);
+      if (pageNumber <= 0) {
+        pageNumber = 1;
       }
+      pager.setPageNumber(pageNumber);
 
-      final String pageName = getName(prefix, "list");
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
 
       List<List<String>> rows = new ArrayList<List<String>>();
