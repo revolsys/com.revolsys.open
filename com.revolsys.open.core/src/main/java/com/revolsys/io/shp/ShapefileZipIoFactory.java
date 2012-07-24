@@ -26,17 +26,14 @@ public class ShapefileZipIoFactory extends
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory factory) {
     return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
       factory);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     File directory;
     try {
@@ -46,13 +43,9 @@ public class ShapefileZipIoFactory extends
     }
     final Resource tempResource = new FileSystemResource(new File(directory,
       baseName + ".shp"));
-    try {
-      final Writer<DataObject> shapeWriter = new ShapefileDataObjectWriter(
-        metaData, tempResource);
-      return new ZipWriter<DataObject>(directory, shapeWriter, outputStream);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to create shape writer", e);
-    }
+    final Writer<DataObject> shapeWriter = new ShapefileDataObjectWriter(
+      metaData, tempResource);
+    return new ZipWriter<DataObject>(directory, shapeWriter, outputStream);
   }
 
 }

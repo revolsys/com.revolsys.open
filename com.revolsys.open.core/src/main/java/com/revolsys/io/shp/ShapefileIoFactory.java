@@ -31,8 +31,7 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
     setSingleFile(false);
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
       final ShapefileIterator iterator = new ShapefileIterator(resource,
@@ -54,19 +53,12 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
 
   @Override
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource) {
-    try {
-      return new ShapefileDataObjectWriter(metaData, resource);
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to create writer for " + resource, e);
-    }
+    final DataObjectMetaData metaData, final Resource resource) {
+    return new ShapefileDataObjectWriter(metaData, resource);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return createDataObjectWriter(metaData, new OutputStreamResource(baseName,
       outputStream));

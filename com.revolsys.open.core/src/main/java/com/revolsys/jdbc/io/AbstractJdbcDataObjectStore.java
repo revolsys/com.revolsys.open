@@ -98,14 +98,9 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.databaseFactory = databaseFactory;
   }
 
-  protected void addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final String dataType,
-    final int sqlType,
-    final int length,
-    final int scale,
-    final boolean required) {
+  protected void addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, final String dataType, final int sqlType,
+    final int length, final int scale, final boolean required) {
     JdbcAttributeAdder attributeAdder = attributeAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
@@ -114,11 +109,9 @@ public abstract class AbstractJdbcDataObjectStore extends
       required);
   }
 
-  protected void addAttribute(
-    final ResultSetMetaData resultSetMetaData,
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    final int i) throws SQLException {
+  protected void addAttribute(final ResultSetMetaData resultSetMetaData,
+    final DataObjectMetaDataImpl metaData, final String name, final int i)
+    throws SQLException {
     final String dataType = resultSetMetaData.getColumnTypeName(i);
     final int sqlType = resultSetMetaData.getColumnType(i);
     final int length = resultSetMetaData.getPrecision(i);
@@ -127,8 +120,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     addAttribute(metaData, name, dataType, sqlType, length, scale, required);
   }
 
-  public void addAttributeAdder(
-    final String sqlTypeName,
+  public void addAttributeAdder(final String sqlTypeName,
     final JdbcAttributeAdder adder) {
     attributeAdders.put(sqlTypeName, adder);
   }
@@ -167,8 +159,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  protected AbstractIterator<DataObject> createIterator(
-    Query query,
+  protected AbstractIterator<DataObject> createIterator(Query query,
     final Map<String, Object> properties) {
     final BoundingBox boundingBox = query.getBoundingBox();
     if (boundingBox != null) {
@@ -189,8 +180,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected DataObjectStoreQueryReader createReader(
-    final DataObjectMetaData metaData,
-    final String sql,
+    final DataObjectMetaData metaData, final String sql,
     final List<Object> parameters) {
     final Query query = new Query(metaData);
     query.setSql(sql);
@@ -199,8 +189,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected DataObjectStoreQueryReader createReader(
-    final DataObjectMetaData metaData,
-    final String query,
+    final DataObjectMetaData metaData, final String query,
     final Object... parameters) {
     return createReader(metaData, query, Arrays.asList(parameters));
   }
@@ -212,19 +201,15 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   @Override
-  public DataObjectReader createReader(
-    final String typePath,
-    final String query,
-    final List<Object> parameters) {
+  public DataObjectReader createReader(final String typePath,
+    final String query, final List<Object> parameters) {
     final DataObjectStoreQueryReader reader = createReader();
     reader.addQuery(typePath, query, parameters);
     return reader;
   }
 
-  protected DataObjectReader createReader(
-    final String typePath,
-    final String whereClause,
-    final Object... parameters) {
+  protected DataObjectReader createReader(final String typePath,
+    final String whereClause, final Object... parameters) {
     return createReader(typePath, whereClause, Arrays.asList(parameters));
   }
 
@@ -245,21 +230,33 @@ public abstract class AbstractJdbcDataObjectStore extends
     if (object.getState() == DataObjectState.Persisted
       || object.getState() == DataObjectState.Modified) {
       object.setState(DataObjectState.Deleted);
-      getWriter().write(object);
+      JdbcWriter writer = createWriter();
+      try {
+        writer.write(object);
+      } finally {
+        writer.close();
+      }
     }
   }
 
   @Override
   public void deleteAll(final Collection<DataObject> objects) {
-    for (final DataObject object : objects) {
-      delete(object);
+    JdbcWriter writer = createWriter();
+    try {
+      for (final DataObject object : objects) {
+        if (object.getState() == DataObjectState.Persisted
+          || object.getState() == DataObjectState.Modified) {
+          object.setState(DataObjectState.Deleted);
+          writer.write(object);
+        }
+      }
+    } finally {
+      writer.close();
     }
   }
 
-  public JdbcAttribute getAttribute(
-    final String schemaName,
-    final String tableName,
-    final String columnName) {
+  public JdbcAttribute getAttribute(final String schemaName,
+    final String tableName, final String columnName) {
     final String typePath = PathUtil.toPath(schemaName, tableName);
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
@@ -321,8 +318,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return hints;
   }
 
-  public DataObjectMetaData getMetaData(
-    final String typePath,
+  public DataObjectMetaData getMetaData(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
       final String schemaName = PathUtil.getPath(typePath);
@@ -436,8 +432,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return flushBetweenTypes;
   }
 
-  private synchronized String loadIdColumnName(
-    final String schemaName,
+  private synchronized String loadIdColumnName(final String schemaName,
     final String tableName) {
     final Connection connection = getDbConnection();
     try {
@@ -588,8 +583,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectMetaDataImpl metaData) {
   }
 
-  public DataObjectStoreQueryReader query(
-    final String typePath,
+  public DataObjectStoreQueryReader query(final String typePath,
     final BoundingBox boundingBox) {
 
     final Query query = createBoundingBoxQuery(new Query(typePath), boundingBox);
@@ -602,9 +596,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return query(typePath, geometry, null);
   }
 
-  public Reader<DataObject> query(
-    final String typePath,
-    Geometry geometry,
+  public Reader<DataObject> query(final String typePath, Geometry geometry,
     final String whereClause) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();

@@ -87,7 +87,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private GeometryFactory geometryFactory;
 
   public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
-    final Resource resource) throws IOException {
+    final Resource resource)  {
     super(metaData, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
   }

@@ -64,8 +64,7 @@ public class SpringUtil {
   }
 
   public static GenericApplicationContext getApplicationContext(
-    final ClassLoader classLoader,
-    final Resource... resources) {
+    final ClassLoader classLoader, final Resource... resources) {
     final GenericApplicationContext applicationContext = new GenericApplicationContext();
     applicationContext.setClassLoader(classLoader);
 
@@ -160,8 +159,7 @@ public class SpringUtil {
     return new InputStreamReader(in);
   }
 
-  public static Resource getResource(
-    final Resource resource,
+  public static Resource getResource(final Resource resource,
     final CharSequence childPath) {
     try {
       if (resource instanceof FileSystemResource) {
@@ -186,12 +184,16 @@ public class SpringUtil {
     }
   }
 
-  public static Resource getResourceWithExtension(
-    final Resource resource,
-    final String extension) throws IOException {
+  public static Resource getResourceWithExtension(final Resource resource,
+    final String extension) {
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     final String newFileName = baseName + "." + extension;
-    return resource.createRelative(newFileName);
+    try {
+      return resource.createRelative(newFileName);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to get resource " + newFileName, e);
+    }
+
   }
 
   public static URL getUrl(final Resource resource) {

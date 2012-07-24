@@ -31,7 +31,7 @@ import java.util.Set;
 
 /**
  * This is a int hashmap that has the exact same features and interface as a
- * normal MapService except that the key is directly an integer. So no hash is
+ * normal Map except that the key is directly an integer. So no hash is
  * calculated or key object is stored.
  * 
  * @author jcompagner
@@ -595,9 +595,9 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Like addEntry<T> except that this version is used when creating entries as
-   * part of MapService construction or "pseudo-construction" (cloning,
+   * part of Map construction or "pseudo-construction" (cloning,
    * deserialization). This version needn't worry about resizing the table.
-   * Subclass overrides this to alter the behavior of HashMap(MapService), clone, and
+   * Subclass overrides this to alter the behavior of HashMap(Map), clone, and
    * readObject.
    * 
    * @param key
@@ -611,7 +611,7 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
   /**
    * Returns a collection view of the mappings contained in this map. Each
-   * element in the returned collection is a <tt>MapService.Entry</tt>. The collection
+   * element in the returned collection is a <tt>Map.Entry</tt>. The collection
    * is backed by the map, so changes to the map are reflected in the
    * collection, and vice-versa. The collection supports element removal, which
    * removes the corresponding mapping from the map, via the
@@ -620,7 +620,7 @@ public class IntHashMap<T> implements Cloneable, Serializable {
    * <tt>add</tt> or <tt>addAll</tt> operations.
    * 
    * @return a collection view of the mappings contained in this map.
-   * @see MapService.Entry
+   * @see Map.Entry
    */
   public Set<Entry<T>> entrySet() {
     final Set<Entry<T>> es = entrySet;
@@ -810,7 +810,7 @@ public class IntHashMap<T> implements Cloneable, Serializable {
 
     /**
      * Look for preexisting entry for key. This will never happen for clone or
-     * deserialize. It will only happen for construction if the input MapService is a
+     * deserialize. It will only happen for construction if the input Map is a
      * sorted map whose ordering is inconsistent w/ equals.
      */
     for (Entry<T> e = table[i]; e != null; e = e.next) {

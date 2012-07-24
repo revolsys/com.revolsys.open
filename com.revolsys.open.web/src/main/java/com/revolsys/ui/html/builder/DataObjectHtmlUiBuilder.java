@@ -41,6 +41,13 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     super(typePath, title, pluralTitle);
   }
 
+  public DataObjectHtmlUiBuilder(final String typePath, String tableName,
+    String idPropertyName, final String title, final String pluralTitle) {
+    super(typePath, title, pluralTitle);
+    this.tableName = tableName;
+    setIdPropertyName(idPropertyName);
+  }
+
   @Override
   protected DataObject createObject() {
     return dataStore.create(tableName);
@@ -63,18 +70,6 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     super.destroy();
     dataStore = null;
     tableName = null;
-  }
-
-  public List<DataObject> getAllObjects(final String... orderBy) {
-    final Query query = new Query(tableName);
-    final String idPropertyName = getIdPropertyName();
-    if (orderBy.length > 0) {
-      query.setOrderByColumns(orderBy);
-    } else if (StringUtils.hasText(idPropertyName)) {
-      query.setOrderByColumns(idPropertyName);
-    }
-    final Reader<DataObject> reader = dataStore.query(query);
-    return reader.read();
   }
 
   public DataObjectStore getDataStore() {
