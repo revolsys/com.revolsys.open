@@ -23,7 +23,7 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
-  private boolean useSchemaSequencePrefix;
+  private boolean useSchemaSequencePrefix = true;
 
   public PostgreSQLDataObjectStore() {
     this(new ArrayDataObjectFactory());

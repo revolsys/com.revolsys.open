@@ -153,6 +153,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return createDataTableHandler(request, pageName, parameters);
   }
 
+  @SuppressWarnings("unchecked")
   public Object createDataTableHandler(final HttpServletRequest request,
     String pageName, Map<String, Object> parameters) {
     String search = request.getParameter("sSearch");
@@ -160,6 +161,10 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
       return createDataTable(request, pageName, 400, parameters);
     } else {
       final Query query = new Query(getTableName());
+      Map<String,Object> filter = (Map<String, Object>)parameters.get("filter");
+      if (filter != null) {
+        query.setFilter(filter);
+      }
       if (StringUtils.hasText(search)) {
         List<KeySerializer> serializers = getSerializers(pageName, "list");
         StringBuffer whereClause = new StringBuffer();

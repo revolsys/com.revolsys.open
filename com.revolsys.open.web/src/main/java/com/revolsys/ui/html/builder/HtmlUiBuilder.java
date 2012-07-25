@@ -377,8 +377,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
     container.setDecorator(new CollapsibleBox(title, open));
 
+    final String prefix = pageName.replaceAll("[lL]ist$", "");
     final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, pageName, "add", "Add", "_top");
+    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
     addMenuElement(container, actionMenu);
 
     return container;

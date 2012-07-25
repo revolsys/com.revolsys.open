@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,7 +25,7 @@ public class Query implements Cloneable {
 
   private BoundingBox boundingBox;
 
-  private Map<String, ? extends Object> filter;
+  private Map<String, Object> filter = new LinkedHashMap<String, Object>();
 
   private String fromClause;
 
@@ -215,7 +216,10 @@ public class Query implements Cloneable {
   }
 
   public void setFilter(final Map<String, ? extends Object> filter) {
-    this.filter = filter;
+    this.filter.clear();
+    if (filter != null) {
+      this.filter.putAll(filter);
+    }
   }
 
   public void setFromClause(final String fromClause) {
@@ -323,5 +327,9 @@ public class Query implements Cloneable {
       string.append(parameters);
     }
     return string.toString();
+  }
+
+  public void addFilter(String name, Object value) {
+    filter.put(name, value);
   }
 }

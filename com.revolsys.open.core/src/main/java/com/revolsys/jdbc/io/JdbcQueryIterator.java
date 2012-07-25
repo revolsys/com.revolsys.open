@@ -104,7 +104,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
       sql.append(" ");
       sql.append(tablePrefix);
     }
-    if (filter != null) {
+    if (filter != null && !filter.isEmpty()) {
       final StringBuffer filterWhere = new StringBuffer();
       boolean first = true;
       for (final Entry<String, ?> entry : filter.entrySet()) {
@@ -249,7 +249,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     final PreparedStatement statement,
     int parameterIndex,
     final Map<String, ? extends Object> filter) throws SQLException {
-    if (filter != null) {
+    if (filter != null && !filter.isEmpty()) {
       for (final Entry<String, ?> entry : filter.entrySet()) {
         final String key = entry.getKey();
         final Object value = entry.getValue();
