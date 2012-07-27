@@ -151,7 +151,7 @@ public class Query implements Cloneable {
     return boundingBox;
   }
 
-  public Map<String, ? extends Object> getFilter() {
+  public Map<String,Object> getFilter() {
     return filter;
   }
 

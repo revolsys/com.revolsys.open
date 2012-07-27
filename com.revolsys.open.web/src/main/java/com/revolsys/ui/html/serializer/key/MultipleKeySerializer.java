@@ -14,14 +14,20 @@ public class MultipleKeySerializer extends AbstractKeySerializer implements
   private HtmlUiBuilder<?> uiBuilder;
 
   public MultipleKeySerializer() {
+    setProperty("sortable", false);
+    setProperty("searchable", false);
   }
 
   public MultipleKeySerializer(final String name) {
     super(name);
+    setProperty("sortable", false);
+    setProperty("searchable", false);
   }
 
   public MultipleKeySerializer(final String name, final String label) {
     super(name, label);
+    setProperty("sortable", false);
+    setProperty("searchable", false);
   }
 
   public List<KeySerializer> getSerializers() {

@@ -1,10 +1,12 @@
 package com.revolsys.collection;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class ListResultPager<T> implements ResultPager<T> {
-  private final List<T> list;
+  private final List<T> list = new ArrayList<T>();
 
   /** The number of objects in a page. */
   private int pageSize = 10;
@@ -12,8 +14,8 @@ public class ListResultPager<T> implements ResultPager<T> {
   /** The current page number. */
   private int pageNumber = -1;
 
-  public ListResultPager(final List<T> list) {
-    this.list = list;
+  public ListResultPager(final Collection<? extends T> list) {
+    this.list.addAll(list);
   }
 
   public void close() {

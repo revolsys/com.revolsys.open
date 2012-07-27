@@ -183,6 +183,31 @@ public final class JavaBeanUtil {
     }
   }
 
+  public static boolean getBooleanValue(final Object object,
+    final String attributeName) {
+    if (object == null) {
+      return false;
+    } else {
+      final Object value = getValue(object, attributeName);
+      if (value == null) {
+        return false;
+      } else if (value instanceof Boolean) {
+        Boolean booleanValue = (Boolean)value;
+        return booleanValue;
+      } else if (value instanceof Number) {
+        Number number = (Number)value;
+        return number.intValue() == 1;
+      } else {
+        String stringValue = value.toString();
+        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+
   public static <T> T invokeConstructor(
     final Constructor<? extends T> constructor, final Object... args) {
     try {

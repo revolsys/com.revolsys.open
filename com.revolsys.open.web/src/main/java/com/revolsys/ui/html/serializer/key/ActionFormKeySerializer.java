@@ -38,6 +38,11 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
 
   private String target;
 
+  public ActionFormKeySerializer() {
+    setProperty("sortable", false);
+    setProperty("searchable", false);
+  }
+
   public String getTarget() {
     return target;
   }

@@ -7,14 +7,17 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class BooleanImageKeySerializer extends AbstractKeySerializer {
   public BooleanImageKeySerializer() {
+    setProperty("searchable", false);
   }
 
   public BooleanImageKeySerializer(final String name) {
     super(name);
+    setProperty("searchable", false);
   }
 
   public BooleanImageKeySerializer(final String name, final String label) {
     super(name, label);
+    setProperty("searchable", false);
   }
 
   /**
@@ -24,7 +27,7 @@ public class BooleanImageKeySerializer extends AbstractKeySerializer {
    * @param object The object to get the value from.
    */
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = JavaBeanUtil.getProperty(object, getName());
+    final Object value = JavaBeanUtil.getBooleanValue(object, getName());
     String text;
     String imageName;
     if (Boolean.TRUE.equals(value)) {

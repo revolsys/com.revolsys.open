@@ -40,11 +40,8 @@ public final class DataObjectUtil {
   public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
     "Feature", new Attribute("geometry", DataTypes.GEOMETRY, true));
 
-  public static void setValues(
-    DataObject target,
-    DataObject source,
-    Collection<String> attributesNames,
-    Collection<String> ignoreAttributeNames) {
+  public static void setValues(DataObject target, DataObject source,
+    Collection<String> attributesNames, Collection<String> ignoreAttributeNames) {
     for (String attributeName : attributesNames) {
       if (!ignoreAttributeNames.contains(attributeName)) {
         Object oldValue = target.getValue(attributeName);
@@ -66,8 +63,7 @@ public final class DataObjectUtil {
    * @param geometry The new geometry.
    * @return The copied object.
    */
-  public static <T extends DataObject> T copy(
-    final T object,
+  public static <T extends DataObject> T copy(final T object,
     final Geometry geometry) {
     final Geometry oldGeometry = object.getGeometryValue();
     final T newObject = (T)object.clone();
@@ -80,8 +76,7 @@ public final class DataObjectUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getAttributeByPath(
-    final DataObject object,
+  public static <T> T getAttributeByPath(final DataObject object,
     final String path) {
     final DataObjectMetaData metaData = object.getMetaData();
 
@@ -131,8 +126,7 @@ public final class DataObjectUtil {
     return (T)propertyValue;
   }
 
-  public static Double getDouble(
-    final DataObject object,
+  public static Double getDouble(final DataObject object,
     final int attributeIndex) {
     final Number value = object.getValue(attributeIndex);
     if (value == null) {
@@ -142,8 +136,7 @@ public final class DataObjectUtil {
     }
   }
 
-  public static Double getDouble(
-    final DataObject object,
+  public static Double getDouble(final DataObject object,
     final String attributeName) {
     final Number value = object.getValue(attributeName);
     if (value == null) {
@@ -153,8 +146,7 @@ public final class DataObjectUtil {
     }
   }
 
-  public static Integer getInteger(
-    final DataObject object,
+  public static Integer getInteger(final DataObject object,
     final String attributeName) {
     if (object == null) {
       return null;
@@ -164,6 +156,31 @@ public final class DataObjectUtil {
         return null;
       } else {
         return value.intValue();
+      }
+    }
+  }
+
+  public static boolean getBoolean(final DataObject object,
+    final String attributeName) {
+    if (object == null) {
+      return false;
+    } else {
+      final Object value = object.getValue(attributeName);
+      if (value == null) {
+        return false;
+      } else if (value instanceof Boolean) {
+        Boolean booleanValue = (Boolean)value;
+        return booleanValue;
+      } else if (value instanceof Number) {
+        Number number = (Number)value;
+        return number.intValue() == 1;
+      } else {
+        String stringValue = value.toString();
+        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
   }

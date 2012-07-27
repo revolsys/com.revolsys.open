@@ -10,6 +10,7 @@ import com.revolsys.util.JavaBeanUtil;
  */
 public class BooleanYesNoKeySerializer extends AbstractKeySerializer {
   public BooleanYesNoKeySerializer() {
+    setProperty("searchable", false);
   }
 
   /**
@@ -17,6 +18,7 @@ public class BooleanYesNoKeySerializer extends AbstractKeySerializer {
    */
   public BooleanYesNoKeySerializer(final String name) {
     super(name);
+    setProperty("searchable", false);
   }
 
   /**
@@ -26,7 +28,7 @@ public class BooleanYesNoKeySerializer extends AbstractKeySerializer {
    * @param object The object to get the value from.
    */
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = JavaBeanUtil.getProperty(object, getName());
+    final Object value = JavaBeanUtil.getBooleanValue(object, getName());
     if (Boolean.TRUE.equals(value)) {
       out.text("Yes");
     } else {

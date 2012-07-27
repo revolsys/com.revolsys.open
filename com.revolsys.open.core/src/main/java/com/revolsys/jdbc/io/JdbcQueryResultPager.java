@@ -210,7 +210,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
       query.setMetaData(metaData);
     }
 
-    final String sql = JdbcQueryIterator.getSql(query);
+    final String sql = JdbcUtils.getSelectSql(query);
 
     try {
       statement = connection.prepareStatement(sql,

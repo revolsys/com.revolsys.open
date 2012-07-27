@@ -2,9 +2,11 @@ package com.revolsys.jdbc.io;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -235,6 +237,50 @@ public abstract class AbstractJdbcDataObjectStore extends
         writer.write(object);
       } finally {
         writer.close();
+      }
+    }
+  }
+
+  @Override
+  public int delete(Query query) {
+    final String typeName = query.getTypeName();
+    DataObjectMetaData metaData = query.getMetaData();
+    if (metaData == null) {
+      if (typeName != null) {
+        metaData = getMetaData(typeName);
+        query.setMetaData(metaData);
+      }
+    }
+    final String sql = JdbcUtils.getDeleteSql(query);
+
+    Connection connection = getConnection();
+    DataSource dataSource = getDataSource();
+    try {
+      if (dataSource != null) {
+        try {
+          connection = JdbcUtils.getConnection(dataSource);
+          boolean autoCommit = false;
+          if (getProperties().get("autoCommit") == Boolean.TRUE) {
+            autoCommit = true;
+          }
+          connection.setAutoCommit(autoCommit);
+        } catch (final SQLException e) {
+          throw new IllegalArgumentException("Unable to create connection", e);
+        }
+      }
+
+      PreparedStatement statement = connection.prepareStatement(sql);
+      try {
+        JdbcUtils.setPreparedStatementFilterParameters(statement, query);
+        return statement.executeUpdate();
+      } finally {
+        JdbcUtils.close(statement);
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException("Unable to delete : " + sql, e);
+    } finally {
+      if (dataSource != null) {
+        JdbcUtils.close(connection);
       }
     }
   }

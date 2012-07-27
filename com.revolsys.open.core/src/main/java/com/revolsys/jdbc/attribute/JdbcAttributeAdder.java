@@ -89,6 +89,9 @@ public class JdbcAttributeAdder {
       case Types.TIMESTAMP:
         attribute = new JdbcTimestampAttribute(name, sqlType, required, null);
       break;
+      case Types.BIT:
+        attribute = new JdbcBooleanAttribute(name, sqlType, length, required, null);
+      break;
       default:
         attribute = new JdbcAttribute(name, dataType, sqlType, length, scale,
           required, null);

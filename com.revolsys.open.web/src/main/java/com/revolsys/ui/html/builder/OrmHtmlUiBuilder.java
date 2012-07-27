@@ -1,5 +1,6 @@
 package com.revolsys.ui.html.builder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,12 +44,7 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   }
 
   public List<T> getList(final Map<String, Object> filter) {
-    return getList(filter, getOrderBy());
-  }
-
-  public List<T> getList(
-    final Map<String, Object> filter,
-    final Map<String, Boolean> orderBy) {
+    final Map<String, Boolean> orderBy = Collections.emptyMap();
     return dataAccessObject.list(filter, orderBy);
   }
 
@@ -58,12 +54,7 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
 
   @Override
   public ResultPager<T> getResultPager(final Map<String, Object> filter) {
-    return getResultPager(filter, getOrderBy());
-  }
-
-  public ResultPager<T> getResultPager(
-    final Map<String, Object> filter,
-    final Map<String, Boolean> orderBy) {
+    final Map<String, Boolean> orderBy = Collections.emptyMap();
     return dataAccessObject.page(filter, orderBy);
   }
 

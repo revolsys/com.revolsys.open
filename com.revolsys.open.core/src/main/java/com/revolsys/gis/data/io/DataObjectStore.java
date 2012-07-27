@@ -34,19 +34,17 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   <T> T createPrimaryIdValue(String typePath);
 
-  Query createQuery(
-    final String typePath,
-    String whereClause,
+  Query createQuery(final String typePath, String whereClause,
     final BoundingBox boundingBox);
 
-  DataObjectReader createReader(
-    String typePath,
-    String query,
+  DataObjectReader createReader(String typePath, String query,
     List<Object> parameters);
 
   Writer<DataObject> createWriter();
 
   void delete(DataObject object);
+
+  int delete(Query query);
 
   void deleteAll(Collection<DataObject> objects);
 
@@ -68,6 +66,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
    * @param typePath The type name.
    * @return The meta data.
    */
+  @Override
   DataObjectMetaData getMetaData(String typePath);
 
   DataObjectStoreSchema getSchema(final String schemaName);

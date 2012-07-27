@@ -65,6 +65,11 @@ public abstract class AbstractDataObjectStore extends
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @Override
+  public int delete(Query query) {
+    return 0;
+  }
+
   public void addCodeTable(final CodeTable codeTable) {
     final String idColumn = codeTable.getIdAttributeName();
     addCodeTable(idColumn, codeTable);
@@ -119,9 +124,7 @@ public abstract class AbstractDataObjectStore extends
     statistics.add(statisticName, object);
   }
 
-  public void addStatistic(
-    final String statisticName,
-    final String typePath,
+  public void addStatistic(final String statisticName, final String typePath,
     final int count) {
     statistics.add(statisticName, typePath, count);
   }
@@ -172,14 +175,12 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  public Query createBoundingBoxQuery(
-    final Query query,
+  public Query createBoundingBoxQuery(final Query query,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
-  protected AbstractIterator<DataObject> createIterator(
-    final Query query,
+  protected AbstractIterator<DataObject> createIterator(final Query query,
     final Map<String, Object> properties) {
     throw new UnsupportedOperationException();
   }
@@ -188,9 +189,7 @@ public abstract class AbstractDataObjectStore extends
     return null;
   }
 
-  public Query createQuery(
-    final String typePath,
-    final String whereClause,
+  public Query createQuery(final String typePath, final String whereClause,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
@@ -201,10 +200,8 @@ public abstract class AbstractDataObjectStore extends
     return reader;
   }
 
-  public DataObjectReader createReader(
-    final String typePath,
-    final String query,
-    final List<Object> parameters) {
+  public DataObjectReader createReader(final String typePath,
+    final String query, final List<Object> parameters) {
     throw new UnsupportedOperationException();
   }
 
@@ -400,8 +397,7 @@ public abstract class AbstractDataObjectStore extends
   }
 
   protected abstract void loadSchemaDataObjectMetaData(
-    DataObjectStoreSchema schema,
-    Map<String, DataObjectMetaData> metaDataMap);
+    DataObjectStoreSchema schema, Map<String, DataObjectMetaData> metaDataMap);
 
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);

@@ -1,9 +1,7 @@
 package com.revolsys.ui.html.builder;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -125,7 +123,11 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   @Override
   public DataObject loadObject(final Object id) {
-    final DataObject object = dataStore.load(tableName, id);
+    return loadObject(tableName, id);
+  }
+
+  public DataObject loadObject(final String typeName, final Object id) {
+    final DataObject object = dataStore.load(typeName, id);
     return object;
   }
 
@@ -161,11 +163,17 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
       return createDataTable(request, pageName, 400, parameters);
     } else {
       final Query query = new Query(getTableName());
-      Map<String,Object> filter = (Map<String, Object>)parameters.get("filter");
+
+      Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
       if (filter != null) {
         query.setFilter(filter);
       }
+
+      String fromClause = (String)parameters.get("fromClause");
+      query.setFromClause(fromClause);
+
       if (StringUtils.hasText(search)) {
+        search = search.toUpperCase();
         List<KeySerializer> serializers = getSerializers(pageName, "list");
         StringBuffer whereClause = new StringBuffer();
         int numSortColumns = HttpRequestUtils.getIntegerParameter(request,
@@ -177,8 +185,9 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
             }
             KeySerializer serializer = serializers.get(i);
             String columnName = serializer.getKey();
+            whereClause.append("UPPER(T.");
             whereClause.append(columnName);
-            whereClause.append(" LIKE ?");
+            whereClause.append(") LIKE ?");
             query.addParameter("%" + search + "%");
           }
           if (whereClause.length() > 0) {

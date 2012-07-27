@@ -23,6 +23,12 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
     }
   }
 
+  public KeySerializerTableSerializer(final List<KeySerializer> serializers,
+    Collection<? extends Object> rows) {
+    this(serializers);
+    setRows(rows);
+  }
+
   public String getBodyCssClass(final int row, final int col) {
     final KeySerializer serializer = getSerializer(col);
     return serializer.getName();
@@ -62,9 +68,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
     return serializers;
   }
 
-  public void serializeBodyCell(
-    final XmlWriter out,
-    final int row,
+  public void serializeBodyCell(final XmlWriter out, final int row,
     final int col) {
     if (col < colCount) {
       final Object object = rows.get(row);
@@ -75,9 +79,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
     }
   }
 
-  public void serializeFooterCell(
-    final XmlWriter out,
-    final int row,
+  public void serializeFooterCell(final XmlWriter out, final int row,
     final int col) {
   }
 
