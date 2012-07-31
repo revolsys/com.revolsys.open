@@ -1,4 +1,4 @@
-package com.revolsys.orm.core.transaction;
+package com.revolsys.jdbc;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.transaction.PlatformTransactionManager;

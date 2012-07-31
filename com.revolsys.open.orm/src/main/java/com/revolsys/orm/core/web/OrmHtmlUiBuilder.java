@@ -1,11 +1,15 @@
-package com.revolsys.ui.html.builder;
+package com.revolsys.orm.core.web;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.BeanFactory;
+
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.orm.core.SpringDaoFactory;
+import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
   private DataAccessObject<T> dataAccessObject;
@@ -36,6 +40,36 @@ public class OrmHtmlUiBuilder<T> extends HtmlUiBuilder<T> {
       throw new RuntimeException("Unable to instantiate " + objectClass, e);
     } catch (final IllegalAccessException e) {
       throw new RuntimeException("Unable to instantiate " + objectClass, e);
+    }
+  }
+
+  /**
+   * Get the Data Access Object for the object's class.
+   * 
+   * @param objectClass<?> The object class.
+   * @return The builder.
+   */
+  public <V> DataAccessObject<V> getDao(final Class<V> objectClass) {
+    final BeanFactory beanFactory = getBeanFactory();
+    if (beanFactory != null) {
+      return SpringDaoFactory.get(beanFactory, objectClass);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Get the Data Access Object for the object's class name.
+   * 
+   * @param objectClass<?>Name The object class name.
+   * @return The builder.
+   */
+  public <V> DataAccessObject<V> getDao(final String objectClassName) {
+    final BeanFactory beanFactory = getBeanFactory();
+    if (beanFactory != null) {
+      return SpringDaoFactory.get(beanFactory, objectClassName);
+    } else {
+      return null;
     }
   }
 

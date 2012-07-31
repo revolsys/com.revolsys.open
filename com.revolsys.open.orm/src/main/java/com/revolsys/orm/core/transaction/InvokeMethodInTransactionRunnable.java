@@ -9,6 +9,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.revolsys.jdbc.InvokeMethodTransactionCallback;
+
 public class InvokeMethodInTransactionRunnable implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodInTransactionRunnable.class);

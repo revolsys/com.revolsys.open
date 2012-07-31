@@ -42,11 +42,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.orm.core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.xbean</groupId>
       <artifactId>xbean-spring</artifactId>
       <version>3.5</version>

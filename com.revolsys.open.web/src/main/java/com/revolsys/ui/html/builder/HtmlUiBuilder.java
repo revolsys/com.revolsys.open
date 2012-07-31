@@ -41,11 +41,9 @@ import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMeth
 
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
-import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.decorator.CollapsibleBox;
@@ -852,33 +850,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return builderFactory;
   }
 
-  /**
-   * Get the Data Access Object for the object's class.
-   * 
-   * @param objectClass<?> The object class.
-   * @return The builder.
-   */
-  public <V> DataAccessObject<V> getDao(final Class<V> objectClass) {
-    if (beanFactory != null) {
-      return SpringDaoFactory.get(beanFactory, objectClass);
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Get the Data Access Object for the object's class name.
-   * 
-   * @param objectClass<?>Name The object class name.
-   * @return The builder.
-   */
-  public <V> DataAccessObject<V> getDao(final String objectClassName) {
-    if (beanFactory != null) {
-      return SpringDaoFactory.get(beanFactory, objectClassName);
-    } else {
-      return null;
-    }
-  }
 
   public Map<String, Boolean> getDataTableSortOrder(
     final HttpServletRequest request) {
