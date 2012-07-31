@@ -3,12 +3,12 @@
   <name>RS PostgreSQL</name>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.gis.postgresql</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.07.30.RELEASE</version>
   <url>http://www.revolsys.com</url>
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.07.30.RELEASE</version>
   </parent>
   <dependencies>
     <dependency>
