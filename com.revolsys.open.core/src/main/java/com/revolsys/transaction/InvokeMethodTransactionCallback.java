@@ -1,4 +1,4 @@
-package com.revolsys.jdbc;
+package com.revolsys.transaction;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.springframework.transaction.TransactionStatus;

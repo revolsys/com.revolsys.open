@@ -1,4 +1,4 @@
-package com.revolsys.orm.core.transaction;
+package com.revolsys.transaction;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;

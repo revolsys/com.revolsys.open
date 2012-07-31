@@ -39,8 +39,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
   private String target;
 
   public ActionFormKeySerializer() {
-    setProperty("sortable", false);
-    setProperty("searchable", false);
+    setProperties(null);
   }
 
   public String getTarget() {
@@ -61,6 +60,16 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
 
   public List<String> getParameterNames() {
     return parameterNames;
+  }
+
+  @Override
+  public void setProperties(Map<String, Object> properties) {
+    getProperties().clear();
+    if (properties != null) {
+      getProperties().putAll(properties);
+    }
+    setProperty("sortable", false);
+    setProperty("searchable", false);
   }
 
   @Override

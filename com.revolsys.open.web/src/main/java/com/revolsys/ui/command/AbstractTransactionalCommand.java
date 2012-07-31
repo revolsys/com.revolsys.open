@@ -17,7 +17,7 @@ package com.revolsys.ui.command;
 
 import org.springframework.beans.factory.BeanFactory;
 
-import com.revolsys.jdbc.InvokeMethodInTransaction;
+import com.revolsys.transaction.InvokeMethodInTransaction;
 
 /**
  * @author paustin

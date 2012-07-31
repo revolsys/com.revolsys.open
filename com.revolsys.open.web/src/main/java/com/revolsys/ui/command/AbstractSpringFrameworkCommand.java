@@ -18,7 +18,7 @@ package com.revolsys.ui.command;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.revolsys.jdbc.InvokeMethodInTransaction;
+import com.revolsys.transaction.InvokeMethodInTransaction;
 
 /**
  * @author paustin

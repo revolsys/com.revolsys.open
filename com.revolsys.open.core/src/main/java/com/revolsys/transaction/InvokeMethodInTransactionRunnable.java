@@ -1,4 +1,4 @@
-package com.revolsys.orm.core.transaction;
+package com.revolsys.transaction;
 
 import java.util.Arrays;
 
@@ -9,7 +9,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.revolsys.jdbc.InvokeMethodTransactionCallback;
 
 public class InvokeMethodInTransactionRunnable implements Runnable {
 

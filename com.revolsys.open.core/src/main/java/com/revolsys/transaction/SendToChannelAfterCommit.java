@@ -1,4 +1,4 @@
-package com.revolsys.orm.core.transaction;
+package com.revolsys.transaction;
 
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;

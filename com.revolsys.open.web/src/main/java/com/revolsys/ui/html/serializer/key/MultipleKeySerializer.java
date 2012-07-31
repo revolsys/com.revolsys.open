@@ -2,6 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
@@ -14,20 +15,17 @@ public class MultipleKeySerializer extends AbstractKeySerializer implements
   private HtmlUiBuilder<?> uiBuilder;
 
   public MultipleKeySerializer() {
-    setProperty("sortable", false);
-    setProperty("searchable", false);
+    setProperties(null);
   }
 
   public MultipleKeySerializer(final String name) {
     super(name);
-    setProperty("sortable", false);
-    setProperty("searchable", false);
+    setProperties(null);
   }
 
   public MultipleKeySerializer(final String name, final String label) {
     super(name, label);
-    setProperty("sortable", false);
-    setProperty("searchable", false);
+    setProperties(null);
   }
 
   public List<KeySerializer> getSerializers() {
@@ -38,6 +36,16 @@ public class MultipleKeySerializer extends AbstractKeySerializer implements
     for (final KeySerializer serializer : serializers) {
       serializer.serialize(out, object);
     }
+  }
+
+  @Override
+  public void setProperties(Map<String, Object> properties) {
+    getProperties().clear();
+    if (properties != null) {
+      getProperties().putAll(properties);
+    }
+    setProperty("sortable", false);
+    setProperty("searchable", false);
   }
 
   @SuppressWarnings("unchecked")
