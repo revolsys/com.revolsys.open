@@ -77,18 +77,19 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
 
   public static Map<String, Object> toObjectMap(final String string) {
     final StringReader reader = new StringReader(string);
-    final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader);
+    final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader,
+      true);
     for (final Map<String, Object> map : mapReader) {
       return map;
     }
     return Collections.emptyMap();
   }
 
-  public static String toString(final Map<String, ? extends Object> map) {
+  public static String toString(final Map<String, ? extends Object> values) {
     final StringWriter writer = new StringWriter();
-    final JsonMapWriter mapWriter = new JsonMapWriter(writer);
-    mapWriter.write(map);
-    mapWriter.close();
+    final JsonWriter jsonWriter = new JsonWriter(writer, false);
+    jsonWriter.write(values);
+    jsonWriter.close();
     return writer.toString();
   }
 

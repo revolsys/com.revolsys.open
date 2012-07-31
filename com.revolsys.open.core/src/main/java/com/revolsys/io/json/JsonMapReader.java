@@ -18,12 +18,19 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
 
   private Iterator<Map<String, Object>> iterator;
 
+  private boolean single = false;
+  
   public JsonMapReader(final InputStream in) {
     this.in = new InputStreamReader(in, Charset.forName("UTF-8"));
   }
 
   public JsonMapReader(final java.io.Reader in) {
     this.in = in;
+  }
+
+  public JsonMapReader(final java.io.Reader in, boolean single) {
+    this.in = in;
+    this.single = single;
   }
 
   @Override
@@ -34,7 +41,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
   public Iterator<Map<String, Object>> iterator() {
     if (iterator == null) {
       try {
-        iterator = new JsonMapIterator(in);
+        iterator = new JsonMapIterator(in, single);
       } catch (final IOException e) {
         throw new IllegalArgumentException("Unable to create Iterator:"
           + e.getMessage(), e);

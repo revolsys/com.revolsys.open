@@ -121,10 +121,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   public Attribute addAttribute(
     final DataObjectMetaDataImpl metaData,
     final String name,
+    String dataTypeName,
     final int sqlType,
     final int length,
-    final int scale,
-    final boolean required) {
+    final int scale, final boolean required) {
     final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
     final DataObjectStoreSchema schema = metaData.getSchema();

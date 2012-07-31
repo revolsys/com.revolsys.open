@@ -17,6 +17,7 @@ package com.revolsys.io;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -225,13 +226,16 @@ public final class FileUtil {
    * @param file The file to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(final InputStream in, final File file)
-    throws IOException {
-    final FileOutputStream out = new FileOutputStream(file);
+  public static long copy(final InputStream in, final File file) {
     try {
-      return copy(in, out);
-    } finally {
-      closeSilent(out);
+      final FileOutputStream out = new FileOutputStream(file);
+      try {
+        return copy(in, out);
+      } finally {
+        closeSilent(out);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to open file: " + file, e);
     }
   }
 
@@ -351,8 +355,7 @@ public final class FileUtil {
    * @return The temportary directory.
    * @throws IOException If there was an exception creating the directory.
    */
-  public static File createTempDirectory(
-    final String prefix,
+  public static File createTempDirectory(final String prefix,
     final String suffix) {
     try {
       final File file = File.createTempFile(prefix, suffix);
@@ -395,8 +398,7 @@ public final class FileUtil {
    * @param deleteRoot Flag indicating if the directory should also be deleted.
    * @throws IOException If a file or directory could not be deleted.
    */
-  public static boolean deleteDirectory(
-    final File directory,
+  public static boolean deleteDirectory(final File directory,
     final boolean deleteRoot) {
     boolean deleted = true;
     final File[] files = directory.listFiles();
@@ -426,8 +428,7 @@ public final class FileUtil {
     return deleted;
   }
 
-  public static void deleteDirectory(
-    final File directory,
+  public static void deleteDirectory(final File directory,
     final FilenameFilter filter) {
     final File[] files = directory.listFiles();
     if (files != null) {
@@ -456,6 +457,7 @@ public final class FileUtil {
     synchronized (deleteFilesOnExit) {
       if (deleteFilesOnExitThread == null) {
         deleteFilesOnExitThread = new Thread(new Runnable() {
+          @Override
           public void run() {
             synchronized (deleteFilesOnExit) {
               for (final File file : deleteFilesOnExit) {
@@ -584,8 +586,7 @@ public final class FileUtil {
     return getBaseName(fileName);
   }
 
-  public static File getFileWithExtension(
-    final File file,
+  public static File getFileWithExtension(final File file,
     final String extension) {
     final File parentFile = file.getParentFile();
     final String baseName = FileUtil.getFileNamePrefix(file);
@@ -594,6 +595,14 @@ public final class FileUtil {
       return new File(newFileName);
     } else {
       return new File(parentFile, newFileName);
+    }
+  }
+
+  public static FileInputStream getInputStream(final File file) {
+    try {
+      return new FileInputStream(file);
+    } catch (final FileNotFoundException e) {
+      throw new RuntimeException("Unble to open file: " + file, e);
     }
   }
 
@@ -607,8 +616,7 @@ public final class FileUtil {
    * @return The relative path.
    * @throws IOException If an I/O error occurs.
    */
-  public static String getRelativePath(
-    final File parentDirectory,
+  public static String getRelativePath(final File parentDirectory,
     final File file) throws IOException {
     final String parentPath = getCanonicalPath(parentDirectory);
     final String filePath = getCanonicalPath(file);

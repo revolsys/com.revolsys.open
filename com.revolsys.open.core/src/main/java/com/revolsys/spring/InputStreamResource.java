@@ -10,10 +10,19 @@ public class InputStreamResource extends
 
   private final String filename;
 
+  private long length = -1;
+
   public InputStreamResource(final String filename,
     final InputStream inputStream) {
     super(inputStream);
     this.filename = filename;
+  }
+
+  public InputStreamResource(final String filename,
+    final InputStream inputStream, long length) {
+    super(inputStream);
+    this.filename = filename;
+    this.length = length;
   }
 
   public InputStreamResource(final String filename,
@@ -30,5 +39,14 @@ public class InputStreamResource extends
   @Override
   public String getFilename() throws IllegalStateException {
     return filename;
+  }
+
+  @Override
+  public long contentLength() throws IOException {
+    if (length >= 0) {
+      return length;
+    } else {
+      return super.contentLength();
+    }
   }
 }

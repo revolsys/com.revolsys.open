@@ -107,8 +107,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     if (attributeAdder == null) {
       attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
     }
-    attributeAdder.addAttribute(metaData, name, sqlType, length, scale,
-      required);
+    attributeAdder.addAttribute(metaData, name, dataType, sqlType, length,
+      scale, required);
   }
 
   protected void addAttribute(final ResultSetMetaData resultSetMetaData,

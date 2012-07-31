@@ -1,20 +1,26 @@
 package com.revolsys.jdbc;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 
-public class ByteArrayBlob implements Blob {
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
-  private final byte[] content;
+import com.revolsys.spring.SpringUtil;
 
-  private final long contentLength;
+public class LocalBlob implements Blob {
 
-  public ByteArrayBlob(final byte[] content) {
-    this.content = content;
-    this.contentLength = content.length;
+  private Resource resource;
+
+  public LocalBlob(Resource resource) {
+    this.resource = resource;
+  }
+
+  public LocalBlob(final byte[] content) {
+    this.resource = new ByteArrayResource(content);
   }
 
   public void free() throws SQLException {
@@ -22,26 +28,29 @@ public class ByteArrayBlob implements Blob {
   }
 
   public InputStream getBinaryStream() throws SQLException {
-    if (content == null) {
+    if (resource == null) {
       return null;
     } else {
-      return new ByteArrayInputStream(content);
+      return SpringUtil.getInputStream(resource);
     }
   }
 
   public InputStream getBinaryStream(final long pos, final long length)
     throws SQLException {
-    return new ByteArrayInputStream(content, (int)pos - 1, (int)length);
+    throw new UnsupportedOperationException();
   }
 
   public byte[] getBytes(final long pos, final int length) throws SQLException {
-    final byte[] bytes = new byte[length];
-    System.arraycopy(content, 0, bytes, (int)pos - 1, length);
     throw new UnsupportedOperationException();
   }
 
   public long length() throws SQLException {
-    return contentLength;
+    try {
+      return resource.contentLength();
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to get length for resource: "
+        + resource, e);
+    }
   }
 
   public long position(final Blob pattern, final long start)
@@ -62,10 +71,7 @@ public class ByteArrayBlob implements Blob {
     throw new UnsupportedOperationException();
   }
 
-  public int setBytes(
-    final long pos,
-    final byte[] bytes,
-    final int offset,
+  public int setBytes(final long pos, final byte[] bytes, final int offset,
     final int len) throws SQLException {
     throw new UnsupportedOperationException();
   }

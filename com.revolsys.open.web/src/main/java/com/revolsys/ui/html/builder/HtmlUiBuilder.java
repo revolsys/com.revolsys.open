@@ -43,7 +43,7 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.io.DataAccessObject;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.io.json.JsonMapWriter;
+import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.spring.InvokeMethodAfterCommit;
@@ -393,7 +393,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       tableParams.put("aoColumnDefs", columnDefs);
     }
     final Script script = new Script();
-    String jsonMap = JsonMapWriter.toString(tableParams);
+    String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
       + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}}";
     script.setContent("$(document).ready(function() {\n"

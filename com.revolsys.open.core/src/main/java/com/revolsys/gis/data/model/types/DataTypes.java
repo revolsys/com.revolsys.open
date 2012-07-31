@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.sql.Blob;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -118,6 +119,9 @@ public final class DataTypes {
 
   public static final DataType STRING = new SimpleDataType("string",
     String.class);
+
+  public static final DataType BLOB = new SimpleDataType("blob",
+    Blob.class);;
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();

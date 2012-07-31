@@ -1,5 +1,6 @@
 package com.revolsys.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +16,20 @@ public final class CollectionUtil {
   public static void append(final StringBuffer string,
     final Collection<? extends Object> values) {
     append(string, values, ",");
+  }
+
+  public static <T> List<T> subList(Iterable<T> iterable, int size) {
+    List<T> list = new ArrayList<T>(size);
+    int i = 0;
+    for (T value : iterable) {
+      if (i < size) {
+        list.add(value);
+        i++;
+      } else {
+        return list;
+      }
+    }
+    return list;
   }
 
   public static Integer getIntValue(Map<String, ? extends Object> map,

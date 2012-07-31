@@ -50,10 +50,10 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
   public Attribute addAttribute(
     final DataObjectMetaDataImpl metaData,
     final String name,
+    String dataTypeName,
     final int sqlType,
     final int length,
-    final int scale,
-    final boolean required) {
+    final int scale, final boolean required) {
     if (available) {
       final DataObjectStoreSchema schema = metaData.getSchema();
        final String typePath = metaData.getPath();
