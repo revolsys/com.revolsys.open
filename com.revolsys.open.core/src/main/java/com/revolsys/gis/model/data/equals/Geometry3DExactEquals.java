@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.data.equals;
 
 import java.util.Collection;
+import java.util.Map;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Geometry;
@@ -9,9 +10,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 public class Geometry3DExactEquals implements Equals<Geometry> {
   private EqualsRegistry equalsRegistry;
 
-  public boolean equals(
-    final Geometry geometry1,
-    final Geometry geometry2,
+  public boolean equals(final Geometry geometry1, final Geometry geometry2,
     final Collection<String> exclude) {
     if (geometry1.getNumGeometries() != geometry2.getNumGeometries()) {
       return false;
@@ -22,19 +21,37 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
       if (!JtsGeometryUtil.equalsExact3D(geometryPart1, geometryPart2)) {
         return false;
       }
-      final Object userData1 = geometryPart1.getUserData();
-      final Object userData2 = geometryPart2.getUserData();
-      if (!equalsRegistry.equals(userData1, userData2, exclude)) {
+      if (!userDataEquals(geometryPart1, geometryPart2, exclude)) {
         return false;
       }
     }
     if (geometry1 instanceof GeometryCollection) {
-      final Object userData1 = geometry1.getUserData();
-      final Object userData2 = geometry2.getUserData();
-      return equalsRegistry.equals(userData1, userData2, exclude);
+      return userDataEquals(geometry1, geometry2, exclude);
     } else {
       return true;
     }
+  }
+
+  public boolean userDataEquals(final Geometry geometry1,
+    final Geometry geometry2, final Collection<String> exclude) {
+    final Object userData1 = geometry1.getUserData();
+    final Object userData2 = geometry2.getUserData();
+    if (userData1 == null) {
+      if (userData2 == null) {
+        return true;
+      } else if (userData2 instanceof Map) {
+        Map map = (Map)userData2;
+        return map.isEmpty();
+      }
+    } else if (userData2 == null) {
+      if (userData1 instanceof Map) {
+        Map map = (Map)userData1;
+        return map.isEmpty();
+      } else {
+        return false;
+      }
+    }
+    return equalsRegistry.equals(userData1, userData2, exclude);
   }
 
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {

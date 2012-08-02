@@ -46,14 +46,16 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
     this(Preferences.userRoot(), preferencesPath);
   }
 
-  public void createConnection(
-    final String connectionName,
+  public void createConnection(final String connectionName,
     final Map<String, String> config) {
     final Preferences preferences = getPreferences(connectionName);
     for (final Entry<String, String> param : config.entrySet()) {
       preferences.put(param.getKey(), param.getValue());
     }
-    propertyChangeSupport.firePropertyChange("connectionName", null, connectionName);
+    DataObjectStore dataObjectStore = getDataObjectStore(connectionName);
+    int index = getConnectionNames().indexOf(connectionName);
+    propertyChangeSupport.fireIndexedPropertyChange("connections", index, null,
+      dataObjectStore);
 
   }
 
@@ -74,7 +76,7 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
       config.remove("productName");
       try {
         if (config.get("url") == null) {
-          LOG.error("No JDBC URL set for " + connectionName);
+          LOG.error("No URL set for " + connectionName);
           preferences.removeNode();
         } else {
           dataStore = DelegatingDataObjectStore.create(connectionName, config);

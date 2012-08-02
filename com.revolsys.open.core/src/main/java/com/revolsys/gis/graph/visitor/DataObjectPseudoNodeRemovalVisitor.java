@@ -28,7 +28,7 @@ import com.revolsys.util.ObjectProcessor;
  * 
  * @author Paul Austin
  */
-public class PseudoNodeRemovalVisitor extends
+public class DataObjectPseudoNodeRemovalVisitor extends
   AbstractNodeListenerVisitor<DataObject> implements
   FilterProxy<Node<DataObject>>, ObjectProcessor<DataObjectGraph> {
 
@@ -41,7 +41,7 @@ public class PseudoNodeRemovalVisitor extends
 
   private Statistics mergedStatistics;
 
-  public PseudoNodeRemovalVisitor() {
+  public DataObjectPseudoNodeRemovalVisitor() {
   }
 
   @PreDestroy

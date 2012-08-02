@@ -81,7 +81,6 @@ public class DataObjectStoreFactoryRegistry {
       try {
         dataSourceBean.setPropertyValue(name, value);
       } catch (final Throwable e) {
-        LOG.error("Unable to set data store property " + name, e);
       }
     }
   }

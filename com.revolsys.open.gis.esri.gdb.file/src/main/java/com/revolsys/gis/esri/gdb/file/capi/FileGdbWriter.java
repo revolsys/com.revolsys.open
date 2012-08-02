@@ -15,6 +15,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
@@ -62,6 +63,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
       if (row != null) {
         try {
           table.deleteRow(row);
+          object.setState(DataObjectState.Deleted);
         } finally {
           row.delete();
           dataStore.addStatistic("Delete", object);
@@ -116,6 +118,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
           esriAttribute.setPostInsertValue(object, row);
         }
+        object.setState(DataObjectState.Persisted);
       } finally {
         row.delete();
         dataStore.addStatistic("Insert", object);

@@ -52,15 +52,13 @@ public final class JtsGeometryUtil {
    * @param coordinate The Coordinate.
    * @param line The line segment the coordinate is on.
    */
-  public static void addElevation(
-    final Coordinate coordinate,
+  public static void addElevation(final Coordinate coordinate,
     final LineSegment line) {
     final double z = getElevation(line, coordinate);
     coordinate.z = z;
   }
 
-  public static void addElevation(
-    final Coordinate coordinate,
+  public static void addElevation(final Coordinate coordinate,
     final LineString line) {
     final CoordinateSequence coordinates = line.getCoordinateSequence();
     Coordinate previousCoordinate = coordinates.getCoordinate(0);
@@ -79,8 +77,7 @@ public final class JtsGeometryUtil {
 
   }
 
-  private static void addElevation(
-    final LineString original,
+  private static void addElevation(final LineString original,
     final LineString update) {
     final Coordinate c0 = update.getCoordinateN(0);
     if (Double.isNaN(c0.z)) {
@@ -92,19 +89,15 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static void addElevation(
-    final PrecisionModel precisionModel,
-    final Coordinate coordinate,
-    final LineSegment3D line) {
+  public static void addElevation(final PrecisionModel precisionModel,
+    final Coordinate coordinate, final LineSegment3D line) {
     addElevation(coordinate, line);
     coordinate.z = precisionModel.makePrecise(coordinate.z);
 
   }
 
-  public static LineSegment addLength(
-    final LineSegment line,
-    final double startDistance,
-    final double endDistance) {
+  public static LineSegment addLength(final LineSegment line,
+    final double startDistance, final double endDistance) {
     final double angle = line.angle();
     final Coordinate c1 = offset(line.p0, angle, -startDistance);
     final Coordinate c2 = offset(line.p1, angle, endDistance);
@@ -122,10 +115,8 @@ public final class JtsGeometryUtil {
    * @param lines The list to add the line to.
    * @param coordinates The coordinates used to create the line.
    */
-  public static void addLine(
-    final GeometryFactory factory,
-    final List<LineString> lines,
-    final List<Coordinate> coordinates) {
+  public static void addLine(final GeometryFactory factory,
+    final List<LineString> lines, final List<Coordinate> coordinates) {
     if (coordinates.size() > 1) {
       boolean add = true;
       final LineString line = factory.createLineString(DoubleCoordinatesListFactory.create(coordinates));
@@ -162,8 +153,7 @@ public final class JtsGeometryUtil {
       envelope.getMinY() - i, envelope.getMaxY() + i);
   }
 
-  public static Coordinate closestCoordinate(
-    final LineSegment lineSegment,
+  public static Coordinate closestCoordinate(final LineSegment lineSegment,
     final LineString line) {
     Coordinate closestCoordinate = null;
     double closestDistance = Double.MAX_VALUE;
@@ -182,8 +172,7 @@ public final class JtsGeometryUtil {
     return closestCoordinate;
   }
 
-  public static void copyUserData(
-    final Geometry oldGeometry,
+  public static void copyUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
     final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(oldGeometry);
     if (userData != null) {
@@ -191,8 +180,7 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static LinearRing createLinearRing(
-    final GeometryFactory factory,
+  public static LinearRing createLinearRing(final GeometryFactory factory,
     final List<Coordinate> coordinates) {
     final Coordinate[] coords = new Coordinate[coordinates.size()];
     coordinates.toArray(coords);
@@ -200,12 +188,9 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static LineString createLineString(
-    final GeometryFactory factory,
-    final Coordinate coordinate,
-    final double angle,
-    final double lengthBackward,
-    final double lengthForward) {
+  public static LineString createLineString(final GeometryFactory factory,
+    final Coordinate coordinate, final double angle,
+    final double lengthBackward, final double lengthForward) {
     final Coordinate c1 = new Coordinate(coordinate.x - lengthBackward
       * Math.cos(angle), coordinate.y - lengthBackward * Math.sin(angle));
     final Coordinate c2 = new Coordinate(coordinate.x + lengthForward
@@ -216,8 +201,7 @@ public final class JtsGeometryUtil {
     return line;
   }
 
-  public static LineString createLineString(
-    final GeometryFactory factory,
+  public static LineString createLineString(final GeometryFactory factory,
     final List<Coordinate> coordinates) {
     final Coordinate[] coords = new Coordinate[coordinates.size()];
     coordinates.toArray(coords);
@@ -237,10 +221,8 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static LineString createParallelLineString(
-    final LineString line,
-    final int orientation,
-    final double distance) {
+  public static LineString createParallelLineString(final LineString line,
+    final int orientation, final double distance) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinateSequence coordinates = line.getCoordinateSequence();
     final List<Coordinate> newCoordinates = new ArrayList<Coordinate>();
@@ -283,8 +265,7 @@ public final class JtsGeometryUtil {
     return factory.createLineString(newCoords);
   }
 
-  public static Polygon createPolygon(
-    final GeometryFactory factory,
+  public static Polygon createPolygon(final GeometryFactory factory,
     final List<Coordinate> coordinates) {
     final LinearRing shell = createLinearRing(factory, coordinates);
     return factory.createPolygon(shell, null);
@@ -299,8 +280,7 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static boolean equalsExact3D(
-    final Geometry geometry1,
+  public static boolean equalsExact3D(final Geometry geometry1,
     final Geometry geometry2) {
     if ((geometry1 instanceof LineString) && (geometry2 instanceof LineString)) {
       final LineString line1 = (LineString)geometry1;
@@ -324,8 +304,7 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static boolean equalsExact3D(
-    final Polygon polygon1,
+  public static boolean equalsExact3D(final Polygon polygon1,
     final Polygon polygon2) {
     if (polygon1.getNumInteriorRing() == polygon2.getNumInteriorRing()) {
       LineString exterior1 = polygon1.getExteriorRing();
@@ -346,8 +325,7 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static boolean equalsExact3D(
-    final GeometryCollection collection1,
+  public static boolean equalsExact3D(final GeometryCollection collection1,
     final GeometryCollection collection2) {
     if (collection1.getNumGeometries() != collection2.getNumGeometries()) {
       return false;
@@ -363,8 +341,7 @@ public final class JtsGeometryUtil {
     return true;
   }
 
-  public static boolean equalsExact3D(
-    final LineString line1,
+  public static boolean equalsExact3D(final LineString line1,
     final LineString line2) {
     if (line1.getNumPoints() != line2.getNumPoints()) {
       return false;
@@ -468,8 +445,7 @@ public final class JtsGeometryUtil {
    * @param line2 The second line
    * @return The coordinate or null if they don't cross
    */
-  public static Coordinate getCrossingIntersection(
-    final LineString line1,
+  public static Coordinate getCrossingIntersection(final LineString line1,
     final LineString line2) {
     final RobustLineIntersector intersector = new RobustLineIntersector();
 
@@ -527,27 +503,22 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static double getElevation(
-    final Coordinate coordinate,
-    final Coordinate c0,
-    final Coordinate c1) {
+  public static double getElevation(final Coordinate coordinate,
+    final Coordinate c0, final Coordinate c1) {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
     final double z = c0.z + (c1.z - c0.z) * (fraction);
     return z;
   }
 
-  public static double getElevation(
-    final LineSegment line,
+  public static double getElevation(final LineSegment line,
     final Coordinate coordinate) {
     final Coordinate c0 = line.p0;
     final Coordinate c1 = line.p1;
     return getElevation(coordinate, c0, c1);
   }
 
-  public static Geometry getGeometries(
-    final GeometryFactory factory,
-    final List<Coordinate> coords,
-    final Set<Coordinate> intersectCoords) {
+  public static Geometry getGeometries(final GeometryFactory factory,
+    final List<Coordinate> coords, final Set<Coordinate> intersectCoords) {
     final List<LineString> lines = new ArrayList<LineString>();
     final Iterator<Coordinate> iterator = coords.iterator();
     Coordinate previousCoordinate = iterator.next();
@@ -589,18 +560,26 @@ public final class JtsGeometryUtil {
 
   @SuppressWarnings("unchecked")
   public static <T extends Object> T getGeometryProperty(
-    final Geometry geometry,
-    final String name) {
+    final Geometry geometry, final String name) {
     final Map<String, Object> map = getGeometryProperties(geometry);
     return (T)map.get(name);
   }
 
-  public static Collection<LineString> getLines(final MultiLineString multiLine) {
+  public static List<LineString> getLines(final MultiLineString multiLine) {
     final List<LineString> lines = new ArrayList<LineString>();
     for (int i = 0; i < multiLine.getNumGeometries(); i++) {
       lines.add((LineString)multiLine.getGeometryN(i));
     }
     return lines;
+  }
+
+  public static List<Geometry> getGeometries(final Geometry geometry) {
+    final List<Geometry> parts = new ArrayList<Geometry>();
+    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      Geometry part = geometry.getGeometryN(i);
+      parts.add(part);
+    }
+    return parts;
   }
 
   public static List<LineSegment> getLineSegments(
@@ -624,10 +603,8 @@ public final class JtsGeometryUtil {
     return getLineSegments(coords);
   }
 
-  public static LineString getMatchingLines(
-    final LineString line1,
-    final LineString line2,
-    final double maxDistance) {
+  public static LineString getMatchingLines(final LineString line1,
+    final LineString line2, final double maxDistance) {
     final List<Coordinate> newCoords = new ArrayList<Coordinate>();
     final CoordinateSequence coords1 = line1.getCoordinateSequence();
     final CoordinateSequence coords2 = line1.getCoordinateSequence();
@@ -673,10 +650,8 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static double getMiddleAngle(
-    final double lastAngle,
-    final double angle,
-    final int orientation) {
+  public static double getMiddleAngle(final double lastAngle,
+    final double angle, final int orientation) {
     if (orientation == Angle.COUNTERCLOCKWISE) {
       if (Double.isNaN(lastAngle)) {
         return angle + Angle.PI_OVER_2;
@@ -712,8 +687,7 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static Geometry getMitredBuffer(
-    final Geometry geometry,
+  public static Geometry getMitredBuffer(final Geometry geometry,
     final double distance) {
     if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
@@ -726,8 +700,7 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static Polygon getMitredBuffer(
-    final LineSegment segment,
+  public static Polygon getMitredBuffer(final LineSegment segment,
     final double distance) {
 
     final LineSegment extendedSegment = addLength(segment, distance, distance);
@@ -745,16 +718,14 @@ public final class JtsGeometryUtil {
     return factory.createPolygon(exteriorRing, null);
   }
 
-  public static Polygon getMitredBuffer(
-    final LineString lineString,
+  public static Polygon getMitredBuffer(final LineString lineString,
     final double distance) {
     final LineStringMitredBuffer visitor = new LineStringMitredBuffer(distance);
     visitLineSegments(lineString.getCoordinateSequence(), visitor);
     return visitor.getBuffer();
   }
 
-  public static Polygon getMitredBuffer(
-    final Polygon polygon,
+  public static Polygon getMitredBuffer(final Polygon polygon,
     final double distance) {
     Geometry buffer = polygon;
     final LineString exteriorRing = polygon.getExteriorRing();
@@ -776,8 +747,7 @@ public final class JtsGeometryUtil {
     return getOrdinateRange(geometry, 3);
   }
 
-  public static double[] getOrdinateRange(
-    final CoordinateSequence coordinates,
+  public static double[] getOrdinateRange(final CoordinateSequence coordinates,
     final int ordinateIndex) {
     double min = Double.MAX_VALUE;
     double max = Double.MIN_VALUE;
@@ -795,10 +765,8 @@ public final class JtsGeometryUtil {
     };
   }
 
-  public static void getOrdinateRange(
-    final double[] range,
-    final CoordinatesList coordinates,
-    final int ordinateIndex) {
+  public static void getOrdinateRange(final double[] range,
+    final CoordinatesList coordinates, final int ordinateIndex) {
     double min = range[0];
     double max = range[1];
     if (ordinateIndex < coordinates.getDimension()) {
@@ -814,8 +782,7 @@ public final class JtsGeometryUtil {
     range[1] = max;
   }
 
-  public static double[] getOrdinateRange(
-    final Geometry geometry,
+  public static double[] getOrdinateRange(final Geometry geometry,
     final int ordinateIndex) {
     final double[] range = {
       Double.MAX_VALUE, Double.MIN_VALUE
@@ -842,9 +809,7 @@ public final class JtsGeometryUtil {
    * @param index The index to insert the coordinate.
    * @param coordinate The coordinate.
    */
-  public static LineString insert(
-    final LineString line,
-    final int index,
+  public static LineString insert(final LineString line, final int index,
     final Coordinate coordinate) {
     final CoordinatesList coords = CoordinatesListUtil.get(line.getCoordinateSequence());
     final CoordinatesList newCoords = new DoubleCoordinatesList(
@@ -869,8 +834,7 @@ public final class JtsGeometryUtil {
     return newLine;
   }
 
-  public static Geometry intersection2DZ(
-    final LineString line,
+  public static Geometry intersection2DZ(final LineString line,
     final Geometry geometry) {
     final Geometry intersection = line.intersection(geometry);
     if (intersection instanceof LineString) {
@@ -898,8 +862,7 @@ public final class JtsGeometryUtil {
    * @param line2
    * @return
    */
-  public static Geometry intersection2DZFloating(
-    final LineString line1,
+  public static Geometry intersection2DZFloating(final LineString line1,
     final LineString line2) {
     final GeometryFactory factory = GeometryFactory.getFactory();
     final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
@@ -909,8 +872,7 @@ public final class JtsGeometryUtil {
     return JtsGeometryUtil.intersection2DZ(line1Floating, line2Floating);
   }
 
-  public static boolean intersects(
-    final Geometry geometry1,
+  public static boolean intersects(final Geometry geometry1,
     final Geometry geometry2) {
     final int srid2 = geometry2.getSRID();
     final Geometry projectedGeometry1 = GeometryProjectionUtil.perform(
@@ -918,17 +880,14 @@ public final class JtsGeometryUtil {
     return projectedGeometry1.intersects(geometry2);
   }
 
-  public static boolean intersectsLinearly(
-    final LineString line1,
+  public static boolean intersectsLinearly(final LineString line1,
     final LineString line2) {
     final IntersectionMatrix matrix = line1.relate(line2);
     return matrix.get(0, 0) == Dimension.L;
   }
 
-  public static boolean isAlmostParallel(
-    final LineString line,
-    final LineString matchLine,
-    final double maxDistance) {
+  public static boolean isAlmostParallel(final LineString line,
+    final LineString matchLine, final double maxDistance) {
     final CoordinateSequence coords = line.getCoordinateSequence();
     final CoordinateSequence matchCoords = line.getCoordinateSequence();
     Coordinate previousCoordinate = coords.getCoordinate(0);
@@ -957,10 +916,8 @@ public final class JtsGeometryUtil {
     return false;
   }
 
-  public static boolean isBothWithinDistance(
-    final LineString line1,
-    final LineString line2,
-    final double maxDistance) {
+  public static boolean isBothWithinDistance(final LineString line1,
+    final LineString line2, final double maxDistance) {
     if (isWithinDistance(line1, line2, maxDistance)) {
       return isWithinDistance(line2, line1, maxDistance);
     } else {
@@ -1045,20 +1002,16 @@ public final class JtsGeometryUtil {
     return isCCW;
   }
 
-  public static boolean isLessThanDistance(
-    final Coordinate coordinate,
-    final LineString line,
-    final double maxDistance) {
+  public static boolean isLessThanDistance(final Coordinate coordinate,
+    final LineString line, final double maxDistance) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final Point point = factory.createPoint(coordinate);
     final double distance = line.distance(point);
     return distance < maxDistance;
   }
 
-  public static boolean isLessThanDistance(
-    final LineString line1,
-    final LineString line2,
-    final double maxDistance) {
+  public static boolean isLessThanDistance(final LineString line1,
+    final LineString line2, final double maxDistance) {
     final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
     for (int i = 0; i < coordinates1.size(); i++) {
       final Coordinate coordinate = coordinates1.getCoordinate(i);
@@ -1069,20 +1022,16 @@ public final class JtsGeometryUtil {
     return true;
   }
 
-  public static boolean isWithinDistance(
-    final Coordinate coordinate,
-    final LineString line,
-    final double maxDistance) {
+  public static boolean isWithinDistance(final Coordinate coordinate,
+    final LineString line, final double maxDistance) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final Point point = factory.createPoint(coordinate);
     final double distance = line.distance(point);
     return distance <= maxDistance;
   }
 
-  public static boolean isWithinDistance(
-    final LineString line1,
-    final LineString line2,
-    final double maxDistance) {
+  public static boolean isWithinDistance(final LineString line1,
+    final LineString line2, final double maxDistance) {
     final CoordinateSequence coordinates1 = line1.getCoordinateSequence();
     for (int i = 0; i < coordinates1.size(); i++) {
       final Coordinate coordinate = coordinates1.getCoordinate(i);
@@ -1093,8 +1042,7 @@ public final class JtsGeometryUtil {
     return true;
   }
 
-  public static void makePrecise(
-    final PrecisionModel precision,
+  public static void makePrecise(final PrecisionModel precision,
     final Geometry geometry) {
     geometry.apply(new CoordinateSequenceFilter() {
       public void filter(final CoordinateSequence coordinates, final int index) {
@@ -1117,17 +1065,14 @@ public final class JtsGeometryUtil {
   }
 
   public static <T extends Geometry> T makePreciseCopy(
-    final PrecisionModel precisionModel,
-    final T geometry) {
+    final PrecisionModel precisionModel, final T geometry) {
     final T newGeometry = (T)geometry.clone();
     makePrecise(precisionModel, newGeometry);
     return newGeometry;
   }
 
-  public static Coordinate offset(
-    final Coordinate coordinate,
-    final double angle,
-    final double distance) {
+  public static Coordinate offset(final Coordinate coordinate,
+    final double angle, final double distance) {
     final double newX = coordinate.x + distance * Math.cos(angle);
     final double newY = coordinate.y + distance * Math.sin(angle);
     final Coordinate newCoordinate = new Coordinate(newX, newY);
@@ -1135,10 +1080,8 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static LineSegment offset(
-    final LineSegment line,
-    final double distance,
-    final int orientation) {
+  public static LineSegment offset(final LineSegment line,
+    final double distance, final int orientation) {
     double angle = line.angle();
     if (orientation == Angle.CLOCKWISE) {
       angle -= Angle.PI_OVER_2;
@@ -1151,18 +1094,12 @@ public final class JtsGeometryUtil {
   }
 
   public static Coordinate processIntersection(
-    final Set<Coordinate> intersectCoords,
-    final Coordinate intersectCoord,
-    final List<Coordinate> coords1,
-    final ListIterator<Coordinate> iterator1,
-    final int index1,
-    final Coordinate previousCoord1,
-    final Coordinate currentCoord1,
-    final List<Coordinate> coords2,
-    final ListIterator<Coordinate> iterator2,
-    final int index2,
-    final Coordinate previousCoord2,
-    final Coordinate currentCoord2,
+    final Set<Coordinate> intersectCoords, final Coordinate intersectCoord,
+    final List<Coordinate> coords1, final ListIterator<Coordinate> iterator1,
+    final int index1, final Coordinate previousCoord1,
+    final Coordinate currentCoord1, final List<Coordinate> coords2,
+    final ListIterator<Coordinate> iterator2, final int index2,
+    final Coordinate previousCoord2, final Coordinate currentCoord2,
     final PrecisionModel precisionModel) {
     boolean intersectionFound = false;
     int matchIndex1 = -1;
@@ -1228,10 +1165,8 @@ public final class JtsGeometryUtil {
     return factory.createPolygon(shell, null);
   }
 
-  public static void setCoordinate(
-    final CoordinateSequence coordinates,
-    final int i,
-    final Coordinate coordinate) {
+  public static void setCoordinate(final CoordinateSequence coordinates,
+    final int i, final Coordinate coordinate) {
     coordinates.setOrdinate(i, 0, coordinate.x);
     coordinates.setOrdinate(i, 1, coordinate.y);
     if (coordinates.getDimension() > 2) {
@@ -1240,17 +1175,14 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static void setGeometryFeature(
-    final Geometry geometry,
+  public static void setGeometryFeature(final Geometry geometry,
     final DataObject feature) {
     setGeometryProperty(geometry, FEATURE_PROPERTY, feature);
   }
 
   @SuppressWarnings("unchecked")
-  public static void setGeometryProperty(
-    final Geometry geometry,
-    final CharSequence name,
-    final Object value) {
+  public static void setGeometryProperty(final Geometry geometry,
+    final CharSequence name, final Object value) {
     Object userData = geometry.getUserData();
     if (!(userData instanceof Map)) {
       userData = new TreeMap<Object, Object>();
@@ -1261,8 +1193,7 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static List<Geometry> splitWhereCross(
-    final LineString line1,
+  public static List<Geometry> splitWhereCross(final LineString line1,
     final LineString line2) {
     final RobustLineIntersector intersector = new RobustLineIntersector();
     final List<Geometry> geometries = new ArrayList<Geometry>();
@@ -1328,8 +1259,7 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static boolean startAndEndEqual(
-    final LineString geometry1,
+  public static boolean startAndEndEqual(final LineString geometry1,
     final LineString geometry2) {
     final Coordinate g1c0 = geometry1.getCoordinateN(0);
     final Coordinate g1cN = geometry1.getCoordinateN(geometry1.getNumPoints() - 1);
@@ -1431,8 +1361,7 @@ public final class JtsGeometryUtil {
    * @param line2 The line to compare the start of with the other line
    * @return
    */
-  public static boolean touchesAtEnd(
-    final LineString line1,
+  public static boolean touchesAtEnd(final LineString line1,
     final LineString line2) {
     final Coordinate l1c0 = line1.getCoordinateN(0);
     final Coordinate l1cN = line1.getCoordinateN(line1.getNumPoints() - 1);
@@ -1449,8 +1378,7 @@ public final class JtsGeometryUtil {
    * @param line2 The line to compare the start of with the other line
    * @return
    */
-  public static boolean touchesAtStart(
-    final LineString line1,
+  public static boolean touchesAtStart(final LineString line1,
     final LineString line2) {
     final Coordinate l1c0 = line1.getCoordinateN(0);
     final Coordinate l1cN = line1.getCoordinateN(line1.getNumPoints() - 1);
@@ -1473,8 +1401,7 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static void visitLineSegments(
-    final CoordinateSequence coords,
+  public static void visitLineSegments(final CoordinateSequence coords,
     final LineSegmentVisitor visitor) {
     Coordinate previousCoordinate = coords.getCoordinate(0);
     for (int i = 1; i < coords.size(); i++) {
