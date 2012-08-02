@@ -223,6 +223,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       geodatabase.delete();
       geodatabase = null;
     }
+    super.close();
   }
 
   // @Override
