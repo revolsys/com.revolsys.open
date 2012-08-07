@@ -17,6 +17,8 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
   private String valueLabel;
 
   public MapTableKeySerializer() {
+    setProperty("sortable", false);
+    setProperty("searchable", false);
   }
 
   /**

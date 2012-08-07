@@ -1,6 +1,7 @@
 package com.revolsys.ui.html.builder;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -20,6 +22,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.util.JavaBeanUtil;
 
 public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
@@ -162,7 +165,8 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     if (search == null) {
       return createDataTable(request, pageName, 400, parameters);
     } else {
-      final Query query = new Query(getTableName());
+      DataObjectMetaData metaData = getDataStore().getMetaData(getTableName());
+      final Query query = new Query(metaData);
 
       Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
       if (filter != null) {
@@ -184,11 +188,27 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
               whereClause.append(" OR ");
             }
             KeySerializer serializer = serializers.get(i);
-            String columnName = serializer.getKey();
-            whereClause.append("UPPER(T.");
-            whereClause.append(columnName);
-            whereClause.append(") LIKE ?");
-            query.addParameter("%" + search + "%");
+            String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
+            Class<?> columnClass = metaData.getAttributeType(columnName)
+              .getJavaClass();
+            if (columnClass != null) {
+              if (columnClass.equals(String.class)) {
+                whereClause.append("UPPER(T.");
+                whereClause.append(columnName);
+                whereClause.append(") LIKE ?");
+                query.addParameter("%" + search + "%");
+              } else if (Number.class.isAssignableFrom(columnClass)) {
+                whereClause.append("TO_CHAR(T.");
+                whereClause.append(columnName);
+                whereClause.append(", '9999999999999999999.9999999999999999999') LIKE ?");
+                query.addParameter("%" + search + "%");
+              } else if (Date.class.isAssignableFrom(columnClass)) {
+                whereClause.append("TO_CHAR(T.");
+                whereClause.append(columnName);
+                whereClause.append(", 'YYYY-MM-DD HH24:MI:SS') LIKE ?");
+                query.addParameter("%" + search + "%");
+              }
+            }
           }
           if (whereClause.length() > 0) {
             query.setWhereClause(whereClause.toString());

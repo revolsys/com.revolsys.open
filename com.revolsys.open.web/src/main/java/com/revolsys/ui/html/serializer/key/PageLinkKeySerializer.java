@@ -38,7 +38,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
       Object currentObject = object;
       String key = parts[0];
       for (int i = 0; i < parts.length - 1; i++) {
-        currentObject = JavaBeanUtil.getValue(currentObject, key);
+        currentObject = uiBuilder.getProperty(currentObject, key);
         if (currentObject == null) {
           uiBuilder.serializeNullLabel(out, key);
           return;
@@ -65,7 +65,9 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
   }
 
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
-    this.uiBuilder = uiBuilder;
+    if (this.uiBuilder == null) {
+      this.uiBuilder = uiBuilder;
+    }
   }
 
   public void setPageName(final String pageName) {

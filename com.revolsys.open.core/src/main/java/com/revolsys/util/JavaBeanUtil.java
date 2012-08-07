@@ -35,6 +35,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObject;
 
@@ -179,7 +180,14 @@ public final class JavaBeanUtil {
       final Annotation annotation = (Annotation)object;
       return AnnotationUtils.getValue(annotation, key);
     } else {
-      return getProperty(object, key);
+      String firstName = getFirstName(key);
+      String subName = getSubName(key);
+      Object value = getProperty(object, firstName);
+      if (value == null || !StringUtils.hasText(subName)) {
+        return value;
+      } else {
+        return getValue(value, subName);
+      }
     }
   }
 
@@ -346,4 +354,27 @@ public final class JavaBeanUtil {
   private JavaBeanUtil() {
   }
 
+  public static String getFirstName(String name) {
+    if (StringUtils.hasText(name)) {
+      int index = name.indexOf(".");
+      if (index == -1) {
+        return name;
+      } else {
+        return name.substring(0, index);
+      }
+    }
+    return name;
+  }
+
+  public static String getSubName(String name) {
+    if (StringUtils.hasText(name)) {
+      int index = name.indexOf(".");
+      if (index == -1) {
+        return "";
+      } else {
+        return name.substring(index + 1);
+      }
+    }
+    return name;
+  }
 }

@@ -86,8 +86,14 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
         parameters.put(parameterName, value);
       }
       if (enabledExpression != null) {
-        final StandardEvaluationContext evaluationContext = new StandardEvaluationContext(
-          object);
+        final StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        if (object instanceof Map) {
+          @SuppressWarnings("unchecked")
+          Map<String, Object> map = (Map<String, Object>)object;
+          evaluationContext.setVariables(map);
+        } else {
+          evaluationContext.setRootObject(object);
+        }
         if (!ExpressionUtils.evaluateAsBoolean(enabledExpression,
           evaluationContext)) {
           return;

@@ -153,7 +153,7 @@ div.breadcrumb ul li a:hover {
   text-decoration: underline;
 }
 
-div.footerMenu {
+div.footer {
   clear: both;
   margin-top: 1em;
   border-top: 1px solid #999999;
@@ -161,6 +161,7 @@ div.footerMenu {
   color: #999999;
   font-size: 0.8em;
 }
+
 
 div.header div.title {
   font-size: 2em;

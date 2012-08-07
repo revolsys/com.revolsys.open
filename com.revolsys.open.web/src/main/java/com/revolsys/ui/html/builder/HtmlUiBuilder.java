@@ -850,7 +850,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return builderFactory;
   }
 
-
   public Map<String, Boolean> getDataTableSortOrder(
     final HttpServletRequest request) {
     final Map<String, Boolean> sortOrder = new LinkedHashMap<String, Boolean>();
@@ -873,6 +872,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         } else {
           columnName = columnNames[0];
         }
+        columnName = JavaBeanUtil.getFirstName(columnName);
         final String sSortDir = request.getParameter("sSortDir_" + i);
         final Boolean sortDir = "asc".equalsIgnoreCase(sSortDir);
         sortOrder.put(columnName, sortDir);

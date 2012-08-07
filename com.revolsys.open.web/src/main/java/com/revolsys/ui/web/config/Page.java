@@ -272,10 +272,15 @@ public class Page extends Component {
       }
     }
     if (canAccess(uriParameters)) {
-      final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
-      final URI path = uriTemplate.expand(uriTemplateVariables);
-      final String url = UrlUtil.getUrl(path, uriParameters);
-      return getAbsoluteUrl(PathAliasController.getPath(url));
+      try {
+        final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
+        final URI path = uriTemplate.expand(uriTemplateVariables);
+        final String url = UrlUtil.getUrl(path, uriParameters);
+        return getAbsoluteUrl(PathAliasController.getPath(url));
+      } catch (IllegalArgumentException e) {
+        LOG.debug("Unable to expand variables for " + uriTemplate, e);
+        return null;
+      }
     } else {
       return null;
     }
