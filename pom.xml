@@ -56,6 +56,7 @@
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.gis.google.fusiontables</module>
     <module>war-overlay</module>
+    <module>famfamfam-silk</module>
   </modules>
 
   <build>
