@@ -39,7 +39,7 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
       return dataObjectStore;
     } catch (final URISyntaxException e) {
       throw new IllegalArgumentException("Url is not valid " + url, e);
-    }
+    } 
   }
 
   @Override

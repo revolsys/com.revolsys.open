@@ -10,7 +10,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
@@ -23,8 +22,7 @@ public class LineSegment extends AbstractCoordinatesList {
 
   private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
 
-  public static void visit(
-    final LineString line,
+  public static void visit(final LineString line,
     final Visitor<LineSegment> visitor) {
     final CoordinatesList coords = CoordinatesListUtil.get(line);
     Coordinates previousCoordinate = coords.get(0);
@@ -82,6 +80,14 @@ public class LineSegment extends AbstractCoordinatesList {
       line.getNumPoints() - 1));
   }
 
+  public LineSegment(GeometryFactory geometryFactory, final LineSegment line) {
+    this(geometryFactory, line.get(0), line.get(1));
+  }
+
+  public LineSegment(final LineSegment line) {
+    this(line.get(0), line.get(1));
+  }
+
   public double angle() {
     return Math.atan2(coordinates2.getY() - coordinates1.getY(),
       coordinates2.getX() - coordinates1.getX());
@@ -122,10 +128,8 @@ public class LineSegment extends AbstractCoordinatesList {
 
   }
 
-  private Coordinates getCrossing(
-    final Coordinates coordinates1,
-    final Coordinates coordinates2,
-    final BoundingBox boundingBox) {
+  private Coordinates getCrossing(final Coordinates coordinates1,
+    final Coordinates coordinates2, final BoundingBox boundingBox) {
     Coordinates intersection = null;
     final Polygon polygon = boundingBox.toPolygon(1);
     final LineString ring = polygon.getExteriorRing();
@@ -244,8 +248,7 @@ public class LineSegment extends AbstractCoordinatesList {
     return coordinates1 == null || coordinates2 == null;
   }
 
-  public boolean isPointOnLineMiddle(
-    final Coordinates point,
+  public boolean isPointOnLineMiddle(final Coordinates point,
     final double maxDistance) {
     return LineSegmentUtil.isPointOnLineMiddle(coordinates1, coordinates2,
       point, maxDistance);
@@ -261,8 +264,7 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public void setElevationOnPoint(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates point) {
+    final CoordinatesPrecisionModel precisionModel, final Coordinates point) {
     final double z = getElevation(point);
     point.setZ(z);
     precisionModel.makePrecise(point);

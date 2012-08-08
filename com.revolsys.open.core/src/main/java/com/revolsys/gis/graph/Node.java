@@ -36,14 +36,12 @@ public class Node<T> extends AbstractCoordinates {
     return points;
   }
 
-  public static <V> int getEdgeIndex(
-    final List<Edge<V>> edges,
+  public static <V> int getEdgeIndex(final List<Edge<V>> edges,
     final Edge<V> edge) {
     return edges.indexOf(edge);
   }
 
-  public static <T> Set<Edge<T>> getEdgesBetween(
-    final Node<T> node0,
+  public static <T> Set<Edge<T>> getEdgesBetween(final Node<T> node0,
     final Node<T> node1) {
     final Set<Edge<T>> commonEdges = new HashSet<Edge<T>>();
     if (node1 == null) {
@@ -63,10 +61,8 @@ public class Node<T> extends AbstractCoordinates {
     return commonEdges;
   }
 
-  public static <T> Collection<Edge<T>> getEdgesBetween(
-    final String typePath,
-    final Node<T> node0,
-    final Node<T> node1) {
+  public static <T> Collection<Edge<T>> getEdgesBetween(final String typePath,
+    final Node<T> node0, final Node<T> node1) {
     final Collection<Edge<T>> edges = getEdgesBetween(node0, node1);
     for (final Iterator<Edge<T>> edgeIter = edges.iterator(); edgeIter.hasNext();) {
       final Edge<T> edge = edgeIter.next();
@@ -77,18 +73,15 @@ public class Node<T> extends AbstractCoordinates {
     return edges;
   }
 
-  public static <V> Edge<V> getNextEdge(
-    final List<Edge<V>> edges,
+  public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges,
     final Edge<V> edge) {
     final int index = getEdgeIndex(edges, edge);
     final int nextIndex = (index + 1) % edges.size();
     return edges.get(nextIndex);
   }
 
-  public static <T> boolean hasEdgesBetween(
-    final String typePath,
-    final Node<T> node0,
-    final Node<T> node1) {
+  public static <T> boolean hasEdgesBetween(final String typePath,
+    final Node<T> node0, final Node<T> node1) {
     if (node1 == null) {
       return false;
     }
@@ -123,11 +116,11 @@ public class Node<T> extends AbstractCoordinates {
 
   private Graph<T> graph;
 
+  private final int id;
+
   private int[] inEdgeIds = new int[0];
 
   private int[] outEdgeIds = new int[0];
-
-  private final int id;
 
   private double x;
 
@@ -365,6 +358,12 @@ public class Node<T> extends AbstractCoordinates {
       }
     }
     return edges;
+  }
+
+  public Point getPoint() {
+    Graph<T> graph = getGraph();
+    GeometryFactory geometryFactory = graph.getGeometryFactory();
+    return geometryFactory.createPoint(this);
   }
 
   public double getValue(final int index) {

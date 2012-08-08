@@ -188,7 +188,7 @@ public class LineStringGraphTest {
   // public void testIntersectionTrueCloseMiddleMiddle() {
   // final LineString line1 =
   // geometryFactory.createGeometry("LINESTRING(800000 1000000.001,800010 1000000.0005,800020 1000000)");
-  // final LineStringGraph graph = new LineStringGraph(line1);
+  // final GeometryGraph graph = new GeometryGraph(line1);
   // final LineString line2 =
   // geometryFactory.createGeometry("LINESTRING(800000 1000000,800010 1000000,800020 1000000)");
   //
