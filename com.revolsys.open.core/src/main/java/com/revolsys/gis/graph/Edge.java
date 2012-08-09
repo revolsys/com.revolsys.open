@@ -220,6 +220,10 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   public int compareTo(final Edge<T> edge) {
     if (this == edge) {
       return 0;
+    } else if (isRemoved()) {
+      return 1;
+    } else if (edge.isRemoved()) {
+      return -1;
     } else {
       final Node<T> otherFromNode = edge.getFromNode();
       final Node<T> fromNode = getFromNode();

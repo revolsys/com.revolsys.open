@@ -178,7 +178,7 @@ public class Graph<T> {
     final T object, final CoordinatesList points) {
     final LineString newLine = geometryFactory.createLineString(points);
     final T newObject = clone(object, newLine);
-    final Edge<T> newEdge = add(newObject, newLine);
+    final Edge<T> newEdge = addMerged(newObject, newLine);
     return newEdge;
   }
 
@@ -607,6 +607,8 @@ public class Graph<T> {
   public Edge<T> merge(final Node<T> node, final Edge<T> edge1,
     final Edge<T> edge2) {
     if (edge1 != edge2 && edge1.hasNode(node) && edge2.hasNode(node)) {
+      Map<String, Object> attributes1 = edge1.getAttributes();
+      Map<String, Object> attributes2 = edge2.getAttributes();
       final T object1 = edge1.getObject();
       final LineString line1 = edge1.getLine();
       remove(edge1);
@@ -617,12 +619,18 @@ public class Graph<T> {
       final LineString newLine = LineStringUtil.merge(line1, line2);
 
       final T mergedObject = clone(object1, newLine);
-      final Edge<T> newEdge = add(mergedObject, newLine);
+      final Edge<T> newEdge = addMerged(mergedObject, newLine);
+      newEdge.addAttributes(attributes2);
+      newEdge.addAttributes(attributes1);
       return newEdge;
     } else {
       return null;
     }
 
+  }
+
+  protected Edge<T> addMerged(final T mergedObject, final LineString newLine) {
+    return add(mergedObject, newLine);
   }
 
   /**
@@ -823,7 +831,7 @@ public class Graph<T> {
       for (int i = 0; i < lines.getNumGeometries(); i++) {
         final LineString line = (LineString)lines.getGeometryN(i);
         final T newObject = clone(object, line);
-        final Edge<T> newEdge = add(newObject, line);
+        final Edge<T> newEdge = addMerged(newObject, line);
         edges.add(newEdge);
       }
       return edges;
@@ -836,7 +844,7 @@ public class Graph<T> {
     if (!edge.isRemoved()) {
       final T object = edge.getObject();
       final T newObject = clone(object, line);
-      final Edge<T> newEdge = add(newObject, line);
+      final Edge<T> newEdge = addMerged(newObject, line);
       remove(edge);
       return newEdge;
     } else {
@@ -852,7 +860,7 @@ public class Graph<T> {
       remove(edge);
       for (final LineString line : lines) {
         final T newObject = clone(object, line);
-        final Edge<T> newEdge = add(newObject, line);
+        final Edge<T> newEdge = addMerged(newObject, line);
         edges.add(newEdge);
       }
       return edges;

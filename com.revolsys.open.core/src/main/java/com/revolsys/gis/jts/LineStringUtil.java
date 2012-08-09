@@ -268,7 +268,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     double minDistance = Double.MAX_VALUE;
     double x1 = coordinates.getX(0);
-    double y1 = coordinates.getX(0);
+    double y1 = coordinates.getY(0);
     for (int i = 1; i < coordinates.size(); i++) {
       final double x2 = coordinates.getX(i);
       final double y2 = coordinates.getY(i);

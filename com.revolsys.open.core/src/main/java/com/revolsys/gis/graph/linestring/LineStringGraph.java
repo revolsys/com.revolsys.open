@@ -93,6 +93,13 @@ public class LineStringGraph extends Graph<LineSegment> {
     return new LineSegment(line);
   }
 
+  @Override
+  protected Edge<LineSegment> addMerged(LineSegment mergedObject,
+    LineString newLine) {
+    LineString mergedLine = mergedObject.getLine();
+    return add(mergedObject, mergedLine);
+  }
+
   public LineString getLine() {
     final Set<Edge<LineSegment>> processedEdges = new HashSet<Edge<LineSegment>>();
     final DoubleListCoordinatesList newPoints = new DoubleListCoordinatesList(
@@ -164,8 +171,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public Map<Edge<LineSegment>, List<Node<LineSegment>>> getPointsOnEdges(
-    final Graph<LineSegment> graph1,
-    final double tolerance) {
+    final Graph<LineSegment> graph1, final double tolerance) {
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = new HashMap<Edge<LineSegment>, List<Node<LineSegment>>>();
     for (final Edge<LineSegment> edge : getEdges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
@@ -372,8 +378,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   @Override
-  public void nodeMoved(
-    final Node<LineSegment> node,
+  public void nodeMoved(final Node<LineSegment> node,
     final Node<LineSegment> newNode) {
     if (fromPoint.equals2d(node)) {
       fromPoint = new DoubleCoordinates(newNode);
@@ -414,15 +419,13 @@ public class LineStringGraph extends Graph<LineSegment> {
     setPrecisionModel(geometryFactory);
   }
 
-  public void setIndex(
-    final Edge<LineSegment> edge,
+  public void setIndex(final Edge<LineSegment> edge,
     final Edge<LineSegment> newEdge) {
     final Integer index = edge.getAttribute(INDEX);
     newEdge.setAttribute(INDEX, index);
   }
 
-  public void setIndex(
-    final Edge<LineSegment> edge,
+  public void setIndex(final Edge<LineSegment> edge,
     final List<Edge<LineSegment>> splitEdges) {
     for (final Edge<LineSegment> splitEdge : splitEdges) {
       setIndex(edge, splitEdge);
@@ -484,8 +487,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   @Override
   public <V extends Coordinates> List<Edge<LineSegment>> splitEdge(
-    final Edge<LineSegment> edge,
-    final Collection<V> nodes) {
+    final Edge<LineSegment> edge, final Collection<V> nodes) {
     final List<Edge<LineSegment>> newEdges = new ArrayList<Edge<LineSegment>>();
     if (!edge.isRemoved()) {
       final Node<LineSegment> fromNode = edge.getFromNode();

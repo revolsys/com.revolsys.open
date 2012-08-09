@@ -5,13 +5,13 @@ import java.util.Comparator;
 import com.revolsys.gis.graph.Edge;
 
 public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
-  private String attributeName;
+  private String[] attributeNames;
 
   public EdgeAttributeValueComparator() {
   }
 
-  public EdgeAttributeValueComparator(final String attributeName) {
-    this.attributeName = attributeName;
+  public EdgeAttributeValueComparator(final String... attributeNames) {
+    this.attributeNames = attributeNames;
   }
 
   public int compare(final Edge<T> edge1, final Edge<T> edge2) {
@@ -22,35 +22,27 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
     } else if (edge2.isRemoved()) {
       return -11;
     } else {
-      final Comparable<Object> object1 = edge1.getAttribute(attributeName);
-
-      final Object object2 = edge2.getAttribute(attributeName);
-      if (object1 == null) {
-        if (object2 == null) {
-          return 0;
+      for (String attributeName : attributeNames) {
+        final Comparable<Object> object1 = edge1.getAttribute(attributeName);
+        final Object object2 = edge2.getAttribute(attributeName);
+        if (object1 == null) {
+          if (object2 != null) {
+            return 1;
+          }
+        } else if (object2 == null) {
+          return -1;
         } else {
-          return 1;
+          int compare = object1.compareTo(object2);
+          if (compare != 0) {
+            return compare;
+
+          }
         }
-      } else if (object2 == null) {
-        return -1;
-      } else {
-        int compare = object1.compareTo(object2);
-        if (compare == 0) {
-          final Integer id1 = edge1.getId();
-          final Integer id2 = edge2.getId();
-          compare = id1.compareTo(id2);
-        }
-        return compare;
       }
+      final Integer id1 = edge1.getId();
+      final Integer id2 = edge2.getId();
+      return id1.compareTo(id2);
     }
-  }
-
-  public String getAttributeName() {
-    return attributeName;
-  }
-
-  public void setAttributeName(final String propertyName) {
-    this.attributeName = propertyName;
   }
 
 }
