@@ -67,8 +67,7 @@ public class DataObjectReaderHttpMessageConverter extends
   }
 
   @Override
-  public DataObjectReader read(
-    final Class<? extends DataObjectReader> clazz,
+  public DataObjectReader read(final Class<? extends DataObjectReader> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -113,9 +112,7 @@ public class DataObjectReaderHttpMessageConverter extends
   }
 
   @Override
-  public void write(
-    final DataObjectReader reader,
-    final MediaType mediaType,
+  public void write(final DataObjectReader reader, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     MediaType actualMediaType;
@@ -128,7 +125,8 @@ public class DataObjectReaderHttpMessageConverter extends
       Charset charset = actualMediaType.getCharSet();
       if (charset == null) {
         charset = DEFAULT_CHARSET;
-        actualMediaType = new MediaType(actualMediaType, Collections.singletonMap("charset", charset.name()));
+        actualMediaType = new MediaType(actualMediaType,
+          Collections.singletonMap("charset", charset.name()));
       }
       final String mediaTypeString = actualMediaType.getType() + "/"
         + actualMediaType.getSubtype();

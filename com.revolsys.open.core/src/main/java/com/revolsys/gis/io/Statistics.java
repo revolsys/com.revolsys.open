@@ -101,8 +101,13 @@ public class Statistics {
   }
 
   public synchronized void logCounts() {
-    int totalCount = 0;
     final StringBuffer sb = new StringBuffer();
+    addCountsText(sb);
+    log.info(sb.toString());
+  }
+
+  public synchronized void addCountsText(StringBuffer sb) {
+    int totalCount = 0;
     if (message != null) {
       sb.append(message);
     }
@@ -119,7 +124,6 @@ public class Statistics {
     sb.append("\t");
     sb.append(totalCount);
     sb.append("\n");
-    log.info(sb.toString());
   }
 
   public void setMessage(final String message) {

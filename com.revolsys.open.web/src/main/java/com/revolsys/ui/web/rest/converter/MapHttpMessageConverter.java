@@ -36,8 +36,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
   }
 
   @Override
-  public Map read(
-    final Class<? extends Map> clazz,
+  public Map read(final Class<? extends Map> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -55,9 +54,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public void write(
-    final Map map,
-    final MediaType mediaType,
+  public void write(final Map map, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     Charset charset = mediaType.getCharSet();

@@ -28,7 +28,7 @@ import com.revolsys.ui.html.view.ElementContainer;
 public abstract class Field extends Element {
   private String name = "";
 
-  private List validationErrors = Collections.EMPTY_LIST;
+  private List<String> validationErrors = Collections.emptyList();
 
   private Object value;
 
@@ -48,7 +48,7 @@ public abstract class Field extends Element {
 
   public void addValidationError(final String error) {
     if (!hasValidationErrors()) {
-      validationErrors = new ArrayList();
+      validationErrors = new ArrayList<String>();
     }
     validationErrors.add(error);
   }
@@ -79,7 +79,7 @@ public abstract class Field extends Element {
     return name;
   }
 
-  public List getValidationErrors() {
+  public List<String> getValidationErrors() {
     return validationErrors;
   }
 

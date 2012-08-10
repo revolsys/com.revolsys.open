@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +40,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 
-import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.json.JsonMapIoFactory;
@@ -115,8 +115,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  private Map<String, List<List<Object>>> listSortOrder = new HashMap<String, List<List<Object>>>();
-
   private BeanFactory beanFactory;
 
   private HtmlUiBuilderFactory builderFactory;
@@ -141,6 +139,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   protected Map<String, KeySerializer> keySerializers = new HashMap<String, KeySerializer>();
 
   private Map<String, String> labels = new HashMap<String, String>();
+
+  private Map<String, List<List<Object>>> listSortOrder = new HashMap<String, List<List<Object>>>();
 
   private Logger log = Logger.getLogger(getClass());
 
@@ -228,10 +228,15 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void addDataTable(final ElementContainer container,
     final String builderName, final String pageName,
-    final int dataHeightPixels, boolean open) {
+    final int dataHeightPixels, boolean open, boolean serverSide) {
     final HtmlUiBuilder<?> builder = getBuilder(builderName);
     if (builder != null) {
-      Map<String, Boolean> parameters = Collections.singletonMap("open", open);
+      Map<String, Object> parameters = new HashMap<String, Object>();
+      parameters.put("open", open);
+      parameters.put("serverSide", serverSide);
+       if (!open) {
+        parameters.put("deferLoading", 0);
+      }
       final ElementContainer element = builder.createDataTable(getRequest(),
         pageName, dataHeightPixels, parameters);
       if (element != null) {
@@ -301,25 +306,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     nullLabels.put(key, label);
   }
 
-  public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Collection<? extends Object> rows) {
-    String search = request.getParameter("sSearch");
-    if (search == null) {
-      Map<String, Object> parameters = Collections.emptyMap();
-      return createDataTable(request, pageName, 400, parameters);
+  public ElementContainer createDataTable(final HttpServletRequest request,
+    final String pageName, final int dataHeightPixels,
+    final Map<String, ? extends Object> parameters) {
+    String pageUrl = getPageUrl(pageName);
+    if (StringUtils.hasText(pageUrl)) {
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.putAll(parameters);
+      params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
+      List<T> rows = Collections.emptyList();
+      return createDataTable(request, pageName, dataHeightPixels, params, rows);
     } else {
-      return createDataTableMap(request, rows, pageName);
-    }
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName, Map<String, Object> parameters,
-    Collection<? extends Object> rows) {
-    String search = request.getParameter("sSearch");
-    if (search == null) {
-      return createDataTable(request, pageName, 400, parameters);
-    } else {
-      return createDataTableMap(request, rows, pageName);
+      return null;
     }
   }
 
@@ -330,10 +328,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
     final RowsTableSerializer model = new KeySerializerTableSerializer(
       serializers, rows);
-    final String title = getPageTitle(pageName);
-    if (request.getAttribute("title") == null) {
-      request.setAttribute("title", title);
-    }
+    final String title = setPageTitle(request, pageName);
     final String typeName = getTypeName();
     final TableView tableView = new TableView(model, typeName);
     String tableId = typeName + "_" + pageName;
@@ -349,13 +344,20 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     tableParams.put("iDisplayLength", 50);
     tableParams.put("aaSorting", getListSortOrder(pageName));
 
+    Boolean serverSide = (Boolean)parameters.get("serverSide");
     final String ajaxSource = (String)parameters.get("ajaxSource");
     if (StringUtils.hasText(ajaxSource)) {
+      if (serverSide == null) {
+        serverSide = true;
+      }
+
+      tableParams.put("iDeferLoading", parameters.get("deferLoading"));
       tableParams.put("bProcessing", true);
-      tableParams.put("bServerSide", true);
+      tableParams.put("bServerSide", serverSide);
       tableParams.put("sAjaxSource", ajaxSource);
+    } else if (serverSide == null) {
+      serverSide = false;
     }
-    tableParams.putAll(parameters);
 
     final List<Map<String, Object>> columnDefs = new ArrayList<Map<String, Object>>();
     int i = 0;
@@ -363,6 +365,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Map<String, Object> columnDef = new LinkedHashMap<String, Object>();
       columnDef.put("aTargets", Arrays.asList(i));
       columnDef.put("sName", serializer.getKey());
+      columnDef.put("sClass", serializer.getKey());
       columnDef.put("sTitle", serializer.getLabel());
 
       final Boolean sortable = serializer.getProperty("sortable");
@@ -394,14 +397,17 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
       + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}}";
-    script.setContent("$(document).ready(function() {\n"
-      + "var table =$('#"
-      + tableId
-      + " table').dataTable("
-      + jsonMap
-      + "\n );\n"
-      + "table.closest('.ui-accordion').bind('accordionchange', function() {table.fnDraw();});\n"
-      + "});");
+    StringBuffer scriptBody = new StringBuffer();
+    scriptBody.append("$(document).ready(function() {\n");
+    scriptBody.append("var table = $('#");
+    scriptBody.append(tableId);
+    scriptBody.append(" table').dataTable(");
+    scriptBody.append(jsonMap);
+    scriptBody.append("\n );\n");
+    scriptBody.append("table.closest('.ui-accordion').bind('accordionchange', function() {table.fnDraw();});\n");
+    scriptBody.append("$(window).resize(function() {table.fnDraw();});\n");
+    scriptBody.append("});");
+    script.setContent(scriptBody.toString());
     final ElementContainer container = new ElementContainer(tableView, script);
     Boolean open = (Boolean)parameters.get("open");
     if (open == null) {
@@ -417,31 +423,52 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return container;
   }
 
-  public ElementContainer createDataTable(final HttpServletRequest request,
-    final String pageName, final int dataHeightPixels,
-    final Map<String, ? extends Object> parameters) {
-    String pageUrl = getPageUrl(pageName);
-    if (StringUtils.hasText(pageUrl)) {
-      Map<String, Object> params = new HashMap<String, Object>();
-      params.putAll(parameters);
-      params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
-      List<T> rows = Collections.emptyList();
-      return createDataTable(request, pageName, dataHeightPixels, params, rows);
+  public String setPageTitle(final HttpServletRequest request,
+    final String pageName) {
+    final String title = getPageTitle(pageName);
+    if (request.getAttribute("pageTitle") == null) {
+      request.setAttribute("title", title);
+      request.setAttribute("pageTitle", title);
+    }
+    return title;
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName, Collection<? extends Object> rows) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    return createDataTableHandler(request, pageName, parameters, rows);
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName, Map<String, Object> parameters,
+    Collection<? extends Object> rows) {
+    parameters.put("serverSide", false);
+    if (request.getParameter("_") == null) {
+      return createDataTable(request, pageName, 400, parameters);
     } else {
-      return null;
+      return createDataTableMap(request, rows, pageName);
     }
   }
 
-  public List<List<Object>> getListSortOrder(final String pageName) {
-    List<List<Object>> sortOrder = listSortOrder.get(pageName);
-    if (sortOrder == null) {
-      if (pageName.equals("list")) {
-        return Collections.emptyList();
-      } else {
-        return getListSortOrder("list");
-      }
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName, Callable<Collection<? extends Object>> rowsCallable) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    return createDataTableHandler(request, pageName, parameters, rowsCallable);
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName, Map<String, Object> parameters,
+    Callable<Collection<? extends Object>> rowsCallable) {
+    parameters.put("serverSide", false);
+    if (request.getParameter("_") == null) {
+      return createDataTable(request, pageName, 400, parameters);
     } else {
-      return sortOrder;
+      try {
+        Collection<? extends Object> rows = rowsCallable.call();
+        return createDataTableMap(request, rows, pageName);
+      } catch (Exception e) {
+        throw new RuntimeException("Unable to get rows", e);
+      }
     }
   }
 
@@ -493,9 +520,23 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Object> createDataTableMap(
     final HttpServletRequest request,
-    final Collection<? extends Object> results, final String pageName) {
-    ListResultPager<Object> pager = new ListResultPager<Object>(results);
-    return createDataTableMap(request, pager, pageName);
+    final Collection<? extends Object> records, final String pageName) {
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+
+    final List<List<String>> rows = new ArrayList<List<String>>();
+    for (final Object object : records) {
+      final List<String> row = new ArrayList<String>();
+      for (final KeySerializer serializer : serializers) {
+        final String html = serializer.toString(object);
+        row.add(html);
+      }
+      rows.add(row);
+    }
+
+    final Map<String, Object> response = new LinkedHashMap<String, Object>();
+    response.put("aaData", rows);
+    return response;
+
   }
 
   public ElementContainer createDetailView(final Object object,
@@ -519,13 +560,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public Element createDetailView(final Object object, final String cssClass,
     final String keyList) {
     return createDetailView(object, cssClass, getKeyList(keyList));
-  }
-
-  public FilterableTableView createFilterableTableView(
-    final List<KeySerializer> serializers) {
-    final KeySerializerTableSerializer model = new KeySerializerTableSerializer(
-      serializers);
-    return new FilterableTableView(model, "objectList " + typeName);
   }
 
   /**
@@ -715,8 +749,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         final List<KeySerializer> serializers = getSerializers(pageName, "view");
         final Element detailView = createDetailView(object, serializers);
 
-        final String title = page.getExpandedTitle();
-        request.setAttribute("title", title);
+        setPageTitle(request, pageName);
 
         final Menu actionMenu = new Menu();
         addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
@@ -1059,6 +1092,19 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, List<List<Object>>> getListSortOrder() {
     return listSortOrder;
+  }
+
+  public List<List<Object>> getListSortOrder(final String pageName) {
+    List<List<Object>> sortOrder = listSortOrder.get(pageName);
+    if (sortOrder == null) {
+      if (pageName.equals("list")) {
+        return Collections.emptyList();
+      } else {
+        return getListSortOrder("list");
+      }
+    } else {
+      return sortOrder;
+    }
   }
 
   public int getMaxPageSize() {
@@ -1616,12 +1662,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void setTitle(final String typeLabel) {
     this.title = typeLabel;
-  }
-
-  public void setTitleAttribute(final HttpServletRequest request,
-    final String pageName) {
-    final String title = getPageTitle(pageName);
-    request.setAttribute("title", title);
   }
 
   public void setTypeName(final String typeName) {

@@ -31,9 +31,7 @@ public class StatisticsMap {
 
   }
 
-  public void add(
-    final String statisticName,
-    final DataObject object,
+  public void add(final String statisticName, final DataObject object,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(object, count);
@@ -44,9 +42,7 @@ public class StatisticsMap {
     statistics.add(type);
   }
 
-  public void add(
-    final String statisticName,
-    final DataObjectMetaData type,
+  public void add(final String statisticName, final DataObjectMetaData type,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type, count);
@@ -62,9 +58,7 @@ public class StatisticsMap {
     statistics.add(name);
   }
 
-  public void add(
-    final String statisticName,
-    final String path,
+  public void add(final String statisticName, final String path,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(path, count);
@@ -87,6 +81,18 @@ public class StatisticsMap {
 
   public String getPrefix() {
     return prefix;
+  }
+
+  public synchronized String getCountsText() {
+    StringBuffer sb = new StringBuffer();
+    addCountsText(sb);
+    return sb.toString();
+  }
+
+  public synchronized void addCountsText(StringBuffer sb) {
+    for (Statistics stats : statisticsMap.values()) {
+      stats.addCountsText(sb);
+    }
   }
 
   public synchronized Statistics getStatistics(final String statisticName) {

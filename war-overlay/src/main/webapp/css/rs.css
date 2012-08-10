@@ -2,67 +2,66 @@ body {
   color: black;
   font-size: 0.9em;
   font-family: sans-serif;
-  margin: 0px;
   border: 0px;
 }
 
-h1 {
-  color: #039;
-  font-family: sans-serif;
+div.header div.title,h1 {
+  color: #003399;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
   line-height: 1;
   font-size: 1.6em;
-  margin-bottom: 12px;
+  margin-bottom: 0.5em;
+  line-height: 1;
 }
 
 h2 {
-  color: #039;
-  font-family: sans-serif;
+  color: #003399;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-weight: bold;
   line-height: 1;
   font-style: italic;
   font-size: 1.4em;
-  margin-bottom: 12px;
-}
-
-h2.subhead {
-  color: #039;
-  font-family: sans-serif;
-  line-height: 1;
-  font-weight: normal;
-  color: #999;
-  margin: -9px 0 12px 0;
+  margin-bottom: 0.5em;
 }
 
 h3 {
-  color: #039;
-  font-family: sans-serif;
+  color: #003399;
+  font-weight: bold;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
   line-height: 1;
   font-size: 1.2em;
-  margin-bottom: 12px;
+  margin-bottom: 0.5em;
 }
 
 h4 {
-  color: #039;
-  font-family: sans-serif;
+  color: #003399;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
   line-height: 1;
   font-size: 1.1em;
   font-style: italic;
-  margin-bottom: 12px;
+  margin-bottom: 0.5em;
 }
 
 h5 {
-  color: #039;
-  font-family: sans-serif;
+  color: #003399;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
   line-height: 1;
   font-size: 1em;
-  margin-bottom: 12px;
+  margin-bottom: 0.5em;
 }
 
 h6 {
-  font-family: sans-serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
   line-height: 1;
   font-size: 1em;
   font-style: italic;
-  margin-bottom: 12px;
+  margin-bottom: 0.5em;
 }
 
 th,td {
@@ -84,7 +83,38 @@ td.actions form {
 }
 
 div.body {
-  margin: 0px auto 0px auto;
+  margin: 0px;
+}
+
+div.columns_2_2 {
+  clear: left;
+  float: left;
+  width: 100%;
+  overflow: hidden;
+}
+
+div.columns_2_1 {
+  clear: left;
+  float: left;
+  width: 100%;
+  position: relative;
+  right: 82%;
+}
+
+div.column_2_1 {
+  float: left;
+  width: 18%;
+  position: relative;
+  left: 82%;
+  overflow: hidden;
+}
+
+div.column_2_2 {
+  float: left;
+  width: 82%;
+  position: relative;
+  left: 82%;
+  overflow: hidden;
 }
 
 div.error {
@@ -97,15 +127,17 @@ div.bodyContainer {
 }
 
 div.bodyContent {
-  margin: 0px 0px 0px 14.5em;
+  margin: 0px;
 }
 
 div.header {
-  background-color: #a2c8ff;
-  border: 2px solid #6699CC;
+  background: #d7ebf9 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png) 50% 50% repeat-x;
+  border: 2px solid #aed0ea;
+  border-radius: 0.5em;
   color: #0046a0;
-  padding: 5px 10px 5px 10px;
-  margin-bottom: 0.5em;
+  padding: 1em 1em 0.5em 1em;
+  margin: 0.5em;
+  color: #0046a0;
 }
 
 div.headerContent {
@@ -123,7 +155,6 @@ div.breadcrumbs {
 }
 
 div.breadcrumb {
-  margin-left: 13.5em;
   padding: 1px 2px 1px 2px;
 }
 
@@ -155,16 +186,35 @@ div.breadcrumb ul li a:hover {
 
 div.footer {
   clear: both;
-  margin-top: 1em;
-  border-top: 1px solid #999999;
-  padding: 1px 2px 1px 2px;
-  color: #999999;
+  background: #d7ebf9 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png) 50% 50% repeat-x;
+  border: 2px solid #aed0ea;
+  border-radius: 0.5em;
+  color: #0046a0;
+  padding: 0.4em 1em 0.4em 1em;
   font-size: 0.8em;
+  margin: 0.5em;
 }
 
+div.footer div.title {
+  float: left;
+  font-weight: normal;
+}
 
-div.header div.title {
-  font-size: 2em;
+div.footer ul {
+  text-align: right;
+  margin: 0em;
+  list-style: none outside none;
+  padding: 0em;
+}
+
+div.footer ul li {
+  display: inline;
+}
+
+div.footer a {
+  color: #0046a0;
+  padding: 0.3em;
+  text-decoration: none;
 }
 
 input.submit {
@@ -202,12 +252,12 @@ div.actionMenu ul li a {
   white-space: nowrap;
 }
 
-div.form > form > div > div.objectList {
+div.form>form>div>div.objectList {
   border-left-width: 0px;
   border-right-width: 0px;
 }
 
-div.form > form > div > div.objectList > table.data {
+div.form>form>div>div.objectList>table.data {
   border-left-width: 0px;
   border-right-width: 0px;
   padding-left: 0px;
@@ -222,88 +272,67 @@ div.table div.title {
   margin-bottom: 12px;
 }
 
-div.form > form > div.objectView > table.data {
+div.form>form>div.objectView>table.data {
   border-width: 0px;
   padding: 0px;
 }
 
 div.objectView {
-  border: 1px solid #666666;
+  border: 2px solid #aed0ea;
+  border-radius: 0.5em;
   width: auto;
 }
 
-div.objectView > table.data {
-  border: 2px solid #6699CC;
-  padding: 1px;
+div.objectView>table.data {
+  border-spacing: 0px;
+  margin: 0px;
   width: 100%;
+  margin: 0px;
 }
 
-div.objectView > table.data > tbody > tr > th {
-  background-color: #a2c8ff;
+div.objectView>table.data>tbody>tr:first-child>th:first-child {
+  border-top-left-radius: 0.4em;
+}
+
+div.objectView>table.data>tbody>tr:first-child>td:last-child {
+  border-top-right-radius: 0.4em;
+}
+
+div.objectView>table.data>tbody>tr:last-child>th:first-child {
+  border-bottom-left-radius: 0.4em;
+}
+
+div.objectView>table.data>tbody>tr:last-child>td:last-child {
+  border-bottom-right-radius: 0.4em;
+}
+
+div.objectView>table.data>tbody>tr>th {
+  background-color: #d7ebf9;
   border-bottom: 1px solid white;
-  padding: 3px 4px 3px 4px;
-  text-align: left;
+  padding: 0.3em 0.4em 0.3em 0.4em;
+  text-align: right;
 }
 
-div.objectView > table.data > tbody > tr > td {
+div.objectView>table.data>tbody>tr>td {
   border-bottom: 1px solid #cccccc;
-  padding: 3px 4px 3px 4px;
+  padding: 0.3em 0.4em 0.3em 0.4em;
 }
 
-div.objectView > table.data > tbody > tr.even > td {
+div.objectView>table.data>tbody>tr:nth-of-type(even)>td {
   background-color: #eeeeee;
 }
 
-div.objectView > table.data > tbody > tr.lastRow > th,div.objectView > table.data > tbody > tr.lastRow > td
+div.objectView>table.data>tbody>tr:last-child>th,div.objectView>table.data>tbody>tr:last-child>td
   {
   border-bottom-width: 0px;
 }
 
-div.pager {
-  
-}
-
-div.pager table {
-  width: 100%;
-}
-
-div.pager td {
-  padding: 2px 4px;
-  vertical-align: middle;
-}
-
-div.pager td.first,div.pager td.previous,div.pager td.next,div.pager td.last {
-  padding: 0px;
-  background-repeat: no-repeat;
-  background-position: center center;
-  width: 2.2em;
-}
-
-div.pager td.first a,div.pager td.previous a,div.pager td.next a,div.pager td.last a {
-  display: block;
-  text-decoration: none;
-  overflow: hidden;
-}
-
-div.pager span.selected {
-  font-weight: bold;
-}
-
-div.pager td.pages {
-  text-align: center;
-  min-width: 15em;
-}
-
-div.pager a {
-  color: #999999;
-}
 
 div.sideNav {
+  border: 2px solid #aed0ea;
+  border-radius: 0.5em;
+  color: #0046a0;
   margin: 0px 1em 1em 1em;
-  border: 2px solid #6699CC;
-  padding: 1px;
-  float: left;
-  width: 12em;
 }
 
 div.sideMenu {
@@ -311,30 +340,37 @@ div.sideMenu {
 }
 
 div.sideMenu div.title {
-  background-color: #a2c8ff;
-  color: #0046a0;
-  font-size: 1.1em;
+  border-top-left-radius: 0.4em;
+  border-top-right-radius: 0.4em;
+  background: #3baae3 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png) 50% 50% repeat-x;
+  color: #ffffff;
   font-weight: bold;
-  padding: 2px 3px 1px 3px;
+  padding: 0.2em 0.4em 0.2em 0.4em;
 }
 
 div.sideMenu div.title a {
-  color: #000000;
+  color: #ffffff;
   text-decoration: none;
 }
 
 div.sideMenu ul {
   list-style: none;
   margin: 0px;
-  padding: 1px;
+  padding: 0px;
 }
 
 div.sideMenu ul li:nth-of-type(even) {
   background-color: #eeeeee;
 }
 
+div.sideMenu ul li:last-child {
+  border-bottom-left-radius: 0.4em;
+  border-bottom-right-radius: 0.4em;
+}
+
 div.sideMenu ul li {
-  padding: 2px 3px 1px 3px;
+  padding: 0.2em 0.4em 0.2em 0.4em;
+  margin-left: 0px;
 }
 
 div.sideMenu ul li a {
@@ -371,20 +407,6 @@ form dl dd div.fieldDescription {
 }
 
 div.form {
-  border: 1px solid #666666;
-}
-
-div.form > div {
-  margin: 0px;
-  height: auto;
-  padding: 0px;
-}
-
-div.form > form > div {
-  margin: 0px;
-  height: auto;
-  border: 2px solid #6699CC;
-  padding: 1px;
 }
 
 div.form div.field {
@@ -410,11 +432,7 @@ div.form div.field div.label {
   vertical-align: top;
 }
 
-div.form div.field div.label label {
-  
-}
-
-div.form div:nth-of-type(1).field > div.label,div.form div:nth-of-type(1).field > div.contents
+div.form div:nth-of-type(1).field>div.label,div.form div:nth-of-type(1).field>div.contents
   {
   border-top-width: 0px;
 }
@@ -426,7 +444,7 @@ div.form div.field div.contents {
   background-color: white;
 }
 
-div.form div:nth-of-type(even).field > div.contents {
+div.form div:nth-of-type(even).field>div.contents {
   background-color: #eeeeee;
 }
 
@@ -445,7 +463,7 @@ div.form div.field div.instructions {
   background-color: white;
 }
 
-div.form div:nth-of-type(even).field > div.instructions {
+div.form div:nth-of-type(even).field>div.instructions {
   background-color: #eeeeee;
   color: #666666;
 }
@@ -459,7 +477,7 @@ div.form div.field div.errors {
   background-color: white;
 }
 
-div.form div:nth-of-type(even).field > div.errors {
+div.form div:nth-of-type(even).field>div.errors {
   background-color: #eeeeee;
 }
 
@@ -483,7 +501,7 @@ div.form div.required {
   padding-top: 3px;
 }
 
-div.jqueryTabs > div > iframe {
+div.jqueryTabs>div>iframe {
   margin: 0px;
   width: 100%;
   border: 0px;
@@ -524,15 +542,13 @@ button.ui-button-icon-only {
   line-height: 1.2em;
 }
 
-input.ui-button,
-.ui-button-text-only span.ui-button-text {
+input.ui-button,.ui-button-text-only span.ui-button-text {
   line-height: 1.2em;
   padding: 0.2em 0.4em;
 }
 
-table.dataTable thead th,
-table.dataTable tbody td {
-  padding: 0.2em 0.4em 0.2em 0.4em;  
+table.dataTable thead th,table.dataTable tbody td {
+  padding: 0.2em 0.4em 0.2em 0.4em;
 }
 
 div.ui-accordion {
@@ -545,37 +561,25 @@ div.ui-accordion div.section {
   padding: 2px 5px 0px 5px;
 }
 
-div.ui-accordion > div.ui-accordion-content {
+div.ui-accordion>div.ui-accordion-content {
   padding: 0.3em;
 }
 
-div.ui-accordion > div.ui-accordion-content > div.form {
+div.ui-accordion>div.ui-accordion-content>div.objectList {
   border-width: 0px;
 }
 
-div.ui-accordion > div.ui-accordion-content > div.form > form > div {
-  border-width: 0px;
-}
-
-div.ui-accordion > div.ui-accordion-content > div.objectList {
-  border-width: 0px;
-}
-
-div.ui-accordion > div.ui-accordion-content > div.objectList > table.data {
+div.ui-accordion>div.ui-accordion-content>div.objectList>table.data {
   border-width: 0px;
   padding: 0px;
 }
 
-div.ui-accordion > div.ui-accordion-content > div.objectView {
-  border-width: 0px;
-}
-
-div.ui-accordion > div.ui-accordion-content > div.objectView > table.data {
+div.ui-accordion>div.ui-accordion-content>div.objectView>table.data {
   border-width: 1px;
   padding: 0px;
 }
 
-div.ui-accordion > div.ui-accordion-content > iframe {
+div.ui-accordion>div.ui-accordion-content>iframe {
   margin: 0px;
   width: 100%;
   border: 0px;
@@ -587,28 +591,28 @@ html.collapsibleBox {
   margin: 0px;
 }
 
-html.collapsibleBox > body {
+html.collapsibleBox>body {
   margin: 0px;
 }
 
-html.collapsibleBox > body > div.form {
+html.collapsibleBox>body>div.form {
   border-width: 0px;
 }
 
-html.collapsibleBox > body > div.form > form > div {
+html.collapsibleBox>body>div.form>form>div {
   border-width: 0px;
 }
 
-html.collapsibleBox > body > div.ui-accordion {
+html.collapsibleBox>body>div.ui-accordion {
   border-width: 0px;
   margin: 0px;
 }
 
-html.collapsibleBox > body > div.ui-accordion > h3 {
+html.collapsibleBox>body>div.ui-accordion>h3 {
   display: none;
 }
 
-html.collapsibleBox > body > div.ui-accordion > div.ui-accordion-content {
+html.collapsibleBox>body>div.ui-accordion>div.ui-accordion-content {
   border-width: 0px;
   overflow: visible;
 }

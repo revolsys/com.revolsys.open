@@ -19,7 +19,16 @@ function resizeHeight(iframe) {
   };
 }(jQuery));
 
-function addConfirmButton(root, selector, icon, title, message) {
+function addConfirmButton(params) {
+  rsConfirmButtons.push(params);
+}
+
+function confirmButton(root, params) {
+  var selector = params['selector'];
+  var icon = params['icon'];
+  var title = params['title'];
+  var message = params['message'];
+
   $(selector, root).button({
     text : false,
     icons : {
@@ -49,17 +58,18 @@ function addConfirmButton(root, selector, icon, title, message) {
   });
 
 }
+var rsConfirmButtons = new Array();
+
 function refreshButtons(root) {
-  addConfirmButton(
-    root,
-    'button.delete',
-    'trash',
-    'Confirm Delete',
-    'Are you sure you want to delete this record?');
+  $(rsConfirmButtons).each(function() {
+    confirmButton(root, this);
+  });
+
   $('div.actionMenu a', root).button();
+
   $('.button', root).button();
 
-  $(':button', root).each(function() {
+  $(':button,:submit', root).each(function() {
     var button = $(this);
     var classes = button.attr('class');
     var icon = undefined;
@@ -83,7 +93,14 @@ function refreshButtons(root) {
     }
   });
 }
+
 $(document).ready(function() {
+  addConfirmButton({
+    selector : 'button.delete',
+    icon : 'trash',
+    title : 'Confirm Delete',
+    message : 'Are you sure you want to delete this record?'
+  });
   refreshButtons($(document));
   $('div.collapsibleBox').each(function() {
     var active;

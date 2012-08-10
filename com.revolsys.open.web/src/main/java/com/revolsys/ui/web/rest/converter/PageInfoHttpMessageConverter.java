@@ -157,7 +157,7 @@ public class PageInfoHttpMessageConverter extends
     }
   }
 
-  private void writeDescription(final XmlWriter writer,
+  private void writeInstructions(final XmlWriter writer,
     final ParameterInfo parameter) {
     final String description = parameter.getDescription();
     if (StringUtils.hasText(description)) {
@@ -262,37 +262,41 @@ public class PageInfoHttpMessageConverter extends
     if (value == null) {
       value = defaultValue;
     }
-    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.TR);
+    writer.startTag(HtmlUtil.TH);
     writer.startTag(HtmlUtil.LABEL);
 
     writer.attribute(HtmlUtil.ATTR_FOR, parameterName);
     writer.text(CaseConverter.toCapitalizedWords(parameterName));
     writer.endTag(HtmlUtil.LABEL);
-    writer.endTag(HtmlUtil.DT);
+    writer.endTag(HtmlUtil.TH);
 
-    writer.startTag(HtmlUtil.DD);
+    writer.startTag(HtmlUtil.TD);
     final int maxLength = 255;
     HtmlUtil.serializeTextInput(writer, parameterName, value, 50, maxLength);
-    writeDescription(writer, parameter);
-    writer.endTag(HtmlUtil.DD);
+    writeInstructions(writer, parameter);
+    writer.endTag(HtmlUtil.TD);
+    writer.endTag(HtmlUtil.TR);
   }
 
   private void writeHtmlFileField(final XmlWriter writer,
     final ParameterInfo parameter, final Map<String, ?> formValues) {
     final String name = parameter.getName();
     final Object value = formValues.get(name);
-    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.TR);
+    writer.startTag(HtmlUtil.TH);
     writer.startTag(HtmlUtil.LABEL);
 
     writer.attribute(HtmlUtil.ATTR_FOR, name);
     writer.text(CaseConverter.toCapitalizedWords(name));
     writer.endTag(HtmlUtil.LABEL);
-    writer.endTag(HtmlUtil.DT);
+    writer.endTag(HtmlUtil.TH);
 
-    writer.startTag(HtmlUtil.DD);
+    writer.startTag(HtmlUtil.TD);
     HtmlUtil.serializeFileInput(writer, name, value);
-    writeDescription(writer, parameter);
-    writer.endTag(HtmlUtil.DD);
+    writeInstructions(writer, parameter);
+    writer.endTag(HtmlUtil.TD);
+    writer.endTag(HtmlUtil.TR);
   }
 
   private void writeHtmlSelect(final XmlWriter writer,
@@ -304,18 +308,20 @@ public class PageInfoHttpMessageConverter extends
     if (value == null) {
       value = parameter.getDefaultValue();
     }
-    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.TR);
+    writer.startTag(HtmlUtil.TH);
     writer.startTag(HtmlUtil.LABEL);
 
     writer.attribute(HtmlUtil.ATTR_FOR, name);
     writer.text(CaseConverter.toCapitalizedWords(name));
     writer.endTag(HtmlUtil.LABEL);
-    writer.endTag(HtmlUtil.DT);
+    writer.endTag(HtmlUtil.TH);
 
-    writer.startTag(HtmlUtil.DD);
+    writer.startTag(HtmlUtil.TD);
     HtmlUtil.serializeSelect(writer, name, value, optional, values);
-    writeDescription(writer, parameter);
-    writer.endTag(HtmlUtil.DD);
+    writeInstructions(writer, parameter);
+    writer.endTag(HtmlUtil.TD);
+    writer.endTag(HtmlUtil.TR);
   }
 
   private void writeHtmlSelect(final XmlWriter writer,
@@ -327,18 +333,20 @@ public class PageInfoHttpMessageConverter extends
     if (value == null) {
       value = parameter.getDefaultValue();
     }
-    writer.startTag(HtmlUtil.DT);
+    writer.startTag(HtmlUtil.TR);
+    writer.startTag(HtmlUtil.TH);
     writer.startTag(HtmlUtil.LABEL);
 
     writer.attribute(HtmlUtil.ATTR_FOR, name);
     writer.text(CaseConverter.toCapitalizedWords(name));
     writer.endTag(HtmlUtil.LABEL);
-    writer.endTag(HtmlUtil.DT);
+    writer.endTag(HtmlUtil.TH);
 
-    writer.startTag(HtmlUtil.DD);
+    writer.startTag(HtmlUtil.TD);
     HtmlUtil.serializeSelect(writer, name, value, optional, values);
-    writeDescription(writer, parameter);
-    writer.endTag(HtmlUtil.DD);
+    writeInstructions(writer, parameter);
+    writer.endTag(HtmlUtil.TD);
+    writer.endTag(HtmlUtil.TR);
   }
 
   private void writeMethod(final XmlWriter writer, final String url,
@@ -351,6 +359,8 @@ public class PageInfoHttpMessageConverter extends
       // writer.element(HtmlUtil.H2, title);
 
       if (hasParameters) {
+        writer.startTag(HtmlUtil.DIV);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "form");
         writer.startTag(HtmlUtil.FORM);
         writer.attribute(HtmlUtil.ATTR_ACTION, url);
         writer.attribute(HtmlUtil.ATTR_TARGET, "_top");
@@ -367,7 +377,12 @@ public class PageInfoHttpMessageConverter extends
           }
         }
         writer.attribute(HtmlUtil.ATTR_METHOD, method);
-        writer.startTag(HtmlUtil.DL);
+        writer.startTag(HtmlUtil.DIV);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "objectView");
+        writer.startTag(HtmlUtil.TABLE);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+        writer.startTag(HtmlUtil.TBODY);
+
         for (final ParameterInfo parameter : parameters) {
           final Map<Object, Object> options = parameter.getAllowedValues();
           if (options.isEmpty()) {
@@ -388,9 +403,15 @@ public class PageInfoHttpMessageConverter extends
           "Select the file format to return the result data in.", mediaTypes);
         writeHtmlSelect(writer, parameter, values, mediaTypes);
       }
-      writer.endTag(HtmlUtil.DL);
+      writer.endTag(HtmlUtil.TBODY);
+      writer.endTag(HtmlUtil.TABLE);
+      writer.endTag(HtmlUtil.DIV);
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "actionMenu");
       HtmlUtil.serializeSubmitInput(writer, "Submit", "submit");
+      writer.endTag(HtmlUtil.DIV);
       writer.endTag(HtmlUtil.FORM);
+      writer.endTag(HtmlUtil.DIV);
     }
   }
 
