@@ -2,6 +2,8 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
@@ -73,11 +75,13 @@ public class FileField extends Field {
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "file");
-    if (style != null) {
+    if (StringUtils.hasText(style)) {
       out.attribute(HtmlUtil.ATTR_STYLE, style);
+    }
+    if (isRequired()) {
+      out.attribute(HtmlUtil.ATTR_CLASS, "required");
     }
     out.endTag(HtmlUtil.INPUT);
   }

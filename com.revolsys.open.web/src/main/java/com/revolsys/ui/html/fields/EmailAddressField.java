@@ -22,12 +22,13 @@ import com.revolsys.util.UrlUtil;
 public class EmailAddressField extends TextField {
 
   public EmailAddressField(final String name, final boolean required) {
-    super(name, 25, 150, required);
+    this(name, null,required);
   }
 
   public EmailAddressField(final String name, final String defaultValue,
     final boolean required) {
     super(name, 25, 150, defaultValue, required);
+    setCssClass("email");
   }
 
   @Override

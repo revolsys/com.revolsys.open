@@ -2,6 +2,8 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
@@ -17,7 +19,17 @@ public class TextField extends Field {
 
   private String inputValue = "";
 
+  private String cssClass;
+
   public TextField() {
+  }
+
+  public void setCssClass(String cssClass) {
+    this.cssClass = cssClass;
+  }
+
+  public String getCssClass() {
+    return cssClass;
   }
 
   public TextField(final String name, final boolean required) {
@@ -160,19 +172,30 @@ public class TextField extends Field {
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
-    out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(size));
-    if (maxLength < Integer.MAX_VALUE) {
+    if (size > 0) {
+      out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(size));
+    }
+    if (maxLength > 0 && maxLength < Integer.MAX_VALUE) {
       out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(maxLength));
     }
-    if (inputValue != null) {
+    if (StringUtils.hasText(inputValue)) {
       out.attribute(HtmlUtil.ATTR_VALUE, inputValue);
     }
-    if (style != null) {
+    if (StringUtils.hasText(style)) {
       out.attribute(HtmlUtil.ATTR_STYLE, style);
     }
+    String cssClass = getCssClass();
+    if (isRequired()) {
+      if (StringUtils.hasText(cssClass)) {
+        cssClass += " required";
+      } else {
+        cssClass = "required";
+      }
+    }
+    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+
     out.endTag(HtmlUtil.INPUT);
   }
 

@@ -125,7 +125,6 @@ public class RegionField extends Field {
    */
   private void serializeSelectField(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     serializeOptions(out);
     out.endTag(HtmlUtil.SELECT);
@@ -133,7 +132,6 @@ public class RegionField extends Field {
 
   private void serializeTextField(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
     out.attribute(HtmlUtil.ATTR_SIZE, "30");

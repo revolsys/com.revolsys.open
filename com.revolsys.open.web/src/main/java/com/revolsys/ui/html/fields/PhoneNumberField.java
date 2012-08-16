@@ -93,7 +93,6 @@ public class PhoneNumberField extends Field {
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
     out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(FIELD_SIZE));

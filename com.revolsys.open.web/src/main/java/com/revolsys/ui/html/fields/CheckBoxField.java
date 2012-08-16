@@ -43,6 +43,15 @@ public class CheckBoxField extends Field {
     super(name, required);
   }
 
+  public CheckBoxField(String name, boolean required, Object defaultValue) {
+    super(name, required);
+    if (defaultValue != null) {
+      if (defaultValue != null) {
+        selected = Boolean.getBoolean(defaultValue.toString());
+      }
+    }
+  }
+
   public Object getFalseValue() {
     return falseValue;
   }

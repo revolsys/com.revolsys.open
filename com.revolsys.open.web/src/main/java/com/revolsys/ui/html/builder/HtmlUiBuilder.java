@@ -49,10 +49,12 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.decorator.CollapsibleBox;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
+import com.revolsys.ui.html.decorator.TableHeadingDecorator;
 import com.revolsys.ui.html.fields.LongField;
 import com.revolsys.ui.html.fields.TextField;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.form.HtmlUiBuilderObjectForm;
+import com.revolsys.ui.html.form.UiBuilderObjectForm;
 import com.revolsys.ui.html.serializer.BuilderMethodSerializer;
 import com.revolsys.ui.html.serializer.BuilderSerializer;
 import com.revolsys.ui.html.serializer.KeySerializerDetailSerializer;
@@ -549,23 +551,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * Create a form for the object using the specified list of fields keys. The
    * form is created without the form title.
    * 
-   * @param <F> The type of form to return.
-   * @param object The object to create the form for.
-   * @param fieldKeys The list of keys for the fields to include on the form.
-   * @return The generated form.
-   */
-  @SuppressWarnings("unchecked")
-  public <F extends Form> F createForm(final Object object,
-    final List<String> fieldKeys) {
-    final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(),
-      fieldKeys);
-    return (F)form;
-  }
-
-  /**
-   * Create a form for the object using the specified list of fields keys. The
-   * form is created without the form title.
-   * 
    * @param <T> The type of form to return.
    * @param object The object to create the form for.
    * @param keyListName The name of the list of keys for the fields to include
@@ -577,6 +562,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String keyListName) {
     final HtmlUiBuilderObjectForm form = createForm(object, getTypeName(),
       getKeyList(keyListName));
+    return (F)form;
+  }
+
+  public <F extends Form> F createTableForm(final Object object,
+    final String keyListName) {
+    List<String> keyList = getKeyList(keyListName);
+    final UiBuilderObjectForm form = new UiBuilderObjectForm(object, this,
+      getTypeName(), keyList);
     return (F)form;
   }
 
@@ -618,7 +611,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String pageName = getName(prefix, "add");
     final Set<String> parameterNamesToSave = new HashSet<String>();
 
-    final Form form = createForm(object, pageName);
+    final Form form = createTableForm(object, pageName);
     for (final String param : parameterNamesToSave) {
       form.addSavedParameter(param, request.getParameter(param));
     }
@@ -649,8 +642,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "list", "Cancel", "_top");
     addMenuItem(actionMenu, prefix, "add", "Clear Fields");
-    actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
-      + form.getName() + "'].submit()"));
+    String name = form.getName();
+    actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name
+      + "').submit()"));
 
     final MenuElement actionMenuElement = new MenuElement(actionMenu,
       "actionMenu");
@@ -669,7 +663,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       parameterNamesToSave.add(getIdParameterName());
 
       final String pageName = getName(prefix, "edit");
-      final Form form = createForm(object, pageName);
+      final Form form = createTableForm(object, pageName);
       for (final String param : parameterNamesToSave) {
         form.addSavedParameter(param, request.getParameter(param));
       }
@@ -703,8 +697,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Menu actionMenu = new Menu();
       addMenuItem(actionMenu, prefix, "view", "Cancel", "_top");
       addMenuItem(actionMenu, prefix, "edit", "Revert to Saved", "_top");
-      actionMenu.addMenuItem(new Menu("Save", "javascript:document.forms['"
-        + form.getName() + "'].submit()"));
+      String name = form.getName();
+      actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name
+        + "').submit()"));
 
       final MenuElement actionMenuElement = new MenuElement(actionMenu,
         "actionMenu");
@@ -913,6 +908,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       fieldLabels.put(key, fieldLabel);
     }
     return fieldLabel;
+  }
+
+  public Decorator getFieldTableLabel(final String key) {
+    final String label = getLabel(key);
+    final String instructions = getFieldInstruction(key);
+    TableHeadingDecorator decorator = new TableHeadingDecorator(label,
+      instructions);
+    return decorator;
   }
 
   public Map<String, Decorator> getFieldLabels() {
@@ -1176,9 +1179,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Object getProperty(final Object object, final String keyName) {
     try {
-    return JavaBeanUtil.getValue(object, keyName);
+      return JavaBeanUtil.getValue(object, keyName);
     } catch (Throwable e) {
-      log.error("Unable to get property " + keyName + " for:\n" +object, e);
+      log.error("Unable to get property " + keyName + " for:\n" + object, e);
       return "ERROR";
     }
   }
@@ -1222,8 +1225,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return pageUrls.containsKey(pageName);
   }
 
-
   public void initializeForm(final HtmlUiBuilderObjectForm form,
+    final HttpServletRequest request) {
+  }
+
+  public void initializeForm(final UiBuilderObjectForm form,
     final HttpServletRequest request) {
   }
 
@@ -1651,6 +1657,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public boolean validateForm(final HtmlUiBuilderObjectForm form) {
+    return true;
+  }
+
+  public boolean validateForm(UiBuilderObjectForm uiBuilderObjectForm) {
     return true;
   }
 }

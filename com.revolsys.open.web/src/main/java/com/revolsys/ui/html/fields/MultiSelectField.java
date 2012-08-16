@@ -141,7 +141,6 @@ public class MultiSelectField extends Field {
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_MULTIPLE, "multiple");
     out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(size));

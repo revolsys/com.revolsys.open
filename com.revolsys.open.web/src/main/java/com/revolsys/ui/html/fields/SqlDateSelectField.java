@@ -195,9 +195,7 @@ public class SqlDateSelectField extends Field {
     serializeSelect(out, YEAR_KEY, yearOptions);
   }
 
-  private void serializeOptions(
-    final XmlWriter out,
-    final String part,
+  private void serializeOptions(final XmlWriter out, final String part,
     final List options) {
     String stringValue = "";
     if (part.equals(DAY_KEY)) {
@@ -227,13 +225,10 @@ public class SqlDateSelectField extends Field {
     }
   }
 
-  private void serializeSelect(
-    final XmlWriter out,
-    final String part,
+  private void serializeSelect(final XmlWriter out, final String part,
     final List options) {
     final String name = getName() + part;
     out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ID, name);
     out.attribute(HtmlUtil.ATTR_NAME, name);
     serializeOptions(out, part, options);
     out.endTag(HtmlUtil.SELECT);

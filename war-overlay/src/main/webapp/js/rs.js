@@ -94,45 +94,71 @@ function refreshButtons(root) {
   });
 }
 
-$(document).ready(function() {
-  addConfirmButton({
-    selector : 'button.delete',
-    icon : 'trash',
-    title : 'Confirm Delete',
-    message : 'Are you sure you want to delete this record?'
-  });
-  refreshButtons($(document));
-  $('div.collapsibleBox').each(function() {
-    var active;
-    if ($(this).hasClass('closed')) {
-      active = false;
-    } else {
-      active = 0;
-    }
-    $(this).accordion({
-      icons : {
-        header : "ui-icon-triangle-1-e",
-        headerSelected : "ui-icon-triangle-1-s"
+$(document).ready(
+  function() {
+    addConfirmButton({
+      selector : 'button.delete',
+      icon : 'trash',
+      title : 'Confirm Delete',
+      message : 'Are you sure you want to delete this record?'
+    });
+    refreshButtons($(document));
+    $('div.collapsibleBox').each(function() {
+      var active;
+      if ($(this).hasClass('closed')) {
+        active = false;
+      } else {
+        active = 0;
+      }
+      $(this).accordion({
+        icons : {
+          header : "ui-icon-triangle-1-e",
+          headerSelected : "ui-icon-triangle-1-s"
+        },
+        collapsible : true,
+        active : active,
+        autoHeight : false,
+        change : function(event, ui) {
+          $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
+        }
+      });
+    });
+    $('div.jqueryTabs').tabs({
+      show : function(event, ui) {
+        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
-      collapsible : true,
-      active : active,
-      autoHeight : false,
-      change : function(event, ui) {
-        $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
+      select : function(event, ui) {
+        window.location.replace(ui.tab.hash);
       }
     });
+    $('div.objectList table').dataTable({
+      "bJQueryUI" : true,
+      "bPaginate" : false,
+      "bSort" : false
+    });
+
+    $('div.form').each(
+      function() {
+        var formWrapper = this;
+        var form = $('form', this);
+        var validate = form.validate({
+          errorContainer : $('div.errorContainer', formWrapper),
+          wrapper : "div class=\"errorMessage\"",
+          highlight : function(element, errorClass, validClass) {
+            $(element).closest('div.fieldComponent').addClass('invalid');
+            $(element).addClass(errorClass).removeClass(validClass);
+            $(element.form).find("label[for=" + element.id + "]").addClass(
+              errorClass);
+          },
+          unhighlight : function(element, errorClass, validClass) {
+            $(element).closest('div.fieldComponent').removeClass('invalid');
+            $(element).removeClass(errorClass).addClass(validClass);
+            $(element.form).find("label[for=" + element.id + "]").removeClass(
+              errorClass);
+          }
+        });
+        if ($(formWrapper).hasClass('formInvalid')) {
+          validate.form();
+        }
+      });
   });
-  $('div.jqueryTabs').tabs({
-    show : function(event, ui) {
-      $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-    },
-    select: function(event, ui) {                   
-      window.location.replace(ui.tab.hash);
-    }
-  });
-  $('div.objectList table').dataTable({
-    "bJQueryUI" : true,
-    "bPaginate" : false,
-    "bSort" : false
-  });
-});

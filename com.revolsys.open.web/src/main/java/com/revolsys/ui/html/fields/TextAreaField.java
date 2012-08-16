@@ -17,6 +17,8 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
@@ -141,11 +143,13 @@ public class TextAreaField extends Field {
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.TEXT_AREA);
-    out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(cols));
     out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(rows));
-    if (inputValue != null) {
+    if (isRequired()) {
+      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+    }
+    if (StringUtils.hasText(inputValue)) {
       out.text(inputValue);
     } else {
       out.text("");

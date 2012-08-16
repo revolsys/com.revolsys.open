@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -63,6 +64,10 @@ public class Form extends ElementContainer {
   private String title;
 
   private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
+
+  private String encType = "application/x-www-form-urlencoded";
+
+  public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
   public Form() {
   }
@@ -119,14 +124,17 @@ public class Form extends ElementContainer {
     return parameters;
   }
 
+  public String getEncType() {
+    return encType;
+  }
+
   @Override
   public Form getForm() {
     return this;
   }
 
   @Override
-  public Object getInitialValue(
-    final Field field,
+  public Object getInitialValue(final Field field,
     final HttpServletRequest request) {
     return null;
   }
@@ -203,12 +211,15 @@ public class Form extends ElementContainer {
     return posted;
   }
 
+  private boolean valid = true;
+
   public boolean isValid() {
     boolean success = true;
     for (final Field field : getFields().values()) {
       success &= field.isValid();
     }
     success &= validate();
+    valid = success;
     return success;
   }
 
@@ -247,6 +258,14 @@ public class Form extends ElementContainer {
    */
   public void serializeStartTag(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
+    String cssClass = this.cssClass;
+    if (!valid) {
+      if (StringUtils.hasText(cssClass)) {
+        cssClass += " formInvalid";
+      } else {
+        cssClass = "formInvalid";
+      }
+    }
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     final String title = getTitle();
     if (title != null) {
@@ -255,6 +274,16 @@ public class Form extends ElementContainer {
       out.text(title);
       out.endTag(HtmlUtil.DIV);
     }
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "errorContainer");
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "title");
+    out.text("The form contains errors, please update the highlighted fields to fix the errors.");
+    out.endTag(HtmlUtil.DIV);
+    out.startTag(HtmlUtil.UL);
+    out.endTag(HtmlUtil.UL);
+    out.endTag(HtmlUtil.DIV);
+
     out.startTag(HtmlUtil.FORM);
     if (onSubmit.size() > 0) {
       final StringBuffer submitScripts = new StringBuffer();
@@ -267,6 +296,7 @@ public class Form extends ElementContainer {
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_ACTION, getAction());
     out.attribute(HtmlUtil.ATTR_METHOD, getMethod());
+    out.attribute(HtmlUtil.ATTR_ENCTYPE, getEncType());
     out.startTag(HtmlUtil.DIV);
   }
 
@@ -275,6 +305,10 @@ public class Form extends ElementContainer {
    */
   public void setAction(final String action) {
     this.action = action;
+  }
+
+  public void setEncType(final String encType) {
+    this.encType = encType;
   }
 
   /**

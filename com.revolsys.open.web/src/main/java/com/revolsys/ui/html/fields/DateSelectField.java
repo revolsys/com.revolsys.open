@@ -225,7 +225,6 @@ public class DateSelectField extends Field {
     final List<FieldValue> options) {
     final String name = getName() + part;
     out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ID, name);
     out.attribute(HtmlUtil.ATTR_NAME, name);
     serializeOptions(out, part, options);
     out.endTag(HtmlUtil.SELECT);

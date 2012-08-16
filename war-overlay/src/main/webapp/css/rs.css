@@ -122,6 +122,21 @@ div.error {
   font-weight: bold;
 }
 
+label.error {
+  display: block;
+  color: red;
+  font-weight: bold;
+  color: red;
+}
+
+input.error {
+  border-color: red;
+}
+
+div.invalid div.errorMessage {
+  padding: 0.1em 0.2em 0.1em 0.2em;
+}
+
 div.bodyContainer {
   margin: 0px 10px 10px 0px;
 }
@@ -462,6 +477,21 @@ div.invalid {
   background-color: pink;
 }
 
+div.errorContainer {
+  border-radius: 0.5em;
+  border: 2px solid red;
+  background-color: pink;
+  display: none;
+  padding: 0.5em;
+  margin: 0.5em 0em 0.5em 0em;
+}
+
+div.errorContainer div.title {
+  color: red;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
 div.form div.field div.instructions {
   clear: both;
   margin-left: 14.8em;
@@ -497,8 +527,8 @@ div.form div.field div.fieldActions a {
 }
 
 div.form div.required {
-  background: url(../images/asterisk.gif) no-repeat 3px 5px;
-  padding-left: 10px;
+  background: url(../images/asterisk.gif) no-repeat center right;
+  padding-right: 10px;
 }
 
 .labelAboveNoPadding {

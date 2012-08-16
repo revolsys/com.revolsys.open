@@ -33,6 +33,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverterRegistry;
 
 /**
@@ -333,6 +335,17 @@ public class XmlWriter extends Writer {
       }
       out.write(' ');
       writeName(attribute);
+      out.write("=\"");
+      writeAttributeValue(value);
+      out.write('"');
+    }
+  }
+
+  public void attribute(final String name, final String value) {
+    if (StringUtils.hasText(value)) {
+      checkWriteAttribute();
+      out.write(' ');
+      out.write(name);
       out.write("=\"");
       writeAttributeValue(value);
       out.write('"');
@@ -1336,5 +1349,13 @@ public class XmlWriter extends Writer {
     } else {
       attribute(XsiConstants.TYPE, xsiName);
     }
+  }
+
+  public void attribute(String name, Object value) {
+    if (value != null) {
+      String string = StringConverterRegistry.toString(value);
+      attribute(name, string);
+    }
+
   }
 }
