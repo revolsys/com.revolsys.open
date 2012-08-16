@@ -38,7 +38,7 @@ function confirmButton(root, params) {
   $(selector, root).click(function() {
     var form = $(this).closest('form');
     $('<div></div>').html(message).dialog({
-      title : 'title',
+      title : title,
       buttons : {
         'Cancel' : function() {
           $(this).dialog('close');
@@ -125,6 +125,9 @@ $(document).ready(function() {
   $('div.jqueryTabs').tabs({
     show : function(event, ui) {
       $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+    },
+    select: function(event, ui) {                   
+      window.location.replace(ui.tab.hash);
     }
   });
   $('div.objectList table').dataTable({

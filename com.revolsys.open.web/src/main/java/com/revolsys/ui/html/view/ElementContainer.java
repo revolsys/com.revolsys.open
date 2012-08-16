@@ -48,6 +48,10 @@ public class ElementContainer extends Element {
     add(elements);
   }
 
+  public ElementContainer(Decorator decorator) {
+    setDecorator(decorator);
+  }
+
   public ElementContainer(final ElementContainerLayout layout) {
     this.layout = layout;
   }
@@ -126,8 +130,7 @@ public class ElementContainer extends Element {
     return allFields;
   }
 
-  public <T> T getInitialValue(
-    final Field field,
+  public <T> T getInitialValue(final Field field,
     final HttpServletRequest request) {
     return (T)getContainer().getInitialValue(field, request);
   }

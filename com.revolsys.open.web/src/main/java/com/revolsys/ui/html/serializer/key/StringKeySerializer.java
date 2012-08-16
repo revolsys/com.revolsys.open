@@ -11,6 +11,11 @@ public class StringKeySerializer extends AbstractKeySerializer {
     super(name);
   }
 
+  public StringKeySerializer(final String name, String label) {
+    super(name);
+    setLabel(label);
+  }
+
   /**
    * Serialize the value to the XML writer.
    * 

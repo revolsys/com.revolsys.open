@@ -35,13 +35,36 @@ public class BoundingBox extends Envelope {
     return new BoundingBox(geometryFactory, geometry.getEnvelopeInternal());
   }
 
-  public static boolean intersects(
-    final double p1X,
-    final double p1Y,
-    final double p2X,
-    final double p2Y,
-    final double qX,
-    final double qY) {
+  /**
+   * Point intersects the bounding box of the line.
+   * 
+   * @param lineStart
+   * @param lineEnd
+   * @param point
+   * @return
+   */
+  public static boolean intersects(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
+    final double x1 = lineStart.getX();
+    final double y1 = lineStart.getY();
+    final double x2 = lineEnd.getX();
+    final double y2 = lineEnd.getY();
+
+    final double x = point.getX();
+    final double y = point.getY();
+    return intersects(x1, y1, x2, y2, x, y);
+  }
+
+  /**
+   * Point intersects the bounding box of the line.
+   * 
+   * @param lineStart
+   * @param lineEnd
+   * @param point
+   * @return
+   */
+  public static boolean intersects(final double p1X, final double p1Y,
+    final double p2X, final double p2Y, final double qX, final double qY) {
     if (((qX >= (p1X < p2X ? p1X : p2X)) && (qX <= (p1X > p2X ? p1X : p2X)))
       && ((qY >= (p1Y < p2Y ? p1Y : p2Y)) && (qY <= (p1Y > p2Y ? p1Y : p2Y)))) {
       return true;
@@ -50,10 +73,8 @@ public class BoundingBox extends Envelope {
     }
   }
 
-  public static boolean intersects(
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
+  public static boolean intersects(final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
     final Coordinates line2End) {
     final double line1x1 = line1Start.getX();
     final double line1y1 = line1Start.getY();
@@ -68,29 +89,9 @@ public class BoundingBox extends Envelope {
       line2x2, line2y2);
   }
 
-  public static boolean intersects(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
-    final double x1 = lineStart.getX();
-    final double y1 = lineStart.getY();
-    final double x2 = lineEnd.getX();
-    final double y2 = lineEnd.getY();
-
-    final double x = point.getX();
-    final double y = point.getY();
-    return intersects(x1, y1, x2, y2, x, y);
-  }
-
-  public static boolean intersects(
-    final double p1X,
-    final double p1Y,
-    final double p2X,
-    final double p2Y,
-    final double q1X,
-    final double q1Y,
-    final double q2X,
-    final double q2Y) {
+  public static boolean intersects(final double p1X, final double p1Y,
+    final double p2X, final double p2Y, final double q1X, final double q1Y,
+    final double q2X, final double q2Y) {
     double minp = Math.min(p1X, p2X);
     double maxq = Math.max(q1X, q2X);
     if (minp > maxq) {
@@ -553,10 +554,8 @@ public class BoundingBox extends Envelope {
     return toPolygon(factory, numSegments, numSegments);
   }
 
-  public Polygon toPolygon(
-    final GeometryFactory geometryFactory,
-    final int numX,
-    final int numY) {
+  public Polygon toPolygon(final GeometryFactory geometryFactory,
+    final int numX, final int numY) {
     final double xStep = getWidth() / numX;
     final double yStep = getHeight() / numY;
     final double minX = getMinX();

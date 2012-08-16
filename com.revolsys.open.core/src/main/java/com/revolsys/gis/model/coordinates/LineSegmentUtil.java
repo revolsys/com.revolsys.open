@@ -1,12 +1,15 @@
 package com.revolsys.gis.model.coordinates;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
@@ -14,81 +17,14 @@ import com.vividsolutions.jts.algorithm.RobustDeterminant;
 public class LineSegmentUtil {
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     final double z = getElevation(lineStart, lineEnd, point);
     point.setZ(z);
     precisionModel.makePrecise(point);
   }
 
-  private static CoordinatesList computeCollinearIntersection(
-    final int numAxis,
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
-    final Coordinates line2End) {
-    final boolean line2StartIntersectsLine1 = BoundingBox.intersects(
-      line1Start, line1End, line2Start);
-    final boolean line2EndIntersectsLine1 = BoundingBox.intersects(line1Start,
-      line1End, line2End);
-    final boolean line1StartIntersectsLine2 = BoundingBox.intersects(
-      line2Start, line2End, line1Start);
-    final boolean line1EndIntersectsLine2 = BoundingBox.intersects(line2Start,
-      line2End, line1End);
-
-    Coordinates line2StartWithElevation = getElevation(numAxis, line1Start,
-      line1End, line2Start);
-    Coordinates line2EndWithElevation = getElevation(numAxis, line1Start,
-      line1End, line2End);
-
-    if (line2StartIntersectsLine1 && line2EndIntersectsLine1) {
-      return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
-        line2EndWithElevation);
-    } else if (line1StartIntersectsLine2 && line1EndIntersectsLine2) {
-      return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
-        line1End);
-    } else if (line2StartIntersectsLine1 && line1StartIntersectsLine2) {
-      if (line2StartWithElevation.equals2d(line1Start)
-        && !line2EndIntersectsLine1 && !line1EndIntersectsLine2) {
-        return new DoubleCoordinatesList(numAxis, line2StartWithElevation);
-      } else {
-        return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
-          line1Start);
-      }
-    } else if (line2StartIntersectsLine1 && line1EndIntersectsLine2) {
-      if (line2StartWithElevation.equals2d(line1End)
-        && !line2EndIntersectsLine1 && !line1StartIntersectsLine2) {
-        return new DoubleCoordinatesList(numAxis, line2StartWithElevation);
-      } else {
-        return new DoubleCoordinatesList(numAxis, line2StartWithElevation,
-          line1End);
-      }
-    } else if (line2EndIntersectsLine1 && line1StartIntersectsLine2) {
-      if (line2EndWithElevation.equals2d(line1Start)
-        && !line2StartIntersectsLine1 && !line1EndIntersectsLine2) {
-        return new DoubleCoordinatesList(numAxis, line2EndWithElevation);
-      } else {
-        return new DoubleCoordinatesList(numAxis, line2EndWithElevation,
-          line1Start);
-      }
-    } else if (line2EndIntersectsLine1 && line1EndIntersectsLine2) {
-      if (line2EndWithElevation.equals2d(line1End)
-        && !line2StartIntersectsLine1 && !line1StartIntersectsLine2) {
-        return new DoubleCoordinatesList(numAxis, line2EndWithElevation);
-      } else {
-        return new DoubleCoordinatesList(numAxis, line2EndWithElevation,
-          line1End);
-      }
-    } else {
-      return new DoubleCoordinatesList(numAxis);
-    }
-  }
-
-  static double det(
-    final double a,
-    final double b,
-    final double c,
+  static double det(final double a, final double b, final double c,
     final double d) {
     return a * d - b * c;
   }
@@ -103,10 +39,8 @@ public class LineSegmentUtil {
    * @param point The coordinates of the point location.
    * @return The distance.
    */
-  public static double distance(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static double distance(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double x2 = lineEnd.getX();
@@ -116,10 +50,8 @@ public class LineSegmentUtil {
     return distance(x1, y1, x2, y2, x, y);
   }
 
-  public static double distance(
-    final Coordinates line1From,
-    final Coordinates line1To,
-    final Coordinates line2From,
+  public static double distance(final Coordinates line1From,
+    final Coordinates line1To, final Coordinates line2From,
     final Coordinates line2To) {
     if (line1From.equals(line1To)) {
       return distance(line1From, line2From, line2To);
@@ -161,11 +93,11 @@ public class LineSegmentUtil {
 
         if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
           return Math.min(
-            distance(line1From, line2From, line2To),
+            distance(line2From, line2To, line1From),
             Math.min(
-              distance(line1To, line2From, line2To),
-              Math.min(distance(line2From, line1From, line1To),
-                distance(line2To, line1From, line1To))));
+              distance(line2From, line2To, line1To),
+              Math.min(distance(line1From, line1To, line2From),
+                distance(line1From, line1To, line2To))));
         } else {
           return 0.0;
         }
@@ -185,13 +117,8 @@ public class LineSegmentUtil {
    * @param y The y coordinate of the point.
    * @return The distance.
    */
-  public static double distance(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
+  public static double distance(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y) {
     if (x1 == x2 && y1 == y2) {
       return MathUtil.distance(x, y, x1, y1);
     } else {
@@ -227,10 +154,8 @@ public class LineSegmentUtil {
    * @param point The point.
    * @return True if the point intersects the line's envelope.
    */
-  public static boolean envelopeIntersects(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static boolean envelopeIntersects(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
 
@@ -253,10 +178,8 @@ public class LineSegmentUtil {
    * @param line2End The point at the end of the second line.
    * @return True if the envelope of line intersects the envelope of line 2.
    */
-  public static boolean envelopeIntersects(
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
+  public static boolean envelopeIntersects(final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
     final Coordinates line2End) {
     final double line1X1 = line1Start.getX();
     final double line1X2 = line1End.getX();
@@ -302,13 +225,8 @@ public class LineSegmentUtil {
    * @param y The y coordinate of the point.
    * @return True if the point intersects the line's envelope.
    */
-  public static boolean envelopeIntersects(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
+  public static boolean envelopeIntersects(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y) {
     final double minX = Math.min(x1, x2);
     if (x >= minX) {
       final double maxX = Math.max(x1, x2);
@@ -325,10 +243,8 @@ public class LineSegmentUtil {
     return false;
   }
 
-  public static double getElevation(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static double getElevation(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double fraction = point.distance(lineStart)
       / lineStart.distance(lineEnd);
     final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ())
@@ -336,87 +252,99 @@ public class LineSegmentUtil {
     return z;
   }
 
-  public static Coordinates getElevation(
-    int numAxis,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+  public static Coordinates getElevation(GeometryFactory geometryFactory,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
-    DoubleCoordinates newPoint = new DoubleCoordinates(point, numAxis);
+    int numAxis = geometryFactory.getNumAxis();
+    Coordinates newPoint = geometryFactory.createCoordinates(point);
     if (numAxis > 2) {
       final double fraction = point.distance(lineStart)
         / lineStart.distance(lineEnd);
       double z1 = lineStart.getZ();
+      if (Double.isNaN(z1)) {
+        z1 = 0;
+      }
       double z2 = lineEnd.getZ();
+      if (Double.isNaN(z2)) {
+        z2 = 0;
+      }
       final double z = z1 + (z2 - z1) * (fraction);
       newPoint.setZ(z);
     }
+    geometryFactory.makePrecise(newPoint);
     return newPoint;
   }
 
+  /**
+   * Get the intersection between line (segment) 1 and line (segment) 2. The
+   * result will be either and empty collection, a single coordinates value for
+   * a crosses intersection or a pair of coordinates for a linear intersection.
+   * The results will be rounded according to the precision model. Any z-value
+   * interpolation will be calculated using the z-values from line (segment) 1.
+   * For linear intersections the order of the points will be the same as the
+   * orientation of line1.
+   * 
+   * @param geometryFactory
+   * @param line1Start
+   * @param line1End
+   * @param line2Start
+   * @param line2End
+   * @return
+   */
   public static CoordinatesList getIntersection(
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
-    final Coordinates line2End) {
-    final int numAxis = Math.max(line1Start.getNumAxis(), line1End.getNumAxis());
+    final GeometryFactory geometryFactory, Coordinates line1Start,
+    Coordinates line1End, Coordinates line2Start, Coordinates line2End) {
+    line1Start = geometryFactory.createCoordinates(line1Start);
+    line1End = geometryFactory.createCoordinates(line1End);
+    line2Start = geometryFactory.createCoordinates(line2Start);
+    line2End = geometryFactory.createCoordinates(line2End);
+    if (BoundingBox.intersects(line1Start, line1End, line2Start, line2End)) {
+      Set<Coordinates> intersections = new TreeSet<Coordinates>(
+        new CoordinatesDistanceComparator(line1Start));
+      if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,
+        line1Start)) {
+        intersections.add(line1Start);
+      }
+      if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,
+        line1End)) {
+        intersections.add(line1End);
+      }
+      if (LineSegmentUtil.isPointOnLine(geometryFactory, line1Start, line1End,
+        line2Start)) {
+        Coordinates intersection = getElevation(geometryFactory, line1Start,
+          line1End, line2Start);
+        intersections.add(intersection);
+      }
+      if (LineSegmentUtil.isPointOnLine(geometryFactory, line1Start, line1End,
+        line2End)) {
+        Coordinates intersection = getElevation(geometryFactory, line1Start,
+          line1End, line2End);
+        intersections.add(intersection);
+      }
 
-    final double line1x1 = line1Start.getX();
-    final double line1y1 = line1Start.getY();
-    final double line1x2 = line1End.getX();
-    final double line1y2 = line1End.getY();
+      if (intersections.isEmpty()) {
+        final double line1x1 = line1Start.getX();
+        final double line1y1 = line1Start.getY();
+        final double line1x2 = line1End.getX();
+        final double line1y2 = line1End.getY();
 
-    final double line2x1 = line2Start.getX();
-    final double line2y1 = line2Start.getY();
-    final double line2x2 = line2End.getX();
-    final double line2y2 = line2End.getY();
+        final double line2x1 = line2Start.getX();
+        final double line2y1 = line2Start.getY();
+        final double line2x2 = line2End.getX();
+        final double line2y2 = line2End.getY();
 
-    if (line1Start.equals(line2Start) || line1Start.equals(line2End)) {
-      return new DoubleCoordinatesList(numAxis, line1Start);
-    } else if (line1End.equals(line2Start) || line1End.equals(line2End)) {
-      return new DoubleCoordinatesList(numAxis, line1End);
-    } else if (BoundingBox.intersects(line1Start, line1End, line2Start,
-      line2End)) {
+        final int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
+          line1x2, line1y2, line2x1, line2y1);
+        final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
+          line1x2, line1y2, line2x2, line2y2);
 
-      final int Pq1 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
-        line1x2, line1y2, line2x1, line2y1);
-      final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
-        line1x2, line1y2, line2x2, line2y2);
+        if (!((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0))) {
+          final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1,
+            line2y1, line2x2, line2y2, line1x1, line1y1);
+          final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1,
+            line2y1, line2x2, line2y2, line1x2, line1y2);
 
-      if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
-        return new DoubleCoordinatesList(numAxis);
-      } else {
-
-        final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
-          line2x2, line2y2, line1x1, line1y1);
-        final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1, line2y1,
-          line2x2, line2y2, line1x2, line1y2);
-
-        if ((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0)) {
-          return new DoubleCoordinatesList(numAxis);
-        }
-
-        final boolean collinear = Pq1 == 0 && Pq2 == 0 && Qp1 == 0 && Qp2 == 0;
-        if (collinear) {
-          return LineSegmentUtil.computeCollinearIntersection(numAxis,
-            line1Start, line1End, line2Start, line2End);
-        } else {
-          if (Pq1 == 0 || Pq2 == 0 || Qp1 == 0 || Qp2 == 0) {
-            if (Pq1 == 0) {
-              Coordinates intersection = getElevation(numAxis, line1Start,
-                line1End, line2Start);
-              return new DoubleCoordinatesList(numAxis, intersection);
-            } else if (Pq2 == 0) {
-              Coordinates intersection = getElevation(numAxis, line1Start,
-                line1End, line2End);
-              return new DoubleCoordinatesList(numAxis, intersection);
-            } else if (Qp1 == 0) {
-              return new DoubleCoordinatesList(numAxis, line1Start);
-            } else if (Qp2 == 0) {
-              return new DoubleCoordinatesList(numAxis, line1End);
-            } else {
-              return new DoubleCoordinatesList(numAxis);
-            }
-          } else {
+          if (!((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0))) {
             double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
               line1y1, line1x2, line1y2);
             double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
@@ -429,69 +357,44 @@ public class LineSegmentUtil {
               - line1y2, detLine2StartLine2End, line2y1 - line2y2)
               / LineSegmentUtil.det(line1x1 - line1x2, line1y1 - line1y2,
                 line2x1 - line2x2, line2y1 - line2y2);
-            Coordinates intersection = getElevation(numAxis, line1Start,
-              line1End, new DoubleCoordinates(x, y));
-            return new DoubleCoordinatesList(numAxis, intersection);
+            Coordinates intersection = geometryFactory.createCoordinates(x, y);
+            intersection = getElevation(geometryFactory, line1Start, line1End,
+              intersection);
+            return geometryFactory.createCoordinatesList(intersection);
           }
         }
+      } else {
+        return geometryFactory.createCoordinatesList(intersections);
       }
-    } else {
-      return new DoubleCoordinatesList(numAxis);
     }
-  }
-
-  /**
-   * Get the intersection between line (segment) 1 and line (segment) 2. The
-   * result will be either and empty collection, a single coordinates value for
-   * a crosses intersection or a pair of coordinates for a linear intersection.
-   * The results will be rounded according to the precision model. Any z-value
-   * interpolation will be calculated using the z-values from line (segment) 1.
-   * 
-   * @param precisionModel
-   * @param line1Start
-   * @param line1End
-   * @param line2Start
-   * @param line2End
-   * @return
-   */
-  public static CoordinatesList getIntersection(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
-    final Coordinates line2End) {
-    final CoordinatesList intersections = getIntersection(line1Start, line1End,
-      line2Start, line2End);
-    for (final Coordinates point : new InPlaceIterator(intersections)) {
-      precisionModel.makePrecise(point);
-
-    }
-    return intersections;
+    return geometryFactory.createCoordinatesList(0);
   }
 
   public static PointLineProjection getPointLineProjection(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates pointCoordinates) {
     return new PointLineProjection(precisionModel, lineStart, lineEnd,
       pointCoordinates);
   }
 
-  public static boolean isPointOnLine(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point,
-    final double maxDistance) {
-    final double distance = distance(lineStart, lineEnd, point);
-    if (distance < maxDistance) {
-      final double projectionFactor = projectionFactor(lineStart, lineEnd,
-        point);
-      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        return true;
+  public static boolean isPointOnLine(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point, final double maxDistance) {
+    if (lineStart.equals2d(point)) {
+      return true;
+    } else if (lineEnd.equals2d(point)) {
+      return true;
+    } else {
+      final double distance = distance(lineStart, lineEnd, point);
+      if (distance < maxDistance) {
+        final double projectionFactor = projectionFactor(lineStart, lineEnd,
+          point);
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
   }
 
   /**
@@ -507,28 +410,29 @@ public class LineSegmentUtil {
    */
   public static boolean isPointOnLine(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
-    final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
-    if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-      final Coordinates projectedPoint = project(lineStart, lineEnd,
-        projectionFactor);
-      precisionModel.makePrecise(projectedPoint);
-      if (projectedPoint.equals2d(point)) {
-        return true;
+    if (lineStart.equals2d(point)) {
+      return true;
+    } else if (lineEnd.equals2d(point)) {
+      return true;
+    } else {
+      final double projectionFactor = projectionFactor(lineStart, lineEnd,
+        point);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        final Coordinates projectedPoint = project(lineStart, lineEnd,
+          projectionFactor);
+        precisionModel.makePrecise(projectedPoint);
+        if (projectedPoint.equals2d(point)) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
   }
 
-  public static boolean isPointOnLine(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y,
+  public static boolean isPointOnLine(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y,
     final double maxDistance) {
     final double distance = distance(x1, y1, x2, y2, x, y);
     if (distance < maxDistance) {
@@ -540,11 +444,8 @@ public class LineSegmentUtil {
     return false;
   }
 
-  public static boolean isPointOnLineMiddle(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point,
-    final double maxDistance) {
+  public static boolean isPointOnLineMiddle(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point, final double maxDistance) {
     if (point.equals2d(lineStart)) {
       return false;
     } else if (point.equals2d(lineEnd)) {
@@ -556,8 +457,7 @@ public class LineSegmentUtil {
 
   public static boolean isPointOnLineMiddle(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart)) {
       return false;
@@ -580,15 +480,12 @@ public class LineSegmentUtil {
 
   public static Coordinates midPoint(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd) {
+    final Coordinates lineStart, final Coordinates lineEnd) {
     return project(precisionModel, lineStart, lineEnd, 0.5);
   }
 
-  public static int orientationIndex(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static int orientationIndex(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double lineDx = lineEnd.getX() - lineStart.getX();
     final double lineDy = lineEnd.getY() - lineStart.getY();
     final double dx2 = point.getX() - lineEnd.getX();
@@ -604,10 +501,8 @@ public class LineSegmentUtil {
    * 
    * @return The angle in radians.
    */
-  public static double orientedAngleBetween2d(
-    final Coordinates start,
-    final Coordinates line1End,
-    final Coordinates line2End) {
+  public static double orientedAngleBetween2d(final Coordinates start,
+    final Coordinates line1End, final Coordinates line2End) {
     final double angle1 = start.angle2d(line1End);
     final double angle2 = start.angle2d(line2End);
     return MathUtil.orientedAngleBetween(angle1, angle2);
@@ -615,8 +510,7 @@ public class LineSegmentUtil {
 
   public static Coordinates pointAlong(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
     if (projectionFactor < 0.0) {
@@ -628,10 +522,8 @@ public class LineSegmentUtil {
     }
   }
 
-  public static Coordinates project(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final double r) {
+  public static Coordinates project(final Coordinates lineStart,
+    final Coordinates lineEnd, final double r) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double z1 = lineStart.getZ();
@@ -659,8 +551,7 @@ public class LineSegmentUtil {
 
   public static Coordinates project(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
+    final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart) || point.equals2d(lineEnd)) {
       return point.clone();
@@ -680,9 +571,7 @@ public class LineSegmentUtil {
 
   public static Coordinates project(
     final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final double r) {
+    final Coordinates lineStart, final Coordinates lineEnd, final double r) {
     final Coordinates point = project(lineStart, lineEnd, r);
     precisionModel.makePrecise(point);
     return point;
@@ -698,10 +587,8 @@ public class LineSegmentUtil {
    * @param point The point coordinates.
    * @return The projection factor from (-inf -> +inf).
    */
-  public static double projectionFactor(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static double projectionFactor(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
 
@@ -727,13 +614,8 @@ public class LineSegmentUtil {
    * @param y The y coordinate for the point.
    * @return The projection factor from (-inf -> +inf).
    */
-  public static double projectionFactor(
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2,
-    final double x,
-    final double y) {
+  public static double projectionFactor(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     final double length = dx * dx + dy * dy;
@@ -741,10 +623,8 @@ public class LineSegmentUtil {
     return r;
   }
 
-  public static double segmentFraction(
-    final Coordinates lineStart,
-    final Coordinates lineEnd,
-    final Coordinates point) {
+  public static double segmentFraction(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
     final double segFrac = projectionFactor(lineStart, lineEnd, point);
     if (segFrac < 0.0) {
       return 0.0;
@@ -755,8 +635,7 @@ public class LineSegmentUtil {
     }
   }
 
-  public static CoordinatesList toCoordinatesList(
-    final int numAxis,
+  public static CoordinatesList toCoordinatesList(final int numAxis,
     final List<LineSegment> lineSegments) {
     final CoordinatesList points = new DoubleCoordinatesList(
       lineSegments.size() + 1, numAxis);

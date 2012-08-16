@@ -28,7 +28,7 @@ import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
 
 public class SelectField extends Field {
-  private String defaultValue;
+  private Object defaultValue;
 
   private String nullValueLabel = "(None)";
 
@@ -62,20 +62,28 @@ public class SelectField extends Field {
     this.stringValue = defaultValue;
   }
 
-  public void addOption(
-    final int index,
-    final Object value,
-    final String stringValue,
-    final String label) {
+  public SelectField(final String name, final Object defaultValue,
+    final boolean required,
+    final Map<? extends Object, ? extends Object> options) {
+    this(name, required);
+    this.defaultValue = defaultValue;
+    this.stringValue = defaultValue.toString();
+    for (Entry<?, ?> entry : options.entrySet()) {
+      Object value = entry.getKey();
+      Object label = entry.getValue();
+      addOption(value, label);
+    }
+  }
+
+  public void addOption(final int index, final Object value,
+    final String stringValue, final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     options.add(index, option);
     optionMap.put(stringValue, option);
     optionValueMap.put(value, option);
   }
 
-  public void addOption(
-    final Object value,
-    final Object stringValue,
+  public void addOption(final Object value, final Object stringValue,
     final String label) {
     addOption(value, stringValue.toString(), label);
   }
@@ -88,9 +96,11 @@ public class SelectField extends Field {
     addOption(value, stringValue, label);
   }
 
-  public void addOption(
-    final Object value,
-    final String stringValue,
+  public void addOption(final Object value, final Object label) {
+    addOption(value, label.toString());
+  }
+
+  public void addOption(final Object value, final String stringValue,
     final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     options.add(option);
@@ -131,7 +141,7 @@ public class SelectField extends Field {
     return field;
   }
 
-  public String getDefaultValue() {
+  public Object getDefaultValue() {
     return defaultValue;
   }
 
@@ -211,7 +221,7 @@ public class SelectField extends Field {
     }
   }
 
-  public void setDefaultValue(final String defaultValue) {
+  public void setDefaultValue(final Object defaultValue) {
     this.defaultValue = defaultValue;
   }
 

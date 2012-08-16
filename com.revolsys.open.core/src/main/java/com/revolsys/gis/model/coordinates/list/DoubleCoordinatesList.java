@@ -1,5 +1,6 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.Coordinates;
@@ -51,6 +52,14 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   public DoubleCoordinatesList(final int numAxis,
     final List<? extends Number> coordinates) {
     this(numAxis, MathUtil.toDoubleArray(coordinates));
+  }
+
+  public DoubleCoordinatesList(int numAxis, Collection<Coordinates> points) {
+    this(points.size(), numAxis);
+    int i = 0;
+    for (Coordinates point : points) {
+      setPoint(i++, point);
+    }
   }
 
   @Override

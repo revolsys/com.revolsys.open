@@ -223,7 +223,6 @@ public class Attribute extends AbstractObjectWithProperties implements
     final Integer length, final Integer scale, final Boolean required,
     final String description, final Map<String, Object> properties) {
     this.name = name;
-    this.description = description;
     this.type = type;
     if (required != null) {
       this.required = required;
@@ -257,10 +256,11 @@ public class Attribute extends AbstractObjectWithProperties implements
     }
   }
 
-  public Map<?, ?> getAllowedValues() {
+  public Map<Object, Object> getAllowedValues() {
     return allowedValues;
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T getDefaultValue() {
     return (T)defaultValue;
   }
@@ -311,6 +311,26 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   /**
+   * Get the data type of the attribute value.
+   * 
+   * @return The data type of the attribute value.
+   */
+  public String getTypeDescription() {
+    final StringBuffer typeDescription = new StringBuffer();
+    typeDescription.append(type);
+    if (length > 0) {
+      typeDescription.append('(');
+      typeDescription.append(length);
+      if (scale > 0) {
+        typeDescription.append(',');
+        typeDescription.append(scale);
+      }
+      typeDescription.append(')');
+    }
+    return typeDescription.toString();
+  }
+
+  /**
    * Return the hash code of the attribute.
    * 
    * @return The hash code.
@@ -341,6 +361,10 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   public void setDefaultValue(final Object defaultValue) {
     this.defaultValue = defaultValue;
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
   }
 
   void setIndex(final int index) {

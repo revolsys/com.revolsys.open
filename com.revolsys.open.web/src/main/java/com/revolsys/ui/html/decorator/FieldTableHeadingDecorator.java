@@ -8,6 +8,7 @@ import com.revolsys.ui.html.fields.EmailAddressField;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.view.Element;
+import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.TableRow;
 
 public class FieldTableHeadingDecorator implements Decorator {
@@ -106,13 +107,13 @@ public class FieldTableHeadingDecorator implements Decorator {
     this.label = label;
   }
 
-  public static void addRow(Form form, Field field, String label,
-    String instructions) {
+  public static void addRow(ElementContainer container, Field field,
+    String label, String instructions) {
 
     FieldTableHeadingDecorator decorator = new FieldTableHeadingDecorator(
       label, instructions);
     TableRow row = new TableRow();
     row.add(field, decorator);
-    form.add(row);
+    container.add(row);
   }
 }

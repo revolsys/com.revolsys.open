@@ -9,11 +9,14 @@ import java.util.Map;
 
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
+import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
+import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -34,6 +37,10 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   private final List<Coordinates> startPoints = new ArrayList<Coordinates>();
 
+  private BoundingBox boundingBox;
+
+  private double maxDistance;
+
   public GeometryGraph(final Geometry geometry) {
     this(GeometryFactory.getFactory(geometry));
     addGeometry(geometry);
@@ -41,6 +48,13 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public GeometryGraph(final GeometryFactory geometryFactory) {
     setGeometryFactory(geometryFactory);
+    boundingBox = new BoundingBox(geometryFactory);
+    final double scaleXY = getGeometryFactory().getScaleXY();
+    if (scaleXY > 0) {
+      maxDistance = 1 / scaleXY;
+    } else {
+      maxDistance = 0;
+    }
   }
 
   public boolean isStartPoint(Coordinates coordinates) {
@@ -59,6 +73,173 @@ public class GeometryGraph extends Graph<LineSegment> {
       edge.addAttributes(attributes);
     }
 
+  }
+
+  public Geometry getIntersection(final LineString line) {
+    List<Geometry> intersections = new ArrayList<Geometry>();
+    GeometryFactory geometryFactory = getGeometryFactory();
+    final BoundingBox boundingBox = getBoundingBox(line);
+    if (boundingBox.intersects(this.boundingBox)) {
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final int numPoints = points.size();
+      final Coordinates fromPoint = points.get(0);
+      final Coordinates toPoint = points.get(numPoints - 1);
+
+      Coordinates previousPoint = fromPoint;
+      for (int i = 1; i < numPoints; i++) {
+        final Coordinates nextPoint = points.get(i);
+        final LineSegment line1 = new LineSegment(getGeometryFactory(),
+          previousPoint, nextPoint);
+        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
+          this, line1, maxDistance);
+        for (final Edge<LineSegment> edge2 : edges) {
+          final LineSegment line2 = edge2.getObject();
+          final CoordinatesList segmentIntersection = line1.getIntersection(line2);
+          final int numIntersections = segmentIntersection.size();
+          if (numIntersections == 1) {
+            final Coordinates intersection = segmentIntersection.get(0);
+            if (intersection.equals(fromPoint) || intersection.equals(toPoint)) {
+              // Point intersection, make sure it's not at the start
+              final Node<LineSegment> node = findNode(intersection);
+              if (node == null) {
+                intersections.add(geometryFactory.createPoint(intersection));
+              } else {
+                final int degree = node.getDegree();
+                if (isStartPoint(node)) {
+                  if (degree > 2) {
+                    // Intersection not at the start/end of the other line,
+                    // taking
+                    // into account loops
+                    intersections.add(geometryFactory.createPoint(intersection));
+                  }
+                } else if (degree > 1) {
+                  // Intersection not at the start/end of the other line
+                  intersections.add(geometryFactory.createPoint(intersection));
+                }
+              }
+            } else {
+              // Intersection not at the start/end of the line
+              intersections.add(geometryFactory.createPoint(intersection));
+            }
+          } else if (numIntersections == 2) {
+            intersections.add(geometryFactory.createLineString(segmentIntersection));
+          }
+          for (final Coordinates point : line1) {
+            if (line2.distance(point) < maxDistance) {
+              if (point.equals(fromPoint) || point.equals(toPoint)) {
+                // Point intersection, make sure it's not at the start
+                for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor.getNodes(
+                  this, point, maxDistance)) {
+                  final int degree = node.getDegree();
+                  if (isStartPoint(node)) {
+                    if (degree > 2) {
+                      // Intersection not at the start/end of the other line,
+                      // taking
+                      // into account loops
+                      intersections.add(geometryFactory.createPoint(point));
+                    }
+                  } else if (degree > 1) {
+                    // Intersection not at the start/end of the other line
+                    intersections.add(geometryFactory.createPoint(point));
+                  }
+                }
+              } else {
+                // Intersection not at the start/end of the line
+                intersections.add(geometryFactory.createPoint(point));
+              }
+            }
+          }
+
+        }
+        previousPoint = nextPoint;
+      }
+    }
+    return geometryFactory.createGeometry(intersections).union();
+  }
+
+  public BoundingBox getBoundingBox(final Geometry geometry) {
+    final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    boundingBox.expandBy(maxDistance);
+    return boundingBox;
+  }
+
+  public boolean intersects(final LineString line) {
+    final BoundingBox boundingBox = BoundingBox.getBoundingBox(line);
+    final double scaleXY = getGeometryFactory().getScaleXY();
+    double maxDistance = 0;
+    if (scaleXY > 0) {
+      maxDistance = 1 / scaleXY;
+    }
+    boundingBox.expandBy(maxDistance);
+    if (boundingBox.intersects(this.boundingBox)) {
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final int numPoints = points.size();
+      final Coordinates fromPoint = points.get(0);
+      final Coordinates toPoint = points.get(numPoints - 1);
+
+      Coordinates previousPoint = fromPoint;
+      for (int i = 1; i < numPoints; i++) {
+        final Coordinates nextPoint = points.get(i);
+        final LineSegment line1 = new LineSegment(previousPoint, nextPoint);
+        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
+          this, line1, maxDistance);
+        for (final Edge<LineSegment> edge2 : edges) {
+          final LineSegment line2 = edge2.getObject();
+          final CoordinatesList intersections = line1.getIntersection(line2);
+          final int numIntersections = intersections.size();
+          for (int j = 0; j < numIntersections; j++) {
+            final Coordinates intersection = intersections.get(j);
+            if (intersection.equals(fromPoint) || intersection.equals(toPoint)) {
+              // Point intersection, make sure it's not at the start
+              final Node<LineSegment> node = findNode(intersection);
+              final int degree = node.getDegree();
+              if (isStartPoint(node)) {
+                if (degree > 2) {
+                  // Intersection not at the start/end of the other line, taking
+                  // into account loops
+                  return true;
+                }
+              } else if (degree > 1) {
+                // Intersection not at the start/end of the other line
+                return true;
+              }
+            } else {
+              // Intersection not at the start/end of the line
+              return true;
+            }
+          }
+          for (final Coordinates point : line1) {
+            if (line2.distance(point) < maxDistance) {
+
+              if (point.equals(fromPoint) || point.equals(toPoint)) {
+                // Point intersection, make sure it's not at the start
+                for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor.getNodes(
+                  this, point, maxDistance)) {
+                  final int degree = node.getDegree();
+                  if (isStartPoint(node)) {
+                    if (degree > 2) {
+                      // Intersection not at the start/end of the other line,
+                      // taking
+                      // into account loops
+                      return true;
+                    }
+                  } else if (degree > 1) {
+                    // Intersection not at the start/end of the other line
+                    return true;
+                  }
+                }
+              } else {
+                // Intersection not at the start/end of the line
+                return true;
+              }
+            }
+          }
+
+        }
+        previousPoint = nextPoint;
+      }
+    }
+    return false;
   }
 
   public void addGeometry(Geometry geometry) {
@@ -95,6 +276,9 @@ public class GeometryGraph extends Graph<LineSegment> {
         properties.remove("ringIndex");
       }
     }
+
+    BoundingBox boundingBox = getBoundingBox(geometry);
+    this.boundingBox.expandToInclude(boundingBox);
   }
 
   public void removeDuplicateLineEdges() {

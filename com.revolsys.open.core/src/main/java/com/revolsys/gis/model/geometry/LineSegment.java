@@ -6,6 +6,7 @@ import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -76,8 +77,8 @@ public class LineSegment extends AbstractCoordinatesList {
   }
 
   public LineSegment(final LineString line) {
-    this(CoordinatesListUtil.get(line, 0), CoordinatesListUtil.get(line,
-      line.getNumPoints() - 1));
+    this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line, 0),
+      CoordinatesListUtil.get(line, line.getNumPoints() - 1));
   }
 
   public LineSegment(GeometryFactory geometryFactory, final LineSegment line) {
@@ -86,6 +87,16 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public LineSegment(final LineSegment line) {
     this(line.get(0), line.get(1));
+  }
+
+  public LineSegment(double x1, double y1, double x2, double y2) {
+    this(new DoubleCoordinates(x1, y1), new DoubleCoordinates(x2, y2));
+  }
+
+  public LineSegment(GeometryFactory geometryFactory, double x1, double y1,
+    double x2, double y2) {
+    this(geometryFactory, geometryFactory.createCoordinates(x1, y1),
+      geometryFactory.createCoordinates(x2, y2));
   }
 
   public double angle() {
@@ -138,7 +149,7 @@ public class LineSegment extends AbstractCoordinatesList {
       final Coordinates ringC1 = points.get(i);
       final Coordinates ringC2 = points.get(i);
       final CoordinatesList currentIntersections = LineSegmentUtil.getIntersection(
-        coordinates1, coordinates2, ringC1, ringC2);
+        geometryFactory, coordinates1, coordinates2, ringC1, ringC2);
       if (currentIntersections.size() == 1) {
         final Coordinates currentIntersection = currentIntersections.get(0);
         if (intersection == null) {
@@ -195,7 +206,7 @@ public class LineSegment extends AbstractCoordinatesList {
   public CoordinatesList getIntersection(
     final CoordinatesPrecisionModel precisionModel,
     final LineSegment lineSegment2) {
-    return LineSegmentUtil.getIntersection(precisionModel, coordinates1,
+    return LineSegmentUtil.getIntersection(geometryFactory, coordinates1,
       coordinates2, lineSegment2.coordinates1, lineSegment2.coordinates2);
   }
 
@@ -285,14 +296,4 @@ public class LineSegment extends AbstractCoordinatesList {
   public int size() {
     return 2;
   }
-
-  @Override
-  public String toString() {
-    if (isEmpty()) {
-      return "LINESTRING EMPTY";
-    } else {
-      return getLine().toString();
-    }
-  }
-
 }

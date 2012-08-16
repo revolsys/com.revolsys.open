@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
   Filter<Edge<T>> {
-  public static <T> List<Edge<T>> edgesWithiDistance(
+  public static <T> List<Edge<T>> edgesWithinDistance(
     final Graph<T> graph,
     final Geometry geometry,
     final double maxDistance) {
@@ -35,7 +35,7 @@ public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
     final double maxDistance) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Geometry geometry = geometryFactory.createPoint(point);
-    return edgesWithiDistance(graph, geometry, maxDistance);
+    return edgesWithinDistance(graph, geometry, maxDistance);
 
   }
 
@@ -46,7 +46,7 @@ public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Coordinates coordinate = node;
     final Geometry geometry = geometryFactory.createPoint(coordinate);
-    return edgesWithiDistance(graph, geometry, maxDistance);
+    return edgesWithinDistance(graph, geometry, maxDistance);
 
   }
 

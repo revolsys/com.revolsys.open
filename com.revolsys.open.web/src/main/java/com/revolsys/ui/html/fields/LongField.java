@@ -27,6 +27,11 @@ public class LongField extends TextField {
     super(name, 10, 19, "", required);
   }
 
+  public LongField(final String name, final boolean required, Object defaultValue) {
+    super(name, 10, 19, "", required);
+    setValue(defaultValue);
+  }
+
   public Long getLongValue() {
     return (Long)getValue();
   }

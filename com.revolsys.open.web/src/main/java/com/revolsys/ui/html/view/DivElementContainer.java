@@ -27,6 +27,8 @@ public class DivElementContainer extends ElementContainer {
 
   private String cssClass;
 
+  private String style;
+
   public DivElementContainer() {
   }
 
@@ -65,7 +67,18 @@ public class DivElementContainer extends ElementContainer {
     if (cssClass != null) {
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
     }
+    if (style != null) {
+      out.attribute(HtmlUtil.ATTR_STYLE, style);
+    }
     super.serializeElement(out);
     out.endTag(HtmlUtil.DIV);
+  }
+
+  public void setStyle(String style) {
+    this.style = style;
+  }
+
+  public String getStyle() {
+    return style;
   }
 }

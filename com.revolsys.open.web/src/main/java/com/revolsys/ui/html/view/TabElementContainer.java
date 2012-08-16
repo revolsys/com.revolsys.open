@@ -1,7 +1,7 @@
 package com.revolsys.ui.html.view;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.revolsys.io.xml.XmlWriter;
@@ -16,7 +16,9 @@ public class TabElementContainer extends ElementContainer {
     setLayout(new DivLayout());
   }
 
-  private Map<String, Element> elementMap = new LinkedHashMap<String, Element>();
+  private List<String> ids = new ArrayList<String>();
+
+  private List<String> labels = new ArrayList<String>();
 
   @Override
   public void serializeElement(XmlWriter out) {
@@ -25,10 +27,11 @@ public class TabElementContainer extends ElementContainer {
     out.attribute(HtmlUtil.ATTR_ID, id);
     out.startTag(HtmlUtil.UL);
     int i = 0;
-    for (final String label : elementMap.keySet()) {
+    for (final String label : labels) {
+      String id = ids.get(i++);
       out.startTag(HtmlUtil.LI);
       out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, "#" + id + "-" + i++);
+      out.attribute(HtmlUtil.ATTR_HREF, "#" + id);
       out.text(label);
       out.endTag(HtmlUtil.A);
       out.endTag(HtmlUtil.LI);
@@ -37,8 +40,9 @@ public class TabElementContainer extends ElementContainer {
 
     i = 0;
     for (final Element element : getElements()) {
+      String id = ids.get(i++);
       out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_ID, id + "-" + i++);
+      out.attribute(HtmlUtil.ATTR_ID, id);
       element.serialize(out);
       out.endTag(HtmlUtil.DIV);
     }
@@ -47,7 +51,13 @@ public class TabElementContainer extends ElementContainer {
   }
 
   public void add(String label, Element element) {
+    String tabId = id + "-" + getElements().size();
+    add(tabId, label, element);
+  }
+
+  public void add(String tabId, String label, Element element) {
     add(element);
-    elementMap.put(label, element);
+    labels.add(label);
+    ids.add(tabId);
   }
 }

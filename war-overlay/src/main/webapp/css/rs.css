@@ -131,7 +131,9 @@ div.bodyContent {
 }
 
 div.header {
-  background: #d7ebf9 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png) 50% 50% repeat-x;
+  background: #d7ebf9
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+    50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
   color: #0046a0;
@@ -186,7 +188,9 @@ div.breadcrumb ul li a:hover {
 
 div.footer {
   clear: both;
-  background: #d7ebf9 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png) 50% 50% repeat-x;
+  background: #d7ebf9
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+    50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
   color: #0046a0;
@@ -327,7 +331,6 @@ div.objectView>table.data>tbody>tr:last-child>th,div.objectView>table.data>tbody
   border-bottom-width: 0px;
 }
 
-
 div.sideNav {
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
@@ -342,7 +345,9 @@ div.sideMenu {
 div.sideMenu div.title {
   border-top-left-radius: 0.4em;
   border-top-right-radius: 0.4em;
-  background: #3baae3 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png) 50% 50% repeat-x;
+  background: #3baae3
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
+    50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
   padding: 0.2em 0.4em 0.2em 0.4em;
@@ -407,6 +412,7 @@ form dl dd div.fieldDescription {
 }
 
 div.form {
+  
 }
 
 div.form div.field {
@@ -615,4 +621,9 @@ html.collapsibleBox>body>div.ui-accordion>h3 {
 html.collapsibleBox>body>div.ui-accordion>div.ui-accordion-content {
   border-width: 0px;
   overflow: visible;
+}
+
+.ui-tabs .ui-tabs-panel {
+  border-width: 0;
+  background-color: white;
 }
