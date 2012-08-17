@@ -18,6 +18,17 @@ public final class CollectionUtil {
     append(string, values, ",");
   }
 
+  public static <T> Integer addCount(Map<T, Integer> counts, T object) {
+    Integer count = counts.get(object);
+    if (count == null) {
+      count = 1;
+    } else {
+      count++;
+    }
+    counts.put(object, count);
+    return count;
+  }
+
   public static <T> List<T> subList(Iterable<T> iterable, int size) {
     List<T> list = new ArrayList<T>(size);
     int i = 0;

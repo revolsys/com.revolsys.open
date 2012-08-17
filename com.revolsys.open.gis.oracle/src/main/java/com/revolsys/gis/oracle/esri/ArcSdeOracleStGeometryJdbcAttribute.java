@@ -17,10 +17,10 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -78,10 +78,8 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final DataObject object) throws SQLException {
+  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final DataObject object) throws SQLException {
 
     final int entity = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
@@ -108,12 +106,14 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, Object value) throws SQLException {
     int index = parameterIndex;
 
+    if (value instanceof Coordinates) {
+      final Coordinates coordinates = (Coordinates)value;
+      value = geometryFactory.createPoint(coordinates);
+    }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
       geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);

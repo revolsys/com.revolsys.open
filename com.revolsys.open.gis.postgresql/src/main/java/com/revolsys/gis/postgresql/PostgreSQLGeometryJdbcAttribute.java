@@ -76,6 +76,10 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       } else if (object instanceof com.vividsolutions.jts.geom.Point) {
         final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
         geometry = toPgPoint(point);
+      } else if (object instanceof Coordinates) {
+        Coordinates coordinates = (Coordinates)object;
+        final com.vividsolutions.jts.geom.Point point = geometryFactory.createPoint(coordinates);
+        geometry = toPgPoint(point);
       } else if (object instanceof com.vividsolutions.jts.geom.MultiPoint) {
         final com.vividsolutions.jts.geom.MultiPoint point = (com.vividsolutions.jts.geom.MultiPoint)object;
         geometry = toPgMultiPoint(point);
@@ -148,7 +152,11 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   public Object toJdbc(final Object object) throws SQLException {
     Geometry geometry = null;
-    if (object instanceof com.vividsolutions.jts.geom.Point) {
+    if (object instanceof Coordinates) {
+      Coordinates coordinates = (Coordinates)object;
+      final com.vividsolutions.jts.geom.Point point = geometryFactory.createPoint(coordinates);
+      geometry = toPgPoint(point);
+    } else if (object instanceof com.vividsolutions.jts.geom.Point) {
       final com.vividsolutions.jts.geom.Point point = (com.vividsolutions.jts.geom.Point)object;
       geometry = toPgPoint(point);
     } else if (object instanceof com.vividsolutions.jts.geom.LineString) {

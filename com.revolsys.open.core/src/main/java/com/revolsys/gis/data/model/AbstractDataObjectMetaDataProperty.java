@@ -1,5 +1,6 @@
 package com.revolsys.gis.data.model;
 
+
 public abstract class AbstractDataObjectMetaDataProperty implements
   DataObjectMetaDataProperty {
   private DataObjectMetaData metaData;

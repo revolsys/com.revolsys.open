@@ -273,6 +273,10 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       } else if (object instanceof Point) {
         final Point point = (Point)geometry;
         jGeometry = toJGeometry(point, dimension);
+      } else if (object instanceof Coordinates) {
+        final Coordinates coordinates = (Coordinates)geometry;
+        Point point = geometryFactory.createPoint(coordinates);
+        jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof MultiPoint) {
         final MultiPoint multiPoint = (MultiPoint)geometry;
         jGeometry = toJGeometry(multiPoint, dimension);

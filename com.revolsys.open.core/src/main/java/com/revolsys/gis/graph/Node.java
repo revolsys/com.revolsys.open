@@ -546,4 +546,8 @@ public class Node<T> extends AbstractCoordinates {
       }
     }
   }
+
+  public int getEdgeCount() {
+    return getDegree();
+  }
 }
