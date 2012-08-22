@@ -78,8 +78,7 @@ public class WktParser {
   }
 
   private CoordinatesList parseCoordinates(
-    final GeometryFactory geometryFactory,
-    final StringBuffer text,
+    final GeometryFactory geometryFactory, final StringBuffer text,
     final int numAxis) {
     final int geometryFactoryNumAxis = geometryFactory.getNumAxis();
     char c = text.charAt(0);
@@ -165,8 +164,7 @@ public class WktParser {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Geometry> T parseGeometry(
-    final String value,
+  public <T extends Geometry> T parseGeometry(final String value,
     boolean useNumAxisFromGeometryFactory) {
     if (StringUtils.hasLength(value)) {
       GeometryFactory geometryFactory = this.geometryFactory;
@@ -205,9 +203,13 @@ public class WktParser {
       }
       if (this.geometryFactory.getSRID() == 0) {
         final int srid = geometry.getSRID();
-        geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
-          scaleZ);
-        return (T)geometryFactory.createGeometry(geometry);
+        if (useNumAxisFromGeometryFactory) {
+          geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+            scaleZ);
+          return (T)geometryFactory.createGeometry(geometry);
+        } else {
+          return (T)geometry;
+        }
       } else if (geometryFactory == this.geometryFactory) {
         return (T)geometry;
       } else {
@@ -236,10 +238,8 @@ public class WktParser {
     }
   }
 
-  private LineString parseLineString(
-    GeometryFactory geometryFactory,
-    boolean useNumAxisFromGeometryFactory,
-    final StringBuffer text) {
+  private LineString parseLineString(GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
       if (numAxis != geometryFactory.getNumAxis()) {
@@ -259,10 +259,8 @@ public class WktParser {
     }
   }
 
-  private MultiLineString parseMultiLineString(
-    GeometryFactory geometryFactory,
-    boolean useNumAxisFromGeometryFactory,
-    final StringBuffer text) {
+  private MultiLineString parseMultiLineString(GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
       if (numAxis != geometryFactory.getNumAxis()) {
@@ -282,10 +280,8 @@ public class WktParser {
     return geometryFactory.createMultiLineString(lines);
   }
 
-  private MultiPoint parseMultiPoint(
-    GeometryFactory geometryFactory,
-    boolean useNumAxisFromGeometryFactory,
-    final StringBuffer text) {
+  private MultiPoint parseMultiPoint(GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
       if (numAxis != geometryFactory.getNumAxis()) {
@@ -306,10 +302,8 @@ public class WktParser {
     return geometryFactory.createMultiPoint(pointsList);
   }
 
-  private MultiPolygon parseMultiPolygon(
-    GeometryFactory geometryFactory,
-    boolean useNumAxisFromGeometryFactory,
-    final StringBuffer text) {
+  private MultiPolygon parseMultiPolygon(GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
       if (numAxis != geometryFactory.getNumAxis()) {
@@ -330,8 +324,7 @@ public class WktParser {
     return geometryFactory.createMultiPolygon(polygons);
   }
 
-  private List<CoordinatesList> parseParts(
-    final StringBuffer text,
+  private List<CoordinatesList> parseParts(final StringBuffer text,
     final int numAxis) {
     final List<CoordinatesList> parts = new ArrayList<CoordinatesList>();
     final char firstChar = text.charAt(0);
@@ -359,8 +352,7 @@ public class WktParser {
     return parts;
   }
 
-  private List<List<CoordinatesList>> parsePartsList(
-    final StringBuffer text,
+  private List<List<CoordinatesList>> parsePartsList(final StringBuffer text,
     final int numAxis) {
     final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
     final char firstChar = text.charAt(0);
@@ -387,10 +379,8 @@ public class WktParser {
     return partsList;
   }
 
-  private Point parsePoint(
-    GeometryFactory geometryFactory,
-    boolean useNumAxisFromGeometryFactory,
-    final StringBuffer text) {
+  private Point parsePoint(GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
       if (numAxis != geometryFactory.getNumAxis()) {
@@ -413,10 +403,8 @@ public class WktParser {
     }
   }
 
-  private Polygon parsePolygon(
-    GeometryFactory geometryFactory,
-    boolean useNumAxisFromGeometryFactory,
-    final StringBuffer text) {
+  private Polygon parsePolygon(GeometryFactory geometryFactory,
+    boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
       if (numAxis != geometryFactory.getNumAxis()) {

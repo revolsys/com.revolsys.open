@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 
 public class IoFactoryRegistry {
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
@@ -43,6 +44,8 @@ public class IoFactoryRegistry {
   private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByMediaType = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
 
   private final Set<IoFactory> factories = new HashSet<IoFactory>();
+
+  private Map<String, String> extensionMimeTypeMap = new HashMap<String, String>();
 
   public IoFactoryRegistry() {
     final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
@@ -83,8 +86,7 @@ public class IoFactoryRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  private void addFactory(
-    final IoFactory factory,
+  private void addFactory(final IoFactory factory,
     final Class<? extends IoFactory> factoryClass) {
     final Class<?>[] interfaces = factoryClass.getInterfaces();
     for (final Class<?> factoryInterface : interfaces) {
@@ -95,6 +97,9 @@ public class IoFactoryRegistry {
           for (final String fileExtension : factory.getFileExtensions()) {
             final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
+            for (final String mediaType : factory.getMediaTypes()) {
+              extensionMimeTypeMap.put(fileExtension, mediaType);
+            }
           }
           final Map<String, IoFactory> factoriesByMediaType = getFactoriesByMediaType(ioInterface);
           for (final String mediaType : factory.getMediaTypes()) {
@@ -127,9 +132,12 @@ public class IoFactoryRegistry {
     return factories;
   }
 
+  public Map<String, String> getExtensionMimeTypeMap() {
+    return extensionMimeTypeMap;
+  }
+
   public <F extends IoFactory> List<F> getFactoriesByFileExtension(
-    final Class<F> factoryClass,
-    final List<String> fileExtensions) {
+    final Class<F> factoryClass, final List<String> fileExtensions) {
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
     final List<F> factories = new ArrayList<F>();
     for (final String fileExtension : fileExtensions) {
@@ -164,29 +172,25 @@ public class IoFactoryRegistry {
   }
 
   public <F extends IoFactory> F getFactoryByFileExtension(
-    final Class<F> factoryClass,
-    final String fileExtension) {
+    final Class<F> factoryClass, final String fileExtension) {
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
     return factoriesByFileExtension.get(fileExtension);
   }
 
   public <F extends IoFactory> F getFactoryByFileName(
-    final Class<F> factoryClass,
-    final String fileName) {
+    final Class<F> factoryClass, final String fileName) {
     final String fileExtension = FileUtil.getFileNameExtension(fileName);
     return getFactoryByFileExtension(factoryClass, fileExtension);
   }
 
   public <F extends IoFactory> F getFactoryByMediaType(
-    final Class<F> factoryClass,
-    final String mediaType) {
+    final Class<F> factoryClass, final String mediaType) {
     final Map<String, F> factoriesByMediaType = getFactoriesByMediaType(factoryClass);
     return factoriesByMediaType.get(mediaType);
   }
 
   public <F extends IoFactory> F getFactoryByResource(
-    final Class<F> factoryClass,
-    final Resource resource) {
+    final Class<F> factoryClass, final Resource resource) {
     String fileName;
     if (resource instanceof UrlResource) {
       final UrlResource urlResoure = (UrlResource)resource;

@@ -75,26 +75,29 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {
-    final String typePath = metaData.getPath();
-    final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
-    String shortName = ShortNameProperty.getShortName(metaData);
-    final String sequenceName;
-    if (StringUtils.hasText(shortName)) {
-      if (useSchemaSequencePrefix) {
-        sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
-      } else {
-        sequenceName = shortName.toLowerCase() + "_SEQ";
-      }
+    if (metaData == null) {
+      return null;
     } else {
-      final String tableName = getDatabaseTableName(typePath);
-      if (useSchemaSequencePrefix) {
-        sequenceName = schema + "." + tableName + "_SEQ";
+      final String typePath = metaData.getPath();
+      final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
+      String shortName = ShortNameProperty.getShortName(metaData);
+      final String sequenceName;
+      if (StringUtils.hasText(shortName)) {
+        if (useSchemaSequencePrefix) {
+          sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
+        } else {
+          sequenceName = shortName.toLowerCase() + "_SEQ";
+        }
       } else {
-        sequenceName = tableName + "_SEQ";
+        final String tableName = getDatabaseTableName(typePath);
+        if (useSchemaSequencePrefix) {
+          sequenceName = schema + "." + tableName + "_SEQ";
+        } else {
+          sequenceName = tableName + "_SEQ";
+        }
       }
+      return sequenceName;
     }
-    return sequenceName;
-
   }
 
   @Override
@@ -139,13 +142,13 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       addAttributeAdder("DATE", attributeAdder);
       addAttributeAdder("TIMESTAMP", attributeAdder);
 
-      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(this,
-        getDataSource(), getConnection());
+      final JdbcAttributeAdder stGeometryAttributeAdder = new StGeometryAttributeAdder(
+        this, getDataSource(), getConnection());
       addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
       addAttributeAdder("SDE.ST_GEOMETRY", stGeometryAttributeAdder);
 
-      final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(this,
-        getDataSource());
+      final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(
+        this, getDataSource());
       addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
       addAttributeAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
     }
@@ -173,8 +176,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public Query createBoundingBoxQuery(
-    final Query query,
+  public Query createBoundingBoxQuery(final Query query,
     final BoundingBox boundingBox) {
     Query boundingBoxQuery = query.clone();
     final String typePath = boundingBoxQuery.getTypeName();

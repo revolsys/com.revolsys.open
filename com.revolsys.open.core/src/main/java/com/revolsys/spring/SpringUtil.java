@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,6 +58,22 @@ public class SpringUtil {
         FileUtil.copy(in, out);
       } finally {
         FileUtil.closeSilent(out);
+      }
+    } finally {
+      FileUtil.closeSilent(in);
+    }
+  }
+
+  public static String getContents(final Resource resource) {
+    final InputStream in = getInputStream(resource);
+    final Reader reader = new InputStreamReader(in);
+    try {
+      final Writer writer = new StringWriter();
+      try {
+        FileUtil.copy(reader, writer);
+        return writer.toString();
+      } finally {
+        FileUtil.closeSilent(writer);
       }
     } finally {
       FileUtil.closeSilent(in);

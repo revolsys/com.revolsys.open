@@ -26,7 +26,7 @@ public class GeometryStringConverter implements StringConverter<Geometry> {
   }
 
   public Geometry toObject(final String string) {
-    return new WktParser().parseGeometry(string);
+    return new WktParser().parseGeometry(string,false);
   }
 
   public String toString(final Object value) {
