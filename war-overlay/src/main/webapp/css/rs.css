@@ -656,4 +656,5 @@ html.collapsibleBox>body>div.ui-accordion>div.ui-accordion-content {
 .ui-tabs .ui-tabs-panel {
   border-width: 0;
   background-color: white;
+  padding: 0.5em;
 }

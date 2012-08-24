@@ -94,8 +94,8 @@ function refreshButtons(root) {
   });
 }
 
-function tableWindowResize(table, percent) {
-  if (percent != undefined) {
+function tableDraw(table, heightPercent) {
+  if (heightPercent > 0) {
     var tableDiv = table.closest('div.table');
 
     var bodyDiv = tableDiv.closest('div.body');
@@ -107,29 +107,44 @@ function tableWindowResize(table, percent) {
       var otherHeight = $(bodyDiv).outerHeight(false) - bodyContent.height();
       var settings = table.fnSettings();
       var tableOverhead = collapsibleBox.outerHeight(false) - scrollHeight;
-      var newHeight = Math.round(($(window).height() - otherHeight) * percent)
+      var newHeight = Math.round(($(window).height() - otherHeight) * heightPercent)
           - tableOverhead - 15;
       if (newHeight < 50) {
         newHeight = 50;
       }
       if (newHeight != settings.oScroll.sY) {
         settings.oScroll.sY = newHeight;
-        table.fnDraw();
       }
     }
   }
+  table.fnDraw();
 }
-function tableShowEvents(table) {
+
+function tableShowEvents(table, heightPercent) {
   table.closest('.ui-accordion').bind('accordionchange', function(event, ui) {
     if ($(ui.panel).find(table).length > 0) {
-      table.fnDraw();
+      tableDraw(table, heightPercent);
     }
   });
-  table.closest('.ui-tabs').bind('tabsshow', function(event, ui) {
-    if ($(ui.panel).find(table).length > 0) {
-      table.fnDraw();
+  var tabs = table.closest('.ui-tabs');
+  if (tabs.length > 0) {
+    tabs.bind('tabsshow', function(event, ui) {
+      if ($(ui.panel).find(table).length > 0) {
+        tableDraw(table, heightPercent);
+      }
+    });
+
+    var tab = $('.ui-tabs-panel:not(.ui-tabs-hide)', tabs);
+    if (tab.find(table).length > 0) {
+      tableDraw(table, heightPercent);
     }
-  });
+    $(window).resize(function () {
+      var tab = $('.ui-tabs-panel:not(.ui-tabs-hide)', tabs);
+      if (tab.find(table).length > 0) {
+        tableDraw(table, heightPercent);
+      }
+    });
+  }
 }
 
 $(document).ready(
@@ -167,13 +182,6 @@ $(document).ready(
       },
       select : function(event, ui) {
         window.location.replace(ui.tab.hash);
-      }
-    });
-    $('div.jqueryTabs').each(function() {
-      var tab = $('.ui-tabs-panel:not(.ui-tabs-hide)', this);
-      var tables = $('table.dataTable', tab);
-      if (tables.length > 0) {
-        table.fnDraw();
       }
     });
     $('div.objectList table').dataTable({

@@ -2,7 +2,6 @@ package com.revolsys.ui.html.builder;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,8 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
+import com.revolsys.ui.html.view.Element;
+import com.revolsys.ui.html.view.TabElementContainer;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -154,23 +155,21 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   }
 
   public Object createDataTableHandler(final HttpServletRequest request,
-    String pageName) {
-    Map<String, Object> parameters = Collections.emptyMap();
-    return createDataTableHandler(request, pageName, parameters);
-  }
-
-  public Object createDataTableHandler(final HttpServletRequest request,
     String pageName, Map<String, Object> parameters) {
     if (request.getParameter("_") == null) {
-      parameters = new HashMap<String, Object>(parameters);
-      if (parameters.get("scrollYPercent") == null) {
-        parameters.put("scrollYPercent", 0.98);
-      }
-      return createDataTable(request, pageName, null, parameters);
+      TabElementContainer tabs = new TabElementContainer();
+      addDataTable(tabs, this, pageName, parameters);
+      return tabs;
     } else {
       return createDataTableMap(request, pageName, parameters);
 
     }
+  }
+
+  public Object createDataTableHandler(final HttpServletRequest request,
+    String pageName) {
+    Map<String, Object> parameters = Collections.emptyMap();
+    return createDataTableHandler(request, pageName, parameters);
   }
 
   @SuppressWarnings("unchecked")
