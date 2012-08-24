@@ -24,9 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -160,6 +158,19 @@ public final class DataObjectUtil {
     }
   }
 
+  public static Integer getInteger(final DataObject object,
+    final String attributeName, Integer defaultValue) {
+    if (object == null) {
+      return null;
+    } else {
+      final Number value = object.getValue(attributeName);
+      if (value == null) {
+        return defaultValue;
+      } else {
+        return value.intValue();
+      }
+    }
+  }
   public static boolean getBoolean(final DataObject object,
     final String attributeName) {
     if (object == null) {
