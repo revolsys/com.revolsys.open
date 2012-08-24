@@ -2,6 +2,7 @@ package com.revolsys.ui.html.builder;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -158,74 +159,84 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     return createDataTableHandler(request, pageName, parameters);
   }
 
-  @SuppressWarnings("unchecked")
   public Object createDataTableHandler(final HttpServletRequest request,
     String pageName, Map<String, Object> parameters) {
-    String search = request.getParameter("sSearch");
-    if (search == null) {
-      return createDataTable(request, pageName, 400, parameters);
-    } else {
-      DataObjectMetaData metaData = getDataStore().getMetaData(getTableName());
-      final Query query = new Query(metaData);
-
-      Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
-      if (filter != null) {
-        query.setFilter(filter);
+    if (request.getParameter("_") == null) {
+      parameters = new HashMap<String, Object>(parameters);
+      if (parameters.get("scrollYPercent") == null) {
+        parameters.put("scrollYPercent", 0.98);
       }
+      return createDataTable(request, pageName, null, parameters);
+    } else {
+      return createDataTableMap(request, pageName, parameters);
 
-      String fromClause = (String)parameters.get("fromClause");
-      query.setFromClause(fromClause);
+    }
+  }
 
-      if (StringUtils.hasText(search)) {
-        search = search.toUpperCase();
-        List<KeySerializer> serializers = getSerializers(pageName, "list");
-        StringBuffer whereClause = new StringBuffer();
-        int numSortColumns = HttpRequestUtils.getIntegerParameter(request,
-          "iColumns");
-        for (int i = 0; i < numSortColumns; i++) {
-          if (HttpRequestUtils.getBooleanParameter(request, "bSearchable_" + i)) {
-            if (whereClause.length() > 0) {
-              whereClause.append(" OR ");
-            }
-            KeySerializer serializer = serializers.get(i);
-            String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-            Class<?> columnClass = metaData.getAttributeType(columnName)
-              .getJavaClass();
-            if (columnClass != null) {
-              if (columnClass.equals(String.class)) {
-                whereClause.append("UPPER(T.");
-                whereClause.append(columnName);
-                whereClause.append(") LIKE ?");
-                query.addParameter("%" + search + "%");
-              } else if (Number.class.isAssignableFrom(columnClass)) {
-                whereClause.append("TO_CHAR(T.");
-                whereClause.append(columnName);
-                whereClause.append(", '9999999999999999999.9999999999999999999') LIKE ?");
-                query.addParameter("%" + search + "%");
-              } else if (Date.class.isAssignableFrom(columnClass)) {
-                whereClause.append("TO_CHAR(T.");
-                whereClause.append(columnName);
-                whereClause.append(", 'YYYY-MM-DD HH24:MI:SS') LIKE ?");
-                query.addParameter("%" + search + "%");
-              }
-            }
-          }
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> createDataTableMap(
+    final HttpServletRequest request, String pageName,
+    Map<String, Object> parameters) {
+    String search = request.getParameter("sSearch");
+    DataObjectMetaData metaData = getDataStore().getMetaData(getTableName());
+    final Query query = new Query(metaData);
+
+    Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
+    if (filter != null) {
+      query.setFilter(filter);
+    }
+
+    String fromClause = (String)parameters.get("fromClause");
+    query.setFromClause(fromClause);
+
+    if (StringUtils.hasText(search)) {
+      search = search.toUpperCase();
+      List<KeySerializer> serializers = getSerializers(pageName, "list");
+      StringBuffer whereClause = new StringBuffer();
+      int numSortColumns = HttpRequestUtils.getIntegerParameter(request,
+        "iColumns");
+      for (int i = 0; i < numSortColumns; i++) {
+        if (HttpRequestUtils.getBooleanParameter(request, "bSearchable_" + i)) {
           if (whereClause.length() > 0) {
-            query.setWhereClause(whereClause.toString());
+            whereClause.append(" OR ");
+          }
+          KeySerializer serializer = serializers.get(i);
+          String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
+          Class<?> columnClass = metaData.getAttributeType(columnName)
+            .getJavaClass();
+          if (columnClass != null) {
+            if (columnClass.equals(String.class)) {
+              whereClause.append("UPPER(T.");
+              whereClause.append(columnName);
+              whereClause.append(") LIKE ?");
+              query.addParameter("%" + search + "%");
+            } else if (Number.class.isAssignableFrom(columnClass)) {
+              whereClause.append("TO_CHAR(T.");
+              whereClause.append(columnName);
+              whereClause.append(", '9999999999999999999.9999999999999999999') LIKE ?");
+              query.addParameter("%" + search + "%");
+            } else if (Date.class.isAssignableFrom(columnClass)) {
+              whereClause.append("TO_CHAR(T.");
+              whereClause.append(columnName);
+              whereClause.append(", 'YYYY-MM-DD HH24:MI:SS') LIKE ?");
+              query.addParameter("%" + search + "%");
+            }
           }
         }
+        if (whereClause.length() > 0) {
+          query.setWhereClause(whereClause.toString());
+        }
       }
+    }
 
-      final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
-      query.setOrderBy(orderBy);
+    final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
+    query.setOrderBy(orderBy);
 
-      final ResultPager<DataObject> pager = getResultPager(query);
-      try {
-        return createDataTableMap(request, pager, pageName);
-      } finally {
-        pager.close();
-      }
-
+    final ResultPager<DataObject> pager = getResultPager(query);
+    try {
+      return createDataTableMap(request, pager, pageName);
+    } finally {
+      pager.close();
     }
   }
 

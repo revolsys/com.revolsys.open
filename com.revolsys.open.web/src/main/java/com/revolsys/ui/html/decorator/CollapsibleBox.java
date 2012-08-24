@@ -10,6 +10,8 @@ public class CollapsibleBox implements Decorator {
 
   private boolean open;
 
+  private String style;
+
   public CollapsibleBox() {
   }
 
@@ -19,6 +21,13 @@ public class CollapsibleBox implements Decorator {
 
   public CollapsibleBox(final String title, final boolean open) {
     this.title = title;
+    this.open = open;
+  }
+
+  public CollapsibleBox(final String title, final String style,
+    final boolean open) {
+    this.title = title;
+    this.style = style;
     this.open = open;
   }
 
@@ -37,6 +46,7 @@ public class CollapsibleBox implements Decorator {
       cssClass += " closed";
     }
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    out.attribute(HtmlUtil.ATTR_STYLE, style);
 
     out.startTag(HtmlUtil.H3);
     HtmlUtil.serializeA(out, null, "#", title);

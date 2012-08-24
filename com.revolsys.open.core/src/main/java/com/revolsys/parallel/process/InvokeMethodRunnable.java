@@ -1,8 +1,8 @@
 package com.revolsys.parallel.process;
 
-import org.apache.commons.beanutils.MethodUtils;
+import java.util.Arrays;
 
-import com.revolsys.util.ExceptionUtil;
+import org.apache.commons.beanutils.MethodUtils;
 
 /**
  * A runnable class which will invoke a method on an object with the specified
@@ -52,19 +52,27 @@ public class InvokeMethodRunnable implements Runnable {
    */
   public void run() {
     try {
-      if (object instanceof Class<?>) {
+      if (object == null) {
+        throw new RuntimeException("Object cannot be null " + this);
+      } else if (object instanceof Class<?>) {
         final Class<?> clazz = (Class<?>)object;
         MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
       } else {
         MethodUtils.invokeMethod(object, methodName, parameters);
       }
-    } catch (final Throwable e) {
-      ExceptionUtil.throwUncheckedException(e);
+    } catch (Throwable e) {
+      throw new RuntimeException("Unable to invoke " + this, e);
     }
   }
 
   @Override
   public String toString() {
-    return object.getClass() + "." + methodName + parameters;
+    if (object == null) {
+      return object + "." + methodName + parameters;
+    } else if (object instanceof Class<?>) {
+      return object + "." + methodName + parameters;
+    } else {
+      return object.getClass() + "." + methodName + Arrays.toString(parameters);
+    }
   }
 }
