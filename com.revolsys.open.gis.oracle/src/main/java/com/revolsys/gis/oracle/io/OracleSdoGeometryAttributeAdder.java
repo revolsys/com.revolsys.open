@@ -118,13 +118,9 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    String dataTypeName,
-    final int sqlType,
-    final int length,
-    final int scale, final boolean required) {
+  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, String dataTypeName, final int sqlType,
+    final int length, final int scale, final boolean required) {
     final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
     final DataObjectStoreSchema schema = metaData.getSchema();
@@ -174,11 +170,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   }
 
-  private Object getColumnProperty(
-    final DataObjectStoreSchema schema,
-    final String typePath,
-    final String columnName,
-    final String propertyName) {
+  private Object getColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
     final Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(OracleSdoGeometryJdbcAttribute.SCHEMA_PROPERTY);
     final Map<String, Map<String, Object>> columnsProperties = columnProperties.get(typePath);
     if (columnsProperties != null) {
@@ -191,11 +184,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     return null;
   }
 
-  private double getDoubleColumnProperty(
-    final DataObjectStoreSchema schema,
-    final String typePath,
-    final String columnName,
-    final String propertyName) {
+  private double getDoubleColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
     if (value instanceof Number) {
@@ -206,11 +196,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private int getIntegerColumnProperty(
-    final DataObjectStoreSchema schema,
-    final String typePath,
-    final String columnName,
-    final String propertyName) {
+  private int getIntegerColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
     if (value instanceof Number) {
@@ -269,7 +256,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
             JdbcUtils.close(statement);
           }
         } finally {
-          JdbcUtils.close(connection);
+          JdbcUtils.release(connection, dataSource);
         }
       } catch (final SQLException e) {
         LOG.error("Unable to initialize", e);
@@ -279,11 +266,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private void setColumnProperty(
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties,
-    final String schemaName,
-    final String tableName,
-    final String columnName,
-    final String propertyName,
-    final Object propertyValue) {
+    final String schemaName, final String tableName, final String columnName,
+    final String propertyName, final Object propertyValue) {
     final String typePath = PathUtil.toPath(schemaName, tableName);
     Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typePath);
     if (typeColumnMap == null) {

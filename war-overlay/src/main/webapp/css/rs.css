@@ -297,16 +297,15 @@ div.form>form>div.objectView>table.data {
 }
 
 div.objectView {
-  border: 2px solid #aed0ea;
-  border-radius: 0.5em;
   width: auto;
 }
 
 div.objectView>table.data {
+  border: 1px solid #aed0ea;
+  border-radius: 0.5em;
   border-spacing: 0px;
   margin: 0px;
-  width: 100%;
-  margin: 0px;
+  max-width: 100%;
 }
 
 div.objectView>table.data>tbody>tr:first-child>th:first-child {
@@ -328,13 +327,13 @@ div.objectView>table.data>tbody>tr:last-child>td:last-child {
 div.objectView>table.data>tbody>tr>th {
   background-color: #d7ebf9;
   border-bottom: 1px solid white;
-  padding: 0.3em 0.4em 0.3em 0.4em;
+  padding: 0.3em 0.6em 0.3em 0.6em;
   text-align: right;
 }
 
 div.objectView>table.data>tbody>tr>td {
   border-bottom: 1px solid #cccccc;
-  padding: 0.3em 0.4em 0.3em 0.4em;
+  padding: 0.3em 0.6em 0.3em 0.6em;
 }
 
 div.objectView>table.data>tbody>tr:nth-of-type(even)>td {
@@ -581,6 +580,53 @@ button.ui-button-icon-only {
 input.ui-button,.ui-button-text-only span.ui-button-text {
   line-height: 1.2em;
   padding: 0.2em 0.4em;
+}
+
+div.simpleDataTable>div div.fg-toolbar {
+  padding: 0px;
+  border: 0px;
+}
+
+div.simpleDataTable>div>table {
+  border: 1px solid #aed0ea;
+  border-collapse: inherit;
+  border-spacing: 0px;
+  padding: 0px;
+  border-radius: 6px;
+}
+
+div.simpleDataTable>div>table.data>thead>tr:first-child>th {
+  border-top-width: 0px;
+}
+
+div.simpleDataTable>div>table.data>thead>tr:first-child>th {
+  border-left-width: 0px;
+}
+
+div.simpleDataTable>div>table.data>thead>tr:first-child>:first-child {
+  border-top-left-radius: 6px;
+}
+
+div.simpleDataTable>div>table.data>thead>tr:first-child>:last-child {
+  border-top-right-radius: 6px;
+  border-right-width: 0px;
+}
+
+div.simpleDataTable>div>table.data>tbody>tr:last-child>:first-child {
+  border-bottom-left-radius: 6px;
+}
+
+div.simpleDataTable>div>table.data>tbody>tr:last-child>:last-child {
+  border-bottom-right-radius: 6px;
+}
+
+table.dataTable>tbody {
+  border-left: 1px solid #aed0ea;
+  border-right: 1px solid #aed0ea;
+}
+
+table.dataTable>tbody>tr.odd {
+  background-color: #eeeeee;
 }
 
 table.dataTable thead th,table.dataTable tbody td {

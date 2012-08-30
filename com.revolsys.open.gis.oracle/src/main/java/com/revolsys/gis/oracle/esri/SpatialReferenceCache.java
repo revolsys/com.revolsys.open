@@ -88,7 +88,7 @@ public class SpatialReferenceCache {
           }
         } finally {
           if (this.dataSource != null) {
-            JdbcUtils.close(connection);
+            JdbcUtils.release(connection, dataSource);
           }
         }
       } catch (final SQLException e) {

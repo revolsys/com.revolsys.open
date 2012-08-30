@@ -75,9 +75,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   @PreDestroy
   public void close() {
     JdbcUtils.close(statement, resultSet);
-    if (dataSource != null) {
-      JdbcUtils.close(connection);
-    }
+    JdbcUtils.release(connection, dataSource);
     connection = null;
     dataObjectFactory = null;
     dataSource = null;

@@ -142,7 +142,7 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
           } catch (final SQLException e) {
             throw new RuntimeException("Failed to commit data:", e);
           } finally {
-            JdbcUtils.close(connection);
+            JdbcUtils.release(connection, dataSource);
             dataSource = null;
             connection = null;
           }

@@ -72,7 +72,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         return id;
 
       } finally {
-        JdbcUtils.close(connection);
+        JdbcUtils.release(connection, dataSource);
       }
 
     } catch (final SQLException e) {

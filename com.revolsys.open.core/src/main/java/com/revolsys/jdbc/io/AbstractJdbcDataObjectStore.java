@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -139,7 +138,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
       if (connection != null) {
         if (dataSource != null) {
-          JdbcUtils.close(connection);
+          JdbcUtils.release(connection, dataSource);
         }
       }
       if (databaseFactory != null && dataSource != null) {
@@ -280,7 +279,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       throw new RuntimeException("Unable to delete : " + sql, e);
     } finally {
       if (dataSource != null) {
-        JdbcUtils.close(connection);
+        JdbcUtils.release(connection, dataSource);
       }
     }
   }
@@ -668,10 +667,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void releaseConnection(final Connection connection) {
-    if (dataSource != null) {
-      JdbcUtils.close(connection);
-    }
-
+    JdbcUtils.release(connection, dataSource);
   }
 
   public void setBatchSize(final int batchSize) {

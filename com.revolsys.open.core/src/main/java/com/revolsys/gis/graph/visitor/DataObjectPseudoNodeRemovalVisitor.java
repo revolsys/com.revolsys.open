@@ -65,8 +65,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     }
   }
 
-  private void mergeEdgePairs(
-    final Node<DataObject> node,
+  private void mergeEdgePairs(final Node<DataObject> node,
     final List<EdgePair<DataObject>> edgePairs) {
     if (edgePairs != null) {
       for (final EdgePair<DataObject> edgePair : edgePairs) {
@@ -80,10 +79,8 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     }
   }
 
-  protected Edge<DataObject> mergeEdges(
-    final Node<DataObject> node,
-    final Edge<DataObject> edge1,
-    final Edge<DataObject> edge2) {
+  protected Edge<DataObject> mergeEdges(final Node<DataObject> node,
+    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
 
     final DataObject object2 = edge2.getObject();
@@ -98,10 +95,8 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     return newEdge;
   }
 
-  protected DataObject mergeObjects(
-    final Node<DataObject> node,
-    final DataObject object1,
-    final DataObject object2) {
+  protected DataObject mergeObjects(final Node<DataObject> node,
+    final DataObject object1, final DataObject object2) {
     return DirectionalAttributes.merge(node, object1, object2);
   }
 
@@ -117,8 +112,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     }
   }
 
-  private void processPseudoNodesForType(
-    final Node<DataObject> node,
+  private void processPseudoNodesForType(final Node<DataObject> node,
     final PseudoNodeAttribute pseudoNodeAttribute) {
     final List<EdgePair<DataObject>> reversedEdgePairs = pseudoNodeAttribute.getReversedEdgePairs();
     mergeEdgePairs(node, reversedEdgePairs);

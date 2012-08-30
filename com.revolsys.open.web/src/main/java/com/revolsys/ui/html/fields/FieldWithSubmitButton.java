@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
+import com.revolsys.ui.html.view.ElementContainer;
 
 public class FieldWithSubmitButton extends Field {
 
@@ -26,5 +27,13 @@ public class FieldWithSubmitButton extends Field {
   public void serializeElement(final XmlWriter out) {
     field.serialize(out);
     HtmlUtil.serializeSubmitInput(out, getName(), getValue());
+  }
+
+  @Override
+  public void setContainer(ElementContainer container) {
+    super.setContainer(container);
+    if (field != null) {
+      field.setContainer(container);
+    }
   }
 }

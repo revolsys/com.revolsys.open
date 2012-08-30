@@ -17,10 +17,13 @@ import com.revolsys.ui.html.serializer.type.TypeSerializer;
 public class BuilderMethodSerializer extends AbstractKeySerializer implements
   TypeSerializer {
   /** The HTML UI Builder */
-  private final HtmlUiBuilder<?> builder;
+  private HtmlUiBuilder<?> builder;
 
   /** The method on the builder */
-  private final Method method;
+  private Method method;
+
+  public BuilderMethodSerializer() {
+  }
 
   /**
    * Construt a new HtmlUiBuilderMethodSerializer.

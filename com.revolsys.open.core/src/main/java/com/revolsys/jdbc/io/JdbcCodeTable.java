@@ -140,7 +140,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
         } catch (final SQLException e) {
           LOG.error(e.getMessage(), e);
         }
-        JdbcUtils.close(connection);
+        JdbcUtils.release(connection, dataSource);
       }
 
     } catch (final SQLException e) {
@@ -244,7 +244,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
           JdbcUtils.close(statement);
         }
       } finally {
-        JdbcUtils.close(connection);
+        JdbcUtils.release(connection, dataSource);
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to load all values for: " + tableName,
@@ -281,7 +281,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
             JdbcUtils.close(statement);
           }
         } finally {
-          JdbcUtils.close(connection);
+          JdbcUtils.release(connection, dataSource);
         }
       } catch (final SQLException e) {
         throw new RuntimeException(tableName + ": Unable to load ID: ", e);
@@ -324,7 +324,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
             JdbcUtils.close(statement);
           }
         } finally {
-          JdbcUtils.close(connection);
+          JdbcUtils.release(connection, dataSource);
         }
       } catch (final SQLException e) {
         throw new IllegalArgumentException(tableName + " " + id

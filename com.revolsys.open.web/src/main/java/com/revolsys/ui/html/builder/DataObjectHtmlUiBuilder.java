@@ -1,13 +1,16 @@
 package com.revolsys.ui.html.builder;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.util.StringUtils;
 
@@ -21,8 +24,8 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
-import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.TabElementContainer;
+import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -156,13 +159,23 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   public Object createDataTableHandler(final HttpServletRequest request,
     String pageName, Map<String, Object> parameters) {
-    if (request.getParameter("_") == null) {
-      TabElementContainer tabs = new TabElementContainer();
-      addDataTable(tabs, this, pageName, parameters);
-      return tabs;
-    } else {
+    if (isDataTableCallback(request)) {
       return createDataTableMap(request, pageName, parameters);
+    } else {
+      TabElementContainer tabs = new TabElementContainer();
+      addTabDataTable(tabs, this, pageName, parameters);
+      return tabs;
+    }
+  }
 
+  public Object createDataTableHandlerOrRedirect(
+    final HttpServletRequest request, final HttpServletResponse response,
+    String pageName, Object parentBuilder, String parentPageName,
+    Map<String, Object> parameters) {
+    if (isDataTableCallback(request)) {
+      return createDataTableMap(request, pageName, parameters);
+    } else {
+      return redirectToTab(response, parentBuilder, parentPageName, pageName);
     }
   }
 

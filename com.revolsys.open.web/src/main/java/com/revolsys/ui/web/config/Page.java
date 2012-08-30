@@ -107,6 +107,11 @@ public class Page extends Component {
     this.secure = secure;
   }
 
+  @Override
+  public String toString() {
+    return getName();
+  }
+
   public void addArgument(final Argument argument) {
     if (!hasArgument(argument.getName())) {
       arguments.add(argument);

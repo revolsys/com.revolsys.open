@@ -96,6 +96,7 @@ function refreshButtons(root) {
 
 function tableDraw(table, heightPercent) {
   if (heightPercent > 0) {
+    var settings = table.fnSettings();
     var tableDiv = table.closest('div.table');
 
     var bodyDiv = tableDiv.closest('div.body');
@@ -104,16 +105,32 @@ function tableDraw(table, heightPercent) {
     var scrollHeight = tableScroll.height();
     if (scrollHeight != null) {
       var collapsibleBox = tableDiv.closest('div.collapsibleBox');
-      var otherHeight = $(bodyDiv).outerHeight(false) - bodyContent.height();
-      var settings = table.fnSettings();
-      var tableOverhead = collapsibleBox.outerHeight(false) - scrollHeight;
-      var newHeight = Math.round(($(window).height() - otherHeight) * heightPercent)
-          - tableOverhead - 15;
-      if (newHeight < 50) {
-        newHeight = 50;
+      if (collapsibleBox.length > 0) {
+        var otherHeight = $(bodyDiv).outerHeight(false) - bodyContent.height();
+        var tableOverhead = collapsibleBox.outerHeight(false) - scrollHeight;
+        var newHeight = Math.round(($(window).height() - otherHeight)
+            * heightPercent)
+            - tableOverhead - 15;
+        if (newHeight < 50) {
+          newHeight = 50;
+        }
+        if (newHeight != settings.oScroll.sY) {
+          settings.oScroll.sY = newHeight;
+        }
       }
-      if (newHeight != settings.oScroll.sY) {
-        settings.oScroll.sY = newHeight;
+      var tabPanel = tableDiv.closest('div.ui-tabs-panel');
+      if (tabPanel.length > 0) {
+        var allScroll = $('div.dataTables_scrollBody', tabPanel);
+        var allScrollHeight = allScroll.height();
+        var otherHeight = $(bodyDiv).outerHeight(false) - allScrollHeight;
+        var availableHeight = $(window).height() - otherHeight - 5;
+        var newHeight = Math.round(availableHeight * heightPercent);
+        if (newHeight < 50) {
+          newHeight = 50;
+        }
+        if (newHeight != settings.oScroll.sY) {
+          settings.oScroll.sY = newHeight;
+        }
       }
     }
   }
@@ -138,7 +155,7 @@ function tableShowEvents(table, heightPercent) {
     if (tab.find(table).length > 0) {
       tableDraw(table, heightPercent);
     }
-    $(window).resize(function () {
+    $(window).resize(function() {
       var tab = $('.ui-tabs-panel:not(.ui-tabs-hide)', tabs);
       if (tab.find(table).length > 0) {
         tableDraw(table, heightPercent);
@@ -188,6 +205,14 @@ $(document).ready(
       "bJQueryUI" : true,
       "bPaginate" : false,
       "bSort" : false
+    });
+
+    $('div.simpleDataTable table').dataTable({
+      "bInfo" : false,
+      "bJQueryUI" : true,
+      "bPaginate" : false,
+      "bSort" : false,
+      "bFilter" : false
     });
 
     $('div.form').each(

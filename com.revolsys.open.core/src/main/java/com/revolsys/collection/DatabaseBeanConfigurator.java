@@ -105,7 +105,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
           JdbcUtils.close(statement);
         }
       } finally {
-        JdbcUtils.close(connection);
+        JdbcUtils.release(connection, dataSource);
       }
     } catch (final Throwable e) {
       LOG.error("Unable to load configuration from database ", e);

@@ -180,7 +180,7 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
     } catch (final SQLException e) {
       throw new BeanInitializationException(e.getMessage(), e);
     } finally {
-      JdbcUtils.close(connection);
+      JdbcUtils.release(connection, dataSource);
     }
 
     processProperties(beanFactory, properties);
@@ -193,8 +193,7 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor,
    * @param properties the Properties to apply
    */
   protected abstract void processProperties(
-    ConfigurableListableBeanFactory beanFactory,
-    Map properties);
+    ConfigurableListableBeanFactory beanFactory, Map properties);
 
   /**
    * Set the data source used to load properties from.

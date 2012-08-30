@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.Attribute;
@@ -33,18 +35,6 @@ public final class JdbcUtils {
 
   public static String cleanObjectName(final String objectName) {
     return objectName.replaceAll("[^a-zA-Z\\._]", "");
-  }
-
-  public static void close(final Connection connection) {
-    if (connection != null) {
-      try {
-        connection.close();
-      } catch (final SQLException e) {
-        LOG.debug("SQL error closing connection", e);
-      } catch (final Throwable e) {
-        LOG.debug("Unknown error closing connection", e);
-      }
-    }
   }
 
   public static void addAttributeName(final StringBuffer sql,
@@ -103,7 +93,7 @@ public final class JdbcUtils {
     if (StringUtils.hasText(fromClause)) {
       sql.append(fromClause);
     } else {
-      final String tableName = JdbcUtils.getQualifiedTableName(typePath);
+      final String tableName = getQualifiedTableName(typePath);
       sql.append(tableName);
       sql.append(" ");
       sql.append(tablePrefix);
@@ -126,9 +116,39 @@ public final class JdbcUtils {
           final Attribute attribute = metaData.getAttribute(key);
           if (attribute instanceof JdbcAttribute) {
             final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+
+            if (value instanceof Collection) {
+              Collection<?> collection = (Collection<?>)value;
+              int size = collection.size();
+              filterWhere.append(key);
+              filterWhere.append(" IN (");
+
+              for (int i = 0; i < size; i++) {
+                if (i > 0) {
+                  filterWhere.append(", ");
+                }
+                jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
+              }
+              filterWhere.append(")");
+            } else {
+              filterWhere.append(key);
+              filterWhere.append(" = ");
+              jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
+            }
+          } else if (value instanceof Collection) {
+            Collection<?> collection = (Collection<?>)value;
+            int size = collection.size();
             filterWhere.append(key);
-            filterWhere.append(" = ");
-            jdbcAttribute.addInsertStatementPlaceHolder(filterWhere, false);
+            filterWhere.append("IN (");
+
+            for (int i = 0; i < size; i++) {
+              if (i > 0) {
+                filterWhere.append(", ?");
+              } else {
+                filterWhere.append("?");
+              }
+            }
+            filterWhere.append(")");
           } else {
             filterWhere.append(key);
             filterWhere.append(" = ?");
@@ -176,7 +196,7 @@ public final class JdbcUtils {
 
   public static String getSelectSql(final Query query) {
     final String tableName = query.getTypeName();
-    final String dbTableName = JdbcUtils.getQualifiedTableName(tableName);
+    final String dbTableName = getQualifiedTableName(tableName);
 
     String sql = query.getSql();
     final Map<String, Boolean> orderBy = query.getOrderBy();
@@ -229,8 +249,16 @@ public final class JdbcUtils {
           } else {
             jdbcAttribute = new JdbcAttribute();
           }
-          parameterIndex = jdbcAttribute.setPreparedStatementValue(statement,
-            parameterIndex, value);
+          if (value instanceof Collection) {
+            Collection<?> collection = (Collection<?>)value;
+            for (Object item : collection) {
+              parameterIndex = jdbcAttribute.setPreparedStatementValue(
+                statement, parameterIndex, item);
+            }
+          } else {
+            parameterIndex = jdbcAttribute.setPreparedStatementValue(statement,
+              parameterIndex, value);
+          }
         }
       }
     }
@@ -270,7 +298,7 @@ public final class JdbcUtils {
 
   public static String getDeleteSql(final Query query) {
     final String tableName = query.getTypeName();
-    final String dbTableName = JdbcUtils.getQualifiedTableName(tableName);
+    final String dbTableName = getQualifiedTableName(tableName);
     final DataObjectMetaData metaData = query.getMetaData();
 
     final StringBuffer sql = new StringBuffer();
@@ -321,17 +349,11 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static void close(final Connection connection,
-    final Statement statement) {
-    close(statement);
-    close(connection);
-  }
-
-  public static void close(final Connection connection,
-    final Statement statement, final ResultSet resultSet) {
-    close(resultSet);
-    close(statement);
-    close(connection);
+  public static void release(final Connection connection,
+    final DataSource dataSource) {
+    if (dataSource != null && connection != null) {
+      DataSourceUtils.releaseConnection(connection, dataSource);
+    }
   }
 
   public static void close(final ResultSet resultSet) {
@@ -416,13 +438,13 @@ public final class JdbcUtils {
     try {
       return executeUpdate(connection, sql, parameters);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 
   public static Connection getConnection(final DataSource dataSource) {
     try {
-      return dataSource.getConnection();
+      return DataSourceUtils.doGetConnection(dataSource);
     } catch (final SQLException e) {
       throw new IllegalArgumentException(
         "SQL error getting connection from data source", e);
@@ -433,7 +455,7 @@ public final class JdbcUtils {
   }
 
   public static String getProductName(final DataSource dataSource) {
-    final Connection connection = JdbcUtils.getConnection(dataSource);
+    final Connection connection = getConnection(dataSource);
     try {
       final DatabaseMetaData metaData = connection.getMetaData();
       return metaData.getDatabaseProductName();
@@ -441,7 +463,7 @@ public final class JdbcUtils {
       throw new IllegalArgumentException("Unable to get database product name",
         e);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 
@@ -518,9 +540,9 @@ public final class JdbcUtils {
     final Connection connection, final String sql, final Object... parameters)
     throws SQLException {
     if (dataSource == null) {
-      return JdbcUtils.selectDate(connection, sql, parameters);
+      return selectDate(connection, sql, parameters);
     } else {
-      return JdbcUtils.selectDate(dataSource, sql, parameters);
+      return selectDate(dataSource, sql, parameters);
     }
   }
 
@@ -530,7 +552,7 @@ public final class JdbcUtils {
     try {
       return selectDate(connection, sql, parameters);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 
@@ -561,9 +583,9 @@ public final class JdbcUtils {
     final Connection connection, final String sql, final Object... parameters)
     throws SQLException {
     if (dataSource == null) {
-      return JdbcUtils.selectInt(connection, sql, parameters);
+      return selectInt(connection, sql, parameters);
     } else {
-      return JdbcUtils.selectInt(dataSource, sql, parameters);
+      return selectInt(dataSource, sql, parameters);
     }
   }
 
@@ -576,7 +598,7 @@ public final class JdbcUtils {
       throw new RuntimeException("Unable to execute " + sql + " "
         + Arrays.toString(parameters), e);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 
@@ -593,6 +615,7 @@ public final class JdbcUtils {
       final ResultSet resultSet = statement.executeQuery();
       try {
         while (resultSet.next()) {
+          @SuppressWarnings("unchecked")
           final T value = (T)resultSet.getObject(columnIndex);
           results.add(value);
         }
@@ -632,9 +655,9 @@ public final class JdbcUtils {
     final Connection connection, final String sql, final Object... parameters)
     throws SQLException {
     if (dataSource == null) {
-      return JdbcUtils.selectLong(connection, sql, parameters);
+      return selectLong(connection, sql, parameters);
     } else {
-      return JdbcUtils.selectLong(dataSource, sql, parameters);
+      return selectLong(dataSource, sql, parameters);
     }
   }
 
@@ -644,7 +667,7 @@ public final class JdbcUtils {
     try {
       return selectLong(connection, sql, parameters);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 
@@ -683,7 +706,7 @@ public final class JdbcUtils {
     try {
       return selectMap(connection, sql, parameters);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 
@@ -714,9 +737,9 @@ public final class JdbcUtils {
     final Connection connection, final String sql, final Object... parameters)
     throws SQLException {
     if (dataSource == null) {
-      return JdbcUtils.selectString(connection, sql, parameters);
+      return selectString(connection, sql, parameters);
     } else {
-      return JdbcUtils.selectString(dataSource, sql, parameters);
+      return selectString(dataSource, sql, parameters);
     }
   }
 
@@ -726,7 +749,7 @@ public final class JdbcUtils {
     try {
       return selectString(connection, sql, parameters);
     } finally {
-      close(connection);
+      release(connection, dataSource);
     }
   }
 

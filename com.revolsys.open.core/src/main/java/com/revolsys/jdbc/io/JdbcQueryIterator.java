@@ -115,9 +115,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   @PreDestroy
   public void doClose() {
     JdbcUtils.close(statement, resultSet);
-    if (dataSource != null) {
-      JdbcUtils.close(connection);
-    }
+    JdbcUtils.release(connection, dataSource);
     attributes = null;
     connection = null;
     dataObjectFactory = null;

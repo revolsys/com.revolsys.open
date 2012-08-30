@@ -32,8 +32,10 @@ public class AutoCompleteTextField extends TextField {
     out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
     out.text("$(document).ready(function() {\n");
     out.text("  $('#");
+    out.text(getForm().getName());
+    out.text(" input[name=\"");
     out.text(getName());
-    out.text("').autocomplete({\n");
+    out.text("\"]').autocomplete({\n");
     out.text("    minLength: 3,\n");
     out.text("    source: function(request, response) {\n");
     out.text("      $.ajax({\n");

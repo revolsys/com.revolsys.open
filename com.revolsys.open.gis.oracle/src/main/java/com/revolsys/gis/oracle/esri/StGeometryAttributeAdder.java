@@ -38,8 +38,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private OracleDataObjectStore dataStore;
 
-  public StGeometryAttributeAdder(OracleDataObjectStore dataStore, final DataSource dataSource,
-    final Connection connection) {
+  public StGeometryAttributeAdder(OracleDataObjectStore dataStore,
+    final DataSource dataSource, final Connection connection) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;
     this.connection = connection;
@@ -47,16 +47,12 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(
-    final DataObjectMetaDataImpl metaData,
-    final String name,
-    String dataTypeName,
-    final int sqlType,
-    final int length,
-    final int scale, final boolean required) {
+  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String name, String dataTypeName, final int sqlType,
+    final int length, final int scale, final boolean required) {
     if (available) {
       final DataObjectStoreSchema schema = metaData.getSchema();
-       final String typePath = metaData.getPath();
+      final String typePath = metaData.getPath();
       final String owner = dataStore.getDatabaseSchemaName(schema);
       final String tableName = dataStore.getDatabaseTableName(typePath);
       final String columnName = name.toUpperCase();
@@ -106,11 +102,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private <T> T getColumnProperty(
-    final DataObjectStoreSchema schema,
-    final String typePath,
-    final String columnName,
-    final String propertyName) {
+  private <T> T getColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = schema.getProperty(ArcSdeOracleStGeometryJdbcAttribute.ESRI_SCHEMA_PROPERTY);
     final Map<String, Map<String, Object>> columnsProperties = esriColumnProperties.get(typePath);
     if (columnsProperties != null) {
@@ -123,11 +116,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     return null;
   }
 
-  private int getIntegerColumnProperty(
-    final DataObjectStoreSchema schema,
-    final String typePath,
-    final String columnName,
-    final String propertyName) {
+  private int getIntegerColumnProperty(final DataObjectStoreSchema schema,
+    final String typePath, final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
     if (value instanceof Number) {
@@ -159,7 +149,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
           initializeColumnProperties(schema, connection, esriColumnProperties);
         } finally {
           if (dataSource != null) {
-            JdbcUtils.close(connection);
+            JdbcUtils.release(connection, dataSource);
           }
         }
       } catch (final SQLException e) {
@@ -168,8 +158,7 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private void initializeColumnProperties(
-    final DataObjectStoreSchema schema,
+  private void initializeColumnProperties(final DataObjectStoreSchema schema,
     final Connection connection,
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties)
     throws SQLException {
@@ -207,11 +196,8 @@ public class StGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private void setColumnProperty(
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties,
-    final String schemaName,
-    final String tableName,
-    final String columnName,
-    final String propertyName,
-    final Object propertyValue) {
+    final String schemaName, final String tableName, final String columnName,
+    final String propertyName, final Object propertyValue) {
     final String typePath = PathUtil.toPath(schemaName, tableName);
     Map<String, Map<String, Object>> typeColumnMap = esriColumnProperties.get(typePath);
     if (typeColumnMap == null) {
