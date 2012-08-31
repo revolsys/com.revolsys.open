@@ -119,9 +119,24 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
               + spatialReference.getLatestWKID());
         }
 
-        setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+        int numAxis = 2;
         final boolean hasZ = geometryDef.isHasZ();
+        if (hasZ) {
+          numAxis = 3;
+        }
         final boolean hasM = geometryDef.isHasM();
+        if (hasM) {
+          numAxis = 4;
+        }
+        if (numAxis != geometryFactory.getNumAxis()) {
+          int srid = geometryFactory.getSRID();
+          double scaleXY = geometryFactory.getScaleXY();
+          double scaleZ = geometryFactory.getScaleZ();
+          geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+            scaleZ);
+        }
+        setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+
         final String geometryTypeKey = geometryType.toString() + hasZ + hasM;
         readMethod = GEOMETRY_TYPE_READ_METHOD_MAP.get(geometryTypeKey);
         if (readMethod == null) {
