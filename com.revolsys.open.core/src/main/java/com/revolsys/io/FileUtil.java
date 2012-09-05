@@ -374,7 +374,9 @@ public final class FileUtil {
 
   public static File createTempFile(final String prefix, final String suffix) {
     try {
-      return File.createTempFile(prefix, suffix);
+      File file = File.createTempFile(prefix, suffix);
+      deleteFileOnExit(file);
+      return file;
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }

@@ -249,12 +249,11 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
               numString = numberFormat.format(0);
             }
           } else if (value instanceof Number) {
-
             Number number = (Number)value;
             final int decimalPlaces = field.getDecimalPlaces();
             if (decimalPlaces >= 0) {
               if (number instanceof BigDecimal) {
-                final BigDecimal bigDecimal = (BigDecimal)number;
+                final BigDecimal bigDecimal = new BigDecimal(number.toString());
                 number = bigDecimal.setScale(decimalPlaces,
                   RoundingMode.HALF_UP);
               } else if ((number instanceof Double)

@@ -89,6 +89,14 @@ public class Graph<T> {
     return geometryFactory;
   }
 
+  protected void evict(final Edge<T> edge) {
+    // TODO
+  }
+
+  protected void evict(final Node<T> node) {
+    // TODO
+  }
+
   protected void add(final Edge<T> edge) {
     edgesById.put(edge.getId(), edge);
     edges.add(edge);

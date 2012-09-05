@@ -1,6 +1,10 @@
-package com.revolsys.io.page;
+package com.revolsys.collection.bplus;
 
 import java.util.AbstractList;
+
+import com.revolsys.io.page.MethodPageValueManager;
+import com.revolsys.io.page.PageManager;
+import com.revolsys.io.page.PageValueManager;
 
 public class BPlusTreeList<T> extends AbstractList<T> {
 
@@ -10,13 +14,13 @@ public class BPlusTreeList<T> extends AbstractList<T> {
     return new BPlusTreeList<T>(pageManager, valueManager);
   }
 
-  private final BPlusTree<Integer, T> tree;
+  private final BPlusTreeMap<Integer, T> tree;
 
   int size = 0;
 
   public BPlusTreeList(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
-    tree = BPlusTree.create(pageManager, MethodPageValueManager.INT,
+    tree = BPlusTreeMap.create(pageManager, MethodPageValueManager.INT,
       valueSerializer);
   }
 

@@ -217,6 +217,14 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     toNode.addInEdge(this);
   }
 
+  public void addAttributes(final Map<String, Object> attributes) {
+    if (this.attributes.isEmpty()) {
+      this.attributes = new HashMap<String, Object>();
+    }
+    this.attributes.putAll(attributes);
+  }
+
+  @Override
   public int compareTo(final Edge<T> edge) {
     if (this == edge) {
       return 0;
@@ -240,7 +248,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
             final String name = toSuperString();
             final String otherName = edge.toSuperString();
             final int nameCompare = name.compareTo(otherName);
-            return nameCompare;
+            if (nameCompare == 0) {
+              return ((Integer)id).compareTo(edge.id);
+            } else {
+              return nameCompare;
+            }
           }
           return lengthCompare;
         } else {
@@ -265,6 +277,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return distance(point);
   }
 
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    graph.evict(this);
+  }
+
   public double getAngle(final Node<T> node) {
     if (node.getGraph() == graph) {
       final int nodeId = node.getId();
@@ -282,6 +300,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * (non-Javadoc)
    * @see com.revolsys.gis.graph.AttributedObject#getAttribute(java.lang.String)
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <A> A getAttribute(final String name) {
     return (A)attributes.get(name);
@@ -291,6 +310,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
    * (non-Javadoc)
    * @see com.revolsys.gis.graph.AttributedObject#getAttributes()
    */
+  @Override
   public Map<String, Object> getAttributes() {
     return Collections.unmodifiableMap(attributes);
   }
@@ -498,6 +518,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     }
   }
 
+  @Override
   public void setAttribute(final String name, final Object value) {
     if (attributes.isEmpty()) {
       attributes = new HashMap<String, Object>();
@@ -560,12 +581,5 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   public boolean touches(final Edge<T> edge) {
     final Collection<Node<T>> nodes1 = getCommonNodes(edge);
     return !nodes1.isEmpty();
-  }
-
-  public void addAttributes(Map<String, Object> attributes) {
-    if (this.attributes.isEmpty()) {
-      this.attributes = new HashMap<String, Object>();
-    }
-    this.attributes.putAll(attributes);
   }
 }

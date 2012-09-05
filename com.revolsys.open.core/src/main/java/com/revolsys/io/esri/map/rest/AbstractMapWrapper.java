@@ -85,7 +85,7 @@ public class AbstractMapWrapper {
     if (spatialReference == null) {
       return GeometryFactory.getFactory();
     } else {
-      Integer srid = CollectionUtil.getIntValue(spatialReference, "wkid");
+      Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
       return GeometryFactory.getFactory(srid);
     }
   }
@@ -105,7 +105,7 @@ public class AbstractMapWrapper {
       if (spatialReference == null) {
         geometryFactory = GeometryFactory.getFactory();
       } else {
-        Integer srid = CollectionUtil.getIntValue(spatialReference, "wkid");
+        Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
         geometryFactory = GeometryFactory.getFactory(srid);
       }
       return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);

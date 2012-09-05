@@ -84,7 +84,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    */
   public ArrayDataObject(final DataObjectMetaData metaData) {
     this.metaData = metaData;
-    int attributeCount = metaData.getAttributeCount();
+    final int attributeCount = metaData.getAttributeCount();
     attributes = new Object[attributeCount];
   }
 
@@ -110,31 +110,31 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public int compareTo(DataObject other) {
+  public int compareTo(final DataObject other) {
     if (this == other) {
       return 0;
     } else {
-      int metaDataCompare = getMetaData().compareTo(other.getMetaData());
+      final int metaDataCompare = getMetaData().compareTo(other.getMetaData());
       if (metaDataCompare == 0) {
-        Object id1 = getIdValue();
-        Object id2 = other.getIdValue();
+        final Object id1 = getIdValue();
+        final Object id2 = other.getIdValue();
         if (id1 instanceof Comparable<?>) {
-          int idCompare = ((Comparable<Object>)id1).compareTo(id2);
+          final int idCompare = ((Comparable<Object>)id1).compareTo(id2);
           if (idCompare != 0) {
             return idCompare;
           }
         }
-        Geometry geometry1 = getGeometryValue();
-        Geometry geometry2 = other.getGeometryValue();
+        final Geometry geometry1 = getGeometryValue();
+        final Geometry geometry2 = other.getGeometryValue();
         if (geometry1 != null && geometry2 != null) {
           final int geometryComparison = geometry1.compareTo(geometry2);
           if (geometryComparison != 0) {
             return geometryComparison;
           }
         }
-        Integer hash1 = hashCode();
-        int hash2 = other.hashCode();
-        int hashCompare = hash1.compareTo(hash2);
+        final Integer hash1 = hashCode();
+        final int hash2 = other.hashCode();
+        final int hashCompare = hash1.compareTo(hash2);
         if (hashCompare != 0) {
           return hashCompare;
         }
@@ -146,6 +146,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
 
   }
 
+  @Override
   public void delete() {
     getMetaData().delete(this);
   }
@@ -164,13 +165,23 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return this == o;
   }
 
-  public boolean isModified() {
-    if (getState() == DataObjectState.New) {
-      return true;
-    } else if (getState() == DataObjectState.Modified) {
-      return true;
+  @Override
+  public Byte getByte(final CharSequence name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
     } else {
-      return false;
+      return value.byteValue();
+    }
+  }
+
+  @Override
+  public Double getDouble(final CharSequence name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
     }
   }
 
@@ -179,8 +190,19 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @return The factory.
    */
+  @Override
   public DataObjectFactory getFactory() {
     return ArrayDataObjectFactory.getInstance();
+  }
+
+  @Override
+  public Float getFloat(final CharSequence name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.floatValue();
+    }
   }
 
   /**
@@ -188,6 +210,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @return The primary geometry.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T getGeometryValue() {
     final int index = metaData.getGeometryAttributeIndex();
@@ -199,10 +222,33 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @return The unique identifier.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getIdValue() {
     final int index = metaData.getIdAttributeIndex();
     return (T)getValue(index);
+  }
+
+  public Integer getInteger(final CharSequence name) {
+    final Object value = getValue(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      Number number = (Number)value;
+      return number.intValue();
+    } else {
+      return Integer.valueOf(value.toString());
+    }
+  }
+
+  @Override
+  public Long getLong(final CharSequence name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.longValue();
+    }
   }
 
   /**
@@ -210,14 +256,27 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @return The meta data.
    */
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
+  @Override
+  public Short getShort(final CharSequence name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.shortValue();
+    }
+  }
+
+  @Override
   public DataObjectState getState() {
     return state;
   }
 
+  @Override
   public String getTypeName() {
     return getMetaData().getPath();
   }
@@ -228,6 +287,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param name The name of the attribute.
    * @return The attribute value.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getValue(final CharSequence name) {
     try {
@@ -246,6 +306,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param index The index of the attribute.
    * @return The attribute value.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getValue(final int index) {
     if (index < 0) {
@@ -255,6 +316,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getValueByPath(final CharSequence path) {
     final String[] propertyPath = path.toString().split("\\.");
@@ -303,6 +365,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return (T)propertyValue;
   }
 
+  @Override
   public Map<String, Object> getValueMap(
     final Collection<? extends CharSequence> attributeNames) {
     final Map<String, Object> values = new HashMap<String, Object>();
@@ -320,6 +383,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @return The attribute value.
    */
+  @Override
   public List<Object> getValues() {
     return Arrays.asList(attributes);
   }
@@ -331,6 +395,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param name The name of the attribute.
    * @return True if the DataObject has an attribute with the specified name.
    */
+  @Override
   public boolean hasAttribute(final CharSequence name) {
     return metaData.hasAttribute(name);
   }
@@ -338,6 +403,17 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   @Override
   public int hashCode() {
     return attributes.hashCode();
+  }
+
+  @Override
+  public boolean isModified() {
+    if (getState() == DataObjectState.New) {
+      return true;
+    } else if (getState() == DataObjectState.Modified) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -359,6 +435,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @param geometry The primary geometry.
    */
+  @Override
   public void setGeometryValue(final Geometry geometry) {
     final int index = metaData.getGeometryAttributeIndex();
     setValue(index, geometry);
@@ -370,6 +447,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * 
    * @param id The unique identifier.
    */
+  @Override
   public void setIdValue(final Object id) {
     if (state != DataObjectState.New) {
       throw new IllegalStateException(
@@ -379,6 +457,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     setValue(index, id);
   }
 
+  @Override
   public void setState(final DataObjectState state) {
     // TODO make this more secure
     this.state = state;
@@ -390,6 +469,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param name The name of the attribute.
    * @param value The new value.
    */
+  @Override
   public void setValue(final CharSequence name, final Object value) {
     final int index = metaData.getAttributeIndex(name);
     if (index >= 0) {
@@ -438,9 +518,10 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value.
    */
+  @Override
   public void setValue(final int index, final Object value) {
     if (index >= 0) {
-      Object oldValue = attributes[index];
+      final Object oldValue = attributes[index];
       if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
         updateState();
         attributes[index] = value;
@@ -448,16 +529,16 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     }
   }
 
-  public <T> T setValueByPath(
-    final CharSequence attributePath,
-    final DataObject source,
-    final String sourceAttributePath) {
+  @Override
+  public <T> T setValueByPath(final CharSequence attributePath,
+    final DataObject source, final String sourceAttributePath) {
     @SuppressWarnings("unchecked")
     final T value = (T)source.getValueByPath(sourceAttributePath);
     setValueByPath(attributePath, value);
     return value;
   }
 
+  @Override
   public void setValueByPath(final CharSequence path, final Object value) {
     final String name = path.toString();
     final int dotIndex = name.indexOf(".");
@@ -499,6 +580,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     }
   }
 
+  @Override
   public void setValues(final DataObject object) {
     for (final String name : this.metaData.getAttributeNames()) {
       final Object value = DataObjectUtil.clone(object.getValue(name));
@@ -507,9 +589,11 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     setGeometryValue((Geometry)DataObjectUtil.clone(object.getGeometryValue()));
   }
 
-  public void setValues(DataObject object, Collection<String> attributesNames) {
-    for (String attributeName : attributesNames) {
-      Object oldValue = getValue(attributeName);
+  @Override
+  public void setValues(final DataObject object,
+    final Collection<String> attributesNames) {
+    for (final String attributeName : attributesNames) {
+      final Object oldValue = getValue(attributeName);
       Object newValue = object.getValue(attributeName);
       if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
         newValue = DataObjectUtil.clone(newValue);
@@ -518,6 +602,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     }
   }
 
+  @Override
   public void setValues(final Map<String, ? extends Object> values) {
     for (final Entry<String, ? extends Object> defaultValue : values.entrySet()) {
       final String name = defaultValue.getKey();

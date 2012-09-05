@@ -1,21 +1,26 @@
-package com.revolsys.io.page;
+package com.revolsys.collection.bplus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataPagePageValueManager<T> implements PageValueManager<T> {
+import com.revolsys.io.page.MethodPageValueManager;
+import com.revolsys.io.page.Page;
+import com.revolsys.io.page.PageManager;
+import com.revolsys.io.page.PageValueManager;
+
+public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
   public static <T> PageValueManager<T> create(
     final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
-    return new DataPagePageValueManager<T>(pageManager, valueSerializer);
+    return new BPlusTreePageValueManager<T>(pageManager, valueSerializer);
   }
 
   private final PageManager pageManager;
 
   private final PageValueManager<T> valueSerializer;
 
-  public DataPagePageValueManager(final PageManager pageManager,
+  public BPlusTreePageValueManager(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
     this.pageManager = pageManager;
     this.valueSerializer = valueSerializer;
@@ -26,20 +31,20 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
     Page dataPage = pageManager.getPage(pageIndex);
     dataPage.setOffset(0);
     byte pageType = dataPage.readByte();
-    while (pageType == BPlusTree.EXTENDED) {
-      BPlusTree.skipHeader(dataPage);
+    while (pageType == BPlusTreeMap.EXTENDED) {
+      BPlusTreeMap.skipHeader(dataPage);
       final int nextPageIndex = dataPage.readInt();
       pageManager.removePage(dataPage);
       dataPage = pageManager.getPage(nextPageIndex);
       dataPage.setOffset(0);
       pageType = dataPage.readByte();
     }
-    if (pageType == BPlusTree.DATA) {
+    if (pageType == BPlusTreeMap.DATA) {
       pageManager.removePage(dataPage);
       pageManager.releasePage(dataPage);
     } else {
       throw new IllegalArgumentException("Expecting a data page "
-        + BPlusTree.DATA + " not " + pageType);
+        + BPlusTreeMap.DATA + " not " + pageType);
     }
   }
 
@@ -57,18 +62,18 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
       final int pageIndex = page.getIndex();
       while (valueBytes.length + 3 > offset + pageSize) {
         final Page nextPage = pageManager.createPage();
-        BPlusTree.writePageHeader(page, BPlusTree.EXTENDED);
+        BPlusTreeMap.writePageHeader(page, BPlusTreeMap.EXTENDED);
         page.writeInt(nextPage.getIndex());
         page.writeBytes(valueBytes, offset, pageSize - 7);
-        BPlusTree.setNumBytes(page);
+        BPlusTreeMap.setNumBytes(page);
         pageManager.releasePage(page);
         page = nextPage;
         offset += pageSize - 7;
       }
 
-      BPlusTree.writePageHeader(page, BPlusTree.DATA);
+      BPlusTreeMap.writePageHeader(page, BPlusTreeMap.DATA);
       page.writeBytes(valueBytes, offset, valueBytes.length - offset);
-      BPlusTree.setNumBytes(page);
+      BPlusTreeMap.setNumBytes(page);
 
       return MethodPageValueManager.INT.getBytes(pageIndex);
     } finally {
@@ -84,7 +89,7 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
       byte pageType = dataPage.readByte();
       final List<byte[]> pageBytes = new ArrayList<byte[]>();
       int size = 0;
-      while (pageType == BPlusTree.EXTENDED) {
+      while (pageType == BPlusTreeMap.EXTENDED) {
         final int numBytes = dataPage.readShort() - 7;
         final int nextPageIndex = dataPage.readInt();
         final byte[] bytes = dataPage.readBytes(numBytes);
@@ -95,7 +100,7 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
         dataPage.setOffset(0);
         pageType = dataPage.readByte();
       }
-      if (pageType == BPlusTree.DATA) {
+      if (pageType == BPlusTreeMap.DATA) {
         final int numBytes = dataPage.readShort() - 3;
         final byte[] bytes = dataPage.readBytes(numBytes);
         pageBytes.add(bytes);
@@ -103,7 +108,7 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
 
       } else {
         throw new IllegalArgumentException("Expecting a data page "
-          + BPlusTree.DATA + " not " + pageType);
+          + BPlusTreeMap.DATA + " not " + pageType);
       }
       final byte[] valueBytes = new byte[size];
       int offset = 0;
@@ -125,7 +130,7 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
   // byte pageType = dataPage.readByte();
   // List<byte[]> pageBytes = new ArrayList<byte[]>();
   // int size = 0;
-  // while (pageType == BPlusTree.EXTENDED) {
+  // while (pageType == BPlusTreeMap.EXTENDED) {
   // int numBytes = dataPage.readShort() - 7;
   // int nextPageIndex = dataPage.readInt();
   // byte[] bytes = dataPage.readBytes(numBytes);
@@ -136,7 +141,7 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
   // dataPage.setOffset(0);
   // pageType = dataPage.readByte();
   // }
-  // if (pageType == BPlusTree.DATA) {
+  // if (pageType == BPlusTreeMap.DATA) {
   // final int numBytes = dataPage.readShort() - 3;
   // final byte[] bytes = dataPage.readBytes(numBytes);
   // pageBytes.add(bytes);
@@ -144,7 +149,7 @@ public class DataPagePageValueManager<T> implements PageValueManager<T> {
   // pageManager.removePage(dataPage);
   // } else {
   // throw new IllegalArgumentException("Expecting a data page "
-  // + BPlusTree.DATA + " not " + pageType);
+  // + BPlusTreeMap.DATA + " not " + pageType);
   // }
   // byte[] valueBytes = new byte[size];
   // int offset = 0;

@@ -101,4 +101,14 @@ public class DataObjectGraph extends Graph<DataObject> {
     }
     return edges;
   }
+
+  public List<DataObject> getObjects(Collection<Integer> edgeIds) {
+    List<DataObject> objects = new ArrayList<DataObject>();
+    for (Integer edgeId : edgeIds) {
+      Edge<DataObject> edge = getEdge(edgeId);
+      DataObject object = edge.getObject();
+      objects.add(object);
+    }
+    return objects;
+  }
 }

@@ -165,6 +165,12 @@ public class Node<T> extends AbstractCoordinates {
     return this.x == x && this.y == y;
   }
 
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    graph.evict(this);
+  }
+
   public Coordinates get3dCoordinates(final String typePath) {
     if (!isRemoved()) {
 
@@ -224,6 +230,10 @@ public class Node<T> extends AbstractCoordinates {
     final GeometryFactory factory = GeometryFactory.getFactory(geometry);
     final Point point = factory.createPoint(this);
     return point.distance(geometry);
+  }
+
+  public int getEdgeCount() {
+    return getDegree();
   }
 
   public int getEdgeIndex(final Edge<T> edge) {
@@ -361,11 +371,12 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   public Point getPoint() {
-    Graph<T> graph = getGraph();
-    GeometryFactory geometryFactory = graph.getGeometryFactory();
+    final Graph<T> graph = getGraph();
+    final GeometryFactory geometryFactory = graph.getGeometryFactory();
     return geometryFactory.createPoint(this);
   }
 
+  @Override
   public double getValue(final int index) {
     switch (index) {
       case 0:
@@ -504,6 +515,7 @@ public class Node<T> extends AbstractCoordinates {
     attributes.put(name, value);
   }
 
+  @Override
   public void setValue(final int index, final double value) {
     switch (index) {
       case 0:
@@ -545,9 +557,5 @@ public class Node<T> extends AbstractCoordinates {
         proxy.clearValue();
       }
     }
-  }
-
-  public int getEdgeCount() {
-    return getDegree();
   }
 }

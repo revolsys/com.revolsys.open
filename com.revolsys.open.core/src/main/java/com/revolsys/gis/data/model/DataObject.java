@@ -3,7 +3,6 @@ package com.revolsys.gis.data.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -17,12 +16,18 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   void delete();
 
+  Byte getByte(final CharSequence name);
+
+  Double getDouble(final CharSequence name);
+
   /**
    * Get the factory which created the instance.
    * 
    * @return The factory.
    */
   DataObjectFactory getFactory();
+
+  Float getFloat(final CharSequence name);
 
   /**
    * Get the value of the primary geometry attribute.
@@ -31,8 +36,6 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    */
   <T extends Geometry> T getGeometryValue();
 
-  boolean isModified();
-
   /**
    * Get the value of the unique identifier attribute.
    * 
@@ -40,12 +43,18 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    */
   <T extends Object> T getIdValue();
 
+  Integer getInteger(CharSequence name);
+
+  Long getLong(final CharSequence name);
+
   /**
    * Get the meta data describing the DataObject and it's attributes.
    * 
    * @return The meta data.
    */
   DataObjectMetaData getMetaData();
+
+  Short getShort(final CharSequence name);
 
   DataObjectState getState();
 
@@ -88,6 +97,8 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    */
   boolean hasAttribute(CharSequence name);
 
+  boolean isModified();
+
   /**
    * Set the value of the primary geometry attribute.
    * 
@@ -120,14 +131,14 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    */
   void setValue(int index, Object value);
 
-  <T> T setValueByPath(
-    CharSequence attributePath,
-    DataObject source,
+  <T> T setValueByPath(CharSequence attributePath, DataObject source,
     String sourceAttributePath);
 
   void setValueByPath(CharSequence attributePath, Object value);
 
   void setValues(final DataObject object);
+
+  void setValues(DataObject object, Collection<String> attributeNames);
 
   /**
    * Set the values on the object based on the values in the map.
@@ -135,6 +146,4 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    * @param values The values to set.
    */
   void setValues(Map<String, ? extends Object> values);
-
-  void setValues(DataObject object, Collection<String> attributeNames);
 }

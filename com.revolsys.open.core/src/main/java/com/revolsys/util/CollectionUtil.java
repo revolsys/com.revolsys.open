@@ -43,13 +43,48 @@ public final class CollectionUtil {
     return list;
   }
 
-  public static Integer getIntValue(Map<String, ? extends Object> map,
+  public static Integer getInteger(Map<String, ? extends Object> map,
     String name) {
-    final Number value = (Number)map.get(name);
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number){
+      final Number number = (Number)value;
+      return number.intValue();
+    } else {
+      return Integer.valueOf(value.toString());
+    }
+  }
+
+  public static String getString(Map<String, ? extends Object> map, String name) {
+    final Object value = map.get(name);
     if (value == null) {
       return null;
     } else {
-      return value.intValue();
+      return value.toString();
+    }
+  }
+
+  public static Boolean getBoolean(Map<String, ? extends Object> map,
+    String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Boolean) {
+      return (Boolean)value;
+    } else {
+      return Boolean.valueOf(value.toString());
+    }
+  }
+
+  public static boolean getBool(Map<String, ? extends Object> map, String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return false;
+    } else if (value instanceof Boolean) {
+      return (Boolean)value;
+    } else {
+      return Boolean.parseBoolean(value.toString());
     }
   }
 

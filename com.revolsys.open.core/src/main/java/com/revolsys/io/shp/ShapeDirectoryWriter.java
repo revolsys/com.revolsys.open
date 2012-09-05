@@ -18,6 +18,7 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
@@ -103,6 +104,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       final File file = new File(directory, getFileName(metaData) + ".shp");
       writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
         new FileSystemResource(file));
+      ((XbaseDataObjectWriter)writer).setUseZeroForNull(useZeroForNull);
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
         setProperty(IoConstants.GEOMETRY_FACTORY,
