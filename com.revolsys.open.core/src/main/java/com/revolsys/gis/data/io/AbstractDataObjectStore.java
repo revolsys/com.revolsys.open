@@ -35,6 +35,7 @@ import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.io.Writer;
 
 public abstract class AbstractDataObjectStore extends
   AbstractObjectWithProperties implements DataObjectStore {
@@ -63,6 +64,10 @@ public abstract class AbstractDataObjectStore extends
 
   public AbstractDataObjectStore(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public Writer<DataObject> getWriter() {
+    return createWriter();
   }
 
   @Override

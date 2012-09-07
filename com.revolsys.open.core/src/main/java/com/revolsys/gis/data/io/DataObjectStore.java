@@ -42,6 +42,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory {
 
   Writer<DataObject> createWriter();
 
+  Writer<DataObject> getWriter();
+
   void delete(DataObject object);
 
   int delete(Query query);

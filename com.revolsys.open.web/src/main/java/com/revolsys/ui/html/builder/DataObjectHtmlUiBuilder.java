@@ -1,12 +1,10 @@
 package com.revolsys.ui.html.builder;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +20,8 @@ import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Reader;
-import com.revolsys.io.Writer;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.html.view.TabElementContainer;
-import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -62,11 +58,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   public void deleteObject(final Object id) {
     final DataObject object = loadObject(id);
     if (object != null) {
-      final Writer<DataObject> writer = dataStore.createWriter();
-      object.setState(DataObjectState.Deleted);
-
-      writer.write(object);
-      writer.close();
+      dataStore.delete(object);
     }
   }
 
@@ -92,15 +84,10 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   @Override
   protected void insertObject(final DataObject object) {
-    final Writer<DataObject> writer = dataStore.createWriter();
-    try {
-      if (object.getIdValue() == null) {
-        object.setIdValue(dataStore.createPrimaryIdValue(tableName));
-      }
-      writer.write(object);
-    } finally {
-      writer.close();
+    if (object.getIdValue() == null) {
+      object.setIdValue(dataStore.createPrimaryIdValue(tableName));
     }
+    dataStore.insert(object);
   }
 
   protected boolean isPropertyUnique(final DataObject object,
@@ -149,12 +136,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   @Override
   protected void updateObject(final DataObject object) {
-    final Writer<DataObject> writer = dataStore.createWriter();
-    try {
-      writer.write(object);
-    } finally {
-      writer.close();
-    }
+    dataStore.update(object);
   }
 
   public Object createDataTableHandler(final HttpServletRequest request,

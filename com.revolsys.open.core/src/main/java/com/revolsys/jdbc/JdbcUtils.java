@@ -444,10 +444,7 @@ public final class JdbcUtils {
 
   public static Connection getConnection(final DataSource dataSource) {
     try {
-      return DataSourceUtils.doGetConnection(dataSource);
-    } catch (final SQLException e) {
-      throw new IllegalArgumentException(
-        "SQL error getting connection from data source", e);
+      return DataSourceUtils.getConnection(dataSource);
     } catch (final Throwable e) {
       throw new RuntimeException(
         "Unknown error getting connection from data source ", e);

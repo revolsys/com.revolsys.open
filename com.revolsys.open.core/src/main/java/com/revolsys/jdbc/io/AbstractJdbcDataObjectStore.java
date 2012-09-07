@@ -16,7 +16,9 @@ import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
-import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
@@ -77,6 +79,8 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private JdbcDatabaseFactory databaseFactory;
 
+  private final Object writerKey = new Object();
+
   public AbstractJdbcDataObjectStore() {
     this(new ArrayDataObjectFactory());
   }
@@ -131,11 +135,6 @@ public abstract class AbstractJdbcDataObjectStore extends
   public synchronized void close() {
     try {
       super.close();
-      final JdbcWriter writer = getSharedAttribute("writer");
-      if (writer != null) {
-        setSharedAttribute("writer", null);
-        writer.close();
-      }
       if (connection != null) {
         if (dataSource != null) {
           JdbcUtils.release(connection, dataSource);
@@ -169,6 +168,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return new JdbcQueryIterator(this, query, properties);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T createPrimaryIdValue(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
@@ -214,7 +214,13 @@ public abstract class AbstractJdbcDataObjectStore extends
     return createReader(typePath, whereClause, Arrays.asList(parameters));
   }
 
+  @Override
   public JdbcWriter createWriter() {
+    int size = batchSize;
+    return createWriter(size);
+  }
+
+  public JdbcWriter createWriter(int batchSize) {
     final JdbcWriter writer = new JdbcWriter(this);
     writer.setSqlPrefix(sqlPrefix);
     writer.setSqlSuffix(sqlSuffix);
@@ -226,12 +232,13 @@ public abstract class AbstractJdbcDataObjectStore extends
     return writer;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void delete(final DataObject object) {
     if (object.getState() == DataObjectState.Persisted
       || object.getState() == DataObjectState.Modified) {
       object.setState(DataObjectState.Deleted);
-      JdbcWriter writer = createWriter();
+      final JdbcWriter writer = getWriter();
       try {
         writer.write(object);
       } finally {
@@ -240,8 +247,9 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
-  public int delete(Query query) {
+  public int delete(final Query query) {
     final String typeName = query.getTypeName();
     DataObjectMetaData metaData = query.getMetaData();
     if (metaData == null) {
@@ -253,7 +261,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final String sql = JdbcUtils.getDeleteSql(query);
 
     Connection connection = getConnection();
-    DataSource dataSource = getDataSource();
+    final DataSource dataSource = getDataSource();
     try {
       if (dataSource != null) {
         try {
@@ -268,14 +276,14 @@ public abstract class AbstractJdbcDataObjectStore extends
         }
       }
 
-      PreparedStatement statement = connection.prepareStatement(sql);
+      final PreparedStatement statement = connection.prepareStatement(sql);
       try {
         JdbcUtils.setPreparedStatementFilterParameters(statement, query);
         return statement.executeUpdate();
       } finally {
         JdbcUtils.close(statement);
       }
-    } catch (SQLException e) {
+    } catch (final SQLException e) {
       throw new RuntimeException("Unable to delete : " + sql, e);
     } finally {
       if (dataSource != null) {
@@ -284,9 +292,10 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void deleteAll(final Collection<DataObject> objects) {
-    JdbcWriter writer = createWriter();
+    final JdbcWriter writer = getWriter();
     try {
       for (final DataObject object : objects) {
         if (object.getState() == DataObjectState.Persisted
@@ -321,6 +330,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return metaData.getAttributeNames();
   }
 
+  @Override
   public Connection getConnection() {
     return connection;
   }
@@ -329,7 +339,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     if (schema == null) {
       return null;
     } else {
-      String schemaPath = schema.getPath();
+      final String schemaPath = schema.getPath();
       return getDatabaseSchemaName(schemaPath);
     }
   }
@@ -342,6 +352,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return tableNameMap.get(typePath);
   }
 
+  @Override
   public DataSource getDataSource() {
     return dataSource;
   }
@@ -354,6 +365,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     }
   }
 
+  @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     throw new UnsupportedOperationException(
       "Cannot create SQL to generate Primary Key for " + metaData);
@@ -363,12 +375,13 @@ public abstract class AbstractJdbcDataObjectStore extends
     return hints;
   }
 
+  @Override
   public DataObjectMetaData getMetaData(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
       final String schemaName = PathUtil.getPath(typePath);
-      DataObjectStoreSchema schema = getSchema(schemaName);
-      String dbSchema = getDatabaseSchemaName(schema);
+      final DataObjectStoreSchema schema = getSchema(schemaName);
+      final String dbSchema = getDatabaseSchemaName(schema);
       final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(this,
         schema, typePath);
 
@@ -439,31 +452,58 @@ public abstract class AbstractJdbcDataObjectStore extends
     return sqlSuffix;
   }
 
-  public synchronized JdbcWriter getWriter() {
-    JdbcWriter writer = getSharedAttribute("writer");
-    if (writer == null) {
-      writer = createWriter();
-      setSharedAttribute("writer", writer);
+  public JdbcWriter getWriter() {
+    final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
+    if (resourceHolder != null
+      && (resourceHolder.hasWriter() || resourceHolder.isSynchronizedWithTransaction())) {
+      resourceHolder.requested();
+      if (!resourceHolder.hasWriter()) {
+        final JdbcWriter writer = createWriter(1);
+        resourceHolder.setWriter(writer);
+      }
+      return resourceHolder.getWriter();
+    }
+    final JdbcWriter writer = createWriter(1);
+    if (TransactionSynchronizationManager.isSynchronizationActive()) {
+      JdbcWriterResourceHolder holderToUse = resourceHolder;
+      if (holderToUse == null) {
+        holderToUse = new JdbcWriterResourceHolder(writer);
+      } else {
+        holderToUse.setWriter(writer);
+      }
+      holderToUse.requested();
+      final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(
+        this, holderToUse, writerKey);
+      TransactionSynchronizationManager.registerSynchronization(synchronization);
+      holderToUse.setSynchronizedWithTransaction(true);
+      if (holderToUse != resourceHolder) {
+        TransactionSynchronizationManager.bindResource(writerKey, holderToUse);
+      }
     }
     return writer;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void insert(final DataObject object) {
+    final JdbcWriter writer = getWriter();
     try {
-      final JdbcWriter writer = createWriter();
       writer.write(object);
+    } finally {
       writer.close();
-    } catch (final RuntimeException e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to insert " + object);
-      throw e;
     }
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void insertAll(final Collection<DataObject> objects) {
-    for (final DataObject object : objects) {
-      insert(object);
+    final JdbcWriter writer = getWriter();
+    try {
+      for (final DataObject object : objects) {
+        writer.write(object);
+      }
+    } finally {
+      writer.close();
     }
   }
 
@@ -628,6 +668,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectMetaDataImpl metaData) {
   }
 
+  @Override
   public DataObjectStoreQueryReader query(final String typePath,
     final BoundingBox boundingBox) {
 
@@ -637,10 +678,12 @@ public abstract class AbstractJdbcDataObjectStore extends
     return reader;
   }
 
+  @Override
   public Reader<DataObject> query(final String typePath, final Geometry geometry) {
     return query(typePath, geometry, null);
   }
 
+  @Override
   public Reader<DataObject> query(final String typePath, Geometry geometry,
     final String whereClause) {
     final DataObjectMetaData metaData = getMetaData(typePath);
@@ -670,6 +713,17 @@ public abstract class AbstractJdbcDataObjectStore extends
     JdbcUtils.release(connection, dataSource);
   }
 
+  public void releaseWriter(final JdbcWriter writer) {
+    if (writer != null) {
+      final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
+      if (resourceHolder != null && resourceHolder.writerEquals(writer)) {
+        resourceHolder.released();
+      } else {
+        writer.close();
+      }
+    }
+  }
+
   public void setBatchSize(final int batchSize) {
     this.batchSize = batchSize;
   }
@@ -684,6 +738,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.connection = connection;
   }
 
+  @Override
   public void setDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
   }
@@ -708,8 +763,27 @@ public abstract class AbstractJdbcDataObjectStore extends
     this.sqlSuffix = sqlSuffix;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void update(final DataObject object) {
-    getWriter().write(object);
+    final JdbcWriter writer = getWriter();
+    try {
+      writer.write(object);
+    } finally {
+      writer.close();
+    }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  @Override
+  public void updateAll(final Collection<DataObject> objects) {
+    final JdbcWriter writer = getWriter();
+    try {
+      for (final DataObject object : objects) {
+        writer.write(object);
+      }
+    } finally {
+      writer.close();
+    }
   }
 }

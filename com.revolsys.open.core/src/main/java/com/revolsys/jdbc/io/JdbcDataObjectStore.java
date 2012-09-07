@@ -26,8 +26,7 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   String getLabel();
 
-  DataObjectMetaData getMetaData(
-    String tableName,
+  DataObjectMetaData getMetaData(String tableName,
     ResultSetMetaData resultSetMetaData);
 
   Object getNextPrimaryKey(DataObjectMetaData metaData);
@@ -41,4 +40,6 @@ public interface JdbcDataObjectStore extends DataObjectStore {
   void setDataSource(DataSource dataSource);
 
   void setLabel(String label);
+
+  void releaseWriter(final JdbcWriter writer);
 }
