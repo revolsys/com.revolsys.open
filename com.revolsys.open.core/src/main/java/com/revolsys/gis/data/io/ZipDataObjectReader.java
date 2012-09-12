@@ -49,14 +49,13 @@ public class ZipDataObjectReader extends DelegatingReader<DataObject> implements
     FileUtil.deleteDirectory(directory);
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return reader.getMetaData();
   }
 
-  protected boolean openFile(
-    final Resource resource,
-    final DataObjectFactory factory,
-    final String zipEntryName) {
+  protected boolean openFile(final Resource resource,
+    final DataObjectFactory factory, final String zipEntryName) {
     final File file = new File(directory, zipEntryName);
     if (file.exists()) {
       final FileSystemResource fileResource = new FileSystemResource(file);

@@ -50,6 +50,7 @@ public class StringFieldType extends AbstractEcsvFieldType {
     super(DataTypes.STRING);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return new String(text);
@@ -58,6 +59,7 @@ public class StringFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     writeQuotedString(out, value);
   }

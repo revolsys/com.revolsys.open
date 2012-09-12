@@ -31,6 +31,7 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
     setSingleFile(false);
   }
 
+  @Override
   public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
@@ -42,6 +43,7 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
     }
   }
 
+  @Override
   public DataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
@@ -57,6 +59,7 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
     return new ShapefileDataObjectWriter(metaData, resource);
   }
 
+  @Override
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
@@ -64,11 +67,13 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
       outputStream));
   }
 
+  @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
   }
 
+  @Override
   public List<String> getUrlPatterns() {
     return null;
   }

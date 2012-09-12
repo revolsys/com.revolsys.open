@@ -30,6 +30,7 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
   /**
    * @return the out
    */
+  @Override
   public Channel<T> getOut() {
     if (out == null) {
       final String channelName = getBeanName() + ".out";
@@ -52,6 +53,7 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
   protected void init() {
   }
 
+  @Override
   public final void run() {
     final Logger log = Logger.getLogger(getClass());
     try {
@@ -78,6 +80,7 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
   /**
    * @param out the out to set
    */
+  @Override
   public void setOut(final Channel<T> out) {
     this.out = out;
     out.writeConnect();

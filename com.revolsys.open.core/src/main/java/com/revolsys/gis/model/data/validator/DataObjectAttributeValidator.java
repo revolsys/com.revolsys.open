@@ -34,6 +34,7 @@ public class DataObjectAttributeValidator implements AttributeValueValidator {
     this.validator = validator;
   }
 
+  @Override
   public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value instanceof DataObject) {
       return validator.isValid(value);

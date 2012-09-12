@@ -32,6 +32,7 @@ public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
     return false;
   }
 
+  @Override
   public boolean visit(final Node<T> node) {
     while (splitEdgesCloseToNode(node)) {
     }

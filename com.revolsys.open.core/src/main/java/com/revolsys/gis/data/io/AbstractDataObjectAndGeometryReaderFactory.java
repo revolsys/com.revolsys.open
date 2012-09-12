@@ -20,8 +20,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
   MapReaderFactory {
 
   public static DataObjectReader dataObjectReader(
-    final FileSystemResource resource,
-    final DataObjectFactory factory) {
+    final FileSystemResource resource, final DataObjectFactory factory) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
@@ -66,6 +65,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @param file The file to read.
    * @return The reader for the file.
    */
+  @Override
   public DataObjectReader createDataObjectReader(final Resource resource) {
     return createDataObjectReader(resource,
       ArrayDataObjectFactory.getInstance());
@@ -77,6 +77,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * 
    * @return The reader.
    */
+  @Override
   public Reader<DataObject> createDirectoryDataObjectReader() {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
@@ -90,6 +91,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @param directory The directory to read.
    * @return The reader for the file.
    */
+  @Override
   public Reader<DataObject> createDirectoryDataObjectReader(final File directory) {
     return createDirectoryDataObjectReader(directory,
       ArrayDataObjectFactory.getInstance());
@@ -104,15 +106,16 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @param dataObjectFactory The dataObjectFactory used to create data objects.
    * @return The reader for the file.
    */
+  @Override
   public Reader<DataObject> createDirectoryDataObjectReader(
-    final File directory,
-    final DataObjectFactory dataObjectFactory) {
+    final File directory, final DataObjectFactory dataObjectFactory) {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
     return directoryReader;
   }
 
+  @Override
   public GeometryReader createGeometryReader(final Resource resource) {
     final Reader<DataObject> dataObjectReader = createDataObjectReader(resource);
     final Iterator<DataObject> dataObjectIterator = dataObjectReader.iterator();
@@ -122,15 +125,18 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     return geometryReader;
   }
 
+  @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     final Reader reader = createDataObjectReader(resource);
     return reader;
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return customAttributionSupported;
   }
 
+  @Override
   public boolean isSingleFile() {
     return singleFile;
   }

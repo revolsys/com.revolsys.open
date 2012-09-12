@@ -12,10 +12,12 @@ public abstract class AbstractEcsvFieldType implements EcsvFieldType,
     this.dataType = dataType;
   }
 
+  @Override
   public DataType getDataType() {
     return dataType;
   }
 
+  @Override
   public String getTypeName() {
     return dataType.getName();
   }

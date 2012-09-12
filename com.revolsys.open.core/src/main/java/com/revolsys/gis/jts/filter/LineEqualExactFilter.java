@@ -39,6 +39,7 @@ public class LineEqualExactFilter implements Filter<LineString> {
     this.numAxis = numAxis;
   }
 
+  @Override
   public boolean accept(final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
 

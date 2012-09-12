@@ -19,24 +19,24 @@ public abstract class AbstractDataObjectAndGeometryWriterFactory extends
     super(name, geometrySupported, customAttributionSupported);
   }
 
+  @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       DataObjectUtil.GEOMETRY_META_DATA, resource);
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
+  @Override
+  public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
-    final OutputStream out,
-    final Charset charset) {
+  @Override
+  public Writer<Geometry> createGeometryWriter(final String baseName,
+    final OutputStream out, final Charset charset) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
     return createGeometryWriter(dataObjectWriter);

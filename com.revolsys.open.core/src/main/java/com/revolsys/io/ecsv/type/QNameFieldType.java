@@ -13,6 +13,7 @@ public class QNameFieldType extends AbstractEcsvFieldType {
     super(DataTypes.QNAME);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return QName.valueOf(text);
@@ -21,6 +22,7 @@ public class QNameFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     StringFieldType.writeQuotedString(out, value);
   }

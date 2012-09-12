@@ -48,6 +48,43 @@ import com.revolsys.gis.data.model.DataObject;
 public final class JavaBeanUtil {
   private static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
+  public static boolean getBooleanValue(final Object object,
+    final String attributeName) {
+    if (object == null) {
+      return false;
+    } else {
+      final Object value = getValue(object, attributeName);
+      if (value == null) {
+        return false;
+      } else if (value instanceof Boolean) {
+        final Boolean booleanValue = (Boolean)value;
+        return booleanValue;
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.intValue() == 1;
+      } else {
+        final String stringValue = value.toString();
+        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+
+  public static String getFirstName(final String name) {
+    if (StringUtils.hasText(name)) {
+      final int index = name.indexOf(".");
+      if (index == -1) {
+        return name;
+      } else {
+        return name.substring(0, index);
+      }
+    }
+    return name;
+  }
+
   public static Method getMethod(final Class<?> clazz, final String name,
     final Class<?>... parameterTypes) {
     try {
@@ -56,50 +93,6 @@ public final class JavaBeanUtil {
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  public static PropertyDescriptor getPropertyDescriptor(
-    final Class<?> beanClass, final String name) {
-    try {
-      final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
-      final PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-      for (int i = 0; i < props.length; i++) {
-        final PropertyDescriptor property = props[i];
-        if (name.equals(property.getName())) {
-          return property;
-        }
-      }
-    } catch (final IntrospectionException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
-  public static Method getReadMethod(final Class<?> beanClass, final String name) {
-    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
-    if (descriptor != null) {
-      return descriptor.getReadMethod();
-    } else {
-      return null;
-    }
-  }
-
-  public static Method getReadMethod(final Object object, final String name) {
-    return getReadMethod(object.getClass(), name);
-  }
-
-  public static Method getWriteMethod(final Class<?> beanClass,
-    final String name) {
-    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
-    if (descriptor != null) {
-      return descriptor.getWriteMethod();
-    } else {
-      return null;
-    }
-  }
-
-  public static Method getWriteMethod(final Object object, final String name) {
-    return getWriteMethod(object.getClass(), name);
   }
 
   /**
@@ -131,6 +124,23 @@ public final class JavaBeanUtil {
     }
   }
 
+  public static PropertyDescriptor getPropertyDescriptor(
+    final Class<?> beanClass, final String name) {
+    try {
+      final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
+      final PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
+      for (int i = 0; i < props.length; i++) {
+        final PropertyDescriptor property = props[i];
+        if (name.equals(property.getName())) {
+          return property;
+        }
+      }
+    } catch (final IntrospectionException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   public static String getPropertyName(final String methodName) {
     String propertyName;
     if (methodName.startsWith("is")) {
@@ -141,6 +151,31 @@ public final class JavaBeanUtil {
         + methodName.substring(4);
     }
     return propertyName;
+  }
+
+  public static Method getReadMethod(final Class<?> beanClass, final String name) {
+    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
+    if (descriptor != null) {
+      return descriptor.getReadMethod();
+    } else {
+      return null;
+    }
+  }
+
+  public static Method getReadMethod(final Object object, final String name) {
+    return getReadMethod(object.getClass(), name);
+  }
+
+  public static String getSubName(final String name) {
+    if (StringUtils.hasText(name)) {
+      final int index = name.indexOf(".");
+      if (index == -1) {
+        return "";
+      } else {
+        return name.substring(index + 1);
+      }
+    }
+    return name;
   }
 
   public static Class<?> getTypeParameterClass(final Method method,
@@ -180,9 +215,9 @@ public final class JavaBeanUtil {
       final Annotation annotation = (Annotation)object;
       return AnnotationUtils.getValue(annotation, key);
     } else {
-      String firstName = getFirstName(key);
-      String subName = getSubName(key);
-      Object value = getProperty(object, firstName);
+      final String firstName = getFirstName(key);
+      final String subName = getSubName(key);
+      final Object value = getProperty(object, firstName);
       if (value == null || !StringUtils.hasText(subName)) {
         return value;
       } else {
@@ -191,29 +226,18 @@ public final class JavaBeanUtil {
     }
   }
 
-  public static boolean getBooleanValue(final Object object,
-    final String attributeName) {
-    if (object == null) {
-      return false;
+  public static Method getWriteMethod(final Class<?> beanClass,
+    final String name) {
+    final PropertyDescriptor descriptor = getPropertyDescriptor(beanClass, name);
+    if (descriptor != null) {
+      return descriptor.getWriteMethod();
     } else {
-      final Object value = getValue(object, attributeName);
-      if (value == null) {
-        return false;
-      } else if (value instanceof Boolean) {
-        Boolean booleanValue = (Boolean)value;
-        return booleanValue;
-      } else if (value instanceof Number) {
-        Number number = (Number)value;
-        return number.intValue() == 1;
-      } else {
-        String stringValue = value.toString();
-        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
-          return true;
-        } else {
-          return false;
-        }
-      }
+      return null;
     }
+  }
+
+  public static Method getWriteMethod(final Object object, final String name) {
+    return getWriteMethod(object.getClass(), name);
   }
 
   public static <T> T invokeConstructor(
@@ -352,29 +376,5 @@ public final class JavaBeanUtil {
    * Construct a new JavaBeanUtil.
    */
   private JavaBeanUtil() {
-  }
-
-  public static String getFirstName(String name) {
-    if (StringUtils.hasText(name)) {
-      int index = name.indexOf(".");
-      if (index == -1) {
-        return name;
-      } else {
-        return name.substring(0, index);
-      }
-    }
-    return name;
-  }
-
-  public static String getSubName(String name) {
-    if (StringUtils.hasText(name)) {
-      int index = name.indexOf(".");
-      if (index == -1) {
-        return "";
-      } else {
-        return name.substring(index + 1);
-      }
-    }
-    return name;
   }
 }

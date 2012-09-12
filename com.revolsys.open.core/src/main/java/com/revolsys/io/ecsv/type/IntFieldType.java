@@ -9,6 +9,7 @@ public class IntFieldType extends NumberFieldType {
     super(DataTypes.INT);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Integer.parseInt(text);

@@ -13,6 +13,7 @@ public class LineLessThanLengthFilter implements Filter<Geometry> {
     this.length = length;
   }
 
+  @Override
   public boolean accept(final Geometry geometry) {
     return geometry.getLength() < length;
   }

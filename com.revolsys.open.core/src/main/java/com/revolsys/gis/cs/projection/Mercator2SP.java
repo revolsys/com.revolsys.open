@@ -42,6 +42,7 @@ public class Mercator2SP implements CoordinatesProjection {
     this.multiple = Math.cos(phi1) / Math.sqrt(1 - e * e * sinPhi1 * sinPhi1);
   }
 
+  @Override
   public void inverse(final Coordinates from, final Coordinates to) {
     final double x = (from.getX() - x0) / multiple;
     final double y = (from.getY() - y0) / multiple;
@@ -67,6 +68,7 @@ public class Mercator2SP implements CoordinatesProjection {
     }
   }
 
+  @Override
   public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getX();
     final double phi = from.getY();

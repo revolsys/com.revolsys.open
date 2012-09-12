@@ -14,15 +14,13 @@ import com.revolsys.gis.data.model.DataObjectMetaDataProperties;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.gml.type.GmlFieldType;
 import com.revolsys.io.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlWriter;
 
 public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   GmlConstants {
-  public static final void srsName(
-    final XmlWriter out,
+  public static final void srsName(final XmlWriter out,
     final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final int csId = coordinateSystem.getId();
@@ -41,7 +39,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private QName qualifiedName;
 
-  private String namespaceUri;
+  private final String namespaceUri;
 
   public GmlDataObjectWriter(final DataObjectMetaData metaData, final Writer out) {
     this.metaData = metaData;
@@ -54,8 +52,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     this.out.setPrefix(qualifiedName);
   }
 
-  private void box(
-    final GeometryFactory geometryFactory,
+  private void box(final GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(BOX);
     srsName(out, geometryFactory);
@@ -81,8 +78,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     out.close();
   }
 
-  private void envelope(
-    final GeometryFactory geometryFactory,
+  private void envelope(final GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(ENVELOPE);
     srsName(out, geometryFactory);
@@ -106,13 +102,14 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     super.setProperty(name, value);
   }
 
+  @Override
   public void write(final DataObject object) {
     if (!opened) {
       writeHeader();
     }
     out.startTag(FEATURE_MEMBER);
     final DataObjectMetaData metaData = object.getMetaData();
-    QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    final QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
     out.startTag(qualifiedName);
 
     for (final Attribute attribute : metaData.getAttributes()) {

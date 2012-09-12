@@ -11,15 +11,15 @@ public class ListObjectTreeNodeModel extends
     setSupportedClasses(AbstractList.class);
   }
 
+  public ListObjectTreeNodeModel(final ObjectTreeModel model) {
+    super(model);
+    setSupportedClasses(AbstractList.class);
+  }
+
   public ListObjectTreeNodeModel(
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     setSupportedClasses(AbstractList.class);
     addObjectTreeNodeModels(objectTreeNodeModels);
-  }
-
-  public ListObjectTreeNodeModel(ObjectTreeModel model) {
-    super(model);
-    setSupportedClasses(AbstractList.class);
   }
 
   @Override

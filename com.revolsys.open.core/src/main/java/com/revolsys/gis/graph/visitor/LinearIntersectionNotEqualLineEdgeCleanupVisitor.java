@@ -74,8 +74,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     duplicateStatistics.connect();
   }
 
-  private boolean middleCoordinatesEqual(
-    final CoordinatesList points1,
+  private boolean middleCoordinatesEqual(final CoordinatesList points1,
     final CoordinatesList points2) {
     if (points1.size() == points2.size()) {
       for (int i = 1; i < points2.size(); i++) {
@@ -90,6 +89,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     }
   }
 
+  @Override
   public void process(final DataObjectGraph graph) {
     graph.visitEdges(this);
   }
@@ -114,6 +114,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     this.newerComparator = newerComparator;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public boolean visit(final Edge<DataObject> edge) {
     final String typePath = edge.getTypeName();

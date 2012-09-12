@@ -24,10 +24,8 @@ public class ExecutorServiceFactory {
     }
   }
 
-  public static final void invokeMethod(
-    final Object object,
-    final String methodName,
-    final Object... args) {
+  public static final void invokeMethod(final Object object,
+    final String methodName, final Object... args) {
     final ExecutorService executorService = getExecutorService();
     final InvokeMethodRunnable task = new InvokeMethodRunnable(object,
       methodName, args);

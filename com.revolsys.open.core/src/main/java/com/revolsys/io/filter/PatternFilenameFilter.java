@@ -46,6 +46,7 @@ public class PatternFilenameFilter implements FilenameFilter {
    * @param fileName The file name.
    * @return True if the file matched, false otherwise.
    */
+  @Override
   public boolean accept(final File directory, final String fileName) {
     final boolean matches = pattern.matcher(fileName).matches();
     return matches;

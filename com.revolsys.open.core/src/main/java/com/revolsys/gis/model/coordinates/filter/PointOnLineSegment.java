@@ -17,6 +17,7 @@ public class PointOnLineSegment implements Filter<Coordinates> {
     this.maxDistance = maxDistance;
   }
 
+  @Override
   public boolean accept(final Coordinates point) {
     final Coordinates start = lineSegment.get(0);
     final Coordinates end = lineSegment.get(1);

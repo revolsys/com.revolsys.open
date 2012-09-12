@@ -21,10 +21,12 @@ public class CollectionFieldType extends AbstractEcsvFieldType {
     return typePath;
   }
 
+  @Override
   public Object parseValue(final String text) {
     return null;
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof Collection) {
       final Collection<Object> collection = (Collection<Object>)value;

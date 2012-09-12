@@ -10,8 +10,7 @@ import com.revolsys.io.page.PageValueManager;
 
 public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
-  public static <T> PageValueManager<T> create(
-    final PageManager pageManager,
+  public static <T> PageValueManager<T> create(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
     return new BPlusTreePageValueManager<T>(pageManager, valueSerializer);
   }
@@ -26,6 +25,7 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
     this.valueSerializer = valueSerializer;
   }
 
+  @Override
   public void disposeBytes(final byte[] bytes) {
     final int pageIndex = MethodPageValueManager.getIntValue(bytes);
     Page dataPage = pageManager.getPage(pageIndex);
@@ -48,10 +48,12 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
     }
   }
 
+  @Override
   public byte[] getBytes(final Page page) {
     return page.readBytes(4);
   }
 
+  @Override
   public byte[] getBytes(final T value) {
     final byte[] valueBytes = valueSerializer.getBytes(value);
 
@@ -75,12 +77,13 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
       page.writeBytes(valueBytes, offset, valueBytes.length - offset);
       BPlusTreeMap.setNumBytes(page);
 
-      return MethodPageValueManager.INT.getBytes(pageIndex);
+      return PageValueManager.INT.getBytes(pageIndex);
     } finally {
       pageManager.releasePage(page);
     }
   }
 
+  @Override
   public <V extends T> V getValue(final byte[] indexBytes) {
     final int pageIndex = MethodPageValueManager.getIntValue(indexBytes);
     Page dataPage = pageManager.getPage(pageIndex);
@@ -160,6 +163,7 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
   // return valueSerializer.readFromByteArray(valueBytes);
   // }
 
+  @Override
   public <V extends T> V readFromPage(final Page page) {
     final byte[] indexBytes = getBytes(page);
     return getValue(indexBytes);

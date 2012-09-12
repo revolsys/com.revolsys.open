@@ -55,6 +55,22 @@ public class BoundingBox extends Envelope {
     return intersects(x1, y1, x2, y2, x, y);
   }
 
+  public static boolean intersects(final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
+    final Coordinates line2End) {
+    final double line1x1 = line1Start.getX();
+    final double line1y1 = line1Start.getY();
+    final double line1x2 = line1End.getX();
+    final double line1y2 = line1End.getY();
+
+    final double line2x1 = line2Start.getX();
+    final double line2y1 = line2Start.getY();
+    final double line2x2 = line2End.getX();
+    final double line2y2 = line2End.getY();
+    return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2);
+  }
+
   /**
    * Point intersects the bounding box of the line.
    * 
@@ -71,22 +87,6 @@ public class BoundingBox extends Envelope {
     } else {
       return false;
     }
-  }
-
-  public static boolean intersects(final Coordinates line1Start,
-    final Coordinates line1End, final Coordinates line2Start,
-    final Coordinates line2End) {
-    final double line1x1 = line1Start.getX();
-    final double line1y1 = line1Start.getY();
-    final double line1x2 = line1End.getX();
-    final double line1y2 = line1End.getY();
-
-    final double line2x1 = line2Start.getX();
-    final double line2y1 = line2Start.getY();
-    final double line2x2 = line2End.getX();
-    final double line2y2 = line2End.getY();
-    return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
-      line2x2, line2y2);
   }
 
   public static boolean intersects(final double p1X, final double p1Y,
@@ -247,6 +247,11 @@ public class BoundingBox extends Envelope {
   }
 
   public BoundingBox(final GeometryFactory geometryFactory,
+    final Coordinates point) {
+    this(geometryFactory, point.getX(), point.getY());
+  }
+
+  public BoundingBox(final GeometryFactory geometryFactory,
     final Coordinates point1, final Coordinates point2) {
     this(geometryFactory, point1.getX(), point1.getY(), point2.getX(),
       point2.getY());
@@ -304,14 +309,16 @@ public class BoundingBox extends Envelope {
     this.geometryFactory = GeometryFactory.getFactory(srid);
   }
 
-  public BoundingBox(GeometryFactory geometryFactory, Coordinates point) {
-    this(geometryFactory, point.getX(), point.getY());
-  }
-
   public boolean contains(final Coordinates coordinate) {
     final double x = coordinate.getX();
     final double y = coordinate.getY();
     return contains(x, y);
+  }
+
+  public boolean contains(final Point point) {
+    final Point projectedPoint = (Point)geometryFactory.createGeometry(point);
+    final Coordinates coordinates = CoordinatesUtil.get(projectedPoint);
+    return contains(coordinates);
   }
 
   public BoundingBox convert(final GeometryFactory geometryFactory) {
@@ -354,6 +361,11 @@ public class BoundingBox extends Envelope {
     final double x = coordinates.getX();
     final double y = coordinates.getY();
     super.expandToInclude(x, y);
+  }
+
+  public void expandToInclude(final Geometry geometry) {
+    final BoundingBox box = getBoundingBox(geometry);
+    expandToInclude(box);
   }
 
   /**
@@ -470,6 +482,14 @@ public class BoundingBox extends Envelope {
   public boolean intersects(final BoundingBox boundingBox) {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     return intersects((Envelope)convertedBoundingBox);
+  }
+
+  public void move(final double xDisplacement, final double yDisplacement) {
+    minX = getMinX() + xDisplacement;
+    maxX = getMaxX() + xDisplacement;
+    minY = getMinY() + yDisplacement;
+    maxY = getMaxY() + yDisplacement;
+    initIfNotNull();
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -615,24 +635,5 @@ public class BoundingBox extends Envelope {
       return "SRID=" + geometryFactory.getSRID() + ";BBOX(" + getMinX() + ","
         + getMinY() + " " + getMaxX() + "," + getMaxY() + ")";
     }
-  }
-
-  public void expandToInclude(Geometry geometry) {
-    BoundingBox box = getBoundingBox(geometry);
-    expandToInclude(box);
-  }
-
-  public boolean contains(Point point) {
-    Point projectedPoint = (Point)geometryFactory.createGeometry(point);
-    Coordinates coordinates = CoordinatesUtil.get(projectedPoint);
-    return contains(coordinates);
-  }
-
-  public void move(double xDisplacement, double yDisplacement) {
-    minX = getMinX() + xDisplacement;
-    maxX = getMaxX() + xDisplacement;
-    minY = getMinY() + yDisplacement;
-    maxY = getMaxY() + yDisplacement;
-    initIfNotNull();
   }
 }

@@ -23,11 +23,8 @@ public abstract class AbstractEdgeListenerVisitor<T> extends
     nodeListeners.add(listener);
   }
 
-  public void edgeEvent(
-    final Edge<T> edge,
-    final String ruleName,
-    final String action,
-    final String notes) {
+  public void edgeEvent(final Edge<T> edge, final String ruleName,
+    final String action, final String notes) {
     edgeListeners.edgeEvent(edge, ruleName, action, notes);
   }
 
@@ -39,12 +36,8 @@ public abstract class AbstractEdgeListenerVisitor<T> extends
     return nodeListeners;
   }
 
-  public void nodeEvent(
-    final Node<T> node,
-    final String typePath,
-    final String ruleName,
-    final String action,
-    final String notes) {
+  public void nodeEvent(final Node<T> node, final String typePath,
+    final String ruleName, final String action, final String notes) {
     nodeListeners.nodeEvent(node, typePath, ruleName, action, notes);
   }
 }

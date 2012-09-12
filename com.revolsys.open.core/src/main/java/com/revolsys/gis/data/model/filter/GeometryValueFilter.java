@@ -15,6 +15,7 @@ public class GeometryValueFilter implements Filter<DataObject> {
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     final Geometry value = object.getGeometryValue();
     if (value == geometry) {

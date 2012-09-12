@@ -1,19 +1,24 @@
 package com.revolsys.gis.graph.visitor;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.gis.graph.EdgeQuadTree;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
 public class SplitCrossingEdgesVisitor<T> extends
   AbstractEdgeListenerVisitor<T> {
+
   public static final String CROSSING_EDGES = "Crossing edges";
 
   private final Graph<T> graph;
@@ -39,6 +44,22 @@ public class SplitCrossingEdgesVisitor<T> extends
     return splitEdgesCloseToNodeVisitor.getSplitObjects();
   }
 
+  public List<Edge<T>> queryCrosses(final IdObjectIndex<Edge<T>> edgeIndex,
+    final LineString line) {
+    final PreparedGeometry preparedLine = PreparedGeometryFactory.prepare(line);
+    final Envelope envelope = line.getEnvelopeInternal();
+    final List<Edge<T>> edges = edgeIndex.query(envelope);
+    // TODO change to use an visitor
+    for (final Iterator<Edge<T>> iterator = edges.iterator(); iterator.hasNext();) {
+      final Edge<T> edge = iterator.next();
+      final LineString matchLine = edge.getLine();
+      if (!preparedLine.crosses(matchLine)) {
+        iterator.remove();
+      }
+    }
+    return edges;
+  }
+
   public void setNewEdges(final Collection<Edge<T>> newEdges) {
     splitEdgesCloseToNodeVisitor.setNewEdges(newEdges);
   }
@@ -47,10 +68,11 @@ public class SplitCrossingEdgesVisitor<T> extends
     splitEdgesCloseToNodeVisitor.setSplitObjects(splitObjects);
   }
 
+  @Override
   public boolean visit(final Edge<T> edge) {
-    final EdgeQuadTree<T> edgeIndex = graph.getEdgeIndex();
+    final IdObjectIndex<Edge<T>> edgeIndex = graph.getEdgeIndex();
     final LineString line = edge.getLine();
-    final List<Edge<T>> crossings = edgeIndex.queryCrosses(line);
+    final List<Edge<T>> crossings = queryCrosses(edgeIndex, line);
     crossings.remove(edge);
 
     for (final Edge<T> crossEdge : crossings) {

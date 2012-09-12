@@ -14,6 +14,7 @@ public class Base64BinaryFieldType extends AbstractEcsvFieldType {
     super(DataTypes.BASE64_BINARY);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Base64.decode(text);
@@ -22,6 +23,7 @@ public class Base64BinaryFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     if (value != null) {
       final Base64EncodingWriter base64Out = new Base64EncodingWriter(out);

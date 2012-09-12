@@ -25,10 +25,12 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
   private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName()
     + ".PROCESSED";
 
+  @Override
   public void process(final DataObjectGraph graph) {
     graph.visitEdges(this);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public boolean visit(final Edge<DataObject> edge) {
     final DataObject object = edge.getObject();

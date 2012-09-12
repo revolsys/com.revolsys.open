@@ -6,6 +6,7 @@ import com.revolsys.util.MathUtil;
 
 public class VersionComparator implements Comparator<String> {
 
+  @Override
   public int compare(final String version1, final String version2) {
     final double[] parts1 = MathUtil.toDoubleArraySplit(version1, "\\.");
     final double[] parts2 = MathUtil.toDoubleArraySplit(version2, "\\.");

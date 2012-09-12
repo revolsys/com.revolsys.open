@@ -7,6 +7,7 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
 
   private ProcessNetwork processNetwork;
 
+  @Override
   public String getBeanName() {
     return beanName;
   }
@@ -14,10 +15,12 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
   /**
    * @return the processNetwork
    */
+  @Override
   public ProcessNetwork getProcessNetwork() {
     return processNetwork;
   }
 
+  @Override
   public void setBeanName(final String beanName) {
     this.beanName = beanName;
   }
@@ -25,6 +28,7 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
   /**
    * @param processNetwork the processNetwork to set
    */
+  @Override
   public void setProcessNetwork(final ProcessNetwork processNetwork) {
     this.processNetwork = processNetwork;
     if (processNetwork != null) {

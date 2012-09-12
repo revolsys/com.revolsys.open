@@ -136,7 +136,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   //
   // dataSource.setConnectionFactoryClassName("oracle.jdbc.pool.OracleConnectionPoolDataSource");
   //
-  // for (final Entry<String, Object> property : newConfig.entrySet()) {
+  // for (final MapKeyEntry<String, Object> property : newConfig.entrySet()) {
   // final String name = property.getKey();
   // final Object value = property.getValue();
   // try {

@@ -120,8 +120,7 @@ public final class DataTypes {
   public static final DataType STRING = new SimpleDataType("string",
     String.class);
 
-  public static final DataType BLOB = new SimpleDataType("blob",
-    Blob.class);;
+  public static final DataType BLOB = new SimpleDataType("blob", Blob.class);;
 
   static {
     final Field[] fields = DataTypes.class.getDeclaredFields();

@@ -11,6 +11,7 @@ public class DecimalFieldType extends NumberFieldType {
     super(DataTypes.DECIMAL);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return new BigDecimal(text);

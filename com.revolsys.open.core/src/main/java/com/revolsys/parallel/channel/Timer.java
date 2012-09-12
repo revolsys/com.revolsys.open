@@ -7,10 +7,12 @@ public class Timer implements SelectableInput {
     this.time = time;
   }
 
+  @Override
   public boolean disable() {
     return isTimeout();
   }
 
+  @Override
   public boolean enable(final MultiInputSelector alt) {
     return isTimeout();
   }
@@ -20,6 +22,7 @@ public class Timer implements SelectableInput {
     return waitTime;
   }
 
+  @Override
   public boolean isClosed() {
     return false;
   }

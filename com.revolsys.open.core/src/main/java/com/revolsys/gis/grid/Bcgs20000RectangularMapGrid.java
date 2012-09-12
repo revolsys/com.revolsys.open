@@ -56,9 +56,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
     }
   }
 
-  protected double getLatitude(
-    final String blockName,
-    final String letter,
+  protected double getLatitude(final String blockName, final String letter,
     final String numberString) {
     double latitude = getLatitude(blockName, letter);
 
@@ -83,9 +81,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
     }
   }
 
-  protected double getLongitude(
-    final String blockName,
-    final String letter,
+  protected double getLongitude(final String blockName, final String letter,
     final String numberString) {
     double longitude = getLongitude(blockName, letter);
     final int number = Integer.parseInt(numberString);

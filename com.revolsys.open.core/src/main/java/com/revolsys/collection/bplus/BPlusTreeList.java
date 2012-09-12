@@ -1,27 +1,29 @@
 package com.revolsys.collection.bplus;
 
 import java.util.AbstractList;
+import java.util.Map;
 
-import com.revolsys.io.page.MethodPageValueManager;
+import org.springframework.util.comparator.ComparableComparator;
+
 import com.revolsys.io.page.PageManager;
 import com.revolsys.io.page.PageValueManager;
 
 public class BPlusTreeList<T> extends AbstractList<T> {
 
-  public static <T> BPlusTreeList<T> create(
-    final PageManager pageManager,
+  public static <T> BPlusTreeList<T> create(final PageManager pageManager,
     final PageValueManager<T> valueManager) {
     return new BPlusTreeList<T>(pageManager, valueManager);
   }
 
-  private final BPlusTreeMap<Integer, T> tree;
+  private final Map<Integer, T> tree;
 
   int size = 0;
 
   public BPlusTreeList(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
-    tree = BPlusTreeMap.create(pageManager, MethodPageValueManager.INT,
-      valueSerializer);
+    ComparableComparator<Integer> comparator = new ComparableComparator<Integer>();
+    tree = BPlusTreeMap.create(pageManager, comparator,
+      PageValueManager.INT, valueSerializer);
   }
 
   @Override

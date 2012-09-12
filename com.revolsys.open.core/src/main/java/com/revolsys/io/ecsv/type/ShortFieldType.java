@@ -9,6 +9,7 @@ public class ShortFieldType extends NumberFieldType {
     super(DataTypes.SHORT);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Short.parseShort(text);

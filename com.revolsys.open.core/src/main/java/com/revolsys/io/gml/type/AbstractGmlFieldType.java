@@ -18,6 +18,7 @@ public abstract class AbstractGmlFieldType implements GmlFieldType,
     this.xmlSchemaTypeName = xmlSchemaTypeName;
   }
 
+  @Override
   public DataType getDataType() {
     return dataType;
   }
@@ -26,10 +27,12 @@ public abstract class AbstractGmlFieldType implements GmlFieldType,
     return xmlSchemaTypeName;
   }
 
+  @Override
   public String getXmlSchemaTypeName() {
     return xmlSchemaTypeName;
   }
 
+  @Override
   public void writeValue(final XmlWriter out, final Object value) {
     if (value == null) {
       out.attribute(XsiConstants.NIL, true);

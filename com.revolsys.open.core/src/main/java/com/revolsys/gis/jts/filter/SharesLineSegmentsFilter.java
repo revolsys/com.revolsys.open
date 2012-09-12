@@ -46,6 +46,7 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
     }
   }
 
+  @Override
   public boolean accept(final LineString line) {
 
     final CoordinatesList points = CoordinatesListUtil.get(line);

@@ -18,6 +18,7 @@ public class SimpleProperty extends AbstractDataObjectMetaDataProperty {
     return new SimpleProperty(propertyName, value);
   }
 
+  @Override
   public String getPropertyName() {
     return propertyName;
   }

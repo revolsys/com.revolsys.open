@@ -66,15 +66,7 @@ public abstract class AbstractDataObjectStore extends
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  public Writer<DataObject> getWriter() {
-    return createWriter();
-  }
-
   @Override
-  public int delete(Query query) {
-    return 0;
-  }
-
   public void addCodeTable(final CodeTable codeTable) {
     final String idColumn = codeTable.getIdAttributeName();
     addCodeTable(idColumn, codeTable);
@@ -91,16 +83,16 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
-  @Override
-  public void addCodeTables(Collection<CodeTable> codeTables) {
-    for (CodeTable codeTable : codeTables) {
-      addCodeTable(codeTable);
-    }
-  }
-
   public void addCodeTable(final String columnName, final CodeTable codeTable) {
     if (columnName != null && !columnName.equalsIgnoreCase("ID")) {
       this.columnToTableMap.put(columnName, codeTable);
+    }
+  }
+
+  @Override
+  public void addCodeTables(final Collection<CodeTable> codeTables) {
+    for (final CodeTable codeTable : codeTables) {
+      addCodeTable(codeTable);
     }
   }
 
@@ -125,10 +117,12 @@ public abstract class AbstractDataObjectStore extends
     schemaMap.put(schema.getPath(), schema);
   }
 
+  @Override
   public void addStatistic(final String statisticName, final DataObject object) {
     statistics.add(statisticName, object);
   }
 
+  @Override
   public void addStatistic(final String statisticName, final String typePath,
     final int count) {
     statistics.add(statisticName, typePath, count);
@@ -162,6 +156,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public DataObject create(final DataObjectMetaData objectMetaData) {
     final DataObjectMetaData metaData = getMetaData(objectMetaData);
     if (metaData == null) {
@@ -171,6 +166,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public DataObject create(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
@@ -190,10 +186,12 @@ public abstract class AbstractDataObjectStore extends
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public <T> T createPrimaryIdValue(final String typePath) {
     return null;
   }
 
+  @Override
   public Query createQuery(final String typePath, final String whereClause,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
@@ -205,15 +203,23 @@ public abstract class AbstractDataObjectStore extends
     return reader;
   }
 
+  @Override
   public DataObjectReader createReader(final String typePath,
     final String query, final List<Object> parameters) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void delete(final DataObject object) {
     throw new UnsupportedOperationException("Delete not supported");
   }
 
+  @Override
+  public int delete(final Query query) {
+    return 0;
+  }
+
+  @Override
   public void deleteAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       delete(object);
@@ -230,6 +236,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public CodeTable getCodeTable(final String typePath) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
@@ -240,12 +247,14 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public CodeTable getCodeTableByColumn(final String columnName) {
     final CodeTable codeTable = columnToTableMap.get(columnName);
     return codeTable;
 
   }
 
+  @Override
   public Map<String, CodeTable> getCodeTableByColumnMap() {
     return new HashMap<String, CodeTable>(columnToTableMap);
   }
@@ -254,6 +263,7 @@ public abstract class AbstractDataObjectStore extends
     return codeTableColumNames;
   }
 
+  @Override
   public DataObjectFactory getDataObjectFactory() {
     return this.dataObjectFactory;
   }
@@ -262,16 +272,19 @@ public abstract class AbstractDataObjectStore extends
     return geometryFactory;
   }
 
+  @Override
   public String getLabel() {
     return label;
   }
 
+  @Override
   public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
     final String typePath = objectMetaData.getPath();
     final DataObjectMetaData metaData = getMetaData(typePath);
     return metaData;
   }
 
+  @Override
   public DataObjectMetaData getMetaData(final String typePath) {
     final String schemaName = PathUtil.getPath(typePath);
     final DataObjectStoreSchema schema = getSchema(schemaName);
@@ -282,6 +295,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public DataObjectStoreSchema getSchema(String schemaName) {
     if (schemaName == null) {
       return null;
@@ -302,10 +316,7 @@ public abstract class AbstractDataObjectStore extends
     return schemaMap;
   }
 
-  protected void refreshSchema() {
-    schemaMap.clear();
-  }
-
+  @Override
   public List<DataObjectStoreSchema> getSchemas() {
     synchronized (schemaMap) {
       if (schemaMap.isEmpty()) {
@@ -331,6 +342,7 @@ public abstract class AbstractDataObjectStore extends
     return sharedAttributes;
   }
 
+  @Override
   public StatisticsMap getStatistics() {
     return statistics;
   }
@@ -343,6 +355,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public List<String> getTypeNames(final String schemaName) {
     final DataObjectStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
@@ -352,6 +365,7 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public List<DataObjectMetaData> getTypes(final String namespace) {
     final List<DataObjectMetaData> types = new ArrayList<DataObjectMetaData>();
     for (final String typePath : getTypeNames(namespace)) {
@@ -360,25 +374,35 @@ public abstract class AbstractDataObjectStore extends
     return types;
   }
 
+  @Override
+  public Writer<DataObject> getWriter() {
+    return createWriter();
+  }
+
+  @Override
   @PostConstruct
   public void initialize() {
     statistics.connect();
   }
 
+  @Override
   public void insert(final DataObject dataObject) {
     throw new UnsupportedOperationException("Insert not supported");
   }
 
+  @Override
   public void insertAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
   }
 
+  @Override
   public boolean isEditable(final String typePath) {
     return false;
   }
 
+  @Override
   public DataObject load(final String typePath, final Object id) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
@@ -407,6 +431,7 @@ public abstract class AbstractDataObjectStore extends
   protected abstract void loadSchemas(
     Map<String, DataObjectStoreSchema> schemaMap);
 
+  @Override
   public DataObject lock(final String typePath, final Object id) {
     final DataObjectMetaData metaData = getMetaData(typePath);
     if (metaData == null) {
@@ -430,36 +455,41 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public ResultPager<DataObject> page(final Query query) {
     final Reader<DataObject> results = query(query);
     final List<DataObject> list = results.read();
     return new ListResultPager<DataObject>(list);
   }
 
+  @Override
   public Reader<DataObject> query(final List<Query> queries) {
     final DataObjectStoreQueryReader reader = createReader();
     reader.setQueries(queries);
     return reader;
   }
 
+  @Override
   public Reader<DataObject> query(final Query... queries) {
     return query(Arrays.asList(queries));
   }
 
+  @Override
   public Reader<DataObject> query(final String path) {
-    DataObjectStoreSchema schema = getSchema(path);
+    final DataObjectStoreSchema schema = getSchema(path);
     if (schema == null) {
       final Query query = new Query(path);
       return query(query);
     } else {
-      List<Query> queries = new ArrayList<Query>();
-      for (String typeName : schema.getTypeNames()) {
+      final List<Query> queries = new ArrayList<Query>();
+      for (final String typeName : schema.getTypeNames()) {
         queries.add(new Query(typeName));
       }
       return query(queries);
     }
   }
 
+  @Override
   public DataObject queryFirst(final Query query) {
     final Reader<DataObject> reader = query(query);
     try {
@@ -482,6 +512,10 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  protected void refreshSchema() {
+    schemaMap.clear();
+  }
+
   public void setCodeTableColumNames(
     final Map<String, List<String>> domainColumNames) {
     this.codeTableColumNames = domainColumNames;
@@ -492,6 +526,7 @@ public abstract class AbstractDataObjectStore extends
     this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
+  @Override
   public void setDataObjectFactory(final DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -500,6 +535,7 @@ public abstract class AbstractDataObjectStore extends
     this.geometryFactory = geometryFactory;
   }
 
+  @Override
   public void setLabel(final String label) {
     this.label = label;
     statistics.setPrefix(label);
@@ -540,10 +576,12 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
   public void update(final DataObject object) {
     throw new UnsupportedOperationException("Update not supported");
   }
 
+  @Override
   public void updateAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       update(object);

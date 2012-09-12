@@ -31,16 +31,14 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
   }
 
   public static URLClassLoader createClassLoader(
-    final ClassLoader parentClassLoader,
-    final Collection<URL> urls) {
+    final ClassLoader parentClassLoader, final Collection<URL> urls) {
     URL[] urlArray = new URL[urls.size()];
     urlArray = urls.toArray(urlArray);
     return new URLClassLoader(urlArray, parentClassLoader);
   }
 
   public static URLClassLoader createClassLoader(
-    final ClassLoader parentClassLoader,
-    final File file) {
+    final ClassLoader parentClassLoader, final File file) {
     final Collection<URL> urls = new LinkedHashSet<URL>();
     if (file.isDirectory()) {
       addJars(urls, file);

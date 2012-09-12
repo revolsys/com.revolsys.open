@@ -142,6 +142,7 @@ public class GpxIterator implements DataObjectIterator {
 
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return GpxConstants.GPX_TYPE;
   }
@@ -150,6 +151,7 @@ public class GpxIterator implements DataObjectIterator {
     return schemaName;
   }
 
+  @Override
   public boolean hasNext() {
     if (!hasNext) {
       return false;
@@ -177,6 +179,7 @@ public class GpxIterator implements DataObjectIterator {
     }
   }
 
+  @Override
   public DataObject next() {
     if (hasNext()) {
       loadNextObject = true;
@@ -414,6 +417,7 @@ public class GpxIterator implements DataObjectIterator {
     return parsePoint(featureType, index);
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.gis.graph.EdgeQuadTree;
 import com.revolsys.gis.graph.Graph;
 import com.vividsolutions.jts.geom.Dimension;
 import com.vividsolutions.jts.geom.Envelope;
@@ -15,14 +15,13 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
 
-  public static <T> List<Edge<T>> getEdges(
-    final Graph<T> graph,
+  public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
     final Edge<T> edge) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final LineString line = edge.getLine();
     final Envelope env = line.getEnvelopeInternal();
-    final EdgeQuadTree<T> index = graph.getEdgeIndex();
-    index.query(env, new EdgeIntersectsLinearlyEdgeVisitor<T>(edge, results));
+    final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
+    index.visit(env, new EdgeIntersectsLinearlyEdgeVisitor<T>(edge, results));
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
@@ -39,6 +38,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
     this.matchVisitor = matchVisitor;
   }
 
+  @Override
   public boolean visit(final Edge<T> edge2) {
     if (edge2 != edge) {
       final LineString line1 = edge.getLine();

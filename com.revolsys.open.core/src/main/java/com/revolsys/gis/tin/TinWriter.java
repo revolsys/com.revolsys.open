@@ -14,8 +14,7 @@ import com.revolsys.spring.SpringUtil;
 
 public class TinWriter {
 
-  public static void write(
-    final Resource resource,
+  public static void write(final Resource resource,
     final TriangulatedIrregularNetwork tin) {
     final TinWriter tinWriter = new TinWriter(resource);
     try {

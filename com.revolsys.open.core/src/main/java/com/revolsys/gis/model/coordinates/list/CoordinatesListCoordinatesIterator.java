@@ -32,10 +32,12 @@ public class CoordinatesListCoordinatesIterator implements
     return index;
   }
 
+  @Override
   public boolean hasNext() {
     return index < coordinatesList.size();
   }
 
+  @Override
   public Coordinates next() {
     if (hasNext()) {
       final CoordinatesListCoordinates coordinates = new CoordinatesListCoordinates(
@@ -47,6 +49,7 @@ public class CoordinatesListCoordinatesIterator implements
     }
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
 

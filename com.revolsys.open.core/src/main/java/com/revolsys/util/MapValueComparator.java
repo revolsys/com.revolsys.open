@@ -12,6 +12,7 @@ public class MapValueComparator<K extends Comparable<K>, V extends Comparable<V>
     this.map = map;
   }
 
+  @Override
   public int compare(final K k1, final K k2) {
     final V v1 = map.get(k1);
     final V v2 = map.get(k2);

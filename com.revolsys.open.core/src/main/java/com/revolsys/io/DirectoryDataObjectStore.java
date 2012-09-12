@@ -57,6 +57,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     super.close();
   }
 
+  @Override
   public Writer<DataObject> createWriter() {
     return new DirectoryDataObjectStoreWriter(this);
   }
@@ -95,6 +96,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     return metaData;
   }
 
+  @Override
   public synchronized Writer<DataObject> getWriter() {
     if (writer == null) {
       writer = new DirectoryDataObjectStoreWriter(this);
@@ -124,7 +126,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
       final Resource resource = new FileSystemResource(file);
       writer = AbstractDataObjectIoFactory.dataObjectWriter(metaData, resource);
       if (writer instanceof ObjectWithProperties) {
-        ObjectWithProperties properties = (ObjectWithProperties)writer;
+        final ObjectWithProperties properties = writer;
         properties.setProperties(getProperties());
       }
       writers.put(typePath, writer);
@@ -141,8 +143,7 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     return createMissingTables;
   }
 
-  protected DataObjectMetaData loadMetaData(
-    final String schemaName,
+  protected DataObjectMetaData loadMetaData(final String schemaName,
     final File file) {
     throw new UnsupportedOperationException();
   }
@@ -177,12 +178,13 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
     }
   }
 
-  public Reader<DataObject> query(
-    final String typePath,
+  @Override
+  public Reader<DataObject> query(final String typePath,
     final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public Reader<DataObject> query(final String typePath, final Geometry geometry) {
     throw new UnsupportedOperationException();
   }

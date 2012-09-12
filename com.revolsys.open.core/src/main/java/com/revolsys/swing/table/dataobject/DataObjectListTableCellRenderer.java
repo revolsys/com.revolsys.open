@@ -26,19 +26,15 @@ public class DataObjectListTableCellRenderer implements TableCellRenderer {
   }
 
   @Override
-  public Component getTableCellRendererComponent(
-    final JTable table,
-    final Object value,
-    final boolean isSelected,
-    final boolean hasFocus,
-    final int row,
-    final int column) {
+  public Component getTableCellRendererComponent(final JTable table,
+    final Object value, final boolean isSelected, final boolean hasFocus,
+    final int row, final int column) {
     Component component = null;
 
     final DataObjectListTableModel model = (DataObjectListTableModel)table.getModel();
 
     final DataObjectMetaData schema = model.getMetaData();
-    boolean required = schema.isAttributeRequired(column);
+    final boolean required = schema.isAttributeRequired(column);
     final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
       schema, column);
     if (uiBuilder != null) {
@@ -58,7 +54,7 @@ public class DataObjectListTableCellRenderer implements TableCellRenderer {
       }
     }
     if (required && value == null) {
-      component.setBackground(new Color(255,0,0,100));
+      component.setBackground(new Color(255, 0, 0, 100));
       component.setForeground(table.getForeground());
     } else if (selected) {
       component.setBackground(table.getSelectionBackground());

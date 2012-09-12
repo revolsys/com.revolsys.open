@@ -6,14 +6,17 @@ import com.revolsys.io.wkt.WktWriter;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryStringConverter implements StringConverter<Geometry> {
+  @Override
   public Class<Geometry> getConvertedClass() {
     return Geometry.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return true;
   }
 
+  @Override
   public Geometry toObject(final Object value) {
     if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
@@ -25,10 +28,12 @@ public class GeometryStringConverter implements StringConverter<Geometry> {
     }
   }
 
+  @Override
   public Geometry toObject(final String string) {
-    return new WktParser().parseGeometry(string,false);
+    return new WktParser().parseGeometry(string, false);
   }
 
+  @Override
   public String toString(final Object value) {
     if (value == null) {
       return null;

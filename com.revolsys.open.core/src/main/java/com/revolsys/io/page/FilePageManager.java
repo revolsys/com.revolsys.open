@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 
+import com.revolsys.collection.WeakCache;
 import com.revolsys.io.FileUtil;
 
 public class FilePageManager implements PageManager {
@@ -17,7 +18,8 @@ public class FilePageManager implements PageManager {
 
   private RandomAccessFile randomAccessFile;
 
-  private final WeakHashMap<Integer, Page> pages = new WeakHashMap<Integer, Page>();
+  // TODO 
+  private final Map<Integer, Page> pages = new WeakCache<Integer, Page>();
 
   private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
 
@@ -36,6 +38,7 @@ public class FilePageManager implements PageManager {
     }
   }
 
+  @Override
   public synchronized Page createPage() {
     synchronized (pages) {
       Page page;
@@ -59,14 +62,17 @@ public class FilePageManager implements PageManager {
     }
   }
 
+  @Override
   public Page createTempPage() {
     return new ByteArrayPage(this, -1, pageSize);
   }
 
+  @Override
   public int getNumPages() {
     return pages.size();
   }
 
+  @Override
   public synchronized Page getPage(final int index) {
     synchronized (pages) {
       if (freePageIndexes.contains(index)) {
@@ -81,12 +87,14 @@ public class FilePageManager implements PageManager {
             + index);
         } else {
           pagesInUse.add(page);
+          page.setOffset(0);
           return page;
         }
       }
     }
   }
 
+  @Override
   public int getPageSize() {
     return pageSize;
   }
@@ -104,11 +112,13 @@ public class FilePageManager implements PageManager {
     }
   }
 
+  @Override
   public synchronized void releasePage(final Page page) {
     write(page);
     pagesInUse.remove(page);
   }
 
+  @Override
   public synchronized void removePage(final Page page) {
     synchronized (pages) {
       page.clear();
@@ -117,6 +127,7 @@ public class FilePageManager implements PageManager {
     }
   }
 
+  @Override
   public synchronized void write(final Page page) {
     if (page.getPageManager() == this) {
       synchronized (randomAccessFile) {

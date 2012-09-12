@@ -46,6 +46,7 @@ public class ShortNameProperty extends AbstractDataObjectMetaDataProperty {
     return new ShortNameProperty(shortName);
   }
 
+  @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
   }

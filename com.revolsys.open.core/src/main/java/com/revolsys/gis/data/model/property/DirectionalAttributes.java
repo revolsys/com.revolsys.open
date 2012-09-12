@@ -42,11 +42,6 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return property.canMerge(point, object1, object2, excludes);
   }
 
-  public static boolean hasProperty(DataObject object) {
-    DataObjectMetaData metaData = object.getMetaData();
-    return metaData.getProperty(PROPERTY_NAME) != null;
-  }
-
   public static boolean canMergeObjects(final Coordinates point,
     final DataObject object1, final DataObject object2,
     final Set<String> equalExcludeAttributes) {
@@ -105,6 +100,11 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return reverse;
   }
 
+  public static boolean hasProperty(final DataObject object) {
+    final DataObjectMetaData metaData = object.getMetaData();
+    return metaData.getProperty(PROPERTY_NAME) != null;
+  }
+
   public static DataObject merge(final Coordinates point,
     final DataObject object1, final DataObject object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
@@ -132,7 +132,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public static void reverse(final DataObject object) {
     final DirectionalAttributes property = getProperty(object);
     final DataObject reverse = property.getReverse(object);
-    DataObjectMetaData metaData = object.getMetaData();
+    final DataObjectMetaData metaData = object.getMetaData();
     for (final String attributeName : metaData.getAttributeNames()) {
       if (attributeName != metaData.getIdAttributeName()) {
         final Object value = reverse.getValue(attributeName);
@@ -831,8 +831,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  public void setEdgeSplitAttributes(LineString line, final Coordinates point,
-    final List<Edge<DataObject>> edges) {
+  public void setEdgeSplitAttributes(final LineString line,
+    final Coordinates point, final List<Edge<DataObject>> edges) {
     for (final Edge<DataObject> edge : edges) {
       final DataObject object = edge.getObject();
       setSplitAttributes(line, point, object);
@@ -892,8 +892,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  public void setSplitAttributes(LineString line, final Coordinates point,
-    final DataObject object) {
+  public void setSplitAttributes(final LineString line,
+    final Coordinates point, final DataObject object) {
     final LineString newLine = object.getGeometryValue();
     final boolean firstPoint = LineStringUtil.isFirstPoint(newLine, point);
     final boolean toPoint = LineStringUtil.isToPoint(newLine, point);

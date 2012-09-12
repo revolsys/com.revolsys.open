@@ -27,8 +27,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
-  public List<T> findWithinDistance(
-    final Coordinates point,
+  public List<T> findWithinDistance(final Coordinates point,
     final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
@@ -41,6 +40,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
+  @Override
   public void put(final Coordinates point, final T value) {
     final double x = point.getX();
     final double y = point.getY();
@@ -56,6 +56,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     }
   }
 
+  @Override
   public boolean remove(final Coordinates point, final T value) {
     final double x = point.getX();
     final double y = point.getY();
@@ -72,12 +73,14 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     }
   }
 
+  @Override
   public void visit(final Envelope envelope, final Visitor<T> visitor) {
     if (root != null) {
       root.visit(envelope, visitor);
     }
   }
 
+  @Override
   public void visit(final Visitor<T> visitor) {
     if (root != null) {
       root.visit(visitor);

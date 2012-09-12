@@ -48,10 +48,8 @@ public class ExcludeSavedObjectsInOutProcess extends
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     final String id = getId(object);
     if (id == null) {
       out.write(object);

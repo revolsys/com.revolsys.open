@@ -12,8 +12,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineStringGraphTest {
   GeometryFactory geometryFactory = GeometryFactory.getFactory(3005, 1000.0);
 
-  public void checkLines(
-    final List<LineString> actualLines,
+  public void checkLines(final List<LineString> actualLines,
     final String... expectedLines) {
     Assert.assertEquals("Number of lines", expectedLines.length,
       actualLines.size());

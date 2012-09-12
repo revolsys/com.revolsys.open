@@ -19,11 +19,8 @@ public class GridUtil {
     }
   }
 
-  public static char getLetter12(
-    final double x,
-    final double y,
-    final double width,
-    final double height) {
+  public static char getLetter12(final double x, final double y,
+    final double width, final double height) {
     final double xSheet = (x + 180) / width;
     final int col = 3 - (int)(Math.floor(xSheet - 0.00000000001) % SIXTEENTH_GRID_SQUARE);
 
@@ -38,11 +35,8 @@ public class GridUtil {
     }
   }
 
-  public static char getLetter16(
-    final double x,
-    final double y,
-    final double width,
-    final double height) {
+  public static char getLetter16(final double x, final double y,
+    final double width, final double height) {
     final double xSheet = (x + 180) / width;
     final int col = (int)(Math.ceil(xSheet - 0.00000000001) % SIXTEENTH_GRID_SQUARE);
 
@@ -80,11 +74,8 @@ public class GridUtil {
     return num / SIXTEENTH_GRID_SQUARE;
   }
 
-  public static char getLetter4(
-    final double x,
-    final double y,
-    final double width,
-    final double height) {
+  public static char getLetter4(final double x, final double y,
+    final double width, final double height) {
     final double xSheet = (x + 180) / width;
     final int col = (int)(Math.ceil(xSheet - 0.00000000001) % QUARTER_GRID_SQUARE);
 
@@ -140,11 +131,8 @@ public class GridUtil {
     return num / SIXTEENTH_GRID_SQUARE;
   }
 
-  public static String getNumber100(
-    final double x,
-    final double y,
-    final double width,
-    final double height) {
+  public static String getNumber100(final double x, final double y,
+    final double width, final double height) {
     final double xSheet = (x + 180) / width;
     final int col = (int)(Math.ceil(xSheet - 0.00000000001 - 1) % HUNDREDTH_GRID_SQUARE);
 

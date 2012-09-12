@@ -17,10 +17,12 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
     return (ReverseCoordinatesList)super.clone();
   }
 
+  @Override
   public byte getNumAxis() {
     return coordinateList.getNumAxis();
   }
 
+  @Override
   public double getValue(final int index, final int axisIndex) {
     return coordinateList.getValue(size() - index - 1, axisIndex);
   }
@@ -30,10 +32,12 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
     return coordinateList;
   }
 
+  @Override
   public void setValue(final int index, final int axisIndex, final double value) {
     coordinateList.setValue(size() - index - 1, axisIndex, value);
   }
 
+  @Override
   public int size() {
     return coordinateList.size();
   }

@@ -22,6 +22,7 @@ public class NodeGeometryIntersectionFilter<T> implements Filter<Node<T>> {
     setGeometry(geometry);
   }
 
+  @Override
   public boolean accept(final Node<T> node) {
     final Coordinates coordinates = node;
     final Point point = geometryFactory.createPoint(coordinates);

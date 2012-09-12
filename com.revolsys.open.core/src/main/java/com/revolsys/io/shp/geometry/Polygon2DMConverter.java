@@ -30,15 +30,18 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POLYGON_ZM_SHAPE;
   }
 
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     return ShapefileGeometryUtil.INSTANCE.readPolylineM(geometryFactory, in);
   }
 
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Polygon) {
@@ -70,7 +73,8 @@ public class Polygon2DMConverter implements ShapefileGeometryConverter {
 
       out.writeInt(recordLength / 2);
       out.writeLEInt(getShapeType());
-      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, polygon.getEnvelopeInternal());
+      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out,
+        polygon.getEnvelopeInternal());
       out.writeLEInt(numParts);
       out.writeLEInt(numPoints);
 

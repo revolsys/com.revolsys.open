@@ -94,10 +94,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return angularUnit;
   }
 
+  @Override
   public Area getArea() {
     return area;
   }
 
+  @Override
   public BoundingBox getAreaBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (area != null) {
@@ -107,6 +109,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  @Override
   public Authority getAuthority() {
     return authority;
   }
@@ -123,10 +126,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return GeometryFactory.getFactory(this);
   }
 
+  @Override
   public int getId() {
     return id;
   }
 
+  @Override
   public Unit<Length> getLengthUnit() {
     final Unit<Angle> unit = angularUnit.getUnit();
     final UnitConverter radianConverter = unit.getConverterTo(SI.RADIAN);
@@ -137,6 +142,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return SI.METRE.times(radius).times(radianFactor);
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -149,6 +155,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   // return angularUnit.getUnit();
   // }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Unit<Angle> getUnit() {
     return angularUnit.getUnit();

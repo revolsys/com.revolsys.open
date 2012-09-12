@@ -28,6 +28,7 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements
     this.matchVisitor = matchVisitor;
   }
 
+  @Override
   public boolean visit(final Node<T> node) {
     final Coordinates coordinate = node;
     final double distance = this.coordinates.distance(coordinate);

@@ -10,9 +10,7 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 public class InvokeMethodAfterCommit extends TransactionSynchronizationAdapter {
   private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodAfterCommit.class);
 
-  public static <V> void invoke(
-    final Object object,
-    final String methodName,
+  public static <V> void invoke(final Object object, final String methodName,
     final Object... args) {
     final InvokeMethodAfterCommit synchronization = new InvokeMethodAfterCommit(
       object, methodName, args);

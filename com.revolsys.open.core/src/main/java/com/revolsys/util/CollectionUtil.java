@@ -13,12 +13,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public final class CollectionUtil {
-  public static void append(final StringBuffer string,
-    final Collection<? extends Object> values) {
-    append(string, values, ",");
-  }
-
-  public static <T> Integer addCount(Map<T, Integer> counts, T object) {
+  public static <T> Integer addCount(final Map<T, Integer> counts,
+    final T object) {
     Integer count = counts.get(object);
     if (count == null) {
       count = 1;
@@ -29,73 +25,9 @@ public final class CollectionUtil {
     return count;
   }
 
-  public static <T> List<T> subList(Iterable<T> iterable, int size) {
-    List<T> list = new ArrayList<T>(size);
-    int i = 0;
-    for (T value : iterable) {
-      if (i < size) {
-        list.add(value);
-        i++;
-      } else {
-        return list;
-      }
-    }
-    return list;
-  }
-
-  public static Integer getInteger(Map<String, ? extends Object> map,
-    String name) {
-    final Object value = map.get(name);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number){
-      final Number number = (Number)value;
-      return number.intValue();
-    } else {
-      return Integer.valueOf(value.toString());
-    }
-  }
-
-  public static String getString(Map<String, ? extends Object> map, String name) {
-    final Object value = map.get(name);
-    if (value == null) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  public static Boolean getBoolean(Map<String, ? extends Object> map,
-    String name) {
-    final Object value = map.get(name);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Boolean) {
-      return (Boolean)value;
-    } else {
-      return Boolean.valueOf(value.toString());
-    }
-  }
-
-  public static boolean getBool(Map<String, ? extends Object> map, String name) {
-    final Object value = map.get(name);
-    if (value == null) {
-      return false;
-    } else if (value instanceof Boolean) {
-      return (Boolean)value;
-    } else {
-      return Boolean.parseBoolean(value.toString());
-    }
-  }
-
-  public static Double getDoubleValue(Map<String, ? extends Object> map,
-    String name) {
-    final Number value = (Number)map.get(name);
-    if (value == null) {
-      return null;
-    } else {
-      return value.doubleValue();
-    }
+  public static void append(final StringBuffer string,
+    final Collection<? extends Object> values) {
+    append(string, values, ",");
   }
 
   public static void append(final StringBuffer string,
@@ -160,6 +92,63 @@ public final class CollectionUtil {
     }
   }
 
+  public static boolean getBool(final Map<String, ? extends Object> map,
+    final String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return false;
+    } else if (value instanceof Boolean) {
+      return (Boolean)value;
+    } else {
+      return Boolean.parseBoolean(value.toString());
+    }
+  }
+
+  public static Boolean getBoolean(final Map<String, ? extends Object> map,
+    final String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Boolean) {
+      return (Boolean)value;
+    } else {
+      return Boolean.valueOf(value.toString());
+    }
+  }
+
+  public static Double getDoubleValue(final Map<String, ? extends Object> map,
+    final String name) {
+    final Number value = (Number)map.get(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
+  public static Integer getInteger(final Map<String, ? extends Object> map,
+    final String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.intValue();
+    } else {
+      return Integer.valueOf(value.toString());
+    }
+  }
+
+  public static String getString(final Map<String, ? extends Object> map,
+    final String name) {
+    final Object value = map.get(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
   public static final String replaceProperties(final CharSequence string,
     final Map<String, Object> properties) {
     if (string == null) {
@@ -214,6 +203,20 @@ public final class CollectionUtil {
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);
+  }
+
+  public static <T> List<T> subList(final Iterable<T> iterable, final int size) {
+    final List<T> list = new ArrayList<T>(size);
+    int i = 0;
+    for (final T value : iterable) {
+      if (i < size) {
+        list.add(value);
+        i++;
+      } else {
+        return list;
+      }
+    }
+    return list;
   }
 
   public static Map<String, Object> toMap(final Preferences preferences) {

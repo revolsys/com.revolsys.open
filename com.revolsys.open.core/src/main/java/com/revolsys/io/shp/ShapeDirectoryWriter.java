@@ -97,7 +97,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private Writer<DataObject> getWriter(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
-    String path = metaData.getPath();
+    final String path = metaData.getPath();
     Writer<DataObject> writer = writers.get(path);
     if (writer == null) {
       final File directory = getDirectory(metaData);
@@ -145,6 +145,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     return directory.getAbsolutePath();
   }
 
+  @Override
   public void write(final DataObject object) {
     final Writer<DataObject> writer = getWriter(object);
     writer.write(object);

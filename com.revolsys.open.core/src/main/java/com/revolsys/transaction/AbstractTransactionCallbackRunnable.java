@@ -20,6 +20,7 @@ public abstract class AbstractTransactionCallbackRunnable extends
     setPropagationBehavior(PROPAGATION_REQUIRES_NEW);
   }
 
+  @Override
   public void run() {
     final TransactionTemplate transactionTemplate = new TransactionTemplate(
       transactionManager, this);

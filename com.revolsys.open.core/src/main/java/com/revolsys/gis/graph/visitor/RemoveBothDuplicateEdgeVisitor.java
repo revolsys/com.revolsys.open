@@ -1,16 +1,12 @@
 package com.revolsys.gis.graph.visitor;
 
-import java.util.List;
 import java.util.Set;
 
-import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.visitor.AbstractVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.graph.filter.LineFilter;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -21,18 +17,19 @@ import com.vividsolutions.jts.geom.LineString;
 public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>>
   implements ObjectProcessor<Graph<T>> {
   @Override
-  public void process(Graph<T> graph) {
+  public void process(final Graph<T> graph) {
     graph.visitEdges(this);
   }
 
+  @Override
   public boolean visit(final Edge<T> edge) {
     final LineString line = edge.getLine();
-    Node<T> fromNode = edge.getFromNode();
-    Node<T> toNode = edge.getToNode();
-    Set<Edge<T>> edges = fromNode.getEdgesTo(toNode);
+    final Node<T> fromNode = edge.getFromNode();
+    final Node<T> toNode = edge.getToNode();
+    final Set<Edge<T>> edges = fromNode.getEdgesTo(toNode);
     edges.remove(edge);
     boolean hasDuplicate = false;
-    for (Edge<T> edge2 : edges) {
+    for (final Edge<T> edge2 : edges) {
       final LineString line2 = edge2.getLine();
       if (LineStringUtil.equalsIgnoreDirection(line, line2, 2)) {
         edge2.remove();

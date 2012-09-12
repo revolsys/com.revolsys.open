@@ -1,6 +1,5 @@
 package com.revolsys.gis.data.model;
 
-
 public abstract class AbstractDataObjectMetaDataProperty implements
   DataObjectMetaDataProperty {
   private DataObjectMetaData metaData;
@@ -16,10 +15,12 @@ public abstract class AbstractDataObjectMetaDataProperty implements
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
+  @Override
   public void setMetaData(final DataObjectMetaData metaData) {
     if (this.metaData != null) {
       this.metaData.setProperty(getPropertyName(), null);

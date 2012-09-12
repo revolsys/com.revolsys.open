@@ -20,23 +20,15 @@ import com.revolsys.util.CollectionUtil;
 
 public class MavenRepository implements URLStreamHandlerFactory {
 
-  public static String getMavenId(
-    final String groupId,
-    final String artifactId,
-    final String type,
-    final String classifier,
-    final String version,
-    final String scope) {
+  public static String getMavenId(final String groupId,
+    final String artifactId, final String type, final String classifier,
+    final String version, final String scope) {
     return CollectionUtil.toString(":", groupId, artifactId, type, classifier,
       version, scope);
   }
 
-  public static String getPath(
-    final String groupId,
-    final String artifactId,
-    final String pathVersion,
-    final String type,
-    final String classifier,
+  public static String getPath(final String groupId, final String artifactId,
+    final String pathVersion, final String type, final String classifier,
     final String version) {
     final StringBuffer path = new StringBuffer();
     path.append('/');
@@ -80,8 +72,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return createClassLoader(id, exclusionIds);
   }
 
-  public URLClassLoader createClassLoader(
-    final String id,
+  public URLClassLoader createClassLoader(final String id,
     final Collection<String> exclusionIds) {
     final MavenPom pom = getPom(id);
     final Set<String> dependencies = pom.getDependencies(exclusionIds);
@@ -95,14 +86,13 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return new URLClassLoader(urls, parentClassLoader, this);
   }
 
+  @Override
   public URLStreamHandler createURLStreamHandler(final String protocol) {
     return urlHandler;
   }
 
-  public Map<String, Object> getMavenMetadata(
-    final String groupId,
-    final String artifactId,
-    final String version) {
+  public Map<String, Object> getMavenMetadata(final String groupId,
+    final String artifactId, final String version) {
     final String metaDataPath = "/"
       + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId,
         version, "maven-metadata.xml");
@@ -157,9 +147,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return getPom(groupId, artifactId, version);
   }
 
-  public MavenPom getPom(
-    final String groupId,
-    final String artifactId,
+  public MavenPom getPom(final String groupId, final String artifactId,
     final String version) {
     final Resource resource = getResource(groupId, artifactId, "pom", version);
     if (resource.exists()) {
@@ -187,20 +175,13 @@ public class MavenRepository implements URLStreamHandlerFactory {
     }
   }
 
-  public Resource getResource(
-    final String groupId,
-    final String artifactId,
-    final String type,
-    final String version) {
+  public Resource getResource(final String groupId, final String artifactId,
+    final String type, final String version) {
     return getResource(groupId, artifactId, type, null, version);
   }
 
-  public Resource getResource(
-    final String groupId,
-    final String artifactId,
-    final String type,
-    final String classifier,
-    final String version) {
+  public Resource getResource(final String groupId, final String artifactId,
+    final String type, final String classifier, final String version) {
 
     final String path = getPath(groupId, artifactId, version, type, classifier,
       version);
@@ -245,13 +226,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
     }
   }
 
-  protected Resource handleMissingResource(
-    final Resource resource,
-    final String groupId,
-    final String artifactId,
-    final String type,
-    final String classifier,
-    final String version) {
+  protected Resource handleMissingResource(final Resource resource,
+    final String groupId, final String artifactId, final String type,
+    final String classifier, final String version) {
     if (version.endsWith("-SNAPSHOT")) {
       final Map<String, Object> mavenMetadata = getMavenMetadata(groupId,
         artifactId, version);

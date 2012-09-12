@@ -27,15 +27,22 @@ public class DataObjectGraph extends Graph<DataObject> {
     return edgeFilter;
   }
 
-  public void add(final Collection<DataObject> objects) {
-    for (final DataObject object : objects) {
-      add(object);
-    }
+  public DataObjectGraph() {
+    super(false);
   }
 
-  public Edge<DataObject> add(final DataObject object) {
+  public Edge<DataObject> addEdge(final DataObject object) {
     final LineString line = object.getGeometryValue();
-    return add(object, line);
+    return addEdge(object, line);
+  }
+
+  public List<Edge<DataObject>> addEdges(final Collection<DataObject> objects) {
+    List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
+    for (final DataObject object : objects) {
+      Edge<DataObject> edge = addEdge(object);
+      edges.add(edge);
+    }
+    return edges;
   }
 
   /**
@@ -52,6 +59,27 @@ public class DataObjectGraph extends Graph<DataObject> {
     } else {
       return DataObjectUtil.copy(object, line);
     }
+  }
+
+  @Override
+  public LineString getEdgeLine(final int edgeId) {
+    final DataObject object = getEdgeObject(edgeId);
+    if (object == null) {
+      return null;
+    } else {
+      final LineString line = object.getGeometryValue();
+      return line;
+    }
+  }
+
+  public List<DataObject> getObjects(final Collection<Integer> edgeIds) {
+    final List<DataObject> objects = new ArrayList<DataObject>();
+    for (final Integer edgeId : edgeIds) {
+      final Edge<DataObject> edge = getEdge(edgeId);
+      final DataObject object = edge.getObject();
+      objects.add(object);
+    }
+    return objects;
   }
 
   /**
@@ -91,24 +119,15 @@ public class DataObjectGraph extends Graph<DataObject> {
     return false;
   }
 
-  public List<Edge<DataObject>> splitEdges(Coordinates point, double distance) {
-    List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
-    for (Edge<DataObject> edge : findEdges(point, distance)) {
-      LineString line = edge.getLine();
-      List<Edge<DataObject>> splitEdges = edge.split(point);
+  public List<Edge<DataObject>> splitEdges(final Coordinates point,
+    final double distance) {
+    final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
+    for (final Edge<DataObject> edge : findEdges(point, distance)) {
+      final LineString line = edge.getLine();
+      final List<Edge<DataObject>> splitEdges = edge.split(point);
       DirectionalAttributes.edgeSplitAttributes(line, point, splitEdges);
       edges.addAll(splitEdges);
     }
     return edges;
-  }
-
-  public List<DataObject> getObjects(Collection<Integer> edgeIds) {
-    List<DataObject> objects = new ArrayList<DataObject>();
-    for (Integer edgeId : edgeIds) {
-      Edge<DataObject> edge = getEdge(edgeId);
-      DataObject object = edge.getObject();
-      objects.add(object);
-    }
-    return objects;
   }
 }

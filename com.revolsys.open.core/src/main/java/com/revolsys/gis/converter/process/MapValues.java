@@ -48,6 +48,7 @@ public class MapValues extends
     return valueMap;
   }
 
+  @Override
   public void process(final DataObject source, final DataObject target) {
     final Object sourceValue = DataObjectUtil.getAttributeByPath(source,
       sourceAttributeName);

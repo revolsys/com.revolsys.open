@@ -58,12 +58,8 @@ public class PointQuadTreeNode<T> {
     return false;
   }
 
-  public void findWithin(
-    final List<T> results,
-    final double x,
-    final double y,
-    final double maxDistance,
-    final Envelope envelope) {
+  public void findWithin(final List<T> results, final double x, final double y,
+    final double maxDistance, final Envelope envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
@@ -124,9 +120,7 @@ public class PointQuadTreeNode<T> {
     return y < this.y;
   }
 
-  public void put(
-    final double x,
-    final double y,
+  public void put(final double x, final double y,
     final PointQuadTreeNode<T> node) {
     final boolean xLess = isLessThanX(x);
     final boolean yLess = isLessThanY(y);
@@ -157,9 +151,7 @@ public class PointQuadTreeNode<T> {
     }
   }
 
-  public PointQuadTreeNode<T> remove(
-    final double x,
-    final double y,
+  public PointQuadTreeNode<T> remove(final double x, final double y,
     final T value) {
     final boolean xLess = isLessThanX(x);
     final boolean yLess = isLessThanY(y);

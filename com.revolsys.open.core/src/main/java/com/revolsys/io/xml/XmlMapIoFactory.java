@@ -34,6 +34,7 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
     addMediaTypeAndFileExtension("text/xml", "xml");
   }
 
+  @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource);
     final Reader<Map<String, Object>> reader = new IteratorReader<Map<String, Object>>(
@@ -41,16 +42,19 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
     return reader;
   }
 
+  @Override
   public MapWriter getWriter(final OutputStream out) {
     final Writer writer = new OutputStreamWriter(out);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Resource resource) {
     final Writer writer = SpringUtil.getWriter(resource);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Writer out) {
     return new XmlMapWriter(out);
   }
@@ -60,6 +64,7 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
     return true;
   }
 
+  @Override
   public boolean isGeometrySupported() {
     return true;
   }

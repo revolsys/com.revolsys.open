@@ -30,8 +30,7 @@ public class JdbcAttribute extends Attribute {
     sql.append(getName());
   }
 
-  public void addInsertStatementPlaceHolder(
-    final StringBuffer sql,
+  public void addInsertStatementPlaceHolder(final StringBuffer sql,
     final boolean generateKeys) {
     addStatementPlaceHolder(sql);
   }
@@ -54,28 +53,22 @@ public class JdbcAttribute extends Attribute {
     return sqlType;
   }
 
-  public int setAttributeValueFromResultSet(
-    final ResultSet resultSet,
-    final int columnIndex,
-    final DataObject object) throws SQLException {
+  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+    final int columnIndex, final DataObject object) throws SQLException {
     final Object value = resultSet.getObject(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;
   }
 
-  public int setInsertPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final DataObject object) throws SQLException {
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final DataObject object) throws SQLException {
     final String name = getName();
     final Object value = object.getValue(name);
     return setPreparedStatementValue(statement, parameterIndex, value);
   }
 
-  public int setPreparedStatementValue(
-    final PreparedStatement statement,
-    final int parameterIndex,
-    final Object value) throws SQLException {
+  public int setPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
     final int sqlType = getSqlType();
     statement.setObject(parameterIndex, value);
     return parameterIndex + 1;

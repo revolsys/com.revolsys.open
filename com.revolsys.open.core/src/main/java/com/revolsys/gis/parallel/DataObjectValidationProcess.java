@@ -14,10 +14,8 @@ public class DataObjectValidationProcess extends
   private final DataObjectValidator validator = new DataObjectValidator();
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     validator.isValid(object);
     out.write(object);
   }

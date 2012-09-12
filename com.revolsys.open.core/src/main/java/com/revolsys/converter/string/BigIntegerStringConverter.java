@@ -10,14 +10,17 @@ public class BigIntegerStringConverter extends
     super(INTEGER_FORMAT);
   }
 
+  @Override
   public Class<BigInteger> getConvertedClass() {
     return BigInteger.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public BigInteger toObject(final Object value) {
     if (value instanceof BigInteger) {
       final BigInteger number = (BigInteger)value;
@@ -29,6 +32,7 @@ public class BigIntegerStringConverter extends
     }
   }
 
+  @Override
   public BigInteger toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return new BigInteger(string);

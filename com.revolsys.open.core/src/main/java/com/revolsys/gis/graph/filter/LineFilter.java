@@ -11,6 +11,7 @@ public class LineFilter<T> implements Filter<Edge<T>> {
     this.filter = filter;
   }
 
+  @Override
   public boolean accept(final Edge<T> edge) {
     final LineString line = edge.getLine();
     return filter.accept(line);

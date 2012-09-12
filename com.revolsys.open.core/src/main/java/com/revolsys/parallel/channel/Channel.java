@@ -65,11 +65,13 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     closed = true;
   }
 
+  @Override
   public boolean disable() {
     alt = null;
     return (data.getState() != ChannelDataStore.EMPTY);
   }
 
+  @Override
   public boolean enable(final MultiInputSelector alt) {
     synchronized (monitor) {
       if (data.getState() == ChannelDataStore.EMPTY) {
@@ -85,6 +87,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     return name;
   }
 
+  @Override
   public boolean isClosed() {
     if (!closed) {
       if (writeClosed) {
@@ -97,6 +100,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     return closed;
   }
 
+  @Override
   public Iterator<T> iterator() {
     return new ChannelInputIterator<T>(this);
   }
@@ -108,6 +112,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * 
    * @return The object returned from the Channel.
    */
+  @Override
   public T read() {
     return read(0);
   }
@@ -121,6 +126,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
+  @Override
   public T read(final long timeout) {
     synchronized (readMonitor) {
       synchronized (monitor) {
@@ -150,6 +156,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     }
   }
 
+  @Override
   public void readConnect() {
     synchronized (monitor) {
       if (isClosed()) {
@@ -161,6 +168,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     }
   }
 
+  @Override
   public void readDisconnect() {
     synchronized (monitor) {
       if (!closed) {
@@ -190,6 +198,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * 
    * @param value The object to write to the Channel.
    */
+  @Override
   public void write(final T value) {
     synchronized (writeMonitor) {
       synchronized (monitor) {
@@ -219,6 +228,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     }
   }
 
+  @Override
   public void writeConnect() {
     synchronized (monitor) {
       if (writeClosed) {
@@ -230,6 +240,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     }
   }
 
+  @Override
   public void writeDisconnect() {
     synchronized (monitor) {
       if (!writeClosed) {

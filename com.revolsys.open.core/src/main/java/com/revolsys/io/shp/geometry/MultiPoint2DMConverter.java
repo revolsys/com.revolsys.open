@@ -26,10 +26,12 @@ public class MultiPoint2DMConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.MULTI_POINT_SHAPE;
   }
 
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
@@ -40,6 +42,7 @@ public class MultiPoint2DMConverter implements ShapefileGeometryConverter {
     return geometryFactory.createMultiPoint(coordinates);
   }
 
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
 

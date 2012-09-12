@@ -66,6 +66,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
     return clone;
   }
 
+  @Override
   public List<String> getAttributeAliases() {
     return Collections.emptyList();
   }
@@ -74,15 +75,18 @@ public class CodedValueDomain extends Domain implements CodeTable {
     return codedValues;
   }
 
+  @Override
   public Map<Object, List<Object>> getCodes() {
     return Collections.unmodifiableMap(idValueMap);
   }
 
+  @Override
   public <T> T getId(final Map<String, ? extends Object> values) {
     final Object name = getName(values);
     return (T)getId(name);
   }
 
+  @Override
   public <T> T getId(final Object... values) {
     if (values.length == 1) {
       final Object value = values[0];
@@ -103,15 +107,18 @@ public class CodedValueDomain extends Domain implements CodeTable {
     }
   }
 
+  @Override
   public String getIdAttributeName() {
     return getDomainName() + "_ID";
   }
 
+  @Override
   public Map<String, ? extends Object> getMap(final Object id) {
     final Object value = getValue(id);
     return Collections.singletonMap("NAME", value);
   }
 
+  @Override
   public String getName() {
     return super.getDomainName();
   }
@@ -120,6 +127,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
     return (String)values.get("NAME");
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     final List<Object> values = getValues(id);
@@ -131,10 +139,12 @@ public class CodedValueDomain extends Domain implements CodeTable {
     }
   }
 
+  @Override
   public List<String> getValueAttributeNames() {
     return Arrays.asList("NAME");
   }
 
+  @Override
   public List<Object> getValues(final Object id) {
     if (id == null) {
       return null;

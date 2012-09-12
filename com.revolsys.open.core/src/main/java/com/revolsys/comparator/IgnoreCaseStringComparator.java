@@ -3,6 +3,7 @@ package com.revolsys.comparator;
 import java.util.Comparator;
 
 public class IgnoreCaseStringComparator implements Comparator<String> {
+  @Override
   public int compare(final String s1, final String s2) {
     if (s1 == null) {
       if (s2 == null) {

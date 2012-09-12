@@ -60,6 +60,7 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties {
    * 
    * @return The iterator.
    */
+  @Override
   Iterator<T> iterator();
 
   /**

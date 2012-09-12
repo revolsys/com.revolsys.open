@@ -47,9 +47,8 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param relatedInformation Additional information about the error.
    * @param location The location of the error.
    */
-  public void addError(
-    final String message,
-    final Object relatedInformation,
+  @Override
+  public void addError(final String message, final Object relatedInformation,
     final Location location) {
     addError(new XmlProcessorError(message, relatedInformation, location));
   }
@@ -59,6 +58,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * 
    * @param error The error.
    */
+  @Override
   public void addError(final XmlProcessorError error) {
     errors.add(error);
   }
@@ -69,6 +69,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param name The name of the attribute.
    * @return The attribute value.
    */
+  @Override
   public Object getAttribute(final String name) {
     return attributes.get(name);
   }
@@ -79,6 +80,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @return The list of {@link XmlProcessorError}s in processing the XML
    *         Document.
    */
+  @Override
   public Collection getErrors() {
     return errors;
   }
@@ -91,11 +93,9 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param relatedInformation Additional information about the error.
    * @param location The location of the error.
    */
-  public void report(
-    final String message,
-    final String errorType,
-    final Object relatedInformation,
-    final Location location) {
+  @Override
+  public void report(final String message, final String errorType,
+    final Object relatedInformation, final Location location) {
     addError(new XmlProcessorError(message, relatedInformation, location));
   }
 
@@ -106,6 +106,7 @@ public class SimpleXmlProcessorContext implements XmlProcessorContext {
    * @param name The name of the attribute.
    * @param value The value of the attribute.
    */
+  @Override
   public void setAttribute(final String name, final Object value) {
     attributes.put(name, value);
   }

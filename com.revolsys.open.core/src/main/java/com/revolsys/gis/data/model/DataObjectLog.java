@@ -24,9 +24,7 @@ public class DataObjectLog {
     return dataObjectLog;
   }
 
-  public static void error(
-    final Class<?> logCategory,
-    final String message,
+  public static void error(final Class<?> logCategory, final String message,
     final DataObject object) {
     final DataObjectLog dataObjectLog = getForThread();
     if (object == null) {
@@ -46,9 +44,7 @@ public class DataObjectLog {
     return dataObjectLog;
   }
 
-  public static void info(
-    final Class<?> logCategory,
-    final String message,
+  public static void info(final Class<?> logCategory, final String message,
     final DataObject object) {
     final DataObjectLog dataObjectLog = getForThread();
     if (object == null) {
@@ -63,9 +59,7 @@ public class DataObjectLog {
     }
   }
 
-  public static void warn(
-    final Class<?> logCategory,
-    final String message,
+  public static void warn(final Class<?> logCategory, final String message,
     final DataObject object) {
     final DataObjectLog dataObjectLog = getForThread();
     if (object == null) {
@@ -113,7 +107,7 @@ public class DataObjectLog {
       } else {
         logTableName = tableName + "_log";
       }
-      final String logTypeName = PathUtil.toPath(parentPath , logTableName);
+      final String logTypeName = PathUtil.toPath(parentPath, logTableName);
       logMetaData = new DataObjectMetaDataImpl(logTypeName);
       logMetaData.addAttribute("LOGMESSAGE", DataTypes.STRING, 255, true);
       logMetaData.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);
@@ -135,9 +129,7 @@ public class DataObjectLog {
     log("INFO", message, object);
   }
 
-  private void log(
-    final String logLevel,
-    final Object message,
+  private void log(final String logLevel, final Object message,
     final DataObject object) {
     if (writer != null) {
       final DataObjectMetaData logMetaData = getLogMetaData(object);

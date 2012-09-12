@@ -51,6 +51,7 @@ public class InvokeStaticMethodCallable<T> implements Callable<T> {
     this.parameters = parameters;
   }
 
+  @Override
   public T call() throws Exception {
     try {
       return (T)MethodUtils.invokeStaticMethod(clazz, methodName, parameters);

@@ -92,8 +92,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     }
   }
 
-  protected boolean geometryEquals(
-    final DataObject object1,
+  protected boolean geometryEquals(final DataObject object1,
     final DataObject object2) {
     final Geometry geometry1 = object1.getGeometryValue();
     final Geometry geometry2 = object2.getGeometryValue();
@@ -109,8 +108,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     return equalExclude;
   }
 
-  protected Set<String> getNotEqualAttributeNames(
-    final DataObject object1,
+  protected Set<String> getNotEqualAttributeNames(final DataObject object1,
     final DataObject object2) {
     final DataObjectMetaData metaData = object1.getMetaData();
     final Set<String> notEqualAttributeNames = new LinkedHashSet<String>();
@@ -166,10 +164,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     }
   }
 
-  private void logNoMatch(
-    final DataObject[] objects,
-    final Channel<DataObject> channel,
-    final boolean other) {
+  private void logNoMatch(final DataObject[] objects,
+    final Channel<DataObject> channel, final boolean other) {
     if (objects[0] != null) {
       logNoMatch(objects[0], false);
     }
@@ -182,10 +178,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     }
   }
 
-  protected void logNotEqual(
-    final DataObject sourceObject,
-    final DataObject otherObject,
-    final Set<String> notEqualAttributeNames,
+  protected void logNotEqual(final DataObject sourceObject,
+    final DataObject otherObject, final Set<String> notEqualAttributeNames,
     final boolean geometryEquals) {
     final String attributeNames = CollectionUtil.toString(",",
       notEqualAttributeNames);

@@ -26,6 +26,7 @@ class TargetBeanObjectFactory implements ObjectFactory, Serializable {
     this.targetBeanName = targetBeanName;
   }
 
+  @Override
   public Object getObject() throws BeansException {
     return this.beanFactory.getBean(this.targetBeanName);
   }

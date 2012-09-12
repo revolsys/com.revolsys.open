@@ -25,8 +25,7 @@ public abstract class AbstractDataObjectReaderFactory extends
     }
   }
 
-  public static DataObjectReader dataObjectReader(
-    final Resource resource,
+  public static DataObjectReader dataObjectReader(final Resource resource,
     final DataObjectFactory factory) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
@@ -62,6 +61,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @param file The file to read.
    * @return The reader for the file.
    */
+  @Override
   public DataObjectReader createDataObjectReader(final Resource resource) {
     return createDataObjectReader(resource,
       ArrayDataObjectFactory.getInstance());
@@ -73,6 +73,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    * 
    * @return The reader.
    */
+  @Override
   public Reader<DataObject> createDirectoryDataObjectReader() {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
@@ -86,6 +87,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @param directory The directory to read.
    * @return The reader for the file.
    */
+  @Override
   public Reader<DataObject> createDirectoryDataObjectReader(final File directory) {
     return createDirectoryDataObjectReader(directory,
       ArrayDataObjectFactory.getInstance());
@@ -100,20 +102,22 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @param dataObjectFactory The dataObjectFactory used to create data objects.
    * @return The reader for the file.
    */
+  @Override
   public Reader<DataObject> createDirectoryDataObjectReader(
-    final File directory,
-    final DataObjectFactory dataObjectFactory) {
+    final File directory, final DataObjectFactory dataObjectFactory) {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
     return directoryReader;
   }
 
+  @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     final Reader reader = createDataObjectReader(resource);
     return reader;
   }
 
+  @Override
   public boolean isBinary() {
     return binary;
   }

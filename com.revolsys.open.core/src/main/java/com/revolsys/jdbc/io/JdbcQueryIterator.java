@@ -137,6 +137,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     if (metaData == null) {
       hasNext();

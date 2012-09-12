@@ -29,6 +29,7 @@ public class EcsvResourceDataObjectMetaDataFactory extends
     return locationPattern;
   }
 
+  @Override
   public DataObjectMetaData getMetaData(final String typePath) {
     return metaDataMap.get(typePath);
   }
@@ -47,6 +48,7 @@ public class EcsvResourceDataObjectMetaDataFactory extends
     }
   }
 
+  @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
     throws BeansException {
     this.applicationContext = applicationContext;

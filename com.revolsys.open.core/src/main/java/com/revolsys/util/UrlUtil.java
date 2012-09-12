@@ -104,6 +104,16 @@ public final class UrlUtil {
     }
   }
 
+  public static String getParent(final String urlString) {
+    final int index = urlString.lastIndexOf('/');
+    if (index != -1) {
+      final String parentPath = urlString.substring(0, index);
+      return parentPath;
+    } else {
+      return urlString;
+    }
+  }
+
   public static URL getParent(final URL url) {
     final String urlString = url.toString();
     final int index = urlString.lastIndexOf('/');
@@ -118,16 +128,6 @@ public final class UrlUtil {
   public static String getParentString(final URL url) {
     final String urlString = url.toString();
     return getParent(urlString);
-  }
-
-  public static String getParent(final String urlString) {
-    final int index = urlString.lastIndexOf('/');
-    if (index != -1) {
-      final String parentPath = urlString.substring(0, index);
-      return parentPath;
-    } else {
-      return urlString;
-    }
   }
 
   /**

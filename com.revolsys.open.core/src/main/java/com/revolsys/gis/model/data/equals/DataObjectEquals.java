@@ -13,10 +13,8 @@ public class DataObjectEquals implements Equals<DataObject> {
     + ".excludeId";
 
   public static boolean equalAttributes(
-    final Collection<String> excludedAttributes,
-    final DataObject object1,
-    final DataObject object2,
-    final Collection<String> attributeNames) {
+    final Collection<String> excludedAttributes, final DataObject object1,
+    final DataObject object2, final Collection<String> attributeNames) {
     for (final String attributeName : attributeNames) {
       if (!equals(excludedAttributes, object1, object2, attributeName)) {
         return false;
@@ -25,10 +23,8 @@ public class DataObjectEquals implements Equals<DataObject> {
     return true;
   }
 
-  public static boolean equalAttributes(
-    final DataObject object1,
-    final DataObject object2,
-    final Collection<String> attributeNames) {
+  public static boolean equalAttributes(final DataObject object1,
+    final DataObject object2, final Collection<String> attributeNames) {
     for (final String attributeName : attributeNames) {
       if (!equals(object1, object2, attributeName)) {
         return false;
@@ -37,10 +33,8 @@ public class DataObjectEquals implements Equals<DataObject> {
     return true;
   }
 
-  public static boolean equals(
-    final Collection<String> excludedAttributes,
-    final DataObject object1,
-    final DataObject object2,
+  public static boolean equals(final Collection<String> excludedAttributes,
+    final DataObject object1, final DataObject object2,
     final String attributeName) {
     final DataObjectMetaData metaData = object1.getMetaData();
     if (excludedAttributes.contains(attributeName)) {
@@ -58,19 +52,15 @@ public class DataObjectEquals implements Equals<DataObject> {
     }
   }
 
-  public static boolean equals(
-    final DataObject object1,
-    final DataObject object2,
-    final String attributeName) {
+  public static boolean equals(final DataObject object1,
+    final DataObject object2, final String attributeName) {
     final Object value1 = object1.getValue(attributeName);
     final Object value2 = object2.getValue(attributeName);
     return EqualsRegistry.INSTANCE.equals(value1, value2);
   }
 
-  public static boolean isAttributeIgnored(
-    final DataObjectMetaData metaData,
-    final Collection<String> excludedAttributes,
-    final String attributeName) {
+  public static boolean isAttributeIgnored(final DataObjectMetaData metaData,
+    final Collection<String> excludedAttributes, final String attributeName) {
     if (excludedAttributes.contains(attributeName)) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_ID)
@@ -86,9 +76,8 @@ public class DataObjectEquals implements Equals<DataObject> {
 
   private EqualsRegistry equalsRegistry;
 
-  public boolean equals(
-    final DataObject object1,
-    final DataObject object2,
+  @Override
+  public boolean equals(final DataObject object1, final DataObject object2,
     final Collection<String> excludedAttributes) {
     if (object1 != null && object2 != null) {
       final DataObjectMetaData metaData1 = object1.getMetaData();
@@ -121,6 +110,7 @@ public class DataObjectEquals implements Equals<DataObject> {
     return false;
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }

@@ -163,6 +163,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
+  @Override
   public boolean hasNext() {
     if (!hasNext) {
       return false;
@@ -327,6 +328,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
    * @return The next DataObject.
    * @exception NoSuchElementException If the reader has no more data objects.
    */
+  @Override
   public DataObject next() {
     if (hasNext()) {
       loadNextObject = true;
@@ -349,10 +351,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     return factory.createLineString(coords);
   }
 
-  private void readCoordinate(
-    final InputStream in,
-    final CoordinatesList coords,
-    final int index) throws IOException {
+  private void readCoordinate(final InputStream in,
+    final CoordinatesList coords, final int index) throws IOException {
     for (int i = 0; i < 2; i++) {
       int coordinate;
       if (coordinateBytes == 2) {
@@ -437,11 +437,11 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
+  @Override
   public void remove() {
   }
 
-  private void setAdmissionHistory(
-    final DataObject object,
+  private void setAdmissionHistory(final DataObject object,
     final char reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.ADMIT_SOURCE_DATE,
@@ -457,8 +457,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       String.valueOf(reasonForChange));
   }
 
-  private void setRetirementHistory(
-    final DataObject object,
+  private void setRetirementHistory(final DataObject object,
     final char reasonForChange) {
     if (directoryReader != null) {
       object.setValue(MoepConstants.RETIRE_SOURCE_DATE,

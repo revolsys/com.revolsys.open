@@ -40,6 +40,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public boolean contains(final Coordinates point) {
     for (int i = 0; i < size(); i++) {
       if (equal(i, point, 2)) {
@@ -49,12 +50,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return false;
   }
 
-  public void copy(
-    final int sourceIndex,
-    final CoordinatesList target,
-    final int targetIndex,
-    final int numAxis,
-    final int count) {
+  @Override
+  public void copy(final int sourceIndex, final CoordinatesList target,
+    final int targetIndex, final int numAxis, final int count) {
     for (int i = 0; i < count; i++) {
       for (int j = 0; j < numAxis; j++) {
         final double coordinate = getValue(sourceIndex + i, j);
@@ -67,6 +65,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return new DoubleCoordinatesList(length, numAxis);
   }
 
+  @Override
   public double distance(final int index, final Coordinates point) {
     if (index < size()) {
       final double x1 = getX(index);
@@ -79,9 +78,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
-  public double distance(
-    final int index,
-    final CoordinatesList other,
+  @Override
+  public double distance(final int index, final CoordinatesList other,
     final int otherIndex) {
     if (index < size() || otherIndex < other.size()) {
       final double x1 = getX(index);
@@ -94,14 +92,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public boolean equal(final int index, final Coordinates point) {
     final int numAxis = Math.max(getNumAxis(), point.getNumAxis());
     return equal(index, point, numAxis);
   }
 
-  public boolean equal(
-    final int index,
-    final Coordinates point,
+  @Override
+  public boolean equal(final int index, final Coordinates point,
     final int numAxis) {
     int maxAxis = Math.max(getNumAxis(), point.getNumAxis());
     if (maxAxis > numAxis) {
@@ -125,9 +123,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
-  public boolean equal(
-    final int index,
-    final CoordinatesList other,
+  @Override
+  public boolean equal(final int index, final CoordinatesList other,
     final int otherIndex) {
     final int numAxis = Math.max(getNumAxis(), other.getNumAxis());
     if (index < size() || otherIndex < other.size()) {
@@ -144,11 +141,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
-  public boolean equal(
-    final int index,
-    final CoordinatesList other,
-    final int otherIndex,
-    int numAxis) {
+  @Override
+  public boolean equal(final int index, final CoordinatesList other,
+    final int otherIndex, int numAxis) {
     numAxis = Math.min(numAxis, Math.max(getNumAxis(), other.getNumAxis()));
     if (index < size() || otherIndex < other.size()) {
       for (int j = 0; j < numAxis; j++) {
@@ -164,10 +159,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public boolean equal2d(final int index, final Coordinates point) {
     return equal(index, point, 2);
   }
 
+  @Override
   public boolean equals(final CoordinatesList coordinatesList) {
     if (getNumAxis() == coordinatesList.getNumAxis()) {
       if (size() == coordinatesList.size()) {
@@ -189,6 +186,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public boolean equals(final CoordinatesList points, final int numAxis) {
     double maxAxis = Math.max(getNumAxis(), points.getNumAxis());
     if (maxAxis > numAxis) {
@@ -224,6 +222,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public Envelope expandEnvelope(final Envelope env) {
     for (int i = 0; i < size(); i++) {
       final double x = getX(i);
@@ -233,10 +232,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return env;
   }
 
+  @Override
   public Coordinates get(final int i) {
     return new CoordinatesListCoordinates(this, i);
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
     final BoundingBox boundingBox = new BoundingBox();
     for (final Coordinates point : this) {
@@ -245,12 +246,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return boundingBox;
   }
 
+  @Override
   public Coordinate getCoordinate(final int i) {
     final Coordinate coordinate = new Coordinate();
     getCoordinate(i, coordinate);
     return coordinate;
   }
 
+  @Override
   public void getCoordinate(final int index, final Coordinate coord) {
     coord.x = getX(index);
     coord.y = getY(index);
@@ -259,12 +262,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public Coordinate getCoordinateCopy(final int i) {
     final Coordinate coordinate = new Coordinate();
     getCoordinate(i, coordinate);
     return coordinate;
   }
 
+  @Override
   public double[] getCoordinates() {
     final int size = size();
     final byte numAxis = getNumAxis();
@@ -280,11 +285,13 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return coordinates;
   }
 
+  @Override
   @Deprecated
   public int getDimension() {
     return getNumAxis();
   }
 
+  @Override
   public List<Coordinates> getList() {
     final List<Coordinates> points = new ArrayList<Coordinates>();
     for (final Coordinates point : this) {
@@ -293,27 +300,33 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return points;
   }
 
+  @Override
   public double getM(final int index) {
     return getValue(index, 3);
   }
 
+  @Override
   @Deprecated
   public double getOrdinate(final int index, final int axisIndex) {
     return getValue(index, axisIndex);
   }
 
+  @Override
   public long getTime(final int index) {
     return (long)getM(index);
   }
 
+  @Override
   public double getX(final int index) {
     return getValue(index, 0);
   }
 
+  @Override
   public double getY(final int index) {
     return getValue(index, 1);
   }
 
+  @Override
   public double getZ(final int index) {
     return getValue(index, 2);
   }
@@ -329,10 +342,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return h;
   }
 
+  @Override
   public Iterator<Coordinates> iterator() {
     return new CoordinatesListCoordinatesIterator(this);
   }
 
+  @Override
   public void makePrecise(final CoordinatesPrecisionModel precisionModel) {
     final InPlaceIterator iterator = new InPlaceIterator(this);
     for (final Coordinates point : iterator) {
@@ -340,10 +355,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public CoordinatesList reverse() {
     return new ReverseCoordinatesList(this);
   }
 
+  @Override
   public void setCoordinate(final int i, final Coordinate coordinate) {
     setValue(i, 0, coordinate.x);
     setValue(i, 1, coordinate.y);
@@ -352,18 +369,19 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public void setM(final int index, final double m) {
     setValue(index, 3, m);
   }
 
+  @Override
   @Deprecated
-  public void setOrdinate(
-    final int index,
-    final int axisIndex,
+  public void setOrdinate(final int index, final int axisIndex,
     final double value) {
     setValue(index, axisIndex, value);
   }
 
+  @Override
   public void setPoint(final int i, final Coordinates point) {
     setX(i, point.getX());
     setY(i, point.getY());
@@ -372,24 +390,28 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  @Override
   public void setTime(final int index, final long time) {
     setM(index, time);
   }
 
+  @Override
   public void setX(final int index, final double x) {
     setValue(index, 0, x);
   }
 
+  @Override
   public void setY(final int index, final double y) {
     setValue(index, 1, y);
   }
 
+  @Override
   public void setZ(final int index, final double z) {
     setValue(index, 2, z);
   }
 
-  public boolean startsWith(
-    final CoordinatesList coordinatesList,
+  @Override
+  public boolean startsWith(final CoordinatesList coordinatesList,
     final int numAxis) {
     if (size() > 1 && coordinatesList.size() > 1) {
       if (getNumAxis() >= numAxis && coordinatesList.getNumAxis() >= numAxis) {
@@ -408,32 +430,32 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return false;
   }
 
+  @Override
   public CoordinatesList subList(final int index) {
     return subList(index, size() - index);
   }
 
+  @Override
   public CoordinatesList subList(final int index, final int count) {
     return subList(count, index, count);
   }
 
-  public CoordinatesList subList(
-    final int length,
-    final int index,
+  @Override
+  public CoordinatesList subList(final int length, final int index,
     final int count) {
     return subList(length, index, 0, count);
   }
 
-  public CoordinatesList subList(
-    final int length,
-    final int sourceIndex,
-    final int targetIndex,
-    final int count) {
+  @Override
+  public CoordinatesList subList(final int length, final int sourceIndex,
+    final int targetIndex, final int count) {
     final int numAxis = getNumAxis();
     final CoordinatesList target = create(length, numAxis);
     copy(sourceIndex, target, targetIndex, numAxis, count);
     return target;
   }
 
+  @Override
   public Coordinate[] toCoordinateArray() {
     final Coordinate[] coordinateArray = new Coordinate[size()];
     for (int i = 0; i < coordinateArray.length; i++) {

@@ -34,6 +34,7 @@ public class GlobalIdProperty extends AbstractDataObjectMetaDataProperty {
     return attributeName;
   }
 
+  @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
   }

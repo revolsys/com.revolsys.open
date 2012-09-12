@@ -15,6 +15,7 @@ public class Intersection implements Filter<LineString> {
     this.graph = new LineStringGraph(line);
   }
 
+  @Override
   public boolean accept(final LineString line) {
     return graph.intersects(line);
   }

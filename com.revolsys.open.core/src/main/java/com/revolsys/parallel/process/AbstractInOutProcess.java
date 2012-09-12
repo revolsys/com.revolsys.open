@@ -53,6 +53,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   /**
    * @return the in
    */
+  @Override
   public Channel<I> getIn() {
     if (in == null) {
       final String channelName = getBeanName() + ".in";
@@ -70,6 +71,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   /**
    * @return the out
    */
+  @Override
   public Channel<O> getOut() {
     if (out == null) {
       final String channelName = getBeanName() + ".out";
@@ -87,6 +89,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   protected void init() {
   }
 
+  @Override
   public final void run() {
     final Logger log = Logger.getLogger(getClass());
     try {
@@ -116,6 +119,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   /**
    * @param in the in to set
    */
+  @Override
   public void setIn(final Channel<I> in) {
     this.in = in;
     in.readConnect();
@@ -128,6 +132,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   /**
    * @param out the out to set
    */
+  @Override
   public void setOut(final Channel<O> out) {
     this.out = out;
     out.writeConnect();

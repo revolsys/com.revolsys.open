@@ -46,6 +46,7 @@ public class SimpleDataObjectConveter implements
     processors.add(processor);
   }
 
+  @Override
   public DataObject convert(final DataObject sourceObject) {
     final DataObject targetObject = factory.createDataObject(dataObjectMetaData);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();

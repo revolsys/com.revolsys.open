@@ -98,6 +98,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     return file.getAbsolutePath();
   }
 
+  @Override
   public void write(final DataObject object) {
     try {
       final Geometry geometry = object.getGeometryValue();
@@ -128,9 +129,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     writeElement(object, GpxConstants.DESCRIPTION_ELEMENT, descriptionAttribute);
   }
 
-  private void writeElement(
-    final DataObject object,
-    final QName tag,
+  private void writeElement(final DataObject object, final QName tag,
     final String attributeName) {
     final String name = object.getValue(attributeName);
     if (name != null && name.length() > 0) {

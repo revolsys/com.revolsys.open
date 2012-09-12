@@ -32,8 +32,7 @@ public class AngularUnit implements Serializable {
    * @param conversionFactor The conversion factor.
    * @return The angular unit.
    */
-  public static Unit<Angle> getUnit(
-    final Unit<Angle> baseUnit,
+  public static Unit<Angle> getUnit(final Unit<Angle> baseUnit,
     final double conversionFactor) {
     Unit<Angle> unit;
     if (baseUnit == null) {

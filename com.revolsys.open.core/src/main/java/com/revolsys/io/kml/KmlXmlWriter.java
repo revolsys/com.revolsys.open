@@ -179,12 +179,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writeNetworkLink(
-    final Envelope envelope,
-    final String name,
-    final Integer minLod,
-    final Integer maxLod,
-    final String href) {
+  public void writeNetworkLink(final Envelope envelope, final String name,
+    final Integer minLod, final Integer maxLod, final String href) {
 
     startTag(NETWORK_LINK);
     if (name != null) {
@@ -200,9 +196,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemark(
-    final Geometry geometry,
-    final String name,
+  public void writePlacemark(final Geometry geometry, final String name,
     final String styleUrl) {
     startTag(PLACEMARK);
     if (name != null) {
@@ -216,10 +210,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writePlacemarkLineString(
-    final Envelope envelope,
-    final String name,
-    final String styleUrl) {
+  public void writePlacemarkLineString(final Envelope envelope,
+    final String name, final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -260,10 +252,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemarkLineString(
-    final LineString lineString,
-    final String name,
-    final String styleUrl) {
+  public void writePlacemarkLineString(final LineString lineString,
+    final String name, final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -278,10 +268,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemarkLineString(
-    final Polygon polygon,
-    final String name,
-    final String styleUrl) {
+  public void writePlacemarkLineString(final Polygon polygon,
+    final String name, final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -297,9 +285,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemarkPoint(
-    final Envelope envelope,
-    final String name,
+  public void writePlacemarkPoint(final Envelope envelope, final String name,
     final String styleUrl) {
 
     startTag(PLACEMARK);
@@ -321,9 +307,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writePlacemarkPolygon(
-    final Polygon polygon,
-    final String name,
+  public void writePlacemarkPolygon(final Polygon polygon, final String name,
     final String styleUrl) {
 
     startTag(PLACEMARK);
@@ -359,9 +343,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeRegion(
-    final Envelope envelope,
-    final Integer minLod,
+  public void writeRegion(final Envelope envelope, final Integer minLod,
     final Integer maxLod) {
     startTag(REGION);
 
@@ -383,10 +365,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeWmsGroundOverlay(
-    final Envelope envelope,
-    final String baseUrl,
-    final String name) {
+  public void writeWmsGroundOverlay(final Envelope envelope,
+    final String baseUrl, final String name) {
 
     startTag(GROUND_OVERLAY);
     if (name != null) {

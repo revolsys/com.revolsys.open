@@ -25,14 +25,17 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
     this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line));
   }
 
+  @Override
   public boolean hasNext() {
     return index < points.size() - 1;
   }
 
+  @Override
   public Iterator<LineString> iterator() {
     return this;
   }
 
+  @Override
   public LineString next() {
     final LineString lineString = factory.createLineString(points.subList(
       index, 2));
@@ -40,6 +43,7 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
     return lineString;
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException("Remove not supported");
 

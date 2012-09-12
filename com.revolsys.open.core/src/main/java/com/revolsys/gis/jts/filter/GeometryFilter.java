@@ -7,8 +7,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class GeometryFilter {
-  public static boolean acceptEnvelopeIntersects(
-    final Envelope envelope,
+  public static boolean acceptEnvelopeIntersects(final Envelope envelope,
     final Geometry geometry) {
     final Envelope geometryEnvelope = geometry.getEnvelopeInternal();
     return envelope.intersects(geometryEnvelope);
@@ -21,25 +20,21 @@ public class GeometryFilter {
   }
 
   public static Filter<LineString> lineContainedWithinTolerance(
-    final LineString line,
-    final double maxDistance) {
+    final LineString line, final double maxDistance) {
     return new LineContainsWithinToleranceFilter(line, maxDistance, true);
   }
 
   public static Filter<LineString> lineContainsWithinTolerance(
-    final LineString line,
-    final double maxDistance) {
+    final LineString line, final double maxDistance) {
     return new LineContainsWithinToleranceFilter(line, maxDistance);
   }
 
   public static Filter<LineString> lineEqualWithinTolerance(
-    final LineString line,
-    final double maxDistance) {
+    final LineString line, final double maxDistance) {
     return new LineEqualWithinToleranceFilter(line, maxDistance);
   }
 
-  public static Filter<LineString> lineWithinDistance(
-    final LineString line,
+  public static Filter<LineString> lineWithinDistance(final LineString line,
     final double maxDistance) {
     return new LineStringLessThanDistanceFilter(line, maxDistance);
   }

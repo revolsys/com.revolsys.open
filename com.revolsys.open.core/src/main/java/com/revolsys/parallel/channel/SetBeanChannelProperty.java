@@ -58,6 +58,7 @@ public class SetBeanChannelProperty<T> extends SetBeanProperties implements
     return outBeanName;
   }
 
+  @Override
   public void setBeanName(final String name) {
     this.name = name;
   }

@@ -415,8 +415,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static void loadGeographicCoordinateSystems(
-    final Map<Integer, Area> areas,
-    final Map<Integer, Datum> datums,
+    final Map<Integer, Area> areas, final Map<Integer, Datum> datums,
     final Map<Integer, AngularUnit> angularCoordinateSystemUnits,
     final Map<Integer, List<Axis>> coordinateAxises,
     final Map<Datum, PrimeMeridian> datumPrimeMeridians) {
@@ -592,8 +591,7 @@ public final class EpsgCoordinateSystems {
     return spheroids;
   }
 
-  private static void loadUnits(
-    final Map<Integer, LinearUnit> linearUnits,
+  private static void loadUnits(final Map<Integer, LinearUnit> linearUnits,
     final Map<Integer, AngularUnit> angularUnits) {
     final String resourceName = "/com/revolsys/gis/cs/epsg/unit.txt";
 

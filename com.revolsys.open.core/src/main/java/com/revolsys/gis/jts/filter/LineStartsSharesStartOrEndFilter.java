@@ -35,6 +35,7 @@ public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
     this.reversePoints = points.reverse();
   }
 
+  @Override
   public boolean accept(final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
 

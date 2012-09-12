@@ -68,6 +68,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
    * 
    * @return <tt>true</tt> if the iterator has more elements.
    */
+  @Override
   public boolean hasNext() {
     return hasNext;
   }
@@ -77,6 +78,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
    * 
    * @return The record
    */
+  @Override
   public Map<String, Object> next() {
     if (!hasNext) {
       throw new NoSuchElementException("No more elements");
@@ -116,6 +118,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
   /**
    * Removing items from the iterator is not supported.
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

@@ -21,6 +21,7 @@ public class LinearIntersectionFilter implements Filter<LineString> {
     this.envelope = line.getEnvelopeInternal();
   }
 
+  @Override
   public boolean accept(final LineString line) {
     final Envelope envelope = line.getEnvelopeInternal();
     if (envelope.intersects(this.envelope)) {

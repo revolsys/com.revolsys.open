@@ -229,12 +229,13 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return (T)getValue(index);
   }
 
+  @Override
   public Integer getInteger(final CharSequence name) {
     final Object value = getValue(name);
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
-      Number number = (Number)value;
+      final Number number = (Number)value;
       return number.intValue();
     } else {
       return Integer.valueOf(value.toString());

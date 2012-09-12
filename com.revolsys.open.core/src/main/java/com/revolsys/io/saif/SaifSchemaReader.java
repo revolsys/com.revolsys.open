@@ -105,8 +105,7 @@ public class SaifSchemaReader {
     exportedObjectHandle.addAttribute("sharable", DataTypes.BOOLEAN, true);
   }
 
-  public void addSuperClass(
-    final DataObjectMetaDataImpl currentClass,
+  public void addSuperClass(final DataObjectMetaDataImpl currentClass,
     final DataObjectMetaData superClass) {
     currentClass.addSuperClass(superClass);
     for (final String name : superClass.getAttributeNames()) {
@@ -132,8 +131,7 @@ public class SaifSchemaReader {
     }
   }
 
-  public void attributes(
-    final DataObjectMetaData type,
+  public void attributes(final DataObjectMetaData type,
     final CsnIterator iterator) throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_NAME
       || iterator.getNextEventType() == CsnIterator.OPTIONAL_ATTRIBUTE) {
@@ -195,8 +193,7 @@ public class SaifSchemaReader {
     }
   }
 
-  public void classAttributes(
-    final DataObjectMetaData type,
+  public void classAttributes(final DataObjectMetaData type,
     final CsnIterator iterator) throws IOException {
   }
 
@@ -317,8 +314,7 @@ public class SaifSchemaReader {
 
   }
 
-  public DataObjectMetaDataFactory loadSchema(
-    final String fileName,
+  public DataObjectMetaDataFactory loadSchema(final String fileName,
     final InputStream in) throws IOException {
     return loadSchema(new CsnIterator(fileName, in));
   }
@@ -362,8 +358,7 @@ public class SaifSchemaReader {
     return new EnumerationDataType(name, String.class, allowedValues);
   }
 
-  public void restricted(
-    final DataObjectMetaData type,
+  public void restricted(final DataObjectMetaData type,
     final CsnIterator iterator) throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();

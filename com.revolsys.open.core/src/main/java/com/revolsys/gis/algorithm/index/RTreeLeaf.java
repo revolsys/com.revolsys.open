@@ -46,10 +46,8 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
   }
 
   @Override
-  public boolean remove(
-    final LinkedList<RTreeNode<T>> path,
-    final Envelope envelope,
-    final T object) {
+  public boolean remove(final LinkedList<RTreeNode<T>> path,
+    final Envelope envelope, final T object) {
     for (int i = 0; i < size; i++) {
       final Envelope envelope1 = envelopes[i];
       final T object1 = getObject(i);
@@ -102,9 +100,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
   }
 
   @Override
-  public boolean visit(
-    final Envelope envelope,
-    final Filter<T> filter,
+  public boolean visit(final Envelope envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
     for (int i = 0; i < size; i++) {
       final Envelope objectEnvelope = envelopes[i];

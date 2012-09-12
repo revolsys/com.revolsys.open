@@ -37,8 +37,7 @@ public class DataObjectStoreSchemaMapProxy extends
   }
 
   @Override
-  public DataObjectStoreSchema put(
-    final String key,
+  public DataObjectStoreSchema put(final String key,
     final DataObjectStoreSchema schema) {
     final DataObjectStoreSchemaProxy schemaProxy = new DataObjectStoreSchemaProxy(
       dataObjectStore, key, schema);

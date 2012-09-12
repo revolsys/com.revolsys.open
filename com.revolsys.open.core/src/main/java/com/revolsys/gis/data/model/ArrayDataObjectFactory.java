@@ -56,6 +56,7 @@ public class ArrayDataObjectFactory implements DataObjectFactory {
    * @param metaData The metadata used to create the instance.
    * @return The DataObject instance.
    */
+  @Override
   public ArrayDataObject createDataObject(final DataObjectMetaData metaData) {
     return new ArrayDataObject(metaData);
   }

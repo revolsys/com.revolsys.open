@@ -20,6 +20,7 @@ public class NestedVisitor<T> implements Visitor<T> {
     this.visitor = visitor;
   }
 
+  @Override
   public boolean visit(final T item) {
     return visitor.visit(item);
   }

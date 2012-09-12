@@ -49,16 +49,12 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     addQuery(new Query(typePath, query));
   }
 
-  public void addQuery(
-    final String path,
-    final String query,
+  public void addQuery(final String path, final String query,
     final List<Object> parameters) {
     addQuery(new Query(path, query, parameters));
   }
 
-  public void addQuery(
-    final String path,
-    final String query,
+  public void addQuery(final String path, final String query,
     final Object... parameters) {
     addQuery(path, query, Arrays.asList(parameters));
   }
@@ -98,6 +94,7 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
     return dataStore;
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return ((DataObjectIterator)iterator()).getMetaData();
   }

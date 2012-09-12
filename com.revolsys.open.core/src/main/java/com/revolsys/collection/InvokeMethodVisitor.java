@@ -43,7 +43,7 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
     this.parameters = new Object[parameters.length + 1];
     System.arraycopy(parameters, 0, this.parameters, 0, parameters.length);
     for (final Method method : object.getClass().getMethods()) {
-      String name = method.getName();
+      final String name = method.getName();
       if (name.equals(methodName)
         && method.getParameterTypes().length == this.parameters.length) {
         this.method = method;
@@ -59,6 +59,7 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
     return object.getClass() + "." + methodName + parameters;
   }
 
+  @Override
   public boolean visit(final T item) {
     try {
       parameters[parameters.length - 1] = item;

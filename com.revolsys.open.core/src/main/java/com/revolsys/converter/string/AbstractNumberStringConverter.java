@@ -19,6 +19,7 @@ public abstract class AbstractNumberStringConverter<T> implements
     this.format = format;
   }
 
+  @Override
   public String toString(final Object value) {
     if (value == null) {
       return null;

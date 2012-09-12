@@ -52,6 +52,7 @@ public class DelegatingReader<T> extends AbstractReader<T> {
     return reader;
   }
 
+  @Override
   public Iterator<T> iterator() {
     if (iterator == null) {
       iterator = reader.iterator();
@@ -59,6 +60,7 @@ public class DelegatingReader<T> extends AbstractReader<T> {
     return iterator;
   }
 
+  @Override
   public void open() {
     reader.open();
   }

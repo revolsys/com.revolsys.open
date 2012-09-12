@@ -64,22 +64,6 @@ public class SpringUtil {
     }
   }
 
-  public static String getContents(final Resource resource) {
-    final InputStream in = getInputStream(resource);
-    final Reader reader = new InputStreamReader(in);
-    try {
-      final Writer writer = new StringWriter();
-      try {
-        FileUtil.copy(reader, writer);
-        return writer.toString();
-      } finally {
-        FileUtil.closeSilent(writer);
-      }
-    } finally {
-      FileUtil.closeSilent(in);
-    }
-  }
-
   public static GenericApplicationContext getApplicationContext(
     final ClassLoader classLoader, final Resource... resources) {
     final GenericApplicationContext applicationContext = new GenericApplicationContext();
@@ -104,6 +88,22 @@ public class SpringUtil {
     return new BufferedReader(in);
   }
 
+  public static String getContents(final Resource resource) {
+    final InputStream in = getInputStream(resource);
+    final Reader reader = new InputStreamReader(in);
+    try {
+      final Writer writer = new StringWriter();
+      try {
+        FileUtil.copy(reader, writer);
+        return writer.toString();
+      } finally {
+        FileUtil.closeSilent(writer);
+      }
+    } finally {
+      FileUtil.closeSilent(in);
+    }
+  }
+
   public static File getFile(final Resource resource) {
     try {
       return resource.getFile();
@@ -123,7 +123,7 @@ public class SpringUtil {
         final String fileExtension = FileUtil.getFileNameExtension(filename);
         return File.createTempFile(baseName, fileExtension);
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to get file for " + resource, e);
     }
   }
@@ -207,7 +207,7 @@ public class SpringUtil {
     final String newFileName = baseName + "." + extension;
     try {
       return resource.createRelative(newFileName);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to get resource " + newFileName, e);
     }
 

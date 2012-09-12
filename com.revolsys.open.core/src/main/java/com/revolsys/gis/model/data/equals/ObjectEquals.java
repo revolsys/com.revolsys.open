@@ -3,9 +3,8 @@ package com.revolsys.gis.model.data.equals;
 import java.util.Collection;
 
 public class ObjectEquals implements Equals<Object> {
-  public boolean equals(
-    final Object object1,
-    final Object object2,
+  @Override
+  public boolean equals(final Object object1, final Object object2,
     final Collection<String> exclude) {
     if (object1 == null) {
       return object2 == null;
@@ -14,6 +13,7 @@ public class ObjectEquals implements Equals<Object> {
     }
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

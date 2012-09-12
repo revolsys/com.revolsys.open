@@ -39,9 +39,7 @@ public class DataObjectUiBuilder extends AbstractUiBuilder {
     appendHtml(s, object, true);
   }
 
-  public void appendHtml(
-    final StringBuffer s,
-    final Object object,
+  public void appendHtml(final StringBuffer s, final Object object,
     final boolean nested) {
     if (object instanceof DataObject) {
       final DataObject feature = (DataObject)object;
@@ -67,11 +65,8 @@ public class DataObjectUiBuilder extends AbstractUiBuilder {
     }
   }
 
-  private void appendRow(
-    final StringBuffer s,
-    final boolean odd,
-    final String name,
-    final Object value) {
+  private void appendRow(final StringBuffer s, final boolean odd,
+    final String name, final Object value) {
     if (odd) {
       s.append("<tr valign=\"top\" class=\"odd\"><th ")
         .append(TABLE_HEADING_ODD_ATTRS)
@@ -103,9 +98,7 @@ public class DataObjectUiBuilder extends AbstractUiBuilder {
     s.append("</div>");
   }
 
-  private void appendValue(
-    final StringBuffer s,
-    final String value,
+  private void appendValue(final StringBuffer s, final String value,
     final String style) {
     s.append("<div ").append(style).append(">");
     if (value == null) {

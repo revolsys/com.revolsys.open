@@ -6,7 +6,6 @@ import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcAttributeAdder {
   private DataType dataType;
@@ -19,8 +18,8 @@ public class JdbcAttributeAdder {
   }
 
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, String dataType, final int sqlType, final int length,
-    final int scale, final boolean required) {
+    final String name, final String dataType, final int sqlType,
+    final int length, final int scale, final boolean required) {
     JdbcAttribute attribute;
     if (dataType.equals("oid")) {
       attribute = new JdbcBlobAttribute(name, sqlType, length, required, null);

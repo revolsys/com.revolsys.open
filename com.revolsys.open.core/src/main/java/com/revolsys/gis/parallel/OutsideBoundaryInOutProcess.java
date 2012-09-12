@@ -14,10 +14,8 @@ public class OutsideBoundaryInOutProcess extends
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     if (outsideBoundaryObjects.boundaryContains(object)) {
       outsideBoundaryObjects.removeObject(object);
       out.write(object);

@@ -9,7 +9,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
-
 public class InvokeMethodInTransactionRunnable implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(InvokeMethodInTransactionRunnable.class);
@@ -95,6 +94,7 @@ public class InvokeMethodInTransactionRunnable implements Runnable {
     this(transactionManager, -1, object, methodName, args);
   }
 
+  @Override
   public void run() {
     try {
       final TransactionTemplate template = new TransactionTemplate(

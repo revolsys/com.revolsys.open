@@ -24,6 +24,7 @@ public class AttributeFilter<T extends AttributedObject> implements Filter<T> {
     this.inverse = inverse;
   }
 
+  @Override
   public boolean accept(final T object) {
     final Object value = object.getAttribute(attributeName);
     final boolean equal = EqualsRegistry.INSTANCE.equals(this.value, value);

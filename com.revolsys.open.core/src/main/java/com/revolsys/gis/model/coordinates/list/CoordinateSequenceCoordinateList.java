@@ -21,18 +21,22 @@ public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
     return new CoordinateSequenceCoordinateList(coordinateSequence);
   }
 
+  @Override
   public byte getNumAxis() {
     return (byte)coordinateSequence.getDimension();
   }
 
+  @Override
   public double getValue(final int index, final int axisIndex) {
     return coordinateSequence.getOrdinate(index, axisIndex);
   }
 
+  @Override
   public void setValue(final int index, final int axisIndex, final double value) {
     coordinateSequence.setOrdinate(index, axisIndex, value);
   }
 
+  @Override
   public int size() {
     return coordinateSequence.size();
   }

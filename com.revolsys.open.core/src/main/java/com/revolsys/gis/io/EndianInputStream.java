@@ -32,11 +32,13 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     super(in);
   }
 
+  @Override
   public double readLEDouble() throws IOException {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
   }
 
+  @Override
   public int readLEInt() throws IOException {
     final int b1 = read();
     final int b2 = read();
@@ -50,6 +52,7 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     return value;
   }
 
+  @Override
   public long readLELong() throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
@@ -58,6 +61,7 @@ public class EndianInputStream extends DataInputStream implements EndianInput {
     return value;
   }
 
+  @Override
   public short readLEShort() throws IOException {
     final int b1 = read();
     final int b2 = read();

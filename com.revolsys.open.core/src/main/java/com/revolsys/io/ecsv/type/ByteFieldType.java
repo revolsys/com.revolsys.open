@@ -9,6 +9,7 @@ public class ByteFieldType extends NumberFieldType {
     super(DataTypes.BYTE);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Byte.parseByte(text);

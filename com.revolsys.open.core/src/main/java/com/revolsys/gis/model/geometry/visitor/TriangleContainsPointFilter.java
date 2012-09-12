@@ -11,6 +11,7 @@ public class TriangleContainsPointFilter implements Filter<Triangle> {
     this.point = point;
   }
 
+  @Override
   public boolean accept(final Triangle triangle) {
     return triangle.contains(point);
   }

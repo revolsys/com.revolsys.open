@@ -29,8 +29,7 @@ public class StringConverterRegistry {
     return instance;
   }
 
-  public static Object toObject(
-    final Class<Object> valueClass,
+  public static Object toObject(final Class<Object> valueClass,
     final Object value) {
     if (value == null) {
       return null;
@@ -60,8 +59,7 @@ public class StringConverterRegistry {
     }
   }
 
-  public static String toString(
-    final Class<Object> valueClass,
+  public static String toString(final Class<Object> valueClass,
     final Object value) {
     if (value == null) {
       return null;
@@ -115,8 +113,7 @@ public class StringConverterRegistry {
     addConverter(new ListStringConverter());
   }
 
-  public void addConverter(
-    final Class<?> clazz,
+  public void addConverter(final Class<?> clazz,
     final StringConverter<?> converter) {
     classConverterMap.put(clazz, converter);
   }
@@ -141,8 +138,7 @@ public class StringConverterRegistry {
   }
 
   @SuppressWarnings("rawtypes")
-  private StringConverter get(
-    final Set<Class<?>> interfaces,
+  private StringConverter get(final Set<Class<?>> interfaces,
     final Class<?> clazz) {
     StringConverter converter = null;
     if (clazz != null) {

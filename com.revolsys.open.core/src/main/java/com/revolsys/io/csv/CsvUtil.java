@@ -9,9 +9,9 @@ import java.util.Map;
 
 public final class CsvUtil {
   /**
-   * Convert a  to a CSV string with a header row and a data row.
+   * Convert a to a CSV string with a header row and a data row.
    * 
-   * @param map The  to convert to CSV
+   * @param map The to convert to CSV
    * @return The CSV string.
    */
   public static String toCsv(final Map<String, ? extends Object> map) {

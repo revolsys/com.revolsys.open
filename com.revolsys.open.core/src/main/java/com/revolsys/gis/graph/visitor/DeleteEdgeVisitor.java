@@ -8,10 +8,11 @@ import com.revolsys.util.ObjectProcessor;
 public class DeleteEdgeVisitor<T> implements Visitor<Edge<T>>,
   ObjectProcessor<Graph<T>> {
   @Override
-  public void process(Graph<T> graph) {
+  public void process(final Graph<T> graph) {
     graph.visitEdges(this);
   }
 
+  @Override
   public boolean visit(final Edge<T> edge) {
     final Graph<T> graph = edge.getGraph();
     graph.remove(edge);

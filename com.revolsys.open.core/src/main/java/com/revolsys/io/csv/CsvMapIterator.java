@@ -42,6 +42,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
    * 
    * @return <tt>true</tt> if the iterator has more elements.
    */
+  @Override
   public boolean hasNext() {
     return in.hasNext();
   }
@@ -51,6 +52,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
    * 
    * @return The DataObject
    */
+  @Override
   public Map<String, Object> next() {
     if (hasNext()) {
       final List<String> record = in.next();
@@ -87,6 +89,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
   /**
    * Removing items from the iterator is not supported.
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

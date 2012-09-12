@@ -60,6 +60,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     return metaData.getPath().toString();
   }
 
+  @Override
   public void write(final DataObject object) {
     open();
     final int attributeCount = metaData.getAttributeCount();
@@ -192,27 +193,21 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     newLine();
   }
 
-  private void writeMultiLineListStart(
-    final String propertyName,
-    final DataType dataType,
-    final String collectionStart) {
+  private void writeMultiLineListStart(final String propertyName,
+    final DataType dataType, final String collectionStart) {
     final String name = dataType.getName();
     writeMultiLineListStart(propertyName, name, collectionStart);
   }
 
-  private void writeMultiLineListStart(
-    final String propertyName,
-    final String path,
-    final String collectionStart) {
+  private void writeMultiLineListStart(final String propertyName,
+    final String path, final String collectionStart) {
     final String type = LIST_TYPE + TYPE_PARAMETER_START + path
       + TYPE_PARAMETER_END;
     writeMultiLineStart(propertyName, type, collectionStart);
   }
 
-  private void writeMultiLineStart(
-    final String propertyName,
-    final String typePath,
-    final String collectionStart) {
+  private void writeMultiLineStart(final String propertyName,
+    final String typePath, final String collectionStart) {
     StringFieldType.writeQuotedString(out, propertyName);
     out.print(FIELD_SEPARATOR);
     StringFieldType.writeQuotedString(out, typePath);
@@ -238,9 +233,7 @@ public class EcsvDataObjectWriter extends AbstractWriter<DataObject> implements
     }
   }
 
-  private void writeProperty(
-    final String name,
-    final String type,
+  private void writeProperty(final String name, final String type,
     final Object value) {
     if (value != null) {
       StringFieldType.writeQuotedString(out, name);

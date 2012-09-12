@@ -1,5 +1,9 @@
 package com.revolsys.gis.graph;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +25,8 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
-public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
+public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
+  Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(
     final Map<LineString, Set<Edge<T>>> lineEdgeMap, final Edge<T> edge) {
@@ -186,42 +191,26 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     }
   }
 
-  /** additional attributes stored on the edge. */
-  private Map<String, Object> attributes = Collections.emptyMap();
-
-  private final int fromNodeId;
-
-  private final int id;
+  private int fromNodeId;
 
   /** The graph the edge is part of. */
   private Graph<T> graph;
 
-  /** The line geometry between the from and to nodes. */
-  private LineString line;
+  private int id;
 
-  /** The object representing the edge. */
-  private T object;
+  private int toNodeId;
 
-  private final int toNodeId;
+  public Edge() {
+  }
 
-  public Edge(final int id, final Graph<T> graph, final T object,
-    final LineString line, final Node<T> fromNode, final Node<T> toNode) {
+  public Edge(final int id, final Graph<T> graph, final Node<T> fromNode,
+    final Node<T> toNode) {
     this.id = id;
     this.graph = graph;
     this.fromNodeId = fromNode.getId();
     this.toNodeId = toNode.getId();
-    this.object = object;
-    this.line = line;
-    attributes.clear();
     fromNode.addOutEdge(this);
     toNode.addInEdge(this);
-  }
-
-  public void addAttributes(final Map<String, Object> attributes) {
-    if (this.attributes.isEmpty()) {
-      this.attributes = new HashMap<String, Object>();
-    }
-    this.attributes.putAll(attributes);
   }
 
   @Override
@@ -265,7 +254,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public double distance(final Coordinates point) {
-    return LineStringUtil.distance(point, line);
+    return LineStringUtil.distance(point, getLine());
   }
 
   public double distance(final Edge<LineSegmentMatch> edge) {
@@ -296,23 +285,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
     return Double.NaN;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.revolsys.gis.graph.AttributedObject#getAttribute(java.lang.String)
-   */
   @Override
   @SuppressWarnings("unchecked")
-  public <A> A getAttribute(final String name) {
-    return (A)attributes.get(name);
+  public <V> V getAttribute(final String name) {
+    return (V)graph.getEdgeAttribute(id, name);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.revolsys.gis.graph.AttributedObject#getAttributes()
-   */
   @Override
   public Map<String, Object> getAttributes() {
-    return Collections.unmodifiableMap(attributes);
+    return graph.getEdgeAttributes(id);
   }
 
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {
@@ -341,7 +322,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public Envelope getEnvelope() {
-    return line.getEnvelopeInternal();
+    return getLine().getEnvelopeInternal();
   }
 
   public double getFromAngle() {
@@ -368,7 +349,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public LineString getLine() {
-    return line;
+    return graph.getEdgeLine(id);
   }
 
   public Node<T> getNextJunctionNode(final Node<T> node) {
@@ -394,7 +375,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public T getObject() {
-    return object;
+    return graph.getEdgeObject(id);
   }
 
   public Node<T> getOppositeNode(final Node<T> node) {
@@ -464,7 +445,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   public boolean isLessThanDistance(final Coordinates point,
     final double distance) {
-    return LineStringUtil.distance(point, line, distance) < distance;
+    return LineStringUtil.distance(point, getLine(), distance) < distance;
   }
 
   public boolean isLessThanDistance(final Node<T> node, final double distance) {
@@ -477,12 +458,22 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   }
 
   public boolean isWithinDistance(final Coordinates point, final double distance) {
-    return LineStringUtil.distance(point, line, distance) <= distance;
+    return LineStringUtil.distance(point, getLine(), distance) <= distance;
   }
 
   public boolean isWithinDistance(final Node<T> node, final double distance) {
     final Coordinates point = node;
     return isWithinDistance(point, distance);
+  }
+
+  @Override
+  public void readExternal(final ObjectInput in) throws IOException,
+    ClassNotFoundException {
+    final int graphId = in.readInt();
+    graph = Graph.getGraph(graphId);
+    id = in.readInt();
+    fromNodeId = in.readInt();
+    toNodeId = in.readInt();
   }
 
   public void remove() {
@@ -501,8 +492,6 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
       toNode.remove(this);
     }
     graph = null;
-    line = null;
-    object = null;
   }
 
   public List<Edge<T>> replace(final LineString... lines) {
@@ -520,10 +509,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
 
   @Override
   public void setAttribute(final String name, final Object value) {
-    if (attributes.isEmpty()) {
-      attributes = new HashMap<String, Object>();
-    }
-    attributes.put(name, value);
+    graph.setEdgeAttribute(id, name, value);
+  }
+
+  public void setAttributes(final Map<String, Object> attributes) {
+    graph.setEdgeAttributes(id, attributes);
   }
 
   public <V extends Coordinates> List<Edge<T>> split(
@@ -581,5 +571,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>> {
   public boolean touches(final Edge<T> edge) {
     final Collection<Node<T>> nodes1 = getCommonNodes(edge);
     return !nodes1.isEmpty();
+  }
+
+  @Override
+  public void writeExternal(final ObjectOutput out) throws IOException {
+    final int graphId = graph.getId();
+    out.writeInt(graphId);
+    out.writeInt(id);
+    out.writeInt(fromNodeId);
+    out.writeInt(toNodeId);
+
   }
 }

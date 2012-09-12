@@ -31,6 +31,7 @@ public class EdgeLessThanLengthVisitor extends
     return minLength;
   }
 
+  @Override
   public void process(final DataObjectGraph graph) {
     graph.visitEdges(this);
   }
@@ -39,6 +40,7 @@ public class EdgeLessThanLengthVisitor extends
     this.minLength = minLength;
   }
 
+  @Override
   public boolean visit(final Edge<DataObject> edge) {
     final double length = edge.getLength();
     if (length < minLength) {

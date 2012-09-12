@@ -21,6 +21,7 @@ public class EdgeLengthComparator<T> implements Comparator<Edge<T>> {
     this.invert = invert;
   }
 
+  @Override
   public int compare(final Edge<T> edge1, final Edge<T> edge2) {
     int compare;
     final double length1 = edge1.getLength();

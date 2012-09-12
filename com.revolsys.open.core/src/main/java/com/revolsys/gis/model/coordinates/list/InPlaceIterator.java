@@ -35,6 +35,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
     return coordinates.getNumAxis();
   }
 
+  @Override
   public double getValue(final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       return coordinates.getValue(this.index, axisIndex);
@@ -51,14 +52,17 @@ public class InPlaceIterator extends AbstractCoordinates implements
     }
   }
 
+  @Override
   public boolean hasNext() {
     return index < coordinates.size() - 1;
   }
 
+  @Override
   public Iterator<Coordinates> iterator() {
     return this;
   }
 
+  @Override
   public Coordinates next() {
     if (hasNext()) {
       index++;
@@ -68,6 +72,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
     }
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
 
@@ -77,15 +82,14 @@ public class InPlaceIterator extends AbstractCoordinates implements
     this.index = index;
   }
 
+  @Override
   public void setValue(final int axisIndex, final double value) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       coordinates.setValue(this.index, axisIndex, value);
     }
   }
 
-  public void setValue(
-    final int relativeIndex,
-    final int axisIndex,
+  public void setValue(final int relativeIndex, final int axisIndex,
     final double value) {
     if (axisIndex >= 0 && axisIndex < getNumAxis()) {
       coordinates.setValue(this.index + relativeIndex, axisIndex, value);

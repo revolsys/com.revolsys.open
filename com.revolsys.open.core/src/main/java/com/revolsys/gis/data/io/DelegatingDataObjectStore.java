@@ -58,7 +58,7 @@ public class DelegatingDataObjectStore implements InvocationHandler {
 
   protected DataObjectStore createDataStore() {
     if (config != null) {
-      DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
+      final DataObjectStore dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(config);
       return dataStore;
     } else {
       throw new UnsupportedOperationException("Data store must be set manually");
@@ -73,11 +73,12 @@ public class DelegatingDataObjectStore implements InvocationHandler {
     return dataStore;
   }
 
+  @Override
   public Object invoke(final Object proxy, final Method method,
     final Object[] args) throws Throwable {
     int numArgs;
     if (args == null) {
-      numArgs =0;
+      numArgs = 0;
     } else {
       numArgs = args.length;
     }

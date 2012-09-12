@@ -27,8 +27,7 @@ public class ZipUtil {
    * @throws IOException
    * @throws IOException If an I/O error occurs.
    */
-  public static void addDirectoryToZipFile(
-    final ZipOutputStream zipOut,
+  public static void addDirectoryToZipFile(final ZipOutputStream zipOut,
     final File directory) throws IOException {
     addDirectoryToZipFile(zipOut, directory, directory);
   }
@@ -43,10 +42,8 @@ public class ZipUtil {
    * @param directory The directory containing the files.
    * @throws IOException If an I/O error occurs.
    */
-  public static void addDirectoryToZipFile(
-    final ZipOutputStream zipOut,
-    final File baseDirectory,
-    final File directory) throws IOException {
+  public static void addDirectoryToZipFile(final ZipOutputStream zipOut,
+    final File baseDirectory, final File directory) throws IOException {
     final File[] files = directory.listFiles();
     for (int i = 0; i < files.length; i++) {
       final File file = files[i];
@@ -72,10 +69,8 @@ public class ZipUtil {
    * @param fileNames The list of file names to add.
    * @throws IOException If an I/O error occurs.
    */
-  public static void addFilesToZipFile(
-    final ZipOutputStream zipOut,
-    final File baseDirectory,
-    final String[] fileNames) throws IOException {
+  public static void addFilesToZipFile(final ZipOutputStream zipOut,
+    final File baseDirectory, final String[] fileNames) throws IOException {
     for (int i = 0; i < fileNames.length; i++) {
       final String fileName = fileNames[i];
       final File file = new File(baseDirectory, fileName);
@@ -90,8 +85,7 @@ public class ZipUtil {
     }
   }
 
-  public static List<String> unzipFile(
-    final File file,
+  public static List<String> unzipFile(final File file,
     final File outputDirectory) throws IOException {
     final List<String> entryNames = new ArrayList<String>();
     final ZipFile zipFile = new ZipFile(file);
@@ -137,8 +131,7 @@ public class ZipUtil {
     zipDirectory(directory, outputStream);
   }
 
-  public static void zipDirectory(
-    final File directory,
+  public static void zipDirectory(final File directory,
     final OutputStream outputStream) throws IOException {
     final ZipOutputStream zipOut = new ZipOutputStream(outputStream);
     addDirectoryToZipFile(zipOut, directory, directory);

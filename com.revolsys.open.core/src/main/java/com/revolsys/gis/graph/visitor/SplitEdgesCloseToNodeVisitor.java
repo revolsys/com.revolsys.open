@@ -54,6 +54,7 @@ public class SplitEdgesCloseToNodeVisitor<T> extends
     this.splitObjects = splitObjects;
   }
 
+  @Override
   public boolean visit(final Node<T> node) {
     final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor.edgesWithinDistance(
       graph, node, maxDistance);

@@ -242,10 +242,8 @@ public class ProcessorPipelineTool {
     }
   }
 
-  private void processDirectory(
-    final File sourceDirectory,
-    final File targetDirectory,
-    final File logDirectory,
+  private void processDirectory(final File sourceDirectory,
+    final File targetDirectory, final File logDirectory,
     final String sourceFileExtension) {
     System.out.println("Processing directory '"
       + sourceDirectory.getAbsolutePath() + "'");
@@ -263,9 +261,7 @@ public class ProcessorPipelineTool {
     }
   }
 
-  private void processFile(
-    final File sourceFile,
-    final File targetFile,
+  private void processFile(final File sourceFile, final File targetFile,
     final File logFile) {
     final long startTime = System.currentTimeMillis();
     if (excludePattern != null) {

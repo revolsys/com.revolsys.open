@@ -48,14 +48,17 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
       + tileHeight);
   }
 
+  @Override
   public CoordinateSystem getCoordinateSystem() {
     return COORDINATE_SYSTEM;
   }
 
+  @Override
   public String getFormattedMapTileName(final String name) {
     return name;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return GEOMETRY_FACTORY;
   }
@@ -80,6 +83,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return getLongitude(block);
   }
 
+  @Override
   public String getMapTileName(final double x, final double y) {
     final int lonRound = (int)Math.ceil(x);
     final int lonRowIndex = (int)(lonRound - NtsConstants.MAX_LONGITUDE);
@@ -104,12 +108,10 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(
-    final String sheet,
-    final int east,
+  public String getMapTileName(final String sheet, final int east,
     final int north) {
-    double sourceLon = getLongitude(sheet);
-    double sourceLat = getLatitude(sheet);
+    final double sourceLon = getLongitude(sheet);
+    final double sourceLat = getLatitude(sheet);
     final double lon = precisionModel.makePrecise(sourceLon + east
       * getTileWidth());
     final double lat = sourceLat + north * getTileHeight();
@@ -133,6 +135,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return precisionModel;
   }
 
+  @Override
   public RectangularMapTile getTileByLocation(final double x, final double y) {
     final String mapTileName = getMapTileName(x, y);
     final String formattedMapTileName = getFormattedMapTileName(mapTileName);
@@ -141,6 +144,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
       mapTileName, boundingBox);
   }
 
+  @Override
   public RectangularMapTile getTileByName(final String mapTileName) {
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
     final double lon = boundingBox.getMaxX();
@@ -151,10 +155,12 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
       boundingBox);
   }
 
+  @Override
   public double getTileHeight() {
     return tileHeight;
   }
 
+  @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
     final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
@@ -184,6 +190,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return tiles;
   }
 
+  @Override
   public double getTileWidth() {
     return tileWidth;
   }

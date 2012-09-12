@@ -77,11 +77,8 @@ public class WmsCapabilities {
     return getLayer(name) != null;
   }
 
-  private boolean isSrsSupported(
-    final String srsId,
-    final Layer layer,
-    final List<String> layerNames,
-    final boolean parentHasSrs) {
+  private boolean isSrsSupported(final String srsId, final Layer layer,
+    final List<String> layerNames, final boolean parentHasSrs) {
     final boolean hasSrs = layer.getSrs().contains(srsId) || parentHasSrs;
     if (layerNames.contains(layer.getName())) {
       if (hasSrs) {
@@ -96,8 +93,7 @@ public class WmsCapabilities {
     return false;
   }
 
-  public boolean isSrsSupported(
-    final String srsId,
+  public boolean isSrsSupported(final String srsId,
     final List<String> layerNames) {
     final Layer layer = capability.getLayer();
     return isSrsSupported(srsId, layer, layerNames, false);

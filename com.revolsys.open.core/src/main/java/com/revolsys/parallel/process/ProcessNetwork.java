@@ -94,14 +94,15 @@ public class ProcessNetwork implements BeanPostProcessor,
     return autoStart;
   }
 
+  @Override
   public void onApplicationEvent(final ContextRefreshedEvent event) {
     if (autoStart) {
       start();
     }
   }
 
-  public Object postProcessAfterInitialization(
-    final Object bean,
+  @Override
+  public Object postProcessAfterInitialization(final Object bean,
     final String beanName) throws BeansException {
     if (parent == null) {
       if (bean instanceof TargetBeanFactoryBean) {
@@ -148,8 +149,8 @@ public class ProcessNetwork implements BeanPostProcessor,
     return bean;
   }
 
-  public Object postProcessBeforeInitialization(
-    final Object bean,
+  @Override
+  public Object postProcessBeforeInitialization(final Object bean,
     final String beanName) throws BeansException {
     return bean;
   }

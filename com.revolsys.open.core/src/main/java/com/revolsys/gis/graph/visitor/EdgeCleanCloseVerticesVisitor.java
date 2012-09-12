@@ -42,8 +42,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
     this.visitor = visitor;
   }
 
-  private double getAngle(
-    final Edge<T> edge,
+  private double getAngle(final Edge<T> edge,
     final CoordinateSequenceCoordinatesIterator ordinates,
     final int relativeIndex) {
     final int index = ordinates.getIndex();
@@ -79,6 +78,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
    * @param edge The edge to visit.
    * @return true If further edges should be processed.
    */
+  @Override
   public boolean visit(final Edge<T> edge) {
     final String typePath = edge.getTypeName();
     final LineString lineString = edge.getLine();

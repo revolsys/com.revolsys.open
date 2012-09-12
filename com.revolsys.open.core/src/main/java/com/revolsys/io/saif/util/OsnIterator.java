@@ -390,6 +390,7 @@ public class OsnIterator implements Iterator<Object> {
     return value;
   }
 
+  @Override
   public boolean hasNext() {
     return true;
   }
@@ -403,6 +404,7 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
+  @Override
   public Object next() {
     try {
       if (skipWhitespace() == -1) {
@@ -651,6 +653,7 @@ public class OsnIterator implements Iterator<Object> {
     return eventType;
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

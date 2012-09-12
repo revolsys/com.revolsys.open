@@ -115,6 +115,7 @@ public class TransverseMercator implements CoordinatesProjection {
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
+  @Override
   public void inverse(final Coordinates from, final Coordinates to) {
     final double x = from.getX();
     final double y = from.getY();
@@ -218,6 +219,7 @@ public class TransverseMercator implements CoordinatesProjection {
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
+  @Override
   public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getValue(0);
     final double phi = from.getValue(1);

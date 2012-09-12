@@ -11,7 +11,6 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -34,8 +33,7 @@ public class SplitGeometryProcess extends
 
   private GeometryFactory geometryFactory;
 
-  protected DataObject createSplitObject(
-    final DataObject object,
+  protected DataObject createSplitObject(final DataObject object,
     final LineString newLine) {
     return DataObjectUtil.copy(object, newLine);
   }
@@ -76,8 +74,7 @@ public class SplitGeometryProcess extends
   }
 
   @Override
-  protected void postRun(
-    final Channel<DataObject> in,
+  protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (createdStatistics != null) {
       createdStatistics.disconnect();
@@ -88,8 +85,7 @@ public class SplitGeometryProcess extends
   }
 
   @Override
-  protected void preRun(
-    final Channel<DataObject> in,
+  protected void preRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (createdStatistics != null) {
       createdStatistics.connect();
@@ -100,10 +96,8 @@ public class SplitGeometryProcess extends
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -162,8 +156,7 @@ public class SplitGeometryProcess extends
     this.tolerance = tolerance;
   }
 
-  protected List<DataObject> split(
-    final DataObject object,
+  protected List<DataObject> split(final DataObject object,
     final LineString line) {
     final List<DataObject> newObjects = new ArrayList<DataObject>();
     final List<LineString> newLines = LineStringUtil.split(geometryFactory,

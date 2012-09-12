@@ -1,10 +1,13 @@
 package com.revolsys.gis.graph;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +28,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-public class Node<T> extends AbstractCoordinates {
+public class Node<T> extends AbstractCoordinates implements AttributedObject,
+  Externalizable {
   public static List<Coordinates> getCoordinates(
     final Collection<Node<DataObject>> nodes) {
     final List<Coordinates> points = new ArrayList<Coordinates>(nodes.size());
@@ -112,11 +116,9 @@ public class Node<T> extends AbstractCoordinates {
     return false;
   }
 
-  private Map<String, Object> attributes = Collections.emptyMap();
-
   private Graph<T> graph;
 
-  private final int id;
+  private int id;
 
   private int[] inEdgeIds = new int[0];
 
@@ -125,6 +127,9 @@ public class Node<T> extends AbstractCoordinates {
   private double x;
 
   private double y;
+
+  public Node() {
+  }
 
   protected Node(final int nodeId, final Graph<T> graph, final Coordinates point) {
     this.id = nodeId;
@@ -202,18 +207,15 @@ public class Node<T> extends AbstractCoordinates {
 
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public <D> D getAttribute(final String name) {
-    Object value = attributes.get(name);
-    if (value instanceof ObjectAttributeProxy) {
-      final ObjectAttributeProxy<D, Node<T>> proxy = (ObjectAttributeProxy<D, Node<T>>)value;
-      value = proxy.getValue(this);
-    }
-    return (D)value;
+  public <V> V getAttribute(final String name) {
+    return (V)graph.getNodeAttribute(id, name);
   }
 
+  @Override
   public Map<String, Object> getAttributes() {
-    return attributes;
+    return graph.getNodeAttributes(id);
   }
 
   public int getDegree() {
@@ -390,7 +392,7 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   public boolean hasAttribute(final String name) {
-    return attributes.containsKey(name);
+    return getAttributes().containsKey(name);
   }
 
   public boolean hasEdge(final Edge<T> edge) {
@@ -486,7 +488,6 @@ public class Node<T> extends AbstractCoordinates {
     graph = null;
     inEdgeIds = null;
     outEdgeIds = null;
-    attributes = null;
   }
 
   public void remove(final Edge<T> edge) {
@@ -508,11 +509,13 @@ public class Node<T> extends AbstractCoordinates {
     return graph.getEdgeIds(edges);
   }
 
+  @Override
   public void setAttribute(final String name, final Object value) {
-    if (attributes.isEmpty()) {
-      attributes = new HashMap<String, Object>();
-    }
-    attributes.put(name, value);
+    graph.setNodeAttribute(id, name, value);
+  }
+
+  public void setAttributes(final Map<String, Object> attributes) {
+    graph.setNodeAttributes(id, attributes);
   }
 
   @Override
@@ -550,12 +553,35 @@ public class Node<T> extends AbstractCoordinates {
   }
 
   private void updateAttributes() {
-    for (final Object attribute : attributes.values()) {
+    for (final Object attribute : getAttributes().values()) {
       if (attribute instanceof ObjectAttributeProxy) {
         @SuppressWarnings("unchecked")
         final ObjectAttributeProxy<Object, Node<T>> proxy = (ObjectAttributeProxy<Object, Node<T>>)attribute;
         proxy.clearValue();
       }
     }
+  }
+
+  @Override
+  public void readExternal(final ObjectInput in) throws IOException,
+    ClassNotFoundException {
+    final int graphId = in.readInt();
+    graph = Graph.getGraph(graphId);
+    id = in.readInt();
+    inEdgeIds = (int[])in.readObject();
+    outEdgeIds = (int[])in.readObject();
+    x = in.readDouble();
+    y = in.readDouble();
+  }
+
+  @Override
+  public void writeExternal(final ObjectOutput out) throws IOException {
+    final int graphId = graph.getId();
+    out.writeInt(graphId);
+    out.writeInt(id);
+    out.writeObject(inEdgeIds);
+    out.writeObject(outEdgeIds);
+    out.writeDouble(x);
+    out.writeDouble(y);
   }
 }

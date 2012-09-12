@@ -19,6 +19,7 @@ public class SourceValueConverter extends
     this.sourceValueConverter = sourceValueConverter;
   }
 
+  @Override
   public void process(final DataObject source, final DataObject target) {
     final Object value = sourceValueConverter.convert(source);
     if (value != null && (!(value instanceof String) || !("".equals(value)))) {

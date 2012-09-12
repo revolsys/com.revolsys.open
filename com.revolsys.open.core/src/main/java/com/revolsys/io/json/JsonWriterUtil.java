@@ -7,8 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 public final class JsonWriterUtil {
-  public static void charSequence(
-    final PrintWriter out,
+  public static void charSequence(final PrintWriter out,
     final CharSequence string) {
     for (int i = 0; i < string.length(); i++) {
       final char c = string.charAt(i);
@@ -69,8 +68,7 @@ public final class JsonWriterUtil {
     out.print("{\n");
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final List<? extends Object> values) {
     startList(out);
     if (values != null) {
@@ -92,8 +90,7 @@ public final class JsonWriterUtil {
     endList(out);
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final Map<String, ? extends Object> values) {
 
     startObject(out);

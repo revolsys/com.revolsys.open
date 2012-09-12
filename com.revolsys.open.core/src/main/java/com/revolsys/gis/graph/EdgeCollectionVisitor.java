@@ -12,6 +12,7 @@ public class EdgeCollectionVisitor<T> implements Visitor<Edge<T>> {
     this.objects = objects;
   }
 
+  @Override
   public boolean visit(final Edge<T> edge) {
     final T object = edge.getObject();
     objects.add(object);

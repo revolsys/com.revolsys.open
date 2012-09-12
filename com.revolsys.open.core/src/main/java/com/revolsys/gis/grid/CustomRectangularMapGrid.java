@@ -38,21 +38,22 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     }
   }
 
+  @Override
   public CoordinateSystem getCoordinateSystem() {
     return geometryFactory.getCoordinateSystem();
   }
 
+  @Override
   public String getFormattedMapTileName(final String name) {
     return name;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
-  public double getGridValue(
-    final double origin,
-    final double gridSize,
+  public double getGridValue(final double origin, final double gridSize,
     final double value) {
     final int xIndex = (int)Math.floor((value - origin) / gridSize);
     final double minX = origin + xIndex * gridSize;
@@ -65,6 +66,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return getMapTileName(x, y);
   }
 
+  @Override
   public String getMapTileName(final double x, final double y) {
     final double tileX = getGridValue(originX, tileWidth, x);
     final double tileY = getGridValue(originY, tileHeight, y);
@@ -80,6 +82,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return originY;
   }
 
+  @Override
   public RectangularMapTile getTileByLocation(final double x, final double y) {
     final String name = getMapTileName(x, y);
     if (name == null) {
@@ -89,6 +92,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     }
   }
 
+  @Override
   public RectangularMapTile getTileByName(final String name) {
     final BoundingBox boundingBox = getBoundingBox(name);
     if (boundingBox == null) {
@@ -98,10 +102,12 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     }
   }
 
+  @Override
   public double getTileHeight() {
     return tileHeight;
   }
 
+  @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
     final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
 
@@ -127,6 +133,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return tiles;
   }
 
+  @Override
   public double getTileWidth() {
     return tileWidth;
   }

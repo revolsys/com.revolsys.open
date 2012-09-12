@@ -27,6 +27,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POINT_SHAPE;
   }
@@ -37,6 +38,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
    * com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryConverter#read
    * (int, com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile)
    */
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     final double x = in.readLEDouble();
@@ -56,6 +58,7 @@ public class Point2DConverter implements ShapefileGeometryConverter {
    * (com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile,
    * com.vividsolutions.jts.geom.Geometry)
    */
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {

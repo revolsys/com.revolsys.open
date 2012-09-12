@@ -12,6 +12,7 @@ public class Constant<T> implements Converter<T, Object> {
     this.value = value;
   }
 
+  @Override
   public Object convert(final T source) {
     return value;
   }

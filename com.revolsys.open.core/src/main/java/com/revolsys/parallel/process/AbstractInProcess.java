@@ -30,6 +30,7 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   /**
    * @return the in
    */
+  @Override
   public Channel<T> getIn() {
     if (in == null) {
       final String channelName = getBeanName() + ".in";
@@ -52,6 +53,7 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   protected void init() {
   }
 
+  @Override
   public final void run() {
     final Logger log = Logger.getLogger(getClass());
     try {
@@ -78,6 +80,7 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements
   /**
    * @param in the in to set
    */
+  @Override
   public void setIn(final Channel<T> in) {
     this.in = in;
     in.readConnect();

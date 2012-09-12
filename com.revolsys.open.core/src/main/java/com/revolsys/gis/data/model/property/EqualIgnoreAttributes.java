@@ -54,6 +54,7 @@ public class EqualIgnoreAttributes extends AbstractDataObjectMetaDataProperty {
     return attributeNames;
   }
 
+  @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
   }

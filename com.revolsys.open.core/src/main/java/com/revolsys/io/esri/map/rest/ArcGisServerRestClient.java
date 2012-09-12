@@ -13,16 +13,16 @@ public class ArcGisServerRestClient {
   private static final Map<String, ? extends Object> FORMAT_PARAMETER = Collections.singletonMap(
     "f", "json");
 
-  private String baseUrl;
+  private final String baseUrl;
 
-  public ArcGisServerRestClient(String baseUrl) {
+  public ArcGisServerRestClient(final String baseUrl) {
     super();
     this.baseUrl = baseUrl;
   }
 
-  public Map<String, Object> getMapServer(String serviceName) {
-    Resource resource = SpringUtil.getResource(UrlUtil.getUrl(baseUrl + "/"
-      + serviceName + "/MapServer", FORMAT_PARAMETER));
+  public Map<String, Object> getMapServer(final String serviceName) {
+    final Resource resource = SpringUtil.getResource(UrlUtil.getUrl(baseUrl
+      + "/" + serviceName + "/MapServer", FORMAT_PARAMETER));
     return JsonMapIoFactory.toMap(resource);
   }
 }

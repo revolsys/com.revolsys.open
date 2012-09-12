@@ -34,10 +34,8 @@ public class PseudoNodeAttribute {
     init(node, edgesByLine);
   }
 
-  private EdgePair<DataObject> createEdgePair(
-    final Node<DataObject> node,
-    final Edge<DataObject> edge1,
-    final Edge<DataObject> edge2) {
+  private EdgePair<DataObject> createEdgePair(final Node<DataObject> node,
+    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
     final DataObject object1 = edge1.getObject();
     final DataObject object2 = edge2.getObject();
     if (DirectionalAttributes.canMergeObjects(node, object1, object2,
@@ -60,16 +58,14 @@ public class PseudoNodeAttribute {
     return typePath;
   }
 
-  private void init(
-    final Node<DataObject> node,
+  private void init(final Node<DataObject> node,
     final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
     if (isPseudoNode(node, edgesByLine)) {
 
     }
   }
 
-  private boolean isPseudoNode(
-    final Node<DataObject> node,
+  private boolean isPseudoNode(final Node<DataObject> node,
     final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
     final Set<LineString> lines = edgesByLine.keySet();
     if (!LineStringUtil.hasLoop(lines)) {
@@ -118,12 +114,9 @@ public class PseudoNodeAttribute {
     return false;
   }
 
-  private void matchEdges(
-    final Node<DataObject> node,
-    final List<Edge<DataObject>> edges1,
-    final List<Edge<DataObject>> edges2,
-    final List<EdgePair<DataObject>> pairedEdges,
-    final boolean reversed) {
+  private void matchEdges(final Node<DataObject> node,
+    final List<Edge<DataObject>> edges1, final List<Edge<DataObject>> edges2,
+    final List<EdgePair<DataObject>> pairedEdges, final boolean reversed) {
     final Iterator<Edge<DataObject>> edgeIter1 = edges1.iterator();
     while (edgeIter1.hasNext()) {
       final Edge<DataObject> edge1 = edgeIter1.next();

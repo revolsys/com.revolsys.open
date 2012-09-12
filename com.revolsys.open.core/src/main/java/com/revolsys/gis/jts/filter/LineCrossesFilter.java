@@ -38,6 +38,7 @@ public class LineCrossesFilter implements Filter<LineString> {
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final LineString geometry) {
     return geometry.crosses(this.geometry);
   }

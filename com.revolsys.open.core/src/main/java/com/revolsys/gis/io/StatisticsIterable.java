@@ -41,6 +41,7 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     }
   }
 
+  @Override
   public Iterator<DataObject> iterator() {
     if (this.statistics == null) {
       setStatistics(new Statistics("Read " + beanName + " "
@@ -49,6 +50,7 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     return new StatisticsIterator(iterable.iterator(), statistics);
   }
 
+  @Override
   public void setBeanName(final String beanName) {
     this.beanName = beanName.replaceAll("Stats", "");
   }

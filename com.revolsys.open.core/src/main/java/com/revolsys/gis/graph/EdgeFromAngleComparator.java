@@ -40,6 +40,7 @@ public class EdgeFromAngleComparator<T> implements Comparator<Edge<T>> {
    * @param edge2 The second edge.
    * @see Angle#getTurn(double, double)
    */
+  @Override
   public int compare(final Edge<T> edge1, final Edge<T> edge2) {
     final double angle1 = edge1.getFromAngle();
     final double angle2 = edge2.getFromAngle();

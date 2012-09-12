@@ -9,6 +9,7 @@ public class FloatFieldType extends NumberFieldType {
     super(DataTypes.FLOAT);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Float.parseFloat(text);

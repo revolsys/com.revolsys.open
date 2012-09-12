@@ -89,23 +89,28 @@ public class SimpleNamingContext implements Context {
       this.iterator = contents.values().iterator();
     }
 
+    @Override
     public void close() {
     }
 
     protected abstract T createObject(String strippedName, Object obj);
 
+    @Override
     public boolean hasMore() {
       return this.iterator.hasNext();
     }
 
+    @Override
     public boolean hasMoreElements() {
       return this.iterator.hasNext();
     }
 
+    @Override
     public T next() {
       return this.iterator.next();
     }
 
+    @Override
     public T nextElement() {
       return this.iterator.next();
     }
@@ -134,8 +139,7 @@ public class SimpleNamingContext implements Context {
     }
 
     @Override
-    protected NameClassPair createObject(
-      final String strippedName,
+    protected NameClassPair createObject(final String strippedName,
       final Object obj) {
       return new NameClassPair(strippedName, obj.getClass().getName());
     }
@@ -180,10 +184,12 @@ public class SimpleNamingContext implements Context {
     }
   }
 
+  @Override
   public Object addToEnvironment(final String propName, final Object propVal) {
     return this.environment.put(propName, propVal);
   }
 
+  @Override
   public void bind(final Name name, final Object obj) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
@@ -196,6 +202,7 @@ public class SimpleNamingContext implements Context {
    * 
    * @see org.springframework.mock.jndi.SimpleNamingContextBuilder#bind
    */
+  @Override
   public void bind(final String name, final Object obj) {
     if (logger.isInfoEnabled()) {
       logger.info("Static JNDI binding: [" + this.root + name + "] = [" + obj
@@ -204,24 +211,29 @@ public class SimpleNamingContext implements Context {
     this.boundObjects.put(this.root + name, obj);
   }
 
+  @Override
   public void close() {
   }
 
+  @Override
   public Name composeName(final Name name, final Name prefix)
     throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public String composeName(final String name, final String prefix) {
     return prefix + name;
   }
 
+  @Override
   public Context createSubcontext(final Name name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public Context createSubcontext(final String name) {
     String subcontextName = this.root + name;
     if (!subcontextName.endsWith("/")) {
@@ -233,19 +245,23 @@ public class SimpleNamingContext implements Context {
     return subcontext;
   }
 
+  @Override
   public void destroySubcontext(final Name name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public void destroySubcontext(final String name) {
     unbind(name);
   }
 
+  @Override
   public Hashtable<String, Object> getEnvironment() {
     return this.environment;
   }
 
+  @Override
   public String getNameInNamespace() throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
@@ -253,22 +269,26 @@ public class SimpleNamingContext implements Context {
 
   // Unsupported methods follow: no support for javax.naming.Name
 
+  @Override
   public NameParser getNameParser(final Name name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public NameParser getNameParser(final String name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public NamingEnumeration<NameClassPair> list(final Name name)
     throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public NamingEnumeration<NameClassPair> list(final String root)
     throws NamingException {
     if (logger.isDebugEnabled()) {
@@ -277,12 +297,14 @@ public class SimpleNamingContext implements Context {
     return new NameClassPairEnumeration(this, root);
   }
 
+  @Override
   public NamingEnumeration<Binding> listBindings(final Name name)
     throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public NamingEnumeration<Binding> listBindings(final String root)
     throws NamingException {
     if (logger.isDebugEnabled()) {
@@ -291,6 +313,7 @@ public class SimpleNamingContext implements Context {
     return new BindingEnumeration(this, root);
   }
 
+  @Override
   public Object lookup(final Name name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
@@ -304,6 +327,7 @@ public class SimpleNamingContext implements Context {
    * 
    * @throws javax.naming.NameNotFoundException if the object could not be found
    */
+  @Override
   public Object lookup(final String lookupName) throws NameNotFoundException {
     String name = this.root + lookupName;
     if (logger.isDebugEnabled()) {
@@ -336,34 +360,41 @@ public class SimpleNamingContext implements Context {
     return found;
   }
 
+  @Override
   public Object lookupLink(final Name name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public Object lookupLink(final String name) throws NameNotFoundException {
     return lookup(name);
   }
 
+  @Override
   public void rebind(final Name name, final Object obj) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public void rebind(final String name, final Object obj) {
     bind(name, obj);
   }
 
+  @Override
   public Object removeFromEnvironment(final String propName) {
     return this.environment.remove(propName);
   }
 
+  @Override
   public void rename(final Name oldName, final Name newName)
     throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public void rename(final String oldName, final String newName)
     throws NameNotFoundException {
     final Object obj = lookup(oldName);
@@ -371,11 +402,13 @@ public class SimpleNamingContext implements Context {
     bind(newName, obj);
   }
 
+  @Override
   public void unbind(final Name name) throws NamingException {
     throw new OperationNotSupportedException(
       "SimpleNamingContext does not support [javax.naming.Name]");
   }
 
+  @Override
   public void unbind(final String name) {
     if (logger.isInfoEnabled()) {
       logger.info("Static JNDI remove: [" + this.root + name + "]");

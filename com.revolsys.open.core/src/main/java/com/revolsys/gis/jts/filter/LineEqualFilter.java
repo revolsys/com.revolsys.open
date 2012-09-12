@@ -30,6 +30,7 @@ public class LineEqualFilter implements Filter<LineString> {
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final LineString geometry) {
     if (this.geometry.equals(geometry)) {
       return true;

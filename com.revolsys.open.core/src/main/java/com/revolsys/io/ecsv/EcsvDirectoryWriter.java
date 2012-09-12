@@ -141,6 +141,7 @@ public class EcsvDirectoryWriter extends AbstractWriter<DataObject> {
     return directory.getAbsolutePath();
   }
 
+  @Override
   public void write(final DataObject object) {
     final Writer<DataObject> writer = getWriter(object);
     writer.write(object);

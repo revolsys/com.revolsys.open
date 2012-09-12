@@ -10,6 +10,7 @@ public class FilterAndValue<F, V> implements Filter<F> {
     this.value = value;
   }
 
+  @Override
   public boolean accept(final F object) {
     return filter.accept(object);
   }

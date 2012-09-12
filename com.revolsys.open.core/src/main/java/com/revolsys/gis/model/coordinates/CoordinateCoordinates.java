@@ -28,6 +28,7 @@ public class CoordinateCoordinates extends AbstractCoordinates {
     }
   }
 
+  @Override
   public double getValue(final int index) {
     switch (index) {
       case 0:
@@ -45,6 +46,7 @@ public class CoordinateCoordinates extends AbstractCoordinates {
     this.coordinate = coordinate;
   }
 
+  @Override
   public void setValue(final int index, final double value) {
     switch (index) {
       case 0:

@@ -43,8 +43,7 @@ public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void postRun(
-    final Channel<DataObject> in,
+  protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (out != null) {
       processGraph();
@@ -56,14 +55,12 @@ public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
-      graph.add(object, line);
+      graph.addEdge(object, line);
     } else {
       if (out != null) {
         out.write(object);

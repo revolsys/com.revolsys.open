@@ -19,11 +19,8 @@ public class JLabelListCellRenderer extends BasicComboBoxRenderer {
   private final Map<Object, Icon> icons = new HashMap<Object, Icon>();
 
   @Override
-  public Component getListCellRendererComponent(
-    final JList list,
-    final Object value,
-    final int index,
-    final boolean isSelected,
+  public Component getListCellRendererComponent(final JList list,
+    final Object value, final int index, final boolean isSelected,
     final boolean cellHasFocus) {
     super.getListCellRendererComponent(list, value, index, isSelected,
       cellHasFocus);

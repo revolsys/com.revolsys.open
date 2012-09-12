@@ -50,8 +50,7 @@ public class AddDefaultValuesProcess extends
 
   private final Map<DataObjectMetaData, Map<String, Object>> typeDefaultValues = new HashMap<DataObjectMetaData, Map<String, Object>>();
 
-  private void addDefaultValues(
-    final Map<String, Object> defaultValues,
+  private void addDefaultValues(final Map<String, Object> defaultValues,
     final DataObjectMetaData type) {
     if (PathUtil.getPath(type.getPath()).equals(schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
@@ -116,8 +115,7 @@ public class AddDefaultValuesProcess extends
     }
   }
 
-  private void processDefaultValues(
-    final DataObject dataObject,
+  private void processDefaultValues(final DataObject dataObject,
     final Map<String, Object> defaultValues) {
     for (final Iterator<Entry<String, Object>> defaults = defaultValues.entrySet()
       .iterator(); defaults.hasNext();) {
@@ -136,9 +134,7 @@ public class AddDefaultValuesProcess extends
     }
   }
 
-  private void setDefaultValue(
-    final DataObject dataObject,
-    final String key,
+  private void setDefaultValue(final DataObject dataObject, final String key,
     final Object value) {
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {

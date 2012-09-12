@@ -9,4 +9,4 @@ public interface Process extends Runnable, BeanNameAware {
 
   void setProcessNetwork(final ProcessNetwork processNetwork);
 
- }
+}

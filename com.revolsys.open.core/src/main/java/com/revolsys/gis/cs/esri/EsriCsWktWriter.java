@@ -32,8 +32,7 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final CoordinateSystem coordinateSystem) {
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
@@ -55,8 +54,7 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final GeographicCoordinateSystem coordinateSystem) {
     out.print("GEOGCS[");
     write(out, coordinateSystem.getName());
@@ -90,8 +88,7 @@ public class EsriCsWktWriter {
 
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final PrimeMeridian primeMeridian) {
     out.print("PRIMEM[");
     write(out, primeMeridian.getName());
@@ -101,8 +98,7 @@ public class EsriCsWktWriter {
     out.write(']');
   }
 
-  public static void write(
-    final PrintWriter out,
+  public static void write(final PrintWriter out,
     final ProjectedCoordinateSystem coordinateSystem) {
     out.print("PROJCS[");
     write(out, coordinateSystem.getName());
@@ -155,9 +151,7 @@ public class EsriCsWktWriter {
     out.write('"');
   }
 
-  public static void write(
-    final PrintWriter out,
-    final String name,
+  public static void write(final PrintWriter out, final String name,
     final Object value) {
     out.print(",PARAMETER[");
     write(out, name);

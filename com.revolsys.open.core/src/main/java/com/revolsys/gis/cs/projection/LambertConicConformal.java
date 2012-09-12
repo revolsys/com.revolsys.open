@@ -61,6 +61,7 @@ public class LambertConicConformal implements CoordinatesProjection {
     this.rho0 = a * f * Math.pow(t0, n);
   }
 
+  @Override
   public void inverse(final Coordinates from, final Coordinates to) {
     double x = from.getX() - x0;
     double y = from.getY() - y0;
@@ -103,6 +104,7 @@ public class LambertConicConformal implements CoordinatesProjection {
     return Math.cos(phi) / Math.sqrt(1 - ee * sinPhi * sinPhi);
   }
 
+  @Override
   public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getX();
     final double phi = from.getY();

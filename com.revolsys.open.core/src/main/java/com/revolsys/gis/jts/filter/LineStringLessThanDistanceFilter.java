@@ -29,8 +29,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
-  public static Filter<DataObject> getFilter(
-    final DataObject object,
+  public static Filter<DataObject> getFilter(final DataObject object,
     final double maxDistance) {
     final LineString line = object.getGeometryValue();
     final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(
@@ -61,6 +60,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
     setGeometry(geometry);
   }
 
+  @Override
   public boolean accept(final LineString line) {
     if (line.getEnvelopeInternal().intersects(envelope)) {
       final double distance = LineStringUtil.distance(line, this.geometry,

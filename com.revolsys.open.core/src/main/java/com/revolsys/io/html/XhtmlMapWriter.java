@@ -70,6 +70,7 @@ public class XhtmlMapWriter extends AbstractMapWriter {
     super.setProperty(name, value);
   }
 
+  @Override
   public void write(final Map<String, ? extends Object> values) {
     if (!opened) {
       if (title == null) {

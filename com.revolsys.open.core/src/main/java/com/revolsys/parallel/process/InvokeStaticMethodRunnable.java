@@ -51,6 +51,7 @@ public class InvokeStaticMethodRunnable implements Runnable {
   /**
    * Execute the method.
    */
+  @Override
   public void run() {
     try {
       MethodUtils.invokeStaticMethod(clazz, methodName, parameters);

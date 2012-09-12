@@ -304,7 +304,7 @@ public class XmlWriter extends Writer {
    */
   public void attribute(final QName attribute, final Object value) {
     if (value != null) {
-      String string = StringConverterRegistry.toString(value);
+      final String string = StringConverterRegistry.toString(value);
       attribute(attribute, string);
     }
   }
@@ -339,6 +339,14 @@ public class XmlWriter extends Writer {
       writeAttributeValue(value);
       out.write('"');
     }
+  }
+
+  public void attribute(final String name, final Object value) {
+    if (value != null) {
+      final String string = StringConverterRegistry.toString(value);
+      attribute(name, string);
+    }
+
   }
 
   public void attribute(final String name, final String value) {
@@ -1106,17 +1114,17 @@ public class XmlWriter extends Writer {
   }
 
 /**
-       * Write content for an attribute value to the output, escaping the characters
-       * that are used within markup. This method will escape characters ' <', '>',
-       * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
-       * unless it is part of "]]>" for simplicity it is allways escaped in this
-       * implementation.
-       * 
-       * @param buffer The character buffer to write
-       * @param offset The offset in the character data to write
-       * @param length The number of characters to write.
-       * @throws IOException If an I/O exception occurs.
-       */
+         * Write content for an attribute value to the output, escaping the characters
+         * that are used within markup. This method will escape characters ' <', '>',
+         * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
+         * unless it is part of "]]>" for simplicity it is allways escaped in this
+         * implementation.
+         * 
+         * @param buffer The character buffer to write
+         * @param offset The offset in the character data to write
+         * @param length The number of characters to write.
+         * @throws IOException If an I/O exception occurs.
+         */
   protected void writeAttributeContent(final char[] buffer, final int offset,
     final int length) {
     final int lastIndex = offset + length;
@@ -1179,16 +1187,16 @@ public class XmlWriter extends Writer {
   }
 
 /**
-       * Write content for an element to the output, escaping the characters that
-       * are used within markup. This method will escape characters ' <', '>' and
-       * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
-       * of "]]>" for simplicity it is allways escaped in this implementation.
-       * 
-       * @param buffer The character buffer to write
-       * @param offest The offset in the character data to write
-       * @param length The number of characters to write.
-       * @throws IOException If an I/O exception occurs.
-       */
+         * Write content for an element to the output, escaping the characters that
+         * are used within markup. This method will escape characters ' <', '>' and
+         * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
+         * of "]]>" for simplicity it is allways escaped in this implementation.
+         * 
+         * @param buffer The character buffer to write
+         * @param offest The offset in the character data to write
+         * @param length The number of characters to write.
+         * @throws IOException If an I/O exception occurs.
+         */
   protected void writeElementContent(final char[] buffer, final int offest,
     final int length) {
     int index = offest;
@@ -1349,13 +1357,5 @@ public class XmlWriter extends Writer {
     } else {
       attribute(XsiConstants.TYPE, xsiName);
     }
-  }
-
-  public void attribute(String name, Object value) {
-    if (value != null) {
-      String string = StringConverterRegistry.toString(value);
-      attribute(name, string);
-    }
-
   }
 }

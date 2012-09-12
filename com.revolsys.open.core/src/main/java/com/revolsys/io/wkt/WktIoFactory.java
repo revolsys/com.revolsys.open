@@ -22,8 +22,8 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory factory) {
     try {
       final WktDataObjectIterator iterator = new WktDataObjectIterator(factory,
@@ -35,10 +35,9 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
     }
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return new WktDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));

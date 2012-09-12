@@ -1,10 +1,14 @@
 package com.revolsys.gis.model.coordinates;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.revolsys.util.MathUtil;
 
-public class DoubleCoordinates extends AbstractCoordinates {
+public class DoubleCoordinates extends AbstractCoordinates implements
+  Serializable {
+  private static final long serialVersionUID = 1L;
+
   private final double[] coordinates;
 
   public DoubleCoordinates(final Coordinates coordinates) {
@@ -56,6 +60,7 @@ public class DoubleCoordinates extends AbstractCoordinates {
     return (byte)coordinates.length;
   }
 
+  @Override
   public double getValue(final int index) {
     if (index >= 0 && index < getNumAxis()) {
       return coordinates[index];
@@ -64,6 +69,7 @@ public class DoubleCoordinates extends AbstractCoordinates {
     }
   }
 
+  @Override
   public void setValue(final int index, final double value) {
     if (index >= 0 && index < getNumAxis()) {
       coordinates[index] = value;

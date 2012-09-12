@@ -14,15 +14,13 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class EdgeLessThanDistanceToNodeVisitor<T> extends
   NestedVisitor<Edge<T>> {
-  public static <T> List<Edge<T>> edgesWithinDistance(
-    final Graph<T> graph,
-    final Node<T> node,
-    final double maxDistance) {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
+    final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final Coordinates point = node;
     final Envelope env = new BoundingBox(point);
     env.expandBy(maxDistance);
-    graph.getEdgeIndex().query(env,
+    graph.getEdgeIndex().visit(env,
       new EdgeLessThanDistanceToNodeVisitor<T>(node, maxDistance, results));
     return results.getList();
 

@@ -69,6 +69,7 @@ public class CsvIterator implements Iterator<List<String>> {
    * 
    * @return <tt>true</tt> if the iterator has more elements.
    */
+  @Override
   public boolean hasNext() {
     return hasNext;
   }
@@ -78,6 +79,7 @@ public class CsvIterator implements Iterator<List<String>> {
    * 
    * @return The record
    */
+  @Override
   public List<String> next() {
     if (!hasNext) {
       throw new NoSuchElementException("No more elements");
@@ -167,6 +169,7 @@ public class CsvIterator implements Iterator<List<String>> {
   /**
    * Removing items from the iterator is not supported.
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

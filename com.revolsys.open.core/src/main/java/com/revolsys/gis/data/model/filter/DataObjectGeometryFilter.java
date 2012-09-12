@@ -35,6 +35,7 @@ public class DataObjectGeometryFilter<G extends Geometry> implements
     this.filter = filter;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public boolean accept(final DataObject object) {
     final G geometry = (G)object.getGeometryValue();

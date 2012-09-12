@@ -10,37 +10,35 @@ public class Catalog extends ArcGisResponse {
 
   private String name;
 
+  private List<Catalog> folders;
+
+  private List<Service> services;
+
+  private Catalog(final Catalog catalog, final String name) {
+    super(catalog, name);
+    this.name = name;
+  }
+
   public Catalog(String serviceUrl) {
     serviceUrl = serviceUrl.replaceAll("/+$", "");
     if (serviceUrl.endsWith("services")) {
       setServiceUrl(serviceUrl);
       name = "";
     } else {
-      String parentUrl = UrlUtil.getParent(serviceUrl);
-      Catalog parent = new Catalog(parentUrl);
-      String name = UrlUtil.getFileName(serviceUrl);
+      final String parentUrl = UrlUtil.getParent(serviceUrl);
+      final Catalog parent = new Catalog(parentUrl);
+      final String name = UrlUtil.getFileName(serviceUrl);
       init(parent, name);
     }
   }
 
-  private Catalog(Catalog catalog, String name) {
-    super(catalog, name);
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  private List<Catalog> folders;
-
   public synchronized List<Catalog> getFolders() {
     if (folders == null) {
       folders = new ArrayList<Catalog>();
-      List<String> folderNames = getValue("folders");
+      final List<String> folderNames = getValue("folders");
       if (folderNames != null) {
-        for (String name : folderNames) {
-          Catalog folder = new Catalog(this, name);
+        for (final String name : folderNames) {
+          final Catalog folder = new Catalog(this, name);
           folders.add(folder);
         }
       }
@@ -48,24 +46,27 @@ public class Catalog extends ArcGisResponse {
     return folders;
   }
 
-  private List<Service> services;
+  public String getName() {
+    return name;
+  }
 
   public synchronized List<Service> getServices() {
     if (services == null) {
       services = new ArrayList<Service>();
-      List<Map<String, Object>> serviceDescriptions = getValue("services");
+      final List<Map<String, Object>> serviceDescriptions = getValue("services");
       if (serviceDescriptions != null) {
-        for (Map<String, Object> serviceDescription : serviceDescriptions) {
-          String name = (String)serviceDescription.get("name");
-          String type = (String)serviceDescription.get("type");
+        for (final Map<String, Object> serviceDescription : serviceDescriptions) {
+          final String name = (String)serviceDescription.get("name");
+          final String type = (String)serviceDescription.get("type");
           Service service;
           try {
-            Class<Service> serviceClass = (Class<Service>)getClass().forName(
-              "com.revolsys.io.esri.map.rest." + type);
+            getClass();
+            final Class<Service> serviceClass = (Class<Service>)Class.forName("com.revolsys.io.esri.map.rest."
+              + type);
             service = serviceClass.newInstance();
             service.setCatalog(this);
             service.setServiceName(name);
-          } catch (Throwable t) {
+          } catch (final Throwable t) {
             service = new Service(this, name, type);
           }
           services.add(service);

@@ -58,6 +58,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
     }
   }
 
+  @Override
   public void run() {
     preRun();
     try {

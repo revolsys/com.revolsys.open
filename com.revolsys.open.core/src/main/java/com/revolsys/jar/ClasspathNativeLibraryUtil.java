@@ -106,7 +106,8 @@ public class ClasspathNativeLibraryUtil {
         try {
           System.loadLibrary(name);
         } catch (final Throwable e) {
-          LOG.error("Unable to load shared library " + libraryName +" " + fileName, e);
+          LOG.error("Unable to load shared library " + libraryName + " "
+            + fileName, e);
           LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
           throw new RuntimeException("Unable to load shared library "
             + fileName, e);
@@ -121,8 +122,8 @@ public class ClasspathNativeLibraryUtil {
         System.load(file.getCanonicalPath());
         LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
       } catch (final Throwable e) {
-        LOG.error(
-          "Unable to load shared library from classpath " + libraryName +" " + fileName, e);
+        LOG.error("Unable to load shared library from classpath " + libraryName
+          + " " + fileName, e);
         LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
         throw new RuntimeException("Unable to load shared library " + fileName,
           e);

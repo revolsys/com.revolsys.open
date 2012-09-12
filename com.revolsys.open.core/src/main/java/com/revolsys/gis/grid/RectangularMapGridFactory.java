@@ -33,8 +33,7 @@ public class RectangularMapGridFactory {
     return GRIDS_BY_NAME.get(name);
   }
 
-  public static RectangularMapGrid getGrid(
-    final String name,
+  public static RectangularMapGrid getGrid(final String name,
     final int inverseScale) {
     if (name.equals("NTS")) {
       switch (inverseScale) {

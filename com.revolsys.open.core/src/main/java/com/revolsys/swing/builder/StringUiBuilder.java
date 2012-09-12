@@ -1,6 +1,5 @@
 package com.revolsys.swing.builder;
 
-
 public class StringUiBuilder extends AbstractUiBuilder {
 
   @Override

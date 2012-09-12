@@ -31,6 +31,7 @@ public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
     return logFile;
   }
 
+  @Override
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();

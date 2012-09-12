@@ -24,11 +24,8 @@ public abstract class AbstractMergeProcess extends
     return true;
   }
 
-  private void addObjectFromOtherChannel(
-    final Channel<DataObject>[] channels,
-    final boolean[] guard,
-    final DataObject[] objects,
-    final int channelIndex) {
+  private void addObjectFromOtherChannel(final Channel<DataObject>[] channels,
+    final boolean[] guard, final DataObject[] objects, final int channelIndex) {
     int otherIndex;
     if (channelIndex == SOURCE_INDEX) {
       otherIndex = OTHER_INDEX;
@@ -64,10 +61,8 @@ public abstract class AbstractMergeProcess extends
   protected abstract void addOtherObject(DataObject object);
 
   private DataObjectMetaData addSavedObjects(
-    final DataObjectMetaData currentType,
-    final String currentTypeName,
-    final Channel<DataObject> out,
-    final boolean[] guard,
+    final DataObjectMetaData currentType, final String currentTypeName,
+    final Channel<DataObject> out, final boolean[] guard,
     final DataObject[] objects) {
     final DataObject sourceObject = objects[SOURCE_INDEX];
     final DataObject otherObject = objects[OTHER_INDEX];
@@ -176,8 +171,7 @@ public abstract class AbstractMergeProcess extends
     return otherInBufferSize;
   }
 
-  protected abstract void processObjects(
-    DataObjectMetaData currentType,
+  protected abstract void processObjects(DataObjectMetaData currentType,
     Channel<DataObject> out);
 
   @Override

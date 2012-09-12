@@ -42,7 +42,7 @@ public final class PathUtil {
     if (parts.length == 0) {
       return "/";
     } else {
-      StringBuffer path = new StringBuffer();
+      final StringBuffer path = new StringBuffer();
       for (String part : parts) {
         if (part != null) {
           part = part.replaceAll("^/*", "");

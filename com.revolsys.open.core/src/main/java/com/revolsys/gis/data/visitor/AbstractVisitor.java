@@ -14,10 +14,12 @@ public abstract class AbstractVisitor<T> implements Visitor<T>, FilterProxy<T>,
 
   private Comparator<T> comparator;
 
+  @Override
   public Comparator<T> getComparator() {
     return comparator;
   }
 
+  @Override
   public Filter<T> getFilter() {
     return filter;
   }

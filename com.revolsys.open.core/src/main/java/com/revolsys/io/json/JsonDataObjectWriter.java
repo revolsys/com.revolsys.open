@@ -211,6 +211,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @Override
   public void write(final DataObject object) {
     if (written) {
       out.print(",\n");

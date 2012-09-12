@@ -42,6 +42,7 @@ public class EdgeTypeNameFilter<T> implements Filter<Edge<T>> {
    * @param edge The edge to filter.
    * @return True if the edge has one of the type names, false otherwise.
    */
+  @Override
   public boolean accept(final Edge<T> edge) {
     final String typePath = edge.getTypeName();
     return typePaths.contains(typePath);

@@ -30,6 +30,7 @@ public class EqualFilter<T extends Geometry> implements Filter<T> {
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final T geometry) {
     if (this.geometry.equals(geometry)) {
       return true;

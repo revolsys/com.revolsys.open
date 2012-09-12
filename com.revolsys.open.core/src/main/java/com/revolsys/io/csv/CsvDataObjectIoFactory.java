@@ -29,14 +29,15 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
       CsvConstants.FILE_EXTENSION);
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     final CsvDataObjectIterator iterator = new CsvDataObjectIterator(resource,
       dataObjectFactory);
     return new DataObjectIteratorReader(iterator);
   }
 
+  @Override
   public DataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
@@ -45,20 +46,21 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
     return new DirectoryDataObjectStore(directory, "csv");
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return new CsvDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));
   }
 
+  @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
   }
 
+  @Override
   public List<String> getUrlPatterns() {
     // TODO Auto-generated method stub
     return null;

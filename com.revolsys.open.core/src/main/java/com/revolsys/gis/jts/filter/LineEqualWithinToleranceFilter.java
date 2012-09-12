@@ -40,6 +40,7 @@ public class LineEqualWithinToleranceFilter implements Filter<LineString> {
     this.tolerance = tolerance;
   }
 
+  @Override
   public boolean accept(final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
 

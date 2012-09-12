@@ -81,9 +81,7 @@ public class PointPairDistance {
    * @param p1
    * @param distance the distance between p0 and p1
    */
-  private void initialize(
-    final Coordinate p0,
-    final Coordinate p1,
+  private void initialize(final Coordinate p0, final Coordinate p1,
     final double distance) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);

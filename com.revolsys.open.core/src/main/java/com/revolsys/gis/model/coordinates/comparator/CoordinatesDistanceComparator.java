@@ -21,6 +21,7 @@ public class CoordinatesDistanceComparator implements Comparator<Coordinates> {
     this.invert = invert;
   }
 
+  @Override
   public int compare(final Coordinates point1, final Coordinates point2) {
     int compare;
     final double distance1 = point1.distance(point);

@@ -28,6 +28,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POLYLINE_SHAPE;
   }
@@ -38,6 +39,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
    * com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryConverter#read
    * (int, com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile)
    */
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     // skip bounding box;
@@ -79,6 +81,7 @@ public class LineString2DMConverter implements ShapefileGeometryConverter {
    * (com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile,
    * com.vividsolutions.jts.geom.Geometry)
    */
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof LineString) {

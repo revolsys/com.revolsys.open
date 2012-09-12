@@ -115,15 +115,12 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     this(new File(fileName));
   }
 
-  public void addCompositeTypeName(
-    final String typePath,
+  public void addCompositeTypeName(final String typePath,
     final String compositeTypeName) {
     compositeTypeNames.put(String.valueOf(typePath), compositeTypeName);
   }
 
-  protected void addExport(
-    final String typePath,
-    final String compositeType,
+  protected void addExport(final String typePath, final String compositeType,
     final String objectSubset) {
     if (!exports.containsKey(typePath)) {
       final Map<String, Object> export = new HashMap<String, Object>();
@@ -187,8 +184,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
 
   private void createExports() throws IOException {
     final File exportsFile = new File(tempDirectory, "exports.dir");
-    final OsnSerializer exportsSerializer = createSerializer(
-      "/ExportedObject", exportsFile, Long.MAX_VALUE);
+    final OsnSerializer exportsSerializer = createSerializer("/ExportedObject",
+      exportsFile, Long.MAX_VALUE);
     exportsSerializer.startObject("/ExportedObjects");
     exportsSerializer.attributeName("handles");
     exportsSerializer.startCollection("/Set");
@@ -209,8 +206,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     exportsSerializer.close();
   }
 
-  private void createMissingDirObject(
-    final String typePath,
+  private void createMissingDirObject(final String typePath,
     final String fileName) throws IOException {
     if (!serializers.containsKey(typePath)) {
       final File file = new File(tempDirectory, fileName);
@@ -284,10 +280,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected OsnSerializer createSerializer(
-    final String typePath,
-    final File file,
-    final long maxSize) throws IOException {
+  protected OsnSerializer createSerializer(final String typePath,
+    final File file, final long maxSize) throws IOException {
     final OsnSerializer serializer = new OsnSerializer(typePath, file, maxSize,
       converters);
     serializer.setIndentEnabled(indentEnabled);
@@ -408,9 +402,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
           serializers.put(typePath, serializer);
         } else if (PathUtil.getName(typePath).endsWith(
           "InternallyReferencedObjects")) {
-          serializer = createSerializer(
-            "/InternallyReferencedObject", new File(tempDirectory,
-              "internal.dir"), Long.MAX_VALUE);
+          serializer = createSerializer("/InternallyReferencedObject",
+            new File(tempDirectory, "internal.dir"), Long.MAX_VALUE);
           serializers.put(typePath, serializer);
         } else if (PathUtil.getName(typePath).endsWith("GlobalMetadata")) {
           serializer = createSerializer(GLOBAL_METADATA, new File(
@@ -480,8 +473,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     this.dataObjectMetaDataFactory = schema;
     if (schema != null) {
       spatialDataSetType = schema.getMetaData("/SpatialDataSet");
-      annotatedSpatialDataSetType = schema.getMetaData(
-        "/AnnotatedSpatialDataSet");
+      annotatedSpatialDataSetType = schema.getMetaData("/AnnotatedSpatialDataSet");
     }
   }
 
@@ -583,6 +575,7 @@ public class SaifWriter extends AbstractWriter<DataObject> {
    * com.revolsys.gis.format.saif.io.Writer<DataObject>#write(com.revolsys.gis
    * .model.data.DataObject)
    */
+  @Override
   public void write(final DataObject object) {
     try {
       final DataObjectMetaData type = object.getMetaData();
@@ -600,10 +593,8 @@ public class SaifWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  public void writeExport(
-    final OsnSerializer exportsSerializer,
-    final String referenceId,
-    final String compositeTypeName,
+  public void writeExport(final OsnSerializer exportsSerializer,
+    final String referenceId, final String compositeTypeName,
     final String objectSubset) throws IOException {
     exportsSerializer.startObject("ExportedObjectHandle");
     exportsSerializer.attribute("referenceID", referenceId, true);

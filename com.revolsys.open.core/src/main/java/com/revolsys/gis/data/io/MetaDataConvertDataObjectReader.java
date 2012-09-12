@@ -34,10 +34,12 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
     reader.close();
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
+  @Override
   public boolean hasNext() {
     if (!open) {
       open();
@@ -45,10 +47,12 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
     return iterator.hasNext();
   }
 
+  @Override
   public Iterator<DataObject> iterator() {
     return this;
   }
 
+  @Override
   public DataObject next() {
     if (hasNext()) {
       final DataObject source = iterator.next();
@@ -69,11 +73,13 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
     }
   }
 
+  @Override
   public void open() {
     open = true;
     this.iterator = reader.iterator();
   }
 
+  @Override
   public void remove() {
     iterator.remove();
   }

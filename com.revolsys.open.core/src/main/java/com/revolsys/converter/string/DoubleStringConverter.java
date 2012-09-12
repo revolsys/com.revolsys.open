@@ -8,14 +8,17 @@ public class DoubleStringConverter extends
     super(DECIMAL_FORMAT);
   }
 
+  @Override
   public Class<Double> getConvertedClass() {
     return Double.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public Double toObject(final Object value) {
     if (value instanceof Double) {
       final Double integer = (Double)value;
@@ -30,6 +33,7 @@ public class DoubleStringConverter extends
     }
   }
 
+  @Override
   public Double toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Double.valueOf(string);

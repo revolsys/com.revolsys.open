@@ -86,8 +86,7 @@ public class ValidateGeometryRange extends
 
   }
 
-  private boolean isValid(
-    final String type,
+  private boolean isValid(final String type,
     final CoordinateSequence coordinates) {
     boolean valid = true;
     for (int j = 0; j < coordinates.size(); j++) {
@@ -139,10 +138,8 @@ public class ValidateGeometryRange extends
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     // TODO Auto-generated method stub
     final Geometry geometry = object.getGeometryValue();
     isValid(object.getMetaData().getPath().toString(), geometry);

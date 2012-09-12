@@ -11,9 +11,7 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public final class MatchDistance {
 
-  private static double farLength(
-    final Geometry a,
-    final Geometry b,
+  private static double farLength(final Geometry a, final Geometry b,
     final double tolerance) {
     final Geometry farA = a.difference(b.buffer(tolerance));
     final double farALen = farA.getLength();
@@ -46,9 +44,7 @@ public final class MatchDistance {
    * @param tolerance the distance beyond which to total the length
    * @return the fraction of length beyond the tolerance
    */
-  public static double nearnessFraction(
-    final LineString a,
-    final LineString b,
+  public static double nearnessFraction(final LineString a, final LineString b,
     final double tolerance) {
     final double lenA = a.getLength();
     final double lenB = b.getLength();
@@ -100,11 +96,8 @@ public final class MatchDistance {
    *          trimmed lines into account
    * @return the fraction of matched line length beyond the tolerance
    */
-  public static double nearnessFraction(
-    final LineString a,
-    final LineString b,
-    final double tolerance,
-    final boolean trimLines) {
+  public static double nearnessFraction(final LineString a, final LineString b,
+    final double tolerance, final boolean trimLines) {
     double nearnessFrac = nearnessFraction(a, b, tolerance);
 
     if (trimLines) {
@@ -138,12 +131,8 @@ public final class MatchDistance {
    *          trimmed lines into account
    * @return the fraction of matched line length beyond the tolerance
    */
-  public static double nearnessFraction(
-    final LineString a,
-    final LineString b,
-    final double maxDistance,
-    final double tolerance,
-    final boolean trimLines) {
+  public static double nearnessFraction(final LineString a, final LineString b,
+    final double maxDistance, final double tolerance, final boolean trimLines) {
     // if the orginal lines are closer than the tolerance there is no need for
     // further computation
     if (maxDistance < tolerance) {

@@ -23,6 +23,7 @@ public class IndexItemVisitor implements ItemVisitor {
     this.visitor = visitor;
   }
 
+  @Override
   public void visitItem(final Object item) {
     final DataObject object = (DataObject)item;
     final Envelope envelope = object.getGeometryValue().getEnvelopeInternal();

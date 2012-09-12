@@ -1,18 +1,16 @@
-package com.revolsys.gis.graph;
+package com.revolsys.gis.algorithm.index;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.algorithm.index.IdObjectIndexItemVisitor;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
-  Iterable<T>, IdObjectIndex<T> {
+  IdObjectIndex<T> {
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {
@@ -21,6 +19,7 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
     }
   }
 
+  @Override
   public T add(final T object) {
     final Envelope envelope = getEnvelope(object);
     final int id = getId(object);
@@ -28,6 +27,7 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
     return object;
   }
 
+  @Override
   public Iterator<T> iterator() {
     return queryAll().iterator();
   }
@@ -35,14 +35,8 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
   @Override
   public List<T> query(final Envelope envelope) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    query(envelope, visitor);
+    visit(envelope, visitor);
     return visitor.getList();
-  }
-
-  public void query(final Envelope envelope, final Visitor<T> visitor) {
-    final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
-      this, envelope, visitor);
-    this.query(envelope, itemVisitor);
   }
 
   @Override
@@ -52,16 +46,24 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
     return getObjects(ids);
   }
 
-  public void remove(final T object) {
+  @Override
+  public boolean remove(final T object) {
     final Envelope envelope = getEnvelope(object);
     final int id = getId(object);
-    remove(envelope, id);
+    return remove(envelope, id);
   }
 
   public void removeAll(final Collection<T> objects) {
     for (final T object : objects) {
       remove(object);
     }
+  }
+
+  @Override
+  public void visit(final Envelope envelope, final Visitor<T> visitor) {
+    final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
+      this, envelope, visitor);
+    this.query(envelope, itemVisitor);
   }
 
 }

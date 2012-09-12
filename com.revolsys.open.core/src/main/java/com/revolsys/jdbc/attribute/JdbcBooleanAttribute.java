@@ -41,10 +41,10 @@ public class JdbcBooleanAttribute extends JdbcAttribute {
       if (value instanceof Boolean) {
         booleanValue = (Boolean)value;
       } else if (value instanceof Number) {
-        Number number = (Number)value;
+        final Number number = (Number)value;
         booleanValue = number.intValue() == 1;
       } else {
-        String stringValue = value.toString();
+        final String stringValue = value.toString();
         if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
           booleanValue = true;
         } else {

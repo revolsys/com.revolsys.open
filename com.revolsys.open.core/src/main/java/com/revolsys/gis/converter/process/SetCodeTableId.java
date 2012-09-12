@@ -25,6 +25,7 @@ public class SetCodeTableId extends
     this.targetAttributeName = targetAttributeName;
   }
 
+  @Override
   public void process(final DataObject source, final DataObject target) {
     final Map<String, Object> codeTableValues = new HashMap<String, Object>();
 
@@ -56,8 +57,7 @@ public class SetCodeTableId extends
     target.setValue(targetAttributeName, codeId);
   }
 
-  public void setValueMapping(
-    final String codeTableAttribute,
+  public void setValueMapping(final String codeTableAttribute,
     final Converter<DataObject, Object> valueConverter) {
     codeTableValueConverters.put(codeTableAttribute, valueConverter);
 

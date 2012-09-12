@@ -10,6 +10,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 public class Geometry3DExactEquals implements Equals<Geometry> {
   private EqualsRegistry equalsRegistry;
 
+  @Override
   public boolean equals(final Geometry geometry1, final Geometry geometry2,
     final Collection<String> exclude) {
     if (geometry1.getNumGeometries() != geometry2.getNumGeometries()) {
@@ -32,6 +33,11 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
     }
   }
 
+  @Override
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
+    this.equalsRegistry = equalsRegistry;
+  }
+
   public boolean userDataEquals(final Geometry geometry1,
     final Geometry geometry2, final Collection<String> exclude) {
     final Object userData1 = geometry1.getUserData();
@@ -40,22 +46,18 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
       if (userData2 == null) {
         return true;
       } else if (userData2 instanceof Map) {
-        Map map = (Map)userData2;
+        final Map map = (Map)userData2;
         return map.isEmpty();
       }
     } else if (userData2 == null) {
       if (userData1 instanceof Map) {
-        Map map = (Map)userData1;
+        final Map map = (Map)userData1;
         return map.isEmpty();
       } else {
         return false;
       }
     }
     return equalsRegistry.equals(userData1, userData2, exclude);
-  }
-
-  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
-    this.equalsRegistry = equalsRegistry;
   }
 
 }

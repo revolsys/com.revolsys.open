@@ -132,6 +132,8 @@ public class SaifReader extends AbstractReader<DataObject> implements
   /** The zip file. */
   private ZipFile zipFile;
 
+  private boolean opened = false;
+
   public SaifReader() {
   }
 
@@ -165,6 +167,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
   /**
    * Close the SAIF archive.
    */
+  @Override
   public void close() {
     if (log.isDebugEnabled()) {
       log.debug("Closing SAIF archive '" + file.getAbsolutePath() + "'");
@@ -281,6 +284,13 @@ public class SaifReader extends AbstractReader<DataObject> implements
     return internallyReferencedObjects;
   }
 
+  @Override
+  public DataObjectMetaData getMetaData() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public DataObjectMetaData getMetaData(final String typePath) {
     return metaDataFactory.getMetaData(typePath);
   }
@@ -296,8 +306,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
 
   private <D extends DataObject> OsnReader getOsnReader(
     final DataObjectMetaDataFactory metaDataFactory,
-    final DataObjectFactory factory,
-    final String className) throws IOException {
+    final DataObjectFactory factory, final String className) throws IOException {
     String fileName = typePathFileNameMap.get(className);
     if (fileName == null) {
       fileName = PathUtil.getName(className);
@@ -313,8 +322,11 @@ public class SaifReader extends AbstractReader<DataObject> implements
     return reader;
   }
 
-  public <D extends DataObject> OsnReader getOsnReader(
-    final String className,
+  public OsnReader getOsnReader(final String className) throws IOException {
+    return getOsnReader(className, factory);
+  }
+
+  public <D extends DataObject> OsnReader getOsnReader(final String className,
     final DataObjectFactory factory) throws IOException {
     final DataObjectMetaDataFactory metaDataFactory = this.metaDataFactory;
     return getOsnReader(metaDataFactory, factory, className);
@@ -356,11 +368,18 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return True if the reader has more data objects to be read.
    */
+  @Override
   public boolean hasNext() {
     if (loadNewObject) {
       return loadNextDataObject();
     }
     return hasNext;
+  }
+
+  @Override
+  public Iterator<DataObject> iterator() {
+    open();
+    return this;
   }
 
   /**
@@ -371,9 +390,9 @@ public class SaifReader extends AbstractReader<DataObject> implements
   @SuppressWarnings("unchecked")
   private void loadExportedObjects() throws IOException {
     final boolean setNames = includeTypeNames.isEmpty();
-    ClassPathResource resource = new ClassPathResource(
+    final ClassPathResource resource = new ClassPathResource(
       "com/revolsys/io/saif/saifzip.csn");
-    DataObjectMetaDataFactory schema = new SaifSchemaReader().loadSchema(resource);
+    final DataObjectMetaDataFactory schema = new SaifSchemaReader().loadSchema(resource);
     final OsnReader reader = getOsnReader(schema, factory, "/exports.dir");
     try {
       final Map<String, String> names = new TreeMap<String, String>();
@@ -535,6 +554,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * @return The next DataObject.
    * @exception NoSuchElementException If the reader has no more data objects.
    */
+  @Override
   public DataObject next() {
     if (hasNext()) {
       loadNewObject = true;
@@ -548,6 +568,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * Open a SAIF archive, extracting compressed archives to a temporary
    * directory.
    */
+  @Override
   public void open() {
     if (!opened) {
       opened = true;
@@ -569,8 +590,8 @@ public class SaifReader extends AbstractReader<DataObject> implements
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           srid, 1.0, 1.0);
 
-        for (DataObjectMetaData metaData : ((DataObjectMetaDataFactoryImpl)this.metaDataFactory).getTypes()) {
-          Attribute geometryAttribute = metaData.getGeometryAttribute();
+        for (final DataObjectMetaData metaData : ((DataObjectMetaDataFactoryImpl)this.metaDataFactory).getTypes()) {
+          final Attribute geometryAttribute = metaData.getGeometryAttribute();
           if (geometryAttribute != null) {
             geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
               geometryFactory);
@@ -581,8 +602,6 @@ public class SaifReader extends AbstractReader<DataObject> implements
       }
     }
   }
-
-  private boolean opened = false;
 
   /**
    * Open the iterator for the next object set.
@@ -614,8 +633,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
     return false;
   }
 
-  protected DataObject readObject(
-    final String className,
+  protected DataObject readObject(final String className,
     final DataObjectFactory factory) throws IOException {
     final OsnReader reader = getOsnReader(className, factory);
     try {
@@ -631,6 +649,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @throws UnsupportedOperationException
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException(
       "Removing SAIF objects is not supported");
@@ -713,21 +732,5 @@ public class SaifReader extends AbstractReader<DataObject> implements
   @Override
   public String toString() {
     return file.getAbsolutePath();
-  }
-
-  public OsnReader getOsnReader(String className) throws IOException {
-    return getOsnReader(className, factory);
-  }
-
-  @Override
-  public Iterator<DataObject> iterator() {
-    open();
-    return this;
-  }
-
-  @Override
-  public DataObjectMetaData getMetaData() {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

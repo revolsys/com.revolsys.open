@@ -52,10 +52,8 @@ public class ItersectsNodeEdgeCleanupVisitor extends
     splitStatistics.connect();
   }
 
-  private boolean moveEndUndershoots(
-    final String typePath,
-    final Node<DataObject> node1,
-    final Node<DataObject> node2) {
+  private boolean moveEndUndershoots(final String typePath,
+    final Node<DataObject> node1, final Node<DataObject> node2) {
     boolean matched = false;
     if (!node2.hasEdgeTo(node1)) {
       final Set<Double> angles1 = NodeAttributes.getEdgeAnglesByType(node2,
@@ -70,10 +68,12 @@ public class ItersectsNodeEdgeCleanupVisitor extends
     return matched;
   }
 
+  @Override
   public void process(final DataObjectGraph graph) {
     graph.visitEdges(this);
   }
 
+  @Override
   public boolean visit(final Edge<DataObject> edge) {
     final String typePath = edge.getTypeName();
     final Node<DataObject> fromNode = edge.getFromNode();

@@ -15,10 +15,12 @@ public class NonExistingResource extends AbstractResource {
     return false;
   }
 
+  @Override
   public String getDescription() {
     return "resource which does not exist";
   }
 
+  @Override
   public InputStream getInputStream() throws IOException {
     return null;
   }

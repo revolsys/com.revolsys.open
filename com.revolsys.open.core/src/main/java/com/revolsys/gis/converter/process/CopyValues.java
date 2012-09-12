@@ -31,6 +31,7 @@ public class CopyValues extends
     return attributeNames;
   }
 
+  @Override
   public void process(final DataObject source, final DataObject target) {
     for (final Entry<String, String> entry : attributeNames.entrySet()) {
       final String sourceName = entry.getKey();

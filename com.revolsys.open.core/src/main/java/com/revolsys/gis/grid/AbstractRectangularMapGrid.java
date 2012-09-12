@@ -10,6 +10,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
+  @Override
   public BoundingBox getBoundingBox(final String mapTileName, final int srid) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid);
     final RectangularMapTile mapTile = getTileByName(mapTileName);
@@ -27,14 +28,14 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
     return mapsheet;
   }
 
-  public Polygon getPolygon(
-    final String mapTileName,
+  @Override
+  public Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem) {
     return getPolygon(mapTileName, GeometryFactory.getFactory(coordinateSystem));
   }
 
-  public Polygon getPolygon(
-    final String mapTileName,
+  @Override
+  public Polygon getPolygon(final String mapTileName,
     final GeometryFactory geometryFactory) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();
@@ -42,11 +43,9 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
     return polygon;
   }
 
-  public Polygon getPolygon(
-    final String mapTileName,
-    final GeometryFactory geometryFactory,
-    final int numX,
-    final int numY) {
+  @Override
+  public Polygon getPolygon(final String mapTileName,
+    final GeometryFactory geometryFactory, final int numX, final int numY) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();
     final Polygon polygon = boundingBox.toPolygon(geometryFactory, numX, numY);

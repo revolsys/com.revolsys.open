@@ -33,11 +33,9 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
   }
 
   @SuppressWarnings("unchecked")
-  protected void addAttributes(
-    final Map<String, Object> attributes,
+  protected void addAttributes(final Map<String, Object> attributes,
     final ConfigurableListableBeanFactory beanFactory,
-    final BeanDefinition beanDefinition,
-    final String beanName,
+    final BeanDefinition beanDefinition, final String beanName,
     final String beanClassName) {
     if (beanClassName != null) {
       if (beanClassName.equals(AttributeMap.class.getName())

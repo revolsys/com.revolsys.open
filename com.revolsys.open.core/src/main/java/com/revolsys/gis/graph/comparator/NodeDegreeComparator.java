@@ -16,6 +16,7 @@ public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
     this.invert = invert;
   }
 
+  @Override
   public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
     final int degree1 = node1.getDegree();

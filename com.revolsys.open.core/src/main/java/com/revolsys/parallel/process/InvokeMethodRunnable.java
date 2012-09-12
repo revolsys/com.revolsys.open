@@ -50,6 +50,7 @@ public class InvokeMethodRunnable implements Runnable {
   /**
    * Execute the method.
    */
+  @Override
   public void run() {
     try {
       if (object == null) {
@@ -60,7 +61,7 @@ public class InvokeMethodRunnable implements Runnable {
       } else {
         MethodUtils.invokeMethod(object, methodName, parameters);
       }
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke " + this, e);
     }
   }

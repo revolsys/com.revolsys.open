@@ -27,7 +27,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   }
 
   public UnitConverstionOperation(final Unit<?> sourceUnit,
-    final Unit<?> targetUnit, int numAxis) {
+    final Unit<?> targetUnit, final int numAxis) {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
     this.numAxis = numAxis;
@@ -38,6 +38,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
     }
   }
 
+  @Override
   public void perform(final Coordinates from, final Coordinates to) {
     final int numAxis = Math.min(from.getNumAxis(), to.getNumAxis());
 

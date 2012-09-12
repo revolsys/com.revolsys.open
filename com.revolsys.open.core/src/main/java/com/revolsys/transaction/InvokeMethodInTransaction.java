@@ -94,9 +94,7 @@ public class InvokeMethodInTransaction {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T execute(
-    final Object object,
-    final String methodName,
+  public <T> T execute(final Object object, final String methodName,
     final Object... args) {
     try {
       final TransactionTemplate template = new TransactionTemplate(

@@ -10,8 +10,7 @@ public class StatisticsProcess extends BaseInOutProcess<DataObject, DataObject> 
   private Statistics statistics;
 
   @Override
-  protected void postRun(
-    final Channel<DataObject> in,
+  protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     if (statistics != null) {
       statistics.disconnect();
@@ -19,18 +18,15 @@ public class StatisticsProcess extends BaseInOutProcess<DataObject, DataObject> 
   }
 
   @Override
-  protected void preRun(
-    final Channel<DataObject> in,
+  protected void preRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     statistics = new Statistics(getBeanName());
     statistics.connect();
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     statistics.add(object);
     out.write(object);
   }

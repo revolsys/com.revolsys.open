@@ -5,7 +5,8 @@ import java.util.Date;
 
 public class DateEquals implements Equals<Date> {
   @Override
-  public boolean equals(Date object1, Date object2, Collection<String> exclude) {
+  public boolean equals(final Date object1, final Date object2,
+    final Collection<String> exclude) {
     if (object1 == null) {
       return object2 == null;
     } else if (object2 == null) {
@@ -18,6 +19,6 @@ public class DateEquals implements Equals<Date> {
   }
 
   @Override
-  public void setEqualsRegistry(EqualsRegistry equalsRegistry) {
+  public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

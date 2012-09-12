@@ -66,10 +66,6 @@ public class FieldDefinition {
 
   private final String fullName;
 
-  public String getFullName() {
-    return fullName;
-  }
-
   private DecimalFormat numberFormat;
 
   private final char type;
@@ -115,6 +111,10 @@ public class FieldDefinition {
 
   public int getDecimalPlaces() {
     return decimalPlaces;
+  }
+
+  public String getFullName() {
+    return fullName;
   }
 
   public int getLength() {

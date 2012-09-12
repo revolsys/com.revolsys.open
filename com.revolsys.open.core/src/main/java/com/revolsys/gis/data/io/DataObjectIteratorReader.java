@@ -9,6 +9,7 @@ public class DataObjectIteratorReader extends IteratorReader<DataObject>
     super(iterator);
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     final DataObjectIterator iterator = (DataObjectIterator)iterator();
     iterator.hasNext();

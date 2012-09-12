@@ -154,9 +154,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     return logNotEqualSource;
   }
 
-  private void logError(
-    final DataObject object,
-    final String message,
+  private void logError(final DataObject object, final String message,
     final boolean source) {
     if (excludeFilter == null || !excludeFilter.accept(object)) {
       if (source) {
@@ -225,8 +223,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   @Override
-  protected void processObjects(
-    final DataObjectMetaData metaData,
+  protected void processObjects(final DataObjectMetaData metaData,
     final Channel<DataObject> out) {
     if (otherIndex.size() + otherPointMap.size() == 0) {
       if (logNotEqualSource) {

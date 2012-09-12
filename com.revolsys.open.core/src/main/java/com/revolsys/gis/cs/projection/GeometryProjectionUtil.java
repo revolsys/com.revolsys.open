@@ -16,8 +16,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static GeometryOperation getGeometryOperation(
-    final int fromSrid,
+  public static GeometryOperation getGeometryOperation(final int fromSrid,
     final CoordinateSystem toCoordinateSystem) {
     if (fromSrid == 0 || toCoordinateSystem == null) {
       return null;
@@ -28,8 +27,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static GeometryOperation getGeometryOperation(
-    final int fromSrid,
+  public static GeometryOperation getGeometryOperation(final int fromSrid,
     final GeometryFactory toGeometryFactory) {
     if (fromSrid == 0) {
       return null;
@@ -40,8 +38,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static GeometryOperation getGeometryOperation(
-    final int sourceSrid,
+  public static GeometryOperation getGeometryOperation(final int sourceSrid,
     final int targetSrid) {
     if (sourceSrid == 0 || targetSrid == 0) {
       return null;
@@ -52,8 +49,7 @@ public class GeometryProjectionUtil {
   }
 
   public static <T extends Geometry> T perform(
-    final GeometryOperation operation,
-    final T geometry) {
+    final GeometryOperation operation, final T geometry) {
     if (operation == null) {
       return geometry;
     } else {
@@ -61,8 +57,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    final T geometry,
+  public static <T extends Geometry> T perform(final T geometry,
     final CoordinateSystem coordinateSystem) {
     final int geometrySrid = geometry.getSRID();
     if (geometrySrid == 0) {
@@ -74,8 +69,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    final T geometry,
+  public static <T extends Geometry> T perform(final T geometry,
     final CoordinateSystem fromCoordinateSystem,
     final CoordinateSystem toCoordinateSystem) {
     if (fromCoordinateSystem == null || toCoordinateSystem == null) {
@@ -87,8 +81,7 @@ public class GeometryProjectionUtil {
     }
   }
 
-  public static <T extends Geometry> T perform(
-    final T geometry,
+  public static <T extends Geometry> T perform(final T geometry,
     final GeometryFactory geometryFactory) {
     if (geometry == null) {
       return null;

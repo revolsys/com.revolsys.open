@@ -1,6 +1,7 @@
 package com.revolsys.gis.data.model;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -146,4 +147,5 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    * @param values The values to set.
    */
   void setValues(Map<String, ? extends Object> values);
+
 }

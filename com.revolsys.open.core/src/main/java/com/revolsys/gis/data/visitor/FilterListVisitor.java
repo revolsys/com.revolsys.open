@@ -24,6 +24,7 @@ public class FilterListVisitor<T> implements Visitor<T> {
     return filter.toString();
   }
 
+  @Override
   public boolean visit(final T item) {
     if (filter.accept(item)) {
       results.add(item);

@@ -33,6 +33,7 @@ public class Equals2DFilter<T extends Geometry> implements Filter<T> {
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final T geometry) {
     if (Geometry2DEquals.INSTANCE.equals(this.geometry, geometry,
       Collections.<String> emptySet())) {

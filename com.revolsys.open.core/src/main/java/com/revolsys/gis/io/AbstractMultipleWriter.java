@@ -41,6 +41,7 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<DataObject> 
     return writer;
   }
 
+  @Override
   public void write(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     final Writer<DataObject> writer = getWriter(metaData);

@@ -15,6 +15,7 @@ public class ThreadLocalAppenderRunnable implements Runnable {
     }
   }
 
+  @Override
   public void run() {
     try {
       if (appender != null) {

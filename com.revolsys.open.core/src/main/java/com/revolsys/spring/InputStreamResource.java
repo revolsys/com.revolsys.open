@@ -19,7 +19,7 @@ public class InputStreamResource extends
   }
 
   public InputStreamResource(final String filename,
-    final InputStream inputStream, long length) {
+    final InputStream inputStream, final long length) {
     super(inputStream);
     this.filename = filename;
     this.length = length;
@@ -32,6 +32,15 @@ public class InputStreamResource extends
   }
 
   @Override
+  public long contentLength() throws IOException {
+    if (length >= 0) {
+      return length;
+    } else {
+      return super.contentLength();
+    }
+  }
+
+  @Override
   public Resource createRelative(final String relativePath) throws IOException {
     return new NonExistingResource();
   }
@@ -39,14 +48,5 @@ public class InputStreamResource extends
   @Override
   public String getFilename() throws IllegalStateException {
     return filename;
-  }
-
-  @Override
-  public long contentLength() throws IOException {
-    if (length >= 0) {
-      return length;
-    } else {
-      return super.contentLength();
-    }
   }
 }

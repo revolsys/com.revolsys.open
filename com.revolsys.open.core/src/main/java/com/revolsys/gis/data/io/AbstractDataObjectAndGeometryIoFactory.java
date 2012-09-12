@@ -38,41 +38,40 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
    * @param resource The resource to write to.
    * @return The writer.
    */
+  @Override
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource) {
+    final DataObjectMetaData metaData, final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
     return createDataObjectWriter(baseName, metaData, out);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream) {
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
   }
 
+  @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       DataObjectUtil.GEOMETRY_META_DATA, resource);
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
+  @Override
+  public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out);
     return createGeometryWriter(dataObjectWriter);
   }
 
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
-    final OutputStream out,
-    final Charset charset) {
+  @Override
+  public Writer<Geometry> createGeometryWriter(final String baseName,
+    final OutputStream out, final Charset charset) {
     final Writer<DataObject> dataObjectWriter = createDataObjectWriter(
       baseName, DataObjectUtil.GEOMETRY_META_DATA, out, charset);
     return createGeometryWriter(dataObjectWriter);
@@ -96,6 +95,7 @@ public abstract class AbstractDataObjectAndGeometryIoFactory extends
     return coordinateSystems.contains(coordinateSystem);
   }
 
+  @Override
   public boolean isGeometrySupported() {
     return true;
   }

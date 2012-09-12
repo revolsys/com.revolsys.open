@@ -52,8 +52,7 @@ public class LineSegmentIndex extends Quadtree {
     return false;
   }
 
-  public List<CoordinatesList> queryIntersections(
-    final Coordinates c0,
+  public List<CoordinatesList> queryIntersections(final Coordinates c0,
     final Coordinates c1) {
     return queryIntersections(new LineSegment(c0, c1));
   }

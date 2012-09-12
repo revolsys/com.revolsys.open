@@ -34,8 +34,7 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
     }
   }
 
-  public static void writeSchema(
-    final DataObjectMetaData metaData,
+  public static void writeSchema(final DataObjectMetaData metaData,
     final Resource resource) {
     final java.io.Writer out = SpringUtil.getWriter(resource);
     final EcsvDataObjectWriter writer = new EcsvDataObjectWriter(metaData, out);
@@ -56,14 +55,15 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     final EcsvDataObjectIterator iterator = new EcsvDataObjectIterator(
       resource, dataObjectFactory);
     return new DataObjectIteratorReader(iterator);
   }
 
+  @Override
   public DataObjectStore createDataObjectStore(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
@@ -72,20 +72,21 @@ public class EcsvIoFactory extends AbstractDataObjectAndGeometryIoFactory
     return new DirectoryDataObjectStore(directory, EcsvConstants.FILE_EXTENSION);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return new EcsvDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));
   }
 
+  @Override
   public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return DataObjectStore.class;
   }
 
+  @Override
   public List<String> getUrlPatterns() {
     return null;
   }

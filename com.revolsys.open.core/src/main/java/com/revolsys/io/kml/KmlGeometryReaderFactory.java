@@ -15,6 +15,7 @@ public class KmlGeometryReaderFactory extends AbstractGeometryReaderFactory {
     setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(4326));
   }
 
+  @Override
   public GeometryReader createGeometryReader(final Resource resource) {
     final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
     return new GeometryReader(iterator);

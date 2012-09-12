@@ -15,40 +15,87 @@ public class AbstractMapWrapper {
   public AbstractMapWrapper() {
   }
 
-  public Map<String, Object> getValues() {
-    return values;
+  public BoundingBox getBoundingBox(final String name) {
+    final Map<String, Object> extent = getValue(name);
+    if (extent == null) {
+      return null;
+    } else {
+      final Double minX = CollectionUtil.getDoubleValue(extent, "xmin");
+      final Double minY = CollectionUtil.getDoubleValue(extent, "ymin");
+      final Double maxX = CollectionUtil.getDoubleValue(extent, "xmax");
+      final Double maxY = CollectionUtil.getDoubleValue(extent, "ymax");
+
+      GeometryFactory geometryFactory;
+      final Map<String, Object> spatialReference = (Map<String, Object>)extent.get("spatialReference");
+      if (spatialReference == null) {
+        geometryFactory = GeometryFactory.getFactory();
+      } else {
+        final Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+        geometryFactory = GeometryFactory.getFactory(srid);
+      }
+      return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
+    }
   }
 
-  public <T extends AbstractMapWrapper> List<T> getList(Class<T> clazz,
-    String name) {
-    List<T> objects = new ArrayList<T>();
+  public Double getDoubleValue(final String name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
+  public Integer getIntValue(final String name) {
+    final Number value = getValue(name);
+    if (value == null) {
+      return null;
+    } else {
+      return value.intValue();
+    }
+  }
+
+  public <T extends AbstractMapWrapper> List<T> getList(final Class<T> clazz,
+    final String name) {
+    final List<T> objects = new ArrayList<T>();
 
     final List<Map<String, Object>> maps = getValue(name);
     if (maps != null) {
-      for (Map<String, Object> map : maps) {
+      for (final Map<String, Object> map : maps) {
         try {
-          T value = clazz.newInstance();
+          final T value = clazz.newInstance();
           value.setValues(map);
           objects.add(value);
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
         }
       }
     }
     return objects;
   }
 
-  public <T extends AbstractMapWrapper> T getObject(Class<T> clazz, String name) {
-    Map<String, Object> values = getValue(name);
+  public <T extends AbstractMapWrapper> T getObject(final Class<T> clazz,
+    final String name) {
+    final Map<String, Object> values = getValue(name);
     if (values == null) {
       return null;
     } else {
       try {
-        T value = clazz.newInstance();
+        final T value = clazz.newInstance();
         value.setValues(values);
         return value;
-      } catch (Throwable t) {
+      } catch (final Throwable t) {
         return null;
       }
+    }
+  }
+
+  public GeometryFactory getSpatialReference() {
+    final Map<String, Object> spatialReference = getValue("spatialReference");
+    if (spatialReference == null) {
+      return GeometryFactory.getFactory();
+    } else {
+      final Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+      return GeometryFactory.getFactory(srid);
     }
   }
 
@@ -58,58 +105,12 @@ public class AbstractMapWrapper {
     return (T)response.get(name);
   }
 
-  protected void setValues(Map<String, Object> values) {
+  public Map<String, Object> getValues() {
+    return values;
+  }
+
+  protected void setValues(final Map<String, Object> values) {
     this.values = values;
-  }
-
-  public Integer getIntValue(String name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
-    } else {
-      return value.intValue();
-    }
-  }
-
-  public Double getDoubleValue(String name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
-    } else {
-      return value.doubleValue();
-    }
-  }
-
-  public GeometryFactory getSpatialReference() {
-    Map<String, Object> spatialReference = getValue("spatialReference");
-    if (spatialReference == null) {
-      return GeometryFactory.getFactory();
-    } else {
-      Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
-      return GeometryFactory.getFactory(srid);
-    }
-  }
-
-  public BoundingBox getBoundingBox(String name) {
-    Map<String, Object> extent = getValue(name);
-    if (extent == null) {
-      return null;
-    } else {
-      Double minX = CollectionUtil.getDoubleValue(extent, "xmin");
-      Double minY = CollectionUtil.getDoubleValue(extent, "ymin");
-      Double maxX = CollectionUtil.getDoubleValue(extent, "xmax");
-      Double maxY = CollectionUtil.getDoubleValue(extent, "ymax");
-
-      GeometryFactory geometryFactory;
-      Map<String, Object> spatialReference = (Map<String, Object>)extent.get("spatialReference");
-      if (spatialReference == null) {
-        geometryFactory = GeometryFactory.getFactory();
-      } else {
-        Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
-        geometryFactory = GeometryFactory.getFactory(srid);
-      }
-      return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
-    }
   }
 
 }

@@ -1,34 +1,8 @@
 package com.revolsys.swing.builder;
 
 public abstract class AbstractUiBuilder implements UiBuilder {
-  private UiBuilderRegistry registry;
-
-  /**
-   * @return the registry
-   */
-  @Override
-  public UiBuilderRegistry getRegistry() {
-    return registry;
-  }
-
-  /**
-   * @param registry the registry to set
-   */
-  @Override
-  public void setRegistry(final UiBuilderRegistry registry) {
-    this.registry = registry;
-  }
-
-  @Override
-  public String toHtml(final Object object) {
-    final StringBuffer s = new StringBuffer();
-    appendHtml(s, object);
-    return s.toString();
-  }
-  public final static String escapeHTML(
-    final String value,
-    final boolean escapeSpaces,
-    final boolean escapeNewlines) {
+  public final static String escapeHTML(final String value,
+    final boolean escapeSpaces, final boolean escapeNewlines) {
     if (value == null) {
       return (null);
     }
@@ -217,5 +191,30 @@ public abstract class AbstractUiBuilder implements UiBuilder {
     }
 
     return (result.toString());
+  }
+
+  private UiBuilderRegistry registry;
+
+  /**
+   * @return the registry
+   */
+  @Override
+  public UiBuilderRegistry getRegistry() {
+    return registry;
+  }
+
+  /**
+   * @param registry the registry to set
+   */
+  @Override
+  public void setRegistry(final UiBuilderRegistry registry) {
+    this.registry = registry;
+  }
+
+  @Override
+  public String toHtml(final Object object) {
+    final StringBuffer s = new StringBuffer();
+    appendHtml(s, object);
+    return s.toString();
   }
 }

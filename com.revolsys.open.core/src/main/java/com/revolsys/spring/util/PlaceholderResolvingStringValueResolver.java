@@ -41,8 +41,7 @@ public class PlaceholderResolvingStringValueResolver implements
     this.attributes = attributes;
   }
 
-  private int findPlaceholderEndIndex(
-    final CharSequence buf,
+  private int findPlaceholderEndIndex(final CharSequence buf,
     final int startIndex) {
     int index = startIndex + this.placeholderPrefix.length();
     int withinNestedPlaceholder = 0;
@@ -78,10 +77,9 @@ public class PlaceholderResolvingStringValueResolver implements
    * @throws BeanDefinitionStoreException if invalid values are encountered
    * @see #resolvePlaceholder(String, java.util.Properties, int)
    */
-  protected String parseStringValue(
-    final String strVal,
-    final Map<String, Object> attributes,
-    final Set<String> visitedPlaceholders) throws BeanDefinitionStoreException {
+  protected String parseStringValue(final String strVal,
+    final Map<String, Object> attributes, final Set<String> visitedPlaceholders)
+    throws BeanDefinitionStoreException {
 
     final StringBuffer buf = new StringBuffer(strVal);
 
@@ -131,6 +129,7 @@ public class PlaceholderResolvingStringValueResolver implements
     return buf.toString();
   }
 
+  @Override
   public String resolveStringValue(final String strVal) throws BeansException {
     final String value = parseStringValue(strVal, this.attributes,
       new HashSet<String>());

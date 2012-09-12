@@ -32,8 +32,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   }
 
   @SuppressWarnings("unchecked")
-  private void addUserData(
-    final Geometry oldGeometry,
+  private void addUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
     final Object userData = oldGeometry.getUserData();
     if (userData != null) {
@@ -164,6 +163,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T perform(final T geometry) {
     try {

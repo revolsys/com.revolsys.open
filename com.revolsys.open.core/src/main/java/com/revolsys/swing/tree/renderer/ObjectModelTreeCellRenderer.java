@@ -24,14 +24,9 @@ public class ObjectModelTreeCellRenderer extends DefaultTreeCellRenderer {
   }
 
   @Override
-  public Component getTreeCellRendererComponent(
-    final JTree tree,
-    final Object value,
-    final boolean selected,
-    final boolean expanded,
-    final boolean leaf,
-    final int row,
-    final boolean hasFocus) {
+  public Component getTreeCellRendererComponent(final JTree tree,
+    final Object value, final boolean selected, final boolean expanded,
+    final boolean leaf, final int row, final boolean hasFocus) {
     final TreePath path = model.getPath(value);
     ObjectTreeNodeModel<Object, Object> nodeModel;
     if (path == null) {

@@ -21,8 +21,7 @@ public class GpxReaderFactory extends
   }
 
   public DataObjectReader createDataObjectReader(
-    final DataObjectMetaData metaData,
-    final Resource resource,
+    final DataObjectMetaData metaData, final Resource resource,
     final DataObjectFactory factory) {
     throw new UnsupportedOperationException();
   }
@@ -34,8 +33,8 @@ public class GpxReaderFactory extends
    * @param factory The factory used to create data objects.
    * @return The reader for the file.
    */
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
       final DataObjectIterator iterator = new GpxIterator(resource,

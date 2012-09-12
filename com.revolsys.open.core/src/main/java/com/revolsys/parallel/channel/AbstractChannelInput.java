@@ -42,6 +42,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
     return closed;
   }
 
+  @Override
   public Iterator<T> iterator() {
     return new ChannelInputIterator<T>(this);
   }
@@ -53,6 +54,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
    * 
    * @return The object returned from the Channel.
    */
+  @Override
   public T read() {
     synchronized (readMonitor) {
       synchronized (monitor) {
@@ -73,6 +75,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
+  @Override
   public T read(final long timeout) {
     synchronized (readMonitor) {
       synchronized (monitor) {
@@ -84,6 +87,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
     }
   }
 
+  @Override
   public void readConnect() {
     synchronized (monitor) {
       if (isClosed()) {
@@ -95,6 +99,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
     }
   }
 
+  @Override
   public void readDisconnect() {
     synchronized (monitor) {
       if (!closed) {

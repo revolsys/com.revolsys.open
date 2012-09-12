@@ -7,6 +7,7 @@ public abstract class AbstractWriter<T> extends AbstractObjectWithProperties
   public void close() {
   }
 
+  @Override
   public void flush() {
   }
 }

@@ -45,6 +45,7 @@ public class DelegatingWriter<T> extends AbstractWriter<T> {
     this.writer = writer;
   }
 
+  @Override
   public void write(final T object) {
     writer.write(object);
   }

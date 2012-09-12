@@ -18,7 +18,7 @@ public class Service extends ArcGisResponse {
     this.serviceType = serviceType;
   }
 
-  public Service(String serviceType) {
+  public Service(final String serviceType) {
     this.serviceType = serviceType;
   }
 

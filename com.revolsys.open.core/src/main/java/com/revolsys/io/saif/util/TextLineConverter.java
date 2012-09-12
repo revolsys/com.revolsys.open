@@ -20,6 +20,7 @@ public class TextLineConverter implements OsnConverter {
     this.converters = converters;
   }
 
+  @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put(TYPE, "/TextLine");
@@ -45,14 +46,13 @@ public class TextLineConverter implements OsnConverter {
     return geometry;
   }
 
-  protected void readAttribute(
-    final OsnIterator iterator,
-    final String attributeName,
-    final Map<String, Object> values) {
+  protected void readAttribute(final OsnIterator iterator,
+    final String attributeName, final Map<String, Object> values) {
     iterator.next();
     values.put(attributeName, iterator.getValue());
   }
 
+  @Override
   public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     if (object instanceof Point) {
@@ -69,10 +69,8 @@ public class TextLineConverter implements OsnConverter {
     }
   }
 
-  protected void writeAttribute(
-    final OsnSerializer serializer,
-    final String name,
-    final Object value) throws IOException {
+  protected void writeAttribute(final OsnSerializer serializer,
+    final String name, final Object value) throws IOException {
     if (value != null) {
       serializer.endLine();
       serializer.attribute(name, value, false);
@@ -80,8 +78,7 @@ public class TextLineConverter implements OsnConverter {
 
   }
 
-  protected void writeAttributes(
-    final OsnSerializer serializer,
+  protected void writeAttributes(final OsnSerializer serializer,
     final Map<String, Object> values) throws IOException {
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String key = entry.getKey();

@@ -53,8 +53,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     this(GeometryFactory.getFactory(line), object, line);
   }
 
-  private Edge<LineSegmentMatch> add(
-    final Coordinates start,
+  private Edge<LineSegmentMatch> add(final Coordinates start,
     final Coordinates end) {
     final Node<LineSegmentMatch> startNode = getNode(start);
     final Node<LineSegmentMatch> endNode = getNode(end);
@@ -62,21 +61,16 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return add(startNode, endNode);
   }
 
-  private Edge<LineSegmentMatch> add(
-    final Coordinates start,
-    final Coordinates end,
-    final LineSegment segment,
-    final int index) {
+  private Edge<LineSegmentMatch> add(final Coordinates start,
+    final Coordinates end, final LineSegment segment, final int index) {
     final Edge<LineSegmentMatch> edge = add(start, end);
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     lineSegmentMatch.addSegment(segment, index);
     return edge;
   }
 
-  private Edge<LineSegmentMatch> add(
-    final LineSegmentMatch lineSegmentMatch,
-    final Node<LineSegmentMatch> from,
-    final Node<LineSegmentMatch> to) {
+  private Edge<LineSegmentMatch> add(final LineSegmentMatch lineSegmentMatch,
+    final Node<LineSegmentMatch> from, final Node<LineSegmentMatch> to) {
     final Edge<LineSegmentMatch> newEdge = add(from, to);
     final LineSegmentMatch newLineSegmentMatch = newEdge.getObject();
     for (int i = 0; i < lineSegmentMatch.getSegmentCount(); i++) {
@@ -140,15 +134,14 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return false;
   }
 
-  private Edge<LineSegmentMatch> add(
-    final Node<LineSegmentMatch> startNode,
+  private Edge<LineSegmentMatch> add(final Node<LineSegmentMatch> startNode,
     final Node<LineSegmentMatch> endNode) {
     Edge<LineSegmentMatch> edge = getEdge(startNode, endNode);
 
     if (edge == null) {
       final LineSegmentMatch lineSegmentMatch = new LineSegmentMatch(
         geometryFactory, startNode, endNode);
-      edge = add(lineSegmentMatch, lineSegmentMatch.getLine());
+      edge = addEdge(lineSegmentMatch, lineSegmentMatch.getLine());
     }
     return edge;
   }
@@ -193,8 +186,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return lines.isEmpty();
   }
 
-  private void createLine(
-    final List<LineString> lines,
+  private void createLine(final List<LineString> lines,
     final List<Coordinates> coordinates) {
     if (!coordinates.isEmpty()) {
       final LineString line = geometryFactory.createLineString(coordinates);
@@ -206,11 +198,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return getMatchedLines(startNodes.size() - 1);
   }
 
-  public double getDuplicateMatchLength(
-    final Node<LineSegmentMatch> node,
-    final boolean direction,
-    final int index1,
-    final int index2) {
+  public double getDuplicateMatchLength(final Node<LineSegmentMatch> node,
+    final boolean direction, final int index1, final int index2) {
     List<Edge<LineSegmentMatch>> edges;
     if (direction) {
       edges = node.getOutEdges();
@@ -232,16 +221,14 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return 0;
   }
 
-  private Edge<LineSegmentMatch> getEdge(
-    final Coordinates coordinate0,
+  private Edge<LineSegmentMatch> getEdge(final Coordinates coordinate0,
     final Coordinates coordinate1) {
     final Node<LineSegmentMatch> node1 = findNode(coordinate0);
     final Node<LineSegmentMatch> node2 = findNode(coordinate1);
     return getEdge(node1, node2);
   }
 
-  private Edge<LineSegmentMatch> getEdge(
-    final Node<LineSegmentMatch> node1,
+  private Edge<LineSegmentMatch> getEdge(final Node<LineSegmentMatch> node1,
     final Node<LineSegmentMatch> node2) {
     final List<Edge<LineSegmentMatch>> edges = node1.getOutEdgesTo(node2);
     if (edges.isEmpty()) {
@@ -252,8 +239,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   private Set<Edge<LineSegmentMatch>> getEdgesWithoutMatch(
-    final LineString line,
-    final int index) {
+    final LineString line, final int index) {
     final Set<Edge<LineSegmentMatch>> edges = new LinkedHashSet<Edge<LineSegmentMatch>>();
 
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
@@ -370,11 +356,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return matchedObjects;
   }
 
-  public double getMatchLength(
-    final Node<LineSegmentMatch> node,
-    final boolean direction,
-    final int index1,
-    final int index2) {
+  public double getMatchLength(final Node<LineSegmentMatch> node,
+    final boolean direction, final int index1, final int index2) {
     List<Edge<LineSegmentMatch>> edges;
     if (direction) {
       edges = node.getOutEdges();
@@ -527,8 +510,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public Edge<LineSegmentMatch> getUnprocessedEdgeWithSegment(
-    final Node<LineSegmentMatch> node,
-    final int index,
+    final Node<LineSegmentMatch> node, final int index,
     final Set<Edge<LineSegmentMatch>> processedEdges) {
     final List<Edge<LineSegmentMatch>> edges = node.getOutEdges();
     for (final Edge<LineSegmentMatch> edge : edges) {
@@ -541,11 +523,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return null;
   }
 
-  public boolean hasMatch(
-    final Node<LineSegmentMatch> node,
-    final boolean direction,
-    final int index1,
-    final int index2) {
+  public boolean hasMatch(final Node<LineSegmentMatch> node,
+    final boolean direction, final int index1, final int index2) {
     List<Edge<LineSegmentMatch>> edges;
     if (direction) {
       edges = node.getOutEdges();
@@ -610,8 +589,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   }
 
-  public boolean hasSegmentsWithIndex(
-    final Node<LineSegmentMatch> node,
+  public boolean hasSegmentsWithIndex(final Node<LineSegmentMatch> node,
     final int index) {
     final List<Edge<LineSegmentMatch>> edges = node.getEdges();
     for (final Edge<LineSegmentMatch> edge : edges) {
@@ -697,8 +675,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     }
   }
 
-  private void integrateMultiLine(
-    final MultiLineString multLine,
+  private void integrateMultiLine(final MultiLineString multLine,
     final int index) {
     for (int i = 0; i < multLine.getNumGeometries(); i++) {
       final LineString line = (LineString)multLine.getGeometryN(i);
@@ -718,8 +695,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   @Override
   @SuppressWarnings("unchecked")
   public List<Edge<LineSegmentMatch>> splitEdge(
-    final Edge<LineSegmentMatch> edge,
-    final Node<LineSegmentMatch> node) {
+    final Edge<LineSegmentMatch> edge, final Node<LineSegmentMatch> node) {
     final Coordinates coordinate = node;
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     final LineSegment segment = lineSegmentMatch.getSegment();

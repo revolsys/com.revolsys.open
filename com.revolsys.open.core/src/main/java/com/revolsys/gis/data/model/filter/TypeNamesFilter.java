@@ -18,6 +18,7 @@ public class TypeNamesFilter implements Filter<DataObject> {
     typePaths.add(typePath);
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     final String typePath = metaData.getPath();

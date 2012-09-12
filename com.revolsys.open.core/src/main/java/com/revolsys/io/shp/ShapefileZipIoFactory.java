@@ -1,7 +1,6 @@
 package com.revolsys.io.shp;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
@@ -26,12 +25,14 @@ public class ShapefileZipIoFactory extends
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
   }
 
+  @Override
   public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory factory) {
     return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
       factory);
   }
 
+  @Override
   public Writer<DataObject> createDataObjectWriter(final String baseName,
     final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {

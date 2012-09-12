@@ -64,6 +64,12 @@ public class StatisticsMap {
     statistics.add(path, count);
   }
 
+  public synchronized void addCountsText(final StringBuffer sb) {
+    for (final Statistics stats : statisticsMap.values()) {
+      stats.addCountsText(sb);
+    }
+  }
+
   @PostConstruct
   public synchronized void connect() {
     providerCount++;
@@ -79,20 +85,14 @@ public class StatisticsMap {
     }
   }
 
-  public String getPrefix() {
-    return prefix;
-  }
-
   public synchronized String getCountsText() {
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
     addCountsText(sb);
     return sb.toString();
   }
 
-  public synchronized void addCountsText(StringBuffer sb) {
-    for (Statistics stats : statisticsMap.values()) {
-      stats.addCountsText(sb);
-    }
+  public String getPrefix() {
+    return prefix;
   }
 
   public synchronized Statistics getStatistics(final String statisticName) {

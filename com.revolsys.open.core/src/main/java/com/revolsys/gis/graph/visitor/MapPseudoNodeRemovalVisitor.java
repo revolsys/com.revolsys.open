@@ -9,21 +9,24 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.util.ObjectProcessor;
 
 public class MapPseudoNodeRemovalVisitor extends
-  AbstractNodeListenerVisitor<Map<String,Object>> implements ObjectProcessor<Graph<Map<String,Object>>> {
+  AbstractNodeListenerVisitor<Map<String, Object>> implements
+  ObjectProcessor<Graph<Map<String, Object>>> {
 
   public MapPseudoNodeRemovalVisitor() {
   }
 
-  public void process(final Graph<Map<String,Object>> graph) {
+  @Override
+  public void process(final Graph<Map<String, Object>> graph) {
     graph.visitNodes(this);
   }
 
-  public boolean visit(final Node<Map<String,Object>> node) {
-    List<Edge<Map<String,Object>>> edges = node.getEdges();
+  @Override
+  public boolean visit(final Node<Map<String, Object>> node) {
+    final List<Edge<Map<String, Object>>> edges = node.getEdges();
     if (edges.size() == 2) {
-      Edge<Map<String,Object>> edge1 = edges.get(0);
-      Edge<Map<String,Object>> edge2 = edges.get(1);
-      Graph<Map<String,Object>> graph = node.getGraph();
+      final Edge<Map<String, Object>> edge1 = edges.get(0);
+      final Edge<Map<String, Object>> edge2 = edges.get(1);
+      final Graph<Map<String, Object>> graph = node.getGraph();
       graph.merge(node, edge1, edge2);
     }
     return true;

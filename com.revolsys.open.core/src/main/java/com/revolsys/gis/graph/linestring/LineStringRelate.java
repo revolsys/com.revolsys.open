@@ -80,8 +80,7 @@ public class LineStringRelate {
   }
 
   public Coordinates getMovedCoordinate(
-    final Map<Coordinates, Coordinates> movedNodes,
-    final LineString line,
+    final Map<Coordinates, Coordinates> movedNodes, final LineString line,
     final int i) {
     final Coordinates coordinates = CoordinatesListUtil.get(line, i);
     if (movedNodes.containsKey(coordinates)) {
@@ -152,10 +151,9 @@ public class LineStringRelate {
     return isContains(graph1, graph2);
   }
 
-  private boolean isContains(
-    final Graph<LineSegment> graph1,
+  private boolean isContains(final Graph<LineSegment> graph1,
     final Graph<LineSegment> graph2) {
-    for (final Edge<LineSegment> edge : graph2.edges()) {
+    for (final Edge<LineSegment> edge : graph2.getEdges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
       if (!graph1.hasEdgeBetween(fromNode, toNode)) {
@@ -189,7 +187,7 @@ public class LineStringRelate {
 
   public boolean isEqual() {
     if (graph1.getEdgeCount() == graph2.getEdgeCount()) {
-      for (final Edge<LineSegment> edge : graph1.edges()) {
+      for (final Edge<LineSegment> edge : graph1.getEdges()) {
         if (!graph2.hasEdge(edge)) {
           return false;
         }
@@ -210,10 +208,9 @@ public class LineStringRelate {
     }
   }
 
-  private boolean isOverlaps(
-    final LineStringGraph graph1,
+  private boolean isOverlaps(final LineStringGraph graph1,
     final LineStringGraph graph2) {
-    for (final Edge<LineSegment> edge : graph1.edges()) {
+    for (final Edge<LineSegment> edge : graph1.getEdges()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
       if (graph2.hasEdgeBetween(fromNode, toNode)) {
@@ -223,12 +220,9 @@ public class LineStringRelate {
     return false;
   }
 
-  private boolean isWithin(
-    final LineStringGraph graph,
-    final Coordinates fromPoint,
-    final Coordinates toPoint,
-    final Coordinates point,
-    final double maxDistance) {
+  private boolean isWithin(final LineStringGraph graph,
+    final Coordinates fromPoint, final Coordinates toPoint,
+    final Coordinates point, final double maxDistance) {
     if (point.distance(fromPoint) < maxDistance) {
       return false;
     } else if (point.distance(toPoint) < maxDistance) {

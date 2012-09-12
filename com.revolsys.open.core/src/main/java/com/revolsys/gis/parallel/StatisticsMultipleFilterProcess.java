@@ -41,10 +41,8 @@ public class StatisticsMultipleFilterProcess extends
   }
 
   @Override
-  protected boolean processFilter(
-    final DataObject object,
-    final Filter<DataObject> filter,
-    final Channel<DataObject> filterOut) {
+  protected boolean processFilter(final DataObject object,
+    final Filter<DataObject> filter, final Channel<DataObject> filterOut) {
     if (super.processFilter(object, filter, filterOut)) {
       if (useStatistics) {
         Statistics stats = statisticsMap.get(filter);

@@ -3,12 +3,7 @@ package com.revolsys.jdbc.data.model.property;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -91,10 +86,6 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     return dataStore;
   }
 
-  public void setUseAuditColumns(final boolean useAuditColumns) {
-    this.useAuditColumns = useAuditColumns;
-  }
-
   @Override
   public void setMetaData(final DataObjectMetaData metaData) {
     super.setMetaData(metaData);
@@ -121,7 +112,9 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         insertSql += ", ?";
       }
       if (useAuditColumns) {
-        if (dataStore.getClass().getName().equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
+        if (dataStore.getClass()
+          .getName()
+          .equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
           insertSql += ", USER, SYSDATE, USER, SYSDATE";
         } else {
           insertSql += ", current_user, current_timestamp, current_user, current_timestamp";
@@ -129,6 +122,10 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       }
       insertSql += ")";
     }
+  }
+
+  public void setUseAuditColumns(final boolean useAuditColumns) {
+    this.useAuditColumns = useAuditColumns;
   }
 
   @Override

@@ -20,24 +20,29 @@ public class XhtmlMapIoFactory extends AbstractIoFactory implements
     addMediaTypeAndFileExtension("application/xhtml+xml", "html");
   }
 
+  @Override
   public MapWriter getWriter(final OutputStream out) {
     final Writer writer = new OutputStreamWriter(out);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Resource resource) {
     final Writer writer = SpringUtil.getWriter(resource);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Writer out) {
     return new XhtmlMapWriter(out);
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return true;
   }
 
+  @Override
   public boolean isGeometrySupported() {
     return true;
   }

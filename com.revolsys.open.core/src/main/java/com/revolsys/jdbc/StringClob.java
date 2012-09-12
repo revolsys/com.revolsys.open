@@ -16,59 +16,69 @@ public class StringClob implements Clob {
     this.string = string;
   }
 
+  @Override
   public void free() throws SQLException {
     string = null;
   }
 
+  @Override
   public InputStream getAsciiStream() throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public Reader getCharacterStream() throws SQLException {
     return new StringReader(string);
   }
 
+  @Override
   public Reader getCharacterStream(final long offset, final long length)
     throws SQLException {
     return new StringReader(string.substring((int)offset - 1, (int)length));
   }
 
+  @Override
   public String getSubString(final long pos, final int len) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public long length() throws SQLException {
     return string.length();
   }
 
+  @Override
   public long position(final Clob colb, final long pos) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public long position(final String string, final long pos) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public OutputStream setAsciiStream(final long pos) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public Writer setCharacterStream(final long pos) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public int setString(final long pos, final String string) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
-  public int setString(
-    final long pos,
-    final String string,
-    final int i,
+  @Override
+  public int setString(final long pos, final String string, final int i,
     final int j) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }
 
+  @Override
   public void truncate(final long pos) throws SQLException {
     throw new UnsupportedOperationException("Cannot modify Clob");
   }

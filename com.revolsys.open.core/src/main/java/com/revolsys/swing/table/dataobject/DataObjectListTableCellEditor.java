@@ -12,8 +12,8 @@ import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
 
 @SuppressWarnings("serial")
-public class DataObjectListTableCellEditor extends AbstractCellEditor
-  implements TableCellEditor {
+public class DataObjectListTableCellEditor extends AbstractCellEditor implements
+  TableCellEditor {
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
   private final JTextField editorComponent = new JTextField();
@@ -35,11 +35,8 @@ public class DataObjectListTableCellEditor extends AbstractCellEditor
   }
 
   @Override
-  public Component getTableCellEditorComponent(
-    final JTable table,
-    final Object value,
-    final boolean isSelected,
-    final int row,
+  public Component getTableCellEditorComponent(final JTable table,
+    final Object value, final boolean isSelected, final int row,
     final int column) {
     final DataObjectListTableModel model = (DataObjectListTableModel)table.getModel();
     final DataObjectMetaData schema = model.getMetaData();

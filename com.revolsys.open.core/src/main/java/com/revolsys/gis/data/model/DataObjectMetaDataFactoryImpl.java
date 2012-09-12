@@ -37,6 +37,7 @@ public class DataObjectMetaDataFactoryImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData(final String path) {
     return types.get(path);
   }

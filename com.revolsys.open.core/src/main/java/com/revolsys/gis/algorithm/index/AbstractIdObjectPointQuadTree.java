@@ -18,6 +18,7 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
     }
   }
 
+  @Override
   public T add(final T object) {
     final Coordinates point = getCoordinates(object);
     put(point, object);
@@ -26,16 +27,19 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
 
   public abstract Coordinates getCoordinates(T object);
 
+  @Override
   public void put(final Coordinates point, final T object) {
     final int id = getId(object);
     index.put(point, id);
   }
 
+  @Override
   public boolean remove(final Coordinates point, final T object) {
     final int id = getId(object);
     return index.remove(point, id);
   }
 
+  @Override
   public boolean remove(final T object) {
     final Coordinates point = getCoordinates(object);
     return remove(point, object);
@@ -47,12 +51,14 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
     }
   }
 
+  @Override
   public void visit(final Envelope envelope, final Visitor<T> visitor) {
     final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(
       this, envelope, visitor);
     index.visit(envelope, itemVisitor);
   }
 
+  @Override
   public void visit(final Visitor<T> visitor) {
     final IdObjectIndexVisitor<T> itemVisitor = new IdObjectIndexVisitor<T>(
       this, visitor);

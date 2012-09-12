@@ -37,6 +37,7 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
    * @param resource The resource to write to.
    * @return The writer.
    */
+  @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
@@ -51,8 +52,8 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
    * @param out The output stream to write to.
    * @return The writer.
    */
-  public Writer<Geometry> createGeometryWriter(
-    final String baseName,
+  @Override
+  public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
     return createGeometryWriter(baseName, out, Charset.forName("UTF-8"));
 

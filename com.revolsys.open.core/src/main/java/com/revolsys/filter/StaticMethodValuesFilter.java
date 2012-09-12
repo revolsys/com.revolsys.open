@@ -31,6 +31,7 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
     this(methodClass, methodName, Arrays.asList(values));
   }
 
+  @Override
   public boolean accept(final T object) {
     final Object value = getValue(object);
     return values.contains(value);

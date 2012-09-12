@@ -53,6 +53,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     }
   }
 
+  @Override
   public String getBeanName() {
     return beanName;
   }
@@ -64,6 +65,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
   /**
    * @return the processNetwork
    */
+  @Override
   public ProcessNetwork getProcessNetwork() {
     return processNetwork;
   }
@@ -83,6 +85,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
 
   }
 
+  @Override
   public void run() {
     preRun();
     try {
@@ -133,6 +136,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
     }
   }
 
+  @Override
   public void setBeanName(final String beanName) {
     this.beanName = beanName;
     final ThreadFactory threadFactory = getThreadFactory();
@@ -149,6 +153,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements
   /**
    * @param processNetwork the processNetwork to set
    */
+  @Override
   public void setProcessNetwork(final ProcessNetwork processNetwork) {
     this.processNetwork = processNetwork;
     if (processNetwork != null) {

@@ -10,14 +10,17 @@ public class BigDecimalStringConverter extends
     super(DECIMAL_FORMAT);
   }
 
+  @Override
   public Class<BigDecimal> getConvertedClass() {
     return BigDecimal.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public BigDecimal toObject(final Object value) {
     if (value instanceof BigDecimal) {
       final BigDecimal number = (BigDecimal)value;
@@ -29,6 +32,7 @@ public class BigDecimalStringConverter extends
     }
   }
 
+  @Override
   public BigDecimal toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return new BigDecimal(string);

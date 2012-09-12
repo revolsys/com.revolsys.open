@@ -6,8 +6,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 
 public class DataObjectMetaDataNameComparator implements
   Comparator<DataObjectMetaData> {
-  public static int compareTypeNames(
-    final DataObjectMetaData metaData1,
+  public static int compareTypeNames(final DataObjectMetaData metaData1,
     final DataObjectMetaData metaData2) {
     final String typePath1 = metaData1.getPath();
     final String name1 = typePath1.toString();
@@ -18,8 +17,8 @@ public class DataObjectMetaDataNameComparator implements
     return name1.compareTo(name2);
   }
 
-  public int compare(
-    final DataObjectMetaData metaData1,
+  @Override
+  public int compare(final DataObjectMetaData metaData1,
     final DataObjectMetaData metaData2) {
     return compareTypeNames(metaData1, metaData2);
   }

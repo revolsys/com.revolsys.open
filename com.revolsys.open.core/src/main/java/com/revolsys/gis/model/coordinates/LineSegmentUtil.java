@@ -252,11 +252,11 @@ public class LineSegmentUtil {
     return z;
   }
 
-  public static Coordinates getElevation(GeometryFactory geometryFactory,
+  public static Coordinates getElevation(final GeometryFactory geometryFactory,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
-    int numAxis = geometryFactory.getNumAxis();
-    Coordinates newPoint = geometryFactory.createCoordinates(point);
+    final int numAxis = geometryFactory.getNumAxis();
+    final Coordinates newPoint = geometryFactory.createCoordinates(point);
     if (numAxis > 2) {
       final double fraction = point.distance(lineStart)
         / lineStart.distance(lineEnd);
@@ -299,7 +299,7 @@ public class LineSegmentUtil {
     line2Start = geometryFactory.createCoordinates(line2Start);
     line2End = geometryFactory.createCoordinates(line2End);
     if (BoundingBox.intersects(line1Start, line1End, line2Start, line2End)) {
-      Set<Coordinates> intersections = new TreeSet<Coordinates>(
+      final Set<Coordinates> intersections = new TreeSet<Coordinates>(
         new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,
         line1Start)) {
@@ -311,14 +311,14 @@ public class LineSegmentUtil {
       }
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line1Start, line1End,
         line2Start)) {
-        Coordinates intersection = getElevation(geometryFactory, line1Start,
-          line1End, line2Start);
+        final Coordinates intersection = getElevation(geometryFactory,
+          line1Start, line1End, line2Start);
         intersections.add(intersection);
       }
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line1Start, line1End,
         line2End)) {
-        Coordinates intersection = getElevation(geometryFactory, line1Start,
-          line1End, line2End);
+        final Coordinates intersection = getElevation(geometryFactory,
+          line1Start, line1End, line2End);
         intersections.add(intersection);
       }
 
@@ -345,9 +345,9 @@ public class LineSegmentUtil {
             line2y1, line2x2, line2y2, line1x2, line1y2);
 
           if (!((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0))) {
-            double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
+            final double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
               line1y1, line1x2, line1y2);
-            double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
+            final double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
               line2y1, line2x2, line2y2);
             final double x = LineSegmentUtil.det(detLine1StartLine1End, line1x1
               - line1x2, detLine2StartLine2End, line2x1 - line2x2)

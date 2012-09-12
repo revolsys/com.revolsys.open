@@ -13,8 +13,7 @@ public class LineSegment3D extends LineSegment {
    */
   private static final long serialVersionUID = -4858771831440204506L;
 
-  public static Coordinate midpoint(
-    final Coordinate coordinate1,
+  public static Coordinate midpoint(final Coordinate coordinate1,
     final Coordinate coordinate2) {
     final double x1 = coordinate1.x;
     final double y1 = coordinate1.y;
@@ -68,8 +67,7 @@ public class LineSegment3D extends LineSegment {
    * @param coordinate The Coordinate.
    * @param line The line segment the coordinate is on.
    */
-  public void addElevation(
-    final Coordinate coordinate,
+  public void addElevation(final Coordinate coordinate,
     final PrecisionModel model) {
     final double z0 = p0.z;
     final double z1 = p1.z;

@@ -78,6 +78,7 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
     return true;
   }
 
+  @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
     throws BeansException {
     this.applicationContext = applicationContext;

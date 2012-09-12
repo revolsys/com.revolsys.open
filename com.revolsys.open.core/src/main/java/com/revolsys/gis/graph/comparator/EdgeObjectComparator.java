@@ -14,6 +14,7 @@ public class EdgeObjectComparator<T> implements Comparator<Edge<T>> {
     this.comparator = comparator;
   }
 
+  @Override
   public int compare(final Edge<T> edge1, final Edge<T> edge2) {
     if (edge1 == edge2) {
       return 0;

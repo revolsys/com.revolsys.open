@@ -87,6 +87,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     return lat1;
   }
 
+  @Override
   public void inverse(final Coordinates from, final Coordinates to) {
     final double x = from.getX();
     final double y = from.getY();
@@ -131,6 +132,7 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     }
   }
 
+  @Override
   public void project(final Coordinates from, final Coordinates to) {
     final double lon = Math.toRadians(from.getX());
     final double lat = Math.toRadians(from.getY());

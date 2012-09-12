@@ -77,6 +77,7 @@ public class JsonMapWriter extends AbstractMapWriter {
     this.listRoot = listRoot;
   }
 
+  @Override
   public void write(final Map<String, ? extends Object> values) {
     if (written) {
       out.print(",");

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import com.revolsys.util.CaseConverter;
 
 public abstract class AbstractCodeTable implements CodeTable, Cloneable {
@@ -38,8 +36,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(
-    final Object id,
+  protected synchronized void addValue(final Object id,
     final List<Object> values) {
     if (id instanceof Number) {
       final Number number = (Number)id;
@@ -81,10 +78,12 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     }
   }
 
+  @Override
   public List<String> getAttributeAliases() {
     return Collections.emptyList();
   }
 
+  @Override
   public Map<Object, List<Object>> getCodes() {
     return Collections.unmodifiableMap(idValueCache);
   }
@@ -123,6 +122,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return (T)id;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getId(final Map<String, ? extends Object> valueMap) {
     final List<String> valueAttributeNames = getValueAttributeNames();
@@ -135,6 +135,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return (T)getId(values);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> T getId(final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
@@ -151,6 +152,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return id;
   }
 
+  @Override
   public Map<String, ? extends Object> getMap(final Object id) {
     final List<Object> values = getValues(id);
     if (values == null) {
@@ -166,6 +168,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     }
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -189,6 +192,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return normalizedValues;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Object id) {
     final List<Object> values = getValues(id);
@@ -199,6 +203,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     }
   }
 
+  @Override
   public List<String> getValueAttributeNames() {
     return Arrays.asList("VALUE");
   }
@@ -215,6 +220,7 @@ public abstract class AbstractCodeTable implements CodeTable, Cloneable {
     return values;
   }
 
+  @Override
   public List<Object> getValues(final Object id) {
     if (id != null) {
       List<Object> values = getValueById(id);

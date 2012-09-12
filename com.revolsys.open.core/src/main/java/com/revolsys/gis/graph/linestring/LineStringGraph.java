@@ -73,19 +73,20 @@ public class LineStringGraph extends Graph<LineSegment> {
   private BoundingBox envelope;
 
   public LineStringGraph(final CoordinatesList points) {
+    super(false);
     setGeometryFactory(GeometryFactory.getFactory());
     setPoints(points);
   }
 
   public LineStringGraph(final GeometryFactory geometryFactory,
     final LineString line) {
+    super(false);
     setGeometryFactory(geometryFactory);
     setLineString(line);
   }
 
   public LineStringGraph(final LineString lineString) {
-    setGeometryFactory(GeometryFactory.getFactory(lineString));
-    setLineString(lineString);
+    this(GeometryFactory.getFactory(lineString), lineString);
   }
 
   @Override
@@ -94,10 +95,13 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   @Override
-  protected Edge<LineSegment> addMerged(LineSegment mergedObject,
-    LineString newLine) {
-    LineString mergedLine = mergedObject.getLine();
-    return add(mergedObject, mergedLine);
+  public LineString getEdgeLine(final int edgeId) {
+    final LineSegment segment = getEdgeObject(edgeId);
+    if (segment == null) {
+      return null;
+    } else {
+      return segment.getLine();
+    }
   }
 
   public LineString getLine() {
@@ -351,7 +355,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public boolean isSimple() {
-    for (final Node<LineSegment> node : nodes()) {
+    for (final Node<LineSegment> node : getNodes()) {
       if (node.getDegree() > 2) {
         return false;
       }
@@ -414,6 +418,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     return true;
   }
 
+  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     setPrecisionModel(geometryFactory);
@@ -443,7 +448,9 @@ public class LineStringGraph extends Graph<LineSegment> {
       geometryFactory, points);
     int index = 0;
     for (final LineSegment lineSegment : iterator) {
-      final Edge<LineSegment> edge = add(lineSegment, lineSegment.getLine());
+      final Coordinates from = lineSegment.get(0);
+      final Coordinates to = lineSegment.get(1);
+      final Edge<LineSegment> edge = addEdge(lineSegment, from, to);
       edge.setAttribute(INDEX, index++);
     }
     fromPoint = new DoubleCoordinates(points.get(0));
@@ -503,7 +510,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       Coordinates previousPoint = fromNode;
       for (final Coordinates point : newPoints) {
         final LineSegment lineSegment = new LineSegment(previousPoint, point);
-        final Edge<LineSegment> newEdge = add(lineSegment,
+        final Edge<LineSegment> newEdge = addEdge(lineSegment,
           lineSegment.getLine());
         setIndex(edge, newEdge);
         newEdges.add(newEdge);
@@ -530,7 +537,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (scaleXY > 0) {
       distance = 1 / scaleXY;
     }
-    for (final Node<LineSegment> node : nodes()) {
+    for (final Node<LineSegment> node : getNodes()) {
       final List<Edge<LineSegment>> edges = findEdges(node, distance);
       edges.removeAll(node.getEdges());
       if (!edges.isEmpty()) {

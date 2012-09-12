@@ -17,53 +17,56 @@ public class LineSegmentTest {
   private static final GeometryFactory GEOMETRY_FACTORY_3D = GeometryFactory.getFactory(
     3005, 3, 1000, 1000);
 
-  public void assertLinearIntersection(double l1x1, double l1y1, double l1x2,
-    double l1y2, double l2x1, double l2y1, double l2x2, double l2y2,
-    double lx1, double ly1, double lx2, double ly2) {
-    LineSegment line1 = new LineSegment(GEOMETRY_FACTORY_2D, l1x1, l1y1, l1x2,
-      l1y2);
-    LineSegment line2 = new LineSegment(GEOMETRY_FACTORY_2D, l2x1, l2y1, l2x2,
-      l2y2);
-    LineSegment line = new LineSegment(GEOMETRY_FACTORY_2D, lx1, ly1, lx2, ly2);
+  private final DoubleCoordinates c_0_0_0 = c(0, 0, 0);
 
-    CoordinatesList intersection = line1.getIntersection(line2);
-    Assert.equals(line, intersection);
-  }
+  private final DoubleCoordinates c_50_0_5 = c(50, 0, 5);
 
-  public DoubleCoordinates c(double... coordinates) {
-    return new DoubleCoordinates(coordinates);
-  }
+  private final DoubleCoordinates c_50_0 = c(50, 0);
 
-  public void assertIntersection3d(Coordinates line1Start,
-    Coordinates line1End, Coordinates line2Start, Coordinates line2End,
-    Coordinates... expectedIntersection) {
-    LineSegment line1 = new LineSegment(GEOMETRY_FACTORY_3D, line1Start,
+  private final DoubleCoordinates c_50_50_5 = c(50, 50, 5);
+
+  private final DoubleCoordinates c_70_0_7 = c(70, 0, 7);
+
+  private final DoubleCoordinates c_70_0 = c(70, 0);
+
+  private final DoubleCoordinates c_100_0_10 = c(100, 0, 10);
+
+  private final DoubleCoordinates c_100_100_10 = c(100, 100, 10);
+
+  private final DoubleCoordinates c_0_100_1 = c(0, 100, 1);
+
+  public void assertIntersection3d(final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
+    final Coordinates line2End, final Coordinates... expectedIntersection) {
+    final LineSegment line1 = new LineSegment(GEOMETRY_FACTORY_3D, line1Start,
       line1End);
-    LineSegment line2 = new LineSegment(GEOMETRY_FACTORY_3D, line2Start,
+    final LineSegment line2 = new LineSegment(GEOMETRY_FACTORY_3D, line2Start,
       line2End);
-    CoordinatesList points = new DoubleCoordinatesList(3, expectedIntersection);
+    final CoordinatesList points = new DoubleCoordinatesList(3,
+      expectedIntersection);
 
-    CoordinatesList intersection = line1.getIntersection(line2);
+    final CoordinatesList intersection = line1.getIntersection(line2);
     Assert.equals(points, intersection);
   }
 
-  private DoubleCoordinates c_0_0_0 = c(0, 0, 0);
+  public void assertLinearIntersection(final double l1x1, final double l1y1,
+    final double l1x2, final double l1y2, final double l2x1, final double l2y1,
+    final double l2x2, final double l2y2, final double lx1, final double ly1,
+    final double lx2, final double ly2) {
+    final LineSegment line1 = new LineSegment(GEOMETRY_FACTORY_2D, l1x1, l1y1,
+      l1x2, l1y2);
+    final LineSegment line2 = new LineSegment(GEOMETRY_FACTORY_2D, l2x1, l2y1,
+      l2x2, l2y2);
+    final LineSegment line = new LineSegment(GEOMETRY_FACTORY_2D, lx1, ly1,
+      lx2, ly2);
 
-  private DoubleCoordinates c_50_0_5 = c(50, 0, 5);
+    final CoordinatesList intersection = line1.getIntersection(line2);
+    Assert.equals(line, intersection);
+  }
 
-  private DoubleCoordinates c_50_0 = c(50, 0);
-
-  private DoubleCoordinates c_50_50_5 = c(50, 50, 5);
-
-  private DoubleCoordinates c_70_0_7 = c(70, 0, 7);
-
-  private DoubleCoordinates c_70_0 = c(70, 0);
-
-  private DoubleCoordinates c_100_0_10 = c(100, 0, 10);
-
-  private DoubleCoordinates c_100_100_10 = c(100, 100, 10);
-
-  private DoubleCoordinates c_0_100_1 = c(0, 100, 1);
+  public DoubleCoordinates c(final double... coordinates) {
+    return new DoubleCoordinates(coordinates);
+  }
 
   @Test
   public void linearIntersection() {

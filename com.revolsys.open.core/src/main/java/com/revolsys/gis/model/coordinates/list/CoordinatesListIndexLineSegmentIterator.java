@@ -31,19 +31,23 @@ public class CoordinatesListIndexLineSegmentIterator implements
     this.points = CoordinatesListUtil.get(line);
   }
 
+  @Override
   public boolean hasNext() {
     return index < points.size() - 2;
   }
 
+  @Override
   public Iterator<LineSegment> iterator() {
     return this;
   }
 
+  @Override
   public LineSegment next() {
     index++;
     return new LineSegment(factory, points.get(index), points.get(index + 1));
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException("Remove not supported");
   }

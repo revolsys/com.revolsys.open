@@ -64,12 +64,16 @@ public class DataObjectQuadTree extends Quadtree {
     return super.queryAll();
   }
 
-  public List<DataObject> queryDistance(
-    final Geometry geometry,
+  public List<DataObject> queryDistance(final Geometry geometry,
     final double distance) {
     final DataObjectGeometryDistanceFilter filter = new DataObjectGeometryDistanceFilter(
       geometry, distance);
     return queryList(geometry, filter);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<DataObject> queryEnvelope(final BoundingBox envelope) {
+    return query(envelope);
   }
 
   public List<DataObject> queryEnvelope(final DataObject object) {
@@ -83,15 +87,13 @@ public class DataObjectQuadTree extends Quadtree {
     return query(envelope);
   }
 
-  public DataObject queryFirst(
-    final DataObject object,
+  public DataObject queryFirst(final DataObject object,
     final Filter<DataObject> filter) {
     final Geometry geometry = object.getGeometryValue();
     return queryFirst(geometry, filter);
   }
 
-  public DataObject queryFirst(
-    final Envelope envelope,
+  public DataObject queryFirst(final Envelope envelope,
     final Filter<DataObject> filter) {
     final SingleObjectVisitor<DataObject> singleObject = new SingleObjectVisitor<DataObject>();
     final FilterVisitor<DataObject> filterVisitor = new FilterVisitor<DataObject>(
@@ -100,15 +102,13 @@ public class DataObjectQuadTree extends Quadtree {
     return singleObject.getObject();
   }
 
-  public DataObject queryFirst(
-    final Geometry geometry,
+  public DataObject queryFirst(final Geometry geometry,
     final Filter<DataObject> filter) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return queryFirst(envelope, filter);
   }
 
-  public DataObject queryFirstEquals(
-    final DataObject object,
+  public DataObject queryFirstEquals(final DataObject object,
     final Collection<String> excludedAttributes) {
     final DataObjectEqualsFilter filter = new DataObjectEqualsFilter(object,
       excludedAttributes);
@@ -121,23 +121,19 @@ public class DataObjectQuadTree extends Quadtree {
     return queryList(geometry, filter);
   }
 
-  public List<DataObject> queryList(
-    final DataObject object,
+  public List<DataObject> queryList(final DataObject object,
     final Filter<DataObject> filter) {
     final Geometry geometry = object.getGeometryValue();
     return queryList(geometry, filter);
   }
 
-  public List<DataObject> queryList(
-    final Envelope envelope,
+  public List<DataObject> queryList(final Envelope envelope,
     final Filter<DataObject> filter) {
     return queryList(envelope, filter, null);
   }
 
-  public List<DataObject> queryList(
-    final Envelope envelope,
-    final Filter<DataObject> filter,
-    final Comparator<DataObject> comparator) {
+  public List<DataObject> queryList(final Envelope envelope,
+    final Filter<DataObject> filter, final Comparator<DataObject> comparator) {
     final CreateListVisitor<DataObject> listVisitor = new CreateListVisitor<DataObject>();
     final FilterVisitor<DataObject> filterVisitor = new FilterVisitor<DataObject>(
       filter, listVisitor);
@@ -149,17 +145,14 @@ public class DataObjectQuadTree extends Quadtree {
     return list;
   }
 
-  public List<DataObject> queryList(
-    final Geometry geometry,
+  public List<DataObject> queryList(final Geometry geometry,
     final Filter<DataObject> filter) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return queryList(envelope, filter);
   }
 
-  public List<DataObject> queryList(
-    final Geometry geometry,
-    final Filter<DataObject> filter,
-    final Comparator<DataObject> comparator) {
+  public List<DataObject> queryList(final Geometry geometry,
+    final Filter<DataObject> filter, final Comparator<DataObject> comparator) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return queryList(envelope, filter, comparator);
   }
@@ -174,10 +167,5 @@ public class DataObjectQuadTree extends Quadtree {
     for (final DataObject object : objects) {
       remove(object);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  public List<DataObject> queryEnvelope(BoundingBox envelope) {
-    return query(envelope);
   }
 }

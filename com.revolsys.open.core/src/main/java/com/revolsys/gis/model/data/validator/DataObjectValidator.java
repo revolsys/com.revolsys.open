@@ -145,8 +145,7 @@ public class DataObjectValidator {
     }
   }
 
-  public void setObjectValidator(
-    final DataType dataType,
+  public void setObjectValidator(final DataType dataType,
     final AttributeValueValidator validator) {
     objectValidators.put(dataType, validator);
   }

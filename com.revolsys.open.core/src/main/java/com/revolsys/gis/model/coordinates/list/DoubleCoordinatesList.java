@@ -17,8 +17,21 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   private final byte numAxis;
 
+  public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
+    this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
+  }
+
   public DoubleCoordinatesList(final int numAxis) {
     this(0, numAxis);
+  }
+
+  public DoubleCoordinatesList(final int numAxis,
+    final Collection<Coordinates> points) {
+    this(points.size(), numAxis);
+    int i = 0;
+    for (final Coordinates point : points) {
+      setPoint(i++, point);
+    }
   }
 
   public DoubleCoordinatesList(final int numAxis, final Coordinates... points) {
@@ -27,10 +40,6 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
       final Coordinates point = points[i];
       setPoint(i, point);
     }
-  }
-
-  public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
-    this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
   }
 
   public DoubleCoordinatesList(final int numAxis,
@@ -54,14 +63,6 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     this(numAxis, MathUtil.toDoubleArray(coordinates));
   }
 
-  public DoubleCoordinatesList(int numAxis, Collection<Coordinates> points) {
-    this(points.size(), numAxis);
-    int i = 0;
-    for (Coordinates point : points) {
-      setPoint(i++, point);
-    }
-  }
-
   @Override
   public DoubleCoordinatesList clone() {
     return new DoubleCoordinatesList(this);
@@ -74,10 +75,12 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     return coordinates;
   }
 
+  @Override
   public byte getNumAxis() {
     return numAxis;
   }
 
+  @Override
   public double getValue(final int index, final int axisIndex) {
     final byte numAxis = getNumAxis();
     if (axisIndex < numAxis) {
@@ -87,6 +90,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
+  @Override
   public void setValue(final int index, final int axisIndex, final double value) {
     final byte numAxis = getNumAxis();
     if (axisIndex < numAxis) {
@@ -94,6 +98,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
+  @Override
   public int size() {
     return coordinates.length / numAxis;
   }

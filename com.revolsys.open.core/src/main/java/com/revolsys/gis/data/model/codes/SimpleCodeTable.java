@@ -20,6 +20,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
     return (SimpleCodeTable)super.clone();
   }
 
+  @Override
   public String getIdAttributeName() {
     return null;
   }

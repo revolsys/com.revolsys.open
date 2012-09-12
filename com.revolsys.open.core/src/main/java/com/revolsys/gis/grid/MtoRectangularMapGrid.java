@@ -41,9 +41,7 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
     }
   }
 
-  private double getLatitude(
-    final String blockName,
-    final String letter,
+  private double getLatitude(final String blockName, final String letter,
     final String number50k) {
     double latitude = getLatitude(blockName, letter);
 
@@ -80,9 +78,7 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
     }
   }
 
-  private double getLongitude(
-    final String blockName,
-    final String letter,
+  private double getLongitude(final String blockName, final String letter,
     final String number50k) {
     double longitude = getLongitude(blockName, letter);
 

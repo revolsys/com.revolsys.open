@@ -49,6 +49,7 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
     setGeometry(geometry);
   }
 
+  @Override
   public boolean accept(final Geometry geometry) {
     if (geometry.getEnvelopeInternal().intersects(envelope)) {
       double distance;

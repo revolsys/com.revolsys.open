@@ -36,6 +36,7 @@ public class Mercator1SP implements CoordinatesProjection {
 
   }
 
+  @Override
   public void inverse(final Coordinates from, final Coordinates to) {
     final double x = (from.getX() - x0);
     final double y = (from.getY() - y0);
@@ -62,6 +63,7 @@ public class Mercator1SP implements CoordinatesProjection {
     }
   }
 
+  @Override
   public void project(final Coordinates from, final Coordinates to) {
     final double lambda = Math.toRadians(from.getX());
     final double phi = Math.toRadians(from.getY());

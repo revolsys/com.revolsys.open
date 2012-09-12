@@ -76,9 +76,7 @@ public class ObjectTableModel<T> extends AbstractTableModel {
   }
 
   @Override
-  public void setValueAt(
-    final Object value,
-    final int rowIndex,
+  public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
     final Object row = rows.get(rowIndex);
     final String propertyName = propertyNames[columnIndex];

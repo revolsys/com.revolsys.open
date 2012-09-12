@@ -34,6 +34,7 @@ public class EqualAttributeCountComparator implements Comparator<DataObject> {
     this.invert = invert;
   }
 
+  @Override
   public int compare(final DataObject object1, final DataObject object2) {
     final int compare;
     if (object1 == null) {

@@ -38,18 +38,42 @@ public final class DataObjectUtil {
   public static final DataObjectMetaData GEOMETRY_META_DATA = new DataObjectMetaDataImpl(
     "Feature", new Attribute("geometry", DataTypes.GEOMETRY, true));
 
-  public static void setValues(DataObject target, DataObject source,
-    Collection<String> attributesNames, Collection<String> ignoreAttributeNames) {
-    for (String attributeName : attributesNames) {
-      if (!ignoreAttributeNames.contains(attributeName)) {
-        Object oldValue = target.getValue(attributeName);
-        Object newValue = source.getValue(attributeName);
-        if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
-          newValue = DataObjectUtil.clone(newValue);
-          target.setValue(attributeName, newValue);
+  /**
+   * Clone the value if it has a clone method.
+   * 
+   * @param value The value to clone.
+   * @return The cloned value.
+   */
+  public static Object clone(final Object value) {
+    if (value instanceof Cloneable) {
+      try {
+        final Class<? extends Object> valueClass = value.getClass();
+        final Method method = valueClass.getMethod("clone", new Class[0]);
+        if (method != null) {
+          return method.invoke(value, new Object[0]);
         }
+      } catch (final IllegalArgumentException e) {
+        throw e;
+      } catch (final InvocationTargetException e) {
+
+        final Throwable cause = e.getCause();
+        if (cause instanceof RuntimeException) {
+          final RuntimeException re = (RuntimeException)cause;
+          throw re;
+        } else if (cause instanceof Error) {
+          final Error ee = (Error)cause;
+          throw ee;
+        } else {
+          throw new RuntimeException(cause.getMessage(), cause);
+        }
+      } catch (final RuntimeException e) {
+        throw e;
+      } catch (final Exception e) {
+        throw new RuntimeException(e.getMessage(), e);
       }
+
     }
+    return value;
   }
 
   /**
@@ -124,6 +148,31 @@ public final class DataObjectUtil {
     return (T)propertyValue;
   }
 
+  public static boolean getBoolean(final DataObject object,
+    final String attributeName) {
+    if (object == null) {
+      return false;
+    } else {
+      final Object value = object.getValue(attributeName);
+      if (value == null) {
+        return false;
+      } else if (value instanceof Boolean) {
+        final Boolean booleanValue = (Boolean)value;
+        return booleanValue;
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.intValue() == 1;
+      } else {
+        final String stringValue = value.toString();
+        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+
   public static Double getDouble(final DataObject object,
     final int attributeIndex) {
     final Number value = object.getValue(attributeIndex);
@@ -159,7 +208,7 @@ public final class DataObjectUtil {
   }
 
   public static Integer getInteger(final DataObject object,
-    final String attributeName, Integer defaultValue) {
+    final String attributeName, final Integer defaultValue) {
     if (object == null) {
       return null;
     } else {
@@ -168,30 +217,6 @@ public final class DataObjectUtil {
         return defaultValue;
       } else {
         return value.intValue();
-      }
-    }
-  }
-  public static boolean getBoolean(final DataObject object,
-    final String attributeName) {
-    if (object == null) {
-      return false;
-    } else {
-      final Object value = object.getValue(attributeName);
-      if (value == null) {
-        return false;
-      } else if (value instanceof Boolean) {
-        Boolean booleanValue = (Boolean)value;
-        return booleanValue;
-      } else if (value instanceof Number) {
-        Number number = (Number)value;
-        return number.intValue() == 1;
-      } else {
-        String stringValue = value.toString();
-        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
-          return true;
-        } else {
-          return false;
-        }
       }
     }
   }
@@ -205,45 +230,22 @@ public final class DataObjectUtil {
     }
   }
 
-  private DataObjectUtil() {
+  public static void setValues(final DataObject target,
+    final DataObject source, final Collection<String> attributesNames,
+    final Collection<String> ignoreAttributeNames) {
+    for (final String attributeName : attributesNames) {
+      if (!ignoreAttributeNames.contains(attributeName)) {
+        final Object oldValue = target.getValue(attributeName);
+        Object newValue = source.getValue(attributeName);
+        if (!EqualsRegistry.INSTANCE.equals(oldValue, newValue)) {
+          newValue = DataObjectUtil.clone(newValue);
+          target.setValue(attributeName, newValue);
+        }
+      }
+    }
   }
 
-  /**
-   * Clone the value if it has a clone method.
-   * 
-   * @param value The value to clone.
-   * @return The cloned value.
-   */
-  public static Object clone(final Object value) {
-    if (value instanceof Cloneable) {
-      try {
-        final Class<? extends Object> valueClass = value.getClass();
-        final Method method = valueClass.getMethod("clone", new Class[0]);
-        if (method != null) {
-          return method.invoke(value, new Object[0]);
-        }
-      } catch (final IllegalArgumentException e) {
-        throw e;
-      } catch (final InvocationTargetException e) {
-
-        final Throwable cause = e.getCause();
-        if (cause instanceof RuntimeException) {
-          final RuntimeException re = (RuntimeException)cause;
-          throw re;
-        } else if (cause instanceof Error) {
-          final Error ee = (Error)cause;
-          throw ee;
-        } else {
-          throw new RuntimeException(cause.getMessage(), cause);
-        }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
-
-    }
-    return value;
+  private DataObjectUtil() {
   }
 
 }

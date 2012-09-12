@@ -40,6 +40,7 @@ public class DataObjectDirectoryReader extends
     return reader;
   }
 
+  @Override
   public DataObjectMetaData getMetaData(final String path) {
     final DataObjectMetaData metaData = typePathMetaDataMap.get(path);
     return metaData;

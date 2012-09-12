@@ -118,6 +118,7 @@ public class ContextClassLoaderRepositorySelector implements RepositorySelector 
    * 
    * @return The logger repository.
    */
+  @Override
   public final synchronized LoggerRepository getLoggerRepository() {
     final Thread thread = Thread.currentThread();
     final ClassLoader classLoader = thread.getContextClassLoader();

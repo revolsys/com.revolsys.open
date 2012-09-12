@@ -25,12 +25,12 @@ public class SetBeanProperties implements BeanFactoryPostProcessor,
 
   private Object propertyValue;
 
-  public void addBeanPropertyName(
-    final String beanName,
+  public void addBeanPropertyName(final String beanName,
     final String propertyName) {
     beanPropertyNames.put(beanName, propertyName);
   }
 
+  @Override
   public void afterPropertiesSet() throws Exception {
     assert (value != null & ref != null) : "Cannot have a value and a ref";
     if (ref != null) {
@@ -68,6 +68,7 @@ public class SetBeanProperties implements BeanFactoryPostProcessor,
     return value;
   }
 
+  @Override
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     for (final Entry<String, String> beanPropertyName : beanPropertyNames.entrySet()) {

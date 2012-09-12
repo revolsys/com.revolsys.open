@@ -33,6 +33,7 @@ public class DataObjectEquals2DFilter implements Filter<DataObject> {
     }
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     final Geometry serachGeometry = searchObject.getGeometryValue();
     final Geometry geometry = object.getGeometryValue();

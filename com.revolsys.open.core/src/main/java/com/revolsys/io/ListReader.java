@@ -20,10 +20,12 @@ public class ListReader<T> extends AbstractReader<T> {
     values = null;
   }
 
+  @Override
   public Iterator<T> iterator() {
     return values.iterator();
   }
 
+  @Override
   public void open() {
   }
 

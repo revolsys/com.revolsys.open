@@ -11,8 +11,7 @@ import java.util.Map;
 
 public class CoordinateSystemParser {
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems(
-    final String authorityName,
-    final InputStream in) {
+    final String authorityName, final InputStream in) {
     final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
     final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     try {
@@ -54,8 +53,7 @@ public class CoordinateSystemParser {
   }
 
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems(
-    final Map<Integer, CoordinateSystem> geoCsById,
-    final String authorityName,
+    final Map<Integer, CoordinateSystem> geoCsById, final String authorityName,
     final InputStream in) {
     final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
     final BufferedReader reader = new BufferedReader(new InputStreamReader(in));

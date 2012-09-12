@@ -54,9 +54,7 @@ public class JtsGeometryConverter {
     return readGeometry(in, shapeType, recordLength);
   }
 
-  public Geometry readGeometry(
-    final EndianInput in,
-    final int shapeType,
+  public Geometry readGeometry(final EndianInput in, final int shapeType,
     final int recordLength) throws IOException {
     switch (shapeType) {
       case ShapefileConstants.NULL_SHAPE:
@@ -94,8 +92,7 @@ public class JtsGeometryConverter {
     return null;
   }
 
-  private void write2DCoordinates(
-    final EndianInputOutput out,
+  private void write2DCoordinates(final EndianInputOutput out,
     final Coordinate[] coordinates) throws IOException {
     for (int i = 0; i < coordinates.length; i++) {
       final Coordinate coordinate = coordinates[i];
@@ -104,8 +101,7 @@ public class JtsGeometryConverter {
     }
   }
 
-  private void writeEnvelope(
-    final EndianInputOutput out,
+  private void writeEnvelope(final EndianInputOutput out,
     final Envelope envelope) throws IOException {
     out.writeLEDouble(envelope.getMinX());
     out.writeLEDouble(envelope.getMinY());
@@ -113,11 +109,8 @@ public class JtsGeometryConverter {
     out.writeLEDouble(envelope.getMaxY());
   }
 
-  public int writeGeometry(
-    final LittleEndianRandomAccessFile out,
-    final int recordNumber,
-    final Object geometry,
-    final Envelope envelope,
+  public int writeGeometry(final LittleEndianRandomAccessFile out,
+    final int recordNumber, final Object geometry, final Envelope envelope,
     final int shapeType) throws IOException {
     out.writeInt(recordNumber);
     if (geometry == null) {
@@ -143,10 +136,8 @@ public class JtsGeometryConverter {
     }
   }
 
-  private int writeLineString(
-    final LittleEndianRandomAccessFile out,
-    final LineString line,
-    final int shapeType) throws IOException {
+  private int writeLineString(final LittleEndianRandomAccessFile out,
+    final LineString line, final int shapeType) throws IOException {
     final Envelope envelope = line.getEnvelopeInternal();
     final Coordinate[] coordinates = line.getCoordinates();
     if (coordinates.length > 0) {
@@ -207,10 +198,8 @@ public class JtsGeometryConverter {
     }
   }
 
-  private int writeMultiPoint(
-    final LittleEndianRandomAccessFile out,
-    final MultiPoint point,
-    final int shapeType) throws IOException {
+  private int writeMultiPoint(final LittleEndianRandomAccessFile out,
+    final MultiPoint point, final int shapeType) throws IOException {
     final com.vividsolutions.jts.geom.Envelope envelope = point.getEnvelopeInternal();
     final Coordinate[] coordinates = point.getCoordinates();
     if (coordinates.length > 0) {
@@ -273,10 +262,8 @@ public class JtsGeometryConverter {
     return ShapefileConstants.NULL_SHAPE;
   }
 
-  private int writePoint(
-    final LittleEndianRandomAccessFile out,
-    final Point point,
-    final int shapeType) throws IOException {
+  private int writePoint(final LittleEndianRandomAccessFile out,
+    final Point point, final int shapeType) throws IOException {
     final Coordinate coordinate = point.getCoordinate();
     if (shapeType == ShapefileConstants.POINT_SHAPE
       || Double.isNaN(coordinate.z)) {
@@ -300,10 +287,8 @@ public class JtsGeometryConverter {
     }
   }
 
-  private int writePolygon(
-    final LittleEndianRandomAccessFile out,
-    final Polygon polygon,
-    final int type) throws IOException {
+  private int writePolygon(final LittleEndianRandomAccessFile out,
+    final Polygon polygon, final int type) throws IOException {
     int shapeType = type;
     if (!polygon.isEmpty()) {
       final Coordinate[] coordinates = polygon.getCoordinates();

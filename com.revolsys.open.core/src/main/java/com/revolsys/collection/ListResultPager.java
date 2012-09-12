@@ -18,6 +18,7 @@ public class ListResultPager<T> implements ResultPager<T> {
     this.list.addAll(list);
   }
 
+  @Override
   public void close() {
   }
 
@@ -26,6 +27,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return The index of the last object in the current page.
    */
+  @Override
   public int getEndIndex() {
     final int numPages = getNumPages();
     if (numPages == 0) {
@@ -42,6 +44,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return The list of objects in the current page.
    */
+  @Override
   public List<T> getList() {
     if (getNumResults() == 0) {
       return Collections.emptyList();
@@ -57,6 +60,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return Thepage number of the next page.
    */
+  @Override
   public int getNextPageNumber() {
     return pageNumber + 2;
   }
@@ -66,6 +70,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return The number of pages.
    */
+  @Override
   public int getNumPages() {
     return (int)Math.ceil((double)list.size() / getPageSize());
   }
@@ -75,6 +80,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return The total number of results returned.
    */
+  @Override
   public int getNumResults() {
     return list.size();
   }
@@ -84,6 +90,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return Thepage number of the current page.
    */
+  @Override
   public int getPageNumber() {
     return pageNumber + 1;
   }
@@ -93,6 +100,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return The number of objects to display in a page.
    */
+  @Override
   public int getPageSize() {
     return pageSize;
   }
@@ -102,6 +110,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return Thepage number of the previous page.
    */
+  @Override
   public int getPreviousPageNumber() {
     return pageNumber;
   }
@@ -111,6 +120,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return The index of the first object in the current page.
    */
+  @Override
   public int getStartIndex() {
     final int numPages = getNumPages();
     if (numPages == 0) {
@@ -127,6 +137,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return True if there is a next page.
    */
+  @Override
   public boolean hasNextPage() {
     return pageNumber < getNumPages();
   }
@@ -136,6 +147,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return True if there is a previous page.
    */
+  @Override
   public boolean hasPreviousPage() {
     return pageNumber > 0;
   }
@@ -145,6 +157,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return True if this is the first page.
    */
+  @Override
   public boolean isFirstPage() {
     return pageNumber == 0;
   }
@@ -154,6 +167,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @return True if this is the last page.
    */
+  @Override
   public boolean isLastPage() {
     return pageNumber == getNumPages();
   }
@@ -163,6 +177,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @param pageNumber The current page number.
    */
+  @Override
   public void setPageNumber(final int pageNumber) {
     if (pageNumber - 1 > getNumPages()) {
       this.pageNumber = getNumPages();
@@ -178,6 +193,7 @@ public class ListResultPager<T> implements ResultPager<T> {
    * 
    * @param pageSize The number of objects per page.
    */
+  @Override
   public void setPageSize(final int pageSize) {
     this.pageSize = pageSize;
   }

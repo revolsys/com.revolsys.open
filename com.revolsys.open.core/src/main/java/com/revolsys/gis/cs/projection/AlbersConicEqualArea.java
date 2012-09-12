@@ -146,6 +146,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * <p>
    * lambda =
    */
+  @Override
   public void inverse(final Coordinates from, final Coordinates to) {
     final double x = from.getX() - x0;
     final double y = from.getY() - y0;
@@ -213,6 +214,7 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * 
    * </pre>
    */
+  @Override
   public void project(final Coordinates from, final Coordinates to) {
     final double lambda = from.getX();
     final double phi = from.getY();

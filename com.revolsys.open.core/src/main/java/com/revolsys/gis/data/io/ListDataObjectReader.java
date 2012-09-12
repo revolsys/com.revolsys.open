@@ -32,14 +32,17 @@ public class ListDataObjectReader extends AbstractReader<DataObject> implements
     objects = null;
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
+  @Override
   public Iterator<DataObject> iterator() {
     return objects.iterator();
   }
 
+  @Override
   public void open() {
   }
 }

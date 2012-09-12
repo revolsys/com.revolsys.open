@@ -103,6 +103,7 @@ public class XmlMapWriter extends AbstractMapWriter {
     }
   }
 
+  @Override
   public void write(final Map<String, ? extends Object> values) {
     if (!opened) {
       writeHeader();

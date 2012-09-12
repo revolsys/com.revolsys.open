@@ -31,6 +31,7 @@ public class EnumerationAttributeValidator implements AttributeValueValidator {
     this.dataType = dataType;
   }
 
+  @Override
   public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value != null) {
       final String stringValue = value.toString();

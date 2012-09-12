@@ -23,6 +23,7 @@ public class LineSegmentIntersectionVisitor extends
     return intersections;
   }
 
+  @Override
   public boolean visit(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
     if (lineSegment.getEnvelope().intersects(querySeg.getEnvelope())) {

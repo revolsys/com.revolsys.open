@@ -12,6 +12,7 @@ public class CrossingLineSegmentFilter implements Filter<LineSegment> {
     this.line = line;
   }
 
+  @Override
   public boolean accept(final LineSegment line) {
     if (this.line == line) {
       return false;

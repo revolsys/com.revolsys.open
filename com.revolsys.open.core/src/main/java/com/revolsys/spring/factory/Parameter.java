@@ -9,17 +9,14 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 public class Parameter implements FactoryBean<Object> {
 
   public static void registerBeanDefinition(
-    final BeanDefinitionRegistry registry,
-    final BeanFactory beanFactory,
+    final BeanDefinitionRegistry registry, final BeanFactory beanFactory,
     final String beanName) {
     registerBeanDefinition(registry, beanFactory, beanName, beanName);
   }
 
   public static void registerBeanDefinition(
-    final BeanDefinitionRegistry registry,
-    final BeanFactory beanFactory,
-    final String beanName,
-    final String alias) {
+    final BeanDefinitionRegistry registry, final BeanFactory beanFactory,
+    final String beanName, final String alias) {
     if (beanFactory.containsBean(beanName)) {
       final Object value = beanFactory.getBean(beanName);
       registerBeanDefinition(registry, alias, value);
@@ -27,8 +24,7 @@ public class Parameter implements FactoryBean<Object> {
   }
 
   public static void registerBeanDefinition(
-    final BeanDefinitionRegistry registry,
-    final String beanName,
+    final BeanDefinitionRegistry registry, final String beanName,
     final Object value) {
     final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
     beanDefinition.setBeanClass(Parameter.class);
@@ -48,10 +44,12 @@ public class Parameter implements FactoryBean<Object> {
     this.value = value;
   }
 
+  @Override
   public Object getObject() throws Exception {
     return value;
   }
 
+  @Override
   public Class getObjectType() {
     if (type == null && value != null) {
       return value.getClass();
@@ -68,6 +66,7 @@ public class Parameter implements FactoryBean<Object> {
     return value;
   }
 
+  @Override
   public boolean isSingleton() {
     return true;
   }

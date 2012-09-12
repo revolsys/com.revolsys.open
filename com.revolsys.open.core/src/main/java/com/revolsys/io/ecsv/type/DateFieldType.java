@@ -17,6 +17,7 @@ public class DateFieldType extends AbstractEcsvFieldType {
     this.dateFormat = new SimpleDateFormat(dateFormat);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       try {
@@ -29,6 +30,7 @@ public class DateFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof Date) {
       final Date date = (Date)value;

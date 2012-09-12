@@ -79,6 +79,7 @@ public class OsnReader implements DataObjectReader {
     dataObject.setValue(name, value);
   }
 
+  @Override
   public void close() {
     try {
       osnIterator.close();
@@ -152,6 +153,7 @@ public class OsnReader implements DataObjectReader {
     return metaDataFactory;
   }
 
+  @Override
   public boolean hasNext() {
     if (nextChecked) {
       return true;
@@ -176,6 +178,7 @@ public class OsnReader implements DataObjectReader {
     return false;
   }
 
+  @Override
   public DataObject next() {
     if (hasNext()) {
       nextChecked = false;
@@ -185,6 +188,7 @@ public class OsnReader implements DataObjectReader {
     }
   }
 
+  @Override
   public void open() {
     try {
       if (directory != null) {
@@ -205,8 +209,7 @@ public class OsnReader implements DataObjectReader {
    * @param endEventType The event type indicating the end of a collection.
    * @throws IOException If an I/O error occurs.
    */
-  private void processCollection(
-    final Collection<Object> collection,
+  private void processCollection(final Collection<Object> collection,
     final Object endEventType) {
     while (osnIterator.getEventType() != endEventType) {
       final Object value = getExpression();
@@ -216,6 +219,7 @@ public class OsnReader implements DataObjectReader {
     }
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException(
       "Removing SAIF objects is not supported");

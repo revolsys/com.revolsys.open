@@ -19,6 +19,7 @@ public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
     dataStore = null;
   }
 
+  @Override
   public void write(final DataObject object) {
     if (object != null) {
       try {

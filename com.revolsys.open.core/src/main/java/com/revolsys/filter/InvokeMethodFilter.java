@@ -52,6 +52,7 @@ public class InvokeMethodFilter<T> implements Filter<T> {
     System.arraycopy(parameters, 0, this.parameters, 0, parameters.length);
   }
 
+  @Override
   public boolean accept(final T item) {
     try {
       parameters[parameters.length - 1] = item;

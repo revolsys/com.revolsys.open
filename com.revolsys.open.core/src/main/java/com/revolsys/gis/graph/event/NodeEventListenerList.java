@@ -12,17 +12,14 @@ public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
    */
   private static final long serialVersionUID = 491848000001273343L;
 
-  public void nodeEvent(
-    final Node<T> node,
-    final String typePath,
-    final String ruleName,
-    final String action,
-    final String notes) {
+  public void nodeEvent(final Node<T> node, final String typePath,
+    final String ruleName, final String action, final String notes) {
     if (!isEmpty()) {
       nodeEvent(new NodeEvent<T>(node, typePath, ruleName, action, notes));
     }
   }
 
+  @Override
   public void nodeEvent(final NodeEvent<T> nodeEvent) {
     for (final NodeEventListener<T> listener : this) {
       listener.nodeEvent(nodeEvent);

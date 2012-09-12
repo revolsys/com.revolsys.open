@@ -47,6 +47,7 @@ public class NamedThreadFactory implements ThreadFactory {
     return priority;
   }
 
+  @Override
   public Thread newThread(final Runnable runnable) {
     synchronized (threadNumber) {
       if (group == null) {

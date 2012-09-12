@@ -12,11 +12,8 @@ public class EdgeEventListenerList<T> extends LinkedHashSet<EdgeEventListener>
    */
   private static final long serialVersionUID = 4332907382649828764L;
 
-  public void edgeEvent(
-    final Edge<T> edge,
-    final String ruleName,
-    final String action,
-    final String notes) {
+  public void edgeEvent(final Edge<T> edge, final String ruleName,
+    final String action, final String notes) {
     if (!isEmpty()) {
       final EdgeEvent<T> edgeEvent = new EdgeEvent<T>(edge, ruleName, action,
         notes);
@@ -24,6 +21,7 @@ public class EdgeEventListenerList<T> extends LinkedHashSet<EdgeEventListener>
     }
   }
 
+  @Override
   public void edgeEvent(final EdgeEvent<T> edgeEvent) {
     for (final EdgeEventListener<T> listener : this) {
       listener.edgeEvent(edgeEvent);

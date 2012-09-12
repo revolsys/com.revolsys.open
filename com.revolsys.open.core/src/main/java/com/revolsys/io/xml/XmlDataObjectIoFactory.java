@@ -16,10 +16,9 @@ public class XmlDataObjectIoFactory extends
     addMediaTypeAndFileExtension("text/xml", "xml");
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return new XmlDataObjectWriter(metaData, new OutputStreamWriter(
       outputStream, charset));

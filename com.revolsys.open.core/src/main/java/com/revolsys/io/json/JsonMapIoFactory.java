@@ -98,6 +98,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     addMediaTypeAndFileExtension("application/json", "json");
   }
 
+  @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     try {
       return new JsonMapReader(resource.getInputStream());
@@ -106,16 +107,19 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     }
   }
 
+  @Override
   public MapWriter getWriter(final OutputStream out) {
     final Writer writer = new OutputStreamWriter(out);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Resource resource) {
     final Writer writer = SpringUtil.getWriter(resource);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Writer out) {
     return new JsonMapWriter(out);
   }
@@ -125,6 +129,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     return true;
   }
 
+  @Override
   public boolean isGeometrySupported() {
     return true;
   }

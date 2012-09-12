@@ -48,8 +48,7 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<DataObject>> {
    * @param edge The edge.
    * @return The type of edge.
    */
-  private EdgeType checkDirection(
-    final Node<DataObject> node,
+  private EdgeType checkDirection(final Node<DataObject> node,
     final Edge<DataObject> edge) {
     final Node<DataObject> toNode = edge.getToNode();
     final int degree = toNode.getDegree();
@@ -83,10 +82,8 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<DataObject>> {
    * @param edge2 The second edge.
    * @return True if one of the edges can be reversed, false otherwise.
    */
-  private boolean fixReversedEdges(
-    final Node<DataObject> node,
-    final Set<Edge<DataObject>> reversedEdges,
-    final Edge<DataObject> edge1,
+  private boolean fixReversedEdges(final Node<DataObject> node,
+    final Set<Edge<DataObject>> reversedEdges, final Edge<DataObject> edge1,
     final Edge<DataObject> edge2) {
     final EdgeType edge1Direction = checkDirection(node, edge1);
     final EdgeType edge2Direction = checkDirection(node, edge2);
@@ -106,6 +103,7 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<DataObject>> {
     }
   }
 
+  @Override
   public boolean visit(final Node<DataObject> node) {
     final Set<Edge<DataObject>> edges = new LinkedHashSet<Edge<DataObject>>(
       node.getEdges());

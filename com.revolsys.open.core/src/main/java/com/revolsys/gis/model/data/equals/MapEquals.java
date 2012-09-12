@@ -8,10 +8,9 @@ import java.util.Set;
 public class MapEquals implements Equals<Map<String, Object>> {
   private EqualsRegistry equalsRegistry;
 
-  public boolean equals(
-    final Map<String, Object> map1,
-    final Map<String, Object> map2,
-    final Collection<String> exclude) {
+  @Override
+  public boolean equals(final Map<String, Object> map1,
+    final Map<String, Object> map2, final Collection<String> exclude) {
     if (map1 == null) {
       if (map2 == null) {
         return true;
@@ -47,6 +46,7 @@ public class MapEquals implements Equals<Map<String, Object>> {
     return true;
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }

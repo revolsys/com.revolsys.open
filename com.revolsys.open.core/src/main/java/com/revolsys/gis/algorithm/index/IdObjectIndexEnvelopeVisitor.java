@@ -17,6 +17,7 @@ public final class IdObjectIndexEnvelopeVisitor<T> implements Visitor<Integer> {
     this.visitor = visitor;
   }
 
+  @Override
   public boolean visit(final Integer id) {
     final T object = index.getObject(id);
     final Envelope e = index.getEnvelope(object);

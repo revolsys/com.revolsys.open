@@ -9,6 +9,7 @@ public class UpperCamelCaseNameConverter implements NameConverter {
 
   private final Map<String, String> names = new HashMap<String, String>();
 
+  @Override
   public String convert(final String name) {
     String newName = names.get(name);
     if (newName == null) {

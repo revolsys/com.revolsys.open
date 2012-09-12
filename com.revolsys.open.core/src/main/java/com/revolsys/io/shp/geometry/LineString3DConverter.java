@@ -28,6 +28,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POLYLINE_ZM_SHAPE;
   }
@@ -38,6 +39,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
    * com.revolsys.gis.format.shape.io.geometry.ShapefileGeometryConverter#read
    * (int, com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile)
    */
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     // skip bounding box;
@@ -89,6 +91,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
    * (com.revolsys.gis.format.core.io.LittleEndianRandomAccessFile,
    * com.vividsolutions.jts.geom.Geometry)
    */
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof LineString) {
@@ -109,8 +112,7 @@ public class LineString3DConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private void writePolyLineZHeader(
-    final EndianOutput out,
+  private void writePolyLineZHeader(final EndianOutput out,
     final Geometry geometry) throws IOException {
     final int numCoordinates = geometry.getNumPoints();
     final int numGeometries = geometry.getNumGeometries();

@@ -29,6 +29,7 @@ public class MultipleAttributeValuesFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
+  @Override
   public boolean accept(final DataObject object) {
     for (final Entry<String, ? extends Object> entry : values.entrySet()) {
       final String attributeName = entry.getKey();

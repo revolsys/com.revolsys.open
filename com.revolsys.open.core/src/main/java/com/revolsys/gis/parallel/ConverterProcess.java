@@ -22,10 +22,8 @@ public class ConverterProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     if (converter != null) {
       final DataObject target = converter.convert(object);
       out.write(target);

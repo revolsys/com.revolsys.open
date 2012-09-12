@@ -87,18 +87,14 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private GeometryFactory geometryFactory;
 
   public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
-    final Resource resource)  {
+    final Resource resource) {
     super(metaData, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
   }
 
   @Override
-  protected int addDbaseField(
-    final String name,
-    final DataType dataType,
-    final Class<?> typeJavaClass,
-    final int length,
-    final int scale) {
+  protected int addDbaseField(final String name, final DataType dataType,
+    final Class<?> typeJavaClass, final int length, final int scale) {
     if (Geometry.class.isAssignableFrom(typeJavaClass)) {
       addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
       return 0;
@@ -230,7 +226,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         shapeType = geometryConverter.getShapeType();
       }
       out.seek(24);
-      int sizeInShorts = (int)(out.length() / 2);
+      final int sizeInShorts = (int)(out.length() / 2);
       out.writeInt(sizeInShorts);
       out.seek(32);
       out.writeLEInt(shapeType);
@@ -259,8 +255,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected boolean writeField(
-    final DataObject object,
+  protected boolean writeField(final DataObject object,
     final FieldDefinition field) throws IOException {
     if (field.getFullName().equals(geometryPropertyName)) {
       final long recordIndex = out.getFilePointer();
@@ -279,9 +274,9 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         recordNumber++;
         if (indexOut != null) {
           final long recordLength = out.getFilePointer() - recordIndex;
-          int offsetShort = (int)(recordIndex / MathUtil.BYTES_IN_SHORT);
+          final int offsetShort = (int)(recordIndex / MathUtil.BYTES_IN_SHORT);
           indexOut.writeInt(offsetShort);
-          int lengthShort = (int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4;
+          final int lengthShort = (int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4;
           indexOut.writeInt(lengthShort);
         }
       }

@@ -17,8 +17,7 @@ public class SortByType extends BaseInOutProcess<DataObject, DataObject> {
     new DataObjectMetaDataNameComparator());
 
   @Override
-  protected void postRun(
-    final Channel<DataObject> in,
+  protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     for (final Collection<DataObject> objects : objectsByType.values()) {
       for (final DataObject object : objects) {
@@ -28,10 +27,8 @@ public class SortByType extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     Collection<DataObject> objects = objectsByType.get(metaData);
     if (objects == null) {

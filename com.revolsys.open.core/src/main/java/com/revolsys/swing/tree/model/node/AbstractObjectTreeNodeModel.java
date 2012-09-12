@@ -13,7 +13,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.ClassUtil;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -41,7 +40,7 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   public AbstractObjectTreeNodeModel() {
   }
 
-  public AbstractObjectTreeNodeModel(ObjectTreeModel objectTreeModel) {
+  public AbstractObjectTreeNodeModel(final ObjectTreeModel objectTreeModel) {
     this.objectTreeModel = objectTreeModel;
   }
 
@@ -58,6 +57,17 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   protected void addObjectTreeNodeModels(
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
     this.objectTreeNodeModels.addAll(Arrays.asList(objectTreeNodeModels));
+  }
+
+  @Override
+  public String convertValueToText(final NODE node, final boolean selected,
+    final boolean expanded, final boolean leaf, final int row,
+    final boolean hasFocus) {
+    if (node == null) {
+      return "";
+    } else {
+      return node.toString();
+    }
   }
 
   @Override
@@ -104,27 +114,21 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     return mouseListener;
   }
 
+  public ObjectTreeModel getObjectTreeModel() {
+    return objectTreeModel;
+  }
+
   @Override
   public ObjectTreeNodeModel<?, ?> getObjectTreeNodeModel(final Class<?> clazz) {
-    Set<Class<?>> classes = ClassUtil.getSuperClassesAndInterfaces(clazz);
+    final Set<Class<?>> classes = ClassUtil.getSuperClassesAndInterfaces(clazz);
 
     for (final ObjectTreeNodeModel<?, ?> objectTreeNodeModel : objectTreeNodeModels) {
-      Set<Class<?>> supportedClasses = objectTreeNodeModel.getSupportedClasses();
+      final Set<Class<?>> supportedClasses = objectTreeNodeModel.getSupportedClasses();
       if (CollectionUtils.containsAny(supportedClasses, classes)) {
         return objectTreeNodeModel;
       }
     }
     return null;
-  }
-
-  @Override
-  public String convertValueToText(NODE node, boolean selected,
-    boolean expanded, boolean leaf, int row, boolean hasFocus) {
-    if (node == null) {
-      return "";
-    } else {
-      return node.toString();
-    }
   }
 
   @Override
@@ -186,12 +190,8 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     this.mouseListener = mouseListener;
   }
 
-  public ObjectTreeModel getObjectTreeModel() {
-    return objectTreeModel;
-  }
-
   @Override
-  public void setObjectTreeModel(ObjectTreeModel objectTreeModel) {
+  public void setObjectTreeModel(final ObjectTreeModel objectTreeModel) {
     this.objectTreeModel = objectTreeModel;
   }
 

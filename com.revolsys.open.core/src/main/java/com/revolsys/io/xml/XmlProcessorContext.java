@@ -39,9 +39,7 @@ public interface XmlProcessorContext extends XMLReporter {
    * @param relatedInformation Additional information about the error.
    * @param location The location of the error.
    */
-  void addError(
-    final String message,
-    final Object relatedInformation,
+  void addError(final String message, final Object relatedInformation,
     final Location location);
 
   /**

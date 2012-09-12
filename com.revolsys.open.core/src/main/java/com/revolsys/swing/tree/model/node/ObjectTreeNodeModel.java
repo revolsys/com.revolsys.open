@@ -14,6 +14,9 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   int addChild(NODE node, int index, CHILD child);
 
+  String convertValueToText(NODE node, boolean selected, boolean expanded,
+    boolean leaf, int row, boolean hasFocus);
+
   CHILD getChild(final NODE node, final int index);
 
   int getChildCount(final NODE node);
@@ -43,7 +46,4 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
   boolean removeChild(final NODE node, final CHILD child);
 
   void setObjectTreeModel(ObjectTreeModel objectTreeModel);
-
-  String convertValueToText(NODE node, boolean selected, boolean expanded,
-    boolean leaf, int row, boolean hasFocus);
 }

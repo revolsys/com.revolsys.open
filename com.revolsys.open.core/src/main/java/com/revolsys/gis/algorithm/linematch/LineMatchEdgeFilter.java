@@ -7,10 +7,8 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
 
-  public static double getDistance(
-    final Edge<LineSegmentMatch> edge,
-    final Node<LineSegmentMatch> node,
-    final double tolerance) {
+  public static double getDistance(final Edge<LineSegmentMatch> edge,
+    final Node<LineSegmentMatch> node, final double tolerance) {
     final double distance = edge.distance(node);
     if (distance == 0) {
       return 0;
@@ -27,10 +25,8 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
   }
 
   public static boolean isEitherOppositeNodesWithinDistance(
-    final Edge<LineSegmentMatch> edge1,
-    final Edge<LineSegmentMatch> edge2,
-    final Node<LineSegmentMatch> fromNode2,
-    final double tolerance) {
+    final Edge<LineSegmentMatch> edge1, final Edge<LineSegmentMatch> edge2,
+    final Node<LineSegmentMatch> fromNode2, final double tolerance) {
     if (isOppositeNodeWithinDistance(edge1, edge2, fromNode2, tolerance)) {
       return true;
     } else if (isOppositeNodeWithinDistance(edge2, edge1, fromNode2, tolerance)) {
@@ -41,10 +37,8 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
   }
 
   public static boolean isOppositeNodeWithinDistance(
-    final Edge<LineSegmentMatch> edge1,
-    final Edge<LineSegmentMatch> edge2,
-    final Node<LineSegmentMatch> node,
-    final double tolerance) {
+    final Edge<LineSegmentMatch> edge1, final Edge<LineSegmentMatch> edge2,
+    final Node<LineSegmentMatch> node, final double tolerance) {
     final Node<LineSegmentMatch> oppositeNode = edge1.getOppositeNode(node);
     final double oppositeNodeEdge2Distance = edge2.distance(oppositeNode);
     if (oppositeNodeEdge2Distance < tolerance) {
@@ -86,6 +80,7 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
     this.toNode = edge.getToNode();
   }
 
+  @Override
   public boolean accept(final Edge<LineSegmentMatch> edge2) {
     if (edge2.getEnvelope().intersects(envelope)) {
       final LineSegmentMatch edgeMatch2 = edge2.getObject();
@@ -130,10 +125,8 @@ public class LineMatchEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
     return false;
   }
 
-  private boolean checkTolerance(
-    final double from1Distance,
-    final double to1Distance,
-    final double from2Distance,
+  private boolean checkTolerance(final double from1Distance,
+    final double to1Distance, final double from2Distance,
     final double to2Distance) {
     if (from1Distance < tolerance) {
       if (to1Distance < tolerance || from2Distance < tolerance

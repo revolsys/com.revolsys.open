@@ -54,6 +54,7 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
     this.flip = flip;
   }
 
+  @Override
   public boolean accept(final LineString line) {
     if (this.envelope.intersects(line.getEnvelopeInternal())) {
       final CoordinatesList points = CoordinatesListUtil.get(line);

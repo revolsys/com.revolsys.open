@@ -11,8 +11,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class PointUtil {
 
-  public static Point createRandomPoint(
-    final GeometryFactory factory,
+  public static Point createRandomPoint(final GeometryFactory factory,
     final Envelope envelope) {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();

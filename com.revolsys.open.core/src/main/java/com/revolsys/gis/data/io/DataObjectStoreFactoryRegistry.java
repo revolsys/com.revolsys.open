@@ -71,8 +71,7 @@ public class DataObjectStoreFactoryRegistry {
   }
 
   public static void setConnectionProperties(
-    final DataObjectStore dataObjectStore,
-    final Map<String, Object> properties) {
+    final DataObjectStore dataObjectStore, final Map<String, Object> properties) {
     final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(
       dataObjectStore);
     for (final Entry<String, Object> property : properties.entrySet()) {

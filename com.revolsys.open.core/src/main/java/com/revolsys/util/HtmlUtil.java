@@ -191,11 +191,8 @@ public final class HtmlUtil {
 
   public static final QName ATTR_TARGET = new QName("target");
 
-  public static void serializeA(
-    final XmlWriter out,
-    final String cssClass,
-    final Object url,
-    final Object content) {
+  public static void serializeA(final XmlWriter out, final String cssClass,
+    final Object url, final Object content) {
     if (url != null) {
       out.startTag(A);
       if (cssClass != null) {
@@ -215,10 +212,8 @@ public final class HtmlUtil {
     out.endTag(B);
   }
 
-  public static void serializeButtonInput(
-    final XmlWriter out,
-    final String value,
-    final String onClick) {
+  public static void serializeButtonInput(final XmlWriter out,
+    final String value, final String onClick) {
     out.startTag(INPUT);
     out.attribute(ATTR_TYPE, "button");
     out.attribute(ATTR_VALUE, value);
@@ -228,12 +223,8 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeCheckBox(
-    final XmlWriter out,
-    final String name,
-    final String value,
-    final boolean selected,
-    final String onClick) {
+  public static void serializeCheckBox(final XmlWriter out, final String name,
+    final String value, final boolean selected, final String onClick) {
     out.startTag(INPUT);
     out.attribute(ATTR_ID, name);
     out.attribute(ATTR_NAME, name);
@@ -250,9 +241,7 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializeDiv(
-    final XmlWriter out,
-    final String cssClass,
+  public static void serializeDiv(final XmlWriter out, final String cssClass,
     final Object content) {
     if (content != null) {
       final String text = content.toString().trim();
@@ -275,9 +264,7 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
-  public static void serializeFileInput(
-    final XmlWriter out,
-    final String name,
+  public static void serializeFileInput(final XmlWriter out, final String name,
     final Object value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
@@ -291,10 +278,8 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeHiddenInput(
-    final XmlWriter out,
-    final String name,
-    final Object value) {
+  public static void serializeHiddenInput(final XmlWriter out,
+    final String name, final Object value) {
 
     String stringValue = null;
     if (value != null) {
@@ -303,10 +288,8 @@ public final class HtmlUtil {
     serializeHiddenInput(out, name, stringValue);
   }
 
-  public static void serializeHiddenInput(
-    final XmlWriter out,
-    final String name,
-    final String value) {
+  public static void serializeHiddenInput(final XmlWriter out,
+    final String name, final String value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "hidden");
@@ -329,11 +312,8 @@ public final class HtmlUtil {
     out.endTag(SCRIPT);
   }
 
-  public static void serializeSelect(
-    final XmlWriter out,
-    final String name,
-    final Object selectedValue,
-    final boolean optional,
+  public static void serializeSelect(final XmlWriter out, final String name,
+    final Object selectedValue, final boolean optional,
     final List<? extends Object> values) {
     out.startTag(SELECT);
     out.attribute(ATTR_NAME, name);
@@ -360,12 +340,8 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeSelect(
-    final XmlWriter out,
-    final String name,
-    final Object selectedValue,
-    final boolean optional,
-    final Map<?, ?> values) {
+  public static void serializeSelect(final XmlWriter out, final String name,
+    final Object selectedValue, final boolean optional, final Map<?, ?> values) {
     out.startTag(SELECT);
     out.attribute(ATTR_NAME, name);
     if (optional) {
@@ -392,19 +368,13 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeSelect(
-    final XmlWriter out,
-    final String name,
-    final Object selectedValue,
-    final boolean optional,
-    final Object... values) {
+  public static void serializeSelect(final XmlWriter out, final String name,
+    final Object selectedValue, final boolean optional, final Object... values) {
     serializeSelect(out, name, selectedValue, false, Arrays.asList(values));
 
   }
 
-  public static void serializeSpan(
-    final XmlWriter out,
-    final String cssClass,
+  public static void serializeSpan(final XmlWriter out, final String cssClass,
     final Object content) {
     if (content != null) {
       final String text = content.toString().trim();
@@ -419,10 +389,8 @@ public final class HtmlUtil {
     }
   }
 
-  public static void serializeSubmitInput(
-    final XmlWriter out,
-    final String name,
-    final Object value) {
+  public static void serializeSubmitInput(final XmlWriter out,
+    final String name, final Object value) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "submit");
@@ -434,21 +402,15 @@ public final class HtmlUtil {
 
   }
 
-  public static void serializeTag(
-    final XmlWriter out,
-    final QName tag,
+  public static void serializeTag(final XmlWriter out, final QName tag,
     final String content) {
     out.startTag(tag);
     out.text(content);
     out.endTag(tag);
   }
 
-  public static void serializeTextInput(
-    final XmlWriter out,
-    final String name,
-    final Object value,
-    final int size,
-    final int maxLength) {
+  public static void serializeTextInput(final XmlWriter out, final String name,
+    final Object value, final int size, final int maxLength) {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "text");

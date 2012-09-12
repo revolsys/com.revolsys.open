@@ -12,6 +12,7 @@ public class LoggingRunnable implements Runnable {
     this.runnable = runnable;
   }
 
+  @Override
   public void run() {
     try {
       runnable.run();

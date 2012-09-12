@@ -48,10 +48,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private List<String> orderBy = new ArrayList<String>();
 
-  public void setOrderBy(List<String> orderBy) {
-    this.orderBy = orderBy;
-  }
-
   private String typePath;
 
   public CodeTableProperty() {
@@ -144,6 +140,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return dataStore;
   }
 
+  @Override
   public String getIdAttributeName() {
     if (metaData == null) {
       return "";
@@ -173,6 +170,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
@@ -181,6 +179,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return modificationTimestampAttributeName;
   }
 
+  @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
   }
@@ -199,8 +198,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
-    Query query = new Query(typePath);
-    for (String order : orderBy) {
+    final Query query = new Query(typePath);
+    for (final String order : orderBy) {
       query.addOrderBy(order, true);
     }
     final Reader<DataObject> allCodes = dataStore.query(query);
@@ -208,8 +207,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   @Override
-  protected synchronized Object loadId(
-    final List<Object> values,
+  protected synchronized Object loadId(final List<Object> values,
     final boolean createId) {
     Object id = null;
     if (createId && loadAll) {
@@ -282,6 +280,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     this.loadAll = loadAll;
   }
 
+  @Override
   public void setMetaData(final DataObjectMetaData metaData) {
     if (this.metaData != metaData) {
       if (this.metaData != null) {
@@ -304,6 +303,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
   public void setModificationTimestampAttributeName(
     final String modificationTimestampAttributeName) {
     this.modificationTimestampAttributeName = modificationTimestampAttributeName;
+  }
+
+  public void setOrderBy(final List<String> orderBy) {
+    this.orderBy = orderBy;
   }
 
   public void setValueAttributeName(final String valueColumns) {

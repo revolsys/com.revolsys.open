@@ -234,7 +234,7 @@ public final class FileUtil {
       } finally {
         closeSilent(out);
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to open file: " + file, e);
     }
   }
@@ -374,7 +374,7 @@ public final class FileUtil {
 
   public static File createTempFile(final String prefix, final String suffix) {
     try {
-      File file = File.createTempFile(prefix, suffix);
+      final File file = File.createTempFile(prefix, suffix);
       deleteFileOnExit(file);
       return file;
     } catch (final IOException e) {

@@ -171,6 +171,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
      */
   }
 
+  @Override
   public DataObjectMetaDataImpl getMetaData() {
     return metaData;
   }

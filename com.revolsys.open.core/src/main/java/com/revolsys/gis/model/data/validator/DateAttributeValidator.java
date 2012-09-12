@@ -26,6 +26,7 @@ import com.revolsys.gis.data.model.Attribute;
 
 public class DateAttributeValidator implements AttributeValueValidator {
 
+  @Override
   public boolean isValid(final Attribute attributeDefinition, final Object value) {
     return (value instanceof Date);
 

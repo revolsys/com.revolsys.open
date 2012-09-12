@@ -1,23 +1,3 @@
-/*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/model/schema/impl/DataObjectMetaDataImpl.java $
- * $Author:paul.austin@revolsys.com $
- * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
- * $Revision:265 $
-
- * Copyright 2004-2005 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.revolsys.gis.data.model;
 
 import java.io.IOException;
@@ -29,13 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.WeakCache;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
@@ -48,6 +28,10 @@ import com.vividsolutions.jts.util.AssertionFailedException;
 
 public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   implements DataObjectMetaData, Cloneable {
+  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
+
+  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakCache<Integer, DataObjectMetaDataImpl>();
+
   public static void destroy(final DataObjectMetaDataImpl... metaDataList) {
     for (final DataObjectMetaDataImpl metaData : metaDataList) {
       metaData.destroy();
@@ -66,6 +50,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   private List<Attribute> attributes = new ArrayList<Attribute>();
 
+  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
+
   private DataObjectFactory dataObjectFactory = new ArrayDataObjectFactory();
 
   private DataObjectMetaDataFactory dataObjectMetaDataFactory;
@@ -77,16 +63,14 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
 
-  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
-
-  private final int instanceId = INSTANCE_IDS.getAndIncrement();
-
   private List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
 
   private List<String> geometryAttributeNames = new ArrayList<String>();
 
   /** The index of the ID attribute. */
   private int idAttributeIndex = -1;
+
+  private final Integer instanceId = INSTANCE_IDS.getAndIncrement();
 
   /** The path of the data type. */
   private String path;
@@ -96,10 +80,6 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   protected DataObjectStoreSchema schema;
 
   private List<DataObjectMetaData> superClasses = new ArrayList<DataObjectMetaData>();
-
-  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakHashMap<Integer, DataObjectMetaDataImpl>();
-
-  private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
 
   public DataObjectMetaDataImpl() {
   }
@@ -188,31 +168,31 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     attribute.setIndex(index);
   }
 
-  public Attribute addAttribute(
-    final String name,
-    final DataType type,
+  /**
+   * Adds an attribute with the given case-sensitive name.
+   * 
+   * @throws AssertionFailedException if a second Geometry is being added
+   */
+  public Attribute addAttribute(final String attributeName, final DataType type) {
+    return addAttribute(attributeName, type, false);
+  }
+
+  public Attribute addAttribute(final String name, final DataType type,
     final boolean required) {
     final Attribute attribute = new Attribute(name, type, required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public Attribute addAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final boolean required) {
+  public Attribute addAttribute(final String name, final DataType type,
+    final int length, final boolean required) {
     final Attribute attribute = new Attribute(name, type, length, required);
     addAttribute(attribute);
     return attribute;
   }
 
-  public Attribute addAttribute(
-    final String name,
-    final DataType type,
-    final int length,
-    final int scale,
-    final boolean required) {
+  public Attribute addAttribute(final String name, final DataType type,
+    final int length, final int scale, final boolean required) {
     final Attribute attribute = new Attribute(name, type, length, scale,
       required);
     addAttribute(attribute);
@@ -223,14 +203,13 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     codeTableByColumnMap.put(column, codeTable);
   }
 
-  public void addDefaultValue(
-    final String attributeName,
+  @Override
+  public void addDefaultValue(final String attributeName,
     final Object defaultValue) {
     defaultValues.put(attributeName, defaultValue);
   }
 
-  public void addRestriction(
-    final String attributePath,
+  public void addRestriction(final String attributePath,
     final Collection<Object> values) {
     restrictions.put(attributePath, values);
   }
@@ -266,6 +245,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public int compareTo(final DataObjectMetaData other) {
     final String otherPath = other.getPath();
     if (otherPath == path) {
@@ -279,10 +259,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public DataObject createDataObject() {
     return dataObjectFactory.createDataObject(this);
   }
 
+  @Override
   public void delete(final DataObject dataObject) {
     if (dataObjectStore == null) {
       throw new UnsupportedOperationException();
@@ -291,6 +273,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   @PreDestroy
   public void destroy() {
     super.close();
@@ -316,19 +299,23 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return other == this;
   }
 
+  @Override
   public Attribute getAttribute(final CharSequence name) {
     final String lowerName = name.toString().toLowerCase();
     return attributeMap.get(lowerName);
   }
 
+  @Override
   public Attribute getAttribute(final int i) {
     return attributes.get(i);
   }
 
+  @Override
   public int getAttributeCount() {
     return attributes.size();
   }
 
+  @Override
   public int getAttributeIndex(final CharSequence name) {
     if (name == null) {
       return -1;
@@ -343,6 +330,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public int getAttributeLength(final int i) {
     try {
       final Attribute attribute = attributes.get(i);
@@ -352,6 +340,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public String getAttributeName(final int i) {
     try {
       if (i == -1) {
@@ -365,19 +354,23 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public List<String> getAttributeNames() {
     return attributeNames;
   }
 
+  @Override
   public List<Attribute> getAttributes() {
     return attributes;
   }
 
+  @Override
   public int getAttributeScale(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getScale();
   }
 
+  @Override
   public DataType getAttributeType(final CharSequence name) {
     final int index = getAttributeIndex(name);
     if (index == -1) {
@@ -387,11 +380,13 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public DataType getAttributeType(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.getType();
   }
 
+  @Override
   public CodeTable getCodeTableByColumn(final String column) {
     CodeTable codeTable = codeTableByColumnMap.get(column);
     if (codeTable == null && dataObjectStore != null) {
@@ -400,10 +395,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return codeTable;
   }
 
+  @Override
   public DataObjectFactory getDataObjectFactory() {
     return dataObjectFactory;
   }
 
+  @Override
   public DataObjectMetaDataFactory getDataObjectMetaDataFactory() {
     if (dataObjectMetaDataFactory == null) {
       return dataObjectStore;
@@ -412,18 +409,22 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public DataObjectStore getDataObjectStore() {
     return dataObjectStore;
   }
 
+  @Override
   public Object getDefaultValue(final String attributeName) {
     return defaultValues.get(attributeName);
   }
 
+  @Override
   public Map<String, Object> getDefaultValues() {
     return defaultValues;
   }
 
+  @Override
   public Attribute getGeometryAttribute() {
     if (geometryAttributeIndex == -1) {
       return null;
@@ -432,22 +433,27 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public int getGeometryAttributeIndex() {
     return geometryAttributeIndex;
   }
 
+  @Override
   public List<Integer> getGeometryAttributeIndexes() {
     return geometryAttributeIndexes;
   }
 
+  @Override
   public String getGeometryAttributeName() {
     return getAttributeName(geometryAttributeIndex);
   }
 
+  @Override
   public List<String> getGeometryAttributeNames() {
     return geometryAttributeNames;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     final Attribute geometryAttribute = getGeometryAttribute();
     if (geometryAttribute == null) {
@@ -458,6 +464,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public Attribute getIdAttribute() {
     if (idAttributeIndex >= 0) {
       return attributes.get(idAttributeIndex);
@@ -466,18 +473,22 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public int getIdAttributeIndex() {
     return idAttributeIndex;
   }
 
+  @Override
   public String getIdAttributeName() {
     return getAttributeName(idAttributeIndex);
   }
 
+  @Override
   public int getInstanceId() {
     return instanceId;
   }
 
+  @Override
   public String getPath() {
     return path;
   }
@@ -490,10 +501,12 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     return schema;
   }
 
+  @Override
   public String getTypeName() {
     return PathUtil.getName(path);
   }
 
+  @Override
   public boolean hasAttribute(final CharSequence name) {
     final String lowerName = name.toString().toLowerCase();
     return attributeMap.containsKey(lowerName);
@@ -508,11 +521,13 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public boolean isAttributeRequired(final int i) {
     final Attribute attribute = attributes.get(i);
     return attribute.isRequired();
   }
 
+  @Override
   public boolean isInstanceOf(final DataObjectMetaData classDefinition) {
     if (classDefinition == null) {
       return false;
@@ -534,8 +549,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     METADATA_CACHE.put(instanceId, this);
   }
 
-  public void replaceAttribute(
-    final Attribute attribute,
+  public void replaceAttribute(final Attribute attribute,
     final Attribute newAttribute) {
     final String name = attribute.getName();
     final String lowerName = name.toLowerCase();
@@ -572,6 +586,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     setGeometryAttributeIndex(id);
   }
 
+  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final Attribute geometryAttribute = getGeometryAttribute();
     if (geometryAttribute != null) {
@@ -592,6 +607,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     setIdAttributeIndex(id);
   }
 
+  @Override
   public void setName(final String path) {
     this.path = path;
   }
@@ -617,14 +633,5 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @Override
   public String toString() {
     return path.toString();
-  }
-
-  /**
-   * Adds an attribute with the given case-sensitive name.
-   * 
-   * @throws AssertionFailedException if a second Geometry is being added
-   */
-  public Attribute addAttribute(final String attributeName, final DataType type) {
-   return addAttribute(attributeName, type, false);
   }
 }

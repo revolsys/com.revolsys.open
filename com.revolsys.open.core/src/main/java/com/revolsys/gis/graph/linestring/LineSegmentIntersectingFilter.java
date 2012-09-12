@@ -12,6 +12,7 @@ public class LineSegmentIntersectingFilter implements Filter<LineSegment> {
     this.line = line;
   }
 
+  @Override
   public boolean accept(final LineSegment line) {
     if (line == this.line) {
       return false;

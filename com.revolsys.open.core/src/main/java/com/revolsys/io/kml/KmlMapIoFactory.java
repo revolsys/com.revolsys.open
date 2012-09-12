@@ -19,24 +19,29 @@ public class KmlMapIoFactory extends AbstractIoFactory implements
       Kml22Constants.FILE_EXTENSION);
   }
 
+  @Override
   public MapWriter getWriter(final OutputStream out) {
     final Writer writer = new OutputStreamWriter(out);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Resource resource) {
     final Writer writer = SpringUtil.getWriter(resource);
     return getWriter(writer);
   }
 
+  @Override
   public MapWriter getWriter(final Writer out) {
     return new KmlMapWriter(out);
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return true;
   }
 
+  @Override
   public boolean isGeometrySupported() {
     return true;
   }

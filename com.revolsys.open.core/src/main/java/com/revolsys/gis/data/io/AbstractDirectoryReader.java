@@ -169,6 +169,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * 
    * @return True if the reader has more data objects to be read.
    */
+  @Override
   public boolean hasNext() {
     while (hasNext && (currentIterator == null || !currentIterator.hasNext())) {
       if (readerIterator.hasNext()) {
@@ -201,6 +202,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * 
    * @return The iterator.
    */
+  @Override
   public Iterator<T> iterator() {
     return this;
   }
@@ -211,6 +213,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    * @return The next DataObject.
    * @exception NoSuchElementException If the reader has no more data objects.
    */
+  @Override
   public T next() {
     if (hasNext()) {
       return currentIterator.next();
@@ -219,6 +222,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
     }
   }
 
+  @Override
   @PostConstruct
   public void open() {
     for (final File file : getFiles()) {
@@ -236,6 +240,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   /**
    * Removing data objects is not supported.
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

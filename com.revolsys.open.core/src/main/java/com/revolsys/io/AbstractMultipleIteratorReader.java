@@ -27,6 +27,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   protected abstract AbstractIterator<T> getNextIterator();
 
+  @Override
   public boolean hasNext() {
     if (loadNext) {
       if (iterator == null) {
@@ -48,11 +49,13 @@ public abstract class AbstractMultipleIteratorReader<T> extends
     return true;
   }
 
+  @Override
   public Iterator<T> iterator() {
     open();
     return this;
   }
 
+  @Override
   public T next() {
     if (hasNext()) {
       final T object = iterator.next();
@@ -64,6 +67,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
     }
   }
 
+  @Override
   public void open() {
     if (!open) {
       open = true;
@@ -73,6 +77,7 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   protected void process(final T object) {
   }
 
+  @Override
   public void remove() {
     iterator.remove();
   }

@@ -196,10 +196,8 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     writeFirstNamespace = true;
   }
 
-  private void addClassProperties(
-    final Class<?> objectClass,
-    final QName tagName,
-    final QName xsiTagName,
+  private void addClassProperties(final Class<?> objectClass,
+    final QName tagName, final QName xsiTagName,
     final Collection<QName> propertyNames) {
     classTagNameMap.put(objectClass, tagName);
     addClassXsiTagName(objectClass, xsiTagName);
@@ -209,19 +207,14 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     classPropertyTagNamesMap.put(objectClass, allPropertyNames);
   }
 
-  private void addClassProperties(
-    final Class<?> objectClass,
-    final QName tagName,
-    final QName xsiTagName,
-    final QName... propertyNames) {
+  private void addClassProperties(final Class<?> objectClass,
+    final QName tagName, final QName xsiTagName, final QName... propertyNames) {
     addClassProperties(objectClass, tagName, xsiTagName,
       Arrays.asList(propertyNames));
   }
 
-  protected void addClassPropertyMethod(
-    final Class<?> objectClass,
-    final QName propertyName,
-    final String methodName) {
+  protected void addClassPropertyMethod(final Class<?> objectClass,
+    final QName propertyName, final String methodName) {
     Map<QName, Method> classMethods = classPropertyMethodMap.get(objectClass);
     if (classMethods == null) {
       classMethods = new HashMap<QName, Method>();
@@ -232,16 +225,14 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     classMethods.put(propertyName, method);
   }
 
-  private void addClassXsiTagName(
-    final Class<?> objectClass,
+  private void addClassXsiTagName(final Class<?> objectClass,
     final QName tagName) {
     if (tagName != null) {
       classXsiTagNameMap.put(objectClass, tagName);
     }
   }
 
-  private void addSuperclassPropertyNames(
-    final Set<QName> allPropertyNames,
+  private void addSuperclassPropertyNames(final Set<QName> allPropertyNames,
     final Class<?> objectClass) {
     if (!objectClass.equals(Object.class)) {
       addSuperclassPropertyNames(allPropertyNames, objectClass.getSuperclass());
@@ -253,14 +244,12 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   }
 
-  private void addTagNameChildTagName(
-    final QName tagName,
+  private void addTagNameChildTagName(final QName tagName,
     final QName xsiTagName) {
     tagNameChildTagNameMap.put(tagName, xsiTagName);
   }
 
-  private void addTagNameListElementTagName(
-    final QName tagName,
+  private void addTagNameListElementTagName(final QName tagName,
     final QName xsiTagName) {
     tagNameListElementTagNameMap.put(tagName, xsiTagName);
   }
@@ -283,8 +272,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     out.endTag();
   }
 
-  private Method getClassPropertyMethod(
-    final Class<?> objectClass,
+  private Method getClassPropertyMethod(final Class<?> objectClass,
     final QName propertyName) {
     final Map<QName, Method> propertyMethodMap = classPropertyMethodMap.get(objectClass);
     if (propertyMethodMap == null) {
@@ -312,8 +300,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
   }
 
   @SuppressWarnings("rawtypes")
-  private void serializeObjectProperties(
-    final QName tagName,
+  private void serializeObjectProperties(final QName tagName,
     final Object object) {
     if (object != null) {
       final Class<? extends Object> objectClass = object.getClass();
@@ -389,8 +376,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     return hasXsi;
   }
 
-  private void writeXsiTypeAttribute(
-    final QName tagName,
+  private void writeXsiTypeAttribute(final QName tagName,
     final Class<? extends Object> objectClass) {
     QName xsiTagName = classXsiTagNameMap.get(objectClass);
     if (xsiTagName == null) {

@@ -41,6 +41,7 @@ public class KmlMapWriter extends AbstractMapWriter {
     out.flush();
   }
 
+  @Override
   public void write(final Map<String, ? extends Object> values) {
     out.startTag(Kml22Constants.PLACEMARK);
     Geometry multiGeometry = null;

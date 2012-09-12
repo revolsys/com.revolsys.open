@@ -23,15 +23,18 @@ public class MultiPoint2DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.MULTI_POINT_SHAPE;
   }
 
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     return ShapefileGeometryUtil.INSTANCE.readMultipoint(geometryFactory, in);
   }
 
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
 

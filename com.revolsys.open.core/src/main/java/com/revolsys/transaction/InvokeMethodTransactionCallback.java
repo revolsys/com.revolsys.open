@@ -36,6 +36,7 @@ public class InvokeMethodTransactionCallback implements
     this(object, methodName, true, args);
   }
 
+  @Override
   public Object doInTransaction(final TransactionStatus transaction) {
     try {
       final Object result = MethodUtils.invokeMethod(object, methodName, args);

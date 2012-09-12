@@ -16,6 +16,7 @@ public class TargetBeanProcess implements Process {
     this.bean = bean;
   }
 
+  @Override
   public String getBeanName() {
     return beanName;
   }
@@ -28,6 +29,7 @@ public class TargetBeanProcess implements Process {
     }
   }
 
+  @Override
   public ProcessNetwork getProcessNetwork() {
     return processNetwork;
   }
@@ -40,13 +42,16 @@ public class TargetBeanProcess implements Process {
     return bean.isInstanceCreated();
   }
 
+  @Override
   public void run() {
   }
 
+  @Override
   public void setBeanName(final String beanName) {
     this.beanName = beanName;
   }
 
+  @Override
   public void setProcessNetwork(final ProcessNetwork processNetwork) {
     this.processNetwork = processNetwork;
   }

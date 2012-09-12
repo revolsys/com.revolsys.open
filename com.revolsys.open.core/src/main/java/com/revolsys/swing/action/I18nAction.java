@@ -68,12 +68,8 @@ public class I18nAction extends AbstractAction {
   public void actionPerformed(final ActionEvent e) {
   }
 
-  private void init(
-    final Class<?> clazz,
-    final String actionCommand,
-    final String nameKey,
-    final String shortDescriptionKey,
-    final Icon icon) {
+  private void init(final Class<?> clazz, final String actionCommand,
+    final String nameKey, final String shortDescriptionKey, final Icon icon) {
     putValue(ACTION_COMMAND_KEY, actionCommand);
     if (nameKey != null) {
       final CharSequence name = I18n.getCharSequence(clazz, nameKey);

@@ -19,7 +19,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
   private Iterator<Map<String, Object>> iterator;
 
   private boolean single = false;
-  
+
   public JsonMapReader(final InputStream in) {
     this.in = new InputStreamReader(in, Charset.forName("UTF-8"));
   }
@@ -28,7 +28,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
     this.in = in;
   }
 
-  public JsonMapReader(final java.io.Reader in, boolean single) {
+  public JsonMapReader(final java.io.Reader in, final boolean single) {
     this.in = in;
     this.single = single;
   }
@@ -38,6 +38,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
     FileUtil.closeSilent(in);
   }
 
+  @Override
   public Iterator<Map<String, Object>> iterator() {
     if (iterator == null) {
       try {
@@ -50,6 +51,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
     return iterator;
   }
 
+  @Override
   public void open() {
   }
 }

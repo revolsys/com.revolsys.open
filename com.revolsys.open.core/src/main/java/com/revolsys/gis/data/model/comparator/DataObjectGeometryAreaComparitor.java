@@ -21,6 +21,7 @@ public class DataObjectGeometryAreaComparitor implements Comparator<DataObject> 
     this.clockwise = clockwise;
   }
 
+  @Override
   public int compare(final DataObject object1, final DataObject object2) {
     if (object1 == object2) {
       return 0;

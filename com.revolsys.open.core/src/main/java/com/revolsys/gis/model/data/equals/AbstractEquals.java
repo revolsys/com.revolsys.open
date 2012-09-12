@@ -5,9 +5,8 @@ import java.util.Collection;
 public abstract class AbstractEquals<T> implements Equals<T> {
   private final EqualsRegistry equalsRegistry = EqualsRegistry.INSTANCE;
 
-  public boolean equals(
-    final T object1,
-    final T object2,
+  @Override
+  public boolean equals(final T object1, final T object2,
     final Collection<String> exclude) {
     if (object1 == null) {
       return object2 == null;
@@ -18,15 +17,14 @@ public abstract class AbstractEquals<T> implements Equals<T> {
     }
   }
 
-  protected abstract boolean equalsNotNull(
-    T object1,
-    T object2,
+  protected abstract boolean equalsNotNull(T object1, T object2,
     Collection<String> exclude);
 
   public EqualsRegistry getEqualsRegistry() {
     return equalsRegistry;
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

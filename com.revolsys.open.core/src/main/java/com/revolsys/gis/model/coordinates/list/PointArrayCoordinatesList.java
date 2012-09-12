@@ -42,20 +42,24 @@ public class PointArrayCoordinatesList extends AbstractCoordinatesList {
     return null;
   }
 
+  @Override
   public byte getNumAxis() {
     return numAxis;
   }
 
+  @Override
   public double getValue(final int index, final int axisIndex) {
     final Coordinates point = points.get(index);
     return point.getValue(axisIndex);
   }
 
+  @Override
   public void setValue(final int index, final int axisIndex, final double value) {
     final Coordinates point = points.get(index);
     point.setValue(axisIndex, value);
   }
 
+  @Override
   public int size() {
     return points.size();
   }

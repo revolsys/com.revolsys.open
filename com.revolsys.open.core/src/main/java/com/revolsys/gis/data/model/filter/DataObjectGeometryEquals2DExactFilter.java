@@ -32,6 +32,7 @@ public class DataObjectGeometryEquals2DExactFilter implements
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
     if (geometry.equalsExact(matchGeometry)) {

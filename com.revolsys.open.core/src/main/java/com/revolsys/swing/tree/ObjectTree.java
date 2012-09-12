@@ -45,7 +45,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
     setModel(model);
     final Object root = model.getRoot();
     if (root instanceof PropertyChangeSupportProxy) {
-      PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
+      final PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
       propProxy.getPropertyChangeSupport().addPropertyChangeListener(this);
 
     }
@@ -273,6 +273,42 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
     ObjectTree.this.setDragEnabled(true);
   }
 
+  @Override
+  public String convertValueToText(final Object value, final boolean selected,
+    final boolean expanded, final boolean leaf, final int row,
+    final boolean hasFocus) {
+    if (model != null) {
+      if (value != null) {
+        final TreePath path = model.getPath(value);
+        if (path != null) {
+          final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+          if (nodeModel != null) {
+            return nodeModel.convertValueToText(value, selected, expanded,
+              leaf, row, hasFocus);
+          }
+        }
+      }
+    }
+    return super.convertValueToText(value, selected, expanded, leaf, row,
+      hasFocus);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> List<T> getSelectedItems(final Class<T> requiredClass) {
+    final List<T> values = new ArrayList<T>();
+    final TreePath[] selectionPaths = getSelectionPaths();
+    if (selectionPaths != null) {
+      for (final TreePath path : selectionPaths) {
+        final Object object = path.getLastPathComponent();
+        final Class<? extends Object> objectClass = object.getClass();
+        if (requiredClass.isAssignableFrom(objectClass)) {
+          values.add((T)object);
+        }
+      }
+    }
+    return values;
+  }
+
   public boolean isMenuEnabled() {
     return menuEnabled;
   }
@@ -302,41 +338,6 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
 
   public void setMenuEnabled(final boolean menuEnabled) {
     this.menuEnabled = menuEnabled;
-  }
-
-  @Override
-  public String convertValueToText(Object value, boolean selected,
-    boolean expanded, boolean leaf, int row, boolean hasFocus) {
-    if (model != null) {
-      if (value != null) {
-        TreePath path = model.getPath(value);
-        if (path != null) {
-          ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
-          if (nodeModel != null) {
-            return nodeModel.convertValueToText(value, selected, expanded,
-              leaf, row, hasFocus);
-          }
-        }
-      }
-    }
-    return super.convertValueToText(value, selected, expanded, leaf, row,
-      hasFocus);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> List<T> getSelectedItems(Class<T> requiredClass) {
-    List<T> values = new ArrayList<T>();
-    TreePath[] selectionPaths = getSelectionPaths();
-    if (selectionPaths != null) {
-      for (TreePath path : selectionPaths) {
-        Object object = path.getLastPathComponent();
-        Class<? extends Object> objectClass = object.getClass();
-        if (requiredClass.isAssignableFrom(objectClass)) {
-          values.add((T)object);
-        }
-      }
-    }
-    return values;
   }
 
 }

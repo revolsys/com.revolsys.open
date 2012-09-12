@@ -11,6 +11,7 @@ public class BooleanFieldType extends AbstractEcsvFieldType {
     super(DataTypes.BOOLEAN);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Boolean.parseBoolean(text);
@@ -19,6 +20,7 @@ public class BooleanFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     if (value != null) {
       out.print(value);

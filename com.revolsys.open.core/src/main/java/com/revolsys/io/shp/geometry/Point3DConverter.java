@@ -27,10 +27,12 @@ public class Point3DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POINT_ZM_SHAPE;
   }
 
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     byte numAxis = 3;
@@ -46,6 +48,7 @@ public class Point3DConverter implements ShapefileGeometryConverter {
     return geometryFactory.createPoint(points);
   }
 
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Point) {

@@ -230,6 +230,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.value(type);
   }
 
+  @Override
   public void write(final DataObject object) {
     if (initialized) {
       out.endAttribute();

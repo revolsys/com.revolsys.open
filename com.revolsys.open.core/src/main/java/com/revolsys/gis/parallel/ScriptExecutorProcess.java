@@ -144,6 +144,7 @@ public class ScriptExecutorProcess extends BaseInProcess<DataObject> implements
     executeScript(object);
   }
 
+  @Override
   public void setBeanFactory(final BeanFactory beanFactory)
     throws BeansException {
     attributes.putAll(ThreadSharedAttributes.getAttributes());

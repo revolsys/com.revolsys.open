@@ -17,6 +17,12 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
   public DataObjectAttributeComparator() {
   }
 
+  public DataObjectAttributeComparator(final boolean sortAsceding,
+    final String... attributeNames) {
+    this(Arrays.asList(attributeNames));
+    this.invert = !sortAsceding;
+  }
+
   public DataObjectAttributeComparator(final List<String> attributeNames) {
     this.attributeNames = attributeNames;
   }
@@ -25,12 +31,7 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
     this(Arrays.asList(attributeNames));
   }
 
-  public DataObjectAttributeComparator(boolean sortAsceding,
-    final String... attributeNames) {
-    this(Arrays.asList(attributeNames));
-    this.invert = !sortAsceding;
-  }
-
+  @Override
   public int compare(final DataObject object1, final DataObject object2) {
     for (final String attributeName : attributeNames) {
       final int compare = compare(object1, object2, attributeName);
@@ -42,9 +43,7 @@ public class DataObjectAttributeComparator implements Comparator<DataObject> {
     return 0;
   }
 
-  public int compare(
-    final DataObject object1,
-    final DataObject object2,
+  public int compare(final DataObject object1, final DataObject object2,
     final String attributeName) {
     final Comparable<Object> value1 = DataObjectUtil.getAttributeByPath(
       object1, attributeName);

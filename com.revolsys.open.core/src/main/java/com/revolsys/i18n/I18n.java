@@ -158,7 +158,8 @@ public final class I18n {
 
   private void loadResourceBundle() {
     final ClassLoader classLoader = classLoaderReference.get();
-    resourceBundle = ResourceBundle.getBundle(resourcePath, Locale.getDefault(), classLoader);
+    resourceBundle = ResourceBundle.getBundle(resourcePath,
+      Locale.getDefault(), classLoader);
   }
 
   public void removePropertyChangeListener(final PropertyChangeListener listener) {

@@ -51,9 +51,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(GmlConstants.COORDINATES);
   }
 
-  private void geometry(
-    final XmlWriter out,
-    final Object value,
+  private void geometry(final XmlWriter out, final Object value,
     final boolean writeSrsName) {
     if (value instanceof Point) {
       final Point point = (Point)value;
@@ -79,19 +77,14 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     }
   }
 
-  private void geometryCollection(
-    final XmlWriter out,
-    final GeometryCollection geometryCollection,
-    final boolean writeSrsName) {
+  private void geometryCollection(final XmlWriter out,
+    final GeometryCollection geometryCollection, final boolean writeSrsName) {
     geometryCollection(out, MULTI_GEOMETRY, GEOMETRY_MEMBER,
       geometryCollection, writeSrsName);
   }
 
-  private void geometryCollection(
-    final XmlWriter out,
-    final QName tag,
-    final QName memberTag,
-    final GeometryCollection geometryCollection,
+  private void geometryCollection(final XmlWriter out, final QName tag,
+    final QName memberTag, final GeometryCollection geometryCollection,
     final boolean writeSrsName) {
     out.startTag(tag);
     srsName(out, geometryCollection, writeSrsName);
@@ -104,9 +97,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(tag);
   }
 
-  private void linearRing(
-    final XmlWriter out,
-    final LineString line,
+  private void linearRing(final XmlWriter out, final LineString line,
     final boolean writeSrsName) {
     out.startTag(LINEAR_RING);
     final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -114,9 +105,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(LINEAR_RING);
   }
 
-  private void lineString(
-    final XmlWriter out,
-    final LineString line,
+  private void lineString(final XmlWriter out, final LineString line,
     final boolean writeSrsName) {
     out.startTag(LINE_STRING);
     srsName(out, line, writeSrsName);
@@ -125,32 +114,24 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(LINE_STRING);
   }
 
-  private void multiLineString(
-    final XmlWriter out,
-    final MultiLineString multiLine,
-    final boolean writeSrsName) {
+  private void multiLineString(final XmlWriter out,
+    final MultiLineString multiLine, final boolean writeSrsName) {
     geometryCollection(out, MULTI_LINE_STRING, LINE_STRING_MEMBER, multiLine,
       writeSrsName);
   }
 
-  private void multiPoint(
-    final XmlWriter out,
-    final MultiPoint multiPoint,
+  private void multiPoint(final XmlWriter out, final MultiPoint multiPoint,
     final boolean writeSrsName) {
     geometryCollection(out, MULTI_POINT, POINT_MEMBER, multiPoint, writeSrsName);
   }
 
-  private void multiPolygon(
-    final XmlWriter out,
-    final MultiPolygon multiPolygon,
-    final boolean writeSrsName) {
+  private void multiPolygon(final XmlWriter out,
+    final MultiPolygon multiPolygon, final boolean writeSrsName) {
     geometryCollection(out, MULTI_POLYGON, POLYGON_MEMBER, multiPolygon,
       writeSrsName);
   }
 
-  private void point(
-    final XmlWriter out,
-    final Point point,
+  private void point(final XmlWriter out, final Point point,
     final boolean writeSrsName) {
     out.startTag(POINT);
     srsName(out, point, writeSrsName);
@@ -159,9 +140,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(POINT);
   }
 
-  private void polygon(
-    final XmlWriter out,
-    final Polygon polygon,
+  private void polygon(final XmlWriter out, final Polygon polygon,
     final boolean writeSrsName) {
     out.startTag(POLYGON);
     srsName(out, polygon, writeSrsName);
@@ -231,9 +210,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(GmlConstants.POS_LIST);
   }
 
-  private void srsName(
-    final XmlWriter out,
-    final Geometry geometry,
+  private void srsName(final XmlWriter out, final Geometry geometry,
     final boolean writeSrsName) {
     if (writeSrsName) {
       final GeometryFactory factory = GeometryFactory.getFactory(geometry);

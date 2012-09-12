@@ -8,10 +8,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectUtil;
 
 public class AttributesEqualIgnoreCaseFilter implements Filter<DataObject> {
-  public static boolean accept(
-    final DataObject object1,
-    final DataObject object2,
-    final Collection<String> attributeNames) {
+  public static boolean accept(final DataObject object1,
+    final DataObject object2, final Collection<String> attributeNames) {
     for (final String attributeName : attributeNames) {
       final String value1 = DataObjectUtil.getAttributeByPath(object1,
         attributeName);
@@ -31,10 +29,8 @@ public class AttributesEqualIgnoreCaseFilter implements Filter<DataObject> {
     return true;
   }
 
-  public static boolean accept(
-    final DataObject object1,
-    final DataObject object2,
-    final String... attributeNames) {
+  public static boolean accept(final DataObject object1,
+    final DataObject object2, final String... attributeNames) {
     return accept(object1, object2, Arrays.asList(attributeNames));
   }
 
@@ -53,6 +49,7 @@ public class AttributesEqualIgnoreCaseFilter implements Filter<DataObject> {
     this(object, Arrays.asList(attributeNames));
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     return accept(this.object, object, attributeNames);
   }

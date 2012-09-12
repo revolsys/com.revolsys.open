@@ -82,6 +82,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
   protected void reset() {
   }
 
+  @Override
   public void run() {
     preRun();
     running = true;

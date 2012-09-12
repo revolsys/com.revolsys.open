@@ -7,14 +7,17 @@ public class LongStringConverter extends AbstractNumberStringConverter<Long> {
     super(INTEGER_FORMAT);
   }
 
+  @Override
   public Class<Long> getConvertedClass() {
     return Long.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public Long toObject(final Object value) {
     if (value instanceof Long) {
       final Long integer = (Long)value;
@@ -29,6 +32,7 @@ public class LongStringConverter extends AbstractNumberStringConverter<Long> {
     }
   }
 
+  @Override
   public Long toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Long.valueOf(string);

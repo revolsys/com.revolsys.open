@@ -15,9 +15,7 @@ public interface RectangularMapTile {
 
   Polygon getPolygon(GeometryFactory factory, int numPoints);
 
-  Polygon getPolygon(
-    GeometryFactory factory,
-    final int numXPoints,
+  Polygon getPolygon(GeometryFactory factory, final int numXPoints,
     final int numYPoints);
 
   Polygon getPolygon(int numPoints);

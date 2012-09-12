@@ -43,8 +43,7 @@ public class MultiInputSelector {
 
   }
 
-  private int disableChannels(
-    final List<? extends SelectableInput> channels,
+  private int disableChannels(final List<? extends SelectableInput> channels,
     final List<Boolean> guard) {
     int closedCount = 0;
     int selected = -1;
@@ -85,8 +84,7 @@ public class MultiInputSelector {
   }
 
   private boolean enableChannels(
-    final List<? extends SelectableInput> channels,
-    final List<Boolean> guard) {
+    final List<? extends SelectableInput> channels, final List<Boolean> guard) {
     enabledChannels = 0;
     scheduled = false;
     maxWait = Long.MAX_VALUE;
@@ -125,8 +123,7 @@ public class MultiInputSelector {
   }
 
   public synchronized int select(
-    final List<? extends SelectableInput> channels,
-    final boolean skip) {
+    final List<? extends SelectableInput> channels, final boolean skip) {
     if (skip) {
       enableChannels(channels);
       return disableChannels(channels);
@@ -136,14 +133,12 @@ public class MultiInputSelector {
   }
 
   public synchronized int select(
-    final List<? extends SelectableInput> channels,
-    final List<Boolean> guard) {
+    final List<? extends SelectableInput> channels, final List<Boolean> guard) {
     return select(channels, guard, Long.MAX_VALUE);
   }
 
   public synchronized int select(
-    final List<? extends SelectableInput> channels,
-    final List<Boolean> guard,
+    final List<? extends SelectableInput> channels, final List<Boolean> guard,
     final boolean skip) {
     if (skip) {
       enableChannels(channels, guard);
@@ -154,17 +149,14 @@ public class MultiInputSelector {
   }
 
   public synchronized int select(
-    final List<? extends SelectableInput> channels,
-    final List<Boolean> guard,
+    final List<? extends SelectableInput> channels, final List<Boolean> guard,
     final long msecs) {
     return select(channels, guard, msecs, 0);
   }
 
   public synchronized int select(
-    final List<? extends SelectableInput> channels,
-    final List<Boolean> guard,
-    final long msecs,
-    final int nsecs) {
+    final List<? extends SelectableInput> channels, final List<Boolean> guard,
+    final long msecs, final int nsecs) {
     if (!enableChannels(channels, guard) && guardEnabledChannels > 0) {
       synchronized (monitor) {
         if (!scheduled) {
@@ -179,9 +171,7 @@ public class MultiInputSelector {
     return disableChannels(channels, guard);
   }
 
-  public synchronized int select(
-    final long msecs,
-    final int nsecs,
+  public synchronized int select(final long msecs, final int nsecs,
     final List<? extends SelectableInput> channels) {
     if (!enableChannels(channels)) {
       if (msecs + nsecs >= 0) {
@@ -199,21 +189,17 @@ public class MultiInputSelector {
     return disableChannels(channels);
   }
 
-  public synchronized int select(
-    final long msecs,
-    final int nsecs,
+  public synchronized int select(final long msecs, final int nsecs,
     final SelectableInput... channels) {
     return select(msecs, nsecs, Arrays.asList(channels));
   }
 
-  public synchronized int select(
-    final long msecs,
+  public synchronized int select(final long msecs,
     final List<? extends SelectableInput> channels) {
     return select(msecs, 0, channels);
   }
 
-  public synchronized int select(
-    final long msecs,
+  public synchronized int select(final long msecs,
     final SelectableInput... channels) {
     return select(msecs, 0, channels);
   }
@@ -222,22 +208,18 @@ public class MultiInputSelector {
     return select(Long.MAX_VALUE, channels);
   }
 
-  public synchronized int select(
-    final SelectableInput[] channels,
+  public synchronized int select(final SelectableInput[] channels,
     final boolean skip) {
     return select(Arrays.asList(channels), skip);
   }
 
-  public synchronized int select(
-    final SelectableInput[] channels,
+  public synchronized int select(final SelectableInput[] channels,
     final boolean[] guard) {
     return select(channels, guard, Long.MAX_VALUE);
   }
 
-  public synchronized int select(
-    final SelectableInput[] channels,
-    final boolean[] guard,
-    final boolean skip) {
+  public synchronized int select(final SelectableInput[] channels,
+    final boolean[] guard, final boolean skip) {
     final List<Boolean> guardList = new ArrayList<Boolean>();
     for (final boolean enabled : guard) {
       guardList.add(enabled);
@@ -245,18 +227,13 @@ public class MultiInputSelector {
     return select(Arrays.asList(channels), guardList, skip);
   }
 
-  public synchronized int select(
-    final SelectableInput[] channels,
-    final boolean[] guard,
-    final long msecs) {
+  public synchronized int select(final SelectableInput[] channels,
+    final boolean[] guard, final long msecs) {
     return select(channels, guard, msecs, 0);
   }
 
-  public synchronized int select(
-    final SelectableInput[] channels,
-    final boolean[] guard,
-    final long msecs,
-    final int nsecs) {
+  public synchronized int select(final SelectableInput[] channels,
+    final boolean[] guard, final long msecs, final int nsecs) {
     final List<Boolean> guardList = new ArrayList<Boolean>();
     for (final boolean enabled : guard) {
       guardList.add(enabled);

@@ -8,7 +8,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.io.EndianInput;
 
 public class XbaseSchemaReader {
-  private List<FieldDefinition> fieldDefinitions;
+  private final List<FieldDefinition> fieldDefinitions;
 
   private final EndianInput in;
 

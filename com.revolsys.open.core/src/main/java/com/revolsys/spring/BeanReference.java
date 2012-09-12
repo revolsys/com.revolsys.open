@@ -17,6 +17,7 @@ public class BeanReference implements BeanFactoryAware {
     return name;
   }
 
+  @Override
   public void setBeanFactory(final BeanFactory beanFactory)
     throws BeansException {
     this.beanFactory = beanFactory;

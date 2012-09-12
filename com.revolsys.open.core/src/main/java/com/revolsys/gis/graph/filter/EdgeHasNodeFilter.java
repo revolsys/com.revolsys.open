@@ -11,6 +11,7 @@ public class EdgeHasNodeFilter<T> implements Filter<Edge<T>> {
     this.node = node;
   }
 
+  @Override
   public boolean accept(final Edge<T> edge) {
     return edge.hasNode(node);
   }

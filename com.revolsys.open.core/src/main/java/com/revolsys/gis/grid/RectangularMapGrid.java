@@ -14,23 +14,18 @@ public interface RectangularMapGrid {
 
   String getFormattedMapTileName(String name);
 
-  String getMapTileName(final double x, final double y);
-
-  Polygon getPolygon(
-    final String mapTileName,
-    final CoordinateSystem coordinateSystem);
-
   GeometryFactory getGeometryFactory();
 
-  Polygon getPolygon(
-    final String mapTileName,
+  String getMapTileName(final double x, final double y);
+
+  Polygon getPolygon(final String mapTileName,
+    final CoordinateSystem coordinateSystem);
+
+  Polygon getPolygon(final String mapTileName,
     final GeometryFactory geometryFactory);
 
-  Polygon getPolygon(
-    final String mapTileName,
-    final GeometryFactory geometryFactory,
-    int numX,
-    int numY);
+  Polygon getPolygon(final String mapTileName,
+    final GeometryFactory geometryFactory, int numX, int numY);
 
   RectangularMapTile getTileByLocation(double x, double y);
 

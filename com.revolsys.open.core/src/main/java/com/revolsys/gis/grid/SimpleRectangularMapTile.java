@@ -22,38 +22,44 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
     this.boundingBox = boundingBox;
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
     return boundingBox;
   }
 
+  @Override
   public String getFormattedName() {
     return formattedName;
   }
 
+  @Override
   public RectangularMapGrid getGrid() {
     return grid;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public Polygon getPolygon(final GeometryFactory factory, final int numPoints) {
     return boundingBox.toPolygon(factory, numPoints);
   }
 
-  public Polygon getPolygon(
-    final GeometryFactory factory,
-    final int numXPoints,
-    final int numYPoints) {
+  @Override
+  public Polygon getPolygon(final GeometryFactory factory,
+    final int numXPoints, final int numYPoints) {
     return boundingBox.toPolygon(factory, numXPoints, numYPoints);
   }
 
+  @Override
   public Polygon getPolygon(final int numPoints) {
     final GeometryFactory factory = GeometryFactory.getFactory(4326);
     return getPolygon(factory, numPoints);
   }
 
+  @Override
   public Polygon getPolygon(final int numXPoints, final int numYPoints) {
     final GeometryFactory factory = GeometryFactory.getFactory(4326);
     return getPolygon(factory, numXPoints, numYPoints);

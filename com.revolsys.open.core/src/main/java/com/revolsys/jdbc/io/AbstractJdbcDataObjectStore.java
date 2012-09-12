@@ -216,11 +216,11 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public JdbcWriter createWriter() {
-    int size = batchSize;
+    final int size = batchSize;
     return createWriter(size);
   }
 
-  public JdbcWriter createWriter(int batchSize) {
+  public JdbcWriter createWriter(final int batchSize) {
     final JdbcWriter writer = new JdbcWriter(this);
     writer.setSqlPrefix(sqlPrefix);
     writer.setSqlSuffix(sqlSuffix);
@@ -452,6 +452,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     return sqlSuffix;
   }
 
+  @Override
   public JdbcWriter getWriter() {
     final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
     if (resourceHolder != null
@@ -713,13 +714,14 @@ public abstract class AbstractJdbcDataObjectStore extends
     JdbcUtils.release(connection, dataSource);
   }
 
+  @Override
   public void releaseWriter(final JdbcWriter writer) {
     if (writer != null) {
       final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
       if (resourceHolder != null && resourceHolder.writerEquals(writer)) {
         resourceHolder.released();
       } else {
-        writer.close();
+        writer.doClose();
       }
     }
   }

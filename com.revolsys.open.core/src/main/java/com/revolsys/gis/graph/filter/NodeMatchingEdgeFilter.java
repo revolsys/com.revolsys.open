@@ -19,6 +19,7 @@ public class NodeMatchingEdgeFilter<T> implements Filter<Node<T>> {
     this.edgeFilter = edgeFilter;
   }
 
+  @Override
   public boolean accept(final Node<T> node) {
     for (final Edge<T> edge : node.getEdges()) {
       if (edgeFilter.accept(edge)) {

@@ -75,7 +75,6 @@ public class InvokeMethodAction extends AbstractAction {
     this(null, icon, false, object, methodName, parameters);
   }
 
-
   @Override
   public void actionPerformed(final ActionEvent event) {
     if (invokeLater) {
@@ -92,6 +91,7 @@ public class InvokeMethodAction extends AbstractAction {
   public Integer getMnemonic() {
     return (Integer)getValue(Action.MNEMONIC_KEY);
   }
+
   public String getName() {
     return (String)getValue(Action.NAME);
   }

@@ -22,8 +22,7 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
   implements DataObjectWriterFactory {
 
   public static Writer<DataObject> dataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource) {
+    final DataObjectMetaData metaData, final Resource resource) {
     final DataObjectWriterFactory writerFactory = getDataObjectWriterFactory(resource);
     if (writerFactory == null) {
       return null;
@@ -64,40 +63,44 @@ public abstract class AbstractDataObjectWriterFactory extends AbstractIoFactory
    * @param resource The resource to write to.
    * @return The writer.
    */
+  @Override
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource) {
+    final DataObjectMetaData metaData, final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
     return createDataObjectWriter(baseName, metaData, out);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream) {
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream) {
     return createDataObjectWriter(baseName, metaData, outputStream,
       Charset.defaultCharset());
   }
 
+  @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
     return coordinateSystems;
   }
 
+  @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
     return coordinateSystems.contains(coordinateSystem);
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return customAttributionSupported;
   }
 
+  @Override
   public boolean isGeometrySupported() {
     return geometrySupported;
   }
 
+  @Override
   public boolean isSingleFile() {
     return singleFile;
   }

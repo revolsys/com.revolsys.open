@@ -22,10 +22,8 @@ public class FilterProcess<T> extends BaseInOutProcess<T, T> {
   }
 
   @Override
-  protected void process(
-    final com.revolsys.parallel.channel.Channel<T> in,
-    final com.revolsys.parallel.channel.Channel<T> out,
-    final T object) {
+  protected void process(final com.revolsys.parallel.channel.Channel<T> in,
+    final com.revolsys.parallel.channel.Channel<T> out, final T object) {
     boolean accept = filter.accept(object);
     if (invert) {
       accept = !accept;

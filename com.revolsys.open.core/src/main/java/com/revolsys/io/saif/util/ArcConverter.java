@@ -29,6 +29,7 @@ public class ArcConverter implements OsnConverter {
     this.geometryType = geometryType;
   }
 
+  @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
     values.put("type", geometryType);
@@ -76,23 +77,20 @@ public class ArcConverter implements OsnConverter {
     return geometry;
   }
 
-  protected void readAttribute(
-    final OsnIterator iterator,
-    final String attributeName,
-    final Map<String, Object> values) {
+  protected void readAttribute(final OsnIterator iterator,
+    final String attributeName, final Map<String, Object> values) {
     final Object value = iterator.nextValue();
     values.put(attributeName, value);
   }
 
+  @Override
   public void write(final OsnSerializer serializer, final Object object)
     throws IOException {
     final boolean writeAttributes = true;
     write(serializer, object, writeAttributes);
   }
 
-  protected void write(
-    final OsnSerializer serializer,
-    final Object object,
+  protected void write(final OsnSerializer serializer, final Object object,
     final boolean writeAttributes) throws IOException {
     if (object instanceof LineString) {
       final LineString line = (LineString)object;
@@ -135,10 +133,8 @@ public class ArcConverter implements OsnConverter {
     }
   }
 
-  protected void writeAttribute(
-    final OsnSerializer serializer,
-    final Map<String, Object> values,
-    final String name) throws IOException {
+  protected void writeAttribute(final OsnSerializer serializer,
+    final Map<String, Object> values, final String name) throws IOException {
     final Object value = values.get(name);
     if (value != null) {
       serializer.endLine();
@@ -146,16 +142,13 @@ public class ArcConverter implements OsnConverter {
     }
   }
 
-  protected void writeAttributes(
-    final OsnSerializer serializer,
+  protected void writeAttributes(final OsnSerializer serializer,
     final Map<String, Object> values) throws IOException {
     writeEnumAttribute(serializer, values, "qualifier");
   }
 
-  protected void writeEnumAttribute(
-    final OsnSerializer serializer,
-    final Map<String, Object> values,
-    final String name) throws IOException {
+  protected void writeEnumAttribute(final OsnSerializer serializer,
+    final Map<String, Object> values, final String name) throws IOException {
     final String value = (String)values.get(name);
     if (value != null) {
       serializer.endLine();

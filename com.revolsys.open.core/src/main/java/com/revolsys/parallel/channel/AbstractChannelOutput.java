@@ -59,6 +59,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
    * 
    * @param value The object to write to the Channel.
    */
+  @Override
   public void write(final T value) {
     synchronized (writeMonitor) {
       synchronized (monitor) {
@@ -70,6 +71,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
     }
   }
 
+  @Override
   public void writeConnect() {
     synchronized (monitor) {
       if (writeClosed) {
@@ -81,6 +83,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
     }
   }
 
+  @Override
   public void writeDisconnect() {
     synchronized (monitor) {
       if (!writeClosed) {

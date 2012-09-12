@@ -41,8 +41,7 @@ public final class JexlUtil {
    * @param jexlExpression The expression to add the test to.
    * @param text The text to add.
    */
-  private static void addText(
-    final StringBuffer jexlExpression,
+  private static void addText(final StringBuffer jexlExpression,
     final String text) {
     jexlExpression.append("'")
       .append(text.replaceAll("'", "' + \"'\" + '"))
@@ -85,8 +84,7 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression createExpression(
-    final String expression,
+  public static Expression createExpression(final String expression,
     final String expressionPattern) throws Exception {
     final String newExpression = expression.replaceAll("\n", "");
     // Wrap the entires expression in '' and replace the expressions in the
@@ -121,8 +119,7 @@ public final class JexlUtil {
     }
   }
 
-  public static Object evaluateExpression(
-    final JexlContext context,
+  public static Object evaluateExpression(final JexlContext context,
     final Expression expression) {
     try {
       return expression.evaluate(context);

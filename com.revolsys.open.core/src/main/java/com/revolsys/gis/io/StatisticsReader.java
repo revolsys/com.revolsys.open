@@ -14,6 +14,7 @@ public class StatisticsReader implements DataObjectReader {
     setReader(reader);
   }
 
+  @Override
   public void close() {
     reader.close();
     statistics.disconnect();
@@ -33,10 +34,12 @@ public class StatisticsReader implements DataObjectReader {
     return statistics;
   }
 
+  @Override
   public boolean hasNext() {
     return reader.hasNext();
   }
 
+  @Override
   public DataObject next() {
     final DataObject object = reader.next();
     if (object != null) {
@@ -45,10 +48,12 @@ public class StatisticsReader implements DataObjectReader {
     return object;
   }
 
+  @Override
   public void open() {
     reader.open();
   }
 
+  @Override
   public void remove() {
     reader.remove();
 

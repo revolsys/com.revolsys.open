@@ -18,9 +18,8 @@ public class Geometry2DEquals implements Equals<Geometry> {
     this.equalsRegistry = equalsRegistry;
   }
 
-  public boolean equals(
-    final Geometry geometry1,
-    final Geometry geometry2,
+  @Override
+  public boolean equals(final Geometry geometry1, final Geometry geometry2,
     final Collection<String> exclude) {
     if (geometry1.getNumGeometries() != geometry2.getNumGeometries()) {
       return false;
@@ -45,6 +44,7 @@ public class Geometry2DEquals implements Equals<Geometry> {
     }
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }

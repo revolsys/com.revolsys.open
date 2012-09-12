@@ -13,18 +13,21 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
     properties = null;
   }
 
+  @Override
   public Map<String, Object> getProperties() {
     return properties;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
     return (C)getProperties().get(name);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public <C> C getProperty(final String name, C defaultValue) {
-    C value = (C)getProperties().get(name);
+  public <C> C getProperty(final String name, final C defaultValue) {
+    final C value = (C)getProperties().get(name);
     if (value == null) {
       return defaultValue;
     } else {
@@ -32,6 +35,7 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
     }
   }
 
+  @Override
   public void setProperties(final Map<String, Object> properties) {
     this.properties.clear();
     if (properties != null) {
@@ -39,6 +43,7 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
     }
   }
 
+  @Override
   public void setProperty(final String name, final Object value) {
     getProperties().put(name, value);
   }

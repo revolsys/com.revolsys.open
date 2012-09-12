@@ -39,6 +39,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
 
   protected abstract T getNext() throws NoSuchElementException;
 
+  @Override
   public final boolean hasNext() {
     if (hasNext) {
       if (!initialized) {
@@ -64,6 +65,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public final T next() {
     if (hasNext()) {
       final T currentObject = object;
@@ -74,6 +76,7 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

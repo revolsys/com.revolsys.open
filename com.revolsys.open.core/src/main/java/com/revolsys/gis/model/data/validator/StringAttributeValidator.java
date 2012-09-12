@@ -24,6 +24,7 @@ import com.revolsys.gis.data.model.Attribute;
 
 public class StringAttributeValidator implements AttributeValueValidator {
 
+  @Override
   public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value instanceof String) {
       return ((String)value).length() < attributeDefinition.getLength();

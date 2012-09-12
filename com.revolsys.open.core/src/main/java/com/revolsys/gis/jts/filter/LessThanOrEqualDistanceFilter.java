@@ -42,6 +42,7 @@ public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
     this.maxDistance = maxDistance;
   }
 
+  @Override
   public boolean accept(final Geometry geometry) {
     final double distance = geometry.distance(this.geometry);
     if (distance <= maxDistance) {

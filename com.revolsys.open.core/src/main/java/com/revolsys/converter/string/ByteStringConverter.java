@@ -7,14 +7,17 @@ public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
     super(INTEGER_FORMAT);
   }
 
+  @Override
   public Class<Byte> getConvertedClass() {
     return Byte.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public Byte toObject(final Object value) {
     if (value instanceof Byte) {
       final Byte integer = (Byte)value;
@@ -29,6 +32,7 @@ public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
     }
   }
 
+  @Override
   public Byte toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Byte.valueOf(string);

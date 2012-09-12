@@ -14,6 +14,7 @@ public abstract class NumberFieldType extends AbstractEcsvFieldType {
     super(dataType);
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof Number) {
       final Number number = (Number)value;

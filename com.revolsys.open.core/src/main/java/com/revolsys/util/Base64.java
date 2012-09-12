@@ -801,11 +801,8 @@ public class Base64 {
    * @return decoded data
    * @since 1.3
    */
-  public static byte[] decode(
-    final byte[] source,
-    final int off,
-    final int len,
-    final int options) {
+  public static byte[] decode(final byte[] source, final int off,
+    final int len, final int options) {
     final byte[] DECODABET = getDecodabet(options);
 
     final int len34 = len * 3 / 4;
@@ -959,12 +956,8 @@ public class Base64 {
    * @return the number of decoded bytes converted
    * @since 1.3
    */
-  private static int decode4to3(
-    final byte[] source,
-    final int srcOffset,
-    final byte[] destination,
-    final int destOffset,
-    final int options) {
+  private static int decode4to3(final byte[] source, final int srcOffset,
+    final byte[] destination, final int destOffset, final int options) {
     final byte[] DECODABET = getDecodabet(options);
 
     // Example: Dk==
@@ -1034,8 +1027,7 @@ public class Base64 {
    * @return true if the operation is successful
    * @since 2.2
    */
-  public static boolean decodeFileToFile(
-    final String infile,
+  public static boolean decodeFileToFile(final String infile,
     final String outfile) {
     boolean success = false;
     java.io.InputStream in = null;
@@ -1127,8 +1119,7 @@ public class Base64 {
    * @return <tt>true</tt> if successful, <tt>false</tt> otherwise
    * @since 2.1
    */
-  public static boolean decodeToFile(
-    final String dataToDecode,
+  public static boolean decodeToFile(final String dataToDecode,
     final String filename) {
     boolean success = false;
     Base64.OutputStream bos = null;
@@ -1212,11 +1203,8 @@ public class Base64 {
    * @return four byte array in Base64 notation.
    * @since 1.5.1
    */
-  private static byte[] encode3to4(
-    final byte[] b4,
-    final byte[] threeBytes,
-    final int numSigBytes,
-    final int options) {
+  private static byte[] encode3to4(final byte[] b4, final byte[] threeBytes,
+    final int numSigBytes, final int options) {
     encode3to4(threeBytes, 0, numSigBytes, b4, 0, options);
     return b4;
   } // end encode3to4
@@ -1246,12 +1234,8 @@ public class Base64 {
    * @return the <var>destination</var> array
    * @since 1.3
    */
-  private static byte[] encode3to4(
-    final byte[] source,
-    final int srcOffset,
-    final int numSigBytes,
-    final byte[] destination,
-    final int destOffset,
+  private static byte[] encode3to4(final byte[] source, final int srcOffset,
+    final int numSigBytes, final byte[] destination, final int destOffset,
     final int options) {
     final byte[] ALPHABET = getAlphabet(options);
 
@@ -1343,9 +1327,7 @@ public class Base64 {
    * @param len Length of data to convert
    * @since 1.4
    */
-  public static String encodeBytes(
-    final byte[] source,
-    final int off,
+  public static String encodeBytes(final byte[] source, final int off,
     final int len) {
     return encodeBytes(source, off, len, NO_OPTIONS);
   } // end encodeBytes
@@ -1376,11 +1358,8 @@ public class Base64 {
    * @see Base64#DONT_BREAK_LINES
    * @since 2.0
    */
-  public static String encodeBytes(
-    final byte[] source,
-    final int off,
-    final int len,
-    final int options) {
+  public static String encodeBytes(final byte[] source, final int off,
+    final int len, final int options) {
     // Isolate options
     final int dontBreakLines = (options & DONT_BREAK_LINES);
     final int gzip = (options & GZIP);
@@ -1477,8 +1456,7 @@ public class Base64 {
    * @return true if the operation is successful
    * @since 2.2
    */
-  public static boolean encodeFileToFile(
-    final String infile,
+  public static boolean encodeFileToFile(final String infile,
     final String outfile) {
     boolean success = false;
     java.io.InputStream in = null;
@@ -1604,8 +1582,7 @@ public class Base64 {
    * @since 2.0
    */
   public static String encodeObject(
-    final java.io.Serializable serializableObject,
-    final int options) {
+    final java.io.Serializable serializableObject, final int options) {
     // Streams
     java.io.ByteArrayOutputStream baos = null;
     java.io.OutputStream b64os = null;
@@ -1672,8 +1649,7 @@ public class Base64 {
    * @return <tt>true</tt> if successful, <tt>false</tt> otherwise
    * @since 2.1
    */
-  public static boolean encodeToFile(
-    final byte[] dataToEncode,
+  public static boolean encodeToFile(final byte[] dataToEncode,
     final String filename) {
     boolean success = false;
     Base64.OutputStream bos = null;

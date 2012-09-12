@@ -14,6 +14,7 @@ public class UriFieldType extends AbstractEcsvFieldType {
 
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       try {
@@ -26,6 +27,7 @@ public class UriFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     StringFieldType.writeQuotedString(out, value);
   }

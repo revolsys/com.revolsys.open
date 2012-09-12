@@ -35,10 +35,12 @@ public class MapReaderDataObjectReader extends AbstractReader<DataObject>
     mapReader.close();
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }
 
+  @Override
   public boolean hasNext() {
     if (!open) {
       open();
@@ -46,10 +48,12 @@ public class MapReaderDataObjectReader extends AbstractReader<DataObject>
     return mapIterator.hasNext();
   }
 
+  @Override
   public Iterator<DataObject> iterator() {
     return this;
   }
 
+  @Override
   public DataObject next() {
     if (hasNext()) {
       final Map<String, Object> source = mapIterator.next();
@@ -70,11 +74,13 @@ public class MapReaderDataObjectReader extends AbstractReader<DataObject>
     }
   }
 
+  @Override
   public void open() {
     open = true;
     this.mapIterator = mapReader.iterator();
   }
 
+  @Override
   public void remove() {
     mapIterator.remove();
   }

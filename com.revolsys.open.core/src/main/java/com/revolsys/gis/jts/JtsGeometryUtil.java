@@ -304,27 +304,6 @@ public final class JtsGeometryUtil {
     }
   }
 
-  public static boolean equalsExact3D(final Polygon polygon1,
-    final Polygon polygon2) {
-    if (polygon1.getNumInteriorRing() == polygon2.getNumInteriorRing()) {
-      LineString exterior1 = polygon1.getExteriorRing();
-      LineString exterior2 = polygon2.getExteriorRing();
-      if (equalsExact3D(exterior1, exterior2)) {
-        for (int i = 0; i < polygon1.getNumInteriorRing(); i++) {
-          if (!equalsExact3D(polygon1.getInteriorRingN(i),
-            polygon2.getInteriorRingN(i))) {
-            return false;
-          }
-        }
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
   public static boolean equalsExact3D(final GeometryCollection collection1,
     final GeometryCollection collection2) {
     if (collection1.getNumGeometries() != collection2.getNumGeometries()) {
@@ -363,6 +342,27 @@ public final class JtsGeometryUtil {
 
     return (coordinate1.x == coordinate2.x) && (coordinate1.y == coordinate2.y)
       && equalsZ(coordinate1.z, coordinate2.z);
+  }
+
+  public static boolean equalsExact3D(final Polygon polygon1,
+    final Polygon polygon2) {
+    if (polygon1.getNumInteriorRing() == polygon2.getNumInteriorRing()) {
+      final LineString exterior1 = polygon1.getExteriorRing();
+      final LineString exterior2 = polygon2.getExteriorRing();
+      if (equalsExact3D(exterior1, exterior2)) {
+        for (int i = 0; i < polygon1.getNumInteriorRing(); i++) {
+          if (!equalsExact3D(polygon1.getInteriorRingN(i),
+            polygon2.getInteriorRingN(i))) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   public static boolean equalsZ(final double z1, final double z2) {
@@ -517,6 +517,15 @@ public final class JtsGeometryUtil {
     return getElevation(coordinate, c0, c1);
   }
 
+  public static List<Geometry> getGeometries(final Geometry geometry) {
+    final List<Geometry> parts = new ArrayList<Geometry>();
+    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      final Geometry part = geometry.getGeometryN(i);
+      parts.add(part);
+    }
+    return parts;
+  }
+
   public static Geometry getGeometries(final GeometryFactory factory,
     final List<Coordinate> coords, final Set<Coordinate> intersectCoords) {
     final List<LineString> lines = new ArrayList<LineString>();
@@ -571,15 +580,6 @@ public final class JtsGeometryUtil {
       lines.add((LineString)multiLine.getGeometryN(i));
     }
     return lines;
-  }
-
-  public static List<Geometry> getGeometries(final Geometry geometry) {
-    final List<Geometry> parts = new ArrayList<Geometry>();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      Geometry part = geometry.getGeometryN(i);
-      parts.add(part);
-    }
-    return parts;
   }
 
   public static List<LineSegment> getLineSegments(
@@ -1045,6 +1045,7 @@ public final class JtsGeometryUtil {
   public static void makePrecise(final PrecisionModel precision,
     final Geometry geometry) {
     geometry.apply(new CoordinateSequenceFilter() {
+      @Override
       public void filter(final CoordinateSequence coordinates, final int index) {
         for (int i = 0; i < coordinates.getDimension(); i++) {
           final double ordinate = coordinates.getOrdinate(index, i);
@@ -1053,10 +1054,12 @@ public final class JtsGeometryUtil {
         }
       }
 
+      @Override
       public boolean isDone() {
         return false;
       }
 
+      @Override
       public boolean isGeometryChanged() {
         return true;
       }

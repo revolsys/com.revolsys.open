@@ -45,10 +45,8 @@ public class JmxUtil {
     return getJmxConnector(connectorString, "", "");
   }
 
-  public static JMXConnector getJmxConnector(
-    final String connectorString,
-    final String userName,
-    final String password) {
+  public static JMXConnector getJmxConnector(final String connectorString,
+    final String userName, final String password) {
     final HashMap<String, String[]> environment = new HashMap<String, String[]>();
     final String[] jmxCredentials = new String[] {
       userName, password
@@ -71,8 +69,7 @@ public class JmxUtil {
   }
 
   public static MBeanAttributeInfo getMBeanAttribute(
-    final MBeanServerConnection connection,
-    final String nameString,
+    final MBeanServerConnection connection, final String nameString,
     final String attributeName) {
     MBeanAttributeInfo attribute = null;
     ObjectName objectName;
@@ -106,8 +103,7 @@ public class JmxUtil {
 
   @SuppressWarnings("unchecked")
   public static Map<String, MBeanAttributeInfo[]> getMBeanAttributes(
-    final MBeanServer mBeanServer,
-    final String objectNameString) {
+    final MBeanServer mBeanServer, final String objectNameString) {
     Map<String, MBeanAttributeInfo[]> attributesMap = null;
     Set<ObjectName> objectNames;
     try {
@@ -137,8 +133,7 @@ public class JmxUtil {
 
   @SuppressWarnings("unchecked")
   public static Map<String, MBeanAttributeInfo[]> getMBeanAttributes(
-    final MBeanServerConnection connection,
-    final String objectNameString) {
+    final MBeanServerConnection connection, final String objectNameString) {
     Map<String, MBeanAttributeInfo[]> attributesMap = null;
     Set<ObjectName> objectNames;
     try {
@@ -169,8 +164,7 @@ public class JmxUtil {
   }
 
   public static Object getMBeanAttributeValue(
-    final MBeanServerConnection connection,
-    final ObjectName objName,
+    final MBeanServerConnection connection, final ObjectName objName,
     final String attributeName) {
     Object attributeValue = "Unavailable";
     try {
@@ -195,8 +189,7 @@ public class JmxUtil {
   }
 
   public static Object getMBeanAttributeValue(
-    final MBeanServerConnection connection,
-    final String nameString,
+    final MBeanServerConnection connection, final String nameString,
     final String attributeName) {
     Object attributeValue = null;
     ObjectName objName;
@@ -261,8 +254,7 @@ public class JmxUtil {
   }
 
   public static void printAttributeValue(
-    final MBeanServerConnection connection,
-    final String objectNameString,
+    final MBeanServerConnection connection, final String objectNameString,
     final MBeanAttributeInfo attribute) {
     final String attributeName = attribute.getName();
     System.out.println("objectName="

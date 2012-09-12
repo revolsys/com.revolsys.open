@@ -7,14 +7,17 @@ public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
     super(DECIMAL_FORMAT);
   }
 
+  @Override
   public Class<Float> getConvertedClass() {
     return Float.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public Float toObject(final Object value) {
     if (value instanceof Float) {
       final Float integer = (Float)value;
@@ -29,6 +32,7 @@ public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
     }
   }
 
+  @Override
   public Float toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Float.valueOf(string);

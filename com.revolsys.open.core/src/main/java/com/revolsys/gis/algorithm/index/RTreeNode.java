@@ -18,10 +18,8 @@ public abstract class RTreeNode<T> extends Envelope {
   public RTreeNode() {
   }
 
-  public abstract boolean remove(
-    LinkedList<RTreeNode<T>> path,
-    Envelope envelope,
-    T object);
+  public abstract boolean remove(LinkedList<RTreeNode<T>> path,
+    Envelope envelope, T object);
 
   @Override
   public String toString() {
@@ -31,9 +29,7 @@ public abstract class RTreeNode<T> extends Envelope {
 
   protected abstract void updateEnvelope();
 
-  public abstract boolean visit(
-    Envelope envelope,
-    Filter<T> filter,
+  public abstract boolean visit(Envelope envelope, Filter<T> filter,
     Visitor<T> visitor);
 
   public abstract boolean visit(Envelope envelope, Visitor<T> visitor);

@@ -79,6 +79,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @Override
   public void write(final DataObject object) {
     if (!opened) {
       writeHeader();
@@ -117,21 +118,6 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
       }
       out.endTag(HtmlUtil.TR);
 
-    }
-  }
-
-  public void writeValue(final String name, final Object value) {
-    final DataType dataType = metaData.getAttributeType(name);
-
-    @SuppressWarnings("unchecked")
-    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-    final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-      .getConverter(dataTypeClass);
-    if (converter == null) {
-      out.text(value);
-    } else {
-      final String stringValue = converter.toString(value);
-      out.text(stringValue);
     }
   }
 
@@ -189,5 +175,20 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
       out.startTag(HtmlUtil.TBODY);
     }
     opened = true;
+  }
+
+  public void writeValue(final String name, final Object value) {
+    final DataType dataType = metaData.getAttributeType(name);
+
+    @SuppressWarnings("unchecked")
+    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
+    final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+      .getConverter(dataTypeClass);
+    if (converter == null) {
+      out.text(value);
+    } else {
+      final String stringValue = converter.toString(value);
+      out.text(stringValue);
+    }
   }
 }

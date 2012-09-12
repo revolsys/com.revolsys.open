@@ -11,8 +11,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 public class NoOp {
-  public static boolean equals(
-    final Coordinates coordinates1End,
+  public static boolean equals(final Coordinates coordinates1End,
     final double... coordinates) {
     if (coordinates1End.equals(coordinates)) {
       noOp();
@@ -22,23 +21,17 @@ public class NoOp {
     }
   }
 
-  public static void equals(
-    final DataObject object,
-    final double x,
+  public static void equals(final DataObject object, final double x,
     final double y) {
     equals(object.getGeometryValue(), x, y);
   }
 
-  public static void equals(
-    final DataObject object,
-    final Double x,
+  public static void equals(final DataObject object, final Double x,
     final Double y) {
     equals(object.getGeometryValue(), x, y);
   }
 
-  public static boolean equals(
-    final Geometry geometry,
-    final double x,
+  public static boolean equals(final Geometry geometry, final double x,
     final double y) {
     final CoordinatesList points = CoordinatesListUtil.get(geometry);
     final DoubleCoordinates point = new DoubleCoordinates(x, y);
@@ -50,12 +43,8 @@ public class NoOp {
     }
   }
 
-  public static boolean equals(
-    final LineString line,
-    final double x1,
-    final double y1,
-    final double x2,
-    final double y2) {
+  public static boolean equals(final LineString line, final double x1,
+    final double y1, final double x2, final double y2) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     if (points.get(0).equals(x1, y1)
       && points.get(points.size() - 1).equals(x2, y2)) {

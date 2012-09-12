@@ -38,16 +38,16 @@ public class JdbcBlobAttribute extends JdbcAttribute {
     } else {
       Blob blob;
       if (value instanceof Resource) {
-        Resource resource = (Resource)value;
+        final Resource resource = (Resource)value;
         blob = new LocalBlob(resource);
       } else if (value instanceof Blob) {
         blob = (Blob)value;
       } else if (value instanceof byte[]) {
-        byte[] bytes = (byte[])value;
+        final byte[] bytes = (byte[])value;
         blob = new LocalBlob(bytes);
       } else if (value instanceof File) {
-        File file = (File)value;
-        FileSystemResource resource = new FileSystemResource(file);
+        final File file = (File)value;
+        final FileSystemResource resource = new FileSystemResource(file);
         blob = new LocalBlob(resource);
       } else {
         throw new IllegalArgumentException("Not valid for a blob column");

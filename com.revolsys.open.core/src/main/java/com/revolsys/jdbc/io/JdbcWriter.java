@@ -109,51 +109,6 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     dataStore.releaseWriter(this);
   }
 
-  protected synchronized void doClose() {
-    if (dataStore != null) {
-      try {
-
-        close(typeInsertSqlMap, typeInsertStatementMap,
-          typeInsertBatchCountMap, "Insert");
-        close(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
-          typeInsertSequenceBatchCountMap, "Insert");
-        close(typeUpdateSqlMap, typeUpdateStatementMap,
-          typeUpdateBatchCountMap, "Update");
-        close(typeDeleteSqlMap, typeDeleteStatementMap,
-          typeDeleteBatchCountMap, "Delete");
-        if (statistics != null) {
-          statistics.disconnect();
-          statistics = null;
-        }
-      } finally {
-        typeInsertSqlMap = null;
-        typeInsertStatementMap = null;
-        typeInsertBatchCountMap = null;
-        typeInsertSequenceSqlMap = null;
-        typeInsertSequenceStatementMap = null;
-        typeInsertSequenceBatchCountMap = null;
-        typeUpdateBatchCountMap = null;
-        typeUpdateSqlMap = null;
-        typeUpdateStatementMap = null;
-        typeDeleteBatchCountMap = null;
-        typeDeleteSqlMap = null;
-        typeDeleteStatementMap = null;
-        dataStore = null;
-        if (dataSource != null) {
-          try {
-            connection.commit();
-          } catch (final SQLException e) {
-            throw new RuntimeException("Failed to commit data:", e);
-          } finally {
-            JdbcUtils.release(connection, dataSource);
-            dataSource = null;
-            connection = null;
-          }
-        }
-      }
-    }
-  }
-
   private void close(final Map<String, String> sqlMap,
     final Map<String, PreparedStatement> statementMap,
     final Map<String, Integer> batchCountMap, final String statisticName) {
@@ -210,6 +165,51 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     // processCurrentBatch(typePath, sql, statement, typeDeleteBatchCountMap,
     // getDeleteStatistics());
     // }
+  }
+
+  protected synchronized void doClose() {
+    if (dataStore != null) {
+      try {
+
+        close(typeInsertSqlMap, typeInsertStatementMap,
+          typeInsertBatchCountMap, "Insert");
+        close(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
+          typeInsertSequenceBatchCountMap, "Insert");
+        close(typeUpdateSqlMap, typeUpdateStatementMap,
+          typeUpdateBatchCountMap, "Update");
+        close(typeDeleteSqlMap, typeDeleteStatementMap,
+          typeDeleteBatchCountMap, "Delete");
+        if (statistics != null) {
+          statistics.disconnect();
+          statistics = null;
+        }
+      } finally {
+        typeInsertSqlMap = null;
+        typeInsertStatementMap = null;
+        typeInsertBatchCountMap = null;
+        typeInsertSequenceSqlMap = null;
+        typeInsertSequenceStatementMap = null;
+        typeInsertSequenceBatchCountMap = null;
+        typeUpdateBatchCountMap = null;
+        typeUpdateSqlMap = null;
+        typeUpdateStatementMap = null;
+        typeDeleteBatchCountMap = null;
+        typeDeleteSqlMap = null;
+        typeDeleteStatementMap = null;
+        dataStore = null;
+        if (dataSource != null) {
+          try {
+            connection.commit();
+          } catch (final SQLException e) {
+            throw new RuntimeException("Failed to commit data:", e);
+          } finally {
+            JdbcUtils.release(connection, dataSource);
+            dataSource = null;
+            connection = null;
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -657,11 +657,12 @@ public class JdbcWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  @Override
   public synchronized void write(final DataObject object) {
     try {
-      DataObjectMetaData metaData = object.getMetaData();
-      DataObjectStore dataStore = metaData.getDataObjectStore();
-      DataObjectState state = object.getState();
+      final DataObjectMetaData metaData = object.getMetaData();
+      final DataObjectStore dataStore = metaData.getDataObjectStore();
+      final DataObjectState state = object.getState();
       if (dataStore != this.dataStore) {
         if (state != DataObjectState.Deleted) {
           insert(object);

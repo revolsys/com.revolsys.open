@@ -11,14 +11,17 @@ public class ByteArrayPage extends AbstractPage {
     content = new byte[size];
   }
 
+  @Override
   public byte[] getContent() {
     return content;
   }
 
+  @Override
   public int getOffset() {
     return offset;
   }
 
+  @Override
   public int getSize() {
     return content.length;
   }
@@ -30,11 +33,13 @@ public class ByteArrayPage extends AbstractPage {
     return b & 0xff;
   }
 
+  @Override
   public void setContent(final Page page) {
     final byte[] copyContent = page.getContent();
     System.arraycopy(copyContent, 0, content, 0, copyContent.length);
   }
 
+  @Override
   public void setOffset(final int offset) {
     if (offset > getSize()) {
       throw new IllegalArgumentException("Cannot set offset past end of file ");

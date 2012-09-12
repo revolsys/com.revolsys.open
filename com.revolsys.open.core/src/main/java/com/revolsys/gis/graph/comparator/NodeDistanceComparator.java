@@ -26,6 +26,7 @@ public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
     this.invert = invert;
   }
 
+  @Override
   public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
     final double distance1 = node1.distance(node);

@@ -10,10 +10,12 @@ public class SimpleDataType implements DataType {
     this.javaClass = javaClass;
   }
 
+  @Override
   public Class<?> getJavaClass() {
     return javaClass;
   }
 
+  @Override
   public String getName() {
     return name;
   }

@@ -51,7 +51,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public void addNodeModel(final Class<?> clazz,
     final ObjectTreeNodeModel<?, ?> model) {
     model.setObjectTreeModel(this);
-   classNodeModels.put(clazz, (ObjectTreeNodeModel<Object, Object>)model);
+    classNodeModels.put(clazz, (ObjectTreeNodeModel<Object, Object>)model);
   }
 
   public void addNodeModel(final ObjectTreeNodeModel<?, ?> model) {
@@ -167,7 +167,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
         if (parentNodeModel == null) {
           parentNodeModel = getNodeModel(object);
         } else {
-          Class<? extends Object> nodeClass = object.getClass();
+          final Class<? extends Object> nodeClass = object.getClass();
           final ObjectTreeNodeModel<Object, Object> nodeModel = (ObjectTreeNodeModel<Object, Object>)parentNodeModel.getObjectTreeNodeModel(nodeClass);
           if (nodeModel == null) {
             parentNodeModel = getNodeModel(object);

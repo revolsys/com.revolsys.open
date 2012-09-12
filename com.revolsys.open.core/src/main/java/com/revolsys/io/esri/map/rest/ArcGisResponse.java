@@ -26,18 +26,8 @@ public class ArcGisResponse extends AbstractMapWrapper {
     init(catalog, name);
   }
 
-  protected void init(final Catalog catalog, final String name) {
-    this.catalog = catalog;
-    setName(name);
-  }
-
   protected ArcGisResponse(final String serviceUrl) {
     setServiceUrl(serviceUrl);
-  }
-
-  protected void setServiceUrl(final String serviceUrl) {
-    this.serviceUrl = serviceUrl;
-    this.path = "";
   }
 
   public Double getCurrentVersion() {
@@ -53,6 +43,11 @@ public class ArcGisResponse extends AbstractMapWrapper {
     return path;
   }
 
+  public String getServiceUrl() {
+    return serviceUrl;
+  }
+
+  @Override
   public synchronized Map<String, Object> getValues() {
     Map<String, Object> values = super.getValues();
     if (values == null) {
@@ -64,8 +59,9 @@ public class ArcGisResponse extends AbstractMapWrapper {
     return values;
   }
 
-  public String getServiceUrl() {
-    return serviceUrl;
+  protected void init(final Catalog catalog, final String name) {
+    this.catalog = catalog;
+    setName(name);
   }
 
   protected void setCatalog(final Catalog catalog) {
@@ -75,5 +71,10 @@ public class ArcGisResponse extends AbstractMapWrapper {
   protected void setName(final String name) {
     this.serviceUrl = catalog.getServiceUrl();
     this.path = "/" + name;
+  }
+
+  protected void setServiceUrl(final String serviceUrl) {
+    this.serviceUrl = serviceUrl;
+    this.path = "";
   }
 }

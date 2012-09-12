@@ -23,15 +23,15 @@ public class GeoJsonIoFactory extends
       GeoJsonConstants.FILE_EXTENSION);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return new GeoJsonDataObjectWriter(new OutputStreamWriter(outputStream,
       charset));
   }
 
+  @Override
   public GeometryReader createGeometryReader(final Resource resource) {
     try {
       final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(
@@ -42,6 +42,7 @@ public class GeoJsonIoFactory extends
     }
   }
 
+  @Override
   public boolean isBinary() {
     return false;
   }

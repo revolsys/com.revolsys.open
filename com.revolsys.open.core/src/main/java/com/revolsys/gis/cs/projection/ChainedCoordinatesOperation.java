@@ -17,6 +17,7 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
     this.operations = new ArrayList<CoordinatesOperation>(operations);
   }
 
+  @Override
   public void perform(final Coordinates from, final Coordinates to) {
     Coordinates source = from;
     final Coordinates target = to;

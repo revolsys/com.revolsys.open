@@ -58,6 +58,7 @@ public class BigDecimalAttributeValidator implements AttributeValueValidator {
     decimal = false;
   }
 
+  @Override
   public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value instanceof BigDecimal) {
       final BigDecimal number = (BigDecimal)value;

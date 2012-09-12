@@ -33,12 +33,8 @@ public class Bcgs1000RectangularMapGrid extends Bcgs2000RectangularMapGrid {
     }
   }
 
-  protected double getLatitude(
-    final String blockName,
-    final String letter,
-    final String number20k,
-    final String number2000,
-    final String number1000) {
+  protected double getLatitude(final String blockName, final String letter,
+    final String number20k, final String number2000, final String number1000) {
     double latitude = getLatitude(blockName, letter, number20k, number2000);
     final int numberRow = GridUtil.getNumberRow4(number1000);
     latitude += numberRow * BcgsConstants.HEIGHT_1000;
@@ -63,12 +59,8 @@ public class Bcgs1000RectangularMapGrid extends Bcgs2000RectangularMapGrid {
     }
   }
 
-  protected double getLongitude(
-    final String blockName,
-    final String letter,
-    final String number20k,
-    final String number2000,
-    final String number1000) {
+  protected double getLongitude(final String blockName, final String letter,
+    final String number20k, final String number2000, final String number1000) {
     double longitude = getLongitude(blockName, letter, number20k, number2000);
     final int numberCol = GridUtil.getNumberCol4(number1000);
     longitude -= numberCol * BcgsConstants.WIDTH_1000;

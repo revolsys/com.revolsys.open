@@ -98,16 +98,12 @@ public class OsnSerializer {
     lineSeparator = "\r\n";
   }
 
-  public void attribute(
-    final String name,
-    final double value,
+  public void attribute(final String name, final double value,
     final boolean endLine) throws IOException {
     attribute(name, new BigDecimal(value), endLine);
   }
 
-  public void attribute(
-    final String name,
-    final Object value,
+  public void attribute(final String name, final Object value,
     final boolean endLine) throws IOException {
     attributeName(name);
     attributeValue(value);
@@ -117,9 +113,7 @@ public class OsnSerializer {
 
   }
 
-  public void attributeEnum(
-    final String name,
-    final String value,
+  public void attributeEnum(final String name, final String value,
     final boolean endLine) throws IOException {
     attributeName(name);
     write(value);
@@ -153,7 +147,7 @@ public class OsnSerializer {
         }
         this.scope.removeLast();
       } else if (scope != DOCUMENT_SCOPE
-        && (scope instanceof DataObject || scope instanceof String )) {
+        && (scope instanceof DataObject || scope instanceof String)) {
         endObject();
       } else {
         if (indentEnabled) {
@@ -359,8 +353,7 @@ public class OsnSerializer {
     }
   }
 
-  private void serializeCollection(
-    final String name,
+  private void serializeCollection(final String name,
     final Collection<Object> collection) throws IOException {
     startCollection(name);
     for (final Object value : collection) {

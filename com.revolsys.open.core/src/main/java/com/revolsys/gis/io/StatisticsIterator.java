@@ -22,6 +22,7 @@ public class StatisticsIterator implements Iterator<DataObject> {
     return statistics;
   }
 
+  @Override
   public boolean hasNext() {
     final boolean hasNext = iterator.hasNext();
     if (!hasNext) {
@@ -30,6 +31,7 @@ public class StatisticsIterator implements Iterator<DataObject> {
     return hasNext;
   }
 
+  @Override
   public DataObject next() {
     final DataObject object = iterator.next();
     if (object != null) {
@@ -38,6 +40,7 @@ public class StatisticsIterator implements Iterator<DataObject> {
     return object;
   }
 
+  @Override
   public void remove() {
     iterator.remove();
   }

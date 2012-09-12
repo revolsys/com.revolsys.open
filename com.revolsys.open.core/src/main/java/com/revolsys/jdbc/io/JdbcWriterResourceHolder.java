@@ -5,7 +5,7 @@ import org.springframework.transaction.support.ResourceHolderSupport;
 public class JdbcWriterResourceHolder extends ResourceHolderSupport {
   private JdbcWriter writer;
 
-  public JdbcWriterResourceHolder(JdbcWriter writer) {
+  public JdbcWriterResourceHolder(final JdbcWriter writer) {
     this.writer = writer;
   }
 
@@ -13,28 +13,28 @@ public class JdbcWriterResourceHolder extends ResourceHolderSupport {
     return writer;
   }
 
-  public void setWriter(JdbcWriter writer) {
-    this.writer = writer;
-  }
-
   public boolean hasWriter() {
     return writer != null;
   }
 
-  public boolean writerEquals(JdbcWriter writer) {
-    if (hasWriter()) {
-      return this.writer == writer || this.equals(writer);
-    } else {
-      return false;
-    }
-  }
-  
   @Override
   public void released() {
     super.released();
     if (!isOpen() && writer != null) {
       writer.flush();
       writer = null;
+    }
+  }
+
+  public void setWriter(final JdbcWriter writer) {
+    this.writer = writer;
+  }
+
+  public boolean writerEquals(final JdbcWriter writer) {
+    if (hasWriter()) {
+      return this.writer == writer || this.equals(writer);
+    } else {
+      return false;
     }
   }
 }

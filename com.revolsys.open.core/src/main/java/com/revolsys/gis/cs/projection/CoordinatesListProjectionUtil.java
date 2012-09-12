@@ -7,8 +7,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 
 public class CoordinatesListProjectionUtil {
 
-  public static CoordinatesList perform(
-    final CoordinatesList coordinates,
+  public static CoordinatesList perform(final CoordinatesList coordinates,
     final CoordinatesOperation operation) {
     final int dimension = coordinates.getDimension();
     final int size = coordinates.size();
@@ -26,8 +25,7 @@ public class CoordinatesListProjectionUtil {
     return newCoordinates;
   }
 
-  public static CoordinatesList perform(
-    final CoordinatesList coordinates,
+  public static CoordinatesList perform(final CoordinatesList coordinates,
     final CoordinateSystem fromCoordinateSystem,
     final CoordinateSystem toCoordinateSystem) {
     final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(

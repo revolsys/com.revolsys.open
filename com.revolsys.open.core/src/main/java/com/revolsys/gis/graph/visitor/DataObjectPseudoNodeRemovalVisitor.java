@@ -52,6 +52,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     mergedStatistics = null;
   }
 
+  @Override
   public Filter<Node<DataObject>> getFilter() {
     return filter;
   }
@@ -89,7 +90,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     newObject.setIdValue(null);
 
     final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
-    final Edge<DataObject> newEdge = graph.add(newObject);
+    final Edge<DataObject> newEdge = graph.addEdge(newObject);
     graph.remove(edge1);
     graph.remove(edge2);
     return newEdge;
@@ -100,6 +101,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     return DirectionalAttributes.merge(node, object1, object2);
   }
 
+  @Override
   public void process(final DataObjectGraph graph) {
     graph.visitNodes(this);
   }
@@ -125,6 +127,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     this.filter = filter;
   }
 
+  @Override
   public boolean visit(final Node<DataObject> node) {
     if (node.getEdges().size() > 1) {
       processPseudoNodes(node);

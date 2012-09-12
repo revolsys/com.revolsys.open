@@ -13,15 +13,13 @@ import com.vividsolutions.jts.util.Assert;
  */
 public class LocationOfPoint {
 
-  public static LineStringLocation locate(
-    final LineString line,
+  public static LineStringLocation locate(final LineString line,
     final Coordinate inputPt) {
     final LocationOfPoint locater = new LocationOfPoint(line);
     return locater.locate(inputPt);
   }
 
-  public static double segmentFraction(
-    final LineSegment seg,
+  public static double segmentFraction(final LineSegment seg,
     final Coordinate inputPt) {
     double segFrac = seg.projectionFactor(inputPt);
     if (segFrac < 0.0) {
@@ -47,9 +45,7 @@ public class LocationOfPoint {
    * @param loc a location
    * @return <code>true</code> if the first location is greater than the second
    */
-  private boolean isGreater(
-    final int i,
-    final double segFrac,
+  private boolean isGreater(final int i, final double segFrac,
     final LineStringLocation loc) {
     return LineStringLocation.compareLocationValues(i, segFrac,
       loc.getSegmentIndex(), loc.getSegmentFraction()) > 0;
@@ -100,8 +96,7 @@ public class LocationOfPoint {
    * @param minLocation the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LineStringLocation locateAfter(
-    final Coordinate inputPt,
+  public LineStringLocation locateAfter(final Coordinate inputPt,
     final LineStringLocation minLocation) {
     if (minLocation == null) {
       return locate(inputPt);

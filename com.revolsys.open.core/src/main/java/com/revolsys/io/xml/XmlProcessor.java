@@ -239,8 +239,7 @@ public abstract class XmlProcessor {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T parseObject(
-    final XMLStreamReader parser,
+  public <T> T parseObject(final XMLStreamReader parser,
     final Class<? extends T> objectClass) throws XMLStreamException,
     IOException {
     try {

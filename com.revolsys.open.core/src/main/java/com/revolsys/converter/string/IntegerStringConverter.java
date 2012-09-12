@@ -8,14 +8,17 @@ public class IntegerStringConverter extends
     super(INTEGER_FORMAT);
   }
 
+  @Override
   public Class<Integer> getConvertedClass() {
     return Integer.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public Integer toObject(final Object value) {
     if (value instanceof Integer) {
       final Integer integer = (Integer)value;
@@ -30,6 +33,7 @@ public class IntegerStringConverter extends
     }
   }
 
+  @Override
   public Integer toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Integer.valueOf(string);

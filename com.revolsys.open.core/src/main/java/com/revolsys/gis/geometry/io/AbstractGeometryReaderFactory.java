@@ -35,14 +35,17 @@ public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
     this.binary = binary;
   }
 
+  @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
     return coordinateSystems;
   }
 
+  @Override
   public boolean isBinary() {
     return binary;
   }
 
+  @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
     return coordinateSystems.contains(coordinateSystem);

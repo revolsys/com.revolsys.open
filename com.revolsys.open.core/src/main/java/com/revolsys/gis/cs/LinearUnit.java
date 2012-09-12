@@ -32,8 +32,7 @@ public class LinearUnit implements Serializable {
    * @param conversionFactor The conversion factor.
    * @return The linear unit.
    */
-  public static Unit<Length> getUnit(
-    final Unit<Length> baseUnit,
+  public static Unit<Length> getUnit(final Unit<Length> baseUnit,
     final double conversionFactor) {
     Unit<Length> unit;
     if (baseUnit == null) {

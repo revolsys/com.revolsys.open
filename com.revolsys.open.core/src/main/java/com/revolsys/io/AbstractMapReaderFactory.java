@@ -31,10 +31,12 @@ public abstract class AbstractMapReaderFactory extends AbstractIoFactory
     super(name);
   }
 
+  @Override
   public boolean isCustomAttributionSupported() {
     return customAttributionSupported;
   }
 
+  @Override
   public boolean isSingleFile() {
     return singleFile;
   }

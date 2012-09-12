@@ -72,6 +72,7 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     boundObjects.clear();
   }
 
+  @Override
   public InitialContextFactory createInitialContextFactory(
     final Hashtable environment) {
     if (activated == null && environment != null) {
@@ -112,6 +113,7 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     }
     return new InitialContextFactory() {
 
+      @Override
       public Context getInitialContext(final Hashtable environment) {
         return new SimpleNamingContext("", boundObjects, environment);
       }

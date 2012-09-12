@@ -64,6 +64,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
     wktParser = new WktParser(geometryFactory);
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }

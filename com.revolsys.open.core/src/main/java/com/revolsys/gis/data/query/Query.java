@@ -25,7 +25,7 @@ public class Query implements Cloneable {
 
   private BoundingBox boundingBox;
 
-  private Map<String, Object> filter = new LinkedHashMap<String, Object>();
+  private final Map<String, Object> filter = new LinkedHashMap<String, Object>();
 
   private String fromClause;
 
@@ -100,6 +100,10 @@ public class Query implements Cloneable {
     this(typePath, query, Arrays.asList(parameters));
   }
 
+  public void addFilter(final String name, final Object value) {
+    filter.put(name, value);
+  }
+
   public void addOrderBy(final String column, final boolean ascending) {
     orderBy.put(column, ascending);
   }
@@ -151,7 +155,7 @@ public class Query implements Cloneable {
     return boundingBox;
   }
 
-  public Map<String,Object> getFilter() {
+  public Map<String, Object> getFilter() {
     return filter;
   }
 
@@ -238,7 +242,7 @@ public class Query implements Cloneable {
     this.metaData = metaData;
   }
 
-  public void setOrderBy(Map<String, Boolean> orderBy) {
+  public void setOrderBy(final Map<String, Boolean> orderBy) {
     this.orderBy = orderBy;
   }
 
@@ -327,9 +331,5 @@ public class Query implements Cloneable {
       string.append(parameters);
     }
     return string.toString();
-  }
-
-  public void addFilter(String name, Object value) {
-    filter.put(name, value);
   }
 }

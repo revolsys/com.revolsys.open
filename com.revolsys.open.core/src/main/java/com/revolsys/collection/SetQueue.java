@@ -13,11 +13,13 @@ public class SetQueue<E> extends AbstractQueue<E> {
     return set.iterator();
   }
 
+  @Override
   public boolean offer(final E o) {
     set.add(o);
     return true;
   }
 
+  @Override
   public E peek() {
     final Iterator<E> iterator = iterator();
     if (iterator.hasNext()) {
@@ -28,6 +30,7 @@ public class SetQueue<E> extends AbstractQueue<E> {
     }
   }
 
+  @Override
   public E poll() {
     final Iterator<E> iterator = iterator();
     if (iterator.hasNext()) {

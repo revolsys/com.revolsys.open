@@ -43,10 +43,8 @@ public class MavenRepositoryCache extends MavenRepository {
     this(null, repositoryUrls);
   }
 
-  public boolean copyRepositoryResource(
-    final Resource resource,
-    final MavenRepository repository,
-    final String path) {
+  public boolean copyRepositoryResource(final Resource resource,
+    final MavenRepository repository, final String path) {
     final Resource repositoryResource = SpringUtil.getResource(
       repository.getRoot(), path);
     if (repositoryResource.exists()) {
@@ -65,13 +63,9 @@ public class MavenRepositoryCache extends MavenRepository {
   }
 
   @Override
-  protected Resource handleMissingResource(
-    final Resource resource,
-    final String groupId,
-    final String artifactId,
-    final String type,
-    final String classifier,
-    final String version) {
+  protected Resource handleMissingResource(final Resource resource,
+    final String groupId, final String artifactId, final String type,
+    final String classifier, final String version) {
     if (version.endsWith("-SNAPSHOT")) {
       final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
 

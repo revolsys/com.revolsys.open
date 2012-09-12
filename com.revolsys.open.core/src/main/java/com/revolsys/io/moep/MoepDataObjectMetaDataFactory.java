@@ -11,6 +11,7 @@ public class MoepDataObjectMetaDataFactory extends AbstractObjectWithProperties
   implements DataObjectMetaDataFactory {
   private static final Map<String, DataObjectMetaData> META_DATA_CACHE = new HashMap<String, DataObjectMetaData>();
 
+  @Override
   public DataObjectMetaData getMetaData(final String typePath) {
     synchronized (META_DATA_CACHE) {
       DataObjectMetaData metaData = META_DATA_CACHE.get(typePath);

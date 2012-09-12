@@ -13,14 +13,17 @@ public class DataObjectEntry implements Entry<String, Object> {
     this.index = index;
   }
 
+  @Override
   public String getKey() {
     return dataObject.getMetaData().getAttributeName(index);
   }
 
+  @Override
   public Object getValue() {
     return dataObject.getValue(index);
   }
 
+  @Override
   public Object setValue(final Object value) {
     dataObject.setValue(index, value);
     return value;

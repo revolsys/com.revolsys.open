@@ -23,6 +23,7 @@ public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }

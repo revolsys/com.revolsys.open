@@ -62,6 +62,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     return (T)currentValue;
   }
 
+  @Override
   public boolean hasNext() {
     return currentEvent != EventType.endDocument;
   }
@@ -149,6 +150,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     }
   }
 
+  @Override
   public EventType next() {
     if (hasNext()) {
       currentValue = nextValue;
@@ -228,6 +230,7 @@ public class JsonParser implements Iterator<JsonParser.EventType> {
     nextValue = text.toString();
   }
 
+  @Override
   public void remove() {
   }
 

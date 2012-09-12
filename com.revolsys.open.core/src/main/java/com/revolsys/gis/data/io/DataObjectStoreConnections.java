@@ -52,8 +52,8 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
     for (final Entry<String, String> param : config.entrySet()) {
       preferences.put(param.getKey(), param.getValue());
     }
-    DataObjectStore dataObjectStore = getDataObjectStore(connectionName);
-    int index = getConnectionNames().indexOf(connectionName);
+    final DataObjectStore dataObjectStore = getDataObjectStore(connectionName);
+    final int index = getConnectionNames().indexOf(connectionName);
     propertyChangeSupport.fireIndexedPropertyChange("connections", index, null,
       dataObjectStore);
 
@@ -105,6 +105,7 @@ public class DataObjectStoreConnections implements PropertyChangeSupportProxy {
     return dataStoresPrefereneces.node(connectionName);
   }
 
+  @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return propertyChangeSupport;
   }

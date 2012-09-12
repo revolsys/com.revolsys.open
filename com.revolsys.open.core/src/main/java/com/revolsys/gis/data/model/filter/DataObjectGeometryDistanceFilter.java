@@ -43,6 +43,7 @@ public class DataObjectGeometryDistanceFilter implements Filter<DataObject> {
     this.maxDistance = maxDistance;
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
     final double distance = matchGeometry.distance(geometry);

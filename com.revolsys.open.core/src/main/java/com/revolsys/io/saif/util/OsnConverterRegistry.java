@@ -34,6 +34,10 @@ public class OsnConverterRegistry {
     }
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
   public void init(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     addConverter("/Date", new DateConverter());
@@ -48,9 +52,5 @@ public class OsnConverterRegistry {
     addConverter("/TextLine", new TextLineConverter(geometryFactory, this));
     addConverter("/TextOnCurve",
       new TextOnCurveConverter(geometryFactory, this));
-  }
-
-  public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
   }
 }

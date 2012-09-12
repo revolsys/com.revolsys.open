@@ -21,6 +21,7 @@ public class GeometryFactoryFieldType extends AbstractEcsvFieldType {
     super(DATA_TYPE);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       final String[] values = text.split(",");
@@ -41,6 +42,7 @@ public class GeometryFactoryFieldType extends AbstractEcsvFieldType {
     }
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object value) {
     if (value instanceof GeometryFactory) {
       final GeometryFactory geometryFactory = (GeometryFactory)value;

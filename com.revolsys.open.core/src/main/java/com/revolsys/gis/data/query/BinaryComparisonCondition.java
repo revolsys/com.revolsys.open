@@ -10,8 +10,7 @@ public class BinaryComparisonCondition implements Condition {
     return new BinaryComparisonCondition(left, ">", right);
   }
 
-  public static Condition greaterThanOrEqual(
-    final Object left,
+  public static Condition greaterThanOrEqual(final Object left,
     final Object right) {
     return new BinaryComparisonCondition(left, ">=", right);
   }
@@ -45,6 +44,7 @@ public class BinaryComparisonCondition implements Condition {
     this.right = right;
   }
 
+  @Override
   public void appendSql(final StringBuffer buffer) {
     if (left instanceof Condition) {
       final Condition condition = (Condition)left;

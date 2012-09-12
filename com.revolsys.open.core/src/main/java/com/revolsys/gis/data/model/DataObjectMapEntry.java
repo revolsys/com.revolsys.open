@@ -12,15 +12,18 @@ public class DataObjectMapEntry implements Entry<String, Object> {
     this.index = index;
   }
 
+  @Override
   public String getKey() {
     final DataObjectMetaData metaData = object.getMetaData();
     return metaData.getAttributeName(index);
   }
 
+  @Override
   public Object getValue() {
     return object.getValue(index);
   }
 
+  @Override
   public Object setValue(final Object value) {
     object.setValue(index, value);
     return value;

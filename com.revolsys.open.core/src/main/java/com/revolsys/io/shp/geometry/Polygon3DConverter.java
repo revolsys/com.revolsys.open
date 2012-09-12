@@ -31,17 +31,19 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POLYGON_ZM_SHAPE;
   }
 
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int[] partIndex = ShapefileGeometryUtil.INSTANCE.readPartIndex(in, numParts,
-      numPoints);
+    final int[] partIndex = ShapefileGeometryUtil.INSTANCE.readPartIndex(in,
+      numParts, numPoints);
 
     byte dimension = 3;
     if (recordLength > 44 + 4 * numParts + 24 * numPoints) {
@@ -59,6 +61,7 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
     return geometryFactory.createPolygon(parts);
   }
 
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof Polygon) {
@@ -104,7 +107,8 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
 
       out.writeInt(recordLength / 2);
       out.writeLEInt(getShapeType());
-      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out, polygon.getEnvelopeInternal());
+      ShapefileGeometryUtil.INSTANCE.writeEnvelope(out,
+        polygon.getEnvelopeInternal());
       out.writeLEInt(numParts);
       out.writeLEInt(numPoints);
 

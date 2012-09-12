@@ -13,8 +13,7 @@ import javax.swing.tree.TreePath;
 
 public final class TreeUtil {
   @SuppressWarnings("unchecked")
-  public static <L> L getFirstSelectedNode(
-    final Object source,
+  public static <L> L getFirstSelectedNode(final Object source,
     final Class<L> nodeClass) {
     final List<Object> nodes = getSelectedNodes(source);
     if (!nodes.isEmpty()) {
@@ -68,8 +67,7 @@ public final class TreeUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <L> List<L> getSelectedNodes(
-    final Object source,
+  public static <L> List<L> getSelectedNodes(final Object source,
     final Class<L> nodeClass) {
     final List<L> nodes = new ArrayList<L>();
     final List<Object> selectedNodes = getSelectedNodes(source);

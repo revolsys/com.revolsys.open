@@ -19,7 +19,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
@@ -38,17 +37,16 @@ public class DataObjectConverterProcess extends
   private Map<Object, Map<String, Object>> simpleMapping;
 
   private Statistics statistics = new Statistics("Converted");
-//
-//  private Statistics ignoredStatistics = new Statistics("Ignored");
 
-  public void addTypeConverter(
-    final String typePath,
+  //
+  // private Statistics ignoredStatistics = new Statistics("Ignored");
+
+  public void addTypeConverter(final String typePath,
     final Converter<DataObject, DataObject> converter) {
     typeConverterMap.put(typePath, converter);
   }
 
-  public void addTypeFilterConverter(
-    final String typePath,
+  public void addTypeFilterConverter(final String typePath,
     final FilterDataObjectConverter filterConverter) {
 
     Collection<FilterDataObjectConverter> converters = typeFilterConverterMap.get(typePath);
@@ -130,20 +128,18 @@ public class DataObjectConverterProcess extends
   }
 
   @Override
-  protected void postRun(
-    final Channel<DataObject> in,
+  protected void postRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     super.postRun(in, out);
     statistics.disconnect();
-//    ignoredStatistics.disconnect();
+    // ignoredStatistics.disconnect();
   }
 
   @Override
-  protected void preRun(
-    final Channel<DataObject> in,
+  protected void preRun(final Channel<DataObject> in,
     final Channel<DataObject> out) {
     statistics.connect();
-//    ignoredStatistics.connect();
+    // ignoredStatistics.connect();
     if (simpleMapping != null) {
       for (final Entry<Object, Map<String, Object>> entry : simpleMapping.entrySet()) {
         final Object key = entry.getKey();
@@ -174,13 +170,11 @@ public class DataObjectConverterProcess extends
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject source) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject source) {
     final DataObject target = convert(source);
     if (target == null) {
-//      ignoredStatistics.add(source);
+      // ignoredStatistics.add(source);
     } else {
       out.write(target);
       if (source != target) {

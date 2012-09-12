@@ -56,6 +56,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     return null;
   }
 
+  @Override
   public void write(final DataObject object) {
     if (!opened) {
       writeHeader();

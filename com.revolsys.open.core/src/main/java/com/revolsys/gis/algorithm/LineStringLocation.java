@@ -8,10 +8,8 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class LineStringLocation implements Comparable<LineStringLocation> {
 
-  public static int compareLocationValues(
-    final int segmentIndex0,
-    final double segmentFraction0,
-    final int segmentIndex1,
+  public static int compareLocationValues(final int segmentIndex0,
+    final double segmentFraction0, final int segmentIndex1,
     final double segmentFraction1) {
     // compare segments
     if (segmentIndex0 < segmentIndex1) {
@@ -42,10 +40,8 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    * @param length the length to the desired point
    * @return the {@link Coordinate} of the desired point
    */
-  public static Coordinate pointAlongSegmentByFraction(
-    final Coordinate p0,
-    final Coordinate p1,
-    final double frac) {
+  public static Coordinate pointAlongSegmentByFraction(final Coordinate p0,
+    final Coordinate p1, final double frac) {
     if (frac <= 0.0) {
       return p0;
     }
@@ -85,6 +81,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    *         <code>LineStringLocation</code> is less than, equal to, or greater
    *         than the specified <code>LineStringLocation</code>
    */
+  @Override
   public int compareTo(final LineStringLocation other) {
     // compare segments
     if (segmentIndex < other.segmentIndex) {

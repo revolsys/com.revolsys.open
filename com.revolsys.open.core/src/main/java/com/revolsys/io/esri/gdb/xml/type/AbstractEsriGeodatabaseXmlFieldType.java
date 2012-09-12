@@ -22,14 +22,17 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
     this.esriFieldType = esriFieldType;
   }
 
+  @Override
   public DataType getDataType() {
     return dataType;
   }
 
+  @Override
   public FieldType getEsriFieldType() {
     return esriFieldType;
   }
 
+  @Override
   public int getFixedLength() {
     return -1;
   }
@@ -38,14 +41,17 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
     return xmlSchemaTypeName;
   }
 
+  @Override
   public String getXmlSchemaTypeName() {
     return xmlSchemaTypeName;
   }
 
+  @Override
   public boolean isUsePrecision() {
     return false;
   }
 
+  @Override
   public void writeValue(final XmlWriter out, final Object value) {
     out.startTag(EsriGeodatabaseXmlConstants.VALUE);
     if (value == null) {

@@ -66,12 +66,6 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
   }
 
   public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
-    final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    super(name, icon, invokeLater, object, methodName, parameters);
-  }
-
-  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
     final CharSequence toolTip, final Icon icon, final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
     super(name, icon, invokeLater, object, methodName, parameters);
@@ -83,6 +77,12 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
     final String methodName, final Object... parameters) {
     super(name, icon, object, methodName, parameters);
     setToolTip(toolTip);
+  }
+
+  public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
+    final Icon icon, final boolean invokeLater, final Object object,
+    final String methodName, final Object... parameters) {
+    super(name, icon, invokeLater, object, methodName, parameters);
   }
 
   public InvokeMethodActionToolBarButtonFactory(final CharSequence name,
@@ -110,10 +110,10 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
   @Override
   public Component createToolbarButton() {
     if (checkBox) {
-      JToggleButton button = new JToggleButton(this);
+      final JToggleButton button = new JToggleButton(this);
       return button;
     } else {
-      JButton button = new JButton(this);
+      final JButton button = new JButton(this);
       return button;
     }
   }

@@ -37,6 +37,7 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
     this.geometry = geometry;
   }
 
+  @Override
   public boolean accept(final DataObject object) {
     final Geometry matchGeometry = object.getGeometryValue();
     if (matchGeometry.intersects(geometry)) {

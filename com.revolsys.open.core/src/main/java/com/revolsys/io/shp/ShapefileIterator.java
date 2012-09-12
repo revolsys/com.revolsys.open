@@ -10,7 +10,6 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
@@ -122,6 +121,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     return dataObjectFactory;
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }

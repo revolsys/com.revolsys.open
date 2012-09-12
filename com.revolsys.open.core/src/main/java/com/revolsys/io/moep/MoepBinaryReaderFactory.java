@@ -16,14 +16,13 @@ public class MoepBinaryReaderFactory extends
   }
 
   public DataObjectReader createDataObjectReader(
-    final DataObjectMetaData metaData,
-    final Resource resource,
+    final DataObjectMetaData metaData, final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     throw new UnsupportedOperationException();
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     return new MoepBinaryReader(null, resource, dataObjectFactory);
   }

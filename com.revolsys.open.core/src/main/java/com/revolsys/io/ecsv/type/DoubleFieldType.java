@@ -9,6 +9,7 @@ public class DoubleFieldType extends NumberFieldType {
     super(DataTypes.DOUBLE);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Double.parseDouble(text);

@@ -169,8 +169,7 @@ public final class JsonParserUtil {
    * @param parser The parser.
    * @param attributeName The name of the attribute to skip through.
    */
-  public static void skipToAttribute(
-    final JsonParser parser,
+  public static void skipToAttribute(final JsonParser parser,
     final String attributeName) {
     while (parser.hasNext()) {
       final EventType eventType = parser.next();

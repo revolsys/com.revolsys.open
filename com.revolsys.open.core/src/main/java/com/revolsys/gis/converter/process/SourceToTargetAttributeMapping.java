@@ -31,6 +31,7 @@ public class SourceToTargetAttributeMapping extends
     }
   }
 
+  @Override
   public void process(final DataObject source, final DataObject target) {
     for (final SourceToTargetProcess<DataObject, DataObject> mapping : targetAttributeMappings.values()) {
       mapping.process(source, target);

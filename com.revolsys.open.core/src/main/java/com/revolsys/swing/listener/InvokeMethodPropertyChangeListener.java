@@ -45,15 +45,15 @@ public class InvokeMethodPropertyChangeListener implements
   }
 
   public InvokeMethodPropertyChangeListener(final Object object,
-    final String methodName, final Object... parameters) {
-    this(object, methodName, false, parameters);
-  }
-
-  public InvokeMethodPropertyChangeListener(final Object object,
     final String methodName, final boolean invokeLater,
     final Object... parameters) {
     runnable = new InvokeMethodRunnable(object, methodName, parameters);
     this.invokeLater = invokeLater;
+  }
+
+  public InvokeMethodPropertyChangeListener(final Object object,
+    final String methodName, final Object... parameters) {
+    this(object, methodName, false, parameters);
   }
 
   @Override

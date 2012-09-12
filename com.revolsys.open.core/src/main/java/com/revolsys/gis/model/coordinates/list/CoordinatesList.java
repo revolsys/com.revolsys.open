@@ -13,12 +13,8 @@ public interface CoordinatesList extends CoordinateSequence,
   Iterable<Coordinates>, Serializable {
   boolean contains(Coordinates point);
 
-  void copy(
-    int sourceIndex,
-    CoordinatesList target,
-    int targetIndex,
-    int numAxis,
-    int count);
+  void copy(int sourceIndex, CoordinatesList target, int targetIndex,
+    int numAxis, int count);
 
   double distance(int index, Coordinates point);
 
@@ -54,8 +50,10 @@ public interface CoordinatesList extends CoordinateSequence,
 
   double getValue(int index, int axisIndex);
 
+  @Override
   double getX(int index);
 
+  @Override
   double getY(int index);
 
   double getZ(int index);
@@ -80,6 +78,7 @@ public interface CoordinatesList extends CoordinateSequence,
 
   void setZ(int index, double z);
 
+  @Override
   int size();
 
   boolean startsWith(CoordinatesList coordinatesList, int numAxis);
@@ -90,9 +89,6 @@ public interface CoordinatesList extends CoordinateSequence,
 
   CoordinatesList subList(int length, int index, int count);
 
-  CoordinatesList subList(
-    int length,
-    int sourceIndex,
-    int targetIndex,
+  CoordinatesList subList(int length, int sourceIndex, int targetIndex,
     int count);
 }

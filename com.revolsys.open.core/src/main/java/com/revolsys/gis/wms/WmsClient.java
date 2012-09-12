@@ -58,14 +58,9 @@ public class WmsClient {
     return capabilities;
   }
 
-  public Image getMapImage(
-    final List<String> layers,
-    final List<String> styles,
-    final String srid,
-    final Envelope envelope,
-    final String format,
-    final int width,
-    final int height) throws IOException {
+  public Image getMapImage(final List<String> layers,
+    final List<String> styles, final String srid, final Envelope envelope,
+    final String format, final int width, final int height) throws IOException {
     final URL mapUrl = getMapUrl(layers, styles, srid, envelope, format, width,
       height);
     final URLConnection connection = mapUrl.openConnection();
@@ -78,14 +73,9 @@ public class WmsClient {
     return ImageIO.read(in);
   }
 
-  public URL getMapUrl(
-    final List<String> layers,
-    final List<String> styles,
-    final String srid,
-    final Envelope envelope,
-    final String format,
-    final int width,
-    final int height) {
+  public URL getMapUrl(final List<String> layers, final List<String> styles,
+    final String srid, final Envelope envelope, final String format,
+    final int width, final int height) {
     final String version = getCapabilities().getVersion();
     final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
     if (version.equals("1.0.0")) {

@@ -28,10 +28,8 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   public CopyProcess() {
   }
 
-  private void copyAttribute(
-    final DataObject sourceObject,
-    final String sourceAttributeName,
-    final DataObject targetObject,
+  private void copyAttribute(final DataObject sourceObject,
+    final String sourceAttributeName, final DataObject targetObject,
     final String targetAttributeName) {
     Object value = sourceObject.getValueByPath(sourceAttributeName);
     final Map<Object, Object> valueMap = valueMaps.get(targetAttributeName);
@@ -74,10 +72,8 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(
-    final Channel<DataObject> in,
-    final Channel<DataObject> out,
-    final DataObject object) {
+  protected void process(final Channel<DataObject> in,
+    final Channel<DataObject> out, final DataObject object) {
     if (metaData == null) {
       out.write(object);
     } else {

@@ -22,6 +22,7 @@ public class LineSegmentMatchWithinDistanceFilter implements
     envelope.expandBy(maxDistance);
   }
 
+  @Override
   public boolean accept(final Edge<LineSegmentMatch> edge) {
     if (!edge.hasNode(node) && edge.distance(node) < maxDistance) {
       return true;

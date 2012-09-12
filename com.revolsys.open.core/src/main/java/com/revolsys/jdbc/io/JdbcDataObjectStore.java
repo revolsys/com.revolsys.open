@@ -16,6 +16,7 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   DataObjectStoreQueryReader createReader();
 
+  @Override
   JdbcWriter createWriter();
 
   Connection getConnection();
@@ -24,6 +25,7 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   String getGeneratePrimaryKeySql(DataObjectMetaData metaData);
 
+  @Override
   String getLabel();
 
   DataObjectMetaData getMetaData(String tableName,
@@ -33,13 +35,15 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   Object getNextPrimaryKey(String typePath);
 
+  @Override
   void initialize();
 
   Reader<DataObject> query(String path, Geometry geometry, String condition);
 
+  void releaseWriter(final JdbcWriter writer);
+
   void setDataSource(DataSource dataSource);
 
+  @Override
   void setLabel(String label);
-
-  void releaseWriter(final JdbcWriter writer);
 }

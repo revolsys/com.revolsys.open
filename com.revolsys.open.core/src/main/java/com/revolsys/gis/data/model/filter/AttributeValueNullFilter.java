@@ -26,6 +26,7 @@ public class AttributeValueNullFilter implements Filter<DataObject> {
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
+  @Override
   public boolean accept(final DataObject object) {
     final Object propertyValue = object.getValue(attributeName);
     return propertyValue == null;

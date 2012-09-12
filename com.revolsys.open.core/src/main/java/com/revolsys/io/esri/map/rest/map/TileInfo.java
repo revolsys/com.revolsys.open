@@ -14,12 +14,12 @@ public class TileInfo extends AbstractMapWrapper {
   public TileInfo() {
   }
 
-  public Integer getRows() {
-    return getIntValue("rows");
-  }
-
   public Integer getCols() {
     return getIntValue("cols");
+  }
+
+  public Integer getCompressionQuality() {
+    return getIntValue("compressionQuality");
   }
 
   public Integer getDpi() {
@@ -30,29 +30,29 @@ public class TileInfo extends AbstractMapWrapper {
     return getValue("format");
   }
 
-  public Integer getCompressionQuality() {
-    return getIntValue("compressionQuality");
+  public List<LevelOfDetail> getLods() {
+    return getList(LevelOfDetail.class, "lods");
   }
 
   public Coordinates getOrigin() {
-    Map<String, Object> origin = getValue("origin");
+    final Map<String, Object> origin = getValue("origin");
     if (origin == null) {
       return null;
     } else {
-      Double x = CollectionUtil.getDoubleValue(origin, "x");
-      Double y = CollectionUtil.getDoubleValue(origin, "y");
+      final Double x = CollectionUtil.getDoubleValue(origin, "x");
+      final Double y = CollectionUtil.getDoubleValue(origin, "y");
       return new DoubleCoordinates(x, y);
     }
   }
 
   public Point getOriginPoint() {
-    GeometryFactory spatialReference = getSpatialReference();
-    Coordinates origin = getOrigin();
+    final GeometryFactory spatialReference = getSpatialReference();
+    final Coordinates origin = getOrigin();
     return spatialReference.createPoint(origin);
   }
 
-  public List<LevelOfDetail> getLods() {
-    return getList(LevelOfDetail.class, "lods");
+  public Integer getRows() {
+    return getIntValue("rows");
   }
 
 }

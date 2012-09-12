@@ -21,21 +21,22 @@ public class GmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
       GmlConstants.FILE_EXTENSION);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
     return new GmlDataObjectWriter(metaData, writer);
   }
 
+  @Override
   public GeometryReader createGeometryReader(final Resource resource) {
     final GmlGeometryIterator iterator = new GmlGeometryIterator(resource);
     return new GeometryReader(iterator);
   }
 
+  @Override
   public boolean isBinary() {
     return false;
   }

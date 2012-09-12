@@ -22,6 +22,7 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
+  @Override
   public void registerCustomEditors(final PropertyEditorRegistry registry) {
     registry.registerCustomEditor(QName.class, new QNameEditor());
     registry.registerCustomEditor(Boolean.class, new BooleanEditor());

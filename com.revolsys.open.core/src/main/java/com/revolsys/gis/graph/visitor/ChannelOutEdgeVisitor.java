@@ -14,9 +14,7 @@ public class ChannelOutEdgeVisitor<T> implements Visitor<Edge<T>> {
     graph.visitEdges(visitor);
   }
 
-  public static <T> void write(
-    final Graph<T> graph,
-    final Filter<T> filter,
+  public static <T> void write(final Graph<T> graph, final Filter<T> filter,
     final Channel<T> out) {
     final Visitor<Edge<T>> visitor = new ChannelOutEdgeVisitor<T>(out);
     final EdgeObjectFilter<T> edgeFilter = new EdgeObjectFilter<T>(filter);
@@ -31,6 +29,7 @@ public class ChannelOutEdgeVisitor<T> implements Visitor<Edge<T>> {
     this.out = out;
   }
 
+  @Override
   public boolean visit(final Edge<T> edge) {
     if (out == null) {
       return false;

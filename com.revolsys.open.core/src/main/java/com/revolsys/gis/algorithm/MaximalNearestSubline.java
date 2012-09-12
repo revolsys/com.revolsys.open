@@ -18,18 +18,15 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class MaximalNearestSubline {
 
-  public static LineString getMaximalNearestSubline(
-    final LineString a,
+  public static LineString getMaximalNearestSubline(final LineString a,
     final LineString b) {
     final MaximalNearestSubline mns = new MaximalNearestSubline(a, b);
     final LineStringLocation[] interval = mns.getInterval();
     return getSubline(a, interval[0], interval[1]);
   }
 
-  public static LineString getSubline(
-    final LineString line,
-    final LineStringLocation start,
-    final LineStringLocation end) {
+  public static LineString getSubline(final LineString line,
+    final LineStringLocation start, final LineStringLocation end) {
     final CoordinateList newCoordinates = new CoordinateList();
 
     int includedStartIndex = start.getSegmentIndex();

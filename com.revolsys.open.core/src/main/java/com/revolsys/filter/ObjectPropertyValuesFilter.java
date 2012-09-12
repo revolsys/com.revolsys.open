@@ -15,6 +15,7 @@ public class ObjectPropertyValuesFilter<T> implements Filter<T> {
     this.values = values;
   }
 
+  @Override
   public boolean accept(final T object) {
     try {
       final Object value = PropertyUtils.getProperty(object, propertyName);

@@ -13,6 +13,7 @@ public class EdgeObjectFilter<T> implements Filter<Edge<T>> {
     this.filter = filter;
   }
 
+  @Override
   public boolean accept(final Edge<T> edge) {
     final T object = edge.getObject();
     return filter.accept(object);

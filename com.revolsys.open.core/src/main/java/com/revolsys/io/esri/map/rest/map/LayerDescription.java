@@ -2,7 +2,6 @@ package com.revolsys.io.esri.map.rest.map;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
 

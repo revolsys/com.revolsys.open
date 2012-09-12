@@ -22,6 +22,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
     return coordinatesList;
   }
 
+  @Override
   public CoordinatesList create(final Coordinate[] coordinates) {
     final CoordinatesList coordinatesList = create(coordinates.length, 3);
     for (int i = 0; i < coordinates.length; i++) {
@@ -31,6 +32,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
     return coordinatesList;
   }
 
+  @Override
   public CoordinatesList create(final CoordinateSequence coordinateSequence) {
     final int size = coordinateSequence.size();
     final int numAxis = coordinateSequence.getDimension();
@@ -44,6 +46,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
     return coordinatesList;
   }
 
+  @Override
   public CoordinatesList create(final int size, final int dimension) {
     return new DoubleCoordinatesList(size, dimension);
   }

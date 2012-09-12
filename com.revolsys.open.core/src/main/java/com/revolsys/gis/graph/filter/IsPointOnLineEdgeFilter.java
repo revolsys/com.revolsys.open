@@ -23,6 +23,7 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
     envelope.expandBy(maxDistance);
   }
 
+  @Override
   public boolean accept(final Node<T> node) {
     final LineString line = edge.getLine();
     if (!edge.hasNode(node)) {

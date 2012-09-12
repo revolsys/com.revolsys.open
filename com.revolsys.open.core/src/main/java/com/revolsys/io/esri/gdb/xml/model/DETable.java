@@ -60,9 +60,7 @@ public class DETable extends DEDataset {
     }
   }
 
-  public void addIndex(
-    final Field field,
-    final boolean unique,
+  public void addIndex(final Field field, final boolean unique,
     final String indexName) {
     final Index index = new Index();
     index.setName(indexName);

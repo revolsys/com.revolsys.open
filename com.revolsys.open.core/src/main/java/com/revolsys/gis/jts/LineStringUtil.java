@@ -850,6 +850,12 @@ public final class LineStringUtil {
     }
   }
 
+  public static boolean isFirstPoint(final LineString line,
+    final Coordinates point) {
+    final Coordinates fromPoint = getFromPoint(line);
+    return fromPoint.equals(point);
+  }
+
   /**
    * Check to see if the point is on any of the segments of the line.
    * 
@@ -916,6 +922,11 @@ public final class LineStringUtil {
     }
 
     return false;
+  }
+
+  public static boolean isToPoint(final LineString line, final Coordinates point) {
+    final Coordinates toPoint = getToPoint(line);
+    return toPoint.equals(point);
   }
 
   public static boolean isWithinDistance(final Coordinates point,
@@ -1184,15 +1195,5 @@ public final class LineStringUtil {
   public static LineString subLineString(final LineString line,
     final int length, final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
-  }
-
-  public static boolean isFirstPoint(LineString line, Coordinates point) {
-    Coordinates fromPoint = getFromPoint(line);
-    return fromPoint.equals(point);
-  }
-
-  public static boolean isToPoint(LineString line, Coordinates point) {
-    Coordinates toPoint = getToPoint(line);
-    return toPoint.equals(point);
   }
 }

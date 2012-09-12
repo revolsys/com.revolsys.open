@@ -57,15 +57,14 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
     return size;
   }
 
+  @Override
   public Iterator<RTreeNode<T>> iterator() {
     return getNodes().iterator();
   }
 
   @Override
-  public boolean remove(
-    final LinkedList<RTreeNode<T>> path,
-    final Envelope envelope,
-    final T object) {
+  public boolean remove(final LinkedList<RTreeNode<T>> path,
+    final Envelope envelope, final T object) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];
       if (node.contains(envelope)) {
@@ -94,8 +93,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   }
 
   @SuppressWarnings("unchecked")
-  public List<RTreeNode<T>> split(
-    final RTreeNode<T> node,
+  public List<RTreeNode<T>> split(final RTreeNode<T> node,
     final List<RTreeNode<T>> newNodes) {
     final RTreeBranch<T> branch1 = new RTreeBranch<T>(nodes.length);
     final RTreeBranch<T> branch2 = new RTreeBranch<T>(nodes.length);
@@ -133,9 +131,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   }
 
   @Override
-  public boolean visit(
-    final Envelope envelope,
-    final Filter<T> filter,
+  public boolean visit(final Envelope envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];

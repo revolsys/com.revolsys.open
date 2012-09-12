@@ -25,6 +25,7 @@ public class GetDataObjectValue implements Converter<DataObject, Object> {
     this.valueMap = valueMap;
   }
 
+  @Override
   public Object convert(final DataObject source) {
     Object value = DataObjectUtil.getAttributeByPath(source, attributePath);
     if (!valueMap.isEmpty()) {

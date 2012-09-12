@@ -72,6 +72,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     init(query);
   }
 
+  @Override
   @PreDestroy
   public void close() {
     JdbcUtils.close(statement, resultSet);
@@ -98,6 +99,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return The index of the last object in the current page.
    */
+  @Override
   public int getEndIndex() {
     if (pageNumber == numPages) {
       return numResults;
@@ -111,6 +113,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return The list of objects in the current page.
    */
+  @Override
   public List<DataObject> getList() {
     if (results == null) {
       throw new IllegalStateException(
@@ -124,6 +127,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return Thepage number of the next page.
    */
+  @Override
   public int getNextPageNumber() {
     return pageNumber + 2;
   }
@@ -133,6 +137,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return The number of pages.
    */
+  @Override
   public int getNumPages() {
     return numPages + 1;
   }
@@ -142,6 +147,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return The total number of results returned.
    */
+  @Override
   public int getNumResults() {
     return numResults;
   }
@@ -151,6 +157,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return Thepage number of the current page.
    */
+  @Override
   public int getPageNumber() {
     return pageNumber + 1;
   }
@@ -160,6 +167,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return The number of objects to display in a page.
    */
+  @Override
   public int getPageSize() {
     return pageSize;
   }
@@ -169,6 +177,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return Thepage number of the previous page.
    */
+  @Override
   public int getPreviousPageNumber() {
     return pageNumber;
   }
@@ -178,6 +187,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return The index of the first object in the current page.
    */
+  @Override
   public int getStartIndex() {
     return (pageNumber * pageSize) + 1;
   }
@@ -187,6 +197,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return True if there is a next page.
    */
+  @Override
   public boolean hasNextPage() {
     return pageNumber < numPages;
   }
@@ -196,6 +207,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return True if there is a previous page.
    */
+  @Override
   public boolean hasPreviousPage() {
     return pageNumber > 0;
   }
@@ -229,6 +241,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return True if this is the first page.
    */
+  @Override
   public boolean isFirstPage() {
     return pageNumber == 0;
   }
@@ -238,6 +251,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @return True if this is the last page.
    */
+  @Override
   public boolean isLastPage() {
     return pageNumber == numPages;
   }
@@ -247,6 +261,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @param pageNumber The current page number.
    */
+  @Override
   public void setPageNumber(final int pageNumber) {
     if (pageNumber - 1 > numPages) {
       this.pageNumber = numPages;
@@ -263,6 +278,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * 
    * @param pageSize The number of objects per page.
    */
+  @Override
   public void setPageSize(final int pageSize) {
     this.pageSize = pageSize;
     this.numPages = Math.max(0, ((numResults - 1) / pageSize));

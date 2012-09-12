@@ -51,6 +51,7 @@ public class JsonDataObjectIterator extends AbstractIterator<DataObject>
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }

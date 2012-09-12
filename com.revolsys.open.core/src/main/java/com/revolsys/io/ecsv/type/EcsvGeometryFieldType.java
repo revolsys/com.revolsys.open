@@ -85,8 +85,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     return typeName;
   }
 
-  private CoordinatesList parseCoordinates(
-    final StringBuffer text,
+  private CoordinatesList parseCoordinates(final StringBuffer text,
     final int numAxis) {
     if (text.charAt(0) == '(') {
       final int endIndex = text.indexOf(")");
@@ -147,8 +146,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     return geometryFactory.createMultiPolygon(parts);
   }
 
-  private List<CoordinatesList> parseParts(
-    final StringBuffer text,
+  private List<CoordinatesList> parseParts(final StringBuffer text,
     final int numAxis) {
     final List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
     final char firstChar = text.charAt(0);
@@ -175,8 +173,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     return lines;
   }
 
-  private List<List<CoordinatesList>> parsePartsList(
-    final StringBuffer text,
+  private List<List<CoordinatesList>> parsePartsList(final StringBuffer text,
     final int numAxis) {
     final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
     final char firstChar = text.charAt(0);
@@ -223,6 +220,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     return geometryFactory.createPolygon(parts);
   }
 
+  @Override
   public Object parseValue(final String value) {
     if (StringUtils.hasLength(value)) {
       final StringBuffer text = new StringBuffer(value);
@@ -247,11 +245,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     }
   }
 
-  private void writeCoordinate(
-    final PrintWriter out,
-    final CoordinatesList coordinates,
-    final int index,
-    final int ordinateIndex) {
+  private void writeCoordinate(final PrintWriter out,
+    final CoordinatesList coordinates, final int index, final int ordinateIndex) {
     if (ordinateIndex > coordinates.getDimension()) {
       out.print(0);
     } else {
@@ -264,10 +259,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     }
   }
 
-  public void writeCoordinates(
-    final PrintWriter out,
-    final CoordinatesList points,
-    final int dimension) {
+  public void writeCoordinates(final PrintWriter out,
+    final CoordinatesList points, final int dimension) {
     out.print('(');
     writeCoordinates(out, points, 0, dimension);
     for (int i = 1; i < points.size(); i++) {
@@ -277,11 +270,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     out.print(')');
   }
 
-  private void writeCoordinates(
-    final PrintWriter out,
-    final CoordinatesList points,
-    final int index,
-    final int dimension) {
+  private void writeCoordinates(final PrintWriter out,
+    final CoordinatesList points, final int index, final int dimension) {
     writeCoordinate(out, points, index, 0);
     for (int j = 1; j < dimension; j++) {
       out.print(',');
@@ -289,17 +279,13 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     }
   }
 
-  public void writeCoordinates(
-    final PrintWriter out,
-    final Geometry geometry,
+  public void writeCoordinates(final PrintWriter out, final Geometry geometry,
     final int dimension) {
     final CoordinatesList points = CoordinatesListUtil.get(geometry);
     writeCoordinates(out, points, dimension);
   }
 
-  private void writeCoordinates(
-    final PrintWriter out,
-    final Polygon polygon,
+  private void writeCoordinates(final PrintWriter out, final Polygon polygon,
     final int dimension) {
     out.print('(');
     final LineString shell = polygon.getExteriorRing();
@@ -312,9 +298,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     out.print(')');
   }
 
-  private void writeGeometry(
-    final PrintWriter out,
-    final Geometry geometry,
+  private void writeGeometry(final PrintWriter out, final Geometry geometry,
     final int dimension) {
     if (geometry != null) {
       if (geometry instanceof Point) {
@@ -345,10 +329,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     }
   }
 
-  public void writeGeometryCollection(
-    final PrintWriter out,
-    final GeometryCollection multiGeometry,
-    final int dimension) {
+  public void writeGeometryCollection(final PrintWriter out,
+    final GeometryCollection multiGeometry, final int dimension) {
     out.print("MG");
     if (dimension > 2) {
       out.print("[Z]");
@@ -365,9 +347,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     out.print(')');
   }
 
-  private void writeLineString(
-    final PrintWriter out,
-    final LineString line,
+  private void writeLineString(final PrintWriter out, final LineString line,
     final int dimension) {
     if (dimension > 2) {
       out.print("L[Z]");
@@ -377,10 +357,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     writeCoordinates(out, line, dimension);
   }
 
-  public void writeMultiLineString(
-    final PrintWriter out,
-    final MultiLineString multiLineString,
-    final int dimension) {
+  public void writeMultiLineString(final PrintWriter out,
+    final MultiLineString multiLineString, final int dimension) {
     out.print("ML");
     if (dimension > 2) {
       out.print("[Z]");
@@ -397,10 +375,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     out.print(')');
   }
 
-  public void writeMultiPoint(
-    final PrintWriter out,
-    final MultiPoint multiPoint,
-    final int dimension) {
+  public void writeMultiPoint(final PrintWriter out,
+    final MultiPoint multiPoint, final int dimension) {
     out.print("MP");
     if (dimension > 2) {
       out.print("[Z]");
@@ -417,10 +393,8 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     out.print(')');
   }
 
-  public void writeMultiPolygon(
-    final PrintWriter out,
-    final MultiPolygon multiPolygon,
-    final int dimension) {
+  public void writeMultiPolygon(final PrintWriter out,
+    final MultiPolygon multiPolygon, final int dimension) {
     out.print("MA");
     if (dimension > 2) {
       out.print("[Z]");
@@ -437,9 +411,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     out.print(')');
   }
 
-  private void writePoint(
-    final PrintWriter out,
-    final Point point,
+  private void writePoint(final PrintWriter out, final Point point,
     final int dimension) {
     out.print('P');
     if (dimension > 2) {
@@ -448,9 +420,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     writeCoordinates(out, point, dimension);
   }
 
-  private void writePolygon(
-    final PrintWriter out,
-    final Polygon polygon,
+  private void writePolygon(final PrintWriter out, final Polygon polygon,
     final int dimension) {
     out.print('A');
     if (dimension > 2) {
@@ -459,6 +429,7 @@ public class EcsvGeometryFieldType extends AbstractEcsvFieldType {
     writeCoordinates(out, polygon, dimension);
   }
 
+  @Override
   public void writeValue(final PrintWriter out, final Object object) {
     if (object instanceof Geometry) {
       out.print(DOUBLE_QUOTE);

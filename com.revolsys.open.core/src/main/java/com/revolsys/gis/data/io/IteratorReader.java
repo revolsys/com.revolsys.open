@@ -54,10 +54,12 @@ public class IteratorReader<T> extends AbstractReader<T> {
     }
   }
 
+  @Override
   public Iterator<T> iterator() {
     return iterator;
   }
 
+  @Override
   public void open() {
     iterator.hasNext();
   }

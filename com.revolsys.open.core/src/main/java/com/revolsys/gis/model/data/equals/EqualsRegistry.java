@@ -47,9 +47,8 @@ public class EqualsRegistry implements Equals<Object> {
     return equals(object1, object2, exclude);
   }
 
-  public boolean equals(
-    final Object object1,
-    final Object object2,
+  @Override
+  public boolean equals(final Object object1, final Object object2,
     final Collection<String> exclude) {
     if (object1 == null) {
       if (object2 == null) {
@@ -97,6 +96,7 @@ public class EqualsRegistry implements Equals<Object> {
     equals.setEqualsRegistry(this);
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
   }
 }

@@ -16,6 +16,7 @@ public abstract class AbstractCoordinates implements Coordinates {
    * @param other The other point.
    * @return The angle in radians.
    */
+  @Override
   public double angle2d(final Coordinates other) {
     final double dx = other.getX() - getX();
     final double dy = other.getY() - getY();
@@ -31,6 +32,7 @@ public abstract class AbstractCoordinates implements Coordinates {
     }
   }
 
+  @Override
   public int compareTo(final Coordinates other) {
     final double x = getX();
     final double y = getY();
@@ -48,10 +50,12 @@ public abstract class AbstractCoordinates implements Coordinates {
     }
   }
 
+  @Override
   public double distance(final Coordinates coordinates) {
     return CoordinatesUtil.distance(this, coordinates);
   }
 
+  @Override
   public boolean equals(final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double coordinate = coordinates[i];
@@ -72,6 +76,7 @@ public abstract class AbstractCoordinates implements Coordinates {
     }
   }
 
+  @Override
   public boolean equals2d(final Coordinates coordinates) {
     if (getX() == coordinates.getX()) {
       if (getY() == coordinates.getY()) {
@@ -81,6 +86,7 @@ public abstract class AbstractCoordinates implements Coordinates {
     return false;
   }
 
+  @Override
   public double[] getCoordinates() {
     final double[] coordinates = new double[getNumAxis()];
     for (int i = 0; i < coordinates.length; i++) {
@@ -89,26 +95,32 @@ public abstract class AbstractCoordinates implements Coordinates {
     return coordinates;
   }
 
+  @Override
   public double getM() {
     return getValue(3);
   }
 
+  @Override
   public byte getNumAxis() {
     return 2;
   }
 
+  @Override
   public long getTime() {
     return (long)getM();
   }
 
+  @Override
   public double getX() {
     return getValue(0);
   }
 
+  @Override
   public double getY() {
     return getValue(1);
   }
 
+  @Override
   public double getZ() {
     return getValue(2);
   }
@@ -121,22 +133,27 @@ public abstract class AbstractCoordinates implements Coordinates {
     return result;
   }
 
+  @Override
   public void setM(final double m) {
     setValue(3, m);
   }
 
+  @Override
   public void setTime(final long time) {
     setM(time);
   }
 
+  @Override
   public void setX(final double x) {
     setValue(0, x);
   }
 
+  @Override
   public void setY(final double y) {
     setValue(1, y);
   }
 
+  @Override
   public void setZ(final double z) {
     setValue(2, z);
   }

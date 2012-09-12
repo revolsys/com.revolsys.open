@@ -13,8 +13,8 @@ public class SaifIoFactory extends AbstractDataObjectAndGeometryReaderFactory {
     addMediaTypeAndFileExtension("zip/x-saif", "saf");
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     final SaifReader reader = new SaifReader(resource);
     return reader;

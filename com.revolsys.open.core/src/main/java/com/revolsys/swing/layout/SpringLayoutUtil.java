@@ -15,11 +15,8 @@ import javax.swing.SwingUtilities;
 
 public class SpringLayoutUtil {
   /* Used by makeCompactGrid. */
-  private static SpringLayout.Constraints getConstraintsForCell(
-    final int row,
-    final int col,
-    final Container parent,
-    final int cols) {
+  private static SpringLayout.Constraints getConstraintsForCell(final int row,
+    final int col, final Container parent, final int cols) {
     final SpringLayout layout = (SpringLayout)parent.getLayout();
     final Component c = parent.getComponent(row * cols + col);
     return layout.getConstraints(c);
@@ -49,13 +46,9 @@ public class SpringLayoutUtil {
     return null;
   }
 
-  public static void makeColumns(
-    final Container container,
-    final int numColumns,
-    final int initialX,
-    final int initialY,
-    final int xPad,
-    final int yPad) {
+  public static void makeColumns(final Container container,
+    final int numColumns, final int initialX, final int initialY,
+    final int xPad, final int yPad) {
     final Spring xPadSpring = Spring.constant(xPad);
     final Spring yPadSpring = Spring.constant(yPad);
 
@@ -128,13 +121,8 @@ public class SpringLayoutUtil {
    * @param xPad x padding between cells
    * @param yPad y padding between cells
    */
-  public static void makeCompactGrid(
-    final Container parent,
-    final int rows,
-    final int cols,
-    final int initialX,
-    final int initialY,
-    final int xPad,
+  public static void makeCompactGrid(final Container parent, final int rows,
+    final int cols, final int initialX, final int initialY, final int xPad,
     final int yPad) {
     SpringLayout layout;
     try {
@@ -197,13 +185,8 @@ public class SpringLayoutUtil {
    * @param xPad x padding between cells
    * @param yPad y padding between cells
    */
-  public static void makeGrid(
-    final Container parent,
-    final int rows,
-    final int cols,
-    final int initialX,
-    final int initialY,
-    final int xPad,
+  public static void makeGrid(final Container parent, final int rows,
+    final int cols, final int initialX, final int initialY, final int xPad,
     final int yPad) {
     SpringLayout layout;
     try {
@@ -276,12 +259,8 @@ public class SpringLayoutUtil {
         lastCons.getConstraint(SpringLayout.EAST)));
   }
 
-  public static void makeRows(
-    final Container container,
-    final int initialX,
-    final int initialY,
-    final int xPad,
-    final int yPad,
+  public static void makeRows(final Container container, final int initialX,
+    final int initialY, final int xPad, final int yPad,
     final int... componentsPerRow) {
     final SpringLayout layout = (SpringLayout)container.getLayout();
     final Spring xPadSpring = Spring.constant(xPad);

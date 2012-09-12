@@ -6,9 +6,8 @@ import java.util.List;
 public class ListEquals implements Equals<List<?>> {
   private EqualsRegistry equalsRegistry;
 
-  public boolean equals(
-    final List<?> list1,
-    final List<?> list2,
+  @Override
+  public boolean equals(final List<?> list1, final List<?> list2,
     final Collection<String> exclude) {
     if (list1 == null) {
       return list2 == null;
@@ -28,6 +27,7 @@ public class ListEquals implements Equals<List<?>> {
     return true;
   }
 
+  @Override
   public void setEqualsRegistry(final EqualsRegistry equalsRegistry) {
     this.equalsRegistry = equalsRegistry;
   }

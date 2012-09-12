@@ -5,14 +5,12 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 
 public class SpatialReference {
 
   private static final double FLOATING_SCALE = 11258999068426.238;
 
-  public static SpatialReference get(
-    final GeometryFactory geometryFactory,
+  public static SpatialReference get(final GeometryFactory geometryFactory,
     final String wkt) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

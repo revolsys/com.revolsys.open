@@ -7,6 +7,7 @@ public class SpatialObjectConverter implements OsnConverter {
     this.converters = converters;
   }
 
+  @Override
   public Object read(final OsnIterator iterator) {
     final String name = iterator.nextAttributeName();
     if (!name.equals("geometry")) {
@@ -22,6 +23,7 @@ public class SpatialObjectConverter implements OsnConverter {
     return geometry;
   }
 
+  @Override
   public void write(final OsnSerializer serializer, final Object object) {
   }
 

@@ -13,6 +13,24 @@ import com.vividsolutions.jts.geom.Point;
 
 public class CoordinatesUtil {
 
+  public static Coordinates add(final Coordinates c1, final Coordinates c2) {
+    final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
+    final Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      final double value1 = c1.getValue(i);
+      final double value2 = c2.getValue(i);
+      final double value = value1 + value2;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
+  public static Point add(final Point c1, final Point c2) {
+    final GeometryFactory factory = GeometryFactory.getFactory(c1);
+    final Point p2 = (Point)factory.createGeometry(c2);
+    return factory.createPoint(add(get(c1), get(p2)));
+  }
+
   public static double angle(final Coordinates p1, final Coordinates p2,
     final Coordinates p3) {
     final double x1 = p1.getX();
@@ -24,75 +42,13 @@ public class CoordinatesUtil {
     return MathUtil.angle(x1, y1, x2, y2, x3, y3);
   }
 
-  public static Coordinate toCoordinate(Coordinates point) {
-    return new Coordinate(point.getX(), point.getY(), point.getZ());
-  }
-
   public static Coordinates average(final Coordinates c1, final Coordinates c2) {
-    int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
-    Coordinates newPoint = new DoubleCoordinates(numAxis);
+    final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
+    final Coordinates newPoint = new DoubleCoordinates(numAxis);
     for (int i = 0; i < numAxis; i++) {
-      double value1 = c1.getValue(i);
-      double value2 = c2.getValue(i);
-      double value = MathUtil.avg(value1, value2);
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
-  }
-
-  public static Coordinates subtract(final Coordinates c1, final Coordinates c2) {
-    int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
-    Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
-      double value1 = c1.getValue(i);
-      double value2 = c2.getValue(i);
-      double value = value1 - value2;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
-  }
-
-  public static Point add(final Point c1, final Point c2) {
-    GeometryFactory factory = GeometryFactory.getFactory(c1);
-    Point p2 = (Point)factory.createGeometry(c2);
-    return factory.createPoint(add(get(c1), get(p2)));
-  }
-
-  public static Point subtract(final Point c1, final Point c2) {
-    GeometryFactory factory = GeometryFactory.getFactory(c1);
-    Point p2 = (Point)factory.createGeometry(c2);
-    return factory.createPoint(subtract(get(c1), get(p2)));
-  }
-
-  public static Coordinates add(final Coordinates c1, final Coordinates c2) {
-    int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
-    Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
-      double value1 = c1.getValue(i);
-      double value2 = c2.getValue(i);
-      double value = value1 + value2;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
-  }
-
-  public static Coordinates divide(final Coordinates c1, final double d) {
-    int numAxis = c1.getNumAxis();
-    Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
-      double value1 = c1.getValue(i);
-      double value = value1 / d;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
-  }
-
-  public static Coordinates multiply(final double d, final Coordinates c1) {
-    int numAxis = c1.getNumAxis();
-    Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
-      double value1 = c1.getValue(i);
-      double value = value1 * d;
+      final double value1 = c1.getValue(i);
+      final double value2 = c2.getValue(i);
+      final double value = MathUtil.avg(value1, value2);
       newPoint.setValue(i, value);
     }
     return newPoint;
@@ -126,6 +82,17 @@ public class CoordinatesUtil {
     final double x2 = point2.getX();
     final double y2 = point2.getY();
     return MathUtil.distance(x1, y1, x2, y2);
+  }
+
+  public static Coordinates divide(final Coordinates c1, final double d) {
+    final int numAxis = c1.getNumAxis();
+    final Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      final double value1 = c1.getValue(i);
+      final double value = value1 / d;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
   }
 
   public static boolean equals(final double x1, final double y1,
@@ -178,6 +145,17 @@ public class CoordinatesUtil {
     return MathUtil.isAcute(x1, y1, x2, y2, x3, y3);
   }
 
+  public static Coordinates multiply(final double d, final Coordinates c1) {
+    final int numAxis = c1.getNumAxis();
+    final Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      final double value1 = c1.getValue(i);
+      final double value = value1 * d;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
   public static Coordinates offset(final Coordinates coordinate,
     final double angle, final double distance) {
     final double newX = coordinate.getX() + distance * Math.cos(angle);
@@ -213,5 +191,27 @@ public class CoordinatesUtil {
     final HCoordinate l2 = new HCoordinate(x1 - dy + dx / 2.0, y1 + dx + dy
       / 2.0, 1.0);
     return new HCoordinate(l1, l2);
+  }
+
+  public static Coordinates subtract(final Coordinates c1, final Coordinates c2) {
+    final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
+    final Coordinates newPoint = new DoubleCoordinates(numAxis);
+    for (int i = 0; i < numAxis; i++) {
+      final double value1 = c1.getValue(i);
+      final double value2 = c2.getValue(i);
+      final double value = value1 - value2;
+      newPoint.setValue(i, value);
+    }
+    return newPoint;
+  }
+
+  public static Point subtract(final Point c1, final Point c2) {
+    final GeometryFactory factory = GeometryFactory.getFactory(c1);
+    final Point p2 = (Point)factory.createGeometry(c2);
+    return factory.createPoint(subtract(get(c1), get(p2)));
+  }
+
+  public static Coordinate toCoordinate(final Coordinates point) {
+    return new Coordinate(point.getX(), point.getY(), point.getZ());
   }
 }

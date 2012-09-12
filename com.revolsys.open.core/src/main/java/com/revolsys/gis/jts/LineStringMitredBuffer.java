@@ -19,6 +19,7 @@ public class LineStringMitredBuffer implements LineSegmentVisitor {
     return buffer;
   }
 
+  @Override
   public boolean visit(final LineSegment segment) {
     final Polygon segmentBuffer = JtsGeometryUtil.getMitredBuffer(segment,
       distance);

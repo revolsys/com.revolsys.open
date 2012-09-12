@@ -86,10 +86,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out = out;
   }
 
-  public void writeAddForeignKeyConstraint(
-    final DataObjectMetaData metaData,
-    final String attributeName,
-    final DataObjectMetaData referencedMetaData) {
+  public void writeAddForeignKeyConstraint(final DataObjectMetaData metaData,
+    final String attributeName, final DataObjectMetaData referencedMetaData) {
     final String typePath = metaData.getPath();
     final String referencedTypeName = referencedMetaData.getPath();
     final String referencedAttributeName = referencedMetaData.getIdAttributeName();
@@ -99,10 +97,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
       referencedTypeName, referencedAttributeName);
   }
 
-  public void writeAddForeignKeyConstraint(
-    final DataObjectMetaData metaData,
-    final String attributeName,
-    final String referenceTablePrefix,
+  public void writeAddForeignKeyConstraint(final DataObjectMetaData metaData,
+    final String attributeName, final String referenceTablePrefix,
     final DataObjectMetaData referencedMetaData) {
     final String typePath = metaData.getPath();
     final String referencedTypeName = referencedMetaData.getPath();
@@ -113,12 +109,9 @@ public abstract class JdbcDdlWriter implements Cloneable {
       referencedTypeName, referencedAttributeName);
   }
 
-  public void writeAddForeignKeyConstraint(
-    final String typePath,
-    final String constraintName,
-    final String attributeName,
-    final String referencedTypeName,
-    final String referencedAttributeName) {
+  public void writeAddForeignKeyConstraint(final String typePath,
+    final String constraintName, final String attributeName,
+    final String referencedTypeName, final String referencedAttributeName) {
     out.print("ALTER TABLE ");
     writeTableName(typePath);
     out.print(" ADD CONSTRAINT ");
@@ -141,10 +134,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     }
   }
 
-  public void writeAddPrimaryKeyConstraint(
-    final String typePath,
-    final String constraintName,
-    final String columnName) {
+  public void writeAddPrimaryKeyConstraint(final String typePath,
+    final String constraintName, final String columnName) {
     out.print("ALTER TABLE ");
     writeTableName(typePath);
     out.print(" ADD CONSTRAINT ");
@@ -208,10 +199,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     }
   }
 
-  public void writeCreateView(
-    final String typePath,
-    final String queryTypeName,
-    final List<String> columnNames) {
+  public void writeCreateView(final String typePath,
+    final String queryTypeName, final List<String> columnNames) {
     out.println();
     out.print("CREATE VIEW ");
     writeTableName(typePath);
@@ -227,12 +216,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   public abstract void writeGeometryMetaData(final DataObjectMetaData metaData);
 
-  public void writeGrant(
-    final String typePath,
-    final String username,
-    final boolean select,
-    final boolean insert,
-    final boolean update,
+  public void writeGrant(final String typePath, final String username,
+    final boolean select, final boolean insert, final boolean update,
     final boolean delete) {
 
     out.print("GRANT ");
@@ -298,8 +283,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   }
 
-  public void writeResetSequence(
-    final DataObjectMetaData metaData,
+  public void writeResetSequence(final DataObjectMetaData metaData,
     final List<DataObject> values) {
     throw new UnsupportedOperationException();
   }

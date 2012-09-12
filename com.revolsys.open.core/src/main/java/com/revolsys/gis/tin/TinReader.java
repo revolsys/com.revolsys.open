@@ -18,8 +18,7 @@ import com.revolsys.util.MathUtil;
 public class TinReader {
 
   public static TriangulatedIrregularNetwork read(
-    final BoundingBox boundingBox,
-    final Resource resource) {
+    final BoundingBox boundingBox, final Resource resource) {
     final TinReader tinReader = new TinReader(boundingBox, resource);
     try {
       final TriangulatedIrregularNetwork tin = tinReader.read();
@@ -30,8 +29,7 @@ public class TinReader {
   }
 
   public static TriangulatedIrregularNetwork read(
-    final GeometryFactory geometryFactory,
-    final Resource resource) {
+    final GeometryFactory geometryFactory, final Resource resource) {
     final TinReader tinReader = new TinReader(geometryFactory, resource);
     try {
       final TriangulatedIrregularNetwork tin = tinReader.read();

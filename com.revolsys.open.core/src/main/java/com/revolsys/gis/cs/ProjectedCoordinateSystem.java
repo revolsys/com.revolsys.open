@@ -114,10 +114,12 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
+  @Override
   public Area getArea() {
     return area;
   }
 
+  @Override
   public BoundingBox getAreaBoundingBox() {
     BoundingBox boundingBox;
     final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.getGeometryFactory();
@@ -132,6 +134,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return projectedBoundingBox;
   }
 
+  @Override
   public Authority getAuthority() {
     return authority;
   }
@@ -157,10 +160,12 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return GeometryFactory.getFactory(this);
   }
 
+  @Override
   public int getId() {
     return id;
   }
 
+  @Override
   public Unit<Length> getLengthUnit() {
     return linearUnit.getUnit();
   }
@@ -169,6 +174,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return linearUnit;
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -186,6 +192,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return projection;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Unit<Length> getUnit() {
     return linearUnit.getUnit();

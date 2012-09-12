@@ -21,10 +21,8 @@ import com.vividsolutions.jts.io.WKTWriter;
 public class Triangle extends AbstractCoordinatesList {
   private static final long serialVersionUID = -4513931832875328029L;
 
-  public static Triangle createClockwiseTriangle(
-    final Coordinates c0,
-    final Coordinates c1,
-    final Coordinates c2) {
+  public static Triangle createClockwiseTriangle(final Coordinates c0,
+    final Coordinates c1, final Coordinates c2) {
     try {
       if (CoordinatesUtil.orientationIndex(c0, c1, c2) == CGAlgorithms.CLOCKWISE) {
         return new Triangle(c0, c1, c2);
@@ -56,12 +54,9 @@ public class Triangle extends AbstractCoordinatesList {
     }
   }
 
-  private void addIntersection(
-    final GeometryFactory geometryFactory,
-    final Set<Coordinates> coordinates,
-    final Coordinates line1Start,
-    final Coordinates line1End,
-    final Coordinates line2Start,
+  private void addIntersection(final GeometryFactory geometryFactory,
+    final Set<Coordinates> coordinates, final Coordinates line1Start,
+    final Coordinates line1End, final Coordinates line2Start,
     final Coordinates line2End) {
     final CoordinatesList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
@@ -161,6 +156,7 @@ public class Triangle extends AbstractCoordinatesList {
     return envelope;
   }
 
+  @Override
   public byte getNumAxis() {
     return 3;
   }
@@ -183,13 +179,13 @@ public class Triangle extends AbstractCoordinatesList {
     return geometryFactory.createPolygon(shell, null);
   }
 
+  @Override
   public double getValue(final int index, final int axisIndex) {
     final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
     return coordinates[coordinateIndex];
   }
 
-  public LineSegment intersection(
-    final GeometryFactory geometryFactory,
+  public LineSegment intersection(final GeometryFactory geometryFactory,
     final LineSegment line) {
     final Coordinates lc0 = line.get(0);
     final Coordinates lc1 = line.get(1);
@@ -225,11 +221,13 @@ public class Triangle extends AbstractCoordinatesList {
     return getCircumcircle().contains(point);
   }
 
+  @Override
   public void setValue(final int index, final int axisIndex, final double value) {
     final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
     coordinates[coordinateIndex] = value;
   }
 
+  @Override
   public int size() {
     return 3;
   }

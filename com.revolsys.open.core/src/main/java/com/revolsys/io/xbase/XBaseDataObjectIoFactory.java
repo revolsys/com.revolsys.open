@@ -22,8 +22,8 @@ public class XBaseDataObjectIoFactory extends AbstractDataObjectIoFactory {
     addMediaTypeAndFileExtension("application/dbf", "dbf");
   }
 
-  public DataObjectReader createDataObjectReader(
-    final Resource resource,
+  @Override
+  public DataObjectReader createDataObjectReader(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
     try {
       final XbaseIterator iterator = new XbaseIterator(resource,
@@ -37,15 +37,13 @@ public class XBaseDataObjectIoFactory extends AbstractDataObjectIoFactory {
 
   @Override
   public Writer<DataObject> createDataObjectWriter(
-    final DataObjectMetaData metaData,
-    final Resource resource) {
+    final DataObjectMetaData metaData, final Resource resource) {
     return new XbaseDataObjectWriter(metaData, resource);
   }
 
-  public Writer<DataObject> createDataObjectWriter(
-    final String baseName,
-    final DataObjectMetaData metaData,
-    final OutputStream outputStream,
+  @Override
+  public Writer<DataObject> createDataObjectWriter(final String baseName,
+    final DataObjectMetaData metaData, final OutputStream outputStream,
     final Charset charset) {
     return createDataObjectWriter(metaData, new OutputStreamResource(baseName,
       outputStream));

@@ -29,8 +29,7 @@ public class FileDataObjectReaderFactory extends
     }
   }
 
-  public static DataObjectReader dataObjectReader(
-    final Resource resource,
+  public static DataObjectReader dataObjectReader(final Resource resource,
     final DataObjectFactory factory) {
     final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {

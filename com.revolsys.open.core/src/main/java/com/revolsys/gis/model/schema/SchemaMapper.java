@@ -35,11 +35,8 @@ public class SchemaMapper {
    * @param from The attribute.
    * @param to The mapped type.
    */
-  public void addAttributeMapping(
-    final DataObjectMetaData fromClass,
-    final String fromName,
-    final DataObjectMetaData toClass,
-    final String toName) {
+  public void addAttributeMapping(final DataObjectMetaData fromClass,
+    final String fromName, final DataObjectMetaData toClass, final String toName) {
     final Attribute fromAttribute = fromClass.getAttribute(fromName);
     final Attribute toAttribute = toClass.getAttribute(toName);
     addAttributeMapping(fromAttribute, toAttribute);
@@ -51,8 +48,7 @@ public class SchemaMapper {
    * @param from The type.
    * @param converter The converter.
    */
-  public void addTypeConverter(
-    final DataObjectMetaData type,
+  public void addTypeConverter(final DataObjectMetaData type,
     final ObjectConverter converter) {
     typeConverter.put(type, converter);
   }
@@ -63,8 +59,7 @@ public class SchemaMapper {
    * @param from The type.
    * @param to The mapped type.
    */
-  public void addTypeMapping(
-    final DataObjectMetaData from,
+  public void addTypeMapping(final DataObjectMetaData from,
     final DataObjectMetaData to) {
     typeMapping.put(from, to);
     typeMapping.put(to, from);

@@ -40,10 +40,8 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     "rawtypes", "unchecked"
   })
   public boolean addDependenciesFromTree(
-    final Map<String, String> dependencies,
-    final String dependencyPath,
-    final Map<String, Map<String, Map>> dependencyTree,
-    final int depth,
+    final Map<String, String> dependencies, final String dependencyPath,
+    final Map<String, Map<String, Map>> dependencyTree, final int depth,
     final int searchDepth) {
     boolean hasChildren = false;
     final Set<Entry<String, Map<String, Map>>> entries = dependencyTree.entrySet();
@@ -108,8 +106,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
   }
 
   protected Map<String, Map<String, Map>> getDependencyTree(
-    final Map<String, String> versions,
-    final Collection<String> exclusionIds,
+    final Map<String, String> versions, final Collection<String> exclusionIds,
     final boolean includeOptional) {
     final Map<String, Map<String, Map>> dependencies = new LinkedHashMap<String, Map<String, Map>>();
     final Map<String, Object> dependencyMap = (Map<String, Object>)get("dependencies");
@@ -249,9 +246,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     }
   }
 
-  public String getMapValue(
-    final Map<String, Object> map,
-    final String key,
+  public String getMapValue(final Map<String, Object> map, final String key,
     final String defaultValue) {
     String value = CollectionUtil.get(map, key, defaultValue);
     value = CollectionUtil.replaceProperties(value, getProperties());
@@ -326,8 +321,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     }
   }
 
-  public boolean isDependencyIgnored(
-    final Set<String> dependencies,
+  public boolean isDependencyIgnored(final Set<String> dependencies,
     final String dependencyId) {
     for (final String matchedDependencyId : dependencies) {
       boolean match = true;

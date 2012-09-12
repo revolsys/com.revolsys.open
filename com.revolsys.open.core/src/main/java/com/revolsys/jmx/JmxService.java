@@ -63,9 +63,7 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @return The attribute value.
    */
-  public Object getAttribute(
-    final String serverId,
-    final String objectId,
+  public Object getAttribute(final String serverId, final String objectId,
     final String attributeId) {
     if (hasAttribute(serverId, objectId, attributeId)) {
       final MBeanServerConnection connection = getConnection(serverId);
@@ -98,8 +96,7 @@ public class JmxService {
    * @return The attribute names.
    */
   @SuppressWarnings("unchecked")
-  public List<String> getAttributeNames(
-    final String serverId,
+  public List<String> getAttributeNames(final String serverId,
     final String objectId) {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final List<Map<String, Object>> attributes = (List<Map<String, Object>>)object.get("attributes");
@@ -121,8 +118,7 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The attribute values.
    */
-  public List<Attribute> getAttributes(
-    final String serverId,
+  public List<Attribute> getAttributes(final String serverId,
     final String objectId) {
     final MBeanServerConnection connection = getConnection(serverId);
     try {
@@ -208,8 +204,7 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The server parameters.
    */
-  private Map<String, Object> getObjectParams(
-    final String serverId,
+  private Map<String, Object> getObjectParams(final String serverId,
     final String objectId) {
     final List<Map<String, Object>> objectNames = getObjectParams(serverId);
     for (final Map<String, Object> object : objectNames) {
@@ -231,10 +226,8 @@ public class JmxService {
    * @param operationId The name of the operation.
    * @return The operations values.
    */
-  public MBeanOperationInfo getOperation(
-    final String serverId,
-    final String objectId,
-    final String operationId) {
+  public MBeanOperationInfo getOperation(final String serverId,
+    final String objectId, final String operationId) {
     if (hasOperation(serverId, objectId, operationId)) {
       final MBeanServerConnection connection = getConnection(serverId);
 
@@ -272,8 +265,7 @@ public class JmxService {
    * @return The attribute names.
    */
   @SuppressWarnings("unchecked")
-  public List<String> getOperationNames(
-    final String serverId,
+  public List<String> getOperationNames(final String serverId,
     final String objectId) {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final List<Map<String, Object>> operations = (List<Map<String, Object>>)object.get("operations");
@@ -299,8 +291,7 @@ public class JmxService {
    * @param objectId The name of the object.
    * @return The operations values.
    */
-  public List<MBeanOperationInfo> getOperations(
-    final String serverId,
+  public List<MBeanOperationInfo> getOperations(final String serverId,
     final String objectId) {
     final MBeanServerConnection connection = getConnection(serverId);
     try {
@@ -351,9 +342,7 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @return True if the attribute exists.
    */
-  public boolean hasAttribute(
-    final String serverId,
-    final String objectId,
+  public boolean hasAttribute(final String serverId, final String objectId,
     final String attributeId) {
     return getAttributeNames(serverId, objectId).contains(attributeId);
   }
@@ -367,9 +356,7 @@ public class JmxService {
    * @param operationId The name of the operation.
    * @return True if the operation exists.
    */
-  public boolean hasOperation(
-    final String serverId,
-    final String objectId,
+  public boolean hasOperation(final String serverId, final String objectId,
     final String operationId) {
     return getOperationNames(serverId, objectId).contains(operationId);
   }
@@ -383,11 +370,8 @@ public class JmxService {
    * @param parameters The parameters to pass to the operation.
    * @return The result of executing the operation.
    */
-  public Object invokeOperation(
-    final String serverId,
-    final String objectId,
-    final String operationId,
-    final Map<String, String> parameters) {
+  public Object invokeOperation(final String serverId, final String objectId,
+    final String operationId, final Map<String, String> parameters) {
     try {
       final MBeanOperationInfo operation = getOperation(serverId, objectId,
         operationId);
@@ -425,11 +409,8 @@ public class JmxService {
    * @param objectId The name of the object.
    * @param attributeId The name of the attribute.
    */
-  public void writeAttribute(
-    final MapWriter mapWriter,
-    final String serverId,
-    final String objectId,
-    final String attributeId) {
+  public void writeAttribute(final MapWriter mapWriter, final String serverId,
+    final String objectId, final String attributeId) {
     Object value;
     try {
       value = getAttribute(serverId, objectId, attributeId);
@@ -448,12 +429,8 @@ public class JmxService {
    * @param attributeId The name of the attribute.
    * @param value The value to write.
    */
-  public void writeAttribute(
-    final MapWriter mapWriter,
-    final String serverId,
-    final String objectId,
-    final String attributeId,
-    final Object value) {
+  public void writeAttribute(final MapWriter mapWriter, final String serverId,
+    final String objectId, final String attributeId, final Object value) {
 
     final Map<String, Object> attributeMap = new LinkedHashMap<String, Object>();
     attributeMap.put("serverId", serverId);
@@ -495,9 +472,7 @@ public class JmxService {
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    */
-  public void writeAttributes(
-    final MapWriter mapWriter,
-    final String serverId,
+  public void writeAttributes(final MapWriter mapWriter, final String serverId,
     final String objectId) {
     final String[] attributeNames = getAttributeNames(serverId, objectId).toArray(
       new String[0]);
@@ -515,11 +490,8 @@ public class JmxService {
    * @param operation The operation details.
    * @param returnValue The value returned from invoking the method.
    */
-  public void writeOperation(
-    final MapWriter mapWriter,
-    final String serverId,
-    final String objectId,
-    final MBeanOperationInfo operation,
+  public void writeOperation(final MapWriter mapWriter, final String serverId,
+    final String objectId, final MBeanOperationInfo operation,
     final Object returnValue) {
 
     final Map<String, Object> attributeMap = new LinkedHashMap<String, Object>();
@@ -550,11 +522,8 @@ public class JmxService {
    * @param objectId The name of the object.
    * @param operationId The name of the operations.
    */
-  public void writeOperation(
-    final MapWriter mapWriter,
-    final String serverId,
-    final String objectId,
-    final String operationId) {
+  public void writeOperation(final MapWriter mapWriter, final String serverId,
+    final String objectId, final String operationId) {
     final MBeanOperationInfo operation = getOperation(serverId, objectId,
       operationId);
     writeOperation(mapWriter, serverId, objectId, operation, null);
@@ -569,12 +538,8 @@ public class JmxService {
    * @param operationId The name of the operations.
    * @param returnValue The value returned from invoking the method.
    */
-  public void writeOperation(
-    final MapWriter mapWriter,
-    final String serverId,
-    final String objectId,
-    final String operationId,
-    final Object returnValue) {
+  public void writeOperation(final MapWriter mapWriter, final String serverId,
+    final String objectId, final String operationId, final Object returnValue) {
     final MBeanOperationInfo operation = getOperation(serverId, objectId,
       operationId);
     writeOperation(mapWriter, serverId, objectId, operation, returnValue);
@@ -615,9 +580,7 @@ public class JmxService {
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    */
-  public void writeOperations(
-    final MapWriter mapWriter,
-    final String serverId,
+  public void writeOperations(final MapWriter mapWriter, final String serverId,
     final String objectId) {
     final List<MBeanOperationInfo> operations = getOperations(serverId,
       objectId);

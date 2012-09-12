@@ -24,6 +24,7 @@ public class StaticMethodFilter<T> implements Filter<T> {
     initialize();
   }
 
+  @Override
   public boolean accept(final T object) {
     try {
       if (args.length == 0) {

@@ -19,6 +19,7 @@ public class OrFilter<T> implements Filter<T> {
     this(Arrays.asList(filters));
   }
 
+  @Override
   public boolean accept(final T object) {
     for (final Filter<T> filter : filters) {
       if (filter.accept(object)) {

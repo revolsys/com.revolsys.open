@@ -17,32 +17,26 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
   Filter<Edge<T>> {
-  public static <T> List<Edge<T>> edgesWithinDistance(
-    final Graph<T> graph,
-    final Geometry geometry,
-    final double maxDistance) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Envelope env = new Envelope(geometry.getEnvelopeInternal());
-    env.expandBy(maxDistance);
-    graph.getEdgeIndex().query(env,
-      new EdgeWithinDistance<T>(geometry, maxDistance, results));
-    return results.getList();
-  }
-
-  public static <T> List<Edge<T>> edgesWithinDistance(
-    final Graph<T> graph,
-    final Coordinates point,
-    final double maxDistance) {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
+    final Coordinates point, final double maxDistance) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Geometry geometry = geometryFactory.createPoint(point);
     return edgesWithinDistance(graph, geometry, maxDistance);
 
   }
 
-  public static <T> List<Edge<T>> edgesWithinDistance(
-    final Graph<T> graph,
-    final Node<T> node,
-    final double maxDistance) {
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
+    final Geometry geometry, final double maxDistance) {
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+    final Envelope env = new Envelope(geometry.getEnvelopeInternal());
+    env.expandBy(maxDistance);
+    graph.getEdgeIndex().visit(env,
+      new EdgeWithinDistance<T>(geometry, maxDistance, results));
+    return results.getList();
+  }
+
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
+    final Node<T> node, final double maxDistance) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Coordinates coordinate = node;
     final Geometry geometry = geometryFactory.createPoint(coordinate);
@@ -66,6 +60,7 @@ public class EdgeWithinDistance<T> extends NestedVisitor<Edge<T>> implements
     this.maxDistance = maxDistance;
   }
 
+  @Override
   public boolean accept(final Edge<T> edge) {
     final LineString line = edge.getLine();
     final double distance = line.distance(geometry);

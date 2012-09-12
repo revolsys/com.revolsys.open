@@ -9,6 +9,7 @@ public class LongFieldType extends NumberFieldType {
     super(DataTypes.LONG);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return Long.parseLong(text);

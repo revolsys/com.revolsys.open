@@ -19,18 +19,15 @@ public class DataObjectMetaDataUiBuilderRegistry {
     return INSTANCE;
   }
 
-  public static void setBuilder(
-    final Attribute attribute,
+  public static void setBuilder(final Attribute attribute,
     final ValueUiBuilder builder) {
     attribute.setProperty(NAME, builder);
   }
 
   private final Map<DataObjectMetaData, List<ValueUiBuilder>> uiBuilders = new HashMap<DataObjectMetaData, List<ValueUiBuilder>>();
 
-  public void addValueUiBuilder(
-    final DataObjectMetaData schema,
-    final int index,
-    final ValueUiBuilder builder) {
+  public void addValueUiBuilder(final DataObjectMetaData schema,
+    final int index, final ValueUiBuilder builder) {
     final List<ValueUiBuilder> builders = getUiBuilders(schema);
     builders.set(index, builder);
   }
@@ -47,8 +44,7 @@ public class DataObjectMetaDataUiBuilderRegistry {
     return builders;
   }
 
-  public ValueUiBuilder getValueUiBuilder(
-    final DataObjectMetaData metaData,
+  public ValueUiBuilder getValueUiBuilder(final DataObjectMetaData metaData,
     final int index) {
     final Attribute attribute = metaData.getAttribute(index);
     final ValueUiBuilder builder = attribute.getProperty(NAME);
@@ -60,8 +56,7 @@ public class DataObjectMetaDataUiBuilderRegistry {
     }
   }
 
-  public ValueUiBuilder getValueUiBuilder(
-    final DataObjectMetaData schema,
+  public ValueUiBuilder getValueUiBuilder(final DataObjectMetaData schema,
     final String attributeName) {
     return getValueUiBuilder(schema, schema.getAttributeIndex(attributeName));
 

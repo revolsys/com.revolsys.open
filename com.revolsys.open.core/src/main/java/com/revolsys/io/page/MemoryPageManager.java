@@ -16,6 +16,7 @@ public class MemoryPageManager implements PageManager {
 
   private final Set<Page> freePages = new TreeSet<Page>();
 
+  @Override
   public synchronized Page createPage() {
     Page page;
     if (freePages.isEmpty()) {
@@ -30,14 +31,17 @@ public class MemoryPageManager implements PageManager {
     return page;
   }
 
+  @Override
   public Page createTempPage() {
     return new ByteArrayPage(this, -1, pageSize);
   }
 
+  @Override
   public synchronized int getNumPages() {
     return pages.size() - freePages.size();
   }
 
+  @Override
   public synchronized Page getPage(final int index) {
     final Page page = pages.get(index);
     if (freePages.contains(page)) {
@@ -46,24 +50,29 @@ public class MemoryPageManager implements PageManager {
       throw new IllegalArgumentException("Page is currently being used "
         + index);
     } else {
+      page.setOffset(0);
       pagesInUse.add(page);
       return page;
     }
   }
 
+  @Override
   public int getPageSize() {
     return pageSize;
   }
 
+  @Override
   public synchronized void releasePage(final Page page) {
     pagesInUse.remove(page);
   }
 
+  @Override
   public synchronized void removePage(final Page page) {
     freePages.add(page);
     pagesInUse.remove(page);
   }
 
+  @Override
   public void write(final Page page) {
   }
 }

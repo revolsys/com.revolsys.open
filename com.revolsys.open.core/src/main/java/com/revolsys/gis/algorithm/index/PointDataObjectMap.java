@@ -75,8 +75,7 @@ public class PointDataObjectMap {
     return Collections.unmodifiableSet(objectMap.keySet());
   }
 
-  public DataObject getFirstMatch(
-    final DataObject object,
+  public DataObject getFirstMatch(final DataObject object,
     final Filter<DataObject> filter) {
     final List<DataObject> objects = getObjects(object);
     for (final DataObject matchObject : objects) {
@@ -87,8 +86,7 @@ public class PointDataObjectMap {
     return null;
   }
 
-  public List<DataObject> getMatches(
-    final DataObject object,
+  public List<DataObject> getMatches(final DataObject object,
     final Filter<DataObject> filter) {
     final List<DataObject> objects = getObjects(object);
     final List<DataObject> filteredObjects = FilterUtil.filter(objects, filter);

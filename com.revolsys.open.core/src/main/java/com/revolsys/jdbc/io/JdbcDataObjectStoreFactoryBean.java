@@ -66,6 +66,7 @@ public class JdbcDataObjectStoreFactoryBean extends
     return properties;
   }
 
+  @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
     throws BeansException {
     this.applicationContext = applicationContext;

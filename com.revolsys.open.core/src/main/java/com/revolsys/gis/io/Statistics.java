@@ -70,6 +70,26 @@ public class Statistics {
     }
   }
 
+  public synchronized void addCountsText(final StringBuffer sb) {
+    int totalCount = 0;
+    if (message != null) {
+      sb.append(message);
+    }
+    sb.append("\n");
+    for (final Entry<String, Long> entry : counts.entrySet()) {
+      sb.append(entry.getKey());
+      sb.append("\t");
+      final Long count = entry.getValue();
+      totalCount += count;
+      sb.append(count);
+      sb.append("\n");
+    }
+    sb.append("Total");
+    sb.append("\t");
+    sb.append(totalCount);
+    sb.append("\n");
+  }
+
   @PostConstruct
   public synchronized void connect() {
     providerCount++;
@@ -104,26 +124,6 @@ public class Statistics {
     final StringBuffer sb = new StringBuffer();
     addCountsText(sb);
     log.info(sb.toString());
-  }
-
-  public synchronized void addCountsText(StringBuffer sb) {
-    int totalCount = 0;
-    if (message != null) {
-      sb.append(message);
-    }
-    sb.append("\n");
-    for (final Entry<String, Long> entry : counts.entrySet()) {
-      sb.append(entry.getKey());
-      sb.append("\t");
-      final Long count = entry.getValue();
-      totalCount += count;
-      sb.append(count);
-      sb.append("\n");
-    }
-    sb.append("Total");
-    sb.append("\t");
-    sb.append(totalCount);
-    sb.append("\n");
   }
 
   public void setMessage(final String message) {

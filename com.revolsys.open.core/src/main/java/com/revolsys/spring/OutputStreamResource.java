@@ -45,6 +45,7 @@ public class OutputStreamResource extends AbstractResource {
     return true;
   }
 
+  @Override
   public String getDescription() {
     return this.description;
   }
@@ -54,6 +55,7 @@ public class OutputStreamResource extends AbstractResource {
     return filename;
   }
 
+  @Override
   public InputStream getInputStream() throws IOException {
     throw new IllegalArgumentException("No input stream exists");
   }

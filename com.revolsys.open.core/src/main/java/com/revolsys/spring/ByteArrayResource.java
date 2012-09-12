@@ -14,14 +14,14 @@ public class ByteArrayResource extends
     this.filename = filename;
   }
 
-  public ByteArrayResource(final String filename, final String data) {
-    super(data.getBytes());
-    this.filename = filename;
-  }
-
   public ByteArrayResource(final String filename, final byte[] data,
     final String description) {
     super(data, description);
+    this.filename = filename;
+  }
+
+  public ByteArrayResource(final String filename, final String data) {
+    super(data.getBytes());
     this.filename = filename;
   }
 

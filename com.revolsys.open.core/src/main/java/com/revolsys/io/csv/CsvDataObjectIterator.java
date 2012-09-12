@@ -76,6 +76,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
     }
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
   }

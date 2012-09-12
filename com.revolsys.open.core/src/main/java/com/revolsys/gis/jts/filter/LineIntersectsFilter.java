@@ -11,6 +11,7 @@ public class LineIntersectsFilter implements Filter<LineString> {
     this.line = line;
   }
 
+  @Override
   public boolean accept(final LineString line) {
     return LineStringUtil.intersects(this.line, line);
   }

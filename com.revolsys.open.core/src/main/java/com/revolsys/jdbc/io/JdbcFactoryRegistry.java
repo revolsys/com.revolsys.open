@@ -137,8 +137,7 @@ public class JdbcFactoryRegistry {
     }
   }
 
-  private void loadFactories(
-    final ClassLoader classLoader,
+  private void loadFactories(final ClassLoader classLoader,
     final Resource resource) {
     try {
       for (final Map<String, Object> factoryDefinition : AbstractMapReaderFactory.mapReader(resource)) {

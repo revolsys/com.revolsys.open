@@ -180,7 +180,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     if (!initialized) {
       initialized = true;
       if (!(resource instanceof NonExistingResource)) {
-        Map<String, String> shortNames = getProperty("shortNames");
+        final Map<String, String> shortNames = getProperty("shortNames");
         if (shortNames != null) {
           this.shortNames = shortNames;
         }
@@ -210,6 +210,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return resource.toString();
   }
 
+  @Override
   public void write(final DataObject object) {
     try {
       if (!initialized) {
@@ -268,7 +269,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             throw new IllegalArgumentException("Not a number " + attributeName
               + "=" + value);
           }
-          int numLength = numString.length();
+          final int numLength = numString.length();
           if (numLength > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
               out.write('9');
@@ -285,7 +286,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             floatString = value.toString();
           }
-          int floatLength = floatString.length();
+          final int floatLength = floatString.length();
           if (floatLength > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
               out.write('9');
@@ -303,7 +304,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
           if (value != null) {
             string = value.toString();
           }
-          byte[] bytes = string.getBytes(Charset.forName("ISO-8859-1"));
+          final byte[] bytes = string.getBytes(Charset.forName("ISO-8859-1"));
           if (bytes.length >= fieldLength) {
             out.write(bytes, 0, fieldLength);
           } else {
@@ -397,7 +398,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             name = name.substring(0, 10);
           }
           final int length = field.getLength();
-           int decimalPlaces = field.getDecimalPlaces();
+          int decimalPlaces = field.getDecimalPlaces();
           if (decimalPlaces < 0) {
             decimalPlaces = 0;
           } else if (decimalPlaces > 15) {

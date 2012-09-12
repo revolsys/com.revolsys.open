@@ -11,6 +11,7 @@ public class IntegerFieldType extends NumberFieldType {
     super(DataTypes.INTEGER);
   }
 
+  @Override
   public Object parseValue(final String text) {
     if (StringUtils.hasLength(text)) {
       return new BigInteger(text);

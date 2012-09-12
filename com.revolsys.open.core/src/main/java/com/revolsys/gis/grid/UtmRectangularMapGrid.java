@@ -23,10 +23,6 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public static final double MIN_LON = -180;
 
-  public  GeometryFactory getGeometryFactory() {
-    return GEOMETRY_FACTORY;
-  }
-
   private PrecisionModel precisionModel = new PrecisionModel(1);
 
   private final double tileHeight = 8;
@@ -40,12 +36,19 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       + tileHeight);
   }
 
+  @Override
   public CoordinateSystem getCoordinateSystem() {
     return COORDINATE_SYSTEM;
   }
 
+  @Override
   public String getFormattedMapTileName(final String name) {
     return name.toUpperCase();
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return GEOMETRY_FACTORY;
   }
 
   public int getHorizontalZone(final double lat, final double lon) {
@@ -76,6 +79,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return MIN_LON + (zone - 1) * tileWidth;
   }
 
+  @Override
   public String getMapTileName(final double x, final double y) {
     char letter;
     if (y >= 72) {
@@ -106,9 +110,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
    * @param north The number of sheets north.
    * @return The new map sheet.
    */
-  public String getMapTileName(
-    final String sheet,
-    final int east,
+  public String getMapTileName(final String sheet, final int east,
     final int north) {
     final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
       * getTileHeight());
@@ -158,6 +160,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return precisionModel;
   }
 
+  @Override
   public RectangularMapTile getTileByLocation(final double x, final double y) {
     final String mapTileName = getMapTileName(x, y);
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
@@ -166,6 +169,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       mapTileName, boundingBox);
   }
 
+  @Override
   public RectangularMapTile getTileByName(final String mapTileName) {
     final BoundingBox boundingBox = getBoundingBox(mapTileName);
     final double lon = boundingBox.getMaxX();
@@ -176,10 +180,12 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       boundingBox);
   }
 
+  @Override
   public double getTileHeight() {
     return tileHeight;
   }
 
+  @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
     final Envelope envelope = boundingBox.convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
@@ -209,6 +215,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return tiles;
   }
 
+  @Override
   public double getTileWidth() {
     return tileWidth;
   }

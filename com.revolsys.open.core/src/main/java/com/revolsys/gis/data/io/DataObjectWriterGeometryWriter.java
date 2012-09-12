@@ -41,6 +41,7 @@ public class DataObjectWriterGeometryWriter extends AbstractWriter<Geometry> {
     writer.setProperty(name, value);
   }
 
+  @Override
   public void write(final Geometry geometry) {
     final DataObject object = new ArrayDataObject(
       DataObjectUtil.GEOMETRY_META_DATA);

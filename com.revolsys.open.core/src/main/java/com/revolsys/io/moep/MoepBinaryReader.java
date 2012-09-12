@@ -61,6 +61,7 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
     iterator.close();
   }
 
+  @Override
   public DataObjectMetaData getMetaData() {
     return MoepConstants.META_DATA;
   }
@@ -75,10 +76,12 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    * 
    * @return The iterator.
    */
+  @Override
   public Iterator iterator() {
     return iterator;
   }
 
+  @Override
   public void open() {
     iterator.hasNext();
   }

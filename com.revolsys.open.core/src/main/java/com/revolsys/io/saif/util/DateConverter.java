@@ -5,6 +5,7 @@ import java.sql.Date;
 public class DateConverter implements OsnConverter {
   public static final Date NULL_DATE = new Date(0, 0, 1);
 
+  @Override
   public Object read(final OsnIterator iterator) {
     int year = 0;
     int month = 0;
@@ -40,6 +41,7 @@ public class DateConverter implements OsnConverter {
     }
   }
 
+  @Override
   public void write(final OsnSerializer serializer, final Object object) {
   }
 

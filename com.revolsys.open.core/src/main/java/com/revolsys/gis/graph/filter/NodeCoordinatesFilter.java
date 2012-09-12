@@ -14,6 +14,7 @@ public class NodeCoordinatesFilter<T> implements Filter<Node<T>> {
     this.filter = filter;
   }
 
+  @Override
   public boolean accept(final Node<T> node) {
     return filter.accept(node);
   }

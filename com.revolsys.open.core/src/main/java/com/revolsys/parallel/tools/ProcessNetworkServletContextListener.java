@@ -14,12 +14,14 @@ public class ProcessNetworkServletContextListener implements
 
   private ProcessNetwork processNetwork;
 
+  @Override
   public void contextDestroyed(final ServletContextEvent servletContextEvent) {
     if (processNetwork != null) {
       processNetwork.stop();
     }
   }
 
+  @Override
   public void contextInitialized(final ServletContextEvent servletContextEvent) {
     final ServletContext servletContext = servletContextEvent.getServletContext();
     final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);

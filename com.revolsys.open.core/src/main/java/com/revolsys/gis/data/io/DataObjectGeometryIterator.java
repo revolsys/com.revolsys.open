@@ -22,10 +22,12 @@ public class DataObjectGeometryIterator extends DelegatingObjectWithProperties
     iterator = null;
   }
 
+  @Override
   public boolean hasNext() {
     return iterator.hasNext();
   }
 
+  @Override
   public Geometry next() {
     if (iterator.hasNext()) {
       final DataObject dataObject = iterator.next();
@@ -35,6 +37,7 @@ public class DataObjectGeometryIterator extends DelegatingObjectWithProperties
     }
   }
 
+  @Override
   public void remove() {
     iterator.remove();
   }

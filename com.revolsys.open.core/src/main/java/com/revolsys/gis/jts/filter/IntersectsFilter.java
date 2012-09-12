@@ -37,6 +37,7 @@ public class IntersectsFilter<T extends Geometry> implements Filter<T> {
     setGeometry(geometry);
   }
 
+  @Override
   public boolean accept(final T geometry) {
     if (preparedGeometry.intersects(geometry)) {
       return true;

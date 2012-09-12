@@ -13,11 +13,8 @@ import javax.swing.border.EmptyBorder;
 public class LabelListCellRenderer extends DefaultListCellRenderer {
 
   @Override
-  public Component getListCellRendererComponent(
-    final JList list,
-    final Object value,
-    final int index,
-    final boolean isSelected,
+  public Component getListCellRendererComponent(final JList list,
+    final Object value, final int index, final boolean isSelected,
     final boolean cellHasFocus) {
     if (value instanceof JLabel) {
       final JLabel label = (JLabel)value;

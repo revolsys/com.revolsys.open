@@ -121,6 +121,7 @@ public class XmlDataObjectWriter extends AbstractWriter<DataObject> {
     return metaData.getPath().toString();
   }
 
+  @Override
   public void write(final DataObject object) {
     if (!opened) {
       writeHeader();

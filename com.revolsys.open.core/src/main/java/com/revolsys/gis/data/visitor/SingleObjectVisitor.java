@@ -9,6 +9,7 @@ public class SingleObjectVisitor<T> implements Visitor<T> {
     return object;
   }
 
+  @Override
   public boolean visit(final T object) {
     if (this.object == null) {
       this.object = object;

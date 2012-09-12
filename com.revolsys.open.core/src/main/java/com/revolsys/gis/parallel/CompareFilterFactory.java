@@ -16,6 +16,7 @@ public class CompareFilterFactory implements
 
   private List<String> equalOrNullAttributeNames = new ArrayList<String>();
 
+  @Override
   public Filter<DataObject> create(final DataObject object) {
     final AndFilter<DataObject> filters = new AndFilter<DataObject>();
     if (!equalAttributeNames.isEmpty()) {

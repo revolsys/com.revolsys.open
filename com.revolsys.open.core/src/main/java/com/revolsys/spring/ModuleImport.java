@@ -37,8 +37,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   DisposableBean {
 
   public static GenericBeanDefinition createTargetBeanDefinition(
-    final BeanDefinitionRegistry beanFactory,
-    final String beanName) {
+    final BeanDefinitionRegistry beanFactory, final String beanName) {
 
     if (beanFactory.containsBeanDefinition(beanName)) {
       final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
@@ -64,10 +63,8 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
   }
 
   public static void registerTargetBeanDefinition(
-    final BeanDefinitionRegistry registry,
-    final BeanFactory beanFactory,
-    final String beanName,
-    final String alias) {
+    final BeanDefinitionRegistry registry, final BeanFactory beanFactory,
+    final String beanName, final String alias) {
 
     final BeanDefinition beanDefinition = createTargetBeanDefinition(
       (BeanDefinitionRegistry)beanFactory, beanName);
@@ -112,6 +109,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     final BeanDefinitionRegistry registry) throws BeansException {
   }
 
+  @Override
   public void destroy() {
     if (applicationContext != null) {
       applicationContext.close();
@@ -254,6 +252,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     }
   }
 
+  @Override
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
     if (beanFactory instanceof BeanDefinitionRegistry) {
@@ -262,6 +261,7 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware,
     }
   }
 
+  @Override
   public void setBeanName(final String beanName) {
     this.beanName = beanName;
   }

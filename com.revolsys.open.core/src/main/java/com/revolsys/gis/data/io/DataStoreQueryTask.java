@@ -34,6 +34,7 @@ public class DataStoreQueryTask extends AbstractProcess {
     return getClass().getName();
   }
 
+  @Override
   public void run() {
     objects = new ArrayList<DataObject>();
     final Reader<DataObject> reader = dataStore.query(path, boundingBox);

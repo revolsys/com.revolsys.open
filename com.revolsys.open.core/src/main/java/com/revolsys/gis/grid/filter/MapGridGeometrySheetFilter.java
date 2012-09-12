@@ -22,6 +22,7 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
   /** The map sheet name. */
   private String sheet;
 
+  @Override
   public boolean accept(final DataObject object) {
     if (sheet != null && grid != null) {
       final Geometry geometry = object.getGeometryValue();

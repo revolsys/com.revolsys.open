@@ -28,12 +28,12 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     addMetaData(metaData.getPath(), metaData);
   }
 
-  protected void addMetaData(
-    final String typePath,
+  protected void addMetaData(final String typePath,
     final DataObjectMetaData metaData) {
     metaDataCache.put(typePath, metaData);
   }
 
+  @Override
   @PreDestroy
   public void close() {
     if (metaDataCache != null) {
@@ -73,6 +73,11 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     return metaDataCache;
   }
 
+  public String getName() {
+    final String path = getPath();
+    return PathUtil.getName(path);
+  }
+
   public String getPath() {
     return path;
   }
@@ -98,10 +103,5 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   @Override
   public String toString() {
     return path;
-  }
-
-  public String getName() {
-    String path = getPath();
-    return PathUtil.getName(path);
   }
 }

@@ -69,8 +69,7 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
       DataTypes.GEOMETRY));
   }
 
-  public void addFieldType(
-    final DataType dataType,
+  public void addFieldType(final DataType dataType,
     final EsriGeodatabaseXmlFieldType fieldType) {
     typeMapping.put(dataType, fieldType);
     esriToDataType.put(fieldType.getEsriFieldType(), dataType);

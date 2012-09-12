@@ -16,9 +16,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class LineSegment extends AbstractCoordinatesList {
-  /**
-   * 
-   */
   private static final long serialVersionUID = 3905321662159212931L;
 
   private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
@@ -29,7 +26,7 @@ public class LineSegment extends AbstractCoordinatesList {
     Coordinates previousCoordinate = coords.get(0);
     for (int i = 1; i < coords.size(); i++) {
       final Coordinates coordinate = coords.get(i);
-      GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
       final LineSegment segment = new LineSegment(geometryFactory,
         previousCoordinate, coordinate);
       if (segment.getLength() > 0) {
@@ -38,20 +35,6 @@ public class LineSegment extends AbstractCoordinatesList {
         }
       }
       previousCoordinate = coordinate;
-    }
-  }
-
-  public Coordinates closestPoint(Coordinates p) {
-    double factor = projectionFactor(p);
-    if (factor > 0 && factor < 1) {
-      return project(p);
-    }
-    double dist0 = coordinates1.distance(p);
-    double dist1 = coordinates2.distance(p);
-    if (dist0 < dist1) {
-      return coordinates1;
-    } else {
-      return coordinates2;
     }
   }
 
@@ -69,19 +52,26 @@ public class LineSegment extends AbstractCoordinatesList {
     this(FACTORY, coordinates1, coordinates2);
   }
 
+  public LineSegment(final double x1, final double y1, final double x2,
+    final double y2) {
+    this(new DoubleCoordinates(x1, y1), new DoubleCoordinates(x2, y2));
+  }
+
   public LineSegment(final GeometryFactory geometryFactory,
     final Coordinates coordinates1, final Coordinates coordinates2) {
     this.geometryFactory = geometryFactory;
-    this.coordinates1 = coordinates1;
-    this.coordinates2 = coordinates2;
+    this.coordinates1 = new DoubleCoordinates(coordinates1);
+    this.coordinates2 = new DoubleCoordinates(coordinates2);
   }
 
-  public LineSegment(final LineString line) {
-    this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line, 0),
-      CoordinatesListUtil.get(line, line.getNumPoints() - 1));
+  public LineSegment(final GeometryFactory geometryFactory, final double x1,
+    final double y1, final double x2, final double y2) {
+    this(geometryFactory, geometryFactory.createCoordinates(x1, y1),
+      geometryFactory.createCoordinates(x2, y2));
   }
 
-  public LineSegment(GeometryFactory geometryFactory, final LineSegment line) {
+  public LineSegment(final GeometryFactory geometryFactory,
+    final LineSegment line) {
     this(geometryFactory, line.get(0), line.get(1));
   }
 
@@ -89,14 +79,9 @@ public class LineSegment extends AbstractCoordinatesList {
     this(line.get(0), line.get(1));
   }
 
-  public LineSegment(double x1, double y1, double x2, double y2) {
-    this(new DoubleCoordinates(x1, y1), new DoubleCoordinates(x2, y2));
-  }
-
-  public LineSegment(GeometryFactory geometryFactory, double x1, double y1,
-    double x2, double y2) {
-    this(geometryFactory, geometryFactory.createCoordinates(x1, y1),
-      geometryFactory.createCoordinates(x2, y2));
+  public LineSegment(final LineString line) {
+    this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line, 0),
+      CoordinatesListUtil.get(line, line.getNumPoints() - 1));
   }
 
   public double angle() {
@@ -107,6 +92,20 @@ public class LineSegment extends AbstractCoordinatesList {
   @Override
   public LineSegment clone() {
     return new LineSegment(geometryFactory, coordinates1, coordinates2);
+  }
+
+  public Coordinates closestPoint(final Coordinates p) {
+    final double factor = projectionFactor(p);
+    if (factor > 0 && factor < 1) {
+      return project(p);
+    }
+    final double dist0 = coordinates1.distance(p);
+    final double dist1 = coordinates2.distance(p);
+    if (dist0 < dist1) {
+      return coordinates1;
+    } else {
+      return coordinates2;
+    }
   }
 
   @Override
@@ -230,10 +229,12 @@ public class LineSegment extends AbstractCoordinatesList {
     return geometryFactory.createLineString(this);
   }
 
+  @Override
   public byte getNumAxis() {
     return (byte)Math.max(coordinates1.getNumAxis(), coordinates2.getNumAxis());
   }
 
+  @Override
   public double getValue(final int index, final int axisIndex) {
     switch (index) {
       case 0:
@@ -281,6 +282,7 @@ public class LineSegment extends AbstractCoordinatesList {
     precisionModel.makePrecise(point);
   }
 
+  @Override
   public void setValue(final int index, final int axisIndex, final double value) {
     switch (index) {
       case 0:
@@ -293,6 +295,7 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
+  @Override
   public int size() {
     return 2;
   }

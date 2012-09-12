@@ -37,24 +37,29 @@ public class SimpleCoordinatesPrecisionModel implements
     this.scaleZ = scaleZ;
   }
 
+  @Override
   public Coordinates getPreciseCoordinates(final Coordinates coordinates) {
     final Coordinates newCoordinates = new DoubleCoordinates(coordinates);
     makePrecise(newCoordinates);
     return newCoordinates;
   }
 
+  @Override
   public double getScaleXY() {
     return scaleXY;
   }
 
+  @Override
   public double getScaleZ() {
     return scaleZ;
   }
 
+  @Override
   public boolean isFloating() {
     return scaleXY <= 0 && scaleZ <= 0;
   }
 
+  @Override
   public void makePrecise(final Coordinates coordinates) {
     if (scaleXY > 0) {
       final double x = coordinates.getX();
@@ -74,10 +79,12 @@ public class SimpleCoordinatesPrecisionModel implements
     }
   }
 
+  @Override
   public double makeXyPrecise(final double value) {
     return makePrecise(value, scaleXY);
   }
 
+  @Override
   public double makeZPrecise(final double value) {
     return makePrecise(value, scaleZ);
   }

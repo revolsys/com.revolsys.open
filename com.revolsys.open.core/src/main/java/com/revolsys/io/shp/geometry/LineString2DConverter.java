@@ -31,10 +31,12 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public int getShapeType() {
     return ShapefileConstants.POLYLINE_SHAPE;
   }
 
+  @Override
   public Geometry read(final EndianInput in, final long recordLength)
     throws IOException {
     // skip bounding box;
@@ -77,6 +79,7 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
     }
   }
 
+  @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
     if (geometry instanceof LineString) {
@@ -95,8 +98,7 @@ public class LineString2DConverter implements ShapefileGeometryConverter {
     }
   }
 
-  private void writePolyLineHeader(
-    final EndianOutput out,
+  private void writePolyLineHeader(final EndianOutput out,
     final Geometry geometry) throws IOException {
     final int numCoordinates = geometry.getNumPoints();
     final int numGeometries = geometry.getNumGeometries();

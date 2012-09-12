@@ -51,9 +51,7 @@ public class EuclideanDistanceToPoint {
   public EuclideanDistanceToPoint() {
   }
 
-  public void computeDistance(
-    final Geometry geom,
-    final Coordinate pt,
+  public void computeDistance(final Geometry geom, final Coordinate pt,
     final PointPairDistance ptDist) {
     if (geom instanceof LineString) {
       computeDistance((LineString)geom, pt, ptDist);
@@ -70,17 +68,13 @@ public class EuclideanDistanceToPoint {
     }
   }
 
-  public void computeDistance(
-    final LineSegment segment,
-    final Coordinate pt,
+  public void computeDistance(final LineSegment segment, final Coordinate pt,
     final PointPairDistance ptDist) {
     final Coordinate closestPt = segment.closestPoint(pt);
     ptDist.setMinimum(closestPt, pt);
   }
 
-  public void computeDistance(
-    final LineString line,
-    final Coordinate pt,
+  public void computeDistance(final LineString line, final Coordinate pt,
     final PointPairDistance ptDist) {
     final Coordinate[] coords = line.getCoordinates();
     for (int i = 0; i < coords.length - 1; i++) {
@@ -91,9 +85,7 @@ public class EuclideanDistanceToPoint {
     }
   }
 
-  public void computeDistance(
-    final Polygon poly,
-    final Coordinate pt,
+  public void computeDistance(final Polygon poly, final Coordinate pt,
     final PointPairDistance ptDist) {
     computeDistance(poly.getExteriorRing(), pt, ptDist);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {

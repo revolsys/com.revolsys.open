@@ -55,6 +55,7 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
     out.print('"');
   }
 
+  @Override
   public void write(final DataObject object) {
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {

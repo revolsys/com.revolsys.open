@@ -38,6 +38,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
     super(name, mode);
   }
 
+  @Override
   public void flush() {
   }
 
@@ -45,6 +46,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEDouble()
    */
+  @Override
   public double readLEDouble() throws IOException {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
@@ -54,6 +56,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEInt()
    */
+  @Override
   public int readLEInt() throws IOException {
     final int b1 = read();
     final int b2 = read();
@@ -68,6 +71,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLELong()
    */
+  @Override
   public long readLELong() throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
@@ -80,6 +84,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#readLEShort()
    */
+  @Override
   public short readLEShort() throws IOException {
     final int b1 = read();
     final int b2 = read();
@@ -92,11 +97,13 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * @see
    * com.revolsys.gis.format.core.io.EndianInputOutput#writeLEDouble(double)
    */
+  @Override
   public void writeLEDouble(final double d) throws IOException {
     final long l = Double.doubleToLongBits(d);
     writeLELong(l);
   }
 
+  @Override
   public void writeLEFloat(final float f) throws IOException {
     final int i = Float.floatToIntBits(f);
     writeLEInt(i);
@@ -106,6 +113,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#writeLEInt(int)
    */
+  @Override
   public void writeLEInt(final int i) throws IOException {
     write(i & 0xFF);
     write((i >>> 8) & 0xFF);
@@ -117,6 +125,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#writeLELong(long)
    */
+  @Override
   public void writeLELong(final long l) throws IOException {
     write((int)l & 0xFF);
     write((int)(l >>> 8) & 0xFF);
@@ -132,11 +141,13 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
    * (non-Javadoc)
    * @see com.revolsys.gis.format.core.io.EndianInputOutput#writeLEShort(short)
    */
+  @Override
   public void writeLEShort(final short s) throws IOException {
     write(s & 0xFF);
     write((s >>> 8) & 0xFF);
   }
 
+  @Override
   public void writeShort(final short s) throws IOException {
     write((s >>> 8) & 0xFF);
     write(s & 0xFF);

@@ -30,6 +30,7 @@ public class ResourceEndianOutput implements EndianOutput {
     this.out = new EndianOutputStream(bufferedOut);
   }
 
+  @Override
   public void close() throws IOException {
     try {
       out.close();
@@ -48,15 +49,18 @@ public class ResourceEndianOutput implements EndianOutput {
     }
   }
 
+  @Override
   public void flush() {
     out.flush();
 
   }
 
+  @Override
   public long getFilePointer() throws IOException {
     return out.getFilePointer();
   }
 
+  @Override
   public long length() throws IOException {
     return out.length();
   }
@@ -74,60 +78,74 @@ public class ResourceEndianOutput implements EndianOutput {
     raOut.seek(pos);
   }
 
-  public void write(final int i) throws IOException {
-    out.write(i);
-  }
-
-  public void writeBytes(final String s) throws IOException {
-    out.writeBytes(s);
-  }
-
-  public void write(final byte[] bytes, int offset, int length)
-    throws IOException {
-    out.write(bytes, offset, length);
-  }
-
+  @Override
   public void write(final byte[] bytes) throws IOException {
     out.write(bytes);
   }
 
+  @Override
+  public void write(final byte[] bytes, final int offset, final int length)
+    throws IOException {
+    out.write(bytes, offset, length);
+  }
+
+  @Override
+  public void write(final int i) throws IOException {
+    out.write(i);
+  }
+
+  @Override
+  public void writeBytes(final String s) throws IOException {
+    out.writeBytes(s);
+  }
+
+  @Override
   public void writeDouble(final double d) throws IOException {
     out.writeDouble(d);
   }
 
+  @Override
   public void writeFloat(final float f) throws IOException {
     out.writeFloat(f);
   }
 
+  @Override
   public void writeInt(final int i) throws IOException {
     out.writeInt(i);
   }
 
+  @Override
   public void writeLEDouble(final double d) throws IOException {
     out.writeLEDouble(d);
   }
 
+  @Override
   public void writeLEFloat(final float f) throws IOException {
     out.writeLEFloat(f);
   }
 
+  @Override
   public void writeLEInt(final int i) throws IOException {
     out.writeLEInt(i);
   }
 
+  @Override
   public void writeLELong(final long l) throws IOException {
     out.writeLELong(l);
 
   }
 
+  @Override
   public void writeLEShort(final short s) throws IOException {
     out.writeLEShort(s);
   }
 
+  @Override
   public void writeLong(final long l) throws IOException {
     out.writeLong(l);
   }
 
+  @Override
   public void writeShort(final short s) throws IOException {
     out.writeShort(s);
   }

@@ -31,6 +31,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     return coordinates.getNumAxis();
   }
 
+  @Override
   public double getValue(final int index) {
     if (index >= 0 && index < coordinates.getNumAxis()) {
       return coordinates.getValue(this.index, index);
@@ -47,6 +48,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     this.index = index;
   }
 
+  @Override
   public void setValue(final int index, final double value) {
     if (index >= 0 && index < coordinates.getNumAxis()) {
       coordinates.setValue(this.index, index, value);

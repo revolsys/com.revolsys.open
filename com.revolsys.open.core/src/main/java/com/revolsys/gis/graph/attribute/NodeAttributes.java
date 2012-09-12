@@ -128,8 +128,7 @@ public class NodeAttributes {
     }
 
     public static Set<Double> getAnglesForType(
-      final Map<String, Set<Double>> anglesByType,
-      final String typePath) {
+      final Map<String, Set<Double>> anglesByType, final String typePath) {
       Set<Double> angles = anglesByType.get(typePath);
       if (angles == null) {
         angles = new TreeSet<Double>(new NumberComparator<Double>());
@@ -171,8 +170,7 @@ public class NodeAttributes {
     return getAttribute(node, EDGE_ANGLES_BY_TYPE);
   }
 
-  public static <T> Set<Double> getEdgeAnglesByType(
-    final Node<T> node,
+  public static <T> Set<Double> getEdgeAnglesByType(final Node<T> node,
     final String typePath) {
     final Map<String, Set<Double>> anglesByType = getEdgeAnglesByType(node);
     final Set<Double> angles = anglesByType.get(typePath);
@@ -196,8 +194,7 @@ public class NodeAttributes {
     return getAttribute(node, EDGES_BY_TYPE);
   }
 
-  public static <T> List<Edge<T>> getEdgesByType(
-    final Node<T> node,
+  public static <T> List<Edge<T>> getEdgesByType(final Node<T> node,
     final String typePath) {
     final Map<String, List<Edge<T>>> edgesByType = getEdgesByType(node);
     final List<Edge<T>> edges = edgesByType.get(typePath);

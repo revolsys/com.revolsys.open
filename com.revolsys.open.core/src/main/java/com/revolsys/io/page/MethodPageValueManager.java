@@ -7,27 +7,6 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class MethodPageValueManager<T> implements PageValueManager<T> {
 
-  public static MethodPageValueManager<Byte> BYTE = new MethodPageValueManager<Byte>(
-    "Byte");
-
-  public static MethodPageValueManager<Double> DOUBLE = new MethodPageValueManager<Double>(
-    "Double");
-
-  public static MethodPageValueManager<Float> FLOAT = new MethodPageValueManager<Float>(
-    "Float");
-
-  public static MethodPageValueManager<Integer> INT = new MethodPageValueManager<Integer>(
-    "Int");
-
-  public static MethodPageValueManager<Long> LONG = new MethodPageValueManager<Long>(
-    "Long");
-
-  public static MethodPageValueManager<Short> SHORT = new MethodPageValueManager<Short>(
-    "Short");
-
-  public static MethodPageValueManager<String> STRING = new MethodPageValueManager<String>(
-    "String");
-
   public static byte[] getByteBytes(final Page page) {
     return page.readBytes(1);
   }
@@ -203,22 +182,27 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
 
   }
 
+  @Override
   public void disposeBytes(final byte[] bytes) {
   }
 
+  @Override
   public byte[] getBytes(final Page page) {
     return (byte[])JavaBeanUtil.invokeMethod(getBytesMethod, getClass(), page);
   }
 
+  @Override
   public byte[] getBytes(final T value) {
     return JavaBeanUtil.invokeMethod(byteArrayWriteMethod, getClass(), value);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V extends T> V getValue(final byte[] bytes) {
     return (V)JavaBeanUtil.invokeMethod(getValueMethod, getClass(), bytes);
   }
 
+  @Override
   public <V extends T> V readFromPage(final Page page) {
     final byte[] bytes = getBytes(page);
     return getValue(bytes);

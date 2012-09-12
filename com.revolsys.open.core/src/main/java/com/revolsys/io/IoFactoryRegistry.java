@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.MediaType;
 
 public class IoFactoryRegistry {
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
@@ -45,7 +44,7 @@ public class IoFactoryRegistry {
 
   private final Set<IoFactory> factories = new HashSet<IoFactory>();
 
-  private Map<String, String> extensionMimeTypeMap = new HashMap<String, String>();
+  private final Map<String, String> extensionMimeTypeMap = new HashMap<String, String>();
 
   public IoFactoryRegistry() {
     final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
@@ -117,6 +116,10 @@ public class IoFactoryRegistry {
     }
   }
 
+  public Map<String, String> getExtensionMimeTypeMap() {
+    return extensionMimeTypeMap;
+  }
+
   @SuppressWarnings("unchecked")
   public synchronized <F extends IoFactory> Set<F> getFactories(
     final Class<F> factoryClass) {
@@ -130,10 +133,6 @@ public class IoFactoryRegistry {
 
   public Set<IoFactory> getFactoriesByClass() {
     return factories;
-  }
-
-  public Map<String, String> getExtensionMimeTypeMap() {
-    return extensionMimeTypeMap;
   }
 
   public <F extends IoFactory> List<F> getFactoriesByFileExtension(

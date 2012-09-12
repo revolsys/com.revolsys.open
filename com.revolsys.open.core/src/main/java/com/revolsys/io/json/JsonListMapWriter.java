@@ -39,6 +39,7 @@ public class JsonListMapWriter extends AbstractMapWriter {
     out.flush();
   }
 
+  @Override
   public void write(final Map<String, ? extends Object> values) {
     if (written) {
       out.print(",\n");

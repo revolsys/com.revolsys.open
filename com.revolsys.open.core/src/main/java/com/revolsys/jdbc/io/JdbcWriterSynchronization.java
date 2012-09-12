@@ -12,13 +12,39 @@ public class JdbcWriterSynchronization extends
 
   private boolean holderActive = true;
 
-  private AbstractJdbcDataObjectStore dataStore;
+  private final AbstractJdbcDataObjectStore dataStore;
 
-  public JdbcWriterSynchronization(AbstractJdbcDataObjectStore dataStore, JdbcWriterResourceHolder writerHolder,
-    Object key) {
+  public JdbcWriterSynchronization(final AbstractJdbcDataObjectStore dataStore,
+    final JdbcWriterResourceHolder writerHolder, final Object key) {
     this.dataStore = dataStore;
     this.writerHolder = writerHolder;
     this.key = key;
+  }
+
+  @Override
+  public void afterCompletion(final int status) {
+    if (holderActive) {
+      TransactionSynchronizationManager.unbindResourceIfPossible(key);
+      holderActive = false;
+      if (writerHolder.hasWriter()) {
+        final JdbcWriter writer = writerHolder.getWriter();
+        dataStore.releaseWriter(writer);
+        writerHolder.setWriter(null);
+      }
+    }
+    writerHolder.reset();
+  }
+
+  @Override
+  public void beforeCompletion() {
+    if (!writerHolder.isOpen()) {
+      TransactionSynchronizationManager.unbindResource(key);
+      holderActive = false;
+      if (writerHolder.hasWriter()) {
+        final JdbcWriter writer = writerHolder.getWriter();
+        dataStore.releaseWriter(writer);
+      }
+    }
   }
 
   @Override
@@ -27,48 +53,21 @@ public class JdbcWriterSynchronization extends
   }
 
   @Override
+  public void resume() {
+    if (holderActive) {
+      TransactionSynchronizationManager.bindResource(key, writerHolder);
+    }
+  }
+
+  @Override
   public void suspend() {
     if (holderActive) {
       TransactionSynchronizationManager.unbindResource(key);
       if (writerHolder.hasWriter() && !writerHolder.isOpen()) {
-        JdbcWriter writer = writerHolder.getWriter();
+        final JdbcWriter writer = writerHolder.getWriter();
         dataStore.releaseWriter(writer);
         writerHolder.setWriter(null);
       }
     }
-  }
-
-  @Override
-  public void resume() {
-    if (holderActive) {
-      TransactionSynchronizationManager.bindResource(key,
-        writerHolder);
-    }
-  }
-
-  @Override
-  public void beforeCompletion() {
-   if (!writerHolder.isOpen()) {
-      TransactionSynchronizationManager.unbindResource(key);
-      holderActive = false;
-      if (writerHolder.hasWriter()) {
-        JdbcWriter writer = writerHolder.getWriter();
-        dataStore.releaseWriter(writer);
-      }
-    }
-  }
-
-  @Override
-  public void afterCompletion(int status) {
-     if (holderActive) {
-      TransactionSynchronizationManager.unbindResourceIfPossible(key);
-      holderActive = false;
-      if (writerHolder.hasWriter()) {
-        JdbcWriter writer = writerHolder.getWriter();
-        dataStore.releaseWriter(writer);
-        writerHolder.setWriter(null);
-      }
-    }
-    writerHolder.reset();
   }
 }

@@ -7,14 +7,17 @@ public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
     super(INTEGER_FORMAT);
   }
 
+  @Override
   public Class<Short> getConvertedClass() {
     return Short.class;
   }
 
+  @Override
   public boolean requiresQuotes() {
     return false;
   }
 
+  @Override
   public Short toObject(final Object value) {
     if (value instanceof Short) {
       final Short integer = (Short)value;
@@ -29,6 +32,7 @@ public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
     }
   }
 
+  @Override
   public Short toObject(final String string) {
     if (StringUtils.hasText(string)) {
       return Short.valueOf(string);

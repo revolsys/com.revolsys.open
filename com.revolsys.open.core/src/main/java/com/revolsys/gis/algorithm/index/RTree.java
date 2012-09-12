@@ -27,10 +27,8 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     root = new RTreeLeaf<T>(maxEntries);
   }
 
-  private RTreeLeaf<T> chooseLeaf(
-    final List<RTreeBranch<T>> path,
-    final RTreeNode<T> node,
-    final Envelope envelope) {
+  private RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path,
+    final RTreeNode<T> node, final Envelope envelope) {
     if (node instanceof RTreeLeaf) {
       return (RTreeLeaf<T>)node;
     } else {
@@ -56,8 +54,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     }
   }
 
-  private double getRequiredExpansion(
-    final RTreeNode<T> node,
+  private double getRequiredExpansion(final RTreeNode<T> node,
     final Envelope envelope) {
     double areaExpansion = 0;
 
@@ -93,6 +90,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     return size;
   }
 
+  @Override
   public void put(final Envelope envelope, final T object) {
     final LinkedList<RTreeBranch<T>> path = new LinkedList<RTreeBranch<T>>();
     final RTreeLeaf<T> leaf = chooseLeaf(path, root, envelope);
@@ -105,6 +103,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     size++;
   }
 
+  @Override
   public boolean remove(final Envelope envelope, final T object) {
     // TODO rebalance after remove
     final LinkedList<RTreeNode<T>> path = new LinkedList<RTreeNode<T>>();
@@ -116,10 +115,8 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     }
   }
 
-  private void replace(
-    final LinkedList<RTreeBranch<T>> path,
-    final RTreeNode<T> oldNode,
-    final List<RTreeNode<T>> newNodes) {
+  private void replace(final LinkedList<RTreeBranch<T>> path,
+    final RTreeNode<T> oldNode, final List<RTreeNode<T>> newNodes) {
     if (path.isEmpty()) {
       root = new RTreeBranch<T>(maxEntries, newNodes);
     } else {
@@ -135,17 +132,18 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
 
   }
 
-  public void visit(
-    final Envelope envelope,
-    final Filter<T> filter,
+  @Override
+  public void visit(final Envelope envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
     root.visit(envelope, filter, visitor);
   }
 
+  @Override
   public void visit(final Envelope envelope, final Visitor<T> visitor) {
     root.visit(envelope, visitor);
   }
 
+  @Override
   public void visit(final Visitor<T> visitor) {
     root.visit(visitor);
   }

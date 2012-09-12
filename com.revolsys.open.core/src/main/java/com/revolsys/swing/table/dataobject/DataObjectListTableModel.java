@@ -81,11 +81,8 @@ public class DataObjectListTableModel extends AbstractTableModel {
     objects.clear();
   }
 
-  private void firePropertyChange(
-    final DataObject feature,
-    final String name,
-    final Object oldValue,
-    final Object newValue) {
+  private void firePropertyChange(final DataObject feature, final String name,
+    final Object oldValue, final Object newValue) {
     final PropertyChangeEvent event = new PropertyChangeEvent(feature, name,
       oldValue, newValue);
     for (final PropertyChangeListener listener : propertyChangeListeners) {
@@ -107,13 +104,6 @@ public class DataObjectListTableModel extends AbstractTableModel {
     return objects.get(index);
   }
 
-  /**
-   * @return the objects
-   */
-  public List<DataObject> getObjects() {
-    return objects;
-  }
-
   public List<DataObject> getFeatures(final int[] rows) {
     final List<DataObject> features = new ArrayList<DataObject>();
     for (final int row : rows) {
@@ -123,6 +113,17 @@ public class DataObjectListTableModel extends AbstractTableModel {
     return features;
   }
 
+  public DataObjectMetaData getMetaData() {
+    return metaData;
+  }
+
+  /**
+   * @return the objects
+   */
+  public List<DataObject> getObjects() {
+    return objects;
+  }
+
   public Set<PropertyChangeListener> getPropertyChangeListeners() {
     return Collections.unmodifiableSet(propertyChangeListeners);
   }
@@ -130,10 +131,6 @@ public class DataObjectListTableModel extends AbstractTableModel {
   @Override
   public int getRowCount() {
     return objects.size();
-  }
-
-  public DataObjectMetaData getMetaData() {
-    return metaData;
   }
 
   /**
@@ -185,7 +182,7 @@ public class DataObjectListTableModel extends AbstractTableModel {
       final int row = this.objects.indexOf(object);
       if (row != -1) {
         objects.remove(row);
-        TableModelEvent event = new TableModelEvent(this, row, row,
+        final TableModelEvent event = new TableModelEvent(this, row, row,
           TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
         fireTableChanged(event);
       }
@@ -209,9 +206,7 @@ public class DataObjectListTableModel extends AbstractTableModel {
   }
 
   @Override
-  public void setValueAt(
-    final Object value,
-    final int rowIndex,
+  public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
     final DataObject feature = getFeature(rowIndex);
     if (feature != null) {
@@ -230,7 +225,7 @@ public class DataObjectListTableModel extends AbstractTableModel {
         sortAscending = true;
       }
       sortedColumnIndex = index;
-      String attributeName = metaData.getAttributeName(index);
+      final String attributeName = metaData.getAttributeName(index);
       final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
         sortAscending, attributeName);
       Collections.sort(objects, comparitor);

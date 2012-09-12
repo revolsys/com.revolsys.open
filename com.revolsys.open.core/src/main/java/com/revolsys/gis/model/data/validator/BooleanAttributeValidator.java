@@ -24,6 +24,7 @@ import com.revolsys.gis.data.model.Attribute;
 
 public class BooleanAttributeValidator implements AttributeValueValidator {
 
+  @Override
   public boolean isValid(final Attribute attributeDefinition, final Object value) {
     if (value instanceof Boolean) {
       return true;

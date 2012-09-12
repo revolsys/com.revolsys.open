@@ -37,8 +37,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
    * @return The split lines.
    */
   private List<LineString> getSplitLines(
-    final LineMatchGraph<LineSegmentMatch> graph,
-    final LineString line,
+    final LineMatchGraph<LineSegmentMatch> graph, final LineString line,
     final int index) {
     final Coordinates startCoordinate = CoordinatesUtil.get(line);
     Node<LineSegmentMatch> currentNode = graph.findNode(startCoordinate);
@@ -116,8 +115,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
    * @param line2 The second line.
    * @return The split lines.
    */
-  private List<List<LineString>> getSplitLines(
-    final LineString line1,
+  private List<List<LineString>> getSplitLines(final LineString line1,
     final LineString line2) {
     final LineMatchGraph<LineSegmentMatch> graph = new LineMatchGraph<LineSegmentMatch>(
       line1);
@@ -139,6 +137,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
    * @param edge The edge to process.
    * @return True
    */
+  @Override
   public boolean visit(final Edge<DataObject> edge) {
     final LineString line = edge.getLine();
     final List<Edge<DataObject>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor.getEdges(

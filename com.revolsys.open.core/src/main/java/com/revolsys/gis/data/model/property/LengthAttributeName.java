@@ -44,6 +44,7 @@ public class LengthAttributeName extends AbstractDataObjectMetaDataProperty {
     return attributeName;
   }
 
+  @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
   }

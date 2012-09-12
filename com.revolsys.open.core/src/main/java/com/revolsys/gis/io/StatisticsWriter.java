@@ -53,6 +53,7 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
     statistics.connect();
   }
 
+  @Override
   public void setBeanName(final String beanName) {
     this.beanName = beanName.replaceAll("Stats", "");
   }
@@ -73,6 +74,7 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
     return writer.toString();
   }
 
+  @Override
   public void write(final DataObject object) {
     if (object != null) {
       writer.write(object);
