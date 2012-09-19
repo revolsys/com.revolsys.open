@@ -156,7 +156,7 @@ public class Graph<T> {
   protected Graph(final boolean storeLines) {
     graphs.put(id, new WeakReference<Graph<?>>(this));
     if (!storeLines) {
-      edgeLinesById.clear();
+      edgeLinesById = null;
     }
   }
 
@@ -464,6 +464,11 @@ public class Graph<T> {
   public List<Edge<T>> getEdges() {
     final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
     return new EdgeList<T>(this, edgeIds);
+  }
+
+  public List<LineString> getEdgeLines() {
+    final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
+    return new EdgeLineList(this, edgeIds);
   }
 
   public List<Edge<T>> getEdges(final Comparator<Edge<T>> comparator) {
@@ -937,7 +942,9 @@ public class Graph<T> {
       final int edgeId = edge.getId();
       edgesById.remove(edgeId);
       edgeAttributesById.remove(edgeId);
-      edgeLinesById.remove(edgeId);
+      if (edgeLinesById != null) {
+        edgeLinesById.remove(edgeId);
+      }
       edgeObjectsById.remove(edgeId);
       if (edgeIndex != null) {
         edgeIndex.remove(edge);

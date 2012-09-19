@@ -57,12 +57,13 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     return dataObjectStore;
   }
 
-  public synchronized DataObjectMetaData getMetaData(final String typePath) {
+  public synchronized DataObjectMetaData getMetaData(String typePath) {
+    typePath = typePath.toUpperCase();
     if (typePath.startsWith(path + "/") || path.equals("/")) {
       if (metaDataCache.isEmpty()) {
         refreshMetaData();
       }
-      final DataObjectMetaData metaData = metaDataCache.get(typePath);
+      final DataObjectMetaData metaData = metaDataCache.get(typePath.toUpperCase());
       return metaData;
     } else {
       return null;

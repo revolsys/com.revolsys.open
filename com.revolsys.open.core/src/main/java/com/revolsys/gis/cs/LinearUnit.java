@@ -32,6 +32,9 @@ public class LinearUnit implements Serializable {
    * @param conversionFactor The conversion factor.
    * @return The linear unit.
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static Unit<Length> getUnit(final Unit<Length> baseUnit,
     final double conversionFactor) {
     Unit<Length> unit;

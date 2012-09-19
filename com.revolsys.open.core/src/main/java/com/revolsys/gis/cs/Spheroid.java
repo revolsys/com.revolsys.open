@@ -2,6 +2,7 @@ package com.revolsys.gis.cs;
 
 import java.io.Serializable;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Spheroid implements Serializable {
@@ -79,6 +80,24 @@ public class Spheroid implements Serializable {
       return false;
     }
 
+  }
+
+  public boolean equalsExact(final Spheroid spheroid) {
+    if (!EqualsRegistry.equal(authority, spheroid.authority)) {
+      return false;
+//    } else if (deprecated != spheroid.deprecated) {
+//      return false;
+    } else if (inverseFlattening != spheroid.inverseFlattening) {
+      return false;
+//    } else if (!EqualsRegistry.equal(name, spheroid.name)) {
+//      return false;
+    } else if (semiMajorAxis != spheroid.semiMajorAxis) {
+      return false;
+    } else if (semiMinorAxis != spheroid.semiMinorAxis) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public Authority getAuthority() {

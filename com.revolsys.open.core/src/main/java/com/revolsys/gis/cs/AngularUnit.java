@@ -7,6 +7,8 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+
 public class AngularUnit implements Serializable {
   /**
    * 
@@ -32,6 +34,9 @@ public class AngularUnit implements Serializable {
    * @param conversionFactor The conversion factor.
    * @return The angular unit.
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static Unit<Angle> getUnit(final Unit<Angle> baseUnit,
     final double conversionFactor) {
     Unit<Angle> unit;
@@ -66,7 +71,7 @@ public class AngularUnit implements Serializable {
 
   private final boolean deprecated;
 
-  private final String name;
+  private String name;
 
   private Unit<Angle> unit;
 
@@ -79,6 +84,9 @@ public class AngularUnit implements Serializable {
     final double conversionFactor, final Authority authority,
     final boolean deprecated) {
     this.name = name;
+    if (name.equals("degree (supplier to define representation)")) {
+      this.name = "degree";
+    }
     this.baseUnit = baseUnit;
     this.conversionFactor = conversionFactor;
     this.authority = authority;
@@ -103,7 +111,7 @@ public class AngularUnit implements Serializable {
       return true;
     } else if (object instanceof AngularUnit) {
       final AngularUnit unit = (AngularUnit)object;
-      if (name == null && unit.name != null || !name.equals(unit.name)) {
+      if (!EqualsRegistry.equal(name,unit.name)) {
         return false;
       } else if (Math.abs(conversionFactor - unit.conversionFactor) > 1.0e-10) {
         return false;

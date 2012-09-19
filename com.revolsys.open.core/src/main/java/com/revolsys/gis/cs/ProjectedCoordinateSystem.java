@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
@@ -88,13 +89,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
       if (!geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!equals(projection, cs.projection)) {
+      } else if (!EqualsRegistry.equal(projection, cs.projection)) {
         return false;
-      } else if (!equals(lowerParameters, cs.lowerParameters)) {
+      } else if (!EqualsRegistry.equal(lowerParameters, cs.lowerParameters)) {
         return false;
-      } else if (!equals(linearUnit, cs.linearUnit)) {
+      } else if (!EqualsRegistry.equal(linearUnit, cs.linearUnit)) {
         return false;
-      } else if (!equals(axis, cs.axis)) {
+      } else if (!EqualsRegistry.equal(axis, cs.axis)) {
         return false;
       } else {
         return true;
@@ -104,13 +105,36 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     }
   }
 
-  private boolean equals(final Object object1, final Object object2) {
-    if (object1 == object2) {
-      return true;
-    } else if (object1 == null || object2 == null) {
+  public boolean equalsExact(final Object object) {
+    if (object == null) {
       return false;
+    } else if (object == this) {
+      return true;
+    } else if (object instanceof ProjectedCoordinateSystem) {
+      final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
+      if (!area.equals(cs.area)) {
+        return false;
+      } else if (!authority.equals(cs.authority)) {
+        return false;
+      } else if (!EqualsRegistry.equal(axis, cs.axis)) {
+        return false;
+      } else if (!geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
+        return false;
+      } else if (id != cs.id) {
+        return false;
+      } else if (!EqualsRegistry.equal(linearUnit, cs.linearUnit)) {
+        return false;
+      } else if (!EqualsRegistry.equal(name, cs.name)) {
+        return false;
+      } else if (!EqualsRegistry.equal(parameters, cs.parameters)) {
+        return false;
+      } else if (!EqualsRegistry.equal(projection, cs.projection)) {
+        return false;
+      } else {
+        return true;
+      }
     } else {
-      return object1.equals(object2);
+      return false;
     }
   }
 

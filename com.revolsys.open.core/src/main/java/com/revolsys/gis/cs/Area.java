@@ -2,6 +2,7 @@ package com.revolsys.gis.cs;
 
 import java.io.Serializable;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class Area implements Serializable {
@@ -42,4 +43,27 @@ public class Area implements Serializable {
     return deprecated;
   }
 
+  @Override
+  public int hashCode() {
+    return latLonBounds.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Area) {
+      Area area = (Area)obj;
+      if (!EqualsRegistry.equal(latLonBounds, area.latLonBounds)) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }

@@ -18,9 +18,17 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
 
   @Override
   public Envelope getEnvelope(final Edge<T> edge) {
-    final LineString line = edge.getLine();
-    final Envelope envelope = line.getEnvelopeInternal();
-    return envelope;
+    if (edge == null) {
+      return new Envelope();
+    } else {
+      final LineString line = edge.getLine();
+      if (line == null) {
+        return new Envelope();
+      } else {
+        final Envelope envelope = line.getEnvelopeInternal();
+        return envelope;
+      }
+    }
   }
 
   @Override

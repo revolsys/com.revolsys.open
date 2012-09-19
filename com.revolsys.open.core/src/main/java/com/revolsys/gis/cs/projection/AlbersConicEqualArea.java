@@ -155,7 +155,6 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     final double q = (c - (rho * rho * n * n) / (semiMajorAxis * semiMajorAxis))
       / n;
     final double lambda = lambda0 + theta / n;
-
     double li = Math.asin(q / 2.0);
     if (!Double.isNaN(li)) {
       double delta = 10e010;

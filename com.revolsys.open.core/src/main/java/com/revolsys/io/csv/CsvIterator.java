@@ -11,7 +11,8 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.io.FileUtil;
 
-public class CsvIterator implements Iterator<List<String>> {
+public class CsvIterator implements Iterator<List<String>>,
+  Iterable<List<String>> {
 
   /** The current record. */
   private List<String> currentRecord;
@@ -32,6 +33,11 @@ public class CsvIterator implements Iterator<List<String>> {
     this.in = new BufferedReader(in);
 
     readNextRecord();
+  }
+
+  @Override
+  public Iterator<List<String>> iterator() {
+    return this;
   }
 
   /**

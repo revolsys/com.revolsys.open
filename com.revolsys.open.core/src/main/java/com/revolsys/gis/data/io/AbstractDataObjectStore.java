@@ -307,7 +307,7 @@ public abstract class AbstractDataObjectStore extends
         if (!schemaName.startsWith("/")) {
           schemaName = "/" + schemaName;
         }
-        return schemaMap.get(schemaName);
+        return schemaMap.get(schemaName.toUpperCase());
       }
     }
   }

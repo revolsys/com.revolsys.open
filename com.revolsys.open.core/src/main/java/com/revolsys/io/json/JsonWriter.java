@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,10 @@ public final class JsonWriter {
     value(key);
     out.print(": ");
     startAttribute = true;
+  }
+
+  public void list(Object... values) {
+    list(Arrays.asList(values));
   }
 
   public void list(final List<? extends Object> values) {

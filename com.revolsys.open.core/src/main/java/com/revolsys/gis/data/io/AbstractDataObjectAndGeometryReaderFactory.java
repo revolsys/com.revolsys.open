@@ -125,6 +125,9 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
     return geometryReader;
   }
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     final Reader reader = createDataObjectReader(resource);

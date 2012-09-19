@@ -13,7 +13,10 @@ public class ProcessRunnable implements Runnable {
 
   @Override
   public void run() {
-    process.run();
-    processManager.removeProcess(process);
+    try {
+      process.run();
+    } finally {
+      processManager.removeProcess(process);
+    }
   }
 }

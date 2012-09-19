@@ -172,8 +172,10 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
 
   @Override
   protected void finalize() throws Throwable {
+    if (graph != null) {
+      graph.evict(this);
+    }
     super.finalize();
-    graph.evict(this);
   }
 
   public Coordinates get3dCoordinates(final String typePath) {

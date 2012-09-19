@@ -2,6 +2,8 @@ package com.revolsys.gis.cs;
 
 import java.io.Serializable;
 
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
+
 public class Projection implements Serializable {
   /**
    * 
@@ -25,7 +27,11 @@ public class Projection implements Serializable {
   public boolean equals(final Object obj) {
     if (obj instanceof Projection) {
       final Projection projection = (Projection)obj;
-      return name.equals(projection.getName());
+      if (EqualsRegistry.equal(authority, projection.authority)) {
+        return true;
+      } else {
+        return name.equals(projection.getName());
+      }
     }
     return false;
   }

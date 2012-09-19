@@ -25,6 +25,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +69,9 @@ public class GpxIterator implements DataObjectIterator {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   private static final Logger log = Logger.getLogger(GpxIterator.class);
+
+  private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(
+    "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
   private static XMLStreamReader createXmlReader(final Reader in) {
     try {
@@ -111,7 +117,7 @@ public class GpxIterator implements DataObjectIterator {
     final DataObjectFactory dataObjectFactory, final String path) {
     this(createXmlReader(in));
     this.dataObjectFactory = dataObjectFactory;
-    this.typePath = typePath;
+    this.typePath = path;
   }
 
   public GpxIterator(final Resource resource,
@@ -119,7 +125,7 @@ public class GpxIterator implements DataObjectIterator {
     throws IOException {
     this(createXmlReader(new InputStreamReader(resource.getInputStream())));
     this.dataObjectFactory = dataObjectFactory;
-    this.typePath = typePath;
+    this.typePath = path;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
@@ -262,11 +268,7 @@ public class GpxIterator implements DataObjectIterator {
       } else if (in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {
         elevation = Double.parseDouble(StaxUtils.getElementText(in));
       } else {
-        final String attributeName = in.getLocalName();
-        final String value = StaxUtils.getElementText(in);
-        if (value != null) {
-          dataObject.setValue(attributeName, value);
-        }
+        parseAttribute(dataObject);
       }
     }
 
@@ -301,11 +303,7 @@ public class GpxIterator implements DataObjectIterator {
         final Coordinates coordinates = CoordinatesUtil.get(point);
         numAxis = Math.max(numAxis, coordinates.getNumAxis());
       } else {
-        final String attributeName = in.getLocalName();
-        final String value = StaxUtils.getElementText(in);
-        if (value != null) {
-          dataObject.setValue(attributeName, value);
-        }
+        parseAttribute(dataObject);
       }
     }
     final CoordinatesList points = new DoubleCoordinatesList(
@@ -319,7 +317,13 @@ public class GpxIterator implements DataObjectIterator {
         points.setValue(i, j, value);
       }
     }
-    final LineString line = geometryFactory.createLineString(points);
+    final LineString line;
+    if (points.size() > 1) {
+      line = geometryFactory.createLineString(points);
+    } else {
+      line = geometryFactory.createLineString((CoordinatesList)null);
+    }
+
     dataObject.setGeometryValue(line);
     objects.addAll(pointObjects);
     return dataObject;
@@ -343,18 +347,37 @@ public class GpxIterator implements DataObjectIterator {
         StaxUtils.skipSubTree(in);
       } else if (in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
         final CoordinatesList points = parseTrackSegment();
-        segments.add(points);
-      } else {
-        final String attributeName = in.getLocalName();
-        final String value = StaxUtils.getElementText(in);
-        if (value != null) {
-          dataObject.setValue(attributeName, value);
+        if (points.size() > 1) {
+          segments.add(points);
         }
+      } else {
+        parseAttribute(dataObject);
       }
     }
     final MultiLineString lines = geometryFactory.createMultiLineString(segments);
     dataObject.setGeometryValue(lines);
     return dataObject;
+  }
+
+  protected Object parseAttribute(final DataObject dataObject) {
+    final String attributeName = in.getLocalName();
+    final String stringValue = StaxUtils.getElementText(in);
+    Object value;
+    if (stringValue == null) {
+      value = null;
+    } else if (attributeName.equals("time")) {
+      try {
+        value = TIMESTAMP_FORMAT.parse(stringValue);
+      } catch (ParseException e) {
+        throw new IllegalArgumentException("Invalid date " + stringValue);
+      }
+    } else {
+      value = stringValue;
+    }
+    if (value != null) {
+      dataObject.setValue(attributeName, value);
+    }
+    return value;
   }
 
   private int parseTrackPoint(final CoordinatesList points)

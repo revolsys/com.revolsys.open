@@ -150,7 +150,7 @@ public class WktCsParser {
   private Authority processAuthority(final List<Object> values) {
     final String name = (String)values.get(0);
     final String code = (String)values.get(1);
-    return new Authority(name, code);
+    return new BaseAuthority(name, code);
   }
 
   private Axis processAxis(final List<Object> values) {

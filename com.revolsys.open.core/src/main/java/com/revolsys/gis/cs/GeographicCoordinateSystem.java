@@ -43,8 +43,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.primeMeridian = primeMeridian;
     this.angularUnit = angularUnit;
     if (axis != null && !axis.isEmpty()) {
-      this.axis.add(axis.get(0));
-      this.axis.add(axis.get(1));
+      this.axis.addAll(axis);
     }
     this.area = area;
     this.authority = authority;
@@ -61,9 +60,23 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     this.primeMeridian = primeMeridian;
     this.angularUnit = angularUnit;
     if (axis != null && !axis.isEmpty()) {
-      this.axis.add(axis.get(0));
-      this.axis.add(axis.get(1));
+      this.axis.addAll(axis);
     }
+    this.authority = authority;
+  }
+
+  public GeographicCoordinateSystem(final int id, final String name,
+    final Datum datum, final AngularUnit angularUnit, final List<Axis> axis,
+    final Area area, final Authority authority, final boolean deprecated) {
+    this.id = id;
+    this.name = name;
+    this.datum = datum;
+    this.primeMeridian = null;
+    this.angularUnit = angularUnit;
+    if (axis != null && !axis.isEmpty()) {
+      this.axis.addAll(axis);
+    }
+    this.area = area;
     this.authority = authority;
   }
 
@@ -75,18 +88,57 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof GeographicCoordinateSystem) {
       final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)object;
-      if (datum != null && !datum.equals(cs.datum)) {
+      if (!equals(datum, cs.datum)) {
         return false;
-      } else if (primeMeridian != null
-        && !primeMeridian.equals(cs.primeMeridian)) {
+      } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
-      } else if (angularUnit != null && !angularUnit.equals(cs.angularUnit)) {
+      } else if (!equals(angularUnit, cs.angularUnit)) {
         return false;
       } else {
         return true;
       }
     } else {
       return false;
+    }
+  }
+
+  public boolean equalsExact(final GeographicCoordinateSystem cs) {
+    if (cs == null) {
+      return false;
+    } else if (cs == this) {
+      return true;
+    } else {
+      if (!equals(angularUnit, cs.angularUnit)) {
+        return false;
+      } else if (!equals(area, cs.area)) {
+  return false;
+      } else if (!equals(authority, cs.authority)) {
+        return false;
+      } else if (!equals(axis, cs.axis)) {
+        return false;
+      } else if (!equals(datum, cs.datum)) {
+        return false;
+      } else if (deprecated != cs.deprecated) {
+        return false;
+      } else if (id != cs.id) {
+        return false;
+      } else if (!equals(name, cs.name)) {
+        return false;
+      } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  private boolean equals(final Object object1, final Object object2) {
+    if (object1 == object2) {
+      return true;
+    } else if (object1 == null || object2 == null) {
+      return false;
+    } else {
+      return object1.equals(object2);
     }
   }
 
@@ -148,7 +200,15 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   public PrimeMeridian getPrimeMeridian() {
-    return primeMeridian;
+    if (primeMeridian == null) {
+      if (datum == null) {
+        return null;
+      } else {
+        return datum.getPrimeMeridian();
+      }
+    } else {
+      return primeMeridian;
+    }
   }
 
   // public Unit<Angle> getUnit() {
@@ -168,8 +228,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     if (datum != null) {
       result = prime * result + datum.hashCode();
     }
-    if (primeMeridian != null) {
-      result = prime * result + primeMeridian.hashCode();
+    if (getPrimeMeridian() != null) {
+      result = prime * result + getPrimeMeridian().hashCode();
     }
     return result;
   }

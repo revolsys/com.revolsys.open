@@ -1,6 +1,7 @@
 package com.revolsys.gis.graph.linestring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.TreeSet;
 
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
+import com.revolsys.comparator.CollectionComparator;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
@@ -44,16 +46,18 @@ import com.vividsolutions.jts.geom.LineString;
 public class LineStringGraph extends Graph<LineSegment> {
   private static final String INDEX = "INDEX";
 
+  private static final CollectionComparator<Integer> INDEX_COMPARATOR = new CollectionComparator<Integer>();
+
   public static Edge<LineSegment> getFirstEdge(
     final Collection<Edge<LineSegment>> edges) {
     final Iterator<Edge<LineSegment>> iterator = edges.iterator();
     if (iterator.hasNext()) {
       Edge<LineSegment> edge = iterator.next();
-      Integer index = edge.getAttribute(INDEX);
+      List<Integer> index = edge.getAttribute(INDEX);
       while (iterator.hasNext()) {
         final Edge<LineSegment> edge2 = iterator.next();
-        final Integer index2 = edge2.getAttribute(INDEX);
-        if (index2 < index) {
+        final List<Integer> index2 = edge2.getAttribute(INDEX);
+        if (INDEX_COMPARATOR.compare(index, index2) > 0) {
           edge = edge2;
           index = index2;
         }
@@ -424,19 +428,6 @@ public class LineStringGraph extends Graph<LineSegment> {
     setPrecisionModel(geometryFactory);
   }
 
-  public void setIndex(final Edge<LineSegment> edge,
-    final Edge<LineSegment> newEdge) {
-    final Integer index = edge.getAttribute(INDEX);
-    newEdge.setAttribute(INDEX, index);
-  }
-
-  public void setIndex(final Edge<LineSegment> edge,
-    final List<Edge<LineSegment>> splitEdges) {
-    for (final Edge<LineSegment> splitEdge : splitEdges) {
-      setIndex(edge, splitEdge);
-    }
-  }
-
   private void setLineString(final LineString lineString) {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     setPoints(points);
@@ -451,7 +442,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       final Coordinates from = lineSegment.get(0);
       final Coordinates to = lineSegment.get(1);
       final Edge<LineSegment> edge = addEdge(lineSegment, from, to);
-      edge.setAttribute(INDEX, index++);
+
+      edge.setAttribute(INDEX, Arrays.asList(index++));
     }
     fromPoint = new DoubleCoordinates(points.get(0));
     envelope = points.getBoundingBox();
@@ -478,15 +470,14 @@ public class LineStringGraph extends Graph<LineSegment> {
         final LineSegment line2 = edge2.getObject();
         final CoordinatesList intersections = line1.getIntersection(line2);
         if (intersections.size() == 1) {
-          final Coordinates intersection = intersections.get(0);
+          final Coordinates intersection = new DoubleCoordinates(
+            intersections.get(0));
           points.add(intersection);
-          final List<Edge<LineSegment>> splitEdges = edge2.split(intersection);
-          setIndex(edge2, splitEdges);
+          edge2.split(intersection);
         }
       }
       if (!points.isEmpty()) {
-        final List<Edge<LineSegment>> splitEdges = edge1.split(points);
-        setIndex(edge1, splitEdges);
+        edge1.split(points);
       }
     }
     return true;
@@ -507,12 +498,16 @@ public class LineStringGraph extends Graph<LineSegment> {
       }
       newPoints.add(toNode);
 
+      final List<Integer> index = edge.getAttribute(INDEX);
+      int i = 0;
       Coordinates previousPoint = fromNode;
       for (final Coordinates point : newPoints) {
         final LineSegment lineSegment = new LineSegment(previousPoint, point);
-        final Edge<LineSegment> newEdge = addEdge(lineSegment,
-          lineSegment.getLine());
-        setIndex(edge, newEdge);
+        final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint,
+          point);
+        List<Integer> newIndecies = new ArrayList<Integer>(index);
+        newIndecies.add(i++);
+        newEdge.setAttribute(INDEX, newIndecies);
         newEdges.add(newEdge);
         previousPoint = point;
       }
@@ -544,8 +539,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         for (final Edge<LineSegment> edge : edges) {
           final LineSegment line = edge.getObject();
           if (line.isPointOnLineMiddle(node, distance)) {
-            final List<Edge<LineSegment>> splitEdges = edge.split(node);
-            setIndex(edge, splitEdges);
+            edge.split(node);
           }
         }
       }

@@ -97,7 +97,7 @@ public class IoFactoryRegistry {
             final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
             for (final String mediaType : factory.getMediaTypes()) {
-              extensionMimeTypeMap.put(fileExtension, mediaType);
+              extensionMimeTypeMap.put(fileExtension.toLowerCase(), mediaType);
             }
           }
           final Map<String, IoFactory> factoriesByMediaType = getFactoriesByMediaType(ioInterface);
@@ -140,7 +140,7 @@ public class IoFactoryRegistry {
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
     final List<F> factories = new ArrayList<F>();
     for (final String fileExtension : fileExtensions) {
-      final F factory = factoriesByFileExtension.get(fileExtension);
+      final F factory = factoriesByFileExtension.get(fileExtension.toLowerCase());
       if (factory != null) {
         factories.add(factory);
       }
@@ -173,7 +173,7 @@ public class IoFactoryRegistry {
   public <F extends IoFactory> F getFactoryByFileExtension(
     final Class<F> factoryClass, final String fileExtension) {
     final Map<String, F> factoriesByFileExtension = getFactoriesByFileExtensionMap(factoryClass);
-    return factoriesByFileExtension.get(fileExtension);
+    return factoriesByFileExtension.get(fileExtension.toLowerCase());
   }
 
   public <F extends IoFactory> F getFactoryByFileName(

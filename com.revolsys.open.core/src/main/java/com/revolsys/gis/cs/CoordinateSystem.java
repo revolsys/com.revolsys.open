@@ -1,6 +1,7 @@
 package com.revolsys.gis.cs;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
@@ -12,6 +13,8 @@ public interface CoordinateSystem extends Serializable {
   BoundingBox getAreaBoundingBox();
 
   Authority getAuthority();
+
+  List<Axis> getAxis();
 
   int getId();
 

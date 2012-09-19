@@ -35,7 +35,7 @@ public class CoordinateSystemParser {
           primeMeridianName, longitude, null);
         final AngularUnit angularUnit = new AngularUnit(angularUnitName,
           conversionFactor, null);
-        final Authority authority = new Authority(authorityName, id);
+        final Authority authority = new BaseAuthority(authorityName, id);
         final GeographicCoordinateSystem cs = new GeographicCoordinateSystem(
           Integer.parseInt(id), csName, datum, primeMeridian, angularUnit,
           null, authority);
@@ -84,7 +84,7 @@ public class CoordinateSystemParser {
           final Projection projection = new Projection(projectionName);
           final LinearUnit unit = new LinearUnit(unitName, conversionFactor,
             null);
-          final Authority authority = new Authority(authorityName, id);
+          final Authority authority = new BaseAuthority(authorityName, id);
           final ProjectedCoordinateSystem cs = new ProjectedCoordinateSystem(
             Integer.parseInt(id), csName, geoCs, projection, parameters, unit,
             null, authority);

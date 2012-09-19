@@ -13,6 +13,7 @@ import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -124,7 +125,7 @@ public class DataObjectGraph extends Graph<DataObject> {
     final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
     for (final Edge<DataObject> edge : findEdges(point, distance)) {
       final LineString line = edge.getLine();
-      final List<Edge<DataObject>> splitEdges = edge.split(point);
+      final List<Edge<DataObject>> splitEdges = edge.split(new DoubleCoordinates(point));
       DirectionalAttributes.edgeSplitAttributes(line, point, splitEdges);
       edges.addAll(splitEdges);
     }

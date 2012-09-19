@@ -3,6 +3,7 @@ package com.revolsys.io.gpx;
 import javax.xml.namespace.QName;
 
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public final class GpxConstants {
@@ -26,6 +27,15 @@ public final class GpxConstants {
 
   public static final DataObjectMetaDataImpl GPX_TYPE = new DataObjectMetaDataImpl(
     "gpx");
+
+  public static final DataObjectMetaDataImpl GPX_WAYPOINT = new DataObjectMetaDataImpl(
+    "/gpx/waypoint");
+
+  public static final DataObjectMetaDataImpl GPX_TRACK = new DataObjectMetaDataImpl(
+    "/gpx/track");
+
+  public static final DataObjectMetaDataImpl GPX_ROUTE = new DataObjectMetaDataImpl(
+    "/gpx/route");
 
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");
 
@@ -60,32 +70,39 @@ public final class GpxConstants {
 
   public static final String MEDIA_TYPE = "application/gpx+xml";
 
+  private static void addAttribute(String name, DataType type, boolean required) {
+    GPX_TYPE.addAttribute(name, type, required);
+    GPX_WAYPOINT.addAttribute(name, type, required);
+    GPX_TRACK.addAttribute(name, type, required);
+    GPX_ROUTE.addAttribute(name, type, required);
+  }
+
   static {
-
+    addAttribute("dataset_name", DataTypes.STRING, false);
+    addAttribute("index", DataTypes.DOUBLE, false);
+    addAttribute("feature_type", DataTypes.STRING, false);
+    addAttribute("time", DataTypes.DATE_TIME, false);
+    addAttribute("magvar", DataTypes.DOUBLE, false);
+    addAttribute("geoidheight", DataTypes.DOUBLE, false);
+    addAttribute("name", DataTypes.STRING, false);
+    addAttribute("cmt", DataTypes.STRING, false);
+    addAttribute("desc", DataTypes.STRING, false);
+    addAttribute("src", DataTypes.STRING, false);
+    addAttribute("number", DataTypes.INT, false);
+    addAttribute("link", DataTypes.STRING, false);
+    addAttribute("sym", DataTypes.STRING, false);
+    addAttribute("type", DataTypes.STRING, false);
+    addAttribute("fix", DataTypes.STRING, false);
+    addAttribute("sat", DataTypes.INT, false);
+    addAttribute("hdop", DataTypes.DOUBLE, false);
+    addAttribute("vdop", DataTypes.DOUBLE, false);
+    addAttribute("pdop", DataTypes.DOUBLE, false);
+    addAttribute("ageofdgpsdata", DataTypes.DOUBLE, false);
+    addAttribute("dgpsid", DataTypes.STRING, false);
     GPX_TYPE.addAttribute("location", DataTypes.GEOMETRY, true);
-    GPX_TYPE.setGeometryAttributeIndex(0);
-    GPX_TYPE.addAttribute("dataset_name", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("index", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("feature_type", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("time", DataTypes.DATE_TIME, false);
-    GPX_TYPE.addAttribute("magvar", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("geoidheight", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("name", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("cmt", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("desc", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("src", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("number", DataTypes.INTEGER, false);
-    GPX_TYPE.addAttribute("link", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("sym", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("type", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("fix", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("sat", DataTypes.INTEGER, false);
-    GPX_TYPE.addAttribute("hdop", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("vdop", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("pdop", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("ageofdgpsdata", DataTypes.DECIMAL, false);
-    GPX_TYPE.addAttribute("dgpsid", DataTypes.STRING, false);
-
+    GPX_WAYPOINT.addAttribute("geometry", DataTypes.POINT, true);
+    GPX_TRACK.addAttribute("geometry", DataTypes.MULTI_LINE_STRING, true);
+    GPX_ROUTE.addAttribute("geometry", DataTypes.LINE_STRING, true);
   }
 
   private GpxConstants() {

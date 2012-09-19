@@ -268,8 +268,10 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   @Override
   protected void finalize() throws Throwable {
+    if (graph != null) {
+      graph.evict(this);
+    }
     super.finalize();
-    graph.evict(this);
   }
 
   public double getAngle(final Node<T> node) {
@@ -288,7 +290,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   @Override
   @SuppressWarnings("unchecked")
   public <V> V getAttribute(final String name) {
-    return (V)graph.getEdgeAttribute(id, name);
+    if (graph == null) {
+      return null;
+    } else {
+      return (V)graph.getEdgeAttribute(id, name);
+    }
   }
 
   @Override
@@ -392,8 +398,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   public double getToAngle() {
     final LineString line = getLine();
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    return CoordinatesListUtil.angleToPrevious(points, points.size() - 1);
+    if (line == null) {
+      return Double.NaN;
+    } else {
+      final CoordinatesList points = CoordinatesListUtil.get(line);
+      return CoordinatesListUtil.angleToPrevious(points, points.size() - 1);
+    }
   }
 
   public Node<T> getToNode() {
