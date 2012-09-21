@@ -29,16 +29,7 @@ public class Spheroid implements Serializable {
 
   public Spheroid(final String name, final double semiMajorAxis,
     final double inverseFlattening, final Authority authority) {
-    this.name = name;
-    this.semiMajorAxis = semiMajorAxis;
-    this.inverseFlattening = inverseFlattening;
-    this.authority = authority;
-
-    final double f = 1.0 / inverseFlattening;
-    semiMinorAxis = semiMajorAxis - semiMajorAxis * f;
-
-    eccentricitySquared = f + f - f * f;
-    eccentricity = Math.sqrt(eccentricitySquared);
+    this(name, semiMajorAxis, Double.NaN, inverseFlattening, authority, false);
   }
 
   public Spheroid(final String name, final double semiMajorAxis,
@@ -61,7 +52,11 @@ public class Spheroid implements Serializable {
       this.semiMinorAxis = semiMajorAxis - semiMajorAxis * f;
     }
 
-    eccentricitySquared = f + f - f * f;
+    // double a2 = this.semiMajorAxis * this.semiMajorAxis;
+    // double b2 = this.semiMinorAxis * this.semiMinorAxis;
+    //eccentricitySquared = 1.0 - b2 / a2;
+
+     eccentricitySquared = f + f - f * f;
     eccentricity = Math.sqrt(eccentricitySquared);
   }
 
@@ -85,12 +80,12 @@ public class Spheroid implements Serializable {
   public boolean equalsExact(final Spheroid spheroid) {
     if (!EqualsRegistry.equal(authority, spheroid.authority)) {
       return false;
-//    } else if (deprecated != spheroid.deprecated) {
-//      return false;
+      // } else if (deprecated != spheroid.deprecated) {
+      // return false;
     } else if (inverseFlattening != spheroid.inverseFlattening) {
       return false;
-//    } else if (!EqualsRegistry.equal(name, spheroid.name)) {
-//      return false;
+      // } else if (!EqualsRegistry.equal(name, spheroid.name)) {
+      // return false;
     } else if (semiMajorAxis != spheroid.semiMajorAxis) {
       return false;
     } else if (semiMinorAxis != spheroid.semiMinorAxis) {

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.measure.quantity.Angle;
 import javax.measure.quantity.Length;
+import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
@@ -90,8 +91,15 @@ public final class ProjectionFactory {
           }
         } else {
           if (!angularUnit1.equals(SI.RADIAN)) {
-            operations.add(new UnitConverstionOperation(angularUnit1,
-              SI.RADIAN, 2));
+            CoordinatesOperation converstionOperation;
+            if (angularUnit1.equals(NonSI.DEGREE_ANGLE)) {
+              converstionOperation = DegreesToRadiansOperation.INSTANCE;
+            } else {
+              converstionOperation = new UnitConverstionOperation(angularUnit1,
+                SI.RADIAN, 2);
+            }
+
+            operations.add(converstionOperation);
           }
         }
       } else {
@@ -295,8 +303,14 @@ public final class ProjectionFactory {
       if (angularUnit.equals(SI.RADIAN)) {
         return operation;
       } else {
-        return new ChainedCoordinatesOperation(operation,
-          new UnitConverstionOperation(SI.RADIAN, angularUnit, 2));
+        CoordinatesOperation converstionOperation;
+        if (angularUnit.equals(NonSI.DEGREE_ANGLE)) {
+          converstionOperation = RadiansToDegreesOperation.INSTANCE;
+        } else {
+          converstionOperation = new UnitConverstionOperation(SI.RADIAN,
+            angularUnit, 2);
+        }
+        return new ChainedCoordinatesOperation(operation, converstionOperation);
       }
     } else {
       return new CopyOperation();

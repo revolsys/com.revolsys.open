@@ -91,7 +91,9 @@ public class AngularUnit implements Serializable {
     this.conversionFactor = conversionFactor;
     this.authority = authority;
     this.deprecated = deprecated;
-    if (baseUnit == null) {
+    if (this.name.equals("degree")) {
+      this.unit = NonSI.DEGREE_ANGLE;
+    } else if (baseUnit == null) {
       this.unit = getUnit(conversionFactor);
     } else {
       this.unit = getUnit(baseUnit.getUnit(), conversionFactor);
@@ -111,7 +113,7 @@ public class AngularUnit implements Serializable {
       return true;
     } else if (object instanceof AngularUnit) {
       final AngularUnit unit = (AngularUnit)object;
-      if (!EqualsRegistry.equal(name,unit.name)) {
+      if (!EqualsRegistry.equal(name, unit.name)) {
         return false;
       } else if (Math.abs(conversionFactor - unit.conversionFactor) > 1.0e-10) {
         return false;

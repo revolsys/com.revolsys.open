@@ -14,6 +14,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.measure.converter.UnitConverter;
+import javax.measure.quantity.Angle;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
+
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.AngularUnit;
@@ -44,6 +49,10 @@ public final class EpsgCoordinateSystems {
   private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<String, CoordinateSystem>();
 
   private static boolean initialized = false;
+
+  private static HashMap<Integer, AngularUnit> angularUnits;
+
+  private static HashMap<Integer, LinearUnit> linearUnits;
 
   public static void clear() {
     coordinateSystems = null;
@@ -162,6 +171,8 @@ public final class EpsgCoordinateSystems {
       try {
         Map<Integer, List<Axis>> axisMap = loadAxis();
         Map<Integer, Area> areas = loadAreas();
+        loadAngularUnits();
+        loadLinearUnits();
         loadGeographicCoordinateSystems(axisMap, areas);
         loadProjectedCoordinateSystems(axisMap, areas);
         coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
@@ -237,8 +248,8 @@ public final class EpsgCoordinateSystems {
     return datums;
   }
 
-  private static Map<Integer, AngularUnit> loadAngularUnits() {
-    Map<Integer, AngularUnit> units = new HashMap<Integer, AngularUnit>();
+  private static void loadAngularUnits() {
+    angularUnits = new HashMap<Integer, AngularUnit>();
     InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/angularunit.csv");
     if (resource != null) {
       try {
@@ -254,22 +265,21 @@ public final class EpsgCoordinateSystems {
             Integer baseId = getInteger(values.get(2));
             double conversionFactor = getDouble(values.get(3));
             boolean deprecated = Boolean.parseBoolean(values.get(4));
-            AngularUnit baseUnit = units.get(baseId);
+            AngularUnit baseUnit = angularUnits.get(baseId);
             EpsgAuthority authority = new EpsgAuthority(id);
             AngularUnit unit = new AngularUnit(name, baseUnit,
               conversionFactor, authority, deprecated);
-            units.put(id, unit);
+            angularUnits.put(id, unit);
           }
         }
       } finally {
         FileUtil.closeSilent(resource);
       }
     }
-    return units;
   }
 
-  private static Map<Integer, LinearUnit> loadLinearUnits() {
-    Map<Integer, LinearUnit> units = new HashMap<Integer, LinearUnit>();
+  private static void loadLinearUnits() {
+    linearUnits = new HashMap<Integer, LinearUnit>();
     InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
     if (resource != null) {
       try {
@@ -284,18 +294,17 @@ public final class EpsgCoordinateSystems {
             Integer baseId = getInteger(values.get(2));
             double conversionFactor = getDouble(values.get(3));
             boolean deprecated = Boolean.parseBoolean(values.get(4));
-            LinearUnit baseUnit = units.get(baseId);
+            LinearUnit baseUnit = linearUnits.get(baseId);
             EpsgAuthority authority = new EpsgAuthority(id);
             LinearUnit unit = new LinearUnit(name, baseUnit, conversionFactor,
               authority, deprecated);
-            units.put(id, unit);
+            linearUnits.put(id, unit);
           }
         }
       } finally {
         FileUtil.closeSilent(resource);
       }
     }
-    return units;
   }
 
   private static Map<Integer, PrimeMeridian> loadPrimeMeridians() {
@@ -329,7 +338,6 @@ public final class EpsgCoordinateSystems {
   private static void loadGeographicCoordinateSystems(
     Map<Integer, List<Axis>> axisMap, Map<Integer, Area> areas) {
     Map<Integer, Datum> datums = loadDatums();
-    Map<Integer, AngularUnit> angularUnits = loadAngularUnits();
     InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/geographic.csv");
     if (resource != null) {
       try {
@@ -364,7 +372,6 @@ public final class EpsgCoordinateSystems {
 
   private static void loadProjectedCoordinateSystems(
     Map<Integer, List<Axis>> axisMap, Map<Integer, Area> areas) {
-    Map<Integer, LinearUnit> linearUnits = loadLinearUnits();
     InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/projected.csv");
     if (resource != null) {
       try {
@@ -384,20 +391,24 @@ public final class EpsgCoordinateSystems {
             Integer axisId = getInteger(values.get(7));
             Integer areaId = getInteger(values.get(8));
             boolean deprecated = Boolean.parseBoolean(values.get(9));
-            GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystemsById.get(geoCsId);
-            EpsgAuthority authority = new EpsgAuthority(id);
-            LinearUnit linearUnit = linearUnits.get(unitId);
-            final Authority projectionAuthority = new EpsgAuthority(methodCode);
-            final Projection projection = new Projection(methodName,
-              projectionAuthority);
-            Map<String, Object> parameters = getParameters(parametersString);
-            List<Axis> axis = axisMap.get(axisId);
-            Area area = areas.get(areaId);
-            ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-              id, name, geographicCoordinateSystem, area, projection,
-              parameters, linearUnit, axis, authority, deprecated);
+            CoordinateSystem referencedCoordinateSystem = coordinateSystemsById.get(geoCsId);
+            if (referencedCoordinateSystem instanceof GeographicCoordinateSystem) {
+              GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)referencedCoordinateSystem;
+              EpsgAuthority authority = new EpsgAuthority(id);
+              LinearUnit linearUnit = linearUnits.get(unitId);
+              final Authority projectionAuthority = new EpsgAuthority(
+                methodCode);
+              final Projection projection = new Projection(methodName,
+                projectionAuthority);
+              Map<String, Object> parameters = getParameters(parametersString);
+              List<Axis> axis = axisMap.get(axisId);
+              Area area = areas.get(areaId);
+              ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
+                id, name, geographicCoordinateSystem, area, projection,
+                parameters, linearUnit, axis, authority, deprecated);
 
-            addCoordinateSystem(coordinateSystem);
+              addCoordinateSystem(coordinateSystem);
+            }
           }
         }
       } finally {
@@ -499,5 +510,27 @@ public final class EpsgCoordinateSystems {
   }
 
   private EpsgCoordinateSystems() {
+  }
+
+  public static double toDegrees(int sourceUomCode, double value) {
+    double degrees;
+    if (sourceUomCode == 9101) {
+      degrees = Math.toDegrees(value);
+    } else if (sourceUomCode == 9102) {
+      degrees = value;
+    } else if (sourceUomCode == 9110) {
+      degrees = EpsgUtil.toDecimalFromSexagesimalDegrees(value);
+    } else {
+      AngularUnit angularUnit = angularUnits.get(sourceUomCode);
+      if (angularUnit == null) {
+        throw new IllegalArgumentException("Angular unit of measure not found "
+          + sourceUomCode);
+      } else {
+        Unit<Angle> unit = angularUnit.getUnit();
+        UnitConverter converter = unit.getConverterTo(NonSI.DEGREE_ANGLE);
+        degrees = converter.convert(value);
+      }
+    }
+    return degrees;
   }
 }

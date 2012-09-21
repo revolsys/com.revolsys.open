@@ -87,7 +87,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
+      if (!EqualsRegistry.equal(geographicCoordinateSystem,cs.geographicCoordinateSystem)) {
         return false;
       } else if (!EqualsRegistry.equal(projection, cs.projection)) {
         return false;
@@ -226,7 +226,9 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + geographicCoordinateSystem.hashCode();
+    if (geographicCoordinateSystem != null) {
+      result = prime * result + geographicCoordinateSystem.hashCode();
+    }
     if (projection != null) {
       result = prime * result + projection.hashCode();
     }

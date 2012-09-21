@@ -18,11 +18,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit) {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
-    try {
-      converter = sourceUnit.getConverterTo(targetUnit);
-    } catch (final ConversionException e) {
-      throw new IllegalArgumentException(e);
-    }
+    converter = sourceUnit.getConverterTo(targetUnit);
   }
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit,
@@ -30,11 +26,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
     this.numAxis = numAxis;
-    try {
-      converter = sourceUnit.getConverterTo(targetUnit);
-    } catch (final ConversionException e) {
-      throw new IllegalArgumentException(e);
-    }
+    converter = sourceUnit.getConverterTo(targetUnit);
   }
 
   @Override

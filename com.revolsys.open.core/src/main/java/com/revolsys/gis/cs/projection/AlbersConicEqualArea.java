@@ -111,8 +111,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
     final Double centralMeridian = cs.getDoubleParameter("longitude_of_false_origin");
-    final Double firstStandardParallel = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
-    final Double secondStandardParallel = cs.getDoubleParameter("latitude_of_2nd_standard_parallel");
+    final double firstStandardParallel = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
+    final double secondStandardParallel = cs.getDoubleParameter("latitude_of_2nd_standard_parallel");
     final Double latitudeOfProjection = cs.getDoubleParameter("latitude_of_false_origin");
 
     this.spheroid = datum.getSpheroid();
@@ -218,8 +218,10 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     final double lambda = from.getX();
     final double phi = from.getY();
     final double q = q(phi);
-    final double theta = n * (lambda - lambda0);
-    final double rho = (semiMajorAxis * Math.sqrt(c - n * q)) / n;
+    double lminusl0 = lambda - lambda0;
+    final double theta = n * lminusl0;
+    double sqrtCminsNQOverN = Math.sqrt(c - n * q) / n;
+    final double rho = semiMajorAxis * sqrtCminsNQOverN;
 
     final double x = x0 + rho * Math.sin(theta);
     final double y = y0 + rho0 - rho * Math.cos(theta);
