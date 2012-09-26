@@ -4,27 +4,39 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.gis.model.geometry.Geometry;
+import com.revolsys.gis.model.geometry.operation.buffer.BufferOp;
 import com.revolsys.gis.model.geometry.operation.overlay.OverlayOp;
 import com.revolsys.gis.model.geometry.operation.overlay.SnapIfNeededOverlayOp;
 import com.revolsys.gis.model.geometry.operation.relate.RelateOp;
+import com.revolsys.gis.model.geometry.operation.valid.IsValidOp;
 import com.revolsys.gis.model.geometry.util.WktWriter;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.vividsolutions.jts.geom.IntersectionMatrix;
 
 public abstract class GeometryImpl extends AbstractObjectWithProperties
   implements Geometry {
-  private final GeometryFactory geometryFactory;
+  private final GeometryFactoryImpl geometryFactory;
 
   private BoundingBox boundingBox;
 
-  protected GeometryImpl(final GeometryFactory geometryFactory) {
+  protected GeometryImpl(final GeometryFactoryImpl geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
   @Override
-  public Geometry buffer(final double value) {
-    // TODO Auto-generated method stub
-    return this;
+  public Geometry buffer(final double distance) {
+    return BufferOp.bufferOp(this, distance);
+  }
+
+  @Override
+  public Geometry buffer(final double distance, final int quadrantSegments) {
+    return BufferOp.bufferOp(this, distance, quadrantSegments);
+  }
+
+  @Override
+  public Geometry buffer(final double distance, final int quadrantSegments,
+    final int endCapStyle) {
+    return BufferOp.bufferOp(this, distance, quadrantSegments, endCapStyle);
   }
 
   @Override
@@ -100,14 +112,6 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
     return !intersects(geometry);
   }
 
-  public double getArea() {
-    return 0;
-  }
-
-  public double getLength() {
-    return 0.0;
-  }
-
   protected boolean doContains(final Geometry geometry) {
     return relate(geometry).isContains();
   }
@@ -124,24 +128,17 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
     return relate(geometry).isIntersects();
   }
 
-  public boolean touches(Geometry geometry) {
-    final BoundingBox boundingBox2 = getConvertedBoundingBox(geometry);
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.intersects(boundingBox2)) {
-      geometry = getConvertedGeometry(geometry);
-      return doTouches(geometry);
-    } else {
-      return false;
-    }
+  protected boolean doOverlaps(final Geometry geometry) {
+    return relate(geometry).isOverlaps(getDimension(), geometry.getDimension());
   }
 
-  protected boolean doTouches(Geometry geometry) {
+  protected boolean doTouches(final Geometry geometry) {
     return relate(geometry).isTouches(getDimension(), geometry.getDimension());
   }
 
-  public boolean within(Geometry geometry) {
-    geometry = getConvertedGeometry(geometry);
-    return geometry.contains(this);
+  @Override
+  public double getArea() {
+    return 0;
   }
 
   @Override
@@ -176,6 +173,11 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
     return (G)getGeometries().get(0);
   }
 
+  @Override
+  public int getGeometryCount() {
+    return 1;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <F extends com.revolsys.gis.model.geometry.GeometryFactory> F getGeometryFactory() {
@@ -183,13 +185,13 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
   }
 
   @Override
-  public byte getNumAxis() {
-    return geometryFactory.getNumAxis();
+  public double getLength() {
+    return 0.0;
   }
 
   @Override
-  public int getGeometryCount() {
-    return 1;
+  public byte getNumAxis() {
+    return geometryFactory.getNumAxis();
   }
 
   @Override
@@ -223,6 +225,7 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public boolean intersects(Geometry geometry) {
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox boundingBox2 = getConvertedBoundingBox(geometry);
@@ -248,7 +251,19 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
 
   @Override
   public boolean isValid() {
-    return false;
+    return IsValidOp.isValid(this);
+  }
+
+  @Override
+  public boolean overlaps(Geometry geometry) {
+    final BoundingBox boundingBox2 = getConvertedBoundingBox(geometry);
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.intersects(boundingBox2)) {
+      geometry = getConvertedGeometry(geometry);
+      return doTouches(geometry);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -258,7 +273,31 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
   }
 
   @Override
+  public boolean relate(final Geometry geometry,
+    final String intersectionPattern) {
+    return relate(geometry).matches(intersectionPattern);
+  }
+
+  @Override
   public String toString() {
     return WktWriter.toString(this);
+  }
+
+  @Override
+  public boolean touches(Geometry geometry) {
+    final BoundingBox boundingBox2 = getConvertedBoundingBox(geometry);
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.intersects(boundingBox2)) {
+      geometry = getConvertedGeometry(geometry);
+      return doTouches(geometry);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean within(Geometry geometry) {
+    geometry = getConvertedGeometry(geometry);
+    return geometry.contains(this);
   }
 }

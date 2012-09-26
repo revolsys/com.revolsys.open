@@ -27,7 +27,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
 
   private double[] coordinates;
 
-  public LineStringImpl(final GeometryFactory geometryFactory,
+  public LineStringImpl(final GeometryFactoryImpl geometryFactory,
     CoordinatesList points) {
     super(geometryFactory);
     byte numAxis = geometryFactory.getNumAxis();
@@ -536,14 +536,14 @@ public class LineStringImpl extends GeometryImpl implements LineString {
 
   @Override
   public Point getFromPoint() {
-    GeometryFactory geometryFactory = getGeometryFactory();
+    GeometryFactoryImpl geometryFactory = getGeometryFactory();
     Coordinates coordinates = get(0);
     return geometryFactory.createPoint(coordinates);
   }
 
   @Override
   public Point getToPoint() {
-    GeometryFactory geometryFactory = getGeometryFactory();
+    GeometryFactoryImpl geometryFactory = getGeometryFactory();
     Coordinates coordinates = get(size() - 1);
     return geometryFactory.createPoint(coordinates);
   }

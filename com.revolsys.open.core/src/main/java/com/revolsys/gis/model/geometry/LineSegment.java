@@ -299,4 +299,80 @@ public class LineSegment extends AbstractCoordinatesList {
   public int size() {
     return 2;
   }
+
+  public int orientationIndex(LineSegment seg) {
+    int orient0 = CoordinatesUtil.orientationIndex(coordinates1, coordinates2,
+      seg.coordinates1);
+    int orient1 = CoordinatesUtil.orientationIndex(coordinates1, coordinates2,
+      seg.coordinates2);
+    // this handles the case where the points are L or collinear
+    if (orient0 >= 0 && orient1 >= 0)
+      return Math.max(orient0, orient1);
+    // this handles the case where the points are R or collinear
+    if (orient0 <= 0 && orient1 <= 0)
+      return Math.max(orient0, orient1);
+    // points lie on opposite sides ==> indeterminate orientation
+    return 0;
+  }
+
+  /**
+   * Tests whether the segment is horizontal.
+   * 
+   * @return <code>true</code> if the segment is horizontal
+   */
+  public boolean isHorizontal() {
+    return coordinates1.getY() == coordinates2.getY();
+  }
+
+  /**
+   * Tests whether the segment is vertical.
+   * 
+   * @return <code>true</code> if the segment is vertical
+   */
+  public boolean isVertical() {
+    return coordinates1.getX() == coordinates2.getY();
+  }
+
+  public void setCoordinates(Coordinates s0, Coordinates s1) {
+    setPoint(0, s0);
+    setPoint(1, s1);
+  }
+
+  // TODO add 3D
+  public Coordinates pointAlongOffset(double segmentLengthFraction,
+    double offsetDistance) {
+    double x1 = getX(0);
+    double x2 = getX(1);
+    double dx = x2 - x1;
+
+    double y1 = getY(0);
+    double y2 = getY(1);
+    double dy = y2 - y1;
+
+    // the point on the segment line
+    double x = x1 + segmentLengthFraction * (dx);
+    double y = y1 + segmentLengthFraction * (dy);
+
+    double len = Math.sqrt(dx * dx + dy * dy);
+    if (offsetDistance != 0.0) {
+      if (len <= 0.0) {
+        throw new IllegalStateException(
+          "Cannot compute offset from zero-length line segment");
+      }
+      double ux = 0.0;
+      double uy = 0.0;
+
+      // u is the vector that is the length of the offset, in the direction of
+      // the segment
+      ux = offsetDistance * dx / len;
+      uy = offsetDistance * dy / len;
+      // the offset point is the seg point plus the offset vector rotated 90
+      // degrees CCW
+      x = x - uy;
+      y = y + ux;
+    }
+
+    DoubleCoordinates coord = new DoubleCoordinates(x, y);
+    return coord;
+  }
 }

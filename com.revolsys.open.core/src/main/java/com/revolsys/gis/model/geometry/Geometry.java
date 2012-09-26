@@ -8,7 +8,12 @@ import com.revolsys.io.ObjectWithProperties;
 import com.vividsolutions.jts.geom.IntersectionMatrix;
 
 public interface Geometry extends Cloneable, ObjectWithProperties {
-  Geometry buffer(double value);
+
+  Geometry buffer(double distance);
+
+  Geometry buffer(double distance, int quadrantSegments);
+
+  Geometry buffer(double distance, int quadrantSegments, int endCapStyle);
 
   Object clone();
 
@@ -50,11 +55,17 @@ public interface Geometry extends Cloneable, ObjectWithProperties {
 
   Geometry intersection(Geometry geometry);
 
+  boolean intersects(Geometry geometry);
+
   boolean isEmpty();
 
   boolean isValid();
 
+  boolean overlaps(Geometry geometry);
+
   IntersectionMatrix relate(Geometry geometry);
+
+  boolean relate(Geometry geometry, String intersectionPattern);
 
   boolean touches(Geometry geometry);
 

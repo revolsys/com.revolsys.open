@@ -11,7 +11,7 @@ import com.revolsys.gis.model.geometry.MultiLinearRing;
 public class MultiLinearRingImpl extends MultiLineStringImpl implements
   MultiLinearRing {
 
-  protected MultiLinearRingImpl(GeometryFactory geometryFactory,
+  protected MultiLinearRingImpl(GeometryFactoryImpl geometryFactory,
     Collection<? extends Geometry> geometries) {
     super(geometryFactory, LinearRing.class,geometries);
   }

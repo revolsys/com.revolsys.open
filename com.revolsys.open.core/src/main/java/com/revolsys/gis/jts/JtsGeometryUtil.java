@@ -85,7 +85,7 @@ public final class JtsGeometryUtil {
     int numAxis = jtsFactory.getNumAxis();
     double scaleXY = jtsFactory.getScaleXY();
     double scaleZ = jtsFactory.getScaleZ();
-    com.revolsys.gis.model.geometry.impl.GeometryFactory factory = com.revolsys.gis.model.geometry.impl.GeometryFactory.getFactory(
+    com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl factory = com.revolsys.gis.model.geometry.impl.GeometryFactoryImpl.getFactory(
       srid, numAxis, scaleXY, scaleZ);
     if (jtsGeometry instanceof Point) {
       Point point = (Point)jtsGeometry;

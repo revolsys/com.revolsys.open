@@ -29,11 +29,13 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.algorithm.RobustDeterminant;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -52,6 +54,26 @@ public class CoordinatesListUtil {
       boundingBox.expandToInclude(point);
     }
     return boundingBox;
+  }
+
+  public static boolean isPointInRing(Coordinates p, CoordinatesList ring) {
+    return locatePointInRing(p, ring) != Location.EXTERIOR;
+  }
+
+  /**
+   * Determines whether a point lies in the interior, on the boundary, or in the
+   * exterior of a ring. The ring may be oriented in either direction.
+   * <p>
+   * This method does <i>not</i> first check the point against the envelope of
+   * the ring.
+   * 
+   * @param p point to check for ring inclusion
+   * @param ring an array of coordinates representing the ring (which must have
+   *          first point identical to last point)
+   * @return the {@link Location} of p relative to the ring
+   */
+  public static int locatePointInRing(Coordinates p, CoordinatesList ring) {
+    return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
   public static double signedArea(CoordinatesList ring) {

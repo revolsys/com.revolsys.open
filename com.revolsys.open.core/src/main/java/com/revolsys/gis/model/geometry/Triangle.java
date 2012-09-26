@@ -7,6 +7,7 @@ import java.util.Set;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -139,6 +140,23 @@ public class Triangle extends AbstractCoordinatesList {
 
     final int coordinateIndex = index * numAxis + axisIndex;
     return coordinateIndex;
+  }
+
+  public Coordinates getInCentre() {
+    Coordinates a = get(0);
+    Coordinates b = get(1);
+    Coordinates c = get(2);
+    // the lengths of the sides, labelled by their opposite vertex
+    double len0 = b.distance(c);
+    double len1 = a.distance(c);
+    double len2 = a.distance(b);
+    double circum = len0 + len1 + len2;
+
+    double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX())
+      / circum;
+    double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY())
+      / circum;
+    return new DoubleCoordinates(inCentreX, inCentreY);
   }
 
   /**

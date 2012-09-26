@@ -21,7 +21,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon,
 
   private MultiLinearRing rings;
 
-  protected PolygonImpl(GeometryFactory geometryFactory, List<LinearRing> rings) {
+  protected PolygonImpl(GeometryFactoryImpl geometryFactory, List<LinearRing> rings) {
     super(geometryFactory);
     this.rings = geometryFactory.createMultiLinearRing(rings);
   }

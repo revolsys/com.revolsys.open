@@ -20,14 +20,15 @@ public interface GeometryFactory extends CoordinatesPrecisionModel {
    */
   <G extends Geometry> G getGeometry(Geometry geometry);
 
-  <G extends Geometry> G createGeometry(Collection<Geometry> geometries);
+  <G extends Geometry> G createGeometry(
+    Collection<? extends Geometry> geometries);
 
   <G extends Geometry> G createGeometry(Geometry geometry);
 
   GeometryCollection createGeometryCollection();
 
   <G extends GeometryCollection> G createGeometryCollection(
-    Collection<Geometry> geometries);
+    Collection<? extends Geometry> geometries);
 
   LinearRing createLinearRing(CoordinatesList points);
 

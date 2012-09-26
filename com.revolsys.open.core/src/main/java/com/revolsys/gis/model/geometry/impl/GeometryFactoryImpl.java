@@ -30,9 +30,9 @@ import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
 
-public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
+public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel implements
   com.revolsys.gis.model.geometry.GeometryFactory {
-  private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
+  private static Map<String, GeometryFactoryImpl> factories = new HashMap<String, GeometryFactoryImpl>();
 
   private static final long serialVersionUID = 4328651897279304108L;
 
@@ -43,37 +43,37 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
   /**
    * get a 3d geometry factory with no coordinate system and a floating scale.
    */
-  public static GeometryFactory getFactory() {
+  public static GeometryFactoryImpl getFactory() {
     return getFactory(0, 3, 0, 0);
   }
 
   /**
    * get a 3d geometry factory with a floating scale.
    */
-  public static GeometryFactory getFactory(
+  public static GeometryFactoryImpl getFactory(
     final CoordinateSystem coordinateSystem) {
     final int crsId = getId(coordinateSystem);
     return getFactory(crsId, 3, 0, 0);
   }
 
-  public static GeometryFactory getFactory(final double scaleXy) {
+  public static GeometryFactoryImpl getFactory(final double scaleXy) {
     return getFactory(0, 3, scaleXy, 0);
   }
 
   /**
    * get a 3d geometry factory with a floating scale.
    */
-  public static GeometryFactory getFactory(final int crsId) {
+  public static GeometryFactoryImpl getFactory(final int crsId) {
     return getFactory(crsId, 3, 0, 0);
   }
 
-  public static GeometryFactory getFactory(final int crsId, final byte numAxis,
+  public static GeometryFactoryImpl getFactory(final int crsId, final byte numAxis,
     final double scaleXY, final double scaleZ) {
     synchronized (factories) {
       final String key = crsId + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
-      GeometryFactory factory = factories.get(key);
+      GeometryFactoryImpl factory = factories.get(key);
       if (factory == null) {
-        factory = new GeometryFactory(crsId, numAxis, scaleXY, scaleZ);
+        factory = new GeometryFactoryImpl(crsId, numAxis, scaleXY, scaleZ);
         factories.put(key, factory);
       }
       return factory;
@@ -87,11 +87,11 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
    * @param scale
    * @return
    */
-  public static GeometryFactory getFactory(final int crsId, final double scale) {
+  public static GeometryFactoryImpl getFactory(final int crsId, final double scale) {
     return getFactory(crsId, 2, scale, 0);
   }
 
-  public static GeometryFactory getFactory(final int crsId,
+  public static GeometryFactoryImpl getFactory(final int crsId,
     final double scaleXy, final double scaleZ) {
     return getFactory(crsId, 3, scaleXy, scaleZ);
   }
@@ -103,11 +103,11 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
    * @param scale
    * @return
    */
-  public static GeometryFactory getFactory(final int crsId, final int numAxis) {
+  public static GeometryFactoryImpl getFactory(final int crsId, final int numAxis) {
     return getFactory(crsId, numAxis, 0, 0);
   }
 
-  public static GeometryFactory getFactory(final int crsId, final int numAxis,
+  public static GeometryFactoryImpl getFactory(final int crsId, final int numAxis,
     final double scaleXY, final double scaleZ) {
     return getFactory(crsId, (byte)numAxis, scaleXY, scaleZ);
   }
@@ -124,17 +124,48 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
 
   private byte numAxis = 2;
 
-  private GeometryFactory(final int crsId, final byte numAxis,
+  private GeometryFactoryImpl(final int crsId, final byte numAxis,
     final double scaleXY, final double scaleZ) {
     super(scaleXY, scaleZ);
     this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(crsId);
     this.numAxis = numAxis;
   }
 
+  protected CoordinatesList createCoordinatesList(
+    final com.revolsys.gis.model.geometry.GeometryFactory factory,
+    final CoordinatesList points) {
+    final byte numAxis = getNumAxis();
+    CoordinatesList newPoints;
+    if (factory == this) {
+      newPoints = new DoubleCoordinatesList(numAxis, points);
+    } else {
+      final CoordinateSystem sourceCoordinateSystem = factory.getCoordinateSystem();
+      final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
+        sourceCoordinateSystem, getCoordinateSystem());
+      final int size = points.size();
+      if (operation == null) {
+        newPoints = new DoubleCoordinatesList(numAxis, points);
+      } else {
+        newPoints = new DoubleCoordinatesList(size, numAxis);
+        final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
+          points);
+        final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
+          newPoints);
+        for (int i = 0; i < size; i++) {
+          sourceCoordinates.setIndex(i);
+          targetCoordinates.setIndex(i);
+          operation.perform(sourceCoordinates, targetCoordinates);
+        }
+      }
+      newPoints.makePrecise(this);
+    }
+    return newPoints;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <G extends Geometry> G createGeometry(
-    final Collection<Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     if (geometries.isEmpty()) {
       return (G)createGeometryCollection();
     } else {
@@ -159,21 +190,6 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
           }
         }
         return (G)geometry;
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <G extends Geometry> G getGeometry(final Geometry geometry) {
-    if (geometry == null) {
-      return null;
-    } else {
-      com.revolsys.gis.model.geometry.GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      if (geometryFactory == this) {
-        return (G)geometry;
-      } else {
-        return (G)createGeometry(geometry);
       }
     }
   }
@@ -225,7 +241,7 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
   @SuppressWarnings("unchecked")
   @Override
   public <G extends GeometryCollection> G createGeometryCollection(
-    final Collection<Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     if (geometries.isEmpty()) {
       return (G)createGeometryCollection();
     } else {
@@ -308,40 +324,9 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
 
   @Override
   public LineString createLineString(final LineString lineString) {
-    GeometryFactory factory = lineString.getGeometryFactory();
-    CoordinatesList points = createCoordinatesList(factory, lineString);
+    final GeometryFactoryImpl factory = lineString.getGeometryFactory();
+    final CoordinatesList points = createCoordinatesList(factory, lineString);
     return createLineString(points);
-  }
-
-  protected CoordinatesList createCoordinatesList(
-    final com.revolsys.gis.model.geometry.GeometryFactory factory,
-    final CoordinatesList points) {
-    byte numAxis = getNumAxis();
-    CoordinatesList newPoints;
-    if (factory == this) {
-      newPoints = new DoubleCoordinatesList(numAxis, points);
-    } else {
-      final CoordinateSystem sourceCoordinateSystem = factory.getCoordinateSystem();
-      final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
-        sourceCoordinateSystem, getCoordinateSystem());
-      final int size = points.size();
-      if (operation == null) {
-        newPoints = new DoubleCoordinatesList(numAxis, points);
-      } else {
-        newPoints = new DoubleCoordinatesList(size, numAxis);
-        final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
-          points);
-        final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
-          newPoints);
-        for (int i = 0; i < size; i++) {
-          sourceCoordinates.setIndex(i);
-          targetCoordinates.setIndex(i);
-          operation.perform(sourceCoordinates, targetCoordinates);
-        }
-      }
-      newPoints.makePrecise(this);
-    }
-    return newPoints;
   }
 
   @Override
@@ -360,7 +345,7 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
   }
 
   private MultiLinearRingImpl createMultiLinearRing(
-    final Collection<Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     return new MultiLinearRingImpl(this, geometries);
   }
 
@@ -368,8 +353,13 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
     return new MultiLinearRingImpl(this, rings);
   }
 
+  public Geometry createMultiLinearRing(final MultiLinearRing line) {
+    final List<LinearRing> geometries = line.getGeometries();
+    return createMultiLinearRing(geometries);
+  }
+
   private MultiLineStringImpl createMultiLineString(
-    final Collection<Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     return new MultiLineStringImpl(this, geometries);
   }
 
@@ -386,16 +376,12 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
   }
 
   public Geometry createMultiLineString(final MultiLineString line) {
-    List<LineString> geometries = line.getGeometries();
+    final Collection<LineString> geometries = line.getGeometries();
     return createMultiLineString(geometries);
   }
 
-  public Geometry createMultiLinearRing(final MultiLinearRing line) {
-    List<LinearRing> geometries = line.getGeometries();
-    return createMultiLinearRing(geometries);
-  }
-
-  private MultiPointImpl createMultiPoint(final Collection<Geometry> geometries) {
+  private MultiPointImpl createMultiPoint(
+    final Collection<? extends Geometry> geometries) {
     return new MultiPointImpl(this, geometries);
   }
 
@@ -406,7 +392,7 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
   }
 
   private MultiPolygonImpl createMultiPolygon(
-    final Collection<Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     return new MultiPolygonImpl(this, geometries);
   }
 
@@ -482,8 +468,23 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
     return coordinateSystem;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <G extends Geometry> G getGeometry(final Geometry geometry) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final com.revolsys.gis.model.geometry.GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      if (geometryFactory == this) {
+        return (G)geometry;
+      } else {
+        return (G)createGeometry(geometry);
+      }
+    }
+  }
+
   protected Class<? extends Geometry> getGeometryInterface(
-    final Collection<Geometry> geometries) {
+    final Collection<? extends Geometry> geometries) {
     Class<? extends Geometry> geomClass = null;
     for (final Geometry geometry : geometries) {
       Class<? extends Geometry> partClass;
@@ -514,6 +515,7 @@ public class GeometryFactory extends SimpleCoordinatesPrecisionModel implements
     return numAxis;
   }
 
+  @Override
   public int getSrid() {
     return coordinateSystem.getId();
   }

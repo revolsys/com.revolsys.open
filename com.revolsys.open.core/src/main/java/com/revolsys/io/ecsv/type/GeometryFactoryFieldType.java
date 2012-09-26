@@ -11,7 +11,7 @@ import com.revolsys.gis.data.model.types.SimpleDataType;
 
 public class GeometryFactoryFieldType extends AbstractEcsvFieldType {
   private static final DataType DATA_TYPE = new SimpleDataType(
-    "GeometryFactory", GeometryFactory.class);
+    "GeometryFactoryImpl", GeometryFactory.class);
 
   static {
     DataTypes.register(DATA_TYPE);

@@ -20,7 +20,7 @@ public class PointImpl extends GeometryImpl implements Point {
 
   protected final double[] coordinates;
 
-  protected PointImpl(GeometryFactory geometryFactory,
+  protected PointImpl(GeometryFactoryImpl geometryFactory,
     final double[] coordinates) {
     super(geometryFactory);
     int numAxis = geometryFactory.getNumAxis();
@@ -41,7 +41,7 @@ public class PointImpl extends GeometryImpl implements Point {
     return 0;
   }
 
-  protected PointImpl(GeometryFactory geometryFactory,
+  protected PointImpl(GeometryFactoryImpl geometryFactory,
     final Coordinates coordinates) {
     super(geometryFactory);
     int numAxis = geometryFactory.getNumAxis();

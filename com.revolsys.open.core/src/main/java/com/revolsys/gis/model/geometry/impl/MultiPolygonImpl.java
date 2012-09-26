@@ -9,7 +9,7 @@ import com.revolsys.gis.model.geometry.Polygon;
 public class MultiPolygonImpl extends GeometryCollectionImpl implements
   MultiPoint {
 
-  protected MultiPolygonImpl(GeometryFactory geometryFactory,
+  protected MultiPolygonImpl(GeometryFactoryImpl geometryFactory,
     Collection<? extends Geometry> geometries) {
     super(geometryFactory, Polygon.class, geometries);
   }

@@ -14,13 +14,13 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   GeometryCollection {
   private final List<? extends Geometry> geometries;
 
-  protected GeometryCollectionImpl(final GeometryFactory geometryFactory,
+  protected GeometryCollectionImpl(final GeometryFactoryImpl geometryFactory,
     final List<? extends Geometry> geometries) {
     super(geometryFactory);
     this.geometries = Collections.unmodifiableList(geometries);
   }
 
-  protected GeometryCollectionImpl(final GeometryFactory geometryFactory,
+  protected GeometryCollectionImpl(final GeometryFactoryImpl geometryFactory,
     final Class<?> geometryClass,
     final Collection<? extends Geometry> geometries) {
     super(geometryFactory);

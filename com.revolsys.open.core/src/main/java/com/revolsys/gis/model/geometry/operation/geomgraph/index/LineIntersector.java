@@ -371,4 +371,5 @@ public abstract class LineIntersector {
       inputLines[segmentIndex][0], inputLines[segmentIndex][1]);
     return dist;
   }
+
 }

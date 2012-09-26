@@ -23,7 +23,7 @@ public interface EcsvConstants extends EcsvProperties {
 
   String FILE_EXTENSION = "ecsv";
 
-  String GEOMETRY_FACTORY_TYPE = "GeometryFactory";
+  String GEOMETRY_FACTORY_TYPE = "GeometryFactoryImpl";
 
   String LIST_TYPE = "List";
 
