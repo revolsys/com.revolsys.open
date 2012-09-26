@@ -105,20 +105,17 @@ public interface Kml22Constants {
 
   QName OPEN = new QName(KML_NS_URI, "open");
 
-  String PLACEMARK_DESCRIPTION_PROPERTY = "java:"
-    + Kml22Constants.class.getName() + ".PlacemarkDescription";
+  String PLACEMARK_DESCRIPTION_PROPERTY = "kmlPlacemarkDescription";
 
-  String DOCUMENT_DESCRIPTION_PROPERTY = "java:"
-    + Kml22Constants.class.getName() + ".DocumentDescription";
+  String DOCUMENT_DESCRIPTION_PROPERTY = "kmlDocumentDescription";
 
-  String DOCUMENT_NAME_PROPERTY = "java:" + Kml22Constants.class.getName()
-    + ".DocumentName";
+  String DOCUMENT_NAME_PROPERTY = "kmlDocumentName";
 
-  String STYLE_PROPERTY = "java:" + Kml22Constants.class.getName() + ".Style";
+  String STYLE_PROPERTY = "kmlStyle";
 
-  String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "java:"
-    + Kml22Constants.class.getName() + ".PlaceMarkNameAttribute";
+  String PLACEMARK_NAME_ATTRIBUTE_PROPERTY = "kmlPlaceMarkNameAttribute";
 
-  String SNIPPET_PROPERTY = "java:" + Kml22Constants.class.getName()
-    + ".Snippet";
+  String SNIPPET_PROPERTY = "kmlSnippet";
+
+  String STYLE_URL_PROPERTY = "kmlStyleUrl";
 }

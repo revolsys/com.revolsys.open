@@ -39,6 +39,15 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
+  public void clearProperties() {
+    if (getObject() == null) {
+      properties.clear();
+    } else {
+       getObject().clearProperties();
+    }
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
     Map<String, Object> properties = getProperties();
@@ -65,7 +74,7 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   public void setPropertyWeak(final String name, final Object value) {
     Map<String, Object> properties = getProperties();
     properties.put(name, new WeakReference<Object>(value));
-  } 
+  }
 
   @Override
   public <C> C getProperty(final String name, final C defaultValue) {

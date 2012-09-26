@@ -5,6 +5,7 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
@@ -40,6 +41,10 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
     return (C)value;
   }
 
+  public void clearProperties() {
+    properties.clear();
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name, final C defaultValue) {
@@ -53,10 +58,12 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public void setProperties(final Map<String, Object> properties) {
-    Map<String, Object> oldProperties = getProperties();
-    oldProperties.clear();
     if (properties != null) {
-      oldProperties.putAll(properties);
+      for (Entry<String, Object> entry : properties.entrySet()) {
+        String name = entry.getKey();
+        Object value = entry.getValue();
+        setProperty(name, value);
+      }
     }
   }
 

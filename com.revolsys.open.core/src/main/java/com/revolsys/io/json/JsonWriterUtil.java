@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+
 public final class JsonWriterUtil {
   public static void charSequence(final PrintWriter out,
     final CharSequence string) {
@@ -137,7 +139,7 @@ public final class JsonWriterUtil {
       charSequence(out, string);
       out.write('"');
     } else {
-      write(out, value.toString());
+      write(out, StringConverterRegistry.toString(value));
     }
 
   }

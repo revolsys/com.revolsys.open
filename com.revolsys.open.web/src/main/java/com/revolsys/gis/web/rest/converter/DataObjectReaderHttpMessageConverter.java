@@ -17,7 +17,6 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -32,6 +31,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.io.kml.Kml22Constants;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
@@ -43,7 +43,7 @@ public class DataObjectReaderHttpMessageConverter extends
   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
   private List<String> requestAttributeNames = Arrays.asList(
-    IoConstants.SINGLE_OBJECT_PROPERTY, IoConstants.STYLE_URL_PROPERTY,
+    IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
     IoConstants.JSONP_PROPERTY, IoConstants.TITLE_PROPERTY,
     IoConstants.DESCRIPTION_PROPERTY);
 

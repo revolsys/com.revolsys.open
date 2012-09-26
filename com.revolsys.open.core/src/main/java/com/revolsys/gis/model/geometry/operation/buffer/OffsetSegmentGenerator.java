@@ -475,7 +475,7 @@ class OffsetSegmentGenerator {
       if (mitreRatio > bufParams.getMitreLimit())
         isMitreWithinLimit = false;
     } catch (NotRepresentableException ex) {
-      intPt = new DoubleCoordinates(0, 0);
+      intPt = new DoubleCoordinates(0.0, 0.0);
       isMitreWithinLimit = false;
     }
 

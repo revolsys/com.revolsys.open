@@ -64,11 +64,13 @@ public class JsonDataObjectIoFactory extends
   }
 
   public static String toString(final DataObjectMetaData metaData,
-    final List<DataObject> list) {
+    final List<? extends Map<String, Object>> list) {
     final StringWriter writer = new StringWriter();
     final JsonDataObjectWriter dataObjectWriter = new JsonDataObjectWriter(
       metaData, writer);
-    for (final DataObject object : list) {
+    for (final Map<String, Object> map : list) {
+      final DataObject object = new ArrayDataObject(metaData);
+      object.setValues(map);
       dataObjectWriter.write(object);
     }
     dataObjectWriter.close();
@@ -78,10 +80,7 @@ public class JsonDataObjectIoFactory extends
   public static String toString(final DataObjectMetaData metaData,
     final Map<String, ? extends Object> parameters) {
     final DataObject object = new ArrayDataObject(metaData);
-    for (final String attributeName : metaData.getAttributeNames()) {
-      final Object value = parameters.get(attributeName);
-      object.setValue(attributeName, value);
-    }
+    object.setValues(parameters);
     return toString(object);
   }
 

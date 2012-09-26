@@ -22,11 +22,17 @@ package com.revolsys.gis.data.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import com.revolsys.converter.string.StringConverter;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -246,6 +252,46 @@ public final class DataObjectUtil {
   }
 
   private DataObjectUtil() {
+  }
+
+  public static List<DataObject> getObjects(DataObjectMetaData metaData,
+    Collection<? extends Map<String, Object>> list) {
+    List<DataObject> objects = new ArrayList<DataObject>();
+    for (Map<String, Object> map : list) {
+      DataObject object = getObject(metaData, map);
+      objects.add(object);
+    }
+    return objects;
+  }
+
+  public static DataObject getObject(DataObjectMetaData metaData,
+    Map<String, Object> values) {
+    DataObject object = new ArrayDataObject(metaData);
+    for (Entry<String, Object> entry : values.entrySet()) {
+      String name = entry.getKey();
+      Attribute attribute = metaData.getAttribute(name);
+      if (attribute != null) {
+        Object value = entry.getValue();
+        if (value != null) {
+          final DataType dataType = attribute.getType();
+          @SuppressWarnings("unchecked")
+          final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
+          if (dataTypeClass.isAssignableFrom(value.getClass())) {
+            object.setValue(name, value);
+          } else {
+            final StringConverter<Object> converter = StringConverterRegistry.getInstance()
+              .getConverter(dataTypeClass);
+            if (converter == null) {
+              object.setValue(name, value);
+            } else {
+              final Object convertedValue = converter.toObject(value);
+              object.setValue(name, convertedValue);
+            }
+          }
+        }
+      }
+    }
+    return object;
   }
 
 }

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
@@ -28,6 +30,10 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
   private final KmlXmlWriter writer;
 
   private boolean opened;
+
+  private String defaultStyleUrl;
+
+  private String styleUrl;
 
   public KmlDataObjectWriter(final java.io.Writer out) {
     this.writer = new KmlXmlWriter(out);
@@ -94,8 +100,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       writer.cdata(description);
       writer.endTag(DESCRIPTION);
     }
-    final String styleUrl = getProperty(IoConstants.STYLE_URL_PROPERTY);
-    if (styleUrl != null) {
+    if (StringUtils.hasText(styleUrl)) {
       writer.element(STYLE_URL, styleUrl);
     }
     boolean hasValues = false;
@@ -125,6 +130,28 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     writer.endTag();
   }
 
+  @Override
+  public void setProperty(String name, Object value) {
+    super.setProperty(name, value);
+    if (Kml22Constants.STYLE_URL_PROPERTY.equals(name)) {
+      String styleUrl;
+      if (value == null) {
+        styleUrl = null;
+      } else {
+        styleUrl = value.toString();
+      }
+      if (StringUtils.hasText(styleUrl)) {
+        if (StringUtils.hasText(defaultStyleUrl)) {
+          this.styleUrl = styleUrl;
+        } else {
+          defaultStyleUrl = styleUrl;
+        }
+      } else {
+        this.styleUrl = defaultStyleUrl;
+      }
+    }
+  }
+
   private void writeHeader() {
     opened = true;
     writer.startDocument();
@@ -146,7 +173,11 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
         writer.element(DESCRIPTION, description);
       }
       writer.element(OPEN, 1);
+      String style = getProperty(STYLE_PROPERTY);
+      if (StringUtils.hasText(style)) {
+        writer.write(style);
+      }
+   
     }
   }
-
 }

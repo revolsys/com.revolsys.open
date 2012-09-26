@@ -195,7 +195,7 @@ public final class JdbcUtils {
             final Collection<?> collection = (Collection<?>)value;
             final int size = collection.size();
             filterWhere.append(key);
-            filterWhere.append("IN (");
+            filterWhere.append(" IN (");
 
             for (int i = 0; i < size; i++) {
               if (i > 0) {

@@ -10,6 +10,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.LineString;
+import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.MultiLineString;
 import com.revolsys.gis.model.geometry.MultiLinearRing;
 import com.revolsys.gis.model.geometry.MultiPoint;
@@ -308,7 +309,7 @@ public class WktWriter {
       if (i > 0) {
         out.print(',');
       }
-      final CoordinatesList coordinates = rings.getGeometry(i);
+      final LinearRing coordinates = rings.getGeometry(i);
       write(out, coordinates, numAxis);
     }
     out.print(')');

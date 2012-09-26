@@ -3,6 +3,7 @@ package com.revolsys.io;
 import java.util.Map;
 
 public interface ObjectWithProperties {
+  void clearProperties();
 
   Map<String, Object> getProperties();
 
@@ -17,5 +18,4 @@ public interface ObjectWithProperties {
   void setPropertyWeak(String name, Object value);
 
   void setPropertySoft(String name, Object value);
-
 }

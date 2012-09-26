@@ -20,9 +20,6 @@ public interface IoConstants {
   String SINGLE_OBJECT_PROPERTY = "java:" + IoConstants.class.getName()
     + ".singleObject";
 
-  String STYLE_URL_PROPERTY = "java:" + IoConstants.class.getName()
-    + ".styleUrl";
-
   String TITLE_PROPERTY = "java:" + IoConstants.class.getName() + ".title";
 
   String WRAP_PROPERTY = "java:" + IoConstants.class.getName() + ".wrap";
