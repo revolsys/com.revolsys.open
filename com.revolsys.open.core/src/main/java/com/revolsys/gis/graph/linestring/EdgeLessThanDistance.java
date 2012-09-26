@@ -10,6 +10,7 @@ import com.revolsys.gis.data.visitor.NestedVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -19,7 +20,7 @@ public class EdgeLessThanDistance extends NestedVisitor<Edge<LineSegment>>
     final Graph<LineSegment> graph, final LineSegment lineSegment,
     final double maxDistance) {
     final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<Edge<LineSegment>>();
-    final Envelope envelope = lineSegment.getBoundingBox();
+    final Envelope envelope = CoordinatesListUtil.getBoundingBox(lineSegment);
     envelope.expandBy(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
     edgeIndex.visit(envelope, new EdgeLessThanDistance(lineSegment,

@@ -10,7 +10,7 @@ public class CoordinateCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public CoordinateCoordinates clone() {
+  public CoordinateCoordinates cloneCoordinates() {
     final Coordinate newCoordinate = new Coordinate(coordinate);
     return new CoordinateCoordinates(newCoordinate);
   }

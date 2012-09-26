@@ -3,7 +3,6 @@ package com.revolsys.gis.model.coordinates.list;
 import java.io.Serializable;
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -35,8 +34,6 @@ public interface CoordinatesList extends CoordinateSequence,
   boolean equals(CoordinatesList coordinatesList, int numAxis);
 
   Coordinates get(int i);
-
-  BoundingBox getBoundingBox();
 
   double[] getCoordinates();
 

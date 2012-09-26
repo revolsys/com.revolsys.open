@@ -5,7 +5,7 @@ public abstract class AbstractDataObjectMetaDataProperty implements
   private DataObjectMetaData metaData;
 
   @Override
-  public AbstractDataObjectMetaDataProperty clone() {
+  public AbstractDataObjectMetaDataProperty cloneCoordinates() {
     try {
       final AbstractDataObjectMetaDataProperty clone = (AbstractDataObjectMetaDataProperty)super.clone();
       clone.metaData = null;

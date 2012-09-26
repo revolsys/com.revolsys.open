@@ -1,5 +1,8 @@
 package com.revolsys.io;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,13 +39,33 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
-    if (getObject() == null) {
-      return (C)properties.get(name);
-    } else {
-      return (C)getObject().getProperty(name);
+    Map<String, Object> properties = getProperties();
+    Object value = properties.get(name);
+    if (value instanceof Reference) {
+      Reference<C> reference = (Reference<C>)value;
+      if (reference.isEnqueued()) {
+        value = null;
+      } else {
+        value = reference.get();
+      }
+      if (value == null) {
+        properties.remove(name);
+      }
     }
+    return (C)value;
   }
+
+  public void setPropertySoft(final String name, final Object value) {
+    Map<String, Object> properties = getProperties();
+    properties.put(name, new SoftReference<Object>(value));
+  }
+
+  public void setPropertyWeak(final String name, final Object value) {
+    Map<String, Object> properties = getProperties();
+    properties.put(name, new WeakReference<Object>(value));
+  } 
 
   @Override
   public <C> C getProperty(final String name, final C defaultValue) {
@@ -72,4 +95,5 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
       getObject().setProperty(name, value);
     }
   }
+
 }

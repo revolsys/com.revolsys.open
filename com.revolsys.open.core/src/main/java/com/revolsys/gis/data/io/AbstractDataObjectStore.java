@@ -106,7 +106,7 @@ public abstract class AbstractDataObjectStore extends
   protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
     final String typePath = metaData.getPath();
     for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-      final DataObjectMetaDataProperty clonedProperty = property.clone();
+      final DataObjectMetaDataProperty clonedProperty = property.cloneCoordinates();
       clonedProperty.setMetaData(metaData);
     }
     final Map<String, Object> properties = typeMetaDataProperties.get(typePath);

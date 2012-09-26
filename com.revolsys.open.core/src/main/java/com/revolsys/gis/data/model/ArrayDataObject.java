@@ -69,7 +69,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   /**
    * Construct a new ArrayDataObject as a deep clone of the attribute values.
    * Objects can only be cloned if they have a publically accessible
-   * {@link #clone()} method.
+   * {@link #cloneCoordinates()} method.
    * 
    * @param object The object to clone.
    */
@@ -100,7 +100,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @return The cloned object.
    */
   @Override
-  public ArrayDataObject clone() {
+  public ArrayDataObject cloneCoordinates() {
     final ArrayDataObject newObject = new ArrayDataObject(this);
     if (metaData.getIdAttributeIndex() != -1) {
       newObject.setIdValue(null);
@@ -227,6 +227,11 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
   public <T extends Object> T getIdValue() {
     final int index = metaData.getIdAttributeIndex();
     return (T)getValue(index);
+  }
+
+  @Override
+  public Integer getIdInteger() {
+    return getInteger(metaData.getIdAttributeName());
   }
 
   @Override
@@ -635,6 +640,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
     return s.toString();
   }
 
+  @SuppressWarnings("incomplete-switch")
   protected void updateState() {
     switch (state) {
       case Persisted:

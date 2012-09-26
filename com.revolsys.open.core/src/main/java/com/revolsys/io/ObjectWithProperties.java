@@ -13,4 +13,9 @@ public interface ObjectWithProperties {
   void setProperties(final Map<String, Object> properties);
 
   void setProperty(String name, Object value);
+
+  void setPropertyWeak(String name, Object value);
+
+  void setPropertySoft(String name, Object value);
+
 }

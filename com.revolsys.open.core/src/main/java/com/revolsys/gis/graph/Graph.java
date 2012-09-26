@@ -905,13 +905,13 @@ public class Graph<T> {
       node1, node2);
     if (!node1.equals2d(midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node1.clone(), midPoint);
+        movedNodes.put(node1.cloneCoordinates(), midPoint);
       }
       node1.move(midPoint);
     }
     if (!node2.equals2d(midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node2.clone(), midPoint);
+        movedNodes.put(node2.cloneCoordinates(), midPoint);
       }
       node2.move(midPoint);
     }
@@ -940,6 +940,7 @@ public class Graph<T> {
     if (!edge.isRemoved()) {
       edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_REMOVED, null);
       final int edgeId = edge.getId();
+      edgeIds.remove(edge);
       edgesById.remove(edgeId);
       edgeAttributesById.remove(edgeId);
       if (edgeLinesById != null) {

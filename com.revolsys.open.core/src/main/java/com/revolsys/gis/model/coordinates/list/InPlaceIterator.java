@@ -22,7 +22,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
   }
 
   @Override
-  public InPlaceIterator clone() {
+  public InPlaceIterator cloneCoordinates() {
     return new InPlaceIterator(coordinates, index);
   }
 

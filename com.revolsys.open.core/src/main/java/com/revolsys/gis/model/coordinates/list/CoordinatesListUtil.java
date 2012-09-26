@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.revolsys.collection.InvokeMethodVisitor;
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -44,6 +45,33 @@ public class CoordinatesListUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
+
+  public static BoundingBox getBoundingBox(CoordinatesList points) {
+    final BoundingBox boundingBox = new BoundingBox();
+    for (final Coordinates point : points) {
+      boundingBox.expandToInclude(point);
+    }
+    return boundingBox;
+  }
+
+  public static double signedArea(CoordinatesList ring) {
+    int n = ring.size();
+    if (n < 3) {
+      return 0.0;
+    } else {
+      double sum = 0.0;
+      double bx = ring.getX(0);
+      double by = ring.getY(0);
+      for (int i = 1; i < n; i++) {
+        double cx = ring.getX(i);
+        double cy = ring.getY(i);
+        sum += (bx + cx) * (cy - by);
+        bx = cx;
+        by = cy;
+      }
+      return -sum / 2.0;
+    }
+  }
 
   public static void addElevation(
     final CoordinatesPrecisionModel precisionModel,
@@ -630,6 +658,30 @@ public class CoordinatesListUtil {
     return false;
   }
 
+  public static boolean isPointOnLine(CoordinatesPrecisionModel precisionModel,
+    final CoordinatesList points, final Coordinates point) {
+    final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
+      points);
+    if (point.equals2d(lineStart)) {
+      return true;
+    }
+    final CoordinatesListCoordinates lineEnd = new CoordinatesListCoordinates(
+      points);
+    for (int i = 1; i < points.size(); i++) {
+      lineStart.setIndex(i - 1);
+      lineEnd.setIndex(i);
+      if (point.equals2d(lineEnd)) {
+        return true;
+      }
+      if (LineSegmentUtil.isPointOnLine(precisionModel, lineStart, lineEnd,
+        point)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static boolean isWithinDistanceOfPoints(final Coordinates point,
     final CoordinatesList points, final double maxDistance) {
     for (final Coordinates point2 : new InPlaceIterator(points)) {
@@ -763,13 +815,13 @@ public class CoordinatesListUtil {
           node1, node2);
         if (!node1.equals2d(midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1.clone(), midPoint);
+            movedNodes.put(node1.cloneCoordinates(), midPoint);
           }
           node1.move(midPoint);
         }
         if (!node2.equals2d(midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2.clone(), midPoint);
+            movedNodes.put(node2.cloneCoordinates(), midPoint);
           }
           node2.move(midPoint);
         }
@@ -1064,6 +1116,32 @@ public class CoordinatesListUtil {
     } else {
       return coordinates.subList(0, length);
     }
+  }
+
+  public static CoordinatesList removeRepeatedPoints(CoordinatesList points) {
+    byte numAxis = points.getNumAxis();
+    List<Double> coordinates = new ArrayList<Double>();
+    double x = points.getX(0);
+    double y = points.getY(0);
+    coordinates.add(x);
+    coordinates.add(y);
+    for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
+      coordinates.add(points.getValue(0, axisIndex));
+    }
+    for (int i = 0; i < points.size(); i++) {
+      double x1 = points.getX(i);
+      double y1 = points.getY(i);
+      if (x != x1 || y != y1) {
+        coordinates.add(x1);
+        coordinates.add(y1);
+        for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
+          coordinates.add(points.getValue(i, axisIndex));
+        }
+        x = x1;
+        y = y1;
+      }
+    }
+    return new DoubleCoordinatesList(numAxis, coordinates);
   }
 
 }

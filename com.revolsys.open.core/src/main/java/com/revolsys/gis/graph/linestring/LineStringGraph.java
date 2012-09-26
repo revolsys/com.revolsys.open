@@ -446,7 +446,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       edge.setAttribute(INDEX, Arrays.asList(index++));
     }
     fromPoint = new DoubleCoordinates(points.get(0));
-    envelope = points.getBoundingBox();
+    envelope = CoordinatesListUtil.getBoundingBox(points);
   }
 
   public void splitCrossingEdges() {

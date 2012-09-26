@@ -2,7 +2,7 @@ package com.revolsys.gis.data.model;
 
 public interface DataObjectMetaDataProperty extends Cloneable {
 
-  DataObjectMetaDataProperty clone();
+  DataObjectMetaDataProperty cloneCoordinates();
 
   DataObjectMetaData getMetaData();
 

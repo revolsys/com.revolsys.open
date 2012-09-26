@@ -1,7 +1,6 @@
 package com.revolsys.gis.data.model;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    * 
    * @return The data object.
    */
-  DataObject clone();
+  DataObject cloneCoordinates();
 
   void delete();
 
@@ -43,6 +42,8 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    * @return The unique identifier.
    */
   <T extends Object> T getIdValue();
+
+  Integer getIdInteger();
 
   Integer getInteger(CharSequence name);
 

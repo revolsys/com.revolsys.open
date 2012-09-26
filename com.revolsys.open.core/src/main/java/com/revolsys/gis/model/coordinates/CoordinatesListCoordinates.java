@@ -18,8 +18,8 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public CoordinatesListCoordinates clone() {
-    return new CoordinatesListCoordinates(coordinates, index);
+  public Coordinates cloneCoordinates() {
+    return new DoubleCoordinates(this);
   }
 
   public int getIndex() {

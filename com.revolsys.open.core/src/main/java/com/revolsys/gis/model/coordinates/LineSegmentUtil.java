@@ -422,7 +422,9 @@ public class LineSegmentUtil {
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
         final Coordinates projectedPoint = project(lineStart, lineEnd,
           projectionFactor);
-        precisionModel.makePrecise(projectedPoint);
+        if (precisionModel != null) {
+          precisionModel.makePrecise(projectedPoint);
+        }
         if (projectedPoint.equals2d(point)) {
           return true;
         }
@@ -554,7 +556,7 @@ public class LineSegmentUtil {
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart) || point.equals2d(lineEnd)) {
-      return point.clone();
+      return point.cloneCoordinates();
     } else {
       final double r = projectionFactor(lineStart, lineEnd, point);
       final Coordinates projectedCoordinate = project(lineStart, lineEnd, r);

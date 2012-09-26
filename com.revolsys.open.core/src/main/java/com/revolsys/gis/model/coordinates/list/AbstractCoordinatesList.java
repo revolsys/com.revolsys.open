@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -20,7 +19,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
    */
   private static final long serialVersionUID = 9211011581013036939L;
 
-  private void append(final StringBuffer s, final int i, final byte numAxis) {
+  public void append(final StringBuffer s, final int i, final byte numAxis) {
     s.append(getX(i));
     s.append(' ');
     s.append(getY(i));
@@ -235,15 +234,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public Coordinates get(final int i) {
     return new CoordinatesListCoordinates(this, i);
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    final BoundingBox boundingBox = new BoundingBox();
-    for (final Coordinates point : this) {
-      boundingBox.expandToInclude(point);
-    }
-    return boundingBox;
   }
 
   @Override

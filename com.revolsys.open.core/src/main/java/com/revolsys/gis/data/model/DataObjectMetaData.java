@@ -33,7 +33,7 @@ public interface DataObjectMetaData extends ObjectWithProperties,
   Comparable<DataObjectMetaData> {
   void addDefaultValue(String attributeName, Object defaultValue);
 
-  DataObjectMetaData clone();
+  DataObjectMetaData cloneCoordinates();
 
   DataObject createDataObject();
 

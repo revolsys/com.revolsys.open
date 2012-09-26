@@ -18,7 +18,7 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public CoordinateSequenceCoordinates clone() {
+  public CoordinateSequenceCoordinates cloneCoordinates() {
     return new CoordinateSequenceCoordinates(coordinates, index);
   }
 

@@ -23,7 +23,7 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   }
 
   @Override
-  public CoordinateSequenceCoordinatesIterator clone() {
+  public CoordinateSequenceCoordinatesIterator cloneCoordinates() {
     return new CoordinateSequenceCoordinatesIterator(coordinates, index);
   }
 

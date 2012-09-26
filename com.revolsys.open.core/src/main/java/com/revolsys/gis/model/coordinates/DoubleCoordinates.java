@@ -12,7 +12,12 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   private final double[] coordinates;
 
   public DoubleCoordinates(final Coordinates coordinates) {
-    this.coordinates = coordinates.getCoordinates();
+    byte numAxis = coordinates.getNumAxis();
+    this.coordinates = new double[numAxis];
+    for (int i = 0; i < numAxis; i++) {
+      double value = coordinates.getValue(i);
+      this.coordinates[i] = value;
+    }
   }
 
   public DoubleCoordinates(final Coordinates point, final int numAxis) {
@@ -25,14 +30,14 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   }
 
   public DoubleCoordinates(final double... coordinates) {
-    this.coordinates = coordinates;
+    this(coordinates.length, coordinates);
   }
 
-  public DoubleCoordinates(final int dimension) {
-    this.coordinates = new double[dimension];
+  public DoubleCoordinates(final int numAxis) {
+    this.coordinates = new double[numAxis];
   }
 
-  public DoubleCoordinates(final int numAxis, final double[] coordinates) {
+  public DoubleCoordinates(final int numAxis, final double... coordinates) {
     this.coordinates = new double[numAxis];
     System.arraycopy(coordinates, 0, this.coordinates, 0,
       Math.min(numAxis, coordinates.length));
@@ -43,7 +48,7 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   }
 
   @Override
-  public DoubleCoordinates clone() {
+  public DoubleCoordinates cloneCoordinates() {
     return new DoubleCoordinates(coordinates);
   }
 

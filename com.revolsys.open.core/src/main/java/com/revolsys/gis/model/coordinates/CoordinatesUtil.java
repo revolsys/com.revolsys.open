@@ -31,6 +31,71 @@ public class CoordinatesUtil {
     return factory.createPoint(add(get(c1), get(p2)));
   }
 
+  /**
+   * Methods for computing and working with octants of the Cartesian plane
+   * Octants are numbered as follows:
+   * 
+   * <pre>
+   *  \2|1/
+   * 3 \|/ 0
+   * ---+--
+   * 4 /|\ 7
+   * /5|6\
+   * 
+   * <pre>
+   * If line segments lie along a coordinate axis, the octant is the lower of the two
+   * possible values.
+   * 
+   * Returns the octant of a directed line segment (specified as x and y
+   * displacements, which cannot both be 0).
+   */
+  public static int octant(double dx, double dy) {
+    if (dx == 0.0 && dy == 0.0)
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for point ( " + dx + ", " + dy + " )");
+
+    double adx = Math.abs(dx);
+    double ady = Math.abs(dy);
+
+    if (dx >= 0) {
+      if (dy >= 0) {
+        if (adx >= ady)
+          return 0;
+        else
+          return 1;
+      } else { // dy < 0
+        if (adx >= ady)
+          return 7;
+        else
+          return 6;
+      }
+    } else { // dx < 0
+      if (dy >= 0) {
+        if (adx >= ady)
+          return 3;
+        else
+          return 2;
+      } else { // dy < 0
+        if (adx >= ady)
+          return 4;
+        else
+          return 5;
+      }
+    }
+  }
+
+  /**
+   * Returns the octant of a directed line segment from p0 to p1.
+   */
+  public static int octant(Coordinates p0, Coordinates p1) {
+    double dx = p1.getX() - p0.getX();
+    double dy = p1.getY() - p0.getY();
+    if (dx == 0.0 && dy == 0.0)
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for two identical points " + p0);
+    return octant(dx, dy);
+  }
+
   public static double angle(final Coordinates p1, final Coordinates p2,
     final Coordinates p3) {
     final double x1 = p1.getX();

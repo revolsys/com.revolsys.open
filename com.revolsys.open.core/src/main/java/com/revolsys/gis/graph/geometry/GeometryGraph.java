@@ -112,7 +112,6 @@ public class GeometryGraph extends Graph<LineSegment> {
     this.boundingBox.expandToInclude(boundingBox);
   }
 
-
   @Override
   protected LineSegment clone(final LineSegment segment, final LineString line) {
     return new LineSegment(line);
@@ -188,7 +187,13 @@ public class GeometryGraph extends Graph<LineSegment> {
     return geometryFactory.createGeometry(geometries);
   }
 
-  public Geometry getIntersection(final LineString line) {
+  /**
+   * Get the intersection between the line and the boundary of this geometry.
+   * 
+   * @param line
+   * @return
+   */
+  public Geometry getBoundaryIntersection(final LineString line) {
     final List<Geometry> intersections = new ArrayList<Geometry>();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);

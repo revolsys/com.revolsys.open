@@ -3,6 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
@@ -15,6 +16,7 @@ import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.visitor.CreateListVisitor;
 import com.revolsys.gis.data.visitor.FilterVisitor;
 import com.revolsys.gis.data.visitor.SingleObjectVisitor;
+import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -71,7 +73,6 @@ public class DataObjectQuadTree extends Quadtree {
     return queryList(geometry, filter);
   }
 
-  @SuppressWarnings("unchecked")
   public List<DataObject> queryEnvelope(final BoundingBox envelope) {
     return query(envelope);
   }
@@ -82,11 +83,29 @@ public class DataObjectQuadTree extends Quadtree {
   }
 
   @SuppressWarnings("unchecked")
+  @Override
+  public List<DataObject> query(Envelope envelope) {
+    List<DataObject> results = super.query(envelope);
+    for (Iterator<DataObject> iterator = results.iterator(); iterator.hasNext();) {
+      DataObject object = iterator.next();
+      Geometry geometry = object.getGeometryValue();
+      Envelope objectEnvelope = geometry.getEnvelopeInternal();
+      if (!envelope.intersects(objectEnvelope)) {
+        iterator.remove();
+      }
+    }
+    return results;
+  }
+
   public List<DataObject> queryEnvelope(final Geometry geometry) {
     final Envelope envelope = geometry.getEnvelopeInternal();
     return query(envelope);
   }
 
+  public List<DataObject> queryEnvelope(final com.revolsys.gis.model.geometry.Geometry geometry) {
+    final Envelope envelope = JtsGeometryUtil.getEnvelope(geometry.getBoundingBox());
+    return query(envelope);
+  }
   public DataObject queryFirst(final DataObject object,
     final Filter<DataObject> filter) {
     final Geometry geometry = object.getGeometryValue();

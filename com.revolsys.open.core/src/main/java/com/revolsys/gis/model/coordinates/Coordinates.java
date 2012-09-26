@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-public interface Coordinates extends Comparable<Coordinates> {
+public interface Coordinates extends Comparable<Coordinates>, Cloneable {
   /**
    * Calculate the counter clockwise angle in radians of the vector from this
    * point to another point. The angle is relative to the positive x-axis
@@ -11,7 +11,9 @@ public interface Coordinates extends Comparable<Coordinates> {
    */
   double angle2d(Coordinates other);
 
-  Coordinates clone();
+  Object clone();
+
+  Coordinates cloneCoordinates();
 
   double distance(Coordinates coordinates);
 

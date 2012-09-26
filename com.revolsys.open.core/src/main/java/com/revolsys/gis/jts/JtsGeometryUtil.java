@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -75,6 +76,30 @@ public final class JtsGeometryUtil {
       previousCoordinate = currentCoordinate;
     }
 
+  }
+
+  public static <G extends com.revolsys.gis.model.geometry.Geometry> G createGeometry(
+    Geometry jtsGeometry) {
+    GeometryFactory jtsFactory = GeometryFactory.getFactory(jtsGeometry);
+    int srid = jtsFactory.getSRID();
+    int numAxis = jtsFactory.getNumAxis();
+    double scaleXY = jtsFactory.getScaleXY();
+    double scaleZ = jtsFactory.getScaleZ();
+    com.revolsys.gis.model.geometry.impl.GeometryFactory factory = com.revolsys.gis.model.geometry.impl.GeometryFactory.getFactory(
+      srid, numAxis, scaleXY, scaleZ);
+    if (jtsGeometry instanceof Point) {
+      Point point = (Point)jtsGeometry;
+      return (G)factory.createPoint(CoordinatesUtil.get(point));
+    } else if (jtsGeometry instanceof LineString) {
+      LineString line = (LineString)jtsGeometry;
+      return (G)factory.createLineString(CoordinatesListUtil.get(line));
+    } else if (jtsGeometry instanceof Polygon) {
+      Polygon polygon = (Polygon)jtsGeometry;
+      return (G)factory.createPolygon(CoordinatesListUtil.getAll(polygon));
+    } else {
+      throw new IllegalArgumentException("Not supported " + jtsGeometry.getClass());
+    }
+    
   }
 
   private static void addElevation(final LineString original,
@@ -1421,5 +1446,10 @@ public final class JtsGeometryUtil {
   }
 
   private JtsGeometryUtil() {
+  }
+
+  public static Envelope getEnvelope(
+    com.revolsys.gis.model.geometry.impl.BoundingBox boundingBox) {
+    return new Envelope(boundingBox.getMinX(), boundingBox.getMaxX(),boundingBox.getMinY(), boundingBox.getMaxY());
   }
 }

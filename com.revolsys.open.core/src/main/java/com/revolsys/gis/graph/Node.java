@@ -34,7 +34,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
     final Collection<Node<DataObject>> nodes) {
     final List<Coordinates> points = new ArrayList<Coordinates>(nodes.size());
     for (final Node<DataObject> node : nodes) {
-      final Coordinates point = node.clone();
+      final Coordinates point = node.cloneCoordinates();
       points.add(point);
     }
     return points;
@@ -158,7 +158,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   }
 
   @Override
-  public Coordinates clone() {
+  public Coordinates cloneCoordinates() {
     return new DoubleCoordinates(x, y);
   }
 
