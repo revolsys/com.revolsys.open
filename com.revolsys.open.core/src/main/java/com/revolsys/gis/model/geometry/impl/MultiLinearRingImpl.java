@@ -11,9 +11,9 @@ import com.revolsys.gis.model.geometry.MultiLinearRing;
 public class MultiLinearRingImpl extends MultiLineStringImpl implements
   MultiLinearRing {
 
-  protected MultiLinearRingImpl(GeometryFactoryImpl geometryFactory,
-    Collection<? extends Geometry> geometries) {
-    super(geometryFactory, LinearRing.class,geometries);
+  protected MultiLinearRingImpl(final GeometryFactoryImpl geometryFactory,
+    final Collection<? extends Geometry> geometries) {
+    super(geometryFactory, LinearRing.class, geometries);
   }
 
   @Override
@@ -23,7 +23,7 @@ public class MultiLinearRingImpl extends MultiLineStringImpl implements
 
   @Override
   public Iterator<LinearRing> iterator() {
-    List<LinearRing> geometries = getGeometries();
+    final List<LinearRing> geometries = getGeometries();
     return geometries.iterator();
   }
 }

@@ -14,6 +14,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.coordinates.list.ReverseCoordinatesList;
+import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.util.MathUtil;
@@ -25,33 +26,21 @@ public class LineStringImpl extends GeometryImpl implements LineString {
 
   private static final long serialVersionUID = 1L;
 
-  private double[] coordinates;
+  private final double[] coordinates;
 
   public LineStringImpl(final GeometryFactoryImpl geometryFactory,
-    CoordinatesList points) {
+    final CoordinatesList points) {
     super(geometryFactory);
-    byte numAxis = geometryFactory.getNumAxis();
-    int size = points.size();
+    final byte numAxis = geometryFactory.getNumAxis();
+    final int size = points.size();
     int k = 0;
     coordinates = new double[numAxis * size];
     for (int i = 0; i < points.size(); i++) {
       for (int j = 0; j < numAxis; j++) {
-        double value = points.getValue(i, j);
+        final double value = points.getValue(i, j);
         coordinates[k++] = value;
       }
     }
-  }
-
-  public int getBoundaryDimension() {
-    if (isClosed()) {
-      return Dimension.FALSE;
-    }
-    return 0;
-  }
-
-  @Override
-  public double getLength() {
-    return CoordinatesListUtil.length2d(this);
   }
 
   public void append(final StringBuffer s, final int i, final byte numAxis) {
@@ -71,11 +60,6 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
-  public boolean isEmpty() {
-    return size() == 0;
-  }
-
-  @Override
   public boolean contains(final Coordinates point) {
     for (int i = 0; i < size(); i++) {
       if (equal(i, point, 2)) {
@@ -83,11 +67,6 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       }
     }
     return false;
-  }
-
-  @Override
-  public List<CoordinatesList> getCoordinatesLists() {
-    return Collections.<CoordinatesList> singletonList(this);
   }
 
   @Override
@@ -278,6 +257,14 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
+  public int getBoundaryDimension() {
+    if (isClosed()) {
+      return Dimension.FALSE;
+    }
+    return 0;
+  }
+
+  @Override
   public Coordinate getCoordinate(final int i) {
     final Coordinate coordinate = new Coordinate();
     getCoordinate(i, coordinate);
@@ -308,8 +295,32 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
+  public List<CoordinatesList> getCoordinatesLists() {
+    return Collections.<CoordinatesList> singletonList(this);
+  }
+
+  @Override
   public int getDimension() {
     return 1;
+  }
+
+  @Override
+  public Point getFirstPoint() {
+    final Coordinates point = get(0);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.createPoint(point);
+  }
+
+  @Override
+  public Point getFromPoint() {
+    final GeometryFactoryImpl geometryFactory = getGeometryFactory();
+    final Coordinates coordinates = get(0);
+    return geometryFactory.createPoint(coordinates);
+  }
+
+  @Override
+  public double getLength() {
+    return CoordinatesListUtil.length2d(this);
   }
 
   @Override
@@ -335,6 +346,13 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public long getTime(final int index) {
     return (long)getM(index);
+  }
+
+  @Override
+  public Point getToPoint() {
+    final GeometryFactoryImpl geometryFactory = getGeometryFactory();
+    final Coordinates coordinates = get(size() - 1);
+    return geometryFactory.createPoint(coordinates);
   }
 
   @Override
@@ -371,6 +389,20 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       }
     }
     return h;
+  }
+
+  @Override
+  public boolean isClosed() {
+    if (isEmpty()) {
+      return false;
+    } else {
+      return equal(0, this, size() - 1, 2);
+    }
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size() == 0;
   }
 
   @Override
@@ -523,28 +555,5 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     } else {
       return "LINESTRING EMPTY";
     }
-  }
-
-  @Override
-  public boolean isClosed() {
-    if (isEmpty()) {
-      return false;
-    } else {
-      return equal(0, this, size() - 1, 2);
-    }
-  }
-
-  @Override
-  public Point getFromPoint() {
-    GeometryFactoryImpl geometryFactory = getGeometryFactory();
-    Coordinates coordinates = get(0);
-    return geometryFactory.createPoint(coordinates);
-  }
-
-  @Override
-  public Point getToPoint() {
-    GeometryFactoryImpl geometryFactory = getGeometryFactory();
-    Coordinates coordinates = get(size() - 1);
-    return geometryFactory.createPoint(coordinates);
   }
 }

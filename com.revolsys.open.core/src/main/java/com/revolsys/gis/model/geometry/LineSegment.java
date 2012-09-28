@@ -11,6 +11,9 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
+import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
@@ -45,6 +48,55 @@ public class LineSegment extends AbstractCoordinatesList {
   private GeometryFactory geometryFactory;
 
   public LineSegment() {
+  }
+
+  public Coordinates[] closestPoints(LineSegment line) {
+    // test for intersection
+    Coordinates intPt = intersection(line);
+    if (intPt != null) {
+      return new Coordinates[] {
+        intPt, intPt
+      };
+    }
+
+    /**
+     * if no intersection closest pair contains at least one endpoint. Test each
+     * endpoint in turn.
+     */
+    Coordinates[] closestPt = new Coordinates[2];
+    double minDistance = Double.MAX_VALUE;
+    double dist;
+
+    Coordinates close00 = closestPoint(line.get(0));
+    minDistance = close00.distance(line.get(0));
+    closestPt[0] = close00;
+    closestPt[1] = line.get(0);
+
+    Coordinates close01 = closestPoint(line.get(1));
+    dist = close01.distance(line.get(1));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestPt[0] = close01;
+      closestPt[1] = line.get(1);
+    }
+
+    Coordinates close10 = line.closestPoint(get(0));
+    dist = close10.distance(get(0));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestPt[0] = get(0);
+      closestPt[1] = close10;
+    }
+
+    Coordinates close11 = line.closestPoint(get(0));
+    dist = close11.distance(get(0));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestPt[0] = get(0);
+      closestPt[1] = close11;
+    }
+
+    return closestPt;
   }
 
   public LineSegment(final Coordinates coordinates1,
@@ -214,6 +266,16 @@ public class LineSegment extends AbstractCoordinatesList {
       geometryFactory, coordinates1, coordinates2, lineSegment2.coordinates1,
       lineSegment2.coordinates2);
     return intersection;
+  }
+
+  public Coordinates intersection(LineSegment line) {
+    LineIntersector li = new RobustLineIntersector();
+    li.computeIntersection(get(0), get(1), line.get(0), line.get(1));
+    if (li.hasIntersection()) {
+      return li.getIntersection(0);
+    } else {
+      return null;
+    }
   }
 
   /**

@@ -29,7 +29,10 @@ public class StringConverterRegistry {
     return instance;
   }
 
-  public static Object toObject(final Class<Object> valueClass,
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public static  <V>  V toObject(final Class valueClass,
     final Object value) {
     if (value == null) {
       return null;
@@ -37,9 +40,9 @@ public class StringConverterRegistry {
       final StringConverter<Object> converter = StringConverterRegistry.getInstance()
         .getConverter(valueClass);
       if (converter == null) {
-        return value;
+        return (V)value;
       } else {
-        return converter.toObject(value);
+        return (V)converter.toObject(value);
       }
     }
   }
@@ -54,6 +57,7 @@ public class StringConverterRegistry {
     if (value == null) {
       return null;
     } else {
+      @SuppressWarnings("unchecked")
       final Class<Object> valueClass = (Class<Object>)value.getClass();
       return toObject(valueClass, value);
     }
@@ -80,6 +84,7 @@ public class StringConverterRegistry {
     return toString(dataTypeClass, value);
   }
 
+  @SuppressWarnings("unchecked")
   public static String toString(final Object value) {
     if (value == null) {
       return null;

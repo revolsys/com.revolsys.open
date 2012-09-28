@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.operation.buffer.BufferOp;
+import com.revolsys.gis.model.geometry.operation.distance.DistanceOp;
 import com.revolsys.gis.model.geometry.operation.overlay.OverlayOp;
 import com.revolsys.gis.model.geometry.operation.overlay.SnapIfNeededOverlayOp;
 import com.revolsys.gis.model.geometry.operation.relate.RelateOp;
@@ -110,6 +111,11 @@ public abstract class GeometryImpl extends AbstractObjectWithProperties
   @Override
   public boolean disjoint(final Geometry geometry) {
     return !intersects(geometry);
+  }
+
+  @Override
+  public double distance(final Geometry g) {
+    return DistanceOp.distance(this, g);
   }
 
   protected boolean doContains(final Geometry geometry) {

@@ -20,10 +20,26 @@ public class PointImpl extends GeometryImpl implements Point {
 
   protected final double[] coordinates;
 
-  protected PointImpl(GeometryFactoryImpl geometryFactory,
+  protected PointImpl(final GeometryFactoryImpl geometryFactory,
+    final Coordinates coordinates) {
+    super(geometryFactory);
+    final int numAxis = geometryFactory.getNumAxis();
+    this.coordinates = new double[numAxis];
+    for (int i = 0; i < numAxis; i++) {
+      double value;
+      if (i < coordinates.getNumAxis()) {
+        value = coordinates.getValue(i);
+      } else {
+        value = Double.NaN;
+      }
+      this.coordinates[i] = value;
+    }
+  }
+
+  protected PointImpl(final GeometryFactoryImpl geometryFactory,
     final double[] coordinates) {
     super(geometryFactory);
-    int numAxis = geometryFactory.getNumAxis();
+    final int numAxis = geometryFactory.getNumAxis();
     this.coordinates = new double[numAxis];
     for (int i = 0; i < numAxis; i++) {
       double value;
@@ -37,48 +53,13 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  public int getDimension() {
-    return 0;
-  }
-
-  protected PointImpl(GeometryFactoryImpl geometryFactory,
-    final Coordinates coordinates) {
-    super(geometryFactory);
-    int numAxis = geometryFactory.getNumAxis();
-    this.coordinates = new double[numAxis];
-    for (int i = 0; i < numAxis; i++) {
-      double value;
-      if (i < coordinates.getNumAxis()) {
-        value = coordinates.getValue(i);
-      } else {
-        value = Double.NaN;
-      }
-      this.coordinates[i] = value;
-    }
-  }
-
-  public int getBoundaryDimension() {
-    return Dimension.FALSE;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return coordinates.length == 0;
-  }
-
-  @Override
-  public List<CoordinatesList> getCoordinatesLists() {
-    CoordinatesList coordinatesList = new DoubleCoordinatesList(getNumAxis(),
-      getCoordinates());
-    return Collections.singletonList(coordinatesList);
-  }
-
   public double angle2d(final Coordinates other) {
     final double dx = other.getX() - getX();
     final double dy = other.getY() - getY();
     return Math.atan2(dy, dx);
   }
 
+  @Override
   public PointImpl clone() {
     return (PointImpl)super.clone();
   }
@@ -88,6 +69,7 @@ public class PointImpl extends GeometryImpl implements Point {
     return clone();
   }
 
+  @Override
   public int compareTo(final Coordinates other) {
     final double x = getX();
     final double y = getY();
@@ -105,10 +87,12 @@ public class PointImpl extends GeometryImpl implements Point {
     }
   }
 
+  @Override
   public double distance(final Coordinates coordinates) {
     return CoordinatesUtil.distance(this, coordinates);
   }
 
+  @Override
   public boolean equals(final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double coordinate = coordinates[i];
@@ -119,6 +103,7 @@ public class PointImpl extends GeometryImpl implements Point {
     return true;
   }
 
+  @Override
   public boolean equals(final Object other) {
     if (other instanceof Coordinates) {
       final Coordinates coordinates = (Coordinates)other;
@@ -128,6 +113,7 @@ public class PointImpl extends GeometryImpl implements Point {
     }
   }
 
+  @Override
   public boolean equals2d(final Coordinates coordinates) {
     if (getX() == coordinates.getX()) {
       if (getY() == coordinates.getY()) {
@@ -137,6 +123,12 @@ public class PointImpl extends GeometryImpl implements Point {
     return false;
   }
 
+  @Override
+  public int getBoundaryDimension() {
+    return Dimension.FALSE;
+  }
+
+  @Override
   public double[] getCoordinates() {
     final double[] coordinates = new double[this.coordinates.length];
     System.arraycopy(this.coordinates, 0, coordinates, 0,
@@ -144,14 +136,34 @@ public class PointImpl extends GeometryImpl implements Point {
     return coordinates;
   }
 
+  @Override
+  public List<CoordinatesList> getCoordinatesLists() {
+    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+      getNumAxis(), getCoordinates());
+    return Collections.singletonList(coordinatesList);
+  }
+
+  @Override
+  public int getDimension() {
+    return 0;
+  }
+
+  @Override
+  public Point getFirstPoint() {
+    return this;
+  }
+
+  @Override
   public double getM() {
     return getValue(3);
   }
 
+  @Override
   public long getTime() {
     return (long)getM();
   }
 
+  @Override
   public double getValue(final int index) {
     if (index >= 0 && index < getNumAxis()) {
       return coordinates[index];
@@ -160,18 +172,22 @@ public class PointImpl extends GeometryImpl implements Point {
     }
   }
 
+  @Override
   public double getX() {
     return getValue(0);
   }
 
+  @Override
   public double getY() {
     return getValue(1);
   }
 
+  @Override
   public double getZ() {
     return getValue(2);
   }
 
+  @Override
   public int hashCode() {
     int result = 17;
     result = 37 * result + hashCode(getX());
@@ -179,32 +195,44 @@ public class PointImpl extends GeometryImpl implements Point {
     return result;
   }
 
+  @Override
+  public boolean isEmpty() {
+    return coordinates.length == 0;
+  }
+
+  @Override
   public void setM(final double m) {
     setValue(3, m);
   }
 
+  @Override
   public void setTime(final long time) {
     setM(time);
   }
 
+  @Override
   public void setValue(final int index, final double value) {
     if (index >= 0 && index < getNumAxis()) {
       coordinates[index] = value;
     }
   }
 
+  @Override
   public void setX(final double x) {
     setValue(0, x);
   }
 
+  @Override
   public void setY(final double y) {
     setValue(1, y);
   }
 
+  @Override
   public void setZ(final double z) {
     setValue(2, z);
   }
 
+  @Override
   public String toString() {
     final byte numAxis = getNumAxis();
     if (numAxis > 0) {
@@ -218,6 +246,11 @@ public class PointImpl extends GeometryImpl implements Point {
     } else {
       return "";
     }
+  }
+
+  @Override
+  public double distance(Point point) {
+    return distance((Coordinates)point);
   }
 
 }

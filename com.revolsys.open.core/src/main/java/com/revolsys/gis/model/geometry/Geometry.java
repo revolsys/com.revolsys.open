@@ -35,6 +35,10 @@ public interface Geometry extends Cloneable, ObjectWithProperties {
 
   BoundingBox getBoundingBox();
 
+  double distance(Geometry g);
+
+  Point getFirstPoint();
+
   List<CoordinatesList> getCoordinatesLists();
 
   int getDimension();

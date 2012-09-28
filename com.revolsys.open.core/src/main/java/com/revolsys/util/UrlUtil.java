@@ -67,6 +67,18 @@ public final class UrlUtil {
     }
   }
 
+  /**
+   * Clean repeated // characters from the URL path.
+   * 
+   * @param url
+   * @return
+   */
+  public static String cleanPath(final String url) {
+    return url.replaceAll("/+", "/")
+      .replaceAll("^((\\w)+:)/", "$1//")
+      .replaceAll("^file://", "file:///");
+  }
+
   public static String getFileBaseName(final URL url) {
     final String name = getFileName(url);
     final int dotIndex = name.lastIndexOf('.');

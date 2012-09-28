@@ -9,8 +9,8 @@ import com.revolsys.gis.model.geometry.Point;
 public class MultiPointImpl extends GeometryCollectionImpl implements
   MultiPoint {
 
-  protected MultiPointImpl(GeometryFactoryImpl geometryFactory,
-    Collection<? extends Geometry> geometries) {
+  protected MultiPointImpl(final GeometryFactoryImpl geometryFactory,
+    final Collection<? extends Geometry> geometries) {
     super(geometryFactory, Point.class, geometries);
   }
 

@@ -9,14 +9,15 @@ import com.revolsys.gis.model.geometry.MultiLineString;
 public class MultiLineStringImpl extends GeometryCollectionImpl implements
   MultiLineString {
 
-  protected MultiLineStringImpl(GeometryFactoryImpl geometryFactory,
-    Collection<? extends Geometry> geometries) {
-    super(geometryFactory, LineString.class, geometries);
+  public MultiLineStringImpl(final GeometryFactoryImpl geometryFactory,
+    final Class<? extends LineString> geometryClass,
+    final Collection<? extends Geometry> geometries) {
+    super(geometryFactory, geometryClass, geometries);
   }
 
-  public MultiLineStringImpl(GeometryFactoryImpl geometryFactory,
-    Class<? extends LineString> geometryClass, Collection<? extends Geometry> geometries) {
-    super(geometryFactory, geometryClass, geometries);
+  protected MultiLineStringImpl(final GeometryFactoryImpl geometryFactory,
+    final Collection<? extends Geometry> geometries) {
+    super(geometryFactory, LineString.class, geometries);
   }
 
   @Override

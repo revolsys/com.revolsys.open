@@ -30,8 +30,8 @@ import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
 
-public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel implements
-  com.revolsys.gis.model.geometry.GeometryFactory {
+public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel
+  implements com.revolsys.gis.model.geometry.GeometryFactory {
   private static Map<String, GeometryFactoryImpl> factories = new HashMap<String, GeometryFactoryImpl>();
 
   private static final long serialVersionUID = 4328651897279304108L;
@@ -67,8 +67,8 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel impleme
     return getFactory(crsId, 3, 0, 0);
   }
 
-  public static GeometryFactoryImpl getFactory(final int crsId, final byte numAxis,
-    final double scaleXY, final double scaleZ) {
+  public static GeometryFactoryImpl getFactory(final int crsId,
+    final byte numAxis, final double scaleXY, final double scaleZ) {
     synchronized (factories) {
       final String key = crsId + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
       GeometryFactoryImpl factory = factories.get(key);
@@ -87,7 +87,8 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel impleme
    * @param scale
    * @return
    */
-  public static GeometryFactoryImpl getFactory(final int crsId, final double scale) {
+  public static GeometryFactoryImpl getFactory(final int crsId,
+    final double scale) {
     return getFactory(crsId, 2, scale, 0);
   }
 
@@ -103,12 +104,13 @@ public class GeometryFactoryImpl extends SimpleCoordinatesPrecisionModel impleme
    * @param scale
    * @return
    */
-  public static GeometryFactoryImpl getFactory(final int crsId, final int numAxis) {
+  public static GeometryFactoryImpl getFactory(final int crsId,
+    final int numAxis) {
     return getFactory(crsId, numAxis, 0, 0);
   }
 
-  public static GeometryFactoryImpl getFactory(final int crsId, final int numAxis,
-    final double scaleXY, final double scaleZ) {
+  public static GeometryFactoryImpl getFactory(final int crsId,
+    final int numAxis, final double scaleXY, final double scaleZ) {
     return getFactory(crsId, (byte)numAxis, scaleXY, scaleZ);
   }
 

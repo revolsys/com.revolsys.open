@@ -15,9 +15,9 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
+import com.revolsys.gis.model.geometry.GeometryFactory;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.util.MathUtil;
-import com.revolsys.gis.model.geometry.GeometryFactory;
 
 public class BoundingBox implements Serializable {
 
