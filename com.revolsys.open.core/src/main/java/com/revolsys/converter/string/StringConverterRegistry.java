@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.revolsys.gis.converter.string.GeometryStringConverter;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.util.CollectionUtil;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -32,8 +33,7 @@ public class StringConverterRegistry {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public static  <V>  V toObject(final Class valueClass,
-    final Object value) {
+  public static <V> V toObject(final Class valueClass, final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -132,7 +132,8 @@ public class StringConverterRegistry {
   })
   private StringConverter get(final Set<Class<?>> interfaces) {
     StringConverter converter = null;
-    for (final Class<?> interfaceClass : interfaces) {
+    for (int i = 0; i < interfaces.size(); i++) {
+      final Class<?> interfaceClass = CollectionUtil.get(interfaces, i);
       converter = get(interfaces, interfaceClass);
       if (converter != null) {
         classConverterMap.put(interfaceClass, converter);

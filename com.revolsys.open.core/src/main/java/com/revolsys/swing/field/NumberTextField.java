@@ -21,12 +21,13 @@ public class NumberTextField extends JFormattedTextField implements
   private DataType dataType;
 
   public NumberTextField(DataType dataType, int length, int scale) {
-    super(createFormatter(length, scale));
+    super(createFormatter(dataType,length, scale));
     this.dataType = dataType;
-    setColumns(length + 2);
+    setColumns(getLength(dataType, length) + 2);
     setFocusLostBehavior(JFormattedTextField.PERSIST);
     addFocusListener(this);
     setMaxValue(createMaxValue(length, scale));
+    setHorizontalAlignment(RIGHT);
   }
 
   protected Comparable createMaxValue(int length, int scale) {
@@ -41,42 +42,67 @@ public class NumberTextField extends JFormattedTextField implements
         text.append('9');
       }
     }
-    BigDecimal maxValue = new BigDecimal(text.toString());
     if (javaClass == Byte.class) {
       try {
-        return maxValue.byteValueExact();
+        if (length == 0) {
+          return Byte.MAX_VALUE;
+        } else {
+          return new BigDecimal(text.toString()).byteValueExact();
+        }
       } catch (ArithmeticException e) {
         return Byte.MAX_VALUE;
       }
     } else if (javaClass == Short.class) {
       try {
-        return maxValue.shortValueExact();
+        if (length == 0) {
+          return Short.MAX_VALUE;
+        } else {
+          return new BigDecimal(text.toString()).shortValueExact();
+        }
       } catch (ArithmeticException e) {
         return Short.MAX_VALUE;
       }
     } else if (javaClass == Integer.class) {
       try {
-        return maxValue.intValueExact();
+        if (length == 0) {
+          return Integer.MAX_VALUE;
+        } else {
+          return new BigDecimal(text.toString()).intValueExact();
+        }
       } catch (ArithmeticException e) {
         return Integer.MAX_VALUE;
       }
     } else if (javaClass == Long.class) {
       try {
-        return maxValue.longValueExact();
+        if (length == 0) {
+          return Long.MAX_VALUE;
+        } else {
+          return new BigDecimal(text.toString()).longValueExact();
+        }
       } catch (ArithmeticException e) {
         return Long.MAX_VALUE;
       }
     } else if (javaClass == Float.class) {
-      return maxValue.floatValue();
+      if (length == 0) {
+        return Float.MAX_VALUE;
+      } else {
+        return new BigDecimal(text.toString()).floatValue();
+      }
     } else if (javaClass == Double.class) {
-      return maxValue.doubleValue();
+      if (length == 0) {
+        return Double.MAX_VALUE;
+      } else {
+        return new BigDecimal(text.toString()).doubleValue();
+      }
     } else {
       return (Comparable)StringConverterRegistry.toObject(javaClass, text);
     }
   }
 
-  public static NumberFormatter createFormatter(int length, int scale) {
+  public static NumberFormatter createFormatter(DataType dataType, int length,
+    int scale) {
     StringBuffer pattern = new StringBuffer(length);
+    length = getLength(dataType, length);
     for (int i = length - scale + 1; i > 1; i--) {
       pattern.append('#');
     }
@@ -88,6 +114,28 @@ public class NumberTextField extends JFormattedTextField implements
     }
     DecimalFormat format = new DecimalFormat(pattern.toString());
     return new NumberFormatter(format);
+  }
+
+  private static int getLength(DataType dataType, int length) {
+    if (length == 0) {
+      Class<?> javaClass = dataType.getJavaClass();
+      if (javaClass == Byte.class) {
+        length = 3;
+      } else if (javaClass == Short.class) {
+        length = 5;
+      } else if (javaClass == Integer.class) {
+        length = 10;
+      } else if (javaClass == Long.class) {
+        length = 19;
+      } else if (javaClass == Float.class) {
+        length = 10;
+      } else if (javaClass == Double.class) {
+        length = 20;
+      } else {
+        length = 20;
+      }
+    }
+    return length;
   }
 
   public void setMinValue(Comparable minValue) {

@@ -140,9 +140,17 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return dataStore;
   }
 
+  private String idAttributeName;
+
+  public void setIdAttributeName(String idAttributeName) {
+    this.idAttributeName = idAttributeName;
+  }
+
   @Override
   public String getIdAttributeName() {
-    if (metaData == null) {
+    if (StringUtils.hasText(idAttributeName)) {
+      return idAttributeName;
+    } else if (metaData == null) {
       return "";
     } else {
       final String idAttributeName = metaData.getIdAttributeName();

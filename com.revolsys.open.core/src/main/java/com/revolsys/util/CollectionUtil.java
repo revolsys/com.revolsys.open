@@ -12,6 +12,8 @@ import java.util.TreeMap;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+
 public final class CollectionUtil {
   public static <T> Integer addCount(final Map<T, Integer> counts,
     final T object) {
@@ -40,7 +42,7 @@ public final class CollectionUtil {
         } else {
           string.append(separator);
         }
-        string.append(value);
+        string.append(StringConverterRegistry.toString(value));
       }
     }
   }

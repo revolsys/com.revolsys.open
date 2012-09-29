@@ -2,24 +2,39 @@ package com.revolsys.swing.field;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
 
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
 public class CodeTableComboBoxModel extends AbstractListModel implements
   ComboBoxModel {
+
+  public static JComboBox create(final CodeTable codeTable) {
+    return create(codeTable, true);
+  }
+
+  public static JComboBox create(final CodeTable codeTable, boolean allowNull) {
+    CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
+    JComboBox comboBox = new JComboBox(model);
+    CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(codeTable);
+    comboBox.setRenderer(renderer);
+    return comboBox;
+  }
+
   private Object selectedItem;
 
   private final CodeTable codeTable;
 
   private boolean allowNull;
-  
+
   public CodeTableComboBoxModel(final CodeTable codeTable) {
-    this(codeTable,true);
+    this(codeTable, true);
   }
 
   public CodeTableComboBoxModel(CodeTable codeTable, boolean allowNull) {
@@ -28,23 +43,20 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
   }
 
   @Override
-  public Object getElementAt(final int index) {
-    int i = 0;
+  public Object getElementAt(int index) {
     if (allowNull) {
       if (index == 0) {
-        return "";
+        return null;
       }
-      i = 1;
+      index--;
     }
-    final Map<Object, List<Object>> codes = codeTable.getCodes();
-    for (final Entry<Object, List<Object>> entry : codes.entrySet()) {
-      if (index == i) {
-        return entry;
-      } else {
-        i++;
-      }
+    if (index < getSize()) {
+      final Map<Object, List<Object>> codes = codeTable.getCodes();
+      Set<Object> keys = codes.keySet();
+      return CollectionUtil.get(keys, index);
+    } else {
+      return null;
     }
-    return null;
   }
 
   @Override
