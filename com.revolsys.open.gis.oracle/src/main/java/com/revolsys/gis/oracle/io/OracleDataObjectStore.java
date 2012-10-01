@@ -151,6 +151,9 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         this, getDataSource());
       addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
       addAttributeAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
+
+      OracleBlobAttributeAdder blobAdder = new OracleBlobAttributeAdder();
+      addAttributeAdder("BLOB", blobAdder);
     }
   }
 
