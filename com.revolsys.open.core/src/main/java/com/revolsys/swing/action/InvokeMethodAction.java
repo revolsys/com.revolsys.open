@@ -31,6 +31,39 @@ public class InvokeMethodAction extends AbstractAction {
     this(name, null, invokeLater, object, methodName, parameters);
   }
 
+  public InvokeMethodAction(final CharSequence name, String toolTip,
+    final Icon icon, final Object object, final String methodName,
+    final Object... parameters) {
+    this(name, toolTip, icon, true, object, methodName, parameters);
+  }
+
+  public InvokeMethodAction(final CharSequence name, String toolTip,
+    final Icon icon, final boolean invokeLater, final Object object,
+    final String methodName, final Object... parameters) {
+    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    this.invokeLater = invokeLater;
+    if (name != null) {
+      putValue(NAME, name.toString());
+    }
+    if (toolTip != null) {
+      putValue(SHORT_DESCRIPTION, toolTip.toString());
+    }
+    if (icon != null) {
+      putValue(SMALL_ICON, icon);
+    }
+    if (name instanceof I18nCharSequence) {
+      final I18nCharSequence i18nName = (I18nCharSequence)name;
+      i18nName.getI18n().addPropertyChangeListener("locale",
+        new PropertyChangeListener() {
+          @Override
+          public void propertyChange(final PropertyChangeEvent evt) {
+            putValue(NAME, name.toString());
+          }
+        });
+
+    }
+  }
+
   public InvokeMethodAction(final CharSequence name, final Icon icon,
     final boolean invokeLater, final Object object, final String methodName,
     final Object... parameters) {
@@ -38,6 +71,7 @@ public class InvokeMethodAction extends AbstractAction {
     this.invokeLater = invokeLater;
     if (name != null) {
       putValue(NAME, name.toString());
+      putValue(SHORT_DESCRIPTION, name.toString());
     }
     if (icon != null) {
       putValue(SMALL_ICON, icon);

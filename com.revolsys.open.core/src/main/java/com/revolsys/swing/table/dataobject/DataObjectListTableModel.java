@@ -3,6 +3,7 @@ package com.revolsys.swing.table.dataobject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,15 +11,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.swing.table.Reorderable;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectListTableModel extends AbstractTableModel {
+public class DataObjectListTableModel extends AbstractTableModel implements
+  Reorderable {
   private static int compareBoolean(final Boolean b1, final Boolean b2) {
     final boolean bool1 = b1.booleanValue();
     final boolean bool2 = b2.booleanValue();
@@ -48,6 +51,8 @@ public class DataObjectListTableModel extends AbstractTableModel {
     return 0;
   }
 
+  private List<String> columnNames = new ArrayList<String>();
+
   private final List<DataObject> objects = new ArrayList<DataObject>();
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
@@ -62,8 +67,14 @@ public class DataObjectListTableModel extends AbstractTableModel {
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
+    this(metaData, metaData.getAttributeNames(), objects);
+  }
+
+  public DataObjectListTableModel(final DataObjectMetaData metaData,
+    List<String> columnNames, final List<DataObject> objects) {
     this.metaData = metaData;
     this.objects.addAll(objects);
+    this.columnNames = new ArrayList<String>(columnNames);
   }
 
   public void addAll(final Collection<DataObject> objects) {
@@ -81,9 +92,9 @@ public class DataObjectListTableModel extends AbstractTableModel {
     objects.clear();
   }
 
-  private void firePropertyChange(final DataObject feature, final String name,
+  private void firePropertyChange(final DataObject object, final String name,
     final Object oldValue, final Object newValue) {
-    final PropertyChangeEvent event = new PropertyChangeEvent(feature, name,
+    final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
       oldValue, newValue);
     for (final PropertyChangeListener listener : propertyChangeListeners) {
       listener.propertyChange(event);
@@ -92,25 +103,25 @@ public class DataObjectListTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return metaData.getAttributeCount();
+    return columnNames.size();
   }
 
   @Override
   public String getColumnName(final int column) {
-    return metaData.getAttributeName(column);
+    return columnNames.get(column);
   }
 
-  public DataObject getFeature(final int index) {
+  public DataObject getObject(final int index) {
     return objects.get(index);
   }
 
-  public List<DataObject> getFeatures(final int[] rows) {
-    final List<DataObject> features = new ArrayList<DataObject>();
+  public List<DataObject> getObjects(final int[] rows) {
+    final List<DataObject> objects = new ArrayList<DataObject>();
     for (final int row : rows) {
-      final DataObject feature = getFeature(row);
-      features.add(feature);
+      final DataObject object = getObject(row);
+      objects.add(object);
     }
-    return features;
+    return objects;
   }
 
   public DataObjectMetaData getMetaData() {
@@ -146,18 +157,20 @@ public class DataObjectListTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final DataObject feature = getFeature(rowIndex);
-    if (feature == null) {
+    final DataObject object = getObject(rowIndex);
+    if (object == null) {
       return null;
     } else {
-      return feature.getValue(columnIndex);
+      String columnName = getColumnName(columnIndex);
+      return object.getValue(columnName);
     }
   }
 
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
-    if (Geometry.class.isAssignableFrom(metaData.getAttributeType(columnIndex)
-      .getJavaClass())) {
+    String columnName = getColumnName(columnIndex);
+    DataType dataType = metaData.getAttributeType(columnName);
+    if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
       return false;
     } else {
       return true;
@@ -171,20 +184,16 @@ public class DataObjectListTableModel extends AbstractTableModel {
     return sortAscending;
   }
 
-  public void remove(final Collection<DataObject> removedFeatures) {
-    if (this.objects.removeAll(removedFeatures)) {
-      fireTableDataChanged();
-    }
+  public void removeAll(DataObject... removedFeatures) {
+    removeAll(Arrays.asList(removedFeatures));
   }
 
   public void removeAll(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       final int row = this.objects.indexOf(object);
       if (row != -1) {
-        objects.remove(row);
-        final TableModelEvent event = new TableModelEvent(this, row, row,
-          TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
-        fireTableChanged(event);
+        this.objects.remove(row);
+        fireTableRowsDeleted(row, row + 1);
       }
     }
   }
@@ -208,12 +217,12 @@ public class DataObjectListTableModel extends AbstractTableModel {
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final DataObject feature = getFeature(rowIndex);
-    if (feature != null) {
-      final Object oldValue = feature.getValue(columnIndex);
-      final String name = metaData.getAttributeName(columnIndex);
-      feature.setValue(columnIndex, value);
-      firePropertyChange(feature, name, oldValue, value);
+    final DataObject object = getObject(rowIndex);
+    if (object != null) {
+      final String name = getColumnName(columnIndex);
+      final Object oldValue = object.getValueByPath(name);
+      object.setValue(name, value);
+      firePropertyChange(object, name, oldValue, value);
     }
   }
 
@@ -225,7 +234,7 @@ public class DataObjectListTableModel extends AbstractTableModel {
         sortAscending = true;
       }
       sortedColumnIndex = index;
-      final String attributeName = metaData.getAttributeName(index);
+      final String attributeName = getColumnName(index);
       final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
         sortAscending, attributeName);
       Collections.sort(objects, comparitor);
@@ -260,6 +269,33 @@ public class DataObjectListTableModel extends AbstractTableModel {
         return ascendingCompare(o1, o2) * (ascending ? 1 : (-1));
       }
     });
+  }
+
+  public void add(DataObject... objects) {
+    for (DataObject object : objects) {
+      this.objects.add(object);
+      fireTableRowsInserted(this.objects.size() - 1, this.objects.size());
+    }
+  }
+
+  public void remove(int... rows) {
+    List<DataObject> rowsToRemove = getObjects(rows);
+    removeAll(rowsToRemove);
+  }
+
+  @Override
+  public void reorder(int fromIndex, int toIndex) {
+    if (fromIndex < toIndex) {
+      toIndex--;
+    }
+    DataObject object = getObject(fromIndex);
+    removeAll(object);
+    add(toIndex, object);
+  }
+
+  public void add(int index, DataObject object) {
+    objects.add(index, object);
+    fireTableRowsInserted(index, index + 1);
   }
 
 }

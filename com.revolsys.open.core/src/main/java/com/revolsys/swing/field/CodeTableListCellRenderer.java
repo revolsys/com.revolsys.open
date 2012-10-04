@@ -18,12 +18,12 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
 
   public Component getListCellRendererComponent(JList list, Object value,
     int index, boolean isSelected, boolean cellHasFocus) {
-    if (value == null) {
+    if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
     } else {
       List<Object> values = codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
-        value = "";
+        value = "-";
       } else {
         value = CollectionUtil.toString(values);
       }

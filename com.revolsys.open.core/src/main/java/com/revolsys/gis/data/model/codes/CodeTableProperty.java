@@ -16,12 +16,16 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
+import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 
 public class CodeTableProperty extends AbstractCodeTable implements
   DataObjectMetaDataProperty {
+
+  private static final ArrayList<String> DEFAULT_ATTRIBUTE_NAMES = new ArrayList<String>(
+    Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -43,10 +47,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private DataObjectMetaData metaData;
 
-  private List<String> valueAttributeNames = new ArrayList<String>(
-    Arrays.asList("VALUE"));
+  private List<String> valueAttributeNames = DEFAULT_ATTRIBUTE_NAMES;
 
-  private List<String> orderBy = new ArrayList<String>();
+  private List<String> orderBy = DEFAULT_ATTRIBUTE_NAMES;
 
   private String typePath;
 
@@ -67,7 +70,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     addValue(id, values);
   }
 
-  protected void addValues(final Reader<DataObject> allCodes) {
+  protected void addValues(final Iterable<DataObject> allCodes) {
     for (final DataObject code : allCodes) {
       addValue(code);
     }
@@ -82,38 +85,43 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized Object createId(final List<Object> values) {
-    // TODO prevent duplicates from other threads/processes
-    final DataObject code = dataStore.create(typePath);
-    final DataObjectMetaData metaData = code.getMetaData();
-    Object id = dataStore.createPrimaryIdValue(typePath);
-    if (id == null) {
-      final Attribute idAttribute = metaData.getIdAttribute();
-      if (idAttribute != null) {
-        if (Number.class.isAssignableFrom(idAttribute.getType().getJavaClass())) {
-          id = getNextId();
-        } else {
-          id = UUID.randomUUID().toString();
+    if (createMissingCodes) {
+      // TODO prevent duplicates from other threads/processes
+      final DataObject code = dataStore.create(typePath);
+      final DataObjectMetaData metaData = code.getMetaData();
+      Object id = dataStore.createPrimaryIdValue(typePath);
+      if (id == null) {
+        final Attribute idAttribute = metaData.getIdAttribute();
+        if (idAttribute != null) {
+          if (Number.class.isAssignableFrom(idAttribute.getType()
+            .getJavaClass())) {
+            id = getNextId();
+          } else {
+            id = UUID.randomUUID().toString();
+          }
         }
       }
-    }
-    code.setIdValue(id);
-    for (int i = 0; i < valueAttributeNames.size(); i++) {
-      final String name = valueAttributeNames.get(i);
-      final Object value = values.get(i);
-      code.setValue(name, value);
-    }
+      code.setIdValue(id);
+      for (int i = 0; i < valueAttributeNames.size(); i++) {
+        final String name = valueAttributeNames.get(i);
+        final Object value = values.get(i);
+        code.setValue(name, value);
+      }
 
-    final Timestamp now = new Timestamp(System.currentTimeMillis());
-    if (creationTimestampAttributeName != null) {
-      code.setValue(creationTimestampAttributeName, now);
-    }
-    if (modificationTimestampAttributeName != null) {
-      code.setValue(modificationTimestampAttributeName, now);
-    }
+      final Timestamp now = new Timestamp(System.currentTimeMillis());
+      if (creationTimestampAttributeName != null) {
+        code.setValue(creationTimestampAttributeName, now);
+      }
+      if (modificationTimestampAttributeName != null) {
+        code.setValue(modificationTimestampAttributeName, now);
+      }
 
-    dataStore.insert(code);
-    id = code.getIdValue();
-    return id;
+      dataStore.insert(code);
+      id = code.getIdValue();
+      return id;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -210,8 +218,24 @@ public class CodeTableProperty extends AbstractCodeTable implements
     for (final String order : orderBy) {
       query.addOrderBy(order, true);
     }
-    final Reader<DataObject> allCodes = dataStore.query(query);
-    addValues(allCodes);
+    final Reader<DataObject> reader = dataStore.query(query);
+    try {
+      List<DataObject> codes = reader.read();
+      Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
+      addValues(codes);
+    } finally {
+      reader.close();
+    }
+  }
+
+  private boolean createMissingCodes = true;
+
+  public void setCreateMissingCodes(boolean createMissingCodes) {
+    this.createMissingCodes = createMissingCodes;
+  }
+
+  public boolean isCreateMissingCodes() {
+    return createMissingCodes;
   }
 
   @Override
@@ -314,7 +338,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   public void setOrderBy(final List<String> orderBy) {
-    this.orderBy = orderBy;
+    this.orderBy = new ArrayList<String>(orderBy);
   }
 
   public void setValueAttributeName(final String valueColumns) {
@@ -322,17 +346,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   public void setValueAttributeNames(final List<String> valueColumns) {
-    this.valueAttributeNames.clear();
-    for (final String column : valueColumns) {
-      this.valueAttributeNames.add(column);
+    this.valueAttributeNames = new ArrayList<String>(valueColumns);
+    if (this.orderBy == DEFAULT_ATTRIBUTE_NAMES) {
+      setOrderBy(valueColumns);
     }
   }
 
   public void setValueAttributeNames(final String... valueColumns) {
-    this.valueAttributeNames.clear();
-    for (final String column : valueColumns) {
-      this.valueAttributeNames.add(column);
-    }
+    setValueAttributeNames(Arrays.asList(valueColumns));
   }
 
   @Override

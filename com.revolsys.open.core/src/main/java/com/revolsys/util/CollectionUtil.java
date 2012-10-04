@@ -12,6 +12,8 @@ import java.util.TreeMap;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public final class CollectionUtil {
@@ -32,17 +34,20 @@ public final class CollectionUtil {
     append(string, values, ",");
   }
 
-  public static void append(final StringBuffer string,
+  public static void append(final StringBuffer buffer,
     final Collection<? extends Object> values, final String separator) {
     boolean first = true;
     for (final Object value : values) {
       if (value != null) {
-        if (first) {
-          first = false;
-        } else {
-          string.append(separator);
+        String string = StringConverterRegistry.toString(value);
+        if (StringUtils.hasText(string)) {
+          if (first) {
+            first = false;
+          } else {
+            buffer.append(separator);
+          }
+          buffer.append(string);
         }
-        string.append(StringConverterRegistry.toString(value));
       }
     }
   }

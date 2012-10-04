@@ -1,38 +1,28 @@
 package com.revolsys.swing.field;
 
-import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 
-import javax.swing.JFormattedTextField;
-import javax.swing.text.NumberFormatter;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
-public class NumberTextField extends JFormattedTextField implements
-  FocusListener {
+public class NumberTextField extends JTextField implements DocumentListener,
+  FocusListener, ValidatingField {
 
-  private DataType dataType;
+  private static final long serialVersionUID = 1L;
 
-  public NumberTextField(DataType dataType, int length, int scale) {
-    super(createFormatter(dataType,length, scale));
-    this.dataType = dataType;
-    setColumns(getLength(dataType, length) + 2);
-    setFocusLostBehavior(JFormattedTextField.PERSIST);
-    addFocusListener(this);
-    setMaxValue(createMaxValue(length, scale));
-    setHorizontalAlignment(RIGHT);
-  }
-
-  protected Comparable createMaxValue(int length, int scale) {
-    Class<?> javaClass = dataType.getJavaClass();
-    StringBuffer text = new StringBuffer(length);
+  public static Number createMaximumValue(final DataType dataType,
+    final int length, final int scale) {
+    final Class<?> javaClass = dataType.getJavaClass();
+    final StringBuffer text = new StringBuffer(length);
     for (int i = length - scale + 1; i > 1; i--) {
       text.append('9');
     }
@@ -49,7 +39,7 @@ public class NumberTextField extends JFormattedTextField implements
         } else {
           return new BigDecimal(text.toString()).byteValueExact();
         }
-      } catch (ArithmeticException e) {
+      } catch (final ArithmeticException e) {
         return Byte.MAX_VALUE;
       }
     } else if (javaClass == Short.class) {
@@ -59,7 +49,7 @@ public class NumberTextField extends JFormattedTextField implements
         } else {
           return new BigDecimal(text.toString()).shortValueExact();
         }
-      } catch (ArithmeticException e) {
+      } catch (final ArithmeticException e) {
         return Short.MAX_VALUE;
       }
     } else if (javaClass == Integer.class) {
@@ -69,7 +59,7 @@ public class NumberTextField extends JFormattedTextField implements
         } else {
           return new BigDecimal(text.toString()).intValueExact();
         }
-      } catch (ArithmeticException e) {
+      } catch (final ArithmeticException e) {
         return Integer.MAX_VALUE;
       }
     } else if (javaClass == Long.class) {
@@ -79,7 +69,7 @@ public class NumberTextField extends JFormattedTextField implements
         } else {
           return new BigDecimal(text.toString()).longValueExact();
         }
-      } catch (ArithmeticException e) {
+      } catch (final ArithmeticException e) {
         return Long.MAX_VALUE;
       }
     } else if (javaClass == Float.class) {
@@ -95,30 +85,14 @@ public class NumberTextField extends JFormattedTextField implements
         return new BigDecimal(text.toString()).doubleValue();
       }
     } else {
-      return (Comparable)StringConverterRegistry.toObject(javaClass, text);
+      return (Number)StringConverterRegistry.toObject(javaClass, text);
     }
   }
 
-  public static NumberFormatter createFormatter(DataType dataType, int length,
-    int scale) {
-    StringBuffer pattern = new StringBuffer(length);
-    length = getLength(dataType, length);
-    for (int i = length - scale + 1; i > 1; i--) {
-      pattern.append('#');
-    }
-    if (scale > 0) {
-      pattern.append(".");
-      for (int i = 0; i < scale; i++) {
-        pattern.append('#');
-      }
-    }
-    DecimalFormat format = new DecimalFormat(pattern.toString());
-    return new NumberFormatter(format);
-  }
-
-  private static int getLength(DataType dataType, int length) {
+  private static int getLength(final DataType dataType, int length, int scale,
+    BigDecimal minimumValue) {
     if (length == 0) {
-      Class<?> javaClass = dataType.getJavaClass();
+      final Class<?> javaClass = dataType.getJavaClass();
       if (javaClass == Byte.class) {
         length = 3;
       } else if (javaClass == Short.class) {
@@ -135,16 +109,155 @@ public class NumberTextField extends JFormattedTextField implements
         length = 20;
       }
     }
+    if (new BigDecimal("0").compareTo(minimumValue) > 0) {
+      length++;
+    }
+    if (scale > 0) {
+      length++;
+    }
     return length;
   }
 
-  public void setMinValue(Comparable minValue) {
-    ((NumberFormatter)getFormatter()).setMinimum(minValue);
+  private final DataType dataType;
+
+  private String fieldValidationMessage;
+
+  private final int length;
+
+  private final int scale;
+
+  private Number fieldValue;
+
+  private BigDecimal minimumValue;
+
+  private BigDecimal maximumValue;
+
+  private boolean fieldValid;
+
+  public NumberTextField(final DataType dataType, final int length,
+    final int scale) {
+    this(dataType, length, scale, null, createMaximumValue(dataType, length,
+      scale));
   }
 
-  public void setMaxValue(Comparable maxValue) {
-    NumberFormatter formatter = (NumberFormatter)getFormatter();
-    formatter.setMaximum(maxValue);
+  public NumberTextField(final DataType dataType, final int length,
+    final int scale, Number minimumValue, Number maximumValue) {
+    this.dataType = dataType;
+    this.length = length;
+    this.scale = scale;
+    setMinimumValue(minimumValue);
+    setMaximumValue(maximumValue);
+    setColumns(getLength(dataType, length, scale, this.minimumValue));
+    setHorizontalAlignment(RIGHT);
+    getDocument().addDocumentListener(this);
+    addFocusListener(this);
+  }
+
+  public NumberTextField(DataType dataType, int length) {
+    this(dataType, length, 0);
+  }
+
+  @Override
+  public void changedUpdate(final DocumentEvent e) {
+    validateField();
+  }
+
+  @Override
+  public String getFieldValidationMessage() {
+    return fieldValidationMessage;
+  }
+
+  public Number getFieldValue() {
+    return fieldValue;
+  }
+
+  public int getLength() {
+    return length;
+  }
+
+  public Number getMaximumValue() {
+    return maximumValue;
+  }
+
+  public Number getMinimumValue() {
+    return minimumValue;
+  }
+
+  public int getScale() {
+    return scale;
+  }
+
+  @Override
+  public void insertUpdate(final DocumentEvent e) {
+    validateField();
+  }
+
+  @Override
+  public boolean isFieldValid() {
+    return fieldValid;
+  }
+
+  @Override
+  public void removeUpdate(final DocumentEvent e) {
+    validateField();
+  }
+
+  public void setMaximumValue(final Number maximumValue) {
+    this.maximumValue = new BigDecimal(maximumValue.toString());
+  }
+
+  public void setMinimumValue(final Number minimumValue) {
+    this.minimumValue = new BigDecimal(minimumValue.toString());
+  }
+
+  private void validateField() {
+    Number oldValue = fieldValue;
+    Number value = null;
+    boolean oldValid = fieldValid;
+    boolean valid = true;
+    final String text = getText();
+    if (StringUtils.hasText(text)) {
+      try {
+        BigDecimal number = new BigDecimal(text);
+        if (number.scale() < 0) {
+          number = number.setScale(scale);
+        }
+        if (number.scale() > scale) {
+          fieldValidationMessage = "Number of decimal places must be < "
+            + scale;
+          valid = false;
+        } else if (minimumValue != null && minimumValue.compareTo(number) > 0) {
+          fieldValidationMessage = "Value must be >= " + minimumValue;
+          valid = false;
+        } else if (maximumValue != null && maximumValue.compareTo(number) < 0) {
+          fieldValidationMessage = "Value must be <= " + maximumValue;
+          valid = false;
+        } else {
+          number = number.setScale(scale);
+          value = (Number)StringConverterRegistry.toObject(dataType, number);
+        }
+      } catch (final Throwable t) {
+        fieldValidationMessage = t.getMessage();
+        valid = false;
+      }
+    }
+
+    if (valid != oldValid) {
+      fieldValid = valid;
+      firePropertyChange("fieldValid", oldValid, fieldValid);
+    }
+    if (valid) {
+      if (!EqualsRegistry.equal(oldValue, value)) {
+        fieldValue = value;
+        firePropertyChange("fieldValid", oldValue, fieldValue);
+      }
+    }
+  }
+
+  public void setFieldValue(Number value) {
+    setText(StringConverterRegistry.toString(value));
+    validateField();
+    updateText();
   }
 
   @Override
@@ -152,58 +265,20 @@ public class NumberTextField extends JFormattedTextField implements
   }
 
   @Override
-  public void focusLost(FocusEvent event) {
-    boolean valid = isFieldValid();
-    if (valid) {
-      setBackground(Color.WHITE);
-      super.setToolTipText(originalToolTipText);
-    } else {
-      try {
-        NumberFormatter formatter = (NumberFormatter)getFormatter();
-        formatter.stringToValue(getText());
-
-      } catch (ParseException e) {
-        super.setToolTipText(null);
-        updateUI();
-        super.setToolTipText(e.getMessage());
-        updateUI();
-      }
-      setBackground(Color.PINK);
-    }
+  public void focusLost(FocusEvent e) {
+    updateText();
   }
 
-  @Override
-  public void setToolTipText(String text) {
-    super.setToolTipText(text);
-    this.originalToolTipText = text;
-  }
-
-  private String originalToolTipText;
-
-  private boolean isFieldValid() {
-    boolean valid = isEditValid();
-    if (valid) {
+  private void updateText() {
+    if (isFieldValid() && fieldValue != null) {
       String text = getText();
-      if (StringUtils.hasText(text)) {
-        try {
-          fieldValue = StringConverterRegistry.toObject(
-            dataType.getJavaClass(), text);
-        } catch (Throwable t) {
-          fieldValue = null;
-          valid = false;
-        }
-      } else {
-        fieldValue = null;
+      BigDecimal number = new BigDecimal(text);
+      number = number.setScale(scale);
+      String newText = number.toPlainString();
+      if (!newText.equals(text)) {
+        setText(newText);
       }
-    } else {
-      fieldValue = null;
     }
-    return valid;
   }
 
-  private Number fieldValue;
-
-  public Number getFieldValue() {
-    return fieldValue;
-  }
 }

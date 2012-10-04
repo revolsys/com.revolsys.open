@@ -20,12 +20,17 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
   }
 
   public static JComboBox create(final CodeTable codeTable, boolean allowNull) {
-    CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
+    CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
+      allowNull);
     JComboBox comboBox = new JComboBox(model);
-    CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(codeTable);
+    CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(
+      codeTable);
     comboBox.setRenderer(renderer);
+    comboBox.setEditable(false);
     return comboBox;
   }
+
+  public static final Object NULL = new Object();
 
   private Object selectedItem;
 
@@ -46,7 +51,7 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
   public Object getElementAt(int index) {
     if (allowNull) {
       if (index == 0) {
-        return null;
+        return NULL;
       }
       index--;
     }
@@ -61,7 +66,11 @@ public class CodeTableComboBoxModel extends AbstractListModel implements
 
   @Override
   public Object getSelectedItem() {
-    return selectedItem;
+    if (selectedItem == NULL) {
+      return null;
+    } else {
+      return selectedItem;
+    }
   }
 
   @Override
