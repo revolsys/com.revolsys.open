@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -327,6 +328,33 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         i++;
       }
       matcher.appendTail(whereClause);
+    }
+    Map<String, Object> filter = query.getFilter();
+    if (!filter.isEmpty()) {
+      if (whereClause.length() > 0) {
+        whereClause.insert(0, '(');
+        whereClause.append(')');
+      }
+      for (Entry<String, Object> entry : filter.entrySet()) {
+        if (whereClause.length() > 0) {
+          whereClause.append(" AND ");
+        }
+        whereClause.append(entry.getKey());
+        Object value = entry.getValue();
+        if (value == null) {
+          whereClause.append(" IS NULL");
+        } else {
+          whereClause.append(" = ");
+          if (value instanceof Number) {
+            whereClause.append(value);
+          } else {
+            whereClause.append("'");
+            whereClause.append(value);
+            whereClause.append("'");
+          }
+        }
+      }
+
     }
     final BoundingBox boundingBox = query.getBoundingBox();
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
