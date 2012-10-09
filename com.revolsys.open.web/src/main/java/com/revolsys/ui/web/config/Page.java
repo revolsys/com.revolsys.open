@@ -281,7 +281,7 @@ public class Page extends Component {
         }
         final URI path = uriTemplate.expand(uriTemplateVariables);
         final String url = UrlUtil.getUrl(path, uriParameters);
-        return getAbsoluteUrl(PathAliasController.getPath(url));
+        return getFullUrl(url);
       } catch (IllegalArgumentException e) {
         LOG.debug("Unable to expand variables for " + uriTemplate, e);
         return null;
@@ -289,6 +289,11 @@ public class Page extends Component {
     } else {
       return null;
     }
+  }
+
+  public static String getFullUrl(final String url) {
+    String aliasUrl = PathAliasController.getPath(url);
+    return getAbsoluteUrl(aliasUrl);
   }
 
   public Layout getLayout() {
