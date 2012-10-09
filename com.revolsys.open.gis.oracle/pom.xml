@@ -25,23 +25,5 @@
       <artifactId>sdoapi</artifactId>
       <version>11.2.0.3</version>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>${org.springframework.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!--
-      <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ucp</artifactId>
-      <version>11.2.0.3</version>
-      </dependency>
-    -->
   </dependencies>
 </project>
