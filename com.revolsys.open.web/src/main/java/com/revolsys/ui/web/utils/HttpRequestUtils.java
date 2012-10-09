@@ -10,6 +10,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+
 public final class HttpRequestUtils {
   private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
@@ -110,6 +112,14 @@ public final class HttpRequestUtils {
 
   public static void setPathVariable(final String name, final String value) {
     getPathVariables().put(name, value);
+  }
+
+  public static void setPathVariable(final String name, final Object value) {
+    if (value == null) {
+      setPathVariable(name, null);
+    } else {
+      setPathVariable(name, StringConverterRegistry.toString(value));
+    }
   }
 
   public static int getIntegerParameter(HttpServletRequest request,
