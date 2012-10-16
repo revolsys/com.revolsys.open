@@ -142,7 +142,16 @@ public final class CollectionUtil {
       final Number number = (Number)value;
       return number.intValue();
     } else {
-      return Integer.valueOf(value.toString());
+      String stringValue = value.toString();
+      if (StringUtils.hasText(stringValue)) {
+        try {
+        return Integer.valueOf(stringValue);
+        } catch (NumberFormatException e) {
+          return null;
+        }
+      } else {
+        return null;
+      }
     }
   }
 

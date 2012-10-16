@@ -6,20 +6,25 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.text.JTextComponent;
 
+import com.revolsys.swing.field.NumberTextField;
+
 public class SwingUtil {
 
   @SuppressWarnings("unchecked")
   public static <V> V getValue(JComponent component) {
-    if (component instanceof JTextComponent) {
+    if (component instanceof NumberTextField) {
+      NumberTextField numberField = (NumberTextField)component;
+      return (V)numberField.getFieldValue();
+    } else if (component instanceof JTextComponent) {
       JTextComponent textComponent = (JTextComponent)component;
       return (V)textComponent.getText();
-    } else  if (component instanceof JComboBox) {
+    } else if (component instanceof JComboBox) {
       JComboBox comboBox = (JComboBox)component;
       return (V)comboBox.getSelectedItem();
-    } else  if (component instanceof JList) {
+    } else if (component instanceof JList) {
       JList list = (JList)component;
       return (V)list.getSelectedValue();
-    } else  if (component instanceof JCheckBox) {
+    } else if (component instanceof JCheckBox) {
       JCheckBox checkBox = (JCheckBox)component;
       return (V)(Object)checkBox.isSelected();
     } else {

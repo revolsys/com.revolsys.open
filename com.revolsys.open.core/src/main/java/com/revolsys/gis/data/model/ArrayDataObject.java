@@ -100,7 +100,7 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
    * @return The cloned object.
    */
   @Override
-  public ArrayDataObject cloneCoordinates() {
+  public ArrayDataObject clone() {
     final ArrayDataObject newObject = new ArrayDataObject(this);
     if (metaData.getIdAttributeIndex() != -1) {
       newObject.setIdValue(null);

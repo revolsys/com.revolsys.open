@@ -12,7 +12,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
    * 
    * @return The data object.
    */
-  DataObject cloneCoordinates();
+  DataObject clone();
 
   void delete();
 

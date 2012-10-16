@@ -103,6 +103,7 @@ public class StringConverterRegistry {
     addConverter(new ByteStringConverter());
     addConverter(new DoubleStringConverter());
     addConverter(new FloatStringConverter());
+    addConverter(new DateStringConverter());
     addConverter(new IntegerStringConverter());
     addConverter(new LongStringConverter());
     addConverter(new ShortStringConverter());

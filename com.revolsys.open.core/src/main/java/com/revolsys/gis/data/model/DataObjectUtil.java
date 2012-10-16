@@ -94,7 +94,7 @@ public final class DataObjectUtil {
   public static <T extends DataObject> T copy(final T object,
     final Geometry geometry) {
     final Geometry oldGeometry = object.getGeometryValue();
-    final T newObject = (T)object.cloneCoordinates();
+    final T newObject = (T)object.clone();
     newObject.setGeometryValue(geometry);
     final Map<String, Object> userData = JtsGeometryUtil.getGeometryProperties(oldGeometry);
     if (userData != null) {

@@ -109,7 +109,7 @@ public class NumberTextField extends JTextField implements DocumentListener,
         length = 20;
       }
     }
-    if (new BigDecimal("0").compareTo(minimumValue) > 0) {
+    if (minimumValue == null || new BigDecimal("0").compareTo(minimumValue) > 0) {
       length++;
     }
     if (scale > 0) {
@@ -132,7 +132,7 @@ public class NumberTextField extends JTextField implements DocumentListener,
 
   private BigDecimal maximumValue;
 
-  private boolean fieldValid;
+  private boolean fieldValid = true;
 
   public NumberTextField(final DataType dataType, final int length,
     final int scale) {
@@ -203,11 +203,19 @@ public class NumberTextField extends JTextField implements DocumentListener,
   }
 
   public void setMaximumValue(final Number maximumValue) {
-    this.maximumValue = new BigDecimal(maximumValue.toString());
+    if (maximumValue == null) {
+      this.maximumValue = null;
+    } else {
+      this.maximumValue = new BigDecimal(maximumValue.toString());
+    }
   }
 
   public void setMinimumValue(final Number minimumValue) {
-    this.minimumValue = new BigDecimal(minimumValue.toString());
+    if (minimumValue == null) {
+      this.minimumValue = null;
+    } else {
+      this.minimumValue = new BigDecimal(minimumValue.toString());
+    }
   }
 
   private void validateField() {

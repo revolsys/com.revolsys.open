@@ -750,7 +750,7 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   }
 
   public DataObject getReverse(final DataObject object) {
-    final DataObject reverse = object.cloneCoordinates();
+    final DataObject reverse = object.clone();
 
     final LineString line = object.getGeometryValue();
     if (line != null) {
