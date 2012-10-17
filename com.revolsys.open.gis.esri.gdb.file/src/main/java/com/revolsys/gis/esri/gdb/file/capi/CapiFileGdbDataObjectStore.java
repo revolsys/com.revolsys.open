@@ -24,6 +24,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
@@ -322,7 +323,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           whereClause.append(argument);
         } else {
           whereClause.append("'");
-          whereClause.append(argument);
+          whereClause.append(StringConverterRegistry.toString(argument).replaceAll("'", "''"));
           whereClause.append("'");
         }
         i++;
@@ -349,7 +350,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
             whereClause.append(value);
           } else {
             whereClause.append("'");
-            whereClause.append(value);
+            whereClause.append(StringConverterRegistry.toString(value).replaceAll("'", "''"));
             whereClause.append("'");
           }
         }
