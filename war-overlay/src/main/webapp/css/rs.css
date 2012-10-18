@@ -291,11 +291,6 @@ div.table div.title {
   margin-bottom: 12px;
 }
 
-div.form>form>div.objectView>table.data {
-  border-width: 0px;
-  padding: 0px;
-}
-
 div.objectView {
   width: auto;
 }

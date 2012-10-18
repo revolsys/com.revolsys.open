@@ -5,6 +5,8 @@ import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
@@ -140,7 +142,9 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
       out.startTag(HtmlUtil.HTML);
 
       out.startTag(HtmlUtil.HEAD);
-      out.element(HtmlUtil.TITLE, title);
+      if (StringUtils.hasText(title)) {
+        out.element(HtmlUtil.TITLE, title);
+      }
 
       out.endTag(HtmlUtil.HEAD);
 

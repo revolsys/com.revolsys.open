@@ -15,6 +15,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 public class ZipUtil {
   /**
@@ -102,8 +103,11 @@ public class ZipUtil {
   }
 
   public static File unzipFile(final Resource resource) throws IOException {
-    final File directory = FileUtil.createTempDirectory(resource.getFilename(),
-      ".zip");
+    String filename = resource.getFilename();
+    while (filename.length() < 3) {
+      filename += "x";
+    }
+    final File directory = FileUtil.createTempDirectory(filename, ".zip");
     final InputStream in = resource.getInputStream();
     final ZipInputStream zipIn = new ZipInputStream(in);
     try {
