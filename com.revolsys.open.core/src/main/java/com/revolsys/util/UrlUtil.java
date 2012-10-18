@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.FileUtil;
 
 /**
@@ -171,8 +173,14 @@ public final class UrlUtil {
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
    */
-  public static String getUrl(final String baseUrl,
+  public static String getUrl(String baseUrl,
     final Map<String, ? extends Object> parameters) {
+    int fragmentIndex = baseUrl.indexOf('#');
+    String fragment = null;
+    if (fragmentIndex > -1 && fragmentIndex < baseUrl.length() - 1) {
+      fragment = baseUrl.substring(fragmentIndex + 1);
+          baseUrl = baseUrl.substring(0, fragmentIndex);
+    }
     final StringBuffer query = new StringBuffer();
     if (parameters != null) {
       boolean firstParameter = true;
@@ -218,17 +226,23 @@ public final class UrlUtil {
         }
       }
     }
+    String url;
     if (query.length() == 0) {
-      return baseUrl;
+      url = baseUrl;
     } else {
       final int qsIndex = baseUrl.indexOf('?');
       if (qsIndex == baseUrl.length() - 1) {
-        return baseUrl + query;
+        url = baseUrl + query;
       } else if (qsIndex > -1) {
-        return baseUrl + '&' + query;
+        url = baseUrl + '&' + query;
       } else {
-        return baseUrl + '?' + query;
+        url = baseUrl + '?' + query;
       }
+    }
+    if (StringUtils.hasText(fragment)) {
+      return url + "#" + fragment;
+    } else {
+      return url;
     }
   }
 

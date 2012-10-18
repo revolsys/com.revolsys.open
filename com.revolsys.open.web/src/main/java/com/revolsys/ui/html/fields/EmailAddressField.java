@@ -27,7 +27,7 @@ public class EmailAddressField extends TextField {
 
   public EmailAddressField(final String name, final String defaultValue,
     final boolean required) {
-    super(name, 25, 150, defaultValue, required);
+    super(name, 50, 150, defaultValue, required);
     setCssClass("email");
   }
 

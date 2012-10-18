@@ -21,7 +21,7 @@ public class ShapefileZipIoFactory extends
   AbstractDataObjectAndGeometryIoFactory {
 
   public ShapefileZipIoFactory() {
-    super("ESRI Shapefile ZIP", true, true);
+    super("ESRI Shapefile inside a ZIP archive", true, true);
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
   }
 

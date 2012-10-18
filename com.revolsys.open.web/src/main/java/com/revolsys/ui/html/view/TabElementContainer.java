@@ -20,6 +20,16 @@ public class TabElementContainer extends ElementContainer {
 
   private List<String> labels = new ArrayList<String>();
 
+  private Integer selectedIndex;
+
+  public void setSelectedIndex(Integer selectedIndex) {
+    this.selectedIndex = selectedIndex;
+  }
+
+  public Integer getSelectedIndex() {
+    return selectedIndex;
+  }
+
   @Override
   public void serializeElement(XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
@@ -48,6 +58,13 @@ public class TabElementContainer extends ElementContainer {
     }
 
     out.endTag(HtmlUtil.DIV);
+    if (selectedIndex != null) {
+      out.startTag(HtmlUtil.SCRIPT);
+      out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+      out.text("$(document).ready(function() {$('#" + id
+        + "').tabs('option', 'selected', " + selectedIndex + ");});");
+      out.endTag(HtmlUtil.SCRIPT);
+    }
   }
 
   public void add(String label, Element element) {

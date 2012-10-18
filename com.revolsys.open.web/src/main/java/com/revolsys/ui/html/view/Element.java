@@ -60,7 +60,7 @@ public class Element implements Cloneable {
   }
 
   public final void serialize(final Writer out) {
-    serialize(out, true);
+    serialize(out, false);
   }
 
   public final void serialize(final Writer out, final boolean useNamespaces) {
