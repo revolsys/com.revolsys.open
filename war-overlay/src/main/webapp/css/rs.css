@@ -1,6 +1,6 @@
 body {
   color: black;
-  font-size: 0.9em;
+  font-size: 12px;
   font-family: sans-serif;
   border: 0px;
 }
@@ -212,6 +212,7 @@ div.footer {
   padding: 0.4em 1em 0.4em 1em;
   font-size: 0.8em;
   margin: 0.5em;
+  min-height: 1.1em;
 }
 
 div.footer div.title {

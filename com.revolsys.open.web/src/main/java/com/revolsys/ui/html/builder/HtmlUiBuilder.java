@@ -71,7 +71,6 @@ import com.revolsys.ui.html.view.DetailView;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.ElementLabel;
-import com.revolsys.ui.html.view.IFrame;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.html.view.RawContent;
 import com.revolsys.ui.html.view.Script;
@@ -207,32 +206,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     setTypeName(typeName);
     this.title = title;
     this.pluralTitle = pluralTitle;
-  }
-
-  public void addCollapsibleIframe(final ElementContainer container,
-    final Class<?> builderClass, final String pageName, final String style,
-    final boolean open) {
-    addCollapsibleIframe(container, builderClass.getName(), pageName, style,
-      open);
-  }
-
-  public void addCollapsibleIframe(final ElementContainer container,
-    final String builderName, final String pageName, final String style,
-    final boolean open) {
-    final HtmlUiBuilder<?> builder = getBuilder(builderName);
-    final Page page = builder.getPage(pageName);
-    if (page != null) {
-      final Map<String, Object> parameters = new HashMap<String, Object>();
-      parameters.put("plain", true);
-      parameters.put("htmlCss", "collapsibleBox");
-      final String link = page.getFullUrl(parameters);
-      if (link != null) {
-        final String title = page.getExpandedTitle();
-        final Decorator decorator = new CollapsibleBox(title, open);
-        final IFrame iFrame = new IFrame(link, "autoHeight", style, decorator);
-        container.add(iFrame);
-      }
-    }
   }
 
   public void addDataTable(final ElementContainer container,

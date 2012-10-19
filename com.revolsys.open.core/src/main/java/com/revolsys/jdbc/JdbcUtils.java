@@ -261,8 +261,12 @@ public final class JdbcUtils {
     try {
       for (int i = 0; i < parameters.length; i++) {
         final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-
+        if (parameter instanceof Date) {
+          Date date = (Date)parameter;
+          statement.setDate(i + 1, date);
+        } else {
+          statement.setObject(i + 1, parameter);
+        }
       }
       return statement.executeUpdate();
     } finally {
