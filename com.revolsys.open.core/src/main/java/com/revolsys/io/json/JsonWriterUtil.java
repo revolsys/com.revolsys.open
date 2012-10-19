@@ -126,7 +126,15 @@ public final class JsonWriterUtil {
     } else if (value instanceof Boolean) {
       out.print(value);
     } else if (value instanceof Number) {
-      out.print(value);
+      Number number = (Number)value;
+      double doubleValue = number.doubleValue();
+      if (Double.isInfinite(doubleValue)) {
+        out.print(Double.MIN_VALUE);
+      } else if (Double.isInfinite(doubleValue)) {
+        out.print("null");
+      } else {
+        out.print(value);
+      }
     } else if (value instanceof List) {
       final List<? extends Object> list = (List<? extends Object>)value;
       write(out, list);
