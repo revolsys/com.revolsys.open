@@ -116,7 +116,11 @@ public class ZipUtil {
         final String entryName = entry.getName();
         final File outputFile = new File(directory, entryName);
         outputFile.getParentFile().mkdirs();
-        FileUtil.copy(zipIn, outputFile);
+        if (entry.isDirectory()) {
+          outputFile.mkdir();
+        } else {
+          FileUtil.copy(zipIn, outputFile);
+        }
         zipIn.closeEntry();
       }
       FileUtil.closeSilent(zipIn);
