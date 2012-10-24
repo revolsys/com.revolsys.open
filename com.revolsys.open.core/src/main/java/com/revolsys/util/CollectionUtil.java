@@ -39,7 +39,7 @@ public final class CollectionUtil {
     boolean first = true;
     for (final Object value : values) {
       if (value != null) {
-        String string = StringConverterRegistry.toString(value);
+        final String string = StringConverterRegistry.toString(value);
         if (StringUtils.hasText(string)) {
           if (first) {
             first = false;
@@ -142,11 +142,11 @@ public final class CollectionUtil {
       final Number number = (Number)value;
       return number.intValue();
     } else {
-      String stringValue = value.toString();
+      final String stringValue = value.toString();
       if (StringUtils.hasText(stringValue)) {
         try {
-        return Integer.valueOf(stringValue);
-        } catch (NumberFormatException e) {
+          return Integer.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
           return null;
         }
       } else {
@@ -165,6 +165,35 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V extends Comparable<V>> void putIfGreaterThan(
+    final Map<K, V> map, final K key, final V value) {
+    synchronized (map) {
+      final V lastValue = map.get(key);
+      if (lastValue == null || value.compareTo(lastValue) > 1) {
+        map.put(key, value);
+      }
+    }
+  }
+
+  public static <K, V extends Comparable<V>> void removeIfLessThanEqual(
+    final Map<K, V> map, final K key, final V value) {
+    synchronized (map) {
+      final V lastValue = map.get(key);
+      if (lastValue == null || value.compareTo(lastValue) <= 0) {
+        map.remove(key);
+      }
+    }
+  }
+
+  public static <K, V extends Comparable<V>> void removeIfGreaterThanEqual(
+    final Map<K, V> map, final K key, final V value) {
+    synchronized (map) {
+      final V lastValue = map.get(key);
+      if (lastValue == null || value.compareTo(lastValue) >= 0) {
+        map.remove(key);
+      }
+    }
+  }
   public static final String replaceProperties(final CharSequence string,
     final Map<String, Object> properties) {
     if (string == null) {

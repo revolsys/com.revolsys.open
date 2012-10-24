@@ -25,7 +25,12 @@ public final class ShapefileGeometryUtil {
 
   public static final ShapefileGeometryUtil INSTANCE = new ShapefileGeometryUtil();
 
+  public static final ShapefileGeometryUtil SHP_INSTANCE = new ShapefileGeometryUtil(
+    true, true);
+
   private boolean clockwise = true;
+
+  private boolean writeLength = false;
 
   public ShapefileGeometryUtil() {
 
@@ -33,6 +38,12 @@ public final class ShapefileGeometryUtil {
 
   public ShapefileGeometryUtil(final boolean clockwise) {
     this.clockwise = clockwise;
+  }
+
+  public ShapefileGeometryUtil(final boolean clockwise,
+    final boolean writeLength) {
+    this.clockwise = clockwise;
+    this.writeLength = writeLength;
   }
 
   public List<CoordinatesList> createCoordinatesLists(final int[] partIndex,
@@ -48,7 +59,7 @@ public final class ShapefileGeometryUtil {
     return parts;
   }
 
-  public Geometry createGeometryFromParts(
+  public Geometry createPolygonGeometryFromParts(
     final GeometryFactory geometryFactory, final List<CoordinatesList> parts) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     final List<CoordinatesList> currentParts = new ArrayList<CoordinatesList>();
@@ -240,7 +251,7 @@ public final class ShapefileGeometryUtil {
 
     readPoints(in, partIndex, parts);
 
-    return createGeometryFromParts(geometryFactory, parts);
+    return createPolygonGeometryFromParts(geometryFactory, parts);
 
   }
 
@@ -254,7 +265,7 @@ public final class ShapefileGeometryUtil {
     final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 4);
     readPoints(in, partIndex, parts);
     readCoordinates(in, partIndex, parts, 3);
-    return createGeometryFromParts(geometryFactory, parts);
+    return createPolygonGeometryFromParts(geometryFactory, parts);
 
   }
 
@@ -268,7 +279,7 @@ public final class ShapefileGeometryUtil {
     final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 3);
     readPoints(in, partIndex, parts);
     readCoordinates(in, partIndex, parts, 2);
-    return createGeometryFromParts(geometryFactory, parts);
+    return createPolygonGeometryFromParts(geometryFactory, parts);
   }
 
   public Geometry readPolygonZM(final GeometryFactory geometryFactory,
@@ -282,7 +293,7 @@ public final class ShapefileGeometryUtil {
     readPoints(in, partIndex, parts);
     readCoordinates(in, partIndex, parts, 2);
     readCoordinates(in, partIndex, parts, 3);
-    return createGeometryFromParts(geometryFactory, parts);
+    return createPolygonGeometryFromParts(geometryFactory, parts);
   }
 
   public Geometry readPolyline(final GeometryFactory geometryFactory,
@@ -654,11 +665,12 @@ public final class ShapefileGeometryUtil {
 
   public void writePolygon(final EndianOutput out, final Geometry geometry)
     throws IOException {
-    writePolygon(out, geometry, ShapefileConstants.POLYGON_SHAPE);
+    writePolygon(out, geometry, ShapefileConstants.POLYGON_SHAPE, 0, 16);
   }
 
   private List<CoordinatesList> writePolygon(final EndianOutput out,
-    final Geometry geometry, final int shapeType) throws IOException {
+    final Geometry geometry, final int shapeType, final int headerOverhead,
+    final int bytesPerPoint) throws IOException {
 
     int numPoints = 0;
 
@@ -679,7 +691,7 @@ public final class ShapefileGeometryUtil {
         for (int j = 0; j < numHoles; j++) {
           final LineString interior = polygon.getInteriorRingN(j);
           CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
-          final boolean interiorClockwise = JtsGeometryUtil.isCCW(interiorCoords);
+          final boolean interiorClockwise = !JtsGeometryUtil.isCCW(interiorCoords);
           if (interiorClockwise == clockwise) {
             interiorCoords = interiorCoords.reverse();
           }
@@ -693,6 +705,12 @@ public final class ShapefileGeometryUtil {
     }
     final int numParts = rings.size();
 
+    if (writeLength) {
+      final int recordLength = 44 + headerOverhead + 4 * numParts
+        + bytesPerPoint * numPoints;
+
+      out.writeInt(recordLength / 2);
+    }
     out.writeLEInt(shapeType);
     final Envelope envelope = geometry.getEnvelopeInternal();
     writeEnvelope(out, envelope);
@@ -714,21 +732,21 @@ public final class ShapefileGeometryUtil {
   public void writePolygonM(final EndianOutput out, final Geometry geometry)
     throws IOException {
     final List<CoordinatesList> rings = writePolygon(out, geometry,
-      ShapefileConstants.POLYGON_M_SHAPE);
+      ShapefileConstants.POLYGON_M_SHAPE, 16, 24);
     writeMCoordinates(out, rings);
   }
 
   public void writePolygonZ(final EndianOutput out, final Geometry geometry)
     throws IOException {
     final List<CoordinatesList> rings = writePolygon(out, geometry,
-      ShapefileConstants.POLYGON_Z_SHAPE);
+      ShapefileConstants.POLYGON_Z_SHAPE, 16, 24);
     writeZCoordinates(out, rings);
   }
 
   public void writePolygonZM(final EndianOutput out, final Geometry geometry)
     throws IOException {
     final List<CoordinatesList> rings = writePolygon(out, geometry,
-      ShapefileConstants.POLYGON_ZM_SHAPE);
+      ShapefileConstants.POLYGON_ZM_SHAPE, 32, 24);
     writeZCoordinates(out, rings);
     writeMCoordinates(out, rings);
   }

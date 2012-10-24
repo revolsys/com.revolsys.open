@@ -39,12 +39,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.shp.geometry.LineString2DConverter;
 import com.revolsys.io.shp.geometry.LineString3DConverter;
-import com.revolsys.io.shp.geometry.MultiPolygonConverter;
 import com.revolsys.io.shp.geometry.Point2DConverter;
 import com.revolsys.io.shp.geometry.Point3DConverter;
 import com.revolsys.io.shp.geometry.Polygon2DConverter;
@@ -72,6 +72,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private String geometryPropertyName = "geometry";
 
+  private boolean hasGeometry = false;
+
   private ResourceEndianOutput indexOut;
 
   private ResourceEndianOutput out;
@@ -96,8 +98,13 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   protected int addDbaseField(final String name, final DataType dataType,
     final Class<?> typeJavaClass, final int length, final int scale) {
     if (Geometry.class.isAssignableFrom(typeJavaClass)) {
-      addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
-      return 0;
+      if (hasGeometry) {
+        return super.addDbaseField(name, DataTypes.STRING, String.class, 254, 0);
+      } else {
+        hasGeometry = true;
+        addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
+        return 0;
+      }
     } else {
       return super.addDbaseField(name, dataType, typeJavaClass, length, scale);
     }
@@ -146,7 +153,11 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
         geometryConverter = new Polygon3DConverter();
       }
     } else if (geometry instanceof MultiPolygon) {
-      geometryConverter = new MultiPolygonConverter();
+      if (numAxis == 2) {
+        geometryConverter = new Polygon2DConverter();
+      } else {
+        geometryConverter = new Polygon3DConverter();
+      }
     } else {
       throw new RuntimeException("Not supported" + geometry.getClass());
     }

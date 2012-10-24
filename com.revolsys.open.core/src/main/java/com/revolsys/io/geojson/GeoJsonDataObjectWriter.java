@@ -245,17 +245,24 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
     final DataObjectMetaData metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
+    boolean geometryWritten = false;
+    out.endAttribute();
+    out.label(GEOMETRY);
     if (geometryIndex != -1) {
       final Geometry geometry = object.getValue(geometryIndex);
-      out.endAttribute();
-      out.label(GEOMETRY);
-      geometry(geometry);
+      if (geometry != null) {
+        geometryWritten = true;
+        geometry(geometry);
+      }
     }
+    if (!geometryWritten) {
+      out.value(null);
+    }
+    out.endAttribute();
+    out.label(PROPERTIES);
+    out.startObject();
     final int numAttributes = metaData.getAttributeCount();
     if (numAttributes > 1 || numAttributes == 1 && geometryIndex == -1) {
-      out.endAttribute();
-      out.label(PROPERTIES);
-      out.startObject();
       int lastIndex = numAttributes - 1;
       if (lastIndex == geometryIndex) {
         lastIndex--;
@@ -265,14 +272,19 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
           final String name = metaData.getAttributeName(i);
           final Object value = object.getValue(i);
           out.label(name);
-          out.value(value);
+          if (value instanceof Geometry) {
+            Geometry geometry = (Geometry)value;
+            geometry(geometry);
+          } else {
+            out.value(value);
+          }
         }
         if (i < lastIndex) {
           out.endAttribute();
         }
       }
-      out.endObject();
     }
+    out.endObject();
     out.endObject();
   }
 

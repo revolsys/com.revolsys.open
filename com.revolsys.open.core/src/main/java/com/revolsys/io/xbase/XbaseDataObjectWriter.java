@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
@@ -302,7 +303,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
         case FieldDefinition.CHARACTER_TYPE:
           String string = "";
           if (value != null) {
-            string = value.toString();
+            string = StringConverterRegistry.toString(value);
           }
           final byte[] bytes = string.getBytes(Charset.forName("ISO-8859-1"));
           if (bytes.length >= fieldLength) {

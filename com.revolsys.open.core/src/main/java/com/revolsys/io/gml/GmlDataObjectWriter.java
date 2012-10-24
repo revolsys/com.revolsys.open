@@ -14,6 +14,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataProperties;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.gml.type.GmlFieldType;
 import com.revolsys.io.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlWriter;
@@ -109,7 +110,15 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     }
     out.startTag(FEATURE_MEMBER);
     final DataObjectMetaData metaData = object.getMetaData();
-    final QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    if (qualifiedName == null) {
+      String typeName = metaData.getPath();
+      String path = PathUtil.getPath(typeName);
+      String name = PathUtil.getName(typeName);
+      qualifiedName = new QName(path, name);
+      metaData.setProperty(DataObjectMetaDataProperties.QUALIFIED_NAME,
+        qualifiedName);
+    }
     out.startTag(qualifiedName);
 
     for (final Attribute attribute : metaData.getAttributes()) {

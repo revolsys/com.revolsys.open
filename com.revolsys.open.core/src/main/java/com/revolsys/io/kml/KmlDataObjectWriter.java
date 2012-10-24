@@ -1,7 +1,9 @@
 package com.revolsys.io.kml;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.util.StringUtils;
@@ -123,9 +125,26 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     if (hasValues) {
       writer.endTag(EXTENDED_DATA);
     }
-    if (geometryIndex != -1) {
-      final Geometry geometry = object.getValue(geometryIndex);
-      writer.writeGeometry(geometry);
+    List<Integer> geometryAttributeIndexes = metaData.getGeometryAttributeIndexes();
+    if (!geometryAttributeIndexes.isEmpty()) {
+      Geometry geometry = null;
+      if (geometryAttributeIndexes.size() == 1) {
+        geometry = object.getValue(geometryAttributeIndexes.get(0));
+      } else {
+        List<Geometry> geometries = new ArrayList<Geometry>();
+        for (Integer geometryAttributeIndex : geometryAttributeIndexes) {
+          Geometry part = object.getValue(geometryAttributeIndex);
+          if (part != null) {
+            geometries.add(part);
+          }
+        }
+        if (!geometries.isEmpty()) {
+          geometry = metaData.getGeometryFactory().createGeometry(geometries);
+        }
+      }
+      if (geometry != null) {
+        writer.writeGeometry(geometry);
+      }
     }
     writer.endTag();
   }
@@ -177,7 +196,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
       if (StringUtils.hasText(style)) {
         writer.write(style);
       }
-   
+
     }
   }
 }
