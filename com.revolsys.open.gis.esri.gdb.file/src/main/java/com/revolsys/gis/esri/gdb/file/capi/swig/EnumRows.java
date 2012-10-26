@@ -9,25 +9,20 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class EnumRows {
-  public static long getCPtr(final EnumRows obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
   private long swigCPtr;
-
   protected boolean swigCMemOwn;
 
-  public EnumRows() {
-    this(EsriFileGdbJNI.new_EnumRows(), true);
-  }
-
-  public EnumRows(final long cPtr, final boolean cMemoryOwn) {
+  public EnumRows(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public void Close() {
-    EsriFileGdbJNI.EnumRows_Close(swigCPtr, this);
+  public static long getCPtr(EnumRows obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
+
+  protected void finalize() {
+    delete();
   }
 
   public synchronized void delete() {
@@ -40,24 +35,25 @@ public class EnumRows {
     }
   }
 
-  @Override
-  protected void finalize() {
-    delete();
+  public void Close() {
+    EsriFileGdbJNI.EnumRows_Close(swigCPtr, this);
   }
 
-  public int GetFieldInformation(final FieldInfo fieldInfo) {
-    return EsriFileGdbJNI.EnumRows_GetFieldInformation(swigCPtr, this,
-      FieldInfo.getCPtr(fieldInfo), fieldInfo);
+  public int GetFieldInformation(FieldInfo fieldInfo) {
+    return EsriFileGdbJNI.EnumRows_GetFieldInformation(swigCPtr, this, FieldInfo.getCPtr(fieldInfo), fieldInfo);
   }
 
-  public VectorOfFieldDef getFields() {
-    return new VectorOfFieldDef(EsriFileGdbJNI.EnumRows_getFields(swigCPtr,
-      this), true);
+  public EnumRows() {
+    this(EsriFileGdbJNI.new_EnumRows(), true);
   }
 
   public Row next() {
-    final long cPtr = EsriFileGdbJNI.EnumRows_next(swigCPtr, this);
+    long cPtr = EsriFileGdbJNI.EnumRows_next(swigCPtr, this);
     return (cPtr == 0) ? null : new Row(cPtr, true);
+  }
+
+  public VectorOfFieldDef getFields() {
+    return new VectorOfFieldDef(EsriFileGdbJNI.EnumRows_getFields(swigCPtr, this), true);
   }
 
 }

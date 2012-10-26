@@ -1,4 +1,4 @@
-package com.revolsys.swing.table.dataobject;
+package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.Component;
 
@@ -12,7 +12,7 @@ import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
 
 @SuppressWarnings("serial")
-public class DataObjectListTableCellEditor extends AbstractCellEditor implements
+public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
@@ -20,7 +20,11 @@ public class DataObjectListTableCellEditor extends AbstractCellEditor implements
 
   private ValueUiBuilder uiBuilder;
 
-  public DataObjectListTableCellEditor(
+  public DataObjectRowTableCellEditor() {
+    this(DataObjectMetaDataUiBuilderRegistry.getInstance());
+  }
+
+  public DataObjectRowTableCellEditor(
     final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
     this.uiBuilderRegistry = uiBuilderRegistry;
   }

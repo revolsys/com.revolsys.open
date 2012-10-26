@@ -21,7 +21,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
-import com.revolsys.io.json.JsonParserUtil;
+import com.revolsys.io.json.JsonParser;
 import com.revolsys.ui.web.utils.HttpRequestUtils;
 
 public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
@@ -42,7 +42,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
     try {
       final Map<String, Object> map = new HashMap<String, Object>();
       final InputStream in = inputMessage.getBody();
-      final Map<String, Object> readMap = JsonParserUtil.read(in);
+      final Map<String, Object> readMap = JsonParser.read(in);
       if (readMap != null) {
         map.putAll(readMap);
       }

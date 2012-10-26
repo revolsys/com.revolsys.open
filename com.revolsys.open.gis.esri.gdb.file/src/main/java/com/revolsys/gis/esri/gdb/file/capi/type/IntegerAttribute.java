@@ -22,6 +22,10 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
       return row.getInteger(name);
     }
   }
+  @Override
+  public int getMaxStringLength() {
+    return 11;
+  }
 
   @Override
   public Object setValue(final DataObject object, final Row row,

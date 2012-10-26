@@ -15,7 +15,6 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.io.json.JsonParser.EventType;
-import com.revolsys.io.json.JsonParserUtil;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -58,14 +57,14 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     String type = null;
     do {
       do {
-        JsonParserUtil.skipToAttribute(in, TYPE);
+        JsonParser.skipToAttribute(in, TYPE);
         if (in.getEvent() == EventType.endDocument) {
           throw new NoSuchElementException();
         } else if (in.getEvent() == EventType.unknown) {
           throw new RuntimeException("Document is not a valid GeoJson document");
         }
       } while (in.getEvent() != EventType.colon);
-      type = JsonParserUtil.getString(in);
+      type = JsonParser.getString(in);
       if (CRS.equals(type)) {
         geometryFactory = readCoordinateSystem();
       }
@@ -108,7 +107,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       && in.next() == EventType.startArray) {
       EventType event = in.getEvent();
       do {
-        final Object value = JsonParserUtil.getValue(in);
+        final Object value = JsonParser.getValue(in);
         if (value instanceof EventType) {
           event = (EventType)value;
         } else if (value instanceof Number) {
@@ -175,9 +174,9 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   private GeometryFactory readCoordinateSystem() {
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (PROPERTIES.equals(attributeName)) {
-        final Map<String, Object> properties = JsonParserUtil.getMap(in);
+        final Map<String, Object> properties = JsonParser.getMap(in);
         final String name = (String)properties.get("name");
         if (name != null) {
           if (name.startsWith(URN_OGC_DEF_CRS_EPSG)) {
@@ -219,7 +218,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     List<Geometry> geometries = new ArrayList<Geometry>();
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (GEOMETRIES.equals(attributeName)) {
         geometries = readGeometryList();
       } else if (CRS.equals(attributeName)) {
@@ -257,7 +256,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     CoordinatesList points = null;
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         points = readCoordinatesList();
       } else if (CRS.equals(attributeName)) {
@@ -273,7 +272,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     List<CoordinatesList> lineStrings = null;
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         lineStrings = readCoordinatesListList();
       } else if (CRS.equals(attributeName)) {
@@ -288,7 +287,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     List<CoordinatesList> points = null;
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         points = readPointCoordinatesListList();
       } else if (CRS.equals(attributeName)) {
@@ -304,7 +303,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     List<List<CoordinatesList>> polygonRings = null;
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         polygonRings = readCoordinatesListListList();
       } else if (CRS.equals(attributeName)) {
@@ -325,7 +324,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     CoordinatesList coordinates = null;
     GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         coordinates = readPointCoordinatesList();
       } else if (CRS.equals(attributeName)) {
@@ -338,7 +337,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private CoordinatesList readPointCoordinatesList() {
-    final double[] values = JsonParserUtil.getDoubleArray(in);
+    final double[] values = JsonParser.getDoubleArray(in);
     return new DoubleCoordinatesList(values.length, values);
   }
 
@@ -367,7 +366,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     List<CoordinatesList> rings = null;
     final GeometryFactory factory = geometryFactory;
     do {
-      final String attributeName = JsonParserUtil.skipToNextAttribute(in);
+      final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         rings = readCoordinatesListList();
       }

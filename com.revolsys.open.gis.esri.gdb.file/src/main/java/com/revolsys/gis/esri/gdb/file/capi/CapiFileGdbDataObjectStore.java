@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +37,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
@@ -77,6 +79,7 @@ import com.revolsys.io.esri.gdb.xml.model.Workspace;
 import com.revolsys.io.esri.gdb.xml.model.WorkspaceDefinition;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlProcessor;
+import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.util.JavaBeanUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -295,11 +298,15 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       typePath = metaData.getPath();
     }
+
     String where = query.getWhereClause();
     if (where == null) {
       where = "";
     }
     final List<Object> parameters = query.getParameters();
+
+    final BoundingBox boundingBox = query.getBoundingBox();
+    Map<String, Boolean> orderBy = query.getOrderBy();
     final StringBuffer whereClause = new StringBuffer();
     if (parameters.isEmpty()) {
       if (where.indexOf('?') > -1) {
@@ -323,7 +330,8 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           whereClause.append(argument);
         } else {
           whereClause.append("'");
-          whereClause.append(StringConverterRegistry.toString(argument).replaceAll("'", "''"));
+          whereClause.append(StringConverterRegistry.toString(argument)
+            .replaceAll("'", "''"));
           whereClause.append("'");
         }
         i++;
@@ -350,16 +358,53 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
             whereClause.append(value);
           } else {
             whereClause.append("'");
-            whereClause.append(StringConverterRegistry.toString(value).replaceAll("'", "''"));
+            whereClause.append(StringConverterRegistry.toString(value)
+              .replaceAll("'", "''"));
             whereClause.append("'");
           }
         }
       }
 
     }
-    final BoundingBox boundingBox = query.getBoundingBox();
+    StringBuffer sql = new StringBuffer();
+    if (orderBy.isEmpty()) {
+      sql = whereClause;
+    } else {
+      sql.append("SELECT * FROM ");
+      sql.append(JdbcUtils.getTableName(typePath));
+      if (whereClause.length() > 0) {
+        sql.append(" WHERE ");
+        sql.append(whereClause);
+      }
+      if (!orderBy.isEmpty()) {
+        boolean first = true;
+        for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
+          .iterator(); iterator.hasNext();) {
+          final Entry<String, Boolean> entry = iterator.next();
+          final String column = entry.getKey();
+          DataType dataType = metaData.getAttributeType(column);
+          // TODO at the moment only numbers are supported
+          if (dataType != null
+            && Number.class.isAssignableFrom(dataType.getJavaClass())) {
+            if (first) {
+              sql.append(" ORDER BY ");
+              first = false;
+            } else {
+              sql.append(", ");
+            }
+            sql.append(column);
+            final Boolean ascending = entry.getValue();
+            if (!ascending) {
+              sql.append(" DESC");
+            }
+
+          }
+        }
+      }
+    }
+
     final FileGdbQueryIterator iterator = new FileGdbQueryIterator(this,
-      typePath, whereClause.toString(), boundingBox);
+      typePath, sql.toString(), boundingBox);
     return iterator;
   }
 

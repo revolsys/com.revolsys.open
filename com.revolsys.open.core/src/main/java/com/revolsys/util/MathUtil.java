@@ -20,6 +20,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 
 /**
@@ -255,6 +256,19 @@ public final class MathUtil {
   public static BigDecimal divideCurrency(final BigDecimal left,
     final BigDecimal right) {
     return left.divide(right, CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
+  }
+
+  /**
+   * Divide two currency amounts, setting the scale to {@link #CURRENCY_SCALE}
+   * and rounding 1/2 u
+   * 
+   * @param left The left operand.
+   * @param right The right operand.
+   * @return The new amount.
+   */
+  public static BigDecimal add(final BigDecimal left,
+    final Number right) {
+    return left.add(new BigDecimal(StringConverterRegistry.toString(right)));
   }
 
   /**

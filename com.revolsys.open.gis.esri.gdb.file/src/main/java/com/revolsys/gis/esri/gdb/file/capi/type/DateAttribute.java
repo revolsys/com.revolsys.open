@@ -26,6 +26,10 @@ public class DateAttribute extends AbstractFileGdbAttribute {
     super(field.getName(), DataTypes.DATE, field.getRequired() == Boolean.TRUE
       || !field.isIsNullable());
   }
+  @Override
+  public int getMaxStringLength() {
+    return 10;
+  }
 
   @Override
   public Object getValue(final Row row) {

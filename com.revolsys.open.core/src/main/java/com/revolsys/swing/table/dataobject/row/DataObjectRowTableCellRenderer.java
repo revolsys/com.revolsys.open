@@ -1,4 +1,4 @@
-package com.revolsys.swing.table.dataobject;
+package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,16 +8,21 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
 
-public class DataObjectListTableCellRenderer implements TableCellRenderer {
+public class DataObjectRowTableCellRenderer implements TableCellRenderer {
   private final JLabel valueComponent;
 
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
-  public DataObjectListTableCellRenderer(
+  public DataObjectRowTableCellRenderer() {
+    this(DataObjectMetaDataUiBuilderRegistry.getInstance());
+  }
+
+  public DataObjectRowTableCellRenderer(
     final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
     this.uiBuilderRegistry = uiBuilderRegistry;
     valueComponent = new JLabel();
@@ -31,19 +36,25 @@ public class DataObjectListTableCellRenderer implements TableCellRenderer {
     final int row, final int column) {
     Component component = null;
 
-    final DataObjectListTableModel model = (DataObjectListTableModel)table.getModel();
+    final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
 
-    final DataObjectMetaData schema = model.getMetaData();
-    final boolean required = schema.isAttributeRequired(column);
-    final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
-      schema, column);
-    if (uiBuilder != null) {
-      component = uiBuilder.getRendererComponent(value);
-    } else if (value == null) {
-      valueComponent.setText("-");
-      component = valueComponent;
-    } else {
-      valueComponent.setText(value.toString());
+    final DataObjectMetaData metaData = model.getMetaData();
+    final boolean required = metaData.isAttributeRequired(column);
+    if (uiBuilderRegistry != null) {
+      final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
+        metaData, column);
+      if (uiBuilder != null) {
+        component = uiBuilder.getRendererComponent(value);
+      }
+    }
+    if (component == null) {
+      String text;
+      if (value == null) {
+        text = "-";
+      } else {
+        text = StringConverterRegistry.toString(value);
+      }
+      valueComponent.setText(text);
       component = valueComponent;
     }
     final int[] selectedRows = table.getSelectedRows();

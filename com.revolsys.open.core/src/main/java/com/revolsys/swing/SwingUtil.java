@@ -1,8 +1,12 @@
 package com.revolsys.swing;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.text.JTextComponent;
 
@@ -30,5 +34,16 @@ public class SwingUtil {
     } else {
       return null;
     }
+  }
+
+  public static void setSizeAndMaximize(JFrame frame, int minusX, int minusY) {
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Dimension screenSize = toolkit.getScreenSize();
+    double screenWidth = screenSize.getWidth();
+    double screenHeight = screenSize.getHeight();
+    Dimension size = new Dimension((int)(screenWidth-minusX), (int)(screenHeight-minusY));
+    frame.setSize(size);
+    frame.setPreferredSize(size);
+    frame.setExtendedState( frame.getExtendedState()|JFrame.MAXIMIZED_BOTH );
   }
 }

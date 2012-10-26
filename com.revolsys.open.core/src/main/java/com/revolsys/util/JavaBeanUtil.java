@@ -344,8 +344,8 @@ public final class JavaBeanUtil {
   }
 
   /**
-   * Set the value of the named property on the object. Any exceptions are
-   * wrapped as runtime exceptions.
+   * Set the value of the named property on the object. Missing properties are
+   * logged as debug statements.
    * 
    * @param object The object.
    * @param propertyName The name of the property.
@@ -353,22 +353,25 @@ public final class JavaBeanUtil {
    */
   public static void setProperty(final Object object,
     final String propertyName, final Object value) {
-    try {
-      PropertyUtils.setProperty(object, propertyName, value);
-    } catch (final IllegalAccessException e) {
-      throw new RuntimeException("Unable to set property " + propertyName, e);
-    } catch (final InvocationTargetException e) {
-      final Throwable t = e.getCause();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      } else if (t instanceof Error) {
-        throw (Error)t;
-      } else {
+    if (object != null) {
+      try {
+        PropertyUtils.setProperty(object, propertyName, value);
+      } catch (final IllegalAccessException e) {
         throw new RuntimeException("Unable to set property " + propertyName, e);
+      } catch (final InvocationTargetException e) {
+        final Throwable t = e.getCause();
+        if (t instanceof RuntimeException) {
+          throw (RuntimeException)t;
+        } else if (t instanceof Error) {
+          throw (Error)t;
+        } else {
+          throw new RuntimeException("Unable to set property " + propertyName,
+            e);
+        }
+      } catch (final NoSuchMethodException e) {
+        LOG.debug("Property " + propertyName + " does not exist on "
+          + object.getClass().getName(), e);
       }
-    } catch (final NoSuchMethodException e) {
-      throw new IllegalArgumentException("Property " + propertyName
-        + " does not exist");
     }
   }
 

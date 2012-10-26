@@ -24,6 +24,11 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
+  public int getMaxStringLength() {
+    return 19;
+  }
+
+  @Override
   public Object setValue(final DataObject object, final Row row,
     final Object value) {
     final String name = getName();

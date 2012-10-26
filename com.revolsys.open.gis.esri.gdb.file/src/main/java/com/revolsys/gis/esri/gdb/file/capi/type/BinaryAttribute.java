@@ -13,6 +13,11 @@ public class BinaryAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
+  public int getMaxStringLength() {
+    return 40;
+  }
+
+  @Override
   public Object getValue(final Row row) {
     // TODO Auto-generated method stub
     return null;

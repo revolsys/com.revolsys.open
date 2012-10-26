@@ -387,6 +387,18 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
+  public Class<?> getAttributeClass(final int i) {
+    final DataType dataType = getAttributeType(i);
+    return dataType.getJavaClass();
+  }
+
+  @Override
+  public Class<?> getAttributeClass(final CharSequence name) {
+    final DataType dataType = getAttributeType(name);
+    return dataType.getJavaClass();
+  }
+
+  @Override
   public CodeTable getCodeTableByColumn(final String column) {
     CodeTable codeTable = codeTableByColumnMap.get(column);
     if (codeTable == null && dataObjectStore != null) {

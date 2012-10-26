@@ -50,6 +50,11 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
     addReadWriteMethods("MultiPatch");
   }
 
+  @Override
+  public int getMaxStringLength() {
+    return 40;
+  }
+
   private static ShapefileGeometryUtil geometryUtil = new ShapefileGeometryUtil(
     true);
 

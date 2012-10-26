@@ -364,6 +364,11 @@ template<class T> class ArrayOut {
 SWIGINTERN void FileGDBAPI_Geodatabase_createFeatureDataset(FileGDBAPI::Geodatabase *self,std::string featureDatasetDef){
     checkResult(self->CreateFeatureDataset(featureDatasetDef));
   }
+SWIGINTERN FileGDBAPI::EnumRows *FileGDBAPI_Geodatabase_query(FileGDBAPI::Geodatabase *self,std::wstring const &sql,bool recycling){
+    FileGDBAPI::EnumRows* rows = new FileGDBAPI::EnumRows();
+    checkResult(self->ExecuteSQL(sql, recycling, *rows));
+    return rows;
+  }
 SWIGINTERN std::vector< std::wstring > FileGDBAPI_Geodatabase_getChildDatasets(FileGDBAPI::Geodatabase *self,std::wstring parentPath,std::wstring datasetType){
     std::vector<std::wstring> value;
     checkResult(self->GetChildDatasets(parentPath, datasetType, value));
@@ -1984,54 +1989,6 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Geodatabase_1ExecuteSQL(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3, jlong jarg4, jobject jarg4_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
-  std::wstring *arg2 = 0 ;
-  bool arg3 ;
-  FileGDBAPI::EnumRows *arg4 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg4_;
-  arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  arg3 = jarg3 ? true : false; 
-  arg4 = *(FileGDBAPI::EnumRows **)&jarg4;
-  if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::EnumRows & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)((FileGDBAPI::Geodatabase const *)arg1)->ExecuteSQL((std::wstring const &)*arg2,arg3,*arg4);;
-    } catch (const std::runtime_error& e) {
-      handleRuntimeError(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1Geodatabase(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   FileGDBAPI::Geodatabase *result = 0 ;
@@ -2236,6 +2193,47 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
       handleRuntimeError(jenv, e);
     }
   }
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Geodatabase_1query(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+  jlong jresult = 0 ;
+  FileGDBAPI::Geodatabase *arg1 = (FileGDBAPI::Geodatabase *) 0 ;
+  std::wstring *arg2 = 0 ;
+  bool arg3 ;
+  FileGDBAPI::EnumRows *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::Geodatabase **)&jarg1; 
+  if(!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
+    return 0;
+  }
+  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
+  if (!arg2_pstr) return 0;
+  jsize arg2_len = jenv->GetStringLength(jarg2);
+  std::wstring arg2_str;
+  if (arg2_len) {
+    arg2_str.reserve(arg2_len);
+    for (jsize i = 0; i < arg2_len; ++i) {
+      arg2_str.push_back((wchar_t)arg2_pstr[i]);
+    }
+  }
+  arg2 = &arg2_str;
+  jenv->ReleaseStringChars(jarg2, arg2_pstr);
+  
+  arg3 = jarg3 ? true : false; 
+  {
+    try {
+      result = (FileGDBAPI::EnumRows *)FileGDBAPI_Geodatabase_query(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleRuntimeError(jenv, e);
+    }
+  }
+  *(FileGDBAPI::EnumRows **)&jresult = result; 
+  return jresult;
 }
 
 

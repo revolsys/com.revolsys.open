@@ -71,7 +71,7 @@ public final class JdbcUtils {
     }
   }
 
-  private static void addOrderBy(final StringBuffer sql,
+  public static void addOrderBy(final StringBuffer sql,
     final Map<String, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");

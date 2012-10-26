@@ -9,25 +9,20 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class Guid {
-  public static long getCPtr(final Guid obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
   private long swigCPtr;
-
   protected boolean swigCMemOwn;
 
-  public Guid() {
-    this(EsriFileGdbJNI.new_Guid(), true);
-  }
-
-  public Guid(final long cPtr, final boolean cMemoryOwn) {
+  public Guid(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public void Create() {
-    EsriFileGdbJNI.Guid_Create(swigCPtr, this);
+  public static long getCPtr(Guid obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
+
+  protected void finalize() {
+    delete();
   }
 
   public synchronized void delete() {
@@ -40,29 +35,30 @@ public class Guid {
     }
   }
 
-  public boolean equal(final Guid other) {
-    return EsriFileGdbJNI.Guid_equal(swigCPtr, this, Guid.getCPtr(other), other);
-  }
-
-  @Override
-  protected void finalize() {
-    delete();
-  }
-
-  public int FromString(final String guidString) {
-    return EsriFileGdbJNI.Guid_FromString(swigCPtr, this, guidString);
-  }
-
-  public boolean notEqual(final Guid other) {
-    return EsriFileGdbJNI.Guid_notEqual(swigCPtr, this, Guid.getCPtr(other),
-      other);
+  public Guid() {
+    this(EsriFileGdbJNI.new_Guid(), true);
   }
 
   public void SetNull() {
     EsriFileGdbJNI.Guid_SetNull(swigCPtr, this);
   }
 
-  @Override
+  public void Create() {
+    EsriFileGdbJNI.Guid_Create(swigCPtr, this);
+  }
+
+  public int FromString(String guidString) {
+    return EsriFileGdbJNI.Guid_FromString(swigCPtr, this, guidString);
+  }
+
+  public boolean equal(Guid other) {
+    return EsriFileGdbJNI.Guid_equal(swigCPtr, this, Guid.getCPtr(other), other);
+  }
+
+  public boolean notEqual(Guid other) {
+    return EsriFileGdbJNI.Guid_notEqual(swigCPtr, this, Guid.getCPtr(other), other);
+  }
+
   public String toString() {
     return EsriFileGdbJNI.Guid_toString(swigCPtr, this);
   }

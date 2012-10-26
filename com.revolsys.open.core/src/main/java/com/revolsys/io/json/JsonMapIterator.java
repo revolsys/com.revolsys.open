@@ -34,7 +34,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
         if (parser.hasNext()) {
           event = parser.next();
           if (event == EventType.startObject) {
-            JsonParserUtil.getString(parser);
+            JsonParser.getString(parser);
             if (parser.hasNext()) {
               event = parser.next();
               if (event == EventType.colon) {
@@ -105,7 +105,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>> {
         close();
         return null;
       } else {
-        currentRecord = JsonParserUtil.getMap(parser);
+        currentRecord = JsonParser.getMap(parser);
         return currentRecord;
       }
     } else {

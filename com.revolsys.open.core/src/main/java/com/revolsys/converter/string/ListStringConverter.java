@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.io.json.JsonParserUtil;
+import com.revolsys.io.json.JsonParser;
 
 public class ListStringConverter implements StringConverter<List<String>> {
   @Override
@@ -45,7 +45,7 @@ public class ListStringConverter implements StringConverter<List<String>> {
   @Override
   @SuppressWarnings("unchecked")
   public List<String> toObject(final String string) {
-    final Object value = JsonParserUtil.read(string);
+    final Object value = JsonParser.read(string);
     if (value instanceof List) {
       return (List<String>)value;
     } else {

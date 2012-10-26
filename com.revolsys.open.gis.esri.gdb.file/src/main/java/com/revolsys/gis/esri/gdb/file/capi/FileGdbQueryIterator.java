@@ -104,7 +104,11 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   protected void doInit() {
     synchronized (dataStore) {
       if (boundingBox == null) {
-        rows = dataStore.search(table, fields, whereClause, true);
+        if (whereClause.startsWith("SELECT *")) {
+           rows = dataStore.getGeodatabase().query(whereClause, false);
+        } else {
+          rows = dataStore.search(table, fields, whereClause, true);
+        }
       } else {
         final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope boundingBox = GeometryConverter.toEsri(this.boundingBox);
         rows = dataStore.search(table, fields, whereClause, boundingBox, true);

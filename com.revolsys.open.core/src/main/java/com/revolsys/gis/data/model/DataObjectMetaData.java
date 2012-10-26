@@ -45,6 +45,10 @@ public interface DataObjectMetaData extends ObjectWithProperties,
 
   Attribute getAttribute(int index);
 
+  Class<?> getAttributeClass(CharSequence name);
+
+  Class<?> getAttributeClass(int index);
+
   /**
    * Get the number of attributes supported by the type.
    * 

@@ -1,5 +1,6 @@
-package com.revolsys.swing.table.dataobject;
+package com.revolsys.swing.table.dataobject.row;
 
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -11,7 +12,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.table.AbstractTableModel;
+import javax.annotation.PreDestroy;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SortOrder;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -20,50 +25,29 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.table.Reorderable;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class DataObjectListTableModel extends AbstractTableModel implements
+public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {
-  private static int compareBoolean(final Boolean b1, final Boolean b2) {
-    final boolean bool1 = b1.booleanValue();
-    final boolean bool2 = b2.booleanValue();
-    if (bool1 == bool2) {
-      return 0;
-    }
-    return bool1 ? 1 : -1;
+  private static final long serialVersionUID = 1L;
+
+  public static JPanel createPanel(DataObjectMetaData metaData,
+    final List<DataObject> objects) {
+    JTable table = createTable(metaData, objects);
+    final JScrollPane scrollPane = new JScrollPane(table);
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.add(scrollPane, BorderLayout.CENTER);
+    return panel;
   }
 
-  private static int compareValue(final Object o1, final Object o2) {
-    if (o1 == null) {
-      return -1;
-    }
-    if (o2 == null) {
-      return 1;
-    }
-
-    if (o1 instanceof Boolean) {
-      return compareBoolean((Boolean)o1, (Boolean)o2);
-    } else if (o1 instanceof Geometry) {
-      return 0; // for now - change to compare type
-    } else if (o1 instanceof Comparable) {
-      final Comparable attribute1 = (Comparable)o1;
-      final Comparable attribute2 = (Comparable)o2;
-      return attribute1.compareTo(attribute2);
-    }
-    return 0;
+  public static DataObjectRowTable createTable(
+    final DataObjectMetaData metaData, final List<DataObject> objects) {
+    final DataObjectListTableModel model = new DataObjectListTableModel(
+      metaData, objects);
+    return new DataObjectRowTable(model);
   }
-
-  private List<String> columnNames = new ArrayList<String>();
 
   private final List<DataObject> objects = new ArrayList<DataObject>();
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
-
-  private DataObjectMetaData metaData;
-
-  private boolean sortAscending = true;
-
-  private int sortedColumnIndex = -1;
-
-  private String sortedColumnName = null;
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     final List<DataObject> objects) {
@@ -72,9 +56,9 @@ public class DataObjectListTableModel extends AbstractTableModel implements
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
     List<String> columnNames, final List<DataObject> objects) {
-    this.metaData = metaData;
+    super(metaData, columnNames);
     this.objects.addAll(objects);
-    this.columnNames = new ArrayList<String>(columnNames);
+    setEditable(true);
   }
 
   public void addAll(final Collection<DataObject> objects) {
@@ -87,8 +71,9 @@ public class DataObjectListTableModel extends AbstractTableModel implements
     this.propertyChangeListeners.add(propertyChangeListener);
   }
 
+  @PreDestroy
   public void dispose() {
-    metaData = null;
+    super.dispose();
     objects.clear();
   }
 
@@ -101,31 +86,8 @@ public class DataObjectListTableModel extends AbstractTableModel implements
     }
   }
 
-  @Override
-  public int getColumnCount() {
-    return columnNames.size();
-  }
-
-  @Override
-  public String getColumnName(final int column) {
-    return columnNames.get(column);
-  }
-
   public DataObject getObject(final int index) {
     return objects.get(index);
-  }
-
-  public List<DataObject> getObjects(final int[] rows) {
-    final List<DataObject> objects = new ArrayList<DataObject>();
-    for (final int row : rows) {
-      final DataObject object = getObject(row);
-      objects.add(object);
-    }
-    return objects;
-  }
-
-  public DataObjectMetaData getMetaData() {
-    return metaData;
   }
 
   /**
@@ -144,44 +106,20 @@ public class DataObjectListTableModel extends AbstractTableModel implements
     return objects.size();
   }
 
-  /**
-   * @return the sortedColumnIndex
-   */
-  public int getSortedColumnIndex() {
-    return sortedColumnIndex;
-  }
-
-  public String getSortedColumnName() {
-    return sortedColumnName;
-  }
-
-  @Override
-  public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final DataObject object = getObject(rowIndex);
-    if (object == null) {
-      return null;
-    } else {
-      String columnName = getColumnName(columnIndex);
-      return object.getValue(columnName);
-    }
-  }
-
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
-    String columnName = getColumnName(columnIndex);
-    DataType dataType = metaData.getAttributeType(columnName);
-    if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
-      return false;
+    if (isEditable()) {
+      String columnName = getColumnName(columnIndex);
+      DataObjectMetaData metaData = getMetaData();
+      DataType dataType = metaData.getAttributeType(columnName);
+      if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+        return false;
+      } else {
+        return true;
+      }
     } else {
-      return true;
+      return false;
     }
-  }
-
-  /**
-   * @return the sortAscending
-   */
-  public boolean isSortAscending() {
-    return sortAscending;
   }
 
   public void removeAll(DataObject... removedFeatures) {
@@ -226,49 +164,15 @@ public class DataObjectListTableModel extends AbstractTableModel implements
     }
   }
 
-  public void sort(final int index) {
-    if (index < getColumnCount()) {
-      if (index == sortedColumnIndex) {
-        sortAscending = !sortAscending;
-      } else {
-        sortAscending = true;
-      }
-      sortedColumnIndex = index;
-      final String attributeName = getColumnName(index);
-      final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
-        sortAscending, attributeName);
-      Collections.sort(objects, comparitor);
-      fireTableDataChanged();
-    }
-  }
-
-  public void sort(final String columnName) {
-    if (columnName != null) {
-      sort(columnName, columnName.equals(sortedColumnName) ? (!sortAscending)
-        : true);
-    }
-  }
-
-  public void sort(final String columnName, final boolean ascending) {
-    this.sortAscending = ascending;
-    this.sortedColumnName = columnName;
-
-    final int column = metaData.getAttributeIndex(columnName);
-    Collections.sort(objects, new Comparator<Object>() {
-      private int ascendingCompare(final Object o1, final Object o2) {
-        final DataObject f1 = (DataObject)o1;
-        final DataObject f2 = (DataObject)o2;
-
-        final Object v1 = f1.getValue(column);
-        final Object v2 = f2.getValue(column);
-        return compareValue(v1, v2);
-      }
-
-      @Override
-      public int compare(final Object o1, final Object o2) {
-        return ascendingCompare(o1, o2) * (ascending ? 1 : (-1));
-      }
-    });
+  @Override
+  public SortOrder setSortOrder(int column) {
+    SortOrder sortOrder = super.setSortOrder(column);
+    final String attributeName = getAttributeName(column);
+    final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
+      sortOrder == SortOrder.ASCENDING, attributeName);
+    Collections.sort(objects, comparitor);
+    fireTableDataChanged();
+    return sortOrder;
   }
 
   public void add(DataObject... objects) {
@@ -291,6 +195,7 @@ public class DataObjectListTableModel extends AbstractTableModel implements
     DataObject object = getObject(fromIndex);
     removeAll(object);
     add(toIndex, object);
+    clearSortedColumns();
   }
 
   public void add(int index, DataObject object) {

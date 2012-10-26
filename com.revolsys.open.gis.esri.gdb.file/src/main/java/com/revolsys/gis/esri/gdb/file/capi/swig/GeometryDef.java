@@ -9,21 +9,20 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class GeometryDef {
-  public static long getCPtr(final GeometryDef obj) {
+  private long swigCPtr;
+  protected boolean swigCMemOwn;
+
+  public GeometryDef(long cPtr, boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
+  }
+
+  public static long getCPtr(GeometryDef obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  private long swigCPtr;
-
-  protected boolean swigCMemOwn;
-
-  public GeometryDef() {
-    this(EsriFileGdbJNI.new_GeometryDef(), true);
-  }
-
-  public GeometryDef(final long cPtr, final boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+  protected void finalize() {
+    delete();
   }
 
   public synchronized void delete() {
@@ -36,19 +35,28 @@ public class GeometryDef {
     }
   }
 
-  @Override
-  protected void finalize() {
-    delete();
+  public GeometryDef() {
+    this(EsriFileGdbJNI.new_GeometryDef(), true);
   }
 
-  public GeometryType getGeometryType() {
-    return GeometryType.swigToEnum(EsriFileGdbJNI.GeometryDef_getGeometryType(
-      swigCPtr, this));
+  public int SetGeometryType(GeometryType geometryType) {
+    return EsriFileGdbJNI.GeometryDef_SetGeometryType(swigCPtr, this, geometryType.swigValue());
   }
 
-  public int GetSpatialReference(final SpatialReference spatialReference) {
-    return EsriFileGdbJNI.GeometryDef_GetSpatialReference(swigCPtr, this,
-      SpatialReference.getCPtr(spatialReference), spatialReference);
+  public int SetHasZ(boolean hasZ) {
+    return EsriFileGdbJNI.GeometryDef_SetHasZ(swigCPtr, this, hasZ);
+  }
+
+  public int SetHasM(boolean hasM) {
+    return EsriFileGdbJNI.GeometryDef_SetHasM(swigCPtr, this, hasM);
+  }
+
+  public int GetSpatialReference(SpatialReference spatialReference) {
+    return EsriFileGdbJNI.GeometryDef_GetSpatialReference(swigCPtr, this, SpatialReference.getCPtr(spatialReference), spatialReference);
+  }
+
+  public int SetSpatialReference(SpatialReference spatialReference) {
+    return EsriFileGdbJNI.GeometryDef_SetSpatialReference(swigCPtr, this, SpatialReference.getCPtr(spatialReference), spatialReference);
   }
 
   public boolean hasM() {
@@ -59,22 +67,8 @@ public class GeometryDef {
     return EsriFileGdbJNI.GeometryDef_hasZ(swigCPtr, this);
   }
 
-  public int SetGeometryType(final GeometryType geometryType) {
-    return EsriFileGdbJNI.GeometryDef_SetGeometryType(swigCPtr, this,
-      geometryType.swigValue());
-  }
-
-  public int SetHasM(final boolean hasM) {
-    return EsriFileGdbJNI.GeometryDef_SetHasM(swigCPtr, this, hasM);
-  }
-
-  public int SetHasZ(final boolean hasZ) {
-    return EsriFileGdbJNI.GeometryDef_SetHasZ(swigCPtr, this, hasZ);
-  }
-
-  public int SetSpatialReference(final SpatialReference spatialReference) {
-    return EsriFileGdbJNI.GeometryDef_SetSpatialReference(swigCPtr, this,
-      SpatialReference.getCPtr(spatialReference), spatialReference);
+  public GeometryType getGeometryType() {
+    return GeometryType.swigToEnum(EsriFileGdbJNI.GeometryDef_getGeometryType(swigCPtr, this));
   }
 
 }

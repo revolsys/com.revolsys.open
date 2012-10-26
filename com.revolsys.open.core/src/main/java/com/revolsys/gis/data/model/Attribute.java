@@ -1,23 +1,3 @@
-/*
- * $URL: https://secure.revolsys.com/svn/open.revolsys.com/rs-gis-core/trunk/src/main/java/com/revolsys/gis/data/model/metadata/Attribute.java $
- * $Author: paul.austin@revolsys.com $
- * $Date: 2008-05-29 08:12:08 -0700 (Thu, 29 May 2008) $
- * $Revision: 1307 $
- *
- * Copyright 2004-2008 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.revolsys.gis.data.model;
 
 import java.util.LinkedHashMap;
@@ -37,6 +17,10 @@ import com.revolsys.io.AbstractObjectWithProperties;
  */
 public class Attribute extends AbstractObjectWithProperties implements
   Cloneable {
+  private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
+
+  private Object defaultValue;
+
   /** The description of the attribute. */
   private String description;
 
@@ -56,10 +40,6 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /** The data type of the attribute value. */
   private DataType type;
-
-  private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
-
-  private Object defaultValue;
 
   public Attribute() {
   }
@@ -280,6 +260,18 @@ public class Attribute extends AbstractObjectWithProperties implements
    * @return The maximum length of an attribute value.
    */
   public int getLength() {
+    return length;
+  }
+
+  public int getMaxStringLength() {
+    int length = this.length;
+    if (scale > 0) {
+      length += 1;
+      length += scale;
+    }
+    if (Number.class.isAssignableFrom(type.getJavaClass())) {
+      length += 1;
+    }
     return length;
   }
 

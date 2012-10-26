@@ -139,6 +139,7 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %rename(openGeodatabase2) FileGDBAPI::OpenGeodatabase;
 %rename(closeGeodatabase2) FileGDBAPI::CloseGeodatabase;
 %rename(deleteGeodatabase2) FileGDBAPI::DeleteGeodatabase;
+%ignore FileGDBAPI::Geodatabase::ExecuteSQL;
 %ignore FileGDBAPI::Geodatabase::GetDatasetDefinition;
 %ignore FileGDBAPI::Geodatabase::GetDatasetDocumentation;
 %ignore FileGDBAPI::Geodatabase::GetQueryName;
@@ -157,6 +158,12 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %extend FileGDBAPI::Geodatabase {
   void createFeatureDataset(std::string featureDatasetDef) {
     checkResult(self->CreateFeatureDataset(featureDatasetDef));
+  }
+
+  FileGDBAPI::EnumRows* query(const std::wstring& sql, bool recycling) {
+    FileGDBAPI::EnumRows* rows = new FileGDBAPI::EnumRows();
+    checkResult(self->ExecuteSQL(sql, recycling, *rows));
+    return rows;
   }
 
   std::vector<std::wstring> getChildDatasets(std::wstring parentPath, std::wstring datasetType) {

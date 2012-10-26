@@ -9,45 +9,20 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class Geodatabase {
-  public static long getCPtr(final Geodatabase obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
   private long swigCPtr;
-
   protected boolean swigCMemOwn;
 
-  public Geodatabase() {
-    this(EsriFileGdbJNI.new_Geodatabase(), true);
-  }
-
-  public Geodatabase(final long cPtr, final boolean cMemoryOwn) {
+  public Geodatabase(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public void alterDomain(final String domainDefinition) {
-    EsriFileGdbJNI.Geodatabase_alterDomain(swigCPtr, this, domainDefinition);
+  public static long getCPtr(Geodatabase obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  public void closeTable(final Table table) {
-    EsriFileGdbJNI.Geodatabase_closeTable(swigCPtr, this, Table.getCPtr(table),
-      table);
-  }
-
-  public void createDomain(final String domainDefinition) {
-    EsriFileGdbJNI.Geodatabase_createDomain(swigCPtr, this, domainDefinition);
-  }
-
-  public void createFeatureDataset(final String featureDatasetDef) {
-    EsriFileGdbJNI.Geodatabase_createFeatureDataset(swigCPtr, this,
-      featureDatasetDef);
-  }
-
-  public Table createTable(final String tableDefinition, final String parent) {
-    final long cPtr = EsriFileGdbJNI.Geodatabase_createTable(swigCPtr, this,
-      tableDefinition, parent);
-    return (cPtr == 0) ? null : new Table(cPtr, true);
+  protected void finalize() {
+    delete();
   }
 
   public synchronized void delete() {
@@ -60,105 +35,103 @@ public class Geodatabase {
     }
   }
 
-  public int Delete(final String path, final String datasetType) {
-    return EsriFileGdbJNI.Geodatabase_Delete(swigCPtr, this, path, datasetType);
+  public int GetDatasetTypes(VectorOfWString datasetTypes) {
+    return EsriFileGdbJNI.Geodatabase_GetDatasetTypes(swigCPtr, this, VectorOfWString.getCPtr(datasetTypes), datasetTypes);
   }
 
-  public void deleteDomain(final String domainName) {
-    EsriFileGdbJNI.Geodatabase_deleteDomain(swigCPtr, this, domainName);
+  public int GetDatasetRelationshipTypes(VectorOfWString relationshipTypes) {
+    return EsriFileGdbJNI.Geodatabase_GetDatasetRelationshipTypes(swigCPtr, this, VectorOfWString.getCPtr(relationshipTypes), relationshipTypes);
   }
 
-  public int ExecuteSQL(final String sqlStmt, final boolean recycling,
-    final EnumRows rows) {
-    return EsriFileGdbJNI.Geodatabase_ExecuteSQL(swigCPtr, this, sqlStmt,
-      recycling, EnumRows.getCPtr(rows), rows);
+  public int GetRelatedDatasets(String path, String relType, String datasetType, VectorOfWString relatedDatasets) {
+    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path, relType, datasetType, VectorOfWString.getCPtr(relatedDatasets), relatedDatasets);
   }
 
-  @Override
-  protected void finalize() {
-    delete();
+  public int GetChildDatasetDefinitions(String parentPath, String datasetType, VectorOfString childDatasetDefs) {
+    return EsriFileGdbJNI.Geodatabase_GetChildDatasetDefinitions(swigCPtr, this, parentPath, datasetType, VectorOfString.getCPtr(childDatasetDefs), childDatasetDefs);
   }
 
-  public int GetChildDatasetDefinitions(final String parentPath,
-    final String datasetType, final VectorOfString childDatasetDefs) {
-    return EsriFileGdbJNI.Geodatabase_GetChildDatasetDefinitions(swigCPtr,
-      this, parentPath, datasetType, VectorOfString.getCPtr(childDatasetDefs),
-      childDatasetDefs);
+  public int GetRelatedDatasetDefinitions(String path, String relType, String datasetType, VectorOfString relatedDatasetDefs) {
+    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr, this, path, relType, datasetType, VectorOfString.getCPtr(relatedDatasetDefs), relatedDatasetDefs);
   }
 
-  public VectorOfWString getChildDatasets(final String parentPath,
-    final String datasetType) {
-    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getChildDatasets(
-      swigCPtr, this, parentPath, datasetType), true);
+  public int Rename(String path, String datasetType, String newName) {
+    return EsriFileGdbJNI.Geodatabase_Rename(swigCPtr, this, path, datasetType, newName);
   }
 
-  public String getDatasetDefinition(final String path, final String datasetType) {
-    return EsriFileGdbJNI.Geodatabase_getDatasetDefinition(swigCPtr, this,
-      path, datasetType);
-  }
-
-  public String getDatasetDocumentation(final String path,
-    final String datasetType) {
-    return EsriFileGdbJNI.Geodatabase_getDatasetDocumentation(swigCPtr, this,
-      path, datasetType);
-  }
-
-  public int GetDatasetRelationshipTypes(final VectorOfWString relationshipTypes) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetRelationshipTypes(swigCPtr,
-      this, VectorOfWString.getCPtr(relationshipTypes), relationshipTypes);
-  }
-
-  public int GetDatasetTypes(final VectorOfWString datasetTypes) {
-    return EsriFileGdbJNI.Geodatabase_GetDatasetTypes(swigCPtr, this,
-      VectorOfWString.getCPtr(datasetTypes), datasetTypes);
-  }
-
-  public String getDomainDefinition(final String domainName) {
-    return EsriFileGdbJNI.Geodatabase_getDomainDefinition(swigCPtr, this,
-      domainName);
-  }
-
-  public VectorOfWString getDomains() {
-    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getDomains(swigCPtr,
-      this), true);
-  }
-
-  public String getQueryName(final String path) {
-    return EsriFileGdbJNI.Geodatabase_getQueryName(swigCPtr, this, path);
-  }
-
-  public int GetRelatedDatasetDefinitions(final String path,
-    final String relType, final String datasetType,
-    final VectorOfString relatedDatasetDefs) {
-    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasetDefinitions(swigCPtr,
-      this, path, relType, datasetType,
-      VectorOfString.getCPtr(relatedDatasetDefs), relatedDatasetDefs);
-  }
-
-  public int GetRelatedDatasets(final String path, final String relType,
-    final String datasetType, final VectorOfWString relatedDatasets) {
-    return EsriFileGdbJNI.Geodatabase_GetRelatedDatasets(swigCPtr, this, path,
-      relType, datasetType, VectorOfWString.getCPtr(relatedDatasets),
-      relatedDatasets);
-  }
-
-  public String getTableDefinition(final String path) {
-    return EsriFileGdbJNI.Geodatabase_getTableDefinition(swigCPtr, this, path);
-  }
-
-  public int Move(final String path, final String newParentPath) {
+  public int Move(String path, String newParentPath) {
     return EsriFileGdbJNI.Geodatabase_Move(swigCPtr, this, path, newParentPath);
   }
 
-  public Table openTable(final String path) {
-    final long cPtr = EsriFileGdbJNI.Geodatabase_openTable(swigCPtr, this, path);
+  public int Delete(String path, String datasetType) {
+    return EsriFileGdbJNI.Geodatabase_Delete(swigCPtr, this, path, datasetType);
+  }
+
+  public Geodatabase() {
+    this(EsriFileGdbJNI.new_Geodatabase(), true);
+  }
+
+  public void createFeatureDataset(String featureDatasetDef) {
+    EsriFileGdbJNI.Geodatabase_createFeatureDataset(swigCPtr, this, featureDatasetDef);
+  }
+
+  public EnumRows query(String sql, boolean recycling) {
+    long cPtr = EsriFileGdbJNI.Geodatabase_query(swigCPtr, this, sql, recycling);
+    return (cPtr == 0) ? null : new EnumRows(cPtr, false);
+  }
+
+  public VectorOfWString getChildDatasets(String parentPath, String datasetType) {
+    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getChildDatasets(swigCPtr, this, parentPath, datasetType), true);
+  }
+
+  public String getDatasetDefinition(String path, String datasetType) {
+    return EsriFileGdbJNI.Geodatabase_getDatasetDefinition(swigCPtr, this, path, datasetType);
+  }
+
+  public String getDatasetDocumentation(String path, String datasetType) {
+    return EsriFileGdbJNI.Geodatabase_getDatasetDocumentation(swigCPtr, this, path, datasetType);
+  }
+
+  public VectorOfWString getDomains() {
+    return new VectorOfWString(EsriFileGdbJNI.Geodatabase_getDomains(swigCPtr, this), true);
+  }
+
+  public String getDomainDefinition(String domainName) {
+    return EsriFileGdbJNI.Geodatabase_getDomainDefinition(swigCPtr, this, domainName);
+  }
+
+  public void createDomain(String domainDefinition) {
+    EsriFileGdbJNI.Geodatabase_createDomain(swigCPtr, this, domainDefinition);
+  }
+
+  public void alterDomain(String domainDefinition) {
+    EsriFileGdbJNI.Geodatabase_alterDomain(swigCPtr, this, domainDefinition);
+  }
+
+  public void deleteDomain(String domainName) {
+    EsriFileGdbJNI.Geodatabase_deleteDomain(swigCPtr, this, domainName);
+  }
+
+  public String getQueryName(String path) {
+    return EsriFileGdbJNI.Geodatabase_getQueryName(swigCPtr, this, path);
+  }
+
+  public Table openTable(String path) {
+    long cPtr = EsriFileGdbJNI.Geodatabase_openTable(swigCPtr, this, path);
     return (cPtr == 0) ? null : new Table(cPtr, true);
   }
 
-  public int Rename(final String path, final String datasetType,
-    final String newName) {
-    return EsriFileGdbJNI.Geodatabase_Rename(swigCPtr, this, path, datasetType,
-      newName);
+  public void closeTable(Table table) {
+    EsriFileGdbJNI.Geodatabase_closeTable(swigCPtr, this, Table.getCPtr(table), table);
+  }
+
+  public String getTableDefinition(String path) {
+    return EsriFileGdbJNI.Geodatabase_getTableDefinition(swigCPtr, this, path);
+  }
+
+  public Table createTable(String tableDefinition, String parent) {
+    long cPtr = EsriFileGdbJNI.Geodatabase_createTable(swigCPtr, this, tableDefinition, parent);
+    return (cPtr == 0) ? null : new Table(cPtr, true);
   }
 
 }

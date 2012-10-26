@@ -1,4 +1,4 @@
-package com.revolsys.swing.table.dataobject;
+package com.revolsys.swing.table.dataobject.row;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,9 @@ public class ResultPagerTableModel<T> extends AbstractTableModel {
   private List<String> titles = new ArrayList<String>();
 
   private ResultPager<T> pager;
+
+  public ResultPagerTableModel() {
+  }
 
   public ResultPagerTableModel(final List<String> attributeNames) {
     this(attributeNames, attributeNames, null);
@@ -43,7 +46,7 @@ public class ResultPagerTableModel<T> extends AbstractTableModel {
     attributeNames = null;
     pager = null;
   }
-
+ 
   @Override
   public int getColumnCount() {
     return attributeNames.size();

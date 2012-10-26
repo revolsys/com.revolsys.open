@@ -20,6 +20,10 @@ public class OidAttribute extends AbstractFileGdbAttribute {
       return row.getOid();
     }
   }
+  @Override
+  public int getMaxStringLength() {
+    return 10;
+  }
 
   @Override
   public void setPostInsertValue(final DataObject object, final Row row) {

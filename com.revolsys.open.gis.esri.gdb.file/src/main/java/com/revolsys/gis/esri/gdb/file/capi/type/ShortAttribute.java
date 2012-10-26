@@ -12,6 +12,11 @@ public class ShortAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
+  public int getMaxStringLength() {
+    return 6;
+  }
+
+  @Override
   public Object getValue(final Row row) {
     final String name = getName();
     if (row.isNull(name)) {

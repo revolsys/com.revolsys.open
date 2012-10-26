@@ -9,37 +9,20 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class VectorOfWString {
-  public static long getCPtr(final VectorOfWString obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
   private long swigCPtr;
-
   protected boolean swigCMemOwn;
 
-  public VectorOfWString() {
-    this(EsriFileGdbJNI.new_VectorOfWString__SWIG_0(), true);
-  }
-
-  public VectorOfWString(final long n) {
-    this(EsriFileGdbJNI.new_VectorOfWString__SWIG_1(n), true);
-  }
-
-  public VectorOfWString(final long cPtr, final boolean cMemoryOwn) {
+  public VectorOfWString(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public void add(final String x) {
-    EsriFileGdbJNI.VectorOfWString_add(swigCPtr, this, x);
+  public static long getCPtr(VectorOfWString obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  public long capacity() {
-    return EsriFileGdbJNI.VectorOfWString_capacity(swigCPtr, this);
-  }
-
-  public void clear() {
-    EsriFileGdbJNI.VectorOfWString_clear(swigCPtr, this);
+  protected void finalize() {
+    delete();
   }
 
   public synchronized void delete() {
@@ -52,29 +35,44 @@ public class VectorOfWString {
     }
   }
 
-  @Override
-  protected void finalize() {
-    delete();
+  public VectorOfWString() {
+    this(EsriFileGdbJNI.new_VectorOfWString__SWIG_0(), true);
   }
 
-  public String get(final int i) {
-    return EsriFileGdbJNI.VectorOfWString_get(swigCPtr, this, i);
+  public VectorOfWString(long n) {
+    this(EsriFileGdbJNI.new_VectorOfWString__SWIG_1(n), true);
+  }
+
+  public long size() {
+    return EsriFileGdbJNI.VectorOfWString_size(swigCPtr, this);
+  }
+
+  public long capacity() {
+    return EsriFileGdbJNI.VectorOfWString_capacity(swigCPtr, this);
+  }
+
+  public void reserve(long n) {
+    EsriFileGdbJNI.VectorOfWString_reserve(swigCPtr, this, n);
   }
 
   public boolean isEmpty() {
     return EsriFileGdbJNI.VectorOfWString_isEmpty(swigCPtr, this);
   }
 
-  public void reserve(final long n) {
-    EsriFileGdbJNI.VectorOfWString_reserve(swigCPtr, this, n);
+  public void clear() {
+    EsriFileGdbJNI.VectorOfWString_clear(swigCPtr, this);
   }
 
-  public void set(final int i, final String val) {
+  public void add(String x) {
+    EsriFileGdbJNI.VectorOfWString_add(swigCPtr, this, x);
+  }
+
+  public String get(int i) {
+    return EsriFileGdbJNI.VectorOfWString_get(swigCPtr, this, i);
+  }
+
+  public void set(int i, String val) {
     EsriFileGdbJNI.VectorOfWString_set(swigCPtr, this, i, val);
-  }
-
-  public long size() {
-    return EsriFileGdbJNI.VectorOfWString_size(swigCPtr, this);
   }
 
 }
