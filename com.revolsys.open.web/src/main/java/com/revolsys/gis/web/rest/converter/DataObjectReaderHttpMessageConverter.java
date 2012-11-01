@@ -34,7 +34,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.kml.Kml22Constants;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectReaderHttpMessageConverter extends
@@ -143,7 +143,7 @@ public class DataObjectReaderHttpMessageConverter extends
         String baseName = (String)requestAttributes.getAttribute(
           "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
         if (baseName == null) {
-          baseName = HttpRequestUtils.getRequestBaseFileName();
+          baseName = HttpServletUtils.getRequestBaseFileName();
         }
         String contentDisposition = (String)requestAttributes.getAttribute(
           "contentDisposition", RequestAttributes.SCOPE_REQUEST);
@@ -162,7 +162,7 @@ public class DataObjectReaderHttpMessageConverter extends
           RequestAttributes.SCOPE_REQUEST))) {
           writer.setProperty(IoConstants.WRAP_PROPERTY, false);
         }
-        final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+        final HttpServletRequest request = HttpServletUtils.getRequest();
         String callback = request.getParameter("jsonp");
         if (callback == null) {
           callback = request.getParameter("callback");

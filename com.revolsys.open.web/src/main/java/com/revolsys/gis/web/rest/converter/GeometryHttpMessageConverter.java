@@ -25,7 +25,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryHttpMessageConverter extends
@@ -124,7 +124,7 @@ public class GeometryHttpMessageConverter extends
         throw new IllegalArgumentException("Media type " + actualMediaType
           + " not supported");
       } else {
-        final String baseName = HttpRequestUtils.getRequestBaseFileName();
+        final String baseName = HttpServletUtils.getRequestBaseFileName();
         final Writer<Geometry> writer = writerFactory.createGeometryWriter(
           baseName, body, charset);
         writer.write(geometry);

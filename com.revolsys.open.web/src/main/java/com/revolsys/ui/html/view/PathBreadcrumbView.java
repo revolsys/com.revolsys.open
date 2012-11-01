@@ -18,7 +18,7 @@ package com.revolsys.ui.html.view;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 
 public class PathBreadcrumbView extends Element {
@@ -44,7 +44,7 @@ public class PathBreadcrumbView extends Element {
   @Override
   public void serializeElement(final XmlWriter out) {
     String path = this.path.substring(contextPath.length());
-    final String pathPrefix = HttpRequestUtils.getRequestAttribute(PathAliasController.PATH_PREFIX);
+    final String pathPrefix = HttpServletUtils.getRequestAttribute(PathAliasController.PATH_PREFIX);
     String crumbPath = contextPath;
     if (pathPrefix != null && path.startsWith(pathPrefix)) {
       path = path.substring(pathPrefix.length());

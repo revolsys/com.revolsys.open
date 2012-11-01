@@ -38,7 +38,7 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.model.DocInfo;
 import com.revolsys.ui.model.PageInfo;
 import com.revolsys.ui.model.ParameterInfo;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 
@@ -106,7 +106,7 @@ public class PageInfoHttpMessageConverter extends
   private String getUrl(final String parentUrl, final String childUrl) {
     String childUri;
     if (childUrl.startsWith("/")) {
-      childUri = HttpRequestUtils.getServerUrl() + childUrl;
+      childUri = HttpServletUtils.getServerUrl() + childUrl;
     } else if (parentUrl.charAt(parentUrl.length() - 1) != '/') {
       childUri = parentUrl + "/" + childUrl;
     } else {
@@ -125,14 +125,14 @@ public class PageInfoHttpMessageConverter extends
         charset = DEFAULT_CHARSET;
       }
 
-      final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+      final HttpServletRequest request = HttpServletUtils.getRequest();
 
       String url = pageInfo.getUrl();
       if (url == null) {
-        url = HttpRequestUtils.getServerUrl();
+        url = HttpServletUtils.getServerUrl();
         url += urlPathHelper.getOriginatingRequestUri(request);
       } else if (url.startsWith("/")) {
-        url = HttpRequestUtils.getServerUrl() + url;
+        url = HttpServletUtils.getServerUrl() + url;
       }
 
       boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
@@ -190,7 +190,7 @@ public class PageInfoHttpMessageConverter extends
         writer.endTag(HtmlUtil.DIV);
       }
     }
-    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String method : pageInfo.getMethods()) {
       @SuppressWarnings("rawtypes")
       final Map parameterMap = request.getParameterMap();
@@ -428,7 +428,7 @@ public class PageInfoHttpMessageConverter extends
         out, charset));
       writer.setProperty(IoConstants.INDENT_PROPERTY, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
-      final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+      final HttpServletRequest request = HttpServletUtils.getRequest();
       String callback = request.getParameter("jsonp");
       if (callback == null) {
         callback = request.getParameter("callback");

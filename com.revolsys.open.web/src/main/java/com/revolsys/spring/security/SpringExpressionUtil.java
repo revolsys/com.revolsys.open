@@ -9,14 +9,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class SpringExpressionUtil {
 
   public static EvaluationContext createEvaluationContext(final Object object) {
     final EvaluationContext evaluationContext = new StandardEvaluationContext(
       object);
-    final Map<String, String> pathVariables = HttpRequestUtils.getPathVariables();
+    final Map<String, String> pathVariables = HttpServletUtils.getPathVariables();
     setVariables(evaluationContext, pathVariables);
     return evaluationContext;
   }

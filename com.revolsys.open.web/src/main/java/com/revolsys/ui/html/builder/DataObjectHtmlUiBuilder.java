@@ -22,7 +22,7 @@ import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.html.view.TabElementContainer;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JavaBeanUtil;
 
 public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
@@ -187,10 +187,10 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
       search = search.toUpperCase();
       List<KeySerializer> serializers = getSerializers(pageName, "list");
       StringBuffer whereClause = new StringBuffer();
-      int numSortColumns = HttpRequestUtils.getIntegerParameter(request,
+      int numSortColumns = HttpServletUtils.getIntegerParameter(request,
         "iColumns");
       for (int i = 0; i < numSortColumns; i++) {
-        if (HttpRequestUtils.getBooleanParameter(request, "bSearchable_" + i)) {
+        if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
           if (whereClause.length() > 0) {
             whereClause.append(" OR ");
           }

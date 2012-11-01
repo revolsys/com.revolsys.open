@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
@@ -12,15 +13,18 @@ import org.springframework.web.util.WebUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 
-public final class HttpRequestUtils {
+public final class HttpServletUtils {
   private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
 
-  public static void clearHttpServletRequest() {
+  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
+
+  public static void clearRequestAndResponse() {
     REQUEST_LOCAL.remove();
+    RESPONSE_LOCAL.remove();
   }
 
   public static String getFullRequestUrl() {
-    return getFullRequestUrl(getHttpServletRequest());
+    return getFullRequestUrl(getRequest());
   }
 
   public static String getFullRequestUrl(final HttpServletRequest request) {
@@ -29,13 +33,31 @@ public final class HttpRequestUtils {
     return serverUrl + requestUri;
   }
 
-  public static HttpServletRequest getHttpServletRequest() {
+  public static HttpServletRequest getRequest() {
     final HttpServletRequest request = REQUEST_LOCAL.get();
     return request;
   }
 
+  public static HttpServletResponse getResponse() {
+    final HttpServletResponse response = RESPONSE_LOCAL.get();
+    return response;
+  }
+
+  public static <T> T notFound() {
+    HttpServletResponse response = getResponse();
+    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    return null;
+  }
+
+  public static <T> T seeOther(String location) {
+    HttpServletResponse response = getResponse();
+    response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+    response.setHeader("Location", location);
+    return null;
+  }
+
   public static String getOriginatingRequestUri() {
-    final HttpServletRequest request = getHttpServletRequest();
+    final HttpServletRequest request = getRequest();
     final String originatingRequestUri = new UrlPathHelper().getOriginatingRequestUri(request);
     return originatingRequestUri;
   }
@@ -45,7 +67,7 @@ public final class HttpRequestUtils {
   }
 
   public static Map<String, String> getPathVariables() {
-    final HttpServletRequest request = getHttpServletRequest();
+    final HttpServletRequest request = getRequest();
     if (request != null) {
       @SuppressWarnings("unchecked")
       Map<String, String> pathVariables = (Map<String, String>)request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
@@ -60,7 +82,7 @@ public final class HttpRequestUtils {
   }
 
   public static <T> T getRequestAttribute(final String name) {
-    final HttpServletRequest request = getHttpServletRequest();
+    final HttpServletRequest request = getRequest();
     if (request == null) {
       return null;
     } else {
@@ -81,7 +103,7 @@ public final class HttpRequestUtils {
   }
 
   public static String getServerUrl() {
-    return getServerUrl(getHttpServletRequest());
+    return getServerUrl(getRequest());
   }
 
   public static String getServerUrl(final HttpServletRequest request) {
@@ -106,8 +128,10 @@ public final class HttpRequestUtils {
 
   }
 
-  public static void setHttpServletRequest(final HttpServletRequest request) {
+  public static void setRequestAndResponse(final HttpServletRequest request,
+    HttpServletResponse response) {
     REQUEST_LOCAL.set(request);
+    RESPONSE_LOCAL.set(response);
   }
 
   public static void setPathVariable(final String name, final String value) {
@@ -143,7 +167,7 @@ public final class HttpRequestUtils {
     return false;
   }
 
-  private HttpRequestUtils() {
+  private HttpServletUtils() {
 
   }
 }

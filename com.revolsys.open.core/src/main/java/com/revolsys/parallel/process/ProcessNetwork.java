@@ -244,9 +244,13 @@ public class ProcessNetwork implements BeanPostProcessor,
     }
   }
 
+  private boolean stopping = false;
+
   @PreDestroy
   public void stop() {
     synchronized (sync) {
+      stopping = true;
+      sync.notifyAll();
       if (processes != null) {
         try {
           for (final Thread thread : new ArrayList<Thread>(processes.values())) {
@@ -259,7 +263,6 @@ public class ProcessNetwork implements BeanPostProcessor,
           finishRunning();
         }
       }
-      sync.notifyAll();
     }
   }
 
@@ -273,7 +276,7 @@ public class ProcessNetwork implements BeanPostProcessor,
 
       synchronized (sync) {
         try {
-          while (count > 0) {
+          while (!stopping && count > 0) {
             try {
               sync.wait();
             } catch (final InterruptedException e) {

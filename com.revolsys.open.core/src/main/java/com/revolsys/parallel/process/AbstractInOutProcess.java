@@ -91,6 +91,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
 
   @Override
   public final void run() {
+    boolean hasError = false;
     final Logger log = Logger.getLogger(getClass());
     try {
       log.debug("Start");
@@ -102,7 +103,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
       log.debug("Shutdown");
     } catch (final Throwable e) {
       log.error(e.getMessage(), e);
-      getProcessNetwork().stop();
+      hasError = true;
     } finally {
       if (in != null) {
         in.readDisconnect();
@@ -111,6 +112,9 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
         out.writeDisconnect();
       }
       destroy();
+    }
+    if (hasError) {
+      getProcessNetwork().stop();
     }
   }
 

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class SavedRequestFilter extends OncePerRequestFilter {
 
@@ -18,15 +18,16 @@ public class SavedRequestFilter extends OncePerRequestFilter {
     final HttpServletRequest request,
     final HttpServletResponse response,
     final FilterChain filterChain) throws ServletException, IOException {
-    final HttpServletRequest savedRequest = HttpRequestUtils.getHttpServletRequest();
-    try {
-      HttpRequestUtils.setHttpServletRequest(request);
+    final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
+    final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
+      try {
+      HttpServletUtils.setRequestAndResponse(request,response);
       filterChain.doFilter(request, response);
     } finally {
       if (savedRequest == null) {
-        HttpRequestUtils.clearHttpServletRequest();
+        HttpServletUtils.clearRequestAndResponse();
       } else {
-        HttpRequestUtils.setHttpServletRequest(request);
+        HttpServletUtils.setRequestAndResponse(savedRequest, savedResponse);
       }
     }
   }

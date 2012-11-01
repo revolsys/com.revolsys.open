@@ -21,7 +21,7 @@ import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JavaBeanUtil;
 
 public class ActionFormKeySerializer extends AbstractKeySerializer implements
@@ -109,7 +109,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
         out.attribute(HtmlUtil.ATTR_METHOD, "post");
         out.attribute(HtmlUtil.ATTR_TARGET, getTarget());
         final String lowerLabel = getLabel().toLowerCase();
-        final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+        final HttpServletRequest request = HttpServletUtils.getRequest();
         for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
           HtmlUtil.serializeHiddenInput(out, parameterName,
             request.getParameter(parameterName));

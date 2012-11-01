@@ -17,7 +17,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ListOfMapHttpMessageConverter extends
   AbstractHttpMessageConverter<ArrayListOfMap> {
@@ -52,7 +52,7 @@ public class ListOfMapHttpMessageConverter extends
       body, charset));
     writer.setProperty(IoConstants.INDENT_PROPERTY, true);
     writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);
-    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
     writer.setProperty(IoConstants.JSON_LIST_ROOT_PROPERTY,
       request.getAttribute(IoConstants.JSON_LIST_ROOT_PROPERTY));
     String callback = request.getParameter("jsonp");

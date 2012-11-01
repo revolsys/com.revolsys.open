@@ -27,7 +27,7 @@ import com.revolsys.spring.StringTemplate;
 import com.revolsys.spring.security.SpringExpressionUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.exception.PageNotFoundException;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
@@ -37,8 +37,8 @@ public class Page extends Component {
 
   public static String getAbsoluteUrl(final String url) {
     if (url.startsWith("/")) {
-      final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-      final String serverUrl = HttpRequestUtils.getServerUrl(request);
+      final HttpServletRequest request = HttpServletUtils.getRequest();
+      final String serverUrl = HttpServletUtils.getServerUrl(request);
       final String contextPath = new UrlPathHelper().getOriginatingContextPath(request);
       return serverUrl + contextPath + url;
     } else {
@@ -253,7 +253,7 @@ public class Page extends Component {
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
       parameters);
-    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
     if (request != null) {
 
       for (final Argument argument : arguments) {
@@ -375,8 +375,8 @@ public class Page extends Component {
 
   public Map<String, Object> getUriTemplateVariables(
     final Map<String, Object> parameters) {
-    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
-    final Map<String, String> pathVariables = HttpRequestUtils.getPathVariables();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    final Map<String, String> pathVariables = HttpServletUtils.getPathVariables();
     final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
 
     for (final String name : uriTemplate.getVariableNames()) {

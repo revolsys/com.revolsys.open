@@ -80,7 +80,7 @@ import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
-import com.revolsys.ui.web.utils.HttpRequestUtils;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
@@ -559,7 +559,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ResultPager<? extends Object> pager, final String pageName) {
     try {
       final int numRecords = pager.getNumResults();
-      int pageSize = HttpRequestUtils.getIntegerParameter(request,
+      int pageSize = HttpServletUtils.getIntegerParameter(request,
         "iDisplayLength");
       if (pageSize < 0) {
         pageSize = numRecords;
@@ -568,7 +568,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
       pager.setPageSize(pageSize);
 
-      final int recordNumber = HttpRequestUtils.getIntegerParameter(request,
+      final int recordNumber = HttpServletUtils.getIntegerParameter(request,
         "iDisplayStart");
       int pageNumber = (int)Math.ceil(recordNumber / (double)pageSize);
       if (pageNumber <= 0) {
@@ -1343,7 +1343,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void redirect(final HttpServletResponse response, String url) {
     final Map<String, Object> parameters = new HashMap<String, Object>();
-    final HttpServletRequest request = HttpRequestUtils.getHttpServletRequest();
+    final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
       final String value = request.getParameter(parameterName);
       if (StringUtils.hasText(value)) {
