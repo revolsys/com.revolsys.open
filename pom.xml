@@ -96,6 +96,10 @@
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <goals>deploy</goals>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <developmentVersion>${project.version}</developmentVersion>
+          <tagNameFormat>@{project.version}</tagNameFormat>
+          <updateDependencies>false</updateDependencies>
         </configuration>
       </plugin>
       <plugin>
