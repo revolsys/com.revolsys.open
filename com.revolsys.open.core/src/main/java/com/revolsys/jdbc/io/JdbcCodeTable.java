@@ -117,12 +117,13 @@ public class JdbcCodeTable extends AbstractCodeTable {
           final PreparedStatement statement = connection.prepareStatement(insertSql);
           try {
             id = dataStore.getNextPrimaryKey(sequenceName);
-            statement.setObject(1, id);
+            int index = 1;
+            index = JdbcUtils.setValue(statement, index, id);
             for (int i = 0; i < valueColumns.size(); i++) {
               final Object value = values.get(i);
-              statement.setObject(i + 2, value);
+              index = JdbcUtils.setValue(statement, index, value);
             }
-            if (statement.executeUpdate() > 0) {
+             if (statement.executeUpdate() > 0) {
               return id;
             } else {
               return null;
@@ -266,9 +267,10 @@ public class JdbcCodeTable extends AbstractCodeTable {
         try {
           final PreparedStatement statement = connection.prepareStatement(idByValueSql);
           try {
+            int index = 1;
             for (int i = 0; i < valueColumns.size(); i++) {
               final Object value = values.get(i);
-              statement.setObject(i + 1, value);
+              index = JdbcUtils.setValue(statement, index, value);
             }
             final ResultSet resultSet = statement.executeQuery();
             try {
@@ -308,7 +310,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
         try {
           final PreparedStatement statement = connection.prepareStatement(valueByIdSql);
           try {
-            statement.setObject(1, id);
+            JdbcUtils.setValue(statement, 1, id);
             final ResultSet rs = statement.executeQuery();
             try {
               if (rs.next()) {

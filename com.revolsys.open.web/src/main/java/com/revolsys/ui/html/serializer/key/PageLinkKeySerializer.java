@@ -5,11 +5,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
-import com.revolsys.util.JavaBeanUtil;
 
 public class PageLinkKeySerializer extends AbstractKeySerializer implements
   HtmlUiBuilderAware<HtmlUiBuilder<?>> {
@@ -46,9 +45,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
 
         uiBuilder = uiBuilder.getBuilder(currentObject);
         if (uiBuilder == null) {
-          final String message = currentObject.getClass().getName()
-            + " does not have a property " + key;
-          out.element(HtmlUtil.B, message);
+          out.write(StringConverterRegistry.toString(currentObject));
           return;
         }
         key = parts[i + 1];

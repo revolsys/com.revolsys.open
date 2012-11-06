@@ -44,10 +44,11 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
           final PreparedStatement statement = connection.prepareStatement(insertSql);
           try {
             id = dataStore.getNextPrimaryKey(getMetaData());
-            statement.setObject(1, id);
+            int index = 1;
+            index = JdbcUtils.setValue(statement, index, id);
             for (int i = 0; i < getValueAttributeNames().size(); i++) {
               final Object value = values.get(i);
-              statement.setObject(i + 2, value);
+              index = JdbcUtils.setValue(statement, index, value);
             }
             if (statement.executeUpdate() > 0) {
               return id;

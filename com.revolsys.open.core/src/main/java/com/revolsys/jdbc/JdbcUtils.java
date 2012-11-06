@@ -1,6 +1,5 @@
 package com.revolsys.jdbc;
 
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -238,7 +237,7 @@ public final class JdbcUtils {
     try {
       final PreparedStatement statement = connection.prepareStatement(sql);
       try {
-        statement.setObject(1, id);
+        setValue(statement, 1, id);
         statement.executeQuery();
       } catch (final SQLException e) {
         LOG.error("Unable to delete:" + sql, e);
@@ -259,15 +258,7 @@ public final class JdbcUtils {
     final String sql, final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        if (parameter instanceof Date) {
-          Date date = (Date)parameter;
-          statement.setDate(i + 1, date);
-        } else {
-          statement.setObject(i + 1, parameter);
-        }
-      }
+      setParameters(statement, parameters);
       return statement.executeUpdate();
     } finally {
       close(statement);
@@ -454,10 +445,7 @@ public final class JdbcUtils {
     final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-      }
+      setParameters(statement, parameters);
       final ResultSet resultSet = statement.executeQuery();
       try {
         if (resultSet.next()) {
@@ -497,10 +485,7 @@ public final class JdbcUtils {
     final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-      }
+      setParameters(statement, parameters);
       final ResultSet resultSet = statement.executeQuery();
       try {
         if (resultSet.next()) {
@@ -545,10 +530,7 @@ public final class JdbcUtils {
     final List<T> results = new ArrayList<T>();
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-      }
+      setParameters(statement, parameters);
       final ResultSet resultSet = statement.executeQuery();
       try {
         while (resultSet.next()) {
@@ -569,10 +551,7 @@ public final class JdbcUtils {
     final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-      }
+      setParameters(statement, parameters);
       final ResultSet resultSet = statement.executeQuery();
       try {
         if (resultSet.next()) {
@@ -612,15 +591,7 @@ public final class JdbcUtils {
     final String sql, final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        if (parameter instanceof BigInteger) {
-          final BigInteger bigInt = (BigInteger)parameter;
-          statement.setLong(i + 1, bigInt.longValue());
-        } else {
-          statement.setObject(i + 1, parameter);
-        }
-      }
+      setParameters(statement, parameters);
       final ResultSet resultSet = statement.executeQuery();
       try {
         if (resultSet.next()) {
@@ -651,10 +622,7 @@ public final class JdbcUtils {
     final String sql, final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
-        statement.setObject(i + 1, parameter);
-      }
+      setParameters(statement, parameters);
       final ResultSet resultSet = statement.executeQuery();
       try {
         if (resultSet.next()) {
@@ -690,6 +658,15 @@ public final class JdbcUtils {
     }
   }
 
+  public static void setParameters(final PreparedStatement statement,
+    final Object... parameters) throws SQLException {
+    int index = 1;
+    for (int i = 0; i < parameters.length; i++) {
+      final Object parameter = parameters[i];
+      index = setValue(statement, index, parameter);
+    }
+  }
+
   public static int setPreparedStatementFilterParameters(
     final DataObjectMetaData metaData, final PreparedStatement statement,
     int parameterIndex, final Map<String, ? extends Object> filter)
@@ -705,7 +682,7 @@ public final class JdbcUtils {
             jdbcAttribute = (JdbcAttribute)attribute;
 
           } else {
-            jdbcAttribute = new JdbcAttribute();
+            jdbcAttribute = JdbcAttribute.createAttribute(value);
           }
           if (value instanceof Collection) {
             final Collection<?> collection = (Collection<?>)value;
@@ -740,18 +717,23 @@ public final class JdbcUtils {
     int statementParameterIndex = 1;
     for (int i = 0; i < parameters.size(); i++) {
       final Attribute attribute = parameterAttributes.get(i);
+      final Object value = parameters.get(i);
       JdbcAttribute jdbcAttribute;
       if (attribute instanceof JdbcAttribute) {
         jdbcAttribute = (JdbcAttribute)attribute;
-
       } else {
-        jdbcAttribute = new JdbcAttribute();
+        jdbcAttribute = JdbcAttribute.createAttribute(value);
       }
-      final Object value = parameters.get(i);
       statementParameterIndex = jdbcAttribute.setPreparedStatementValue(
         statement, statementParameterIndex, value);
     }
     return statementParameterIndex;
+  }
+
+  public static int setValue(final PreparedStatement statement,
+    final int index, final Object value) throws SQLException {
+    final JdbcAttribute attribute = JdbcAttribute.createAttribute(value);
+    return attribute.setPreparedStatementValue(statement, index, value);
   }
 
   private JdbcUtils() {
