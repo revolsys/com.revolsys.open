@@ -3,7 +3,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>2012.11.06.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <artifactId>com.revolsys.open.gis.google.fusiontables</artifactId>
   <name>RS Google Fusion Tables</name>
