@@ -46,7 +46,10 @@ public final class HttpServletUtils {
 
   public static <T> T notFound() {
     HttpServletResponse response = getResponse();
-    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    try {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not found");
+    } catch (IOException e) {
+    }
     return null;
   }
 
