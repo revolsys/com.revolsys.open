@@ -125,22 +125,28 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   private LinearRing parseLinearRing() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINEAR_RING);
     CoordinatesList cooordinatesList = null;
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (!StaxUtils.isEndElementLocalName(in, LINEAR_RING)
+      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    final LinearRing ring = geometryFactory.createLinearRing(cooordinatesList);
     StaxUtils.skipToEndElementByLocalName(in, LINEAR_RING);
+    final LinearRing ring = geometryFactory.createLinearRing(cooordinatesList);
     return ring;
+  }
+
+  public String toString() {
+    return StaxUtils.toString(in);
   }
 
   private LineString parseLineString() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINE_STRING);
     CoordinatesList cooordinatesList = null;
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (!StaxUtils.isEndElementLocalName(in, LINE_STRING)
+      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
       } else {
@@ -155,7 +161,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   private Geometry parseMultiGeometry() throws XMLStreamException {
     StaxUtils.requireLocalName(in, MULTI_GEOMETRY);
     final List<Geometry> geometries = new ArrayList<Geometry>();
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (!StaxUtils.isEndElementLocalName(in, MULTI_GEOMETRY)
+      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Geometry geometry = parseGeometry();
       if (geometry != null) {
         geometries.add(geometry);
@@ -169,7 +176,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   private LinearRing parseOuterBoundary() throws XMLStreamException {
     StaxUtils.requireLocalName(in, OUTER_BOUNDARY_IS);
     LinearRing ring = null;
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (!StaxUtils.isEndElementLocalName(in, OUTER_BOUNDARY_IS)
+      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (ring == null && StaxUtils.matchElementLocalName(in, LINEAR_RING)) {
         ring = parseLinearRing();
       } else {
@@ -183,7 +191,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   private Point parsePoint() throws XMLStreamException {
     StaxUtils.requireLocalName(in, POINT);
     CoordinatesList cooordinatesList = null;
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (!StaxUtils.isEndElementLocalName(in, POINT)
+      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (cooordinatesList == null
         && StaxUtils.matchElementLocalName(in, COORDINATES)) {
         cooordinatesList = parseCoordinates();
@@ -199,7 +208,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   private Polygon parsePolygon() throws XMLStreamException {
     StaxUtils.requireLocalName(in, POLYGON);
     final List<LinearRing> rings = new ArrayList<LinearRing>();
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (!StaxUtils.isEndElementLocalName(in, POLYGON)
+      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (rings.isEmpty()) {
         if (StaxUtils.matchElementLocalName(in, OUTER_BOUNDARY_IS)) {
           rings.add(parseOuterBoundary());

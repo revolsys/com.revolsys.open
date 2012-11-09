@@ -1,5 +1,6 @@
 package com.revolsys.ui.web.utils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +54,15 @@ public final class HttpServletUtils {
     HttpServletResponse response = getResponse();
     response.setStatus(HttpServletResponse.SC_SEE_OTHER);
     response.setHeader("Location", location);
+    return null;
+  }
+
+  public static <T> T sendRedirect(String location) {
+    HttpServletResponse response = getResponse();
+    try {
+      response.sendRedirect(location);
+    } catch (IOException e) {
+    }
     return null;
   }
 

@@ -308,6 +308,17 @@ public final class StaxUtils {
     next(parser);
   }
 
+  public static boolean isEndElementLocalName(final XMLStreamReader parser,
+    final QName name) {
+    if (parser.isEndElement()) {
+      QName elementName = parser.getName();
+      if (elementName.getLocalPart().equals(name.getLocalPart())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Skip all events until the next end element event.
    * 
@@ -320,7 +331,7 @@ public final class StaxUtils {
       || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
       next(parser);
     }
-    next(parser);
+    skipWhitespace(parser);
   }
 
   /**
@@ -387,6 +398,37 @@ public final class StaxUtils {
         element.getNamespaceURI());
     } catch (final XMLStreamException e) {
       ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  public static String toString(final XMLStreamReader in) {
+    if (in == null) {
+      return null;
+    } else {
+      try {
+        final int eventType = in.getEventType();
+        switch (eventType) {
+          case XMLStreamConstants.START_DOCUMENT:
+            return "startDocument";
+          case XMLStreamConstants.END_DOCUMENT:
+            return "endDocument";
+          case XMLStreamConstants.START_ELEMENT:
+            return "start " + in.getName();
+          case XMLStreamConstants.END_ELEMENT:
+            return "end " + in.getName();
+          case XMLStreamConstants.CDATA:
+            return "cdata";
+          case XMLStreamConstants.CHARACTERS:
+            return "characters " + in.getElementText();
+          case XMLStreamConstants.SPACE:
+            return "whitespace";
+
+          default:
+            return "unknown:" + eventType;
+        }
+      } catch (final XMLStreamException e) {
+        return e.getMessage();
+      }
     }
   }
 
