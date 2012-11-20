@@ -99,7 +99,7 @@
           <updateDependencies>false</updateDependencies>
         </configuration>
       </plugin>
-      <plugin>
+<!--      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-maven-plugin</artifactId>
         <version>1.7</version>
@@ -112,7 +112,7 @@
           <version>${releaseVersion}</version>
         </configuration>
       </plugin>
-      <plugin>
+ -->       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
         <version>2.3.1</version>
