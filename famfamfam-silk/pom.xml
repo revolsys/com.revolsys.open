@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>famfamfam-silk</artifactId>
   <name>Fam Fam Fam Silk Icons</name>
-  <version>TRUNK-SNAPSHOT</version>
+  <version>2012.11.20.RELEASE</version>
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>2012.11.20.RELEASE</version>
   </parent>
   <licenses>
     <license>
