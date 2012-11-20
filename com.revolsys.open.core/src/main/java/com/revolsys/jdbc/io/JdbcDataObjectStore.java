@@ -9,6 +9,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.Reader;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -46,4 +47,6 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   @Override
   void setLabel(String label);
+
+  Statistics getStatistics(String name);
 }

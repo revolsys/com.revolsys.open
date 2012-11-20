@@ -58,6 +58,8 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   Short getShort(final CharSequence name);
 
+  String getString(final CharSequence name);
+
   DataObjectState getState();
 
   String getTypeName();

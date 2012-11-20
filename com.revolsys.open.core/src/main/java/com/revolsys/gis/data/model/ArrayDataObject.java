@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.sql.Clob;
+import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
@@ -274,6 +276,25 @@ public class ArrayDataObject extends AbstractMap<String, Object> implements
       return null;
     } else {
       return value.shortValue();
+    }
+  }
+
+  @Override
+  public String getString(final CharSequence name) {
+    final Object value = getValue(name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof String) {
+      return (String)value.toString();
+    } else if (value instanceof Clob) {
+      Clob clob = (Clob)value;
+      try {
+        return clob.getSubString(1, (int)clob.length());
+      } catch (SQLException e) {
+        throw new RuntimeException("Unable to read clob", e);
+      }
+    } else {
+      return value.toString();
     }
   }
 

@@ -81,7 +81,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private Query query;
 
-  private final Statistics statistics;
+  private Statistics statistics;
 
   public JdbcQueryIterator(final JdbcDataObjectStore dataStore,
     final Query query, final Map<String, Object> properties) {
@@ -122,6 +122,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     query = null;
     resultSet = null;
     statement = null;
+    statistics = null;
   }
 
   @Override

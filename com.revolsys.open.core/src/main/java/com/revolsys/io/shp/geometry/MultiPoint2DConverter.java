@@ -37,6 +37,6 @@ public class MultiPoint2DConverter implements ShapefileGeometryConverter {
   @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
-
+    ShapefileGeometryUtil.SHP_INSTANCE.writeMultipoint(out, geometry);
   }
 }

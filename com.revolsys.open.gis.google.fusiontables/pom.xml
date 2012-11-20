@@ -24,7 +24,7 @@
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>com.revolsys.open.core</artifactId>
-      <version>2012.11.06.RELEASE</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

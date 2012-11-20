@@ -94,6 +94,7 @@ public final class HttpServletUtils {
     return new HashMap<String, String>();
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> T getRequestAttribute(final String name) {
     final HttpServletRequest request = getRequest();
     if (request == null) {
@@ -182,5 +183,11 @@ public final class HttpServletUtils {
 
   private HttpServletUtils() {
 
+  }
+
+  public static void setAttribute(String name,
+    Object value) {
+    HttpServletRequest request = getRequest();
+    request.setAttribute(name, value);
   }
 }

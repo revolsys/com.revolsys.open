@@ -31,6 +31,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
@@ -345,6 +346,10 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public StatisticsMap getStatistics() {
     return statistics;
+  }
+
+  public Statistics getStatistics(String name) {
+    return statistics.getStatistics(name);
   }
 
   public String getString(final Object name) {

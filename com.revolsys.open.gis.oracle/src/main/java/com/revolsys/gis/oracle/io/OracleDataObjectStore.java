@@ -154,6 +154,9 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
       OracleBlobAttributeAdder blobAdder = new OracleBlobAttributeAdder();
       addAttributeAdder("BLOB", blobAdder);
+
+      OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
+      addAttributeAdder("CLOB", clobAdder);
     }
   }
 

@@ -104,6 +104,8 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     }
     if (StringUtils.hasText(styleUrl)) {
       writer.element(STYLE_URL, styleUrl);
+    } else if (StringUtils.hasText(defaultStyleUrl)) {
+      writer.element(STYLE_URL, defaultStyleUrl);
     }
     boolean hasValues = false;
     for (int i = 0; i < metaData.getAttributeCount(); i++) {

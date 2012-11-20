@@ -51,6 +51,6 @@ public class MultiPoint3DConverter implements ShapefileGeometryConverter {
   @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
-
+    ShapefileGeometryUtil.SHP_INSTANCE.writeMultipointZM(out, geometry);
   }
 }

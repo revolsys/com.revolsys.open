@@ -60,7 +60,7 @@ public class Polygon3DConverter implements ShapefileGeometryConverter {
   @Override
   public void write(final EndianOutput out, final Geometry geometry)
     throws IOException {
-    ShapefileGeometryUtil.SHP_INSTANCE.writePolygonZ(out, geometry);
+    ShapefileGeometryUtil.SHP_INSTANCE.writePolygonZM(out, geometry);
 
   }
 }

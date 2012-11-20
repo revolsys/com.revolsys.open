@@ -58,6 +58,10 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     }
   }
 
+  public Statistics getStatistics() {
+    return statistics;
+  }
+
   @Override
   public void flush() {
     for (final Writer<DataObject> writer : writers.values()) {

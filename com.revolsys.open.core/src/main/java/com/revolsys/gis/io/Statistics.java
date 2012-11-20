@@ -62,7 +62,7 @@ public class Statistics {
   }
 
   public synchronized void add(final String name, final long count) {
-    final Long oldCount = counts.get(name);
+     final Long oldCount = counts.get(name);
     if (oldCount == null) {
       counts.put(name, count);
     } else {
