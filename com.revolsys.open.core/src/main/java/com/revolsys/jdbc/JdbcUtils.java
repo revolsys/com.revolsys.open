@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.Attribute;
@@ -276,12 +277,7 @@ public final class JdbcUtils {
   }
 
   public static Connection getConnection(final DataSource dataSource) {
-    try {
-      return DataSourceUtils.getConnection(dataSource);
-    } catch (final Throwable e) {
-      throw new RuntimeException(
-        "Unknown error getting connection from data source ", e);
-    }
+    return DataSourceUtils.getConnection(dataSource);
   }
 
   public static String getDeleteSql(final Query query) {

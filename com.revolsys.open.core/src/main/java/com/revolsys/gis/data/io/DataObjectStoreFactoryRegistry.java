@@ -25,13 +25,13 @@ public class DataObjectStoreFactoryRegistry {
   public static <T extends DataObjectStore> T createDataObjectStore(
     final Map<String, Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
-    final DataObjectStoreFactory factory = getDataSourceFactory(url);
+    final DataObjectStoreFactory factory = getDataStoreFactory(url);
     return (T)factory.createDataObjectStore(connectionProperties);
   }
 
   public static <T extends DataObjectStore> T createDataObjectStore(
     final String url) {
-    final DataObjectStoreFactory factory = getDataSourceFactory(url);
+    final DataObjectStoreFactory factory = getDataStoreFactory(url);
     final Map<String, Object> connectionProperties = new HashMap<String, Object>();
     connectionProperties.put("url", url);
     return (T)factory.createDataObjectStore(connectionProperties);
@@ -40,11 +40,11 @@ public class DataObjectStoreFactoryRegistry {
   public static Class<?> getDataObjectStoreInterfaceClass(
     final Map<String, Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
-    final DataObjectStoreFactory factory = getDataSourceFactory(url);
+    final DataObjectStoreFactory factory = getDataStoreFactory(url);
     return factory.getDataObjectStoreInterfaceClass(connectionProperties);
   }
 
-  public static DataObjectStoreFactory getDataSourceFactory(final String url) {
+  public static DataObjectStoreFactory getDataStoreFactory(final String url) {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {

@@ -90,12 +90,10 @@ public class Statistics {
     sb.append("\n");
   }
 
-  @PostConstruct
   public synchronized void connect() {
     providerCount++;
   }
 
-  @PreDestroy
   public synchronized void disconnect() {
     providerCount--;
     if (providerCount <= 0) {
