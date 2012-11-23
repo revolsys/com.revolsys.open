@@ -1,5 +1,8 @@
 ESRI_FILE_GBD_HOME=C:\Apps\EsriFileGdb-1.2
 ESRI_FILE_GBD_INCLUDE=$(ESRI_FILE_GBD_HOME)\include
+#TOOLS=C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC
+#WIN_SDK=C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A
+
 TOOLS=C:\Program Files\Microsoft Visual Studio 10.0\VC
 WIN_SDK=C:\Program Files\Microsoft SDKs\Windows\v7.0a
 WINLIBS=kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib
