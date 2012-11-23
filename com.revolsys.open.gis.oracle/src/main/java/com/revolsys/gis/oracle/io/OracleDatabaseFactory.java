@@ -25,7 +25,7 @@ import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.util.JavaBeanUtil;
 
 public class OracleDatabaseFactory implements JdbcDatabaseFactory {
-  public static final String URL_REGEX = "jdbc:oracle:thin:(?:([^/]+)(?:/([^@]+))?)?@(?://)?([^:]+)(?::([^:]+))[:/](.+)";
+  public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
 
   public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
 
