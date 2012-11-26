@@ -14,7 +14,7 @@ public class BigIntegerField extends NumberField {
   public BigIntegerField(final String name, final boolean required,
     final Object defaultValue) {
     super(name, 10, 30, defaultValue, required);
-    setCssClass("digits");
+    setCssClass("long");
   }
 
   @Override

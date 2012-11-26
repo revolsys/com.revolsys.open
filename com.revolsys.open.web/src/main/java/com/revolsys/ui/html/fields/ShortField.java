@@ -12,7 +12,7 @@ public class ShortField extends NumberField {
   public ShortField(final String name, final boolean required,
     Object defaultValue) {
     super(name, 10, 10, defaultValue, required, Short.MIN_VALUE, Short.MAX_VALUE);
-    setCssClass("digits");
+    setCssClass("short");
   }
 
   @Override

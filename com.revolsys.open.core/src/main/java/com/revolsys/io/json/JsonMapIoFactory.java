@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.DataObject;
@@ -50,17 +51,17 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
       throw new RuntimeException("Unable to read JSON map", e);
     }
   }
-  public static String toString(
-    final List<? extends Map<String, Object>> list) {
+
+  public static String toString(final List<? extends Map<String, Object>> list) {
     final StringWriter writer = new StringWriter();
-    final JsonMapWriter dataObjectWriter = new JsonMapWriter(
-     writer);
+    final JsonMapWriter dataObjectWriter = new JsonMapWriter(writer);
     for (final Map<String, Object> map : list) {
       dataObjectWriter.write(map);
     }
     dataObjectWriter.close();
     return writer.toString();
   }
+
   public static final Map<String, Object> toMap(final Resource resource) {
     try {
       final InputStream in = resource.getInputStream();
@@ -90,11 +91,13 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
   }
 
   public static Map<String, Object> toObjectMap(final String string) {
-    final StringReader reader = new StringReader(string);
-    final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader,
-      true);
-    for (final Map<String, Object> map : mapReader) {
-      return map;
+    if (StringUtils.hasText(string)) {
+      final StringReader reader = new StringReader(string);
+      final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader,
+        true);
+      for (final Map<String, Object> map : mapReader) {
+        return map;
+      }
     }
     return Collections.emptyMap();
   }

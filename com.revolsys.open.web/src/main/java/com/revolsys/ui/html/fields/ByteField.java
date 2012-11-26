@@ -12,7 +12,7 @@ public class ByteField extends NumberField {
   public ByteField(final String name, final boolean required,
     Object defaultValue) {
     super(name, 3, 3, defaultValue, required, Byte.MIN_VALUE, Byte.MAX_VALUE);
-    setCssClass("digits");
+    setCssClass("byte");
   }
 
   @Override

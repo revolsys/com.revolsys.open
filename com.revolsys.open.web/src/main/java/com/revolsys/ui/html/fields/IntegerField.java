@@ -12,7 +12,7 @@ public class IntegerField extends NumberField {
   public IntegerField(final String name, final boolean required,
     Object defaultValue) {
     super(name, 10, 10, defaultValue, required, Integer.MIN_VALUE, Integer.MAX_VALUE);
-    setCssClass("digits");
+    setCssClass("int");
   }
 
   @Override

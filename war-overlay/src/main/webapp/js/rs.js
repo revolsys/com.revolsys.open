@@ -239,4 +239,56 @@ $(document).ready(
           validate.form();
         }
       });
+    jQuery.validator.addMethod("integer", function(value, element) {
+      if (this.optional(element)) {
+        return true;
+      } else if (/^-?\d+$/.test(value)) {
+        return true;
+      }
+      return false;
+    }, "Please enter a valid integer number.");
+    jQuery.validator.addMethod("byte", function(value, element) {
+      if (this.optional(element)) {
+        return true;
+      } else if (/^-?\d+$/.test(value)) {
+        var number = parseInt(value);
+        if (number >= -128 && number <= 127) {
+          return true;
+        }
+      }
+      return false;
+    }, "Please enter a valid integer number -128 >=< 127.");
+    jQuery.validator.addMethod("short", function(value, element) {
+      if (this.optional(element)) {
+        return true;
+      } else if (/^-?\d+$/.test(value)) {
+        var number = parseInt(value);
+        if (number >= -32768 && number <= 32767) {
+          return true;
+        }
+      }
+      return false;
+    }, "Please enter a valid integer number -32768 >=< 32767.");
+    jQuery.validator.addMethod("int", function(value, element) {
+      if (this.optional(element)) {
+        return true;
+      } else if (/^-?\d+$/.test(value)) {
+        var number = parseInt(value);
+        if (number >= -2147483648 && number <= 2147483647) {
+          return true;
+        }
+      }
+      return false;
+    }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
+    jQuery.validator.addMethod("long", function(value, element) {
+      if (this.optional(element)) {
+        return true;
+      } else if (/^-?\d+$/.test(value)) {
+        var number = parseInt(value);
+        if (number >= -9223372036854775808 && number <= 9223372036854775807) {
+          return true;
+        }
+      }
+      return false;
+    }, "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
   });
