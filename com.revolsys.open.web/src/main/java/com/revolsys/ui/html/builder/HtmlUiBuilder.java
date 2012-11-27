@@ -79,6 +79,7 @@ import com.revolsys.ui.html.view.TableView;
 import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
+import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
@@ -648,12 +649,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return null;
   }
 
-  public Element createObjectAddPage(final HttpServletRequest request,
-    final HttpServletResponse response,
-    final Map<String, Object> defaultValues, final String prefix,
-    final String preInsertMethod) throws IOException, ServletException {
+  public Element createObjectAddPage(final Map<String, Object> defaultValues,
+    final String prefix, final String preInsertMethod) throws IOException,
+    ServletException {
     final T object = createObject();
-
+    HttpServletRequest request = HttpServletUtils.getRequest();
     JavaBeanUtil.setProperties(object, defaultValues);
 
     // if (!canAddObject(request)) {
@@ -684,7 +684,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           postInsert(object);
           final String viewName = getName(prefix, "view");
           final String url = getPageUrl(viewName, parameters);
-          response.sendRedirect(url);
+          redirect(url);
           return null;
         }
       }
@@ -708,12 +708,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return view;
   }
 
-  public Element createObjectEditPage(final HttpServletRequest request,
-    final HttpServletResponse response, final T object, final String prefix)
+  public Element createObjectEditPage(final T object, final String prefix)
     throws IOException, ServletException {
     if (object == null) {
-      throw new NoSuchRequestHandlingMethodException(request);
+      throw new PageNotFoundException();
     } else {
+      HttpServletRequest request = HttpServletUtils.getRequest();
       final Set<String> parameterNamesToSave = new HashSet<String>();
       parameterNamesToSave.add(getIdParameterName());
 
@@ -735,7 +735,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           parameters.put(getIdParameterName(), id);
 
           final String url = getPageUrl(viewName, parameters);
-          response.sendRedirect(url);
+          redirect(url);
           return null;
         } else {
           setRollbackOnly(object);
@@ -765,23 +765,23 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  public ElementContainer createObjectViewPage(
-    final HttpServletRequest request, final HttpServletResponse response,
-    final Object object, final String prefix, boolean collapsible)
+  public ElementContainer createObjectViewPage(final Object object,
+    final String prefix, boolean collapsible)
     throws NoSuchRequestHandlingMethodException {
     if (object == null) {
-      throw new NoSuchRequestHandlingMethodException(request);
+      throw new PageNotFoundException();
     } else {
+
       final String pageName = getName(prefix, "view");
 
       final Page page = getPage(pageName);
       if (page == null) {
         log.error("Page not found " + pageName);
-        throw new NoSuchRequestHandlingMethodException(request);
+        throw new PageNotFoundException();
       } else {
         final List<KeySerializer> serializers = getSerializers(pageName, "view");
         final Element detailView = createDetailView(object, serializers);
-
+        HttpServletRequest request = HttpServletUtils.getRequest();
         setPageTitle(request, pageName);
 
         final Menu actionMenu = new Menu();
@@ -1339,6 +1339,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public boolean preUpdate(final Form form, final T object) {
     return true;
+  }
+
+  public void redirect(String url) {
+    HttpServletResponse response = HttpServletUtils.getResponse();
+    redirect(response, url);
   }
 
   public void redirect(final HttpServletResponse response, String url) {

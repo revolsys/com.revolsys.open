@@ -185,9 +185,16 @@ public final class HttpServletUtils {
 
   }
 
-  public static void setAttribute(String name,
-    Object value) {
+  public static void setAttribute(String name, Object value) {
     HttpServletRequest request = getRequest();
     request.setAttribute(name, value);
+  }
+
+  public static void redirect(String url) {
+    try {
+      HttpServletResponse response = getResponse();
+      response.sendRedirect(url);
+    } catch (IOException e) {
+    }
   }
 }

@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -54,7 +55,9 @@ public class XmlWriter extends Writer {
    */
   private class TagConfiguration {
     /** The namespaces defined on the element. */
-    private final List<String> definedNamespaces = new ArrayList<String>();
+    private final List<String> attributeDefinedNamespaces = new ArrayList<String>();
+
+    private String tagDefinedNamespace;
 
     /** The QName of the current element. */
     private final QName element;
@@ -73,8 +76,16 @@ public class XmlWriter extends Writer {
      * 
      * @param namespaceUri The namespace URI to add.
      */
-    public void addDefinedNamespace(final String namespaceUri) {
-      definedNamespaces.add(namespaceUri);
+    public void addAttributeDefinedNamespace(final String namespaceUri) {
+      attributeDefinedNamespaces.add(namespaceUri);
+    }
+
+    public void setTagDefinedNamespace(String tagDefinedNamespace) {
+      this.tagDefinedNamespace = tagDefinedNamespace;
+    }
+
+    public String getTagDefinedNamespace() {
+      return tagDefinedNamespace;
     }
 
     /**
@@ -82,8 +93,8 @@ public class XmlWriter extends Writer {
      * 
      * @return The namespaces defined on the element.
      */
-    public List<String> getDefinedNamespaces() {
-      return definedNamespaces;
+    public List<String> getAttributeDefinedNamespaces() {
+      return attributeDefinedNamespaces;
     }
 
     /**
@@ -330,11 +341,12 @@ public class XmlWriter extends Writer {
             prefix = "p" + ++prefixNum;
           }
           namespacePrefixMap.put(namespaceUri, prefix);
+          elementStack.getFirst().addAttributeDefinedNamespace(namespaceUri);
           writeNamespaceAttribute(namespaceUri, prefix);
         }
       }
       out.write(' ');
-      writeName(attribute);
+      writeName(attribute, true);
       out.write("=\"");
       writeAttributeValue(value);
       out.write('"');
@@ -613,7 +625,7 @@ public class XmlWriter extends Writer {
       } else {
         writeEndIndent();
         out.write("</");
-        writeName(element);
+        writeName(element, false);
         out.write('>');
       }
       removeCurrentTag();
@@ -694,9 +706,10 @@ public class XmlWriter extends Writer {
    * XML Namespace.
    * 
    * @param qName The QName without the prefix.
+   * @param attribute
    * @return The QName with the prefix.
    */
-  private QName getQNameWithPrefix(final QName qName) {
+  private QName getQNameWithPrefix(final QName qName, boolean attribute) {
     final String namespaceUri = qName.getNamespaceURI();
     if (namespaceUri.equals("")) {
       return new QName(qName.getLocalPart());
@@ -705,7 +718,9 @@ public class XmlWriter extends Writer {
     String prefix = namespacePrefixMap.get(namespaceUri);
     if (prefix == null) {
       prefix = qName.getPrefix();
-      getCurrentTag().addDefinedNamespace(namespaceUri);
+      if (!attribute) {
+        getCurrentTag().setTagDefinedNamespace(namespaceUri);
+      }
       namespacePrefixMap.put(namespaceUri, prefix);
       return new QName(namespaceUri, qName.getLocalPart(), prefix);
     }
@@ -778,7 +793,7 @@ public class XmlWriter extends Writer {
   private void removeCurrentTag() {
     if (!endingDocument) {
       final TagConfiguration tag = elementStack.removeFirst();
-      final Iterator<String> namespaceUris = tag.getDefinedNamespaces()
+      final Iterator<String> namespaceUris = tag.getAttributeDefinedNamespaces()
         .iterator();
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
@@ -827,7 +842,7 @@ public class XmlWriter extends Writer {
     }
     final TagConfiguration currentTag = getCurrentTag();
     if (currentTag != null) {
-      currentTag.addDefinedNamespace(namespaceUri);
+      currentTag.addAttributeDefinedNamespace(namespaceUri);
     }
   }
 
@@ -932,7 +947,7 @@ public class XmlWriter extends Writer {
     writingStartTag = true;
     setCurrentTag(element);
     out.write('<');
-    writeName(element);
+    writeName(element, false);
     elementHasContent = false;
   }
 
@@ -1282,13 +1297,14 @@ public class XmlWriter extends Writer {
    * prefix of the namespace.
    * 
    * @param qName The QName to write
+   * @param attribute TODO
    * @throws IOException If an I/O exception occurs.
    */
-  private void writeName(final QName qName) {
+  private void writeName(final QName qName, boolean attribute) {
     if (useNamespaces) {
       final String namespaceUri = qName.getNamespaceURI();
       String prefix = namespacePrefixMap.get(namespaceUri);
-      final QName prefixedQName = getQNameWithPrefix(qName);
+      final QName prefixedQName = getQNameWithPrefix(qName, attribute);
       prefix = prefixedQName.getPrefix();
       if (prefix.length() != 0) {
         out.write(prefix);
@@ -1326,7 +1342,12 @@ public class XmlWriter extends Writer {
       if (elementStack.size() == 1) {
         namespaceUris = namespacePrefixMap.keySet();
       } else {
-        namespaceUris = tag.getDefinedNamespaces();
+        String tagNamespace = tag.getTagDefinedNamespace();
+        if (tagNamespace == null) {
+          namespaceUris = Collections.emptyList();
+        } else {
+          namespaceUris = Collections.singletonList(tagNamespace);
+        }
       }
       for (final String namespaceUri : namespaceUris) {
         final String prefix = namespacePrefixMap.get(namespaceUri);

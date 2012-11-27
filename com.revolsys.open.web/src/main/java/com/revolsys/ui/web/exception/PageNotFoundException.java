@@ -24,7 +24,7 @@ package com.revolsys.ui.web.exception;
  * @author P.D.Austin
  * @version 1.0
  */
-public class PageNotFoundException extends ActionException {
+public class PageNotFoundException extends RuntimeException {
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -2691390352514959032L;
 
