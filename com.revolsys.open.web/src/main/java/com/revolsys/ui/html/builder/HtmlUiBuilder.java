@@ -1373,6 +1373,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         if (url != null) {
           url += "#" + getTypeName() + "_" + tabName;
           redirectAfterCommit(url);
+          return null;
         }
       }
     }
