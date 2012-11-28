@@ -80,6 +80,7 @@ import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.ui.web.exception.PageNotFoundException;
+import com.revolsys.ui.web.exception.RedirectException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
@@ -530,7 +531,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         throw new RuntimeException("Unable to get rows", e);
       }
     } else {
-      return redirectToTab(response, parentBuilder, parentPageName, pageName);
+      return redirectToTab(parentBuilder, parentPageName, pageName);
     }
   }
 
@@ -684,8 +685,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           postInsert(object);
           final String viewName = getName(prefix, "view");
           final String url = getPageUrl(viewName, parameters);
-          redirect(url);
-          return null;
+          redirectAfterCommit(url);
+          return new Element();
         }
       }
     }
@@ -735,8 +736,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           parameters.put(getIdParameterName(), id);
 
           final String url = getPageUrl(viewName, parameters);
-          redirect(url);
-          return null;
+          redirectAfterCommit(url);
+          return new Element();
         } else {
           setRollbackOnly(object);
         }
@@ -1341,12 +1342,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return true;
   }
 
-  public void redirect(String url) {
-    HttpServletResponse response = HttpServletUtils.getResponse();
-    redirect(response, url);
-  }
-
-  public void redirect(final HttpServletResponse response, String url) {
+  public  void redirectAfterCommit(String url) {
     final Map<String, Object> parameters = new HashMap<String, Object>();
     final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
@@ -1356,20 +1352,19 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
     }
     url = UrlUtil.getUrl(url, parameters);
-    InvokeMethodAfterCommit.invoke(response, "sendRedirect", url);
+    InvokeMethodAfterCommit.invoke(HttpServletUtils.class, "redirect", url);
   }
 
-  public void redirectPage(final HttpServletResponse response,
-    final String pageName) {
+  public void redirectPage(final String pageName) {
     String url = getPageUrl(pageName);
     if (url == null) {
       url = "..";
     }
-    redirect(response, url);
+    redirectAfterCommit(url);
   }
 
-  public Object redirectToTab(final HttpServletResponse response,
-    Object parentBuilder, String parentPageName, String tabName) {
+  public Object redirectToTab(Object parentBuilder, String parentPageName,
+    String tabName) {
     final HtmlUiBuilder<?> builder = getBuilder(parentBuilder);
     if (builder != null) {
       final Page parentPage = builder.getPage(parentPageName);
@@ -1377,9 +1372,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         String url = parentPage.getFullUrl();
         if (url != null) {
           url += "#" + getTypeName() + "_" + tabName;
-          response.setStatus(HttpServletResponse.SC_SEE_OTHER);
-          response.setHeader("Location", url);
-          return null;
+          throw new RedirectException(url);
         }
       }
     }
@@ -1387,10 +1380,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       + " from builder " + parentBuilder);
   }
 
-  public void referrerRedirect(final HttpServletRequest request,
-    final HttpServletResponse response) {
+  public void referrerRedirect(final HttpServletRequest request) {
     final String url = request.getHeader("Referer");
-    redirect(response, url);
+    redirectAfterCommit(url);
   }
 
   /**

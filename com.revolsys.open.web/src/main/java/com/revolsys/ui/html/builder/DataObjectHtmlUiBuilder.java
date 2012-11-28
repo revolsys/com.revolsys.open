@@ -157,7 +157,7 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     if (isDataTableCallback(request)) {
       return createDataTableMap(request, pageName, parameters);
     } else {
-      return redirectToTab(response, parentBuilder, parentPageName, pageName);
+      return redirectToTab(parentBuilder, parentPageName, pageName);
     }
   }
 
