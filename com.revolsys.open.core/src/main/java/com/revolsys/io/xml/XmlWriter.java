@@ -517,9 +517,13 @@ public class XmlWriter extends Writer {
     checkWriteDocType();
     out.write("<!DOCTYPE ");
     out.write(name);
-    out.write(" SYSTEM \"");
-    out.write(systemId);
-    out.write("\">");
+    if (systemId != null) {
+      out.write(" SYSTEM \"");
+      out.write(systemId);
+      out.write("\"");
+    }
+    out.write(">");
+    newLine();
     canWriteXmlDeclaration = false;
     docTypeWritten = true;
   }

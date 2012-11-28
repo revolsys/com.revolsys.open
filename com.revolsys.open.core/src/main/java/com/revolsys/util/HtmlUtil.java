@@ -191,6 +191,8 @@ public final class HtmlUtil {
 
   public static final QName ATTR_TARGET = new QName("target");
 
+  public static final QName HR = new QName(HTML_NS_URI, "hr", HTML_NS_PREFIX);
+
   public static void serializeA(final XmlWriter out, final String cssClass,
     final Object url, final Object content) {
     if (url != null) {
@@ -312,6 +314,14 @@ public final class HtmlUtil {
     out.endTag(SCRIPT);
   }
 
+  public static void serializeScriptLink(final XmlWriter out, final String url) {
+    out.startTag(SCRIPT);
+    out.attribute(ATTR_TYPE, "text/javascript");
+    out.attribute(ATTR_SRC, url);
+    out.text("");
+    out.endTag(SCRIPT);
+  }
+
   public static void serializeSelect(final XmlWriter out, final String name,
     final Object selectedValue, final boolean optional,
     final List<? extends Object> values) {
@@ -427,5 +437,13 @@ public final class HtmlUtil {
    * Construct a new HtmlUtil.
    */
   private HtmlUtil() {
+  }
+
+  public static void serializeCss(XmlWriter out, String url) {
+    out.startTag(LINK);
+    out.attribute(ATTR_HREF, url);
+    out.attribute(ATTR_REL, "stylesheet");
+    out.attribute(ATTR_TYPE, "text/css");
+    out.endTag(LINK);
   }
 }

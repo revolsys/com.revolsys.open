@@ -1372,7 +1372,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         String url = parentPage.getFullUrl();
         if (url != null) {
           url += "#" + getTypeName() + "_" + tabName;
-          throw new RedirectException(url);
+          redirectAfterCommit(url);
         }
       }
     }
