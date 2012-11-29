@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.gis.ecsv</artifactId>
-  <version>2012.11.29.RELEASE</version>
+  <version>TRUNK-SNAPSHOT</version>
   <name>GIS ECSV Tools</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>2012.11.29.RELEASE</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>
