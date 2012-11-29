@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.model.Menu;
@@ -95,15 +97,22 @@ public class MenuElement extends Element {
     if (onClick != null && uri == null) {
       uri = "#";
     }
-    if (uri != null) {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, uri);
-      out.attribute(HtmlUtil.ATTR_TITLE, linkTitle);
-      out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
-      out.attribute(HtmlUtil.ATTR_TARGET, menu.getTarget());
+    if (StringUtils.hasText(uri)) {
+      if (uri.startsWith("javascript:")) {
+        out.startTag(HtmlUtil.BUTTON);
+        out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
+        out.text(menu.getTitle());
+        out.endTag(HtmlUtil.BUTTON);
+      } else {
+        out.startTag(HtmlUtil.A);
+        out.attribute(HtmlUtil.ATTR_HREF, uri);
+        out.attribute(HtmlUtil.ATTR_TITLE, linkTitle);
+        out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
+        out.attribute(HtmlUtil.ATTR_TARGET, menu.getTarget());
 
-      out.text(linkTitle);
-      out.endTag(HtmlUtil.A);
+        out.text(linkTitle);
+        out.endTag(HtmlUtil.A);
+      }
     } else {
       out.text(linkTitle);
     }

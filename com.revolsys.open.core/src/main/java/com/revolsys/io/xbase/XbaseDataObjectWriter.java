@@ -336,7 +336,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
             final Boolean boolVal = (Boolean)value;
             logical = boolVal.booleanValue();
           } else if (value != null) {
-            logical = Boolean.getBoolean(value.toString());
+            logical = Boolean.valueOf(value.toString());
           }
           if (logical) {
             out.write('T');

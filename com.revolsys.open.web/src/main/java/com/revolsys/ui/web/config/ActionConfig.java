@@ -106,7 +106,7 @@ public class ActionConfig {
 
   /**
    * Get the parameter value as an boolean. See
-   * {@link Boolean#getBoolean(java.lang.String)} for more details.
+   * {@link Boolean#valueOf(java.lang.String)} for more details.
    * 
    * @param name The parameter name.
    * @return The parameter value.

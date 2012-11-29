@@ -47,7 +47,7 @@ public class CheckBoxField extends Field {
     super(name, required);
     if (defaultValue != null) {
       if (defaultValue != null) {
-        selected = Boolean.getBoolean(defaultValue.toString());
+        selected = Boolean.valueOf(defaultValue.toString());
       }
     }
   }

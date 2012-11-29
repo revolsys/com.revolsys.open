@@ -126,6 +126,7 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.io.IoConstants;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 
 /**
  * Implementation of the {@link org.springframework.web.servlet.HandlerAdapter}
@@ -980,30 +981,40 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
   public ModelAndView handle(final HttpServletRequest request,
     final HttpServletResponse response, final Object handler) throws Exception {
+    final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
+    final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
+    try {
+      HttpServletUtils.setRequestAndResponse(request, response);
+      if (AnnotationUtils.findAnnotation(handler.getClass(),
+        SessionAttributes.class) != null) {
+        // Always prevent caching in case of session attribute management.
+        checkAndPrepare(request, response,
+          this.cacheSecondsForSessionAttributeHandlers, true);
+        // Prepare cached set of session attributes names.
+      } else {
+        // Uses configured default cacheSeconds setting.
+        checkAndPrepare(request, response, true);
+      }
 
-    if (AnnotationUtils.findAnnotation(handler.getClass(),
-      SessionAttributes.class) != null) {
-      // Always prevent caching in case of session attribute management.
-      checkAndPrepare(request, response,
-        this.cacheSecondsForSessionAttributeHandlers, true);
-      // Prepare cached set of session attributes names.
-    } else {
-      // Uses configured default cacheSeconds setting.
-      checkAndPrepare(request, response, true);
-    }
-
-    // Execute invokeHandlerMethod in synchronized block if required.
-    if (this.synchronizeOnSession) {
-      final HttpSession session = request.getSession(false);
-      if (session != null) {
-        final Object mutex = WebUtils.getSessionMutex(session);
-        synchronized (mutex) {
-          return invokeHandlerMethod(request, response, handler);
+      // Execute invokeHandlerMethod in synchronized block if required.
+      if (this.synchronizeOnSession) {
+        final HttpSession session = request.getSession(false);
+        if (session != null) {
+          final Object mutex = WebUtils.getSessionMutex(session);
+          synchronized (mutex) {
+            return invokeHandlerMethod(request, response, handler);
+          }
         }
       }
-    }
 
-    return invokeHandlerMethod(request, response, handler);
+      return invokeHandlerMethod(request, response, handler);
+    } finally {
+      if (savedRequest == null) {
+        HttpServletUtils.clearRequestAndResponse();
+      } else {
+        HttpServletUtils.setRequestAndResponse(savedRequest, savedResponse);
+      }
+    }
   }
 
   protected ModelAndView invokeHandlerMethod(final HttpServletRequest request,

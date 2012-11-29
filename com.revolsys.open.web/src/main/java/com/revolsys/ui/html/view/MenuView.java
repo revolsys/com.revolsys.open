@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
@@ -68,12 +69,19 @@ public class MenuView extends ObjectView {
   private void menuItemLink(final XmlWriter out, final MenuItem menuItem) {
 
     final String uri = menuItem.getUri();
-    if (uri != null) {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, uri);
-      out.attribute(HtmlUtil.ATTR_TITLE, menuItem.getTitle());
-      out.text(menuItem.getTitle());
-      out.endTag(HtmlUtil.A);
+    if (StringUtils.hasText(uri)) {
+      if (uri.startsWith("javascript:")) {
+        out.startTag(HtmlUtil.BUTTON);
+        out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
+        out.text(menuItem.getTitle());
+        out.endTag(HtmlUtil.BUTTON);
+      } else {
+        out.startTag(HtmlUtil.A);
+        out.attribute(HtmlUtil.ATTR_HREF, uri);
+        out.attribute(HtmlUtil.ATTR_TITLE, menuItem.getTitle());
+        out.text(menuItem.getTitle());
+        out.endTag(HtmlUtil.A);
+      }
     } else {
       out.text(menuItem.getTitle());
     }
