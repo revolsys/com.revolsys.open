@@ -2,45 +2,75 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 12px;
 }
-div.restClass {
+
+div.title {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+div.javaPackage {
   border: 1px solid #2694e8;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   margin-bottom: 1em;
-  
 }
 
-div.restClass > h2 {
+div.javaPackage>div.title {
   background-color: #3baae3;
   color: white;
+  font-size: 1.4em;
+  font-weight: bold;
   margin: 0px;
   padding: 4px 5px 4px 5px;
+  margin: 0px;
 }
 
-div.restClass > div.content {
-   margin: 1em;
+div.javaPackage>div.content {
+  margin: 1em;
 }
 
-div.restMethod {
+div.javaClass {
+  border: 1px solid #2694e8;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
   margin-bottom: 1em;
 }
 
-div.restMethod > h3 {
-  padding-left: 2em;
-}
-
-
-div.restMethod > div.content {
-}
-
-div.restMethod h4 {
-  font-size: 1em;
-  font-style: italic;
+div.javaClass>div.title {
+  background-color: #3baae3;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0px;
+  padding: 4px 5px 4px 5px;
   font-weight: bold;
 }
 
+div.javaClass>div.content {
+  margin: 1em;
+}
+
+div.javaMethod {
+  margin-bottom: 1em;
+}
+
+div.javaMethod>div.title {
+  font-size: 1em;
+  padding-left: 2em;
+}
+
+div.title code {
+  font-size: 1em;
+  font-weight: normal;
+}
+
+div.javaMethod>div.content {
+  
+}
 
 div.simpleDataTable>div div.fg-toolbar {
   padding: 0px;

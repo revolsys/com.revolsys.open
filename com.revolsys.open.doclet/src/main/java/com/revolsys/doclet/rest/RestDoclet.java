@@ -4,77 +4,52 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.revolsys.doclet.DocletUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
-import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
-import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.Parameter;
-import com.sun.javadoc.ProgramElementDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 
 public class RestDoclet {
 
-  public static AnnotationDesc getAnnotation(ProgramElementDoc doc, String name) {
-    AnnotationDesc[] annotations = doc.annotations();
-    return getAnnotation(annotations, name);
-  }
-
-  public static AnnotationDesc getAnnotation(AnnotationDesc[] annotations,
-    String name) {
-    for (AnnotationDesc annotation : annotations) {
-      AnnotationTypeDoc annotationType = annotation.annotationType();
-      String annotationName = qualifiedName(annotationType);
-      if (name.equals(annotationName)) {
-        return annotation;
-      }
-    }
-    return null;
-  }
-
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
-    if (optionName.equals("-d") || optionName.equals("-doctitle")) {
+    if (optionName.equals("-d") || optionName.equals("-doctitle")
+      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
       return 2;
     }
     return -1;
   }
 
-  public static String qualifiedName(ProgramElementDoc element) {
-    String packageName = element.containingPackage().name();
-    return packageName + "." + element.name();
-  }
-
   public static boolean start(RootDoc root) {
     new RestDoclet(root).start();
-
     return true;
   }
 
-  public static boolean validOptions(String args[][],
+  public static boolean validOptions(String options[][],
     DocErrorReporter docerrorreporter) {
     boolean flag = true;
     String s = "";
-    for (String[] arg : args) {
-      String argName = arg[0].toLowerCase();
+    for (String[] option : options) {
+      String argName = option[0].toLowerCase();
       if (argName.equals("-d")) {
-        String destDir = arg[1];
+        String destDir = option[1];
         File file = new File(destDir);
         if (!file.exists()) {
           docerrorreporter.printNotice("Create directory" + destDir);
@@ -89,89 +64,63 @@ public class RestDoclet {
             + file.getPath());
           return false;
         }
+      } else if (argName.equals("-htmlheader")) {
+        if (!new File(option[1]).exists()) {
+          docerrorreporter.printError("Header file does not exist" + option[1]);
+          return false;
+        }
+      } else if (argName.equals("-htmlfooter")) {
+        if (!new File(option[1]).exists()) {
+          docerrorreporter.printError("Footer file does not exist" + option[1]);
+          return false;
+        }
       }
     }
 
     return flag || s.length() <= 0;
   }
 
+  private String destDir = ".";
+
   private String docTitle;
+
+  private String footer;
+
+  private String header;
 
   private RootDoc root;
 
   private XmlWriter writer;
 
-  private String destDir = ".";
-
   public RestDoclet(RootDoc root) {
     this.root = root;
   }
 
-  private void setOptions(String[][] options) {
-    for (String[] option : options) {
-      String optionName = option[0];
-      if (optionName.equals("-d")) {
-        destDir = option[1];
-
-      } else if (optionName.equals("-doctitle")) {
-        docTitle = option[1];
-      } else {
-      }
+  public void addResponseStatusDescription(
+    Map<String, List<String>> responseCodes, String code, String description) {
+    List<String> descriptions = responseCodes.get(code);
+    if (descriptions == null) {
+      descriptions = new ArrayList<String>();
+      responseCodes.put(code, descriptions);
     }
-    try {
-      File dir = new File(destDir);
-      File indexFile = new File(dir, "index.html");
-      FileWriter out = new FileWriter(indexFile);
-      writer = new XmlWriter(out, false);
-      FileUtil.copy(getClass().getResourceAsStream("javadoc.css"), new File(
-        destDir, "javadoc.css"));
-      FileUtil.copy(getClass().getResourceAsStream("javadoc.js"), new File(
-        destDir, "javadoc.js"));
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
-    }
+    descriptions.add(description);
   }
 
-  private void start() {
-    try {
-      setOptions(root.options());
-
-      writer.startDocument("UTF-8", "1.0");
-      writer.docType("html", null);
-      writer.startTag(HtmlUtil.HTML);
-      writer.attribute(HtmlUtil.ATTR_LANG, "en");
-
-      head();
-
-      body();
-
-      writer.endTag(HtmlUtil.HTML);
-      writer.endDocument();
-    } finally {
-      if (writer != null) {
-        writer.close();
-      }
-    }
-  }
-
-  public static boolean hasAnnotation(ProgramElementDoc doc, String name) {
-    AnnotationDesc annotation = getAnnotation(doc, name);
-    return annotation != null;
-  }
-
-  public static boolean hasAnnotation(AnnotationDesc[] annotations, String name) {
-    AnnotationDesc annotation = getAnnotation(annotations, name);
-    return annotation != null;
-  }
-
-  public void body() {
-    writer.startTag(HtmlUtil.BODY);
-
+  public void bodyContent() {
     writer.element(HtmlUtil.H1, docTitle);
 
     documentation();
+  }
 
-    writer.endTag(HtmlUtil.BODY);
+  public void description(Map<String, String> descriptions, String name) {
+    writer.startTag(HtmlUtil.TD);
+    String description = descriptions.get(name);
+    if (description == null) {
+      writer.write("-");
+    } else {
+      writer.write(description);
+    }
+    writer.endTag(HtmlUtil.TD);
   }
 
   public void documentation() {
@@ -190,12 +139,13 @@ public class RestDoclet {
   }
 
   public void documentationClass(ClassDoc classDoc) {
-    if (hasAnnotation(classDoc, "org.springframework.stereotype.Controller")) {
+    if (DocletUtil.hasAnnotation(classDoc,
+      "org.springframework.stereotype.Controller")) {
       writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "restClass");
-      writer.attribute(HtmlUtil.ATTR_ID, qualifiedName(classDoc));
+      writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
+      writer.attribute(HtmlUtil.ATTR_ID, DocletUtil.qualifiedName(classDoc));
       String name = classDoc.name();
-      writer.element(HtmlUtil.H2, CaseConverter.toCapitalizedWords(name));
+      title(CaseConverter.toCapitalizedWords(name));
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "content");
       writer.write(classDoc.commentText());
@@ -208,15 +158,14 @@ public class RestDoclet {
   public void documentationMethod(ClassDoc classDoc) {
     for (MethodDoc method : classDoc.methods()) {
       String methodName = method.name();
-      AnnotationDesc requestMapping = getAnnotation(method,
+      AnnotationDesc requestMapping = DocletUtil.getAnnotation(method,
         "org.springframework.web.bind.annotation.RequestMapping");
       if (requestMapping != null) {
         writer.startTag(HtmlUtil.DIV);
-        writer.attribute(HtmlUtil.ATTR_CLASS, "restMethod");
-        writer.attribute(HtmlUtil.ATTR_ID, qualifiedName(classDoc) + "."
-          + methodName);
-        writer.element(HtmlUtil.H3,
-          CaseConverter.toCapitalizedWords(methodName));
+        writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
+        writer.attribute(HtmlUtil.ATTR_ID, DocletUtil.qualifiedName(classDoc)
+          + "." + methodName);
+        title(CaseConverter.toCapitalizedWords(methodName));
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "content");
         writer.write(method.commentText());
@@ -234,6 +183,148 @@ public class RestDoclet {
         writer.endTag(HtmlUtil.DIV);
         writer.endTag(HtmlUtil.DIV);
       }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> T getElementValue(AnnotationDesc annotation, String name) {
+    for (ElementValuePair pair : annotation.elementValues()) {
+      if (pair.element().name().equals(name)) {
+        return (T)pair.value().value();
+      }
+    }
+    return null;
+  }
+
+  public void head() {
+    writer.startTag(HtmlUtil.HEAD);
+    writer.element(HtmlUtil.TITLE, docTitle);
+    HtmlUtil.serializeCss(
+      writer,
+      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/css/jquery.dataTables_themeroller.css");
+    HtmlUtil.serializeCss(
+      writer,
+      "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css");
+    HtmlUtil.serializeCss(writer, "javadoc.css");
+    HtmlUtil.serializeScriptLink(writer,
+      "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
+    HtmlUtil.serializeScriptLink(writer,
+      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js");
+    HtmlUtil.serializeScriptLink(
+      writer,
+      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/jquery.dataTables.min.js");
+    HtmlUtil.serializeScriptLink(writer, "javadoc.js");
+    writer.endTag(HtmlUtil.HEAD);
+  }
+
+  private void parameters(MethodDoc method) {
+    List<Parameter> parameters = new ArrayList<Parameter>();
+    for (Parameter parameter : method.parameters()) {
+      AnnotationDesc[] annotations = parameter.annotations();
+      if (DocletUtil.hasAnnotation(annotations,
+        "org.springframework.web.bind.annotation.RequestParam")
+        || DocletUtil.hasAnnotation(annotations,
+          "org.springframework.web.bind.annotation.RequestBody")) {
+        parameters.add(parameter);
+      }
+    }
+    if (!parameters.isEmpty()) {
+      Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+
+      writer.element(HtmlUtil.H4, "Parameters");
+      writer.element(
+        HtmlUtil.P,
+        "The resource supports the following parameters. "
+          + "For HTTP get requests these must be specified using query string parameters. "
+          + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
+          + "Array values [] can be specified by including the parameter multiple times in the request.");
+
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
+      writer.startTag(HtmlUtil.TABLE);
+      writer.attribute(HtmlUtil.ATTR_STYLE, "width:auto;margin-left:0px");
+      writer.startTag(HtmlUtil.THEAD);
+      writer.startTag(HtmlUtil.TR);
+      writer.element(HtmlUtil.TH, "Parameter");
+      writer.element(HtmlUtil.TH, "Type");
+      writer.element(HtmlUtil.TH, "Default");
+      writer.element(HtmlUtil.TH, "Required");
+      writer.element(HtmlUtil.TH, "Description");
+      writer.endTag(HtmlUtil.TR);
+      writer.endTag(HtmlUtil.THEAD);
+
+      writer.startTag(HtmlUtil.TBODY);
+      for (Parameter parameter : parameters) {
+        writer.startTag(HtmlUtil.TR);
+        String name = parameter.name();
+        AnnotationDesc requestParam = DocletUtil.getAnnotation(
+          parameter.annotations(),
+          "org.springframework.web.bind.annotation.RequestParam");
+        AnnotationDesc requestBody = DocletUtil.getAnnotation(
+          parameter.annotations(),
+          "org.springframework.web.bind.annotation.RequestBody");
+        String paramName = name;
+        String defaultValue = "-";
+        String typeName = parameter.typeName().replaceFirst("^java.lang.", "");
+        boolean required = true;
+        if (requestParam != null) {
+          String value = getElementValue(requestParam, "value");
+          if (value != null && !value.trim().equals("")) {
+            paramName = value;
+          }
+          defaultValue = getElementValue(requestParam, "defaultValue");
+          if (defaultValue == null) {
+            defaultValue = "-";
+          }
+          required = Boolean.FALSE != (Boolean)getElementValue(requestParam,
+            "required");
+        }
+        if (requestBody != null) {
+          required = true;
+          paramName = "HTTP Request body or 'body' parameter";
+          typeName = "binary/character data";
+        }
+        
+        writer.startTag(HtmlUtil.TD);
+        writer.startTag(HtmlUtil.CODE);
+        writer.text(paramName);
+        writer.endTag(HtmlUtil.CODE);
+        writer.endTag(HtmlUtil.TD);
+        
+        writer.startTag(HtmlUtil.TD);
+        writer.startTag(HtmlUtil.CODE);
+        writer.text(typeName);
+        writer.endTag(HtmlUtil.CODE);
+        writer.endTag(HtmlUtil.TD);
+
+        writer.element(HtmlUtil.TD, defaultValue);
+        if (required) {
+          writer.element(HtmlUtil.TD, "Yes");
+        } else {
+          writer.element(HtmlUtil.TD, "No");
+        }
+        description(descriptions, name);
+        writer.endTag(HtmlUtil.TR);
+      }
+      writer.endTag(HtmlUtil.TBODY);
+
+      writer.endTag(HtmlUtil.TABLE);
+      writer.endTag(HtmlUtil.DIV);
+    }
+  }
+
+  private void requestMethods(AnnotationDesc requestMapping) {
+    AnnotationValue[] methods = getElementValue(requestMapping, "method");
+    if (methods != null && methods.length > 0) {
+      writer.element(HtmlUtil.H4, "HTTP Request Methods");
+      writer.element(HtmlUtil.P,
+        "The resource can be accessed using the following HTTP request methods.");
+      writer.startTag(HtmlUtil.UL);
+      for (AnnotationValue value : methods) {
+        FieldDoc method = (FieldDoc)value.value();
+        writer.element(HtmlUtil.LI, method.name());
+      }
+      writer.endTag(HtmlUtil.UL);
     }
   }
 
@@ -299,55 +390,86 @@ public class RestDoclet {
     }
   }
 
-  public void addResponseStatusDescription(
-    Map<String, List<String>> responseCodes, String code, String description) {
-    List<String> descriptions = responseCodes.get(code);
-    if (descriptions == null) {
-      descriptions = new ArrayList<String>();
-      responseCodes.put(code, descriptions);
-    }
-    descriptions.add(description);
-  }
+  private void setOptions(String[][] options) {
+    for (String[] option : options) {
+      String optionName = option[0];
+      if (optionName.equals("-d")) {
+        destDir = option[1];
 
-  private void requestMethods(AnnotationDesc requestMapping) {
-    AnnotationValue[] methods = getElementValue(requestMapping, "method");
-    if (methods != null && methods.length > 0) {
-      writer.element(HtmlUtil.H4, "HTTP Request Methods");
-      writer.element(HtmlUtil.P,
-        "The resource can be accessed using the following HTTP request methods.");
-      writer.startTag(HtmlUtil.UL);
-      for (AnnotationValue value : methods) {
-        FieldDoc method = (FieldDoc)value.value();
-        writer.element(HtmlUtil.LI, method.name());
-      }
-      writer.endTag(HtmlUtil.UL);
-    }
-  }
-
-  public void uriTemplates(AnnotationDesc requestMapping) {
-    AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
-    if (uriTemplates.length > 0) {
-      writer.element(HtmlUtil.H4, "URI Templates");
-      writer.element(
-        HtmlUtil.P,
-        "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
-
-      for (AnnotationValue uriTemplate : uriTemplates) {
-        writer.element(HtmlUtil.PRE, uriTemplate.value());
+      } else if (optionName.equals("-doctitle")) {
+        docTitle = option[1];
+      } else if (optionName.equals("-htmlheader")) {
+        header = FileUtil.getFileAsString(option[1]);
+      } else if (optionName.equals("-htmlfooter")) {
+        footer = FileUtil.getFileAsString(option[1]);
       }
     }
+    try {
+      File dir = new File(destDir);
+      File indexFile = new File(dir, "index.html");
+      FileWriter out = new FileWriter(indexFile);
+      writer = new XmlWriter(out, false);
+      FileUtil.copy(
+        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"),
+        new File(destDir, "javadoc.css"));
+      FileUtil.copy(
+        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.js"),
+        new File(destDir, "javadoc.js"));
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
+    }
+  }
+
+  private void start() {
+    try {
+      setOptions(root.options());
+
+      if (header == null) {
+        writer.startDocument("UTF-8", "1.0");
+        writer.docType("html", null);
+        writer.startTag(HtmlUtil.HTML);
+        writer.attribute(HtmlUtil.ATTR_LANG, "en");
+
+        head();
+        writer.startTag(HtmlUtil.BODY);
+      } else {
+        writer.write(header);
+      }
+
+      bodyContent();
+
+      if (footer == null) {
+        writer.endTag(HtmlUtil.BODY);
+
+        writer.endTag(HtmlUtil.HTML);
+      } else {
+        writer.write(footer);
+      }
+      writer.endDocument();
+    } finally {
+      if (writer != null) {
+        writer.close();
+      }
+    }
+  }
+
+  public void title(String title) {
+    writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.text(title);
+    writer.endTag(HtmlUtil.DIV);
   }
 
   private void uriTemplateParameters(MethodDoc method) {
     List<Parameter> parameters = new ArrayList<Parameter>();
     for (Parameter parameter : method.parameters()) {
-      if (hasAnnotation(parameter.annotations(),
+      if (DocletUtil.hasAnnotation(parameter.annotations(),
         "org.springframework.web.bind.annotation.PathVariable")) {
         parameters.add(parameter);
       }
     }
     if (!parameters.isEmpty()) {
-      Map<String, String> descriptions = getParameterDescriptions(method);
+      Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
       writer.element(HtmlUtil.H4, "URI Template Parameters");
       writer.element(
         HtmlUtil.P,
@@ -383,137 +505,18 @@ public class RestDoclet {
     }
   }
 
-  public void description(Map<String, String> descriptions, String name) {
-    writer.startTag(HtmlUtil.TD);
-    String description = descriptions.get(name);
-    if (description == null) {
-      writer.write("-");
-    } else {
-      writer.write(description);
-    }
-    writer.endTag(HtmlUtil.TD);
-  }
-
-  public static Map<String, String> getParameterDescriptions(MethodDoc method) {
-    Map<String, String> descriptions = new HashMap<String, String>();
-    for (ParamTag tag : method.paramTags()) {
-      descriptions.put(tag.parameterName(), tag.parameterComment());
-    }
-    return descriptions;
-  }
-
-  private void parameters(MethodDoc method) {
-    List<Parameter> parameters = new ArrayList<Parameter>();
-    for (Parameter parameter : method.parameters()) {
-      AnnotationDesc[] annotations = parameter.annotations();
-      if (hasAnnotation(annotations,
-        "org.springframework.web.bind.annotation.RequestParam")
-        || hasAnnotation(annotations,
-          "org.springframework.web.bind.annotation.RequestBody")) {
-        parameters.add(parameter);
-      }
-    }
-    if (!parameters.isEmpty()) {
-      Map<String, String> descriptions = getParameterDescriptions(method);
-
-      writer.element(HtmlUtil.H4, "Parameters");
+  public void uriTemplates(AnnotationDesc requestMapping) {
+    AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
+    if (uriTemplates.length > 0) {
+      writer.element(HtmlUtil.H4, "URI Templates");
       writer.element(
         HtmlUtil.P,
-        "The resource supports the following parameters. "
-          + "For HTTP get requests these must be specified using query string parameters. "
-          + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
-          + "Array values [] can be specified by including the parameter multiple times in the request.");
+        "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
 
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
-      writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_STYLE, "width:auto;margin-left:0px");
-      writer.startTag(HtmlUtil.THEAD);
-      writer.startTag(HtmlUtil.TR);
-      writer.element(HtmlUtil.TH, "Parameter");
-      writer.element(HtmlUtil.TH, "Type");
-      writer.element(HtmlUtil.TH, "Default");
-      writer.element(HtmlUtil.TH, "Required");
-      writer.element(HtmlUtil.TH, "Description");
-      writer.endTag(HtmlUtil.TR);
-      writer.endTag(HtmlUtil.THEAD);
-
-      writer.startTag(HtmlUtil.TBODY);
-      for (Parameter parameter : parameters) {
-        writer.startTag(HtmlUtil.TR);
-        String name = parameter.name();
-        AnnotationDesc requestParam = getAnnotation(parameter.annotations(),
-          "org.springframework.web.bind.annotation.RequestParam");
-        AnnotationDesc requestBody = getAnnotation(parameter.annotations(),
-          "org.springframework.web.bind.annotation.RequestBody");
-        String paramName = name;
-        String defaultValue = "-";
-        String typeName = parameter.typeName().replaceFirst("^java.lang.", "");
-        boolean required = true;
-        if (requestParam != null) {
-          String value = getElementValue(requestParam, "value");
-          if (value != null && !value.trim().equals("")) {
-            paramName = value;
-          }
-          defaultValue = getElementValue(requestParam, "defaultValue");
-          if (defaultValue == null) {
-            defaultValue = "-";
-          }
-          required = Boolean.FALSE != (Boolean)getElementValue(requestParam,
-            "required");
-        }
-        if (requestBody != null) {
-          required = true;
-          paramName="HTTP Request body or 'body' parameter";
-          typeName="binary/character data";
-        }
-        writer.element(HtmlUtil.TD, paramName);
-         writer.element(HtmlUtil.TD,
-          typeName);
-        writer.element(HtmlUtil.TD, defaultValue);
-        if (required) {
-          writer.element(HtmlUtil.TD, "Yes");
-        } else {
-          writer.element(HtmlUtil.TD, "No");
-        }
-        description(descriptions, name);
-        writer.endTag(HtmlUtil.TR);
-      }
-      writer.endTag(HtmlUtil.TBODY);
-
-      writer.endTag(HtmlUtil.TABLE);
-      writer.endTag(HtmlUtil.DIV);
-    }
-  }
-
-  private <T> T getElementValue(AnnotationDesc annotation, String name) {
-    for (ElementValuePair pair : annotation.elementValues()) {
-      if (pair.element().name().equals(name)) {
-        return (T)pair.value().value();
+      for (AnnotationValue uriTemplate : uriTemplates) {
+        writer.element(HtmlUtil.PRE, uriTemplate.value());
       }
     }
-    return null;
-  }
-
-  public void head() {
-    writer.startTag(HtmlUtil.HEAD);
-    writer.element(HtmlUtil.TITLE, docTitle);
-    HtmlUtil.serializeCss(
-      writer,
-      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/css/jquery.dataTables_themeroller.css");
-    HtmlUtil.serializeCss(
-      writer,
-      "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css");
-    HtmlUtil.serializeCss(writer, "javadoc.css");
-    HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
-    HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js");
-    HtmlUtil.serializeScriptLink(
-      writer,
-      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/jquery.dataTables.min.js");
-    HtmlUtil.serializeScriptLink(writer, "javadoc.js");
-    writer.endTag(HtmlUtil.HEAD);
   }
 
 }

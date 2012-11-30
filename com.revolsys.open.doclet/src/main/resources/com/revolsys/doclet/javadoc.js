@@ -7,7 +7,7 @@ $(document).ready(function() {
     "bFilter" : false
   });
   
-  $('div.restMethod').accordion({
+  $('div.javaMethod').accordion({
     icons : {
       header : "ui-icon-triangle-1-e",
       headerSelected : "ui-icon-triangle-1-s"

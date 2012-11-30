@@ -193,6 +193,8 @@ public final class HtmlUtil {
 
   public static final QName HR = new QName(HTML_NS_URI, "hr", HTML_NS_PREFIX);
 
+  public static final QName CODE = new QName(HTML_NS_URI, "code", HTML_NS_PREFIX);
+
   public static void serializeA(final XmlWriter out, final String cssClass,
     final Object url, final Object content) {
     if (url != null) {

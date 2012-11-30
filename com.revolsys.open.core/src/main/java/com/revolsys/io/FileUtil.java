@@ -555,6 +555,17 @@ public final class FileUtil {
 
   }
 
+  public static String getFileAsString(String fileName) {
+    File file = new File(fileName);
+    StringWriter out = new StringWriter();
+    try {
+      copy(file,out);
+    } catch (IOException e) {
+      throw new RuntimeException("Unable to copy file: " + fileName);
+    }
+    return out.toString();
+  }
+
   public static String getFileName(final String fileName) {
     int slashIndex = fileName.lastIndexOf('/');
     if (slashIndex != -1) {
