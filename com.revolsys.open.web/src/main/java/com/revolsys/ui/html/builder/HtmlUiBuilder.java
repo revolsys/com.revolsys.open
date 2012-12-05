@@ -80,7 +80,6 @@ import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.ui.web.exception.PageNotFoundException;
-import com.revolsys.ui.web.exception.RedirectException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
@@ -399,7 +398,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
 
       tableParams.put("iDeferLoading", parameters.get("deferLoading"));
-      tableParams.put("bProcessing", true);
+      tableParams.put("bProcessing", false);
       tableParams.put("bServerSide", serverSide);
       tableParams.put("sAjaxSource", ajaxSource);
     } else if (serverSide == null) {
@@ -452,6 +451,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
       + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}";
+//    if (serverSide) {
+//      jsonMap += ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
+//    }
     jsonMap += "}";
     StringBuffer scriptBody = new StringBuffer();
     scriptBody.append("$(document).ready(function() {\n");
@@ -1342,7 +1344,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return true;
   }
 
-  public  void redirectAfterCommit(String url) {
+  public void redirectAfterCommit(String url) {
     final Map<String, Object> parameters = new HashMap<String, Object>();
     final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String parameterName : Arrays.asList("plain", "htmlCss")) {

@@ -1,3 +1,10 @@
+function activateAccordion() {
+  if (location.hash) {
+    var anchor = $('[name="' + location.hash.substring(1) + '"]');
+    anchor.parents('.ui-accordion').accordion('activate', 0);
+  } 
+}
+
 $(document).ready(function() {
   $('div.simpleDataTable table').dataTable({
     "bInfo" : false,
@@ -16,5 +23,7 @@ $(document).ready(function() {
     active : 1,
     autoHeight : false
   });
-
+  activateAccordion();
 });
+
+$(window).bind('hashchange', activateAccordion());

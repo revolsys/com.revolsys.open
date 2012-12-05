@@ -37,20 +37,19 @@ public class RestDoclet {
     return -1;
   }
 
-  public static boolean start(RootDoc root) {
+  public static boolean start(final RootDoc root) {
     new RestDoclet(root).start();
     return true;
   }
 
-  public static boolean validOptions(String options[][],
-    DocErrorReporter docerrorreporter) {
-    boolean flag = true;
-    String s = "";
-    for (String[] option : options) {
-      String argName = option[0].toLowerCase();
+  public static boolean validOptions(final String options[][],
+    final DocErrorReporter docerrorreporter) {
+    final boolean flag = true;
+    for (final String[] option : options) {
+      final String argName = option[0].toLowerCase();
       if (argName.equals("-d")) {
-        String destDir = option[1];
-        File file = new File(destDir);
+        final String destDir = option[1];
+        final File file = new File(destDir);
         if (!file.exists()) {
           docerrorreporter.printNotice("Create directory" + destDir);
           file.mkdirs();
@@ -77,7 +76,7 @@ public class RestDoclet {
       }
     }
 
-    return flag || s.length() <= 0;
+    return flag;
   }
 
   private String destDir = ".";
@@ -88,16 +87,17 @@ public class RestDoclet {
 
   private String header;
 
-  private RootDoc root;
+  private final RootDoc root;
 
   private XmlWriter writer;
 
-  public RestDoclet(RootDoc root) {
+  public RestDoclet(final RootDoc root) {
     this.root = root;
   }
 
   public void addResponseStatusDescription(
-    Map<String, List<String>> responseCodes, String code, String description) {
+    final Map<String, List<String>> responseCodes, final String code,
+    final String description) {
     List<String> descriptions = responseCodes.get(code);
     if (descriptions == null) {
       descriptions = new ArrayList<String>();
@@ -112,9 +112,10 @@ public class RestDoclet {
     documentation();
   }
 
-  public void description(Map<String, String> descriptions, String name) {
+  public void description(final Map<String, String> descriptions,
+    final String name) {
     writer.startTag(HtmlUtil.TD);
-    String description = descriptions.get(name);
+    final String description = descriptions.get(name);
     if (description == null) {
       writer.write("-");
     } else {
@@ -125,12 +126,12 @@ public class RestDoclet {
 
   public void documentation() {
     writer.startTag(HtmlUtil.DIV);
-    for (PackageDoc packageDoc : root.specifiedPackages()) {
-      Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
-      for (ClassDoc classDoc : packageDoc.ordinaryClasses()) {
+    for (final PackageDoc packageDoc : root.specifiedPackages()) {
+      final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
+      for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
         classes.put(classDoc.name(), classDoc);
       }
-      for (ClassDoc classDoc : classes.values()) {
+      for (final ClassDoc classDoc : classes.values()) {
         documentationClass(classDoc);
       }
     }
@@ -138,14 +139,19 @@ public class RestDoclet {
     writer.endTag(HtmlUtil.DIV);
   }
 
-  public void documentationClass(ClassDoc classDoc) {
+  public void documentationClass(final ClassDoc classDoc) {
     if (DocletUtil.hasAnnotation(classDoc,
       "org.springframework.stereotype.Controller")) {
+      writer.startTag(HtmlUtil.A);
+      writer.attribute(HtmlUtil.ATTR_NAME, DocletUtil.qualifiedName(classDoc));
+      writer.text("");
+      writer.endTag(HtmlUtil.A);
+
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
-      writer.attribute(HtmlUtil.ATTR_ID, DocletUtil.qualifiedName(classDoc));
-      String name = classDoc.name();
-      title(CaseConverter.toCapitalizedWords(name));
+      final String name = classDoc.name();
+      title(DocletUtil.qualifiedName(classDoc),
+        CaseConverter.toCapitalizedWords(name));
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "content");
       writer.write(classDoc.commentText());
@@ -155,17 +161,16 @@ public class RestDoclet {
     }
   }
 
-  public void documentationMethod(ClassDoc classDoc) {
-    for (MethodDoc method : classDoc.methods()) {
-      String methodName = method.name();
-      AnnotationDesc requestMapping = DocletUtil.getAnnotation(method,
+  public void documentationMethod(final ClassDoc classDoc) {
+    for (final MethodDoc method : classDoc.methods()) {
+      final String methodName = method.name();
+      final AnnotationDesc requestMapping = DocletUtil.getAnnotation(method,
         "org.springframework.web.bind.annotation.RequestMapping");
       if (requestMapping != null) {
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
-        writer.attribute(HtmlUtil.ATTR_ID, DocletUtil.qualifiedName(classDoc)
-          + "." + methodName);
-        title(CaseConverter.toCapitalizedWords(methodName));
+        title(DocletUtil.qualifiedName(classDoc)
+          + "." + methodName,CaseConverter.toCapitalizedWords(methodName));
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "content");
         writer.write(method.commentText());
@@ -187,8 +192,9 @@ public class RestDoclet {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T getElementValue(AnnotationDesc annotation, String name) {
-    for (ElementValuePair pair : annotation.elementValues()) {
+  private <T> T getElementValue(final AnnotationDesc annotation,
+    final String name) {
+    for (final ElementValuePair pair : annotation.elementValues()) {
       if (pair.element().name().equals(name)) {
         return (T)pair.value().value();
       }
@@ -217,10 +223,10 @@ public class RestDoclet {
     writer.endTag(HtmlUtil.HEAD);
   }
 
-  private void parameters(MethodDoc method) {
-    List<Parameter> parameters = new ArrayList<Parameter>();
-    for (Parameter parameter : method.parameters()) {
-      AnnotationDesc[] annotations = parameter.annotations();
+  private void parameters(final MethodDoc method) {
+    final List<Parameter> parameters = new ArrayList<Parameter>();
+    for (final Parameter parameter : method.parameters()) {
+      final AnnotationDesc[] annotations = parameter.annotations();
       if (DocletUtil.hasAnnotation(annotations,
         "org.springframework.web.bind.annotation.RequestParam")
         || DocletUtil.hasAnnotation(annotations,
@@ -229,7 +235,7 @@ public class RestDoclet {
       }
     }
     if (!parameters.isEmpty()) {
-      Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+      final Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
 
       writer.element(HtmlUtil.H4, "Parameters");
       writer.element(
@@ -254,13 +260,13 @@ public class RestDoclet {
       writer.endTag(HtmlUtil.THEAD);
 
       writer.startTag(HtmlUtil.TBODY);
-      for (Parameter parameter : parameters) {
+      for (final Parameter parameter : parameters) {
         writer.startTag(HtmlUtil.TR);
-        String name = parameter.name();
-        AnnotationDesc requestParam = DocletUtil.getAnnotation(
+        final String name = parameter.name();
+        final AnnotationDesc requestParam = DocletUtil.getAnnotation(
           parameter.annotations(),
           "org.springframework.web.bind.annotation.RequestParam");
-        AnnotationDesc requestBody = DocletUtil.getAnnotation(
+        final AnnotationDesc requestBody = DocletUtil.getAnnotation(
           parameter.annotations(),
           "org.springframework.web.bind.annotation.RequestBody");
         String paramName = name;
@@ -268,7 +274,7 @@ public class RestDoclet {
         String typeName = parameter.typeName().replaceFirst("^java.lang.", "");
         boolean required = true;
         if (requestParam != null) {
-          String value = getElementValue(requestParam, "value");
+          final String value = getElementValue(requestParam, "value");
           if (value != null && !value.trim().equals("")) {
             paramName = value;
           }
@@ -284,13 +290,13 @@ public class RestDoclet {
           paramName = "HTTP Request body or 'body' parameter";
           typeName = "binary/character data";
         }
-        
+
         writer.startTag(HtmlUtil.TD);
         writer.startTag(HtmlUtil.CODE);
         writer.text(paramName);
         writer.endTag(HtmlUtil.CODE);
         writer.endTag(HtmlUtil.TD);
-        
+
         writer.startTag(HtmlUtil.TD);
         writer.startTag(HtmlUtil.CODE);
         writer.text(typeName);
@@ -313,32 +319,32 @@ public class RestDoclet {
     }
   }
 
-  private void requestMethods(AnnotationDesc requestMapping) {
-    AnnotationValue[] methods = getElementValue(requestMapping, "method");
+  private void requestMethods(final AnnotationDesc requestMapping) {
+    final AnnotationValue[] methods = getElementValue(requestMapping, "method");
     if (methods != null && methods.length > 0) {
       writer.element(HtmlUtil.H4, "HTTP Request Methods");
       writer.element(HtmlUtil.P,
         "The resource can be accessed using the following HTTP request methods.");
       writer.startTag(HtmlUtil.UL);
-      for (AnnotationValue value : methods) {
-        FieldDoc method = (FieldDoc)value.value();
+      for (final AnnotationValue value : methods) {
+        final FieldDoc method = (FieldDoc)value.value();
         writer.element(HtmlUtil.LI, method.name());
       }
       writer.endTag(HtmlUtil.UL);
     }
   }
 
-  private void responseStatus(MethodDoc method) {
-    Map<String, List<String>> responseStatusDescriptions = new TreeMap<String, List<String>>();
+  private void responseStatus(final MethodDoc method) {
+    final Map<String, List<String>> responseStatusDescriptions = new TreeMap<String, List<String>>();
 
-    for (Tag tag : method.tags()) {
+    for (final Tag tag : method.tags()) {
       if (tag.name().equals("@web.response.status")) {
-        String text = tag.text();
+        final String text = tag.text();
 
-        int index = text.indexOf(" ");
+        final int index = text.indexOf(" ");
         if (index != -1) {
-          String status = text.substring(0, index);
-          String description = text.substring(index + 1).trim();
+          final String status = text.substring(0, index);
+          final String description = text.substring(index + 1).trim();
           addResponseStatusDescription(responseStatusDescriptions, status,
             description);
         }
@@ -371,9 +377,9 @@ public class RestDoclet {
       writer.endTag(HtmlUtil.THEAD);
 
       writer.startTag(HtmlUtil.TBODY);
-      for (Entry<String, List<String>> entry : responseStatusDescriptions.entrySet()) {
-        String code = entry.getKey();
-        for (String message : entry.getValue()) {
+      for (final Entry<String, List<String>> entry : responseStatusDescriptions.entrySet()) {
+        final String code = entry.getKey();
+        for (final String message : entry.getValue()) {
           writer.startTag(HtmlUtil.TR);
           writer.element(HtmlUtil.TD, code);
           writer.startTag(HtmlUtil.TD);
@@ -390,9 +396,9 @@ public class RestDoclet {
     }
   }
 
-  private void setOptions(String[][] options) {
-    for (String[] option : options) {
-      String optionName = option[0];
+  private void setOptions(final String[][] options) {
+    for (final String[] option : options) {
+      final String optionName = option[0];
       if (optionName.equals("-d")) {
         destDir = option[1];
 
@@ -405,9 +411,9 @@ public class RestDoclet {
       }
     }
     try {
-      File dir = new File(destDir);
-      File indexFile = new File(dir, "index.html");
-      FileWriter out = new FileWriter(indexFile);
+      final File dir = new File(destDir);
+      final File indexFile = new File(dir, "index.html");
+      final FileWriter out = new FileWriter(indexFile);
       writer = new XmlWriter(out, false);
       FileUtil.copy(
         getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"),
@@ -415,7 +421,7 @@ public class RestDoclet {
       FileUtil.copy(
         getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.js"),
         new File(destDir, "javadoc.js"));
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
     }
   }
@@ -453,23 +459,33 @@ public class RestDoclet {
     }
   }
 
-  public void title(String title) {
+  public void title(final String title) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
     writer.text(title);
     writer.endTag(HtmlUtil.DIV);
   }
 
-  private void uriTemplateParameters(MethodDoc method) {
-    List<Parameter> parameters = new ArrayList<Parameter>();
-    for (Parameter parameter : method.parameters()) {
+  public void title(final String name, final String title) {
+    writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.startTag(HtmlUtil.A);
+    writer.attribute(HtmlUtil.ATTR_NAME, name);
+    writer.text(title);
+    writer.endTag(HtmlUtil.A);
+    writer.endTag(HtmlUtil.DIV);
+  }
+
+  private void uriTemplateParameters(final MethodDoc method) {
+    final List<Parameter> parameters = new ArrayList<Parameter>();
+    for (final Parameter parameter : method.parameters()) {
       if (DocletUtil.hasAnnotation(parameter.annotations(),
         "org.springframework.web.bind.annotation.PathVariable")) {
         parameters.add(parameter);
       }
     }
     if (!parameters.isEmpty()) {
-      Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
+      final Map<String, String> descriptions = DocletUtil.getParameterDescriptions(method);
       writer.element(HtmlUtil.H4, "URI Template Parameters");
       writer.element(
         HtmlUtil.P,
@@ -489,9 +505,9 @@ public class RestDoclet {
       writer.endTag(HtmlUtil.THEAD);
 
       writer.startTag(HtmlUtil.TBODY);
-      for (Parameter parameter : parameters) {
+      for (final Parameter parameter : parameters) {
         writer.startTag(HtmlUtil.TR);
-        String name = parameter.name();
+        final String name = parameter.name();
         writer.element(HtmlUtil.TD, "{" + name + "}");
         writer.element(HtmlUtil.TD, parameter.typeName());
         description(descriptions, name);
@@ -505,15 +521,16 @@ public class RestDoclet {
     }
   }
 
-  public void uriTemplates(AnnotationDesc requestMapping) {
-    AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
+  public void uriTemplates(final AnnotationDesc requestMapping) {
+    final AnnotationValue[] uriTemplates = getElementValue(requestMapping,
+      "value");
     if (uriTemplates.length > 0) {
       writer.element(HtmlUtil.H4, "URI Templates");
       writer.element(
         HtmlUtil.P,
         "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
 
-      for (AnnotationValue uriTemplate : uriTemplates) {
+      for (final AnnotationValue uriTemplate : uriTemplates) {
         writer.element(HtmlUtil.PRE, uriTemplate.value());
       }
     }

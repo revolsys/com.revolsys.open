@@ -994,7 +994,7 @@
 3002	Makassar / NEIEZ	4257	Mercator	{Central_Meridian=110, False_Easting=3900000, False_Northing=900000, Scale_Factor=0.997}	Meter	1.0
 3003	Monte Mario / Italy zone 1	4265	Transverse_Mercator	{Central_Meridian=9, False_Easting=1500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=0.9996}	Meter	1.0
 3004	Monte Mario / Italy zone 2	4265	Transverse_Mercator	{Central_Meridian=15, False_Easting=2520000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=0.9996}	Meter	1.0
-3005	NAD83 / BC Albers	4269	Albers	{False_Easting=1000000, False_Northing=0, Central_Meridian=-126, Standard_Parallel_1=50, Standard_Parallel_2=58.5, Latitude_Of_Origin=45}	Meter	1.0
+3005	NAD_1983_BC_Environment_Albers	4269	Albers	{False_Easting=1000000.0, False_Northing=0.0, Central_Meridian=-126.0, Standard_Parallel_1=50.0, Standard_Parallel_2=58.5, Latitude_Of_Origin=45.0}	Meter	1.0
 3006	SWEREF99 TM	4619	Transverse_Mercator	{Central_Meridian=15, False_Easting=500000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=0.9996}	Meter	1.0
 3007	SWEREF99 12 00	4619	Transverse_Mercator	{Central_Meridian=12, False_Easting=150000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=1}	Meter	1.0
 3008	SWEREF99 13 30	4619	Transverse_Mercator	{Central_Meridian=13.5, False_Easting=150000, False_Northing=0, Latitude_Of_Origin=0, Scale_Factor=1}	Meter	1.0

@@ -84,7 +84,7 @@ public class EsriCsWktWriter {
   }
 
   private static void write(final PrintWriter out, final Number number) {
-    out.print(new DecimalFormat("#0.################").format(number));
+    out.print(new DecimalFormat("#0.0###############").format(number));
 
   }
 
