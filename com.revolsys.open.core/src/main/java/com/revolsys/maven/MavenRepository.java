@@ -1,5 +1,7 @@
 package com.revolsys.maven;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
@@ -98,7 +101,23 @@ public class MavenRepository implements URLStreamHandlerFactory {
         version, "maven-metadata.xml");
     final Resource metaDataResource = SpringUtil.getResource(root, metaDataPath);
     if (metaDataResource.exists()) {
-      return XmlMapIoFactory.toMap(metaDataResource);
+      try {
+        return XmlMapIoFactory.toMap(metaDataResource);
+      } catch (RuntimeException e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Error loading maven resource" + metaDataResource, e);
+        if (metaDataResource instanceof FileSystemResource) {
+          try {
+            File file = metaDataResource.getFile();
+            if (file.delete()) {
+              LoggerFactory.getLogger(getClass()).error(
+                "Deleting corrupt maven resource" + metaDataResource, e);
+            }
+          } catch (IOException ioe) {
+          }
+        }
+       throw e;
+      }
     } else {
       return Collections.emptyMap();
     }
