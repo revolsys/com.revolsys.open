@@ -144,6 +144,16 @@ public class XmlWriter extends Writer {
   /** Flag indicating that the xml elements should be indented. */
   private boolean indent;
 
+  private boolean writeNewLine = true;
+
+  public void setWriteNewLine(boolean writeNewLine) {
+    this.writeNewLine = writeNewLine;
+  }
+
+  public boolean isWriteNewLine() {
+    return writeNewLine;
+  }
+
   /** The map of XML Namespace URIs to prefixes. */
   private final Map<String, String> namespacePrefixMap = new LinkedHashMap<String, String>();
 
@@ -635,6 +645,16 @@ public class XmlWriter extends Writer {
       removeCurrentTag();
       elementHasContent = false;
     }
+  }
+
+  public void endTagLn(final QName element) {
+    endTag(element);
+    newLine();
+  }
+
+  public void startTagLn(final QName element) {
+    startTag(element);
+    newLine();
   }
 
   /**
@@ -1267,7 +1287,9 @@ public class XmlWriter extends Writer {
    */
   private void writeEndIndent() {
     if (!elementHasContent) {
-      out.write(newLine);
+      if (writeNewLine) {
+        out.write(newLine);
+      }
       if (indent) {
         final int depth = elementStack.size() - 1;
         for (int i = 0; i < depth; i++) {
@@ -1284,7 +1306,9 @@ public class XmlWriter extends Writer {
    */
   private void writeIndent() {
     if (elementsStarted) {
-      out.write(newLine);
+      if (writeNewLine) {
+        out.write(newLine);
+      }
       if (indent) {
         final int depth = elementStack.size();
         for (int i = 0; i < depth; i++) {

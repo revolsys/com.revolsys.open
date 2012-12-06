@@ -57,33 +57,35 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
   public void write(final Map map, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
-    Charset charset = mediaType.getCharSet();
-    if (charset == null) {
-      charset = DEFAULT_CHARSET;
+    if (!HttpServletUtils.getResponse().isCommitted()) {
+      Charset charset = mediaType.getCharSet();
+      if (charset == null) {
+        charset = DEFAULT_CHARSET;
+      }
+      outputMessage.getHeaders().setContentType(mediaType);
+      final OutputStream body = outputMessage.getBody();
+      final String mediaTypeString = mediaType.getType() + "/"
+        + mediaType.getSubtype();
+      final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
+        MapWriterFactory.class, mediaTypeString);
+      final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
+        body, charset));
+      writer.setProperty(IoConstants.INDENT_PROPERTY, true);
+      writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+      final HttpServletRequest request = HttpServletUtils.getRequest();
+      String callback = request.getParameter("jsonp");
+      if (callback == null) {
+        callback = request.getParameter("callback");
+      }
+      if (callback != null) {
+        writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
+      }
+      final Object title = request.getAttribute(IoConstants.TITLE_PROPERTY);
+      if (title != null) {
+        writer.setProperty(IoConstants.TITLE_PROPERTY, title);
+      }
+      writer.write(map);
+      writer.close();
     }
-    outputMessage.getHeaders().setContentType(mediaType);
-    final OutputStream body = outputMessage.getBody();
-    final String mediaTypeString = mediaType.getType() + "/"
-      + mediaType.getSubtype();
-    final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
-      MapWriterFactory.class, mediaTypeString);
-    final MapWriter writer = writerFactory.getWriter(new OutputStreamWriter(
-      body, charset));
-    writer.setProperty(IoConstants.INDENT_PROPERTY, true);
-    writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    String callback = request.getParameter("jsonp");
-    if (callback == null) {
-      callback = request.getParameter("callback");
-    }
-    if (callback != null) {
-      writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
-    }
-    final Object title = request.getAttribute(IoConstants.TITLE_PROPERTY);
-    if (title != null) {
-      writer.setProperty(IoConstants.TITLE_PROPERTY, title);
-    }
-    writer.write(map);
-    writer.close();
   }
 }

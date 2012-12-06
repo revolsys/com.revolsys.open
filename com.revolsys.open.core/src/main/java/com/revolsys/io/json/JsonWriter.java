@@ -177,7 +177,13 @@ public final class JsonWriter {
     } else if (value instanceof Boolean) {
       out.print(value);
     } else if (value instanceof Number) {
-      out.print(NUMBER_FORMAT.format(value));
+      Number number = (Number)value;
+      double doubleValue = number.doubleValue();
+      if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
+        out.print("null");
+      } else {
+        out.print(NUMBER_FORMAT.format(value));
+      }
     } else if (value instanceof List) {
       final List<? extends Object> list = (List<? extends Object>)value;
       list(list);

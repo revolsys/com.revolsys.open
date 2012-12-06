@@ -38,6 +38,11 @@ public class LowestLeftComparator implements Comparator<Coordinates> {
       inverseOperation.perform(coordinates2, point2);
     }
 
+    return compareCoordinates(point1, point2);
+  }
+
+  public static int compareCoordinates(final Coordinates point1,
+    final Coordinates point2) {
     final Double x1 = point1.getX();
     final Double y1 = point1.getY();
     final Double x2 = point2.getX();

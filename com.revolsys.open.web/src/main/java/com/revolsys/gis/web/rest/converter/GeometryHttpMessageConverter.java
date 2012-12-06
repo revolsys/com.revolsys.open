@@ -49,8 +49,7 @@ public class GeometryHttpMessageConverter extends
   }
 
   @Override
-  public Geometry read(
-    final Class<? extends Geometry> clazz,
+  public Geometry read(final Class<? extends Geometry> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     final HttpHeaders headers = inputMessage.getHeaders();
@@ -97,38 +96,38 @@ public class GeometryHttpMessageConverter extends
   }
 
   @Override
-  public void write(
-    final Geometry geometry,
-    final MediaType mediaType,
+  public void write(final Geometry geometry, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
-    MediaType actualMediaType;
-    if (mediaType == null) {
-      actualMediaType = getDefaultMediaType();
-    } else {
-      actualMediaType = mediaType;
-    }
-    if (actualMediaType != null) {
-      Charset charset = actualMediaType.getCharSet();
-      if (charset == null) {
-        charset = DEFAULT_CHARSET;
-      }
-      final HttpHeaders headers = outputMessage.getHeaders();
-      headers.setContentType(actualMediaType);
-      final OutputStream body = outputMessage.getBody();
-      final String mediaTypeString = actualMediaType.getType() + "/"
-        + actualMediaType.getSubtype();
-      final GeometryWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
-        GeometryWriterFactory.class, mediaTypeString);
-      if (writerFactory == null) {
-        throw new IllegalArgumentException("Media type " + actualMediaType
-          + " not supported");
+    if (!HttpServletUtils.getResponse().isCommitted()) {
+      MediaType actualMediaType;
+      if (mediaType == null) {
+        actualMediaType = getDefaultMediaType();
       } else {
-        final String baseName = HttpServletUtils.getRequestBaseFileName();
-        final Writer<Geometry> writer = writerFactory.createGeometryWriter(
-          baseName, body, charset);
-        writer.write(geometry);
-        writer.close();
+        actualMediaType = mediaType;
+      }
+      if (actualMediaType != null) {
+        Charset charset = actualMediaType.getCharSet();
+        if (charset == null) {
+          charset = DEFAULT_CHARSET;
+        }
+        final HttpHeaders headers = outputMessage.getHeaders();
+        headers.setContentType(actualMediaType);
+        final OutputStream body = outputMessage.getBody();
+        final String mediaTypeString = actualMediaType.getType() + "/"
+          + actualMediaType.getSubtype();
+        final GeometryWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
+          GeometryWriterFactory.class, mediaTypeString);
+        if (writerFactory == null) {
+          throw new IllegalArgumentException("Media type " + actualMediaType
+            + " not supported");
+        } else {
+          final String baseName = HttpServletUtils.getRequestBaseFileName();
+          final Writer<Geometry> writer = writerFactory.createGeometryWriter(
+            baseName, body, charset);
+          writer.write(geometry);
+          writer.close();
+        }
       }
     }
   }

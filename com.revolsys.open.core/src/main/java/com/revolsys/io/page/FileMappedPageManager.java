@@ -4,34 +4,40 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.collection.WeakCache;
+import com.revolsys.collection.LruMap;
 import com.revolsys.io.FileUtil;
 
-public class FilePageManager implements PageManager {
-  int pageSize = 64;
+public class FileMappedPageManager implements PageManager {
+  int pageSize = 2048;
 
   private RandomAccessFile randomAccessFile;
 
-  // TODO 
-  private final Map<Integer, Page> pages = new WeakCache<Integer, Page>();
+  private FileChannel fileChannel;
+
+  // TODO
+  private final Map<Integer, Page> pages = new LruMap<Integer, Page>(1000);
 
   private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
 
   private final Set<Page> pagesInUse = new HashSet<Page>();
 
-  public FilePageManager() {
+  public FileMappedPageManager() {
     this(FileUtil.createTempFile("pages", ".pf"));
   }
 
-  public FilePageManager(final File file) {
+  public FileMappedPageManager(final File file) {
     try {
       this.randomAccessFile = new RandomAccessFile(file, "rw");
+      fileChannel = randomAccessFile.getChannel();
     } catch (final FileNotFoundException e) {
       throw new IllegalArgumentException("Unable to open file "
         + file.getAbsolutePath(), e);
@@ -45,9 +51,14 @@ public class FilePageManager implements PageManager {
       if (freePageIndexes.isEmpty()) {
         try {
           final int index = (int)(randomAccessFile.length() / pageSize);
-          page = new ByteArrayPage(this, index, pageSize);
+          long offset = (long)index * pageSize;
+          randomAccessFile.setLength(offset + pageSize);
+          FileChannel channel = randomAccessFile.getChannel();
+          MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE, offset,
+            pageSize);
+          page = new FileMappedPage(this, index, buffer);
+
           pages.put(page.getIndex(), page);
-          write(page);
         } catch (final IOException e) {
           throw new RuntimeException(e);
         }
@@ -101,10 +112,9 @@ public class FilePageManager implements PageManager {
 
   private Page loadPage(final int index) {
     try {
-      final Page page = new ByteArrayPage(this, index, pageSize);
-      randomAccessFile.seek((long)index * pageSize);
-      final byte[] content = page.getContent();
-      randomAccessFile.read(content);
+      MappedByteBuffer buffer = fileChannel.map(MapMode.READ_WRITE, (long)index
+        * pageSize, pageSize);
+      final Page page = new FileMappedPage(this, index, buffer);
       pages.put(index, page);
       return page;
     } catch (final IOException e) {
@@ -130,17 +140,8 @@ public class FilePageManager implements PageManager {
   @Override
   public synchronized void write(final Page page) {
     if (page.getPageManager() == this) {
-      synchronized (randomAccessFile) {
-        try {
-          final long index = page.getIndex();
-          if (index >= 0) {
-            randomAccessFile.seek(index * pageSize);
-            final byte[] content = page.getContent();
-            randomAccessFile.write(content);
-          }
-        } catch (final IOException e) {
-          throw new RuntimeException(e);
-        }
+      if (page instanceof FileMappedPage) {
+        page.flush();
       }
     }
   }

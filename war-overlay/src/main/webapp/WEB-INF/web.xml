@@ -18,38 +18,13 @@
     <param-value>classpath:log4j.xml</param-value>
   </context-param>
 
-  <filter>
-    <filter-name>hibernateSessionFilter</filter-name>
-    <filter-class>com.revolsys.orm.hibernate.servlet.filter.HibernateSessionFilter</filter-class>
-    <init-param>
-      <param-name>sessionBeanFactoryName</param-name>
-      <param-value>sessionFactory</param-value>
-    </init-param>
-  </filter>
-  
-  <filter>
-    <filter-name>transactionFilter</filter-name>
-    <filter-class>com.revolsys.ui.web.servlet.TransactionFilter</filter-class>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>transactionFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-  <filter-mapping>
-    <filter-name>hibernateSessionFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
   <filter-mapping>
     <filter-name>springSecurityFilterChain</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <listener>
-    <listener-class>org.springframework.web.util.Log4jConfigListener
-    </listener-class>
+    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
   </listener>
 
   <listener>
@@ -57,19 +32,16 @@
   </listener>
 
   <listener>
-    <listener-class>com.revolsys.orm.core.servlet.listener.DriverManagerCleanupListener
-    </listener-class>
+    <listener-class>com.revolsys.orm.core.servlet.listener.DriverManagerCleanupListener</listener-class>
   </listener>
 
   <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener
-    </listener-class>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
 
   <servlet>
     <servlet-name>dispatcher</servlet-name>
-    <servlet-class>com.revolsys.ui.web.servlet.DispatcherServlet
-    </servlet-class>
+    <servlet-class>com.revolsys.ui.web.servlet.DispatcherServlet</servlet-class>
     <load-on-startup>0</load-on-startup>
   </servlet>
 
@@ -81,31 +53,37 @@
   <error-page>
     <error-code>400</error-code>
     <location>/error.jsp?subTitle=I'm sorry the path you requested is
-      not valid.</location>
+      not valid.
+    </location>
   </error-page>
 
   <error-page>
     <error-code>401</error-code>
     <location>/error.jsp?subTitle=I'm sorry you must be logged in to
-      access this page.</location>
+      access this page.
+    </location>
   </error-page>
 
   <error-page>
     <error-code>403</error-code>
     <location>/error.jsp?subTitle=I'm sorry you do not have permission
-      to access this page.</location>
+      to access this page.
+    </location>
   </error-page>
 
   <error-page>
     <error-code>404</error-code>
     <location>/error.jsp?subTitle=I'm sorry the page you requested
       could
-      not be found.</location>
+      not be found.
+    </location>
   </error-page>
 
   <error-page>
     <error-code>500</error-code>
     <location>/error.jsp?subTitle=I'm sorry there was an error
-      generating the page you requested.</location>
+      generating the page you
+      requested.
+    </location>
   </error-page>
 </web-app>

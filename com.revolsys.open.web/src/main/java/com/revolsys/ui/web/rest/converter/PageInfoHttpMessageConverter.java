@@ -119,40 +119,42 @@ public class PageInfoHttpMessageConverter extends
   public void write(final PageInfo pageInfo, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
-    if (pageInfo != null) {
-      Charset charset = mediaType.getCharSet();
-      if (charset == null) {
-        charset = DEFAULT_CHARSET;
-      }
+    if (!HttpServletUtils.getResponse().isCommitted()) {
+      if (pageInfo != null) {
+        Charset charset = mediaType.getCharSet();
+        if (charset == null) {
+          charset = DEFAULT_CHARSET;
+        }
 
-      final HttpServletRequest request = HttpServletUtils.getRequest();
+        final HttpServletRequest request = HttpServletUtils.getRequest();
 
-      String url = pageInfo.getUrl();
-      if (url == null) {
-        url = HttpServletUtils.getServerUrl();
-        url += urlPathHelper.getOriginatingRequestUri(request);
-      } else if (url.startsWith("/")) {
-        url = HttpServletUtils.getServerUrl() + url;
-      }
+        String url = pageInfo.getUrl();
+        if (url == null) {
+          url = HttpServletUtils.getServerUrl();
+          url += urlPathHelper.getOriginatingRequestUri(request);
+        } else if (url.startsWith("/")) {
+          url = HttpServletUtils.getServerUrl() + url;
+        }
 
-      boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
-      final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
-      if (extension != null) {
-        url = url.replaceAll(extension + "/?$", "/");
-      }
-      final HttpHeaders headers = outputMessage.getHeaders();
-      headers.setContentType(mediaType);
+        boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
+        final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
+        if (extension != null) {
+          url = url.replaceAll(extension + "/?$", "/");
+        }
+        final HttpHeaders headers = outputMessage.getHeaders();
+        headers.setContentType(mediaType);
 
-      final OutputStream out = outputMessage.getBody();
-      if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {
-        writeWadl(out, url, pageInfo);
-      } else if (MediaType.TEXT_HTML.equals(mediaType)
-        || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
-        writeHtml(out, url, pageInfo, showTitle);
-      } else if (TEXT_URI_LIST.equals(mediaType)) {
-        writeUriList(out, url, pageInfo);
-      } else {
-        writeResourceList(mediaType, charset, out, url, pageInfo);
+        final OutputStream out = outputMessage.getBody();
+        if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {
+          writeWadl(out, url, pageInfo);
+        } else if (MediaType.TEXT_HTML.equals(mediaType)
+          || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
+          writeHtml(out, url, pageInfo, showTitle);
+        } else if (TEXT_URI_LIST.equals(mediaType)) {
+          writeUriList(out, url, pageInfo);
+        } else {
+          writeResourceList(mediaType, charset, out, url, pageInfo);
+        }
       }
     }
   }

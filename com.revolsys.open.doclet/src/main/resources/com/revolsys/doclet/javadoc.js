@@ -11,7 +11,8 @@ $(document).ready(function() {
     "bJQueryUI" : true,
     "bPaginate" : false,
     "bSort" : false,
-    "bFilter" : false
+    "bFilter" : false,
+    "bAutoWidth": false
   });
   
   $('div.javaMethod').accordion({

@@ -20,6 +20,7 @@ import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.FieldDoc;
+import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.Parameter;
@@ -27,6 +28,9 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 
 public class RestDoclet {
+  public static LanguageVersion languageVersion() {
+    return LanguageVersion.JAVA_1_5;
+  }
 
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
@@ -108,7 +112,7 @@ public class RestDoclet {
 
   public void bodyContent() {
     writer.element(HtmlUtil.H1, docTitle);
-
+    writer.write(root.commentText());
     documentation();
   }
 
@@ -169,8 +173,8 @@ public class RestDoclet {
       if (requestMapping != null) {
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
-        title(DocletUtil.qualifiedName(classDoc)
-          + "." + methodName,CaseConverter.toCapitalizedWords(methodName));
+        title(DocletUtil.qualifiedName(classDoc) + "." + methodName,
+          CaseConverter.toCapitalizedWords(methodName));
         writer.startTag(HtmlUtil.DIV);
         writer.attribute(HtmlUtil.ATTR_CLASS, "content");
         writer.write(method.commentText());
@@ -248,7 +252,8 @@ public class RestDoclet {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
       writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_STYLE, "width:auto;margin-left:0px");
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+
       writer.startTag(HtmlUtil.THEAD);
       writer.startTag(HtmlUtil.TR);
       writer.element(HtmlUtil.TH, "Parameter");
@@ -367,7 +372,7 @@ public class RestDoclet {
       writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
 
       writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_STYLE, "width:auto;margin-left:0px");
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
 
       writer.startTag(HtmlUtil.THEAD);
       writer.startTag(HtmlUtil.TR);
@@ -494,7 +499,7 @@ public class RestDoclet {
       writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
 
       writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_STYLE, "width:auto;margin-left:0px");
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
 
       writer.startTag(HtmlUtil.THEAD);
       writer.startTag(HtmlUtil.TR);

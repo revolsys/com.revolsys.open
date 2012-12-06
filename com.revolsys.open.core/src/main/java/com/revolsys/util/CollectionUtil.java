@@ -99,6 +99,19 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V> List<V> getNotNull(Map<K, V> map, Collection<K> keys) {
+    List<V> values = new ArrayList<V>();
+    if (keys != null) {
+      for (K key : keys) {
+        V value = map.get(key);
+        if (value != null) {
+          values.add(value);
+        }
+      }
+    }
+    return values;
+  }
+
   public static boolean getBool(final Map<String, ? extends Object> map,
     final String name) {
     final Object value = map.get(name);
@@ -194,6 +207,7 @@ public final class CollectionUtil {
       }
     }
   }
+
   public static final String replaceProperties(final CharSequence string,
     final Map<String, Object> properties) {
     if (string == null) {

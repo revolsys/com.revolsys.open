@@ -197,7 +197,7 @@ public final class HtmlUtil {
     if (content != null) {
       if (url != null) {
         out.startTag(A);
-        if (cssClass != null) {
+        if (StringUtils.hasText(cssClass)) {
           out.attribute(ATTR_CLASS, cssClass);
         }
         out.attribute(ATTR_HREF, url);

@@ -21,6 +21,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class DataObjectHttpMessageConverter extends
   AbstractHttpMessageConverter<DataObject> {
@@ -42,8 +43,7 @@ public class DataObjectHttpMessageConverter extends
   }
 
   @Override
-  public DataObject read(
-    final Class<? extends DataObject> clazz,
+  public DataObject read(final Class<? extends DataObject> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     final DataObjectReader reader = readerConverter.read(
@@ -67,19 +67,19 @@ public class DataObjectHttpMessageConverter extends
   }
 
   @Override
-  public void write(
-    final DataObject dataObject,
-    final MediaType mediaType,
+  public void write(final DataObject dataObject, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
-    if (dataObject != null) {
-      final DataObjectMetaData metaData = dataObject.getMetaData();
-      final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-      requestAttributes.setAttribute(IoConstants.SINGLE_OBJECT_PROPERTY, true,
-        RequestAttributes.SCOPE_REQUEST);
-      final ListDataObjectReader reader = new ListDataObjectReader(metaData,
-        dataObject);
-      readerConverter.write(reader, mediaType, outputMessage);
+    if (!HttpServletUtils.getResponse().isCommitted()) {
+      if (dataObject != null) {
+        final DataObjectMetaData metaData = dataObject.getMetaData();
+        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        requestAttributes.setAttribute(IoConstants.SINGLE_OBJECT_PROPERTY,
+          true, RequestAttributes.SCOPE_REQUEST);
+        final ListDataObjectReader reader = new ListDataObjectReader(metaData,
+          dataObject);
+        readerConverter.write(reader, mediaType, outputMessage);
+      }
     }
   }
 }

@@ -13,6 +13,7 @@ import org.springframework.util.comparator.ComparableComparator;
 
 import com.revolsys.collection.MapKeySetEntrySet;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.page.FileMappedPageManager;
 import com.revolsys.io.page.FilePageManager;
 import com.revolsys.io.page.MemoryPageManager;
 import com.revolsys.io.page.MethodPageValueManager;
@@ -138,6 +139,29 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
     BPlusTreeMap<K, V> map = new BPlusTreeMap<K, V>(pageManager, comparator,
       keyManager, valueManager);
     map.putAll(values);
+    return map;
+  }
+
+  public static <K extends Comparable<K>, V> Map<K, V> createTempDisk(
+    PageValueManager<K> keyManager, PageValueManager<V> valueManager) {
+    final File file = FileUtil.createTempFile("temp", ".bplustree");
+    final PageManager pageManager = new FileMappedPageManager(file);
+
+    if (keyManager instanceof SerializablePageValueManager) {
+      SerializablePageValueManager<K> serializeableManager = (SerializablePageValueManager<K>)keyManager;
+      keyManager = BPlusTreePageValueManager.create(pageManager,
+        serializeableManager);
+    }
+
+    if (valueManager instanceof SerializablePageValueManager) {
+      SerializablePageValueManager<V> serializeableManager = (SerializablePageValueManager<V>)valueManager;
+      valueManager = BPlusTreePageValueManager.create(pageManager,
+        serializeableManager);
+    }
+
+    final Comparator<K> comparator = new ComparableComparator<K>();
+    BPlusTreeMap<K, V> map = new BPlusTreeMap<K, V>(pageManager, comparator,
+      keyManager, valueManager);
     return map;
   }
 
@@ -652,18 +676,18 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
   <T> int getLeafValues(List<T> values, int pageIndex, boolean key) {
     values.clear();
     Page page = pages.getPage(pageIndex);
-    
+
     final byte pageType = page.readByte();
     while (pageType == INTERIOR) {
       page.readShort(); // skip num bytes
       pageIndex = page.readInt();
       pages.releasePage(page);
     }
-    
+
     if (pageType != LEAF) {
       throw new IllegalArgumentException("Unknown page type " + pageType);
     }
-    
+
     // TODO traverse to leaf
     try {
       final int numBytes = page.readShort();

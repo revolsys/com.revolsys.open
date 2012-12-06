@@ -212,7 +212,8 @@ $(document).ready(
       "bJQueryUI" : true,
       "bPaginate" : false,
       "bSort" : false,
-      "bFilter" : false
+      "bFilter" : false,
+      "bAutoWidth": false
     });
 
     $('div.form').each(

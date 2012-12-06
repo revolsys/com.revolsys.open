@@ -589,6 +589,8 @@ div.simpleDataTable>div>table {
   border-spacing: 0px;
   padding: 0px;
   border-radius: 6px;
+  margin-left: 0px;
+  width: auto;
 }
 
 div.simpleDataTable>div>table.data>thead>tr:first-child>th {
@@ -627,6 +629,10 @@ table.dataTable>tbody>tr.odd {
 
 table.dataTable thead th,table.dataTable tbody td {
   padding: 0.2em 0.4em 0.2em 0.4em;
+}
+
+table.dataTable tbody td {
+  border-right: 1px solid #dddddd;
 }
 
 div.ui-accordion {

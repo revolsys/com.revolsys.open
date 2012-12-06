@@ -115,87 +115,89 @@ public class DataObjectReaderHttpMessageConverter extends
   public void write(final DataObjectReader reader, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
-    MediaType actualMediaType;
-    if (mediaType == null) {
-      actualMediaType = getDefaultMediaType();
-    } else {
-      actualMediaType = mediaType;
-    }
-    if (actualMediaType != null) {
-      Charset charset = actualMediaType.getCharSet();
-      if (charset == null) {
-        charset = DEFAULT_CHARSET;
-        actualMediaType = new MediaType(actualMediaType,
-          Collections.singletonMap("charset", charset.name()));
-      }
-      final String mediaTypeString = actualMediaType.getType() + "/"
-        + actualMediaType.getSubtype();
-      final DataObjectWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
-        DataObjectWriterFactory.class, mediaTypeString);
-      if (writerFactory == null) {
-        throw new IllegalArgumentException("Media type " + actualMediaType
-          + " not supported");
+    if (!HttpServletUtils.getResponse().isCommitted()) {
+      MediaType actualMediaType;
+      if (mediaType == null) {
+        actualMediaType = getDefaultMediaType();
       } else {
-        final DataObjectMetaData metaData = reader.getMetaData();
-        final HttpHeaders headers = outputMessage.getHeaders();
-        headers.setContentType(actualMediaType);
-        final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        String baseName = (String)requestAttributes.getAttribute(
-          "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
-        if (baseName == null) {
-          baseName = HttpServletUtils.getRequestBaseFileName();
+        actualMediaType = mediaType;
+      }
+      if (actualMediaType != null) {
+        Charset charset = actualMediaType.getCharSet();
+        if (charset == null) {
+          charset = DEFAULT_CHARSET;
+          actualMediaType = new MediaType(actualMediaType,
+            Collections.singletonMap("charset", charset.name()));
         }
-        String contentDisposition = (String)requestAttributes.getAttribute(
-          "contentDisposition", RequestAttributes.SCOPE_REQUEST);
-        if (contentDisposition == null) {
-          contentDisposition = "attachment";
-        }
-        final String fileName = baseName + "."
-          + writerFactory.getFileExtension(mediaTypeString);
-        headers.set("Content-Disposition", contentDisposition + "; filename="
-          + fileName);
-
-        final OutputStream body = outputMessage.getBody();
-        final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
-          baseName, metaData, body, charset);
-        if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
-          RequestAttributes.SCOPE_REQUEST))) {
-          writer.setProperty(IoConstants.WRAP_PROPERTY, false);
-        }
-        final HttpServletRequest request = HttpServletUtils.getRequest();
-        String callback = request.getParameter("jsonp");
-        if (callback == null) {
-          callback = request.getParameter("callback");
-        }
-        if (callback != null) {
-          writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
-        }
-        for (final String attributeName : requestAttributes.getAttributeNames(RequestAttributes.SCOPE_REQUEST)) {
-          final Object value = requestAttributes.getAttribute(attributeName,
-            RequestAttributes.SCOPE_REQUEST);
-          if (value != null && attributeName.startsWith("java:")
-            || requestAttributeNames.contains(attributeName)) {
-            writer.setProperty(attributeName, value);
+        final String mediaTypeString = actualMediaType.getType() + "/"
+          + actualMediaType.getSubtype();
+        final DataObjectWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
+          DataObjectWriterFactory.class, mediaTypeString);
+        if (writerFactory == null) {
+          throw new IllegalArgumentException("Media type " + actualMediaType
+            + " not supported");
+        } else {
+          final DataObjectMetaData metaData = reader.getMetaData();
+          final HttpHeaders headers = outputMessage.getHeaders();
+          headers.setContentType(actualMediaType);
+          final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+          String baseName = (String)requestAttributes.getAttribute(
+            "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
+          if (baseName == null) {
+            baseName = HttpServletUtils.getRequestBaseFileName();
           }
-        }
+          String contentDisposition = (String)requestAttributes.getAttribute(
+            "contentDisposition", RequestAttributes.SCOPE_REQUEST);
+          if (contentDisposition == null) {
+            contentDisposition = "attachment";
+          }
+          final String fileName = baseName + "."
+            + writerFactory.getFileExtension(mediaTypeString);
+          headers.set("Content-Disposition", contentDisposition + "; filename="
+            + fileName);
 
-        final Iterator<DataObject> iterator = reader.iterator();
-        if (iterator.hasNext()) {
-          DataObject dataObject = iterator.next();
-          final Geometry geometry = dataObject.getGeometryValue();
-          if (geometry != null) {
-            final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-            writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
+          final OutputStream body = outputMessage.getBody();
+          final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
+            baseName, metaData, body, charset);
+          if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
+            RequestAttributes.SCOPE_REQUEST))) {
+            writer.setProperty(IoConstants.WRAP_PROPERTY, false);
+          }
+          final HttpServletRequest request = HttpServletUtils.getRequest();
+          String callback = request.getParameter("jsonp");
+          if (callback == null) {
+            callback = request.getParameter("callback");
+          }
+          if (callback != null) {
+            writer.setProperty(IoConstants.JSONP_PROPERTY, callback);
+          }
+          for (final String attributeName : requestAttributes.getAttributeNames(RequestAttributes.SCOPE_REQUEST)) {
+            final Object value = requestAttributes.getAttribute(attributeName,
+              RequestAttributes.SCOPE_REQUEST);
+            if (value != null && attributeName.startsWith("java:")
+              || requestAttributeNames.contains(attributeName)) {
+              writer.setProperty(attributeName, value);
+            }
           }
 
-          writer.write(dataObject);
-          while (iterator.hasNext()) {
-            dataObject = iterator.next();
+          final Iterator<DataObject> iterator = reader.iterator();
+          if (iterator.hasNext()) {
+            DataObject dataObject = iterator.next();
+            final Geometry geometry = dataObject.getGeometryValue();
+            if (geometry != null) {
+              final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+              writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
+            }
+
             writer.write(dataObject);
+            while (iterator.hasNext()) {
+              dataObject = iterator.next();
+              writer.write(dataObject);
 
+            }
           }
+          writer.close();
         }
-        writer.close();
       }
     }
   }

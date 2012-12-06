@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.doclet.DocletUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
@@ -16,13 +18,20 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.ExecutableMemberDoc;
+import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.Parameter;
+import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
+import com.sun.javadoc.WildcardType;
 
 public class ClientDoclet {
+  public static LanguageVersion languageVersion() {
+    return LanguageVersion.JAVA_1_5;
+  }
 
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
@@ -104,20 +113,21 @@ public class ClientDoclet {
 
   public void bodyContent() {
     writer.element(HtmlUtil.H1, docTitle);
-
+    writer.write(root.commentText());
     documentation();
   }
 
   public void description(final Map<String, String> descriptions,
     final String name) {
     writer.startTag(HtmlUtil.TD);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "description");
     final String description = descriptions.get(name);
     if (description == null) {
       writer.write("-");
     } else {
       writer.write(description);
     }
-    writer.endTag(HtmlUtil.TD);
+    writer.endTagLn(HtmlUtil.TD);
   }
 
   public void documentation() {
@@ -126,7 +136,7 @@ public class ClientDoclet {
       documentationPackage(packageDoc);
     }
 
-    writer.endTag(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
   public void documentationClass(final ClassDoc classDoc) {
@@ -144,7 +154,7 @@ public class ClientDoclet {
     if (constructors.length > 0) {
       title("Constructors");
       for (final ConstructorDoc method : constructors) {
-        documentationMethod(classDoc, method);
+        documentationMethod(method);
       }
     }
 
@@ -152,39 +162,35 @@ public class ClientDoclet {
     if (methods.length > 0) {
       title("Methods");
       for (final MethodDoc method : methods) {
-        documentationMethod(classDoc, method);
+        documentationMethod(method);
       }
     }
-    writer.endTag(HtmlUtil.DIV);
-    writer.endTag(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public void documentationMethod(final ClassDoc classDoc,
-    final ExecutableMemberDoc method) {
-    final String methodName = method.name();
-
-    writer.startTag(HtmlUtil.A);
-    writer.attribute(HtmlUtil.ATTR_NAME, DocletUtil.qualifiedName(classDoc)
-      + "." + methodName);
-    writer.text("");
-    writer.endTag(HtmlUtil.A);
-
+  public void documentationMethod(final ExecutableMemberDoc member) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
-    methodSignature(method);
-    writer.endTag(HtmlUtil.DIV);
+    methodSignature(member);
+    writer.endTagLn(HtmlUtil.DIV);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(method.commentText());
+    writer.write(member.commentText());
 
-    parameters(method);
+    parameters(member);
 
-    writer.endTag(HtmlUtil.DIV);
-    writer.endTag(HtmlUtil.DIV);
+    if (member instanceof MethodDoc) {
+      MethodDoc method = (MethodDoc)member;
+      documentationReturn(method);
+    }
+
+    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
   public void documentationPackage(final PackageDoc packageDoc) {
@@ -192,7 +198,7 @@ public class ClientDoclet {
     writer.startTag(HtmlUtil.A);
     writer.attribute(HtmlUtil.ATTR_NAME, name);
     writer.text("");
-    writer.endTag(HtmlUtil.A);
+    writer.endTagLn(HtmlUtil.A);
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaPackage");
 
@@ -208,9 +214,8 @@ public class ClientDoclet {
     for (final ClassDoc classDoc : classes.values()) {
       documentationClass(classDoc);
     }
-    writer.endTag(HtmlUtil.DIV);
-    writer.endTag(HtmlUtil.DIV);
-
+    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
   public void head() {
@@ -231,17 +236,20 @@ public class ClientDoclet {
       writer,
       "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/jquery.dataTables.min.js");
     HtmlUtil.serializeScriptLink(writer, "javadoc.js");
-    writer.endTag(HtmlUtil.HEAD);
+    writer.endTagLn(HtmlUtil.HEAD);
   }
 
   public void methodSignature(final ExecutableMemberDoc member) {
+    writer.startTag(HtmlUtil.A);
+    String anchor = getAnchor(member);
+    writer.attribute(HtmlUtil.ATTR_NAME, anchor);
     if (member instanceof MethodDoc) {
       writer.startTag(HtmlUtil.CODE);
       final MethodDoc method = (MethodDoc)member;
       final Type returnType = method.returnType();
-      writer.text(returnType.typeName());
+      typeName(returnType);
       writer.text(" ");
-      writer.endTag(HtmlUtil.CODE);
+      writer.endTagLn(HtmlUtil.CODE);
     }
     writer.text(member.name());
     writer.startTag(HtmlUtil.CODE);
@@ -254,12 +262,42 @@ public class ClientDoclet {
       } else {
         writer.text(", ");
       }
-      writer.text(parameter.typeName());
+
+      typeName(parameter.type());
       writer.text(" ");
       writer.text(parameter.name());
     }
     writer.text(")");
-    writer.endTag(HtmlUtil.CODE);
+    writer.endTagLn(HtmlUtil.CODE);
+    writer.endTagLn(HtmlUtil.A);
+  }
+
+  private String getAnchor(ExecutableMemberDoc member) {
+    StringBuffer anchor = new StringBuffer();
+    ClassDoc classDoc = member.containingClass();
+    String className = DocletUtil.qualifiedName(classDoc);
+    anchor.append(className);
+    anchor.append(".");
+    anchor.append(member.name());
+    anchor.append("(");
+    final Parameter[] parameters = member.parameters();
+    boolean first = true;
+    for (final Parameter parameter : parameters) {
+      if (first) {
+        first = false;
+      } else {
+        anchor.append(",");
+      }
+      Type type = parameter.type();
+      String typeName = type.qualifiedTypeName();
+      typeName = typeName.replaceAll("^java.lang.", "");
+      typeName = typeName.replaceAll("^java.io.", "");
+      typeName = typeName.replaceAll("^java.util.", "");
+      anchor.append(typeName);
+      anchor.append(type.dimension());
+    }
+    anchor.append(")");
+    return anchor.toString();
   }
 
   private void parameters(final ExecutableMemberDoc method) {
@@ -273,16 +311,16 @@ public class ClientDoclet {
       title("Parameters");
 
       writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
+      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
       writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_STYLE, "width:auto;margin-left:0px");
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
       writer.startTag(HtmlUtil.THEAD);
       writer.startTag(HtmlUtil.TR);
       writer.element(HtmlUtil.TH, "Parameter");
       writer.element(HtmlUtil.TH, "Type");
       writer.element(HtmlUtil.TH, "Description");
-      writer.endTag(HtmlUtil.TR);
-      writer.endTag(HtmlUtil.THEAD);
+      writer.endTagLn(HtmlUtil.TR);
+      writer.endTagLn(HtmlUtil.THEAD);
 
       writer.startTag(HtmlUtil.TBODY);
       for (final Parameter parameter : parameters) {
@@ -290,24 +328,71 @@ public class ClientDoclet {
         final String name = parameter.name();
 
         writer.startTag(HtmlUtil.TD);
-        writer.startTag(HtmlUtil.CODE);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "name");
         writer.text(parameter.name());
-        writer.endTag(HtmlUtil.CODE);
-        writer.endTag(HtmlUtil.TD);
+        writer.endTagLn(HtmlUtil.TD);
 
         writer.startTag(HtmlUtil.TD);
-        writer.startTag(HtmlUtil.CODE);
-        typeName(parameter.type());
-        writer.endTag(HtmlUtil.CODE);
-        writer.endTag(HtmlUtil.TD);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "type");
+        typeNameLink(parameter.type());
+        writer.endTagLn(HtmlUtil.TD);
 
         description(descriptions, name);
-        writer.endTag(HtmlUtil.TR);
+        writer.endTagLn(HtmlUtil.TR);
       }
-      writer.endTag(HtmlUtil.TBODY);
+      writer.endTagLn(HtmlUtil.TBODY);
 
-      writer.endTag(HtmlUtil.TABLE);
-      writer.endTag(HtmlUtil.DIV);
+      writer.endTagLn(HtmlUtil.TABLE);
+      writer.endTagLn(HtmlUtil.DIV);
+    }
+  }
+
+  private void documentationReturn(final MethodDoc method) {
+    Type type = method.returnType();
+   if (type != null && !"void".equals(type.qualifiedTypeName())) {
+      String description = "";
+      for (Tag tag:method.tags()) {
+        if (tag.name().equals("@return")) {
+          description = tag.text();
+        }
+      }
+      title("Return");
+
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
+      writer.startTag(HtmlUtil.TABLE);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+      writer.startTag(HtmlUtil.THEAD);
+      writer.startTag(HtmlUtil.TR);
+      writer.element(HtmlUtil.TH, "Type");
+      writer.element(HtmlUtil.TH, "Description");
+      writer.endTagLn(HtmlUtil.TR);
+      writer.endTagLn(HtmlUtil.THEAD);
+
+      writer.startTag(HtmlUtil.TBODY);
+     
+
+        writer.startTag(HtmlUtil.TR);
+        writer.startTag(HtmlUtil.TD);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "type");
+        typeNameLink(type);
+        writer.endTagLn(HtmlUtil.TD);
+
+        writer.startTag(HtmlUtil.TD);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+        if (StringUtils.hasText(description)) {
+          writer.write(description);
+        } else {
+          writer.write("-");
+        }
+        writer.endTagLn(HtmlUtil.TD);
+
+        writer.endTagLn(HtmlUtil.TR);
+
+      writer.endTagLn(HtmlUtil.TBODY);
+
+      writer.endTagLn(HtmlUtil.TABLE);
+      writer.endTagLn(HtmlUtil.DIV);
     }
   }
 
@@ -330,6 +415,8 @@ public class ClientDoclet {
       final File indexFile = new File(dir, "index.html");
       final FileWriter out = new FileWriter(indexFile);
       writer = new XmlWriter(out, false);
+      writer.setIndent(false);
+      writer.setWriteNewLine(false);
       FileUtil.copy(
         getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"),
         new File(destDir, "javadoc.css"));
@@ -360,9 +447,9 @@ public class ClientDoclet {
       bodyContent();
 
       if (footer == null) {
-        writer.endTag(HtmlUtil.BODY);
+        writer.endTagLn(HtmlUtil.BODY);
 
-        writer.endTag(HtmlUtil.HTML);
+        writer.endTagLn(HtmlUtil.HTML);
       } else {
         writer.write(footer);
       }
@@ -378,7 +465,7 @@ public class ClientDoclet {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
     writer.text(title);
-    writer.endTag(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
   public void title(final String name, final String title) {
@@ -387,19 +474,60 @@ public class ClientDoclet {
     writer.startTag(HtmlUtil.A);
     writer.attribute(HtmlUtil.ATTR_NAME, name);
     writer.text(title);
-    writer.endTag(HtmlUtil.A);
-    writer.endTag(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.A);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public void typeName(final Type returnType) {
-    final String qualifiedTypeName = returnType.qualifiedTypeName();
-    if (qualifiedTypeName.startsWith("java.")) {
-      final String url = "http://docs.oracle.com/javase/6/docs/api/"
-        + qualifiedTypeName.replaceAll("\\.", "/") + ".html?is-external=true";
-      HtmlUtil.serializeA(writer, "", url, returnType.typeName());
+  public void typeNameLink(final Type type) {
+    if (type instanceof WildcardType) {
+      WildcardType wildCard = (WildcardType)type;
+      writer.text("?");
+      Type[] extendsBounds = wildCard.extendsBounds();
+      if (extendsBounds.length > 0) {
+        writer.text(" extends ");
+        for (int i = 0; i < extendsBounds.length; i++) {
+          if (i > 0) {
+            writer.text(", ");
+          }
+          Type extendsType = extendsBounds[i];
+          typeNameLink(extendsType);
+        }
+      }
     } else {
-      writer.text(returnType);
+      final String qualifiedTypeName = type.qualifiedTypeName();
+      if (qualifiedTypeName.startsWith("java.")) {
+        final String url = "http://docs.oracle.com/javase/6/docs/api/"
+          + qualifiedTypeName.replaceAll("\\.", "/") + ".html?is-external=true";
+        HtmlUtil.serializeA(writer, "", url, type.typeName());
+      } else {
+        writer.text(type);
+      }
+      if (type instanceof ParameterizedType) {
+        ParameterizedType parameterizedType = (ParameterizedType)type;
+        Type[] typeArguments = parameterizedType.typeArguments();
+        if (typeArguments.length > 0) {
+          writer.text("<");
+          for (int i = 0; i < typeArguments.length; i++) {
+            if (i > 0) {
+              writer.text(", ");
+            }
+            Type typeParameter = typeArguments[i];
+            typeNameLink(typeParameter);
+          }
+          writer.text(">");
+        }
+      }
     }
+    writer.text(type.dimension());
+  }
+
+  public void typeName(final Type type) {
+    String typeName = type.qualifiedTypeName();
+    typeName = typeName.replaceAll("^java.lang.", "");
+    typeName = typeName.replaceAll("^java.io.", "");
+    typeName = typeName.replaceAll("^java.util.", "");
+    writer.text(typeName);
+    writer.text(type.dimension());
   }
 
 }
