@@ -160,13 +160,17 @@ public class DataObjectConverterProcess extends
         @SuppressWarnings("unchecked")
         final Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
 
-        final DataObjectMetaData targetMetaData = targetMetaDataFactory.getMetaData(targetTypeName);
+        final DataObjectMetaData targetMetaData = getTargetMetaData(targetTypeName);
         final SimpleDataObjectConveter converter = new SimpleDataObjectConveter(
           targetMetaData);
         converter.addProcessor(new CopyValues(attributeMapping));
         addTypeConverter(sourceTypeName, converter);
       }
     }
+  }
+
+  public DataObjectMetaData getTargetMetaData(String typePath) {
+    return targetMetaDataFactory.getMetaData(typePath);
   }
 
   @Override

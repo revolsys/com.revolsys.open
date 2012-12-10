@@ -74,10 +74,16 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
   @Override
   protected void process(final Channel<DataObject> in,
     final Channel<DataObject> out, final DataObject object) {
+    DataObject targetObject = copy(object);
+    out.write(targetObject);
+  }
+
+  protected DataObject copy(final DataObject object) {
+    DataObject targetObject;
     if (metaData == null) {
-      out.write(object);
+      targetObject = object;
     } else {
-      final DataObject targetObject = new ArrayDataObject(metaData);
+      targetObject = new ArrayDataObject(metaData);
       for (final String attributeName : metaData.getAttributeNames()) {
         copyAttribute(object, attributeName, targetObject, attributeName);
       }
@@ -89,8 +95,8 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
             targetAttributeName);
         }
       }
-      out.write(targetObject);
     }
+    return targetObject;
   }
 
   public void setAttributeMap(final Map<String, String> attributeMap) {

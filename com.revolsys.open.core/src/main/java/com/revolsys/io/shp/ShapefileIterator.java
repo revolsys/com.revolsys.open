@@ -1,7 +1,10 @@
 package com.revolsys.io.shp;
 
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
@@ -19,12 +22,15 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.gis.io.EndianMappedByteBuffer;
+import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.shp.geometry.JtsGeometryConverter;
 import com.revolsys.io.xbase.XbaseIterator;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.spring.SpringUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class ShapefileIterator extends AbstractIterator<DataObject> implements
@@ -34,7 +40,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private JtsGeometryConverter geometryReader;
 
-  private final EndianInput in;
+  private EndianInput in;
 
   private DataObjectMetaData metaData;
 
@@ -46,21 +52,80 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private int shapeType;
 
+  private EndianMappedByteBuffer indexIn;
+
+  private boolean closeFile = true;
+
+  private boolean file;
+
+  public void setCloseFile(boolean closeFile) {
+    this.closeFile = closeFile;
+    if (xbaseIterator != null) {
+      xbaseIterator.setCloseFile(closeFile);
+    }
+  }
+
+  public boolean isCloseFile() {
+    return closeFile;
+  }
+
   public ShapefileIterator(final Resource resource,
     final DataObjectFactory factory) throws IOException {
     this.dataObjectFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     name = baseName;
-    this.in = new EndianInputStream(resource.getInputStream());
+    try {
+      File file = SpringUtil.getFile(resource);
+      this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+      File indexFile = new File(file.getParentFile(), baseName + ".shx");
+      this.indexIn = new EndianMappedByteBuffer(indexFile, MapMode.READ_ONLY);
+      this.file = true;
+    } catch (FileNotFoundException e) {
+      this.in = new EndianInputStream(resource.getInputStream());
+    }
     this.resource = resource;
   }
 
   @Override
   protected void doClose() {
-    FileUtil.closeSilent(in);
-    if (xbaseIterator != null) {
-      xbaseIterator.close();
+    if (closeFile) {
+      forceClose();
     }
+  }
+
+  public void forceClose() {
+    FileUtil.closeSilent(in);
+    FileUtil.closeSilent(indexIn);
+    if (xbaseIterator != null) {
+      xbaseIterator.forceClose();
+    }
+  }
+
+  private int position;
+
+  public void setPosition(int position) {
+    if (file) {
+      EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
+      this.position = position;
+      try {
+        indexIn.seek(100 + 8 * position);
+        int offset = indexIn.readInt();
+        file.seek(offset * 2);
+        setLoadNext(true);
+      } catch (IOException e) {
+        throw new RuntimeException("Unable to find record " + position, e);
+      }
+      if (xbaseIterator != null) {
+        xbaseIterator.setPosition(position);
+      }
+    } else {
+      throw new UnsupportedOperationException(
+        "The position can only be set on files");
+    }
+  }
+
+  public int getPosition() {
+    return position;
   }
 
   @Override
@@ -71,6 +136,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
         xbaseIterator = new XbaseIterator(xbaseResource,
           this.dataObjectFactory, new InvokeMethodRunnable(this,
             "updateMetaData"));
+        xbaseIterator.setCloseFile(closeFile);
       }
       loadHeader();
       int numAxis = 3;
@@ -134,6 +200,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
         if (xbaseIterator.hasNext()) {
           object = xbaseIterator.next();
           for (int i = 0; i < xbaseIterator.getDeletedCount(); i++) {
+            position++;
             geometryReader.readGeometry(in);
           }
         } else {

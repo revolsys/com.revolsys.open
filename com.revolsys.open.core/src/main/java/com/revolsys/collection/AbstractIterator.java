@@ -8,7 +8,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.io.AbstractObjectWithProperties;
 
 public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
-  implements Iterator<T> {
+  implements Iterator<T>, Iterable<T> {
 
   private boolean hasNext = true;
 
@@ -24,6 +24,11 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
     hasNext = false;
     object = null;
     doClose();
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return this;
   }
 
   protected void doClose() {
@@ -79,5 +84,10 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+
+  protected void setLoadNext(final boolean loadNext) {
+    this.loadNext = loadNext;
+    hasNext= true;
   }
 }

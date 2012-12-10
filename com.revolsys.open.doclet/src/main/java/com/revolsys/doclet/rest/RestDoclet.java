@@ -444,6 +444,7 @@ public class RestDoclet {
         head();
         writer.startTag(HtmlUtil.BODY);
       } else {
+        header = header.replaceAll("\\$\\{docTitle\\}", docTitle);
         writer.write(header);
       }
 
@@ -454,6 +455,7 @@ public class RestDoclet {
 
         writer.endTag(HtmlUtil.HTML);
       } else {
+        footer = footer.replaceAll("\\$\\{docTitle\\}", docTitle);
         writer.write(footer);
       }
       writer.endDocument();

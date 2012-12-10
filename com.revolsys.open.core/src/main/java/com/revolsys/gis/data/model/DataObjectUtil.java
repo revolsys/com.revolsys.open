@@ -103,6 +103,13 @@ public final class DataObjectUtil {
     return newObject;
   }
 
+  public static DataObject copy(final DataObjectMetaData metaData,
+    final DataObject object) {
+    DataObject copy = new ArrayDataObject(metaData);
+    copy.setValues(object);
+    return copy;
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T getAttributeByPath(final DataObject object,
     final String path) {

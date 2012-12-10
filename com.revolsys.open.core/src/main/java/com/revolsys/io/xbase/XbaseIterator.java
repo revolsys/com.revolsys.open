@@ -1,7 +1,10 @@
 package com.revolsys.io.xbase;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.channels.FileChannel.MapMode;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,8 +23,11 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.gis.io.EndianMappedByteBuffer;
+import com.revolsys.gis.io.LittleEndianRandomAccessFile;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.SpringUtil;
 
 public class XbaseIterator extends AbstractIterator<DataObject> implements
   DataObjectIterator {
@@ -40,6 +46,8 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   public static final char NUMBER_TYPE = 'N';
 
   public static final char OBJECT_TYPE = 'o';
+
+  private boolean closeFile = true;
 
   static {
     DATA_TYPES.put(CHARACTER_TYPE, DataTypes.STRING);
@@ -60,7 +68,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private int deletedCount = 0;
 
-  private final EndianInput in;
+  private EndianInput in;
 
   private DataObjectMetaDataImpl metaData;
 
@@ -74,10 +82,23 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private int numRecords;
 
+  private int position = 0;
+
+  private long firstIndex;
+
+  private boolean file;
+
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = FileUtil.getBaseName(resource.getFilename());
-    this.in = new EndianInputStream(resource.getInputStream());
+
+    try {
+      File file = SpringUtil.getFile(resource);
+      this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+      this.file = true;
+    } catch (FileNotFoundException e) {
+      this.in = new EndianInputStream(resource.getInputStream());
+    }
     this.dataObjectFactory = dataObjectFactory;
   }
 
@@ -88,16 +109,14 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     this.initCallback = initCallback;
   }
 
-  public XbaseIterator(final String name, final EndianInput in,
-    final DataObjectFactory dataObjectFactory) throws IOException {
-    this.name = name;
-    this.in = in;
-    this.dataObjectFactory = dataObjectFactory;
-    doInit();
-  }
-
   @Override
   protected void doClose() {
+    if (closeFile) {
+      forceClose();
+    }
+  }
+
+  public void forceClose() {
     FileUtil.closeSilent(in);
   }
 
@@ -192,6 +211,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
         } else if (deleteFlag != 0x1A) {
           currentDeletedCount++;
           in.read(recordBuffer);
+          position++;
         }
       } while (deleteFlag == '*');
       if (object == null) {
@@ -216,8 +236,16 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
     return numRecords;
   }
 
+  public int getPosition() {
+    return position;
+  }
+
   private String getString(final int startIndex, final int len) {
     return new String(recordBuffer, startIndex, len).trim();
+  }
+
+  public boolean isCloseFile() {
+    return closeFile;
   }
 
   protected DataObject loadDataObject() throws IOException {
@@ -298,11 +326,37 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       }
       metaData.addAttribute(fieldName.toString(), dataType, length, -1, true);
     }
+    if (file) {
+      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
+      firstIndex = file.getFilePointer();
+    }
   }
 
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+
+  public void setCloseFile(final boolean closeFile) {
+    this.closeFile = closeFile;
+  }
+
+  public void setPosition(final int position) {
+    if (file) {
+      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
+      this.position = position;
+      try {
+        long offset = firstIndex + (long)(recordSize + 1) * position;
+        file.seek(offset);
+        setLoadNext(true);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to seek to " + firstIndex, e);
+      }
+
+    } else {
+      throw new UnsupportedOperationException(
+        "The position can only be set on files");
+    }
   }
 
 }

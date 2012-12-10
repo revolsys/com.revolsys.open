@@ -69,11 +69,12 @@ public final class FileUtil {
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
 
   public static void closeSilent(final EndianInput in) {
-    try {
-      in.close();
-    } catch (final IOException e) {
+    if (in != null) {
+      try {
+        in.close();
+      } catch (final IOException e) {
+      }
     }
-
   }
 
   /**
@@ -559,7 +560,7 @@ public final class FileUtil {
     File file = new File(fileName);
     StringWriter out = new StringWriter();
     try {
-      copy(file,out);
+      copy(file, out);
     } catch (IOException e) {
       throw new RuntimeException("Unable to copy file: " + fileName);
     }
