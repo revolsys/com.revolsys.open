@@ -26,6 +26,7 @@ public class ObjectTreePanel extends JPanel {
 
   public ObjectTreePanel(final Object object, final boolean menuEnabled,
     final ObjectTreeNodeModel<?, ?>... objectTreeNodeModels) {
+    super(new BorderLayout());
     final ObjectTreeModel model = new ObjectTreeModel(object);
     for (final ObjectTreeNodeModel<?, ?> objectTreeNodeModel : objectTreeNodeModels) {
       model.addNodeModel(objectTreeNodeModel);
@@ -35,9 +36,8 @@ public class ObjectTreePanel extends JPanel {
     tree.setMenuEnabled(menuEnabled);
     tree.setRootVisible(false);
     tree.setShowsRootHandles(true);
-    setLayout(new BorderLayout());
+    tree.setLargeModel(true);
     final JScrollPane scrollPane = new JScrollPane(tree);
-    scrollPane.setPreferredSize(new Dimension(200, 600));
     add(scrollPane, BorderLayout.CENTER);
 
     if (object instanceof PropertyChangeSupportProxy) {
@@ -46,7 +46,7 @@ public class ObjectTreePanel extends JPanel {
 
       listeners.add(model);
       final InvokeMethodPropertyChangeListener repaintListener = new InvokeMethodPropertyChangeListener(
-        tree, "repaint");
+        tree, "repaint", true);
       listeners.add(repaintListener);
 
       for (final PropertyChangeListener listener : listeners) {

@@ -41,8 +41,8 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
   private boolean menuEnabled = true;
 
   public ObjectTree(final ObjectTreeModel model) {
+    super(model);
     this.model = model;
-    setModel(model);
     final Object root = model.getRoot();
     if (root instanceof PropertyChangeSupportProxy) {
       final PropertyChangeSupportProxy propProxy = (PropertyChangeSupportProxy)root;
