@@ -51,7 +51,7 @@
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.doclet</module>
     <module>war-overlay</module>
-    <module>famfamfam-silk</module>
+    <module>com.revolsys.open.icons</module>
   </modules>
 
   <build>
