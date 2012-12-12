@@ -420,12 +420,7 @@ public class RestDoclet {
       final File indexFile = new File(dir, "index.html");
       final FileWriter out = new FileWriter(indexFile);
       writer = new XmlWriter(out, false);
-      FileUtil.copy(
-        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"),
-        new File(destDir, "javadoc.css"));
-      FileUtil.copy(
-        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.js"),
-        new File(destDir, "javadoc.js"));
+      DocletUtil.copyFiles(destDir);
     } catch (final IOException e) {
       throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
     }

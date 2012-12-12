@@ -1,4 +1,4 @@
-package com.revolsys.doclet.client;
+package com.revolsys.doclet.java;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,8 +14,6 @@ import com.revolsys.doclet.DocletUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.sun.javadoc.AnnotationTypeDoc;
-import com.sun.javadoc.AnnotationTypeElementDoc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.DocErrorReporter;
@@ -28,107 +26,9 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.Type;
 
-public class ClientDoclet {
-  public static LanguageVersion languageVersion() {
-    return LanguageVersion.JAVA_1_5;
-  }
-
-  public static int optionLength(String optionName) {
-    optionName = optionName.toLowerCase();
-    if (optionName.equals("-d") || optionName.equals("-doctitle")
-      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")
-      || optionName.equals("-packagesOpen")) {
-      return 2;
-    }
-    return -1;
-  }
-
-  public static boolean start(final RootDoc root) {
-    new ClientDoclet(root).start();
-    return true;
-  }
-
-  public static boolean validOptions(final String options[][],
-    final DocErrorReporter docerrorreporter) {
-    final boolean flag = true;
-    for (final String[] option : options) {
-      final String argName = option[0].toLowerCase();
-      if (argName.equals("-d")) {
-        final String destDir = option[1];
-        final File file = new File(destDir);
-        if (!file.exists()) {
-          docerrorreporter.printNotice("Create directory" + destDir);
-          file.mkdirs();
-        }
-        if (!file.isDirectory()) {
-          docerrorreporter.printError("Destination not a directory"
-            + file.getPath());
-          return false;
-        } else if (!file.canWrite()) {
-          docerrorreporter.printError("Destination directory not writable "
-            + file.getPath());
-          return false;
-        }
-      } else if (argName.equals("-htmlheader")) {
-        if (!new File(option[1]).exists()) {
-          docerrorreporter.printError("Header file does not exist" + option[1]);
-          return false;
-        }
-      } else if (argName.equals("-htmlfooter")) {
-        if (!new File(option[1]).exists()) {
-          docerrorreporter.printError("Footer file does not exist" + option[1]);
-          return false;
-        }
-      } else if (argName.equals("-packagesOpen")) {
-        if (!"true".equalsIgnoreCase(option[1])
-          && !"false".equalsIgnoreCase(option[1])) {
-          docerrorreporter.printError("PackagesOpen must be true or false not "
-            + option[1]);
-          return false;
-        }
-      }
-    }
-
-    return flag;
-  }
-
-  private String docTitle;
-
-  private final RootDoc root;
-
-  private XmlWriter writer;
-
-  private String destDir = ".";
-
-  private String header;
-
-  private String footer;
-
-  private boolean packagesOpen = true;
-
-  public ClientDoclet(final RootDoc root) {
-    this.root = root;
-  }
-
-  public void addResponseStatusDescription(
-    final Map<String, List<String>> responseCodes, final String code,
-    final String description) {
-    List<String> descriptions = responseCodes.get(code);
-    if (descriptions == null) {
-      descriptions = new ArrayList<String>();
-      responseCodes.put(code, descriptions);
-    }
-    descriptions.add(description);
-  }
-
-  public void bodyContent() {
-    writer.element(HtmlUtil.H1, docTitle);
-    writer.write(root.commentText());
-    documentation();
-  }
-
-  public void description(final Map<String, String> descriptions,
-    final String name) {
+public class JavaDoclet {
+  public static void description(final XmlWriter writer,
+    final Map<String, String> descriptions, final String name) {
     writer.startTag(HtmlUtil.TD);
     writer.attribute(HtmlUtil.ATTR_CLASS, "description");
     final String description = descriptions.get(name);
@@ -140,80 +40,8 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.TD);
   }
 
-  public void documentation() {
-    writer.startTag(HtmlUtil.DIV);
-    for (final PackageDoc packageDoc : root.specifiedPackages()) {
-      documentationPackage(packageDoc);
-    }
-
-    writer.endTagLn(HtmlUtil.DIV);
-  }
-
-  public void documentationAnnotation(final AnnotationTypeDoc annotationDoc) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
-    final String name = annotationDoc.name();
-
-    DocletUtil.title(writer, DocletUtil.qualifiedName(annotationDoc), name);
-
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-    writer.write(annotationDoc.commentText());
-
-    final AnnotationTypeElementDoc[] elements = annotationDoc.elements();
-    if (elements.length > 0) {
-      DocletUtil.title(writer, "Annotation Elements");
-
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
-      writer.startTag(HtmlUtil.TABLE);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
-      writer.startTag(HtmlUtil.THEAD);
-      writer.startTag(HtmlUtil.TR);
-      writer.element(HtmlUtil.TH, "Name");
-      writer.element(HtmlUtil.TH, "Type");
-      writer.element(HtmlUtil.TH, "Default");
-      writer.element(HtmlUtil.TH, "Description");
-      writer.endTagLn(HtmlUtil.TR);
-      writer.endTagLn(HtmlUtil.THEAD);
-
-      writer.startTag(HtmlUtil.TBODY);
-      for (final AnnotationTypeElementDoc element : elements) {
-        writer.startTag(HtmlUtil.TR);
-        final String elementName = element.name();
-
-        writer.startTag(HtmlUtil.TD);
-        writer.attribute(HtmlUtil.ATTR_CLASS, "name");
-        writer.text(elementName);
-        writer.endTagLn(HtmlUtil.TD);
-
-        writer.startTag(HtmlUtil.TD);
-        writer.attribute(HtmlUtil.ATTR_CLASS, "type");
-        DocletUtil.typeNameLink(writer, element.returnType());
-        writer.endTagLn(HtmlUtil.TD);
-
-        writer.startTag(HtmlUtil.TD);
-        writer.attribute(HtmlUtil.ATTR_CLASS, "default");
-        writer.text(element.defaultValue());
-        writer.endTagLn(HtmlUtil.TD);
-
-        writer.startTag(HtmlUtil.TD);
-        writer.attribute(HtmlUtil.ATTR_CLASS, "description");
-        writer.text(element.commentText());
-        writer.endTagLn(HtmlUtil.TD);
-        writer.endTagLn(HtmlUtil.TR);
-      }
-      writer.endTagLn(HtmlUtil.TBODY);
-
-      writer.endTagLn(HtmlUtil.TABLE);
-      writer.endTagLn(HtmlUtil.DIV);
-
-    }
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
-  }
-
-  public void documentationClass(final ClassDoc classDoc) {
+  public static void documentationClass(final XmlWriter writer,
+    final ClassDoc classDoc) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
     final String name = classDoc.name();
@@ -228,7 +56,7 @@ public class ClientDoclet {
     if (constructors.length > 0) {
       DocletUtil.title(writer, "Constructors");
       for (final ConstructorDoc method : constructors) {
-        documentationMethod(method);
+        documentationMethod(writer, method);
       }
     }
 
@@ -236,100 +64,66 @@ public class ClientDoclet {
     if (methods.length > 0) {
       DocletUtil.title(writer, "Methods");
       for (final MethodDoc method : methods) {
-        documentationMethod(method);
+        documentationMethod(writer, method);
       }
     }
     writer.endTagLn(HtmlUtil.DIV);
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public void documentationMethod(final ExecutableMemberDoc member) {
+  public static void documentationMethod(final XmlWriter writer,
+    final ExecutableMemberDoc member) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
-    methodSignature(member);
+    methodSignature(writer, member);
     writer.endTagLn(HtmlUtil.DIV);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
     writer.write(member.commentText());
 
-    parameters(member);
+    parameters(writer, member);
 
     if (member instanceof MethodDoc) {
       final MethodDoc method = (MethodDoc)member;
-      documentationReturn(method);
+      documentationReturn(writer, method);
     }
 
     writer.endTagLn(HtmlUtil.DIV);
     writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public void documentationPackage(final PackageDoc packageDoc) {
+  public static void documentationPackage(final XmlWriter writer,
+    final PackageDoc packageDoc) {
     final String name = packageDoc.name();
+    writer.startTag(HtmlUtil.A);
+    writer.attribute(HtmlUtil.ATTR_NAME, name);
+    writer.text("");
+    writer.endTagLn(HtmlUtil.A);
     writer.startTag(HtmlUtil.DIV);
-    String cssClass = "javaPackage";
-    if (packagesOpen) {
-      cssClass += " open";
-    }
-    writer.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "javaPackage");
 
     DocletUtil.title(writer, name, name);
 
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "content");
     writer.write(packageDoc.commentText());
-
-    documentationAnnotations(packageDoc);
-    documentationInterfaces(packageDoc);
-    documentationClasses(packageDoc);
-
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
-  }
-
-  public void documentationAnnotations(final PackageDoc packageDoc) {
-    final Map<String, AnnotationTypeDoc> annotations = new TreeMap<String, AnnotationTypeDoc>();
-    for (final AnnotationTypeDoc annotationDoc : packageDoc.annotationTypes()) {
-      annotations.put(annotationDoc.name(), annotationDoc);
-    }
-    if (!annotations.isEmpty()) {
-      DocletUtil.title(writer, "Annotations");
-      for (final AnnotationTypeDoc annotationDoc : annotations.values()) {
-        documentationAnnotation(annotationDoc);
-      }
-    }
-  }
-
-  public void documentationClasses(final PackageDoc packageDoc) {
     final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
     for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
       classes.put(classDoc.name(), classDoc);
     }
-    if (!classes.isEmpty()) {
-      DocletUtil.title(writer, "Classes");
-      for (final ClassDoc classDoc : classes.values()) {
-        documentationClass(classDoc);
-      }
+    for (final ClassDoc classDoc : classes.values()) {
+      documentationClass(writer, classDoc);
     }
+    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
   }
 
-  public void documentationInterfaces(final PackageDoc packageDoc) {
-    final Map<String, ClassDoc> interfaces = new TreeMap<String, ClassDoc>();
-    for (final ClassDoc classDoc : packageDoc.interfaces()) {
-      interfaces.put(classDoc.name(), classDoc);
-    }
-    if (!interfaces.isEmpty()) {
-      DocletUtil.title(writer, "Interfaces");
-      for (final ClassDoc classDoc : interfaces.values()) {
-        documentationClass(classDoc);
-      }
-    }
-  }
-
-  private void documentationReturn(final MethodDoc method) {
+  public static void documentationReturn(final XmlWriter writer,
+    final MethodDoc method) {
     final Type type = method.returnType();
     if (type != null && !"void".equals(type.qualifiedTypeName())) {
       String description = "";
@@ -377,7 +171,7 @@ public class ClientDoclet {
     }
   }
 
-  private String getAnchor(final ExecutableMemberDoc member) {
+  public static String getAnchor(final ExecutableMemberDoc member) {
     final StringBuffer anchor = new StringBuffer();
     final ClassDoc classDoc = member.containingClass();
     final String className = DocletUtil.qualifiedName(classDoc);
@@ -405,7 +199,12 @@ public class ClientDoclet {
     return anchor.toString();
   }
 
-  public void methodSignature(final ExecutableMemberDoc member) {
+  public static LanguageVersion languageVersion() {
+    return LanguageVersion.JAVA_1_5;
+  }
+
+  public static void methodSignature(final XmlWriter writer,
+    final ExecutableMemberDoc member) {
     writer.startTag(HtmlUtil.A);
     final String anchor = getAnchor(member);
     writer.attribute(HtmlUtil.ATTR_NAME, anchor);
@@ -438,7 +237,17 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.A);
   }
 
-  private void parameters(final ExecutableMemberDoc method) {
+  public static int optionLength(String optionName) {
+    optionName = optionName.toLowerCase();
+    if (optionName.equals("-d") || optionName.equals("-doctitle")
+      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
+      return 2;
+    }
+    return -1;
+  }
+
+  public static void parameters(final XmlWriter writer,
+    final ExecutableMemberDoc method) {
     final List<Parameter> parameters = new ArrayList<Parameter>();
     for (final Parameter parameter : method.parameters()) {
       parameters.add(parameter);
@@ -475,7 +284,7 @@ public class ClientDoclet {
         DocletUtil.typeNameLink(writer, parameter.type());
         writer.endTagLn(HtmlUtil.TD);
 
-        description(descriptions, name);
+        description(writer, descriptions, name);
         writer.endTagLn(HtmlUtil.TR);
       }
       writer.endTagLn(HtmlUtil.TBODY);
@@ -483,6 +292,100 @@ public class ClientDoclet {
       writer.endTagLn(HtmlUtil.TABLE);
       writer.endTagLn(HtmlUtil.DIV);
     }
+  }
+
+  public static boolean start(final RootDoc root) {
+    new JavaDoclet(root).start();
+    return true;
+  }
+
+  public static boolean validOptions(final String options[][],
+    final DocErrorReporter docerrorreporter) {
+    final boolean flag = true;
+    for (final String[] option : options) {
+      final String argName = option[0].toLowerCase();
+      if (argName.equals("-d")) {
+        final String destDir = option[1];
+        final File file = new File(destDir);
+        if (!file.exists()) {
+          docerrorreporter.printNotice("Create directory" + destDir);
+          file.mkdirs();
+        }
+        if (!file.isDirectory()) {
+          docerrorreporter.printError("Destination not a directory"
+            + file.getPath());
+          return false;
+        } else if (!file.canWrite()) {
+          docerrorreporter.printError("Destination directory not writable "
+            + file.getPath());
+          return false;
+        }
+      } else if (argName.equals("-htmlheader")) {
+        if (!new File(option[1]).exists()) {
+          docerrorreporter.printError("Header file does not exist" + option[1]);
+          return false;
+        }
+      } else if (argName.equals("-htmlfooter")) {
+        if (!new File(option[1]).exists()) {
+          docerrorreporter.printError("Footer file does not exist" + option[1]);
+          return false;
+        }
+      }
+    }
+
+    return flag;
+  }
+
+  private String docTitle;
+
+  private final RootDoc root;
+
+  private XmlWriter writer;
+
+  private String destDir = ".";
+
+  private String header;
+
+  private String footer;
+
+  public JavaDoclet(final RootDoc root) {
+    this.root = root;
+  }
+
+  public void bodyContent() {
+    writer.element(HtmlUtil.H1, docTitle);
+    writer.write(root.commentText());
+    documentation();
+  }
+
+  public void documentation() {
+    writer.startTag(HtmlUtil.DIV);
+    for (final PackageDoc packageDoc : root.specifiedPackages()) {
+      documentationPackage(writer, packageDoc);
+    }
+
+    writer.endTagLn(HtmlUtil.DIV);
+  }
+
+  public void head() {
+    writer.startTag(HtmlUtil.HEAD);
+    writer.element(HtmlUtil.TITLE, docTitle);
+    HtmlUtil.serializeCss(
+      writer,
+      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/css/jquery.dataTables_themeroller.css");
+    HtmlUtil.serializeCss(
+      writer,
+      "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css");
+    HtmlUtil.serializeCss(writer, "javadoc.css");
+    HtmlUtil.serializeScriptLink(writer,
+      "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js");
+    HtmlUtil.serializeScriptLink(writer,
+      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js");
+    HtmlUtil.serializeScriptLink(
+      writer,
+      "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.1/jquery.dataTables.min.js");
+    HtmlUtil.serializeScriptLink(writer, "javadoc.js");
+    writer.endTagLn(HtmlUtil.HEAD);
   }
 
   private void setOptions(final String[][] options) {
@@ -497,8 +400,6 @@ public class ClientDoclet {
         header = FileUtil.getFileAsString(option[1]);
       } else if (optionName.equals("-htmlfooter")) {
         footer = FileUtil.getFileAsString(option[1]);
-      } else if (optionName.equals("-packagesopen")) {
-        packagesOpen = Boolean.valueOf(option[1]);
       }
     }
     try {
@@ -508,7 +409,12 @@ public class ClientDoclet {
       writer = new XmlWriter(out, false);
       writer.setIndent(false);
       writer.setWriteNewLine(false);
-      DocletUtil.copyFiles(destDir);
+      FileUtil.copy(
+        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.css"),
+        new File(destDir, "javadoc.css"));
+      FileUtil.copy(
+        getClass().getResourceAsStream("/com/revolsys/doclet/javadoc.js"),
+        new File(destDir, "javadoc.js"));
     } catch (final IOException e) {
       throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
     }
@@ -524,7 +430,7 @@ public class ClientDoclet {
         writer.startTag(HtmlUtil.HTML);
         writer.attribute(HtmlUtil.ATTR_LANG, "en");
 
-        DocletUtil.head(writer, docTitle);
+        head();
         writer.startTag(HtmlUtil.BODY);
       } else {
         header = header.replaceAll("\\$\\{docTitle\\}", docTitle);

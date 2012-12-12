@@ -9,49 +9,22 @@ div.title {
 }
 
 div.javaPackage {
-  border: 1px solid #2694e8;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
   margin-bottom: 1em;
 }
 
 div.javaPackage>div.title {
-  background-color: #3baae3;
-  color: white;
   font-size: 1.4em;
-  font-weight: bold;
-  margin: 0px;
-  padding: 4px 5px 4px 5px;
-  margin: 0px;
-}
-
-div.javaPackage>div.content {
-  margin: 1em;
 }
 
 div.javaClass {
-  border: 1px solid #2694e8;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
   margin-bottom: 1em;
 }
 
 div.javaClass>div.title {
-  background-color: #3baae3;
-  color: white;
   font-size: 1.2em;
-  font-weight: bold;
-  margin: 0px;
-  padding: 4px 5px 4px 5px;
-  font-weight: bold;
 }
 
 div.javaClass>div.content {
-  margin: 1em;
 }
 
 div.javaMethod {
