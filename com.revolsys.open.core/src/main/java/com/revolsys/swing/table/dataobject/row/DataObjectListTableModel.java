@@ -22,7 +22,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.swing.table.Reorderable;
+import com.revolsys.util.Reorderable;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class DataObjectListTableModel extends DataObjectRowTableModel implements

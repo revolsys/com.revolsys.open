@@ -11,6 +11,8 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
+import com.revolsys.util.Reorderable;
+
 public class TableRowTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
