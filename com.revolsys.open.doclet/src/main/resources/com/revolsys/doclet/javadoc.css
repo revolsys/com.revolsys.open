@@ -152,3 +152,8 @@ div.javaMethod table tbody td.type {
   font-family: monospace;
   white-space: pre;
 }
+
+
+pre.prettyprint {
+  background-color: white;
+}
