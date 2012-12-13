@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.i18n.I18nCharSequence;
@@ -14,10 +15,24 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodAction extends AbstractAction {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = -5339626097125548212L;
+
+  public static JButton createButton(final CharSequence name,
+    final String toolTip, final Icon icon, final boolean invokeLater,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, toolTip,
+      icon, invokeLater, object, methodName, parameters);
+    final JButton button = new JButton(action);
+    return button;
+  }
+
+  public static JButton createButton(final String name, final Object object,
+    final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, object,
+      methodName, parameters);
+    final JButton button = new JButton(action);
+    return button;
+  }
 
   private boolean invokeLater;
 
@@ -29,39 +44,6 @@ public class InvokeMethodAction extends AbstractAction {
   public InvokeMethodAction(final CharSequence name, final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
     this(name, null, invokeLater, object, methodName, parameters);
-  }
-
-  public InvokeMethodAction(final CharSequence name, String toolTip,
-    final Icon icon, final Object object, final String methodName,
-    final Object... parameters) {
-    this(name, toolTip, icon, true, object, methodName, parameters);
-  }
-
-  public InvokeMethodAction(final CharSequence name, String toolTip,
-    final Icon icon, final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    runnable = new InvokeMethodRunnable(object, methodName, parameters);
-    this.invokeLater = invokeLater;
-    if (name != null) {
-      putValue(NAME, name.toString());
-    }
-    if (toolTip != null) {
-      putValue(SHORT_DESCRIPTION, toolTip.toString());
-    }
-    if (icon != null) {
-      putValue(SMALL_ICON, icon);
-    }
-    if (name instanceof I18nCharSequence) {
-      final I18nCharSequence i18nName = (I18nCharSequence)name;
-      i18nName.getI18n().addPropertyChangeListener("locale",
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(final PropertyChangeEvent evt) {
-            putValue(NAME, name.toString());
-          }
-        });
-
-    }
   }
 
   public InvokeMethodAction(final CharSequence name, final Icon icon,
@@ -97,6 +79,39 @@ public class InvokeMethodAction extends AbstractAction {
   public InvokeMethodAction(final CharSequence name, final Object object,
     final String methodName, final Object... parameters) {
     this(name, null, false, object, methodName, parameters);
+  }
+
+  public InvokeMethodAction(final CharSequence name, final String toolTip,
+    final Icon icon, final boolean invokeLater, final Object object,
+    final String methodName, final Object... parameters) {
+    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    this.invokeLater = invokeLater;
+    if (name != null) {
+      putValue(NAME, name.toString());
+    }
+    if (toolTip != null) {
+      putValue(SHORT_DESCRIPTION, toolTip.toString());
+    }
+    if (icon != null) {
+      putValue(SMALL_ICON, icon);
+    }
+    if (name instanceof I18nCharSequence) {
+      final I18nCharSequence i18nName = (I18nCharSequence)name;
+      i18nName.getI18n().addPropertyChangeListener("locale",
+        new PropertyChangeListener() {
+          @Override
+          public void propertyChange(final PropertyChangeEvent evt) {
+            putValue(NAME, name.toString());
+          }
+        });
+
+    }
+  }
+
+  public InvokeMethodAction(final CharSequence name, final String toolTip,
+    final Icon icon, final Object object, final String methodName,
+    final Object... parameters) {
+    this(name, toolTip, icon, true, object, methodName, parameters);
   }
 
   public InvokeMethodAction(final Icon icon, final boolean invokeLater,
