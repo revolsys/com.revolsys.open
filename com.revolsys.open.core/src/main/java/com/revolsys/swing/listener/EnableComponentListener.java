@@ -5,10 +5,14 @@ import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-public class EnableComponentItemStateChangeListener implements ItemListener {
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+public class EnableComponentListener implements ItemListener,
+  ListSelectionListener {
   private Component component;
 
-  public EnableComponentItemStateChangeListener(Component component) {
+  public EnableComponentListener(Component component) {
     this.component = component;
   }
 
@@ -20,6 +24,19 @@ public class EnableComponentItemStateChangeListener implements ItemListener {
       component.setEnabled(false);
     } else {
       component.setEnabled(true);
+    }
+  }
+
+  @Override
+  public void valueChanged(ListSelectionEvent e) {
+    if (!e.getValueIsAdjusting()) {
+
+      int firstIndex = e.getFirstIndex();
+      if (firstIndex == -1) {
+        component.setEnabled(false);
+      } else {
+        component.setEnabled(true);
+      }
     }
   }
 }
