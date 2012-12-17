@@ -18,4 +18,6 @@ public interface ObjectWithProperties {
   void setPropertyWeak(String name, Object value);
 
   void setPropertySoft(String name, Object value);
+
+  void removeProperty(String propertyName);
 }

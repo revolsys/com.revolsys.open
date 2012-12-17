@@ -56,7 +56,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private boolean closeFile = true;
 
-  private boolean file;
+  private boolean mappedFile;
 
   public void setCloseFile(boolean closeFile) {
     this.closeFile = closeFile;
@@ -74,15 +74,6 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     this.dataObjectFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     name = baseName;
-    try {
-      File file = SpringUtil.getFile(resource);
-      this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-      File indexFile = new File(file.getParentFile(), baseName + ".shx");
-      this.indexIn = new EndianMappedByteBuffer(indexFile, MapMode.READ_ONLY);
-      this.file = true;
-    } catch (FileNotFoundException e) {
-      this.in = new EndianInputStream(resource.getInputStream());
-    }
     this.resource = resource;
   }
 
@@ -104,7 +95,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   private int position;
 
   public void setPosition(int position) {
-    if (file) {
+    if (mappedFile) {
       EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
       this.position = position;
       try {
@@ -130,56 +121,79 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   @Override
   protected synchronized void doInit() {
-    try {
-      final Resource xbaseResource = this.resource.createRelative(name + ".dbf");
-      if (xbaseResource.exists()) {
-        xbaseIterator = new XbaseIterator(xbaseResource,
-          this.dataObjectFactory, new InvokeMethodRunnable(this,
-            "updateMetaData"));
-        xbaseIterator.setCloseFile(closeFile);
-      }
-      loadHeader();
-      int numAxis = 3;
-      int srid = 0;
-      if (shapeType < 10) {
-        numAxis = 2;
-      } else if (shapeType < 20) {
-        numAxis = 3;
-      } else if (shapeType < 30) {
-        numAxis = 4;
-      } else {
-        numAxis = 4;
-      }
-      GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-      final Resource projResource = this.resource.createRelative(name + ".prj");
-      if (projResource.exists()) {
+    if (in == null) {
+      try {
+        Boolean memoryMapped = getProperty("memoryMapped");
         try {
-          CoordinateSystem coordinateSystem = new WktCsParser(
-            projResource.getInputStream()).parse();
-          coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
-          srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-          setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
-        } catch (final Exception e) {
-          e.printStackTrace();
+          File file = SpringUtil.getFile(resource);
+          File indexFile = new File(file.getParentFile(), name + ".shx");
+          if (Boolean.TRUE == memoryMapped) {
+            this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+            this.indexIn = new EndianMappedByteBuffer(indexFile,
+              MapMode.READ_ONLY);
+            this.mappedFile = true;
+          } else {
+            this.in = new LittleEndianRandomAccessFile(file, "r");
+          }
+        } catch (FileNotFoundException e) {
+          this.in = new EndianInputStream(resource.getInputStream());
         }
-      }
-      if (geometryFactory == null) {
-        if (srid < 1) {
-          srid = 4326;
-        }
-        geometryFactory = GeometryFactory.getFactory(srid, numAxis);
-      }
-      geometryReader = new JtsGeometryConverter(geometryFactory);
 
-      if (xbaseIterator != null) {
-        xbaseIterator.hasNext();
+        final Resource xbaseResource = this.resource.createRelative(name
+          + ".dbf");
+        if (xbaseResource.exists()) {
+          xbaseIterator = new XbaseIterator(xbaseResource,
+            this.dataObjectFactory, new InvokeMethodRunnable(this,
+              "updateMetaData"));
+          xbaseIterator.setProperty("memoryMapped", memoryMapped);
+          xbaseIterator.setCloseFile(closeFile);
+        }
+        loadHeader();
+        int numAxis = 3;
+        int srid = 0;
+        if (shapeType < 10) {
+          numAxis = 2;
+        } else if (shapeType < 20) {
+          numAxis = 3;
+        } else if (shapeType < 30) {
+          numAxis = 4;
+        } else {
+          numAxis = 4;
+        }
+        GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        final Resource projResource = this.resource.createRelative(name
+          + ".prj");
+        if (projResource.exists()) {
+          try {
+            CoordinateSystem coordinateSystem = new WktCsParser(
+              projResource.getInputStream()).parse();
+            coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
+            srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
+            setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
+          } catch (final Exception e) {
+            e.printStackTrace();
+          }
+        }
+        if (geometryFactory == null) {
+          if (srid < 1) {
+            srid = 4326;
+          }
+          geometryFactory = GeometryFactory.getFactory(srid, numAxis);
+        }
+        geometryReader = new JtsGeometryConverter(geometryFactory);
+
+        if (xbaseIterator != null) {
+          xbaseIterator.hasNext();
+        }
+        if (metaData == null) {
+          metaData = new DataObjectMetaDataImpl(
+            DataObjectUtil.GEOMETRY_META_DATA);
+        }
+        metaData.setGeometryFactory(geometryFactory);
+      } catch (final IOException e) {
+        throw new RuntimeException("Error initializing mappedFile " + resource,
+          e);
       }
-      if (metaData == null) {
-        metaData = new DataObjectMetaDataImpl(DataObjectUtil.GEOMETRY_META_DATA);
-      }
-      metaData.setGeometryFactory(geometryFactory);
-    } catch (final IOException e) {
-      throw new RuntimeException("Error initializing file " + resource, e);
     }
   }
 
@@ -221,7 +235,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
   }
 
   /**
-   * Load the header record from the shape file.
+   * Load the header record from the shape mappedFile.
    * 
    * @throws IOException If an I/O error occurs.
    */

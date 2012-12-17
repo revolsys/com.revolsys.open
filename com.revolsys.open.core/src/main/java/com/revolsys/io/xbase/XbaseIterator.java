@@ -86,19 +86,15 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   private long firstIndex;
 
-  private boolean file;
+  private boolean mappedFile;
+
+  private Resource resource;
 
   public XbaseIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) throws IOException {
     this.name = FileUtil.getBaseName(resource.getFilename());
+    this.resource = resource;
 
-    try {
-      File file = SpringUtil.getFile(resource);
-      this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-      this.file = true;
-    } catch (FileNotFoundException e) {
-      this.in = new EndianInputStream(resource.getInputStream());
-    }
     this.dataObjectFactory = dataObjectFactory;
   }
 
@@ -122,15 +118,29 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   @Override
   protected void doInit() {
-    try {
-      loadHeader();
-      readMetaData();
-      recordBuffer = new byte[recordSize];
-      if (initCallback != null) {
-        initCallback.run();
+    if (in == null) {
+      try {
+        try {
+          File file = SpringUtil.getFile(resource);
+          Boolean memoryMapped = getProperty("memoryMapped");
+          if (Boolean.TRUE == memoryMapped) {
+           this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+          this.mappedFile = true;
+          } else {
+            this.in = new LittleEndianRandomAccessFile(file, "r");
+          }
+        } catch (FileNotFoundException e) {
+          this.in = new EndianInputStream(resource.getInputStream());
+        }
+        loadHeader();
+        readMetaData();
+        recordBuffer = new byte[recordSize];
+        if (initCallback != null) {
+          initCallback.run();
+        }
+      } catch (final IOException e) {
+        throw new RuntimeException("Error initializing mappedFile ", e);
       }
-    } catch (final IOException e) {
-      throw new RuntimeException("Error initializing file ", e);
     }
   }
 
@@ -178,11 +188,12 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
      * String memoIndexString = new String(record, startIndex, len).trim(); if
      * (memoIndexString.length() != 0) { int memoIndex =
      * Integer.parseInt(memoIndexString.trim()); if (memoIn == null) { File
-     * memoFile = new File(file.getParentFile(), typePath + ".dbt"); if
+     * memoFile = new File(mappedFile.getParentFile(), typePath + ".dbt"); if
      * (memoFile.exists()) { if (log.isInfoEnabled()) { log.info("Opening memo
-     * file: " + memoFile); } memoIn = new RandomAccessFile(memoFile, "r"); }
-     * else { return null; } } memoIn.seek(memoIndex 512); StringBuffer memo =
-     * new StringBuffer(512); byte[] memoBuffer = new byte[512]; while
+     * mappedFile:
+     * " + memoFile); } memoIn = new RandomAccessFile(memoFile, "r"); } else {
+     * return null; } } memoIn.seek(memoIndex 512); StringBuffer memo = new
+     * StringBuffer(512); byte[] memoBuffer = new byte[512]; while
      * (memoIn.read(memoBuffer) != -1) { int i = 0; while (i <
      * memoBuffer.length) { if (memoBuffer[i] == 0x1A) { return memo.toString();
      * } memo.append((char)memoBuffer[i]); i++; } } return memo.toString(); }
@@ -250,7 +261,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
 
   protected DataObject loadDataObject() throws IOException {
     if (in.read(recordBuffer) != recordBuffer.length) {
-      throw new IllegalStateException("Unexpected end of file");
+      throw new IllegalStateException("Unexpected end of mappedFile");
     }
     final DataObject object = dataObjectFactory.createDataObject(metaData);
     int startIndex = 0;
@@ -280,7 +291,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   /**
-   * Load the header record from the shape file.
+   * Load the header record from the shape mappedFile.
    * 
    * @throws IOException If an I/O error occurs.
    */
@@ -326,7 +337,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
       }
       metaData.addAttribute(fieldName.toString(), dataType, length, -1, true);
     }
-    if (file) {
+    if (mappedFile) {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
       firstIndex = file.getFilePointer();
     }
@@ -342,7 +353,7 @@ public class XbaseIterator extends AbstractIterator<DataObject> implements
   }
 
   public void setPosition(final int position) {
-    if (file) {
+    if (mappedFile) {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
       this.position = position;
       try {

@@ -20,6 +20,16 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     }
   }
 
+  @Override
+  public void removeProperty(final String propertyName) {
+    object.removeProperty(propertyName);
+    if (getObject() == null) {
+      properties.remove(propertyName);
+    } else {
+      getObject().removeProperty(propertyName);
+    }
+  }
+
   protected void close() {
     properties = null;
     object = null;

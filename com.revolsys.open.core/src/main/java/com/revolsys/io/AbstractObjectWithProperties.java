@@ -12,6 +12,11 @@ import javax.annotation.PreDestroy;
 public class AbstractObjectWithProperties implements ObjectWithProperties {
   private Map<String, Object> properties = new HashMap<String, Object>();
 
+  @Override
+  public void clearProperties() {
+    properties.clear();
+  }
+
   @PreDestroy
   public void close() {
     properties = null;
@@ -25,10 +30,10 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
   @Override
   @SuppressWarnings("unchecked")
   public <C> C getProperty(final String name) {
-    Map<String, Object> properties = getProperties();
+    final Map<String, Object> properties = getProperties();
     Object value = properties.get(name);
     if (value instanceof Reference) {
-      Reference<C> reference = (Reference<C>)value;
+      final Reference<C> reference = (Reference<C>)value;
       if (reference.isEnqueued()) {
         value = null;
       } else {
@@ -39,10 +44,6 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
       }
     }
     return (C)value;
-  }
-
-  public void clearProperties() {
-    properties.clear();
   }
 
   @Override
@@ -57,11 +58,16 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
+  public void removeProperty(final String propertyName) {
+    properties.remove(propertyName);
+  }
+
+  @Override
   public void setProperties(final Map<String, Object> properties) {
     if (properties != null) {
-      for (Entry<String, Object> entry : properties.entrySet()) {
-        String name = entry.getKey();
-        Object value = entry.getValue();
+      for (final Entry<String, Object> entry : properties.entrySet()) {
+        final String name = entry.getKey();
+        final Object value = entry.getValue();
         setProperty(name, value);
       }
     }
@@ -69,17 +75,19 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public void setProperty(final String name, final Object value) {
-    Map<String, Object> properties = getProperties();
+    final Map<String, Object> properties = getProperties();
     properties.put(name, value);
   }
 
+  @Override
   public void setPropertySoft(final String name, final Object value) {
-    Map<String, Object> properties = getProperties();
+    final Map<String, Object> properties = getProperties();
     properties.put(name, new SoftReference<Object>(value));
   }
 
+  @Override
   public void setPropertyWeak(final String name, final Object value) {
-    Map<String, Object> properties = getProperties();
+    final Map<String, Object> properties = getProperties();
     properties.put(name, new WeakReference<Object>(value));
   }
 }
