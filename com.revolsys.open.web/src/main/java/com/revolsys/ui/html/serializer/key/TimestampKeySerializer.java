@@ -11,6 +11,13 @@ public class TimestampKeySerializer extends DateTimeKeySerializer {
   /**
    * Construct a new TimestampKeySerializer.
    */
+  public TimestampKeySerializer() {
+    setTimeStyle(DateFormat.LONG);
+  }
+
+  /**
+   * Construct a new TimestampKeySerializer.
+   */
   public TimestampKeySerializer(final String name) {
     super(name);
     setTimeStyle(DateFormat.LONG);
