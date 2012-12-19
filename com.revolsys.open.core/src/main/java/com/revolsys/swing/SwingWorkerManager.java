@@ -3,7 +3,6 @@ package com.revolsys.swing;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -13,37 +12,51 @@ import javax.swing.SwingWorker.StateValue;
 public class SwingWorkerManager implements PropertyChangeListener {
   private static SwingWorkerManager INSTANCE = new SwingWorkerManager();
 
-  public static void execute(SwingWorker<?, ?> worker) {
-    INSTANCE.doExecute(worker);
-  }
-
   public static SwingWorker<?, ?> execute(final String description,
-    final Object object, String backgroundMethodName,
-    final String doneMethodName) {
-    SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName, doneMethodName);
+    final Class<?> object, final String backgroundMethodName,
+    final Object... parameters) {
+    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+      description, object, backgroundMethodName, Arrays.asList(parameters));
     execute(worker);
     return worker;
   }
 
   public static SwingWorker<?, ?> execute(final String description,
-    final Object object, String backgroundMethodName) {
-    SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+    final Object object, final String backgroundMethodName) {
+    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
       description, object, backgroundMethodName);
     execute(worker);
     return worker;
   }
 
+  public static SwingWorker<?, ?> execute(final String description,
+    final Object object, final String backgroundMethodName,
+    final String doneMethodName) {
+    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+      description, object, backgroundMethodName, doneMethodName);
+    execute(worker);
+    return worker;
+  }
+
+  public static void execute(final SwingWorker<?, ?> worker) {
+    INSTANCE.doExecute(worker);
+  }
+
+  private final Set<SwingWorker<?, ?>> workers = new LinkedHashSet<SwingWorker<?, ?>>();
+
+  private final Set<SwingWorker<?, ?>> runningWorkers = new LinkedHashSet<SwingWorker<?, ?>>();
+
   private SwingWorkerManager() {
   }
 
-  private Set<SwingWorker<?, ?>> workers = new LinkedHashSet<SwingWorker<?, ?>>();
-
-  private Set<SwingWorker<?, ?>> runningWorkers = new LinkedHashSet<SwingWorker<?, ?>>();
+  private void doExecute(final SwingWorker<?, ?> worker) {
+    worker.addPropertyChangeListener(this);
+    worker.execute();
+  }
 
   @Override
-  public void propertyChange(PropertyChangeEvent event) {
-    SwingWorker<?, ?> worker = (SwingWorker<?, ?>)event.getSource();
+  public void propertyChange(final PropertyChangeEvent event) {
+    final SwingWorker<?, ?> worker = (SwingWorker<?, ?>)event.getSource();
     if (event.getPropertyName().equals("state")) {
       if (event.getNewValue().equals(StateValue.STARTED)) {
         runningWorkers.add(worker);
@@ -59,18 +72,5 @@ public class SwingWorkerManager implements PropertyChangeListener {
         }
       }
     }
-  }
-
-  private void doExecute(SwingWorker<?, ?> worker) {
-    worker.addPropertyChangeListener(this);
-    worker.execute();
-  }
-
-  public static SwingWorker<?, ?> execute(String description, Class<?> object,
-    String backgroundMethodName, Object... parameters) {
-    SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName, Arrays.asList(parameters));
-    execute(worker);
-    return worker;
   }
 }
