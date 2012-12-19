@@ -23,7 +23,7 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
 
   private String description;
 
-  private Collection<Object> doneMethodParameters;
+  private Collection<? extends Object> doneMethodParameters;
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     String backgroundMethodName,  Collection<Object> parameters) {
@@ -45,8 +45,8 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
 
   public InvokeMethodSwingWorker(final String description, final Object object,
     String backgroundMethodName,
-    final Collection<Object> backgroundMethodParameters,
-    final String doneMethodName, final Collection<Object> doneMethodParameters) {
+    final Collection<? extends Object> backgroundMethodParameters,
+    final String doneMethodName, final Collection<? extends Object> doneMethodParameters) {
     this.description = description;
     this.backgroundTask = new InvokeMethodCallable<T>(object,
       backgroundMethodName, backgroundMethodParameters);

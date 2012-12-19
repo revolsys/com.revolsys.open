@@ -3,6 +3,7 @@ package com.revolsys.swing;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -34,6 +35,18 @@ public class SwingWorkerManager implements PropertyChangeListener {
     final String doneMethodName) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
       description, object, backgroundMethodName, doneMethodName);
+    execute(worker);
+    return worker;
+  }
+
+  public static SwingWorker<?, ?> execute(final String description,
+    final Object object, final String backgroundMethodName,
+    Collection<? extends Object> backgrounMethodParameters,
+    final String doneMethodName,
+    Collection<? extends Object> doneMethodParameters) {
+    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+      description, object, backgroundMethodName, backgrounMethodParameters,
+      doneMethodName, doneMethodParameters);
     execute(worker);
     return worker;
   }
