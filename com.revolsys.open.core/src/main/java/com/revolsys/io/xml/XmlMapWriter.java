@@ -1,7 +1,7 @@
 package com.revolsys.io.xml;
 
 import java.io.Writer;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -50,13 +50,13 @@ public class XmlMapWriter extends AbstractMapWriter {
     out.flush();
   }
 
-  private void list(final List<? extends Object> list) {
+  private void list(final Collection<? extends Object> list) {
     for (final Object value : list) {
       if (value instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)value;
         map(map);
-      } else if (value instanceof List) {
-        final List<?> subList = (List<?>)value;
+      } else if (value instanceof Collection) {
+        final Collection<?> subList = (Collection<?>)value;
         list(subList);
       } else {
         out.startTag(new QName("item"));
@@ -83,8 +83,8 @@ public class XmlMapWriter extends AbstractMapWriter {
         out.startTag(tagName);
         map(map);
         out.endTag();
-      } else if (value instanceof List) {
-        final List<?> list = (List<?>)value;
+      } else if (value instanceof Collection) {
+        final Collection<?> list = (Collection<?>)value;
         out.startTag(tagName);
         list(list);
         out.endTag();

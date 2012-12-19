@@ -19,6 +19,8 @@ public final class HttpServletUtils {
 
   private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
 
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+
   public static void clearRequestAndResponse() {
     REQUEST_LOCAL.remove();
     RESPONSE_LOCAL.remove();
@@ -196,5 +198,20 @@ public final class HttpServletUtils {
       response.sendRedirect(url);
     } catch (IOException e) {
     }
+  }
+
+  public static String getParameter(String name) {
+    HttpServletRequest request = getRequest();
+    return request.getParameter(name);
+  }
+
+  public static String[] getParameterValues(String name) {
+    HttpServletRequest request = getRequest();
+    return request.getParameterValues(name);
+  }
+
+  public static String getOriginatingContextPath() {
+    HttpServletRequest request = getRequest();
+    return URL_PATH_HELPER.getOriginatingContextPath(request);
   }
 }

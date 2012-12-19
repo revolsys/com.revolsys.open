@@ -234,4 +234,9 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
     }
   }
 
+  public Object createDataTableMap(String pageName,
+    Map<String, Object> parameters) {
+    HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableMap(request, pageName, parameters);
+  }
 }

@@ -1,8 +1,8 @@
 package com.revolsys.io.json;
 
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +71,7 @@ public final class JsonWriterUtil {
   }
 
   public static void write(final PrintWriter out,
-    final List<? extends Object> values) {
+    final Collection<? extends Object> values) {
     startList(out);
     if (values != null) {
       int i = 0;
@@ -135,8 +135,8 @@ public final class JsonWriterUtil {
       } else {
         out.print(value);
       }
-    } else if (value instanceof List) {
-      final List<? extends Object> list = (List<? extends Object>)value;
+    } else if (value instanceof Collection) {
+      final Collection<? extends Object> list = (Collection<? extends Object>)value;
       write(out, list);
     } else if (value instanceof Map) {
       final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
