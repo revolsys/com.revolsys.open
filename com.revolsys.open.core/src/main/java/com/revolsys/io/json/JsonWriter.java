@@ -5,8 +5,8 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -114,7 +114,7 @@ public final class JsonWriter {
     list(Arrays.asList(values));
   }
 
-  public void list(final List<? extends Object> values) {
+  public void list(final Collection<? extends Object> values) {
     startList();
     int i = 0;
     final int size = values.size();
@@ -184,8 +184,8 @@ public final class JsonWriter {
       } else {
         out.print(NUMBER_FORMAT.format(value));
       }
-    } else if (value instanceof List) {
-      final List<? extends Object> list = (List<? extends Object>)value;
+    } else if (value instanceof Collection) {
+      final Collection<? extends Object> list = (Collection<? extends Object>)value;
       list(list);
     } else if (value instanceof Map) {
       final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;

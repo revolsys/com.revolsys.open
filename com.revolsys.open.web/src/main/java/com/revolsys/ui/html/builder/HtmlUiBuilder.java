@@ -120,6 +120,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return request.getParameter("_") != null;
   }
 
+  public static boolean isDataTableCallback() {
+    return HttpServletUtils.getParameter("_") != null;
+  }
+
   public static boolean isHtmlPage(final HttpServletRequest request) {
     return MediaTypeUtil.isPreferedMediaType(request, MediaType.TEXT_HTML);
   }
@@ -296,18 +300,16 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void addObjectViewPage(final TabElementContainer tabs,
-    final Object object, final String prefix)
-    throws NoSuchRequestHandlingMethodException {
+    final Object object, final String prefix) {
     HttpServletRequest request = getRequest();
     if (object == null) {
-      throw new NoSuchRequestHandlingMethodException(request);
+      throw new PageNotFoundException();
     } else {
       final String pageName = getName(prefix, "view");
 
       final Page page = getPage(pageName);
       if (page == null) {
-        log.error("Page not found " + pageName);
-        throw new NoSuchRequestHandlingMethodException(request);
+        throw new PageNotFoundException("Page not found " + pageName);
       } else {
         final List<KeySerializer> serializers = getSerializers(pageName, "view");
         final Element detailView = createDetailView(object, serializers);
@@ -451,9 +453,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
       + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}";
-//    if (serverSide) {
-//      jsonMap += ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
-//    }
+    // if (serverSide) {
+    // jsonMap +=
+    // ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
+    // }
     jsonMap += "}";
     StringBuffer scriptBody = new StringBuffer();
     scriptBody.append("$(document).ready(function() {\n");
@@ -482,6 +485,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     String pageName, Callable<Collection<? extends Object>> rowsCallable) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     return createDataTableHandler(request, pageName, parameters, rowsCallable);
+  }
+
+  public Object createDataTableHandler(String pageName,
+    Collection<? extends Object> rows) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableHandler(request, pageName, rows);
   }
 
   public Object createDataTableHandler(final HttpServletRequest request,
@@ -559,6 +568,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Map<String, Object> createDataTableMap(
+    final ResultPager<? extends Object> pager, final String pageName) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableMap(request, pager, pageName);
+  }
+
+  public Map<String, Object> createDataTableMap(
+    final Collection<? extends Object> records, final String pageName) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return createDataTableMap(request, records, pageName);
+  }
+
+  public Map<String, Object> createDataTableMap(
     final HttpServletRequest request,
     final ResultPager<? extends Object> pager, final String pageName) {
     try {
@@ -621,7 +642,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @param <T> The type of form to return.
    * @param object The object to create the form for.
    * @param keyListName The name of the list of keys for the fields to include
-   *          on the form.
+   * on the form.
    * @return The generated form.
    */
   @SuppressWarnings("unchecked")
@@ -1770,4 +1791,5 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public boolean validateForm(UiBuilderObjectForm uiBuilderObjectForm) {
     return true;
   }
+
 }

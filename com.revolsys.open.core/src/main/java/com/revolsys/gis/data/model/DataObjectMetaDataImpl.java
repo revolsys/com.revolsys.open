@@ -361,7 +361,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public List<Attribute> getAttributes() {
-    return attributes;
+    return new ArrayList<Attribute>(attributes);
   }
 
   @Override
