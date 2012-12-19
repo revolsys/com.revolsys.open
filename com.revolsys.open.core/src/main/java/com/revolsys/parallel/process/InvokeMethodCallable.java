@@ -1,5 +1,6 @@
 package com.revolsys.parallel.process;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.beanutils.MethodUtils;
@@ -35,8 +36,23 @@ public class InvokeMethodCallable<T> implements Callable<T> {
     this(object, methodName, NULL_PARAMETERS);
   }
 
+
   /**
-   * Construct a new InvokeMethodRunnable.
+   * Construct a new InvokeMethodCallable.
+   * 
+   * @param object The object to invoke the method on.
+   * @param methodName The name of the method to invoke.
+   * @param parameters The parameters to pass to the method.
+   */
+  public InvokeMethodCallable(final Object object, final String methodName,
+    final Collection<Object> parameters) {
+    this.object = object;
+    this.methodName = methodName;
+    this.parameters = parameters.toArray();
+  }
+
+  /**
+   * Construct a new InvokeMethodCallable.
    * 
    * @param object The object to invoke the method on.
    * @param methodName The name of the method to invoke.

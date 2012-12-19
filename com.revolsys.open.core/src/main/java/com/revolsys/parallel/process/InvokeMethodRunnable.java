@@ -1,6 +1,7 @@
 package com.revolsys.parallel.process;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.beanutils.MethodUtils;
 
@@ -45,6 +46,20 @@ public class InvokeMethodRunnable implements Runnable {
     this.object = object;
     this.methodName = methodName;
     this.parameters = parameters;
+  }
+
+  /**
+   * Construct a new InvokeMethodRunnable.
+   * 
+   * @param object The object to invoke the method on.
+   * @param methodName The name of the method to invoke.
+   * @param parameters The parameters to pass to the method.
+   */
+  public InvokeMethodRunnable(final Object object, final String methodName,
+    final Collection<Object> parameters) {
+    this.object = object;
+    this.methodName = methodName;
+    this.parameters = parameters.toArray();
   }
 
   /**

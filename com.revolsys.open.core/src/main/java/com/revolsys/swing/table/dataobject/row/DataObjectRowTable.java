@@ -1,9 +1,10 @@
 package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.Component;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -12,7 +13,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -37,12 +37,13 @@ public class DataObjectRowTable extends JTable implements MouseListener {
     tableHeader.setReorderingAllowed(false);
     tableHeader.setDefaultRenderer(headerRenderer);
 
+    List<TableColumn> removeColumns = new ArrayList<TableColumn>();
     final TableColumnModel columnModel = getColumnModel();
     for (int i = 0; i < model.getColumnCount(); i++) {
       final TableColumn column = columnModel.getColumn(i);
       final Class<?> attributeClass = metaData.getAttributeClass(i);
       if (Geometry.class.isAssignableFrom(attributeClass)) {
-        removeColumn(column);
+        removeColumns.add(column);
       } else {
         final String columnName = model.getColumnName(i) + "XX";
 
@@ -63,6 +64,9 @@ public class DataObjectRowTable extends JTable implements MouseListener {
 
         column.setCellRenderer(cellRenderer);
       }
+    }
+    for (TableColumn column : removeColumns) {
+      removeColumn(column);
     }
     tableHeader.addMouseListener(this);
     model.addTableModelListener(this);
