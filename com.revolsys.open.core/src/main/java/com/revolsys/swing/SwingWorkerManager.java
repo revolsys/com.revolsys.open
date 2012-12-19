@@ -2,12 +2,13 @@ package com.revolsys.swing;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
-
 
 public class SwingWorkerManager implements PropertyChangeListener {
   private static SwingWorkerManager INSTANCE = new SwingWorkerManager();
@@ -63,5 +64,13 @@ public class SwingWorkerManager implements PropertyChangeListener {
   private void doExecute(SwingWorker<?, ?> worker) {
     worker.addPropertyChangeListener(this);
     worker.execute();
+  }
+
+  public static SwingWorker<?, ?> execute(String description, Class<?> object,
+    String backgroundMethodName, Object... parameters) {
+    SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+      description, object, backgroundMethodName, Arrays.asList(parameters));
+    execute(worker);
+    return worker;
   }
 }

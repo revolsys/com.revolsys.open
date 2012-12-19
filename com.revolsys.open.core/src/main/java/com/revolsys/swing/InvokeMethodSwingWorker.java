@@ -26,6 +26,12 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
   private Collection<Object> doneMethodParameters;
 
   public InvokeMethodSwingWorker(final String description, final Object object,
+    String backgroundMethodName,  Collection<Object> parameters) {
+    this(description, object, backgroundMethodName,  parameters,
+      null, Collections.emptyList());
+  }
+
+  public InvokeMethodSwingWorker(final String description, final Object object,
     String backgroundMethodName, final String doneMethodName) {
     this(description, object, backgroundMethodName, Collections.emptyList(),
       doneMethodName, Collections.emptyList());
