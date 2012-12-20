@@ -11,8 +11,8 @@ import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
 
-import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.controller.PathAliasController;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
@@ -162,7 +162,7 @@ public class Menu implements Cloneable {
         return null;
       }
     } else {
-      baseUri = Page.getAbsoluteUrl(PathAliasController.getPath(baseUri));
+      baseUri = HttpServletUtils.getAbsoluteUrl(PathAliasController.getPath(baseUri));
 
       Map<String, Object> params;
       if (context != null) {

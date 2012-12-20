@@ -1378,12 +1378,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     InvokeMethodAfterCommit.invoke(HttpServletUtils.class, "redirect", url);
   }
 
-  public void redirectPage(final String pageName) {
+  public Void redirectPage(final String pageName) {
     String url = getPageUrl(pageName);
     if (url == null) {
       url = "..";
     }
     redirectAfterCommit(url);
+    return null;
   }
 
   public Object redirectToTab(Object parentBuilder, String parentPageName,

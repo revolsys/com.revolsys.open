@@ -22,7 +22,6 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
@@ -45,8 +44,6 @@ import com.revolsys.util.HtmlUtil;
 public class PageInfoHttpMessageConverter extends
   AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
-
-  private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
 
@@ -105,7 +102,9 @@ public class PageInfoHttpMessageConverter extends
 
   private String getUrl(final String parentUrl, final String childUrl) {
     String childUri;
-    if (childUrl.startsWith("/")) {
+    if (childUrl.startsWith("http")) {
+      return childUrl;
+    } else if (childUrl.startsWith("/")) {
       childUri = HttpServletUtils.getServerUrl() + childUrl;
     } else if (parentUrl.charAt(parentUrl.length() - 1) != '/') {
       childUri = parentUrl + "/" + childUrl;
@@ -130,17 +129,17 @@ public class PageInfoHttpMessageConverter extends
 
         String url = pageInfo.getUrl();
         if (url == null) {
-          url = HttpServletUtils.getServerUrl();
-          url += urlPathHelper.getOriginatingRequestUri(request);
+          url = HttpServletUtils.getFullRequestUrl();
+          final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
+          if (extension != null) {
+            url = url.replaceAll(extension + "/?$", "/");
+          }
         } else if (url.startsWith("/")) {
           url = HttpServletUtils.getServerUrl() + url;
         }
 
         boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
-        final String extension = MEDIA_TYPE_TO_EXTENSION_MAP.get(mediaType);
-        if (extension != null) {
-          url = url.replaceAll(extension + "/?$", "/");
-        }
+
         final HttpHeaders headers = outputMessage.getHeaders();
         headers.setContentType(mediaType);
 

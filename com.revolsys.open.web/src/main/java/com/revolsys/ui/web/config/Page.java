@@ -21,11 +21,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriTemplate;
-import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.spring.StringTemplate;
 import com.revolsys.spring.security.SpringExpressionUtil;
-import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
@@ -34,17 +32,6 @@ import com.revolsys.util.UrlUtil;
 
 public class Page extends Component {
   private static final Logger LOG = Logger.getLogger(Page.class);
-
-  public static String getAbsoluteUrl(final String url) {
-    if (url.startsWith("/")) {
-      final HttpServletRequest request = HttpServletUtils.getRequest();
-      final String serverUrl = HttpServletUtils.getServerUrl(request);
-      final String contextPath = new UrlPathHelper().getOriginatingContextPath(request);
-      return serverUrl + contextPath + url;
-    } else {
-      return url;
-    }
-  }
 
   private final List<Argument> arguments = new ArrayList<Argument>();
 
@@ -281,7 +268,7 @@ public class Page extends Component {
         }
         final URI path = uriTemplate.expand(uriTemplateVariables);
         final String url = UrlUtil.getUrl(path, uriParameters);
-        return getFullUrl(url);
+        return HttpServletUtils.getFullUrl(url);
       } catch (IllegalArgumentException e) {
         LOG.debug("Unable to expand variables for " + uriTemplate, e);
         return null;
@@ -289,11 +276,6 @@ public class Page extends Component {
     } else {
       return null;
     }
-  }
-
-  public static String getFullUrl(final String url) {
-    String aliasUrl = PathAliasController.getPath(url);
-    return getAbsoluteUrl(aliasUrl);
   }
 
   public Layout getLayout() {

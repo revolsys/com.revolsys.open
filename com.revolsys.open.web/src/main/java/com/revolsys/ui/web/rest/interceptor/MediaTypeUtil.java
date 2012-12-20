@@ -15,6 +15,7 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class MediaTypeUtil {
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
@@ -25,14 +26,17 @@ public class MediaTypeUtil {
 
   private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
 
+  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
+
   static {
     for (Entry<String, String> entry : IoFactoryRegistry.getInstance()
       .getExtensionMimeTypeMap()
       .entrySet()) {
       String exetension = entry.getKey();
       String mimeType = entry.getValue();
-      extensionToMediaTypeMap.put(exetension,
-        MediaType.parseMediaType(mimeType));
+      MediaType mediaType = MediaType.parseMediaType(mimeType);
+      extensionToMediaTypeMap.put(exetension, mediaType);
+      mediaTypeToExtensionMap.put(mediaType, exetension);
     }
   }
 
@@ -134,6 +138,18 @@ public class MediaTypeUtil {
     }
   }
 
+  public static String getAcceptedFileNameExtension() {
+    HttpServletRequest request = HttpServletUtils.getRequest();
+    List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
+    for (MediaType mediaType : mediaTypes) {
+      String extension = mediaTypeToExtensionMap.get(mediaType);
+      if (StringUtils.hasText(extension)) {
+        return extension;
+      }
+    }
+    return "html";
+  }
+
   public static MediaType getMediaTypeFromFilename(
     final Map<String, MediaType> extensionToMediaTypeMap, final String filename) {
     final String extension = StringUtils.getFilenameExtension(filename);
@@ -191,5 +207,27 @@ public class MediaTypeUtil {
       }
     }
     return null;
+  }
+
+  public static String getUrlWithExtension(final String path) {
+    String baseUrl = HttpServletUtils.getFullRequestUrl();
+    final String extension = "." + getAcceptedFileNameExtension();
+    if (baseUrl.endsWith(extension)) {
+      baseUrl = baseUrl.substring(0,baseUrl.length() - extension.length());
+    }
+    if (!baseUrl.endsWith("/")) {
+      baseUrl += '/';
+    }
+    if (!path.endsWith(extension)) {
+      return baseUrl + path + extension;
+    } else {
+      return baseUrl + path;
+    }
+  }
+
+  public static String getPathWithExtension(final String path) {
+    final String extension = getAcceptedFileNameExtension();
+    String pathWithExtension = path + "." + extension;
+    return pathWithExtension;
   }
 }

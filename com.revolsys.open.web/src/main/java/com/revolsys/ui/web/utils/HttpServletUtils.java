@@ -13,6 +13,7 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.ui.web.controller.PathAliasController;
 
 public final class HttpServletUtils {
   private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
@@ -27,7 +28,8 @@ public final class HttpServletUtils {
   }
 
   public static String getFullRequestUrl() {
-    return getFullRequestUrl(getRequest());
+    HttpServletRequest request = getRequest();
+    return getFullRequestUrl(request);
   }
 
   public static String getFullRequestUrl(final HttpServletRequest request) {
@@ -213,5 +215,21 @@ public final class HttpServletUtils {
   public static String getOriginatingContextPath() {
     HttpServletRequest request = getRequest();
     return URL_PATH_HELPER.getOriginatingContextPath(request);
+  }
+
+  public static String getAbsoluteUrl(final String url) {
+    if (url.startsWith("/")) {
+      final HttpServletRequest request = getRequest();
+      final String serverUrl = getServerUrl(request);
+      final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
+      return serverUrl + contextPath + url;
+    } else {
+      return url;
+    }
+  }
+
+  public static String getFullUrl(final String url) {
+    String aliasUrl = PathAliasController.getPath(url);
+    return getAbsoluteUrl(aliasUrl);
   }
 }

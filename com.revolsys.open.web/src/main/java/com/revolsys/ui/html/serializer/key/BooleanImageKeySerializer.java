@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.ui.web.config.Page;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BooleanImageKeySerializer extends AbstractKeySerializer {
@@ -39,7 +39,7 @@ public class BooleanImageKeySerializer extends AbstractKeySerializer {
     }
     out.startTag(HtmlUtil.IMG);
     out.attribute(HtmlUtil.ATTR_SRC,
-      Page.getAbsoluteUrl("/images/" + imageName + ".png"));
+      HttpServletUtils.getAbsoluteUrl("/images/" + imageName + ".png"));
     out.attribute(HtmlUtil.ATTR_ALT, text);
     out.attribute(HtmlUtil.ATTR_TITLE, text);
     out.endTag(HtmlUtil.IMG);
