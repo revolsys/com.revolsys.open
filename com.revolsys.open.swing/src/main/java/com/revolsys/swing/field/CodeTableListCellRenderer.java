@@ -9,6 +9,7 @@ import javax.swing.JList;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.util.CollectionUtil;
 
+@SuppressWarnings("serial")
 public class CodeTableListCellRenderer extends DefaultListCellRenderer {
   private CodeTable codeTable;
 

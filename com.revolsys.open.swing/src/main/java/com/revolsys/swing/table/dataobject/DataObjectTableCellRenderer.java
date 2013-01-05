@@ -3,23 +3,28 @@ package com.revolsys.swing.table.dataobject;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.JXTable;
+
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
+import com.revolsys.util.CollectionUtil;
 
 public class DataObjectTableCellRenderer implements TableCellRenderer {
   private final JLabel valueComponent = new JLabel();
 
   private final JLabel labelComponent = new JLabel();
 
-  private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
+  private DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
   public DataObjectTableCellRenderer() {
     this(DataObjectMetaDataUiBuilderRegistry.getInstance());
@@ -34,22 +39,35 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
 
     valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     valueComponent.setOpaque(true);
-
   }
 
   @Override
   public Component getTableCellRendererComponent(final JTable table,
     final Object value, final boolean isSelected, final boolean hasFocus,
     final int row, final int column) {
+    int attributeIndex;
+    if (table instanceof JXTable) {
+      JXTable jxTable = (JXTable)table;
+      attributeIndex = jxTable.convertRowIndexToModel(row);
+    } else {
+      attributeIndex = row;
+    }
     final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
     final DataObjectMetaData metaData = model.getMetaData();
-    final boolean required = metaData.isAttributeRequired(row);
+    final boolean required = metaData.isAttributeRequired(attributeIndex);
 
     Component component = null;
-    if (column == 1) {
+    String name = metaData.getAttributeName(attributeIndex);
+    if (column == 0) {
+      valueComponent.setText(String.valueOf(attributeIndex));
+      component = valueComponent;
+    } else if (column == 1) {
+      labelComponent.setText(name);
+      component = labelComponent;
+    } else if (column == 2) {
       if (uiBuilderRegistry != null) {
         final ValueUiBuilder uiBuilder = uiBuilderRegistry.getValueUiBuilder(
-          metaData, row);
+          metaData, attributeIndex);
         if (uiBuilder != null) {
           component = uiBuilder.getRendererComponent(value);
         }
@@ -59,15 +77,21 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
         if (value == null) {
           text = "-";
         } else {
-          text = StringConverterRegistry.toString(value);
+          final CodeTable codeTable = metaData.getCodeTableByColumn(name);
+          if (codeTable == null) {
+            text = StringConverterRegistry.toString(value);
+          } else {
+            List<Object> values = codeTable.getValues(value);
+            if (values == null || values.isEmpty()) {
+              text = "-";
+            } else {
+              text = CollectionUtil.toString(values);
+            }
+          }
         }
         valueComponent.setText(text);
         component = valueComponent;
       }
-    } else {
-      String name = metaData.getAttributeName(row);
-      labelComponent.setText(name);
-      component = labelComponent;
     }
     final int[] selectedRows = table.getSelectedRows();
     boolean selected = false;
@@ -76,7 +100,7 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
         selected = true;
       }
     }
-    if (required && model.getValue(row) == null) {
+    if (required && model.getValue(attributeIndex) == null) {
       component.setBackground(new Color(255, 0, 0, 100));
       component.setForeground(table.getForeground());
     } else if (selected) {
@@ -90,5 +114,10 @@ public class DataObjectTableCellRenderer implements TableCellRenderer {
       component.setForeground(table.getForeground());
     }
     return component;
+  }
+
+  public void setUiBuilderRegistry(
+    DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
+    this.uiBuilderRegistry = uiBuilderRegistry;
   }
 }

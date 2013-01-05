@@ -1,4 +1,4 @@
-package com.revolsys.swing.table.dataobject;
+package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.Component;
 
@@ -8,11 +8,12 @@ import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.builder.DataObjectMetaDataUiBuilderRegistry;
 import com.revolsys.swing.builder.ValueUiBuilder;
 
 @SuppressWarnings("serial")
-public class DataObjectTableCellEditor extends AbstractCellEditor implements
+public class DataObjectRowTableCellEditor extends AbstractCellEditor implements
   TableCellEditor {
   private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
@@ -20,11 +21,11 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   private ValueUiBuilder uiBuilder;
 
-  public DataObjectTableCellEditor() {
+  public DataObjectRowTableCellEditor() {
     this(DataObjectMetaDataUiBuilderRegistry.getInstance());
   }
 
-  public DataObjectTableCellEditor(
+  public DataObjectRowTableCellEditor(
     final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
     this.uiBuilderRegistry = uiBuilderRegistry;
   }
@@ -42,20 +43,14 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   public Component getTableCellEditorComponent(final JTable table,
     final Object value, final boolean isSelected, final int row,
     final int column) {
-    if (column == -1) {
-      final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
-      final DataObjectMetaData schema = model.getMetaData();
-      uiBuilder = uiBuilderRegistry.getValueUiBuilder(schema, row);
-      if (uiBuilder != null) {
-        return uiBuilder.getEditorComponent(value);
-      } else if (value == null) {
-        editorComponent.setText(null);
-      } else {
-        editorComponent.setText(value.toString());
-      }
-      return editorComponent;
+    final DataObjectListTableModel model = (DataObjectListTableModel)table.getModel();
+    final DataObjectMetaData metaData = model.getMetaData();
+    uiBuilder = uiBuilderRegistry.getValueUiBuilder(metaData, column);
+    if (uiBuilder != null) {
+      return uiBuilder.getEditorComponent(value);
     } else {
-      return null;
+      String fieldName = metaData.getAttributeName(column);
+      return SwingUtil.createField(metaData, fieldName, true);
     }
   }
 }

@@ -61,4 +61,10 @@ public class DataObjectMetaDataUiBuilderRegistry {
     return getValueUiBuilder(schema, schema.getAttributeIndex(attributeName));
 
   }
+
+  public void addValueUiBuilder(DataObjectMetaData metaData, String fieldName,
+    ValueUiBuilder builder) {
+    int attributeIndex = metaData.getAttributeIndex(fieldName);
+    addValueUiBuilder(metaData, attributeIndex, builder);
+  }
 }

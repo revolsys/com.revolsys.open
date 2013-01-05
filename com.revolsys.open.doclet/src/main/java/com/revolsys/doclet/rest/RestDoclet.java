@@ -276,7 +276,11 @@ public class RestDoclet {
           "org.springframework.web.bind.annotation.RequestBody");
         String paramName = name;
         String defaultValue = "-";
-        String typeName = parameter.typeName().replaceFirst("^java.lang.", "");
+        String typeName = parameter.typeName();
+        typeName = typeName.replaceAll("java.util.List<([^>]+)>", "$1\\[\\]");
+        typeName = typeName.replaceFirst("^java.lang.", "");
+        typeName = typeName.replaceAll("org.springframework.web.multipart.MultipartFile", "File");
+        
         boolean required = true;
         if (requestParam != null) {
           final String value = getElementValue(requestParam, "value");

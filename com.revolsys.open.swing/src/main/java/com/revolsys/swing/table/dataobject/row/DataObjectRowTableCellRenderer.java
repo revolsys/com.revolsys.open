@@ -16,7 +16,7 @@ import com.revolsys.swing.builder.ValueUiBuilder;
 public class DataObjectRowTableCellRenderer implements TableCellRenderer {
   private final JLabel valueComponent;
 
-  private final DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
+  private DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry;
 
   public DataObjectRowTableCellRenderer() {
     this(DataObjectMetaDataUiBuilderRegistry.getInstance());
@@ -28,6 +28,11 @@ public class DataObjectRowTableCellRenderer implements TableCellRenderer {
     valueComponent = new JLabel();
     valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     valueComponent.setOpaque(true);
+  }
+
+  public void setUiBuilderRegistry(
+    DataObjectMetaDataUiBuilderRegistry uiBuilderRegistry) {
+    this.uiBuilderRegistry = uiBuilderRegistry;
   }
 
   @Override

@@ -104,6 +104,7 @@ public class StringConverterRegistry {
     addConverter(new DoubleStringConverter());
     addConverter(new FloatStringConverter());
     addConverter(new DateStringConverter());
+    addConverter(new DateTimeStringConverter());
     addConverter(new IntegerStringConverter());
     addConverter(new LongStringConverter());
     addConverter(new ShortStringConverter());

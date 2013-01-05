@@ -138,6 +138,15 @@ public class MediaTypeUtil {
     }
   }
 
+  public static MediaType getContentType() {
+    HttpServletRequest request = HttpServletUtils.getRequest();
+    return getContentType(request);
+  }
+  
+  public static boolean isContentType(MediaType contentType) {
+    return contentType.equals(getContentType());
+  }
+
   public static String getAcceptedFileNameExtension() {
     HttpServletRequest request = HttpServletUtils.getRequest();
     List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
@@ -213,7 +222,7 @@ public class MediaTypeUtil {
     String baseUrl = HttpServletUtils.getFullRequestUrl();
     final String extension = "." + getAcceptedFileNameExtension();
     if (baseUrl.endsWith(extension)) {
-      baseUrl = baseUrl.substring(0,baseUrl.length() - extension.length());
+      baseUrl = baseUrl.substring(0, baseUrl.length() - extension.length());
     }
     if (!baseUrl.endsWith("/")) {
       baseUrl += '/';
