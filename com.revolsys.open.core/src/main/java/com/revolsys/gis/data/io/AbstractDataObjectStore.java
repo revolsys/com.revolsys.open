@@ -217,7 +217,16 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public int delete(final Query query) {
-    return 0;
+    int i = 0;
+    Reader<DataObject> reader = query(query);
+    try {
+      for (DataObject object : reader) {
+        delete(object);
+      }
+    } finally {
+      reader.close();
+    }
+    return i++;
   }
 
   @Override

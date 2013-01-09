@@ -152,7 +152,7 @@ public class RestDoclet {
       writer.endTag(HtmlUtil.A);
 
       writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
+      writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass open");
       final String name = classDoc.name();
       title(DocletUtil.qualifiedName(classDoc),
         CaseConverter.toCapitalizedWords(name));

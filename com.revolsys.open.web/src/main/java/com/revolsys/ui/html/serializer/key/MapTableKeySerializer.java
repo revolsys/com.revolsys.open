@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.io.json.JsonParser;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -28,93 +30,104 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
    * @param object The object to get the value from.
    */
   public void serialize(final XmlWriter out, final Object object) {
-    final Object property = JavaBeanUtil.getProperty(object, getName());
-    if (property == null) {
+     Object value = JavaBeanUtil.getProperty(object, getKey());
+    if (value == null) {
       out.text("-");
-    } else if (property instanceof Map) {
-      final Map<Object, Object> map = (Map)property;
-      if (map.isEmpty()) {
-        out.text("-");
-      } else {
-        out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, "objectList");
+    } else {
+      if (value instanceof String) {
+        String string = (String)value;
+        if (StringUtils.hasText(string)) {
+          value = JsonMapIoFactory.toMap(string);
+        } else {
+          out.text("-");
+          return;
+        }
+      }
+      if (value instanceof Map) {
+        final Map<Object, Object> map = (Map)value;
+        if (map.isEmpty()) {
+          out.text("-");
+        } else {
+          out.startTag(HtmlUtil.DIV);
+          out.attribute(HtmlUtil.ATTR_CLASS, "objectList");
 
-        out.startTag(HtmlUtil.TABLE);
-        out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
-        out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-        out.attribute(HtmlUtil.ATTR_CLASS, "data");
-        out.startTag(HtmlUtil.THEAD);
-        out.startTag(HtmlUtil.TR);
-
-        out.startTag(HtmlUtil.TH);
-        out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
-        out.text(keyLabel);
-        out.endTag(HtmlUtil.TH);
-
-        out.startTag(HtmlUtil.TH);
-        out.attribute(HtmlUtil.ATTR_CLASS, "lastCol");
-        out.text(valueLabel);
-        out.endTag(HtmlUtil.TH);
-
-        out.endTag(HtmlUtil.TR);
-        out.endTag(HtmlUtil.THEAD);
-
-        out.startTag(HtmlUtil.TBODY);
-        boolean odd = true;
-        boolean first = true;
-        for (final Iterator<Entry<Object, Object>> entries = map.entrySet()
-          .iterator(); entries.hasNext();) {
-          final Entry<Object, Object> entry = entries.next();
+          out.startTag(HtmlUtil.TABLE);
+          out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
+          out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
+          out.attribute(HtmlUtil.ATTR_CLASS, "data");
+          out.startTag(HtmlUtil.THEAD);
           out.startTag(HtmlUtil.TR);
-          String cssClass = "";
-          if (first) {
-            cssClass = "firstRow ";
-            first = false;
-          }
-          if (!entries.hasNext()) {
-            cssClass = "lastRow ";
-          }
-          if (odd) {
-            cssClass += "odd";
-          } else {
-            cssClass += "even";
-          }
-          out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-          odd = !odd;
-          final Object key = entry.getKey();
-          String keyText = "-";
-          if (key != null) {
-            keyText = key.toString();
-            if (!StringUtils.hasText(keyText)) {
-              keyText = "-";
-            }
-          }
-          out.startTag(HtmlUtil.TD);
-          out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
-          out.text(keyText);
-          out.endTag(HtmlUtil.TD);
 
-          final Object value = entry.getValue();
-          String valueText = "-";
-          if (value != null) {
-            valueText = value.toString();
-            if (!StringUtils.hasText(valueText)) {
-              valueText = "-";
-            }
-          }
-          out.startTag(HtmlUtil.TD);
+          out.startTag(HtmlUtil.TH);
+          out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
+          out.text(keyLabel);
+          out.endTag(HtmlUtil.TH);
+
+          out.startTag(HtmlUtil.TH);
           out.attribute(HtmlUtil.ATTR_CLASS, "lastCol");
-          out.text(valueText);
-          out.endTag(HtmlUtil.TD);
+          out.text(valueLabel);
+          out.endTag(HtmlUtil.TH);
 
           out.endTag(HtmlUtil.TR);
+          out.endTag(HtmlUtil.THEAD);
+
+          out.startTag(HtmlUtil.TBODY);
+          boolean odd = true;
+          boolean first = true;
+          for (final Iterator<Entry<Object, Object>> entries = map.entrySet()
+            .iterator(); entries.hasNext();) {
+            final Entry<Object, Object> entry = entries.next();
+            out.startTag(HtmlUtil.TR);
+            String cssClass = "";
+            if (first) {
+              cssClass = "firstRow ";
+              first = false;
+            }
+            if (!entries.hasNext()) {
+              cssClass = "lastRow ";
+            }
+            if (odd) {
+              cssClass += "odd";
+            } else {
+              cssClass += "even";
+            }
+            out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+            odd = !odd;
+            final Object key = entry.getKey();
+            String keyText = "-";
+            if (key != null) {
+              keyText = key.toString();
+              if (!StringUtils.hasText(keyText)) {
+                keyText = "-";
+              }
+            }
+            out.startTag(HtmlUtil.TD);
+            out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
+            out.text(keyText);
+            out.endTag(HtmlUtil.TD);
+
+            final Object entryValue = entry.getValue();
+            String valueText = "-";
+            if (entryValue != null) {
+              valueText = entryValue.toString();
+              if (!StringUtils.hasText(valueText)) {
+                valueText = "-";
+              }
+            }
+            out.startTag(HtmlUtil.TD);
+            out.attribute(HtmlUtil.ATTR_CLASS, "lastCol");
+            out.text(valueText);
+            out.endTag(HtmlUtil.TD);
+
+            out.endTag(HtmlUtil.TR);
+          }
+          out.endTag(HtmlUtil.TBODY);
+          out.endTag(HtmlUtil.TABLE);
+          out.endTag(HtmlUtil.DIV);
         }
-        out.endTag(HtmlUtil.TBODY);
-        out.endTag(HtmlUtil.TABLE);
-        out.endTag(HtmlUtil.DIV);
+      } else {
+        out.text(value.toString());
       }
-    } else {
-      out.text(property.toString());
     }
   }
 
