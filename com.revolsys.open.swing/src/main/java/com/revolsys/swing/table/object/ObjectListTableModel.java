@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.swing.table.AbstractTableModel;
 
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Reorderable;
 
@@ -36,6 +37,11 @@ public class ObjectListTableModel extends AbstractTableModel implements
     this(objects, columnNames, columnNames);
   }
 
+  public ObjectListTableModel(final List<String> columnNames,
+    final List<String> columnTiList) {
+    this(Collections.emptyList(), columnNames, columnTiList);
+  }
+
   public ObjectListTableModel(final Collection<? extends Object> objects,
     final List<String> columnNames, final List<String> columnTitles) {
     this.objects.addAll(objects);
@@ -44,21 +50,35 @@ public class ObjectListTableModel extends AbstractTableModel implements
     setEditable(true);
   }
 
+  public ObjectListTableModel(String... columnNames) {
+    this(Collections.emptyList(), Arrays.asList(columnNames),
+      Arrays.asList(columnNames));
+    setEditable(false);
+  }
+
   public void add(final Object... objects) {
-    for (final Object object : objects) {
-      this.objects.add(object);
-      fireTableRowsInserted(this.objects.size() - 1, this.objects.size());
+    if (objects.length > 0) {
+      int startIndex = this.objects.size();
+      for (final Object object : objects) {
+        this.objects.add(object);
+      }
+      int endIndex = this.objects.size() - 1;
+      fireTableRowsInserted(startIndex, endIndex);
     }
   }
 
   public void add(final int index, final Object object) {
     objects.add(index, object);
-    fireTableRowsInserted(index, index + 1);
+    fireTableRowsInserted(index, index);
   }
 
   public void addAll(final Collection<Object> objects) {
-    this.objects.clear();
-    this.objects.addAll(objects);
+    if (objects.size() > 0) {
+      int startIndex = this.objects.size();
+      this.objects.addAll(objects);
+      int endIndex = this.objects.size() - 1;
+      fireTableRowsInserted(startIndex, endIndex);
+    }
   }
 
   public void addPropertyChangeListener(
@@ -100,7 +120,11 @@ public class ObjectListTableModel extends AbstractTableModel implements
   }
 
   public Object getObject(final int index) {
-    return objects.get(index);
+    if (index < objects.size()) {
+      return objects.get(index);
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -209,5 +233,16 @@ public class ObjectListTableModel extends AbstractTableModel implements
       JavaBeanUtil.setProperty(object, name, value);
       firePropertyChange(object, name, oldValue, value);
     }
+  }
+
+  public void clear() {
+    objects.clear();
+    fireTableDataChanged();
+  }
+
+  public void setAll(List<? extends Object> objects) {
+    this.objects.clear();
+    this.objects.addAll(objects);
+    fireTableDataChanged();
   }
 }

@@ -1,19 +1,23 @@
 package com.revolsys.swing.table.object;
 
+import java.util.List;
+
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
+
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.table.SortableTableCellHeaderRenderer;
 
-public class ObjectListTable extends JTable {
+public class ObjectListTable extends JXTable {
   private static final long serialVersionUID = 1L;
 
   public ObjectListTable(final ObjectListTableModel model) {
     super(model);
+    setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     setModel(model);
     final ObjectListTableCellRenderer cellRenderer = new ObjectListTableCellRenderer();
 
@@ -22,13 +26,20 @@ public class ObjectListTable extends JTable {
     tableHeader.setReorderingAllowed(false);
     tableHeader.setDefaultRenderer(headerRenderer);
 
-    final TableColumnModel columnModel = getColumnModel();
     for (int i = 0; i < model.getColumnCount(); i++) {
-      final TableColumn column = columnModel.getColumn(i);
-
+      TableColumnExt column = getColumnExt(i);
+      column.sizeWidthToFit();
       column.setCellRenderer(cellRenderer);
     }
     model.addTableModelListener(this);
+  }
+
+  public ObjectListTable(String... columnNames) {
+    this(new ObjectListTableModel(columnNames));
+  }
+
+  public ObjectListTable(List<String> columnNames, List<String> columnTitles) {
+    this(new ObjectListTableModel(columnNames, columnTitles));
   }
 
   @Override
