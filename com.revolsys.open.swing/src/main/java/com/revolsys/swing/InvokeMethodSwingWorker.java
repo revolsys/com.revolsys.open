@@ -49,7 +49,7 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     final String doneMethodName, final Collection<? extends Object> doneMethodParameters) {
     this.description = description;
     this.backgroundTask = new InvokeMethodCallable<T>(object,
-      backgroundMethodName, backgroundMethodParameters);
+      backgroundMethodName, backgroundMethodParameters.toArray());
     this.object = object;
     this.doneMethodName = doneMethodName;
     this.doneMethodParameters = doneMethodParameters;
