@@ -1,9 +1,12 @@
 package com.revolsys.swing.table.worker;
 
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
@@ -17,6 +20,13 @@ import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 
 @SuppressWarnings("serial")
 public class SwingWorkerTableModel extends AbstractTableModel {
+  public static JPanel createPanel() {
+    JPanel taskPanel = new JPanel(new BorderLayout());
+    JXTable table = SwingWorkerTableModel.createTable();
+    JScrollPane scrollPane = new JScrollPane(table);
+    taskPanel.add(scrollPane, BorderLayout.CENTER);
+    return taskPanel;
+  }
 
   public static JXTable createTable() {
     SwingWorkerTableModel model = new SwingWorkerTableModel();
@@ -50,8 +60,7 @@ public class SwingWorkerTableModel extends AbstractTableModel {
     listener = new InvokeMethodPropertyChangeListener(this,
       "fireTableDataChanged");
     PropertyChangeSupport propertyChangeSupport = SwingWorkerManager.getPropertyChangeSupport();
-    propertyChangeSupport.addPropertyChangeListener(
-      listener);
+    propertyChangeSupport.addPropertyChangeListener(listener);
   }
 
   @Override
