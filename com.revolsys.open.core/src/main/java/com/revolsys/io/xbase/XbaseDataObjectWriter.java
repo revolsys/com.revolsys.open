@@ -1,6 +1,7 @@
 package com.revolsys.io.xbase;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -26,6 +27,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.spring.NonExistingResource;
+import com.revolsys.spring.SpringUtil;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
@@ -48,6 +50,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   private boolean initialized;
 
   private Map<String, String> shortNames = new HashMap<String, String>();
+
 
   public XbaseDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
@@ -187,6 +190,16 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
         }
         this.out = new ResourceEndianOutput(resource);
         writeHeader();
+      }
+      final Resource codePageResource = SpringUtil.getResourceWithExtension(
+        resource, "cpg");
+      if (!(codePageResource instanceof NonExistingResource)) {
+        PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
+        try {
+          writer.print("UTF-8");
+        } finally {
+          writer.close();
+        }
       }
     }
   }

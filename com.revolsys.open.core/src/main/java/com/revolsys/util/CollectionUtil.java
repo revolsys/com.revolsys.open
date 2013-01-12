@@ -1,5 +1,6 @@
 package com.revolsys.util;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +30,44 @@ public final class CollectionUtil {
     return count;
   }
 
+  public static <T> boolean containsReference(List<WeakReference<T>> list,
+    T object) {
+    for (int i = 0; i < list.size(); i++) {
+      WeakReference<T> reference = list.get(i);
+      T value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else if (value == object) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static <T> void removeReference(List<WeakReference<T>> list, T object) {
+    for (int i = 0; i < list.size(); i++) {
+      WeakReference<T> reference = list.get(i);
+      T value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else if (value == object) {
+        list.remove(i);
+      }
+    }
+  }
+  public static <T> List<T> getReferences(List<WeakReference<T>> list) {
+    List<T> values = new ArrayList<T>();
+    for (int i = 0; i < list.size(); i++) {
+      WeakReference<T> reference = list.get(i);
+      T value = reference.get();
+      if (value == null) {
+        list.remove(i);
+      } else {
+        values.add(value);
+      }
+    }
+    return values;
+  }
   public static void append(final StringBuffer string,
     final Collection<? extends Object> values) {
     append(string, values, ",");

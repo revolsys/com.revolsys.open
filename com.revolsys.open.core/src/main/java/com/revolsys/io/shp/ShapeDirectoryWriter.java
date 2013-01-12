@@ -32,6 +32,8 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private Statistics statistics;
 
+  private String nameSuffix = "";
+
   public ShapeDirectoryWriter() {
   }
 
@@ -56,10 +58,6 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       statistics.disconnect();
       statistics = null;
     }
-  }
-
-  public Statistics getStatistics() {
-    return statistics;
   }
 
   @Override
@@ -99,13 +97,22 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     return metaData.getTypeName();
   }
 
+  public String getNameSuffix() {
+    return nameSuffix;
+  }
+
+  public Statistics getStatistics() {
+    return statistics;
+  }
+
   private Writer<DataObject> getWriter(final DataObject object) {
     final DataObjectMetaData metaData = object.getMetaData();
     final String path = metaData.getPath();
     Writer<DataObject> writer = writers.get(path);
     if (writer == null) {
       final File directory = getDirectory(metaData);
-      final File file = new File(directory, getFileName(metaData) + ".shp");
+      final File file = new File(directory, getFileName(metaData) + nameSuffix
+        + ".shp");
       writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
         new FileSystemResource(file));
       ((XbaseDataObjectWriter)writer).setUseZeroForNull(useZeroForNull);
@@ -133,6 +140,10 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     statistics = new Statistics("Write Shape "
       + baseDirectory.getAbsolutePath());
     statistics.connect();
+  }
+
+  public void setNameSuffix(final String nameSuffix) {
+    this.nameSuffix = nameSuffix;
   }
 
   public void setUseNamespaceAsSubDirectory(
