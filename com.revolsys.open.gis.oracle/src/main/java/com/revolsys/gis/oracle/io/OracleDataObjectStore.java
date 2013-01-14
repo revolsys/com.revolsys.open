@@ -9,11 +9,13 @@ import javax.sql.DataSource;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
+import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -62,6 +64,11 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     super(dataSource);
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
+  }
+
+  @Override
+  public ResultPager<DataObject> page(Query query) {
+    return new OracleJdbcQueryResultPager(this, getProperties(), query);
   }
 
   private boolean useSchemaSequencePrefix = true;

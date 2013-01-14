@@ -17,7 +17,6 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.util.ExceptionUtil;
 
 public class JdbcQueryResultPager implements ResultPager<DataObject> {
   /** The objects in the current page. */
@@ -49,6 +48,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
 
   private ResultSet resultSet;
 
+  private final Query query;
+
+  private final String sql;
+
   public JdbcQueryResultPager(final JdbcDataObjectStore dataStore,
     final Map<String, Object> properties, final Query query) {
     this.connection = dataStore.getConnection();
@@ -69,7 +72,18 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     this.dataObjectFactory = dataStore.getDataObjectFactory();
     this.dataStore = dataStore;
 
-    init(query);
+    this.query = query;
+
+    final String tableName = query.getTypeName();
+    metaData = query.getMetaData();
+    if (metaData == null) {
+      metaData = dataStore.getMetaData(tableName);
+      query.setMetaData(metaData);
+    }
+
+    this.sql = JdbcUtils.getSelectSql(query);
+
+    initResultSet();
   }
 
   @Override
@@ -92,6 +106,14 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   protected void finalize() throws Throwable {
     super.finalize();
     close();
+  }
+
+  public Connection getConnection() {
+    return connection;
+  }
+
+  public DataSource getDataSource() {
+    return dataSource;
   }
 
   /**
@@ -122,6 +144,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return results;
   }
 
+  public DataObjectMetaData getMetaData() {
+    return metaData;
+  }
+
   /**
    * Get the page number of the next page.
    * 
@@ -130,6 +156,14 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   @Override
   public int getNextPageNumber() {
     return pageNumber + 2;
+  }
+
+  public JdbcDataObjectStore getDataStore() {
+    return dataStore;
+  }
+
+  public DataObjectFactory getDataObjectFactory() {
+    return dataObjectFactory;
   }
 
   /**
@@ -182,6 +216,14 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return pageNumber;
   }
 
+  public Query getQuery() {
+    return query;
+  }
+
+  protected String getSql() {
+    return sql;
+  }
+
   /**
    * Get the index of the first object in the current page.
    * 
@@ -212,27 +254,20 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return pageNumber > 0;
   }
 
-  protected void init(final Query query) {
-    final String tableName = query.getTypeName();
-    metaData = query.getMetaData();
-    if (metaData == null) {
-      metaData = dataStore.getMetaData(tableName);
-      query.setMetaData(metaData);
-    }
+  private void initResultSet() {
+    if (resultSet == null) {
+      try {
+        statement = connection.prepareStatement(sql,
+          ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        statement.setFetchSize(pageSize);
 
-    final String sql = JdbcUtils.getSelectSql(query);
-
-    try {
-      statement = connection.prepareStatement(sql,
-        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-      statement.setFetchSize(pageSize);
-
-      resultSet = JdbcQueryIterator.getResultSet(metaData, statement, query);
-      resultSet.last();
-      this.numResults = resultSet.getRow();
-    } catch (final SQLException e) {
-      JdbcUtils.close(statement, resultSet);
-      throw new RuntimeException("Error executing query:" + sql, e);
+        resultSet = JdbcQueryIterator.getResultSet(metaData, statement, query);
+        resultSet.last();
+        this.numResults = resultSet.getRow();
+      } catch (final SQLException e) {
+        JdbcUtils.close(statement, resultSet);
+        throw new RuntimeException("Error executing query:" + sql, e);
+      }
     }
   }
 
@@ -285,12 +320,17 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     updateResults();
   }
 
+  protected void setResults(final List<DataObject> results) {
+    this.results = results;
+  }
+
   /**
    * Update the cached results for the current page.
    */
-  private void updateResults() {
+  protected void updateResults() {
     results = new ArrayList<DataObject>();
     try {
+      initResultSet();
       if (pageNumber != -1 && resultSet != null) {
         if (resultSet.absolute(pageNumber * pageSize + 1)) {
           int i = 0;
@@ -303,9 +343,13 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
           } while (resultSet.next() && i < pageSize);
         }
       }
-    } catch (final Throwable t) {
+    } catch (final SQLException e) {
+      JdbcUtils.getException(getDataSource(), getConnection(), "updateResults",
+        sql, e);
+    } catch (final RuntimeException e) {
       close();
-      ExceptionUtil.throwUncheckedException(t);
+    } catch (final Error e) {
+      close();
     }
   }
 }
