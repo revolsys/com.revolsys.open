@@ -20,8 +20,10 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.Attribute;
@@ -333,6 +335,17 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
+  public static DataAccessException getException(final DataSource dataSource,
+    final Connection connection, final String task, final String sql,
+    final SQLException e) {
+    if (dataSource == null) {
+      return new SQLStateSQLExceptionTranslator().translate(task, sql, e);
+    } else {
+      return new SQLErrorCodeSQLExceptionTranslator(dataSource).translate(task,
+        sql, e);
+    }
+  }
+
   public static String getProductName(final DataSource dataSource) {
     final Connection connection = getConnection(dataSource);
     try {
@@ -478,46 +491,46 @@ public final class JdbcUtils {
   }
 
   public static int selectInt(final Connection connection, final String sql,
-    final Object... parameters) throws SQLException {
-    final PreparedStatement statement = connection.prepareStatement(sql);
-    try {
-      setParameters(statement, parameters);
-      final ResultSet resultSet = statement.executeQuery();
-      try {
-        if (resultSet.next()) {
-          return resultSet.getInt(1);
-        } else {
-          throw new IllegalArgumentException("Value not found");
-        }
-      } finally {
-        close(resultSet);
-      }
-    } finally {
-      close(statement);
-    }
+    final Object... parameters) {
+    return selectInt(null, connection, sql, parameters);
   }
 
   public static int selectInt(final DataSource dataSource,
-    final Connection connection, final String sql, final Object... parameters)
-    throws SQLException {
-    if (dataSource == null) {
-      return selectInt(connection, sql, parameters);
-    } else {
-      return selectInt(dataSource, sql, parameters);
+    Connection connection, final String sql, final Object... parameters) {
+    if (dataSource != null) {
+      connection = getConnection(dataSource);
+    }
+    try {
+      final PreparedStatement statement = connection.prepareStatement(sql);
+      try {
+        setParameters(statement, parameters);
+        final ResultSet resultSet = statement.executeQuery();
+        try {
+          if (resultSet.next()) {
+            return resultSet.getInt(1);
+          } else {
+            throw new IllegalArgumentException("Value not found");
+          }
+        } finally {
+          close(resultSet);
+        }
+
+      } finally {
+        close(statement);
+      }
+    } catch (final SQLException e) {
+      throw getException(dataSource, connection, "selectInt", sql, e);
+    } finally {
+      if (dataSource != null) {
+        release(connection, dataSource);
+      }
     }
   }
 
   public static int selectInt(final DataSource dataSource, final String sql,
     final Object... parameters) {
-    final Connection connection = getConnection(dataSource);
-    try {
-      return selectInt(connection, sql, parameters);
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to execute " + sql + " "
-        + Arrays.toString(parameters), e);
-    } finally {
-      release(connection, dataSource);
-    }
+    return selectInt(dataSource, null, sql, parameters);
+
   }
 
   public static <T> List<T> selectList(final Connection connection,
