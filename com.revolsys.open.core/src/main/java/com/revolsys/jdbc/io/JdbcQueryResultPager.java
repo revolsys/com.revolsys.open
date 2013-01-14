@@ -82,8 +82,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     }
 
     this.sql = JdbcUtils.getSelectSql(query);
-
-    initResultSet();
   }
 
   @Override
@@ -318,10 +316,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     this.pageSize = pageSize;
     this.numPages = Math.max(0, ((numResults - 1) / pageSize));
     updateResults();
-  }
-
-  protected void setResults(final List<DataObject> results) {
-    this.results = results;
   }
 
   /**
