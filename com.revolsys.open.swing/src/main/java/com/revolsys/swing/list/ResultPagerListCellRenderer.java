@@ -36,10 +36,10 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
     Component component = super.getListCellRendererComponent(list, value,
       index, isSelected, cellHasFocus);
     String label;
-    if (attributeNames.isEmpty()) {
+    if (value == ResultPagerComboBoxModel.NULL || value == null) {
+      label = "-";
+    } else if (attributeNames.isEmpty()) {
       label = StringConverterRegistry.toString(value);
-    } else if (value == ResultPagerComboBoxModel.NULL) {
-      label ="-";
     } else {
       List<String> values = new ArrayList<String>();
       for (String attributeName : attributeNames) {

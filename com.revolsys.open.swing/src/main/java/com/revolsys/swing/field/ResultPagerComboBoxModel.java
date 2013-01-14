@@ -1,9 +1,13 @@
 package com.revolsys.swing.field;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 
+import com.revolsys.collection.LruMap;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.swing.list.ResultPagerListCellRenderer;
 
@@ -24,6 +28,8 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
   }
 
   public static final Object NULL = new Object();
+
+  private Map<Integer, T> cache = new LruMap<Integer, T>(200);
 
   private Object selectedItem;
 
@@ -49,9 +55,10 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
       if (this.pager != null) {
         this.pager.close();
       }
+      cache.clear();
       this.pager = pager;
       if (pager != null) {
-        pager.setPageSize(1);
+        pager.setPageSize(100);
       }
     }
     fireContentsChanged(this, -1, -1);
@@ -66,11 +73,23 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
       index--;
     }
     if (index < getSize()) {
-      pager.setPageNumber(index + 1);
-      return pager.getList().get(0);
-    } else {
-      return null;
+      synchronized (cache) {
+        // TODO load in background
+        T value = cache.get(index);
+        if (value == null) {
+          pager.setPageNumber((int)Math.floor(index / 100.0) + 1);
+          List<T> values = pager.getList();
+          int i = index;
+          for (T result : values) {
+            cache.put(i, result);
+            i++;
+          }
+          value = cache.get(index);
+        }
+        return value;
+      }
     }
+    return null;
   }
 
   @Override
