@@ -36,13 +36,19 @@ public class SilkIconLoader {
     String resourceName = RESOURCE_FOLDER + imageName + ".png";
     InputStream in = clazz.getResourceAsStream(resourceName);
     if (in == null) {
-      return null;
-    } else {
+      in = Thread.currentThread().getContextClassLoader().getResourceAsStream("images/" + imageName + ".png");
+    }
+    return getImage(in);
+  }
+
+  protected static BufferedImage getImage(InputStream in) {
+    if (in != null) {
       try {
         return ImageIO.read(in);
       } catch (IOException e) {
-        return null;
       }
     }
+    return null;
+
   }
 }
