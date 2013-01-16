@@ -29,15 +29,42 @@ public class MediaTypeUtil {
   private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
 
   static {
-    for (Entry<String, String> entry : IoFactoryRegistry.getInstance()
+    for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
       .getExtensionMimeTypeMap()
       .entrySet()) {
-      String exetension = entry.getKey();
-      String mimeType = entry.getValue();
-      MediaType mediaType = MediaType.parseMediaType(mimeType);
+      final String exetension = entry.getKey();
+      final String mimeType = entry.getValue();
+      final MediaType mediaType = MediaType.parseMediaType(mimeType);
       extensionToMediaTypeMap.put(exetension, mediaType);
       mediaTypeToExtensionMap.put(mediaType, exetension);
     }
+  }
+
+  public static void addMediaType(final List<MediaType> mediaTypes,
+    final String extension) {
+    final MediaType mediaType = getMediaTypeFromParameter(
+      extensionToMediaTypeMap, extension);
+    if (mediaType != null) {
+      mediaTypes.add(mediaType);
+    }
+  }
+
+  public static void addMediaTypeFromFilename(final List<MediaType> mediaTypes,
+    final String filename) {
+    final String extension = StringUtils.getFilenameExtension(filename);
+    addMediaType(mediaTypes, extension);
+  }
+
+  public static String getAcceptedFileNameExtension() {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    final List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
+    for (final MediaType mediaType : mediaTypes) {
+      final String extension = mediaTypeToExtensionMap.get(mediaType);
+      if (StringUtils.hasText(extension)) {
+        return extension;
+      }
+    }
+    return "html";
   }
 
   public static List<MediaType> getAcceptedMediaTypes(
@@ -58,36 +85,6 @@ public class MediaTypeUtil {
     }
     mediaTypes.add(MediaType.TEXT_HTML);
     return mediaTypes;
-  }
-
-  public static void addMediaTypeFromFilename(final List<MediaType> mediaTypes,
-    final String filename) {
-    final String extension = StringUtils.getFilenameExtension(filename);
-    addMediaType(mediaTypes, extension);
-  }
-
-  public static void addMediaType(final List<MediaType> mediaTypes,
-    final String extension) {
-    final MediaType mediaType = getMediaTypeFromParameter(
-      extensionToMediaTypeMap, extension);
-    if (mediaType != null) {
-      mediaTypes.add(mediaType);
-    }
-  }
-
-  public static boolean isPreferedMediaType(HttpServletRequest request,
-    MediaType mediaType) {
-    List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
-    if (mediaTypes.isEmpty()) {
-      return true;
-    } else {
-      MediaType firstMediaType = mediaTypes.get(0);
-      if (firstMediaType.includes(mediaType)) {
-        return true;
-      } else {
-        return false;
-      }
-    }
   }
 
   public static List<MediaType> getAcceptedMediaTypes(
@@ -129,6 +126,11 @@ public class MediaTypeUtil {
     return mediaTypes;
   }
 
+  public static MediaType getContentType() {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    return getContentType(request);
+  }
+
   public static MediaType getContentType(final HttpServletRequest request) {
     final String contentTypeHeader = request.getHeader(CONTENT_TYPE_HEADER);
     if (StringUtils.hasText(contentTypeHeader)) {
@@ -136,27 +138,6 @@ public class MediaTypeUtil {
     } else {
       return null;
     }
-  }
-
-  public static MediaType getContentType() {
-    HttpServletRequest request = HttpServletUtils.getRequest();
-    return getContentType(request);
-  }
-  
-  public static boolean isContentType(MediaType contentType) {
-    return contentType.equals(getContentType());
-  }
-
-  public static String getAcceptedFileNameExtension() {
-    HttpServletRequest request = HttpServletUtils.getRequest();
-    List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
-    for (MediaType mediaType : mediaTypes) {
-      String extension = mediaTypeToExtensionMap.get(mediaType);
-      if (StringUtils.hasText(extension)) {
-        return extension;
-      }
-    }
-    return "html";
   }
 
   public static MediaType getMediaTypeFromFilename(
@@ -176,6 +157,12 @@ public class MediaTypeUtil {
       final MediaType mediaType = extensionToMediaTypeMap.get(lowerExtension);
       return mediaType;
     }
+  }
+
+  public static String getPathWithExtension(final String path) {
+    final String extension = getAcceptedFileNameExtension();
+    final String pathWithExtension = path + "." + extension;
+    return pathWithExtension;
   }
 
   public static MediaType getRequestMediaType(final HttpServletRequest request,
@@ -218,25 +205,43 @@ public class MediaTypeUtil {
     return null;
   }
 
-  public static String getUrlWithExtension(final String path) {
-    String baseUrl = HttpServletUtils.getFullRequestUrl();
+  public static String getUrlWithExtension(String path) {
     final String extension = "." + getAcceptedFileNameExtension();
-    if (baseUrl.endsWith(extension)) {
-      baseUrl = baseUrl.substring(0, baseUrl.length() - extension.length());
-    }
-    if (!baseUrl.endsWith("/")) {
-      baseUrl += '/';
-    }
+    path = path.replaceAll("/+$", "");
     if (!path.endsWith(extension)) {
-      return baseUrl + path + extension;
+      path += extension;
+    }
+    if (path.startsWith("http")) {
+      return path;
     } else {
+      String baseUrl = HttpServletUtils.getFullRequestUrl();
+
+      if (baseUrl.endsWith(extension)) {
+        baseUrl = baseUrl.substring(0, baseUrl.length() - extension.length());
+      }
+      if (!baseUrl.endsWith("/")) {
+        baseUrl += '/';
+      }
       return baseUrl + path;
     }
   }
 
-  public static String getPathWithExtension(final String path) {
-    final String extension = getAcceptedFileNameExtension();
-    String pathWithExtension = path + "." + extension;
-    return pathWithExtension;
+  public static boolean isContentType(final MediaType contentType) {
+    return contentType.equals(getContentType());
+  }
+
+  public static boolean isPreferedMediaType(final HttpServletRequest request,
+    final MediaType mediaType) {
+    final List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
+    if (mediaTypes.isEmpty()) {
+      return true;
+    } else {
+      final MediaType firstMediaType = mediaTypes.get(0);
+      if (firstMediaType.includes(mediaType)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 }
