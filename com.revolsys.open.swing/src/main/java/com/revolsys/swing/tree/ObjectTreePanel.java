@@ -1,7 +1,6 @@
 package com.revolsys.swing.tree;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class ObjectTreePanel extends JPanel {
 
       listeners.add(model);
       final InvokeMethodPropertyChangeListener repaintListener = new InvokeMethodPropertyChangeListener(
-        tree, "repaint", true);
+        true, tree, "repaint");
       listeners.add(repaintListener);
 
       for (final PropertyChangeListener listener : listeners) {
