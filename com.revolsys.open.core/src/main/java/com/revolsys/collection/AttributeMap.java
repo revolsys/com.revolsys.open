@@ -57,7 +57,7 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
       properties.load(resource.getInputStream());
       setProps(properties);
     } catch (final Throwable e) {
-      LOG.error("Cannot load properties from " + resource, e);
+      LOG.warn("Cannot load properties from " + resource, e);
     }
   }
 
@@ -67,7 +67,7 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
       try {
         properties.load(resource.getInputStream());
       } catch (final Throwable e) {
-        LOG.error("Cannot load properties from " + resource, e);
+        LOG.warn("Cannot load properties from " + resource, e);
       }
     }
     setProps(properties);
