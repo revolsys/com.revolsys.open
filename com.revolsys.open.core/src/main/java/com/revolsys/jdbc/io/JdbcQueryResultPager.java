@@ -82,8 +82,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     }
 
     this.sql = JdbcUtils.getSelectSql(query);
-
-    initResultSet();
   }
 
   @Override
@@ -187,9 +185,9 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   }
 
   /**
-   * Get the page number of the current page.
+   * Get the page number of the current page. Index starts at 1.
    * 
-   * @return Thepage number of the current page.
+   * @return The page number of the current page.
    */
   @Override
   public int getPageNumber() {
@@ -225,13 +223,17 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   }
 
   /**
-   * Get the index of the first object in the current page.
+   * Get the index of the first object in the current page. Index starts at 1.
    * 
    * @return The index of the first object in the current page.
    */
   @Override
   public int getStartIndex() {
-    return (pageNumber * pageSize) + 1;
+    if (numResults == 0) {
+      return 0;
+    } else {
+      return (pageNumber * pageSize) + 1;
+    }
   }
 
   /**
@@ -318,10 +320,6 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     this.pageSize = pageSize;
     this.numPages = Math.max(0, ((numResults - 1) / pageSize));
     updateResults();
-  }
-
-  protected void setResults(final List<DataObject> results) {
-    this.results = results;
   }
 
   /**

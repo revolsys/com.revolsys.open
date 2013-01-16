@@ -1,9 +1,12 @@
 package com.revolsys.swing.table.dataobject.row;
 
 import java.awt.BorderLayout;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,6 +22,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.swing.SwingWorkerManager;
 import com.revolsys.swing.table.SortableTableModel;
+import com.revolsys.util.CollectionUtil;
 
 public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
   SortableTableModel {
@@ -40,9 +44,13 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
 
   private final DataObjectStore dataStore;
 
-  ResultPager<DataObject> pager;
+  private ResultPager<DataObject> pager;
 
-  SwingWorker<?, ?> pagerWorker;
+  private SwingWorker<?, ?> pagerWorker;
+
+  private SwingWorker<?, ?> loadObjectsWorker;
+
+  private SwingWorker<?, ?> rowCountWorker;
 
   private Map<Integer, DataObject> cache = new LruMap<Integer, DataObject>(100);
 
@@ -61,14 +69,61 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
     return dataStore;
   }
 
+  private Integer rowCount;
+
   @Override
   public int getRowCount() {
-    final ResultPager<DataObject> pager = getPager();
-    if (pager == null) {
-      return 0;
-    } else {
-      return pager.getNumResults();
+    synchronized (cache) {
+      final ResultPager<DataObject> pager = getPager();
+      if (pager == null) {
+        return 0;
+      } else {
+        if (rowCount == null) {
+          if (rowCountWorker == null) {
+            rowCountWorker = SwingWorkerManager.execute("Load row count "
+              + getTypeName(), this, "loadRowCount");
+          }
+          return 0;
+        } else {
+          return rowCount;
+        }
+      }
     }
+  }
+
+  public void loadRowCount() {
+    ResultPager<DataObject> pager = getPager();
+    if (pager != null) {
+      rowCount = pager.getNumResults();
+      rowCountWorker = null;
+      fireTableDataChanged();
+    }
+  }
+
+  public void loadRows() {
+    if (pager != null) {
+      while (!loadingRowIndexes.isEmpty()) {
+        int row = CollectionUtil.get(loadingRowIndexes,0);
+        if (row < getRowCount()) {
+          int pageNumber = (int)Math.ceil((row + 1) / (double)100);
+          if (pageNumber <= 0) {
+            pageNumber = 1;
+          }
+          pager.setPageNumber(pageNumber);
+          List<DataObject> list = pager.getList();
+          int i = pager.getStartIndex()-1;
+          synchronized (cache) {
+            for (DataObject result : list) {
+              cache.put(i, result);
+              loadingRowIndexes.remove(i);
+              fireTableRowsUpdated(i, i);
+              i++;
+            }
+          }
+        }
+      }
+    }
+    loadObjectsWorker = null;
   }
 
   @Override
@@ -78,31 +133,33 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
         pagerWorker.cancel(true);
         pagerWorker = null;
       }
+      if (rowCountWorker != null) {
+        rowCountWorker.cancel(true);
+        rowCountWorker = null;
+      }
     }
     SortOrder sortOrder = super.setSortOrder(column);
     createPagerWorker();
     return sortOrder;
   }
 
+  private Set<Integer> loadingRowIndexes = new LinkedHashSet<Integer>();
+
   public DataObject getObject(final int row) {
     synchronized (cache) {
       DataObject object = cache.get(row);
       if (object == null) {
-        ResultPager<DataObject> pager = getPager();
-        if (pager != null) {
-          if (row < pager.getNumResults()) {
-            pager.setPageNumber(row + 1);
-            List<DataObject> list = pager.getList();
-            object = list.get(0);
-            cache.put(row, object);
-          }
+        loadingRowIndexes.add(row);
+        if (loadObjectsWorker == null) {
+          loadObjectsWorker = SwingWorkerManager.execute("Loading records "
+            + getTypeName(), this, "loadRows");
         }
       }
       return object;
     }
   }
 
-  ResultPager<DataObject> getPager() {
+  private ResultPager<DataObject> getPager() {
     synchronized (cache) {
       if (pager == null) {
         if (pagerWorker == null) {
@@ -114,10 +171,16 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
   }
 
   private void createPagerWorker() {
-    pagerWorker = SwingWorkerManager.execute("Load data", this, "loadData");
+    pagerWorker = SwingWorkerManager.execute("Initialize Query "
+      + getTypeName(), this, "createPager");
+    rowCount = null;
   }
 
-  public void loadData() {
+  public String getTypeName() {
+    return getMetaData().getPath();
+  }
+
+  public void createPager() {
     DataObjectMetaData metaData = getMetaData();
     final Query query = new Query(metaData);
     for (Entry<Integer, SortOrder> entry : getSortedColumns().entrySet()) {
@@ -131,7 +194,7 @@ public class DataStoreQueryTableModel extends DataObjectRowTableModel implements
       }
     }
     ResultPager<DataObject> pager = dataStore.page(query);
-    pager.setPageSize(1);
+    pager.setPageSize(100);
     synchronized (cache) {
       if (this.pager != null) {
         this.pager.close();

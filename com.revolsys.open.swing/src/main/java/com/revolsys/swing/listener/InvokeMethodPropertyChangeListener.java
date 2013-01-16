@@ -28,6 +28,9 @@ package com.revolsys.swing.listener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -35,29 +38,39 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodPropertyChangeListener implements
   PropertyChangeListener {
-  private final Runnable runnable;
+  private static final List<Class<PropertyChangeEvent>> EVENT_PARAMETERS = Collections.singletonList(
+    PropertyChangeEvent.class
+  );
+
+  private Runnable runnable;
 
   private final boolean invokeLater;
 
-  public InvokeMethodPropertyChangeListener(final Object object,
-    final String methodName, final boolean invokeLater) {
-    this(object, methodName, invokeLater, new Object[0]);
-  }
+  private Object object;
 
-  public InvokeMethodPropertyChangeListener(final Object object,
-    final String methodName, final boolean invokeLater,
-    final Object... parameters) {
-    runnable = new InvokeMethodRunnable(object, methodName, parameters);
+  private String methodName;
+
+  public InvokeMethodPropertyChangeListener(final boolean invokeLater,
+    final Object object, final String methodName, final Object... parameters) {
+    this.object = object;
+    this.methodName = methodName;
+    if (!Arrays.asList(parameters).equals(EVENT_PARAMETERS)) {
+      runnable = new InvokeMethodRunnable(object, methodName, parameters);
+    }
     this.invokeLater = invokeLater;
   }
 
   public InvokeMethodPropertyChangeListener(final Object object,
     final String methodName, final Object... parameters) {
-    this(object, methodName, false, parameters);
+    this(false, object, methodName, parameters);
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    Runnable runnable= this.runnable;
+    if (runnable == null) {
+      runnable = new InvokeMethodRunnable(object, methodName, evt);
+    }
     if (invokeLater) {
       SwingUtilities.invokeLater(runnable);
     } else {
