@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -35,6 +36,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
 import com.revolsys.util.ExceptionUtil;
 
@@ -316,12 +320,17 @@ public final class FileUtil {
    * @param file The file to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static void copy(final Reader in, final File file) throws IOException {
-    final FileWriter out = new FileWriter(file);
+  public static void copy(final Reader in, final File file) {
     try {
-      copy(in, out);
-    } finally {
-      in.close();
+      final FileWriter out = new FileWriter(file);
+      try {
+        copy(in, out);
+      } finally {
+        closeSilent(in);
+        closeSilent(out);
+      }
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Unable to write to " + file);
     }
   }
 
@@ -541,6 +550,32 @@ public final class FileUtil {
     }
   }
 
+  public static List<File> getDirectories(final File directory) {
+    final List<File> directories = new ArrayList<File>();
+    final File[] files = directory.listFiles();
+    if (files != null) {
+      for (final File file : files) {
+        if (file.isDirectory()) {
+          directories.add(file);
+        }
+      }
+    }
+    return directories;
+  }
+
+  public static List<String> getDirectoryNames(final File directory) {
+    final List<String> directories = new ArrayList<String>();
+    final File[] files = directory.listFiles();
+    if (files != null) {
+      for (final File file : files) {
+        if (file.isDirectory()) {
+          directories.add(file.getName());
+        }
+      }
+    }
+    return directories;
+  }
+
   public static File getFile(final Resource resource) throws IOException {
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
@@ -556,12 +591,12 @@ public final class FileUtil {
 
   }
 
-  public static String getFileAsString(String fileName) {
-    File file = new File(fileName);
-    StringWriter out = new StringWriter();
+  public static String getFileAsString(final String fileName) {
+    final File file = new File(fileName);
+    final StringWriter out = new StringWriter();
     try {
       copy(file, out);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException("Unable to copy file: " + fileName);
     }
     return out.toString();
@@ -598,6 +633,54 @@ public final class FileUtil {
   public static String getFileNamePrefix(final File file) {
     final String fileName = file.getName();
     return getBaseName(fileName);
+  }
+
+  public static List<String> getFileNames(final File directory,
+    final ExtensionFilenameFilter filter) {
+    final List<String> names = new ArrayList<String>();
+    final File[] files = directory.listFiles(filter);
+    if (files != null) {
+      for (final File file : files) {
+        final String name = file.getName();
+        names.add(name);
+      }
+    }
+    return names;
+  }
+
+  public static List<String> getFileNamesByExtension(final File directory,
+    final String extension) {
+    final ExtensionFilenameFilter filter = new ExtensionFilenameFilter(
+      extension);
+    return getFileNames(directory, filter);
+  }
+
+  public static List<String> getFileBaseNamesByExtension(final File directory,
+    final String extension) {
+    List<String> names = new ArrayList<String>();
+    List<File> files = getFilesByExtension(directory, extension);
+    for (File file : files) {
+      String baseName = getBaseName(file);
+      names.add(baseName);
+    }
+    return names;
+  }
+
+  public static List<File> getFiles(final File directory,
+    final ExtensionFilenameFilter filter) {
+    final File[] files = directory.listFiles(filter);
+    if (files == null) {
+      return Collections.emptyList();
+    } else {
+      return Arrays.asList(files);
+    }
+  }
+
+  public static List<File> getFilesByExtension(final File directory,
+    final String extension) {
+    final ExtensionFilenameFilter filter = new ExtensionFilenameFilter(
+      extension);
+    return getFiles(directory, filter);
   }
 
   public static File getFileWithExtension(final File file,
@@ -671,5 +754,9 @@ public final class FileUtil {
    * Construct a new FileUtil.
    */
   private FileUtil() {
+  }
+
+  public static void copy(String text, File file) {
+    copy(new StringReader(text), file);
   }
 }

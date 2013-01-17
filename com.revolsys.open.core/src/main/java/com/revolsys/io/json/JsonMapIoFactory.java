@@ -1,5 +1,6 @@
 package com.revolsys.io.json;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,12 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.ArrayDataObject;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapWriter;
@@ -29,6 +28,11 @@ import com.revolsys.spring.SpringUtil;
 
 public class JsonMapIoFactory extends AbstractMapReaderFactory implements
   MapWriterFactory {
+  public static Map<String, Object> toMap(final File file) {
+    final FileSystemResource resource = new FileSystemResource(file);
+    return toMap(resource);
+  }
+
   public static Map<String, Object> toMap(final InputStream in) {
 
     try {
@@ -50,16 +54,6 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     } catch (final IOException e) {
       throw new RuntimeException("Unable to read JSON map", e);
     }
-  }
-
-  public static String toString(final List<? extends Map<String, Object>> list) {
-    final StringWriter writer = new StringWriter();
-    final JsonMapWriter dataObjectWriter = new JsonMapWriter(writer);
-    for (final Map<String, Object> map : list) {
-      dataObjectWriter.write(map);
-    }
-    dataObjectWriter.close();
-    return writer.toString();
   }
 
   public static final Map<String, Object> toMap(final Resource resource) {
@@ -90,6 +84,16 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     }
   }
 
+  public static List<Map<String, Object>> toMapList(final String string) {
+    final StringReader in = new StringReader(string);
+    final JsonMapReader reader = new JsonMapReader(in);
+    try {
+      return reader.read();
+    } finally {
+      reader.close();
+    }
+  }
+
   public static Map<String, Object> toObjectMap(final String string) {
     if (StringUtils.hasText(string)) {
       final StringReader reader = new StringReader(string);
@@ -102,14 +106,14 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     return Collections.emptyMap();
   }
 
-  public static List<Map<String, Object>> toMapList(final String string) {
-    final StringReader in = new StringReader(string);
-    final JsonMapReader reader = new JsonMapReader(in);
-    try {
-      return reader.read();
-    } finally {
-      reader.close();
+  public static String toString(final List<? extends Map<String, Object>> list) {
+    final StringWriter writer = new StringWriter();
+    final JsonMapWriter dataObjectWriter = new JsonMapWriter(writer);
+    for (final Map<String, Object> map : list) {
+      dataObjectWriter.write(map);
     }
+    dataObjectWriter.close();
+    return writer.toString();
   }
 
   public static String toString(final Map<String, ? extends Object> values) {
