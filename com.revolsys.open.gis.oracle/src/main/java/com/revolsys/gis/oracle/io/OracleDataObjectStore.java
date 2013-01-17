@@ -54,7 +54,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   public OracleDataObjectStore(OracleDatabaseFactory databaseFactory,
     Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
-    DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
+    setExcludeTablePatterns(".*\\$");
+      DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
@@ -62,7 +63,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
   public OracleDataObjectStore(DataSource dataSource) {
     super(dataSource);
-    setSqlPrefix("BEGIN ");
+    setExcludeTablePatterns(".*\\$");
+     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
   }
 

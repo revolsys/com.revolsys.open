@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,7 +60,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   private DataSource dataSource;
 
-  private String[] excludeTablePatterns = new String[0];
+  private List<String> excludeTablePatterns = new ArrayList<String>();
 
   private boolean flushBetweenTypes;
 
@@ -564,7 +565,7 @@ public abstract class AbstractJdbcDataObjectStore extends
           final String dbTableName = tablesRs.getString("TABLE_NAME");
           final String tableName = dbTableName.toUpperCase();
           final String tableType = tablesRs.getString("TABLE_TYPE");
-          boolean excluded = !tableTypes.contains(tableType);
+         boolean excluded = !tableTypes.contains(tableType);
           for (final String pattern : excludeTablePatterns) {
             if (dbTableName.matches(pattern) || tableName.matches(pattern)) {
               excluded = true;
@@ -746,7 +747,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public void setExcludeTablePatterns(final String... excludeTablePatterns) {
-    this.excludeTablePatterns = excludeTablePatterns;
+    this.excludeTablePatterns = new ArrayList<String>(Arrays.asList(excludeTablePatterns));
   }
 
   public void setFlushBetweenTypes(final boolean flushBetweenTypes) {
