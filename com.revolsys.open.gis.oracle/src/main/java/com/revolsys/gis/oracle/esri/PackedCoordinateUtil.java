@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
@@ -271,7 +273,12 @@ public class PackedCoordinateUtil {
     final Double mScale) {
     List<CoordinatesList> pointsList = getPolygonCoordinatesLists(numPoints,
       xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
+    try {
     return geometryFactory.createPolygon(pointsList);
+    } catch (IllegalArgumentException e) {
+      LoggerFactory.getLogger(PackedCoordinateUtil.class).error("Unable to load polygon",e);
+      return null;
+    }
   }
 
   public static Geometry getLineString(
