@@ -266,8 +266,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal add(final BigDecimal left,
-    final Number right) {
+  public static BigDecimal add(final BigDecimal left, final Number right) {
     return left.add(new BigDecimal(StringConverterRegistry.toString(right)));
   }
 
@@ -322,7 +321,7 @@ public final class MathUtil {
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
     final double y2 = points.getY(i2);
-    if (distance(x1, y1, x2, y2) < 1) {
+    if (distance(x1, y1, x2, y2) == 0) { //TODO
       if (start) {
         if (i2 + 1 < points.size()) {
           return getAngle(points, i1, i2 + 1, start);
