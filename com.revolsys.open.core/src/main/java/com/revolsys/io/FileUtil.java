@@ -329,7 +329,7 @@ public final class FileUtil {
         closeSilent(in);
         closeSilent(out);
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to write to " + file);
     }
   }
@@ -355,6 +355,10 @@ public final class FileUtil {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static void copy(final String text, final File file) {
+    copy(new StringReader(text), file);
   }
 
   /**
@@ -563,6 +567,18 @@ public final class FileUtil {
     return directories;
   }
 
+  public static File getDirectory(final String path) {
+    final File file = new File(path);
+    if (!file.exists()) {
+      file.mkdirs();
+    }
+    if (file.exists()) {
+      return getFile(file);
+    } else {
+      return file;
+    }
+  }
+
   public static List<String> getDirectoryNames(final File directory) {
     final List<String> directories = new ArrayList<String>();
     final File[] files = directory.listFiles();
@@ -574,6 +590,14 @@ public final class FileUtil {
       }
     }
     return directories;
+  }
+
+  public static File getFile(final File file) {
+    try {
+      return file.getCanonicalFile();
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get file " + file, e);
+    }
   }
 
   public static File getFile(final Resource resource) throws IOException {
@@ -591,6 +615,19 @@ public final class FileUtil {
 
   }
 
+  public static File getFile(final File file,final String path) {
+    File childFile = new File(file,path);
+    return getFile(childFile);
+  }
+  public static File getFile(final String path) {
+    final File file = new File(path);
+    if (file.exists()) {
+      return getFile(file);
+    } else {
+      return file;
+    }
+  }
+
   public static String getFileAsString(final String fileName) {
     final File file = new File(fileName);
     final StringWriter out = new StringWriter();
@@ -600,6 +637,17 @@ public final class FileUtil {
       throw new RuntimeException("Unable to copy file: " + fileName);
     }
     return out.toString();
+  }
+
+  public static List<String> getFileBaseNamesByExtension(final File directory,
+    final String extension) {
+    final List<String> names = new ArrayList<String>();
+    final List<File> files = getFilesByExtension(directory, extension);
+    for (final File file : files) {
+      final String baseName = getBaseName(file);
+      names.add(baseName);
+    }
+    return names;
   }
 
   public static String getFileName(final String fileName) {
@@ -655,17 +703,6 @@ public final class FileUtil {
     return getFileNames(directory, filter);
   }
 
-  public static List<String> getFileBaseNamesByExtension(final File directory,
-    final String extension) {
-    List<String> names = new ArrayList<String>();
-    List<File> files = getFilesByExtension(directory, extension);
-    for (File file : files) {
-      String baseName = getBaseName(file);
-      names.add(baseName);
-    }
-    return names;
-  }
-
   public static List<File> getFiles(final File directory,
     final ExtensionFilenameFilter filter) {
     final File[] files = directory.listFiles(filter);
@@ -685,11 +722,11 @@ public final class FileUtil {
 
   public static File getFileWithExtension(final File file,
     final String extension) {
-    final File parentFile = file.getParentFile();
+    final File parentFile = getFile(file).getParentFile();
     final String baseName = FileUtil.getFileNamePrefix(file);
     final String newFileName = baseName + "." + extension;
     if (parentFile == null) {
-      return new File(newFileName);
+      return getFile(newFileName);
     } else {
       return new File(parentFile, newFileName);
     }
@@ -754,9 +791,5 @@ public final class FileUtil {
    * Construct a new FileUtil.
    */
   private FileUtil() {
-  }
-
-  public static void copy(String text, File file) {
-    copy(new StringReader(text), file);
   }
 }
