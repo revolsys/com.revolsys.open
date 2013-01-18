@@ -567,16 +567,20 @@ public final class FileUtil {
     return directories;
   }
 
+  public static File getDirectory(final File parent, final String path) {
+    final File file = new File(parent, path);
+    if (!file.exists()) {
+      file.mkdirs();
+    }
+    return getFile(file);
+  }
+
   public static File getDirectory(final String path) {
     final File file = new File(path);
     if (!file.exists()) {
       file.mkdirs();
     }
-    if (file.exists()) {
-      return getFile(file);
-    } else {
-      return file;
-    }
+    return file;
   }
 
   public static List<String> getDirectoryNames(final File directory) {
@@ -600,6 +604,11 @@ public final class FileUtil {
     }
   }
 
+  public static File getFile(final File file, final String path) {
+    final File childFile = new File(file, path);
+    return getFile(childFile);
+  }
+
   public static File getFile(final Resource resource) throws IOException {
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
@@ -615,17 +624,9 @@ public final class FileUtil {
 
   }
 
-  public static File getFile(final File file,final String path) {
-    File childFile = new File(file,path);
-    return getFile(childFile);
-  }
   public static File getFile(final String path) {
     final File file = new File(path);
-    if (file.exists()) {
-      return getFile(file);
-    } else {
-      return file;
-    }
+    return getFile(file);
   }
 
   public static String getFileAsString(final String fileName) {
