@@ -57,7 +57,7 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   private InvokeMethodPropertyChangeListener listener;
 
   public SwingWorkerTableModel() {
-    listener = new InvokeMethodPropertyChangeListener(true, this,
+    listener = new InvokeMethodPropertyChangeListener( this,
       "fireTableDataChanged");
     PropertyChangeSupport propertyChangeSupport = SwingWorkerManager.getPropertyChangeSupport();
     propertyChangeSupport.addPropertyChangeListener(listener);

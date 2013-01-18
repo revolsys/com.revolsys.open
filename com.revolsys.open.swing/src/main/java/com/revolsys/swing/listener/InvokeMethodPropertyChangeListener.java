@@ -62,7 +62,7 @@ public class InvokeMethodPropertyChangeListener implements
 
   public InvokeMethodPropertyChangeListener(final Object object,
     final String methodName, final Object... parameters) {
-    this(false, object, methodName, parameters);
+    this(true, object, methodName, parameters);
   }
 
   @Override
