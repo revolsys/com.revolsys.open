@@ -23,16 +23,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class PackedCoordinateUtil {
 
-  public static List<CoordinatesList> getCoordinatesLists(
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
-    final Double mScale,
-    final InputStream inputStream) {
+  public static List<CoordinatesList> getCoordinatesLists(final int numPoints,
+    final Double xOffset, final Double yOffset, final Double xyScale,
+    final Double zOffset, final Double zScale, final Double mOffset,
+    final Double mScale, final InputStream inputStream) {
 
     try {
       final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
@@ -89,15 +83,9 @@ public class PackedCoordinateUtil {
   }
 
   public static List<CoordinatesList> getPolygonCoordinatesLists(
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
-    final Double mScale,
-    final InputStream inputStream) {
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale, final InputStream inputStream) {
 
     try {
       final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
@@ -131,7 +119,10 @@ public class PackedCoordinateUtil {
         y = readOordinate(in, points, j, 1, y, xyScale);
         if (j > 0 && i < numPoints - 1) {
           if (points.equal(0, points, j)) {
-            pointsList.add(points.subList(0, j + 1));
+            CoordinatesList coordinates = points.subList(0, j + 1);
+            if (coordinates.size() > 2) {
+              pointsList.add(coordinates);
+            }
             j = 0;
           } else {
             j++;
@@ -140,8 +131,10 @@ public class PackedCoordinateUtil {
           j++;
         }
       }
-      pointsList.add(points.subList(0, j));
-
+      CoordinatesList coordinates = points.subList(0, j);
+      if (coordinates.size() > 2) {
+        pointsList.add(coordinates);
+      }
       if (hasZ) {
         readPolygonOordinates(in, pointsList, 2, zOffset, zScale);
       }
@@ -157,16 +150,10 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static CoordinatesList getCoordinatesList(
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
-    final Double mScale,
-    final InputStream inputStream) {
+  public static CoordinatesList getCoordinatesList(final int numPoints,
+    final Double xOffset, final Double yOffset, final Double xyScale,
+    final Double zOffset, final Double zScale, final Double mOffset,
+    final Double mScale, final InputStream inputStream) {
 
     try {
       final PackedIntegerInputStream in = new PackedIntegerInputStream(
@@ -213,35 +200,21 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static Geometry getGeometry(
-    final byte[] data,
-    final GeometryFactory geometryFactory,
-    final int entity,
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
-    final Double mScale) {
+  public static Geometry getGeometry(final byte[] data,
+    final GeometryFactory geometryFactory, final int entity,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final InputStream in = new ByteArrayInputStream(data);
     return getGeometry(in, geometryFactory, entity, numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale);
   }
 
-  public static Geometry getGeometry(
-    final InputStream pointsIn,
-    final GeometryFactory geometryFactory,
-    final int entity,
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
-    final Double mScale) {
+  public static Geometry getGeometry(final InputStream pointsIn,
+    final GeometryFactory geometryFactory, final int entity,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
 
     switch (entity) {
       case ArcSdeConstants.ST_GEOMETRY_POINT:
@@ -260,53 +233,36 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static Geometry getPolygon(
-    final InputStream pointsIn,
-    final GeometryFactory geometryFactory,
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
+  public static Geometry getPolygon(final InputStream pointsIn,
+    final GeometryFactory geometryFactory, final int numPoints,
+    final Double xOffset, final Double yOffset, final Double xyScale,
+    final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
     List<CoordinatesList> pointsList = getPolygonCoordinatesLists(numPoints,
       xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
     try {
-    return geometryFactory.createPolygon(pointsList);
+      return geometryFactory.createPolygon(pointsList);
     } catch (IllegalArgumentException e) {
-      LoggerFactory.getLogger(PackedCoordinateUtil.class).error("Unable to load polygon",e);
+      LoggerFactory.getLogger(PackedCoordinateUtil.class).error(
+        "Unable to load polygon", e);
       return null;
     }
   }
 
-  public static Geometry getLineString(
-    final InputStream pointsIn,
-    final GeometryFactory geometryFactory,
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
+  public static Geometry getLineString(final InputStream pointsIn,
+    final GeometryFactory geometryFactory, final int numPoints,
+    final Double xOffset, final Double yOffset, final Double xyScale,
+    final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
     CoordinatesList points = getCoordinatesList(numPoints, xOffset, yOffset,
       xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
     return geometryFactory.createLineString(points);
   }
 
-  public static Geometry getPoint(
-    final InputStream pointsIn,
-    final GeometryFactory geometryFactory,
-    final int numPoints,
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final Double zOffset,
-    final Double zScale,
-    final Double mOffset,
+  public static Geometry getPoint(final InputStream pointsIn,
+    final GeometryFactory geometryFactory, final int numPoints,
+    final Double xOffset, final Double yOffset, final Double xyScale,
+    final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
     CoordinatesList points = getCoordinatesList(numPoints, xOffset, yOffset,
       xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
@@ -324,18 +280,11 @@ public class PackedCoordinateUtil {
     return numCoordinates;
   }
 
-  public static byte[] getPackedBytes(
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final boolean hasZ,
-    final Double zOffset,
-    final Double zScale,
-    final boolean hasM,
-    final Double mScale,
-    final Double mOffset,
-    final List<CoordinatesList> pointsList,
-    int numCoordinates) {
+  public static byte[] getPackedBytes(final Double xOffset,
+    final Double yOffset, final Double xyScale, final boolean hasZ,
+    final Double zOffset, final Double zScale, final boolean hasM,
+    final Double mScale, final Double mOffset,
+    final List<CoordinatesList> pointsList, int numCoordinates) {
 
     final int packedByteLength = 0;
     byte dimensionFlag = 0;
@@ -388,17 +337,10 @@ public class PackedCoordinateUtil {
     return out.toByteArray();
   }
 
-  public static byte[] getPackedBytes(
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final boolean hasZ,
-    final Double zOffset,
-    final Double zScale,
-    final boolean hasM,
-    final Double mScale,
-    final Double mOffset,
-    final CoordinatesList points,
+  public static byte[] getPackedBytes(final Double xOffset,
+    final Double yOffset, final Double xyScale, final boolean hasZ,
+    final Double zOffset, final Double zScale, final boolean hasM,
+    final Double mScale, final Double mOffset, final CoordinatesList points,
     int numCoordinates) {
 
     final int packedByteLength = 0;
@@ -445,18 +387,11 @@ public class PackedCoordinateUtil {
     return out.toByteArray();
   }
 
-  public static byte[] getPolygonPackedBytes(
-    final Double xOffset,
-    final Double yOffset,
-    final Double xyScale,
-    final boolean hasZ,
-    final Double zOffset,
-    final Double zScale,
-    final boolean hasM,
-    final Double mScale,
-    final Double mOffset,
-    final List<CoordinatesList> pointsList,
-    int numCoordinates) {
+  public static byte[] getPolygonPackedBytes(final Double xOffset,
+    final Double yOffset, final Double xyScale, final boolean hasZ,
+    final Double zOffset, final Double zScale, final boolean hasM,
+    final Double mScale, final Double mOffset,
+    final List<CoordinatesList> pointsList, int numCoordinates) {
 
     final int packedByteLength = 0;
     byte dimensionFlag = 0;
@@ -555,22 +490,16 @@ public class PackedCoordinateUtil {
     return pointsList;
   }
 
-  public static double readOordinate(
-    final PackedIntegerInputStream in,
-    final CoordinatesList points,
-    final int index,
-    final int axisIndex,
-    final double previousValue,
-    final double scale) throws IOException {
+  public static double readOordinate(final PackedIntegerInputStream in,
+    final CoordinatesList points, final int index, final int axisIndex,
+    final double previousValue, final double scale) throws IOException {
     final double value = readOordinate(in, previousValue, scale);
     points.setValue(index, axisIndex, value);
     return value;
   }
 
-  public static double readOordinate(
-    final PackedIntegerInputStream in,
-    final double previousValue,
-    final double scale) throws IOException {
+  public static double readOordinate(final PackedIntegerInputStream in,
+    final double previousValue, final double scale) throws IOException {
     final long deltaValueLong = in.readLong();
     final double deltaValue = deltaValueLong / scale;
     final double value = Math.round((previousValue + deltaValue) * scale)
@@ -578,12 +507,9 @@ public class PackedCoordinateUtil {
     return value;
   }
 
-  public static void readOordinates(
-    final PackedIntegerInputStream in,
-    final List<CoordinatesList> pointsList,
-    final int axisIndex,
-    final double offset,
-    final double scale) throws IOException {
+  public static void readOordinates(final PackedIntegerInputStream in,
+    final List<CoordinatesList> pointsList, final int axisIndex,
+    final double offset, final double scale) throws IOException {
 
     double previousValue = offset;
     for (final Iterator<CoordinatesList> iterator = pointsList.iterator(); iterator.hasNext();) {
@@ -599,12 +525,9 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static void readPolygonOordinates(
-    final PackedIntegerInputStream in,
-    final List<CoordinatesList> pointsList,
-    final int axisIndex,
-    final double offset,
-    final double scale) throws IOException {
+  public static void readPolygonOordinates(final PackedIntegerInputStream in,
+    final List<CoordinatesList> pointsList, final int axisIndex,
+    final double offset, final double scale) throws IOException {
 
     double previousValue = offset;
     for (final CoordinatesList points : pointsList) {
@@ -616,11 +539,8 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static void readOordinates(
-    final PackedIntegerInputStream in,
-    final CoordinatesList points,
-    final int axisIndex,
-    final double offset,
+  public static void readOordinates(final PackedIntegerInputStream in,
+    final CoordinatesList points, final int axisIndex, final double offset,
     final double scale) throws IOException {
 
     double previousValue = offset;
@@ -631,11 +551,8 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static long writeCoordinates(
-    final PackedIntegerOutputStream out,
-    final CoordinatesList points,
-    long previousValue,
-    final double scale,
+  public static long writeCoordinates(final PackedIntegerOutputStream out,
+    final CoordinatesList points, long previousValue, final double scale,
     final int ordinateIndex) {
     for (int i = 0; i < points.size(); i++) {
       previousValue = writeOrdinate(out, points, previousValue, scale, i,
@@ -644,12 +561,9 @@ public class PackedCoordinateUtil {
     return previousValue;
   }
 
-  public static void writeCoordinates(
-    final PackedIntegerOutputStream out,
-    final List<CoordinatesList> pointsList,
-    final int axisIndex,
-    final double offset,
-    final double scale) {
+  public static void writeCoordinates(final PackedIntegerOutputStream out,
+    final List<CoordinatesList> pointsList, final int axisIndex,
+    final double offset, final double scale) {
     long previous = Math.round(offset * scale);
     for (final Iterator<CoordinatesList> iterator = pointsList.iterator(); iterator.hasNext();) {
       final CoordinatesList points = iterator.next();
@@ -664,11 +578,8 @@ public class PackedCoordinateUtil {
     }
   }
 
-  public static void writeCoordinates(
-    final PackedIntegerOutputStream out,
-    final CoordinatesList points,
-    final int axisIndex,
-    final double offset,
+  public static void writeCoordinates(final PackedIntegerOutputStream out,
+    final CoordinatesList points, final int axisIndex, final double offset,
     final double scale) {
     long previous = Math.round(offset * scale);
     if (points.getNumAxis() > axisIndex) {
@@ -693,22 +604,15 @@ public class PackedCoordinateUtil {
    * @param ordinateIndex The ordinate index.
    * @return The current ordinate value * scale rounded to a long value.
    */
-  public static long writeOrdinate(
-    final PackedIntegerOutputStream out,
-    final CoordinatesList coordinates,
-    final long previousValue,
-    final double scale,
-    final int coordinateIndex,
-    final int ordinateIndex) {
+  public static long writeOrdinate(final PackedIntegerOutputStream out,
+    final CoordinatesList coordinates, final long previousValue,
+    final double scale, final int coordinateIndex, final int ordinateIndex) {
     final double value = coordinates.getOrdinate(coordinateIndex, ordinateIndex);
     return writeOrdinate(out, previousValue, scale, value);
   }
 
-  public static long writeOrdinate(
-    final PackedIntegerOutputStream out,
-    final long previousValue,
-    final double scale,
-    final double value) {
+  public static long writeOrdinate(final PackedIntegerOutputStream out,
+    final long previousValue, final double scale, final double value) {
     long longValue;
     if (Double.isNaN(value)) {
       longValue = 0;
@@ -719,11 +623,8 @@ public class PackedCoordinateUtil {
     return longValue;
   }
 
-  public static long writeZeroCoordinates(
-    final PackedIntegerOutputStream out,
-    final int numCoordinates,
-    final double scale,
-    long previousValue) {
+  public static long writeZeroCoordinates(final PackedIntegerOutputStream out,
+    final int numCoordinates, final double scale, long previousValue) {
     for (int i = 0; i < numCoordinates; i++) {
       previousValue = writeOrdinate(out, previousValue, scale, 0);
     }

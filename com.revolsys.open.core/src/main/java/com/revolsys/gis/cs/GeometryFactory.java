@@ -625,7 +625,7 @@ public class GeometryFactory extends
       final LinearRing ring = createLinearRing(nullPoints);
       return createPolygon(ring, null);
     } else {
-      final LinearRing exteriorRing = getLinearRing(rings, 0);
+       final LinearRing exteriorRing = getLinearRing(rings, 0);
       final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
       for (int i = 1; i < rings.size(); i++) {
         interiorRings[i - 1] = getLinearRing(rings, i);
