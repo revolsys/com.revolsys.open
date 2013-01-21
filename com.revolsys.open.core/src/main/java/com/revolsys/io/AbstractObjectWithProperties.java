@@ -63,9 +63,9 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
-  public void setProperties(final Map<String, Object> properties) {
+  public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties != null) {
-      for (final Entry<String, Object> entry : properties.entrySet()) {
+      for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
         final String name = entry.getKey();
         final Object value = entry.getValue();
         setProperty(name, value);

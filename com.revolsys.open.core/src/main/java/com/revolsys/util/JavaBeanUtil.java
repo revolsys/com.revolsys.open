@@ -327,20 +327,19 @@ public final class JavaBeanUtil {
   }
 
   public static void setProperties(final Object object,
-    final Map<String, Object> properties) {
-    for (final Entry<String, Object> property : properties.entrySet()) {
+    final Map<String, ? extends Object> properties) {
+    for (final Entry<String, ? extends Object> property : properties.entrySet()) {
       final String propertyName = property.getKey();
       final Object value = property.getValue();
       try {
         PropertyUtils.setProperty(object, propertyName, value);
       } catch (final InvocationTargetException e) {
         final Throwable t = e.getCause();
-        LOG.error("Unable to set property " + propertyName, t);
+        LOG.debug("Unable to set property " + propertyName, t);
       } catch (final Throwable e) {
-        LOG.error("Unable to set property " + propertyName, e);
+        LOG.debug("Unable to set property " + propertyName, e);
       }
     }
-
   }
 
   /**

@@ -63,7 +63,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
   }
 
   @Override
-  public void setProperties(Map<String, Object> properties) {
+  public void setProperties(Map<String, ? extends Object> properties) {
     getProperties().clear();
     if (properties != null) {
       getProperties().putAll(properties);

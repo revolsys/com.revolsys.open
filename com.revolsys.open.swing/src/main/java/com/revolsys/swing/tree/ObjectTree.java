@@ -121,6 +121,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
               if (menu != null && menu.getSubElements().length > 0) {
                 mouseClickItem = node;
                 menu.show(ObjectTree.this, x, y);
+                //TODO add listener to set item=null
               }
             }
           }

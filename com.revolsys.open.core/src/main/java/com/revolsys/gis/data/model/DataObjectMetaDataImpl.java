@@ -625,9 +625,9 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setProperties(final Map<String, Object> properties) {
+  public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties != null) {
-      for (final Entry<String, Object> entry : properties.entrySet()) {
+      for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
         final String key = entry.getKey();
         final Object value = entry.getValue();
         if (value instanceof DataObjectMetaDataProperty) {

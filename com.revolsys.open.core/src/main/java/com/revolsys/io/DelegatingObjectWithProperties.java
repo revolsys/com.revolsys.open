@@ -86,6 +86,7 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
     properties.put(name, new WeakReference<Object>(value));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <C> C getProperty(final String name, final C defaultValue) {
     final C value = (C)getProperty(name);
@@ -97,7 +98,7 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
-  public void setProperties(final Map<String, Object> properties) {
+  public void setProperties(final Map<String, ? extends Object> properties) {
     if (getObject() == null) {
       this.properties.clear();
       this.properties.putAll(properties);
