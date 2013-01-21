@@ -13,6 +13,7 @@ import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.util.MathUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -53,6 +54,22 @@ public class BoundingBox extends Envelope {
     final double x = point.getX();
     final double y = point.getY();
     return intersects(x1, y1, x2, y2, x, y);
+  }
+
+  public LineSegment getNorthLine() {
+    return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(), getMaxX(), getMaxY());
+  }
+
+  public LineSegment getSouthLine() {
+    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(), getMaxX(), getMinY());
+  }
+
+  public LineSegment getWestLine() {
+    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(), getMinX(), getMaxY());
+  }
+
+  public LineSegment getEastLine() {
+    return new LineSegment(getGeometryFactory(), getMaxX(), getMinY(), getMaxX(), getMaxY());
   }
 
   public static boolean intersects(final Coordinates line1Start,
@@ -422,9 +439,23 @@ public class BoundingBox extends Envelope {
     return Measure.valueOf(super.getMaxX(), unit);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public <Q extends Quantity> double getMaximumX(final Unit convertUnit) {
+    return getMaximumX().doubleValue(convertUnit);
+  }
+
   public <Q extends Quantity> Measurable<Q> getMaximumY() {
     final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMaxY(), unit);
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public <Q extends Quantity> double getMaximumY(final Unit convertUnit) {
+    return getMaximumY().doubleValue(convertUnit);
   }
 
   public double getMaxZ() {
@@ -440,9 +471,23 @@ public class BoundingBox extends Envelope {
     return Measure.valueOf(super.getMinX(), unit);
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public <Q extends Quantity> double getMinimumX(final Unit convertUnit) {
+    return getMinimumX().doubleValue(convertUnit);
+  }
+
   public <Q extends Quantity> Measurable<Q> getMinimumY() {
     final Unit<Q> unit = getCoordinateSystem().getUnit();
     return Measure.valueOf(super.getMinY(), unit);
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public <Q extends Quantity> double getMinimumY(final Unit convertUnit) {
+    return getMinimumY().doubleValue(convertUnit);
   }
 
   public double getMinZ() {

@@ -3,6 +3,7 @@ package com.revolsys.gis.model.geometry;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
+import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -13,7 +14,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
@@ -48,55 +48,6 @@ public class LineSegment extends AbstractCoordinatesList {
   private GeometryFactory geometryFactory;
 
   public LineSegment() {
-  }
-
-  public Coordinates[] closestPoints(LineSegment line) {
-    // test for intersection
-    Coordinates intPt = intersection(line);
-    if (intPt != null) {
-      return new Coordinates[] {
-        intPt, intPt
-      };
-    }
-
-    /**
-     * if no intersection closest pair contains at least one endpoint. Test each
-     * endpoint in turn.
-     */
-    Coordinates[] closestPt = new Coordinates[2];
-    double minDistance = Double.MAX_VALUE;
-    double dist;
-
-    Coordinates close00 = closestPoint(line.get(0));
-    minDistance = close00.distance(line.get(0));
-    closestPt[0] = close00;
-    closestPt[1] = line.get(0);
-
-    Coordinates close01 = closestPoint(line.get(1));
-    dist = close01.distance(line.get(1));
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestPt[0] = close01;
-      closestPt[1] = line.get(1);
-    }
-
-    Coordinates close10 = line.closestPoint(get(0));
-    dist = close10.distance(get(0));
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestPt[0] = get(0);
-      closestPt[1] = close10;
-    }
-
-    Coordinates close11 = line.closestPoint(get(0));
-    dist = close11.distance(get(0));
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestPt[0] = get(0);
-      closestPt[1] = close11;
-    }
-
-    return closestPt;
   }
 
   public LineSegment(final Coordinates coordinates1,
@@ -160,6 +111,55 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
+  public Coordinates[] closestPoints(final LineSegment line) {
+    // test for intersection
+    final Coordinates intPt = intersection(line);
+    if (intPt != null) {
+      return new Coordinates[] {
+        intPt, intPt
+      };
+    }
+
+    /**
+     * if no intersection closest pair contains at least one endpoint. Test each
+     * endpoint in turn.
+     */
+    final Coordinates[] closestPt = new Coordinates[2];
+    double minDistance = Double.MAX_VALUE;
+    double dist;
+
+    final Coordinates close00 = closestPoint(line.get(0));
+    minDistance = close00.distance(line.get(0));
+    closestPt[0] = close00;
+    closestPt[1] = line.get(0);
+
+    final Coordinates close01 = closestPoint(line.get(1));
+    dist = close01.distance(line.get(1));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestPt[0] = close01;
+      closestPt[1] = line.get(1);
+    }
+
+    final Coordinates close10 = line.closestPoint(get(0));
+    dist = close10.distance(get(0));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestPt[0] = get(0);
+      closestPt[1] = close10;
+    }
+
+    final Coordinates close11 = line.closestPoint(get(0));
+    dist = close11.distance(get(0));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestPt[0] = get(0);
+      closestPt[1] = close11;
+    }
+
+    return closestPt;
+  }
+
   @Override
   public boolean contains(final Coordinates coordinate) {
     if (get(0).equals(coordinate)) {
@@ -168,6 +168,18 @@ public class LineSegment extends AbstractCoordinatesList {
       return true;
     } else {
       return false;
+    }
+  }
+
+  public LineSegment convert(final GeometryFactory geometryFactory) {
+    if (geometryFactory == this.geometryFactory) {
+      return this;
+    } else {
+      final Coordinates point1 = ProjectionFactory.convert(coordinates1,
+        this.geometryFactory, geometryFactory);
+      final Coordinates point2 = ProjectionFactory.convert(coordinates2,
+        this.geometryFactory, geometryFactory);
+      return new LineSegment(geometryFactory, point1, point2);
     }
   }
 
@@ -268,16 +280,6 @@ public class LineSegment extends AbstractCoordinatesList {
     return intersection;
   }
 
-  public Coordinates intersection(LineSegment line) {
-    LineIntersector li = new RobustLineIntersector();
-    li.computeIntersection(get(0), get(1), line.get(0), line.get(1));
-    if (li.hasIntersection()) {
-      return li.getIntersection(0);
-    } else {
-      return null;
-    }
-  }
-
   /**
    * Computes the length of the line segment.
    * 
@@ -309,6 +311,16 @@ public class LineSegment extends AbstractCoordinatesList {
     }
   }
 
+  public Coordinates intersection(final LineSegment line) {
+    final LineIntersector li = new RobustLineIntersector();
+    li.computeIntersection(get(0), get(1), line.get(0), line.get(1));
+    if (li.hasIntersection()) {
+      return li.getIntersection(0);
+    } else {
+      return null;
+    }
+  }
+
   public boolean intersects(final BoundingBox boundingBox) {
     return (boundingBox.contains(coordinates1) || boundingBox.contains(coordinates2));
   }
@@ -322,10 +334,83 @@ public class LineSegment extends AbstractCoordinatesList {
     return coordinates1 == null || coordinates2 == null;
   }
 
+  /**
+   * Tests whether the segment is horizontal.
+   * 
+   * @return <code>true</code> if the segment is horizontal
+   */
+  public boolean isHorizontal() {
+    return coordinates1.getY() == coordinates2.getY();
+  }
+
   public boolean isPointOnLineMiddle(final Coordinates point,
     final double maxDistance) {
     return LineSegmentUtil.isPointOnLineMiddle(coordinates1, coordinates2,
       point, maxDistance);
+  }
+
+  /**
+   * Tests whether the segment is vertical.
+   * 
+   * @return <code>true</code> if the segment is vertical
+   */
+  public boolean isVertical() {
+    return coordinates1.getX() == coordinates2.getY();
+  }
+
+  public int orientationIndex(final LineSegment seg) {
+    final int orient0 = CoordinatesUtil.orientationIndex(coordinates1,
+      coordinates2, seg.coordinates1);
+    final int orient1 = CoordinatesUtil.orientationIndex(coordinates1,
+      coordinates2, seg.coordinates2);
+    // this handles the case where the points are L or collinear
+    if (orient0 >= 0 && orient1 >= 0) {
+      return Math.max(orient0, orient1);
+    }
+    // this handles the case where the points are R or collinear
+    if (orient0 <= 0 && orient1 <= 0) {
+      return Math.max(orient0, orient1);
+    }
+    // points lie on opposite sides ==> indeterminate orientation
+    return 0;
+  }
+
+  // TODO add 3D
+  public Coordinates pointAlongOffset(final double segmentLengthFraction,
+    final double offsetDistance) {
+    final double x1 = getX(0);
+    final double x2 = getX(1);
+    final double dx = x2 - x1;
+
+    final double y1 = getY(0);
+    final double y2 = getY(1);
+    final double dy = y2 - y1;
+
+    // the point on the segment line
+    double x = x1 + segmentLengthFraction * (dx);
+    double y = y1 + segmentLengthFraction * (dy);
+
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    if (offsetDistance != 0.0) {
+      if (len <= 0.0) {
+        throw new IllegalStateException(
+          "Cannot compute offset from zero-length line segment");
+      }
+      double ux = 0.0;
+      double uy = 0.0;
+
+      // u is the vector that is the length of the offset, in the direction of
+      // the segment
+      ux = offsetDistance * dx / len;
+      uy = offsetDistance * dy / len;
+      // the offset point is the seg point plus the offset vector rotated 90
+      // degrees CCW
+      x = x - uy;
+      y = y + ux;
+    }
+
+    final DoubleCoordinates coord = new DoubleCoordinates(x, y);
+    return coord;
   }
 
   public Coordinates project(final Coordinates p) {
@@ -335,6 +420,11 @@ public class LineSegment extends AbstractCoordinatesList {
 
   public double projectionFactor(final Coordinates p) {
     return LineSegmentUtil.projectionFactor(coordinates1, coordinates2, p);
+  }
+
+  public void setCoordinates(final Coordinates s0, final Coordinates s1) {
+    setPoint(0, s0);
+    setPoint(1, s1);
   }
 
   public void setElevationOnPoint(
@@ -360,81 +450,5 @@ public class LineSegment extends AbstractCoordinatesList {
   @Override
   public int size() {
     return 2;
-  }
-
-  public int orientationIndex(LineSegment seg) {
-    int orient0 = CoordinatesUtil.orientationIndex(coordinates1, coordinates2,
-      seg.coordinates1);
-    int orient1 = CoordinatesUtil.orientationIndex(coordinates1, coordinates2,
-      seg.coordinates2);
-    // this handles the case where the points are L or collinear
-    if (orient0 >= 0 && orient1 >= 0)
-      return Math.max(orient0, orient1);
-    // this handles the case where the points are R or collinear
-    if (orient0 <= 0 && orient1 <= 0)
-      return Math.max(orient0, orient1);
-    // points lie on opposite sides ==> indeterminate orientation
-    return 0;
-  }
-
-  /**
-   * Tests whether the segment is horizontal.
-   * 
-   * @return <code>true</code> if the segment is horizontal
-   */
-  public boolean isHorizontal() {
-    return coordinates1.getY() == coordinates2.getY();
-  }
-
-  /**
-   * Tests whether the segment is vertical.
-   * 
-   * @return <code>true</code> if the segment is vertical
-   */
-  public boolean isVertical() {
-    return coordinates1.getX() == coordinates2.getY();
-  }
-
-  public void setCoordinates(Coordinates s0, Coordinates s1) {
-    setPoint(0, s0);
-    setPoint(1, s1);
-  }
-
-  // TODO add 3D
-  public Coordinates pointAlongOffset(double segmentLengthFraction,
-    double offsetDistance) {
-    double x1 = getX(0);
-    double x2 = getX(1);
-    double dx = x2 - x1;
-
-    double y1 = getY(0);
-    double y2 = getY(1);
-    double dy = y2 - y1;
-
-    // the point on the segment line
-    double x = x1 + segmentLengthFraction * (dx);
-    double y = y1 + segmentLengthFraction * (dy);
-
-    double len = Math.sqrt(dx * dx + dy * dy);
-    if (offsetDistance != 0.0) {
-      if (len <= 0.0) {
-        throw new IllegalStateException(
-          "Cannot compute offset from zero-length line segment");
-      }
-      double ux = 0.0;
-      double uy = 0.0;
-
-      // u is the vector that is the length of the offset, in the direction of
-      // the segment
-      ux = offsetDistance * dx / len;
-      uy = offsetDistance * dy / len;
-      // the offset point is the seg point plus the offset vector rotated 90
-      // degrees CCW
-      x = x - uy;
-      y = y + ux;
-    }
-
-    DoubleCoordinates coord = new DoubleCoordinates(x, y);
-    return coord;
   }
 }

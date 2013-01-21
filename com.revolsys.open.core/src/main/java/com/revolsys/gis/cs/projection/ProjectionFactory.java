@@ -18,6 +18,8 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
+import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.vividsolutions.jts.geom.Geometry;
 
 public final class ProjectionFactory {
@@ -30,7 +32,8 @@ public final class ProjectionFactory {
     registerCoordinatesProjection("Transverse_Mercator",
       TransverseMercator.class);
     registerCoordinatesProjection("Mercator", Mercator1SP.class);
-    registerCoordinatesProjection("Popular_Visualisation_Pseudo_Mercator", Mercator1SP.class);
+    registerCoordinatesProjection("Popular_Visualisation_Pseudo_Mercator",
+      Mercator1SP.class);
     registerCoordinatesProjection("Mercator_(1SP)", Mercator1SP.class);
     registerCoordinatesProjection("Mercator_(2SP)", Mercator2SP.class);
     registerCoordinatesProjection("Mercator_(1SP)_(Spherical)",
@@ -41,6 +44,28 @@ public final class ProjectionFactory {
       LambertConicConformal.class);
     registerCoordinatesProjection("Lambert_Conic_Conformal_(2SP_Belgium)",
       LambertConicConformal.class);
+  }
+
+  public static Coordinates convert(final Coordinates point,
+    final GeometryFactory sourceGeometryFactory,
+    final GeometryFactory targetGeometryFactory) {
+    if (sourceGeometryFactory == targetGeometryFactory) {
+      return point;
+    } else if (sourceGeometryFactory == null) {
+      return point;
+    } else {
+      final CoordinatesOperation operation = getCoordinatesOperation(
+        sourceGeometryFactory, targetGeometryFactory);
+      if (operation == null) {
+        return point;
+      } else {
+        final DoubleCoordinates newPoint = new DoubleCoordinates(
+          point.getNumAxis());
+        operation.perform(point, newPoint);
+        targetGeometryFactory.makePrecise(newPoint);
+        return newPoint;
+      }
+    }
   }
 
   public static <T extends Geometry> T convert(final T geometry,
@@ -133,6 +158,15 @@ public final class ProjectionFactory {
           return new ChainedCoordinatesOperation(operations);
       }
     }
+  }
+
+  public static CoordinatesOperation getCoordinatesOperation(
+    final GeometryFactory sourceGeometryFactory,
+    final GeometryFactory targetGeometryFactory) {
+    final CoordinateSystem sourceCoordinateSystem = sourceGeometryFactory.getCoordinateSystem();
+    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
+    return getCoordinatesOperation(sourceCoordinateSystem,
+      targetCoordinateSystem);
   }
 
   /**
