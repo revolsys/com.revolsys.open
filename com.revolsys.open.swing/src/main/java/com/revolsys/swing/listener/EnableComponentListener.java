@@ -4,12 +4,14 @@ import java.awt.Component;
 import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class EnableComponentListener implements ItemListener,
-  ListSelectionListener {
+  ListSelectionListener,PropertyChangeListener {
   private Component component;
 
   public EnableComponentListener(Component component) {
@@ -27,6 +29,15 @@ public class EnableComponentListener implements ItemListener,
     }
   }
 
+  @Override
+  public void propertyChange(PropertyChangeEvent event) {
+    Object newValue = event.getNewValue();
+    if (newValue instanceof Boolean) {
+      Boolean enabled = (Boolean)newValue;
+      component.setEnabled(enabled);
+      
+    }
+  }
   @Override
   public void valueChanged(ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
