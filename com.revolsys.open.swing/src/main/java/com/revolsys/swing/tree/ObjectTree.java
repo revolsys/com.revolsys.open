@@ -40,6 +40,8 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
 
   private boolean menuEnabled = true;
 
+  private static Object mouseClickItem = null;
+
   public ObjectTree(final ObjectTreeModel model) {
     super(model);
     this.model = model;
@@ -72,7 +74,12 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
             final Object node = path.getLastPathComponent();
             final MouseListener listener = nodeModel.getMouseListener(node);
             if (listener != null) {
-              listener.mouseClicked(e);
+              try {
+                mouseClickItem = node;
+                listener.mouseClicked(e);
+              } finally {
+                mouseClickItem = null;
+              }
             }
           }
         }
@@ -112,6 +119,7 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
             if (nodeModel != null) {
               final JPopupMenu menu = nodeModel.getMenu(node);
               if (menu != null && menu.getSubElements().length > 0) {
+                mouseClickItem = node;
                 menu.show(ObjectTree.this, x, y);
               }
             }
@@ -340,4 +348,8 @@ public class ObjectTree extends JTree implements PropertyChangeListener {
     this.menuEnabled = menuEnabled;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V> V getMouseClickItem() {
+    return (V)mouseClickItem;
+  }
 }

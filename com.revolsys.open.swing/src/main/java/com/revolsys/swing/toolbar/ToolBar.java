@@ -43,6 +43,7 @@ public class ToolBar extends JToolBar {
       object, methodName, parameters);
 
     final JButton button = createActionComponent(action);
+    button.setFocusPainted(false);
     button.setAction(action);
     addComponent(groupName, button);
     return button;
