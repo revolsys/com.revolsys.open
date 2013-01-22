@@ -546,7 +546,7 @@ public final class FileUtil {
     }
   }
 
-  private static String getCanonicalPath(final File file) {
+  public static String getCanonicalPath(final File file) {
     try {
       return file.getCanonicalPath();
     } catch (final IOException e) {
