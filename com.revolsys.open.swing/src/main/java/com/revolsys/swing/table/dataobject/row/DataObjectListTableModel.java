@@ -38,11 +38,11 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     return panel;
   }
 
-  public static DataObjectRowTable createTable(
+  public static DataObjectRowJxTable createTable(
     final DataObjectMetaData metaData, final List<DataObject> objects) {
     final DataObjectListTableModel model = new DataObjectListTableModel(
       metaData, objects);
-    return new DataObjectRowTable(model);
+    return new DataObjectRowJxTable(model);
   }
 
   private final List<DataObject> objects = new ArrayList<DataObject>();
