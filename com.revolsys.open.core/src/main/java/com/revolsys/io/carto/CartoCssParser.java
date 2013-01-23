@@ -1,6 +1,7 @@
 package com.revolsys.io.carto;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
@@ -16,11 +18,16 @@ import com.revolsys.spring.SpringUtil;
 
 public class CartoCssParser {
 
-  public static CartoCssDocument parse(Resource resource) {
+  public static CartoCssDocument parse(final File file) {
+    final FileSystemResource resource = new FileSystemResource(file);
+    return parse(resource);
+  }
+
+  public static CartoCssDocument parse(final Resource resource) {
     return new CartoCssParser(resource).parse();
   }
 
-  private BufferedReader reader;
+  private final BufferedReader reader;
 
   private String currentLine = "";
 
@@ -30,78 +37,35 @@ public class CartoCssParser {
 
   private int currentCharacter;
 
-  public CartoCssParser(Resource resource) {
-    this(SpringUtil.getReader(resource));
-  }
-
-  public CartoCssParser(Reader reader) {
+  public CartoCssParser(final Reader reader) {
     this.reader = new BufferedReader(reader);
   }
 
-  public CartoCssDocument parse() {
-    List<RuleSet> ruleSets = new ArrayList<RuleSet>();
-    try {
-      getNextCharacter();
-      while (skipWhitespaceAndComments()) {
-        RuleSet ruleSet = parseRuleSet();
-        if (ruleSet != null) {
-          ruleSets.add(ruleSet);
-        }
-      }
-    } catch (IOException e) {
-      throwException("Error reading ", e);
-    } finally {
-      FileUtil.closeSilent(reader);
-    }
-    return new CartoCssDocument(ruleSets);
+  public CartoCssParser(final Resource resource) {
+    this(SpringUtil.getReader(resource));
   }
 
-  private RuleSet parseRuleSet() throws IOException {
-    while (currentCharacter != -1 && !Character.isWhitespace(currentCharacter)
-      && currentCharacter != '/') {
-      Selector selector = parseSelector();
-      if (selector != null) {
-        Map<CartoCssProperty, String> declarations = parseDeclarations();
-        return new RuleSet(selector, declarations);
+  private int getNextCharacter() throws IOException {
+    if (currentIndex >= currentLine.length()) {
+      currentLine = "";
+      currentIndex = 0;
+    }
+    while (!StringUtils.hasText(currentLine)) {
+      currentLine = reader.readLine();
+      if (currentLine == null) {
+        currentLine = "";
+        currentCharacter = -1;
+        return currentCharacter;
+      } else {
+        lineNumber++;
       }
     }
-    return null;
+    currentCharacter = currentLine.charAt(currentIndex++);
+    return currentCharacter;
   }
 
-  private Map<CartoCssProperty, String> parseDeclarations() throws IOException {
-    Map<CartoCssProperty, String> declarations = new LinkedHashMap<CartoCssProperty, String>();
-    skipWhitespaceAndComments();
-    while (currentCharacter != '}') {
-      String name = getString(':');
-      if (!StringUtils.hasText(name)) {
-        throwException("Expecting a property name before ':'");
-      }
-      CartoCssProperty propertyName = CartoCssProperty.getProperty(name);
-      skipWhitespaceAndComments();
-      String value = getString(';');
-      if (!StringUtils.hasText(value)) {
-        throwException("Expecting a property value before ';'");
-      }
-      skipWhitespaceAndComments();
-      declarations.put(propertyName, value);
-    }
-    return declarations;
-  }
-
-  private Selector parseSelector() throws IOException {
-    String selector = getString('{');
-    if (selector == null) {
-      return null;
-    } else {
-      if (selector.length() == 0) {
-        throwException("A selector must be specified");
-      }
-      return new IdSelector(selector.substring(1));
-    }
-  }
-
-  private String getString(char endCharacter) throws IOException {
-    StringBuffer buffer = new StringBuffer();
+  private String getString(final char endCharacter) throws IOException {
+    final StringBuffer buffer = new StringBuffer();
     while (currentCharacter != endCharacter) {
       buffer.append((char)currentCharacter);
       getNextCharacter();
@@ -115,27 +79,66 @@ public class CartoCssParser {
     return selector;
   }
 
-  private void throwException(String message, Throwable e) {
-    throw new RuntimeException(message + "line #" + lineNumber + ", index #"
-      + currentIndex + "\n" + currentLine, e);
+  public CartoCssDocument parse() {
+    final List<RuleSet> ruleSets = new ArrayList<RuleSet>();
+    try {
+      getNextCharacter();
+      while (skipWhitespaceAndComments()) {
+        final RuleSet ruleSet = parseRuleSet();
+        if (ruleSet != null) {
+          ruleSets.add(ruleSet);
+        }
+      }
+    } catch (final IOException e) {
+      throwException("Error reading ", e);
+    } finally {
+      FileUtil.closeSilent(reader);
+    }
+    return new CartoCssDocument(ruleSets);
   }
 
-  private void throwException(String message) {
-    throw new RuntimeException(message + "line #" + lineNumber + ", index #"
-      + currentIndex + "\n" + currentLine);
+  private Map<CartoCssProperty, String> parseDeclarations() throws IOException {
+    final Map<CartoCssProperty, String> declarations = new LinkedHashMap<CartoCssProperty, String>();
+    skipWhitespaceAndComments();
+    while (currentCharacter != '}') {
+      final String name = getString(':');
+      if (!StringUtils.hasText(name)) {
+        throwException("Expecting a property name before ':'");
+      }
+      final CartoCssProperty propertyName = CartoCssProperty.getProperty(name);
+      skipWhitespaceAndComments();
+      final String value = getString(';');
+      if (!StringUtils.hasText(value)) {
+        throwException("Expecting a property value before ';'");
+      }
+      skipWhitespaceAndComments();
+      declarations.put(propertyName, value);
+    }
+    return declarations;
   }
 
-  private boolean skipWhitespaceAndComments() throws IOException {
-    while (currentCharacter != -1) {
-      if (Character.isWhitespace(currentCharacter)) {
-        skipWhitespace();
-      } else if (currentCharacter == '/') {
-        skipComment();
-      } else {
-        return true;
+  private RuleSet parseRuleSet() throws IOException {
+    while (currentCharacter != -1 && !Character.isWhitespace(currentCharacter)
+      && currentCharacter != '/') {
+      final Selector selector = parseSelector();
+      if (selector != null) {
+        final Map<CartoCssProperty, String> declarations = parseDeclarations();
+        return new RuleSet(selector, declarations);
       }
     }
-    return false;
+    return null;
+  }
+
+  private Selector parseSelector() throws IOException {
+    final String selector = getString('{');
+    if (selector == null) {
+      return null;
+    } else {
+      if (selector.length() == 0) {
+        throwException("A selector must be specified");
+      }
+      return new IdSelector(selector.substring(1));
+    }
   }
 
   private boolean skipComment() throws IOException {
@@ -167,22 +170,26 @@ public class CartoCssParser {
     }
   }
 
-  private int getNextCharacter() throws IOException {
-    if (currentIndex >= currentLine.length()) {
-      currentLine = "";
-      currentIndex = 0;
-    }
-    while (!StringUtils.hasText(currentLine)) {
-      currentLine = reader.readLine();
-      if (currentLine == null) {
-        currentLine = "";
-        currentCharacter = -1;
-        return currentCharacter;
+  private boolean skipWhitespaceAndComments() throws IOException {
+    while (currentCharacter != -1) {
+      if (Character.isWhitespace(currentCharacter)) {
+        skipWhitespace();
+      } else if (currentCharacter == '/') {
+        skipComment();
       } else {
-        lineNumber++;
+        return true;
       }
     }
-    currentCharacter = currentLine.charAt(currentIndex++);
-    return currentCharacter;
+    return false;
+  }
+
+  private void throwException(final String message) {
+    throw new RuntimeException(message + "line #" + lineNumber + ", index #"
+      + currentIndex + "\n" + currentLine);
+  }
+
+  private void throwException(final String message, final Throwable e) {
+    throw new RuntimeException(message + "line #" + lineNumber + ", index #"
+      + currentIndex + "\n" + currentLine, e);
   }
 }

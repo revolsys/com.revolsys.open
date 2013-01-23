@@ -41,11 +41,25 @@ public class RuleSet {
     return s.toString();
   }
 
-  public Color getColor(CartoCssProperty property) {
+  public float getFloat(CartoCssProperty property, float defaultValue) {
+    String value = declarations.get(property);
+    if (StringUtils.hasText(value)) {
+      try {
+        return Float.parseFloat(value);
+      } catch (Throwable t) {
+        throw new RuntimeException("Not a valid float " + property + "="
+          + value);
+      }
+    } else {
+      return defaultValue;
+    }
+  }
+
+  public Color getColor(CartoCssProperty property, Color defaultColor) {
     String value = declarations.get(property);
     if (StringUtils.hasText(value)) {
       if (value.startsWith("#")) {
-return null;
+        return null;
       } else if (value.startsWith("rgb(")) {
         try {
           String[] values = value.replaceAll("[^0-9,]", "").split(",");
@@ -55,7 +69,8 @@ return null;
           Color color = new Color(red, green, blue);
           return color;
         } catch (Throwable e) {
-          throw new IllegalArgumentException("Not a valid CSS color " + value,e);
+          throw new IllegalArgumentException("Not a valid CSS color " + value,
+            e);
         }
       } else if (value.startsWith("rgba(")) {
         try {
@@ -67,13 +82,14 @@ return null;
           Color color = new Color(red, green, blue, alpha);
           return color;
         } catch (Throwable e) {
-          throw new IllegalArgumentException("Not a valid CSS color " + value,e);
+          throw new IllegalArgumentException("Not a valid CSS color " + value,
+            e);
         }
       } else {
         throw new IllegalArgumentException("Not a valid CSS color " + value);
       }
     } else {
-      return null;
+      return defaultColor;
     }
 
   }
