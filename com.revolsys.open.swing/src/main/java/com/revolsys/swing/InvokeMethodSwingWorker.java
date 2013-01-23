@@ -26,9 +26,9 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
   private Collection<? extends Object> doneMethodParameters;
 
   public InvokeMethodSwingWorker(final String description, final Object object,
-    String backgroundMethodName,  Collection<Object> parameters) {
-    this(description, object, backgroundMethodName,  parameters,
-      null, Collections.emptyList());
+    String backgroundMethodName, Collection<Object> parameters) {
+    this(description, object, backgroundMethodName, parameters, null,
+      Collections.emptyList());
   }
 
   public InvokeMethodSwingWorker(final String description, final Object object,
@@ -46,10 +46,13 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
   public InvokeMethodSwingWorker(final String description, final Object object,
     String backgroundMethodName,
     final Collection<? extends Object> backgroundMethodParameters,
-    final String doneMethodName, final Collection<? extends Object> doneMethodParameters) {
+    final String doneMethodName,
+    final Collection<? extends Object> doneMethodParameters) {
     this.description = description;
-    this.backgroundTask = new InvokeMethodCallable<T>(object,
-      backgroundMethodName, backgroundMethodParameters.toArray());
+    if (backgroundMethodName != null) {
+      this.backgroundTask = new InvokeMethodCallable<T>(object,
+        backgroundMethodName, backgroundMethodParameters.toArray());
+    }
     this.object = object;
     this.doneMethodName = doneMethodName;
     this.doneMethodParameters = doneMethodParameters;
@@ -57,7 +60,11 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
 
   @Override
   protected T doInBackground() throws Exception {
-    return backgroundTask.call();
+    if (backgroundTask != null) {
+      return backgroundTask.call();
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -74,7 +81,9 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     if (doneMethodName != null) {
       try {
         List<Object> parameters = new ArrayList<Object>(doneMethodParameters);
-        parameters.add(result);
+        if (result != null) {
+          parameters.add(result);
+        }
         if (object == null) {
           throw new RuntimeException("Object cannot be null " + this);
         } else if (object instanceof Class<?>) {

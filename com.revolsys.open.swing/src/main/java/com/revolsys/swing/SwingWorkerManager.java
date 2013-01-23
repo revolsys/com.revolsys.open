@@ -131,4 +131,20 @@ public class SwingWorkerManager {
 
   private SwingWorkerManager() {
   }
+
+  public static SwingWorker<?, ?> executeUi(final String description,
+    final Object object, final String doneMethodName,
+    final Collection<? extends Object> doneMethodParameters) {
+    final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
+      description, object, (String)null, (Collection<?>)null, doneMethodName, doneMethodParameters);
+    execute(worker);
+    return worker;
+  }
+
+  public static SwingWorker<?, ?> executeUi(final String description,
+    final Object object, 
+    final String doneMethodName,
+    final Object... doneMethodParameters) {
+     return executeUi(description, object, doneMethodName, Arrays.asList(doneMethodParameters));
+  }
 }
