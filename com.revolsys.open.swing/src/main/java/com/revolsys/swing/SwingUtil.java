@@ -1,8 +1,10 @@
 package com.revolsys.swing;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.util.Date;
@@ -34,17 +36,107 @@ import com.revolsys.swing.field.NumberTextField;
 
 public class SwingUtil {
 
-  public static void setMaximumWidth(JComponent component, int width) {
-    Dimension preferredSize = component.getPreferredSize();
-    Dimension size = new Dimension(width, preferredSize.height);
-    component.setMaximumSize(size);
-  }
-
-  public static JLabel addLabel(Container container, String text) {
-    JLabel label = new JLabel(text);
+  public static JLabel addLabel(final Container container, final String text) {
+    final JLabel label = new JLabel(text);
     label.setFont(label.getFont().deriveFont(Font.BOLD));
     container.add(label);
     return label;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends JComponent> T createField(
+    final DataObjectMetaData metaData, final String fieldName,
+    final boolean enabled) {
+    JComponent field;
+    final Attribute attribute = metaData.getAttribute(fieldName);
+    if (attribute == null) {
+      throw new IllegalArgumentException("Cannot find field " + fieldName);
+    } else {
+      final boolean required = attribute.isRequired();
+      final int length = attribute.getLength();
+      final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
+      final DataType type = attribute.getType();
+      int size = length;
+      if (size == 0) {
+        size = 10;
+      } else if (size > 50) {
+        size = 50;
+      }
+      if (!enabled) {
+        field = new JTextField(1);
+        field.setEnabled(false);
+      } else if (codeTable != null) {
+        final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
+          !required);
+        comboBox.setSelectedIndex(0);
+        final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
+          codeTable);
+        AutoCompleteDecorator.decorate(comboBox, stringConverter);
+        field = comboBox;
+      } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
+        final int scale = attribute.getScale();
+        field = new NumberTextField(type, length, scale);
+      } else if (type.equals(DataTypes.DATE)) {
+        final JXDatePicker captureDateField = new JXDatePicker();
+        captureDateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
+          "yyyy/MMM/dd");
+        field = captureDateField;
+      } else {
+        final JTextField textField = new JTextField(size);
+        field = textField;
+      }
+    }
+    return (T)field;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V getValue(final JComponent component) {
+    if (component instanceof JXDatePicker) {
+      final JXDatePicker dateField = (JXDatePicker)component;
+      return (V)dateField.getDate();
+    } else if (component instanceof NumberTextField) {
+      final NumberTextField numberField = (NumberTextField)component;
+      return (V)numberField.getFieldValue();
+    } else if (component instanceof JTextComponent) {
+      final JTextComponent textComponent = (JTextComponent)component;
+      final String text = textComponent.getText();
+      if (StringUtils.hasText(text)) {
+        return (V)text;
+      } else {
+        return null;
+      }
+    } else if (component instanceof JComboBox) {
+      final JComboBox comboBox = (JComboBox)component;
+      return (V)comboBox.getSelectedItem();
+    } else if (component instanceof JList) {
+      final JList list = (JList)component;
+      return (V)list.getSelectedValue();
+    } else if (component instanceof JCheckBox) {
+      final JCheckBox checkBox = (JCheckBox)component;
+      return (V)(Object)checkBox.isSelected();
+    } else {
+      return null;
+    }
+  }
+
+  public static int getX(final Component component) {
+    final int x = component.getX();
+    final Component parent = component.getParent();
+    if (parent == null) {
+      return x;
+    } else {
+      return x + getX(parent);
+    }
+  }
+
+  public static int getY(final Component component) {
+    final int y = component.getY();
+    final Component parent = component.getParent();
+    if (parent == null) {
+      return y;
+    } else {
+      return y + getY(parent);
+    }
   }
 
   public static void setFieldValue(final JComponent field,
@@ -89,107 +181,41 @@ public class SwingUtil {
       final JComboBox comboField = (JComboBox)field;
       comboField.setSelectedItem(value);
     }
-    Container parent = field.getParent();
+    final Container parent = field.getParent();
     if (parent != null) {
       parent.getLayout().layoutContainer(parent);
       field.revalidate();
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T extends JComponent> T createField(
-    DataObjectMetaData metaData, final String fieldName, boolean enabled) {
-    JComponent field;
-    final Attribute attribute = metaData.getAttribute(fieldName);
-    if (attribute == null) {
-      throw new IllegalArgumentException("Cannot find field " + fieldName);
-    } else {
-      final boolean required = attribute.isRequired();
-      final int length = attribute.getLength();
-      final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
-      final DataType type = attribute.getType();
-      int size = length;
-      if (size == 0) {
-        size = 10;
-      } else if (size > 50) {
-        size = 50;
-      }
-      if (!enabled) {
-        field = new JTextField(1);
-        field.setEnabled(false);
-      } else if (codeTable != null) {
-        final JComboBox comboBox = CodeTableComboBoxModel.create(codeTable,
-          !required);
-        comboBox.setSelectedIndex(0);
-        final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
-          codeTable);
-        AutoCompleteDecorator.decorate(comboBox, stringConverter);
-        field = comboBox;
-      } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
-        final int scale = attribute.getScale();
-        field = new NumberTextField(type, length, scale);
-      } else if (type.equals(DataTypes.DATE)) {
-        final JXDatePicker captureDateField = new JXDatePicker();
-        captureDateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd","yyyy-MMM-dd", "yyyy/MMM/dd");
-        field = captureDateField;
-      } else {
-        JTextField textField = new JTextField(size);
-        field = textField;
-      }
-    }
-    return (T)field;
+  public static void setMaximumWidth(final JComponent component, final int width) {
+    final Dimension preferredSize = component.getPreferredSize();
+    final Dimension size = new Dimension(width, preferredSize.height);
+    component.setMaximumSize(size);
   }
 
-  @SuppressWarnings("unchecked")
-  public static <V> V getValue(JComponent component) {
-    if (component instanceof JXDatePicker) {
-      JXDatePicker dateField = (JXDatePicker)component;
-      return (V)dateField.getDate();
-    } else if (component instanceof NumberTextField) {
-      NumberTextField numberField = (NumberTextField)component;
-      return (V)numberField.getFieldValue();
-    } else if (component instanceof JTextComponent) {
-      JTextComponent textComponent = (JTextComponent)component;
-      String text = textComponent.getText();
-      if (StringUtils.hasText(text)) {
-        return (V)text;
-      } else {
-        return null;
-      }
-    } else if (component instanceof JComboBox) {
-      JComboBox comboBox = (JComboBox)component;
-      return (V)comboBox.getSelectedItem();
-    } else if (component instanceof JList) {
-      JList list = (JList)component;
-      return (V)list.getSelectedValue();
-    } else if (component instanceof JCheckBox) {
-      JCheckBox checkBox = (JCheckBox)component;
-      return (V)(Object)checkBox.isSelected();
-    } else {
-      return null;
-    }
-  }
-
-  public static void setSizeAndMaximize(JFrame frame, int minusX, int minusY) {
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Dimension screenSize = toolkit.getScreenSize();
-    double screenWidth = screenSize.getWidth();
-    double screenHeight = screenSize.getHeight();
-    Dimension size = new Dimension((int)(screenWidth - minusX),
-      (int)(screenHeight - minusY));
-    frame.setSize(size);
-    frame.setPreferredSize(size);
-    frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-  }
-
-  public static void setSize(Window window, int minusX, int minusY) {
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Dimension screenSize = toolkit.getScreenSize();
-    double screenWidth = screenSize.getWidth();
-    double screenHeight = screenSize.getHeight();
-    Dimension size = new Dimension((int)(screenWidth - minusX),
+  public static void setSize(final Window window, final int minusX,
+    final int minusY) {
+    final Toolkit toolkit = Toolkit.getDefaultToolkit();
+    final Dimension screenSize = toolkit.getScreenSize();
+    final double screenWidth = screenSize.getWidth();
+    final double screenHeight = screenSize.getHeight();
+    final Dimension size = new Dimension((int)(screenWidth - minusX),
       (int)(screenHeight - minusY));
     window.setBounds(minusX / 2, minusY / 2, size.width, size.height);
     window.setPreferredSize(size);
+  }
+
+  public static void setSizeAndMaximize(final JFrame frame, final int minusX,
+    final int minusY) {
+    final Toolkit toolkit = Toolkit.getDefaultToolkit();
+    final Dimension screenSize = toolkit.getScreenSize();
+    final double screenWidth = screenSize.getWidth();
+    final double screenHeight = screenSize.getHeight();
+    final Dimension size = new Dimension((int)(screenWidth - minusX),
+      (int)(screenHeight - minusY));
+    frame.setSize(size);
+    frame.setPreferredSize(size);
+    frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
   }
 }

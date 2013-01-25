@@ -20,7 +20,6 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -30,6 +29,7 @@ import java.util.Set;
  * 
  * @author Paul Austin
  */
+
 public class ExtensionFilenameFilter implements FilenameFilter {
   /** An instance of the filter to match gif, jpg, png, tif and tiff files. */
   public static final ExtensionFilenameFilter IMAGE_FILTER = new ExtensionFilenameFilter(
@@ -129,12 +129,11 @@ public class ExtensionFilenameFilter implements FilenameFilter {
    * 
    * @param extensions The file extensions.
    */
-  public void addExtensions(final Collection extensions) {
+  public void addExtensions(final Collection<String> extensions) {
     if (readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
-    for (final Iterator extenIter = extensions.iterator(); extenIter.hasNext();) {
-      final String extension = (String)extenIter.next();
+    for (final String extension : extensions) {
       addExtension(extension);
     }
   }
@@ -160,4 +159,5 @@ public class ExtensionFilenameFilter implements FilenameFilter {
     }
     this.readOnly = readOnly;
   }
+
 }
