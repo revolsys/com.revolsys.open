@@ -1,17 +1,16 @@
-function activateAccordion() {
-  if (location.hash) {
-    var anchor = $('[name="' + location.hash.substring(1) + '"]');
-    anchor.parents('.ui-accordion').accordion('activate', 0);
-  } 
-}
-
 function createAccordion(selector) {
   $(selector).each(function() {
-    var active;
+    var active = false;
+    if (location.hash) {
+      if ($('a[name="' + location.hash.substring(1) + '"]', this).length > 0) {
+           active = 0;
+      }
+    }
     if ($(this).hasClass('open')) {
-      active = 0;
-    } else {
-      active = false;
+      $(this).removeClass('open');
+      if (active == false) {
+        active = 0;
+      }
     }
     $(this).accordion({
       icons : {
@@ -39,9 +38,6 @@ $(document).ready(function() {
   createAccordion('div.javaPackage');
   createAccordion('div.javaClass');
   createAccordion('div.javaMethod');
-  activateAccordion();
   prettyPrint();
   $(':button').button();
 });
-
-$(window).bind('hashchange', activateAccordion());

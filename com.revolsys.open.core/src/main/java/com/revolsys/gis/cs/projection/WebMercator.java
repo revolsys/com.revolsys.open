@@ -7,7 +7,7 @@ import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.vividsolutions.jts.algorithm.Angle;
 
-public class Mercator1SP implements CoordinatesProjection {
+public class WebMercator implements CoordinatesProjection {
 
   private final double a;
 
@@ -21,7 +21,7 @@ public class Mercator1SP implements CoordinatesProjection {
 
   private final double y0;
 
-  public Mercator1SP(final ProjectedCoordinateSystem cs) {
+  public WebMercator(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
     final double centralMeridian = cs.getDoubleParameter("longitude_of_natural_origin");
@@ -38,25 +38,18 @@ public class Mercator1SP implements CoordinatesProjection {
 
   @Override
   public void inverse(final Coordinates from, final Coordinates to) {
-    final double x = (from.getX() - x0);
-    final double y = (from.getY() - y0);
+    final double x = from.getX();
+    final double y = from.getY();
 
-    final double lambda = x / a + lambda0;
+  // TODO radians
+    
+    double lon = (x / 20037508.34) * 180;
+    double lat = (y / 20037508.34) * 180;
 
-    final double t = Math.pow(Math.E, -y / a);
-    // TODO phi
-    double phi = Angle.PI_OVER_2 - 2 * Math.atan(t);
-    double delta = 10e010;
-    do {
-      final double eSinPhi = e * Math.sin(phi);
-      final double phi1 = Angle.PI_OVER_2 - 2
-        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2));
-      delta = Math.abs(phi1 - phi);
-      phi = phi1;
-    } while (delta > 1.0e-011);
-
-    to.setValue(0, lambda);
-    to.setValue(1, phi);
+    lat = 180/Math.PI * (2 * Math.atan(Math.exp(lat * Math.PI / 180)) - Math.PI / 2);
+   
+    to.setValue(0, lon);
+    to.setValue(1, lat);
     for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
       final double ordinate = from.getValue(i);
       to.setValue(i, ordinate);
@@ -65,18 +58,15 @@ public class Mercator1SP implements CoordinatesProjection {
 
   @Override
   public void project(final Coordinates from, final Coordinates to) {
-    final double lambda = from.getX();
-    final double phi = from.getY();
+    final double lon = from.getX();
+    final double lat = from.getY();
 
-    final double x = a * (lambda - lambda0);
+    double x = lon * 20037508.34 / 180;
+    double y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+    y = y * 20037508.34 / 180;
 
-    final double eSinPhi = e * Math.sin(phi);
-    final double y = a
-      * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
-        * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2));
-
-    to.setValue(0, x0 + x);
-    to.setValue(1, y0 + y);
+    to.setValue(0, x);
+    to.setValue(1, y);
 
     for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
       final double ordinate = from.getValue(i);
