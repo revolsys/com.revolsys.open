@@ -1,5 +1,7 @@
 package com.revolsys.gis.cs;
 
+import java.math.BigDecimal;
+
 import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -57,19 +59,23 @@ public class BoundingBox extends Envelope {
   }
 
   public LineSegment getNorthLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(), getMaxX(), getMaxY());
+    return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(),
+      getMaxX(), getMaxY());
   }
 
   public LineSegment getSouthLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(), getMaxX(), getMinY());
+    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
+      getMaxX(), getMinY());
   }
 
   public LineSegment getWestLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(), getMinX(), getMaxY());
+    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
+      getMinX(), getMaxY());
   }
 
   public LineSegment getEastLine() {
-    return new LineSegment(getGeometryFactory(), getMaxX(), getMinY(), getMaxX(), getMaxY());
+    return new LineSegment(getGeometryFactory(), getMaxX(), getMinY(),
+      getMaxX(), getMaxY());
   }
 
   public static boolean intersects(final Coordinates line1Start,
@@ -297,7 +303,8 @@ public class BoundingBox extends Envelope {
    */
   public BoundingBox(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
-    super(x1, x2, y1, y2);
+    super(geometryFactory.makePrecise(x1), geometryFactory.makePrecise(x2),
+      geometryFactory.makePrecise(y1), geometryFactory.makePrecise(y2));
     this.geometryFactory = geometryFactory;
     this.minZ = Double.NaN;
     this.maxZ = Double.NaN;
@@ -673,12 +680,21 @@ public class BoundingBox extends Envelope {
 
   @Override
   public String toString() {
-    if (geometryFactory == null) {
-      return "BBOX(" + getMinX() + "," + getMinY() + " " + getMaxX() + ","
-        + getMaxY() + ")";
-    } else {
-      return "SRID=" + geometryFactory.getSRID() + ";BBOX(" + getMinX() + ","
-        + getMinY() + " " + getMaxX() + "," + getMaxY() + ")";
+    StringBuffer s = new StringBuffer();
+    if (geometryFactory != null) {
+      s.append("SRID=");
+      s.append(geometryFactory.getSRID());
+      s.append(";");
     }
+    s.append("BBOX(");
+    s.append((long)getMinX());
+    s.append(',');
+    s.append((long)getMinY());
+    s.append(' ');
+    s.append((long)getMaxX());
+    s.append(',');
+    s.append((long)getMaxY());
+    s.append(')');
+    return s.toString();
   }
 }

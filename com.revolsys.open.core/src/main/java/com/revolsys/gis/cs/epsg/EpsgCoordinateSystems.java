@@ -408,10 +408,18 @@ public final class EpsgCoordinateSystems {
                 parameters, linearUnit, axis, authority, deprecated);
 
               addCoordinateSystem(coordinateSystem);
+              if (id == 3857) {
+                 authority = new EpsgAuthority(102100);
+                ProjectedCoordinateSystem webMercator = new ProjectedCoordinateSystem(
+                  102100, name, geographicCoordinateSystem, area, projection,
+                  parameters, linearUnit, axis, authority, deprecated);
+
+                addCoordinateSystem(webMercator);
+              }
             }
           }
         }
-      } finally {
+       } finally {
         FileUtil.closeSilent(resource);
       }
     }

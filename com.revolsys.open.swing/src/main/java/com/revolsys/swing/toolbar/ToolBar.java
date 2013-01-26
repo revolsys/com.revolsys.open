@@ -19,6 +19,10 @@ import com.revolsys.swing.action.InvokeMethodAction;
 public class ToolBar extends JToolBar {
   private final Map<String, List<Component>> groups = new LinkedHashMap<String, List<Component>>();
 
+  public ToolBar() {
+    setRollover(true);
+  }
+
   @Override
   public JButton add(final Action action) {
     final JButton button = super.add(action);
@@ -92,7 +96,7 @@ public class ToolBar extends JToolBar {
       }
     }
   }
-  
+
   public void setGroupEnabled(String groupName, boolean enabled) {
     List<Component> components = getGroup(groupName);
     for (Component component : components) {

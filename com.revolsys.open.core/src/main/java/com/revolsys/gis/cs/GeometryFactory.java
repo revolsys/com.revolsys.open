@@ -758,4 +758,8 @@ public class GeometryFactory extends
     }
   }
 
+  public double makePrecise(double value) {
+     return getPrecisionModel().makePrecise(value);
+  }
+
 }
