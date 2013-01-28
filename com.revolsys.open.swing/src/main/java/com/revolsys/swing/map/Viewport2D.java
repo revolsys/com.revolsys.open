@@ -71,12 +71,12 @@ public abstract class Viewport2D {
     }
   }
 
-  /** The current bounding box of the map. */
+  /** The current bounding box of the project. */
   private BoundingBox boundingBox;
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
 
-  private Project map;
+  private Project project;
 
   private AffineTransform modelToScreenTransform;
 
@@ -92,7 +92,8 @@ public abstract class Viewport2D {
   }
 
   public Viewport2D(final Project project) {
-    this.map = project;
+    this.project = project;
+    this.geometryFactory = project.getGeometryFactory();
   }
 
 
@@ -122,9 +123,9 @@ public abstract class Viewport2D {
   }
 
   /**
-   * Get the coordinate system the map is displayed in.
+   * Get the coordinate system the project is displayed in.
    * 
-   * @return The coordinate system the map is displayed in.
+   * @return The coordinate system the project is displayed in.
    */
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
@@ -132,7 +133,7 @@ public abstract class Viewport2D {
 
 
   public Project getProject() {
-    return map;
+    return project;
   }
 
   public double getModelHeight() {
@@ -249,9 +250,9 @@ public abstract class Viewport2D {
   }
 
   /**
-   * Set the coordinate system the map is displayed in.
+   * Set the coordinate system the project is displayed in.
    * 
-   * @param coordinateSystem The coordinate system the map is displayed in.
+   * @param coordinateSystem The coordinate system the project is displayed in.
    */
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldGeometryFactory = this.geometryFactory;
