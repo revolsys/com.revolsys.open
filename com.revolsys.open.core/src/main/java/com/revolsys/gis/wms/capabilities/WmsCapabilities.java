@@ -16,14 +16,14 @@ public class WmsCapabilities {
     return capability;
   }
 
-  private Layer getLayer(final Layer layer, final String name) {
+  private WmsLayer getLayer(final WmsLayer layer, final String name) {
 
     final String layerName = layer.getName();
     if (layerName != null && layerName.equals(name)) {
       return layer;
     }
-    for (final Layer childLayer : layer.getLayers()) {
-      final Layer matchedLayer = getLayer(childLayer, name);
+    for (final WmsLayer childLayer : layer.getLayers()) {
+      final WmsLayer matchedLayer = getLayer(childLayer, name);
       if (matchedLayer != null) {
         return matchedLayer;
       }
@@ -31,7 +31,7 @@ public class WmsCapabilities {
     return null;
   }
 
-  public Layer getLayer(final String name) {
+  public WmsLayer getLayer(final String name) {
     return getLayer(capability.getLayer(), name);
   }
 
@@ -77,7 +77,7 @@ public class WmsCapabilities {
     return getLayer(name) != null;
   }
 
-  private boolean isSrsSupported(final String srsId, final Layer layer,
+  private boolean isSrsSupported(final String srsId, final WmsLayer layer,
     final List<String> layerNames, final boolean parentHasSrs) {
     final boolean hasSrs = layer.getSrs().contains(srsId) || parentHasSrs;
     if (layerNames.contains(layer.getName())) {
@@ -85,7 +85,7 @@ public class WmsCapabilities {
         return true;
       }
     }
-    for (final Layer childLayer : layer.getLayers()) {
+    for (final WmsLayer childLayer : layer.getLayers()) {
       if (isSrsSupported(srsId, childLayer, layerNames, hasSrs)) {
         return true;
       }
@@ -95,7 +95,7 @@ public class WmsCapabilities {
 
   public boolean isSrsSupported(final String srsId,
     final List<String> layerNames) {
-    final Layer layer = capability.getLayer();
+    final WmsLayer layer = capability.getLayer();
     return isSrsSupported(srsId, layer, layerNames, false);
   }
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class Layer {
+public class WmsLayer {
   private String name;
 
   private String title;
@@ -40,7 +40,7 @@ public class Layer {
 
   private ScaleHint scaleHint;
 
-  private List<Layer> layers = new ArrayList<Layer>();
+  private List<WmsLayer> layers = new ArrayList<WmsLayer>();
 
   private boolean queryable;
 
@@ -54,7 +54,7 @@ public class Layer {
 
   private int fixedHeight;
 
-  private Layer parent;
+  private WmsLayer parent;
 
   public void addAuthorityUrl(final AuthorityUrl authorityUrl) {
     authorityUrls.add(authorityUrl);
@@ -89,7 +89,7 @@ public class Layer {
     identifiers.add(identifier);
   }
 
-  public void addLayer(final Layer layer) {
+  public void addLayer(final WmsLayer layer) {
     layers.add(layer);
     layer.setParent(this);
 
@@ -164,7 +164,7 @@ public class Layer {
     return latLonBoundingBox;
   }
 
-  public List<Layer> getLayers() {
+  public List<WmsLayer> getLayers() {
     return layers;
   }
 
@@ -176,7 +176,7 @@ public class Layer {
     return name;
   }
 
-  public Layer getParent() {
+  public WmsLayer getParent() {
     return parent;
   }
 
@@ -264,7 +264,7 @@ public class Layer {
     this.latLonBoundingBox = latLonBoundingBox;
   }
 
-  public void setLayers(final List<Layer> layers) {
+  public void setLayers(final List<WmsLayer> layers) {
     this.layers = layers;
   }
 
@@ -284,7 +284,7 @@ public class Layer {
     this.opaque = opaque;
   }
 
-  public void setParent(final Layer parent) {
+  public void setParent(final WmsLayer parent) {
     this.parent = parent;
   }
 

@@ -109,8 +109,8 @@ public class Parser extends XmlProcessor {
         }
       } else {
         final Object object = process(parser);
-        if (object instanceof Layer) {
-          final Layer layer = (Layer)object;
+        if (object instanceof WmsLayer) {
+          final WmsLayer layer = (WmsLayer)object;
           capability.setLayer(layer);
         }
       }
@@ -346,9 +346,9 @@ public class Parser extends XmlProcessor {
 
   }
 
-  public Layer processLayer(final XMLStreamReader parser)
+  public WmsLayer processLayer(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
-    final Layer layer = new Layer();
+    final WmsLayer layer = new WmsLayer();
     final String queryable = parser.getAttributeValue(null, "queryable");
     layer.setQueryable("1".equals(queryable));
     final String opaque = parser.getAttributeValue(null, "opaque");
@@ -405,8 +405,8 @@ public class Parser extends XmlProcessor {
           layer.addStyle((Style)object);
         } else if (object instanceof ScaleHint) {
           layer.setScaleHint((ScaleHint)object);
-        } else if (object instanceof Layer) {
-          layer.addLayer((Layer)object);
+        } else if (object instanceof WmsLayer) {
+          layer.addLayer((WmsLayer)object);
         }
       }
 

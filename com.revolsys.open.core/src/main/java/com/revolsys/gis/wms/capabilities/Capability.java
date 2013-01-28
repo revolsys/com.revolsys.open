@@ -9,7 +9,7 @@ public class Capability {
 
   private final List<String> exceptionFormats = new ArrayList<String>();
 
-  private Layer layer;
+  private WmsLayer layer;
 
   public void addExceptionFormat(final String format) {
     exceptionFormats.add(format);
@@ -24,7 +24,7 @@ public class Capability {
     return exceptionFormats;
   }
 
-  public Layer getLayer() {
+  public WmsLayer getLayer() {
     return layer;
   }
 
@@ -32,7 +32,7 @@ public class Capability {
     return requests;
   }
 
-  public void setLayer(final Layer layer) {
+  public void setLayer(final WmsLayer layer) {
     this.layer = layer;
   }
 
