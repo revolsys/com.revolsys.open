@@ -29,8 +29,6 @@ public class ComponentViewport2D extends Viewport2D {
   public ComponentViewport2D(final Project project, final Component component) {
     super(project);
     this.component = component;
-    super.setBoundingBox(getGeometryFactory().getCoordinateSystem()
-      .getAreaBoundingBox());
     project.getPropertyChangeSupport().addPropertyChangeListener(
       new InvokeMethodPropertyChangeListener(this, "updateCachedFields"));
     updateCachedFields();
@@ -270,13 +268,15 @@ public class ComponentViewport2D extends Viewport2D {
       maxDecimalDigits = 15 - maxIntegerDigits;
       getPropertyChangeSupport().firePropertyChange("geometryFactory",
         oldGeometryFactory, geometryFactory);
-      final BoundingBox newBoundingBox = getBoundingBox().convert(
-        geometryFactory);
-      final BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
-      if (intersection.isNull()) {
-        setBoundingBox(areaBoundingBox);
-      } else {
-        setBoundingBox(intersection);
+      BoundingBox boundingBox = getBoundingBox();
+      if (boundingBox != null) {
+        final BoundingBox newBoundingBox = boundingBox.convert(geometryFactory);
+        final BoundingBox intersection = newBoundingBox.intersection(areaBoundingBox);
+        if (intersection.isNull()) {
+          setBoundingBox(areaBoundingBox);
+        } else {
+          setBoundingBox(intersection);
+        }
       }
     }
   }
@@ -292,15 +292,17 @@ public class ComponentViewport2D extends Viewport2D {
   }
 
   public void updateCachedFields() {
-    final com.revolsys.swing.map.layer.Project map = getProject();
-    final GeometryFactory geometryFactory = map.getGeometryFactory();
-    if (!geometryFactory.equals(getGeometryFactory())) {
-      setGeometryFactory(geometryFactory);
+    final Project project = getProject();
+    final GeometryFactory geometryFactory = project.getGeometryFactory();
+    if (geometryFactory != null) {
+      if (geometryFactory != getGeometryFactory()) {
+        setGeometryFactory(geometryFactory);
 
+      }
+      if (getViewAspectRatio() != getBoundingBox().getAspectRatio()) {
+        setBoundingBox(this.getBoundingBox());
+      }
+      component.repaint();
     }
-    if (getViewAspectRatio() != getBoundingBox().getAspectRatio()) {
-      setBoundingBox(this.getBoundingBox());
-    }
-    component.repaint();
   }
 }

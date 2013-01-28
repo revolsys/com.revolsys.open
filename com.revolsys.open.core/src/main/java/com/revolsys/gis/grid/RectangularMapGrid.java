@@ -36,4 +36,6 @@ public interface RectangularMapGrid {
   List<RectangularMapTile> getTiles(final BoundingBox boundingBox);
 
   double getTileWidth();
+
+  String getName();
 }

@@ -10,6 +10,10 @@ public class GridLayer extends AbstractLayer {
 
   private final RectangularMapGrid grid;
 
+  public GridLayer(final RectangularMapGrid grid) {
+    this(grid.getName(), grid);
+  }
+
   public GridLayer(final String name, final RectangularMapGrid grid) {
     super(name);
     this.grid = grid;
