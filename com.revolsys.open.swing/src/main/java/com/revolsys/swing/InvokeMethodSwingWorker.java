@@ -55,7 +55,7 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
     }
     this.object = object;
     this.doneMethodName = doneMethodName;
-    this.doneMethodParameters = doneMethodParameters;
+    this.doneMethodParameters = new ArrayList<Object>(doneMethodParameters);
   }
 
   @Override
