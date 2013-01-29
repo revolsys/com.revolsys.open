@@ -1,6 +1,7 @@
 package com.revolsys.swing.map;
 
 import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -18,10 +19,9 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.layer.Project;
 
-public abstract class Viewport2D {
+public class Viewport2D {
   public static AffineTransform createModelToScreenTransform(
-    final BoundingBox boundingBox,
-    final double viewWidth,
+    final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {
     final AffineTransform modelToScreenTransform = new AffineTransform();
     final double mapWidth = boundingBox.getWidth();
@@ -40,8 +40,7 @@ public abstract class Viewport2D {
   }
 
   public static AffineTransform createScreenToModelTransform(
-    final BoundingBox boundingBox,
-    final double viewWidth,
+    final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {
     final AffineTransform transform = new AffineTransform();
     final double mapWidth = boundingBox.getWidth();
@@ -58,8 +57,7 @@ public abstract class Viewport2D {
     return transform;
   }
 
-  public static double getScale(
-    final Measurable<Length> viewWidth,
+  public static double getScale(final Measurable<Length> viewWidth,
     final Measurable<Length> modelWidth) {
     final double width1 = viewWidth.doubleValue(SI.METRE);
     final double width2 = modelWidth.doubleValue(SI.METRE);
@@ -88,6 +86,10 @@ public abstract class Viewport2D {
 
   private AffineTransform screenToModelTransform;
 
+  private int width;
+
+  private int height;
+
   public Viewport2D() {
   }
 
@@ -96,6 +98,13 @@ public abstract class Viewport2D {
     this.geometryFactory = project.getGeometryFactory();
   }
 
+  public Viewport2D(Project project, int width, int height, BoundingBox boundingBox) {
+    this(project);
+    this.width = width;
+    this.height = height;
+    setBoundingBox(boundingBox);
+    setGeometryFactory(boundingBox.getGeometryFactory());
+  }
 
   /**
    * Add the property change listener.
@@ -112,8 +121,7 @@ public abstract class Viewport2D {
    * @param propertyName The property name.
    * @param listener The listener.
    */
-  public void addPropertyChangeListener(
-    final String propertyName,
+  public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
@@ -130,7 +138,6 @@ public abstract class Viewport2D {
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
-
 
   public Project getProject() {
     return project;
@@ -180,7 +187,11 @@ public abstract class Viewport2D {
     return screenToModelTransform;
   }
 
-  public abstract Unit<Length> getScreenUnit();
+  public Unit<Length> getScreenUnit() {
+    final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+    final int screenResolution = defaultToolkit.getScreenResolution();
+    return NonSI.INCH.divide(screenResolution);
+  }
 
   public double getViewAspectRatio() {
     return getViewWidthPixels() / getViewHeightPixels();
@@ -194,8 +205,6 @@ public abstract class Viewport2D {
     return Measure.valueOf(width, getScreenUnit());
   }
 
-  public abstract double getViewHeightPixels();
-
   public Measurable<Length> getViewWidthLength() {
     double width = getViewWidthPixels();
     if (width < 0) {
@@ -204,7 +213,13 @@ public abstract class Viewport2D {
     return Measure.valueOf(width, getScreenUnit());
   }
 
-  public abstract double getViewWidthPixels();
+  public int getViewHeightPixels() {
+    return height;
+  }
+
+  public int getViewWidthPixels() {
+    return width;
+  }
 
   public boolean isUseModelCoordinates() {
     return savedTransform != null;
@@ -225,8 +240,7 @@ public abstract class Viewport2D {
    * @param propertyName The property name.
    * @param listener The listener.
    */
-  public void removePropertyChangeListener(
-    final String propertyName,
+  public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
   }
@@ -261,8 +275,8 @@ public abstract class Viewport2D {
       oldGeometryFactory, geometryFactory);
   }
 
-
-  public void setUseModelCoordinates(final boolean useModelCoordinates, Graphics2D graphics) {
+  public void setUseModelCoordinates(final boolean useModelCoordinates,
+    Graphics2D graphics) {
     if (savedTransform != null) {
       graphics.setTransform(savedTransform);
     }

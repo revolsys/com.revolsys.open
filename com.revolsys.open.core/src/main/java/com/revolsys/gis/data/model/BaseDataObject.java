@@ -97,9 +97,6 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   public BaseDataObject clone() {
     try {
       final BaseDataObject newObject = (BaseDataObject)super.clone();
-      if (metaData.getIdAttributeIndex() != -1) {
-        newObject.setIdValue(null);
-      }
       return newObject;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException("Unable to clone", e);

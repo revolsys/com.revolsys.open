@@ -13,16 +13,10 @@ import java.awt.geom.AffineTransform;
 import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.projection.GeometryOperation;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
@@ -39,30 +33,14 @@ public class GridLayerRenderer implements LayerRenderer<GridLayer> {
     if (layer.isVisible()) {
       final double scale = viewport.getScale();
       if (scale >= layer.getMinScale() && scale <= layer.getMaxScale()) {
-        final Project project = layer.getProject();
-        viewport.setUseModelCoordinates(true, graphics);
-        final CoordinateSystem coordinateSystem = project.getGeometryFactory()
-          .getCoordinateSystem();
-        GeographicCoordinateSystem geographicCs;
-        GeometryOperation operation = null;
-        if (coordinateSystem instanceof GeographicCoordinateSystem) {
-          geographicCs = (GeographicCoordinateSystem)coordinateSystem;
-        } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-          geographicCs = ((ProjectedCoordinateSystem)coordinateSystem).getGeographicCoordinateSystem();
-          operation = ProjectionFactory.getGeometryOperation(geographicCs,
-            coordinateSystem);
-        } else {
-          return;
-        }
+         viewport.setUseModelCoordinates(true, graphics);
+       
         final BoundingBox boundingBox = viewport.getBoundingBox();
         final RectangularMapGrid grid = layer.getGrid();
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
         final Font font = graphics.getFont();
         for (final RectangularMapTile tile : tiles) {
-          Polygon polygon = tile.getPolygon(50);
-          if (operation != null) {
-            polygon = operation.perform(polygon);
-          }
+          Polygon polygon = tile.getPolygon(viewport.getGeometryFactory(),50);
           graphics.setColor(Color.LIGHT_GRAY);
           graphics.setStroke(new BasicStroke(
             (float)viewport.getModelUnitsPerViewUnit()));

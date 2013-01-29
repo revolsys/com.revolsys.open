@@ -179,17 +179,6 @@ public class ComponentViewport2D extends Viewport2D {
     return modelUnit.times(modelWidth).divide(viewWidth);
   }
 
-  /**
-   * Get the unit of measure representing one screen pixel.
-   * 
-   * @return The unit of measure for screen pixels.
-   */
-  @Override
-  public Unit<Length> getScreenUnit() {
-    final Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-    final int screenResolution = defaultToolkit.getScreenResolution();
-    return NonSI.INCH.divide(screenResolution);
-  }
 
   public BoundingBox getValidBoundingBox(final BoundingBox boundingBox) {
     BoundingBox validBoundingBox = boundingBox;
@@ -229,12 +218,12 @@ public class ComponentViewport2D extends Viewport2D {
   }
 
   @Override
-  public double getViewHeightPixels() {
+  public int getViewHeightPixels() {
     return component.getHeight();
   }
 
   @Override
-  public double getViewWidthPixels() {
+  public int getViewWidthPixels() {
     return component.getWidth();
   }
 
@@ -299,7 +288,8 @@ public class ComponentViewport2D extends Viewport2D {
         setGeometryFactory(geometryFactory);
 
       }
-      if (getViewAspectRatio() != getBoundingBox().getAspectRatio()) {
+      BoundingBox boundingBox = getBoundingBox();
+      if (boundingBox != null && getViewAspectRatio() != boundingBox.getAspectRatio()) {
         setBoundingBox(this.getBoundingBox());
       }
       component.repaint();

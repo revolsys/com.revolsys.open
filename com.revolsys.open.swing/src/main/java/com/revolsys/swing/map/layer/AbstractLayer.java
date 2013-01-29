@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.util.JavaBeanUtil;
@@ -24,6 +25,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
+
+  private GeometryFactory geometryFactory;
 
   private boolean readOnly;
 
@@ -43,7 +46,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private final long id = ID_GEN.incrementAndGet();
 
-  private LayerRenderer renderer;
+  private LayerRenderer<?> renderer;
 
   public AbstractLayer() {
   }
@@ -81,6 +84,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     } else {
       return getBoundingBox();
     }
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   @Override
@@ -136,6 +143,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return propertyChangeSupport;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <L extends LayerRenderer<Layer>> L getRenderer() {
     return (L)renderer;
@@ -213,6 +221,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       this.editable = editable;
       propertyChangeSupport.firePropertyChange("editable", old, editable);
     }
+  }
+
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   @Override

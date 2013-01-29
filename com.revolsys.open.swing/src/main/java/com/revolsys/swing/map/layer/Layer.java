@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.io.ObjectWithProperties;
 
 public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties {
@@ -15,6 +16,8 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
   BoundingBox getBoundingBox();
 
   BoundingBox getBoundingBox(boolean visibleLayersOnly);
+
+  GeometryFactory getGeometryFactory();
 
   long getId();
 

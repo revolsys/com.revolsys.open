@@ -37,7 +37,7 @@ public class DataObjectQuadTree extends Quadtree {
     }
   }
 
-  public void insert(final List<DataObject> objects) {
+  public void insert(final Collection<DataObject> objects) {
     for (final DataObject object : objects) {
       insert(object);
     }
