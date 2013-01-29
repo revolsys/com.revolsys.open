@@ -3,6 +3,7 @@ package com.revolsys.swing.map;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -18,6 +19,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.swing.map.layer.Project;
+import com.vividsolutions.jts.geom.Point;
 
 public class Viewport2D {
   public static AffineTransform createModelToScreenTransform(
@@ -98,7 +100,8 @@ public class Viewport2D {
     this.geometryFactory = project.getGeometryFactory();
   }
 
-  public Viewport2D(Project project, int width, int height, BoundingBox boundingBox) {
+  public Viewport2D(Project project, int width, int height,
+    BoundingBox boundingBox) {
     this(project);
     this.width = width;
     this.height = height;
@@ -313,18 +316,39 @@ public class Viewport2D {
     return convertedValue;
   }
 
-  public double[] toModelCoordinates(final double... sourceCoordinates) {
-    final double[] ordinates = new double[2];
+  public double[] toModelCoordinates(final double... viewCoordinates) {
+    final double[] coordinates = new double[2];
     final AffineTransform transform = getScreenToModelTransform();
-    transform.transform(sourceCoordinates, 0, ordinates, 0, 1);
-    return ordinates;
+    transform.transform(viewCoordinates, 0, coordinates, 0, 1);
+    return coordinates;
   }
 
-  public double[] toViewCoordinates(final double... sourceCoordinates) {
+  public double[] toViewCoordinates(final double... modelCoordinates) {
     final double[] ordinates = new double[2];
     final AffineTransform transform = getModelToScreenTransform();
-    transform.transform(sourceCoordinates, 0, ordinates, 0, 1);
+    transform.transform(modelCoordinates, 0, ordinates, 0, 1);
     return ordinates;
   }
 
+  public Point2D toViewPoint(Point point) {
+    point = (Point)geometryFactory.createGeometry(point);
+    double x = point.getX();
+    double y = point.getY();
+    double[] coordinates = toViewCoordinates(x, y);
+    double viewX = coordinates[0];
+    double viewY = coordinates[1];
+    return new Point2D.Double(viewX, viewY);
+  }
+
+  public Point toModelPoint(double... viewCoordinates) {
+    double[] coordinates = toModelCoordinates(viewCoordinates);
+    return geometryFactory.createPoint(coordinates);
+  }
+
+  public Point toModelPoint(GeometryFactory geometryFactory,
+    double... viewCoordinates) {
+    double[] coordinates = toModelCoordinates(viewCoordinates);
+    Point point = this.geometryFactory.createPoint(coordinates);
+    return (Point)geometryFactory.createGeometry(point);
+  }
 }

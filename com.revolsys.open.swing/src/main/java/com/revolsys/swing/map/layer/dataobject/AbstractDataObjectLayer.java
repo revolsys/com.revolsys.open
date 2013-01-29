@@ -3,7 +3,9 @@ package com.revolsys.swing.map.layer.dataobject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -17,7 +19,8 @@ import com.revolsys.swing.map.symbolizer.PointSymbolizer;
 import com.revolsys.swing.map.symbolizer.PolygonSymbolizer;
 import com.revolsys.swing.map.symbolizer.Symbolizer;
 
-public abstract class AbstractDataObjectLayer extends AbstractLayer {
+public abstract class AbstractDataObjectLayer extends AbstractLayer implements
+  DataObjectLayer {
   private static final DataObjectLayerRenderer RENDERER = new DataObjectLayerRenderer();
 
   private static List<Symbolizer> createDefaultStyles() {
@@ -28,9 +31,69 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer {
     return symbolizers;
   }
 
+  public int setSelectedAtPoint(final boolean selected, final double x,
+    final double y, final int tolerance) {
+    final List<DataObject> objects = getObjects(x, y, tolerance);
+    if (selected) {
+      selectedObjects.addAll(objects);
+    } else {
+      selectedObjects.removeAll(objects);
+    }
+    return objects.size();
+  }
+
   private List<Symbolizer> symbolizers = Collections.emptyList();
 
   private DataObjectMetaData metaData;
+
+  private Set<DataObject> selectedObjects = new LinkedHashSet<DataObject>();
+
+  public List<DataObject> getSelectedObjects() {
+    return new ArrayList<DataObject>(selectedObjects);
+  }
+
+  @Override
+  public int getRowCount() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<DataObject> getObjects() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public DataObject getObject(int row) {
+    throw new UnsupportedOperationException();
+  }
+
+  public List<DataObject> getObjects(double x, double y, int buffer) {
+    // TODO
+    return null;
+  }
+
+  @Override
+  public void selectObjects(List<DataObject> objects) {
+    selectedObjects.addAll(objects);
+  }
+
+  public void selectObjects(DataObject... objects) {
+    selectObjects(Arrays.asList(objects));
+  }
+
+  @Override
+  public void deleteObjects(List<DataObject> objects) {
+   throw new UnsupportedOperationException();
+  }
+
+  public void deleteObjects(DataObject... objects) {
+    deleteObjects(Arrays.asList(objects));
+  }
+
+  @Override
+  public void clearSelection() {
+    selectedObjects = new LinkedHashSet<DataObject>();
+  }
 
   public AbstractDataObjectLayer() {
     setSymbolizers(createDefaultStyles());

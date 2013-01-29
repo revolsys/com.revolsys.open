@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.symbolizer;
 
+import java.awt.Color;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -7,7 +8,7 @@ public class Fill {
   private final PropertyChangeSupport eventHandler = new PropertyChangeSupport(
     this);
 
-  private CharSequence color;
+  private CharSequence colorString;
 
   private Graphic pattern;
 
@@ -24,13 +25,17 @@ public class Fill {
 
   public Fill(final CharSequence fillColor, final Number opacity,
     final Graphic pattern) {
-    this.color = fillColor;
+    this.colorString = fillColor;
     this.opacity = opacity;
     this.pattern = pattern;
   }
 
   public Fill(final Fill fill) {
-    this(fill.getColor(), fill.getOpacity(), fill.getPattern());
+    this(fill.getColorString(), fill.getOpacity(), fill.getPattern());
+  }
+
+  public Fill(Color color) {
+    this.color = color;
   }
 
   /**
@@ -48,8 +53,7 @@ public class Fill {
    * @param propertyName The property name.
    * @param listener The listener.
    */
-  public void addPropertyChangeListener(
-    final String propertyName,
+  public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     eventHandler.addPropertyChangeListener(propertyName, listener);
   }
@@ -68,7 +72,16 @@ public class Fill {
     return (int)(opacity.floatValue() * 255 + 0.5);
   }
 
-  public CharSequence getColor() {
+  public CharSequence getColorString() {
+    return colorString;
+  }
+
+  private Color color;
+
+  public Color getColor() {
+    if (color == null) {
+      color = CssUtil.getColor(getColorString(), getAlpha());
+    }
     return color;
   }
 
@@ -95,16 +108,15 @@ public class Fill {
    * @param propertyName The property name.
    * @param listener The listener.
    */
-  public void removePropertyChangeListener(
-    final String propertyName,
+  public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     eventHandler.removePropertyChangeListener(propertyName, listener);
   }
 
   public void setColor(final CharSequence color) {
-    final Object oldValue = this.color;
-    this.color = color;
-    eventHandler.firePropertyChange("color", oldValue, this.color);
+    final Object oldValue = this.colorString;
+    this.colorString = color;
+    eventHandler.firePropertyChange("color", oldValue, this.colorString);
   }
 
   public void setOpacity(final Number opacity) {
@@ -124,5 +136,4 @@ public class Fill {
     this.pattern = pattern;
     eventHandler.firePropertyChange("pattern", oldValue, this.pattern);
   }
-
 }

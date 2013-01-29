@@ -21,6 +21,11 @@ public class PolygonSymbolizer extends AbstractGeometrySymbolizer {
       Measure.valueOf(0.0, NonSI.PIXEL), Measure.valueOf(0.0, NonSI.PIXEL));
   }
 
+  public PolygonSymbolizer(final Stroke stroke, final Fill fill) {
+    this(stroke, fill, Measure.valueOf(0.0, NonSI.PIXEL), Measure.valueOf(0.0,
+      NonSI.PIXEL), Measure.valueOf(0.0, NonSI.PIXEL));
+  }
+
   public PolygonSymbolizer(final Stroke stroke, final Fill fill,
     final Measure<Length> displacementX, final Measure<Length> displacementY,
     final Measure<Length> offset) {

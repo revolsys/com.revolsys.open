@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.symbolizer;
 
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -14,7 +15,7 @@ public class Stroke implements PropertyChangeListener {
     this);
 
   /** SVG stroke. */
-  private CharSequence color;
+  private CharSequence colorString;
 
   /** SVG stroke-opacity. */
   private Number opacity = 1;
@@ -23,7 +24,7 @@ public class Stroke implements PropertyChangeListener {
   private List<Measure<Length>> dashArray;
 
   /** SVG stroke-dashoffset. */
-  private Measure<Length> dashOffset;
+  private Measure<Length> dashOffset =Measure.valueOf(0.0, NonSI.PIXEL);
 
   private Fill fillPattern;
 
@@ -37,10 +38,15 @@ public class Stroke implements PropertyChangeListener {
   private double mitreLimit = 10;
 
   /** SVG stroke-width. */
-  private Measure<Length> width;
+  private Measure<Length> width = Measure.valueOf(1, NonSI.PIXEL);
 
   public Stroke() {
     this(null, null, null, 10, null, null, null);
+  }
+
+  public Stroke(final Color color, double width) {
+    this.color = color;
+    this.width = Measure.valueOf(width, NonSI.PIXEL);
   }
 
   public Stroke(final CharSequence color, final Measure<Length> width) {
@@ -62,7 +68,7 @@ public class Stroke implements PropertyChangeListener {
   }
 
   public Stroke(final Stroke stroke) {
-    this(stroke.getColor(), stroke.getWidth(), stroke.getLineCap(),
+    this(stroke.getColorString(), stroke.getWidth(), stroke.getLineCap(),
       stroke.getMitreLimit(), stroke.getLineJoin(), stroke.getDashArray(),
       stroke.getDashOffset());
   }
@@ -82,8 +88,7 @@ public class Stroke implements PropertyChangeListener {
    * @param propertyName The property name.
    * @param listener The listener.
    */
-  public void addPropertyChangeListener(
-    final String propertyName,
+  public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
@@ -102,7 +107,16 @@ public class Stroke implements PropertyChangeListener {
     return (int)(opacity.floatValue() * 255 + 0.5);
   }
 
-  public CharSequence getColor() {
+  public CharSequence getColorString() {
+    return colorString;
+  }
+
+  private Color color;
+
+  public Color getColor() {
+    if (color == null) {
+      color = CssUtil.getColor(getColorString(), getAlpha());
+    }
     return color;
   }
 
@@ -158,20 +172,20 @@ public class Stroke implements PropertyChangeListener {
    * @param propertyName The property name.
    * @param listener The listener.
    */
-  public void removePropertyChangeListener(
-    final String propertyName,
+  public void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
   }
 
   public void setColor(final CharSequence color) {
-    final CharSequence oldValue = this.color;
+    final CharSequence oldValue = this.colorString;
     if (color == null) {
-      this.color = "#000000";
+      this.colorString = "#000000";
     } else {
-      this.color = color;
+      this.colorString = color;
     }
-    propertyChangeSupport.firePropertyChange("color", oldValue, this.color);
+    propertyChangeSupport.firePropertyChange("color", oldValue,
+      this.colorString);
   }
 
   public void setDashArray(final List<Measure<Length>> dashArray) {
@@ -182,7 +196,7 @@ public class Stroke implements PropertyChangeListener {
 
   public void setDashOffset(final Measure<Length> dashOffset) {
     final Object oldValue = this.dashOffset;
-    if (this.dashOffset == null) {
+    if (dashOffset == null) {
       this.dashOffset = Measure.valueOf(0.0, NonSI.PIXEL);
     } else {
       this.dashOffset = dashOffset;

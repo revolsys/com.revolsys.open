@@ -36,6 +36,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Location;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -445,11 +446,27 @@ public class CoordinatesListUtil {
     } else if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
       return get(polygon);
+    } else if (geometry instanceof MultiPoint) {
+      final MultiPoint multiPoint = (MultiPoint)geometry;
+      return get(multiPoint);
     } else if (geometry.getNumGeometries() > 0) {
       return get(geometry.getGeometryN(0));
     } else {
       return null;
     }
+  }
+
+  public static CoordinatesList get(final MultiPoint multiPoint) {
+    int numPoints = multiPoint.getNumGeometries();
+    GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    int numAxis = geometryFactory.getNumAxis();
+    DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints, numAxis);
+    for (int i = 0; i < numPoints; i++) {
+      Point point = (Point)multiPoint.getGeometryN(i);
+      Coordinates coordinates = CoordinatesUtil.get(point);
+      points.setPoint(i, coordinates);
+    }
+    return points;
   }
 
   public static CoordinatesList get(final LineString line) {

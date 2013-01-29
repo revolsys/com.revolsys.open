@@ -10,15 +10,13 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.symbolizer.CssUtil;
 import com.revolsys.swing.map.symbolizer.Fill;
 import com.revolsys.swing.map.symbolizer.Graphic;
 import com.revolsys.swing.map.symbolizer.Stroke;
 
 public class SymbolizerUtil {
 
-  public static BasicStroke getBasicStroke(
-    final Stroke stroke,
+  public static BasicStroke getBasicStroke(final Stroke stroke,
     final Viewport2D viewport) {
     Measure<Length> strokeWidth = stroke.getWidth();
     if (strokeWidth == null) {
@@ -74,8 +72,7 @@ public class SymbolizerUtil {
 
   public static void setFill(final Graphics2D graphics, final Fill fill) {
     if (fill != null) {
-      final CharSequence fillColor = fill.getColor();
-      final Color color = CssUtil.getColor(fillColor, fill.getAlpha());
+      final Color color = fill.getColor();
       graphics.setPaint(color);
       final Graphic fillPattern = fill.getPattern();
       if (fillPattern != null) {
@@ -97,13 +94,10 @@ public class SymbolizerUtil {
     }
   }
 
-  public static void setStroke(
-    final Viewport2D viewport,
-    final Graphics2D graphics,
-    final Stroke stroke) {
+  public static void setStroke(final Viewport2D viewport,
+    final Graphics2D graphics, final Stroke stroke) {
     if (stroke != null) {
-      final CharSequence strokeColor = stroke.getColor();
-      final Color color = CssUtil.getColor(strokeColor, stroke.getAlpha());
+      final Color color = stroke.getColor();
       graphics.setColor(color);
       final BasicStroke basicStroke = getBasicStroke(stroke, viewport);
       graphics.setStroke(basicStroke);
