@@ -69,9 +69,11 @@ public class InvokeMethodSwingWorker<T, V> extends SwingWorker<T, V> {
 
   @Override
   protected void done() {
-    T result;
+    T result = null;
     try {
-      result = get();
+      if (!isCancelled()) {
+        result = get();
+      }
     } catch (InterruptedException e) {
       return;
     } catch (ExecutionException e) {
