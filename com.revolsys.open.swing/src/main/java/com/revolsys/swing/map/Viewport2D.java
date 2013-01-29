@@ -317,10 +317,14 @@ public class Viewport2D {
   }
 
   public double[] toModelCoordinates(final double... viewCoordinates) {
-    final double[] coordinates = new double[2];
     final AffineTransform transform = getScreenToModelTransform();
-    transform.transform(viewCoordinates, 0, coordinates, 0, 1);
-    return coordinates;
+    if (transform == null) {
+      return viewCoordinates;
+    } else {
+      final double[] coordinates = new double[2];
+      transform.transform(viewCoordinates, 0, coordinates, 0, 1);
+      return coordinates;
+    }
   }
 
   public double[] toViewCoordinates(final double... modelCoordinates) {
