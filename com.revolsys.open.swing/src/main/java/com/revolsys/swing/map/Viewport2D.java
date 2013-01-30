@@ -72,7 +72,7 @@ public class Viewport2D {
   }
 
   /** The current bounding box of the project. */
-  private BoundingBox boundingBox;
+  private BoundingBox boundingBox = new BoundingBox();
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
 
@@ -295,10 +295,11 @@ public class Viewport2D {
   public double toDisplayValue(final Measure<Length> value) {
     double convertedValue;
     final Unit<Length> unit = value.getUnit();
+    double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
     if (unit.equals(NonSI.PIXEL)) {
       convertedValue = value.doubleValue(NonSI.PIXEL);
       if (isUseModelCoordinates()) {
-        convertedValue = convertedValue * getModelUnitsPerViewUnit();
+        convertedValue = convertedValue * modelUnitsPerViewUnit;
       }
     } else {
       convertedValue = value.doubleValue(SI.METRE);
@@ -310,7 +311,7 @@ public class Viewport2D {
 
       }
       if (!isUseModelCoordinates()) {
-        convertedValue = convertedValue / getModelUnitsPerViewUnit();
+        convertedValue = convertedValue / modelUnitsPerViewUnit;
       }
     }
     return convertedValue;
@@ -330,8 +331,12 @@ public class Viewport2D {
   public double[] toViewCoordinates(final double... modelCoordinates) {
     final double[] ordinates = new double[2];
     final AffineTransform transform = getModelToScreenTransform();
-    transform.transform(modelCoordinates, 0, ordinates, 0, 1);
-    return ordinates;
+    if (transform == null) {
+      return modelCoordinates;
+    } else {
+      transform.transform(modelCoordinates, 0, ordinates, 0, 1);
+      return ordinates;
+    }
   }
 
   public Point2D toViewPoint(Point point) {

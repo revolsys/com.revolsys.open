@@ -9,7 +9,6 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.symbolizer.Graphic;
 
 public class Style {
 
@@ -23,6 +22,19 @@ public class Style {
     final Style style = new Style();
     style.setLineColor(color);
     style.setLineWidth(width);
+    return style;
+  }
+
+  public static Style marker(final String markerName, final int markerSize,
+    final Color lineColor, final int lineWidth, final Color fillColor) {
+    final Style style = new Style();
+    style.setMarker(new ShapeMarker(markerName));
+    style.setMarkerWidth(markerSize);
+    style.setMarkerHeight(markerSize);
+    style.setMarkerDeltaX(-markerSize / 2);
+    style.setMarkerDeltaY(-markerSize / 2);
+    style.setLineColor(lineColor);
+    style.setPolygonFillColor(fillColor);
     return style;
   }
 
@@ -46,45 +58,11 @@ public class Style {
 
   private Measure<Length> markerHeight = Measure.valueOf(10, NonSI.PIXEL);
 
-  public void setMarkerWidth(Measure<Length> markerWidth) {
-    if (markerWidth == null) {
-      this.markerWidth = Measure.valueOf(10, NonSI.PIXEL);
-    } else {
-      this.markerWidth = markerWidth;
-    }
-  }
+  private Measure<Length> markerDeltaX = Measure.valueOf(0, NonSI.PIXEL);
 
-  public void setMarkerHeight(Measure<Length> markerHeight) {
-    if (markerHeight == null) {
-      this.markerHeight = Measure.valueOf(10, NonSI.PIXEL);
-    } else {
-      this.markerHeight = markerWidth;
-    }
-  }
+  private Measure<Length> markerDeltaY = Measure.valueOf(0, NonSI.PIXEL);
 
-  public void setMarkerWidth(double markerWidth) {
-    setMarkerWidth(Measure.valueOf(markerWidth, NonSI.PIXEL));
-  }
-
-  public void setMarkerHeight(double markerHeight) {
-    setMarkerHeight(Measure.valueOf(markerHeight, NonSI.PIXEL));
-  }
-
-  public Measure<Length> getMarkerWidth() {
-    return markerWidth;
-  }
-
-  public Measure<Length> getMarkerHeight() {
-    return markerHeight;
-  }
-
-  public void setLineWidth(Measure<Length> lineWidth) {
-    if (lineWidth == null) {
-      this.lineWidth = Measure.valueOf(1, NonSI.PIXEL);
-    } else {
-      this.lineWidth = lineWidth;
-    }
-  }
+  private Marker marker = new ShapeMarker("square");
 
   private boolean lineClip = true;
 
@@ -162,6 +140,26 @@ public class Style {
     return lineWidth.doubleValue(NonSI.PIXEL);
   }
 
+  public Marker getMarker() {
+    return marker;
+  }
+
+  public Measure<Length> getMarkerDeltaX() {
+    return markerDeltaX;
+  }
+
+  public Measure<Length> getMarkerDeltaY() {
+    return markerDeltaY;
+  }
+
+  public Measure<Length> getMarkerHeight() {
+    return markerHeight;
+  }
+
+  public Measure<Length> getMarkerWidth() {
+    return markerWidth;
+  }
+
   public CompositionOperation getPolygonCompositionOperation() {
     return polygonCompositionOperation;
   }
@@ -192,6 +190,27 @@ public class Style {
 
   public boolean isPolygonClip() {
     return polygonClip;
+  }
+
+  public void setFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
+    graphics.setPaint(polygonFillColor);
+    // final Graphic fillPattern = fill.getPattern();
+    // if (fillPattern != null) {
+    // TODO fillPattern
+    // double width = fillPattern.getWidth();
+    // double height = fillPattern.getHeight();
+    // Rectangle2D.Double patternRect;
+    // // TODO units
+    // // if (isUseModelUnits()) {
+    // // patternRect = new Rectangle2D.Double(0, 0, width
+    // // * viewport.getModelUnitsPerViewUnit(), height
+    // // * viewport.getModelUnitsPerViewUnit());
+    // // } else {
+    // patternRect = new Rectangle2D.Double(0, 0, width, height);
+    // // }
+    // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
+
+    // }
   }
 
   public void setLineCap(final LineCap lineCap) {
@@ -301,6 +320,66 @@ public class Style {
     this.lineWidth = Measure.valueOf(lineWidth, NonSI.PIXEL);
   }
 
+  public void setLineWidth(final Measure<Length> lineWidth) {
+    if (lineWidth == null) {
+      this.lineWidth = Measure.valueOf(1, NonSI.PIXEL);
+    } else {
+      this.lineWidth = lineWidth;
+    }
+  }
+
+  public void setMarker(final Marker marker) {
+    this.marker = marker;
+  }
+
+  public void setMarkerDeltaX(final Measure<Length> markerDeltaX) {
+    if (markerDeltaX == null) {
+      this.markerDeltaX = Measure.valueOf(0, NonSI.PIXEL);
+    } else {
+      this.markerDeltaX = markerDeltaX;
+    }
+  }
+
+  public void setMarkerDeltaX(final double markerDeltaX) {
+    setMarkerDeltaX(Measure.valueOf(markerDeltaX, NonSI.PIXEL));
+  }
+
+  public void setMarkerDeltaY(final Measure<Length> markerDeltaY) {
+    if (markerDeltaY == null) {
+      this.markerDeltaY = Measure.valueOf(0, NonSI.PIXEL);
+    } else {
+      this.markerDeltaY = markerDeltaY;
+    }
+  }
+
+  public void setMarkerDeltaY(final double markerDeltaY) {
+    setMarkerDeltaY(Measure.valueOf(markerDeltaY, NonSI.PIXEL));
+  }
+
+  public void setMarkerHeight(final double markerHeight) {
+    setMarkerHeight(Measure.valueOf(markerHeight, NonSI.PIXEL));
+  }
+
+  public void setMarkerHeight(final Measure<Length> markerHeight) {
+    if (markerHeight == null) {
+      this.markerHeight = Measure.valueOf(10, NonSI.PIXEL);
+    } else {
+      this.markerHeight = markerWidth;
+    }
+  }
+
+  public void setMarkerWidth(final double markerWidth) {
+    setMarkerWidth(Measure.valueOf(markerWidth, NonSI.PIXEL));
+  }
+
+  public void setMarkerWidth(final Measure<Length> markerWidth) {
+    if (markerWidth == null) {
+      this.markerWidth = Measure.valueOf(10, NonSI.PIXEL);
+    } else {
+      this.markerWidth = markerWidth;
+    }
+  }
+
   public void setPolygonClip(final boolean polygonClip) {
     this.polygonClip = polygonClip;
   }
@@ -352,27 +431,6 @@ public class Style {
 
   public void setPolygonSmooth(final double polygonSmooth) {
     this.polygonSmooth = polygonSmooth;
-  }
-
-  public void setFillStyle(Viewport2D viewport, Graphics2D graphics) {
-    graphics.setPaint(polygonFillColor);
-   // final Graphic fillPattern = fill.getPattern();
-   // if (fillPattern != null) {
-      // TODO fillPattern
-      // double width = fillPattern.getWidth();
-      // double height = fillPattern.getHeight();
-      // Rectangle2D.Double patternRect;
-      // // TODO units
-      // // if (isUseModelUnits()) {
-      // // patternRect = new Rectangle2D.Double(0, 0, width
-      // // * viewport.getModelUnitsPerViewUnit(), height
-      // // * viewport.getModelUnitsPerViewUnit());
-      // // } else {
-      // patternRect = new Rectangle2D.Double(0, 0, width, height);
-      // // }
-      // graphics.setPaint(new TexturePaint(fillPattern, patternRect));
-
-    //}
   }
 
 }

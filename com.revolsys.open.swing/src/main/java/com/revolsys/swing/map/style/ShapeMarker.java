@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.style;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -12,17 +13,10 @@ import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
 
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.dataobject.symbolizer.SymbolizerUtil;
-import com.revolsys.swing.map.symbolizer.Fill;
-import com.revolsys.swing.map.symbolizer.Graphic;
-import com.revolsys.swing.map.symbolizer.Stroke;
-import com.revolsys.swing.map.symbolizer.WellKnownMarkGraphicSymbol;
 
-public class ShapeMarker {
+public class ShapeMarker implements Marker {
 
   private static final Map<String, Shape> SHAPES = new HashMap<String, Shape>();
 
@@ -113,38 +107,55 @@ public class ShapeMarker {
 
   public ShapeMarker(Shape shape) {
     this.shape = shape;
+    if (shape != null) {
+      Rectangle bounds = shape.getBounds();
+      double width = bounds.width;
+      double height = bounds.height;
+      double scale;
+      if (width > height) {
+        scale = 1 / width;
+      } else {
+        scale = 1 / height;
+      }
+      AffineTransform transform = AffineTransform.getTranslateInstance(
+        -bounds.x, -bounds.y);
+      transform.concatenate(AffineTransform.getScaleInstance(scale, scale));
+      this.shape = new GeneralPath(shape).createTransformedShape(transform);
+    }
   }
 
   public ShapeMarker(String name) {
-    this.shape = SHAPES.get(name);
+    this(SHAPES.get(name));
     if (shape == null) {
       throw new IllegalArgumentException("Unknown shape " + name);
     }
   }
 
   public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final Style style, final double originX, final double originY) {
+    final Style style, final double modelX, double modelY) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
     final AffineTransform savedTransform = graphics.getTransform();
-    final double width = viewport.toDisplayValue(style.getMarkerWidth());
-    final double height = viewport.toDisplayValue(style.getMarkerHeight());;
-    double x = originX;
-    double y = originY;
-//    x -= width * graphic.getAnchorX().doubleValue();
-//    y -= height * (1 - graphic.getAnchorY().doubleValue());
-//    final double rotation = graphic.getRotation().doubleValue(SI.RADIAN);
-//    if (rotation != 0) {
-//      graphics.rotate(rotation, x, y);
-//    }
-//    x += viewport.toDisplayValue(graphic.getDisplacementX());
-//    y -= viewport.toDisplayValue(graphic.getDisplacementY());
+    Measure<Length> markerWidth = style.getMarkerWidth();
+    double mapWidth = viewport.toDisplayValue(markerWidth);
+    Measure<Length> markerHeight = style.getMarkerHeight();
+    double mapHeight = viewport.toDisplayValue(markerHeight);
+    double x = modelX;
+    double y = modelY;
+    Measure<Length> deltaX = style.getMarkerDeltaX();
+    x += viewport.toDisplayValue(deltaX);
+    Measure<Length> deltaY = style.getMarkerDeltaX();
+    y += viewport.toDisplayValue(deltaY);
+    // final double rotation = graphic.getRotation().doubleValue(SI.RADIAN);
+    // if (rotation != 0) {
+    // graphics.rotate(rotation, x, y);
+    // }
     graphics.translate(x, y);
     final Shape newShape = new GeneralPath(shape).createTransformedShape(AffineTransform.getScaleInstance(
-      width, height));
-    style.setLineStyle(viewport, graphics);
+      mapWidth, mapHeight));
     style.setFillStyle(viewport, graphics);
     graphics.fill(newShape);
+    style.setLineStyle(viewport, graphics);
     graphics.draw(newShape);
     graphics.setTransform(savedTransform);
   }

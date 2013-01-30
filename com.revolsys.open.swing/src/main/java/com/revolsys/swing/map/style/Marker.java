@@ -1,5 +1,10 @@
 package com.revolsys.swing.map.style;
 
-public interface Marker {
+import java.awt.Graphics2D;
 
+import com.revolsys.swing.map.Viewport2D;
+
+public interface Marker {
+  void render(Viewport2D viewport, Graphics2D graphics, Style style,
+    double modelX, double modelY);
 }
