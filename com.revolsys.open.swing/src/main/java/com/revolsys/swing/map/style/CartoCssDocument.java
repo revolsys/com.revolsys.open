@@ -1,4 +1,4 @@
-package com.revolsys.io.carto;
+package com.revolsys.swing.map.style;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -1,4 +1,4 @@
-package com.revolsys.io.carto;
+package com.revolsys.swing.map.style;
 
 public enum CartoCssProperty {
  image_filters("image-filters"),

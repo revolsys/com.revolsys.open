@@ -4,6 +4,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -16,6 +17,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.Viewport2D;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer implements
   List<DataObject> {
@@ -54,6 +57,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     metaData.setGeometryFactory(geometryFactory);
     return metaData;
   }
+
+
+  
+  @Override
+  public List<DataObject> getObjects(Geometry geometry, double distance) {
+    geometry = getGeometryFactory().createGeometry(geometry);
+    return index.queryDistance(geometry, distance);
+  }
+ 
 
   public void addAllObjects(final Collection<? extends DataObject> objects) {
     List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);

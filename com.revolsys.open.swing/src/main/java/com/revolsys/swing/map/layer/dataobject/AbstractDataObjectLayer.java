@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.dataobject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.revolsys.swing.map.symbolizer.LineSymbolizer;
 import com.revolsys.swing.map.symbolizer.PointSymbolizer;
 import com.revolsys.swing.map.symbolizer.PolygonSymbolizer;
 import com.revolsys.swing.map.symbolizer.Symbolizer;
+import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectLayer {
@@ -31,9 +33,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return symbolizers;
   }
 
-  public int setSelectedAtPoint(final boolean selected, final double x,
-    final double y, final int tolerance) {
-    final List<DataObject> objects = getObjects(x, y, tolerance);
+  public int setSelectedWithinDistance(final boolean selected,
+    final Geometry geometry, final int distance) {
+    final List<DataObject> objects = getObjects(geometry, distance);
     if (selected) {
       selectedObjects.addAll(objects);
     } else {
@@ -48,8 +50,26 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<DataObject> selectedObjects = new LinkedHashSet<DataObject>();
 
+  private Set<DataObject> editingObjects = new LinkedHashSet<DataObject>();
+
+  @Override
+  public void setEditingObjects(
+    Collection<? extends DataObject> invisibleObjects) {
+    this.editingObjects = new LinkedHashSet<DataObject>(invisibleObjects);
+  }
+
+  @Override
+  public void clearEditingObjects() {
+    this.editingObjects.clear();
+  }
+
   public List<DataObject> getSelectedObjects() {
     return new ArrayList<DataObject>(selectedObjects);
+  }
+
+  @Override
+  public Set<DataObject> getEditingObjects() {
+    return editingObjects;
   }
 
   @Override
@@ -67,9 +87,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     throw new UnsupportedOperationException();
   }
 
-  public List<DataObject> getObjects(double x, double y, int buffer) {
-    // TODO
-    return null;
+  public List<DataObject> getObjects(Geometry geometry, double distance) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -83,7 +102,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   @Override
   public void deleteObjects(List<DataObject> objects) {
-   throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException();
   }
 
   public void deleteObjects(DataObject... objects) {

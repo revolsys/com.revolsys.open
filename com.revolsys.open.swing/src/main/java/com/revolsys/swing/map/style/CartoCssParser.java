@@ -1,4 +1,4 @@
-package com.revolsys.io.carto;
+package com.revolsys.swing.map.style;
 
 import java.io.BufferedReader;
 import java.io.File;

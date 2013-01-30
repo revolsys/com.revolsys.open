@@ -1,4 +1,4 @@
-package com.revolsys.io.carto;
+package com.revolsys.swing.map.style;
 
 import java.awt.Color;
 import java.util.Collections;
@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 
 public class RuleSet {
   private Selector selector;
-
+ 
   private Map<CartoCssProperty, String> declarations = new LinkedHashMap<CartoCssProperty, String>();
 
   public RuleSet(Selector selector, Map<CartoCssProperty, String> declarations) {

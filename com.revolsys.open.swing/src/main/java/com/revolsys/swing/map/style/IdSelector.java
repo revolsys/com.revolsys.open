@@ -1,4 +1,4 @@
-package com.revolsys.io.carto;
+package com.revolsys.swing.map.style;
 
 public class IdSelector implements Selector {
 

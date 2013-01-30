@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.jmx.LoggerDynamicMBean;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.cs.BoundingBox;
@@ -91,6 +90,11 @@ public class DataObjectLayerRenderer implements
         viewport.setUseModelCoordinates(true, graphics);
         final BoundingBox boundingBox = viewport.getBoundingBox();
         List<DataObject> dataObjects = layer.getDataObjects(viewport);
+
+        if (layer.isEditable()) {
+          dataObjects.removeAll(layer.getEditingObjects());
+        }
+        
         final GeometryFactory mapGeometryFactory = boundingBox.getGeometryFactory();
         final GeometryFactory layerGeometryFactory = layer.getGeometryFactory();
         if (layerGeometryFactory != null
