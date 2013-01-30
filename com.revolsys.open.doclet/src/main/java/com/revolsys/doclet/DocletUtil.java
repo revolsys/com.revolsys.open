@@ -5,17 +5,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.doclet.client.ClientDoclet;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeDoc;
+import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ExecutableMemberDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.ProgramElementDoc;
-import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Type;
 import com.sun.javadoc.WildcardType;
 
@@ -78,13 +77,17 @@ public class DocletUtil {
         }
       }
     } else {
+      boolean included = isTypeIncluded(type);
       final String qualifiedTypeName = type.qualifiedTypeName();
       if (qualifiedTypeName.startsWith("java.")) {
         final String url = "http://docs.oracle.com/javase/6/docs/api/"
           + qualifiedTypeName.replaceAll("\\.", "/") + ".html?is-external=true";
         HtmlUtil.serializeA(writer, "", url, type.typeName());
+      } else if (included) {
+        final String url = "#" + qualifiedTypeName;
+        HtmlUtil.serializeA(writer, "", url, type.typeName());
       } else {
-        writer.text(type);
+        writer.text(qualifiedTypeName);
       }
       if (type instanceof ParameterizedType) {
         ParameterizedType parameterizedType = (ParameterizedType)type;
@@ -105,11 +108,24 @@ public class DocletUtil {
     writer.text(type.dimension());
   }
 
+  public static boolean isTypeIncluded(final Type type) {
+    ClassDoc classDoc = type.asClassDoc();
+    ClassDoc annotationDoc = type.asAnnotationTypeDoc();
+    boolean included = annotationDoc != null && annotationDoc.isIncluded()
+      || classDoc != null && classDoc.isIncluded();
+    return included;
+  }
+
   public static void typeName(XmlWriter writer, final Type type) {
-    String typeName = type.qualifiedTypeName();
-    typeName = typeName.replaceAll("^java.lang.", "");
-    typeName = typeName.replaceAll("^java.io.", "");
-    typeName = typeName.replaceAll("^java.util.", "");
+    String typeName;
+    if (isTypeIncluded(type)) {
+      typeName = type.typeName();
+    } else {
+      typeName = type.qualifiedTypeName();
+      typeName = typeName.replaceAll("^java.lang.", "");
+      typeName = typeName.replaceAll("^java.io.", "");
+      typeName = typeName.replaceAll("^java.util.", "");
+    }
     writer.text(typeName);
     writer.text(type.dimension());
   }
@@ -156,7 +172,8 @@ public class DocletUtil {
   }
 
   public static void copyFiles(String destDir) {
-    for (String name : Arrays.asList("javadoc.css", "javadoc.js", "javadoc.js", "prettify.js", "prettify.css")) {
+    for (String name : Arrays.asList("javadoc.css", "javadoc.js", "javadoc.js",
+      "prettify.js", "prettify.css")) {
       FileUtil.copy(
         DocletUtil.class.getResourceAsStream("/com/revolsys/doclet/" + name),
         new File(destDir, name));
