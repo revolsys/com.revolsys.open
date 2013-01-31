@@ -20,6 +20,7 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.DocErrorReporter;
 import com.sun.javadoc.ExecutableMemberDoc;
+import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
@@ -213,6 +214,59 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
+
+  public void documentationEnum(final ClassDoc enumDoc) {
+    writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
+    final String name = enumDoc.name();
+
+    DocletUtil.title(writer, DocletUtil.qualifiedName(enumDoc), name);
+
+    writer.startTag(HtmlUtil.DIV);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "content");
+    writer.write(enumDoc.commentText());
+
+    final FieldDoc[] elements = enumDoc.enumConstants();
+    if (elements.length > 0) {
+      DocletUtil.title(writer, "Enum Constants");
+
+      writer.startTag(HtmlUtil.DIV);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable parameters");
+      writer.startTag(HtmlUtil.TABLE);
+      writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+      writer.startTag(HtmlUtil.THEAD);
+      writer.startTag(HtmlUtil.TR);
+      writer.element(HtmlUtil.TH, "Constant");
+       writer.element(HtmlUtil.TH, "Description");
+      writer.endTagLn(HtmlUtil.TR);
+      writer.endTagLn(HtmlUtil.THEAD);
+
+      writer.startTag(HtmlUtil.TBODY);
+      for (final FieldDoc element : elements) {
+        writer.startTag(HtmlUtil.TR);
+        final String elementName = element.name();
+
+        writer.startTag(HtmlUtil.TD);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "constant");
+        writer.text(elementName);
+        writer.endTagLn(HtmlUtil.TD);
+
+        writer.startTag(HtmlUtil.TD);
+        writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+        writer.text(element.commentText());
+        writer.endTagLn(HtmlUtil.TD);
+        writer.endTagLn(HtmlUtil.TR);
+      }
+      writer.endTagLn(HtmlUtil.TBODY);
+
+      writer.endTagLn(HtmlUtil.TABLE);
+      writer.endTagLn(HtmlUtil.DIV);
+
+    }
+    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlUtil.DIV);
+  }
+
   public void documentationClass(final ClassDoc classDoc) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass");
@@ -283,6 +337,7 @@ public class ClientDoclet {
     writer.write(packageDoc.commentText());
 
     documentationAnnotations(packageDoc);
+    documentationEnums(packageDoc);
     documentationInterfaces(packageDoc);
     documentationClasses(packageDoc);
 
@@ -290,6 +345,19 @@ public class ClientDoclet {
     writer.endTagLn(HtmlUtil.DIV);
   }
 
+
+  public void documentationEnums(final PackageDoc packageDoc) {
+    final Map<String, ClassDoc> enums = new TreeMap<String, ClassDoc>();
+    for (final ClassDoc enumDoc : packageDoc.enums()) {
+      enums.put(enumDoc.name(), enumDoc);
+    }
+    if (!enums.isEmpty()) {
+      DocletUtil.title(writer, "Enums");
+      for (final ClassDoc enumDoc : enums.values()) {
+        documentationEnum(enumDoc);
+      }
+    }
+  }
   public void documentationAnnotations(final PackageDoc packageDoc) {
     final Map<String, AnnotationTypeDoc> annotations = new TreeMap<String, AnnotationTypeDoc>();
     for (final AnnotationTypeDoc annotationDoc : packageDoc.annotationTypes()) {
@@ -472,7 +540,9 @@ public class ClientDoclet {
 
         writer.startTag(HtmlUtil.TD);
         writer.attribute(HtmlUtil.ATTR_CLASS, "type");
-        DocletUtil.typeNameLink(writer, parameter.type());
+
+        Type type = parameter.type();
+        DocletUtil.typeNameLink(writer, type);
         writer.endTagLn(HtmlUtil.TD);
 
         description(descriptions, name);

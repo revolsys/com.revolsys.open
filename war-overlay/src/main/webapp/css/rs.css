@@ -592,6 +592,9 @@ div.simpleDataTable>div>table {
   margin-left: 0px;
   width: auto;
 }
+div.simpleDataTable>div>table>tbody>tr>th {
+  text-align: left;
+}
 
 div.simpleDataTable>div>table.data>thead>tr:first-child>th {
   border-top-width: 0px;
