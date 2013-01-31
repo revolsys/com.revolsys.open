@@ -249,20 +249,22 @@ public class Viewport2D {
   }
 
   public void setBoundingBox(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(getGeometryFactory());
-    if (!boundingBox.isNull()) {
-      final BoundingBox oldBoundingBox = this.boundingBox;
-      this.boundingBox = boundingBox;
+    if (boundingBox != null) {
+      boundingBox = boundingBox.convert(getGeometryFactory());
+      if (!boundingBox.isNull()) {
+        final BoundingBox oldBoundingBox = this.boundingBox;
+        this.boundingBox = boundingBox;
 
-      final double viewWidth = getViewWidthPixels();
-      final double viewHeight = getViewHeightPixels();
-      modelToScreenTransform = createModelToScreenTransform(boundingBox,
-        viewWidth, viewHeight);
-      screenToModelTransform = createScreenToModelTransform(boundingBox,
-        viewWidth, viewHeight);
+        final double viewWidth = getViewWidthPixels();
+        final double viewHeight = getViewHeightPixels();
+        modelToScreenTransform = createModelToScreenTransform(boundingBox,
+          viewWidth, viewHeight);
+        screenToModelTransform = createScreenToModelTransform(boundingBox,
+          viewWidth, viewHeight);
 
-      propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
-        boundingBox);
+        propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
+          boundingBox);
+      }
     }
   }
 

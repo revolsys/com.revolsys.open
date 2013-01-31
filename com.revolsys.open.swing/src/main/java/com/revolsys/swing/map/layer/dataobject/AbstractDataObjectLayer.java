@@ -13,7 +13,6 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.symbolizer.LineSymbolizer;
 import com.revolsys.swing.map.symbolizer.PointSymbolizer;
@@ -151,12 +150,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return getGeometryFactory().getCoordinateSystem();
   }
 
-  public List<DataObject> getDataObjects(final Viewport2D viewport) {
-    return getDataObjects(viewport, viewport.getBoundingBox());
-  }
-
-  public List<DataObject> getDataObjects(final Viewport2D viewport,
-    final BoundingBox boundingBox) {
+  public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
     return Collections.emptyList();
   }
 

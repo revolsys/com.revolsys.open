@@ -342,7 +342,7 @@ public class GeometryFactory extends
           geometrySrid, numAxis, getScaleXY(), getScaleZ());
         return geometryFactory.createGeometry(geometry);
       } else if (srid != 0 && geometrySrid != srid) {
-        return GeometryProjectionUtil.perform(geometry, this);
+        return GeometryProjectionUtil.performCopy(geometry, this);
       } else if (geometry instanceof MultiPoint) {
         final List<Point> geometries = new ArrayList<Point>();
         for (int i = 0; i < geometry.getNumGeometries(); i++) {
@@ -394,6 +394,15 @@ public class GeometryFactory extends
         throw new RuntimeException("Unknown geometry type " + geometry);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G copy(G geometry) {
+    return (G)createGeometry(geometry);
+  }
+
+  public <G extends Geometry> G project(G geometry) {
+    return (G)GeometryProjectionUtil.perform(geometry, this);
   }
 
   public Geometry createGeometry(final List<? extends Geometry> geometries) {
@@ -625,7 +634,7 @@ public class GeometryFactory extends
       final LinearRing ring = createLinearRing(nullPoints);
       return createPolygon(ring, null);
     } else {
-       final LinearRing exteriorRing = getLinearRing(rings, 0);
+      final LinearRing exteriorRing = getLinearRing(rings, 0);
       final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
       for (int i = 1; i < rings.size(); i++) {
         interiorRings[i - 1] = getLinearRing(rings, i);
@@ -759,7 +768,7 @@ public class GeometryFactory extends
   }
 
   public double makePrecise(double value) {
-     return getPrecisionModel().makePrecise(value);
+    return getPrecisionModel().makePrecise(value);
   }
 
 }

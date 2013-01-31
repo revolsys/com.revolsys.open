@@ -6,6 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.util.List;
 
+import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeometryFactory;
 import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -22,6 +23,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryRendererUtil {
 
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
+    .createEmptyGeometry();
+
   public static final void renderGeometry(Viewport2D viewport,
     Graphics2D graphics, Geometry geometry, Style style) {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
@@ -37,7 +41,21 @@ public class GeometryRendererUtil {
         renderPolygon(viewport, graphics, polygon, style);
       }
     }
+  }
 
+  private static Geometry getGeometry(Viewport2D viewport, Style style,
+    Geometry geometry) {
+    BoundingBox viewExtent = viewport.getBoundingBox();
+    if (geometry != null) {
+      if (viewExtent.isNull()) {
+        BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        if (geometryExtent.intersects(viewExtent)) {
+          GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          return geometryFactory.createGeometry(geometry);
+        }
+      }
+    }
+    return EMPTY_GEOMETRY;
   }
 
   public static final void renderOutline(Viewport2D viewport,
@@ -63,11 +81,10 @@ public class GeometryRendererUtil {
 
   public static final void renderVertices(Viewport2D viewport,
     Graphics2D graphics, Geometry geometry, Style style) {
-    GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    if (geometryFactory != null) {
+    geometry = getGeometry(viewport, style, geometry);
+    if (!geometry.isEmpty()) {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
         Geometry part = geometry.getGeometryN(i);
-        part = geometryFactory.createGeometry(part);
         if (geometry instanceof Point) {
           Point point = (Point)geometry;
           renderPoint(viewport, graphics, point, style);
@@ -88,15 +105,13 @@ public class GeometryRendererUtil {
 
   public static final void renderPolygon(Viewport2D viewport,
     Graphics2D graphics, Polygon polygon, Style style) {
-    GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    if (geometryFactory != null) {
+    Geometry geometry = getGeometry(viewport, style, polygon);
+    if (!geometry.isEmpty()) {
       final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
       viewport.setUseModelCoordinates(true, graphics);
       Paint paint = graphics.getPaint();
       try {
-        Polygon convertedPolygon = (Polygon)geometryFactory.createGeometry(polygon);
-        // TODO clip
-        Shape shape = GeometryShapeUtil.toShape(viewport, convertedPolygon);
+        Shape shape = GeometryShapeUtil.toShape(viewport, geometry);
         style.setFillStyle(viewport, graphics);
         graphics.fill(shape);
         style.setLineStyle(viewport, graphics);
@@ -110,15 +125,13 @@ public class GeometryRendererUtil {
 
   public static final void renderLineString(Viewport2D viewport,
     Graphics2D graphics, LineString lineString, Style style) {
-    GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    if (geometryFactory != null) {
+    Geometry geometry = getGeometry(viewport, style, lineString);
+    if (!geometry.isEmpty()) {
       final boolean savedUseModelUnits = viewport.isUseModelCoordinates();
       viewport.setUseModelCoordinates(true, graphics);
       Paint paint = graphics.getPaint();
       try {
-        LineString convertedLineString = (LineString)geometryFactory.createGeometry(lineString);
-        // TODO clip
-        Shape shape = GeometryShapeUtil.toShape(viewport, convertedLineString);
+        Shape shape = GeometryShapeUtil.toShape(viewport, lineString);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
@@ -134,10 +147,9 @@ public class GeometryRendererUtil {
 
   public static final void renderPoint(Viewport2D viewport,
     Graphics2D graphics, Point point, Style style) {
-    GeometryFactory geometryFactory = viewport.getGeometryFactory();
-    if (geometryFactory != null) {
-      Point convertedPoint = (Point)geometryFactory.createGeometry(point);
-      Coordinates coordinates = CoordinatesUtil.get(convertedPoint);
+    Geometry geometry = getGeometry(viewport, style, point);
+    if (!geometry.isEmpty()) {
+      Coordinates coordinates = CoordinatesUtil.get((Point)geometry);
       renderPoint(viewport, graphics, style, coordinates);
     }
   }

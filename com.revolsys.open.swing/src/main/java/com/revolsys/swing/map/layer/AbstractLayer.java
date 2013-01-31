@@ -34,9 +34,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   private boolean selectSupported = true;
 
-  private double maxScale = Double.MAX_VALUE;
+  private double maximumScale = 0;
 
-  private double minScale = 0;
+  private double minimumScale = Double.MAX_VALUE;
 
   private boolean visible = true;
 
@@ -86,6 +86,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
@@ -101,13 +102,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public double getMaxScale() {
-    return maxScale;
+  public double getMaximumScale() {
+    return maximumScale;
   }
 
   @Override
-  public double getMinScale() {
-    return minScale;
+  public double getMinimumScale() {
+    return minimumScale;
   }
 
   @Override
@@ -185,6 +186,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public boolean isVisible(final double scale) {
+    if (isVisible()) {
+      if ((long)scale <= getMinimumScale()) {
+        if ((long)scale >= getMaximumScale()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
     propertyChangeSupport.firePropertyChange(evt);
   }
@@ -237,13 +250,13 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setMaxScale(final double maxScale) {
-    this.maxScale = maxScale;
+  public void setMaximumScale(final double maxScale) {
+    this.maximumScale = maxScale;
   }
 
   @Override
-  public void setMinScale(final double minScale) {
-    this.minScale = minScale;
+  public void setMinimumScale(final double minScale) {
+    this.minimumScale = minScale;
   }
 
   @Override
@@ -260,21 +273,24 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       propertyChangeSupport.firePropertyChange("properties",
         this.getProperties(), properties);
       super.setProperties(properties);
-      JavaBeanUtil.setProperties(this, properties);
     }
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
-    final Object oldValue = getProperty(name);
-    if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
-      final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this,
-        "property", oldValue, value, name);
-      propertyChangeSupport.firePropertyChange(event);
+    if (name.equals("minimumScale")) {
+      setMinimumScale(((Number)value).doubleValue());
+    } else if (name.equals("maximumScale")) {
+      setMaximumScale(((Number)value).doubleValue());
+    } else {
+      final Object oldValue = getProperty(name);
+      if (!EqualsRegistry.INSTANCE.equals(oldValue, value)) {
+        final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(
+          this, "property", oldValue, value, name);
+        propertyChangeSupport.firePropertyChange(event);
 
-      super.setProperty(name, value);
-      JavaBeanUtil.setProperty(this, name, value);
-
+        super.setProperty(name, value);
+      }
     }
   }
 

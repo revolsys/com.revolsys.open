@@ -84,26 +84,24 @@ public class DataObjectLayerRenderer implements
   @Override
   public void render(final Viewport2D viewport, Graphics2D graphics,
     final AbstractDataObjectLayer layer) {
-    if (layer.isVisible()) {
-      final double scale = viewport.getScale();
-      if (scale >= layer.getMinScale() && scale <= layer.getMaxScale()) {
-        viewport.setUseModelCoordinates(true, graphics);
-        final BoundingBox boundingBox = viewport.getBoundingBox();
-        List<DataObject> dataObjects = layer.getDataObjects(viewport);
+    final double scale = viewport.getScale();
+    if (layer.isVisible(scale)) {
+      viewport.setUseModelCoordinates(true, graphics);
+      final BoundingBox boundingBox = viewport.getBoundingBox();
+      List<DataObject> dataObjects = layer.getDataObjects(boundingBox);
 
-        if (layer.isEditable()) {
-          dataObjects.removeAll(layer.getEditingObjects());
-        }
-        
-        final GeometryFactory mapGeometryFactory = boundingBox.getGeometryFactory();
-        final GeometryFactory layerGeometryFactory = layer.getGeometryFactory();
-        if (layerGeometryFactory != null
-          && !mapGeometryFactory.equals(layerGeometryFactory)) {
-          dataObjects = getProjectedObjects(layerGeometryFactory,
-            mapGeometryFactory, dataObjects);
-        }
-        renderObjects(viewport, graphics, layer, dataObjects);
+      if (layer.isEditable()) {
+        dataObjects.removeAll(layer.getEditingObjects());
       }
+
+      final GeometryFactory mapGeometryFactory = boundingBox.getGeometryFactory();
+      final GeometryFactory layerGeometryFactory = layer.getGeometryFactory();
+      if (layerGeometryFactory != null
+        && !mapGeometryFactory.equals(layerGeometryFactory)) {
+        dataObjects = getProjectedObjects(layerGeometryFactory,
+          mapGeometryFactory, dataObjects);
+      }
+      renderObjects(viewport, graphics, layer, dataObjects);
     }
   }
 

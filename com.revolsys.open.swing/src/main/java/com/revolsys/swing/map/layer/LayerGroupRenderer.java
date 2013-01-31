@@ -15,13 +15,13 @@ public class LayerGroupRenderer implements LayerRenderer<LayerGroup> {
 
   @Override
   public void render(final Viewport2D viewport, Graphics2D graphics, final LayerGroup layer) {
-    if (layer.isVisible()) {
+    if (layer.isVisible(viewport.getScale())) {
       viewport.setUseModelCoordinates(false, graphics);
       final List<Layer> layers = new ArrayList<Layer>(layer.getLayers());
       Collections.reverse(layers);
 
       for (final Layer childLayer : layers) {
-        if (childLayer.isVisible()) {
+        if (childLayer.isVisible(viewport.getScale())) {
           try {
             final LayerRenderer<Layer> renderer = childLayer.getRenderer();
             if (renderer != null) {

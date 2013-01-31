@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 
+import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.util.CollectionUtil;
 
 public class SwingWorkerManager {

@@ -33,7 +33,7 @@ public final class ProjectionFactory {
       TransverseMercator.class);
     registerCoordinatesProjection("Mercator", Mercator1SP.class);
     registerCoordinatesProjection("Popular_Visualisation_Pseudo_Mercator",
-      Mercator1SP.class);
+      WebMercator.class);
     registerCoordinatesProjection("Mercator_(1SP)", Mercator1SP.class);
     registerCoordinatesProjection("Mercator_(2SP)", Mercator2SP.class);
     registerCoordinatesProjection("Mercator_(1SP)_(Spherical)",

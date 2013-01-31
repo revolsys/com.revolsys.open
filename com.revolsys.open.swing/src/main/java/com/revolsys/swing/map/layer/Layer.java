@@ -23,9 +23,9 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
 
   LayerGroup getLayerGroup();
 
-  double getMaxScale();
+  double getMaximumScale();
 
-  double getMinScale();
+  double getMinimumScale();
 
   String getName();
 
@@ -60,9 +60,21 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
 
   void setLayerGroup(LayerGroup layerGroup);
 
-  void setMaxScale(double maxScale);
+  /**
+   * Set the maximum scale. This is the scale that if you zoom in to a more
+   * detailed scale than the maximum scale the layer will not be visible. This
+   * is inverse from the logical definition of maximum. If scale < maximumScale
+   * it will not be shown.
+   */
+  void setMaximumScale(double maximumScale);
 
-  void setMinScale(double minScale);
+  /**
+  * Set the minimum scale. This is the scale that if you zoom out to a less
+   * detailed scale than the minimum scale the layer will not be visible. This
+   * is inverse from the logical definition of minimum. If scale > minimumScale
+   * it will not be shown.
+   */
+  void setMinimumScale(double minimumScale);
 
   void setName(String name);
 
@@ -73,4 +85,6 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties 
   void setSelectable(boolean selectable);
 
   void setVisible(boolean visible);
+
+  boolean isVisible(double scale);
 }

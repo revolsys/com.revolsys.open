@@ -27,65 +27,63 @@ public class GridLayerRenderer implements LayerRenderer<GridLayer> {
   public GridLayerRenderer() {
   }
 
-
   @Override
-  public void render(final Viewport2D viewport, Graphics2D graphics, final GridLayer layer) {
-    if (layer.isVisible()) {
-      final double scale = viewport.getScale();
-      if (scale >= layer.getMinScale() && scale <= layer.getMaxScale()) {
-         viewport.setUseModelCoordinates(true, graphics);
-       
-        final BoundingBox boundingBox = viewport.getBoundingBox();
-        final RectangularMapGrid grid = layer.getGrid();
-        final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
-        final Font font = graphics.getFont();
-        for (final RectangularMapTile tile : tiles) {
-          Polygon polygon = tile.getPolygon(viewport.getGeometryFactory(),50);
-          graphics.setColor(Color.LIGHT_GRAY);
-          graphics.setStroke(new BasicStroke(
-            (float)viewport.getModelUnitsPerViewUnit()));
-          Shape shape = GeometryShapeUtil.toShape(viewport, polygon);
-          graphics.draw(shape);
+  public void render(final Viewport2D viewport, Graphics2D graphics,
+    final GridLayer layer) {
+    final double scale = viewport.getScale();
+    if (layer.isVisible(scale)) {
+      viewport.setUseModelCoordinates(true, graphics);
 
-          final Point centroid = polygon.getCentroid();
-          final Coordinate coordinate = centroid.getCoordinate();
+      final BoundingBox boundingBox = viewport.getBoundingBox();
+      final RectangularMapGrid grid = layer.getGrid();
+      final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
+      final Font font = graphics.getFont();
+      for (final RectangularMapTile tile : tiles) {
+        Polygon polygon = tile.getPolygon(viewport.getGeometryFactory(), 50);
+        graphics.setColor(Color.LIGHT_GRAY);
+        graphics.setStroke(new BasicStroke(
+          (float)viewport.getModelUnitsPerViewUnit()));
+        Shape shape = GeometryShapeUtil.toShape(viewport, polygon);
+        graphics.draw(shape);
 
-          viewport.setUseModelCoordinates(false, graphics);
+        final Point centroid = polygon.getCentroid();
+        final Coordinate coordinate = centroid.getCoordinate();
 
-          final Font newFont = new Font(font.getName(), font.getStyle(), 12);
-          graphics.setFont(newFont);
+        viewport.setUseModelCoordinates(false, graphics);
 
-          final FontMetrics metrics = graphics.getFontMetrics();
-          final double[] coord = new double[2];
-          viewport.getModelToScreenTransform().transform(new double[] {
-            coordinate.x, coordinate.y
-          }, 0, coord, 0, 1);
-          final String tileName = tile.getName();
-          final int x = (int)(coord[0] + metrics.stringWidth(tileName) / 2);
-          final int y = (int)(coord[1] + metrics.getHeight() / 2);
+        final Font newFont = new Font(font.getName(), font.getStyle(), 12);
+        graphics.setFont(newFont);
 
-          final Stroke savedStroke = graphics.getStroke();
-          final Stroke outlineStroke = new BasicStroke(3, BasicStroke.CAP_BUTT,
-            BasicStroke.JOIN_BEVEL);
-          graphics.setColor(Color.WHITE);
-          graphics.setStroke(outlineStroke);
+        final FontMetrics metrics = graphics.getFontMetrics();
+        final double[] coord = new double[2];
+        viewport.getModelToScreenTransform().transform(new double[] {
+          coordinate.x, coordinate.y
+        }, 0, coord, 0, 1);
+        final String tileName = tile.getName();
+        final int x = (int)(coord[0] + metrics.stringWidth(tileName) / 2);
+        final int y = (int)(coord[1] + metrics.getHeight() / 2);
 
-          graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-          final TextLayout textLayout = new TextLayout(tileName, newFont,
-            graphics.getFontRenderContext());
+        final Stroke savedStroke = graphics.getStroke();
+        final Stroke outlineStroke = new BasicStroke(3, BasicStroke.CAP_BUTT,
+          BasicStroke.JOIN_BEVEL);
+        graphics.setColor(Color.WHITE);
+        graphics.setStroke(outlineStroke);
 
-          graphics.draw(textLayout.getOutline(AffineTransform.getTranslateInstance(x,
-            y)));
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+          RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        final TextLayout textLayout = new TextLayout(tileName, newFont,
+          graphics.getFontRenderContext());
 
-          graphics.setStroke(savedStroke);
+        graphics.draw(textLayout.getOutline(AffineTransform.getTranslateInstance(
+          x, y)));
 
-          graphics.setColor(Color.BLACK);
-          graphics.drawString(tileName, x, y);
-          viewport.setUseModelCoordinates(true, graphics);
-        }
-        graphics.setFont(font);
+        graphics.setStroke(savedStroke);
+
+        graphics.setColor(Color.BLACK);
+        graphics.drawString(tileName, x, y);
+        viewport.setUseModelCoordinates(true, graphics);
       }
+      graphics.setFont(font);
     }
   }
 

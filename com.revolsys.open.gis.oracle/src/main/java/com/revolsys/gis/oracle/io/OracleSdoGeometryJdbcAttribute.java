@@ -261,7 +261,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int dimension) throws SQLException {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
-      geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);
+      geometry = GeometryProjectionUtil.performCopy(geometry, geometryFactory);
       // TODO direct convert to SDO Geometry from JTS Geometry
       JGeometry jGeometry = null;
       if (object instanceof Polygon) {

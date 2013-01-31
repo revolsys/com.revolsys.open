@@ -116,7 +116,7 @@ public class ArcSdeOracleStGeometryJdbcAttribute extends JdbcAttribute {
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
-      geometry = GeometryProjectionUtil.perform(geometry, geometryFactory);
+      geometry = GeometryProjectionUtil.performCopy(geometry, geometryFactory);
 
       final int sdeSrid = spatialReference.getEsriSrid();
       final Double xOffset = spatialReference.getXOffset();

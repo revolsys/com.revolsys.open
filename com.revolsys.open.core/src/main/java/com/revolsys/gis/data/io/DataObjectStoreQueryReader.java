@@ -82,10 +82,11 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
       }
       if (boundingBox != null) {
         query.setBoundingBox(boundingBox);
-      }
+      } 
+      
       final AbstractIterator<DataObject> iterator = dataStore.createIterator(
         query, getProperties());
-      return iterator;
+       return iterator;
     }
     throw new NoSuchElementException();
   }

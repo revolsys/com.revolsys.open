@@ -16,9 +16,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.swing.map.Viewport2D;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer implements
   List<DataObject> {
@@ -58,14 +56,11 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
     return metaData;
   }
 
-
-  
   @Override
   public List<DataObject> getObjects(Geometry geometry, double distance) {
     geometry = getGeometryFactory().createGeometry(geometry);
     return index.queryDistance(geometry, distance);
   }
- 
 
   public void addAllObjects(final Collection<? extends DataObject> objects) {
     List<DataObject> oldValue = new ArrayList<DataObject>(this.objects);
@@ -111,17 +106,15 @@ public class DataObjectListLayer extends AbstractDataObjectLayer implements
   }
 
   @Override
-  public List<DataObject> getDataObjects(final Viewport2D viewport) {
-    return getDataObjects(viewport, viewport.getBoundingBox());
-  }
-
-  @Override
-  public List<DataObject> getDataObjects(final Viewport2D viewport,
-    final BoundingBox boundingBox) {
-    GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-    final List<DataObject> objects = index.query(convertedBoundingBox);
-    return objects;
+  public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
+    if (boundingBox.isNull()) {
+      return Collections.emptyList();
+    } else {
+      GeometryFactory geometryFactory = getGeometryFactory();
+      BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+      final List<DataObject> objects = index.query(convertedBoundingBox);
+      return objects;
+    }
   }
 
   public List<DataObject> getObjects() {

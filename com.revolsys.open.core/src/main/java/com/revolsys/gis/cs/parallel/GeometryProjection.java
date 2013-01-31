@@ -21,7 +21,7 @@ public class GeometryProjection extends
     final Geometry geometry = object.getGeometryValue();
 
     if (geometry != null) {
-      final Geometry projectedGeometry = GeometryProjectionUtil.perform(
+      final Geometry projectedGeometry = GeometryProjectionUtil.performCopy(
         geometry, geometryFactory);
       if (geometry != projectedGeometry) {
         object.setGeometryValue(projectedGeometry);
