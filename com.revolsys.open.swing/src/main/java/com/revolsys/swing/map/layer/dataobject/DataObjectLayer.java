@@ -43,4 +43,12 @@ public interface DataObjectLayer extends Layer {
   void clearEditingObjects();
 
   Set<DataObject> getEditingObjects();
+
+  void setHiddenObjects(Collection<? extends DataObject> hiddenObjects);
+
+  void clearHiddenObjects();
+
+  Set<DataObject> getHiddenObjects();
+
+  void setHiddenObjects(DataObject... hiddenObjects);
 }

@@ -32,17 +32,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return symbolizers;
   }
 
-  public int setSelectedWithinDistance(final boolean selected,
-    final Geometry geometry, final int distance) {
-    final List<DataObject> objects = getObjects(geometry, distance);
-    if (selected) {
-      selectedObjects.addAll(objects);
-    } else {
-      selectedObjects.removeAll(objects);
-    }
-    return objects.size();
-  }
-
   private List<Symbolizer> symbolizers = Collections.emptyList();
 
   private DataObjectMetaData metaData;
@@ -51,67 +40,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private Set<DataObject> editingObjects = new LinkedHashSet<DataObject>();
 
-  @Override
-  public void setEditingObjects(
-    Collection<? extends DataObject> invisibleObjects) {
-    this.editingObjects = new LinkedHashSet<DataObject>(invisibleObjects);
-  }
-
-  @Override
-  public void clearEditingObjects() {
-    this.editingObjects.clear();
-  }
-
-  public List<DataObject> getSelectedObjects() {
-    return new ArrayList<DataObject>(selectedObjects);
-  }
-
-  @Override
-  public Set<DataObject> getEditingObjects() {
-    return editingObjects;
-  }
-
-  @Override
-  public int getRowCount() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public List<DataObject> getObjects() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public DataObject getObject(int row) {
-    throw new UnsupportedOperationException();
-  }
-
-  public List<DataObject> getObjects(Geometry geometry, double distance) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void selectObjects(List<DataObject> objects) {
-    selectedObjects.addAll(objects);
-  }
-
-  public void selectObjects(DataObject... objects) {
-    selectObjects(Arrays.asList(objects));
-  }
-
-  @Override
-  public void deleteObjects(List<DataObject> objects) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void deleteObjects(DataObject... objects) {
-    deleteObjects(Arrays.asList(objects));
-  }
-
-  @Override
-  public void clearSelection() {
-    selectedObjects = new LinkedHashSet<DataObject>();
-  }
+  private Set<DataObject> hiddenObjects = new LinkedHashSet<DataObject>();
 
   public AbstractDataObjectLayer() {
     setSymbolizers(createDefaultStyles());
@@ -124,12 +53,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setMetaData(metaData);
   }
 
-  public AbstractDataObjectLayer(final String name,
-    final GeometryFactory geometryFactory) {
-    this(name);
-    setGeometryFactory(geometryFactory);
-  }
-
   public AbstractDataObjectLayer(final String name) {
     super(name);
     setReadOnly(false);
@@ -139,11 +62,42 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     setRenderer(RENDERER);
   }
 
+  public AbstractDataObjectLayer(final String name,
+    final GeometryFactory geometryFactory) {
+    this(name);
+    setGeometryFactory(geometryFactory);
+  }
+
   public void addSymbolizer(final Symbolizer symbolizer) {
     if (symbolizer != null) {
       symbolizers.add(symbolizer);
     }
 
+  }
+
+  @Override
+  public void clearEditingObjects() {
+    this.editingObjects.clear();
+  }
+
+  @Override
+  public void clearHiddenObjects() {
+    this.hiddenObjects.clear();
+  }
+
+  @Override
+  public void clearSelection() {
+    selectedObjects = new LinkedHashSet<DataObject>();
+  }
+
+  @Override
+  public void deleteObjects(final DataObject... objects) {
+    deleteObjects(Arrays.asList(objects));
+  }
+
+  @Override
+  public void deleteObjects(final List<DataObject> objects) {
+    throw new UnsupportedOperationException();
   }
 
   public CoordinateSystem getCoordinateSystem() {
@@ -154,8 +108,45 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return Collections.emptyList();
   }
 
+  @Override
+  public Set<DataObject> getEditingObjects() {
+    return editingObjects;
+  }
+
+  @Override
+  public Set<DataObject> getHiddenObjects() {
+    return hiddenObjects;
+  }
+
+  @Override
   public DataObjectMetaData getMetaData() {
     return metaData;
+  }
+
+  @Override
+  public DataObject getObject(final int row) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<DataObject> getObjects() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<DataObject> getObjects(final Geometry geometry,
+    final double distance) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int getRowCount() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<DataObject> getSelectedObjects() {
+    return new ArrayList<DataObject>(selectedObjects);
   }
 
   public List<Symbolizer> getSymbolizers() {
@@ -166,9 +157,48 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return symbolizers;
   }
 
+  @Override
+  public void selectObjects(final DataObject... objects) {
+    selectObjects(Arrays.asList(objects));
+  }
+
+  @Override
+  public void selectObjects(final List<DataObject> objects) {
+    selectedObjects.addAll(objects);
+  }
+
+  @Override
+  public void setEditingObjects(
+    final Collection<? extends DataObject> invisibleObjects) {
+    this.editingObjects = new LinkedHashSet<DataObject>(invisibleObjects);
+  }
+
+  @Override
+  public void setHiddenObjects(
+    final Collection<? extends DataObject> hiddenObjects) {
+    this.hiddenObjects = new LinkedHashSet<DataObject>(hiddenObjects);
+  }
+
+  @Override
+  public void setHiddenObjects(final DataObject... hiddenObjects) {
+    setHiddenObjects(Arrays.asList(hiddenObjects));
+  }
+
   protected void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
     setGeometryFactory(metaData.getGeometryFactory());
+  }
+
+  @Override
+  public int setSelectedWithinDistance(final boolean selected,
+    final Geometry geometry, final int distance) {
+    final List<DataObject> objects = getObjects(geometry, distance);
+    if (selected) {
+      selectedObjects.addAll(objects);
+    } else {
+      selectedObjects.removeAll(objects);
+    }
+    return objects.size();
   }
 
   public void setSymbolizers(final List<Symbolizer> symbolizers) {
@@ -185,6 +215,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       this.symbolizers);
   }
 
+  @Override
   public void setSymbolizers(final Symbolizer... symbolizers) {
     setSymbolizers(Arrays.asList(symbolizers));
   }

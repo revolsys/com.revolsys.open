@@ -183,7 +183,9 @@ public class Viewport2D {
   }
 
   public double getScale() {
-    return getScale(getViewWidthLength(), getModelWidthLength());
+    Measurable<Length> viewWidth = getViewWidthLength();
+    Measurable<Length> modelWidth = getModelWidthLength();
+    return getScale(viewWidth, modelWidth);
   }
 
   public AffineTransform getScreenToModelTransform() {
@@ -250,22 +252,29 @@ public class Viewport2D {
 
   public void setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null) {
-      boundingBox = boundingBox.convert(getGeometryFactory());
-      if (!boundingBox.isNull()) {
+      BoundingBox convertedBoundingBox = boundingBox.convert(getGeometryFactory());
+      if (!convertedBoundingBox.isNull()) {
         final BoundingBox oldBoundingBox = this.boundingBox;
-        this.boundingBox = boundingBox;
+        double oldScale = getScale();
+        this.boundingBox = convertedBoundingBox;
 
         final double viewWidth = getViewWidthPixels();
         final double viewHeight = getViewHeightPixels();
-        modelToScreenTransform = createModelToScreenTransform(boundingBox,
-          viewWidth, viewHeight);
-        screenToModelTransform = createScreenToModelTransform(boundingBox,
-          viewWidth, viewHeight);
+        modelToScreenTransform = createModelToScreenTransform(
+          convertedBoundingBox, viewWidth, viewHeight);
+        screenToModelTransform = createScreenToModelTransform(
+          convertedBoundingBox, viewWidth, viewHeight);
 
+        double newScale = getScale();
         propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox,
-          boundingBox);
+          convertedBoundingBox);
+        propertyChangeSupport.firePropertyChange("scale", oldScale, newScale);
       }
     }
+  }
+
+  public void setScale(double scale) {
+    propertyChangeSupport.firePropertyChange("scale", getScale(), scale);
   }
 
   /**
@@ -352,8 +361,12 @@ public class Viewport2D {
   }
 
   public Point toModelPoint(double... viewCoordinates) {
-    double[] coordinates = toModelCoordinates(viewCoordinates);
-    return geometryFactory.createPoint(coordinates);
+    if (geometryFactory == null) {
+      return GeometryFactory.getFactory().createPoint();
+    } else {
+      double[] coordinates = toModelCoordinates(viewCoordinates);
+      return geometryFactory.createPoint(coordinates);
+    }
   }
 
   public Point toModelPoint(GeometryFactory geometryFactory,

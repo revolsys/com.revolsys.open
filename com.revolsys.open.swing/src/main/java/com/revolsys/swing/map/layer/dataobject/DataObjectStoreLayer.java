@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.dataobject;
 import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import javax.swing.SwingWorker;
 
@@ -86,10 +87,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       synchronized (sync) {
 
         try {
-          index = get();
-          final DataObjectStoreLayer layer = DataObjectStoreLayer.this;
-          PropertyChangeSupport propertyChangeSupport = layer.getPropertyChangeSupport();
-          propertyChangeSupport.firePropertyChange("loaded", false, true);
+          if (!isCancelled()) {
+            index = get();
+            final DataObjectStoreLayer layer = DataObjectStoreLayer.this;
+            PropertyChangeSupport propertyChangeSupport = layer.getPropertyChangeSupport();
+            propertyChangeSupport.firePropertyChange("loaded", false, true);
+          }
+        } catch (CancellationException e) {
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass()).error(
             "Unable to load " + typePath, t);

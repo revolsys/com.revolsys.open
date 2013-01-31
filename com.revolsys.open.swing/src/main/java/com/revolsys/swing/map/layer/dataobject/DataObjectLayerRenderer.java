@@ -93,6 +93,7 @@ public class DataObjectLayerRenderer implements
       if (layer.isEditable()) {
         dataObjects.removeAll(layer.getEditingObjects());
       }
+      dataObjects.removeAll(layer.getHiddenObjects());
 
       final GeometryFactory mapGeometryFactory = boundingBox.getGeometryFactory();
       final GeometryFactory layerGeometryFactory = layer.getGeometryFactory();

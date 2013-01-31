@@ -289,7 +289,9 @@ public class ComponentViewport2D extends Viewport2D {
 
       }
       BoundingBox boundingBox = getBoundingBox();
-      if (boundingBox != null && getViewAspectRatio() != boundingBox.getAspectRatio()) {
+      double viewAspectRatio = getViewAspectRatio();
+      double aspectRatio = boundingBox.getAspectRatio();
+      if (boundingBox != null && viewAspectRatio != aspectRatio) {
         setBoundingBox(this.getBoundingBox());
       }
       component.repaint();
