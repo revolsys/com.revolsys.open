@@ -1,7 +1,5 @@
 package com.revolsys.gis.cs;
 
-import java.math.BigDecimal;
-
 import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -696,5 +694,11 @@ public class BoundingBox extends Envelope {
     s.append((long)getMaxY());
     s.append(')');
     return s.toString();
+  }
+
+  public void expandPercent(double factor) {
+    double deltaX = getWidth() * factor / 2;
+    double deltaY = getHeight() * factor / 2;
+    expandBy(deltaX, deltaY);
   }
 }

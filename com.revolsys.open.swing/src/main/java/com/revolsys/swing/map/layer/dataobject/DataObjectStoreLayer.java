@@ -108,14 +108,16 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     public String toString() {
       return "Loading: " + typePath;
     }
-  };
+  }
 
   @Override
-  public List<DataObject> getDataObjects(final BoundingBox boundingBox) {
+  public List<DataObject> getDataObjects( BoundingBox boundingBox) {
     if (boundingBox.isNull()) {
       return Collections.emptyList();
     } else {
       synchronized (sync) {
+        boundingBox = new BoundingBox(boundingBox);
+        boundingBox.expandPercent(0.2);
         if (!this.boundingBox.contains(boundingBox)
           && !loadingBoundingBox.contains(boundingBox)) {
           if (loadingWorker != null) {
