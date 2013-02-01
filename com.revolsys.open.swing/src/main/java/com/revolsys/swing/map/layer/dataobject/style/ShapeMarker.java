@@ -132,7 +132,7 @@ public class ShapeMarker implements Marker {
   }
 
   public void render(final Viewport2D viewport, final Graphics2D graphics,
-    final Style style, final double modelX, double modelY) {
+    final GeometryStyle style, final double modelX, double modelY) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
     final AffineTransform savedTransform = graphics.getTransform();
@@ -142,9 +142,9 @@ public class ShapeMarker implements Marker {
     double mapHeight = viewport.toDisplayValue(markerHeight);
     double x = modelX;
     double y = modelY;
-    Measure<Length> deltaX = style.getMarkerDeltaX();
+    Measure<Length> deltaX = style.getMarkerDx();
     x += viewport.toDisplayValue(deltaX);
-    Measure<Length> deltaY = style.getMarkerDeltaX();
+    Measure<Length> deltaY = style.getMarkerDx();
     y += viewport.toDisplayValue(deltaY);
     // final double rotation = graphic.getRotation().doubleValue(SI.RADIAN);
     // if (rotation != 0) {

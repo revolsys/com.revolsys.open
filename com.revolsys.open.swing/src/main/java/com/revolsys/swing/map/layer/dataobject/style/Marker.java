@@ -5,6 +5,6 @@ import java.awt.Graphics2D;
 import com.revolsys.swing.map.Viewport2D;
 
 public interface Marker {
-  void render(Viewport2D viewport, Graphics2D graphics, Style style,
+  void render(Viewport2D viewport, Graphics2D graphics, GeometryStyle style,
     double modelX, double modelY);
 }

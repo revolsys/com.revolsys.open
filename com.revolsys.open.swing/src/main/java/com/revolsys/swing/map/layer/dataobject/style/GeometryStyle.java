@@ -15,41 +15,46 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.JavaBeanUtil;
 
-public class Style {
+public class GeometryStyle {
 
-  public Style() {
+  public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10,
+    NonSI.PIXEL);
+
+  public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0,
+    NonSI.PIXEL);
+
+  public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1,
+    NonSI.PIXEL);
+
+  public static Color getColorWithOpacity(final Color color, final int opacity) {
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
   }
 
-  public Style(Map<String, Object> style) {
-    for (Entry<String, Object> entry : style.entrySet()) {
-      String label = entry.getKey();
-      Object value = entry.getValue();
-      CartoCssProperty property = CartoCssProperty.getProperty(label);
-      if (property != null) {
-        DataType dataType = property.getDataType();
-        String propertyName = property.getPropertyName();
-        value = StringConverterRegistry.toObject(dataType, value);
-        JavaBeanUtil.setProperty(this, propertyName, value);
-      }
+  public static <T> T getWithDefault(final T value, final T defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
     }
   }
 
-  public static Style line(final Color color) {
-    final Style style = new Style();
+  public static GeometryStyle line(final Color color) {
+    final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
     return style;
   }
 
-  public static Style line(final Color color, final double width) {
-    final Style style = new Style();
+  public static GeometryStyle line(final Color color, final double width) {
+    final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
     style.setLineWidth(width);
     return style;
   }
 
-  public static Style marker(final String markerName, final int markerSize,
-    final Color lineColor, final int lineWidth, final Color fillColor) {
-    final Style style = new Style();
+  public static GeometryStyle marker(final String markerName,
+    final int markerSize, final Color lineColor, final int lineWidth,
+    final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
     style.setMarker(new ShapeMarker(markerName));
     style.setMarkerWidth(markerSize);
     style.setMarkerHeight(markerSize);
@@ -60,29 +65,30 @@ public class Style {
     return style;
   }
 
-  public static Style polygon(final Color lineColor, final Color fillColor) {
-    final Style style = new Style();
+  public static GeometryStyle polygon(final Color lineColor,
+    final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
     style.setLineColor(lineColor);
     style.setPolygonFill(fillColor);
     return style;
   }
 
-  public static Style polygon(final Color lineColor, final int lineWidth,
-    final Color fillColor) {
-    final Style style = new Style();
+  public static GeometryStyle polygon(final Color lineColor,
+    final int lineWidth, final Color fillColor) {
+    final GeometryStyle style = new GeometryStyle();
     style.setLineColor(lineColor);
     style.setLineWidth(lineWidth);
     style.setPolygonFill(fillColor);
     return style;
   }
 
-  private Measure<Length> markerWidth = Measure.valueOf(10, NonSI.PIXEL);
+  private Measure<Length> markerWidth = TEN_PIXELS;
 
-  private Measure<Length> markerHeight = Measure.valueOf(10, NonSI.PIXEL);
+  private Measure<Length> markerHeight = TEN_PIXELS;
 
-  private Measure<Length> markerDeltaX = Measure.valueOf(0, NonSI.PIXEL);
+  private Measure<Length> markerDx = ZERO_PIXEL;
 
-  private Measure<Length> markerDeltaY = Measure.valueOf(0, NonSI.PIXEL);
+  private Measure<Length> markerDy = ZERO_PIXEL;
 
   private Marker marker = new ShapeMarker("square");
 
@@ -114,13 +120,30 @@ public class Style {
 
   private int polygonFillOpacity = 255;
 
-  private Measure<Length> lineWidth = Measure.valueOf(1, NonSI.PIXEL);
+  private Measure<Length> lineWidth = ONE_PIXEL;
 
   private float lineMiterlimit = 4;
 
   private LineCap lineCap = LineCap.BUTT;
 
   private LineJoin lineJoin = LineJoin.MITER;
+
+  public GeometryStyle() {
+  }
+
+  public GeometryStyle(final Map<String, Object> style) {
+    for (final Entry<String, Object> entry : style.entrySet()) {
+      final String label = entry.getKey();
+      Object value = entry.getValue();
+      final CartoCssProperty property = CartoCssProperty.getProperty(label);
+      if (property != null) {
+        final DataType dataType = property.getDataType();
+        final String propertyName = property.getPropertyName();
+        value = StringConverterRegistry.toObject(dataType, value);
+        JavaBeanUtil.setProperty(this, propertyName, value);
+      }
+    }
+  }
 
   public LineCap getLineCap() {
     return lineCap;
@@ -166,12 +189,12 @@ public class Style {
     return marker;
   }
 
-  public Measure<Length> getMarkerDeltaX() {
-    return markerDeltaX;
+  public Measure<Length> getMarkerDx() {
+    return markerDx;
   }
 
-  public Measure<Length> getMarkerDeltaY() {
-    return markerDeltaY;
+  public Measure<Length> getMarkerDy() {
+    return markerDy;
   }
 
   public Measure<Length> getMarkerHeight() {
@@ -291,8 +314,7 @@ public class Style {
         "Line opacity must be between 0.0 - 1.0");
     } else {
       this.lineOpacity = (int)(255 * lineOpacity);
-      this.lineColor = new Color(lineColor.getRed(), lineColor.getGreen(),
-        lineColor.getBlue(), this.lineOpacity);
+      this.lineColor = getColorWithOpacity(lineColor, this.lineOpacity);
     }
   }
 
@@ -301,8 +323,7 @@ public class Style {
       throw new IllegalArgumentException("Line opacity must be between 0 - 255");
     } else {
       this.lineOpacity = lineOpacity;
-      this.lineColor = new Color(lineColor.getRed(), lineColor.getGreen(),
-        lineColor.getBlue(), this.lineOpacity);
+      this.lineColor = getColorWithOpacity(lineColor, this.lineOpacity);
     }
   }
 
@@ -343,39 +364,27 @@ public class Style {
   }
 
   public void setLineWidth(final Measure<Length> lineWidth) {
-    if (lineWidth == null) {
-      this.lineWidth = Measure.valueOf(1, NonSI.PIXEL);
-    } else {
-      this.lineWidth = lineWidth;
-    }
+    this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
   }
 
   public void setMarker(final Marker marker) {
     this.marker = marker;
   }
 
-  public void setMarkerDeltaX(final Measure<Length> markerDeltaX) {
-    if (markerDeltaX == null) {
-      this.markerDeltaX = Measure.valueOf(0, NonSI.PIXEL);
-    } else {
-      this.markerDeltaX = markerDeltaX;
-    }
+  public void setMarkerDeltaX(final double markerDx) {
+    setMarkerDx(Measure.valueOf(markerDx, NonSI.PIXEL));
   }
 
-  public void setMarkerDeltaX(final double markerDeltaX) {
-    setMarkerDeltaX(Measure.valueOf(markerDeltaX, NonSI.PIXEL));
+  public void setMarkerDeltaY(final double markerDy) {
+    setMarkerDy(Measure.valueOf(markerDy, NonSI.PIXEL));
   }
 
-  public void setMarkerDeltaY(final Measure<Length> markerDeltaY) {
-    if (markerDeltaY == null) {
-      this.markerDeltaY = Measure.valueOf(0, NonSI.PIXEL);
-    } else {
-      this.markerDeltaY = markerDeltaY;
-    }
+  public void setMarkerDx(final Measure<Length> markerDx) {
+    this.markerDx = getWithDefault(markerDx, ZERO_PIXEL);
   }
 
-  public void setMarkerDeltaY(final double markerDeltaY) {
-    setMarkerDeltaY(Measure.valueOf(markerDeltaY, NonSI.PIXEL));
+  public void setMarkerDy(final Measure<Length> markerDy) {
+    this.markerDy = getWithDefault(markerDx, ZERO_PIXEL);
   }
 
   public void setMarkerHeight(final double markerHeight) {
@@ -383,11 +392,7 @@ public class Style {
   }
 
   public void setMarkerHeight(final Measure<Length> markerHeight) {
-    if (markerHeight == null) {
-      this.markerHeight = Measure.valueOf(10, NonSI.PIXEL);
-    } else {
-      this.markerHeight = markerWidth;
-    }
+    this.markerHeight = getWithDefault(markerHeight, TEN_PIXELS);
   }
 
   public void setMarkerWidth(final double markerWidth) {
@@ -395,11 +400,7 @@ public class Style {
   }
 
   public void setMarkerWidth(final Measure<Length> markerWidth) {
-    if (markerWidth == null) {
-      this.markerWidth = Measure.valueOf(10, NonSI.PIXEL);
-    } else {
-      this.markerWidth = markerWidth;
-    }
+    this.markerWidth = getWithDefault(markerWidth, TEN_PIXELS);
   }
 
   public void setPolygonClip(final boolean polygonClip) {
@@ -426,8 +427,7 @@ public class Style {
         "Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
-      this.polygonFill = new Color(polygonFill.getRed(),
-        polygonFill.getGreen(), polygonFill.getBlue(),
+      this.polygonFill = getColorWithOpacity(polygonFill,
         this.polygonFillOpacity);
     }
   }
@@ -437,8 +437,7 @@ public class Style {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
-      this.polygonFill = new Color(polygonFill.getRed(),
-        polygonFill.getGreen(), polygonFill.getBlue(),
+      this.polygonFill = getColorWithOpacity(polygonFill,
         this.polygonFillOpacity);
     }
   }
